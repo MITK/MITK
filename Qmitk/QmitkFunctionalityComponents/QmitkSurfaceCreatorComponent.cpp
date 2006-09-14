@@ -47,7 +47,7 @@ m_DataTreeIteratorClone(NULL),
 m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
 m_Active(false),
-m_GUI(NULL),
+m_SurfaceCreatorComponentGUI(NULL),
 m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
@@ -109,7 +109,7 @@ void QmitkSurfaceCreatorComponent::SetDataTreeIterator(mitk::DataTreeIteratorBas
 /***************         GET GUI        ***************/
 QWidget* QmitkSurfaceCreatorComponent::GetGUI()
 {
-  return m_GUI;
+  return m_SurfaceCreatorComponentGUI;
 }
 
 /*************** TREE CHANGED (       ) ***************/
@@ -121,23 +121,23 @@ void QmitkSurfaceCreatorComponent::TreeChanged()
 /***************       CONNECTIONS      ***************/
 void QmitkSurfaceCreatorComponent::CreateConnections()
 {
-  if ( m_GUI )
+  if ( m_SurfaceCreatorComponentGUI)
   {
-    connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
-    connect( (QObject*)(m_GUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceCreatorContent(bool)));
-    connect( (QObject*)(m_GUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowCreateSurface(bool)));
-    connect( (QObject*)(m_GUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceCreatorContent(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowCreateSurface(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
 
-    connect( (QObject*)(m_GUI->GetCreateSurfaceButton()), SIGNAL(pressed()), (QObject*) this, SLOT(CreateSurface()));
-    connect( (QObject*)(m_GUI->GetThresholdLineEdit()), SIGNAL(returnPressed()), (QObject*) this, SLOT(CreateSurface()));
-    connect( (QObject*)(m_GUI->GetShowExpertModeGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowExpertMode(bool)));
-    connect( (QObject*)(m_GUI->GetShowSurfaceParameterGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceParameter(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetCreateSurfaceButton()), SIGNAL(pressed()), (QObject*) this, SLOT(CreateSurface()));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetThresholdLineEdit()), SIGNAL(returnPressed()), (QObject*) this, SLOT(CreateSurface()));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowExpertMode(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetShowSurfaceParameterGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceParameter(bool)));
 
-    connect( (QObject*)(m_GUI->GetMedian3DCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetMedian3DFlag(bool)));
-    connect( (QObject*)(m_GUI->GetInterpolateCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInterpolateFlag(bool)));
-    connect( (QObject*)(m_GUI->GetSmoothCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetSmoothFlag(bool)));
-    connect( (QObject*)(m_GUI->GetGaussCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetGaussFlag(bool)));
-    connect( (QObject*)(m_GUI->GetDecimateCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetDecimateFlag(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetMedian3DCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetMedian3DFlag(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetInterpolateCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInterpolateFlag(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSmoothCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetSmoothFlag(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetGaussCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetGaussFlag(bool)));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetDecimateCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetDecimateFlag(bool)));
   }
 }
 
@@ -146,9 +146,9 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
 {
   m_SelectedImage = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
-  if(m_GUI)
+  if(m_SurfaceCreatorComponentGUI)
   {
-    if(mitk::DataTreeFilter* filter = m_GUI->GetTreeNodeSelector()->GetFilter())
+    if(mitk::DataTreeFilter* filter = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter())
     {
       if(imageIt)
       {
@@ -160,7 +160,7 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
   {
     currentItem->SetSelected(true);
   }
-  if(m_GUI != NULL)
+  if(m_SurfaceCreatorComponentGUI != NULL)
   {
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
@@ -170,9 +170,9 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
   }
   TreeChanged();
 
-  if(m_GUI)
+  if(m_SurfaceCreatorComponentGUI)
   {
-    mitk::DataTreeFilter* filter = m_GUI->GetTreeNodeSelector()->GetFilter();
+    mitk::DataTreeFilter* filter = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter();
     m_MitkImageIterator = filter->GetIteratorToSelectedItem();
 
     if(m_MitkImageIterator.GetPointer())
@@ -181,21 +181,23 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
     }
   }
  m_SurfaceCounter = 0;
- m_GUI->GetReplaceExistingSurfaceCheckBox()->setChecked(false);
+ m_SurfaceCreatorComponentGUI->GetReplaceExistingSurfaceCheckBox()->setChecked(false);
 
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
 {
-  m_GUI = new QmitkSurfaceCreatorComponentGUI(parent);
-  m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+  m_SurfaceCreatorComponentGUI = new QmitkSurfaceCreatorComponentGUI(parent);
+  m_GUI = m_SurfaceCreatorComponentGUI;
+
+  m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
 
   if(!m_ShowSelector)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(false);
+   m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(false);
   }
-   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
+  m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   InitSurfaceGUI();
   ShowSurfaceParameter(false);
 
@@ -203,21 +205,22 @@ QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
 
   if(!m_AllowExpertMode)
   {
-   m_GUI->GetShowExpertModeGroupBox()->setCheckable(m_AllowExpertMode);
-   m_GUI->GetShowExpertModeGroupBox()->setTitle("");
-   m_GUI->GetShowExpertModeGroupBox()->setLineWidth(0);
+   m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->setCheckable(m_AllowExpertMode);
+   m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->setTitle("");
+   m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->setLineWidth(0);
   }
 
-  return m_GUI;
+  CreateConnections();
+  return m_SurfaceCreatorComponentGUI;
 
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
 void QmitkSurfaceCreatorComponent::SetSelectorVisibility(bool visibility)
 {
-  if(m_GUI)
+  if(m_SurfaceCreatorComponentGUI)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
   }
   m_ShowSelector = visibility;
 }
@@ -251,7 +254,7 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
 {
   if(m_ShowSelector)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(m_GUI->GetSurfaceCreatorGroupBox()->isChecked());
+    m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()->isChecked());
   }
 
   for(unsigned int i = 0;  i < m_ParameterList.size(); i++)
@@ -263,14 +266,14 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkSurfaceCreatorComponent::ShowImageContent(bool)
 {
-  m_GUI->GetImageContent()->setShown(m_GUI->GetSelectDataGroupBox()->isChecked());
+  m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
 }
 
 
 ///************* SHOW CREATE SRUFACE CONTENT ************/
 void QmitkSurfaceCreatorComponent::ShowCreateSurface(bool)
 {
-  m_GUI->GetCreateSurfaceGroupBox()->setShown(m_GUI->GetSurfaceCreatorGroupBox()->isChecked());
+  m_SurfaceCreatorComponentGUI->GetCreateSurfaceGroupBox()->setShown(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()->isChecked());
 }
 
 void QmitkSurfaceCreatorComponent::ShowExpertMode(bool)
@@ -281,7 +284,7 @@ void QmitkSurfaceCreatorComponent::ShowExpertMode(bool)
     {
       for(unsigned int i = 0;  i < m_ExpertModeList.size(); i++)
       {
-        m_ExpertModeList[i]->setShown(m_GUI->GetShowExpertModeGroupBox()->isChecked());
+        m_ExpertModeList[i]->setShown(m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->isChecked());
       }   
     }
   }
@@ -302,8 +305,8 @@ void QmitkSurfaceCreatorComponent::ShowExpertMode(bool)
 ///*************    SHOW SURFACE PARAMETER   ************/
 void QmitkSurfaceCreatorComponent::ShowSurfaceParameter(bool)
 {
-  m_GUI->GetShowExpertModeGroupBox()->setShown(m_GUI->GetShowSurfaceParameterGroupBox()->isChecked());
-  if(m_GUI->GetShowSurfaceParameterGroupBox()->isChecked() == true)
+  m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->setShown(m_SurfaceCreatorComponentGUI->GetShowSurfaceParameterGroupBox()->isChecked());
+  if(m_SurfaceCreatorComponentGUI->GetShowSurfaceParameterGroupBox()->isChecked() == true)
   {
     for(unsigned int i = 0;  i < m_ParameterList.size(); i++)
     {
@@ -318,24 +321,24 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceParameter(bool)
 void QmitkSurfaceCreatorComponent::SetThreshold(int threshold)
 {
   m_Threshold = threshold;
-  m_GUI->SetThreshold(threshold);
+  m_SurfaceCreatorComponentGUI->SetThreshold(threshold);
 }
 
 ///***************       SET THRESHOLD     **************/
 void QmitkSurfaceCreatorComponent::SetThreshold(const QString& threshold)
 {
-  m_GUI->SetThreshold(atoi(threshold));
+  m_SurfaceCreatorComponentGUI->SetThreshold(atoi(threshold));
 }
 
 ///***************      INIT SURFACE GUI   **************/
 void QmitkSurfaceCreatorComponent::InitSurfaceGUI()
 {
   //Fill vector with all Widgets for the Parameters
-  m_ParameterList.push_back(m_GUI->GetMedian3DCheckBox());
-  m_ParameterList.push_back(m_GUI->GetInterpolateCheckBox());
-  m_ParameterList.push_back(m_GUI->GetSmoothCheckBox());
-  m_ParameterList.push_back(m_GUI->GetGaussCheckBox());
-  m_ParameterList.push_back(m_GUI->GetDecimateCheckBox());
+  m_ParameterList.push_back(m_SurfaceCreatorComponentGUI->GetMedian3DCheckBox());
+  m_ParameterList.push_back(m_SurfaceCreatorComponentGUI->GetInterpolateCheckBox());
+  m_ParameterList.push_back(m_SurfaceCreatorComponentGUI->GetSmoothCheckBox());
+  m_ParameterList.push_back(m_SurfaceCreatorComponentGUI->GetGaussCheckBox());
+  m_ParameterList.push_back(m_SurfaceCreatorComponentGUI->GetDecimateCheckBox());
 
   for(unsigned int i = 0;  i < m_ParameterList.size(); i++)
   {
@@ -343,16 +346,16 @@ void QmitkSurfaceCreatorComponent::InitSurfaceGUI()
   }
 
   //Fill vector with all widgets for the ExpertMode
-  m_ExpertModeList.push_back(m_GUI->GetExpertModeMedianGroupBox());
-  m_ExpertModeList.push_back(m_GUI->GetExpertModeInterpolateGoupBox());
-  m_ExpertModeList.push_back(m_GUI->GetExpertModeSmoothGroupBox());
-  m_ExpertModeList.push_back(m_GUI->GetExpertModeGaussGroupBox());
-  m_ExpertModeList.push_back(m_GUI->GetExpertModeDecimateGroupBox());
+  m_ExpertModeList.push_back(m_SurfaceCreatorComponentGUI->GetExpertModeMedianGroupBox());
+  m_ExpertModeList.push_back(m_SurfaceCreatorComponentGUI->GetExpertModeInterpolateGoupBox());
+  m_ExpertModeList.push_back(m_SurfaceCreatorComponentGUI->GetExpertModeSmoothGroupBox());
+  m_ExpertModeList.push_back(m_SurfaceCreatorComponentGUI->GetExpertModeGaussGroupBox());
+  m_ExpertModeList.push_back(m_SurfaceCreatorComponentGUI->GetExpertModeDecimateGroupBox());
 
   for(unsigned int i = 0;  i < m_ExpertModeList.size(); i++)
   {
     m_ExpertModeList[i]->setEnabled(true);
-    m_ExpertModeList[i]->setShown(m_GUI->GetShowExpertModeGroupBox()->isChecked());
+    m_ExpertModeList[i]->setShown(m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->isChecked());
   }
 }
 
@@ -385,30 +388,30 @@ void QmitkSurfaceCreatorComponent::SetDecimateFlag(bool flag)
 
 void QmitkSurfaceCreatorComponent::InitSurfaceParamterFlags()
 { 
-  if(m_GUI)
+  if(m_SurfaceCreatorComponentGUI)
   {
-    m_Median3DFlag = m_GUI->GetMedian3DCheckBox()->isChecked();
-    m_InterpolateFlag = m_GUI->GetInterpolateCheckBox()->isChecked();
-    m_SmoothFlag = m_GUI->GetSmoothCheckBox()->isChecked();
-    m_GaussFlag = m_GUI->GetGaussCheckBox()->isChecked();
-    m_DecimateFlag = m_GUI->GetDecimateCheckBox()->isChecked();
+    m_Median3DFlag = m_SurfaceCreatorComponentGUI->GetMedian3DCheckBox()->isChecked();
+    m_InterpolateFlag = m_SurfaceCreatorComponentGUI->GetInterpolateCheckBox()->isChecked();
+    m_SmoothFlag = m_SurfaceCreatorComponentGUI->GetSmoothCheckBox()->isChecked();
+    m_GaussFlag = m_SurfaceCreatorComponentGUI->GetGaussCheckBox()->isChecked();
+    m_DecimateFlag = m_SurfaceCreatorComponentGUI->GetDecimateCheckBox()->isChecked();
   }
 }
 
 void QmitkSurfaceCreatorComponent::GetMedian3DValue(int& x, int& y, int& z)
 {
-  m_GUI->GetMedian3DValue(x, y, z);
+ m_SurfaceCreatorComponentGUI->GetMedian3DValue(x, y, z);
 }
 
 void QmitkSurfaceCreatorComponent::GetInterpolateValue(int& x, int& y, int& z)
 {
-  m_GUI->GetInterpolationValue(x, y, z);
+  m_SurfaceCreatorComponentGUI->GetInterpolationValue(x, y, z);
 }
 
 int QmitkSurfaceCreatorComponent::GetSmoothIterationValue()
 {
   int iteration;
-  iteration = m_GUI->GetSmoothIterationValue();
+  iteration = m_SurfaceCreatorComponentGUI->GetSmoothIterationValue();
 
  return iteration;
 }
@@ -416,7 +419,7 @@ int QmitkSurfaceCreatorComponent::GetSmoothIterationValue()
 float QmitkSurfaceCreatorComponent::GetSmoothRelaxationValue()
 {
   float relaxation;
-  relaxation = m_GUI->GetSmoothRelaxationValue();
+  relaxation = m_SurfaceCreatorComponentGUI->GetSmoothRelaxationValue();
 
   return relaxation;
 }
@@ -424,7 +427,7 @@ float QmitkSurfaceCreatorComponent::GetSmoothRelaxationValue()
 float QmitkSurfaceCreatorComponent::GetGaussValue()
 {
   float gsDev;
-  gsDev = m_GUI->GetGaussValue();
+  gsDev = m_SurfaceCreatorComponentGUI->GetGaussValue();
 
   return gsDev;
 }
@@ -433,27 +436,9 @@ float QmitkSurfaceCreatorComponent::GetDecimateValue()
 {
   //Value for DecimatePro 
   float targetReduction;
-  targetReduction = m_GUI->GetDecimateValue();
+  targetReduction = m_SurfaceCreatorComponentGUI->GetDecimateValue();
 
   return targetReduction;
-}
-
-/***************      ADD COMPONENT     ***************/
-void QmitkSurfaceCreatorComponent::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
-{  
-  if(componentContainer!=NULL)
-  {
-    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
-    m_AddedChildList.push_back(componentContainer);
-    m_GUI->layout()->add(componentWidget);
-    if(m_Spacer != NULL)
-    {
-      m_GUI->layout()->removeItem(m_Spacer);
-    }
-      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-      m_Spacer = spacer;
-      m_GUI->layout()->addItem( m_Spacer );
-  }
 }
 
 ///***************      CREATE SURFACE     **************/
@@ -512,7 +497,7 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
     }
 
     //THRESHOLD FROM GUI 
-    filter->SetThreshold( m_GUI->GetThreshold()); 
+    filter->SetThreshold( m_SurfaceCreatorComponentGUI->GetThreshold()); 
 
     //MEDIAN 3D FILTER
     filter->SetMedianFilter3D(m_Median3DFlag);
@@ -573,7 +558,7 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
 
 
     std::ostringstream buffer;
-    QString surfaceDataName = m_GUI->GetTreeNodeSelector()->currentText();
+    QString surfaceDataName = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->currentText();
     buffer << surfaceDataName.ascii();
     buffer << "_";
     buffer << m_SurfaceCounter;
@@ -604,13 +589,13 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
     }
     iteratorClone= iteratorOnImageToBeSkinExtracted; 
 
-    if(!(m_GUI->GetReplaceExistingSurfaceCheckBox()->isChecked()))
+    if(!(m_SurfaceCreatorComponentGUI->GetReplaceExistingSurfaceCheckBox()->isChecked()))
     {
       iteratorClone->Add(surfaceNode);
       isSurface = true;
     }
 
-    else if(m_GUI->GetReplaceExistingSurfaceCheckBox()->isChecked())
+    else if(m_SurfaceCreatorComponentGUI->GetReplaceExistingSurfaceCheckBox()->isChecked())
     {
       if(isSurface)
       {
@@ -627,7 +612,7 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
       }
     }
 
-    m_GUI->GetReplaceExistingSurfaceCheckBox()->setEnabled(isSurface);
+    m_SurfaceCreatorComponentGUI->GetReplaceExistingSurfaceCheckBox()->setEnabled(isSurface);
 
     iteratorClone->GetTree()->Modified();
 

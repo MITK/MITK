@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "QmitkFunctionalityComponentContainer.h"
-#include "QmitkFunctionalityComponentContainerGUI.h"
 
 #include <QmitkDataTreeComboBox.h>
 #include <mitkDataTreeFilter.h>
@@ -35,14 +34,15 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
 : QmitkBaseFunctionalityComponent(parentName, it),
+m_GUI(NULL),
 m_Active(false),
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
+m_FunctionalityComponentContainerGUI(NULL),
 m_Parent(parent), 
 m_ParentName(parentName), 
 m_ComponentName("ComponentContainer"),
 m_MultiWidget(mitkStdMultiWidget),
-m_GUI(NULL),
 m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
@@ -128,7 +128,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 {
   if ( m_GUI )
   {
-    connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
   }
 }
 
@@ -136,7 +136,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
   m_SelectedImage = imageIt;
-  if(m_GUI != NULL)
+  if(m_FunctionalityComponentContainerGUI != NULL)
   {
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
@@ -149,14 +149,17 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFil
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* parent)
 {
-  if (m_GUI == NULL)
+  if (m_FunctionalityComponentContainerGUI == NULL)
   {
-    m_GUI = new QmitkFunctionalityComponentContainerGUI(parent);
-    m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-    m_GUI->GetContainerBorder()->setTitle("Container");
-    m_GUI->GetContainerBorder()->setLineWidth(0);
+    m_FunctionalityComponentContainerGUI = new QmitkFunctionalityComponentContainerGUI(parent);
+    m_GUI = m_FunctionalityComponentContainerGUI;
+
+    m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+    m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("Container");
+    m_FunctionalityComponentContainerGUI->GetContainerBorder()->setLineWidth(0);
   }
-  m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
+  CreateConnections();
+  m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   return m_GUI;
 }
 
@@ -165,7 +168,7 @@ void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility
 {
   if(m_GUI)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_FunctionalityComponentContainerGUI->GetSelectDataGroupBox()->setShown(visibility);
   }
   m_ShowSelector = visibility;
 }
@@ -174,6 +177,11 @@ void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility
 void QmitkFunctionalityComponentContainer::Activated()
 {
   m_Active = true;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Activated();
+  } 
+
 }
 
 void QmitkFunctionalityComponentContainer::Deactivated()
@@ -183,21 +191,22 @@ void QmitkFunctionalityComponentContainer::Deactivated()
 
 
 /***************      ADD COMPONENT     ***************/
-void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
+void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* component)
 {  
-  if(componentContainer!=NULL)
+  if(component!=NULL)
   {
-    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
-    m_AddedChildList.push_back(componentContainer);
+    QWidget* componentWidget = component->CreateContainerWidget(m_GUI);
+    m_AddedChildList.push_back(component);
     m_GUI->layout()->add(componentWidget);
     if(m_Spacer != NULL)
     {
       m_GUI->layout()->removeItem(m_Spacer);
     }
-      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-      m_Spacer = spacer;
-      m_GUI->layout()->addItem( m_Spacer );
+    QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+    m_Spacer = spacer;
+    m_GUI->layout()->addItem( m_Spacer );
 
+    component->CreateConnections();
   }
 
 }

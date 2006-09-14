@@ -38,7 +38,7 @@ m_MultiWidget(mitkStdMultiWidget),
 m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
 m_Active(false),
-m_GUI(NULL),
+m_ThresholdComponentGUI(NULL),
 m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
@@ -88,7 +88,7 @@ void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it
 /***************         GET GUI        ***************/
 QWidget* QmitkThresholdComponent::GetGUI()
 {
-  return m_GUI;
+  return m_ThresholdComponentGUI;
 }
 
 /*************** TREE CHANGED (       ) ***************/
@@ -96,32 +96,32 @@ void QmitkThresholdComponent::TreeChanged()
 {
   if(m_Active)
   {
-  if(m_ThresholdNodeExisting)
-  {
-    m_ThresholdImageNode->SetData(m_Node->GetData());
-  }
-  else
-  {
-    CreateThresholdImageNode();
-    m_ThresholdImageNode->SetData(m_Node->GetData());
-  }
-  ShowThreshold();
+    if(m_ThresholdNodeExisting)
+    {
+      m_ThresholdImageNode->SetData(m_Node->GetData());
+    }
+    else
+    {
+      CreateThresholdImageNode();
+      m_ThresholdImageNode->SetData(m_Node->GetData());
+    }
+    ShowThreshold();
   }
 }
 
 /***************       CONNECTIONS      ***************/
 void QmitkThresholdComponent::CreateConnections()
 {
-  if ( m_GUI )
+  if ( m_ThresholdComponentGUI )
   {
-    connect( (QObject*)(m_GUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
-    connect( (QObject*)(m_GUI->GetThresholdFinderGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThresholdFinderContent(bool)));     
-    connect( (QObject*)(m_GUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
+    connect( (QObject*)(m_ThresholdComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThresholdFinderContent(bool)));     
+    connect( (QObject*)(m_ThresholdComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
 
-    connect( (QObject*)(m_GUI->GetThresholdInputSlider()), SIGNAL(sliderMoved(int)), (QObject*) this, SLOT(ThresholdSliderChanged(int)));
-    connect( (QObject*)(m_GUI->GetThresholdInputNumber()), SIGNAL(returnPressed()), (QObject*) this, SLOT(ThresholdValueChanged()));    
-    connect( (QObject*)(m_GUI->GetShowThresholdGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThreshold(bool)));     
-     
+    connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdInputSlider()), SIGNAL(sliderMoved(int)), (QObject*) this, SLOT(ThresholdSliderChanged(int)));
+    connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdInputNumber()), SIGNAL(returnPressed()), (QObject*) this, SLOT(ThresholdValueChanged()));    
+    connect( (QObject*)(m_ThresholdComponentGUI->GetShowThresholdGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThreshold(bool)));     
+
   }
 }
 
@@ -130,9 +130,9 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
 {
   m_SelectedImage = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
-  if(m_GUI)
+  if(m_ThresholdComponentGUI)
   {
-    if(mitk::DataTreeFilter* filter = m_GUI->GetTreeNodeSelector()->GetFilter())
+    if(mitk::DataTreeFilter* filter = m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter())
     {
       if(imageIt)
       {
@@ -144,7 +144,7 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
   {
     currentItem->SetSelected(true);
   }
-  if(m_GUI != NULL)
+  if(m_ThresholdComponentGUI != NULL)
   {
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
@@ -161,24 +161,28 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkThresholdComponent::CreateContainerWidget(QWidget* parent)
 {
-  m_GUI = new QmitkThresholdComponentGUI(parent);
-  m_GUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-  
+  m_ThresholdComponentGUI = new QmitkThresholdComponentGUI(parent);
+  m_GUI = m_ThresholdComponentGUI;
+
+  m_ThresholdComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+
   if(!m_ShowSelector)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(false);
+    m_ThresholdComponentGUI->GetSelectDataGroupBox()->setShown(false);
   }
-   m_GUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
-  return m_GUI;
 
+  m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
+  CreateConnections();
+
+  return m_ThresholdComponentGUI;
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
 void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
 {
-  if(m_GUI)
+  if(m_ThresholdComponentGUI)
   {
-    m_GUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_ThresholdComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
   }
   m_ShowSelector = visibility;
 }
@@ -197,24 +201,6 @@ void QmitkThresholdComponent::Deactivated()
   m_Active = false;
   ShowThreshold();
   DeleteThresholdNode();
-}
-
-/***************      ADD COMPONENT     ***************/
-void QmitkThresholdComponent::AddComponent(QmitkFunctionalityComponentContainer* componentContainer)
-{  
-  if(componentContainer!=NULL)
-  {
-    QWidget* componentWidget = componentContainer->CreateContainerWidget(m_GUI);
-    m_AddedChildList.push_back(componentContainer);
-    m_GUI->layout()->add(componentWidget);
-    if(m_Spacer != NULL)
-    {
-      m_GUI->layout()->removeItem(m_Spacer);
-    }
-      QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-      m_Spacer = spacer;
-      m_GUI->layout()->addItem( m_Spacer );
-  }
 }
 
 ///*************CREATE THRESHOLD IMAGE NODE************/
@@ -238,7 +224,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
         int layer = 0;
         m_Node->GetIntProperty("layer", layer);
         m_ThresholdImageNode->SetIntProperty("layer", layer+1);
-        m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(m_GUI->GetNumberValue(),1));
+        m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdComponentGUI->GetNumberValue(),1));
 
         mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
         while ( !iteratorClone->IsAtEnd() )
@@ -259,11 +245,11 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
 ///************ SHOW THRESHOLD FINDER CONTENT ***********/
 void QmitkThresholdComponent::ShowThresholdFinderContent(bool)
 {
-  m_GUI->GetShowThresholdGroupBox()->setShown(m_GUI->GetThresholdFinderGroupBox()->isChecked());
-  
+  m_ThresholdComponentGUI->GetShowThresholdGroupBox()->setShown(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked());
+
   if(m_ShowSelector)
   {
-  m_GUI->GetSelectDataGroupBox()->setShown(m_GUI->GetThresholdFinderGroupBox()->isChecked());
+    m_ThresholdComponentGUI->GetSelectDataGroupBox()->setShown(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked());
   }
 
   ShowThreshold();
@@ -272,8 +258,8 @@ void QmitkThresholdComponent::ShowThresholdFinderContent(bool)
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkThresholdComponent::ShowImageContent(bool)
 {
-  m_GUI->GetImageContent()->setShown(m_GUI->GetSelectDataGroupBox()->isChecked());
-  m_GUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  m_ThresholdComponentGUI->GetImageContent()->setShown(m_ThresholdComponentGUI->GetSelectDataGroupBox()->isChecked());
+  m_ThresholdComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
 }
 
 ///***************      SHOW THRESHOLD     **************/
@@ -283,13 +269,13 @@ void QmitkThresholdComponent::ShowThreshold(bool)
   {
     if(m_Active == true)
     {
-      m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((m_GUI->GetShowThresholdGroupBox()->isChecked())) );
+      m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((m_ThresholdComponentGUI->GetShowThresholdGroupBox()->isChecked())) );
     }
     else
     {
       m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((false)) );
     }
-    m_GUI->GetThresholdValueContent()->setShown(m_GUI->GetShowThresholdGroupBox()->isChecked());
+    m_ThresholdComponentGUI->GetThresholdValueContent()->setShown(m_ThresholdComponentGUI->GetShowThresholdGroupBox()->isChecked());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -298,26 +284,26 @@ void QmitkThresholdComponent::ShowThreshold(bool)
 //By Slider
 void QmitkThresholdComponent::ThresholdSliderChanged(int)
 {
-  int value = m_GUI->GetThresholdInputSlider()->value();
+  int value = m_ThresholdComponentGUI->GetThresholdInputSlider()->value();
   if (m_ThresholdImageNode)
   {
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(value,1));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-  m_GUI->GetThresholdInputNumber()->setText(QString::number(value)); 
+  m_ThresholdComponentGUI->GetThresholdInputNumber()->setText(QString::number(value)); 
 }
 
 ///*************** THRESHOLD VALUE CHANGED **************/
 //By LineEdit
 void QmitkThresholdComponent::ThresholdValueChanged( )
 {
-  int value = m_GUI->GetNumberValue();
+  int value = m_ThresholdComponentGUI->GetNumberValue();
   if (m_ThresholdImageNode)
   {
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(value,1));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-  m_GUI->GetThresholdInputSlider()->setValue(value);
+  m_ThresholdComponentGUI->GetThresholdInputSlider()->setValue(value);
 }
 
 
@@ -326,15 +312,15 @@ void QmitkThresholdComponent::SetSliderRange()
 {
   if(m_Active)
   {
-  if(m_GUI->GetThresholdFinderGroupBox()->isChecked()==true)
-  {
-    mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_ThresholdImageNode->GetData());
-    if(currentImage)
+    if(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked()==true)
     {
-    m_GUI->GetThresholdInputSlider()->setMinValue((int)currentImage->GetScalarValueMin());
-    m_GUI->GetThresholdInputSlider()->setMaxValue((int)currentImage->GetScalarValueMax());
+      mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_ThresholdImageNode->GetData());
+      if(currentImage)
+      {
+        m_ThresholdComponentGUI->GetThresholdInputSlider()->setMinValue((int)currentImage->GetScalarValueMin());
+        m_ThresholdComponentGUI->GetThresholdInputSlider()->setMaxValue((int)currentImage->GetScalarValueMax());
+      }
     }
-  }
   }
 }
 

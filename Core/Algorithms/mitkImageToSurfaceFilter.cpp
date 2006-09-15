@@ -144,8 +144,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   if(polydata->GetNumberOfPoints() > 0)
   {
-    vtkFloatingPointType* spacing;
-    spacing = vtkimage->GetSpacing();
+    mitk::Vector3D spacing = GetInput()->GetGeometry(time)->GetSpacing();
 
     vtkPoints * points = polydata->GetPoints();
     vtkMatrix4x4 *vtkmatrix = vtkMatrix4x4::New();

@@ -46,6 +46,11 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
 void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
   if (!property) return;
+  //make sure that BaseProperty*, which may have just been created and never been 
+  //assigned to a SmartPointer, is registered/unregistered properly. If we do not
+  //do that, it will a) not deleted in case it is identical to the old one or
+  //b) possibly deleted when temporarily added to a smartpointer somewhere below.
+  BaseProperty::Pointer tmpSmartPointerToProperty = property;
 
   PropertyMap::iterator it( m_Properties.find( propertyKey ) );
   

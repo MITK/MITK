@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.9  2006/09/15 17:29:57  nolden
+ * CHG: simplified ipPic include for non-plugin builds
+ *
  * Revision 1.8  2006/01/10 16:53:09  hasselberg
  * FIX: ANSI C conformance (required for MSVC7.0)
  *
@@ -179,7 +182,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
 
 #else
 
-#include "DataStructures/ipPic/ipPic.h"
+#include "ipPic.h"
 #ifdef DOS
 #include "ipPicOP.h"
 #else

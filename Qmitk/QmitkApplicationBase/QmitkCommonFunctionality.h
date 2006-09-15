@@ -156,31 +156,16 @@ namespace CommonFunctionality
     if (subTree->IsAtEnd() || subTree->Get().IsNull() )
     {
       node=mitk::DataTreeNode::New();
+      node->SetData(image);
+      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
       mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
       node->SetProperty("name",nameProp);
-      node->SetData(image);
       it->Add(node);
     }
     else
     {
       node = subTree->Get();
       node->SetData(image);
-    }
-
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    mitk::LevelWindow levelWindow;
-    node->GetPropertyList()->SetProperty("levelwindow",levWinProp);
-    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
-
-    float extrema[2];
-    extrema[0] = 0;
-    extrema[1] = 4096;
-
-    CommonFunctionality::MinMax<TImageType>(itkImage,extrema[0],extrema[1]);
-    if (extrema[0] == 0 && extrema[1] ==1)
-    {
-      mitk::BoolProperty::Pointer binProp = new mitk::BoolProperty(true);
-      node->GetPropertyList()->SetProperty("binary",binProp);
     }
     return node;
   }

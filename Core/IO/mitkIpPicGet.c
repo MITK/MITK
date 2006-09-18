@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.10  2006/09/18 12:57:40  nolden
+ * CHG: added USE_ITKZLIB define
+ *
  * Revision 1.9  2006/09/15 17:29:57  nolden
  * CHG: simplified ipPic include for non-plugin builds
  *
@@ -134,6 +137,7 @@
  *--------------------------------------------------------------------
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
+#define USE_ITKZLIB
 
 #ifdef CHILIPLUGIN
 #include <ipPic.h>

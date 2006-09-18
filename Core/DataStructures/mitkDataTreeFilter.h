@@ -612,6 +612,9 @@ public:
   void TreePrune(const itk::EventObject &);
   void TreeRemove(const itk::EventObject &);
 
+  /// only until the whole tree notification thing gets nice 
+  void ForceUpdateAll();
+
 protected:
 
   // intentionally hidden (itk::Object / SmartPointer)

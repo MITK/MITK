@@ -879,6 +879,14 @@ void DataTreeFilter::GenerateModelFromTree()
   DEBUG_MSG_STATE("After GenerateModel")
 }
 
+void DataTreeFilter::ForceUpdateAll()
+{
+  DEBUG_MSG_STATE("Before ForceUpdateAll")
+
+  GenerateModelFromTree();
+  DEBUG_MSG_STATE("After ForceUpdateAll")
+}
+
 #ifndef NDEBUG
 void DataTreeFilter::PrintStateForDebug(std::ostream& out)
 {

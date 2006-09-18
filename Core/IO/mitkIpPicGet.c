@@ -52,6 +52,9 @@
  *   reads a PicFile from disk
  *
  * $Log$
+ * Revision 1.11  2006/09/18 13:55:50  nolden
+ * FIX: removed define USE_ITKZLIB, crashes on windows
+ *
  * Revision 1.10  2006/09/18 12:57:40  nolden
  * CHG: added USE_ITKZLIB define
  *
@@ -137,7 +140,6 @@
  *--------------------------------------------------------------------
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
-#define USE_ITKZLIB
 
 #ifdef CHILIPLUGIN
 #include <ipPic.h>

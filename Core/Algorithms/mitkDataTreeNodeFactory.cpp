@@ -112,6 +112,9 @@ void mitk::DataTreeNodeFactory::SetImageSerie(bool serie)
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
+  // check if selected file exists
+  FILE *fp;
+  fp = fopen(this->GetFileName(),"r");
   // part for DICOM
   if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
     || this->FileNameEndsWith( ".ima" ) 
@@ -122,14 +125,24 @@ void mitk::DataTreeNodeFactory::GenerateData()
     || this->FilePatternEndsWith( ".IMA" ) 
     || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
   {
+    if (fp != NULL)
+    {
+      fclose(fp);
+    }
     if (m_Serie)
     {
       m_FileName = m_FilePrefix;
     }
     this->ReadFileSeriesTypeDCM();
   }
+  else if (fp == NULL) 
+  {
+    std::cout<<this->GetFileName()<<std::endl;
+    std::cout<<"file doesn't exist\n"<<std::endl;
+  }
   else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) || this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
   {
+    fclose(fp);
     if (m_Serie)
     {
       m_FileName = m_FilePrefix;
@@ -138,6 +151,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
   }
   else
   {
+    fclose(fp);
     /***************************************** new datatreenode factory mechanism **********************************************/
     // the mitkBaseDataIOFactory class returns a pointer of a vector of BaseData objects
     // the IO factories of the file readers are registered in the class mitkBaseDataIOFactory

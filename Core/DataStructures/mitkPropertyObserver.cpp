@@ -6,6 +6,26 @@
 
 namespace mitk {
 
+//---- PropertyObserver -----------------------------------------------------------
+PropertyObserver::PropertyObserver()
+:m_SelfCall(false)
+{
+}
+
+PropertyObserver::~PropertyObserver()
+{
+}
+
+void PropertyObserver::BeginModifyProperty()
+{
+  m_SelfCall = true;
+}
+
+void PropertyObserver::EndModifyProperty()
+{
+  m_SelfCall = false;
+}
+
 //---- PropertyView ---------------------------------------------------------------
 
 PropertyView::PropertyView( const mitk::BaseProperty* property )
@@ -40,12 +60,16 @@ PropertyView::~PropertyView()
 
 void PropertyView::OnModified(const itk::EventObject& /*e*/)
 {
+  if (m_SelfCall) return;
+
   PropertyChanged();
 }
 
 
 void PropertyView::OnDelete(const itk::EventObject& /*e*/)
 {
+  if (m_SelfCall) return;
+
   PropertyRemoved();
   if (m_Property)
   {
@@ -56,33 +80,6 @@ void PropertyView::OnDelete(const itk::EventObject& /*e*/)
   }
 }
     
-void PropertyView::BeginModifyProperty()
-{
-  if (m_Property)
-  {
-    mitk::BaseProperty* prop = const_cast<mitk::BaseProperty*>(m_Property);
-    prop->RemoveObserver(m_ModifiedTag);
-    prop->RemoveObserver(m_DeleteTag);
-  }
-}
-
-void PropertyView::EndModifyProperty()
-{
-  if (m_Property)
-  {
-    {
-      itk::ReceptorMemberCommand<PropertyView>::Pointer command = itk::ReceptorMemberCommand<PropertyView>::New();
-      command->SetCallbackFunction(this, &PropertyView::OnModified);
-      m_ModifiedTag = m_Property->AddObserver( itk::ModifiedEvent(), command );
-    }
-    {
-      itk::ReceptorMemberCommand<PropertyView>::Pointer command = itk::ReceptorMemberCommand<PropertyView>::New();
-      command->SetCallbackFunction(this, &PropertyView::OnDelete);
-      m_DeleteTag = m_Property->AddObserver( itk::DeleteEvent(), command );
-    }
-  }
-}
-
 //---- PropertyEditor -------------------------------------------------------------
 
 PropertyEditor::PropertyEditor( mitk::BaseProperty* property )
@@ -116,44 +113,22 @@ PropertyEditor::~PropertyEditor()
 
 void PropertyEditor::OnModified(const itk::EventObject& /*e*/)
 {
+  if (m_SelfCall) return;
+
   PropertyChanged();
 }
 
 
 void PropertyEditor::OnDelete(const itk::EventObject& /*e*/)
 {
+  if (m_SelfCall) return; // does this make any sense?
+  
   PropertyRemoved();
   if (m_Property)
   {
     m_Property->RemoveObserver(m_ModifiedTag);
     m_Property->RemoveObserver(m_DeleteTag);
     m_Property = NULL;
-  }
-}
-
-void PropertyEditor::BeginModifyProperty()
-{
-  if (m_Property)
-  {
-    m_Property->RemoveObserver(m_ModifiedTag);
-    m_Property->RemoveObserver(m_DeleteTag);
-  }
-}
-
-void PropertyEditor::EndModifyProperty()
-{
-  if (m_Property)
-  {
-    {
-        itk::ReceptorMemberCommand<PropertyEditor>::Pointer command = itk::ReceptorMemberCommand<PropertyEditor>::New();
-      command->SetCallbackFunction(this, &PropertyEditor::OnModified);
-      m_ModifiedTag = m_Property->AddObserver( itk::ModifiedEvent(), command );
-    }
-    {
-      itk::ReceptorMemberCommand<PropertyEditor>::Pointer command = itk::ReceptorMemberCommand<PropertyEditor>::New();
-      command->SetCallbackFunction(this, &PropertyEditor::OnDelete);
-      m_DeleteTag = m_Property->AddObserver( itk::DeleteEvent(), command );
-    }
   }
 }
 

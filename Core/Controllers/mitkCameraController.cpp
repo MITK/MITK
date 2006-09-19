@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkOpenGLRenderer.h"
 #include "mitkRenderingManager.h"
-#include "vtkRenderer.h"
-#include "vtkCamera.h"
 
+#include "vtkCamera.h"
+#include "vtkRenderer.h"
+
+#include "QString.h"
 //##ModelId=3E3AE7440312
 mitk::CameraController::CameraController(const char * type) : BaseController(type)
 {}
@@ -126,4 +128,9 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
     vtkRenderer->ResetCamera(min[0],max[0],min[1],max[1],min[2],max[2]);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+}
+
+QString mitk::CameraController::GetCameraControllerName()
+{
+  return m_CameraControllerName;
 }

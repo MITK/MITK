@@ -25,7 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseController.h"
 #include "mitkEventTypedefs.h"
+#include "QString.h"
 class mitk::BaseRenderer;
+
 namespace mitk {
 
 //##ModelId=3DF8BCFD014C
@@ -48,6 +50,11 @@ public:
     /** Method for creation through the object factory. */
     //itkNewMacro(Self);
     CameraController(const char * type = NULL);
+
+    /*!
+    \brief method returning the name of the current camera controller
+    */
+    QString GetCameraControllerName();
 
     //##ModelId=3E6D5DD400A3
     //##Documentation
@@ -85,6 +92,11 @@ protected:
     //##ModelId=3E3AE75803CF
     virtual ~CameraController();
     const BaseRenderer* m_Renderer;
+
+    /*!
+    \brief name of the current camera controller ("VTKInteraktorCameraController" and "TrackingCameraController" respectively)
+    */
+    QString m_CameraControllerName; 
 };
 
 } // namespace mitk

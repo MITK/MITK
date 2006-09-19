@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKOPENGLRENDERER_H_HEADER_INCLUDED_C1C29F6D
 #define MITKOPENGLRENDERER_H_HEADER_INCLUDED_C1C29F6D
 
+#include "mitkCameraController.h"
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataTree.h"
@@ -54,6 +55,12 @@ public:
 
   //##ModelId=3E3D28AB0018
   void SetData(const mitk::DataTreeIteratorBase* iterator);
+
+  /*!
+  \brief set the controller of this renderer's camera. By default it is VtkInteractorCameraController
+  \param cameraController instance of the active camera controller
+  */
+  void SetCameraController(CameraController* cameraController);
 
   virtual void Update(mitk::DataTreeNode* datatreenode);
 

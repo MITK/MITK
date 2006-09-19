@@ -59,7 +59,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_PixelMapGL(NULL), 
   m_PixelMapGLValid(false)
 {
-  m_CameraController=NULL;//\*todo remove line
+  //m_CameraController = new VtkInteractorCameraController();
   m_CameraController = new VtkInteractorCameraController();
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
@@ -459,6 +459,11 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
   m_InitNeeded = true;
   m_ResizeNeeded = true;
 
+  /**@todo SetNumberOfLayers commented out, because otherwise the backface of the planes are not shown (only, when a light is added).
+  * But we need SetNumberOfLayers(2) later, when we want to prevent vtk to clear the widget before it renders (i.e., when we render something in the scene before vtk).
+  */
+  //m_RenderWindow->GetVtkRenderWindow()->SetNumberOfLayers(2);
+
   if(m_CameraController.IsNotNull())
   {
     VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
@@ -635,5 +640,16 @@ void mitk::OpenGLRenderer::DrawOverlay()
 void mitk::OpenGLRenderer::DrawOverlayMouse( mitk::Point2D& pos_unit )
 {
   m_DrawOverlayPosition= pos_unit;
+}
+
+/*!
+Sets the new camera controller and deletes the vtkRenderWindowInteractor in case of the VTKInteractorCameraController
+*/
+void mitk::OpenGLRenderer::SetCameraController(CameraController* cameraController)
+{
+  m_CameraController->SetRenderer(NULL);
+  m_CameraController = NULL;
+  m_CameraController = cameraController;
+  m_CameraController->SetRenderer(this);
 }
 

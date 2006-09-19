@@ -417,7 +417,7 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
     e->ignore();
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
 }
 
 /**
@@ -797,7 +797,7 @@ void QmitkDataTreeListView::newItemHandler( const itk::EventObject& e )
 }
 
 /**
-  Handles TreeFilterUpdateAllEvents from the DataTreeFilter. 
+  Handles TreeFilterUpdateIncludingVtkActorsEvents from the DataTreeFilter. 
 */
 void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
 {

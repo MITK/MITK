@@ -232,23 +232,30 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 //##ModelId=3E6D600F0093
 bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* renderer)
 {
-  Superclass::SetRenderer(renderer);
-
-  VtkRenderWindowInteractor* windowInteractor =
-    dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
-  if (windowInteractor == NULL)
+  if (renderer)
   {
-    itkWarningMacro(<< "renderwindow is not an mitk::VtkRenderWindow");
-  }
+    Superclass::SetRenderer(renderer);
+
+    VtkRenderWindowInteractor* windowInteractor =
+    dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
+    if (windowInteractor == NULL)
+    {
+      itkWarningMacro(<< "renderwindow is not an mitk::VtkRenderWindow");
+    }
+    else
+    {
+      windowInteractor->SetMitkRenderer(const_cast<mitk::BaseRenderer*>(this->GetRenderer()));
+    }
+    m_VtkInteractor->Initialize();
+    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
+    if (glRenderer)
+    {
+      m_VtkInteractor->SetRenderWindow(glRenderer->GetVtkRenderWindow());
+    }
+    }
   else
   {
-    windowInteractor->SetMitkRenderer(const_cast<mitk::BaseRenderer*>(this->GetRenderer()));
-  }
-  m_VtkInteractor->Initialize();
-  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
-  if (glRenderer)
-  {
-    m_VtkInteractor->SetRenderWindow(glRenderer->GetVtkRenderWindow());
+    m_VtkInteractor->Delete();
   }
   return true;
 }

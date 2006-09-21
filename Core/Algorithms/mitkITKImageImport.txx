@@ -62,7 +62,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateData()
 	InputImageConstPointer input  = this->GetInput();
 	mitk::Image::Pointer output = this->GetOutput();
 
-  output->SetImportVolume((void*)input->GetBufferPointer(), 0, 0, mitk::Image::ReferenceMemory); 
+  output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory); 
 }
 
 template <class TInputImage>
@@ -98,7 +98,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
   	InputImageConstPointer input = this->GetInput();
   	mitk::Image::Pointer currentOutput = this->GetOutput();
   	if(input.IsNotNull() && currentOutput.IsNotNull())
-  	  currentOutput->SetVolume(input->GetBufferPointer());
+  	  currentOutput->SetChannel(input->GetBufferPointer());
   }
   Superclass::SetNthOutput(idx, output);
 }

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>255</width>
-            <height>132</height>
+            <width>309</width>
+            <height>203</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -539,6 +539,18 @@
                         </widget>
                     </vbox>
                 </widget>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Delete Threshold Image 
+if Component is deactivated</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
             </vbox>
         </widget>
     </vbox>
@@ -587,6 +599,8 @@
     <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
     <function returnType="QGroupBox *">GetThresholdValueContent()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
+    <function returnType="QCheckBox *">GetDeleateImageIfDeactivatedCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

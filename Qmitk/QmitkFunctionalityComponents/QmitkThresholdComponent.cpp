@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlineedit.h>
 #include <qslider.h>
 #include <qgroupbox.h>
+#include <qcheckbox.h>
 
 
 /***************       CONSTRUCTOR      ***************/
@@ -190,7 +191,11 @@ void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
 /***************        ACTIVATED       ***************/
 void QmitkThresholdComponent::Activated()
 {
-  m_Active = true;
+    m_Active = true;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Activated();
+  } 
   CreateThresholdImageNode();
   ShowThreshold();
 }
@@ -199,8 +204,16 @@ void QmitkThresholdComponent::Activated()
 void QmitkThresholdComponent::Deactivated()
 {
   m_Active = false;
+
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
   ShowThreshold();
-  DeleteThresholdNode();
+  if(m_ThresholdComponentGUI->GetDeleateImageIfDeactivatedCheckBox()->isChecked())
+  {
+    DeleteThresholdNode();
+  }
 }
 
 ///*************CREATE THRESHOLD IMAGE NODE************/
@@ -273,7 +286,10 @@ void QmitkThresholdComponent::ShowThreshold(bool)
     }
     else
     {
+      if(m_ThresholdComponentGUI->GetDeleateImageIfDeactivatedCheckBox()->isChecked())
+      {
       m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((false)) );
+      }
     }
     m_ThresholdComponentGUI->GetThresholdValueContent()->setShown(m_ThresholdComponentGUI->GetShowThresholdGroupBox()->isChecked());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -27,7 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
-mitk::GeometryClipImageFilter::GeometryClipImageFilter() : m_ClippingGeometry(NULL), m_ClipPartAboveGeometry(true)
+mitk::GeometryClipImageFilter::GeometryClipImageFilter() 
+  : m_ClippingGeometry(NULL), m_ClipPartAboveGeometry(true), m_OutsideValue(0), m_AutoOutsideValue(false)
 {
   this->SetNumberOfInputs(2);
   this->SetNumberOfRequiredInputs(2);
@@ -121,7 +122,11 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   ItkInputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
-  typename ItkOutputImageType::PixelType m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+  typename ItkOutputImageType::PixelType outsideValue;
+  if(geometryClipper->m_AutoOutsideValue)
+    outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+  else
+    outsideValue = (typename ItkOutputImageType::PixelType) geometryClipper->m_OutsideValue;
 
   mitk::Geometry3D* inputGeometry = geometryClipper->m_InputTimeSelector->GetOutput()->GetGeometry();
   typedef itk::Index<VImageDimension> IndexType;
@@ -131,17 +136,24 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   bool above = geometryClipper->m_ClipPartAboveGeometry;
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {
-    for(i=0;i<dim;++i)
-      indexPt[i]=(mitk::ScalarType)inputIt.GetIndex()[i];
-    inputGeometry->IndexToWorld(indexPt, pointInMM);
-
-    if(clippingGeometry2D->IsAbove(pointInMM) == above)
+    if((typename ItkOutputImageType::PixelType)inputIt.Get() == outsideValue)
     {
-      outputIt.Set(m_OutsideValue);
+      outputIt.Set(outsideValue);
     }
     else
     {
-      outputIt.Set(inputIt.Get());
+      for(i=0;i<dim;++i)
+        indexPt[i]=(mitk::ScalarType)inputIt.GetIndex()[i];
+      inputGeometry->IndexToWorld(indexPt, pointInMM);
+
+      if(clippingGeometry2D->IsAbove(pointInMM) == above)
+      {
+        outputIt.Set(outsideValue);
+      }
+      else
+      {
+        outputIt.Set(inputIt.Get());
+      }
     }
   }
 }

@@ -65,6 +65,18 @@ public:
   //## shall be clipped (default: @a true)
   itkBooleanMacro(ClipPartAboveGeometry);
 
+  //##Description 
+  //## @brief Set value for outside pixels (default: 0), 
+  //## used when m_AutoOutsideValue is \a false
+  itkSetMacro(OutsideValue, ScalarType);
+  itkGetMacro(OutsideValue, ScalarType);
+
+  //##Description 
+  //## @brief If set to \a true the minimum of the ouput pixel type is
+  //## used as outside value (default: \a false)
+  itkSetMacro(AutoOutsideValue, bool);
+  itkGetMacro(AutoOutsideValue, bool);
+  itkBooleanMacro(AutoOutsideValue);
 protected:
   GeometryClipImageFilter();
 
@@ -89,6 +101,16 @@ protected:
   //## @brief Defines whether the part above or below the geometry 
   //## shall be clipped (default: @a true)
   bool m_ClipPartAboveGeometry;
+
+  //##Description 
+  //## @brief Value for outside pixels (default: 0)
+  //##
+  //## Used only if m_AutoOutsideValue is \a false.
+  ScalarType m_OutsideValue;
+  //##Description 
+  //## @brief If \a true the minimum of the ouput pixel type is
+  //## used as outside value (default: \a false)
+  bool m_AutoOutsideValue;
 
   //##Description 
   //## @brief Time when Header was last initialized

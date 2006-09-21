@@ -127,10 +127,10 @@ int testImageToItkAndBack(mitk::Image* imgMem)
   std::cout << "Testing mitk::ImageToItk: " << std::flush;
   typedef itk::Image<int,dim> ImageType;
 
-  mitk::ImageToItk<ImageType>::Pointer toItkFilter = mitk::ImageToItk<ImageType>::New();
+  typename mitk::ImageToItk<ImageType>::Pointer toItkFilter = mitk::ImageToItk<ImageType>::New();
   toItkFilter->SetInput(imgMem);
   toItkFilter->Update();
-  ImageType::Pointer itkImage = toItkFilter->GetOutput();
+  typename ImageType::Pointer itkImage = toItkFilter->GetOutput();
 
   result = testBackCasting<ImageType>(imgMem, itkImage);
   if(result != EXIT_SUCCESS)

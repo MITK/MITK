@@ -92,13 +92,13 @@ protected:
   //## \sa m_UseInsideValue
   ScalarType m_InsideValue;
   //##Description 
-  //## @brief Value for outside pixels (default: \a false)
+  //## @brief Value for outside pixels (default: 0)
   //##
   //## Used only if m_AutoOutsideValue is \a false.
   ScalarType m_OutsideValue;
   //##Description 
   //## @brief If \a true the minimum of the ouput pixel type is
-  //## used as outside value.
+  //## used as outside value (default: \a false)
   bool m_AutoOutsideValue;
   //##Description 
   //## @brief Use m_InsideValue for inside pixels (default: \a false)

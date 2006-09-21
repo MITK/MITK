@@ -157,6 +157,8 @@ void QmitkDataTreeFilterDemo::ConnectListboxNotification()
 
 void QmitkDataTreeFilterDemo::onComboBoxItemSelected(const mitk::DataTreeFilter::Item* item)
 {
+  if ( !IsActivated() ) return; // don't do anything if functionality isn't activated
+
     std::cout << "(Combobox) Item " << item << " selected." << std::endl;
   if (item)
   {
@@ -208,6 +210,8 @@ void QmitkDataTreeFilterDemo::onListboxItemClicked(const mitk::DataTreeFilter::I
 
 void QmitkDataTreeFilterDemo::onListboxItemAdded(const mitk::DataTreeFilter::Item* item)
 {
+  if ( !IsActivated() ) return; // don't do anything if functionality isn't activated
+
   MoveCrossHairToItem(item);
 }
 

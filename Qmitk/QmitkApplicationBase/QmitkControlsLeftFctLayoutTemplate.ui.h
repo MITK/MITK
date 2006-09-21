@@ -29,16 +29,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 void QmitkControlsLeftFctLayoutTemplate::init()
 {
-    //MainSplitter->setResizeMode(MainParent,QSplitter::FollowSizeHint);
-    //MainSplitter->setResizeMode(ControlParent,QSplitter::FollowSizeHint);
+  //MainSplitter->setResizeMode(MainParent,QSplitter::FollowSizeHint);
+  MainSplitter->setResizeMode(ControlParent,QSplitter::FollowSizeHint);
 }
 
 
 void QmitkControlsLeftFctLayoutTemplate::setControlSizeHint(QSize * size)
 {
-    QValueList<int> sizes;
-    int w=10; //MainSplitter->width(); hierin stehen absurde werte. Deshalb funktioniert auch der auto-resize wahrscheinlich nicht!!
-    sizes.append(size->width());
-    sizes.append(width()-size->width()-w);
-    MainSplitter->setSizes(sizes);
+  QValueList<int> sizes;
+  //int w=10; //MainSplitter->width(); hierin stehen absurde werte. Deshalb funktioniert auch der auto-resize wahrscheinlich nicht!!
+  int w = MainSplitter->handleWidth();
+  sizes.append(size->width());
+  sizes.append( width() - size->width() - w );
+  MainSplitter->setSizes(sizes);
 }

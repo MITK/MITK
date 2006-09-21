@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkControlsRightFctLayoutTemplate</class>
 <widget class="QWidget">
     <property name="name">
@@ -36,12 +36,6 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>57</width>
-                    <height>50</height>
-                </size>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>

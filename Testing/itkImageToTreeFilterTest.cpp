@@ -838,7 +838,7 @@ int testParticleReflectionCalculator()
   calculator->SetParticle(testParticle);
   calculator->CalculateReflection();
 
-  ScalarType tolerance = 0.1;
+  ScalarType tolerance = 0.3;
 
   PointType expPoint;
   expPoint[0] = 35.5;

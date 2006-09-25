@@ -14,7 +14,7 @@ power2 (const unsigned int x) {
     return y;
 }
 
-const unsigned int iil4mitkImage::_bytes [] = {1, 2, 3, 4};
+const unsigned int iil4mitkImage::_bytes [] = {1, 2, 3, 4, 3};
 
 iil4mitkImage::iil4mitkImage ()
         : _width (0), _height (0), _rx (0), _ry (0), _rw (0), _rh (0), _model (INTENSITY), _interpolation (false), _pixels (NULL), _internal (GL_LUMINANCE)
@@ -161,7 +161,7 @@ iil4mitkImage::display (iil4mitkWidget* widget)
 	glClipPlane (GL_CLIP_PLANE2, planeY);
 	glEnable (GL_CLIP_PLANE2);
 
-    	if ((_model == INTENSITY_ALPHA) || (_model == COLOR_ALPHA)) {
+    	if ((_model == INTENSITY_ALPHA) || (_model == COLOR_ALPHA) || (_model == RGB)) {
             glEnable (GL_BLEND);
             glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     	}

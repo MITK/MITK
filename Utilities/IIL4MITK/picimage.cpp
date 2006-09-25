@@ -361,6 +361,17 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
 
         // copy current line
 
+    if (model () == RGB)
+    {
+      unsigned char* source = (unsigned char *) src;
+      unsigned char* dest = dst;
+      while (dest < eol) 
+      {
+        *dest = *source;
+        ++source;
+        ++dest;
+      }
+    } else
 	if (mask ()) {
 		ipPicFORALL(MASK_INTENSITIES, _pic);
 	} else 

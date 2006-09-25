@@ -77,6 +77,9 @@ _iil4mitkTexture::setModel (int model)
 	case COLOR_ALPHA:
 		_model = GL_RGBA;
 		break;
+	case RGB:
+		_model = GL_RGB;
+		break;
 	}
 		if (_internal != _model) {
 			_internal = _model;

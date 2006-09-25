@@ -445,6 +445,9 @@ void mitk::ImageMapper2D::GenerateData(mitk::BaseRenderer *renderer)
 
   renderinfo.m_Pic = pic;
 
+  if(pic->bpe == 24) //RGB image
+    m_iil4mitkMode = iil4mitkImage::RGB;
+
   image->setImage(pic, m_iil4mitkMode);
   image->setInterpolation( false );
   image->setRegion(0,0,pic->n[0],pic->n[1]);
@@ -503,9 +506,9 @@ void mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   {
     LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
       this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer()
-    );
+      );
     if(LookupTableProp.IsNull())
-    useColor=true;
+      useColor=true;
   }
   if(useColor)
   {

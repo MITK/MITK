@@ -36,7 +36,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	pic->n[1] = dim[1];
 	pic->n[2] = dim[2];
 
-	register unsigned long size = dim[0] * dim[1] * dim[2];
+	register unsigned long size = dim[0] * dim[1] * dim[2] * vtkImage->GetNumberOfScalarComponents();
 
 	switch ( vtkImage->GetScalarType () ) {
 
@@ -66,7 +66,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	case VTK_CHAR: {
 
 		pic->type = ipPicInt;
-		pic->bpe = 8;
+		pic->bpe = 8*vtkImage->GetNumberOfScalarComponents();
 
 		register char *s = (char*) vtkImage->GetScalarPointer();	
 		register char *a = (char*) malloc(sizeof(char)* size);
@@ -80,7 +80,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	case VTK_UNSIGNED_CHAR: {
 
 		pic->type = ipPicUInt;
-		pic->bpe = 8;
+		pic->bpe = 8*vtkImage->GetNumberOfScalarComponents();
 
 		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();	
 		register unsigned char *a = (unsigned char*) malloc(sizeof(unsigned char)* size);
@@ -536,6 +536,18 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		register unsigned char* a = (unsigned char*) inData->GetScalarPointer();	
 
 		for ( register unsigned long i = 0; i < size ; i++ )
+			*a++ = *s++;
+
+		
+	} else if ( pic->type == ipPicUInt && pic->bpe == 24 ) {
+    inData->SetNumberOfScalarComponents(3);
+		inData->SetScalarType( VTK_UNSIGNED_CHAR );
+		inData->AllocateScalars();
+
+		register unsigned char* s = (unsigned char*) pic->data;
+		register unsigned char* a = (unsigned char*) inData->GetScalarPointer();	
+
+		for ( register unsigned long i = 0; i < size*3 ; i++ )
 			*a++ = *s++;
 
 		

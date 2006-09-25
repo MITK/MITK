@@ -23,11 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
+#include "mitkRenderWindow.h"
 #include "mitkDataTree.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkRenderingManager.h"
-
-#include "picimage.h"
+#include <mitkGL.h>
 
 #include <itkCommand.h>
 

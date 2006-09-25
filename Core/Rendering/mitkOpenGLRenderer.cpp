@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkOpenGLRenderer.h"
+
+#include "picimage.h"
+
 #include "mitkMapper.h"
 #include "mitkImageMapper2D.h"
 #include "mitkBaseVtkMapper2D.h"

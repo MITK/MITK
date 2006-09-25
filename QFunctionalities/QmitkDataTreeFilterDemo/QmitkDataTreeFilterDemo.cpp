@@ -105,6 +105,9 @@ void QmitkDataTreeFilterDemo::Activated()
    // init the combobox (to show only images, which is also the default)
     m_Controls->TreeComboBox->SetDataTree( GetDataTreeIterator() );
     m_Controls->TreeComboBox->GetFilter()->SetFilter( mitk::IsBaseDataType<mitk::Image>() );  // this line could be skipped because this filter is the default at the moment
+    
+    // uncomment to get more output from the DataTreeFilter
+    //m_Controls->TreeComboBox->GetFilter()->SetDebugOn();
   
     // define the list of segmentations
     m_DataTreeFilter = mitk::DataTreeFilter::New( GetDataTreeIterator()->GetTree() );
@@ -133,6 +136,9 @@ void QmitkDataTreeFilterDemo::Activated()
     
     m_Controls->TreeListBox->SetViewType("name", QmitkPropertyViewFactory::etON_DEMAND_EDIT);
     m_Controls->TreeListBox->SetFilter( m_DataTreeFilter );
+    
+    // uncomment to get more output from the DataTreeFilter
+    //m_DataTreeFilter->SetDebugOn();
 
     ConnectListboxNotification();
 

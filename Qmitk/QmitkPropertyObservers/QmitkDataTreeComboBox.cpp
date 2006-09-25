@@ -402,7 +402,8 @@ void QmitkDataTreeComboBox::generateItems()
   const mitk::DataTreeFilter::PropertyList&  visibleProps( m_DataTreeFilter->GetVisibleProperties() );
 
   // fill rows with property views for the visible items 
-  AddItemsToList(m_DataTreeFilter->GetItems(), visibleProps, 0);
+  if (m_SkipItemParent != (mitk::DataTreeFilter::Item*) -1)
+    AddItemsToList(m_DataTreeFilter->GetItems(), visibleProps, 0);
 
   try
   {
@@ -450,6 +451,8 @@ void QmitkDataTreeComboBox::removeChildrenHandler( const itk::EventObject& e )
   const mitk::TreeFilterRemoveChildrenEvent& event( static_cast<const mitk::TreeFilterRemoveChildrenEvent&>(e) );
   // TODO: do something more clever
   m_SkipItemParent = event.GetChangedItem();
+  if ( m_SkipItemParent == NULL ) 
+    m_SkipItemParent = (mitk::DataTreeFilter::Item*) -1; // in generateItems --> don't draw any content
   generateItems();
   m_SkipItemParent = NULL;
 }

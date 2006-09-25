@@ -34,18 +34,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PolygonToRingFilter::PolygonToRingFilter()
-: m_RingRadius(3.5f), m_RingResolution(30), m_SplineResolution(10)
+: m_RingRadius(3.5f), m_RingResolution(30), m_SplineResolution(20)
 {
-  m_SpX=vtkCardinalSpline::New();
-  m_SpY=vtkCardinalSpline::New();
-  m_SpZ=vtkCardinalSpline::New();
+  m_SplineX = vtkCardinalSpline::New();
+  m_SplineY = vtkCardinalSpline::New();
+  m_SplineZ = vtkCardinalSpline::New();
 }
 
 mitk::PolygonToRingFilter::~PolygonToRingFilter()
 {
-  m_SpX->Delete();
-  m_SpY->Delete();
-  m_SpZ->Delete();
+  m_SplineX->Delete();
+  m_SplineY->Delete();
+  m_SplineZ->Delete();
 }
 
 void mitk::PolygonToRingFilter::GenerateOutputInformation()
@@ -232,76 +232,81 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
 
 void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& cell, PointListType& ptList, VectorListType& vecList)
 {
-  float pvtk[3];
+  // This method constructs a spline from the given point list and retrieves
+  // a number of interpolated points from it to form a ring-like structure.
+  //
+  // To make the spline "closed", the end point is connected to the start
+  // point. For ensuring smoothness at the start-end-point transition, the
+  // (intrinsically non-circular) spline array is extended on both sides
+  // by wrapping a number of points from the respective other side.
+  //
+  // The used VTK filters do principally support this kind of "closed" spline,
+  // but it does not produce results as consistent as with the method used
+  // here. Also, the spline class of VTK 4.4 has only poor support for
+  // arbitrary parametric coordinates (t values in vtkSpline). VTK 5.0 has
+  // better support, and also provides a new class vtkParametricSpline for
+  // directly calculating 3D splines.
 
-  const mitk::Mesh* input = GetInput();
 
-  Mesh::PointIdIterator ptIt;
-  Mesh::PointIdIterator ptEnd;
+  // Remove points from previous call of this method
+  m_SplineX->RemoveAllPoints();
+  m_SplineY->RemoveAllPoints();
+  m_SplineZ->RemoveAllPoints();
 
-  ptEnd = cell.PointIdsEnd();
+  int numberOfPoints = cell.GetNumberOfPoints();
 
-  unsigned int i, size=cell.GetNumberOfPoints();
+  Mesh::PointType inputPoint;
+  vtkFloatingPointType t, tStart, tEnd;
 
-  //for(ptIt = cell.PointIdsBegin(); ptIt !=ptEnd; ++ptIt)
-  //{
-  //  unsigned int numOfPointsInCell = cell.GetNumberOfPoints();
-  //}
-
-  unsigned int closed_loop_pre_load = 2;
-  //bei geschlossener Kontur: vor dem ersten Punkt die zwei letzten einfügen für glatten Übergang
-  ptIt = ptEnd; ptIt-=closed_loop_pre_load;
-  for(i=0;i<closed_loop_pre_load;++i, ++ptIt)
+  // Add input points to the spline and assign each the parametric value t
+  // derived from the point euclidean distances.
+  int i;
+  Mesh::PointIdIterator pit = cell.PointIdsEnd() - 3;
+  for ( i = -3, t = 0.0; i < numberOfPoints + 3; ++i )
   {
-    itk2vtk(input->GetPoint(*ptIt), pvtk);
-    m_SpX->AddPoint(i, pvtk[0]);
-    m_SpY->AddPoint(i, pvtk[1]);
-    m_SpZ->AddPoint(i, pvtk[2]);
-  }
-  //Punkte einfügen
-  for(ptIt = cell.PointIdsBegin();i<size+closed_loop_pre_load;++i, ++ptIt)
-  {
-    itk2vtk(input->GetPoint(*ptIt), pvtk);
-    m_SpX->AddPoint(i, pvtk[0]);
-    m_SpY->AddPoint(i, pvtk[1]);
-    m_SpZ->AddPoint(i, pvtk[2]);
-  }
-  //bei geschlossener Kontur: nach dem letzten Punkt die zwei ersten einfügen für glatten Übergang
-  unsigned int j;
-  for(j=0,ptIt = cell.PointIdsBegin();j<closed_loop_pre_load;++j,++i, ++ptIt)
-  {
-    itk2vtk(input->GetPoint(*ptIt), pvtk);
-    m_SpX->AddPoint(i, pvtk[0]);
-    m_SpY->AddPoint(i, pvtk[1]);
-    m_SpZ->AddPoint(i, pvtk[2]);
-  }
-  bool first = true;
-  Point3D pt, lastPt, firstPt;
-  Vector3D vec;
-  float t, step=1.0f/m_SplineResolution;
-  size*=m_SplineResolution;
-  i=closed_loop_pre_load;
+    if ( i == 0 ) { tStart = t; }
+    if ( i == numberOfPoints ) { tEnd = t; }
 
-  for(t=closed_loop_pre_load;i<size+closed_loop_pre_load;++i, t+=step)
-  {
-    FillVector3D(pt, m_SpX->Evaluate(t), m_SpY->Evaluate(t), m_SpZ->Evaluate(t));
-    ptList.push_back(pt);
-    if(first)
+    inputPoint = this->GetInput()->GetPoint( *pit );
+    m_SplineX->AddPoint( t, inputPoint[0] );
+    m_SplineY->AddPoint( t, inputPoint[1] );
+    m_SplineZ->AddPoint( t, inputPoint[2] );
+
+    ++pit;
+    if ( pit == cell.PointIdsEnd() )
     {
-      firstPt=pt;
-      first=false;
+      pit = cell.PointIdsBegin();
+    }
+
+    t += inputPoint.EuclideanDistanceTo( this->GetInput()->GetPoint( *pit ) );
+  }
+
+  // Evaluate the spline for the desired number of points
+  // (number of input points) * (spline resolution)
+  Point3D point, firstPoint, lastPoint;
+  int numberOfSegments = numberOfPoints * m_SplineResolution;
+  vtkFloatingPointType step = (tEnd - tStart) / numberOfSegments;
+  for ( i = 0, t = tStart; i < numberOfSegments; ++i, t += step )
+  {
+    FillVector3D( point,
+      m_SplineX->Evaluate(t), m_SplineY->Evaluate(t), m_SplineZ->Evaluate(t)
+    );
+
+    ptList.push_back( point );
+
+    if ( i == 0 )
+    {
+      firstPoint = point;
     }
     else
     {
-      vec=pt-lastPt;
-      vecList.push_back(vec);
+      vecList.push_back( point - lastPoint );
     }
-    lastPt=pt;
+    lastPoint = point;
   }
-
-  vec=firstPt-lastPt;
-  vecList.push_back(vec);
+  vecList.push_back( firstPoint - lastPoint );
 }
+
 
 const mitk::Mesh *mitk::PolygonToRingFilter::GetInput(void)
 {

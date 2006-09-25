@@ -102,7 +102,7 @@ protected:
   //##
   unsigned int m_SplineResolution;
 
-  vtkCardinalSpline *m_SpX, *m_SpY, *m_SpZ;
+  vtkCardinalSpline *m_SplineX, *m_SplineY, *m_SplineZ;
 
   PointListType m_PointList;
   VectorListType m_VectorList;

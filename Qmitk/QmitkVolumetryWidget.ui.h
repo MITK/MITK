@@ -43,11 +43,11 @@ void QmitkVolumetryWidget::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone 
   m_DataTreeIteratorClone = it;
 }
 
-void QmitkVolumetryWidget::SetDataTreeNode(mitk::DataTreeNode* node)
+void QmitkVolumetryWidget::SetDataTreeNode(const mitk::DataTreeNode* node)
 {
   if(node == m_OverlayNode.GetPointer())
     return;
-  m_Node = node;
+  m_Node = node; // is the non-const m_Node needed anyway?
   if (m_OverlayNode)
   {
     // remove it from the tree
@@ -138,7 +138,7 @@ void QmitkVolumetryWidget::CalculateTimeSeries()
   }
 }
 
-mitk::DataTreeNode* QmitkVolumetryWidget::GetImageNode()
+const mitk::DataTreeNode* QmitkVolumetryWidget::GetImageNode()
 {
   return m_Node;
 }

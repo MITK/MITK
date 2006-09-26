@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 #include <QmitkStepperAdapter.h>
 #include "qpushbutton.h"
-#include "QmitkTreeNodeSelector.h"
+#include "QmitkDataTreeComboBox.h"
 
 // for stereo setting
 #include <mitkOpenGLRenderer.h>
@@ -41,6 +41,35 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDisplayVectorInteractor.h>
 #include <mitkDisplayInteractor.h>
 #include <mitkInteractionConst.h>
+
+#include <mitkDataTreeFilterFunctions.h>
+
+namespace mitk
+{
+  class IsImageNodeButNotOverlayNode: public mitk::DataTreeFilterFunction
+  {
+    public:
+      virtual ~IsImageNodeButNotOverlayNode() {}
+
+      virtual bool NodeMatches(DataTreeNode* node) const
+      {
+        bool result = node && node->GetData() && dynamic_cast<mitk::Image*>(node->GetData());
+        if(result)
+        {
+          std::string name;
+          node->GetName(name);
+          result = ! (name=="volume threshold overlay image");
+        }
+        return result;
+      } 
+
+      virtual DataTreeFilterFunction* Clone() const
+      {
+        return new IsImageNodeButNotOverlayNode();
+      }
+  };
+
+}
 
 QmitkVolumetry::QmitkVolumetry(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) 
 : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -70,7 +99,7 @@ QWidget * QmitkVolumetry::CreateControlWidget(QWidget *parent)
   {    
     m_Controls = new QmitkVolumetryControls(parent);          
     m_Controls->SetDataTreeIterator(GetDataTreeIterator());
-    m_Controls->m_TreeNodeSelector->m_FilterFunction=QmitkVolumetry::IsImageNodeButNotOverlayNode;
+    m_Controls->m_TreeNodeSelector->GetFilter()->SetFilter( mitk::IsImageNodeButNotOverlayNode() );
   }  
   return m_Controls;
 }
@@ -92,7 +121,7 @@ QAction * QmitkVolumetry::CreateAction(QActionGroup *parent)
 
 void QmitkVolumetry::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->UpdateContent();
+  m_Controls->m_TreeNodeSelector->Update();
 }
 
 void QmitkVolumetry::Activated()
@@ -116,18 +145,6 @@ void QmitkVolumetry::Deactivated()
 void QmitkVolumetry::InitializeStandardViews(mitk::BaseData::Pointer data)
 {
   m_MultiWidget->InitializeStandardViews( data->GetGeometry() );
-}
-
-bool QmitkVolumetry::IsImageNodeButNotOverlayNode( mitk::DataTreeNode * node )
-{
-  bool result = node && node->GetData() && dynamic_cast<mitk::Image*>(node->GetData());
-  if(result)
-  {
-    std::string name;
-    node->GetName(name);
-    result = ! (name=="volume threshold overlay image");
-  }
-  return result;
 }
 
 

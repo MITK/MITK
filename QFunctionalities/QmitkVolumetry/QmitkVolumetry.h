@@ -69,8 +69,6 @@ class QmitkVolumetry : public QmitkFunctionality
   virtual void Activated();
   virtual void Deactivated();
 
-  static bool IsImageNodeButNotOverlayNode( mitk::DataTreeNode * node );
-
 public slots:
   void InitializeStandardViews(mitk::BaseData::Pointer data);
 protected slots:  

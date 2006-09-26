@@ -10,11 +10,16 @@
 ** destructor.
 *****************************************************************************/
 
-#include "QmitkTreeNodeSelector.h"
-
 void QmitkVolumetryControls::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
    m_DataTreeIterator = it;
-   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
+   m_TreeNodeSelector->SetDataTree(it);
    m_VolumetryWidget->SetDataTreeNodeIterator(it);
+}
+
+
+void QmitkVolumetryControls::onImageSelected( const mitk::DataTreeFilter::Item * item )
+{
+  if (item)
+    m_VolumetryWidget->SetDataTreeNode(item->GetNode());
 }

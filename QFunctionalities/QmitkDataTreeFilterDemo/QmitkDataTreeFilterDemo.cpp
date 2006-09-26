@@ -93,6 +93,8 @@ QAction* QmitkDataTreeFilterDemo::CreateAction(QActionGroup* parent)
 
 void QmitkDataTreeFilterDemo::TreeChanged()
 {
+  m_Controls->TreeComboBox->Update(); // recreate contents. To update it all of the time, even when the functionality is deactivated, 
+                                     //  call m_Controls->TreeComboBox->SetAutoUpdate(true) at some point
 }
 
 
@@ -163,8 +165,6 @@ void QmitkDataTreeFilterDemo::ConnectListboxNotification()
 
 void QmitkDataTreeFilterDemo::onComboBoxItemSelected(const mitk::DataTreeFilter::Item* item)
 {
-  if ( !IsActivated() ) return; // don't do anything if functionality isn't activated
-
     std::cout << "(Combobox) Item " << item << " selected." << std::endl;
   if (item)
   {

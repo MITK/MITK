@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkMovieMaker.h"
 #include "QmitkMovieMakerControls.h"
-#include "QmitkTreeNodeSelector.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkCommonFunctionality.h"
@@ -401,7 +400,7 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
     return m_Stepper.GetPointer();
   } else {
     // should never get here
-	return 0;
+  return 0;
   }
 }
 

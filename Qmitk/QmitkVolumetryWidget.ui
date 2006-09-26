@@ -324,12 +324,12 @@
 </includes>
 <variables>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIteratorClone;</variable>
-    <variable>mitk::DataTreeNode::Pointer m_Node;</variable>
+    <variable>mitk::DataTreeNode::ConstPointer m_Node;</variable>
     <variable>mitk::DataTreeNode::Pointer m_OverlayNode;</variable>
 </variables>
 <slots>
     <slot>SetDataTreeNodeIterator( mitk::DataTreeIteratorClone it )</slot>
-    <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
+    <slot>SetDataTreeNode( const mitk::DataTreeNode * node )</slot>
     <slot access="protected">CalculateVolume()</slot>
     <slot access="protected">CalculateTimeSeries()</slot>
     <slot>UpdateSlider()</slot>
@@ -338,7 +338,7 @@
     <slot>SaveCsvButtonClicked()</slot>
 </slots>
 <functions>
-    <function returnType="mitk::DataTreeNode *">GetImageNode()</function>
+    <function returnType="const mitk::DataTreeNode *">GetImageNode()</function>
     <function access="protected">CreateOverlayChild()</function>
     <function returnType="mitk::DataTreeNode *">GetOverlayNode()</function>
     <function returnType="mitk::Image *">GetImage()</function>

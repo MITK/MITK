@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_VOLUMEVISUALIZATION_H__INCLUDED
 
 #include <QmitkFunctionality.h>
+#include <mitkDataTreeFilter.h>
 
 class QmitkStdMultiWidget;
 class QmitkVolumeVisualizationControls;
@@ -75,7 +76,7 @@ class QmitkVolumeVisualization : public QmitkFunctionality
     /*
      * just an example slot for the example TreeNodeSelector widget
      */
-    void ImageSelected(mitk::DataTreeIteratorClone imageIt);
+    void ImageSelected(const mitk::DataTreeFilter::Item* item);
     void EnableRendering(bool state);
   protected:  
     /*!  

@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkRenderWindow.h>
 #include <mitkRenderingManager.h>
 #include <QmitkStdMultiWidget.h>
-#include <QmitkTreeNodeSelector.h>
 
 #include <mitkCuboid.h>
 #include <mitkProperties.h>
@@ -82,9 +81,7 @@ QWidget * QmitkImageCropper::CreateControlWidget(QWidget *parent)
     if (!m_Controls) return NULL;
 
     // tell the node selector (inside the controls), which data tree to use
-    m_Controls->qmitkNodeSelector->SetDataTreeNodeIterator(m_DataTreeIterator);
-    // install filter function, that accepts only images
-    m_Controls->qmitkNodeSelector->m_FilterFunction = &QmitkImageCropper::DataTreeNodeFilter;
+    m_Controls->cmbImage->SetDataTree(m_DataTreeIterator.GetPointer());
   }
   return m_Controls;
 }
@@ -130,13 +127,7 @@ void QmitkImageCropper::Deactivated()
 void QmitkImageCropper::TreeChanged()
 {
   // Update the image selection widget
-  m_Controls->qmitkNodeSelector->SetDataTreeNodeIterator( m_DataTreeIterator );
-}
-
-
-bool QmitkImageCropper::DataTreeNodeFilter( mitk::DataTreeNode* node )
-{
-  return (node && node->GetData() && dynamic_cast<mitk::Image*>( node->GetData() )); // accept only images
+  m_Controls->cmbImage->Update();
 }
 
 

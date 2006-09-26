@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qaction.h>
 #include <qcheckbox.h>
 #include "icon.xpm"
-#include "QmitkTreeNodeSelector.h"
+#include "QmitkDataTreeComboBox.h"
 #include <mitkDataTreeNode.h>
 #include <mitkProperties.h>
 
@@ -53,7 +53,8 @@ void QmitkVolumeVisualization::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)),(QObject*) this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
+    connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(activated(const mitk::DataTreeFilter::Item*)),(QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item*)) );
+    m_Controls->m_TreeNodeSelector->SetDataTree(this->GetDataTreeIterator());
     connect( (QObject*)(m_Controls), SIGNAL(EnableRenderingToggled(bool)),(QObject*) this, SLOT(EnableRendering(bool)));
   }
 }
@@ -67,16 +68,16 @@ QAction * QmitkVolumeVisualization::CreateAction(QActionGroup *parent)
 
 void QmitkVolumeVisualization::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+  m_Controls->m_TreeNodeSelector->Update();
 }
 
 void QmitkVolumeVisualization::Activated()
 {
   QmitkFunctionality::Activated();
 }
-void QmitkVolumeVisualization::ImageSelected(mitk::DataTreeIteratorClone)
+void QmitkVolumeVisualization::ImageSelected(const mitk::DataTreeFilter::Item* item)
 {
-  mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
+  mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
   bool enabled = false; 
   if (node) {
     node->GetBoolProperty("volumerendering",enabled);
@@ -88,14 +89,18 @@ m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
 }
 void QmitkVolumeVisualization::EnableRendering(bool state) {
   std::cout << "EnableRendering:" << state << std::endl;
-  mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
-  if (state && node) {
-    node->SetProperty("volumerendering",new mitk::BoolProperty(true));
-    mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-   assert(image);
-m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
-  } else if (!state && node) {
-    node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+  const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
+  if (item)
+  {
+    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
+    if (state && node) {
+      node->SetProperty("volumerendering",new mitk::BoolProperty(true));
+      mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+      assert(image);
+      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+    } else if (!state && node) {
+      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+    }
   }
 }
 

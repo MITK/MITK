@@ -36,21 +36,21 @@ void QmitkImageCropperControls::btnCrop_clicked()
 void QmitkImageCropperControls::init()
 {
   groupInfo->hide();
-  connect ( qmitkNodeSelector, SIGNAL(TreeNodeChanged()), this, SLOT(ImageNodeChanged()) ); 
+  connect ( cmbImage, SIGNAL(activated(const mitk::DataTreeFilter::Item*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeFilter::Item*)) ); 
 }
 
 
-void QmitkImageCropperControls::ImageNodeChanged()
+void QmitkImageCropperControls::ImageNodeChanged(const mitk::DataTreeFilter::Item* item)
 {
   // called when the selection of the image selector changes
-  btnCrop->setEnabled( qmitkNodeSelector->GetSelectedNode() );
+  btnCrop->setEnabled( item );
   emit ImageSelectionChanged();
 }
 
 
 const mitk::DataTreeIteratorClone QmitkImageCropperControls::selectedImage()
 {
-  return *qmitkNodeSelector->GetSelectedIterator();
+  return cmbImage->GetFilter()->GetIteratorToSelectedItem();
 }
 
 

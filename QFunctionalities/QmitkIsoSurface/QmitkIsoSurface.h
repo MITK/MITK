@@ -20,7 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_ISOSURFACE_H__INCLUDED
 
 #include <QmitkFunctionality.h>
-#include <mitkColorSequence.h>
+#include <mitkColorSequenceRainbow.h>
+#include <mitkDataTreeFilter.h>
 
 class QmitkStdMultiWidget;
 class QmitkIsoSurfaceControls;
@@ -31,6 +32,7 @@ class QmitkIsoSurfaceControls;
   One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
   and CreateAction(..) from QmitkFunctionality. 
 
+  \TODO review use of iterators and DataTreeCombobox
   \sa QmitkFunctionality
   \ingroup Functionalities
   */
@@ -43,11 +45,6 @@ class QmitkIsoSurface : public QmitkFunctionality
       \brief default constructor  
       */  
     QmitkIsoSurface(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
-
-    /*!  
-      \brief default destructor  
-      */  
-    virtual ~QmitkIsoSurface();
 
     /*!  
       \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
@@ -69,14 +66,14 @@ class QmitkIsoSurface : public QmitkFunctionality
       */  
     virtual QAction * CreateAction(QActionGroup *parent);
 
-    virtual void Activated();
-
     protected slots:  
-      void TreeChanged();
+
+    virtual void TreeChanged();
+
     /*
      * just an example slot for the example TreeNodeSelector widget
      */
-    void ImageSelected(mitk::DataTreeIteratorClone imageIt);
+    void ImageSelected(const mitk::DataTreeFilter::Item* item);
 
     /*!  
       \brief method for creating a surface object  
@@ -106,26 +103,12 @@ class QmitkIsoSurface : public QmitkFunctionality
     float getThreshold();
 
     /*!
-     * Node that contains the surfaceModel
-     */
-    //  mitk::DataTreeNode::Pointer m_SurfaceNode;
-
-    /*!
-     * iterator on current image
-     */
-    mitk::DataTreeIteratorClone m_MitkImageIterator;
-
-    /*!
      *  variable to count Surfaces and give it to name in DataTree 
      */
     int m_SurfaceCounter;
 
-    //SurfaceColor
-    float m_r;
-    float m_g;
-    float m_b;
-
-    mitk::Color m_Color;
-    mitk::ColorSequence* m_RainbowColor;
+    mitk::ColorSequenceRainbow m_RainbowColor;
 };
+
 #endif // !defined(QMITK_ISOSURFACE_H__INCLUDED)
+

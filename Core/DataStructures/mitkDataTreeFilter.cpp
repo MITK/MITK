@@ -258,7 +258,8 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   m_TreeAddConnection(0),
   m_TreePruneConnection(0),
   m_TreeRemoveConnection(0),
-  m_LastSelectedItem(NULL)
+  m_LastSelectedItem(NULL),
+  m_AutoUpdate(false)
 #ifndef NDEBUG
   , m_DEBUG(false)
 #endif
@@ -269,6 +270,24 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   
   m_Items = ItemList::New(); // create an empty list
 
+  SetAutoUpdate( true );
+ 
+  GenerateModelFromTree();
+}
+ 
+DataTreeFilter::~DataTreeFilter()
+{
+  DisconnectTreeEvents();
+ 
+  InvokeEvent( TreeFilterRemoveAllEvent() );
+
+  m_Items->clear();
+  m_Item.clear(); // should already BE clear by now
+  m_SelectedItems.clear();
+}
+
+void DataTreeFilter::ConnectTreeEvents()
+{
   // connect tree notifications to member functions
   {
   itk::ReceptorMemberCommand<DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<DataTreeFilter>::New();
@@ -293,24 +312,15 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   command->SetCallbackFunction(this, &DataTreeFilter::TreePrune);
   m_TreePruneConnection = m_DataTree->AddObserver(itk::TreePruneEvent<DataTreeBase>(), command);
   }
-
-  
-  GenerateModelFromTree();
 }
- 
-DataTreeFilter::~DataTreeFilter()
+
+void DataTreeFilter::DisconnectTreeEvents()
 {
   // remove this as observer from the data tree
   m_DataTree->RemoveObserver( m_TreeChangeConnection );
   m_DataTree->RemoveObserver( m_TreeAddConnection );
   m_DataTree->RemoveObserver( m_TreeRemoveConnection );
   m_DataTree->RemoveObserver( m_TreePruneConnection );
-  
-  InvokeEvent( TreeFilterRemoveAllEvent() );
-
-  m_Items->clear();
-  m_Item.clear(); // should already BE clear by now
-  m_SelectedItems.clear();
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -879,12 +889,29 @@ void DataTreeFilter::GenerateModelFromTree()
   DEBUG_MSG_STATE("After GenerateModel")
 }
 
-void DataTreeFilter::ForceUpdateAll()
+void DataTreeFilter::SetAutoUpdate(bool autoUpdatesEnabled)
 {
-  DEBUG_MSG_STATE("Before ForceUpdateAll")
+  if ( autoUpdatesEnabled != m_AutoUpdate )
+  {
+    if ( autoUpdatesEnabled )
+    {
+      ConnectTreeEvents();
+    }
+    else
+    {
+      DisconnectTreeEvents();
+    }
+
+    m_AutoUpdate = autoUpdatesEnabled;
+  }
+}
+
+void DataTreeFilter::Update()
+{
+  DEBUG_MSG_STATE("Before Update")
 
   GenerateModelFromTree();
-  DEBUG_MSG_STATE("After ForceUpdateAll")
+  DEBUG_MSG_STATE("After Update")
 }
 
 #ifndef NDEBUG

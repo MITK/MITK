@@ -89,6 +89,9 @@
 
     - To keep clients / GUI elements in sync with the model of the data tree, the
       tree filter uses the <b>ITK event mechanism to notify about changes</b>.
+      Clients can turn off the automatic synchronization with the data tree by calling
+      SetAutoUpdate(false).
+      
 
   Why would you want such features? You will like them, if ...
 
@@ -398,7 +401,6 @@
   - What happens if you provide empty lists of visible and editable properties?
   - Why all this const/non-const fuss?
   - Why did nobody remove EXTENDED_SELECT? It is not implemented! It's only an idea.
-  - Has anybody ever tested GetSelectedItems?
 
 */
 
@@ -612,8 +614,12 @@ public:
   void TreePrune(const itk::EventObject &);
   void TreeRemove(const itk::EventObject &);
 
-  /// only until the whole tree notification thing gets nice 
-  void ForceUpdateAll();
+  /// Call with true to enable updates whenever the data tree changes. Default is false,
+  /// which requires you to call Update() from time to time
+  void SetAutoUpdate(bool);
+
+  /// Force regeneration of the whole item list
+  void Update();
 
 protected:
 
@@ -622,6 +628,9 @@ protected:
   ~DataTreeFilter();
 
 private:
+
+  void ConnectTreeEvents();
+  void DisconnectTreeEvents();
 
   const Item* FindItem(const DataTreeNode* node, ItemList* itemList) const;
 
@@ -670,6 +679,8 @@ private:
 
   const DataTreeNode* m_LastSelectedNode; /// for reconstruction of selection after regeneration of items
   DataTreeNodeSet m_LastSelectedNodes; /// for reconstruction of selection after regeneration of items
+
+  bool m_AutoUpdate;
 
 #ifndef NDEBUG
 public:

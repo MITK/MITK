@@ -88,6 +88,7 @@ void QmitkDataTreeListView::initialize()
   m_SkipItemParent = NULL;
   m_StretchedColumn = -1; 
   m_SelfCall = false;
+  m_AutoUpdate = true;
   
   m_RemoveItemConnection       = 63535;
   m_RemoveChildrenConnection   = 63535;
@@ -183,6 +184,7 @@ void QmitkDataTreeListView::SetDataTree(mitk::DataTreeBase* tree)
   {
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
+    m_PrivateFilter->SetAutoUpdate( m_AutoUpdate ); 
     m_PrivateFilter->SetFilter(mitk::IsGoodDataTreeNode());
     mitk::DataTreeFilter::PropertyList visible;
     visible.push_back("visible");
@@ -804,11 +806,21 @@ void QmitkDataTreeListView::updateAllHandler( const itk::EventObject& )
   generateItems();
 }
 
-void QmitkDataTreeListView::updateAll()
+void QmitkDataTreeListView::Update()
 {
-  generateItems();
+  if (m_DataTreeFilter)
+    m_DataTreeFilter->Update();
 }
 
+void QmitkDataTreeListView::SetAutoUpdate(bool autoUpdatesEnabled)
+{
+  if ( autoUpdatesEnabled != m_AutoUpdate )
+  {
+    if (m_DataTreeFilter) m_DataTreeFilter->SetAutoUpdate(autoUpdatesEnabled);
+
+    m_AutoUpdate = autoUpdatesEnabled;
+  }
+}
 
 
 

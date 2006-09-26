@@ -161,7 +161,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     void updateAllHandler( const itk::EventObject& e );
     void newItemHandler( const itk::EventObject& e );
     
-    void updateAll();
+    void SetAutoUpdate(bool);
+    void Update();
 
   signals:
     
@@ -214,6 +215,8 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     unsigned long  m_NewItemConnection;
 
     bool m_SelfCall;
+    
+    bool m_AutoUpdate;
 
     PropertyViewTypeMap m_ViewTypes;
 };

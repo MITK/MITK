@@ -83,6 +83,7 @@ void QmitkDataTreeComboBox::initialize()
   m_SelfCall = false;
   m_DisplayedProperty.clear();
   m_UserSetDisplayedProperty.clear();
+  m_AutoUpdate = false;
 
   connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
 }
@@ -165,6 +166,7 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
 
     // create default filter with visibility (editable) and name (non-editable)
     m_PrivateFilter = mitk::DataTreeFilter::New(tree);
+    m_PrivateFilter->SetAutoUpdate( m_AutoUpdate ); 
     m_PrivateFilter->SetFilter( mitk::IsBaseDataType<mitk::Image>() );
     m_PrivateFilter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
     mitk::DataTreeFilter::PropertyList visible;
@@ -240,6 +242,23 @@ mitk::DataTreeFilter* QmitkDataTreeComboBox::GetFilter()
 {
   return m_DataTreeFilter;
 }
+
+void QmitkDataTreeComboBox::SetAutoUpdate(bool autoUpdatesEnabled)
+{
+  if ( autoUpdatesEnabled != m_AutoUpdate )
+  {
+    if (m_DataTreeFilter) m_DataTreeFilter->SetAutoUpdate(autoUpdatesEnabled);
+
+    m_AutoUpdate = autoUpdatesEnabled;
+  }
+}
+
+void QmitkDataTreeComboBox::Update()
+{
+  if (m_DataTreeFilter)
+    m_DataTreeFilter->Update();
+}
+
 
 /**
   Called whenever the user selects a different item. The task here is to find the belonging item and change its selection status.

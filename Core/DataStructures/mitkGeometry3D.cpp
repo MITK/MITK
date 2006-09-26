@@ -97,13 +97,13 @@ void mitk::Geometry3D::Initialize()
 void mitk::Geometry3D::TransferItkToVtkTransform()
 {
   // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform
-  TransferItkTransformToVtkMatrix(m_IndexToWorldTransform, m_VtkMatrix);
+  TransferItkTransformToVtkMatrix(m_IndexToWorldTransform.GetPointer(), m_VtkMatrix);
   m_VtkIndexToWorldTransform->Modified();
 }
 
 void mitk::Geometry3D::TransferVtkToItkTransform()
 {
-  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform);
+  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
   m_ParametricTransform = m_IndexToWorldTransform;
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
@@ -456,7 +456,7 @@ void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType
 void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
 {
   mitk::AffineGeometryFrame3D::TransformType::Pointer itkTransform = mitk::AffineGeometryFrame3D::TransformType::New();
-  TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform);
+  TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
   Compose(itkTransform, pre);
 }
 

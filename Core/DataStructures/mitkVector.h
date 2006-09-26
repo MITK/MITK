@@ -325,7 +325,7 @@ namespace mitk
   // *This* ensures m_MatrixMTime.Modified(), which is therewith not equal to
   // m_InverseMatrixMTime, thus a new inverse will be calculated (when
   // requested).
-  static_cast<mitk::ItkMatrixHack*>(itkTransform)->MatrixChanged();
+  static_cast<mitk::ItkMatrixHack<TTransformType>*>(itkTransform)->MatrixChanged();
 
   typename TTransformType::OffsetType offset;
   offset[0] = vtkmatrix->GetElement( 0, 3 );

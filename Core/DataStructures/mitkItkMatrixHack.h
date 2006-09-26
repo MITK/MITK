@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef ITKMATRIXHACK_H_HEADER_INCLUDED_C1EBD0AD
 #define ITKMATRIXHACK_H_HEADER_INCLUDED_C1EBD0AD
 
-#include <mitkGeometry3D.h>
-
 namespace mitk {
 
 //##Documentation
@@ -37,11 +35,10 @@ namespace mitk {
 //## as m_MatrixMTime and the inverse is not recalculated.
 //## @warning Use with care!
 //## @ingroup Geometry
-class ItkMatrixHack : public AffineGeometryFrame3D::TransformType
+template <class TTransformType>
+class ItkMatrixHack : public TTransformType
 {
 public:
-  mitkClassMacro(ItkMatrixHack, AffineGeometryFrame3D::TransformType);
-
   void MatrixChanged()
   {
 #if (ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 2)

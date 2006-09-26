@@ -13,7 +13,13 @@
 /**
   \class QmitkTreeNodeSelector
   
-  A simple ComboXBox for selecting an image node
+ \attention This class is deprecated and should be replaced by QmitkDataTreeComboBox, 
+            as it provides the same functionality but better separation of GUI and 
+            non-GUI tasks.
+            For information about how to use the new widget, refer to QmitkDataTreeComboBox, 
+            there is quite some information. If unsure, ask the MITK mailinglist.
+  
+ A simple ComboXBox for selecting an image node
 */
 #include "mitkDataTreeNode.h"
 #include "QmitkCommonFunctionality.h"

@@ -304,6 +304,7 @@ template <class Tin, class Tout> inline void TransferMatrix(const Tin& in, Tout&
  * probably related to a compiler bug. 
  */
 #include <itkAffineGeometryFrame.h>
+#include "mitkItkMatrixHack.h"
 
 namespace mitk
 {

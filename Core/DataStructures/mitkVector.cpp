@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVector.h"
-#include "mitkItkMatrixHack.h"
 #include <vtkSystemIncludes.h>
 #include <vtkMatrix4x4.h>
 

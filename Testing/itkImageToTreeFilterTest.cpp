@@ -47,7 +47,6 @@ const unsigned int                                    DIMENSION = 3;
 typedef double                                        ScalarType;
 
 typedef itk::Image<PixelType, DIMENSION>              ImageType;
-typedef ImageType::Pointer                            ImagePointer;
 typedef ImageType::PointType                          PointType;
 typedef ImageType::DirectionType                      DirectionType;
 
@@ -65,84 +64,64 @@ typedef RegistratedModelType::Pointer                 RegistratedModelPointer;
 
 // tree type
 typedef itk::RegistrationModelTree<RegistrationModelType>
-OutputTreeType;
-typedef OutputTreeType::TreeContainerPointer          OutputTreeContainerPointer;
-typedef OutputTreeType::Pointer                       OutputTreePointer;
+    OutputTreeType;
+typedef OutputTreeType::TreeContainerType             OutputTreeContainerType;
 
 typedef short                                         OutputPixelType;
 typedef itk::Image<OutputPixelType, DIMENSION>        OutputImageType;
-typedef OutputImageType::Pointer                      OutputImagePointer;
 typedef OutputImageType::PointType                    OutputImagePointType;
 
 // test classes
 typedef itk::ImageToTreeFilter<ImageType, OutputTreeType>
-ImageToTreeFilterType;
-typedef ImageToTreeFilterType::Pointer                ImageToTreeFilterPointer;
+    ImageToTreeFilterType;
 typedef itk::ITTFilterContext<ImageType, OutputTreeType>
-FilterContextType;
-typedef FilterContextType::Pointer                    FilterContextPointer;
+    FilterContextType;
 typedef itk::StartPointData<ImageType>                StartPointDataType;
-typedef StartPointDataType::Pointer                   StartPointDataPointer;
 typedef StartPointDataType::VectorType                StartPointDataVectorType;
 
 typedef itk::TubeSegmentModel<PixelType, DIMENSION, MeshTraits>
     TubeSegmentModelType;
-typedef TubeSegmentModelType::Pointer                 TubeSegmentModelPointer;
 
 typedef itk::RegistrationModelXMLWriter<TubeSegmentModelType>
-RegistrationModelWriterType;
-typedef RegistrationModelWriterType::Pointer          RegistrationModelWriterPointer;
+    RegistrationModelWriterType;
 typedef itk::RegistrationModelXMLReader<TubeSegmentModelType>
-RegistrationModelReaderType;
-typedef RegistrationModelReaderType::Pointer          RegistrationModelReaderPointer;
+    RegistrationModelReaderType;
 
 typedef TubeSegmentModelType::MeshType                MeshType;
-typedef MeshType::Pointer                             MeshPointer;
+
 
 typedef TubeSegmentModelType::PointSetType            PointSetType;
-typedef PointSetType::Pointer                         PointSetPointer;
 typedef PointSetType::PointType                       PointSetPointType;
 typedef PointSetType::PointsContainer                 PointsContainerType;
 typedef PointsContainerType::Iterator                 PointsIterator;
-typedef PointsContainerType::Pointer                  PointsContainerPointer;
 typedef PointsContainerType::ElementIdentifier        ElementIdentifier;
 typedef PointSetType::PointDataContainer              PointDataContainerType;
-typedef PointDataContainerType::Pointer               PointDataContainerPointer;
 
 typedef itk::Transform<ScalarType>                    BaseTransformType;
-typedef BaseTransformType::Pointer                    BaseTransformPointer;
 typedef itk::TranslationTransform<ScalarType>         TransformType;
-typedef TransformType::Pointer                        TransformPointer;
 typedef TransformType::ParametersType                 TransformParamtersType;
 typedef TransformType::OutputVectorType               TransformOutputVectorType;
 typedef TransformType::InputPointType                 TransformInputPointType;
 typedef TransformType::OutputPointType                TransformOutputPointType;
 
 typedef itk::TreeToBinaryImageFilter<OutputTreeType, OutputImageType>
-TreeToImageFilterType;
-typedef TreeToImageFilterType::Pointer                TreeToImageFilterPointer;
+    TreeToImageFilterType;
 
 typedef itk::ProfileGradientFinder<OutputImageType>   ProfileGradientFinderType;
-typedef ProfileGradientFinderType::Pointer            ProfileGradientFinderPointer;
 
 typedef ProfileGradientFinderType::ProfileDataType    ProfileDataType;
-typedef ProfileDataType::Pointer                      ProfileDataPointer;
 
 typedef itk::RefinementModelProcessor<RegistrationModelType, ImageType>
     RefinementModelProcessorType;
-typedef RefinementModelProcessorType::Pointer         RefinementModelProcessorPointer;
 
 typedef itk::PointSetToImageFilter<PointSetType, ImageType>
     PointSetToImageFilterType;
-typedef PointSetToImageFilterType::Pointer            PointSetToImageFilterPointer;
 
 typedef itk::TubeSegmentModelGenerator<PixelType>
     TubeSegmentModelGeneratorType;
-typedef TubeSegmentModelGeneratorType::Pointer        TubeSegmentModelGeneratorPointer;
 
 typedef itk::TubeSegmentModelRegistrator<PointSetType, ImageType, OutputTreeType>
     TubeSegmentModelRegistratorType;
-typedef TubeSegmentModelRegistratorType::Pointer          TubeSegmentModelRegistratorPointer;
 
 typedef itk::Vector<ScalarType>                       VectorType;
 
@@ -155,15 +134,15 @@ typedef std::list<int>                                ResultListType;
 typedef itk::ImageFileWriter<ImageType>               ImageFileWriterType;
 typedef itk::ROISphereExtractor<ImageType>            ROISphereExtractorType;
 
-TubeSegmentModelPointer generateTubeSegment()
+TubeSegmentModelType::Pointer generateTubeSegment()
 {
   PixelType pixelValue = 255;
 
-  TubeSegmentModelPointer tubeSegment = TubeSegmentModelType::New();
+  TubeSegmentModelType::Pointer tubeSegment = TubeSegmentModelType::New();
   ElementIdentifier index = 0;
-  PointSetPointer pointSet = PointSetType::New();
-  PointsContainerPointer pointsContainer = PointsContainerType::New();
-  PointDataContainerPointer pointDataContainer = PointDataContainerType::New();
+  PointSetType::Pointer pointSet = PointSetType::New();
+  PointsContainerType::Pointer pointsContainer = PointsContainerType::New();
+  PointDataContainerType::Pointer pointDataContainer = PointDataContainerType::New();
 
   // init test data
   PointType startPoint;
@@ -199,8 +178,8 @@ TubeSegmentModelPointer generateTubeSegment()
   pointSet->SetPointData(pointDataContainer);
   tubeSegment->SetPointSet(pointSet);
 
-  PointSetPointer connectionPointSet = PointSetType::New();
-  PointsContainerPointer connectionPointsContainer = PointsContainerType::New();
+  PointSetType::Pointer connectionPointSet = PointSetType::New();
+  PointsContainerType::Pointer connectionPointsContainer = PointsContainerType::New();
   index = 0;
   connectionPointsContainer->InsertElement(index, point1);
   connectionPointSet->SetPoints(connectionPointsContainer);
@@ -209,7 +188,7 @@ TubeSegmentModelPointer generateTubeSegment()
   return tubeSegment;
 }
 
-PointType transformPoint(TransformPointer transform, TransformParamtersType parameters, PointType point)
+PointType transformPoint(TransformType::Pointer transform, TransformParamtersType parameters, PointType point)
 {
   transform->SetParameters(parameters);
 
@@ -228,11 +207,11 @@ PointType transformPoint(TransformPointer transform, TransformParamtersType para
   return transformedPoint;
 }
 
-PointSetPointer transformPointSet(TransformPointer transform, TransformParamtersType parameters, PointSetPointer pointSet)
+PointSetType::Pointer transformPointSet(TransformType::Pointer transform, TransformParamtersType parameters, PointSetType::Pointer pointSet)
 {
   transform->SetParameters(parameters);
 
-  PointsContainerPointer transformedPoints = PointsContainerType::New();
+  PointsContainerType::Pointer transformedPoints = PointsContainerType::New();
   ElementIdentifier index = 0;
 
   PointsIterator pointsIter = pointSet->GetPoints()->Begin();
@@ -258,7 +237,7 @@ PointSetPointer transformPointSet(TransformPointer transform, TransformParamters
     ++index;
   }
 
-  PointSetPointer transformedPointSet = PointSetType::New();
+  PointSetType::Pointer transformedPointSet = PointSetType::New();
   transformedPointSet->SetPoints(transformedPoints);
 
   return transformedPointSet;
@@ -272,11 +251,11 @@ int testRegistrationModelXMLWriter()
   // TODO: add new point types
   std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
 
-  TubeSegmentModelPointer tubeSegment = generateTubeSegment();
+  TubeSegmentModelType::Pointer tubeSegment = generateTubeSegment();
   PointType startPoint = tubeSegment->GetStartPoint();
-  PointsContainerPointer pointsContainer = tubeSegment->GetPointSet()->GetPoints();
+  PointsContainerType::Pointer pointsContainer = tubeSegment->GetPointSet()->GetPoints();
 
-  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  RegistrationModelWriterType::Pointer modelWriter = RegistrationModelWriterType::New();
   modelWriter->SetRegistrationModel(tubeSegment);
   modelWriter->SetFilename("test.xml");
   modelWriter->WriteFile();
@@ -315,13 +294,13 @@ int testRegistrationModelXMLWriter()
 
   std::cout << " *** Testing the RegistrationModelXMLReader ***\n";
 
-  RegistrationModelReaderPointer registrationModelReader = RegistrationModelReaderType::New();
+  RegistrationModelReaderType::Pointer registrationModelReader = RegistrationModelReaderType::New();
   //   registrationModelReader->SetDebug(true);
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
-  TubeSegmentModelPointer readTubeSegment = registrationModelReader->GetTubeSegment();
-  PointSetPointer readPointSet = readTubeSegment->GetPointSet();
+  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetTubeSegment();
+  PointSetType::Pointer readPointSet = readTubeSegment->GetPointSet();
   PointType readStartPoint = readTubeSegment->GetStartPoint();
 
   if (startPoint != readStartPoint)
@@ -352,7 +331,7 @@ int testRegistrationModelXMLWriter()
     readPointsIter++;
   }
 
-  PointSetPointer readConnectionPoints      = readTubeSegment->GetConnectionPoints();
+  PointSetType::Pointer readConnectionPoints      = readTubeSegment->GetConnectionPoints();
   PointsIterator  readConnectionPointsIter  = readConnectionPoints->GetPoints()->Begin();
   PointSetPointType readConnectionPoint     = readConnectionPointsIter.Value();
 
@@ -377,16 +356,16 @@ int testRegistratedModel()
 {
   std::cout << " *** Testing the transfer of a model part via RegistratedModel ***\n";
 
-  TubeSegmentModelPointer tubeSegment = generateTubeSegment();
+  TubeSegmentModelType::Pointer tubeSegment = generateTubeSegment();
 
   TransformOutputVectorType offset;
   offset.Fill(1);
 
-  TransformPointer transform = TransformType::New();
+  TransformType::Pointer transform = TransformType::New();
   transform->SetOffset(offset);
   TransformParamtersType transformParameters = transform->GetParameters();
 
-  RegistratedModelPointer registratedModel = RegistratedModelType::New();
+  RegistratedModelType::Pointer registratedModel = RegistratedModelType::New();
   registratedModel->SetTransform(transform.GetPointer());
   registratedModel->SetTransformParameters(transformParameters);
   registratedModel->SetBaseModel(tubeSegment.GetPointer());
@@ -411,10 +390,10 @@ int testRegistratedModel()
     return EXIT_FAILURE;
   }
 
-  PointSetPointer transformedConnectionPoints = transformPointSet(transform, transformParameters, tubeSegment->GetConnectionPoints());
+  PointSetType::Pointer transformedConnectionPoints = transformPointSet(transform, transformParameters, tubeSegment->GetConnectionPoints());
   PointsIterator  transformedConPointsIter    = transformedConnectionPoints->GetPoints()->Begin();
 
-  PointSetPointer registratedConnectionPoints = registratedModel->GetConnectionPoints();
+  PointSetType::Pointer registratedConnectionPoints = registratedModel->GetConnectionPoints();
   PointsIterator  registratedConPointsIter    = registratedConnectionPoints->GetPoints()->Begin();
   PointsIterator  lastRegistratedPoint        = registratedConnectionPoints->GetPoints()->End();
 
@@ -435,10 +414,10 @@ int testRegistratedModel()
     ++registratedConPointsIter;
   }
 
-  PointSetPointer transformedPointSet   = transformPointSet(transform, transformParameters, tubeSegment->GetPointSet());
+  PointSetType::Pointer transformedPointSet   = transformPointSet(transform, transformParameters, tubeSegment->GetPointSet());
   PointsIterator  transformedPointsIter = transformedPointSet->GetPoints()->Begin();
 
-  PointSetPointer registratedPoints     = registratedModel->GetPointSet();
+  PointSetType::Pointer registratedPoints     = registratedModel->GetPointSet();
   PointsIterator  registratedPointsIter = registratedPoints->GetPoints()->Begin();
   PointsIterator  lastPoint             = registratedPoints->GetPoints()->End();
 
@@ -470,10 +449,10 @@ int testTreeToBinaryImageFilter()
 {
   std::cout << " *** Testing the TreeToImageFilter ***\n";
 
-  OutputTreePointer           outputTree    = OutputTreeType::New();
-  OutputTreeContainerPointer  treeContainer = outputTree->GetTreeContainer();
-  TransformPointer            transform     = TransformType::New();
-  TubeSegmentModelPointer     tubeSegment   = generateTubeSegment();
+  OutputTreeType::Pointer           outputTree    = OutputTreeType::New();
+  OutputTreeContainerType::Pointer  treeContainer = outputTree->GetTreeContainer();
+  TransformType::Pointer            transform     = TransformType::New();
+  TubeSegmentModelType::Pointer     tubeSegment   = generateTubeSegment();
 
   TransformOutputVectorType offset1;
   offset1.Fill(1);
@@ -488,13 +467,13 @@ int testTreeToBinaryImageFilter()
   offset2.Fill(2);
   transform->SetOffset(offset2);
   RegistratedModelPointer model2 = RegistratedModelType::New();
-  model2->SetBaseModel((RegistrationModelPointer)tubeSegment);
-  model2->SetTransform((BaseTransformPointer)transform);
+  model2->SetBaseModel(tubeSegment.GetPointer());
+  model2->SetTransform(transform.GetPointer());
   model2->SetTransformParameters(transform->GetParameters());
   treeContainer->Add(static_cast<RegistrationModelPointer>(model2),
                      static_cast<RegistrationModelPointer>(model1));
 
-  TreeToImageFilterPointer treeToImageFilter = TreeToImageFilterType::New();
+  TreeToImageFilterType::Pointer treeToImageFilter = TreeToImageFilterType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
   OutputImageType::SpacingType spacing;
@@ -525,7 +504,7 @@ int testProfileGradientFinder()
 {
   std::cout << " *** Testing the ProfileGradientFinder ***\n";
 
-  OutputImagePointer image = OutputImageType::New();
+  OutputImageType::Pointer image = OutputImageType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
   image->SetRegions(size);
@@ -542,7 +521,7 @@ int testProfileGradientFinder()
 
   itk::TimeProbe profileClock;
 
-  ProfileGradientFinderPointer gradientFinder = ProfileGradientFinderType::New();
+  ProfileGradientFinderType::Pointer gradientFinder = ProfileGradientFinderType::New();
   gradientFinder->SetInput(image);
   gradientFinder->SetStartPoint(startPoint);
   gradientFinder->SetEndPoint(endPoint);
@@ -583,40 +562,40 @@ int testRefinementModelProcessor()
 {
   std::cout << " *** Testing the RefinementModelProcessor ***\n";
 
-  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
 
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
   tubeGenerator->SetOuterRing(false);
   tubeGenerator->Update();
-  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+  TubeSegmentModelType::Pointer tubeSegment = tubeGenerator->GetOutput();
 
-  TransformPointer transform = TransformType::New();
+  TransformType::Pointer transform = TransformType::New();
   TransformOutputVectorType startPoint;
   startPoint.Fill(50);
   transform->SetOffset(startPoint);
 
-  RegistratedModelPointer registratedModel = RegistratedModelType::New();
-  registratedModel->SetBaseModel(static_cast<RegistrationModelPointer>(tubeSegment));
-  registratedModel->SetTransform(static_cast<BaseTransformPointer>(transform));
+  RegistratedModelType::Pointer registratedModel = RegistratedModelType::New();
+  registratedModel->SetBaseModel(tubeSegment.GetPointer());
+  registratedModel->SetTransform(transform.GetPointer());
   registratedModel->SetTransformParameters(transform->GetParameters());
 
-  PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
+  PointSetToImageFilterType::Pointer pointSetToImageFilter = PointSetToImageFilterType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
   pointSetToImageFilter->SetSize(size);
   pointSetToImageFilter->SetInput(registratedModel->GetPointSet());
   pointSetToImageFilter->Update();
 
-  RefinementModelProcessorPointer refinementProcessor = RefinementModelProcessorType::New();
+  RefinementModelProcessorType::Pointer refinementProcessor = RefinementModelProcessorType::New();
   refinementProcessor->SetInput(registratedModel);
   refinementProcessor->SetImage(pointSetToImageFilter->GetOutput());
   refinementProcessor->Update();
 
-  RegistrationModelPointer  outputModel   = refinementProcessor->GetOutput();
-  PointsContainerPointer    inputPoints   = tubeSegment->GetPointSet()->GetPoints();
-  PointsContainerPointer    outputPoints  = outputModel->GetPointSet()->GetPoints();
+  RegistrationModelType::Pointer  outputModel   = refinementProcessor->GetOutput();
+  PointsContainerType::Pointer    inputPoints   = tubeSegment->GetPointSet()->GetPoints();
+  PointsContainerType::Pointer    outputPoints  = outputModel->GetPointSet()->GetPoints();
 
   if(inputPoints->Size() != outputPoints->Size())
   {
@@ -635,40 +614,40 @@ int testTubeSegmentRegistrator()
 {
   std::cout << " *** Testing the TubeSegmentRegistrator ***\n";
 
-  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
   tubeGenerator->SetOuterRing(false);
   tubeGenerator->Update();
-  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+  TubeSegmentModelType::Pointer tubeSegment = tubeGenerator->GetOutput();
 
   TubeSegmentModelType::PointType          tubeStartPoint       = tubeSegment->GetStartPoint();
   TubeSegmentModelType::PointSetPointType  tubeConnectionPoint  = tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value();
 
-  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  RegistrationModelWriterType::Pointer modelWriter = RegistrationModelWriterType::New();
   modelWriter->SetRegistrationModel(tubeSegment);
   modelWriter->SetFilename("test.xml");
   modelWriter->WriteFile();
 
-  PointSetToImageFilterPointer pointSetToImageFilter = PointSetToImageFilterType::New();
+  PointSetToImageFilterType::Pointer pointSetToImageFilter = PointSetToImageFilterType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
   pointSetToImageFilter->SetSize(size);
   pointSetToImageFilter->SetInput(tubeSegment->GetPointSet());
   pointSetToImageFilter->Update();
 
-  OutputTreePointer outputTree = OutputTreeType::New();
+  OutputTreeType::Pointer outputTree = OutputTreeType::New();
 
-  FilterContextPointer filterContext = FilterContextType::New();
+  FilterContextType::Pointer filterContext = FilterContextType::New();
   filterContext->SetInputImage(pointSetToImageFilter->GetOutput());
   filterContext->SetDryRun(true);
   filterContext->SetDryRun(true);
   filterContext->SetOutputTree(outputTree);
   filterContext->SetModelFilename("test.xml");
 
-  StartPointDataPointer startPointData = StartPointDataType::New();
+  StartPointDataType::Pointer startPointData = StartPointDataType::New();
   StartPointDataType::PointType startPoint;
   startPoint.Fill(50);
   startPointData->SetStartPoint(startPoint);
@@ -676,12 +655,12 @@ int testTubeSegmentRegistrator()
   startDirection.Fill(1.0);
   startPointData->SetStartDirection(startDirection);
 
-  TubeSegmentModelRegistratorPointer tubeModelRegistrator = TubeSegmentModelRegistratorType::New();
+  TubeSegmentModelRegistratorType::Pointer tubeModelRegistrator = TubeSegmentModelRegistratorType::New();
   tubeModelRegistrator->SetFilterContext(filterContext);
   tubeModelRegistrator->SetStartPointData(startPointData);
   tubeModelRegistrator->Update();
 
-  RegistrationModelPointer movedModel = filterContext->GetOutputTree()->GetTreeContainer()->GetRoot()->Get();
+  RegistrationModelType::Pointer movedModel = filterContext->GetOutputTree()->GetTreeContainer()->GetRoot()->Get();
   RegistrationModelType::PointType          modelStartPoint       = movedModel->GetStartPoint();
   RegistrationModelType::PointSetPointType  modelConnectionPoint  = movedModel->GetConnectionPoints()->GetPoints()->Begin().Value();
 
@@ -719,14 +698,14 @@ int testRegistrationModelRadius()
 {
   std::cout << " *** Testing the Radius calculation of the RegistrationModel ***\n";
 
-  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
   tubeGenerator->SetOuterRing(false);
   tubeGenerator->Update();
-  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+  TubeSegmentModelType::Pointer tubeSegment = tubeGenerator->GetOutput();
 
   ScalarType radius = tubeSegment->GetRadius(tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value());
 
@@ -754,28 +733,28 @@ int testMeshReadWrite()
   std::cout << "This test will crash on ITK > 2.6!" << std::endl;
   std::cout << "--------------- WARNING ---------------" << std::endl;
 
-  TubeSegmentModelGeneratorPointer tubeGenerator = TubeSegmentModelGeneratorType::New();
+  TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
   tubeGenerator->SetRadius(10);
   tubeGenerator->SetInnerRing(false);
   tubeGenerator->SetOuterRing(false);
   tubeGenerator->Update();
-  TubeSegmentModelPointer tubeSegment = tubeGenerator->GetOutput();
+  TubeSegmentModelType::Pointer tubeSegment = tubeGenerator->GetOutput();
 
-  RegistrationModelWriterPointer modelWriter = RegistrationModelWriterType::New();
+  RegistrationModelWriterType::Pointer modelWriter = RegistrationModelWriterType::New();
   modelWriter->SetRegistrationModel(tubeSegment);
   modelWriter->SetFilename("test.xml");
   modelWriter->WriteFile();
 
-  RegistrationModelReaderPointer registrationModelReader = RegistrationModelReaderType::New();
+  RegistrationModelReaderType::Pointer registrationModelReader = RegistrationModelReaderType::New();
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
-  TubeSegmentModelPointer readTubeSegment = registrationModelReader->GetTubeSegment();
+  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetTubeSegment();
 
-  MeshPointer mesh      = tubeSegment->GetMesh();
-  MeshPointer readMesh  = readTubeSegment->GetMesh();
+  MeshType::Pointer mesh      = tubeSegment->GetMesh();
+  MeshType::Pointer readMesh  = readTubeSegment->GetMesh();
 
   if(mesh->GetPoints()->Size() != readMesh->GetPoints()->Size() &&
       mesh->GetPointData()->Size() != readMesh->GetPointData()->Size() &&

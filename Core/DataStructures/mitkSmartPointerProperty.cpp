@@ -133,6 +133,40 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
     return std::string("NULL");
 }
 
+bool mitk::SmartPointerProperty::Assignable(const BaseProperty& other) const
+{
+  try
+  {
+    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
+    return true;
+  }
+  catch (std::bad_cast)
+  {
+  }
+  return false;
+}
+
+mitk::BaseProperty& mitk::SmartPointerProperty::operator=(const BaseProperty& other)
+{
+  try
+  {
+    const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+    if (this->m_SmartPointer != otherProp.m_SmartPointer)
+    {
+      this->m_SmartPointer = otherProp.m_SmartPointer;
+      this->Modified();
+    }
+  }
+  catch (std::bad_cast)
+  {
+    // nothing to do then
+  }
+
+  return *this;
+}
+
+
 bool mitk::SmartPointerProperty::ReadXMLData( XMLReader& xmlReader)
 {
   std::string pointedAt;

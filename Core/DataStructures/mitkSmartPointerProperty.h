@@ -56,6 +56,10 @@ class SmartPointerProperty : public BaseProperty
 
     /// mainly for XML output
     virtual std::string GetValueAsString() const;
+    
+    virtual bool Assignable(const BaseProperty&) const;
+    
+    virtual BaseProperty& operator=(const BaseProperty& property);
 
     /// XML input
     virtual bool ReadXMLData(XMLReader&);

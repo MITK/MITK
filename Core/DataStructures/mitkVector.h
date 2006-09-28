@@ -28,8 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 
-class vtkMatrix4x4;
-
 #ifndef DOXYGEN_SKIP
 
 namespace mitk {

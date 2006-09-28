@@ -22,8 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkVector.h"
-#include "mitkVector.h"
-#include "mitkMatrixConvert.h"
 #include <itkAffineGeometryFrame.h>
 #include "mitkOperationActor.h"
 #include <itkBoundingBox.h>

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry3D.h"
 #include "mitkItkMatrixHack.h"
+#include "mitkMatrixConvert.h"
 #include "mitkOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"

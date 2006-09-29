@@ -244,11 +244,11 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   double *alphas;
   double *alphasHead;
-  alphasHead=alphas=(double*)malloc(sizeof(double*)*num_of_values);
+  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
 #else
   float *alphas;
   float *alphasHead;
-  alphasHead=alphas=(float *)malloc(sizeof(float *)*num_of_values);
+  alphasHead=alphas=(float *)malloc(sizeof(float)*num_of_values);
 #endif
 
 

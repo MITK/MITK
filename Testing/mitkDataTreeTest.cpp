@@ -346,6 +346,59 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   else
     std::cout<<"[PASSED]"<<std::endl;
 
+
+  // some iterator tests
+  // start with new datatree
+  tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  std::cout << "Now doing an iterator test. Create another node with another image: " << std::flush;
+  mitk::DataTreeNode::Pointer node3 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer node3Watcher = new mitk::ReferenceCountWatcher(node3, "node3");
+  mitk::Image::Pointer image3 = mitk::Image::New();
+  mitk::ReferenceCountWatcher::Pointer image3Watcher = new mitk::ReferenceCountWatcher(image3, "image3");
+  node3->SetData(image3);
+  image3 = NULL;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Adding node3 via iterator by root-iterator: " << std::flush;
+  mitk::DataTreePreOrderIterator rootIt(tree);
+  rootIt.Add(node3);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Clone root-iterator: " << std::flush;
+  mitk::DataTreePreOrderIterator* res = static_cast<mitk::DataTreePreOrderIterator*>(rootIt.Clone());
+  if(res == NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Find node3 again and go there: " << std::flush;
+  res->GoToChild(res->ChildPosition(node3));
+  if((res->IsAtEnd()) || (res->Get() != node3.GetPointer()))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Remove node3 from tree via iterator: " << std::flush;
+  res->Remove();
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  node3 = NULL;
+  std::cout << "Testing whether image3 was really freed: ";
+  if(image3Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

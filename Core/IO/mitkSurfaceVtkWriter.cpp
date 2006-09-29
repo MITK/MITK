@@ -22,18 +22,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
 
+namespace mitk {
+
 template<>
-void mitk::SurfaceVtkWriter<vtkSTLWriter>::SetDefaultExtension()
+void SurfaceVtkWriter<vtkSTLWriter>::SetDefaultExtension()
 {
   m_Extension = ".stl";
 }
 
 template<>
-void mitk::SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
+void SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
 {
   m_Extension = ".vtk";
 }
 
-template class mitk::SurfaceVtkWriter<vtkSTLWriter>;
+template class SurfaceVtkWriter<vtkSTLWriter>;
 
-template class mitk::SurfaceVtkWriter<vtkPolyDataWriter>;
+template class SurfaceVtkWriter<vtkPolyDataWriter>;
+
+}

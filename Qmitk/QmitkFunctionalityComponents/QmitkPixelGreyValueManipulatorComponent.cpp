@@ -32,16 +32,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 /***************       CONSTRUCTOR      ***************/
 QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
-m_ParentName(parentName),
-m_ComponentName("SurfaceCreator"),
-m_MultiWidget(mitkStdMultiWidget),
-m_DataTreeIteratorClone(NULL),
-m_UpdateSelector(updateSelector),
-m_ShowSelector(showSelector),
-m_Active(false),
-m_PixelGreyValueManipulatorComponentGUI(NULL),
-m_SelectedImage(NULL),
-m_Spacer(NULL)
+  QmitkFunctionalityComponentContainer(parent, parentName),
+  m_ParentName(parentName),
+  m_ComponentName("SurfaceCreator"),
+  m_MultiWidget(mitkStdMultiWidget),
+  m_DataTreeIteratorClone(NULL),
+  m_UpdateSelector(updateSelector),
+  m_ShowSelector(showSelector),
+  m_Active(false),
+  m_PixelGreyValueManipulatorComponentGUI(NULL),
+  m_SelectedImage(NULL),
+  m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
 }
@@ -298,7 +299,7 @@ void QmitkPixelGreyValueManipulatorComponent::GetManipulationValueFromGUI(int & 
 
 }
 
-void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* image, const mitk::Image* segmentation)
+void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*image*/, const mitk::Image* /*segmentation*/)
 {
 
 }

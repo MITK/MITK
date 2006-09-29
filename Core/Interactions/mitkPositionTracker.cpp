@@ -17,7 +17,7 @@ mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* 
 {}
 
 
-bool mitk::PositionTracker::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
+bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());

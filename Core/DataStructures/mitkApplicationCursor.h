@@ -39,6 +39,8 @@ class ApplicationCursorImplementation
     /// Restore the previous cursor
     virtual void PopCursor() = 0;
 
+    virtual ~ApplicationCursorImplementation() {};
+
   protected:
   private:
 };

@@ -147,7 +147,7 @@ protected:
   */
   mitk::DataTreeIteratorClone m_DataTreeIteratorClone;
 
-  void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
+  void LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
 
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;

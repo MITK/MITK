@@ -45,7 +45,7 @@ QmitkDataTreeFilterDemo::~QmitkDataTreeFilterDemo()
 }
 
 
-QWidget* QmitkDataTreeFilterDemo::CreateMainWidget(QWidget* parent)
+QWidget* QmitkDataTreeFilterDemo::CreateMainWidget(QWidget* /*parent*/)
 {
   return NULL;
 }
@@ -222,7 +222,7 @@ void QmitkDataTreeFilterDemo::onListboxItemAdded(const mitk::DataTreeFilter::Ite
 }
 
 
-void QmitkDataTreeFilterDemo::ListboxModifiedHandler( const itk::EventObject& e )
+void QmitkDataTreeFilterDemo::ListboxModifiedHandler( const itk::EventObject& /*e*/ )
 {
   std::cout << "(Listbox) Something changed." << std::endl;
  

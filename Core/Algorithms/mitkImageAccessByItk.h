@@ -54,7 +54,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## within which the mitk-image (@a mitkImage) is accessed:
 //## \code
 //##   template < typename TPixel, unsigned int VImageDimension > 
-//##     void ExampleFunction( itk::Image<typename TPixel, VImageDimension>* itkImage, TPixel* dummy = NULL );
+//##     void ExampleFunction( itk::Image<TPixel, VImageDimension>* itkImage, TPixel* dummy = NULL );
 //## \endcode
 //## Instantiate the function using
 //## \code
@@ -90,7 +90,6 @@ PURPOSE.  See the above copyright notices for more information.
   if(mitkImage->GetDimension()==2)                                                     \
   {                                                                                    \
     _accessAllTypesByItk(mitkImage, itkImageTypeFunction, 2);                          \
-    return;                                                                            \
   }                                                                                    \
   else                                                                                 \
   {                                                                                    \

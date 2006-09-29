@@ -38,6 +38,7 @@ mitk::PointSetMapper2D::PointSetMapper2D()
 : m_Polygon(false),
   m_ShowPoints(true),
   m_ShowDistances(false),
+  m_DistancesDecimalDigits(1),
   m_ShowAngles(false),
   m_ShowDistantLines(true)
 {
@@ -65,6 +66,7 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetBoolProperty("contour",            m_Polygon);
   node->GetBoolProperty("show points",        m_ShowPoints);
   node->GetBoolProperty("show distances",     m_ShowDistances);
+  node->GetFloatProperty("distance decimal digits",     m_DistancesDecimalDigits);
   node->GetBoolProperty("show angles",        m_ShowAngles);
   node->GetBoolProperty("show distant lines", m_ShowDistantLines);
 }
@@ -277,7 +279,12 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           if(m_ShowDistances) // calculate and print a distance
           {
             std::stringstream buffer;
-            buffer << vec.GetNorm();
+            float distance = vec.GetNorm();
+            // std::stringstream::setprecision not used because this would set the length of the whole string (including digits before the decimal point)
+            buffer << static_cast<int>(distance); // cut of decimal digits
+            buffer << '.';
+            buffer <<     (int)(distance - static_cast<float>(static_cast<int>(distance))) // decimal digits
+                       * pow( 10, m_DistancesDecimalDigits ); 
             // TODO limit to 1 or 0 decimal places (by default)
 
             Vector2D vec2d = pt2d-lastPt2d;

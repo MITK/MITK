@@ -74,6 +74,7 @@ protected:
     bool m_Polygon;
     bool m_ShowPoints;
     bool m_ShowDistances;
+    float m_DistancesDecimalDigits;
     bool m_ShowAngles;
     bool m_ShowDistantLines;
 };

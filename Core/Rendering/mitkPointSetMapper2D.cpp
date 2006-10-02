@@ -284,7 +284,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
             buffer << static_cast<int>(distance); // cut of decimal digits
             buffer << '.';
             buffer <<     (int)(distance - static_cast<float>(static_cast<int>(distance))) // decimal digits
-                       * pow( 10, m_DistancesDecimalDigits ); 
+                       * pow( 10.0f, m_DistancesDecimalDigits ); 
             // TODO limit to 1 or 0 decimal places (by default)
 
             Vector2D vec2d = pt2d-lastPt2d;

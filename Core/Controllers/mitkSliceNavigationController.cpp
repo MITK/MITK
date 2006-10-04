@@ -75,34 +75,6 @@ void SliceNavigationController::SetInputWorldGeometry(const Geometry3D* geometry
     m_InputWorldGeometry = geometry;
     Modified();
   }
-
-  m_ExtendedInputWorldGeometry = dynamic_cast< Geometry3D * >(
-    m_InputWorldGeometry->Clone().GetPointer()
-  );
-
-  if ( m_ExtendedInputWorldGeometry )
-  {
-    BoundingBox * boundingBox = const_cast< BoundingBox * >( m_ExtendedInputWorldGeometry->GetBoundingBox() );
-    BoundingBox::PointType center = boundingBox->GetCenter();
-
-    BoundingBox::AccumulateType diagonalLength = sqrt(
-      boundingBox->GetDiagonalLength2()
-    );
-
-    BoundingBox::PointType minimum;
-    minimum[0] = center[0] - diagonalLength / 2.0;
-    minimum[1] = center[1] - diagonalLength / 2.0;
-    minimum[2] = center[2] - diagonalLength / 2.0;
-    boundingBox->SetMinimum( minimum );
-
-    BoundingBox::PointType maximum;
-    maximum[0] = center[0] + diagonalLength / 2.0;
-    maximum[1] = center[1] + diagonalLength / 2.0;
-    maximum[2] = center[2] + diagonalLength / 2.0;
-    boundingBox->SetMaximum( maximum );
-
-    boundingBox->ComputeBoundingBox();
-  }
 }
 
 RenderingManager* SliceNavigationController::GetRenderingManager() const
@@ -155,14 +127,14 @@ void SliceNavigationController::Update(SliceNavigationController::ViewDirection 
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
     
     m_CreatedWorldGeometry = NULL;
-    const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_ExtendedInputWorldGeometry.GetPointer());
+    const TimeSlicedGeometry* worldTimeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(m_InputWorldGeometry.GetPointer());
     switch(viewDirection)
     {
     case Original:
       if(worldTimeSlicedGeometry != NULL)
       {
         m_CreatedWorldGeometry =
-          static_cast<TimeSlicedGeometry*>(m_ExtendedInputWorldGeometry->Clone().GetPointer());
+          static_cast<TimeSlicedGeometry*>(m_InputWorldGeometry->Clone().GetPointer());
         worldTimeSlicedGeometry = m_CreatedWorldGeometry.GetPointer();
         slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(m_CreatedWorldGeometry->GetGeometry3D(0));
         if(slicedWorldGeometry.IsNotNull())
@@ -172,25 +144,25 @@ void SliceNavigationController::Update(SliceNavigationController::ViewDirection 
       }
       else
       {
-        const SlicedGeometry3D* worldSlicedGeometry = dynamic_cast<const SlicedGeometry3D*>(m_ExtendedInputWorldGeometry.GetPointer());
+        const SlicedGeometry3D* worldSlicedGeometry = dynamic_cast<const SlicedGeometry3D*>(m_InputWorldGeometry.GetPointer());
         if(worldSlicedGeometry != NULL)
         {
-          slicedWorldGeometry = static_cast<SlicedGeometry3D*>(m_ExtendedInputWorldGeometry->Clone().GetPointer());
+          slicedWorldGeometry = static_cast<SlicedGeometry3D*>(m_InputWorldGeometry->Clone().GetPointer());
           break;
         }
       }
       //else: use Transversal: no "break" here!!
     case Transversal:
       slicedWorldGeometry=SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes(m_ExtendedInputWorldGeometry, PlaneGeometry::Transversal, top, frontside, rotated);
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, PlaneGeometry::Transversal, top, frontside, rotated);
       break;
     case Frontal:
       slicedWorldGeometry=SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes(m_ExtendedInputWorldGeometry, PlaneGeometry::Frontal, top, frontside, rotated);
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, PlaneGeometry::Frontal, top, frontside, rotated);
       break;
     case Sagittal:
       slicedWorldGeometry=SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes(m_ExtendedInputWorldGeometry, PlaneGeometry::Sagittal, top, frontside, rotated);
+      slicedWorldGeometry->InitializePlanes(m_InputWorldGeometry, PlaneGeometry::Sagittal, top, frontside, rotated);
       break;
     default:
       itkExceptionMacro("unknown ViewDirection");

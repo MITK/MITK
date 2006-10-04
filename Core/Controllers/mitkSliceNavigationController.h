@@ -314,7 +314,6 @@ class SliceNavigationController : public BaseController
     virtual ~SliceNavigationController();
 
     mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
-    mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
 
     mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 

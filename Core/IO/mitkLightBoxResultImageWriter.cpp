@@ -35,7 +35,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageFileReader.h>
 
 
-
 mitk::LightBoxResultImageWriter::LightBoxResultImageWriter()
 {
   m_ImageTypeName = "Image, Segmentation";
@@ -77,11 +76,13 @@ const mitk::Image *mitk::LightBoxResultImageWriter::GetSourceImage(void)
   return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));		
 }
 
+/// set the image that should be stored to the database
 void mitk::LightBoxResultImageWriter::SetSourceImage(const mitk::Image *source)
 {
   this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );	
 }
 
+/// set the "example image" that is needed for writing (and already existent in the database)
 bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator)
 {
   if(iterator==NULL)
@@ -110,7 +111,8 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
 
 
     itkGenericOutputMacro(<<"it-> name"<<it->Get()->GetPropertyList()->GetProperty("name")->GetValueAsString());
-    if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
+    //if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
+    if (true)
     {
       mitk::Image::Pointer sourcecandidate=dynamic_cast<mitk::Image*>(it->Get()->GetData());
       if(sourcecandidate.IsNotNull())
@@ -218,7 +220,6 @@ QcLightbox* mitk::LightBoxResultImageWriter::GetLightBox() const
 {
   return m_LightBox;
 }
-
 
 void mitk::LightBoxResultImageWriter::GenerateData()
 {
@@ -339,7 +340,7 @@ void mitk::LightBoxResultImageWriter::GenerateData()
       cur->dim = 2;
 
       if( prev )
-        QcPlugin::changeSeries( cur, prev );
+        QcPlugin::changeSeries( cur, prev ); // same series as previous slice
       m_LightBox->addImage( cur );
 
       prev = cur;

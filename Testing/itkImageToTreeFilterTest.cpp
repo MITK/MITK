@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProfileGradientFinder.h>
 #include <itkRefinementModelProcessor.h>
 #include <itkRegistrationModelTree.h>
+#include <itkRegistrationModelTreeWriter.h>
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
 #include <itkStartPointData.h>
@@ -89,7 +90,6 @@ typedef itk::RegistrationModelXMLReader<TubeSegmentModelType>
 
 typedef TubeSegmentModelType::MeshType                MeshType;
 
-
 typedef TubeSegmentModelType::PointSetType            PointSetType;
 typedef PointSetType::PointType                       PointSetPointType;
 typedef PointSetType::PointsContainer                 PointsContainerType;
@@ -133,6 +133,9 @@ typedef std::list<int>                                ResultListType;
 
 typedef itk::ImageFileWriter<ImageType>               ImageFileWriterType;
 typedef itk::ROISphereExtractor<ImageType>            ROISphereExtractorType;
+
+typedef itk::RegistrationModelTreeWriter<OutputTreeType>
+    RegistrationModelTreeWriterType;
 
 TubeSegmentModelType::Pointer generateTubeSegment()
 {
@@ -817,7 +820,7 @@ int testParticleReflectionCalculator()
   calculator->SetParticle(testParticle);
   calculator->CalculateReflection();
 
-  ScalarType tolerance = 0.3;
+  ScalarType tolerance = 0.5;
 
   PointType expPoint;
   expPoint[0] = 35.5;
@@ -860,6 +863,45 @@ int testParticleReflectionCalculator()
   return EXIT_SUCCESS;
 }
 
+int testModelTreeWriteRead()
+{
+  std::cout << " *** Testing the Reading and Writing of model trees ***" << std::endl;
+
+  OutputTreeType::Pointer           outputTree    = OutputTreeType::New();
+  OutputTreeContainerType::Pointer  treeContainer = outputTree->GetTreeContainer();
+  TransformType::Pointer            transform     = TransformType::New();
+  TubeSegmentModelType::Pointer     tubeSegment   = generateTubeSegment();
+
+  TransformOutputVectorType offset1;
+  offset1.Fill(1);
+  transform->SetOffset(offset1);
+  RegistratedModelPointer model1 = RegistratedModelType::New();
+  model1->SetBaseModel(tubeSegment.GetPointer());
+  model1->SetTransform(transform.GetPointer());
+  model1->SetTransformParameters(transform->GetParameters());
+  treeContainer->SetRoot(model1.GetPointer());
+
+  TransformOutputVectorType offset2;
+  offset2.Fill(2);
+  transform->SetOffset(offset2);
+  RegistratedModelPointer model2 = RegistratedModelType::New();
+  model2->SetBaseModel(tubeSegment.GetPointer());
+  model2->SetTransform(transform.GetPointer());
+  model2->SetTransformParameters(transform->GetParameters());
+  treeContainer->Add(static_cast<RegistrationModelPointer>(model2),
+                     static_cast<RegistrationModelPointer>(model1));
+
+  RegistrationModelTreeWriterType::Pointer treeWriter =
+      RegistrationModelTreeWriterType::New();
+  treeWriter->SetFilename("testtree.rmt");
+  treeWriter->SetTree(outputTree);
+  treeWriter->WriteFile();
+
+  std::cout << " *** [TEST PASSED] ***\n";
+  return EXIT_SUCCESS;
+}
+
+
 int itkImageToTreeFilterTest(int /*i*/, char* argv[])
 {
   ResultListType resultList;
@@ -876,6 +918,7 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   resultList.push_back(testTubeSegmentRegistrator());
   resultList.push_back(testMeshReadWrite());
   resultList.push_back(testParticleReflectionCalculator());
+  resultList.push_back(testModelTreeWriteRead());
 
   std::cout << " *** [ALL TESTS DONE] ***\n";
 

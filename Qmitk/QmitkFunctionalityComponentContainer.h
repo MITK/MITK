@@ -113,16 +113,18 @@ public:
   virtual void Deactivated();
 
 
-  /***************        ATTRIBUTES      ***************/
-  /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
+
 
 protected slots:  
+
+
+public slots:
+
   /*************** TREE CHANGED (       ) ***************/
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
   virtual void TreeChanged();
 
-public slots:
+
   /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
@@ -133,6 +135,10 @@ protected:
   unsigned long m_ObserverTag;
 
   QWidget* m_GUI;
+
+    /***************        ATTRIBUTES      ***************/
+  /** \brief Vector with all added components */
+  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;

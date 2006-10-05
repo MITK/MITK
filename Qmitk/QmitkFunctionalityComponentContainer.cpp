@@ -120,13 +120,21 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
+  if(m_FunctionalityComponentContainerGUI)
+  {
+    m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->Update();
 
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    {
+      m_AddedChildList[i]->TreeChanged();
+    } 
+  }
 }
 
 /***************       CONNECTIONS      ***************/
 void QmitkFunctionalityComponentContainer::CreateConnections()
 {
-  if ( m_GUI )
+  if ( m_FunctionalityComponentContainerGUI )
   {
     connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
   }
@@ -187,6 +195,10 @@ void QmitkFunctionalityComponentContainer::Activated()
 void QmitkFunctionalityComponentContainer::Deactivated()
 {
   m_Active = false;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
 }
 
 

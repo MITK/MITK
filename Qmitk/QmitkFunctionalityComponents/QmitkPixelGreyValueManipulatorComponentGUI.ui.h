@@ -93,14 +93,41 @@ QGroupBox * QmitkPixelGreyValueManipulatorComponentGUI::GetPixelManipulatorConte
    return m_PixelManipulatorContentGroupBox;
 }
 
-
-QLayout* QmitkPixelGreyValueManipulatorComponentGUI::GetValueLayout()
-{
-  return m_ValueLayout;
-}
-
-
 QGroupBox * QmitkPixelGreyValueManipulatorComponentGUI::GetValue1GroupBox()
 {
   return m_Value1GroupBox;
+}
+
+
+
+
+QGroupBox* QmitkPixelGreyValueManipulatorComponentGUI::GetBaseThresholdGroupBox()
+{
+  return m_BaseThresholdGroupBox;
+}
+
+
+int QmitkPixelGreyValueManipulatorComponentGUI::GetBaseThreshold()
+{
+  int value;
+  value = atoi(m_BaseThresholdLineEdit->text());
+  return value;
+}
+
+
+QmitkDataTreeComboBox* QmitkPixelGreyValueManipulatorComponentGUI::GetSegmentationSelector()
+{
+  return m_SegmentationSelector;
+}
+
+
+QGroupBox* QmitkPixelGreyValueManipulatorComponentGUI::GetSegmentationSelectorGroupBox()
+{
+  return m_SegmentationSelectorGroupBox;
+}
+
+
+void QmitkPixelGreyValueManipulatorComponentGUI::SetThreshold(int threshold)
+{
+ m_BaseThresholdLineEdit->setText(QString::number(threshold));
 }

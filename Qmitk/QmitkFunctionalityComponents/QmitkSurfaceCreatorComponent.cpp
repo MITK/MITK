@@ -115,7 +115,15 @@ QWidget* QmitkSurfaceCreatorComponent::GetGUI()
 /*************** TREE CHANGED (       ) ***************/
 void QmitkSurfaceCreatorComponent::TreeChanged()
 {
+  if(m_SurfaceCreatorComponentGUI)
+  {
+    m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->Update();
 
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    {
+      m_AddedChildList[i]->TreeChanged();
+    } 
+  }
 }
 
 /***************       CONNECTIONS      ***************/
@@ -239,12 +247,20 @@ void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
 void QmitkSurfaceCreatorComponent::Activated()
 {
   m_Active = true;
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Activated();
+  } 
 }
 
 /***************       DEACTIVATED      ***************/
 void QmitkSurfaceCreatorComponent::Deactivated()
 {
   m_Active = false;
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
 }
 
 /**********************VISIBILITY************************************/

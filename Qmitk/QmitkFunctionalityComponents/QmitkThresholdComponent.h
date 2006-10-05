@@ -98,8 +98,8 @@ public:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
+  ///** \brief Vector with all added components */
+  //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
 
 
 public slots:  
@@ -128,6 +128,10 @@ public slots:
 
 
 protected:
+
+  /** \brief Method that controls everything what happend after an image was selected */
+  void DataObjectSelected();
+
   /***************        ATTRIBUTES      ***************/
 
   /*!

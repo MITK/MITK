@@ -95,18 +95,14 @@ QWidget* QmitkThresholdComponent::GetGUI()
 /*************** TREE CHANGED (       ) ***************/
 void QmitkThresholdComponent::TreeChanged()
 {
-  if(m_Active)
+  if(m_ThresholdComponentGUI)
   {
-    if(m_ThresholdNodeExisting)
+    m_ThresholdComponentGUI->GetTreeNodeSelector()->Update();
+
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
-      m_ThresholdImageNode->SetData(m_Node->GetData());
-    }
-    else
-    {
-      CreateThresholdImageNode();
-      m_ThresholdImageNode->SetData(m_Node->GetData());
-    }
-    ShowThreshold();
+      m_AddedChildList[i]->TreeChanged();
+    } 
   }
 }
 
@@ -154,9 +150,26 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
     }
   }
   m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedImage->GetNode());
-  TreeChanged();
+  DataObjectSelected();
   SetSliderRange();
   ShowThreshold();
+}
+
+void QmitkThresholdComponent::DataObjectSelected()
+{
+  if(m_Active)
+  {
+    if(m_ThresholdNodeExisting)
+    {
+      m_ThresholdImageNode = m_Node;//->SetData(m_Node->GetData());
+    }
+    else
+    {
+      CreateThresholdImageNode();
+      m_ThresholdImageNode = m_Node;//->SetData(m_Node->GetData());
+    }
+    ShowThreshold();
+  }
 }
 
 /*************** CREATE CONTAINER WIDGET **************/

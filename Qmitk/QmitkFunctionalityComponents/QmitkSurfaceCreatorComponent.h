@@ -110,7 +110,7 @@ public:
   /***************        ATTRIBUTES      ***************/
 
   /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
+  //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
 
 
 public slots:  

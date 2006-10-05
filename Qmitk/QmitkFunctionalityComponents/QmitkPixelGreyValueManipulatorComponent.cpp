@@ -25,9 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"
 
+#include <mitkImageAccessByItk.h>
+
 #include <qlineedit.h>
 #include <qslider.h>
 #include <qgroupbox.h>
+#include <qcursor.h>
+#include <qapplication.h>
 
 
 /***************       CONSTRUCTOR      ***************/
@@ -45,6 +49,17 @@ QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent
   m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
+  m_MitkImage = NULL;
+  m_MitkImageIterator = NULL;
+  m_Segmentation = NULL; 
+  m_PixelChangedImage = NULL;
+  m_PixelChangedImageNode = NULL;
+  m_SegmentedShiftResultNode = NULL;
+  m_ItNewBuildSeg = NULL;
+  m_SegmentationNode = NULL;
+  m_PixelChangedImageCounter = NULL;
+  m_ManipulationMode = 0;
+  m_ManipulationArea = 0;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -92,7 +107,16 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::GetGUI()
 /*************** TREE CHANGED (       ) ***************/
 void QmitkPixelGreyValueManipulatorComponent::TreeChanged()
 {
+    if(m_PixelGreyValueManipulatorComponentGUI)
+  {
+    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
 
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    {
+      m_AddedChildList[i]->TreeChanged();
+    } 
+  }
 }
 
 /***************       CONNECTIONS      ***************/
@@ -101,11 +125,14 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
   if ( m_PixelGreyValueManipulatorComponentGUI )
   {
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(SegmentationSelected(const mitk::DataTreeFilter::Item *)));        
+
+
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowPixelGreyValueManipulatorContent(bool)));
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
 
     //Button "create new manipulated image" pressed
-    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetCreateNewManipulatedImageButton()), SIGNAL(pressed()), (QObject*) this, SLOT(PipelineControlerToCreateManipulatedImage()));
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetCreateNewManipulatedImageButton()), SIGNAL(clicked()), (QObject*) this, SLOT(PipelineControllerToCreateManipulatedImage()));
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int)));    
   }
 }
@@ -129,6 +156,17 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
   {
     currentItem->SetSelected(true);
   }
+    if(m_PixelGreyValueManipulatorComponentGUI)
+  {
+    mitk::DataTreeFilter* filter = m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter();
+    m_MitkImageIterator = filter->GetIteratorToSelectedItem();
+
+    if(m_MitkImageIterator.GetPointer())
+    {
+      m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+    }
+  }
+
   if(m_PixelGreyValueManipulatorComponentGUI != NULL)
   {
 
@@ -140,20 +178,56 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
   TreeChanged();
 }
 
+/*************** SEGMENTATION SELECTED  ***************/
+void QmitkPixelGreyValueManipulatorComponent::SegmentationSelected(const mitk::DataTreeFilter::Item * segmentationIt)
+{
+  mitk::DataTreeFilter::Item* currentItem(NULL);
+  if(m_PixelGreyValueManipulatorComponentGUI)
+  {
+    if(mitk::DataTreeFilter* filter = m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter())
+    {
+      if(segmentationIt)
+      {
+        currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( segmentationIt->GetNode() ) );
+      }
+    }
+  }
+  if(currentItem)
+  {
+    currentItem->SetSelected(true);
+  }
+
+  if(m_PixelGreyValueManipulatorComponentGUI)
+  {
+    mitk::DataTreeFilter* filter = m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter();
+
+    mitk::DataTreeIteratorClone segmentationIterator = filter->GetIteratorToSelectedItem();
+
+    if(segmentationIterator.GetPointer())
+    {
+      m_Segmentation = static_cast<mitk::Image*> (segmentationIterator->Get()->GetData());
+    }
+  }
+
+}
+
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkPixelGreyValueManipulatorComponent::CreateContainerWidget(QWidget* parent)
 {
   m_PixelGreyValueManipulatorComponentGUI = new QmitkPixelGreyValueManipulatorComponentGUI(parent);
   m_GUI = m_PixelGreyValueManipulatorComponentGUI;
   m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+  m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->SetDataTree(GetDataTreeIterator());
+
+  //m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->insertItem("-- Segmentation / Mask --", 0);
  
   if(!m_ShowSelector)
   {
     m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()->setShown(false);
   }
-  //m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsSegmentationImage"));
-  
-  CreateConnections();
+  m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
+  m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation"));
+  //CreateConnections();
 
   return m_PixelGreyValueManipulatorComponentGUI;
 
@@ -173,13 +247,27 @@ void QmitkPixelGreyValueManipulatorComponent::SetSelectorVisibility(bool visibil
 /***************        ACTIVATED       ***************/
 void QmitkPixelGreyValueManipulatorComponent::Activated()
 {
-  m_Active = true;
+    m_Active = true;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Activated();
+  } 
 }
 
 /***************       DEACTIVATED      ***************/
 void QmitkPixelGreyValueManipulatorComponent::Deactivated()
 {
   m_Active = false;
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
+}
+
+/***************      SET THRESHOLD     ***************/
+void QmitkPixelGreyValueManipulatorComponent::SetThreshold(const QString& threshold)
+{
+  m_PixelGreyValueManipulatorComponentGUI->SetThreshold(atoi(threshold));
 }
 
 ///*********** SHOW PIXEL MANIPULATOR CONTENT ***********/
@@ -212,9 +300,16 @@ void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
   int manipulationMode;
   int manipulationArea;
   GetManipulationModeAndAreaFromGUI(manipulationMode, manipulationArea);
-  int value1;
-  int value2;
-  GetManipulationValueFromGUI(value1, value2);
+
+  m_ManipulationMode = manipulationMode;
+  m_ManipulationArea = manipulationArea;
+
+  bool boolSegmentation = false;
+  if(manipulationArea == 2)
+  {
+    boolSegmentation = true;
+  }
+
   switch(manipulationMode)
   {
   case 0: 
@@ -222,14 +317,8 @@ void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
     break;
   case 1: 
     // Linear Shift 
-    //if(manipulationArea == 2)//if manipulationArea == Segmentation
-    //{
-    //  //LinearShift(const mitk::Image* image, const mitk::Image* segmentation);
-    //}
-    //else(manipulationArea == 1 )// else (i.e. even if nothing is selected, the default is manipulationArea = Image
-    //{
-    //  //LinearShift(const mitk::Image* image, const mitk::Image* segmentation);
-    //}
+       LinearShift();
+
     break;
   case 2: 
     // GradientShift
@@ -287,22 +376,223 @@ void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(
 
     if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem() == 0)
   {
-    manipulationArea = 2;
+    manipulationArea = 1;
   }
 }
 
 /*************** GET MANIPULATION AREA  ***************/
-void QmitkPixelGreyValueManipulatorComponent::GetManipulationValueFromGUI(int & value1, int & value2)
+void QmitkPixelGreyValueManipulatorComponent::GetManipulationValueFromGUI(int & value1, int & value2, int & baseValue)
 {
   value1 = atoi(m_PixelGreyValueManipulatorComponentGUI->GetValue1LineEdit()->text());
   value2 = atoi(m_PixelGreyValueManipulatorComponentGUI->GetValue2LineEdit()->text());
+  baseValue = m_PixelGreyValueManipulatorComponentGUI->GetBaseThreshold();
 
 }
 
-void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*image*/, const mitk::Image* /*segmentation*/)
+
+/***************      LINEAR SHIFT      ***************/
+void QmitkPixelGreyValueManipulatorComponent::LinearShift()
 {
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
+  mitk::Image*  image = m_MitkImage;
+  AccessFixedDimensionByItk_1(image, CreateLinearShiftedImage, 3, m_Segmentation.GetPointer()); 
+  //CreateLinearShiftedImage(value1, segmentation);
+
+  std::cout<<"Template ready\t"<<std::endl;
+
+  QApplication::restoreOverrideCursor();
 }
+
+/***************         TEMPLATE       ***************/
+template < typename TPixel, unsigned int VImageDimension >    
+void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation)
+{
+  typedef itk::Image< TPixel, VImageDimension > ItkImageType;
+  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetLargestPossibleRegion() );
+
+  typedef itk::Image< unsigned char, VImageDimension > ItkSegmentationImageType;
+  typename ItkSegmentationImageType::Pointer itkSegmentation;
+
+  if(segmentation != NULL)
+  {
+    mitk::CastToItkImage(segmentation, itkSegmentation);
+  }
+
+  typename ItkImageType::Pointer itkShiftedImage = ItkImageType::New();
+  itkShiftedImage->SetRegions(itkImage->GetLargestPossibleRegion());
+  itkShiftedImage->Allocate();
+  itk::ImageRegionIterator<ItkImageType> itShifted(itkShiftedImage, itkShiftedImage->GetLargestPossibleRegion() );
+
+  const typename ItkImageType::RegionType & imageRegion = itkImage->GetLargestPossibleRegion();
+
+  int xImageDim = imageRegion.GetSize(0);
+  int yImageDim = imageRegion.GetSize(1);
+  int zImageDim = imageRegion.GetSize(2);
+
+  int imageDim = xImageDim * yImageDim * zImageDim; //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+
+  int value1;
+  int value2;
+  int baseValue;
+
+  GetManipulationValueFromGUI(value1, value2, baseValue);
+
+  int baseThreshold = baseValue;
+  int shiftedThresholdOne = value1;
+
+  if(m_ManipulationArea == 2) //if manipulation shall be only on segmented parts
+  {
+  if(m_Segmentation.IsNotNull())
+  {
+    itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
+    while(!(it.IsAtEnd()))
+    {
+      if(itSeg.Get()!=0)
+        itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
+      else
+        itShifted.Set(it.Get());
+      ++it;
+      ++itShifted;
+      ++itSeg;
+
+      --imageDim;//Kontrollausgabe
+      if(imageDim % 1000 == 0)
+      {
+        std::cout<<imageDim<<std::endl;
+      }
+    }//end of while
+  }//if(m_Segmentation != NULL)
+  }//end of manipulation on segmented area
+
+  else //manipulation shall be on entire image
+  {
+    while(!(it.IsAtEnd()))
+    {
+      itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
+      ++it;
+      ++itShifted;
+
+      --imageDim;//Kontrollausgabe
+      if(imageDim % 1000 == 0)
+      {
+        std::cout<<imageDim<<std::endl;
+      }
+    }//end of while
+  }//end of manipulation on entire image
+
+
+  //else 
+  //{
+  //  mitk::StatusBar::GetInstance()->DisplayText( "You need a Segmentation first! (load in ERIS)");
+  //}
+
+
+  if(m_SegmentedShiftResultNode.IsNotNull())
+  {
+    m_SegmentedShiftResultNode->SetData(NULL);
+  }
+
+  m_PixelChangedImage = mitk::Image::New(); 
+  mitk::CastToMitkImage(itkShiftedImage, m_PixelChangedImage);
+  m_PixelChangedImage->SetGeometry(static_cast<mitk::Geometry3D*>(m_MitkImage->GetGeometry()->Clone().GetPointer()));
+  m_ItNewBuildSeg = GetDataTreeIterator();
+
+  //TODO ABFRAGE OB SEGMENTIERUNG DA IST
+  mitk::DataTreeIteratorClone  selectedIterator; 
+  //if(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter() != NULL)
+  //{
+    if(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->GetSelectedItem() != NULL)
+    {
+      selectedIterator = m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->GetIteratorToSelectedItem(); 
+      m_SegmentationNode = m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->GetSelectedItem()->GetNode();
+    }
+ // }
+  else
+  {
+   selectedIterator = m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
+  }
+  //
+  //check if current node is a image
+  if ( m_SegmentationNode.IsNotNull() ) 
+  {
+    std::string nodeName;
+
+    if( m_SegmentationNode->GetPropertyList().IsNotNull() )
+    {
+      if( m_SegmentationNode->GetPropertyList()->GetProperty("name").IsNotNull() )
+      {
+        nodeName = m_SegmentationNode->GetPropertyList()->GetProperty("name")->GetValueAsString();
+      }//end of if( m_SegmentationNode->GetPropertyList()->GetProperty("name") != NULL)
+    }//end of if( m_SegmentationNode->GetPropertyList() != NULL)
+  }//end of if(m_SegmentationNode.IsNotNull())
+    ++m_PixelChangedImageCounter;
+    std::ostringstream buffer;
+    buffer << m_PixelChangedImageCounter;
+    std::string sPName = "PixelChanged Image " + buffer.str();
+    m_PixelChangedImageNode = mitk::DataTreeNode::New();//m_GradientShiftedImageNode = mitk::DataTreeNode::New();
+    m_PixelChangedImageNode->SetData(m_PixelChangedImage);
+    //mitk::DataTreeNodeFactory::SetDefaultImageProperties(m_PixelChangedImageNode);
+    m_PixelChangedImageNode->SetProperty("name", new mitk::StringProperty(sPName ) );
+    m_PixelChangedImageNode->SetIntProperty("layer", 2);
+    selectedIterator->Add(m_PixelChangedImageNode);
+
+  
+
+
+}// end of CreateLinearShiftedImage
+
+
+  //// m_ThresholdMethod is set in the method comboBoxSelection. Its value depends on the choosen selection:
+  //// switch which method is choosen
+  //// 0 = shift linear on segmentation, value = normalThreshold - shiftThreshold
+  //// 1 = shift with a gradient on a segmentation
+  //// 2 = shift with a gradient on the hole image
+  //// 3 = change value of pixel on a segmentation
+  //// 4 = change value of pixel on the hole image
+  //// 5 = lighten or shade pixel value on segmentation
+
+  //switch(m_ThresholdMethod)
+  //{
+
+
+  //case 0: /*********************SHIFT LINEAR ON SEGMENTATION***************************************/
+  //  {
+  //    normalThreshold = atoi(m_PixelGreyValueManipulatorComponentGUI->getThresholdLineEdit()->text());
+  //    shiftedThresholdOne = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxOneLinear()->text());
+
+  //    if(m_Segmentation.IsNotNull())
+  //    {
+  //      itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
+  //      while(!(it.IsAtEnd()))
+  //      {
+  //        if(itSeg.Get()!=0)
+  //          itShifted.Set(it.Get()+ (normalThreshold -shiftedThresholdOne));
+  //        else
+  //          itShifted.Set(it.Get());
+  //        ++it;
+  //        ++itShifted;
+  //        ++itSeg;
+
+  //        --imageDim;//Kontrollausgabe
+  //        if(imageDim % 1000 == 0)
+  //        {
+  //          std::cout<<imageDim<<std::endl;
+  //        }
+
+  //      }//end of while
+  //    }//if(m_Segmentation != NULL)
+  //    else 
+  //    {
+  //      mitk::StatusBar::GetInstance()->DisplayText( "You need a Segmentation first! (load in ERIS)");
+  //    }
+  //  }//end of case 0
+  //  break;
+
+
+
+
+
 
 ////******************************************** Shift Local Threshold******************************
 ////
@@ -311,7 +601,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //{
 //  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 //
-//  m_ThresholdMethod = m_Controls->getShiftThresholdComboBox()->currentItem();
+//  m_ThresholdMethod = m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdComboBox()->currentItem();
 //
 //  // if for valueChange a segmentation is neccessary (0, 1, 3)
 //  if ((m_ThresholdMethod == 0) || (m_ThresholdMethod == 1) || (m_ThresholdMethod == 3))
@@ -319,7 +609,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //    if (m_Segmentation.IsNotNull())
 //    {
 //      mitk::Image*  image = static_cast<mitk::Image*> (m_IteratorOnImageToBeSkinExtracted->Get()->GetData());
-//      AccessFixedDimensionByItk_2(image, ChangePixelValueByUrte, 3, m_Segmentation.GetPointer(), m_Controls); 
+//      AccessFixedDimensionByItk_2(image, ChangePixelValueByUrte, 3, m_Segmentation.GetPointer(), m_PixelGreyValueManipulatorComponentGUI); 
 //    }//end of if (m_Segmentation != NULL)
 //    else 
 //    {
@@ -329,7 +619,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //  else //if no segmentation is neccessary
 //  {
 //    mitk::Image*  image = static_cast<mitk::Image*> (m_IteratorOnImageToBeSkinExtracted->Get()->GetData());
-//    AccessFixedDimensionByItk_2(image, ChangePixelValueByUrte, 3, m_Segmentation.GetPointer(), m_Controls); 
+//    AccessFixedDimensionByItk_2(image, ChangePixelValueByUrte, 3, m_Segmentation.GetPointer(), m_PixelGreyValueManipulatorComponentGUI); 
 //  }
 //  std::cout<<"Template ready\t"<<std::endl;
 //
@@ -340,9 +630,9 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 ////******************************************CHANGE PIXEL VALUE******************+
 //// to change pixel values (linear shift, gradient shift, and per amount, on segmentation or image
 //template < typename TPixel, unsigned int VImageDimension >    
-//void QmitkSurfaceCreator::ChangePixelValueByUrte( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation, QmitkSurfaceCreatorControls * m_Controls)
+//void QmitkSurfaceCreator::ChangePixelValueByUrte( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation, QmitkSurfaceCreatorControls * m_PixelGreyValueManipulatorComponentGUI)
 //{
-//  m_ThresholdMethod = m_Controls->getShiftThresholdComboBox()->currentItem();
+//  m_ThresholdMethod = m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdComboBox()->currentItem();
 //
 //  typedef itk::Image< TPixel, VImageDimension > ItkImageType;
 //  itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetLargestPossibleRegion() );
@@ -389,8 +679,8 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //
 //  case 0: /*********************SHIFT LINEAR ON SEGMENTATION***************************************/
 //    {
-//      normalThreshold = atoi(m_Controls->getThresholdLineEdit()->text());
-//      shiftedThresholdOne = atoi(m_Controls->getShiftThresholdSpinBoxOneLinear()->text());
+//      normalThreshold = atoi(m_PixelGreyValueManipulatorComponentGUI->getThresholdLineEdit()->text());
+//      shiftedThresholdOne = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxOneLinear()->text());
 //
 //      if(m_Segmentation.IsNotNull())
 //      {
@@ -423,9 +713,9 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //
 //  case 1: /*********************SHIFT GRADIENT ON SEGMENTATION***************************************/
 //    {
-//      normalThreshold = atoi(m_Controls->getThresholdLineEdit()->text());
-//      shiftedThresholdOne = atoi(m_Controls->getShiftThresholdSpinBoxOneGradientOnSegmentation()->text());
-//      shiftedThresholdTwo = atoi(m_Controls->getShiftThresholdSpinBoxTwoGradientOnSegmentation()->text());
+//      normalThreshold = atoi(m_PixelGreyValueManipulatorComponentGUI->getThresholdLineEdit()->text());
+//      shiftedThresholdOne = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxOneGradientOnSegmentation()->text());
+//      shiftedThresholdTwo = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxTwoGradientOnSegmentation()->text());
 //
 //      if(m_Segmentation.IsNotNull())
 //      {
@@ -539,9 +829,9 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //
 //  case 2: /*********************SHIFT GRADIENT ON IMAGE***************************************/
 //    {
-//      normalThreshold = atoi(m_Controls->getThresholdLineEdit()->text());
-//      shiftedThresholdOne = atoi(m_Controls->getShiftThresholdSpinBoxOneGradientOnImage()->text());
-//      shiftedThresholdTwo = atoi(m_Controls->getShiftThresholdSpinBoxTwoGradientOnImage()->text());
+//      normalThreshold = atoi(m_PixelGreyValueManipulatorComponentGUI->getThresholdLineEdit()->text());
+//      shiftedThresholdOne = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxOneGradientOnImage()->text());
+//      shiftedThresholdTwo = atoi(m_PixelGreyValueManipulatorComponentGUI->getShiftThresholdSpinBoxTwoGradientOnImage()->text());
 //
 //      if(m_PointSetNode.IsNotNull())
 //      {
@@ -641,7 +931,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //    break;
 //  case 3: /*************************CHANGE PIXEL VALUE ON SEGMENTATION***************************/
 //    {
-//      pixelChangeValue = atoi(m_Controls->getChangePixelValueSpinBox()->text());
+//      pixelChangeValue = atoi(m_PixelGreyValueManipulatorComponentGUI->getChangePixelValueSpinBox()->text());
 //      if(m_Segmentation.IsNotNull())
 //      {
 //        itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
@@ -673,7 +963,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //
 //  case 4: /***************************CHANGE PIXEL VALUE ON IMAGE***********************************/
 //    {
-//      pixelChangeValue = atoi(m_Controls->getChangePixelValueSpinBox()->text());
+//      pixelChangeValue = atoi(m_PixelGreyValueManipulatorComponentGUI->getChangePixelValueSpinBox()->text());
 //
 //      while(!(it.IsAtEnd()))
 //      {
@@ -696,7 +986,7 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //      case 5: /***********************LIGHTEN OR SHADE PIXEL VALUE ON SEGMENTATION*************************/
 //    {
 //      //define the pixelChangeValue: the value that will be added to the old pixelvalue
-//      pixelChangeValue = atoi(m_Controls->getLightenOrShadePixelValueSpinBox()->text());
+//      pixelChangeValue = atoi(m_PixelGreyValueManipulatorComponentGUI->getLightenOrShadePixelValueSpinBox()->text());
 //      
 //      if(m_Segmentation.IsNotNull())
 //      {
@@ -743,8 +1033,8 @@ void QmitkPixelGreyValueManipulatorComponent::LinearShift(const mitk::Image* /*i
 //  m_PixelChangedImage->SetGeometry(static_cast<mitk::Geometry3D*>(m_MitkImage->GetGeometry()->Clone().GetPointer()));
 //  m_ItNewBuildSeg = GetDataTreeIterator();
 //
-//  const mitk::DataTreeIteratorClone * selectedIterator = m_Controls->getTreeNodeImageSelector()->GetSelectedIterator();
-//  m_SegmentationNode = m_Controls->getTreeNodeImageSelector()->GetSelectedNode();
+//  const mitk::DataTreeIteratorClone * selectedIterator = m_PixelGreyValueManipulatorComponentGUI->getTreeNodeImageSelector()->GetSelectedIterator();
+//  m_SegmentationNode = m_PixelGreyValueManipulatorComponentGUI->getTreeNodeImageSelector()->GetSelectedNode();
 //
 //  //check if current node is a image
 //  if ( m_SegmentationNode.IsNotNull() ) 

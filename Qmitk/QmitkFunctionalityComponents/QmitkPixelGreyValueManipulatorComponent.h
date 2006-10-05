@@ -21,8 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_PIXELGREYVALUEMANIPULATORCOMPONENT_H
 
 #include "QmitkFunctionalityComponentContainer.h"
+#include <itkImage.h>
+
 class QmitkPixelGreyValueManipulatorComponentGUI;
 class QmitkStdMultiWidget;
+
 
 /**
 * \brief ComponentClass to create a surface based on a threshold for a selected image
@@ -88,6 +91,7 @@ public:
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
+
   /***************      (DE)ACTIVATED     ***************/
 
   ///** \brief Method to set m_Activated to true */
@@ -97,10 +101,10 @@ public:
   virtual void Deactivated();
 
 
-  /***************        ATTRIBUTES      ***************/
+  ///***************        ATTRIBUTES      ***************/
 
-  /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
+  ///** \brief Vector with all added components */
+  //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
 
 
 public slots:  
@@ -108,6 +112,9 @@ public slots:
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
+
+  /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current segmentation. */
+  virtual void SegmentationSelected(const mitk::DataTreeFilter::Item * imageIt);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowPixelGreyValueManipulatorContent(bool show = true);
@@ -123,6 +130,9 @@ public slots:
 
   /** \brief Method is called when the ManipulationMode was selected to decide 	whether value2 shall be visible or not */
   virtual void HideOrShowValue2(int index);
+
+  /** \brief Slot-Method to set the Threshold from extern, for example by signal-slot from the surfaceCreatorComponent */
+  void SetThreshold(const QString&);
 
 protected:
   /***************        ATTRIBUTES      ***************/
@@ -147,7 +157,10 @@ protected:
   */
   mitk::DataTreeIteratorClone m_DataTreeIteratorClone;
 
-  void LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
+  void LinearShift(/*int baseValue, int value1, bool boolSegmentation/*const mitk::Image* image, const mitk::Image* segmentation = NULL*/);
+  //void CreateLinearShiftedImage(int value1, bool segmentation);
+ // void LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
+  //void LinearShift(const mitk::Image* /*image*/, const mitk::Image* /*segmentation*/, int value1);
 
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
@@ -173,11 +186,61 @@ private:
   /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;
 
+  /*!
+  * base image for the pixelmanipulated image
+  */
+  mitk::Image* m_MitkImage;
+
+  /*!
+  * Image which includes the segmentation, if existing (to be raised) 
+  */
+  mitk::Image::Pointer m_Segmentation;
+
+  /*!
+  * iterator on current image
+  */
+  mitk::DataTreeIteratorClone m_MitkImageIterator;
+
+    /*!
+  * Image after ValueChange 
+  */
+  mitk::Image::Pointer m_PixelChangedImage;
+
+    /*!
+  * Node which includes the changed image (shift, gradient or normal change)
+  */
+  mitk::DataTreeNode::Pointer m_PixelChangedImageNode;
+
+  
+  /*!
+  * Node which includes the Shifted Resultimage 
+  */
+  mitk::DataTreeNode::Pointer m_SegmentedShiftResultNode;
+
+    /*!
+  * iterator on the shifted Image node 
+  */
+  mitk::DataTreeIteratorClone m_ItNewBuildSeg;
+
+  /*!
+  * Node which includes the "eris"-segmentation, if existing (to be raised) 
+  */
+  mitk::DataTreeNode::ConstPointer m_SegmentationNode;
+
+    /*!
+  *  variable to count PixelChangedImage an give it to name in DataTree 
+  */
+  int m_PixelChangedImageCounter;
+
+  int m_ManipulationMode;
+  int m_ManipulationArea;
+
+
   void GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea);
-  void GetManipulationValueFromGUI(int & value1, int & value2);
+  void GetManipulationValueFromGUI(int & value1, int & value2, int & baseValue);
   //void shiftLocalThreshold();
-  //template < typename TPixel, unsigned int VImageDimension > 
-  //void ChangePixelValueByUrte( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation, QmitkSurfaceCreatorControls * m_Controls);
+  template < typename TPixel, unsigned int VImageDimension > 
+  void CreateLinearShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
 
 };
 

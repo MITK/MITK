@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProfileGradientFinder.h>
 #include <itkRefinementModelProcessor.h>
 #include <itkRegistrationModelTree.h>
+#include <itkRegistrationModelTreeReader.h>
 #include <itkRegistrationModelTreeWriter.h>
 #include <itkRegistrationModelXMLReader.h>
 #include <itkRegistrationModelXMLWriter.h>
@@ -251,8 +252,7 @@ PointSetType::Pointer transformPointSet(TransformType::Pointer transform, Transf
  ****************************************************************/
 int testRegistrationModelXMLWriter()
 {
-  // TODO: add new point types
-  std::cout << " *** Testing the RegistrationModelXMLWriter ***\n";
+  std::cout << " *** Testing the RegistrationModelXMLWriter ***" << std::endl;
 
   TubeSegmentModelType::Pointer tubeSegment = generateTubeSegment();
   PointType startPoint = tubeSegment->GetStartPoint();
@@ -281,13 +281,12 @@ int testRegistrationModelXMLWriter()
     std::cout << "Error reading the testfile.";
   }
 
-  // TODO: find a better way to compare the strings
   std::string value = buffer.str();
   std::string expected = "<model><name>TubeSegment</name><startPoint><point><x>0</x><y>0</y><z>0</z></point></startPoint><rotationPoint><point><x>0</x><y>0</y><z>0</z></point></rotationPoint><connectionPoints><point><x>1</x><y>1</y><z>0</z></point></connectionPoints><points><point><x>1</x><y>1</y><z>0</z><value>255</value></point><point><x>1</x><y>0</y><z>1</z><value>255</value></point><point><x>1</x><y>1</y><z>0</z><value>255</value></point></points></model>";
 
   if (value != expected)
   {
-    std::cout << "XML does not match!\n";
+    std::cout << "XML does not match!" << std::endl;
     std::cout << expected << std::endl;
     std::cout << value << std::endl;
     return EXIT_FAILURE;
@@ -295,7 +294,7 @@ int testRegistrationModelXMLWriter()
 
   std::cout << "Testfile okay." << std::endl;
 
-  std::cout << " *** Testing the RegistrationModelXMLReader ***\n";
+  std::cout << " *** Testing the RegistrationModelXMLReader ***" << std::endl;
 
   RegistrationModelReaderType::Pointer registrationModelReader = RegistrationModelReaderType::New();
   //   registrationModelReader->SetDebug(true);
@@ -348,7 +347,7 @@ int testRegistrationModelXMLWriter()
     return EXIT_FAILURE;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -357,7 +356,7 @@ int testRegistrationModelXMLWriter()
  ****************************************************************/
 int testRegistratedModel()
 {
-  std::cout << " *** Testing the transfer of a model part via RegistratedModel ***\n";
+  std::cout << " *** Testing the transfer of a model part via RegistratedModel ***" << std::endl;
 
   TubeSegmentModelType::Pointer tubeSegment = generateTubeSegment();
 
@@ -441,7 +440,7 @@ int testRegistratedModel()
     ++transformedPointsIter;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -450,7 +449,7 @@ int testRegistratedModel()
  ****************************************************************/
 int testTreeToBinaryImageFilter()
 {
-  std::cout << " *** Testing the TreeToImageFilter ***\n";
+  std::cout << " *** Testing the TreeToImageFilter ***" << std::endl;
 
   OutputTreeType::Pointer           outputTree    = OutputTreeType::New();
   OutputTreeContainerType::Pointer  treeContainer = outputTree->GetTreeContainer();
@@ -495,7 +494,7 @@ int testTreeToBinaryImageFilter()
     return EXIT_FAILURE;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -505,7 +504,7 @@ int testTreeToBinaryImageFilter()
  ****************************************************************/
 int testProfileGradientFinder()
 {
-  std::cout << " *** Testing the ProfileGradientFinder ***\n";
+  std::cout << " *** Testing the ProfileGradientFinder ***" << std::endl;
 
   OutputImageType::Pointer image = OutputImageType::New();
   OutputImageType::SizeType size;
@@ -554,7 +553,7 @@ int testProfileGradientFinder()
     }
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -563,7 +562,7 @@ int testProfileGradientFinder()
  ****************************************************************/
 int testRefinementModelProcessor()
 {
-  std::cout << " *** Testing the RefinementModelProcessor ***\n";
+  std::cout << " *** Testing the RefinementModelProcessor ***" << std::endl;
 
   TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
 
@@ -606,7 +605,7 @@ int testRefinementModelProcessor()
     return EXIT_FAILURE;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -615,7 +614,7 @@ int testRefinementModelProcessor()
  ****************************************************************/
 int testTubeSegmentRegistrator()
 {
-  std::cout << " *** Testing the TubeSegmentRegistrator ***\n";
+  std::cout << " *** Testing the TubeSegmentRegistrator ***" << std::endl;
 
   TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
@@ -699,7 +698,7 @@ int testTubeSegmentRegistrator()
  ****************************************************************/
 int testRegistrationModelRadius()
 {
-  std::cout << " *** Testing the Radius calculation of the RegistrationModel ***\n";
+  std::cout << " *** Testing the Radius calculation of the RegistrationModel ***" << std::endl;
 
   TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
@@ -720,7 +719,7 @@ int testRegistrationModelRadius()
     return EXIT_FAILURE;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -735,7 +734,6 @@ int testMeshReadWrite()
   std::cout << "--------------- WARNING ---------------" << std::endl;
   std::cout << "This test will crash on ITK > 2.6!" << std::endl;
   std::cout << "--------------- WARNING ---------------" << std::endl;
-
   TubeSegmentModelGeneratorType::Pointer tubeGenerator = TubeSegmentModelGeneratorType::New();
   tubeGenerator->SetLength(10);
   tubeGenerator->SetNumberOfSlices(10);
@@ -768,7 +766,7 @@ int testMeshReadWrite()
     return EXIT_FAILURE;
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 
 }
@@ -859,7 +857,7 @@ int testParticleReflectionCalculator()
     }
   }
 
-  std::cout << " *** [TEST PASSED] ***\n";
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -891,13 +889,53 @@ int testModelTreeWriteRead()
   treeContainer->Add(static_cast<RegistrationModelPointer>(model2),
                      static_cast<RegistrationModelPointer>(model1));
 
+  TransformOutputVectorType offset3;
+  offset3.Fill(2);
+  transform->SetOffset(offset3);
+  RegistratedModelPointer model3 = RegistratedModelType::New();
+  model3->SetBaseModel(tubeSegment.GetPointer());
+  model3->SetTransform(transform.GetPointer());
+  model3->SetTransformParameters(transform->GetParameters());
+  treeContainer->Add(static_cast<RegistrationModelPointer>(model3),
+                     static_cast<RegistrationModelPointer>(model1));
+
+
   RegistrationModelTreeWriterType::Pointer treeWriter =
       RegistrationModelTreeWriterType::New();
   treeWriter->SetFilename("testtree.rmt");
   treeWriter->SetTree(outputTree);
   treeWriter->WriteFile();
 
-  std::cout << " *** [TEST PASSED] ***\n";
+    // compare to normal data
+  std::ifstream file("testtree.rmt");
+  std::stringstream buffer;
+
+  char charBuffer;
+  while (file.get(charBuffer))
+  {
+    if (charBuffer != ' ' && charBuffer != '\n')
+    {
+      buffer.put(charBuffer);
+    }
+  }
+
+  if (!file.eof() || buffer.bad())
+  {
+    std::cout << "Error reading the testfile.";
+  }
+
+  std::string value = buffer.str();
+  std::string expected = "<modeltree><model><id>0</id><filename>testtree-0.rmx</filename></model><model><id>1</id><parent>0</parent><filename>testtree-1.rmx</filename></model><model><id>2</id><parent>0</parent><filename>testtree-2.rmx</filename></model></modeltree>";
+
+  if (value != expected)
+  {
+    std::cout << "XML does not match!" << std::endl;
+    std::cout << expected << std::endl;
+    std::cout << value << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
 
@@ -920,7 +958,7 @@ int itkImageToTreeFilterTest(int /*i*/, char* argv[])
   resultList.push_back(testParticleReflectionCalculator());
   resultList.push_back(testModelTreeWriteRead());
 
-  std::cout << " *** [ALL TESTS DONE] ***\n";
+  std::cout << " *** [ALL TESTS DONE] ***" << std::endl;
 
   testCount = resultList.size();
   bool allSuccess = true;

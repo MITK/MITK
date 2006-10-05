@@ -41,3 +41,4 @@ template class SurfaceVtkWriter<vtkSTLWriter>;
 template class SurfaceVtkWriter<vtkPolyDataWriter>;
 
 }
+

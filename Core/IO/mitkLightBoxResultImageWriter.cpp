@@ -95,7 +95,6 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
 
 
   mitk::DataTreeIteratorClone it=new itk::RootTreeIterator<DataTreeBase>(iterator->GetTree(), iterator->GetNode());
-  bool LoadedFromChili;
   while(!it->IsAtEnd())
   {
     //const char * name;
@@ -111,6 +110,7 @@ bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIterat
 
 
     itkGenericOutputMacro(<<"it-> name"<<it->Get()->GetPropertyList()->GetProperty("name")->GetValueAsString());
+    //bool LoadedFromChili;
     //if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
     if (true)
     {

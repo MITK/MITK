@@ -16,6 +16,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+/*! \class RenderingManager
+
+   A short explanation of the s_RenderWindowList[rendererWindow] map. There are some magic numbers
+   involved in the signalling of an update request. These numbers are stored per render window inside
+   the static STL map s_RenderWindowList. The numbers are:
+
+   - 0 for "no update requested"
+   - 1 for "overlay update requested"
+   - 2 for "normal update requested"
+   - 3 for "normal update, plus calling the UpdateIncludingVtkActors() method of all involved OpenGLRenderers"
+
+   These numbers should perhaps be replaced by some constants...
+
+*/
+
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkRenderWindow.h"
@@ -147,8 +162,18 @@ void
 mitk::RenderingManager
 ::ForceImmediateUpdate( RenderWindow *renderWindow )
 {
-  bool onlyOverlay = (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
+  bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
+  bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 ) && ( s_RenderWindowList[renderWindow] == 3 )) ?true:false;
 
+  if ( includingVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
+  {
+    // if the render window is rendered via an mitk::OpenGLRenderer
+    // call UpdateIncludingVtkActors. 
+    OpenGLRenderer* openGLRenderer = dynamic_cast<OpenGLRenderer*>( renderWindow->GetRenderer() );
+    if ( openGLRenderer ) openGLRenderer->UpdateIncludingVtkActors();
+
+  }
+ 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
 
@@ -169,13 +194,15 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::RequestUpdateAll()
+::RequestUpdateAll( bool includeVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
 {
+  int magicUpdateFlag = includeVtkActors?3:2;
+
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    it->second = 2;
-    s_RenderWindowList[it->first] = 2;
+    it->second = magicUpdateFlag;
+    s_RenderWindowList[it->first] = magicUpdateFlag;
   }
 
   // Restart the timer if there are no requests already
@@ -230,7 +257,7 @@ mitk::RenderingManager
     
     // if the render window is rendered via an mitk::OpenGLRenderer
     // call UpdateIncludingVtkActors. 
-    mitk::OpenGLRenderer* openGLRenderer = dynamic_cast<mitk::OpenGLRenderer*>( it->first->GetRenderer() );
+    OpenGLRenderer* openGLRenderer = dynamic_cast<OpenGLRenderer*>( it->first->GetRenderer() );
     if ( openGLRenderer )
       openGLRenderer->UpdateIncludingVtkActors();
     it->first->Repaint(onlyOverlay);

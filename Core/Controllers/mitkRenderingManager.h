@@ -105,8 +105,8 @@ public:
   /** Immediately executes an update of the specified RenderWindow. */
   void ForceImmediateUpdate( RenderWindow *renderWindow );
 
-  /** Requests all currently registered RenderWindows to be update. */
-  void RequestUpdateAll();
+  /** Requests all currently registered RenderWindows to be updated. */
+  void RequestUpdateAll( bool includeVtkActors = false ); // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done
 
   /** Immediately executes an update of all registered RenderWindows. */
   void ForceImmediateUpdateAll();

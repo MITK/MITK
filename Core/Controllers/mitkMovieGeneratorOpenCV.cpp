@@ -10,9 +10,7 @@ mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 
 void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
 {
-  m_sFile = _T( fileName );
-
-  if( _tcsstr( (char*)m_sFile, _T("avi") ) == NULL ) m_sFile += _T( ".avi" );
+  m_sFile = fileName;
 
 }
 
@@ -25,7 +23,7 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
   m_height = viewport[3];  m_height -= m_height % 4;
   
   m_currentFrame = cvCreateImage(cvSize(m_width,m_height),8,3);
-  m_aviWriter = cvCreateVideoWriter(m_sFile,-1,m_dwRate,cvSize(m_width,m_height));
+  m_aviWriter    = cvCreateVideoWriter(m_sFile,-1,m_dwRate,cvSize(m_width,m_height));
   
   if(!m_aviWriter)
     return false;

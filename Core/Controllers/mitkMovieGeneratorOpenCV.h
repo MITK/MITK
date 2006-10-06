@@ -2,9 +2,7 @@
 #define MovieGeneratorOpenCV_H_HEADER_INCLUDED
 
 #include "mitkMovieGenerator.h"
-#include <comdef.h>
 #include <memory.h>
-#include <tchar.h>
 #include <string.h>
 
 // OpenCV includes
@@ -40,10 +38,10 @@ protected:
   virtual bool TerminateGenerator();
 
   //! name of output file
-  _bstr_t m_sFile;
+  const char * m_sFile;
 
   //! frame rate 
-  DWORD m_dwRate;
+  int m_dwRate;
 
   
 private:

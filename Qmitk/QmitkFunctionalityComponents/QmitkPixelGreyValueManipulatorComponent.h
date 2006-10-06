@@ -22,6 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionalityComponentContainer.h"
 #include <itkImage.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIterator.h>
+
+//NUR FUER POINTSET
+#include "mitkPointSetInteractor.h"
+#include "mitkPointSet.h"
+
 
 class QmitkPixelGreyValueManipulatorComponentGUI;
 class QmitkStdMultiWidget;
@@ -135,6 +142,14 @@ public slots:
   void SetThreshold(const QString&);
 
 protected:
+  /** \brief Method to call the linearShift-TemplateMethod */
+  void LinearShift();
+
+  /** \brief Method to call the gradientShift-TemplateMethod */
+  void GradientShift();
+
+
+
   /***************        ATTRIBUTES      ***************/
 
   /*!
@@ -156,11 +171,6 @@ protected:
   a reference to a data tree iterator object
   */
   mitk::DataTreeIteratorClone m_DataTreeIteratorClone;
-
-  void LinearShift(/*int baseValue, int value1, bool boolSegmentation/*const mitk::Image* image, const mitk::Image* segmentation = NULL*/);
-  //void CreateLinearShiftedImage(int value1, bool segmentation);
- // void LinearShift(const mitk::Image* image, const mitk::Image* segmentation = NULL);
-  //void LinearShift(const mitk::Image* /*image*/, const mitk::Image* /*segmentation*/, int value1);
 
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
@@ -235,12 +245,36 @@ private:
   int m_ManipulationMode;
   int m_ManipulationArea;
 
+  //BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
+    /*!
+  * Node for the seed-points for threshold-gradient
+  */
+  mitk::DataTreeNode::Pointer m_SeedPointSetNode;
+
+  /*!
+  * Interactor for the seed-points for threshold-gradient
+  */
+  mitk::PointSetInteractor::Pointer m_SeedPointSetInteractor;
+
+    /*!
+  * PointSetPointer for the seed-points for threshold-gradient
+  */
+  mitk::PointSet::Pointer m_Seeds;
+  //END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
+
+
+  /** \brief Method to calculate the shiftvalue for the gradient shift and add it into new image */
+  template < typename ItkImageType >  
+  void InternalGradientShiftCalculation(int & shiftedThresholdOne, int & shiftedThresholdTwo, int & normalThreshold, itk::ImageRegionIterator<ItkImageType> & itShifted, itk::ImageRegionConstIterator<ItkImageType> & it, mitk::PointSet::PointType & pointOne, mitk::PointSet::PointType & pointTwo);
 
   void GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea);
   void GetManipulationValueFromGUI(int & value1, int & value2, int & baseValue);
-  //void shiftLocalThreshold();
+
   template < typename TPixel, unsigned int VImageDimension > 
   void CreateLinearShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
+
+  template < typename TPixel, unsigned int VImageDimension > 
+  void CreateGradientShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
 
 };
 

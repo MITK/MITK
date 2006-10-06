@@ -131,3 +131,9 @@ void QmitkPixelGreyValueManipulatorComponentGUI::SetThreshold(int threshold)
 {
  m_BaseThresholdLineEdit->setText(QString::number(threshold));
 }
+
+
+QmitkPointListWidget* QmitkPixelGreyValueManipulatorComponentGUI::GetQmitkPointListWidget()
+{
+  return m_QmitkPointListWidget;
+}

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>272</width>
-            <height>419</height>
+            <width>290</width>
+            <height>369</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -67,12 +67,6 @@
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>2</number>
-                </property>
-                <property name="spacing">
-                    <number>0</number>
                 </property>
                 <widget class="QGroupBox">
                     <property name="name">
@@ -449,11 +443,51 @@
                         </widget>
                     </vbox>
                 </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>groupBox11</cstring>
+                    </property>
+                    <property name="title">
+                        <string>SeedPoints</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QmitkPointListWidget">
+                            <property name="name">
+                                <cstring>m_QmitkPointListWidget</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
             </vbox>
         </widget>
     </vbox>
 </widget>
 <customwidgets>
+    <customwidget>
+        <class>QmitkPointListWidget</class>
+        <header location="local">QmitkPointListWidget.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
         <header location="global">QmitkDataTreeComboBox.h</header>
@@ -505,6 +539,7 @@
     <function returnType="QmitkDataTreeComboBox *">GetSegmentationSelector()</function>
     <function returnType="QGroupBox *">GetSegmentationSelectorGroupBox()</function>
     <function>SetThreshold( int threshold )</function>
+    <function returnType="QmitkPointListWidget *">GetQmitkPointListWidget()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 

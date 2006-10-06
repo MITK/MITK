@@ -161,6 +161,15 @@ public:
     return *this;
   }
 
+  const Self
+  operator++(int)
+  {
+    Self oldValue = *this;
+    this->Next();
+    return oldValue;
+  }
+
+
   /** operator = */
   virtual Self& operator=(Self& iterator) 
     {

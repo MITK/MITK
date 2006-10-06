@@ -127,7 +127,18 @@ public:
       ++(*m_Pointer);
     return *this;
     }
-  
+
+  const Self
+  operator++(int)
+    {
+    if(m_Pointer)
+      {
+      const Self oldValue( m_Pointer ); // create a copy of the iterator behind the pointer (Clone())
+      ++(*m_Pointer);
+      return oldValue;
+      }
+    }
+   
   /** Function to print object pointed to  */
   ObjectType *Print (std::ostream& os) const 
     { 

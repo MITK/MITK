@@ -76,7 +76,7 @@ void mitk::PlaneFit::CalculateCentroid()
   mitk::PointSet::PointsContainer::Iterator pit, end;
   pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
   end = m_PointSet->GetPointSet()->GetPoints()->End();
-  for (pit; pit!=end; pit++)
+  for (; pit!=end; pit++)
   {
      mitk::Point3D p3d = pit.Value();
      m_Centroid[0] += p3d[0]; 

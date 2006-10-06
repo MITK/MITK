@@ -154,21 +154,17 @@ public:
   };
 
   /** operator++ */
-  Self &
+  TreeIteratorBase<TTreeType> &
   operator++()
   {
     this->Next();
     return *this;
   }
 
-  const Self
-  operator++(int)
+  void operator++(int)
   {
-    Self oldValue = *this;
-    this->Next();
-    return oldValue;
+    ++(*this);
   }
-
 
   /** operator = */
   virtual Self& operator=(Self& iterator) 

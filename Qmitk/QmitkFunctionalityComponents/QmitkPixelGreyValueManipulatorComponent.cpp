@@ -863,7 +863,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 }// end of CreateLightenOrShadeImage
 
 template < typename ItkImageType >  
-void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(ItkImageType::Pointer & itkShiftedImage)
+void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(typename ItkImageType::Pointer & itkShiftedImage)
 {
   if(m_SegmentedShiftResultNode.IsNotNull())
   {

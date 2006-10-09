@@ -274,7 +274,7 @@ private:
   void InternalGradientShiftCalculation(int & shiftedThresholdOne, int & shiftedThresholdTwo, int & normalThreshold, itk::ImageRegionIterator<ItkImageType> & itShifted, itk::ImageRegionConstIterator<ItkImageType> & it, mitk::PointSet::PointType & pointOne, mitk::PointSet::PointType & pointTwo);
 
   template < typename ItkImageType>
-  void AddManipulatedImageIntoTree(ItkImageType::Pointer & itkShiftedImage);
+  void AddManipulatedImageIntoTree(typename ItkImageType::Pointer & itkShiftedImage);
 
   void GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea);
   void GetManipulationValueFromGUI(int & value1, int & value2, int & baseValue);

@@ -137,6 +137,9 @@ typedef itk::ROISphereExtractor<ImageType>            ROISphereExtractorType;
 
 typedef itk::RegistrationModelTreeWriter<OutputTreeType>
     RegistrationModelTreeWriterType;
+typedef itk::RegistrationModelTreeReader<OutputTreeType>
+    RegistrationModelTreeReaderType;
+
 
 TubeSegmentModelType::Pointer generateTubeSegment()
 {
@@ -297,7 +300,6 @@ int testRegistrationModelXMLWriter()
   std::cout << " *** Testing the RegistrationModelXMLReader ***" << std::endl;
 
   RegistrationModelReaderType::Pointer registrationModelReader = RegistrationModelReaderType::New();
-  //   registrationModelReader->SetDebug(true);
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
@@ -935,6 +937,20 @@ int testModelTreeWriteRead()
     return EXIT_FAILURE;
   }
 
+  RegistrationModelTreeReaderType::Pointer treeReader
+      = RegistrationModelTreeReaderType::New();
+  treeReader->SetFilename("testtree.rmt");
+  treeReader->GenerateOutputInformation();
+
+  OutputTreeType::Pointer readTree = treeReader->GetRegistrationModelTree();
+
+  if(readTree->GetTreeContainer()->Count() != outputTree->GetTreeContainer()->Count())
+  {
+    std::cout << "Tree did not read all models!" << std::endl;
+    std::cout << " *** [TEST FAILED] ***" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   std::cout << " *** [TEST PASSED] ***" << std::endl;
   return EXIT_SUCCESS;
 }
@@ -942,6 +958,10 @@ int testModelTreeWriteRead()
 
 int itkImageToTreeFilterTest(int /*i*/, char* argv[])
 {
+  if(sizeof(argv) > 0)
+  {
+    std::cerr << "Warning: Ignoring arguments to itkImageToTreeFilterTest!" << std::endl;
+  }
   ResultListType resultList;
   int failedCount = 0;
   int testCount;

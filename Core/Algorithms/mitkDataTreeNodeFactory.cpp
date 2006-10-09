@@ -592,16 +592,17 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
   this->ResizeOutputs( seriesUID.size() );
 
-  for ( unsigned int i = 0 ; i < seriesUID.size() ; ++i )
+  int size = seriesUID.size();
+  for ( unsigned int i = 0 ; i < size ; ++i )
   {
-    std::cout << "Reading series " << seriesUID[ i ] << std::endl;
+    std::cout << "Reading series #" << i << ": " << seriesUID[ i ] << std::endl;
     StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
     StringContainer::const_iterator fnItr = fileNames.begin();
     StringContainer::const_iterator fnEnd = fileNames.end();
     while ( fnItr != fnEnd )
     {
       std::cout << *fnItr << std::endl;
-      fnItr++;
+      ++fnItr;
     }
     ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileNames( fileNames );
@@ -609,6 +610,12 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     try
     {
       reader->Update();
+
+      if(reader->GetOutput() == NULL)
+      {
+        std::cout << "no image returned by reader for series #" << i << std::endl;
+        continue;
+      }
 
       //Initialize mitk image from itk
       mitk::Image::Pointer image = mitk::Image::New();
@@ -630,6 +637,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     catch ( const std::exception & e )
     {
       itkWarningMacro( << e.what() );
+      std::cout << "skipping series #" << i << " due to exception" << std::endl;
       reader->ResetPipeline();
     }
   }

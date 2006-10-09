@@ -613,16 +613,22 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   m_Dimension=dimension;
 
+  unsigned int i;
+  for(i=0;i<dimension;++i)
+  {
+    if(dimensions[i]<1)
+      itkExceptionMacro(<< "invalid dimension[" << i << "]: " << dimensions[i]);
+  }
+
   m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
   memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
   if(m_Dimension<4)
   {
-    unsigned int i, *p;
+    unsigned int *p;
     for(i=0,p=m_Dimensions+m_Dimension;i<4-m_Dimension;++i, ++p)
       *p=1;
   }
 
-  unsigned int i;
   for(i=0;i<4;++i)
   {
     m_LargestPossibleRegion.SetIndex(i, 0);

@@ -126,21 +126,21 @@ void QmitkThresholdComponent::CreateConnections()
 void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
   m_SelectedImage = imageIt;
-  mitk::DataTreeFilter::Item* currentItem(NULL);
-  if(m_ThresholdComponentGUI)
-  {
-    if(mitk::DataTreeFilter* filter = m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter())
-    {
-      if(imageIt)
-      {
-        currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
-      }
-    }
-  }
-  if(currentItem)
-  {
-    currentItem->SetSelected(true);
-  }
+  //mitk::DataTreeFilter::Item* currentItem(NULL);
+  //if(m_ThresholdComponentGUI)
+  //{
+  //  if(mitk::DataTreeFilter* filter = m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter())
+  //  {
+  //    if(imageIt)
+  //    {
+  //      currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+  //    }
+  //  }
+  //}
+  //if(currentItem)
+  //{
+  //  currentItem->SetSelected(true);
+  //}
   if(m_ThresholdComponentGUI != NULL)
   {
 
@@ -161,13 +161,16 @@ void QmitkThresholdComponent::DataObjectSelected()
   {
     if(m_ThresholdNodeExisting)
     {
-      m_ThresholdImageNode = m_Node;//->SetData(m_Node->GetData());
+      m_ThresholdImageNode->SetData(m_Node->GetData());
     }
     else
     {
+    //if(!m_ThresholdNodeExisting)
+    //{
       CreateThresholdImageNode();
-      m_ThresholdImageNode = m_Node;//->SetData(m_Node->GetData());
-    }
+    
+     m_ThresholdImageNode->SetData(m_Node->GetData());
+   }
     ShowThreshold();
   }
 }
@@ -253,6 +256,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
         m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(m_ThresholdComponentGUI->GetNumberValue(),1));
 
         mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
+        iteratorClone->GoToBegin();
         while ( !iteratorClone->IsAtEnd() )
         {
           mitk::DataTreeNode::Pointer node = iteratorClone->Get();
@@ -361,7 +365,12 @@ void QmitkThresholdComponent::DeleteThresholdNode()
     while ( !iteratorClone->IsAtEnd() )
     {
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-      if (  node == m_ThresholdImageNode )
+          
+      std::string name;
+      node->GetName(name);
+      //if ( node == m_ThresholdImageNode ) 
+      if(name == "Thresholdview image")
+      //GetStringProperty("name", "Thresholdview image", ) ))
       {
         iteratorClone->Disconnect();
         m_ThresholdNodeExisting = false;

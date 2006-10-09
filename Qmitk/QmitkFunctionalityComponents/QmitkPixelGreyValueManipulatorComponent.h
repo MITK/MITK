@@ -148,6 +148,12 @@ protected:
   /** \brief Method to call the gradientShift-TemplateMethod */
   void GradientShift();
 
+  /** \brief Method to call the ChangeGreyValuet-TemplateMethod */
+  void ChangeGreyValue();
+
+  /** \brief Method to call the lightenOrShade-TemplateMethod */
+  void LightenOrShade();
+
 
 
   /***************        ATTRIBUTES      ***************/
@@ -267,6 +273,9 @@ private:
   template < typename ItkImageType >  
   void InternalGradientShiftCalculation(int & shiftedThresholdOne, int & shiftedThresholdTwo, int & normalThreshold, itk::ImageRegionIterator<ItkImageType> & itShifted, itk::ImageRegionConstIterator<ItkImageType> & it, mitk::PointSet::PointType & pointOne, mitk::PointSet::PointType & pointTwo);
 
+  template < typename ItkImageType>
+  void AddManipulatedImageIntoTree(ItkImageType::Pointer & itkShiftedImage);
+
   void GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea);
   void GetManipulationValueFromGUI(int & value1, int & value2, int & baseValue);
 
@@ -276,6 +285,11 @@ private:
   template < typename TPixel, unsigned int VImageDimension > 
   void CreateGradientShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
 
+  template < typename TPixel, unsigned int VImageDimension > 
+  void CreateChangedGreyValueImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
+
+  template < typename TPixel, unsigned int VImageDimension > 
+  void CreateLightenOrShadeImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation);
 };
 
 #endif

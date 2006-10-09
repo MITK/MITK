@@ -17,7 +17,20 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVtkARRenderWindow.h"
+#include "mitkGL.h"
+#include <vtkObjectFactory.h>
 
+mitk::VtkARRenderWindow* mitk::VtkARRenderWindow::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("mitk::VtkARRenderWindow");
+  if(ret)
+  {
+    return (mitk::VtkARRenderWindow*)ret;
+  }
+  // If the factory was unable to create the object, then create it here.
+  return new mitk::VtkARRenderWindow;
+}
 
 mitk::VtkARRenderWindow::VtkARRenderWindow()
 : mitk::VtkRenderWindow(), m_FinishRendering(true)

@@ -34,6 +34,7 @@ namespace mitk
     vtkTypeMacro(VtkARRenderWindow,VtkRenderWindow);
     itkTypeMacro(VtkARRenderWindow,VtkRenderWindow);
 
+    static VtkARRenderWindow *New();
     //##Documentation
     //##@brief derived from vtkRenderWindow to only swap buffer if we are about to finish the rendering
     virtual void CopyResultFrame();

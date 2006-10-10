@@ -143,7 +143,9 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
    }
    else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
    {
-      itkExceptionMacro( "Pixel type currently not supported." );
+      m_Type = ipPicUInt;
+      m_NumberOfComponents = 3;
+      m_Bpe = sizeof(unsigned char) * 8 * m_NumberOfComponents;
    }
    else if ( *m_TypeId == typeid( itk::RGBAPixel<unsigned char> ) )
    {

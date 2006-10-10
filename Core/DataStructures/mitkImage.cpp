@@ -771,34 +771,34 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   {
   case VTK_BIT: 
   case VTK_CHAR: 
-    pixelType.Initialize(typeid(char));
+    pixelType.Initialize(typeid(char), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_UNSIGNED_CHAR: 
-    pixelType.Initialize(typeid(unsigned char));
+    pixelType.Initialize(typeid(unsigned char), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_SHORT: 
-    pixelType.Initialize(typeid(short));
+    pixelType.Initialize(typeid(short), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_UNSIGNED_SHORT: 
-    pixelType.Initialize(typeid(unsigned short));
+    pixelType.Initialize(typeid(unsigned short), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_INT: 
-    pixelType.Initialize(typeid(int));
+    pixelType.Initialize(typeid(int), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_UNSIGNED_INT: 
-    pixelType.Initialize(typeid(unsigned int));
+    pixelType.Initialize(typeid(unsigned int), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_LONG: 
-    pixelType.Initialize(typeid(long));
+    pixelType.Initialize(typeid(long), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_UNSIGNED_LONG: 
-    pixelType.Initialize(typeid(unsigned long));
+    pixelType.Initialize(typeid(unsigned long), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_FLOAT:
-    pixelType.Initialize(typeid(float));
+    pixelType.Initialize(typeid(float), vtkimagedata->GetNumberOfScalarComponents());
     break;
   case VTK_DOUBLE: 
-    pixelType.Initialize(typeid(double));
+    pixelType.Initialize(typeid(double), vtkimagedata->GetNumberOfScalarComponents());
     break;
   default:
     break;

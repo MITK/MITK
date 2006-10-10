@@ -592,7 +592,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
   this->ResizeOutputs( seriesUID.size() );
 
-  int size = seriesUID.size();
+  unsigned int size = seriesUID.size();
   for ( unsigned int i = 0 ; i < size ; ++i )
   {
     std::cout << "Reading series #" << i << ": " << seriesUID[ i ] << std::endl;

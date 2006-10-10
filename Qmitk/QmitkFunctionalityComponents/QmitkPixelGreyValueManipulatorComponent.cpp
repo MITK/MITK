@@ -58,7 +58,7 @@ m_Spacer(NULL)
   m_SegmentedShiftResultNode = NULL;
   m_ItNewBuildSeg = NULL;
   m_SegmentationNode = NULL;
-  m_PixelChangedImageCounter = NULL;
+  m_PixelChangedImageCounter = 0;
   m_ManipulationMode = 0;
   m_ManipulationArea = 0;
 }
@@ -463,7 +463,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 
   int imageDim = 1;
 
-  for(int dimension = 0; dimension < VImageDimension; ++dimension)
+  for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
   }
@@ -545,7 +545,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 
   int imageDim = 1;
 
-  for(int dimension = 0; dimension < VImageDimension; ++dimension)
+  for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
   }
@@ -715,7 +715,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 
   int imageDim = 1;
 
-  for(int dimension = 0; dimension < VImageDimension; ++dimension)
+  for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
   }
@@ -801,7 +801,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 
   int imageDim = 1;
 
-  for(int dimension = 0; dimension < VImageDimension; ++dimension)
+  for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
   {
     imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
   }

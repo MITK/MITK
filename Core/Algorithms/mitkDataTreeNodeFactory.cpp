@@ -220,7 +220,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
     /***********************************************************************************************************/
     if(!usedNewDTNF)
     { 
-      if ( m_FileName != "" )
+      if ( ( m_FileName != "" ) && (m_Serie == false))
       {
 #ifdef MBI_INTERNAL
         if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )

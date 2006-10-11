@@ -40,13 +40,14 @@ m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
 m_FunctionalityComponentContainerGUI(NULL),
 m_Parent(parent), 
-m_ParentName(parentName), 
+//m_ParentName(parentName), 
 m_ComponentName("ComponentContainer"),
-m_MultiWidget(mitkStdMultiWidget),
+//m_MultiWidget(mitkStdMultiWidget),
 m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
+  SetAvailability(true);
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -54,32 +55,20 @@ QmitkFunctionalityComponentContainer::~QmitkFunctionalityComponentContainer()
 {
   if(m_DataTreeIterator.IsNotNull() )
   {
-    //m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
   }
 }
 
-/*************** GET FUNCTIONALITY NAME ***************/
-QString QmitkFunctionalityComponentContainer::GetFunctionalityName()
-{
-  return m_ParentName;
-}
-
-/*************** SET FUNCTIONALITY NAME ***************/
-void QmitkFunctionalityComponentContainer::SetFunctionalityName(QString parentName)
-{
-  m_ParentName = parentName;
-}
+/***************   SET COMPONENT NAME   ***************/
+ void QmitkFunctionalityComponentContainer::SetComponentName(QString name)
+ {
+  m_ComponentName = name;
+ }
 
 /***************   GET COMPONENT NAME   ***************/
 QString QmitkFunctionalityComponentContainer::GetComponentName()
 {
   return m_ComponentName;
-}
-
-/*************** GET DATA TREE ITERATOR ***************/
-mitk::DataTreeIteratorBase* QmitkFunctionalityComponentContainer::GetDataTreeIterator()
-{
-  return m_DataTreeIterator.GetPointer();
 }
 
 /*************** SET DATA TREE ITERATOR ***************/
@@ -109,11 +98,9 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
 {
   if(IsActivated())
   {
-    m_TreeChangedWhileInActive = false;
     TreeChanged();
   }
   else
-    m_TreeChangedWhileInActive = true;
   TreeChanged();
 }
 
@@ -184,23 +171,24 @@ void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility
 /***************        ACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Activated()
 {
+  QmitkBaseFunctionalityComponent::Activated();
   m_Active = true;
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Activated();
   } 
-
 }
 
+/***************      DEACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Deactivated()
 {
+  QmitkBaseFunctionalityComponent::Deactivated();
   m_Active = false;
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Deactivated();
   } 
 }
-
 
 /***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* component)
@@ -220,7 +208,6 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
 
     component->CreateConnections();
   }
-
 }
 
 

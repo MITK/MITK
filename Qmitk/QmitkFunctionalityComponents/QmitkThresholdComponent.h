@@ -54,7 +54,7 @@ public:
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
-  ~QmitkThresholdComponent();
+  virtual ~QmitkThresholdComponent();
 
   /***************        CREATE          ***************/
 
@@ -70,21 +70,6 @@ public:
   /** \brief Method to set the Iterator to the DataTree */
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
-  /** \brief Method to get the Iterator to the DataTree */
-  mitk::DataTreeIteratorBase* GetDataTreeIterator();
-
-  /** \brief Method to set the Name of the Functionality */
-  void SetFunctionalityName(QString parentName);
-
-  /** \brief Method to get the Name of the Functionality */
-  virtual QString GetFunctionalityName();
-
-  /** \brief Method to get the Name of the FunctionalityComponent */
-  virtual QString GetComponentName();
-  
-  /** \brief Method to get the GUI of this component. This Method is obligatory */
-  virtual QWidget* GetGUI();
-
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
@@ -95,12 +80,6 @@ public:
 
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
-
-  /***************        ATTRIBUTES      ***************/
-
-  ///** \brief Vector with all added components */
-  //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
-
 
 public slots:  
   /***************      OHTER METHODS     ***************/
@@ -135,21 +114,6 @@ protected:
   /***************        ATTRIBUTES      ***************/
 
   /*!
-  the name of the parent-component
-  */
-  QString m_ParentName;
-
-  /*!
-  the name of the component
-  */
-  QString m_ComponentName;
-
-  /*!
-  a reference to the MultiWidget
-  */
-  QmitkStdMultiWidget * m_MultiWidget;
-
-  /*!
   a reference to a data tree iterator object
   */
   mitk::DataTreeIteratorClone m_DataTreeIteratorClone;
@@ -163,16 +127,6 @@ protected:
   a reference to the node with the thresholdImage and adjusted preferences to show the threshold
   */
   mitk::DataTreeNode::Pointer m_ThresholdImageNode;
-
-  /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
-  bool m_UpdateSelector;
-
-  /** \brief Attribute to decide whether the selector shall be shown or not */
-  bool m_ShowSelector;
- 
-  /** \brief Attribute to that will be set to true by the first activation of the functionality */
-  bool m_Active;
-
 
 private:
 
@@ -197,8 +151,6 @@ private:
   /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/
   bool m_ThresholdNodeExisting;
 
-  /** \brief Spacer added at the end of the component */
-  QSpacerItem* m_Spacer;
 
 };
 

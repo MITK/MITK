@@ -64,7 +64,7 @@ public:
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
-  ~QmitkPixelGreyValueManipulatorComponent();
+  virtual ~QmitkPixelGreyValueManipulatorComponent();
 
   /***************        CREATE          ***************/
 

@@ -66,54 +66,57 @@ public:
   
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
-  ~QmitkFunctionalityComponentContainer();
+  virtual ~QmitkFunctionalityComponentContainer();
 
   /***************        CREATE          ***************/
-  //virtual QAction * CreateAction(QActionGroup* m_FunctionalityComponentActionGroup);
+  /*!
+  \brief Method to create all Signale-Slot-Connections 
+  */
   virtual void CreateConnections();
+
+  /*!
+  \brief Method to create the GUI-Object
+  */
   virtual QWidget* CreateContainerWidget(QWidget* parent);
 
   
 
   /***************        SET AND GET     ***************/
-  virtual QString GetFunctionalityName();
-
-  void SetFunctionalityName(QString parentName);
-
-  virtual QString GetComponentName();
-    /*!
-  \brief getter for dataTree attribute. It returns the 
-  reference to a data tree iterator object
-  */
-  mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   /*!
-  \brief setter method for data tree attribute
-  @param it the reference to a data tree ieterator object
+  \brief  set it the reference to a data tree ieterator object
   */
   virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
+  
+  /** \brief Method to set the Name of the FunctionalityComponent */
+  virtual void SetComponentName(QString name);
 
-  /** \brief Method to get the GUI of this component. This Method is obligatory */
+  /** \brief Method to get the Name of the FunctionalityComponent */
+  virtual QString GetComponentName();
+
+  /** \brief Method to get the GUI of this component.*/
   QWidget* GetGUI();
 
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
   
+
   /***************     ADD COMPONENTS     ***************/
+
   /** \brief method to add components into this component. */
   virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
-
 
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
-  /***************      OHTER METHODS     ***************/
 
+  /***************      (DE)ACTIVATED     ***************/
+
+  ///** \brief Method to set m_Activated to true */
   virtual void Activated();
+
+  ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
-
-
-
 
 protected slots:  
 
@@ -124,19 +127,18 @@ public slots:
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
   virtual void TreeChanged();
 
-
   /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
   /***************        ATTRIBUTES      ***************/
-
+  /** \brief ObserverTag */
   unsigned long m_ObserverTag;
 
+  /** \brief Graphical User Interface for the component in general QWidget-Type */
   QWidget* m_GUI;
 
-    /***************        ATTRIBUTES      ***************/
   /** \brief Vector with all added components */
   std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
 
@@ -145,24 +147,31 @@ protected:
 
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
+
   /** \brief Attribute to decide whether the selector shall be shown or not */
   bool m_ShowSelector;
 
 
 private:
+
   /***************        ATTRIBUTES      ***************/
+  /** \brief also the Graphical User Interface for the component, like m_GUI, but with its specific type */
   QmitkFunctionalityComponentContainerGUI * m_FunctionalityComponentContainerGUI;
+
+  /** \brief parent of the component */
   QObject *m_Parent;
-  QString m_ParentName;
+
+  /** \brief name of this the component */
   QString m_ComponentName;
-  QmitkStdMultiWidget * m_MultiWidget;
+
+//  QmitkStdMultiWidget * m_MultiWidget;
 //  QmitkFunctionalityComponentContainerGUI * m_GUI;
+
+  /** \brief Item on the actual selected Image in the TreeNodeSelector */
   const mitk::DataTreeFilter::Item * m_SelectedImage;
 
   /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;
-
-
 };
 
 #endif

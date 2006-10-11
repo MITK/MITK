@@ -40,18 +40,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 /***************       CONSTRUCTOR      ***************/
 QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode):
-m_ParentName(parentName),
-m_ComponentName("SurfaceCreator"),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
-m_UpdateSelector(updateSelector),
-m_ShowSelector(showSelector),
-m_Active(false),
+//m_UpdateSelector(updateSelector),
+//m_ShowSelector(showSelector),
+//m_Active(false),
 m_SurfaceCreatorComponentGUI(NULL),
-m_SelectedImage(NULL),
-m_Spacer(NULL)
+m_SelectedImage(NULL)
+//m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
+  SetComponentName("SurfaceCreator");
   m_Color.Set(1.0, 0.67, 0.0);
   m_RainbowColor = new mitk::ColorSequenceRainbow();
   m_AllowExpertMode = allowExpertMode;
@@ -76,24 +75,6 @@ QmitkSurfaceCreatorComponent::~QmitkSurfaceCreatorComponent()
 
 }
 
-/*************** GET FUNCTIONALITY NAME ***************/
-QString QmitkSurfaceCreatorComponent::GetFunctionalityName()
-{
-  return m_ParentName;
-}
-
-/*************** SET FUNCTIONALITY NAME ***************/
-void QmitkSurfaceCreatorComponent::SetFunctionalityName(QString parentName)
-{
-  m_ParentName = parentName;
-}
-
-/***************   GET COMPONENT NAME   ***************/
-QString QmitkSurfaceCreatorComponent::GetComponentName()
-{
-  return m_ComponentName;
-}
-
 /*************** GET DATA TREE ITERATOR ***************/
 mitk::DataTreeIteratorBase* QmitkSurfaceCreatorComponent::GetDataTreeIterator()
 {
@@ -106,11 +87,11 @@ void QmitkSurfaceCreatorComponent::SetDataTreeIterator(mitk::DataTreeIteratorBas
   m_DataTreeIterator = it;
 }
 
-/***************         GET GUI        ***************/
-QWidget* QmitkSurfaceCreatorComponent::GetGUI()
-{
-  return m_SurfaceCreatorComponentGUI;
-}
+///***************         GET GUI        ***************/
+//QWidget* QmitkSurfaceCreatorComponent::GetGUI()
+//{
+//  return m_SurfaceCreatorComponentGUI;
+//}
 
 /*************** TREE CHANGED (       ) ***************/
 void QmitkSurfaceCreatorComponent::TreeChanged()
@@ -246,6 +227,7 @@ void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
 /***************        ACTIVATED       ***************/
 void QmitkSurfaceCreatorComponent::Activated()
 {
+  QmitkBaseFunctionalityComponent::Activated();
   m_Active = true;
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
@@ -256,6 +238,7 @@ void QmitkSurfaceCreatorComponent::Activated()
 /***************       DEACTIVATED      ***************/
 void QmitkSurfaceCreatorComponent::Deactivated()
 {
+  QmitkBaseFunctionalityComponent::Deactivated();
   m_Active = false;
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {

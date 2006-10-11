@@ -19,102 +19,73 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 
 
+/***************       CONSTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *name, mitk::DataTreeIteratorBase* dataIt ):
-m_Name(name)
+m_FuncName(name)
 {
   SetDataTreeIterator(dataIt);
   
 }
 
-
+/***************        DESTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
 {
-  //if(m_DataTreeIterator.IsNotNull() )
-  //{
-  //  m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-  //}
+
 }
 
+/*************** SET DATA TREE ITERATOR ***************/
 void QmitkBaseFunctionalityComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-//  if(m_DataTreeIterator.IsNotNull() )
-//  {
-//    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-//  }
-    m_DataTreeIterator = it;
-//  if(m_DataTreeIterator.IsNotNull())
-//  {
-//    itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::Pointer command = itk::ReceptorMemberCommand<QmitkBaseFunctionalityComponent>::New();
-//    command->SetCallbackFunction(this, &QmitkBaseFunctionalityComponent::TreeChanged);
-//    m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
-//  }
+  m_DataTreeIterator = it;
 }
 
-
+/*************** GET DATA TREE ITERATOR ***************/
 mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator()
 {
   return m_DataTreeIterator.GetPointer();
 }
 
-QString QmitkBaseFunctionalityComponent::GetFunctionalityName()
-{
-  return m_Name;
-}
-
+/*************** SET FUNCTIONALITY NAME ***************/
 void QmitkBaseFunctionalityComponent::SetFunctionalityName(QString name)
 {
-  m_Name = name;
+  m_FuncName = name;
 }
 
+/*************** GET FUNCTIONALITY NAME ***************/
+QString QmitkBaseFunctionalityComponent::GetFunctionalityName()
+{
+  return m_FuncName;
+}
+
+/***************        ACTIVATED       ***************/
 void QmitkBaseFunctionalityComponent::Activated()
 {
   m_Activated = true;
-  if(m_TreeChangedWhileInActive)
-  {
-    TreeChanged();
-    m_TreeChangedWhileInActive = false;
-  }
 }
 
+/***************       DEACTIVATED      ***************/
 void QmitkBaseFunctionalityComponent::Deactivated()
 {
-  //m_Activated = false;
+  m_Activated = false;
 }
 
+/***************      IS ACTIVATED      ***************/
 bool QmitkBaseFunctionalityComponent::IsActivated()
 {
   return m_Activated;
 }
 
+/***************      IS AVAILABLE      ***************/
 bool QmitkBaseFunctionalityComponent::IsAvailable()
 {
   return m_Available;
 }
 
+/***************     SET AVAILABLE      ***************/
 void QmitkBaseFunctionalityComponent::SetAvailability(bool available)
 {
-  this->m_Available=available;
-  //emit AvailabilityChanged(this); TODO
-  //emit AvailabilityChanged();
+  this->m_Available = available;
 }
 
-//void QmitkBaseFunctionalityComponent::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
-//{
-//  if(IsActivated())
-//  {
-//    m_TreeChangedWhileInActive = false;
-//    //TreeChanged();
-//  }
-//  else
-//    m_TreeChangedWhileInActive = true;
-//}
 
-void QmitkBaseFunctionalityComponent::TreeChanged()
-{
-  
-}
 
-QWidget* QmitkBaseFunctionalityComponent::GetGUI()
-{
-  return NULL;
-}

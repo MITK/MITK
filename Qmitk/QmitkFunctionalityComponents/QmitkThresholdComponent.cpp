@@ -33,17 +33,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 /***************       CONSTRUCTOR      ***************/
 QmitkThresholdComponent::QmitkThresholdComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
-m_ParentName(parentName),
-m_ComponentName("ThresholdFinder"),
-m_MultiWidget(mitkStdMultiWidget),
-m_UpdateSelector(updateSelector),
-m_ShowSelector(showSelector),
-m_Active(false),
 m_ThresholdComponentGUI(NULL),
-m_SelectedImage(NULL),
-m_Spacer(NULL)
+m_SelectedImage(NULL)
+//m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
+  SetAvailability(true);
+
+  SetComponentName("ThresholdFinder");
   m_Node = it->Get();
   m_ThresholdImageNode = NULL;
   m_ThresholdNodeExisting = false;
@@ -55,41 +52,11 @@ QmitkThresholdComponent::~QmitkThresholdComponent()
 
 }
 
-/*************** GET FUNCTIONALITY NAME ***************/
-QString QmitkThresholdComponent::GetFunctionalityName()
-{
-  return m_ParentName;
-}
-
-/*************** SET FUNCTIONALITY NAME ***************/
-void QmitkThresholdComponent::SetFunctionalityName(QString parentName)
-{
-  m_ParentName = parentName;
-}
-
-/***************   GET COMPONENT NAME   ***************/
-QString QmitkThresholdComponent::GetComponentName()
-{
-  return m_ComponentName;
-}
-
-/*************** GET DATA TREE ITERATOR ***************/
-mitk::DataTreeIteratorBase* QmitkThresholdComponent::GetDataTreeIterator()
-{
-  return m_DataTreeIterator.GetPointer();
-}
-
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
   m_DataTreeIterator = it;
   m_Node = m_DataTreeIterator->Get();
-}
-
-/***************         GET GUI        ***************/
-QWidget* QmitkThresholdComponent::GetGUI()
-{
-  return m_ThresholdComponentGUI;
 }
 
 /*************** TREE CHANGED (       ) ***************/
@@ -126,21 +93,21 @@ void QmitkThresholdComponent::CreateConnections()
 void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
   m_SelectedImage = imageIt;
-  //mitk::DataTreeFilter::Item* currentItem(NULL);
-  //if(m_ThresholdComponentGUI)
-  //{
-  //  if(mitk::DataTreeFilter* filter = m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter())
-  //  {
-  //    if(imageIt)
-  //    {
-  //      currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
-  //    }
-  //  }
-  //}
-  //if(currentItem)
-  //{
-  //  currentItem->SetSelected(true);
-  //}
+  mitk::DataTreeFilter::Item* currentItem(NULL);
+  if(m_ThresholdComponentGUI)
+  {
+    if(mitk::DataTreeFilter* filter = m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter())
+    {
+      if(imageIt)
+      {
+        currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+      }
+    }
+  }
+  if(currentItem)
+  {
+    currentItem->SetSelected(true);
+  }
   if(m_ThresholdComponentGUI != NULL)
   {
 
@@ -155,6 +122,7 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
   ShowThreshold();
 }
 
+/***************  DATA OBJECT SELECTED   **************/
 void QmitkThresholdComponent::DataObjectSelected()
 {
   if(m_Active)
@@ -207,7 +175,8 @@ void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
 /***************        ACTIVATED       ***************/
 void QmitkThresholdComponent::Activated()
 {
-    m_Active = true;
+  QmitkBaseFunctionalityComponent::Activated();
+  m_Active = true;
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Activated();
@@ -219,8 +188,8 @@ void QmitkThresholdComponent::Activated()
 /***************       DEACTIVATED      ***************/
 void QmitkThresholdComponent::Deactivated()
 {
+  QmitkBaseFunctionalityComponent::Deactivated();
   m_Active = false;
-
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Deactivated();

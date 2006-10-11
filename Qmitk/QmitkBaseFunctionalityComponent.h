@@ -60,19 +60,17 @@ public:
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
-  ~QmitkBaseFunctionalityComponent();
+ virtual  ~QmitkBaseFunctionalityComponent();
 
-  /***************        CREATE          ***************/
-  //virtual QWidget* CreateContainerWidget(QWidget* parent);
-
-
-  /***************        SET AND GET     ***************/
+   /***************        SET AND GET     ***************/
   /*!
   \brief setter method for data tree attribute
+
   @param it the reference to a data tree ieterator object
   */
   virtual void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
+ /** \brief Method to set the Name of the Functionality */
   void SetFunctionalityName(QString name);
 
   /*!
@@ -85,16 +83,6 @@ public:
   \brief method for defining the name of the functionality
   */
   virtual QString GetFunctionalityName();
-
-  virtual QWidget* GetGUI();
-
-  /*************** TREE CHANGED (       ) ***************/
-  /*!
-  \brief  Slot that will be called if DataTree changes to inform
-  addicted methods
-  */
-  //virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
-  virtual void TreeChanged();
 
   /***************      OHTER METHODS     ***************/
   /*!
@@ -111,13 +99,18 @@ public:
   */
   virtual void Deactivated();
 
-  /***************        ATTRIBUTES      ***************/
+  
   //##Documentation
   //## @brief Is the functionalityComponent currently active?
   //## 
   //## @warning Will only work if in sub-classes the superclass-methods are called in Activated() and Deactivated()!
   virtual bool IsActivated();
 
+  //##Documentation
+  //## @brief Is the functionalityComponent currently available? Some components can only be available if other components
+  //## are active. That can be checked here
+  //## 
+  //## @warning Will only work if in sub-classes the superclass-methods are called in Activated() and Deactivated()!
   virtual bool IsAvailable();
 
 
@@ -126,35 +119,37 @@ public:
 protected:
 
   /***************        SET AND GET     ***************/
+  /*!
+  To set whether this component can be used or not. Thats why some components can only be used 	in connexion with other components.
+  */
   virtual void SetAvailability(bool available);
 
 
   /***************        ATTRIBUTES      ***************/
   
   /*!
-  a Name of the FunctionalityComponent
+  A Name of the FunctionalityComponent
   */
-  QString m_Name;
+  QString m_FuncName;
   
   /*!
   a reference to a data tree iterator object
   */
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 
-
-  //unsigned long m_ObserverTag;
-
-  bool m_TreeChangedWhileInActive;
-
-    bool m_Available;
-  bool m_Activated;
-
-
-
 private:
 
+  /***************        ATTRIBUTES      ***************/
 
+  /*!
+  A boolean attribute to hold if the Component is available
+  */
+  bool m_Available;
 
+  /*!
+  A boolean attribute to hold if the Component is currently active
+  */
+  bool m_Activated;
 
 };
 //}//namespace mitk

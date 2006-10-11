@@ -61,7 +61,7 @@ public:
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
-  ~QmitkSurfaceCreatorComponent();
+  virtual ~QmitkSurfaceCreatorComponent();
 
   /***************        CREATE          ***************/
 
@@ -80,17 +80,11 @@ public:
   /** \brief Method to get the Iterator to the DataTree */
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
-  /** \brief Method to set the Name of the Functionality */
-  void SetFunctionalityName(QString parentName);
 
-  /** \brief Method to get the Name of the Functionality */
-  virtual QString GetFunctionalityName();
 
-  /** \brief Method to get the Name of the FunctionalityComponent */
-  virtual QString GetComponentName();
 
-  /** \brief Method to get the GUI of this component. This Method is obligatory */
-  virtual QWidget* GetGUI();
+  ///** \brief Method to get the GUI of this component. This Method is obligatory */
+  //virtual QWidget* GetGUI();
 
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
@@ -175,16 +169,6 @@ protected:
 
   /** \brief Vector with all Parameter-Widgets */
   std::vector<QCheckBox *> m_ParameterList;
-
-  /*!
-  the name of the parent-component
-  */
-  QString m_ParentName;
-
-  /*!
-  the name of the component
-  */
-  QString m_ComponentName;
 
   /*!
   a reference to the MultiWidget

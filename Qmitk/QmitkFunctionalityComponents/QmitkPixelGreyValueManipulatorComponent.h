@@ -93,7 +93,8 @@ public:
   virtual QString GetComponentName();
   
   /** \brief Method to get the GUI of this component. This Method is obligatory */
-  virtual QWidget* GetGUI();
+  //virtual QWidget* GetGUI();
+  virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
    
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
@@ -129,8 +130,8 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
-  /** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
-  virtual void TreeChanged();
+  ///** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
+  //virtual void TreeChanged();
 
   /** \brief Method is called when the "create new manipulated image" - was pressed. This Method coordinates all steps to create a new manipulated image  */
   virtual void PipelineControllerToCreateManipulatedImage();

@@ -39,7 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode):
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode)
+: QmitkFunctionalityComponentContainer(parent, parentName),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
 //m_UpdateSelector(updateSelector),
@@ -87,25 +88,25 @@ void QmitkSurfaceCreatorComponent::SetDataTreeIterator(mitk::DataTreeIteratorBas
   m_DataTreeIterator = it;
 }
 
-///***************         GET GUI        ***************/
-//QWidget* QmitkSurfaceCreatorComponent::GetGUI()
-//{
-//  return m_SurfaceCreatorComponentGUI;
-//}
-
-/*************** TREE CHANGED (       ) ***************/
-void QmitkSurfaceCreatorComponent::TreeChanged()
+/*************** GET TREE NODE SELECTOR ***************/
+QmitkDataTreeComboBox* QmitkSurfaceCreatorComponent::GetTreeNodeSelector()
 {
-  if(m_SurfaceCreatorComponentGUI)
-  {
-    m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->Update();
-
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->TreeChanged();
-    } 
-  }
+  return m_SurfaceCreatorComponentGUI->GetTreeNodeSelector();
 }
+
+///*************** TREE CHANGED (       ) ***************/
+//void QmitkSurfaceCreatorComponent::TreeChanged()
+//{
+//  if(m_SurfaceCreatorComponentGUI)
+//  {
+//    m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->Update();
+//
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      m_AddedChildList[i]->TreeChanged();
+//    } 
+//  }
+//}
 
 /***************       CONNECTIONS      ***************/
 void QmitkSurfaceCreatorComponent::CreateConnections()

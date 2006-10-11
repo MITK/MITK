@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "QmitkFunctionalityComponentContainer.h"
+#include "QmitkBaseFunctionalityComponent.h"
 
 #include <QmitkDataTreeComboBox.h>
 #include <mitkDataTreeFilter.h>
@@ -33,7 +34,7 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
-: QmitkBaseFunctionalityComponent(parentName, it),
+: QmitkBaseFunctionalityComponent(parent, parentName, it),
 m_GUI(NULL),
 m_Active(false),
 m_UpdateSelector(updateSelector), 
@@ -93,6 +94,13 @@ QWidget* QmitkFunctionalityComponentContainer::GetGUI()
   return m_GUI;
 }
 
+
+/*************** GET TREE NODE SELECTOR ***************/
+QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector()
+{
+  return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
+}
+
 /*************** TREE CHANGED ( EVENT ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
 {
@@ -104,19 +112,31 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
   TreeChanged();
 }
 
+///*************** TREE CHANGED (       ) ***************/
+//void QmitkFunctionalityComponentContainer::TreeChanged()
+//{
+//  if(m_FunctionalityComponentContainerGUI)
+//  {
+//    m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->Update();
+//
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      m_AddedChildList[i]->TreeChanged();
+//    } 
+//  }
+//}
+
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-  if(m_FunctionalityComponentContainerGUI)
-  {
-    m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->Update();
+    GetTreeNodeSelector()->Update();
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
       m_AddedChildList[i]->TreeChanged();
     } 
-  }
 }
+
 
 /***************       CONNECTIONS      ***************/
 void QmitkFunctionalityComponentContainer::CreateConnections()

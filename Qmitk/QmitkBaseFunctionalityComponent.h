@@ -56,7 +56,7 @@ public:
 
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkBaseFunctionalityComponent(const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkBaseFunctionalityComponent(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */

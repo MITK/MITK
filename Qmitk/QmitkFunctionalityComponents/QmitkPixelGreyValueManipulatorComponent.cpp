@@ -36,8 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
-QmitkFunctionalityComponentContainer(parent, parentName),
+QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+: QmitkFunctionalityComponentContainer(parent, parentName),
 m_ParentName(parentName),
 m_ComponentName("SurfaceCreator"),
 m_MultiWidget(mitkStdMultiWidget),
@@ -99,26 +99,32 @@ void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTree
   m_DataTreeIterator = it;
 }
 
-/***************         GET GUI        ***************/
-QWidget* QmitkPixelGreyValueManipulatorComponent::GetGUI()
+///***************         GET GUI        ***************/
+//QWidget* QmitkPixelGreyValueManipulatorComponent::GetGUI()
+//{
+//  return m_PixelGreyValueManipulatorComponentGUI;
+//}
+
+/*************** GET TREE NODE SELECTOR ***************/
+QmitkDataTreeComboBox* QmitkPixelGreyValueManipulatorComponent::GetTreeNodeSelector()
 {
-  return m_PixelGreyValueManipulatorComponentGUI;
+  return m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector();
 }
 
-/*************** TREE CHANGED (       ) ***************/
-void QmitkPixelGreyValueManipulatorComponent::TreeChanged()
-{
-  if(m_PixelGreyValueManipulatorComponentGUI)
-  {
-    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
-    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
-
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->TreeChanged();
-    } 
-  }
-}
+///*************** TREE CHANGED (       ) ***************/
+//void QmitkPixelGreyValueManipulatorComponent::TreeChanged()
+//{
+//  if(m_PixelGreyValueManipulatorComponentGUI)
+//  {
+//    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
+//    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
+//
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      m_AddedChildList[i]->TreeChanged();
+//    } 
+//  }
+//}
 
 /***************       CONNECTIONS      ***************/
 void QmitkPixelGreyValueManipulatorComponent::CreateConnections()

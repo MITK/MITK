@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkThresholdComponent.h"
 #include "QmitkThresholdComponentGUI.h"
 
+
 #include <QmitkDataTreeComboBox.h>
 
 #include "mitkRenderWindow.h"
@@ -32,7 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject * /*parent*/, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector):
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+: QmitkFunctionalityComponentContainer(parent, parentName),
 m_ThresholdComponentGUI(NULL),
 m_SelectedImage(NULL)
 //m_Spacer(NULL)
@@ -59,19 +61,19 @@ void QmitkThresholdComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it
   m_Node = m_DataTreeIterator->Get();
 }
 
-/*************** TREE CHANGED (       ) ***************/
-void QmitkThresholdComponent::TreeChanged()
-{
-  if(m_ThresholdComponentGUI)
-  {
-    m_ThresholdComponentGUI->GetTreeNodeSelector()->Update();
-
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->TreeChanged();
-    } 
-  }
-}
+///*************** TREE CHANGED (       ) ***************/
+//void QmitkThresholdComponent::TreeChanged()
+//{
+//  if(m_ThresholdComponentGUI)
+//  {
+//    m_ThresholdComponentGUI->GetTreeNodeSelector()->Update();
+//
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      m_AddedChildList[i]->TreeChanged();
+//    } 
+//  }
+//}
 
 /***************       CONNECTIONS      ***************/
 void QmitkThresholdComponent::CreateConnections()
@@ -170,6 +172,12 @@ void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
     m_ThresholdComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
   }
   m_ShowSelector = visibility;
+}
+
+/*************** GET TREE NODE SELECTOR ***************/
+QmitkDataTreeComboBox* QmitkThresholdComponent::GetTreeNodeSelector()
+{
+  return m_ThresholdComponentGUI->GetTreeNodeSelector();
 }
 
 /***************        ACTIVATED       ***************/

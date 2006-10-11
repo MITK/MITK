@@ -80,6 +80,8 @@ public:
   /** \brief Method to get the Iterator to the DataTree */
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
+  virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
 
 
 
@@ -128,8 +130,8 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox ShowSurfaceParameter was toggled to show the Parameters or not. */ 
   void ShowSurfaceParameter(bool);
 
-  /** \brief Method is called when the DataTree was changed. This Method is self-evident obligatory */
-  virtual void TreeChanged();
+  ///** \brief Method is called when the DataTree was changed. This Method is self-evident obligatory */
+  //virtual void TreeChanged();
 
   /** \brief Method to set the threshold that is used to create the surface */
   virtual void SetThreshold(int threshold);

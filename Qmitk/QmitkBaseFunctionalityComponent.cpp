@@ -20,7 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(const char *name, mitk::DataTreeIteratorBase* dataIt ):
+QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt )
+: QObject(parent, name),
 m_FuncName(name)
 {
   SetDataTreeIterator(dataIt);

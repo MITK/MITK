@@ -97,6 +97,8 @@ public:
   /** \brief Method to get the GUI of this component.*/
   QWidget* GetGUI();
 
+  virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
   

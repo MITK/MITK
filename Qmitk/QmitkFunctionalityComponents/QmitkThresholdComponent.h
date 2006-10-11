@@ -73,6 +73,8 @@ public:
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
+  virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
   /***************      (DE)ACTIVATED     ***************/
    
   ///** \brief Method to set m_Activated to true */
@@ -102,8 +104,8 @@ public slots:
   /** \brief Slot method that will be called if the ThresholdLineEdit was changed to update the shown image and the ThresholdSlider. */
   void ThresholdValueChanged( );
 
-  /** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
-  virtual void TreeChanged();
+  ///** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
+  //virtual void TreeChanged();
 
 
 protected:

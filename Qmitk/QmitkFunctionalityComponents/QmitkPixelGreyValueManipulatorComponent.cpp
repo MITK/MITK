@@ -38,29 +38,22 @@ PURPOSE.  See the above copyright notices for more information.
 /***************       CONSTRUCTOR      ***************/
 QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
 : QmitkFunctionalityComponentContainer(parent, parentName),
-m_ParentName(parentName),
-m_ComponentName("SurfaceCreator"),
-m_MultiWidget(mitkStdMultiWidget),
-m_DataTreeIteratorClone(NULL),
-m_UpdateSelector(updateSelector),
-m_ShowSelector(showSelector),
-m_Active(false),
 m_PixelGreyValueManipulatorComponentGUI(NULL),
-m_SelectedImage(NULL),
-m_Spacer(NULL)
+  m_MitkImage(NULL),
+    m_Segmentation(NULL),
+  m_MitkImageIterator(NULL),
+  m_PixelChangedImage(NULL),
+  m_PixelChangedImageNode(NULL),
+  m_SegmentedShiftResultNode(NULL),
+  m_ItNewBuildSeg(NULL),
+  m_SegmentationNode(NULL),
+  m_PixelChangedImageCounter(0),
+  m_ManipulationMode(0),
+  m_ManipulationArea(0)
 {
   SetDataTreeIterator(it);
-  m_MitkImage = NULL;
-  m_MitkImageIterator = NULL;
-  m_Segmentation = NULL; 
-  m_PixelChangedImage = NULL;
-  m_PixelChangedImageNode = NULL;
-  m_SegmentedShiftResultNode = NULL;
-  m_ItNewBuildSeg = NULL;
-  m_SegmentationNode = NULL;
-  m_PixelChangedImageCounter = 0;
-  m_ManipulationMode = 0;
-  m_ManipulationArea = 0;
+  SetAvailability(true);
+  SetComponentName("PixelGreyValueManipulatorComponent");
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -69,22 +62,10 @@ QmitkPixelGreyValueManipulatorComponent::~QmitkPixelGreyValueManipulatorComponen
 
 }
 
-/*************** GET FUNCTIONALITY NAME ***************/
-QString QmitkPixelGreyValueManipulatorComponent::GetFunctionalityName()
+/*************** SET DATA TREE ITERATOR ***************/
+void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-  return m_ParentName;
-}
-
-/*************** SET FUNCTIONALITY NAME ***************/
-void QmitkPixelGreyValueManipulatorComponent::SetFunctionalityName(QString parentName)
-{
-  m_ParentName = parentName;
-}
-
-/***************   GET COMPONENT NAME   ***************/
-QString QmitkPixelGreyValueManipulatorComponent::GetComponentName()
-{
-  return m_ComponentName;
+  m_DataTreeIterator = it;
 }
 
 /*************** GET DATA TREE ITERATOR ***************/
@@ -93,38 +74,18 @@ mitk::DataTreeIteratorBase* QmitkPixelGreyValueManipulatorComponent::GetDataTree
   return m_DataTreeIterator.GetPointer();
 }
 
-/*************** SET DATA TREE ITERATOR ***************/
-void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
-{
-  m_DataTreeIterator = it;
-}
-
-///***************         GET GUI        ***************/
-//QWidget* QmitkPixelGreyValueManipulatorComponent::GetGUI()
-//{
-//  return m_PixelGreyValueManipulatorComponentGUI;
-//}
-
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkPixelGreyValueManipulatorComponent::GetTreeNodeSelector()
 {
   return m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector();
 }
 
-///*************** TREE CHANGED (       ) ***************/
-//void QmitkPixelGreyValueManipulatorComponent::TreeChanged()
-//{
-//  if(m_PixelGreyValueManipulatorComponentGUI)
-//  {
-//    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
-//    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
-//
-//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-//    {
-//      m_AddedChildList[i]->TreeChanged();
-//    } 
-//  }
-//}
+/************ Update DATATREECOMBOBOX(ES) *************/
+void QmitkPixelGreyValueManipulatorComponent::UpdateDataTreeComboBoxes()
+{
+    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
+}
 
 /***************       CONNECTIONS      ***************/
 void QmitkPixelGreyValueManipulatorComponent::CreateConnections()

@@ -83,30 +83,11 @@ public:
   virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
 
 
-
-
-  ///** \brief Method to get the GUI of this component. This Method is obligatory */
-  //virtual QWidget* GetGUI();
-
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
   /** \brief Method to set the ExpertMode visible or invisible */
   virtual void SetExpertMode(bool visibility);
-
-
-  /***************      (DE)ACTIVATED     ***************/
-
-  ///** \brief Method to set m_Activated to true */
-  virtual void Activated();
-
-  ///** \brief Method to set m_Activated to false */
-  virtual void Deactivated();
-
-  /***************        ATTRIBUTES      ***************/
-
-  /** \brief Vector with all added components */
-  //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
 
 
 public slots:  
@@ -253,8 +234,8 @@ private:
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
   QmitkSurfaceCreatorComponentGUI * m_SurfaceCreatorComponentGUI;
 
-  /** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
-  const mitk::DataTreeFilter::Item * m_SelectedImage; 
+  ///** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
+  //const mitk::DataTreeFilter::Item * m_SelectedImage; 
 
   //----------------------------------------------------
   /*!

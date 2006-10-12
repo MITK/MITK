@@ -73,10 +73,11 @@ public:
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
+  /** \brief Method to return the TreeNodeSelector-QmitkDataTreeComboBox */
   virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
 
   /***************      (DE)ACTIVATED     ***************/
-   
+
   ///** \brief Method to set m_Activated to true */
   virtual void Activated();
 
@@ -89,13 +90,13 @@ public slots:
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
-    /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
+  /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowThreshold(bool show = true);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowThresholdFinderContent(bool show = true);
 
-   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
+  /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
   /** \brief Slot method that will be called if the Thresholdslider was moved to update the shown image and the ThresholdLineEdit. */ 
@@ -103,9 +104,6 @@ public slots:
 
   /** \brief Slot method that will be called if the ThresholdLineEdit was changed to update the shown image and the ThresholdSlider. */
   void ThresholdValueChanged( );
-
-  ///** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
-  //virtual void TreeChanged();
 
 
 protected:
@@ -146,9 +144,6 @@ private:
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
   QmitkThresholdComponentGUI * m_ThresholdComponentGUI;
-
-  /** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
-  const mitk::DataTreeFilter::Item * m_SelectedImage; 
 
   /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/
   bool m_ThresholdNodeExisting;

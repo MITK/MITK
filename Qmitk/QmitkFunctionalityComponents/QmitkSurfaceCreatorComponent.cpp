@@ -46,12 +46,13 @@ m_DataTreeIteratorClone(NULL),
 //m_UpdateSelector(updateSelector),
 //m_ShowSelector(showSelector),
 //m_Active(false),
-m_SurfaceCreatorComponentGUI(NULL),
-m_SelectedImage(NULL)
+m_SurfaceCreatorComponentGUI(NULL)
+//m_SelectedImage(NULL)
 //m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
   SetComponentName("SurfaceCreator");
+
   m_Color.Set(1.0, 0.67, 0.0);
   m_RainbowColor = new mitk::ColorSequenceRainbow();
   m_AllowExpertMode = allowExpertMode;
@@ -111,7 +112,6 @@ QmitkDataTreeComboBox* QmitkSurfaceCreatorComponent::GetTreeNodeSelector()
 /***************       CONNECTIONS      ***************/
 void QmitkSurfaceCreatorComponent::CreateConnections()
 {
-  if ( m_SurfaceCreatorComponentGUI)
   {
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));        
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceCreatorContent(bool)));
@@ -200,7 +200,7 @@ QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
    m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()->setLineWidth(0);
   }
 
-  CreateConnections();
+  //CreateConnections();
   return m_SurfaceCreatorComponentGUI;
 
 }
@@ -225,27 +225,27 @@ void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
 
 }
 
-/***************        ACTIVATED       ***************/
-void QmitkSurfaceCreatorComponent::Activated()
-{
-  QmitkBaseFunctionalityComponent::Activated();
-  m_Active = true;
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-  {
-    m_AddedChildList[i]->Activated();
-  } 
-}
+///***************        ACTIVATED       ***************/
+//void QmitkSurfaceCreatorComponent::Activated()
+//{
+//  QmitkBaseFunctionalityComponent::Activated();
+//  m_Active = true;
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//  {
+//    m_AddedChildList[i]->Activated();
+//  } 
+//}
 
-/***************       DEACTIVATED      ***************/
-void QmitkSurfaceCreatorComponent::Deactivated()
-{
-  QmitkBaseFunctionalityComponent::Deactivated();
-  m_Active = false;
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-  {
-    m_AddedChildList[i]->Deactivated();
-  } 
-}
+///***************       DEACTIVATED      ***************/
+//void QmitkSurfaceCreatorComponent::Deactivated()
+//{
+//  QmitkBaseFunctionalityComponent::Deactivated();
+//  m_Active = false;
+//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//  {
+//    m_AddedChildList[i]->Deactivated();
+//  } 
+//}
 
 /**********************VISIBILITY************************************/
 

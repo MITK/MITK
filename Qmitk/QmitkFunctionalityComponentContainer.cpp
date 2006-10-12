@@ -39,12 +39,12 @@ m_GUI(NULL),
 m_Active(false),
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
+m_SelectedImage(NULL),
 m_FunctionalityComponentContainerGUI(NULL),
 m_Parent(parent), 
 //m_ParentName(parentName), 
 m_ComponentName("ComponentContainer"),
 //m_MultiWidget(mitkStdMultiWidget),
-m_SelectedImage(NULL),
 m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
@@ -95,7 +95,7 @@ QWidget* QmitkFunctionalityComponentContainer::GetGUI()
 }
 
 
-/*************** GET TREE NODE SELECTOR ***************/
+/******** ******* GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector()
 {
   return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
@@ -112,24 +112,10 @@ void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & 
   TreeChanged();
 }
 
-///*************** TREE CHANGED (       ) ***************/
-//void QmitkFunctionalityComponentContainer::TreeChanged()
-//{
-//  if(m_FunctionalityComponentContainerGUI)
-//  {
-//    m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->Update();
-//
-//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-//    {
-//      m_AddedChildList[i]->TreeChanged();
-//    } 
-//  }
-//}
-
 /*************** TREE CHANGED (       ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged()
 {
-    GetTreeNodeSelector()->Update();
+    UpdateDataTreeComboBoxes();
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
@@ -137,6 +123,11 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
     } 
 }
 
+/************ Update DATATREECOMBOBOX(ES) *************/
+void QmitkFunctionalityComponentContainer::UpdateDataTreeComboBoxes()
+{
+    GetTreeNodeSelector()->Update();
+}
 
 /***************       CONNECTIONS      ***************/
 void QmitkFunctionalityComponentContainer::CreateConnections()
@@ -218,6 +209,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     QWidget* componentWidget = component->CreateContainerWidget(m_GUI);
     m_AddedChildList.push_back(component);
     m_GUI->layout()->add(componentWidget);
+    component->CreateConnections();
     if(m_Spacer != NULL)
     {
       m_GUI->layout()->removeItem(m_Spacer);
@@ -225,8 +217,10 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
     m_Spacer = spacer;
     m_GUI->layout()->addItem( m_Spacer );
-
-    component->CreateConnections();
+    m_GUI->layout()->activate();
+    m_GUI->repaint();
+    m_GUI->updateGeometry();
+    
   }
 }
 

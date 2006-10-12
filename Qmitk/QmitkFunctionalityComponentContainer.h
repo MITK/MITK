@@ -134,6 +134,10 @@ public slots:
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
+
+  /** \brief Method to update the content of all DataTreeComboBoxes. */
+  virtual void UpdateDataTreeComboBoxes();
+
   /***************        ATTRIBUTES      ***************/
   /** \brief ObserverTag */
   unsigned long m_ObserverTag;
@@ -153,6 +157,9 @@ protected:
   /** \brief Attribute to decide whether the selector shall be shown or not */
   bool m_ShowSelector;
 
+    /** \brief Item on the actual selected Image in the TreeNodeSelector */
+  const mitk::DataTreeFilter::Item * m_SelectedImage;
+
 
 private:
 
@@ -168,9 +175,6 @@ private:
 
 //  QmitkStdMultiWidget * m_MultiWidget;
 //  QmitkFunctionalityComponentContainerGUI * m_GUI;
-
-  /** \brief Item on the actual selected Image in the TreeNodeSelector */
-  const mitk::DataTreeFilter::Item * m_SelectedImage;
 
   /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;

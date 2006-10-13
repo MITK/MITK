@@ -219,6 +219,8 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     }
     ScalarType minValue    = image->GetScalarValueMin();
     ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
+    SetRangeMinMax(minValue, maxValue);
+    SetDefaultRangeMinMax(minValue, maxValue);
     ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
     ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
     unsigned int numPixelsInSlice = image->GetDimensions()[0];
@@ -322,8 +324,6 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   {
     maxValue = minValue+1;
   }
-  SetRangeMinMax(minValue, maxValue);
-  SetDefaultRangeMinMax(minValue, maxValue);
   SetMinMax(minValue, maxValue);
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
   if ( tryPicTags )

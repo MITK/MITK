@@ -53,6 +53,7 @@ mitk::Geometry3D::Geometry3D()
 //##ModelId=3E3456C50067
 mitk::Geometry3D::~Geometry3D()
 {
+  m_VtkMatrix->Delete();
 }
 
 static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3])

@@ -77,7 +77,7 @@ public:
   /*!
   \brief Method to create the GUI-Object
   */
-  virtual QWidget* CreateContainerWidget(QWidget* parent);
+  virtual QWidget* CreateControlWidget(QWidget* parent);
 
   
 
@@ -106,7 +106,7 @@ public:
   /***************     ADD COMPONENTS     ***************/
 
   /** \brief method to add components into this component. */
-  virtual void AddComponent(QmitkFunctionalityComponentContainer* componentContainer);
+  virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer);
 
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
@@ -146,7 +146,7 @@ protected:
   QWidget* m_GUI;
 
   /** \brief Vector with all added components */
-  std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList;      
+  std::vector<QmitkBaseFunctionalityComponent*> m_AddedChildList;      
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;

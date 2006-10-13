@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkBaseFunctionalityComponent.h"
 #include <itkCommand.h>
 
+//#include <QmitkDataTreeComboBox.h>
+#include <mitkDataTreeFilter.h>
+//#include "mitkDataTreeFilterFunctions.h"
 
 /***************       CONSTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt )
@@ -30,6 +33,28 @@ m_FuncName(name)
 
 /***************        DESTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
+{
+
+}
+
+/***************       CONNECTIONS      ***************/
+void QmitkBaseFunctionalityComponent::CreateConnections()
+{
+
+}
+
+/*************** CREATE CONTAINER WIDGET **************/
+QWidget* QmitkBaseFunctionalityComponent::CreateControlWidget(QWidget* parent)
+{
+  return (QWidget*) NULL;
+}
+
+/*************** TREE CHANGED (       ) ***************/
+void QmitkBaseFunctionalityComponent::TreeChanged()
+{
+}
+
+void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
 
 }

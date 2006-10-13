@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(AFX_QUSFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)
 #define AFX_QUSFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_
 
+#include "QmitkBaseFunctionalityComponent.h"
+
 #include <qobject.h>
 #include <qstring.h>
 #include <qtoolbutton.h>
@@ -48,7 +50,7 @@ setting. Furthermore, most functionalities will connect interaction objects in A
 and disconnect them in Deactivated().
 \ingroup Functionalities
 */
-class QmitkFunctionality : public QObject
+class QmitkFunctionality : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
     bool m_Available;

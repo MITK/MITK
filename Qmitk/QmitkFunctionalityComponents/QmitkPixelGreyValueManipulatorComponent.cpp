@@ -180,7 +180,7 @@ void QmitkPixelGreyValueManipulatorComponent::SegmentationSelected(const mitk::D
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-QWidget* QmitkPixelGreyValueManipulatorComponent::CreateContainerWidget(QWidget* parent)
+QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* parent)
 {
   m_PixelGreyValueManipulatorComponentGUI = new QmitkPixelGreyValueManipulatorComponentGUI(parent);
   m_GUI = m_PixelGreyValueManipulatorComponentGUI;

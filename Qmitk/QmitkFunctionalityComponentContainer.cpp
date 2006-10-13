@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "QmitkFunctionalityComponentContainer.h"
-#include "QmitkBaseFunctionalityComponent.h"
+//#include "QmitkBaseFunctionalityComponent.h"
 
 #include <QmitkDataTreeComboBox.h>
 #include <mitkDataTreeFilter.h>
@@ -153,7 +153,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFil
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-QWidget* QmitkFunctionalityComponentContainer::CreateContainerWidget(QWidget* parent)
+QWidget* QmitkFunctionalityComponentContainer::CreateControlWidget(QWidget* parent)
 {
   if (m_FunctionalityComponentContainerGUI == NULL)
   {
@@ -202,11 +202,11 @@ void QmitkFunctionalityComponentContainer::Deactivated()
 }
 
 /***************      ADD COMPONENT     ***************/
-void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* component)
+void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityComponent* component)
 {  
   if(component!=NULL)
   {
-    QWidget* componentWidget = component->CreateContainerWidget(m_GUI);
+    QWidget* componentWidget = component->CreateControlWidget(m_GUI);
     m_AddedChildList.push_back(component);
     m_GUI->layout()->add(componentWidget);
     component->CreateConnections();
@@ -216,11 +216,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     }
     QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
     m_Spacer = spacer;
-    m_GUI->layout()->addItem( m_Spacer );
-    m_GUI->layout()->activate();
-    m_GUI->repaint();
-    m_GUI->updateGeometry();
-    
+    m_GUI->layout()->addItem( m_Spacer ); 
   }
 }
 

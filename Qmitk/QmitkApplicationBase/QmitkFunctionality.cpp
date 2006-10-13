@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt) : 
-QObject(parent, name), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
+QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
 {
   std::cout << "Instantiating QmitkFunctionality. QObject::name(): " << this->name() << std::endl;
   SetDataTree(dataIt);

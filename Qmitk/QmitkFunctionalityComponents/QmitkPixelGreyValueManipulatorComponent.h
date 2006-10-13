@@ -69,7 +69,7 @@ public:
   /***************        CREATE          ***************/
 
   /** \brief Method to create the GUI for the component from the .ui-File. This Method is obligatory */
-  QWidget* CreateContainerWidget(QWidget* parent);
+  virtual QWidget* CreateControlWidget(QWidget* parent);
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();

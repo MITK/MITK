@@ -41,11 +41,11 @@ PURPOSE.  See the above copyright notices for more information.
 * 
 */
 
-#include "mitkDataTree.h"
+//#include "mitkDataTree.h"
 #include <qstring.h>
 #include <qobject.h>
 
-
+#include "mitkDataTreeFilter.h"
 
 //namespace mitk {
 class QmitkBaseFunctionalityComponent : public QObject
@@ -60,7 +60,23 @@ public:
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
- virtual  ~QmitkBaseFunctionalityComponent();
+  virtual  ~QmitkBaseFunctionalityComponent();
+
+   /***************        CREATE          ***************/
+
+  /** \brief Method to create the GUI for the component from the .ui-File. This Method is obligatory */
+  virtual QWidget* CreateControlWidget(QWidget* parent);
+
+  /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
+  virtual void CreateConnections();
+
+  /*************** TREE CHANGED (       ) ***************/
+  // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
+  virtual void TreeChanged();
+
+  /***************      OHTER METHODS     ***************/
+  /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
+  virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
    /***************        SET AND GET     ***************/
   /*!

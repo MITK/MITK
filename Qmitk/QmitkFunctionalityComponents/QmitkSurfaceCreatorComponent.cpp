@@ -175,8 +175,8 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
 
 }
 
-/*************** CREATE CONTAINER WIDGET **************/
-QWidget* QmitkSurfaceCreatorComponent::CreateContainerWidget(QWidget* parent)
+/***************  CREATE CONTROL WIDGET  **************/
+QWidget* QmitkSurfaceCreatorComponent::CreateControlWidget(QWidget* parent)
 {
   m_SurfaceCreatorComponentGUI = new QmitkSurfaceCreatorComponentGUI(parent);
   m_GUI = m_SurfaceCreatorComponentGUI;

@@ -141,7 +141,7 @@ void QmitkThresholdComponent::DataObjectSelected()
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-QWidget* QmitkThresholdComponent::CreateContainerWidget(QWidget* parent)
+QWidget* QmitkThresholdComponent::CreateControlWidget(QWidget* parent)
 {
   m_ThresholdComponentGUI = new QmitkThresholdComponentGUI(parent);
   m_GUI = m_ThresholdComponentGUI;

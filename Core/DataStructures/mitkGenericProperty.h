@@ -70,9 +70,9 @@ class GenericProperty : public BaseProperty
     {
       try
       {
-        const Self& otherProp( dynamic_cast<const Self&>(other) );
-
-        if (this->m_Value == otherProp.m_Value) return true;
+        const Self *otherProp = dynamic_cast<const Self*>(&other);
+        if(otherProp==NULL) return false;
+        if (this->m_Value == otherProp->m_Value) return true;
       }
       catch (std::bad_cast)
       {

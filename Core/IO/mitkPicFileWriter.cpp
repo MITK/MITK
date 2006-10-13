@@ -75,11 +75,9 @@ void mitk::PicFileWriter::GenerateData()
       geometryTag->type = ipPicFloat;
       geometryTag->bpe = 32;
       strcpy(geometryTag->tag, "ISG");
-      geometryTag->dim = 4;
+      geometryTag->dim = 2;
       geometryTag->n[0] = 3;
-      geometryTag->n[1] = 3;
-      geometryTag->n[2] = 3;
-      geometryTag->n[3] = 3;
+      geometryTag->n[1] = 4;
       geometryTag->value = malloc( sizeof(float) * 3 * 4 );
       ipPicAddTag (picImage, geometryTag);
     }

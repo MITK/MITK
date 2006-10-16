@@ -96,7 +96,7 @@ void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
   if(m_BackgroundRenderers.size() > 0)
   {
     it = std::find(m_BackgroundRenderers.begin(),m_BackgroundRenderers.end(),renderer);
-    if((*it) == renderer)
+    if(it != m_BackgroundRenderers.end())
     {
       m_BackgroundRenderers.erase(it);
       UpdateLayers();
@@ -107,7 +107,7 @@ void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
   if(m_SceneRenderers.size() > 0)
   {
     it = std::find(m_SceneRenderers.begin(),m_SceneRenderers.end(),renderer);
-    if((*it) == renderer)
+    if(it != m_SceneRenderers.end())
     {
       m_SceneRenderers.erase(it);
       UpdateLayers();
@@ -118,7 +118,7 @@ void mitk::VtkLayerController::RemoveRenderer(vtkRenderer* renderer)
   if(m_ForegroundRenderers.size() > 0 )
   {
     it = std::find(m_ForegroundRenderers.begin(),m_ForegroundRenderers.end(),renderer);
-    if((*it) == renderer)
+    if(it != m_ForegroundRenderers.end())
     {
       m_ForegroundRenderers.erase(it);
       UpdateLayers();

@@ -1,0 +1,60 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
+#include "mitkCallbackFromGUIThread.h"
+
+#include <iostream>
+
+mitk::CallbackFromGUIThread* mitk::CallbackFromGUIThread::m_Instance = NULL;
+
+namespace mitk {
+
+CallbackFromGUIThread::CallbackFromGUIThread()
+: m_Implementation(NULL)
+{
+}
+
+CallbackFromGUIThread* CallbackFromGUIThread::GetInstance()
+{
+  if (!m_Instance)
+  {
+    m_Instance = new CallbackFromGUIThread();
+  }
+
+  return m_Instance;
+}
+    
+void CallbackFromGUIThread::RegisterImplementation(CallbackFromGUIThreadImplementation* implementation)
+{
+  m_Implementation = implementation;
+}
+
+void CallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd)
+{
+  if (m_Implementation)
+  {
+    m_Implementation->CallThisFromGUIThread(cmd);
+  }
+  else
+  {
+    std::cerr << "in mitk::CallbackFromGUIThread::CallbackFromGUIThread(): no implementation registered." << std::endl;
+  }
+}
+
+} // namespace
+

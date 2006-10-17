@@ -28,10 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifdef CHILIPLUGIN
 #include "QcMITKSamplePlugin.h"
-#include <chili/plugin.h>
-#include <chili/qclightbox.h>
-#include <chili/qclightboxmanager.h>
-#include <chili/isg.h>
+#include <plugin.h>
+#include <qclightbox.h>
+#include <qclightboxmanager.h>
+#include <isg.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic.h>
 #include <ipFunc.h>

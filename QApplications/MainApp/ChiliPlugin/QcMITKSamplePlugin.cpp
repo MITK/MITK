@@ -1,6 +1,6 @@
-#include <chili/plugin.xpm>
-#include <chili/qclightbox.h>
-#include <chili/qclightboxmanager.h>
+#include <plugin.xpm>
+#include <qclightbox.h>
+#include <qclightboxmanager.h>
 #include <QcMITKTask.h>
 
 #include <qlayout.h>

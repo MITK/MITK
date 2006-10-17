@@ -506,6 +506,8 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
   }
   else
     m_CameraController = NULL;
+  if(m_PixelMapGL != NULL)
+    delete [] m_PixelMapGL;
 }
 
 /*!

@@ -630,11 +630,6 @@ int testTubeSegmentRegistrator()
   TubeSegmentModelType::PointType          tubeStartPoint       = tubeSegment->GetStartPoint();
   TubeSegmentModelType::PointSetPointType  tubeConnectionPoint  = tubeSegment->GetConnectionPoints()->GetPoints()->Begin().Value();
 
-  RegistrationModelWriterType::Pointer modelWriter = RegistrationModelWriterType::New();
-  modelWriter->SetRegistrationModel(tubeSegment);
-  modelWriter->SetFilename("test.xml");
-  modelWriter->WriteFile();
-
   PointSetToImageFilterType::Pointer pointSetToImageFilter = PointSetToImageFilterType::New();
   OutputImageType::SizeType size;
   size.Fill(100);
@@ -649,7 +644,6 @@ int testTubeSegmentRegistrator()
   filterContext->SetDryRun(true);
   filterContext->SetDryRun(true);
   filterContext->SetOutputTree(outputTree);
-  filterContext->SetModelFilename("test.xml");
   filterContext->SetBaseModel(tubeSegment.GetPointer());
 
   StartPointDataType::Pointer startPointData = StartPointDataType::New();

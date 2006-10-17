@@ -303,7 +303,7 @@ int testRegistrationModelXMLWriter()
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
-  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetTubeSegment();
+  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetCurrentModel();
   PointSetType::Pointer readPointSet = readTubeSegment->GetPointSet();
   PointType readStartPoint = readTubeSegment->GetStartPoint();
 
@@ -650,6 +650,7 @@ int testTubeSegmentRegistrator()
   filterContext->SetDryRun(true);
   filterContext->SetOutputTree(outputTree);
   filterContext->SetModelFilename("test.xml");
+  filterContext->SetBaseModel(tubeSegment.GetPointer());
 
   StartPointDataType::Pointer startPointData = StartPointDataType::New();
   StartPointDataType::PointType startPoint;
@@ -754,7 +755,7 @@ int testMeshReadWrite()
   registrationModelReader->SetFilename("test.xml");
   registrationModelReader->GenerateOutputInformation();
 
-  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetTubeSegment();
+  TubeSegmentModelType::Pointer readTubeSegment = registrationModelReader->GetCurrentModel();
 
   MeshType::Pointer mesh      = tubeSegment->GetMesh();
   MeshType::Pointer readMesh  = readTubeSegment->GetMesh();

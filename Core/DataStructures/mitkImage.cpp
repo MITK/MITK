@@ -760,10 +760,18 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
       *p=1;
   }
 
-  if((m_Dimension>2) && (sDim>=0))
+  if(sDim>=0)
+  {
     tmpDimensions[2]=sDim;
-  if((m_Dimension>3) && (tDim>=0))
+    if(m_Dimension < 3)
+      m_Dimension = 3;
+  }
+  if(tDim>=0)
+  {
     tmpDimensions[3]=tDim;
+    if(m_Dimension < 4)
+      m_Dimension = 4;
+  }
 
   mitk::PixelType pixelType;
 
@@ -845,10 +853,18 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
       *p=1;
   }
 
-  if((m_Dimension>2) && (sDim>=0))
+  if(sDim>=0)
+  {
     m_Dimensions[2]=sDim;
-  if((m_Dimension>3) && (tDim>=0))
+    if(m_Dimension < 3)
+      m_Dimension = 3;
+  }
+  if(tDim>=0)
+  {
     m_Dimensions[3]=tDim;
+    if(m_Dimension < 4)
+      m_Dimension = 4;
+  }
 
   unsigned int i;
   for(i=0;i<4;++i)

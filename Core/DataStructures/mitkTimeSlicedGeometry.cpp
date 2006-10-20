@@ -150,9 +150,9 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
   assert(m_EvenlyTimed);
   {
     if(time_in_ms < m_TimeBounds[0])
-      return 0;
+      return -1;
     if(time_in_ms >= m_TimeBounds[1])
-      return m_TimeSteps-1;
+      return m_TimeSteps;
     if(m_TimeBounds[0]==m_TimeBounds[1])
       return 0;
     if((m_TimeBounds[0]>-ScalarTypeNumericTraits::max()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))

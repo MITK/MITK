@@ -219,8 +219,6 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     }
     ScalarType minValue    = image->GetScalarValueMin();
     ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
-    SetRangeMinMax(minValue, maxValue);
-    SetDefaultRangeMinMax(minValue, maxValue);
     ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
     ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
     unsigned int numPixelsInSlice = image->GetDimensions()[0];
@@ -233,7 +231,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
     {
         // guessByCentralSlice seems to have failed, lets look at all data
         minValue    = wholeImage->GetScalarValueMin();                   
-        maxValue    = wholeImage->GetScalarValueMaxNoRecompute();        
+        maxValue    = wholeImage->GetScalarValueMaxNoRecompute();
         min2ndValue = wholeImage->GetScalarValue2ndMinNoRecompute();  
         max2ndValue = wholeImage->GetScalarValue2ndMaxNoRecompute();  
         unsigned int numPixelsInDataset = image->GetDimensions()[0];
@@ -243,10 +241,15 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
         minCountFraction = minCount/float(numPixelsInDataset);
         maxCountFraction = maxCount/float(numPixelsInDataset);
     }
+    SetRangeMinMax(minValue, maxValue);
+    SetDefaultRangeMinMax(minValue, maxValue);
+
     //// uniform image
     if ( minValue == maxValue )
     {
         maxValue = minValue+1;
+        SetRangeMinMax(minValue, maxValue);
+        SetDefaultRangeMinMax(minValue, maxValue);
     }
 
     //// binary image

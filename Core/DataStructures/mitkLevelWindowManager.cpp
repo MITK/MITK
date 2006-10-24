@@ -44,6 +44,9 @@ mitk::LevelWindowManager::~LevelWindowManager()
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;
   }
+  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); iter++ ) {
+    (*iter).second->RemoveObserver((*iter).first);
+  }
 }
 
 // sets the DataTree which holds all image-nodes
@@ -176,6 +179,71 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
   there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.*/
 void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
 {
+  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); iter++ ) {
+    (*iter).second->RemoveObserver((*iter).first);
+  }
+  m_PropObserverToNode.clear();
+
+  bool stillExists = false;
+
+  if (m_DataTree.IsNotNull())
+  {
+    DataTreeIteratorClone iter = m_DataTree->GetIteratorToNode( m_DataTree, NULL );
+    iter->GoToBegin();
+    while ( !iter->IsAtEnd() )
+    {
+      if ( (iter->Get().IsNotNull()) && (iter->Get()->GetProperty("visible")) )
+      {
+        itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+        command->SetCallbackFunction(this, &LevelWindowManager::Update);
+        m_PropObserverToNode[iter->Get()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command )] = iter->Get()->GetProperty("visible");
+      }
+      ++iter;
+    }
+    iter->GoToBegin();
+    if (m_LevelWindowProperty.IsNotNull() && !m_AutoTopMost && m_DataTree.IsNotNull())
+    {
+      while ( !iter->IsAtEnd() )
+      {
+        if ( (iter->Get().IsNotNull()) && (iter->Get()->IsVisible(NULL)) )
+        {
+          bool binary = false;
+          iter->Get()->GetBoolProperty("binary", binary);
+          if( binary == false)
+          { 
+            mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(iter->Get()->GetProperty("levelwindow").GetPointer());
+            if (levelWindowProperty)
+            {
+              if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)
+                stillExists = true;
+            }
+          }
+        }
+        ++iter;
+      }
+    }
+  }
+  if (stillExists == false && m_DataTree.IsNotNull())
+  {
+    SetAutoTopMostImage(true);
+  }
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+// returns the DataTree
+mitk::DataTree::Pointer mitk::LevelWindowManager::GetDataTree()
+{
+  return m_DataTree.GetPointer();
+}
+
+// true if changes on slider or line-edits will affect always the topmost layer image
+bool mitk::LevelWindowManager::isAutoTopMost()
+{
+  return m_AutoTopMost;
+}
+
+void mitk::LevelWindowManager::Update(const itk::EventObject&)
+{
   bool stillExists = false;
 
   if (m_LevelWindowProperty.IsNotNull() && !m_AutoTopMost && m_DataTree.IsNotNull())
@@ -207,16 +275,4 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
     SetAutoTopMostImage(true);
   }
   RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-// returns the DataTree
-mitk::DataTree* mitk::LevelWindowManager::GetDataTree()
-{
-  return m_DataTree.GetPointer();
-}
-
-// true if changes on slider or line-edits will affect always the topmost layer image
-bool mitk::LevelWindowManager::isAutoTopMost()
-{
-  return m_AutoTopMost;
 }

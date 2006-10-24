@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataTree.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkBaseProperty.h>
 
 /**
   \class mitk::LevelWindowManager mitkLevelWindowManager.h mitkLevelWindowManager.h
@@ -51,10 +52,12 @@ namespace mitk
     void SetDataTree(mitk::DataTree* tree);
 
     /// returns the DataTree
-    DataTree* GetDataTree();
+    DataTree::Pointer GetDataTree();
   
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
     void SetAutoTopMostImage(bool autoTopMost);
+
+    void Update(const itk::EventObject& e);
 
     /*!
     * sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
@@ -96,6 +99,9 @@ namespace mitk
 
     /// pointer to the LevelWindowProperty of the current image
     LevelWindowProperty::Pointer m_LevelWindowProperty;
+
+    //map to hold observer ID´s to every visible property of DataTreeNode´s BaseProperty
+    std::map<unsigned long, mitk::BaseProperty::Pointer> m_PropObserverToNode;
 
     bool m_AutoTopMost;
     unsigned long m_ObserverTag;

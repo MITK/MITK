@@ -257,3 +257,9 @@ QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
 //it is removed by the linker. 
 #include "VtkQRenderWindowInteractor.h"
 VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
+
+#include "QmitkApplicationCursor.h"
+QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance
+
+#include "QmitkCallbackFromGUIThread.h"
+QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;

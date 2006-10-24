@@ -2,8 +2,6 @@
 
 #include<qapplication.h>
 
-QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;
-
 /// This kind of object is posted into the Qt event queue in order to call some method from the GUI thread
 class QmitkCallbackEvent : public QEvent
 {

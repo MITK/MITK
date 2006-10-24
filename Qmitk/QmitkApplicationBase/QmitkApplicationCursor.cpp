@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance
-
 QmitkApplicationCursor::QmitkApplicationCursor()
 {
   mitk::ApplicationCursor::RegisterImplementation(this);

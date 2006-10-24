@@ -59,7 +59,7 @@ class CallbackFromGUIThread
     static CallbackFromGUIThread* GetInstance();
 
     /// To be called by a toolkit specific CallbackFromGUIThreadImplementation. 
-    void RegisterImplementation(CallbackFromGUIThreadImplementation* implementation);
+    static void RegisterImplementation(CallbackFromGUIThreadImplementation* implementation);
 
     /// Change the current application cursor
     void CallThisFromGUIThread(itk::Command*);
@@ -71,7 +71,7 @@ class CallbackFromGUIThread
 
   private:
     
-    CallbackFromGUIThreadImplementation* m_Implementation;
+    static CallbackFromGUIThreadImplementation* m_Implementation;
     static CallbackFromGUIThread* m_Instance;
 };
 

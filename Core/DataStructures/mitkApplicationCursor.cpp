@@ -21,11 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 mitk::ApplicationCursor* mitk::ApplicationCursor::m_Instance = NULL;
+mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = NULL;
 
 namespace mitk {
 
 ApplicationCursor::ApplicationCursor()
-: m_Implementation(NULL)
 {
 }
 

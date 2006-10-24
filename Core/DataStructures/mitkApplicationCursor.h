@@ -63,7 +63,7 @@ class ApplicationCursor
     static ApplicationCursor* GetInstance();
 
     /// To be called by a toolkit specific ApplicationCursorImplementation. 
-    void RegisterImplementation(ApplicationCursorImplementation* implementation);
+    static void RegisterImplementation(ApplicationCursorImplementation* implementation);
 
     /// Change the current application cursor
     void PushCursor(const char* XPM[], int hotspotX = -1, int hotspotY = -1);
@@ -78,7 +78,7 @@ class ApplicationCursor
 
   private:
     
-    ApplicationCursorImplementation* m_Implementation;
+    static ApplicationCursorImplementation* m_Implementation;
     static ApplicationCursor* m_Instance;
 };
 

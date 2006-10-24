@@ -29,7 +29,7 @@ protected:
 
 QmitkCallbackFromGUIThread::QmitkCallbackFromGUIThread()
 {
-  mitk::CallbackFromGUIThread::GetInstance()->RegisterImplementation(this);
+  mitk::CallbackFromGUIThread::RegisterImplementation(this);
 }
 
 QmitkCallbackFromGUIThread::~QmitkCallbackFromGUIThread()

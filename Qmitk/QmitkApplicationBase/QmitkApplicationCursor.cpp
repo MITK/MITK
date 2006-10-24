@@ -10,7 +10,7 @@ QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance
 
 QmitkApplicationCursor::QmitkApplicationCursor()
 {
-  mitk::ApplicationCursor::GetInstance()->RegisterImplementation(this);
+  mitk::ApplicationCursor::RegisterImplementation(this);
 }
 
 void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY) 

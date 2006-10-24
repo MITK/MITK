@@ -601,6 +601,9 @@ public:
 
   /// Views can call this to select items
   void SelectItem(const Item*, bool selected = true);
+  
+  /// This will unselect all selected items
+  void UnselectAll();
 
   /// This will delete all selected items from the data tree
   void DeleteSelectedItems();

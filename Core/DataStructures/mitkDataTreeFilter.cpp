@@ -479,6 +479,14 @@ void DataTreeFilter::SelectItem(const Item* item, bool selected)
   const_cast<Item*>(item) -> SetSelected(selected);
 } 
 
+void DataTreeFilter::UnselectAll()
+{
+  while ( m_SelectedItems.size() != 0 ) // for all selected items
+  {
+    (*m_SelectedItems.begin())->SetSelected(false);
+  }
+}
+
 void DataTreeFilter::DeleteSelectedItems()
 {
   while ( m_SelectedItems.size() != 0 ) // for all selected items

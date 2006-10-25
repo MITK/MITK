@@ -903,6 +903,7 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
   node->SetProperty( "color mode", new mitk::BoolProperty(false) );
   node->SetProperty( "representation", new mitk::VtkRepresentationProperty );
   node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
+  node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
@@ -910,7 +911,6 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
     {
       node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
       node->SetProperty( "color mode", new mitk::BoolProperty(true) );
-      node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
     }
   }
 }

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 
+#include "mitkGeometry3D.h"
 #include "mitkItkMatrixHack.h"
 #include <vtkMatrix4x4.h>
 
@@ -60,6 +61,91 @@ namespace mitk
       vtkmatrix->SetElement(i, 3, itkTransform->GetOffset()[i]);
     vtkmatrix->Modified();
   }
+
+  template <class TTransformType1, class TTransformType2>
+  void ConvertItkTransform(const TTransformType1* sourceTransform, TTransformType2* destTransform)
+  {
+    if((sourceTransform==NULL) || (destTransform==NULL))
+      return;
+
+    // transfer offset
+    const typename TTransformType1::OutputVectorType& sourceOffset =
+      sourceTransform->GetOffset();
+
+    typename TTransformType2::OutputVectorType offset;
+    offset[0] = sourceOffset[0]; offset[1] = sourceOffset[1]; offset[2] = sourceOffset[2];
+    destTransform->SetOffset( offset );
+
+    typename TTransformType1::MatrixType::InternalMatrixType& sourceVnlMatrix =
+      const_cast<typename TTransformType1::MatrixType::InternalMatrixType&>(sourceTransform->GetMatrix().GetVnlMatrix());
+
+    //transfer matrix
+    typename TTransformType2::MatrixType::InternalMatrixType& destVnlMatrix =
+      const_cast<typename TTransformType2::MatrixType::InternalMatrixType&>(destTransform->GetMatrix().GetVnlMatrix());
+
+    for ( int i=0; i < 3; ++i)
+      for( int j=0; j < 3; ++j )
+        destVnlMatrix[i][j] = sourceVnlMatrix[i][j];    
+
+    // *This* ensures m_MatrixMTime.Modified(), which is therewith not equal to
+    // m_InverseMatrixMTime, thus a new inverse will be calculated (when
+    // requested).
+    static_cast<mitk::ItkMatrixHack<TTransformType2>*>(destTransform)->MatrixChanged();
+  }
+
+  template <class TMatrixType>
+  void GetRotation(const mitk::Geometry3D * geometry, TMatrixType& itkmatrix)
+  {
+    const mitk::Vector3D& spacing = geometry->GetSpacing();
+    typename mitk::Geometry3D::TransformType::MatrixType::InternalMatrixType& geometryVnlMatrix =
+      const_cast<typename mitk::Geometry3D::TransformType::MatrixType::InternalMatrixType&>(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
+
+    typename TMatrixType::InternalMatrixType& outputVnlMatrix =
+      const_cast<typename TMatrixType::InternalMatrixType&>(itkmatrix.GetVnlMatrix());
+
+    for ( int i=0; i < 3; ++i)
+      for( int j=0; j < 3; ++j )
+        outputVnlMatrix [i][j] = geometryVnlMatrix [i][j] / spacing[j];
+  }
+
+  template <class TTransformType>
+  void GetWorldToItkPhysicalTransform(const mitk::Geometry3D * geometry, TTransformType* itkTransform)
+  {
+    if(itkTransform==NULL)
+      return;
+
+    // get rotation matrix and offset from Geometry and transfer in TTransformType types
+    typename TTransformType::MatrixType rotationMatrix;
+    GetRotation(geometry, rotationMatrix);
+
+    typename const mitk::Geometry3D::TransformType::OffsetType& geometryOffset =
+      geometry->GetIndexToWorldTransform()->GetOffset();
+
+    typename vnl_vector<TTransformType::MatrixType::ValueType> vnlOffset(3);
+    vnlOffset[0] = geometryOffset[0]; vnlOffset[1] = geometryOffset[1]; vnlOffset[2] = geometryOffset[2];
+
+    // do calculations
+    typename TTransformType::MatrixType::InternalMatrixType inverseRotationVnlMatrix = rotationMatrix.GetTranspose();
+
+    vnlOffset -= inverseRotationVnlMatrix*vnlOffset;
+
+    typename TTransformType::OutputVectorType offset;//vnl_vector<TTransformType::MatrixType::ValueType> offset;
+    offset[0] = vnlOffset[0]; offset[1] = vnlOffset[1]; offset[2] = vnlOffset[2];
+    itkTransform->SetOffset( offset );
+
+    // copy in destination itkTransform
+    typename TTransformType::MatrixType::InternalMatrixType& destVnlMatrix =
+      const_cast<typename TTransformType::MatrixType::InternalMatrixType&>(itkTransform->GetMatrix().GetVnlMatrix());
+
+    for ( int i=0; i < 3; ++i)
+      for( int j=0; j < 3; ++j )
+        destVnlMatrix[i][j] = inverseRotationVnlMatrix[i][j];    
+    // *This* ensures m_MatrixMTime.Modified(), which is therewith not equal to
+    // m_InverseMatrixMTime, thus a new inverse will be calculated (when
+    // requested).
+    static_cast<mitk::ItkMatrixHack<TTransformType>*>(itkTransform)->MatrixChanged();
+  }
+
 }
 
 #endif /* MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD */

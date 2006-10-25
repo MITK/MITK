@@ -42,6 +42,9 @@ public:
   /// constructor
   QmitkLineEditLevelWindowWidget( QWidget * parent=0, const char * name=0, WFlags f = false );
 
+  /// destructor
+  ~QmitkLineEditLevelWindowWidget();
+  
   /// inputfield for level value
   QLineEdit* m_LevelInput;
 

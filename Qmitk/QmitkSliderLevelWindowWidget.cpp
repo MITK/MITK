@@ -54,6 +54,15 @@ QmitkSliderLevelWindowWidget::QmitkSliderLevelWindowWidget( QWidget * parent, co
   update();
 }
 
+QmitkSliderLevelWindowWidget::~QmitkSliderLevelWindowWidget()
+{
+  if ( m_IsObserverTagSet)
+  {
+    m_Manager->RemoveObserver(m_ObserverTag);
+    m_IsObserverTagSet = false;
+  }
+}
+
 void QmitkSliderLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
 {
   if ( m_IsObserverTagSet)

@@ -74,6 +74,15 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   this->hide();
 }
 
+QmitkLineEditLevelWindowWidget::~QmitkLineEditLevelWindowWidget()
+{
+  if( m_IsObserverTagSet )
+  {
+    m_Manager->RemoveObserver(m_ObserverTag);
+    m_IsObserverTagSet = false;
+  }
+}
+
 void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
 {
   try

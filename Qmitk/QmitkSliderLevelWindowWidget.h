@@ -75,6 +75,9 @@ public:
   /// constructor
   QmitkSliderLevelWindowWidget( QWidget * parent=0, const char * name=0, WFlags f = false );
 
+  /// destructor
+  ~QmitkSliderLevelWindowWidget();
+
   /*!
   *	data structure which stores the values manipulated
   *	by a QmitkSliderLevelWindowWidget

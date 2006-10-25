@@ -265,6 +265,10 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
         useCellData = true;
       }
     }
+    else
+    {
+      usePointData = true;
+    }
   }
 
 

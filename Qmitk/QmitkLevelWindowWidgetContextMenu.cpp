@@ -22,9 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget * parent, const char * name, WFlags f )
-: QWidget( parent, name, f ), m_LevelWindowPreset()
+: QWidget( parent, name, f )
 {
-  m_LevelWindowPreset.LoadPreset();
+  m_LevelWindowPreset = new mitk::LevelWindowPreset();
+  m_LevelWindowPreset->LoadPreset();
+}
+
+QmitkLevelWindowWidgetContextMenu::~QmitkLevelWindowWidgetContextMenu()
+{
+  m_LevelWindowPreset->Delete();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setPreset(int presetID)
@@ -32,8 +38,8 @@ void QmitkLevelWindowWidgetContextMenu::setPreset(int presetID)
   QString item = m_PresetSubmenu->text(presetID);
   if (!(presetID == m_PresetID))
   {
-    double dlevel = m_LevelWindowPreset.getLevel(std::string((const char*)item));
-    double dwindow = m_LevelWindowPreset.getWindow(std::string((const char*)item));
+    double dlevel = m_LevelWindowPreset->getLevel(std::string((const char*)item));
+    double dwindow = m_LevelWindowPreset->getWindow(std::string((const char*)item));
     if ((dlevel + dwindow/2) > m_LevelWindow.GetRangeMax())
     {
       double lowerBound = (dlevel - dwindow/2);
@@ -75,10 +81,10 @@ void QmitkLevelWindowWidgetContextMenu::setLevelWindowManager(mitk::LevelWindowM
 void QmitkLevelWindowWidgetContextMenu::addPreset()
 {
   QmitkLevelWindowPresetDefinition addPreset(this, "newPreset", true);
-  addPreset.setPresets(m_LevelWindowPreset.getLevelPresets(), m_LevelWindowPreset.getWindowPresets(), QString::number( (int) m_LevelWindow.GetLevel() ), QString::number( (int) m_LevelWindow.GetWindow() ));
+  addPreset.setPresets(m_LevelWindowPreset->getLevelPresets(), m_LevelWindowPreset->getWindowPresets(), QString::number( (int) m_LevelWindow.GetLevel() ), QString::number( (int) m_LevelWindow.GetWindow() ));
   if(addPreset.exec())
   {
-    m_LevelWindowPreset.newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
+    m_LevelWindowPreset->newPresets(addPreset.getLevelPresets(), addPreset.getWindowPresets());
   }
 }
 
@@ -140,7 +146,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetID = m_PresetSubmenu->insertItem(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->insertSeparator();
-    std::map<std::string, double> preset = m_LevelWindowPreset.getLevelPresets();
+    std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
     for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->insertItem(item);
@@ -213,7 +219,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetID = m_PresetSubmenu->insertItem(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->insertSeparator();
-    std::map<std::string, double> preset = m_LevelWindowPreset.getLevelPresets();
+    std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
     for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->insertItem(item);

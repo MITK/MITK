@@ -39,11 +39,12 @@ public:
 
   /// constructor
   QmitkLevelWindowWidgetContextMenu(QWidget * parent, const char * name, WFlags f );
+  virtual ~QmitkLevelWindowWidgetContextMenu();
   
   /*!
   *	data structure which reads and writes presets defined in a XML-file
   */
-  mitk::LevelWindowPreset m_LevelWindowPreset;
+  mitk::LevelWindowPreset* m_LevelWindowPreset;
 
   /*!
   *	data structure which stores the values manipulated

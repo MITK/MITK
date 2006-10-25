@@ -134,9 +134,33 @@ void mitk::ItkImageFileReader::GenerateData()
   image->Initialize( pixelType, ndim, dimensions );
 #endif 
   image->SetVolume( buffer );
+
+#if ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 4
   image->GetSlicedGeometry()->SetOrigin( origin );
   image->GetSlicedGeometry()->SetSpacing( spacing );
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
+#else
+  // access direction of itk::Image and include spacing
+  mitk::Matrix3D matrix;
+  matrix.SetIdentity();
+  unsigned int i, j, itkDimMax3 = (ndim >= 3? 3 : ndim);
+  for ( i=0; i < itkDimMax3; ++i)
+    for( j=0; j < itkDimMax3; ++j )
+      matrix[i][j] = imageIO->GetDirection(j)[i];
+
+  // re-initialize PlaneGeometry with origin and direction
+  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(image->GetSlicedGeometry(0)->GetGeometry2D(0));
+  planeGeometry->SetOrigin(origin);
+  planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
+
+  // re-initialize SlicedGeometry3D
+  SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry(0);
+  slicedGeometry->InitializeEvenlySpaced(planeGeometry, image->GetDimension(2));
+  slicedGeometry->SetSpacing(spacing);
+
+  // re-initialize TimeSlicedGeometry
+  image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
+#endif
   free( buffer );
   buffer = NULL;
   std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;

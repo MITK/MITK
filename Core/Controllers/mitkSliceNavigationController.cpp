@@ -190,7 +190,7 @@ void SliceNavigationController::Update(SliceNavigationController::ViewDirection 
     m_Time->SetSteps(worldTimeSlicedGeometry->GetTimeSteps());
     m_Time->SetPos(0);
     m_BlockUpdate = false;
-
+    assert( worldTimeSlicedGeometry->GetGeometry3D( 0 ) != NULL );
     slicedWorldGeometry->SetTimeBounds(worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBounds());
     //@todo implement for non-evenly-timed geometry!
     m_CreatedWorldGeometry->InitializeEvenlyTimed(slicedWorldGeometry, worldTimeSlicedGeometry->GetTimeSteps());

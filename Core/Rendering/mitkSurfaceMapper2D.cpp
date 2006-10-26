@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkLookupTableProperty.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataSource.h>
@@ -53,7 +54,7 @@ mitk::SurfaceMapper2D::SurfaceMapper2D()
   m_LUT = vtkLookupTable::New();
   m_LUT->SetTableRange(0,255);
   m_LUT->SetNumberOfColors(255);
-  m_LUT->SetRampToLinear ();
+  m_LUT->SetRampToLinear();
   m_LUT->Build();
 }
 
@@ -84,14 +85,14 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
   if (!useCellData)
   {
     // search min/max point scalars over all time steps
-    #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-      double dataRange[2] = {0,0};
-      double range[2];
-    #else
-      float dataRange[2] = {0,0};
-      float range[2];
-    #endif
-    
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+    double dataRange[2] = {0,0};
+    double range[2];
+#else
+    float dataRange[2] = {0,0};
+    float range[2];
+#endif
+
     mitk::Surface::Pointer input  = const_cast< mitk::Surface* >(dynamic_cast<const mitk::Surface*>( this->GetDataTreeNode()->GetData() ));
     if(input.IsNull()) return;
     const TimeSlicedGeometry::Pointer inputTimeGeometry = input->GetTimeSlicedGeometry();
@@ -169,6 +170,13 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   {
     Point3D point;
     Vector3D normal;
+
+    mitk::LookupTableProperty::Pointer lookupTableProp;
+    this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
+    if (lookupTableProp.IsNotNull() )
+    {
+      m_LUT = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+    }
 
     vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
     if(worldPlaneGeometry.IsNotNull())

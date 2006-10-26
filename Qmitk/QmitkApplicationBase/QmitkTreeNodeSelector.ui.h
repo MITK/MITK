@@ -34,30 +34,31 @@ void QmitkTreeNodeSelector::SetDataTreeNodeIterator( mitk::DataTreeIteratorClone
 void QmitkTreeNodeSelector::UpdateContent()
 {
   // iteriere ueber Baum und wende filter funktion an
-  CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_DataTreeIteratorClone,m_FilterFunction);
   QString currentText = m_ComboBox->currentText();
   m_ComboBox->clear();
   m_TreeNodes.clear();
- 
-  for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
-  {
-    std::string name;
-    if ((*it)->Get()->GetName(name))
+  if (m_DataTreeIteratorClone != NULL) {
+    CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_DataTreeIteratorClone,m_FilterFunction);
+   
+    for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
     {
-      /** TODO: create a better kind of uniqueness */
-      // this line adds spaces to the name, until it is unique within the list
-      while ( m_ComboBox->listBox() && m_ComboBox->listBox()->findItem( QString(name.c_str()), Qt::ExactMatch|Qt::CaseSensitive ) )
-        name += ' ';
-      
-      m_ComboBox->insertItem( name.c_str() );
-      m_TreeNodes[name] = *it;
-      if (currentText == name.c_str())
+      std::string name;
+      if ((*it)->Get()->GetName(name))
       {
-        m_ComboBox->setCurrentText(currentText);
+        /** TODO: create a better kind of uniqueness */
+        // this line adds spaces to the name, until it is unique within the list
+        while ( m_ComboBox->listBox() && m_ComboBox->listBox()->findItem( QString(name.c_str()), Qt::ExactMatch|Qt::CaseSensitive ) )
+          name += ' ';
+        
+        m_ComboBox->insertItem( name.c_str() );
+        m_TreeNodes[name] = *it;
+        if (currentText == name.c_str())
+        {
+          m_ComboBox->setCurrentText(currentText);
+        }
       }
     }
   }
-  
   QString newText = m_ComboBox->currentText();
   if ( (currentText != newText) )
   {

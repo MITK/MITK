@@ -1,3 +1,5 @@
+//#include <iostream>
+//#include <iomanip>
 #include "CreatePOVMesh.h"
 #include <itksys/SystemTools.hxx>
 
@@ -10,13 +12,12 @@ int vtkPolyDataToPovRayMesh2Test (int argc, char * argv[])
 
   bool error = true;
   error = itkMeshToIndexedTriangleMeshFilterTest(fileOut);
-  std::cout << "Subroutine returned: " << error << std::endl;
+  std::cout << "Writer returned error state: " << std::boolalpha << error << std::endl;
 
   if ( !error ) std::cout << "[TEST DONE]" << std::endl;
   else {std::cout << "[FAILED]" << std::endl;
         return EXIT_FAILURE;
   }
-
   return EXIT_SUCCESS;
 }
 
@@ -35,6 +36,7 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
 
   // Convert sphere to itk::Mesh
   MeshType::Pointer itkmesh = MeshType::New();
+  //std::cout << "Created empty mesh" << std::endl;
   itkmesh = MeshUtilType::MeshFromPolyData( mySphereSource->GetOutput() );
   if ( ! itkmesh ) {
     std::cout << "Unable to convert test sphere to itk::Mesh" << std::endl;
@@ -72,6 +74,7 @@ bool itkMeshToIndexedTriangleMeshFilterTest(std::string outFile)
   writer->SetTranslationInX(0);
   writer->SetTranslationInY(0);
   writer->SetFilePrefix(outFile.c_str());
+  std::cout << "Writer initialized, starting write process: " << std::endl;
 
   if( writer->GetNumberOfInputs() < 1 )
   {

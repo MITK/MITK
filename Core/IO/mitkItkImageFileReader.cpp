@@ -117,7 +117,7 @@ void mitk::ItkImageFileReader::GenerateData()
 
   std::cout << "ioRegion: " << ioRegion << std::endl;
   imageIO->SetIORegion( ioRegion );
-  void* buffer = malloc( imageIO->GetImageSizeInBytes() );
+  void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
   //mitk::Image::Pointer image = mitk::Image::New();
   if((ndim==4) && (dimensions[3]<=1))
@@ -133,7 +133,7 @@ void mitk::ItkImageFileReader::GenerateData()
   mitk::PixelType pixelType( imageIO->GetPixelType() );
   image->Initialize( pixelType, ndim, dimensions );
 #endif 
-  image->SetVolume( buffer );
+  image->SetImportVolume( buffer, 0, 0, Image::ManageMemory );
 
 #if ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 4
   image->GetSlicedGeometry()->SetOrigin( origin );
@@ -161,7 +161,6 @@ void mitk::ItkImageFileReader::GenerateData()
   // re-initialize TimeSlicedGeometry
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
 #endif
-  free( buffer );
   buffer = NULL;
   std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 //  mitk::DataTreeNode::Pointer node = this->GetOutput();

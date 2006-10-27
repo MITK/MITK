@@ -95,7 +95,8 @@ void mitk::ItkImageFileReader::GenerateData()
   Point3D origin;
   origin.Fill(0);
 
-  for ( unsigned int i = 0; i < ndim ; ++i )
+  unsigned int i;
+  for ( i = 0; i < ndim ; ++i )
   {
     ioStart[ i ] = 0;
     ioSize[ i ] = imageIO->GetDimensions( i );
@@ -143,7 +144,7 @@ void mitk::ItkImageFileReader::GenerateData()
   // access direction of itk::Image and include spacing
   mitk::Matrix3D matrix;
   matrix.SetIdentity();
-  unsigned int i, j, itkDimMax3 = (ndim >= 3? 3 : ndim);
+  unsigned int j, itkDimMax3 = (ndim >= 3? 3 : ndim);
   for ( i=0; i < itkDimMax3; ++i)
     for( j=0; j < itkDimMax3; ++j )
       matrix[i][j] = imageIO->GetDirection(j)[i];

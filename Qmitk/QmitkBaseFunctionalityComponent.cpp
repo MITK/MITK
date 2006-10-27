@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkBaseFunctionalityComponent.h"
 #include <itkCommand.h>
 
-//#include <QmitkDataTreeComboBox.h>
+#include <QmitkDataTreeComboBox.h>
 #include <mitkDataTreeFilter.h>
 //#include "mitkDataTreeFilterFunctions.h"
 
 /***************       CONSTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt )
 : QObject(parent, name),
+m_Parent(parent),
 m_FuncName(name)
 {
   SetDataTreeIterator(dataIt);
@@ -82,6 +83,14 @@ QString QmitkBaseFunctionalityComponent::GetFunctionalityName()
 {
   return m_FuncName;
 }
+
+
+
+  QObject* QmitkBaseFunctionalityComponent::GetParent()
+  {
+   return m_Parent;
+  }
+
 
 /***************        ACTIVATED       ***************/
 void QmitkBaseFunctionalityComponent::Activated()

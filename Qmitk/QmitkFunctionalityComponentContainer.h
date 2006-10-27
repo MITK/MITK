@@ -101,6 +101,9 @@ public:
 
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
+
+  QmitkStdMultiWidget * GetMulitWidget();
+
   
 
   /***************     ADD COMPONENTS     ***************/
@@ -134,6 +137,8 @@ public slots:
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
 protected:
+
+  QmitkStdMultiWidget *GetMultiWidget();
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
   virtual void UpdateDataTreeComboBoxes();
@@ -178,6 +183,8 @@ private:
 
   /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;
+
+  QmitkStdMultiWidget *m_MulitWidget;
 };
 
 #endif

@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include "QmitkBaseAlgorithmComponent.h"
-
+#include <QmitkDataTreeComboBox.h>
 
 QmitkBaseAlgorithmComponent::QmitkBaseAlgorithmComponent( )
 {
@@ -27,3 +27,4 @@ QmitkBaseAlgorithmComponent::~QmitkBaseAlgorithmComponent()
 {
 
 }
+

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>309</width>
-            <height>203</height>
+            <width>277</width>
+            <height>146</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -518,38 +518,21 @@
                                         </widget>
                                     </hbox>
                                 </widget>
-                                <spacer>
+                                <widget class="QCheckBox">
                                     <property name="name">
-                                        <cstring>spacer4</cstring>
+                                        <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
                                     </property>
-                                    <property name="orientation">
-                                        <enum>Vertical</enum>
+                                    <property name="text">
+                                        <string>Delete Threshold Image 
+if Component is deactivated</string>
                                     </property>
-                                    <property name="sizeType">
-                                        <enum>Fixed</enum>
+                                    <property name="checked">
+                                        <bool>true</bool>
                                     </property>
-                                    <property name="sizeHint">
-                                        <size>
-                                            <width>20</width>
-                                            <height>16</height>
-                                        </size>
-                                    </property>
-                                </spacer>
+                                </widget>
                             </vbox>
                         </widget>
                     </vbox>
-                </widget>
-                <widget class="QCheckBox">
-                    <property name="name">
-                        <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Delete Threshold Image 
-if Component is deactivated</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
-                    </property>
                 </widget>
             </vbox>
         </widget>
@@ -602,5 +585,4 @@ if Component is deactivated</string>
     <function returnType="QCheckBox *">GetDeleateImageIfDeactivatedCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

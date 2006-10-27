@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>290</width>
-            <height>369</height>
+            <width>396</width>
+            <height>248</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -45,9 +45,12 @@
             <property name="paletteBackgroundColor">
                 <color>
                     <red>170</red>
-                    <green>0</green>
+                    <green>255</green>
                     <blue>255</blue>
                 </color>
+            </property>
+            <property name="lineWidth">
+                <number>1</number>
             </property>
             <property name="margin">
                 <number>0</number>
@@ -68,52 +71,21 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QGroupBox">
-                    <property name="name">
-                        <cstring>m_PixelManipulatorDataGroupBox</cstring>
-                    </property>
-                    <property name="margin">
-                        <number>0</number>
-                    </property>
-                    <property name="midLineWidth">
-                        <number>0</number>
-                    </property>
-                    <property name="title">
-                        <string>ImageSelector</string>
-                    </property>
-                    <property name="checkable">
-                        <bool>true</bool>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QGroupBox">
-                            <property name="name">
-                                <cstring>m_ImageContent</cstring>
-                            </property>
-                            <property name="title">
-                                <string></string>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QmitkDataTreeComboBox">
-                                    <property name="name">
-                                        <cstring>m_TreeNodeSelector</cstring>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </vbox>
-                </widget>
+                <property name="margin">
+                    <number>2</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_PixelManipulatorContentGroupBox</cstring>
                     </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
+                    </property>
                     <property name="lineWidth">
-                        <number>1</number>
+                        <number>0</number>
                     </property>
                     <property name="title">
                         <string></string>
@@ -126,8 +98,69 @@
                             <cstring>unnamed</cstring>
                         </property>
                         <property name="margin">
-                            <number>2</number>
+                            <number>0</number>
                         </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QGroupBox">
+                            <property name="name">
+                                <cstring>m_PixelManipulatorDataGroupBox</cstring>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Sunken</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="margin">
+                                <number>0</number>
+                            </property>
+                            <property name="midLineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="title">
+                                <string>Show Image Selector</string>
+                            </property>
+                            <property name="checkable">
+                                <bool>true</bool>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>m_ImageContent</cstring>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="title">
+                                        <string></string>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QmitkDataTreeComboBox">
+                                            <property name="name">
+                                                <cstring>m_TreeNodeSelector</cstring>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </vbox>
+                        </widget>
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ManipulatorContentGroupBox</cstring>
@@ -148,6 +181,9 @@
                                 <property name="margin">
                                     <number>0</number>
                                 </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
                                 <widget class="QLayoutWidget">
                                     <property name="name">
                                         <cstring>layout6</cstring>
@@ -155,6 +191,9 @@
                                     <hbox>
                                         <property name="name">
                                             <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="margin">
+                                            <number>5</number>
                                         </property>
                                         <widget class="QComboBox">
                                             <item>
@@ -210,48 +249,88 @@
                                 </widget>
                                 <widget class="QGroupBox">
                                     <property name="name">
-                                        <cstring>m_BaseThresholdGroupBox</cstring>
+                                        <cstring>m_ShowBaseThresholdGroupBox</cstring>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>0</number>
                                     </property>
                                     <property name="title">
-                                        <string>BaseThresholdGroupBox</string>
+                                        <string>ShowBaseThreshold</string>
                                     </property>
-                                    <hbox>
+                                    <property name="checkable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                    <vbox>
                                         <property name="name">
                                             <cstring>unnamed</cstring>
                                         </property>
                                         <property name="margin">
                                             <number>0</number>
                                         </property>
-                                        <widget class="QLabel">
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <widget class="QGroupBox">
                                             <property name="name">
-                                                <cstring>textLabel1_2</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Base Threshold</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QLineEdit">
-                                            <property name="name">
-                                                <cstring>m_BaseThresholdLineEdit</cstring>
-                                            </property>
-                                            <property name="frameShape">
-                                                <enum>LineEditPanel</enum>
+                                                <cstring>m_BaseThresholdGroupBox</cstring>
                                             </property>
                                             <property name="frameShadow">
-                                                <enum>Sunken</enum>
+                                                <enum>Plain</enum>
                                             </property>
-                                            <property name="text">
-                                                <string>1</string>
+                                            <property name="lineWidth">
+                                                <number>0</number>
                                             </property>
+                                            <property name="title">
+                                                <string></string>
+                                            </property>
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>8</number>
+                                                </property>
+                                                <widget class="QLabel">
+                                                    <property name="name">
+                                                        <cstring>textLabel1_2</cstring>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Base Threshold</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QLineEdit">
+                                                    <property name="name">
+                                                        <cstring>m_BaseThresholdLineEdit</cstring>
+                                                    </property>
+                                                    <property name="frameShape">
+                                                        <enum>LineEditPanel</enum>
+                                                    </property>
+                                                    <property name="frameShadow">
+                                                        <enum>Sunken</enum>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>1</string>
+                                                    </property>
+                                                </widget>
+                                            </hbox>
                                         </widget>
-                                    </hbox>
+                                    </vbox>
                                 </widget>
                                 <widget class="QGroupBox">
                                     <property name="name">
                                         <cstring>m_SegmentationSelectorGroupBox</cstring>
                                     </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
+                                    </property>
                                     <property name="lineWidth">
-                                        <number>1</number>
+                                        <number>0</number>
                                     </property>
                                     <property name="midLineWidth">
                                         <number>0</number>
@@ -279,12 +358,21 @@
                                             <property name="name">
                                                 <cstring>m_SegmentationContent</cstring>
                                             </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
                                                 <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QmitkDataTreeComboBox">
                                                     <property name="name">
@@ -443,51 +531,11 @@
                         </widget>
                     </vbox>
                 </widget>
-                <widget class="QGroupBox">
-                    <property name="name">
-                        <cstring>groupBox11</cstring>
-                    </property>
-                    <property name="title">
-                        <string>SeedPoints</string>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>0</number>
-                        </property>
-                        <widget class="QmitkPointListWidget">
-                            <property name="name">
-                                <cstring>m_QmitkPointListWidget</cstring>
-                            </property>
-                        </widget>
-                    </vbox>
-                </widget>
             </vbox>
         </widget>
     </vbox>
 </widget>
 <customwidgets>
-    <customwidget>
-        <class>QmitkPointListWidget</class>
-        <header location="local">QmitkPointListWidget.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image0</pixmap>
-    </customwidget>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
         <header location="global">QmitkDataTreeComboBox.h</header>
@@ -539,8 +587,8 @@
     <function returnType="QmitkDataTreeComboBox *">GetSegmentationSelector()</function>
     <function returnType="QGroupBox *">GetSegmentationSelectorGroupBox()</function>
     <function>SetThreshold( int threshold )</function>
-    <function returnType="QmitkPointListWidget *">GetQmitkPointListWidget()</function>
+    <function returnType="QGroupBox *">GetShowBaseThresholdGroupBox()</function>
+    <function returnType="QGroupBox *">GetSegmentationContent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

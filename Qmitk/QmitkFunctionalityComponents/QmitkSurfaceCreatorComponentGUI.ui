@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>251</width>
-            <height>689</height>
+            <width>547</width>
+            <height>664</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -42,6 +42,13 @@
             <property name="name">
                 <cstring>m_SurfaceCreatorGroupBox</cstring>
             </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>138</red>
+                    <green>209</green>
+                    <blue>90</blue>
+                </color>
+            </property>
             <property name="title">
                 <string>SurfaceCreator</string>
             </property>
@@ -56,7 +63,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>0</number>
+                    <number>2</number>
                 </property>
                 <property name="spacing">
                     <number>0</number>
@@ -66,7 +73,7 @@
                         <cstring>m_SurfaceDataGroupBox</cstring>
                     </property>
                     <property name="lineWidth">
-                        <number>1</number>
+                        <number>0</number>
                     </property>
                     <property name="midLineWidth">
                         <number>0</number>
@@ -121,23 +128,6 @@
                                         <cstring>m_TreeNodeSelector</cstring>
                                     </property>
                                 </widget>
-                                <spacer>
-                                    <property name="name">
-                                        <cstring>spacer1</cstring>
-                                    </property>
-                                    <property name="orientation">
-                                        <enum>Vertical</enum>
-                                    </property>
-                                    <property name="sizeType">
-                                        <enum>Fixed</enum>
-                                    </property>
-                                    <property name="sizeHint">
-                                        <size>
-                                            <width>20</width>
-                                            <height>10</height>
-                                        </size>
-                                    </property>
-                                </spacer>
                             </vbox>
                         </widget>
                     </vbox>
@@ -163,6 +153,12 @@
                             <hbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>4</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>1</number>
                                 </property>
                                 <widget class="QLabel">
                                     <property name="name">
@@ -205,23 +201,6 @@
                                 </widget>
                             </hbox>
                         </widget>
-                        <spacer>
-                            <property name="name">
-                                <cstring>spacer3</cstring>
-                            </property>
-                            <property name="orientation">
-                                <enum>Vertical</enum>
-                            </property>
-                            <property name="sizeType">
-                                <enum>Fixed</enum>
-                            </property>
-                            <property name="sizeHint">
-                                <size>
-                                    <width>20</width>
-                                    <height>16</height>
-                                </size>
-                            </property>
-                        </spacer>
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowSurfaceParameterGroupBox</cstring>
@@ -266,7 +245,7 @@
                                             <cstring>unnamed</cstring>
                                         </property>
                                         <property name="margin">
-                                            <number>0</number>
+                                            <number>3</number>
                                         </property>
                                         <widget class="QCheckBox">
                                             <property name="name">
@@ -791,23 +770,6 @@
                                 <string>Replace existing Surface</string>
                             </property>
                         </widget>
-                        <spacer>
-                            <property name="name">
-                                <cstring>spacer4</cstring>
-                            </property>
-                            <property name="orientation">
-                                <enum>Vertical</enum>
-                            </property>
-                            <property name="sizeType">
-                                <enum>Fixed</enum>
-                            </property>
-                            <property name="sizeHint">
-                                <size>
-                                    <width>20</width>
-                                    <height>16</height>
-                                </size>
-                            </property>
-                        </spacer>
                     </vbox>
                 </widget>
             </vbox>

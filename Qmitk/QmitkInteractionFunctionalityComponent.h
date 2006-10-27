@@ -1,9 +1,3 @@
-#ifndef QMITK_INTERACTIONFUNCTIONALITYCOMPONENT_H
-#define QMITK_INTERACTIONFUNCTIONALITYCOMPONENT_H
-
-#include "QmitkBaseFunctionalityComponent.h"
-
-
 /*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
@@ -39,24 +33,79 @@ PURPOSE.  See the above copyright notices for more information.
 
  */
 
+#ifndef QMITK_INTERACTIONFUNCTIONALITYCOMPONENT_H
+#define QMITK_INTERACTIONFUNCTIONALITYCOMPONENT_H
+
+#include "QmitkBaseFunctionalityComponent.h"
+#include <qstring.h>
+#include <qobject.h>
+
+class QmitkDataTreeComboBox;
+class QmitkStdMultiWidget;
 
 class QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 
   public:
+         /** \brief Constructor. */
+    QmitkInteractionFunctionalityComponent(QObject *parent = 0, const char * parentName = 0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
 
-     /** \brief Constructor. */
-    QmitkInteractionFunctionalityComponent();
 
      /** \brief Destructor. */
     ~QmitkInteractionFunctionalityComponent();
+
+/***************      SET AND GET       ***************/
+
+
+    void SetComponentName(QString name);
+      /** \brief Method to get the GUI of this component.*/
+    QWidget* GetGUI();
+
+/***************   GET COMPONENT NAME   ***************/
+QString SetComponentName();
+
+
+
+  
+
+
+      /*************** TREE CHANGED (       ) ***************/
+virtual void TreeChanged();
+
+/************ Update DATATREECOMBOBOX(ES) *************/
+virtual void UpdateDataTreeComboBoxes();
+
 
 
 
   protected:
 
+    /******** ******* GET TREE NODE SELECTOR ***************/
+/** \brief Method to return the TreeNodeSelector-QmitkDataTreeComboBox */
+virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
+
+  /** \brief Method to set the Iterator to the DataTree */
+  void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
+
+
+  /** \brief Graphical User Interface for the component in general QWidget-Type */
+  QWidget* m_GUI;
+
+  /** \brief Attribute whether the component is active or not */
+  bool m_Active;
+
+  /** \brief Item on the actual selected Image in the TreeNodeSelector */
+  const mitk::DataTreeFilter::Item * m_SelectedImage;
+
+  mitk::DataTreeIteratorClone m_DataTreeIterator;
+
   private:
+  /*!
+  Name of the Component
+  */
+  QString m_Name;
 
 
 

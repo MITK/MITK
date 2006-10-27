@@ -45,7 +45,8 @@ m_Parent(parent),
 //m_ParentName(parentName), 
 m_ComponentName("ComponentContainer"),
 //m_MultiWidget(mitkStdMultiWidget),
-m_Spacer(NULL)
+m_Spacer(NULL),
+m_MulitWidget(mitkStdMultiWidget)
 {
   SetDataTreeIterator(it);
   SetAvailability(true);
@@ -101,6 +102,12 @@ QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector
   return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
 }
 
+/******** *******    GET MULTI WIDGET    ***************/
+QmitkStdMultiWidget * QmitkFunctionalityComponentContainer::GetMulitWidget()
+{
+  return m_MulitWidget;
+}
+
 /*************** TREE CHANGED ( EVENT ) ***************/
 void QmitkFunctionalityComponentContainer::TreeChanged(const itk::EventObject & /*treeChangedEvent*/)
 {
@@ -126,7 +133,10 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
 /************ Update DATATREECOMBOBOX(ES) *************/
 void QmitkFunctionalityComponentContainer::UpdateDataTreeComboBoxes()
 {
+  if(GetTreeNodeSelector() != NULL)
+  {
     GetTreeNodeSelector()->Update();
+  }
 }
 
 /***************       CONNECTIONS      ***************/
@@ -217,6 +227,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
     QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
     m_Spacer = spacer;
     m_GUI->layout()->addItem( m_Spacer ); 
+    m_GUI->repaint();
   }
 }
 

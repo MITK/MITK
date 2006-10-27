@@ -225,30 +225,6 @@ void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
 
 }
 
-///***************        ACTIVATED       ***************/
-//void QmitkSurfaceCreatorComponent::Activated()
-//{
-//  QmitkBaseFunctionalityComponent::Activated();
-//  m_Active = true;
-//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-//  {
-//    m_AddedChildList[i]->Activated();
-//  } 
-//}
-
-///***************       DEACTIVATED      ***************/
-//void QmitkSurfaceCreatorComponent::Deactivated()
-//{
-//  QmitkBaseFunctionalityComponent::Deactivated();
-//  m_Active = false;
-//    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-//  {
-//    m_AddedChildList[i]->Deactivated();
-//  } 
-//}
-
-/**********************VISIBILITY************************************/
-
 ///************ SHOW SURFACE CREATOR CONTENT ************/
 void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
 {

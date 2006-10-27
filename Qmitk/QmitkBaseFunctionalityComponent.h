@@ -140,6 +140,8 @@ protected:
   */
   virtual void SetAvailability(bool available);
 
+  QObject* GetParent();
+
 
   /***************        ATTRIBUTES      ***************/
   
@@ -154,6 +156,8 @@ protected:
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 
 private:
+
+  QObject * m_Parent;
 
   /***************        ATTRIBUTES      ***************/
 

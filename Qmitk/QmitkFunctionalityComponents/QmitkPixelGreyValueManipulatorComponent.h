@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkPixelGreyValueManipulatorComponentGUI;
 class QmitkStdMultiWidget;
+class QmitkSeedPointSetComponent;
 
 
 /**
@@ -80,8 +81,8 @@ public:
   /** \brief Method to set the Iterator to the DataTree */
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
-  /** \brief Method to get the Iterator to the DataTree */
-  mitk::DataTreeIteratorBase* GetDataTreeIterator();
+  ///** \brief Method to get the Iterator to the DataTree */
+  //mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
   ///** \brief Method to set the Name of the Functionality */
   //void SetFunctionalityName(QString parentName);
@@ -144,6 +145,9 @@ public slots:
   /** \brief Slot-Method to set the Threshold from extern, for example by signal-slot from the surfaceCreatorComponent */
   void SetThreshold(const QString&);
 
+  /** \brief Method to hide or show specific GroupBoxes*/
+  void HideOrShow();
+
 protected:
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
@@ -197,6 +201,7 @@ protected:
 
 private:
 
+  void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
 
@@ -265,23 +270,25 @@ private:
   */
   int m_ManipulationArea;
 
-  //BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
-    /*!
-  * Node for the seed-points for threshold-gradient
-  */
-  mitk::DataTreeNode::Pointer m_SeedPointSetNode;
+  QmitkSeedPointSetComponent* m_PointSet;
 
-  /*!
-  * Interactor for the seed-points for threshold-gradient
-  */
-  mitk::PointSetInteractor::Pointer m_SeedPointSetInteractor;
+  ////BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
+  //  /*!
+  //* Node for the seed-points for threshold-gradient
+  //*/
+  //mitk::DataTreeNode::Pointer m_SeedPointSetNode;
 
-    /*!
-  * PointSetPointer for the seed-points for threshold-gradient
-  */
-  mitk::PointSet::Pointer m_Seeds;
-  //END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
+  ///*!
+  //* Interactor for the seed-points for threshold-gradient
+  //*/
+  //mitk::PointSetInteractor::Pointer m_SeedPointSetInteractor;
 
+  //  /*!
+  //* PointSetPointer for the seed-points for threshold-gradient
+  //*/
+  //mitk::PointSet::Pointer m_Seeds;
+  ////END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
+mitk::DataTreeIteratorBase* m_DataIt;
 
   /** \brief Method to calculate the shiftvalue for the gradient shift and add it into new image */
   template < typename ItkImageType >  

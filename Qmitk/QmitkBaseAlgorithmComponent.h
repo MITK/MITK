@@ -1,6 +1,3 @@
-#ifndef QMITK_BASEALGORITHMCOMPONENT_H
-#define QMITK_BASEALGORITHMCOMPONENT_H
-
 /*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
@@ -40,6 +37,10 @@ PURPOSE.  See the above copyright notices for more information.
  */
 
 
+#ifndef QMITK_BASEALGORITHMCOMPONENT_H
+#define QMITK_BASEALGORITHMCOMPONENT_H
+
+class QmitkDataTreeComboBox;
 class QmitkBaseAlgorithmComponent 
 {
 
@@ -54,6 +55,8 @@ class QmitkBaseAlgorithmComponent
 
 
   protected:
+
+
 
   private:
 

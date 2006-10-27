@@ -133,7 +133,14 @@ void QmitkPixelGreyValueManipulatorComponentGUI::SetThreshold(int threshold)
 }
 
 
-QmitkPointListWidget* QmitkPixelGreyValueManipulatorComponentGUI::GetQmitkPointListWidget()
+
+QGroupBox* QmitkPixelGreyValueManipulatorComponentGUI::GetShowBaseThresholdGroupBox()
 {
-  return m_QmitkPointListWidget;
+  return m_ShowBaseThresholdGroupBox;
+}
+
+
+QGroupBox * QmitkPixelGreyValueManipulatorComponentGUI::GetSegmentationContent()
+{
+ return m_SegmentationContent;
 }

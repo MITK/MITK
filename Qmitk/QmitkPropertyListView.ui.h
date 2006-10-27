@@ -60,7 +60,8 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
     {
       m_PropertyList->RemoveObserver(m_ObserverTags[m_PropertyList]);
       m_ObserverTags.erase(m_PropertyList);
-
+      m_PropertyList->RemoveObserver(m_ObserverTags2[m_PropertyList]);
+      m_ObserverTags2.erase(m_PropertyList);
     }
     m_PropertyList = propertyList;
     if (m_PropertyList)
@@ -88,7 +89,7 @@ void QmitkPropertyListView::SetPropertyList( mitk::PropertyList *propertyList )
       itk::MemberCommand<QmitkPropertyListView>::Pointer propertyListDeletedCommand =
         itk::MemberCommand<QmitkPropertyListView>::New();
       propertyListDeletedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListDeleted);
-      m_PropertyList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
+      m_ObserverTags2[m_PropertyList] = m_PropertyList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
       const mitk::PropertyList::PropertyMap* propertyMap = propertyList->GetMap();
 
       // from c'tor
@@ -168,6 +169,12 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
   {
     (*mapIt).first->RemoveObserver((*mapIt).second);
   }
+  m_ObserverTags.clear();
+  for (std::map<mitk::PropertyList*,unsigned long>::iterator mapIt = m_ObserverTags2.begin(); mapIt != m_ObserverTags2.end(); mapIt++)
+  {
+    (*mapIt).first->RemoveObserver((*mapIt).second);
+  }
+  m_ObserverTags2.clear();
   delete m_Group;
   m_Items.clear();
   m_PropertyList = NULL;
@@ -204,7 +211,7 @@ void QmitkPropertyListView::SetMultiMode( std::vector<std::string> propertyNames
           itk::MemberCommand<QmitkPropertyListView>::Pointer propertyListDeletedCommand =
             itk::MemberCommand<QmitkPropertyListView>::New();
           propertyListDeletedCommand->SetCallbackFunction(this, &QmitkPropertyListView::PropertyListDeleted);
-          propList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
+          m_ObserverTags2[propList] = propList->AddObserver(itk::DeleteEvent(), propertyListDeletedCommand);
 
         }
       }
@@ -219,6 +226,7 @@ void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const
   if (propList)
   {
     m_ObserverTags.erase(const_cast<mitk::PropertyList*>(propList));
+    m_ObserverTags2.erase(const_cast<mitk::PropertyList*>(propList));
     if (m_MultiMode == false)
     {
       delete m_Group;
@@ -242,5 +250,18 @@ void QmitkPropertyListView::PropertyListDeleted(const itk::Object *caller, const
       }
       PropertyListModified();
     }
+  }
+}
+
+void QmitkPropertyListView::destroy()
+{
+  // remove all observers
+  for (std::map<mitk::PropertyList*,unsigned long>::iterator mapIt = m_ObserverTags.begin(); mapIt != m_ObserverTags.end(); mapIt++)
+  {
+    (*mapIt).first->RemoveObserver((*mapIt).second);
+  }
+  for (std::map<mitk::PropertyList*,unsigned long>::iterator mapIt = m_ObserverTags2.begin(); mapIt != m_ObserverTags2.end(); mapIt++)
+  {
+    (*mapIt).first->RemoveObserver((*mapIt).second);
   }
 }

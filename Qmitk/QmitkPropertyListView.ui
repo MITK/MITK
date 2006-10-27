@@ -49,6 +49,7 @@
     <variable>mitk::PropertyList* m_PropertyList;</variable>
     <variable>QGridLayout* m_GridLayout;</variable>
     <variable>std::map&lt;mitk::PropertyList*,unsigned long&gt; m_ObserverTags;</variable>
+    <variable>std::map&lt;mitk::PropertyList*,unsigned long&gt; m_ObserverTags2;</variable>
 </variables>
 <slots>
     <slot>SetPropertyList( mitk::PropertyList * propertyList )</slot>
@@ -58,6 +59,7 @@
     <function>PropertyListModified()</function>
     <function>SetMultiMode( std::vector&lt;std::string&gt; propertyNames, CommonFunctionality::DataTreeIteratorVector nodes, mitk::BaseRenderer* renderer = NULL )</function>
     <function>PropertyListDeleted(const itk::Object *caller, const itk::EventObject &amp;event)</function>
+    <function access="private">destroy()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

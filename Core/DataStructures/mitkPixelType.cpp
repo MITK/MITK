@@ -32,8 +32,28 @@ mitk::PixelType::PixelType( const mitk::PixelType& aPixelType )
 mitk::PixelType::PixelType() : m_TypeId( NULL ), m_Type( ipPicUnknown ), m_Bpe( 0 ), m_NumberOfComponents( 1 )
 {}
 
-//##ModelId=3E1400C40198
+bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
+{
+  std::cout << "operator==" << std::endl;
 
+std::cout << "m_Type = " << m_Type << " " << rhs.m_Type << std::endl;
+std::cout << "m_Bpe = " << m_Bpe << " " << rhs.m_Bpe << std::endl;
+std::cout << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
+std::cout << "m_BitsPerComponent = " << m_BitsPerComponent << " " << rhs.m_BitsPerComponent << std::endl;
+
+   return (
+     *(this->m_TypeId) == *(rhs.m_TypeId)
+    && this->m_Type == rhs.m_Type
+    && this->m_Bpe == rhs.m_Bpe
+    && this->m_NumberOfComponents == rhs.m_NumberOfComponents
+    && this->m_BitsPerComponent == rhs.m_BitsPerComponent
+    );
+}
+
+bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
+{
+  return !(this->operator==(rhs));
+}
 
 
 mitk::PixelType::PixelType( const std::type_info& aTypeId, int numberOfComponents ) : m_TypeId( &aTypeId ), m_NumberOfComponents( numberOfComponents )
@@ -244,3 +264,5 @@ void mitk::PixelType::Initialize( ipPicType_t type, int bpe, int numberOfCompone
    }
    m_BitsPerComponent = m_Bpe / numberOfComponents;
 }
+
+

@@ -1,0 +1,138 @@
+
+
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+#ifndef MITK_POINTSETCOMPONENT_H
+#define MITK_POINTSETCOMPONENT_H
+
+#include "QmitkInteractionFunctionalityComponent.h"
+
+#include "mitkPointSetInteractor.h"
+#include "mitkPointSet.h"
+
+
+class QmitkSeedPointSetComponentGUI;
+class QmitkStdMultiWidget;
+
+/**
+* \brief ComponentClass to set Seed-Points in the MPR-Widgets
+* \ingroup QmitkFunctionalityComponent
+* 
+* This class inherits from
+* - \ref QmitkInteractionFunctionalityComponent
+
+* 
+* \section QmitkSeedPointSetComponent Overview
+* 
+* The PointSetComponent is a class to set two or three Seed-Points with a combination 
+* of the key "shift" and a left-mouse-click on that position in the widget where the 
+* point shall be placed. The point is visible in all fout widget, that also includes 
+* the 3D-view. That component has an point-list-widget that shows the points
+* whith their coordinates. By clicking on of these points in the point-list-widget or
+* on one of the four MPR-widgets it will be marked. A marked point can be moved with
+* the mouse or removed by using the "delete"-key.
+* 
+*/
+
+
+class QmitkSeedPointSetComponent : public QmitkInteractionFunctionalityComponent
+{
+
+  Q_OBJECT
+
+public:
+  /***************       CONSTRUCTOR      ***************/
+  /** \brief Constructor. */
+  QmitkSeedPointSetComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+
+  /***************        DESTRUCTOR      ***************/
+  /** \brief Destructor. */
+  virtual ~QmitkSeedPointSetComponent();
+
+  /***************        CREATE          ***************/
+
+  /** \brief Method to create the GUI for the component from the .ui-File. This Method is obligatory */
+  virtual QWidget* CreateControlWidget(QWidget* parent);
+
+  /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
+  virtual void CreateConnections();
+
+
+  /***************      SET AND GET       ***************/
+
+  /*************** SET DATA TREE ITERATOR ***************/
+  void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
+
+  /** \brief Method to return the TreeNodeSelector-QmitkDataTreeComboBox */
+  virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
+  /** \brief Method to return the Node that includes the points */
+  mitk::DataTreeNode::Pointer GetPointSetNode();
+
+  /***************      (DE)ACTIVATED     ***************/
+
+  ///** \brief Method to set m_Activated to true */
+  virtual void Activated();
+
+  ///** \brief Method to set m_Activated to false */
+  virtual void Deactivated();
+
+public slots:  
+  /***************      OHTER METHODS     ***************/
+
+  void ShowTreeNodeSelector();
+  void ShowComponentContent();
+
+  /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
+  virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
+
+protected:
+
+  /************ Update DATATREECOMBOBOX(ES) *************/
+  virtual void UpdateDataTreeComboBoxes();
+
+
+private:
+
+  /***************        ATTRIBUTES      ***************/
+
+  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  QmitkSeedPointSetComponentGUI * m_PointSetComponentGUI;
+
+
+  /*!
+  * Node for the seed-points for threshold-gradient
+  */
+  mitk::DataTreeNode::Pointer m_PointSetNode;
+
+  /*!
+  * Interactor for the seed-points for threshold-gradient
+  */
+  mitk::PointSetInteractor::Pointer m_PointSetInteractor;
+
+  /*!
+  * PointSetPointer for the seed-points for threshold-gradient
+  */
+  mitk::PointSet::Pointer m_Seeds;
+
+
+
+};
+
+#endif
+

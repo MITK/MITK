@@ -29,68 +29,95 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
   ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
 
   ipPicTSV_t *tsv;
+  bool pixelSize = false;
 
   tsv = ipPicQueryTag( pic, "REAL PIXEL SIZE" );
   if(tsv==NULL)
+  {
     tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
+    pixelSize = true;
+  }
   if(tsv)
   {
+    bool tagFound = false;
     if((tsv->dim*tsv->n[0]>=3) && (tsv->type==ipPicFloat))
     {
       if(tsv->bpe==32)
       {
         FillVector3D(spacing,((ipFloat4_t*)tsv->value)[0], ((ipFloat4_t*)tsv->value)[1],((ipFloat4_t*)tsv->value)[2]);
-        return true;
+        tagFound = true;
       }
       else
-        if(tsv->bpe==64)
-        {
-          FillVector3D(spacing,((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
-          return true;
-        }
+      if(tsv->bpe==64)
+      {
+        FillVector3D(spacing,((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
+        tagFound = true;
+      }
     }
+    if(tagFound && pixelSize)
+    {
+      tsv = ipPicQueryTag( pic, "PIXEL SPACING" );
+      if(tsv)
+      {
+        mitk::ScalarType zSpacing = 0;
+        if((tsv->dim*tsv->n[0]>=3) && (tsv->type==ipPicFloat))
+        {
+          if(tsv->bpe==32)
+          {
+            zSpacing = ((ipFloat4_t*)tsv->value)[2];
+          }
+          else
+          if(tsv->bpe==64)
+          {
+            zSpacing = ((ipFloat8_t*)tsv->value)[2];
+          }
+          if(zSpacing != 0)
+          {
+            spacing[2] = zSpacing;
+          }
+        }
+      }
+    }
+    if(tagFound) return true;
   }
 #ifdef HAVE_IPDICOM
-  else
+  tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
+  if( tsv )
   {
-    tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
-    if( tsv )
-    {
-      void *data;
-      ipUInt4_t len;
-      ipFloat8_t spacing_z = 0;
-      ipFloat8_t thickness = 1;
-      ipFloat8_t fx = 1;
-      ipFloat8_t fy = 1;
-      bool ok=false;
+    void *data;
+    ipUInt4_t len;
+    ipFloat8_t spacing_z = 0;
+    ipFloat8_t thickness = 1;
+    ipFloat8_t fx = 1;
+    ipFloat8_t fy = 1;
+    bool ok=false;
 
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
-      {
-        ok=true;
-        sscanf( (char *) data, "%lf", &spacing_z );
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
+    {
+      ok=true;
+      sscanf( (char *) data, "%lf", &spacing_z );
 //        itkGenericOutputMacro( "spacing:  " << spacing_z << " mm");
-      }
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
-      {
-        ok=true;
-        sscanf( (char *) data, "%lf", &thickness );
+    }
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0050, &data, &len ) )
+    {
+      ok=true;
+      sscanf( (char *) data, "%lf", &thickness );
 //        itkGenericOutputMacro( "thickness: " << thickness << " mm");
 
-        if( thickness == 0 )
-          thickness = 1;
-      }
-      if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
-        && len>0 && ((char *)data)[0] )
-      {
-        sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
-//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");        
-      }
-      else
-        ok=false;
-      if(ok)
-        FillVector3D(spacing, fx, fy,( spacing_z > 0 ? spacing_z : thickness));
-      return ok;
+      if( thickness == 0 )
+        thickness = 1;
     }
+    if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
+      && len>0 && ((char *)data)[0] )
+    {
+      sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
+//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");        
+    }
+    else
+      ok=false;
+    if(ok)
+      FillVector3D(spacing, fx, fy,( spacing_z > 0 ? spacing_z : thickness));
+    return ok;
   }
 #endif /* HAVE_IPDICOM */
   if(spacing[0]<=0 || spacing[1]<=0 || spacing[2]<=0)

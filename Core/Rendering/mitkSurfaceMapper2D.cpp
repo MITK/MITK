@@ -189,6 +189,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
 
       lut->SetTableRange(scalarsMin, scalarsMax);
+      lut->Build();
     }
     else 
     { 

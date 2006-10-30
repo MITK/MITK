@@ -171,11 +171,28 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point3D point;
     Vector3D normal;
 
+    // Check if Lookup-Table is already given, else use standard one. 
+    double *scalarLimits = m_LUT->GetTableRange();
+    double scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1]; 
+
+    vtkLookupTable *lut = vtkLookupTable::New();
+
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
     if (lookupTableProp.IsNotNull() )
     {
-      m_LUT = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+      lut = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+
+      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
+        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
+      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
+        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+
+      lut->SetTableRange(scalarsMin, scalarsMax);
+    }
+    else 
+    { 
+      lut = m_LUT; 
     }
 
     vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
@@ -194,7 +211,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeSlicedGeometry()->GetGeometry3D(0));
         if(surfaceAbstractGeometry.IsNotNull()) //@todo substitude by operator== after implementation, see bug id 28
         {
-          PaintCells(renderer, vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT);
+          PaintCells(renderer, vtkpolydata, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);
           return;
         }
         else
@@ -243,7 +260,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     ApplyProperties(renderer);
 
     // travers the cut contour
-    PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, m_LUT);
+    PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);
   }
 }
 
@@ -264,7 +281,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
     if(this->GetDataTreeNode()->GetProperty(scalarMode, "scalar mode", renderer))
     {
       if( (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA) ||
-          (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT) )
+        (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT) )
       {
         usePointData = true;
       }

@@ -168,6 +168,9 @@ public:
   //##ModelId=3F0177E9020B
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
+  //Method for subclasses
+  virtual void OnPointSetChange();
+
 protected:
   //##ModelId=3F0177E901BD
   PointSet();

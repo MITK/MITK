@@ -178,8 +178,10 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
       PointDataType pointData = {pointOp->GetIndex(), pointOp->GetSelected(), pointOp->GetPointType()};
       m_ItkData->GetPointData()->InsertElement(position, pointData);
+
       this->Modified();
       ((const itk::Object*)this)->InvokeEvent( NewPointEvent() );
+      this->OnPointSetChange();
     }
     break;
   case OpMOVE://moves the point given by index
@@ -189,6 +191,9 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
       m_ItkData->SetPoint(pointOp->GetIndex(), pt);
+
+      this->OnPointSetChange();
+
       this->Modified();
     }
     break;
@@ -198,6 +203,9 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
       m_ItkData->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_ItkData->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
+
+      this->OnPointSetChange();
+
       this->Modified();
      ((const itk::Object*)this)->InvokeEvent( RemovedPointEvent() );
     }
@@ -249,6 +257,10 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
   //*todo has to be done here, cause of update-pipeline not working yet
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
+void mitk::PointSet::OnPointSetChange(){}
+
 
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()

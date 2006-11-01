@@ -42,7 +42,6 @@ public:
   virtual bool SplineExist();
 
 protected:
-
   ClosedSpline();
   virtual ~ClosedSpline();
 
@@ -50,7 +49,6 @@ protected:
   virtual void DoSortPoints() {};
 
 private:
-
   /*!@brief This method constructs a spline from the given point list and retrieves
   // a number of interpolated points from it to form a ring-like structure.
   //
@@ -86,3 +84,4 @@ private:
 } // namespace mitk
 
 #endif /* MITKClosedSpline_H_HEADER_INCLUDED */
+

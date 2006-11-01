@@ -1,18 +1,16 @@
-#include <mitkClosedSpline.h>
+#include <mitkRingSpline.h>
 
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
 #include <fstream>
 
-int mitkClosedSplineTest(int /*argc*/, char* /*argv*/[])
-{  //Create ClosedSpline
-  mitk::ClosedSpline::Pointer cs = mitk::ClosedSpline::New();
-  //mitk::ClosedSpline::Pointer cs = mitk::ClosedSpline::New();
+int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
+{  //Create RingSpline
+  mitk::RingSpline::Pointer cs = mitk::RingSpline::New();
 
-  //try to get the itkClosedSpline
-  std::cout << "Create a RingSpline and try to get the itkClosedSpline";
-  mitk::ClosedSpline::DataType::Pointer itkdata = NULL;
-  //mitk::ClosedSpline::DataType::Pointer itkdata = NULL;
+  //try to get the itkRingSpline
+  std::cout << "Create a RingSpline and try to get the itkRingSpline";
+  mitk::RingSpline::DataType::Pointer itkdata = NULL;
   itkdata = cs->GetPointSet();
   if (itkdata.IsNull())
   {
@@ -20,8 +18,8 @@ int mitkClosedSplineTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
 
-  //fresh ClosedSpline has to be empty!
-  std::cout << "Is the ClosedSpline empty?";
+  //fresh RingSpline has to be empty!
+  std::cout << "Is the RingSpline empty?";
   if (cs->GetSize() != 0)
   {
     std::cout<<"[FAILED]"<<std::endl;

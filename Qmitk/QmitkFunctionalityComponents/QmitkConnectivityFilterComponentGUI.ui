@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>255</width>
-            <height>150</height>
+            <height>261</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -179,12 +179,32 @@
                                     </item>
                                     <item>
                                         <property name="text">
+                                            <string>Show Specified Regions</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
                                             <string>Delete Spezified Region</string>
                                         </property>
                                     </item>
                                     <item>
                                         <property name="text">
-                                            <string>Show Specified Regions</string>
+                                            <string>Show PointSeededRegions</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>Delete Seed</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>Show CellSeededRegions</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>Show ClosestPointRegion</string>
                                         </property>
                                     </item>
                                     <property name="name">
@@ -230,12 +250,39 @@
                                             <property name="name">
                                                 <cstring>m_ParamterLineEdit</cstring>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>LineEditPanel</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>Sunken</enum>
+                                            </property>
+                                            <property name="text">
+                                                <string>0</string>
+                                            </property>
                                         </widget>
                                     </vbox>
                                 </widget>
                             </vbox>
                         </widget>
                     </hbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>m_PointListGroupBox</cstring>
+                    </property>
+                    <property name="title">
+                        <string>PointListWidget</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QmitkPointListWidget">
+                            <property name="name">
+                                <cstring>m_PointListWidget</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
                 </widget>
                 <widget class="QPushButton">
                     <property name="name">
@@ -245,11 +292,38 @@
                         <string>Start Filter</string>
                     </property>
                 </widget>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_ReplaceSurfaceCheckBox</cstring>
+                    </property>
+                    <property name="text">
+                        <string>replace Surface?</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
             </vbox>
         </widget>
     </vbox>
 </widget>
 <customwidgets>
+    <customwidget>
+        <class>QmitkPointListWidget</class>
+        <header location="local">QmitkPointListWidget.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
         <header location="global">QmitkDataTreeComboBox.h</header>
@@ -291,8 +365,12 @@
     <function returnType="QComboBox *">GetFilterModeComboBox()</function>
     <function returnType="QLineEdit *">GetParameterLineEdit()</function>
     <function returnType="QPushButton *">GetStartFilterPushButton()</function>
-    <function returnType="QLabel *">GetParameterLabel()</function>
+    <function returnType="QLineEdit *">GetParameterLabel()</function>
     <function returnType="QGroupBox *">GetParameterPart()</function>
+    <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
+    <function returnType="QmitkPointListWidget*">GetPointListWidget()</function>
+    <function returnType="QGroupBox*">GetPointListWidgetGroupBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

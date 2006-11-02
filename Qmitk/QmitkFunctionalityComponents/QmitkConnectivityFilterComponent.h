@@ -94,7 +94,7 @@ public:
 
 public slots:  
 
-  void startConnectivityFilter();
+  void StartConnectivityFilter();
   /***************      OHTER METHODS     ***************/
 
   void ShowTreeNodeSelector();
@@ -118,9 +118,15 @@ private:
 
 
   /*!
-  * Node for the seed-points for threshold-gradient
+  * Node for the connectivity-surface
   */
   mitk::DataTreeNode::Pointer m_ConnectivityNode;
+
+    /*!
+  * Node for the seed-points 
+  */
+  mitk::DataTreeNode::Pointer m_PointSetNode;
+
 
   /*!
   * Interactor for the seed-points for threshold-gradient
@@ -131,6 +137,7 @@ private:
   * PointSetPointer for the seed-points for threshold-gradient
   */
   mitk::PointSet::Pointer m_Seeds;
+
 
 
 

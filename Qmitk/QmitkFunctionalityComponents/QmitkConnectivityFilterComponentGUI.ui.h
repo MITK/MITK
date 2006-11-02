@@ -27,7 +27,7 @@ QGroupBox* QmitkConnectivityFilterComponentGUI::GetTreeNodeSelectorContentGroupB
 
 void QmitkConnectivityFilterComponentGUI::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
-   m_DataTreeIterator = it;
+  m_DataTreeIterator = it;
 }
 
 
@@ -39,7 +39,7 @@ void QmitkConnectivityFilterComponentGUI::SetDataTreeIterator( mitk::DataTreeIte
 
 QmitkDataTreeComboBox * QmitkConnectivityFilterComponentGUI::GetTreeNodeSelector()
 {
-return m_TreeNodeSelector;
+  return m_TreeNodeSelector;
 }
 
 
@@ -51,7 +51,7 @@ QGroupBox * QmitkConnectivityFilterComponentGUI::GetComponentContent()
 
 QGroupBox* QmitkConnectivityFilterComponentGUI::GetShowComponent()
 {
-return m_PointSet;
+  return m_PointSet;
 }
 
 
@@ -63,23 +63,41 @@ QComboBox*  QmitkConnectivityFilterComponentGUI::GetFilterModeComboBox()
 
 QLineEdit* QmitkConnectivityFilterComponentGUI::GetParameterLineEdit()
 {
- return m_ParamterLineEdit;
+  return m_ParamterLineEdit;
 }
 
 
 QPushButton* QmitkConnectivityFilterComponentGUI::GetStartFilterPushButton()
 {
-m_StartFilterPushButton
+  return m_StartFilterPushButton;
 }
 
 
-QLabel* QmitkConnectivityFilterComponentGUI::GetParameterLabel()
+QLineEdit* QmitkConnectivityFilterComponentGUI::GetParameterLabel()
 {
- return m_ParamterLineEdit;
+  return m_ParamterLineEdit;
 }
 
 
 QGroupBox* QmitkConnectivityFilterComponentGUI::GetParameterPart()
 {
   return m_ExtraParameterGroupBox;
+}
+
+
+QCheckBox* QmitkConnectivityFilterComponentGUI::GetReplaceSurfaceCheckBox()
+{
+  return m_ReplaceSurfaceCheckBox;
+}
+
+
+QmitkPointListWidget* QmitkConnectivityFilterComponentGUI::GetPointListWidget()
+{
+  return m_PointListWidget;
+}
+
+
+QGroupBox* QmitkConnectivityFilterComponentGUI::GetPointListWidgetGroupBox()
+{
+ return m_PointListGroupBox;
 }

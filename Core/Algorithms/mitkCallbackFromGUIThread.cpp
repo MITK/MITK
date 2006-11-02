@@ -44,11 +44,11 @@ void CallbackFromGUIThread::RegisterImplementation(CallbackFromGUIThreadImplemen
   m_Implementation = implementation;
 }
 
-void CallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd)
+void CallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd, itk::EventObject* e)
 {
   if (m_Implementation)
   {
-    m_Implementation->CallThisFromGUIThread(cmd);
+    m_Implementation->CallThisFromGUIThread(cmd, e);
   }
   else
   {

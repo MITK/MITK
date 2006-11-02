@@ -8,10 +8,16 @@ class QmitkCallbackEvent : public QEvent
 
   public:
 
-    QmitkCallbackEvent( itk::Command* cmd )
+    QmitkCallbackEvent( itk::Command* cmd, itk::EventObject* e )
     : QEvent(QEvent::User),
-      m_Command(cmd)
+      m_Command(cmd),
+      m_Event(e)
     {
+    }
+
+    ~QmitkCallbackEvent()
+    {
+      delete m_Event;
     }
 
     itk::Command* command()
@@ -19,9 +25,15 @@ class QmitkCallbackEvent : public QEvent
       return m_Command;
     }
 
+    itk::EventObject* itkevent()
+    {
+      return m_Event;
+    }
+
 protected:
 
     itk::Command::Pointer m_Command;
+    itk::EventObject* m_Event;
 };
 
 
@@ -34,10 +46,10 @@ QmitkCallbackFromGUIThread::~QmitkCallbackFromGUIThread()
 {
 }
 
-void QmitkCallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd)
+void QmitkCallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd, itk::EventObject* e)
 {
   std::cout << "posting callback event" << cmd << std::endl;
-  qApp->postEvent( this, new QmitkCallbackEvent(cmd) );
+  qApp->postEvent( this, new QmitkCallbackEvent(cmd, e) );
 }
 
 bool QmitkCallbackFromGUIThread::event( QEvent* e ) 
@@ -53,9 +65,18 @@ bool QmitkCallbackFromGUIThread::event( QEvent* e )
 
   if (cmd)
   {
-    const itk::NoEvent dummyEvent;
-    cmd->Execute( (const itk::Object*) NULL, // no itk::Object here
-                  dummyEvent );
+    std::cout << "executing cmd " << cmd << std::endl;
+    if (event->itkevent())
+    {
+      cmd->Execute( (const itk::Object*) NULL, // no itk::Object here
+                    *(event->itkevent()) );
+    }
+    else
+    {
+      const itk::NoEvent dummyEvent;
+      cmd->Execute( (const itk::Object*) NULL, // no itk::Object here
+                    dummyEvent );
+    }
   }
   
   return true;

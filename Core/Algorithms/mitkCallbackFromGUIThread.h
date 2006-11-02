@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
 
 #include<itkCommand.h>
+#include<itkEventObject.h>
 
 namespace mitk
 {
@@ -36,7 +37,7 @@ class CallbackFromGUIThreadImplementation
   public:
     
     /// Change the current application cursor
-    virtual void CallThisFromGUIThread(itk::Command*) = 0;
+    virtual void CallThisFromGUIThread(itk::Command*, itk::EventObject*) = 0;
 
     virtual ~CallbackFromGUIThreadImplementation() {};
 
@@ -62,7 +63,7 @@ class CallbackFromGUIThread
     static void RegisterImplementation(CallbackFromGUIThreadImplementation* implementation);
 
     /// Change the current application cursor
-    void CallThisFromGUIThread(itk::Command*);
+    void CallThisFromGUIThread(itk::Command*, itk::EventObject* e = NULL);
     
   protected:
 

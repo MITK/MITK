@@ -34,7 +34,7 @@ class QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIT
   public:
     
     /// Change the current application cursor
-    virtual void CallThisFromGUIThread(itk::Command*);
+    virtual void CallThisFromGUIThread(itk::Command*, itk::EventObject*);
 
     QmitkCallbackFromGUIThread();
     virtual ~QmitkCallbackFromGUIThread();

@@ -138,7 +138,7 @@ void QmitkPixelGreyValueManipulatorComponent::HideOrShow()
 /***************     IMAGE SELECTED     ***************/
 void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedImage = imageIt;
+  m_SelectedItem = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
   if(m_PixelGreyValueManipulatorComponentGUI)
   {
@@ -170,7 +170,7 @@ void QmitkPixelGreyValueManipulatorComponent::ImageSelected(const mitk::DataTree
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
-      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
     }
   }
   TreeChanged();
@@ -236,11 +236,11 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
   m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMulitWidget(), m_DataIt);
   m_PointSet->CreateControlWidget(m_PixelGreyValueManipulatorComponentGUI);
   m_AddedChildList.push_back(m_PointSet);
-      for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      std::cout << "In der ChildList ist  " << m_AddedChildList[i]->GetFunctionalityName() << " drin." << std::endl;
-      std::cout << "In der ChildList ist  " << m_AddedChildList[i] << " drin." << std::endl;
-    } 
+    //  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    //{
+    //  std::cout << "In der ChildList ist  " << m_AddedChildList[i]->GetFunctionalityName() << " drin." << std::endl;
+    //  std::cout << "In der ChildList ist  " << m_AddedChildList[i] << " drin." << std::endl;
+    //} 
   m_PixelGreyValueManipulatorComponentGUI->layout()->add(m_PointSet->GetGUI());
   m_PointSet->CreateConnections();
   m_PixelGreyValueManipulatorComponentGUI->repaint();

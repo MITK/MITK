@@ -39,7 +39,7 @@ int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
     //now check new condition!
     if ( (cs->GetSize()!= i) )
     {
-      std::cout<<"[FAILED] while: "<<cs->GetSize()<<std::endl;
+      std::cout<<"[FAILED] while point set size == "<<cs->GetSize()<<"(expected: "<<i<<")"<<std::endl;
       return EXIT_FAILURE;
     }
   }

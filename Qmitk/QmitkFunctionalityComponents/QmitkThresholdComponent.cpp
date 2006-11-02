@@ -93,7 +93,7 @@ void QmitkThresholdComponent::CreateConnections()
 /***************     IMAGE SELECTED     ***************/
 void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedImage = imageIt;
+  m_SelectedItem = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
   if(m_ThresholdComponentGUI)
   {
@@ -113,10 +113,10 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
   {
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
-      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
     }
   }
-  m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedImage->GetNode());
+  m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
   DataObjectSelected();
   SetSliderRange();
   ShowThreshold();

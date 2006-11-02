@@ -97,7 +97,7 @@ virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
   bool m_Active;
 
   /** \brief Item on the actual selected Image in the TreeNodeSelector */
-  const mitk::DataTreeFilter::Item * m_SelectedImage;
+  const mitk::DataTreeFilter::Item * m_SelectedItem;
 
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 

@@ -116,17 +116,17 @@ private:
 
 
   /*!
-  * Node for the seed-points for threshold-gradient
+  * Node for the seed-points 
   */
   mitk::DataTreeNode::Pointer m_PointSetNode;
 
   /*!
-  * Interactor for the seed-points for threshold-gradient
+  * Interactor for the seed-points
   */
   mitk::PointSetInteractor::Pointer m_PointSetInteractor;
 
   /*!
-  * PointSetPointer for the seed-points for threshold-gradient
+  * PointSetPointer for the seed-points 
   */
   mitk::PointSet::Pointer m_Seeds;
 

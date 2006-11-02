@@ -24,7 +24,7 @@ QmitkInteractionFunctionalityComponent::QmitkInteractionFunctionalityComponent(Q
 : QmitkBaseFunctionalityComponent(parent, parentName, dataIt),
 m_GUI(NULL),
 m_Active(true),
-m_SelectedImage(NULL)
+m_SelectedItem(NULL)
 {
 
 }

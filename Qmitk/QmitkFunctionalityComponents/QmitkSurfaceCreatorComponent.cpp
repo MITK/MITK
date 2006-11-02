@@ -47,7 +47,7 @@ m_DataTreeIteratorClone(NULL),
 //m_ShowSelector(showSelector),
 //m_Active(false),
 m_SurfaceCreatorComponentGUI(NULL)
-//m_SelectedImage(NULL)
+//m_SelectedItem(NULL)
 //m_Spacer(NULL)
 {
   SetDataTreeIterator(it);
@@ -134,7 +134,7 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
 /***************     IMAGE SELECTED     ***************/
 void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedImage = imageIt;
+  m_SelectedItem = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
   if(m_SurfaceCreatorComponentGUI)
   {
@@ -155,7 +155,7 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
 
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
-      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
     }
   }
   TreeChanged();

@@ -111,7 +111,7 @@ m_PointSetComponentGUI->GetTreeNodeSelectorContentGroupBox()->setShown(m_PointSe
 /***************     IMAGE SELECTED     ***************/
 void QmitkSeedPointSetComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedImage = imageIt;
+  m_SelectedItem = imageIt;
   mitk::DataTreeFilter::Item* currentItem(NULL);
   if(m_PointSetComponentGUI)
   {

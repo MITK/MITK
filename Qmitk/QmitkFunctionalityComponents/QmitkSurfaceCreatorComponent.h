@@ -235,7 +235,7 @@ private:
   QmitkSurfaceCreatorComponentGUI * m_SurfaceCreatorComponentGUI;
 
   ///** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/
-  //const mitk::DataTreeFilter::Item * m_SelectedImage; 
+  //const mitk::DataTreeFilter::Item * m_SelectedItem; 
 
   //----------------------------------------------------
   /*!

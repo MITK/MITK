@@ -163,7 +163,7 @@ protected:
   bool m_ShowSelector;
 
     /** \brief Item on the actual selected Image in the TreeNodeSelector */
-  const mitk::DataTreeFilter::Item * m_SelectedImage;
+  const mitk::DataTreeFilter::Item * m_SelectedItem;
 
 
 private:

@@ -39,7 +39,7 @@ m_GUI(NULL),
 m_Active(false),
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
-m_SelectedImage(NULL),
+m_SelectedItem(NULL),
 m_FunctionalityComponentContainerGUI(NULL),
 m_Parent(parent), 
 //m_ParentName(parentName), 
@@ -151,12 +151,12 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 /***************     IMAGE SELECTED     ***************/
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedImage = imageIt;
+  m_SelectedItem = imageIt;
   if(m_FunctionalityComponentContainerGUI != NULL)
   {
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
-      m_AddedChildList[i]->ImageSelected(m_SelectedImage);
+      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
     }   
   }
   TreeChanged();
@@ -192,6 +192,7 @@ void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility
 /***************        ACTIVATED       ***************/
 void QmitkFunctionalityComponentContainer::Activated()
 {
+  TreeChanged();
   QmitkBaseFunctionalityComponent::Activated();
   m_Active = true;
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)

@@ -48,7 +48,6 @@ QmitkCallbackFromGUIThread::~QmitkCallbackFromGUIThread()
 
 void QmitkCallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd, itk::EventObject* e)
 {
-  std::cout << "posting callback event" << cmd << std::endl;
   qApp->postEvent( this, new QmitkCallbackEvent(cmd, e) );
 }
 
@@ -60,12 +59,10 @@ bool QmitkCallbackFromGUIThread::event( QEvent* e )
 
   itk::Command* cmd( event->command() );
   
-  std::cout << "callback event" << cmd << std::endl;
 
 
   if (cmd)
   {
-    std::cout << "executing cmd " << cmd << std::endl;
     if (event->itkevent())
     {
       cmd->Execute( (const itk::Object*) NULL, // no itk::Object here

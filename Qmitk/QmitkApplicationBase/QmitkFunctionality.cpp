@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt) : 
-QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_ObserverTag(0)
+QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_InTreeChanged(false), m_ObserverTag(0)
 {
   std::cout << "Instantiating QmitkFunctionality. QObject::name(): " << this->name() << std::endl;
   SetDataTree(dataIt);
@@ -49,7 +49,12 @@ void QmitkFunctionality::Activated()
   m_Activated = true;
   if(m_TreeChangedWhileInActive)
   {
-    TreeChanged();
+    if(IsInTreeChanged()==false)
+    {
+      m_InTreeChanged = true;
+      TreeChanged();
+      m_InTreeChanged = false;
+    }
     m_TreeChangedWhileInActive = false;
   }
 }
@@ -67,6 +72,11 @@ bool QmitkFunctionality::IsActivated()
 bool QmitkFunctionality::IsAvailable()
 {
   return m_Available;
+}
+
+bool QmitkFunctionality::IsInTreeChanged() const
+{
+  return m_InTreeChanged;
 }
 
 void QmitkFunctionality::SetAvailability(bool available)
@@ -101,7 +111,12 @@ void QmitkFunctionality::TreeChanged(const itk::EventObject & /*treeChangedEvent
   if(IsActivated())
   {
     m_TreeChangedWhileInActive = false;
-    TreeChanged();
+    if(IsInTreeChanged()==false)
+    {
+      m_InTreeChanged = true;
+      TreeChanged();
+      m_InTreeChanged = false;
+    }
   }
   else
     m_TreeChangedWhileInActive = true;

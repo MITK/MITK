@@ -124,6 +124,12 @@ public:
   virtual bool IsAvailable();
 
   /*!
+  \brief Returns \a true if method TreeChanged was called and
+  is still active (did not return yet)
+  */
+  virtual bool IsInTreeChanged() const;
+
+  /*!
   \brief setter method for data tree attribute
   @param it the reference to a data tree ieterator object
   */
@@ -137,6 +143,14 @@ public:
 
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
+  /*!
+  \brief Overwrite this method to get informed of tree-changes
+  when the functionality is active or activated
+
+  \warning When a tree-change occurs while the method
+  has already been called, it will not be called again to
+  avoid the risk of infinite recursions.
+  */
   virtual void TreeChanged();
 
   /*!
@@ -172,6 +186,7 @@ protected:
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 
   bool m_TreeChangedWhileInActive;
+  bool m_InTreeChanged;
 
   unsigned long m_ObserverTag;
   friend class QmitkFctMediator;

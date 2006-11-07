@@ -22,6 +22,7 @@ void mitk::RingSpline::DoSortPoints()
   //std::cout<<"RingSpline::SortPointSet() - stand by "<<std::endl;
 
   mitk::PointSet::MeshType::Pointer mesh = this->GetPointSet();
+  mesh->Update();
   
   if ( this->GetSize() < 3 ) return;
 

@@ -1,4 +1,5 @@
 #include <mitkPlaneFit.h>
+
 #include <mitkPlaneGeometry.h>
 #include <mitkGeometryData.h>
 #include <vnl/algo/vnl_svd.h>
@@ -15,8 +16,8 @@ mitk::PlaneFit::~PlaneFit(){}
 
 void mitk::PlaneFit::GenerateOutputInformation()
 {
-	mitk::PointSet::ConstPointer input  = this->GetInput();
-	mitk::GeometryData::Pointer output  = this->GetOutput();
+  mitk::PointSet::ConstPointer input  = this->GetInput();
+  mitk::GeometryData::Pointer output  = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -29,7 +30,7 @@ void mitk::PlaneFit::GenerateData()
 {
   // set the timeslice globaly known.
   m_PointSet = static_cast<const mitk::PointSet * > (this->ProcessObject::GetInput( 0 ));
-  
+
   // check number of data points - less then 3points isn't enough
   if(m_PointSet->GetSize() < 3 ) return;
 
@@ -59,14 +60,6 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 
 void mitk::PlaneFit::CalculateCentroid()
 {  
-  //typedef mitk::PointSet::DataType PointSetTyp;
-  typedef mitk::PointSet::PointDataType PointDataType;
-  //typedef mitk::Mesh::DataType::PointDataContainerIterator PointDataIterator;
-  typedef mitk::PointSet::PointDataIterator PointDataIterator;
-  //typedef mitk::PointSet::PointsContainer PointsContainer;
-  
-  
-
   if( m_PointSet == NULL ) return;
 
   int ps_total = m_PointSet->GetSize();
@@ -78,10 +71,10 @@ void mitk::PlaneFit::CalculateCentroid()
   end = m_PointSet->GetPointSet()->GetPoints()->End();
   for (; pit!=end; pit++)
   {
-     mitk::Point3D p3d = pit.Value();
-     m_Centroid[0] += p3d[0]; 
-     m_Centroid[1] += p3d[1];
-     m_Centroid[2] += p3d[2];
+    mitk::Point3D p3d = pit.Value();
+    m_Centroid[0] += p3d[0]; 
+    m_Centroid[1] += p3d[1];
+    m_Centroid[2] += p3d[2];
   }
 
   // calculation of centroid
@@ -113,7 +106,7 @@ void mitk::PlaneFit::ProcessPointSet()
   // process the SVD (singular value decomposition) from ITK
   // the vector will be orderd 	descending 
   vnl_svd<mitk::ScalarType> svd(dataM, 0.0);
- 
+
   // calculate the SVD of A
   vnl_vector<mitk::ScalarType> v = svd.nullvector();
 
@@ -150,3 +143,4 @@ void mitk::PlaneFit::InitializePlane()
 {
   m_Plane->InitializePlane (m_Centroid, m_PlaneVector);
 }
+

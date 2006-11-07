@@ -31,7 +31,6 @@ mitk::ClosedSpline::~ClosedSpline()
 //## @brief executes the given Operation
 void mitk::ClosedSpline::ExecuteOperation(mitk::Operation* operation)
 {
-  //std::cout<<"ClosedSpline::ExecuteOperation"<<std::endl;
   //for the very moment quit empty but there are spline operation missing until now...
    
   Superclass::ExecuteOperation(operation);
@@ -50,8 +49,6 @@ void mitk::ClosedSpline::CreateSpline()
 
   int numberOfPoints = m_ItkData->GetNumberOfPoints();
   if(numberOfPoints < 3) return;
-
-  std::cout<<"ClosedSpline::CreateSpline()"<<std::endl;
 
   // Remove points from previous call of this method
   // \todo should be replaced to RemovePoint() AddPoint() to minimize calculation
@@ -102,7 +99,6 @@ void mitk::ClosedSpline::CreateSpline()
       m_SplineX->Evaluate(t), m_SplineY->Evaluate(t), m_SplineZ->Evaluate(t)
     );
   }
-  std::cout<<"   _cs"<<std::endl;
 }
 
 

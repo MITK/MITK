@@ -5,13 +5,14 @@
 #include <fstream>
 
 int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
-{  //Create RingSpline
-  mitk::RingSpline::Pointer cs = mitk::RingSpline::New();
+{
+  //Create RingSpline
+  mitk::RingSpline::Pointer rs = mitk::RingSpline::New();
 
   //try to get the itkRingSpline
   std::cout << "Create a RingSpline and try to get the itkRingSpline";
   mitk::RingSpline::DataType::Pointer itkdata = NULL;
-  itkdata = cs->GetPointSet();
+  itkdata = rs->GetPointSet();
   if (itkdata.IsNull())
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -19,8 +20,8 @@ int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
   }
 
   //fresh RingSpline has to be empty!
-  std::cout << "Is the RingSpline empty?";
-  if (cs->GetSize() != 0)
+  std::cout << "Try size of RingSpline is empty:";
+  if (rs->GetSize() != 0)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -31,24 +32,28 @@ int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
   mitk::Point3D point;
   for (int i = 1; i <6; ++i)
   {
+    //    std::cout<<"Test::: "<<rs->GetSize()<<std::endl;
     position = i-1;
-    point.Fill( (i%2)?i:i*5 );
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
-    cs->ExecuteOperation(doOp);
-    
-    //now check new condition!
-    if ( (cs->GetSize()!= i) )
+    point[0]= (i%2)?i*2:i*5 ;
+    point[1]= (i%3)?i*3:i+2 ;
+    point[2]= (i%6)?i*0.5:i-1; 
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position); rs->ExecuteOperation(doOp);
+    //    std::cout<<"Test::: "<<rs->GetSize()<<std::endl;
+
+    //now check new condition! 
+    if( (rs->GetSize()!= i))
     {
-      std::cout<<"[FAILED] while point set size == "<<cs->GetSize()<<"(expected: "<<i<<")"<<std::endl;
+      std::cout<<"[FAILED] while point set size == "<<rs->GetSize()<<"(expected: "<<i<<")"<<std::endl;
       return EXIT_FAILURE;
     }
   }
 
-  if (!cs->SplineExist())
-  {
-    std::cout<<"Spline no exist: [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
+  if
+    (!rs->SplineExist())
+    {
+      std::cout<<"Spline no exist: [FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
 
 
   //well done!!! Passed!
@@ -57,3 +62,4 @@ int mitkRingSplineTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }
+

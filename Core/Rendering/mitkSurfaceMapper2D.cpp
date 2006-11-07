@@ -172,7 +172,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     Vector3D normal;
 
     // Check if Lookup-Table is already given, else use standard one. 
-    double *scalarLimits = m_LUT->GetTableRange();
+    double *scalarLimits = (double*)  m_LUT->GetTableRange();
     double scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1]; 
 
     vtkLookupTable *lut = vtkLookupTable::New();

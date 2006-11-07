@@ -118,15 +118,15 @@ void QmitkStdMultiWidget::init()
   
   m_GradientBackground1 = mitk::GradientBackground::New();
   m_GradientBackground1->SetRenderWindow( mitkWidget1->GetRenderer()->GetRenderWindow() );
-  m_GradientBackground1->Enable();
+  m_GradientBackground1->Disable();
   
   m_GradientBackground2 = mitk::GradientBackground::New();
   m_GradientBackground2->SetRenderWindow( mitkWidget2->GetRenderer()->GetRenderWindow() );
-  m_GradientBackground2->Enable();
+  m_GradientBackground2->Disable();
   
   m_GradientBackground3 = mitk::GradientBackground::New();
   m_GradientBackground3->SetRenderWindow( mitkWidget3->GetRenderer()->GetRenderWindow() );
-  m_GradientBackground3->Enable();
+  m_GradientBackground3->Disable();
   
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow( mitkWidget4->GetRenderer()->GetRenderWindow() );

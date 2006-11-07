@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkImageToSurfaceFilter.h"
+#include <mitkImageToSurfaceFilter.h>
+
 #include <vtkImageData.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
@@ -29,23 +30,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkDecimate.h>
 #endif
 
-mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
+mitk::ImageToSurfaceFilter::ImageToSurfaceFilter(): 
+  m_Smooth(false),
+  m_Decimate( NoDecimation),
+  m_Threshold(1.0),
+  m_TargetReduction(0.95f),
+  m_SmoothIteration(50),
+  m_SmoothRelaxation(0.1)
 {
-  m_Smooth = false;
-  m_Decimate = NoDecimation;
-  m_Threshold = 1;
-  m_TargetReduction = 0.95f;
-  m_SmoothIteration = 50;
-  m_SmoothRelaxation = 0.1;
 }
 
 mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
 {
 }
 
-template <class T1, class T2, class T3>
+  template <class T1, class T2, class T3>
 inline void mitkVtkLinearTransformPoint(T1 matrix[4][4], 
-                                           T2 in[3], T3 out[3])
+    T2 in[3], T3 out[3])
 {
   T3 x = matrix[0][0]*in[0]+matrix[0][1]*in[1]+matrix[0][2]*in[2]+matrix[0][3];
   T3 y = matrix[1][0]*in[0]+matrix[1][1]*in[1]+matrix[1][2]*in[2]+matrix[1][3];
@@ -222,13 +223,13 @@ const mitk::Image *mitk::ImageToSurfaceFilter::GetInput(void)
 void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer inputImage  =(mitk::Image*) this->GetInput();
-  
+
   //mitk::Image *inputImage = (mitk::Image*)this->GetImage();
   mitk::Surface::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   if(inputImage.IsNull()) return;
-  
+
   //Set Data
 }

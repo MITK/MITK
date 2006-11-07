@@ -1,7 +1,8 @@
 #ifndef _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
 #define _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
 
-#include "mitkImageToSurfaceFilter.h"
+#include <mitkImageToSurfaceFilter.h>
+
 #include <vtkImageGaussianSmooth.h>
 #include <vtkImageMedian3D.h>
 #include <vtkImageResample.h>
@@ -9,88 +10,126 @@
 
 
 namespace mitk {
-/**
- * @brief Smooths 3D pixel data and create surface.
- *
- * The resulting image can be smoothed by a Median3D and a Gaussian Filter. If interpolation
- * is used all voxels are resized to 1mm in each direction.
- *
- * @ingroup ImageFilters
- * @ingroup Process
- */
-
-class ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
-{
-public:
-  mitkClassMacro(ManualSegmentationToSurfaceFilter,ImageToSurfaceFilter);
-
   /**
-  * New Implementation from mitkImageToSurfaceFilter
-  */
-  virtual void GenerateData();
-  itkNewMacro(Self);
+   * @brief Creates a 3D surface from a segmentation. 
+   *
+   * The resulting surface depends on a filter pipline based on vtkMedian (1) and a gausian filter with vtkStandardDeviation (2).
+   * Additional voxel can be changed to an isotropic represantation of the
+   * image (ATTANTION: the number of voxels in the will change). The
+   * resulting isotropic image has 1mm isotropic voxel.
+   *
+   * @ingroup ImageFilters
+   * @ingroup Process
+   */
 
-  
-  itkSetMacro(MedianFilter3D,bool);
-  itkGetConstMacro(MedianFilter3D,bool);
-  /**
-  * Enable/Disable Median3DFilter for smoothing the segementation
-  */
-  itkBooleanMacro(MedianFilter3D);
+  class ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
+  {
+    public:
+      mitkClassMacro(ManualSegmentationToSurfaceFilter,ImageToSurfaceFilter);
 
-  /**
-  * Enable/Disable Interpolation to 1mm x 1mm x 1mm pixel.
-  */
-  itkSetMacro(Interpolation,bool);
-  itkGetConstMacro(Interpolation,bool);
-  /**
-  * Enable/Disable Interpolation to 1mm x 1mm x 1mm pixel.
-  */
-  itkBooleanMacro(Interpolation);
+      /**
+       * Will preprocess an segmentation voxelwise. The segmentation can use
+       * a hole fill relating a median filter and smoth by a gaussian
+       * filter. 
+       * The image can be interpolatet to an isotropic image.
+       * By default every filter is disabled.
+       * This method calls CreateSurface from  mitkImageToSurfaceFilter.
+       */
+      virtual void GenerateData();
+      itkNewMacro(Self);
 
-  
-  itkSetMacro(UseStandardDeviation,bool);
-  itkGetConstMacro(UseStandardDeviation,bool);
-  /**
-  * Enable/Disable Gaussian StandardDeviation. As well the threshold for CreatedSurface will be set to 49 and the image range set from 0 to 100.
-  */
-  itkBooleanMacro(UseStandardDeviation);
 
-  /**
-  * Set/Get Standard Deviation for Gaussian Filter.
-  * @param _arg by default 1.5
-  */
-  itkSetMacro(StandardDeviation, double);
-  itkGetConstMacro(StandardDeviation, double);
+      /**
+       * Supplies a method for setting median filter by a bool value.
+       */
+      itkSetMacro(MedianFilter3D,bool);
+      /**
+       * Return state of median filter
+       */
+      itkGetConstMacro(MedianFilter3D,bool);
+      /**
+       * Enable the median filter (first in pipline).
+       */
+      itkBooleanMacro(MedianFilter3D);
 
-  /**
-  * Set the Kernel for Median3DFilter. By default its set to 3 x 3 x 3. If you choose '1' nothing will be processed in this direction.
-  */
-  void SetMedianKernelSize(int x, int y, int z);
-  itkGetConstMacro(MedianKernelSizeX, int);
-  itkGetConstMacro(MedianKernelSizeY, int);
-  itkGetConstMacro(MedianKernelSizeZ, int);
+      /**
+       * Supplies a method for activating Interpolation.
+       */
+      itkSetMacro(Interpolation,bool);
+      /**
+       * Returns activation state of interpolation filter.
+       */
+      itkGetConstMacro(Interpolation,bool);
+      /**
+       * Enable the interpolation filter (second in pipline) for isotropic
+       * voxel.
+       */
+      itkBooleanMacro(Interpolation);
 
-  /**
-  * Set the values for Spacing in X, Y and Z-Dimension
-  */
-  void SetInterpolation(int x, int y, int z);
+      /**
+       * Supplies a method for gaussian filter (third in pipline). 
+       */
+      itkSetMacro(UseStandardDeviation,bool);
+      /**
+       * Returns activation state of standard deviation filter.
+       */
+      itkGetConstMacro(UseStandardDeviation,bool);
+      /**
+       *  Enable Gaussian StandardDeviation. As well the threshold for 
+       *  CreatedSurface will be set to 49 and the image range set 
+       *  from 0 to 100. Than there are better results for dividing 
+       *  fore- and background.
+       */
+      itkBooleanMacro(UseStandardDeviation);
 
-protected:
-  ManualSegmentationToSurfaceFilter();
-  virtual ~ManualSegmentationToSurfaceFilter();
+      /**
+       * Set standard deviation for gaussian Filter.
+       * @param _arg by default 1.5
+       */
+      itkSetMacro(StandardDeviation, double);
+      /**
+       * Returns the standard deviation of the gaussian filter wich will be
+       * used when filter is enabled.
+       */
+      itkGetConstMacro(StandardDeviation, double);
 
-  bool m_MedianFilter3D;
-  int m_MedianKernelSizeX, m_MedianKernelSizeY, m_MedianKernelSizeZ;
-  bool m_UseStandardDeviation; //Gaussian Filter
-  double m_StandardDeviation;
-  bool m_Interpolation;
+      /**
+       * Set the Kernel for Median3DFilter. By default its set to 3 x 3 x 3. If you choose '1' nothing will be processed in this direction.
+       */
+      void SetMedianKernelSize(int x, int y, int z);
+      /**
+       * Returns the kernel size in the first direction.
+       */
+      itkGetConstMacro(MedianKernelSizeX, int);
+      /**
+       * Returns the kernel size in the second direction.
+       */
+      itkGetConstMacro(MedianKernelSizeY, int);
+      /**
+       * Returns the kernel size in the third direction.
+       */
+      itkGetConstMacro(MedianKernelSizeZ, int);
 
-  int m_InterpolationX;
-  int m_InterpolationY;
-  int m_InterpolationZ;
-  
-};//namespace
+      /**
+       * Set the values for Spacing in X, Y and Z-Dimension
+       */
+      void SetInterpolation(int x, int y, int z);
+
+    protected:
+      ManualSegmentationToSurfaceFilter();
+      virtual ~ManualSegmentationToSurfaceFilter();
+
+      bool m_MedianFilter3D;
+      int m_MedianKernelSizeX, m_MedianKernelSizeY, m_MedianKernelSizeZ;
+      bool m_UseStandardDeviation; //Gaussian Filter
+      double m_StandardDeviation;
+      bool m_Interpolation;
+
+      int m_InterpolationX;
+      int m_InterpolationY;
+      int m_InterpolationZ;
+
+  };//namespace
 
 }
 #endif //_MITKMANUALSEGMENTATIONTISURFACEFILTER_h__

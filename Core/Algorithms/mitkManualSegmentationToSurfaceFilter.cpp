@@ -1,4 +1,4 @@
-#include "mitkManualSegmentationToSurfaceFilter.h"
+#include <mitkManualSegmentationToSurfaceFilter.h>
 
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 

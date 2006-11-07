@@ -65,6 +65,11 @@ class VtkLayerController
     */
     bool IsRendererInserted(vtkRenderer* renderer);
 
+    /**
+    * Returns the number of renderers in the renderwindow.
+    */
+    int GetNumberOfRenderers();
+
 	protected:
     vtkRenderWindow*    m_RenderWindow;
        	

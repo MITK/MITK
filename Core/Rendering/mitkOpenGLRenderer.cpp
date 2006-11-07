@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include <mitkGeometry3D.h>
 #include <mitkPointSetMapper2D.h>
+#include "mitkVtkLayerController.h"
 
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
@@ -372,18 +373,6 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
     glMatrixMode( GL_MODELVIEW );
 
     //------------------
-    //rendering VTK-Mappers if present
-    if(m_VtkMapperPresent)
-    {
-      mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
-      if (arRenderWindow)
-        arRenderWindow->SetFinishRendering(false);
-
-      //start vtk render process with the updated scenegraph
-      m_RenderWindow->GetVtkRenderWindow()->MitkRender();
-    }
-
-    //------------------
     //preparing and gaining information about 2D rendering for OpenGL
     if(GetDisplayGeometry()->IsValid())
     {
@@ -419,6 +408,18 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
         layers.top().second->Paint(this);
         layers.pop();
       }
+    }
+
+    //------------------
+    //rendering VTK-Mappers if present
+    if(m_VtkMapperPresent || m_RenderWindow->GetVtkLayerController()->GetNumberOfRenderers() > 1)
+    {
+      mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
+      if (arRenderWindow)
+        arRenderWindow->SetFinishRendering(false);
+
+      //start vtk render process with the updated scenegraph
+      m_RenderWindow->GetVtkRenderWindow()->MitkRender();
     }
 
     if( m_DrawOverlayPosition[0]>0)

@@ -254,4 +254,11 @@ void mitk::VtkLayerController::UpdateLayers()
       currentLayerNumber--;
   }
 }
+/**
+ * Returns the number of renderers in the renderwindow.
+ */
+int mitk::VtkLayerController::GetNumberOfRenderers()
+{
+  return m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size();
+}
 

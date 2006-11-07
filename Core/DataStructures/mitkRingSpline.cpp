@@ -2,13 +2,12 @@
 
 #include <mitkInteractionConst.h>
 #include <mitkGeometryData.h>
-#include <mitkMesh.h>
 #include <mitkOperation.h>
 
 
 
 mitk::RingSpline::RingSpline()
-{
+{ 
   m_PlaneFit = mitk::PlaneFit::New();
   m_PlaneFit->SetInput(this); 
 }
@@ -60,11 +59,6 @@ void mitk::RingSpline::DoSortPoints()
     sortedPointMap[alpha]= pit.Value();
   }
 
-  typedef mitk::Mesh::DataType MeshType;
-  typedef MeshType::CellType CellType;
-  typedef CellType::CellAutoPointer CellAutoPointer;
-  typedef itk::PolygonCell<MeshType::CellType> PolygonCellType;
-
   // remove points
   mesh->GetPoints()->Initialize();
   mesh->GetCells()->Initialize();
@@ -88,4 +82,6 @@ void mitk::RingSpline::DoSortPoints()
   std::cout<<"RingSpline::SortPointSet() - finished "<<std::endl;
 
   mesh->SetCell( 0, polygon );
+  
 }
+

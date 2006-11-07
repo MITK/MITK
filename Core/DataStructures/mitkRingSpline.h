@@ -4,8 +4,7 @@
 #include <mitkClosedSpline.h>
 #include <mitkCommon.h>
 #include <mitkPlaneFit.h>
-
-class vtkCardinalSpline;
+#include <mitkMesh.h>
 
 namespace mitk {
 
@@ -15,6 +14,11 @@ public:
   mitkClassMacro(RingSpline, ClosedSpline);
 
   itkNewMacro(Self);
+
+  typedef mitk::Mesh::DataType MeshType;
+  typedef MeshType::CellType CellType;
+  typedef CellType::CellAutoPointer CellAutoPointer;
+  typedef itk::PolygonCell<MeshType::CellType> PolygonCellType;
 
 protected:
 
@@ -34,3 +38,4 @@ private:
 } // namespace mitk
 
 #endif /* MITKRingSpline_H_HEADER_INCLUDED */
+

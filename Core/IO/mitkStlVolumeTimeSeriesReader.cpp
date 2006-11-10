@@ -39,7 +39,7 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
     std::cout << "Loading " << fileName << " as stl..." << std::endl;
 
     STLFileReader::Pointer stlReader = STLFileReader::New();
-    stlReader->SetFileName( fileName );
+    stlReader->SetFileName( fileName.c_str() );
     stlReader->Update();
 
     if ( stlReader->GetOutput() != NULL )

@@ -69,9 +69,9 @@ public:
   mitk::BaseProcess::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
   { 
     typename T::Pointer ioProcessObject = T::New();
-    ioProcessObject->SetFileName(filename);
-    ioProcessObject->SetFilePrefix(filePrefix);
-    ioProcessObject->SetFilePattern(filePattern);
+    ioProcessObject->SetFileName(filename.c_str());
+    ioProcessObject->SetFilePrefix(filePrefix.c_str());
+    ioProcessObject->SetFilePattern(filePattern.c_str());
     return ioProcessObject.GetPointer(); 
   }
   

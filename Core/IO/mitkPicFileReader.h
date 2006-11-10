@@ -37,19 +37,13 @@ public:
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);
-    itkGetMacro(FileName, std::string);
     itkGetStringMacro(FileName);
 
-    itkSetMacro(FilePrefix, std::string);
     itkSetStringMacro(FilePrefix);
-    itkGetMacro(FilePrefix, std::string);
     itkGetStringMacro(FilePrefix);
 
-    itkSetMacro(FilePattern, std::string);
     itkSetStringMacro(FilePattern);
-    itkGetMacro(FilePattern, std::string);
     itkGetStringMacro(FilePattern);
 
     virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);

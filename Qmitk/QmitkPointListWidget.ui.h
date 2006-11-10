@@ -68,7 +68,11 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 
 void QmitkPointListWidget::ItemsOfListUpdate()
 {
-  if (m_DatatreeNode.IsNull())return;
+  if (m_DatatreeNode.IsNull())
+    return;
+  
+  int lastSelectedPoint = InteractivePointList->currentItem();
+  
   InteractivePointList->clear();
   m_PointSet = (mitk::PointSet*)(m_DatatreeNode->GetData());
   int size =m_PointSet->GetSize();
@@ -95,6 +99,8 @@ void QmitkPointListWidget::ItemsOfListUpdate()
     // also be highlighted in the pointlist widget.
     //
     int selectedPointIndex = m_PointSet->SearchSelectedPoint();
+    if (selectedPointIndex == -1) 
+      selectedPointIndex = lastSelectedPoint;
     if (selectedPointIndex > -1 && m_PointSet->GetPointSet()->GetPoints()->IndexExists(selectedPointIndex))
     {
       //

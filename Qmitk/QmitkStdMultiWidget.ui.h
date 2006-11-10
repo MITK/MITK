@@ -200,6 +200,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
 
+  m_Layout = LAYOUT_2D_IMAGES_LEFT;
 }
 
 void QmitkStdMultiWidget::changeLayoutToDefault()
@@ -357,30 +358,6 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 
   std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
   QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
-  QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
-
-  mitkWidget1->hide();
-  mitkWidget2->hide();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
-
-  mitkWidget3->setMaximumSize(2000,2000);
-  mitkWidget4->setMaximumSize(2000,2000);
-
-  layout4->addWidget( mitkWidget3);
-  layout4->addWidget( mitkWidget4);
-  layout4->addWidget( levelWindowWidget );
-  QmitkStdMultiWidgetLayout->addLayout( layout4 );
-
-  m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
-}
-
-void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
-{
-  delete QmitkStdMultiWidgetLayout ;
-
-  std::cout << "changing layout to Widget3 and 4 in one Column..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
@@ -389,13 +366,38 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()//doesn't work yet
   if ( mitkWidget3->isHidden() ) mitkWidget3->show();
   if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
-  mitkWidget3->setMaximumSize(2000,2000);
-  mitkWidget4->setMaximumSize(2000,2000);
+  mitkWidget3->setMaximumSize(2000,1000);
+  mitkWidget4->setMaximumSize(2000,1000);
 
-  layout3->addWidget( mitkWidget3,0,0 );
-  layout3->addWidget( mitkWidget4,1,0 );
+  layout3->addWidget( mitkWidget3,0,0);
+  layout3->addWidget( mitkWidget4,1,0);
 
-  layout4->addLayout( layout3 );
+  layout4->addLayout(layout3);
+  layout4->addWidget( levelWindowWidget );
+  QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
+}
+
+void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
+{
+  delete QmitkStdMultiWidgetLayout ;
+
+  std::cout << "changing layout to Widget3 and 4 in one Column..." << std::endl;
+  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+
+  mitkWidget1->hide();
+  mitkWidget2->hide();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+
+  mitkWidget3->setMaximumSize(1000,2000);
+  mitkWidget4->setMaximumSize(1000,2000);
+
+  layout4->addWidget( mitkWidget3);
+  layout4->addWidget( mitkWidget4);
+
   layout4->addWidget( levelWindowWidget );
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
 

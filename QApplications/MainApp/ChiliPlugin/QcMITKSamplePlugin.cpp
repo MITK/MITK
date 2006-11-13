@@ -504,8 +504,7 @@ void QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
                       ipTypeStringPtr, &str );
       //std::cout<<"CONFERENCE: (1) "<<str;
       if( ! EventCollector::PostEvent(QString(str), task))
-        //std::cout<<" NO SUCCES!"<<std::endl;
-        ;
+      //std::cout<<" NO SUCCES!"<<std::endl;
       //std::cout<<std::endl;
 
     break;

@@ -514,7 +514,46 @@ public:
         } 
 
       case VTK_QUAD:
+        {
+          if (npts != 4 ) continue; // skip non-quadrilateral
+          unsigned long pointIds[3];
+
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+
+          pointIds[0] = (unsigned long) pts[2];
+          pointIds[1] = (unsigned long) pts[3];
+          pointIds[2] = (unsigned long) pts[0];
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          break;
+        }
+
       case VTK_EMPTY_CELL:
+        {
+          if (npts != 3) 
+          {
+            std::cout << "Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
+          }
+          unsigned long pointIds[3];
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
+
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          break;    
+        } 
+
       case VTK_VERTEX:
       case VTK_POLY_VERTEX:
       case VTK_LINE:
@@ -543,6 +582,22 @@ public:
 
       case VTK_POLYGON:
       case VTK_PIXEL:
+        {
+          if (npts != 4 ) continue;// skip non-quadrilateral
+          unsigned long pointIds[3];
+          for ( unsigned int idx = 0; idx <= 1; idx++ )
+          {
+            pointIds[0] = (unsigned long) pts[idx];
+            pointIds[1] = (unsigned long) pts[idx+1];
+            pointIds[2] = (unsigned long) pts[idx+2];
+            newCell.TakeOwnership( new TriCellType );
+            newCell->SetPointIds(pointIds);
+            output->SetCell(cellId, newCell );
+            output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          }
+          break;
+        }
+
       case VTK_TETRA:
       case VTK_VOXEL:
       case VTK_HEXAHEDRON:

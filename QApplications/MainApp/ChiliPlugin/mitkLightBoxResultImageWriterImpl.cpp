@@ -16,8 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
-#include "mitkLightBoxResultImageWriter.h"
+#include "mitkLightBoxResultImageWriterImpl.h"
 
 #include <plugin.h>
 #include <qclightbox.h>

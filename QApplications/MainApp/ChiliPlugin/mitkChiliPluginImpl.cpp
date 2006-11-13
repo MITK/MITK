@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkChiliPlugin.h"
+#include "mitkChiliPluginImpl.h"
 
 QcPlugin* mitk::ChiliPluginImpl::s_PluginInstance = 0;
 
@@ -34,3 +34,7 @@ void mitk::ChiliPluginImpl::SetPluginInstance(QcPlugin* instance)
 {
   s_PluginInstance = instance;
 }
+mitk::ChiliPluginImpl::~ChiliPluginImpl() 
+{ 
+}
+

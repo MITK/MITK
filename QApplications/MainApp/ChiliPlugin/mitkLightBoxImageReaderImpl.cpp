@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "mitkLightBoxImageReaderImpl.h"
 
-#include "mitkLightBoxImageReader.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include <mitkChiliPlugin.h>
@@ -428,7 +428,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   itkDebugMacro(<<"fertig ");
 }
 
-mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB(LocalImageInfoArray& IF_CHILI_PLUGIN(imageNumbers))
+mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB(LocalImageInfoArray& imageNumbers)
 {
   mitk::Vector3D spacing;
   spacing.Fill(1.0);
@@ -474,7 +474,7 @@ bool mitk::LightBoxImageReaderImpl::ImageNumberLesser ( const LocalImageInfo& el
   return elem1.imageNumber < elem2.imageNumber;
 };
 
-void mitk::LightBoxImageReaderImpl::SortImage(LocalImageInfoArray& IF_CHILI_PLUGIN(imageNumbers))
+void mitk::LightBoxImageReaderImpl::SortImage(LocalImageInfoArray& imageNumbers)
 {
   ipPicDescriptor*  pic=NULL;
   ipPicTSV_t *tsv;

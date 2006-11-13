@@ -520,6 +520,26 @@ public:
       case VTK_LINE:
       case VTK_POLY_LINE:
       case VTK_TRIANGLE_STRIP:
+        {
+          unsigned int numberOfTrianglesInStrip = npts - 2;
+          unsigned long pointIds[3];
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
+
+          for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
+          {
+            newCell.TakeOwnership( new TriCellType );
+            newCell->SetPointIds(pointIds);
+            output->SetCell(cellId, newCell );
+            output->SetCellData(cellId, (typename MeshType::PixelType)3);
+            cellId++;
+            pointIds[0] = pointIds[1];
+            pointIds[1] = pointIds[2];
+            pointIds[2] = pts[t+3];
+          }
+        }
+
       case VTK_POLYGON:
       case VTK_PIXEL:
       case VTK_TETRA:

@@ -538,6 +538,7 @@ public:
             pointIds[1] = pointIds[2];
             pointIds[2] = pts[t+3];
           }
+          break;
         }
 
       case VTK_POLYGON:

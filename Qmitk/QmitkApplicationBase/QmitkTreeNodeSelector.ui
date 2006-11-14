@@ -67,7 +67,6 @@
     <function returnType="mitk::DataTreeNode *">GetSelectedNode() const</function>
     <function returnType="const mitk::DataTreeIteratorClone *">GetSelectedIterator() const</function>
     <function returnType="bool">SelectNode( mitk::DataTreeNode * node )</function>
-    <function returnType="QComboBox *">GetComboBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

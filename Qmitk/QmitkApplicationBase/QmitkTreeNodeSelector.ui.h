@@ -37,7 +37,7 @@ void QmitkTreeNodeSelector::UpdateContent()
   QString currentText = m_ComboBox->currentText();
   m_ComboBox->clear();
   m_TreeNodes.clear();
-  if (m_DataTreeIteratorClone != NULL) {
+  if ( m_DataTreeIteratorClone.IsNotNull() ) {
     CommonFunctionality::DataTreeIteratorVector images = CommonFunctionality::FilterNodes(m_DataTreeIteratorClone,m_FilterFunction);
    
     for (CommonFunctionality::DataTreeIteratorVector::iterator it = images.begin(); it != images.end() ; it++ )
@@ -147,9 +147,3 @@ bool QmitkTreeNodeSelector::SelectNode(mitk::DataTreeNode* node)
   return false;
 }
 
-
-
-QComboBox* QmitkTreeNodeSelector::GetComboBox()
-{
-  return m_ComboBox;
-}

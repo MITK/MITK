@@ -20,6 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 
+
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
+
 class QcPlugin;
 
 namespace mitk {
@@ -37,7 +42,8 @@ typedef enum
   MOUSEMOVEc ,
 } ConfMsgType;
 
-class ChiliPlugin
+class ChiliPlugin : public itk::Object
+
 {
 public:
   static bool IsPlugin();
@@ -45,6 +51,11 @@ public:
   static void SetPluginInstance(QcPlugin* instance);
   static int GetConferenceID();
 
+  mitkClassMacro(ChiliPlugin,itk::Object);
+  itkNewMacro(ChiliPlugin);
+  virtual ~ChiliPlugin();
+protected:
+  ChiliPlugin::ChiliPlugin() {}
 private:
   static QcPlugin* s_PluginInstance;
 };

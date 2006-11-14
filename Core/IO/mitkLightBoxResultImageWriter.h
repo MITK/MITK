@@ -52,20 +52,20 @@ public:
   itkNewMacro(Self);
 
   virtual void SetInput(const mitk::Image *image);
-  const mitk::Image *GetInput(void);
+  virtual const mitk::Image *GetInput(void);
 
   //##Documentation
   //## @brief Sets the input to node->GetData() and additionally 
   //## m_LevelWindow and m_ImageTypeName from the node properties
   virtual void SetInputByNode(const mitk::DataTreeNode *node);
 
-  const mitk::Image *GetSourceImage(void);
+  virtual const mitk::Image *GetSourceImage(void);
   virtual void SetSourceImage(const mitk::Image *source); 
   virtual bool SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator);
 
   //##Description 
   //## @brief Set the lightbox to write into
-  void SetLightBox(QcLightbox* lightbox);
+  virtual void SetLightBox(QcLightbox* lightbox);
 
   //##Description 
   //## @brief Set the lightbox to write into to the current lightbox
@@ -91,7 +91,7 @@ public:
 
   //##Description 
   //## @brief Get the lightbox to write into
-  QcLightbox* GetLightBox() const;
+  virtual QcLightbox* GetLightBox() const;
 
   itkSetStringMacro( ImageTypeName );
   itkGetStringMacro( ImageTypeName );
@@ -123,16 +123,14 @@ public:
   virtual void Write() const;
 
 protected:
-  virtual void GenerateData();
-
   LightBoxResultImageWriter();
 
   virtual ~LightBoxResultImageWriter();
 
   QcLightbox* m_LightBox;
-
+  
   LevelWindow m_LevelWindow;
-
+  
   std::string m_ImageTypeName;
 
   // the series description

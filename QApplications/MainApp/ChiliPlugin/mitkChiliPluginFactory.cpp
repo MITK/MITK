@@ -73,7 +73,6 @@ ChiliPluginFactory::ChiliPluginFactory()
                          "MITK Chili Plugin Lightbox Writer",
                          1,
                          mitk::CreateChiliObjectFunction<mitk::LightBoxResultImageWriterImpl>::New());
-  ObjectFactoryBase::RegisterFactory(this);
 }
   
 ChiliPluginFactory::~ChiliPluginFactory()
@@ -91,6 +90,4 @@ const char* ChiliPluginFactory::GetDescription() const
 }
 
 } // end namespace mitk
-
-mitk::ChiliPluginFactory::Pointer dummyFactory = mitk::ChiliPluginFactory::New();
 

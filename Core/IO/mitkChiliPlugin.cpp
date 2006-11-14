@@ -22,11 +22,7 @@ QcPlugin* mitk::ChiliPlugin::s_PluginInstance = 0;
 
 bool mitk::ChiliPlugin::IsPlugin()
 {
-#ifdef CHILIPLUGIN
   return true;
-#else
-  return false;
-#endif
 }
 
 QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
@@ -37,4 +33,24 @@ QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
 void mitk::ChiliPlugin::SetPluginInstance(QcPlugin* instance)
 {
   s_PluginInstance = instance;
+} 
+mitk::ChiliPlugin::~ChiliPlugin() 
+{ 
+  //std::cout << "ChiliPlugin d'tor" << std::endl; 
 }
+/*
+ * this was another workaround. replaced by own createobjectfunction in the
+ * plugin factory
+ *
+mitk::ChiliPlugin::Pointer mitk::ChiliPlugin::New(void)
+{
+  Pointer smartPtr; 
+  smartPtr = ::itk::ObjectFactory<ChiliPlugin>::Create(); 
+  if(smartPtr.IsNull() ) 
+    { 
+    smartPtr = new ChiliPlugin();     
+    } 
+  return smartPtr; 
+} 
+*/
+

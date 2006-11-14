@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPicFileReader.h"
 #include <itkImageFileReader.h>
-#include <mitkChiliPlugin.h>
 
 extern "C" 
 {

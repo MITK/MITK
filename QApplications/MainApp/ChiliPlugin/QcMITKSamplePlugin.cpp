@@ -22,6 +22,7 @@
 #include "SampleApp.h"
 #include "ToolBar.h"
 #include "mitkChiliPlugin.h"
+#include "mitkChiliPluginFactory.h"
 #include "QcMITKSamplePlugin.h"
 
 #include <ipPic.h>
@@ -55,7 +56,9 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
 
   //std::cout<< "QEventLogger initialisiert..."<<std::endl;
 
+  mitk::ChiliPluginFactory::RegisterOneFactory();
   mitk::ChiliPlugin::SetPluginInstance(s_PluginInstance);
+  
 }
 
 QString QcMITKSamplePlugin::name()

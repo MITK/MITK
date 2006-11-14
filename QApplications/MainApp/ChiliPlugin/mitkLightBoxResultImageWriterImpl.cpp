@@ -106,7 +106,7 @@ bool mitk::LightBoxResultImageWriterImpl::SetSourceByTreeSearch(mitk::DataTreeIt
 
 
 
-    itkGenericOutputMacro(<<"it-> name"<<it->Get()->GetPropertyList()->GetProperty("name")->GetValueAsString());
+    itkGenericOutputMacro(<<"it-> name:"<<it->Get()->GetPropertyList()->GetProperty("name")->GetValueAsString());
     //bool LoadedFromChili;
     //if(it->Get()->GetBoolProperty("LoadedFromChili", LoadedFromChili) && LoadedFromChili)
     if (true)

@@ -430,7 +430,7 @@ public:
 
     // Get the points from vtk
     vtkPoints* vtkpoints = poly->GetPoints();
-    int numPoints = poly->GetNumberOfPoints();
+    const unsigned int numPoints = poly->GetNumberOfPoints();
 
     // Create a compatible point container for the mesh
     // the mesh is created with a null points container
@@ -474,7 +474,7 @@ public:
     // extract the cell id's from the vtkUnstructuredGrid
     int numcells = vtkcells->GetNumberOfCells();
     int* vtkCellTypes = new int[numcells];
-    int cellId =0;
+    int cellId = 0;
     for(; cellId < numcells; cellId++)
     {
       vtkCellTypes[cellId] = poly->GetCellType(cellId);
@@ -493,6 +493,8 @@ public:
     typedef typename TriCellType::CellAutoPointer	           TriCellPointer;
 
     TriCellPointer newCell;
+    output->GetCells()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
+    output->GetCellData()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
 
     for(vtkcells->InitTraversal(); vtkcells->GetNextCell(npts, pts); cellId++)
     {
@@ -525,6 +527,7 @@ public:
           newCell->SetPointIds(pointIds);
           output->SetCell(cellId, newCell );
           output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          cellId++;
 
           pointIds[0] = (unsigned long) pts[2];
           pointIds[1] = (unsigned long) pts[3];
@@ -540,7 +543,8 @@ public:
         {
           if (npts != 3) 
           {
-            std::cout << "Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
+            std::cout << "Error: Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
+            continue;
           }
           unsigned long pointIds[3];
           pointIds[0] = (unsigned long) pts[0];
@@ -554,32 +558,10 @@ public:
           break;    
         } 
 
-      case VTK_VERTEX:
-      case VTK_POLY_VERTEX:
-      case VTK_LINE:
-      case VTK_POLY_LINE:
-      case VTK_TRIANGLE_STRIP:
-        {
-          unsigned int numberOfTrianglesInStrip = npts - 2;
-          unsigned long pointIds[3];
-          pointIds[0] = (unsigned long) pts[0];
-          pointIds[1] = (unsigned long) pts[1];
-          pointIds[2] = (unsigned long) pts[2];
-
-          for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
-          {
-            newCell.TakeOwnership( new TriCellType );
-            newCell->SetPointIds(pointIds);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
-            cellId++;
-            pointIds[0] = pointIds[1];
-            pointIds[1] = pointIds[2];
-            pointIds[2] = pts[t+3];
-          }
-          break;
-        }
-
+        //case VTK_VERTEX:              // If need to implement use 
+        //case VTK_POLY_VERTEX:         // the poly->GetVerts() and 
+        //case VTK_LINE:                // poly->GetLines() routines 
+        //case VTK_POLY_LINE:           // outside of the switch..case.
       case VTK_POLYGON:
       case VTK_PIXEL:
         {
@@ -592,9 +574,10 @@ public:
             pointIds[2] = (unsigned long) pts[idx+2];
             newCell.TakeOwnership( new TriCellType );
             newCell->SetPointIds(pointIds);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
+            output->SetCell(cellId+idx, newCell );
+            output->SetCellData(cellId+idx, (typename MeshType::PixelType)3);
           }
+          cellId++;
           break;
         }
 
@@ -608,6 +591,49 @@ public:
       default:
         std::cerr << "Warning, unhandled cell type " 
           << vtkCellTypes[cellId] << std::endl;
+      }
+    }
+
+    if (poly->GetNumberOfStrips() != 0) 
+    {
+      vtkcells = poly->GetStrips();
+      numcells = vtkcells->GetNumberOfCells();
+      vtkCellTypes = new int[numcells];
+
+      unsigned int stripId = 0;
+      for( stripId; stripId < numcells; stripId++)
+      {
+        vtkCellTypes[stripId] = poly->GetCellType(stripId);
+      }
+      stripId = 0;
+
+      vtkcells->InitTraversal();
+      while( vtkcells->GetNextCell(npts, pts) )
+      {
+        if (vtkCellTypes[stripId] != VTK_TRIANGLE_STRIP) 
+        {
+          std::cout << "Error: Only triangle strips supported!" << std::endl;
+          continue;
+        }
+        stripId++;
+
+        unsigned int numberOfTrianglesInStrip = npts - 2;
+        unsigned long pointIds[3];
+        pointIds[0] = (unsigned long) pts[0];
+        pointIds[1] = (unsigned long) pts[1];
+        pointIds[2] = (unsigned long) pts[2];
+
+        for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
+        {
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          cellId++;
+          pointIds[0] = pointIds[1];
+          pointIds[1] = pointIds[2];
+          pointIds[2] = pts[t+3];
+        }
       }
     }
     //output->Print(std::cout);

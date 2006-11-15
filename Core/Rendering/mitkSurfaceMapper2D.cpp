@@ -229,11 +229,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         return;
     }
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double vp[3], vnormal[3];
-#else
-    float vp[3], vnormal[3];
-#endif
+    vtkFloatingPointType vp[3], vnormal[3];
 
     vnl2vtk(point.Get_vnl_vector(), vp);
     vnl2vtk(normal.Get_vnl_vector(), vnormal);
@@ -315,11 +311,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   for(i=0;i<numberOfLines;++i)
   {
     int *cell, cellSize;
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double vp[3];
-#else
-    float vp[3];
-#endif
+    vtkFloatingPointType vp[3];
 
     vlines->GetNextCell(cellSize, cell);
 

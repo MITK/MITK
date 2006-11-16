@@ -201,6 +201,21 @@ public:
   itkGetConstMacro(TimeStep, unsigned int);
 
   //##Documentation
+  //## @brief Get the time-step of a BaseData object which
+  //## exists at the time of the currently displayed content
+  //##
+  //## Returns -1 or mitk::BaseData::m_TimeSteps if there
+  //## is no data at the current time.
+  //## \sa GetTimeStep, m_TimeStep
+  int GetTimeStep(mitk::BaseData* data) const;
+
+  //##Documentation
+  //## @brief Get the time in ms of the currently displayed content
+  //##
+  //## \sa GetTimeStep, m_TimeStep
+  mitk::ScalarType GetTime() const;
+
+  //##Documentation
   //## @brief SetWorldGeometry is called according to the geometrySliceEvent,
   //## which is supposed to be a SliceNavigationController::GeometrySendEvent
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);

@@ -202,6 +202,27 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
   }
 }
 
+int mitk::BaseRenderer::GetTimeStep(mitk::BaseData* data) const
+{
+  if(data!=NULL)
+  {
+    return -1;
+  }
+  return data->GetTimeSlicedGeometry()->MSToTimeStep(GetTime());
+}
+
+mitk::ScalarType mitk::BaseRenderer::GetTime() const
+{
+  if(m_TimeSlicedWorldGeometry.IsNull())
+  {
+    return 0;
+  }
+  else
+  {
+    return m_TimeSlicedWorldGeometry->TimeStepToMS(GetTimeStep());
+  }
+}
+
 //##ModelId=3E66CC590379
 void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
 {

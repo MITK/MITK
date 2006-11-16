@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <qobject.h>
+#include <qtimer.h>
 
 class QmitkFctMediator;
 class QTimer;
@@ -29,9 +30,11 @@ public:
   ~QmitkFunctionalityTesting();
 protected slots:
   virtual void ActivateNextFunctionality();
+  virtual void CloseFirstMessageBox();
 protected:
   QmitkFctMediator* m_QmitkFctMediator;
-  QTimer *m_Timer;
+  QTimer m_ActivateTimer;
+  QTimer m_CloseMessagesTimer;
 };
 
 int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);

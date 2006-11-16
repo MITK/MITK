@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qapplication.h>
 #include <qtimer.h>
+#include <qwidgetlist.h>
+#include <qobjectlist.h>
+#include <qmessagebox.h>
 
 #include <stdlib.h>
 #include <iostream>
@@ -29,14 +32,46 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFunctionalityTesting::QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent, const char * name ) 
   : QObject(parent, name), m_QmitkFctMediator(qfm)
 {
-  m_Timer = new QTimer( this );
-  QObject::connect( m_Timer, SIGNAL(timeout()), this, SLOT(ActivateNextFunctionality()) );
+  QObject::connect( &m_ActivateTimer, SIGNAL(timeout()), this, SLOT(ActivateNextFunctionality()) );
+  QObject::connect( &m_CloseMessagesTimer, SIGNAL(timeout()), this, SLOT(CloseFirstMessageBox()) );
 }
 
 QmitkFunctionalityTesting::~QmitkFunctionalityTesting()
 {
 
 }
+
+void QmitkFunctionalityTesting::CloseFirstMessageBox() {
+    bool boxClosed = false;
+    QWidgetList* topWidgets = QApplication::topLevelWidgets();
+    QWidgetListIt topWidgetsIt(*topWidgets);
+    QWidget* widget;
+    while ( ( widget = topWidgetsIt.current()) != 0 ) {
+       ++topWidgetsIt;
+    QObjectList *l = widget->queryList( "QMessageBox" );
+    QObjectListIt it( *l ); 
+    QObject *obj;
+    while ( (obj = it.current()) != 0 ) {
+        ++it;
+        std::cout << "Found a message box! Closing it ..." << std::endl;
+        ((QMessageBox*)obj)->close();
+        boxClosed = true;
+        break;
+    }
+    delete l; // delete the list, not the objects
+    if (boxClosed) {
+      break;
+    }  
+  }
+  delete topWidgets;
+  if (boxClosed) {
+    // let everything redraw and call self
+    m_CloseMessagesTimer.start(5000,true); 
+  } else {
+    std::cout << "No message box closed" << std::endl; 
+  }
+}
+
 
 void QmitkFunctionalityTesting::ActivateNextFunctionality()
 {
@@ -46,8 +81,10 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   if(nextFunctionality != NULL)
   {
     std::cout << "Testing Functionality \"" << nextFunctionality->className() <<"\" "<< std::flush;
-    m_Timer->start( 1000, TRUE ); // 2 seconds single-shot timer
+    m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
     m_QmitkFctMediator->RaiseFunctionality(nextId);
+    m_CloseMessagesTimer.stop();
+    m_ActivateTimer.start(5000,true); // after redraw activate next
   }
   else
   {
@@ -59,10 +96,7 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
 {
   QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
 
-  //QtTestingClass *qttestingclass = new QtTestingClass;
-  QTimer *timer = new QTimer( testing );
-  QObject::connect( timer, SIGNAL(timeout()), testing, SLOT(ActivateNextFunctionality()) );
-  timer->start( 2000, TRUE ); // 2 seconds single-shot timer
+  QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
   std::cout << "Testing Functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;

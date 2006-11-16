@@ -156,7 +156,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
     m_SlicedGeometry->GetBoundingBox()->GetBounds();
 
 //  mitk::SlicedGeometry3D::Pointer correctGeometry = m_SlicedGeometry.GetPointer();
-  mitk::Geometry3D::Pointer geometry = m_SlicedGeometry.GetPointer();
+  mitk::Geometry3D::Pointer geometry = static_cast<mitk::Geometry3D*>(m_SlicedGeometry->Clone().GetPointer());
 
   const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox");
   if(boundingbox->GetPoints()->Size()>0)
@@ -179,7 +179,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
         mitk::TimeSlicedGeometry::New();
 
       timegeometry->InitializeEvenlyTimed(
-        m_SlicedGeometry.GetPointer(), (unsigned int) duration
+        geometry.GetPointer(), (unsigned int) duration
       );
 
       timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME

@@ -17,8 +17,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef MITK_POINTSETCOMPONENT_H
-#define MITK_POINTSETCOMPONENT_H
+#ifndef MITK_SEEDPOINTSETCOMPONENT_H
+#define MITK_SEEDPOINTSETCOMPONENT_H
 
 #include "QmitkInteractionFunctionalityComponent.h"
 
@@ -41,9 +41,9 @@ class QmitkStdMultiWidget;
 * 
 * The PointSetComponent is a class to set two or three Seed-Points with a combination 
 * of the key "shift" and a left-mouse-click on that position in the widget where the 
-* point shall be placed. The point is visible in all fout widget, that also includes 
+* point shall be placed. The point is visible in all four widgets, that also includes 
 * the 3D-view. That component has an point-list-widget that shows the points
-* whith their coordinates. By clicking on of these points in the point-list-widget or
+* whith their coordinates. By clicking on oine of these points in the point-list-widget or
 * on one of the four MPR-widgets it will be marked. A marked point can be moved with
 * the mouse or removed by using the "delete"-key.
 * 
@@ -84,6 +84,15 @@ public:
   /** \brief Method to return the Node that includes the points */
   mitk::DataTreeNode::Pointer GetPointSetNode();
 
+  /** \brief Method to return the ComboBox that includes all GUI-elements instead of the outermost checkable CheckBox and that can be set visible or not*/
+  virtual QGroupBox * GetContentContainer();
+
+  /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
+  virtual QGroupBox * GetMainCheckBoxContainer();
+
+  /** \brief Method to that the name of the PointSetNode in the dataTree */
+  void SetDataTreeName(std::string pointSetNodeName);
+
   /***************      (DE)ACTIVATED     ***************/
 
   ///** \brief Method to set m_Activated to true */
@@ -101,24 +110,30 @@ public slots:
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
+    /** \brief Method to set the Image Selector visible or invisible */
+  void SetContentContainerVisibility(bool visible);
+
 protected:
 
   /************ Update DATATREECOMBOBOX(ES) *************/
   virtual void UpdateDataTreeComboBoxes();
 
-
 private:
-
+ void CreatePointSetNode();
+ void IsNodeExisting();
   /***************        ATTRIBUTES      ***************/
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
   QmitkSeedPointSetComponentGUI * m_PointSetComponentGUI;
+  bool m_PointSetNodeExisting;
 
 
   /*!
   * Node for the seed-points 
   */
   mitk::DataTreeNode::Pointer m_PointSetNode;
+
+  mitk::DataTreeIteratorBase* m_It;
 
   /*!
   * Interactor for the seed-points
@@ -129,6 +144,11 @@ private:
   * PointSetPointer for the seed-points 
   */
   mitk::PointSet::Pointer m_Seeds;
+
+  /*!
+  * Name of the PointSetNode that can be set by - \ref SetDataTreeName(QString * pointSetNodeName) 
+  */
+  std::string  m_PointSetNodeName;
 
 
 

@@ -63,8 +63,9 @@ class QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComp
     QWidget* GetGUI();
 
 /***************   GET COMPONENT NAME   ***************/
-QString SetComponentName();
+QString GetComponentName();
 
+QmitkStdMultiWidget * GetMultiWidget();
 
 
   
@@ -92,6 +93,8 @@ virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
 
   /** \brief Graphical User Interface for the component in general QWidget-Type */
   QWidget* m_GUI;
+
+  QmitkStdMultiWidget * m_MultiWidget;
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;

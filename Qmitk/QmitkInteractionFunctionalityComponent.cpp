@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkInteractionFunctionalityComponent::QmitkInteractionFunctionalityComponent(QObject *parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt, bool updateSelector, bool showSelector)
 : QmitkBaseFunctionalityComponent(parent, parentName, dataIt),
 m_GUI(NULL),
+m_MultiWidget(mitkStdMultiWidget),
 m_Active(true),
 m_SelectedItem(NULL)
 {
@@ -47,7 +48,7 @@ void QmitkInteractionFunctionalityComponent::SetComponentName(QString name)
 }
 
 /***************   GET COMPONENT NAME   ***************/
-QString QmitkInteractionFunctionalityComponent::SetComponentName()
+QString QmitkInteractionFunctionalityComponent::GetComponentName()
 {
   return m_Name;
 }
@@ -64,6 +65,11 @@ QWidget* QmitkInteractionFunctionalityComponent::GetGUI()
   return m_GUI;
 }
 
+/***************   GET MULTI WIDGET     ***************/
+QmitkStdMultiWidget * QmitkInteractionFunctionalityComponent::GetMultiWidget()
+{
+ return m_MultiWidget;
+}
 /*************** TREE CHANGED (       ) ***************/
 void QmitkInteractionFunctionalityComponent::TreeChanged()
 {

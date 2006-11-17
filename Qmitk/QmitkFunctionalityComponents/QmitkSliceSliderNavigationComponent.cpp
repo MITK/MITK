@@ -87,6 +87,9 @@ void QmitkSliceSliderNavigationComponent::CreateConnections()
    
     connect( (QObject*)(m_SliceSliderComponentGUI->GetSliceSliderNavigator()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(HideOrShow()));  
     connect( (QObject*)(m_SliceSliderComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(HideOrShow()));  
+
+    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+    connect( (QObject*)(m_SliceSliderComponentGUI->GetSliceSliderNavigator()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
   }
 }
 
@@ -176,4 +179,19 @@ QWidget* QmitkSliceSliderNavigationComponent::CreateControlWidget(QWidget* paren
 
   return m_SliceSliderComponentGUI;
 }
+
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkSliceSliderNavigationComponent::GetContentContainer()
+{
+ return m_SliceSliderComponentGUI->GetSliceSliderNavigatorContentGroupBox();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkSliceSliderNavigationComponent::GetMainCheckBoxContainer()
+{
+ return m_SliceSliderComponentGUI->GetSliceSliderNavigator();
+}
+
+
+
 

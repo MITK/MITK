@@ -112,7 +112,10 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 
     //Button "create new manipulated image" pressed
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetCreateNewManipulatedImageButton()), SIGNAL(clicked()), (QObject*) this, SLOT(PipelineControllerToCreateManipulatedImage()));
-    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int)));    
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int))); 
+
+    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
   }
 }
 
@@ -230,10 +233,22 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
   return m_PixelGreyValueManipulatorComponentGUI;
 }
 
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkPixelGreyValueManipulatorComponent::GetContentContainer()
+{
+ return m_PixelGreyValueManipulatorComponentGUI->GetPixelManipulatorContentGroupBox();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkPixelGreyValueManipulatorComponent::GetMainCheckBoxContainer()
+{
+ return m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox();
+}
+
 /*************** CREATE SEEDPOINT WIDGET **************/
 void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
 {
-  m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMulitWidget(), m_DataIt);
+  m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);
   m_PointSet->CreateControlWidget(m_PixelGreyValueManipulatorComponentGUI);
   m_AddedChildList.push_back(m_PointSet);
     //  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
@@ -245,6 +260,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
   m_PointSet->CreateConnections();
   m_PixelGreyValueManipulatorComponentGUI->repaint();
 }
+
 
 /************** SET SELECTOR VISIBILITY ***************/
 void QmitkPixelGreyValueManipulatorComponent::SetSelectorVisibility(bool visibility)
@@ -265,38 +281,6 @@ void QmitkPixelGreyValueManipulatorComponent::Activated()
   {
     m_AddedChildList[i]->Activated();
   } 
-
-
-
-  ////BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
-  //if (m_SeedPointSetNode.IsNull())
-  //{
-  //  //SeedPoints are to define the two Points for the ThresholdGradient
-  //  //add Point with crtl + leftMouseButton
-  //  m_Seeds = mitk::PointSet::New();
-
-  //  m_SeedPointSetNode = mitk::DataTreeNode::New();
-  //  m_SeedPointSetNode->SetData(m_Seeds);
-  //  mitk::ColorProperty::Pointer color = new mitk::ColorProperty(0.2, 0.0, 0.8);
-  //  mitk::Point3D colorTwo; 
-  //  mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
-  //  m_PixelGreyValueManipulatorComponentGUI->GetQmitkPointListWidget()->SwitchInteraction(&m_SeedPointSetInteractor, &m_SeedPointSetNode, 2, colorTwo,"SeedPoints ");  //-1 for unlimited points
-  //  m_SeedPointSetNode->SetProperty("color",color);
-  //  m_SeedPointSetNode->SetIntProperty("layer", 101);
-  //  m_SeedPointSetNode->SetProperty("name", new mitk::StringProperty("SeedPoints"));
-
-  //  m_SeedPointSetInteractor = new mitk::PointSetInteractor("seedpointsetinteractor", m_SeedPointSetNode, 2);
-
-  //  m_DataTreeIterator.GetPointer()->Add(m_SeedPointSetNode);
-
-  //  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointSetInteractor);
-  //}
-  //else 
-  //{
-  //  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointSetInteractor);
-  //}
-  ////END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
-
 }
 
 /***************       DEACTIVATED      ***************/
@@ -307,14 +291,6 @@ void QmitkPixelGreyValueManipulatorComponent::Deactivated()
   {
     m_AddedChildList[i]->Deactivated();
   } 
-
-  ////BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
-  ////deactivate m_SeedPointSetNode when leaving SurfaceCreator
-  //if (m_SeedPointSetNode.IsNotNull())
-  //{
-  //  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointSetInteractor);
-  //}
-  ////END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
 }
 
 /***************      SET THRESHOLD     ***************/

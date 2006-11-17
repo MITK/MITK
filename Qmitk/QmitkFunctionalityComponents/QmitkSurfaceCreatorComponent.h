@@ -89,6 +89,15 @@ public:
   /** \brief Method to set the ExpertMode visible or invisible */
   virtual void SetExpertMode(bool visibility);
 
+      /** \brief Method to return the ComboBox that includes all GUI-elements instead of the outermost checkable CheckBox and that can be set visible or not*/
+  virtual QGroupBox * GetContentContainer();
+
+    /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
+  virtual QGroupBox * GetMainCheckBoxContainer();
+
+ ///** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
+ //virtual void SetContentContainerVisibility();
+
 
 public slots:  
   /***************      OHTER METHODS     ***************/

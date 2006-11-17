@@ -128,6 +128,9 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSmoothCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetSmoothFlag(bool)));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetGaussCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetGaussFlag(bool)));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetDecimateCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetDecimateFlag(bool)));
+
+    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
   }
 }
 
@@ -238,6 +241,31 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
     m_ParameterList[i]->setEnabled(true);
   }
 }
+
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkSurfaceCreatorComponent::GetContentContainer()
+{
+ return m_SurfaceCreatorComponentGUI->GetCreateSurfaceGroupBox();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkSurfaceCreatorComponent::GetMainCheckBoxContainer()
+{
+ return m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox();
+}
+
+///*********** SET CONTENT CONTAINER VISIBLE ************/
+//void QmitkSurfaceCreatorComponent::SetContentContainerVisibility()
+//{
+//     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      if(m_AddedChildList[i]->GetContentContainer() != NULL)
+//      {
+//        m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
+//      }
+//    } 
+//}
+
 
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkSurfaceCreatorComponent::ShowImageContent(bool)

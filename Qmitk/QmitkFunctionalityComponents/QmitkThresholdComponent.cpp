@@ -86,7 +86,10 @@ void QmitkThresholdComponent::CreateConnections()
 
     connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdInputSlider()), SIGNAL(sliderMoved(int)), (QObject*) this, SLOT(ThresholdSliderChanged(int)));
     connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdInputNumber()), SIGNAL(returnPressed()), (QObject*) this, SLOT(ThresholdValueChanged()));    
-    connect( (QObject*)(m_ThresholdComponentGUI->GetShowThresholdGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThreshold(bool)));     
+    connect( (QObject*)(m_ThresholdComponentGUI->GetShowThresholdGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThreshold(bool)));  
+
+    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+    connect( (QObject*)(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
   }
 }
 
@@ -158,6 +161,30 @@ QWidget* QmitkThresholdComponent::CreateControlWidget(QWidget* parent)
 
   return m_ThresholdComponentGUI;
 }
+
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkThresholdComponent::GetContentContainer()
+{
+ return m_ThresholdComponentGUI->GetContainerContent();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkThresholdComponent::GetMainCheckBoxContainer()
+{
+ return m_ThresholdComponentGUI->GetThresholdFinderGroupBox();
+}
+
+///*********** SET CONTENT CONTAINER VISIBLE ************/
+//void QmitkThresholdComponent::SetContentContainerVisibility()
+//{
+//     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+//    {
+//      if(m_AddedChildList[i]->GetContentContainer() != NULL)
+//      {
+//        m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
+//      }
+//    } 
+//}
 
 /***************        ACTIVATED       ***************/
 void QmitkThresholdComponent::Activated()
@@ -313,6 +340,7 @@ void QmitkThresholdComponent::SetSliderRange()
   }
 }
 
+///***************  DELETE THRESHOLD NODE  **************/
 void QmitkThresholdComponent::DeleteThresholdNode()
 {
   if(m_ThresholdImageNode)

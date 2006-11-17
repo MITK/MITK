@@ -31,6 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
+
+#include "QmitkSeedPointSetComponent.h"
+
       //#include <vtkImageGaussianSmooth.h>
 #include <vtkPolyDataConnectivityFilter.h>
       //#include <vtkRenderer.h>
@@ -49,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
       //#include <vtkRenderWindow.h>
 #include <vtkSTLWriter.h>
 
-
+#include <qlayout.h>
 #include <qlineedit.h>
 #include <qslider.h>
 #include <qgroupbox.h>
@@ -61,14 +64,13 @@ QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * par
 : QmitkInteractionFunctionalityComponent(parent, parentName, mitkStdMultiWidget, it),
 m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),
-m_PointSetNode(NULL),
-m_PointSetInteractor(NULL),
-m_Seeds(NULL)
+m_DataIt(it),
+m_PointSet(NULL)
 {
   SetDataTreeIterator(it);
   SetAvailability(true);
 
-  SetComponentName("PointSet");
+  SetComponentName("ConnectivityFilterComponent");
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -121,6 +123,9 @@ void QmitkConnectivityFilterComponent::CreateConnections()
     //Button to start the connectFilter pressed:
     connect((QObject*)(m_ConnectivityFilterComponentGUI->GetStartFilterPushButton()), SIGNAL(clicked()), (QObject*) this, SLOT(StartConnectivityFilter()));
 
+    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+    connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
+
   }
 }
 
@@ -168,7 +173,60 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
 
+  CreatePointSet();
   return m_ConnectivityFilterComponentGUI;
+}
+
+/*************** CREATE SEEDPOINT WIDGET **************/
+void QmitkConnectivityFilterComponent::CreatePointSet()
+{
+  m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);
+  m_PointSet->CreateControlWidget(m_ConnectivityFilterComponentGUI);
+  m_AddedChildList.push_back(m_PointSet);
+  m_ConnectivityFilterComponentGUI->layout()->add(m_PointSet->GetGUI());
+  m_PointSet->CreateConnections();
+  m_PointSet->SetDataTreeName("SeedPointsForConnectivity");
+  m_ConnectivityFilterComponentGUI->repaint();
+}
+
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkConnectivityFilterComponent::GetContentContainer()
+{
+ return m_ConnectivityFilterComponentGUI->GetComponentContent();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkConnectivityFilterComponent::GetMainCheckBoxContainer()
+{
+ return m_ConnectivityFilterComponentGUI->GetShowComponent();
+}
+
+/*********** SET CONTENT CONTAINER VISIBLE ************/
+void QmitkConnectivityFilterComponent::SetContentContainerVisibility(bool)
+{
+  if(GetMainCheckBoxContainer() != NULL)
+  {
+    if(GetMainCheckBoxContainer()->isChecked())
+    {
+      Activated();
+    }
+    else
+    {
+      Deactivated();
+    }
+  }
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    if(m_AddedChildList[i]->GetContentContainer() != NULL)
+    {
+      m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
+    }
+    if(m_AddedChildList[i]->GetMainCheckBoxContainer() != NULL)
+    {
+      m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
+    }
+    m_AddedChildList[i]->SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
+  } 
 }
 
 /***************        ACTIVATED       ***************/
@@ -177,44 +235,21 @@ void QmitkConnectivityFilterComponent::Activated()
   QmitkBaseFunctionalityComponent::Activated();
   m_Active = true;
   TreeChanged();
-
-    if (m_PointSetNode.IsNull())
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
-    //Points are to define the two Points for the ThresholdGradient
-    //add Point with crtl + leftMouseButton
-    m_Seeds = mitk::PointSet::New();
-
-    m_PointSetNode = mitk::DataTreeNode::New();
-    m_PointSetNode->SetData(m_Seeds);
-    mitk::ColorProperty::Pointer color = new mitk::ColorProperty(0.2, 0.0, 0.8);
-    mitk::Point3D colorTwo; 
-    mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
-    m_ConnectivityFilterComponentGUI->GetPointListWidget()->SwitchInteraction(&m_PointSetInteractor, &m_PointSetNode, 2, colorTwo,"Points ");  //-1 for unlimited points
-    m_PointSetNode->SetProperty("color",color);
-    m_PointSetNode->SetIntProperty("layer", 101);
-    m_PointSetNode->SetProperty("name", new mitk::StringProperty("SeedPointsForConnectiviy"));
-
-    m_PointSetNode->SetProperty( "SeedPoints", new mitk::BoolProperty(true));
-
-    m_PointSetInteractor = new mitk::PointSetInteractor("pointsetinteractor", m_PointSetNode, 2);
-
-    m_DataTreeIterator.GetPointer()->Add(m_PointSetNode);
-
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
-  }
-  else 
-  {
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
-  }
+    m_AddedChildList[i]->Activated();
+  } 
 }
 
 /***************       DEACTIVATED      ***************/
 void QmitkConnectivityFilterComponent::Deactivated()
 {
- if (m_PointSetNode.IsNotNull())
- {
-   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
- }
+  QmitkBaseFunctionalityComponent::Deactivated();
+  m_Active = false;
+   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
 }
 
 
@@ -313,7 +348,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
     case 7: /*ShowClosestPointRegion*/
       {
-                mitk::PointSet::Pointer pointSet = m_Seeds;
+        mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
         int numberOfPoints = pointSet->GetSize();
 
         if(numberOfPoints > 0)

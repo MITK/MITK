@@ -17,8 +17,8 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef MITK_POINTSETCOMPONENT_H
-#define MITK_POINTSETCOMPONENT_H
+#ifndef MITK_CONNECTIVITYFILTERCOMPONENT_H
+#define MITK_CONNECTIVITYFILTERCOMPONENT_H
 
 #include "QmitkInteractionFunctionalityComponent.h"
 
@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 class QmitkConnectivityFilterComponentGUI;
+class QmitkSeedPointSetComponent;
 class QmitkStdMultiWidget;
 
 /**
@@ -84,6 +85,12 @@ public:
   /** \brief Method to return the Node that includes the points */
   mitk::DataTreeNode::Pointer GetPointSetNode();
 
+  /** \brief Method to return the ComboBox that includes all GUI-elements instead of the outermost checkable CheckBox and that can be set visible or not*/
+  virtual QGroupBox * GetContentContainer();
+
+  /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
+  virtual QGroupBox * GetMainCheckBoxContainer();
+
   /***************      (DE)ACTIVATED     ***************/
 
   ///** \brief Method to set m_Activated to true */
@@ -103,13 +110,21 @@ public slots:
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
+  /** \brief Method to set the Image Selector visible or invisible */
+  void SetContentContainerVisibility(bool visible);
+
 protected:
 
   /************ Update DATATREECOMBOBOX(ES) *************/
   virtual void UpdateDataTreeComboBoxes();
 
 
+
+
 private:
+
+  /** \brief Method to create the pointset-object that is necessary for some connectivity-options. See also  - \ref QmitkSeedPointSetComponent*/
+  void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
 
@@ -122,7 +137,7 @@ private:
   */
   mitk::DataTreeNode::Pointer m_ConnectivityNode;
 
-    /*!
+  /*!
   * Node for the seed-points 
   */
   mitk::DataTreeNode::Pointer m_PointSetNode;
@@ -136,7 +151,11 @@ private:
   /*!
   * PointSetPointer for the seed-points for threshold-gradient
   */
-  mitk::PointSet::Pointer m_Seeds;
+  //mitk::PointSet::Pointer m_Seeds;
+
+  mitk::DataTreeIteratorBase* m_DataIt;
+
+  QmitkSeedPointSetComponent* m_PointSet;
 
 
 

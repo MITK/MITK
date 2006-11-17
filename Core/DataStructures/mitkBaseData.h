@@ -266,7 +266,7 @@ protected:
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-#if ITK_VERSION_MAJOR == 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
+#if ITK_VERSION_MAJOR >= 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
   bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 #endif

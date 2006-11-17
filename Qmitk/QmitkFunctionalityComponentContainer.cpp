@@ -28,7 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include <qobjectlist.h>
 #include <qcombobox.h>
+
 //#include <qlayout.h>
+
+#include <vector>
+
 
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -103,7 +107,7 @@ QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector
 }
 
 /******** *******    GET MULTI WIDGET    ***************/
-QmitkStdMultiWidget * QmitkFunctionalityComponentContainer::GetMulitWidget()
+QmitkStdMultiWidget * QmitkFunctionalityComponentContainer::GetMultiWidget()
 {
   return m_MulitWidget;
 }
@@ -145,6 +149,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
   if ( m_FunctionalityComponentContainerGUI )
   {
     connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetContainerBorder()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));    
   }
 }
 
@@ -177,6 +182,46 @@ QWidget* QmitkFunctionalityComponentContainer::CreateControlWidget(QWidget* pare
   CreateConnections();
   m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   return m_GUI;
+}
+
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkFunctionalityComponentContainer::GetContentContainer()
+{
+ return m_FunctionalityComponentContainerGUI->GetSelectDataGroupBox();
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkFunctionalityComponentContainer::GetMainCheckBoxContainer()
+{
+ return m_FunctionalityComponentContainerGUI->GetContainerBorder();
+}
+
+/*********** SET CONTENT CONTAINER VISIBLE ************/
+void QmitkFunctionalityComponentContainer::SetContentContainerVisibility(bool)
+{
+  if(GetMainCheckBoxContainer() != NULL)
+  {
+    if(GetMainCheckBoxContainer()->isChecked())
+    {
+      Activated();
+    }
+    else
+    {
+      Deactivated();
+    }
+  }
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    if(m_AddedChildList[i]->GetContentContainer() != NULL)
+    {
+      m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
+    }
+    if(m_AddedChildList[i]->GetMainCheckBoxContainer() != NULL)
+    {
+      m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
+    }
+    m_AddedChildList[i]->SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
+  } 
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
@@ -218,7 +263,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
   if(component!=NULL)
   {
     QWidget* componentWidget = component->CreateControlWidget(m_GUI);
-    m_AddedChildList.push_back(component);
+    AddComponentListener(component);
     m_GUI->layout()->add(componentWidget);
     component->CreateConnections();
     if(m_Spacer != NULL)

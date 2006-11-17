@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 #include <qwidgetstack.h>
 #include "mitkDataTree.h"
-#include <vector>
 #include <qstring.h>
 #include <qobject.h>
 #include <mitkDataTreeFilter.h>
@@ -102,9 +101,14 @@ public:
   /** \brief Method to set the Image Selector visible or invisible */
   virtual void SetSelectorVisibility(bool visibility);
 
-  QmitkStdMultiWidget * GetMulitWidget();
+  QmitkStdMultiWidget * GetMultiWidget();
 
-  
+    /** \brief Method to return the ComboBox that includes all GUI-elements instead of the outermost checkable CheckBox and that can be set visible or not*/
+  virtual QGroupBox * GetContentContainer();
+
+    /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
+  virtual QGroupBox * GetMainCheckBoxContainer();
+
 
   /***************     ADD COMPONENTS     ***************/
 
@@ -128,6 +132,9 @@ protected slots:
 
 public slots:
 
+   /** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
+ virtual void SetContentContainerVisibility(bool);
+
   /*************** TREE CHANGED (       ) ***************/
   // /** \brief The TreeChanged-slot-method updates the TreeNodeSelector if the datatree changes. */
   virtual void TreeChanged();
@@ -138,7 +145,7 @@ public slots:
 
 protected:
 
-  QmitkStdMultiWidget *GetMultiWidget();
+  //QmitkStdMultiWidget *GetMultiWidget();
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
   virtual void UpdateDataTreeComboBoxes();
@@ -149,9 +156,6 @@ protected:
 
   /** \brief Graphical User Interface for the component in general QWidget-Type */
   QWidget* m_GUI;
-
-  /** \brief Vector with all added components */
-  std::vector<QmitkBaseFunctionalityComponent*> m_AddedChildList;      
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;

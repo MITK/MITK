@@ -48,6 +48,12 @@ void QmitkFunctionalityTesting::CloseFirstMessageBox() {
     QWidget* widget;
     while ( ( widget = topWidgetsIt.current()) != 0 ) {
        ++topWidgetsIt;
+       if (widget->isA("QMessageBox")) {
+        std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
+         ((QMessageBox*)widget)->close();
+         boxClosed=true;
+         break;
+       }
     QObjectList *l = widget->queryList( "QMessageBox" );
     QObjectListIt it( *l ); 
     QObject *obj;

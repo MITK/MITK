@@ -51,7 +51,7 @@ QGroupBox * QmitkConnectivityFilterComponentGUI::GetComponentContent()
 
 QGroupBox* QmitkConnectivityFilterComponentGUI::GetShowComponent()
 {
-  return m_PointSet;
+  return m_ConnectivityFilter;
 }
 
 
@@ -91,13 +91,4 @@ QCheckBox* QmitkConnectivityFilterComponentGUI::GetReplaceSurfaceCheckBox()
 }
 
 
-QmitkPointListWidget* QmitkConnectivityFilterComponentGUI::GetPointListWidget()
-{
-  return m_PointListWidget;
-}
 
-
-QGroupBox* QmitkConnectivityFilterComponentGUI::GetPointListWidgetGroupBox()
-{
- return m_PointListGroupBox;
-}

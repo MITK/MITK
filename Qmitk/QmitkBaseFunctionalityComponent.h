@@ -44,6 +44,9 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "mitkDataTree.h"
 #include <qstring.h>
 #include <qobject.h>
+#include <vector>
+
+class QGroupBox;
 
 #include "mitkDataTreeFilter.h"
 
@@ -100,6 +103,15 @@ public:
   */
   virtual QString GetFunctionalityName();
 
+    /*************** GET CONTENT CONTAINER  ***************/
+virtual QGroupBox * GetContentContainer();
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+virtual QGroupBox * GetMainCheckBoxContainer();
+
+ /** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
+ virtual void SetContentContainerVisibility(bool);
+
   /***************      OHTER METHODS     ***************/
   /*!
   \brief called when a functionality becomes active/visible. Often, event-handlers are connected (e.g., 
@@ -141,6 +153,17 @@ protected:
   virtual void SetAvailability(bool available);
 
   QObject* GetParent();
+
+    /** \brief Vector with all added components */
+  std::vector<QmitkBaseFunctionalityComponent*> m_AddedChildList;   
+
+  
+  /********************SIGN ON / OFF ************************************/
+  
+   
+  void AddComponentListener(QmitkBaseFunctionalityComponent* component);
+
+  void RemoveComponentListener(QmitkBaseFunctionalityComponent* component);
 
 
   /***************        ATTRIBUTES      ***************/

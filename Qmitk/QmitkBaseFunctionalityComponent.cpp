@@ -86,11 +86,29 @@ QString QmitkBaseFunctionalityComponent::GetFunctionalityName()
 
 
 
+/***************       GET PARENT       ***************/
   QObject* QmitkBaseFunctionalityComponent::GetParent()
   {
    return m_Parent;
   }
 
+/*************** GET CONTENT CONTAINER  ***************/
+QGroupBox * QmitkBaseFunctionalityComponent::GetContentContainer()
+{
+ return (QGroupBox*) NULL;
+}
+
+/************ GET MAIN CHECK BOX CONTAINER ************/
+QGroupBox * QmitkBaseFunctionalityComponent::GetMainCheckBoxContainer()
+{
+ return (QGroupBox*) NULL;
+}
+
+/*********** SET CONTENT CONTAINER VISIBLE ************/
+void QmitkBaseFunctionalityComponent::SetContentContainerVisibility(bool)
+{
+
+}
 
 /***************        ACTIVATED       ***************/
 void QmitkBaseFunctionalityComponent::Activated()
@@ -122,5 +140,29 @@ void QmitkBaseFunctionalityComponent::SetAvailability(bool available)
   this->m_Available = available;
 }
 
-
-
+/*************** ADD COMPONENT LISTENER ***************/
+void QmitkBaseFunctionalityComponent::AddComponentListener(QmitkBaseFunctionalityComponent* component)
+{  
+  if(component!=NULL)
+  {
+    m_AddedChildList.push_back(component);
+  }
+}
+ 
+/************* REMOVE COMPONENT LISTENER **************/
+void QmitkBaseFunctionalityComponent::RemoveComponentListener(QmitkBaseFunctionalityComponent* component)
+{  
+  if(component!=NULL)
+  {
+    std::vector<QmitkBaseFunctionalityComponent*>::iterator it = m_AddedChildList.begin();   
+    while (it != m_AddedChildList.end()) 
+    {
+      if(*it == component) 
+      {
+        m_AddedChildList.erase(it);
+        break;
+      }
+      ++it; 
+    }
+  }
+}

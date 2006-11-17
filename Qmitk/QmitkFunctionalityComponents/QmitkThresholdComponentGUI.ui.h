@@ -82,3 +82,9 @@ QCheckBox* QmitkThresholdComponentGUI::GetDeleateImageIfDeactivatedCheckBox()
 {
   return m_DeleateImageIfDeactivatedCheckBox;
 }
+
+
+QGroupBox* QmitkThresholdComponentGUI::GetContainerContent()
+{
+  return m_ContainerContent;
+}

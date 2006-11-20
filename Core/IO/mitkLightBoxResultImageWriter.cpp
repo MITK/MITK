@@ -41,11 +41,11 @@ const mitk::Image *mitk::LightBoxResultImageWriter::GetInput(void)
   return NULL;
 }
 
-void mitk::LightBoxResultImageWriter::SetInput(const mitk::Image *image)
+void mitk::LightBoxResultImageWriter::SetInput(const mitk::Image *)
 {
 }
 
-void mitk::LightBoxResultImageWriter::SetInputByNode(const mitk::DataTreeNode *node)
+void mitk::LightBoxResultImageWriter::SetInputByNode(const mitk::DataTreeNode *)
 {
 }
 
@@ -55,16 +55,16 @@ const mitk::Image *mitk::LightBoxResultImageWriter::GetSourceImage(void)
 }
 
 /// set the image that should be stored to the database
-void mitk::LightBoxResultImageWriter::SetSourceImage(const mitk::Image *source)
+void mitk::LightBoxResultImageWriter::SetSourceImage(const mitk::Image *)
 {
 }
 
 /// set the "example image" that is needed for writing (and already existent in the database)
-bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator)
+bool mitk::LightBoxResultImageWriter::SetSourceByTreeSearch(mitk::DataTreeIteratorBase* )
 {
   return false;
 }
-void mitk::LightBoxResultImageWriter::SetLightBox(QcLightbox* lightbox)
+void mitk::LightBoxResultImageWriter::SetLightBox(QcLightbox* )
 {
 }
 

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/vnl_cross.h>
 #include <stdlib.h>
 
-void mitk::LightBoxImageReader::SetLightBox(QcLightbox* lightbox)
+void mitk::LightBoxImageReader::SetLightBox(QcLightbox*)
 {
 }
 void mitk::LightBoxImageReader::SetLightBoxToCurrentLightBox()

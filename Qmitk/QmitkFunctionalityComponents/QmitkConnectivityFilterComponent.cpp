@@ -373,11 +373,8 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
   numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
 //
   //to set different colors 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double* range = pdConnectivity->GetOutput()->GetPointData()->GetScalars()->GetRange();
-#else
-  float* range = pdConnectivity->GetOutput()->GetPointData()->GetScalars()->GetRange();
-#endif
+  vtkFloatingPointType* range = pdConnectivity->GetOutput()->GetPointData()->GetScalars()->GetRange();
+
   float scalarsMin = range[0];
   float scalarsMax = range[1];
 

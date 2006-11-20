@@ -126,15 +126,9 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   //due to different params in VTK (double/float) we have to convert!
 
   //vars to convert to
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double unselectedColor[4]={1.0f,1.0f,1.0f,1.0f};
-  double selectedColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-  double contourColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-#else
-  float unselectedColor[4]={1.0f,1.0f,1.0f,1.0f};
-  float selectedColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-  float contourColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-#endif
+  vtkFloatingPointType unselectedColor[4]={1.0f,1.0f,1.0f,1.0f};
+  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,0.0f};//red
+  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,0.0f};//red
 
   mitk::Color tmpColor;
 
@@ -280,7 +274,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   {
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType = pointDataIter.Value().pointSpec;
-    
+
 #if (VTK_MAJOR_VERSION >= 5)
     vtkPolyDataAlgorithm *source;
 #else
@@ -294,7 +288,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
-   
+
         //MouseOrientation Tool (PositionTracker)
         if(isInputDevice)
         {

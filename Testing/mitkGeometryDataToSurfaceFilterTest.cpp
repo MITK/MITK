@@ -78,11 +78,8 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
     std::cout<<"[PASSED]"<<std::endl;
   }
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-#else
-  float bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-#endif
+  vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
   vtkPolyData* polys = surface->GetVtkPolyData();
   polys->ComputeBounds();
   polys->GetBounds( bounds );

@@ -90,11 +90,7 @@ bool mitk::ContourInteractor::ExecuteAction(mitk::Action* action, mitk::StateEve
 #endif
 
     sender->GetVtkRenderer()->DisplayToWorld();
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
-#else
-    float *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
-#endif
+    vtkFloatingPointType *vtkwp = sender->GetVtkRenderer()->GetWorldPoint();
     vtk2itk(vtkwp, eventPoint);
   }
   else

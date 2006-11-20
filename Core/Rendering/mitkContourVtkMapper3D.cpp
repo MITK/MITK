@@ -103,12 +103,8 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::Contour::PointsContainerPointer contourPoints = input->GetPoints();
     mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double vtkpoint[3];
-#else
-    float vtkpoint[3];
-#endif
-    
+    vtkFloatingPointType vtkpoint[3];
+
     int i;
     float pointSize = 2;
     this->GetDataTreeNode()->GetFloatProperty("spheres size", pointSize);
@@ -170,11 +166,7 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     {
       m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
     }
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[4]={0.0f,1.0f,0.0f,0.6f};
-#else
-    float rgba[4]={0.0f,1.0f,0.0f,0.6f};
-#endif
+    vtkFloatingPointType rgba[4]={0.0f,1.0f,0.0f,0.6f};
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }

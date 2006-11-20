@@ -194,11 +194,7 @@ void mitk::SplineVtkMapper3D::ApplyProperties()
 
 
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
-#else
-  float rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
-#endif
+  vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 
   //getting the color from DataTreeNode
   float temprgba[4];

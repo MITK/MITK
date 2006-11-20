@@ -57,7 +57,7 @@ void mitk::ClosedSpline::CreateSpline()
   m_SplineZ->RemoveAllPoints();
 
   PointType inputPoint;
-  vtkFloatingPointType t, tStart, tEnd;
+  vtkFloatingPointType t, tStart(0), tEnd(0);
 
   // Add input points to the spline and assign each the parametric value t
   // derived from the point euclidean distances.

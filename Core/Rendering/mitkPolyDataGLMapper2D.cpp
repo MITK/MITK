@@ -155,20 +155,12 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
             if ( m_ColorByCellData )
             {  // color each cell according to cell data
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-              double * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
-#else
-              float * color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
-#endif
-                glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
+              vtkFloatingPointType* color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+              glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
             if ( m_ColorByPointData )
             {
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-              double* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
-#else
-              float* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
-#endif
+              vtkFloatingPointType* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
               glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
             }
 

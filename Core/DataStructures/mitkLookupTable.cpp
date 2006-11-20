@@ -49,8 +49,8 @@ const std::string mitk::LookupTable::RAMP = "RAMP";
 
 mitk::LookupTable::LookupTable()
 {
-    m_LookupTable = vtkLookupTable::New();
-    this->SetRequestedRegionToLargestPossibleRegion();
+  m_LookupTable = vtkLookupTable::New();
+  this->SetRequestedRegionToLargestPossibleRegion();
 }
 
 
@@ -59,11 +59,11 @@ mitk::LookupTable::~LookupTable()
 
 void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 {
-    if (m_LookupTable != lut)
-    {
-        m_LookupTable = lut;
-        this->Modified();
-    }
+  if (m_LookupTable != lut)
+  {
+    m_LookupTable = lut;
+    this->Modified();
+  }
 
 }
 
@@ -71,113 +71,105 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 void mitk::LookupTable::ChangeOpacityForAll( float opacity )
 {
 
-    int noValues = m_LookupTable->GetNumberOfTableValues ();
+  int noValues = m_LookupTable->GetNumberOfTableValues ();
 
+  vtkFloatingPointType rgba[ 4 ];
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ];
-#else
-    float rgba[ 4 ];
-#endif
-
-    for ( int i = 0;i < noValues;i++ )
-    {
-        m_LookupTable->GetTableValue ( i, rgba );
-        rgba[ 3 ] = opacity;
-        m_LookupTable->SetTableValue ( i, rgba );
-    }
-    this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+  for ( int i = 0;i < noValues;i++ )
+  {
+    m_LookupTable->GetTableValue ( i, rgba );
+    rgba[ 3 ] = opacity;
+    m_LookupTable->SetTableValue ( i, rgba );
+  }
+  this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
 }
 
 void mitk::LookupTable::ChangeOpacity(int index, float opacity )
 {
 
-    int noValues = m_LookupTable->GetNumberOfTableValues ();
-    if (index>noValues)
-    {
-      std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
-      return;
-    }
-    
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ];
-#else
-    float rgba[ 4 ];
-#endif
-    m_LookupTable->GetTableValue ( index, rgba );
-    rgba[ 3 ] = opacity;
-    m_LookupTable->SetTableValue ( index, rgba );
+  int noValues = m_LookupTable->GetNumberOfTableValues ();
+  if (index>noValues)
+  {
+    std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
+    return;
+  }
 
-    this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+  vtkFloatingPointType rgba[ 4 ];
+
+  m_LookupTable->GetTableValue ( index, rgba );
+  rgba[ 3 ] = opacity;
+  m_LookupTable->SetTableValue ( index, rgba );
+
+  this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
 }
 
 
 vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
 {
-    return m_LookupTable;
+  return m_LookupTable;
 };
 
 mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() const
 {
 
-    if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
-    return m_LookupTable->GetPointer( 0 );
+  if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
+  return m_LookupTable->GetPointer( 0 );
 };
 
 /*!
- * \brief equality operator inplementation
- */
+* \brief equality operator inplementation
+*/
 bool mitk::LookupTable::operator==( const mitk::LookupTable& LookupTable ) const
 {
-    if ( m_LookupTable == LookupTable.GetVtkLookupTable() )
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+  if ( m_LookupTable == LookupTable.GetVtkLookupTable() )
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /*!
- * \brief equality operator inplementation
- */
+* \brief equality operator inplementation
+*/
 bool mitk::LookupTable::operator!=( const mitk::LookupTable& LookupTable ) const
 {
 
-    if ( m_LookupTable == ( LookupTable.GetVtkLookupTable() ) )
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+  if ( m_LookupTable == ( LookupTable.GetVtkLookupTable() ) )
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 
 }
 
 /*!
- * \brief non equality operator inplementation
- */
+* \brief non equality operator inplementation
+*/
 mitk::LookupTable& mitk::LookupTable::operator=( const mitk::LookupTable& LookupTable )
 {
-    if ( this == &LookupTable )
-    {
-        return * this;
-    }
-    else
-    {
-        m_LookupTable = LookupTable.GetVtkLookupTable();
-        return *this;
-    }
+  if ( this == &LookupTable )
+  {
+    return * this;
+  }
+  else
+  {
+    m_LookupTable = LookupTable.GetVtkLookupTable();
+    return *this;
+  }
 }
 
 void mitk::LookupTable::UpdateOutputInformation( )
 {
-    if ( this->GetSource( ) )
-    {
-        this->GetSource( ) ->UpdateOutputInformation( );
-    }
+  if ( this->GetSource( ) )
+  {
+    this->GetSource( ) ->UpdateOutputInformation( );
+  }
 }
 
 
@@ -187,31 +179,31 @@ void mitk::LookupTable::SetRequestedRegionToLargestPossibleRegion( )
 
 bool mitk::LookupTable::RequestedRegionIsOutsideOfTheBufferedRegion( )
 {
-    return false;
+  return false;
 }
 
 
 bool mitk::LookupTable::VerifyRequestedRegion( )
 {
-    //normally we should check if the requested region lies within the
-    //largest possible region. Since for lookup-tables we assume, that the
-    //requested region is always the largest possible region, we can always
-    //return true!
-    return true;
+  //normally we should check if the requested region lies within the
+  //largest possible region. Since for lookup-tables we assume, that the
+  //requested region is always the largest possible region, we can always
+  //return true!
+  return true;
 }
 
 
 void mitk::LookupTable::SetRequestedRegion( itk::DataObject *)
 {
-    //not implemented, since we always want to have the RequestedRegion
-    //to be set to LargestPossibleRegion
+  //not implemented, since we always want to have the RequestedRegion
+  //to be set to LargestPossibleRegion
 }
 
 void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction)
 {
   if(colorFunction==NULL)
     colorFunction = vtkColorTransferFunction::New();
-  
+
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
@@ -240,17 +232,9 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
 
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double *alphas;
-  double *alphasHead;
-  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
-#else
-  float *alphas;
-  float *alphasHead;
-  alphasHead=alphas=(float *)malloc(sizeof(float)*num_of_values);
-#endif
-
+  vtkFloatingPointType *alphas;
+  vtkFloatingPointType *alphasHead;
+  alphasHead=alphas=(vtkFloatingPointType*)malloc(sizeof(vtkFloatingPointType)*num_of_values);
 
   rgba+=3;
   for(i=0;i<num_of_values;++i)
@@ -265,13 +249,8 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
 
 bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
 {
+  vtkFloatingPointType color[ 4 ], lowerRange, upperRange;
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double color[ 4 ], lowerRange, upperRange;
-#else
-  float color[ 4 ], lowerRange, upperRange;
-#endif
-  
   xmlWriter.WriteProperty( NUMBER_OF_COLORS, m_LookupTable->GetNumberOfColors() );
   xmlWriter.WriteProperty( SCALE, m_LookupTable->GetScale() );
   xmlWriter.WriteProperty( RAMP, m_LookupTable->GetRamp() );
@@ -292,29 +271,25 @@ bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
   xmlWriter.WriteProperty( ALPHA_UPPER_RANGE, m_LookupTable->GetAlphaRange()[1] );
   xmlWriter.EndNode();
   xmlWriter.BeginNode(TABLE_RANGE);
-    lowerRange = m_LookupTable->GetTableRange()[0];
-    upperRange = m_LookupTable->GetTableRange()[1];
-    xmlWriter.WriteProperty( TABLE_LOWER_RANGE, lowerRange );
-    xmlWriter.WriteProperty( TABLE_UPPER_RANGE, upperRange );
-    for(int i=(int)lowerRange; i<=(int)upperRange; ++i){
-      xmlWriter.BeginNode(TABLE_VALUE);
-      xmlWriter.WriteProperty( "INDEX", i );
-      m_LookupTable->GetTableValue(i, color);
-      xmlWriter.WriteProperty( "COLOR", color );
-      xmlWriter.EndNode();
+  lowerRange = m_LookupTable->GetTableRange()[0];
+  upperRange = m_LookupTable->GetTableRange()[1];
+  xmlWriter.WriteProperty( TABLE_LOWER_RANGE, lowerRange );
+  xmlWriter.WriteProperty( TABLE_UPPER_RANGE, upperRange );
+  for(int i=(int)lowerRange; i<=(int)upperRange; ++i){
+    xmlWriter.BeginNode(TABLE_VALUE);
+    xmlWriter.WriteProperty( "INDEX", i );
+    m_LookupTable->GetTableValue(i, color);
+    xmlWriter.WriteProperty( "COLOR", color );
+    xmlWriter.EndNode();
   }
   xmlWriter.EndNode();
   return true;
 }
- 
+
 bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
 {
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-  double color[ 4 ], lowerRange, upperRange;
-#else
-  float color[ 4 ], lowerRange, upperRange;
-#endif
+  vtkFloatingPointType color[ 4 ], lowerRange, upperRange;
 
   int index;
   XMLReader::RGBAType rgba;
@@ -368,7 +343,7 @@ bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
 
   return true;
 }
- 
+
 const std::string& mitk::LookupTable::GetXMLNodeName() const
 {
   return XML_NODE_NAME;

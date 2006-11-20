@@ -134,11 +134,7 @@ void mitk::Surface::CalculateBoundingBox()
   for ( unsigned int i = 0 ; i < m_PolyDataSeries.size() ; ++i )
   {
     vtkPolyData* polyData = m_PolyDataSeries[ i ];
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-#else
-    float bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-#endif
+    vtkFloatingPointType bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     if ( ( polyData != NULL ) && ( polyData->GetNumberOfPoints() > 0 ) )
     {
       polyData->Update();

@@ -77,11 +77,8 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             vtkLookupTable->SetTableRange(0,255);
 
             int LookupTablesize = 256;
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-            double rgba[ 4 ];
-#else
-            float rgba[ 4 ];
-#endif
+            vtkFloatingPointType rgba[ 4 ];
+
             vtkLookupTable->SetNumberOfColors( LookupTablesize );
             for ( int i = 0; i < LookupTablesize; i++ )
             {
@@ -111,11 +108,8 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             int factor = 1;
             int i, n;
 
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-            double rgba[ 4 ];
-#else
-            float rgba[ 4 ];
-#endif
+            vtkFloatingPointType rgba[ 4 ];
+
             //int xDim = lutSize;
             //int yDim = 3;
 
@@ -231,15 +225,11 @@ vtkLookupTable* mitk::USLookupTableSource::BuildStrainRateLookupTable()
         vtkLookupTable->SetTableRange(0,255);
 
         int lutSize = 256;
-				vtkLookupTable->SetNumberOfTableValues(lutSize);
-				
+        vtkLookupTable->SetNumberOfTableValues(lutSize);
+
         //   xDim = size;
         //   yDim = 3;
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-            double rgba[ 4 ];
-#else
-            float rgba[ 4 ];
-#endif
+        vtkFloatingPointType rgba[ 4 ];
 
         float quartal = lutSize / 8.0f;
 

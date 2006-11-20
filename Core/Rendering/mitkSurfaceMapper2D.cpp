@@ -85,13 +85,8 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
   if (!useCellData)
   {
     // search min/max point scalars over all time steps
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double dataRange[2] = {0,0};
-    double range[2];
-#else
-    float dataRange[2] = {0,0};
-    float range[2];
-#endif
+    vtkFloatingPointType dataRange[2] = {0,0};
+    vtkFloatingPointType range[2];
 
     mitk::Surface::Pointer input  = const_cast< mitk::Surface* >(dynamic_cast<const mitk::Surface*>( this->GetDataTreeNode()->GetData() ));
     if(input.IsNull()) return;

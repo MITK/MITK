@@ -45,11 +45,7 @@ vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildSeedsLookupTable()
   vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
   vtkLookupTable->SetTableRange(0,255);
 
-  #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ];
-  #else
-    float rgba[ 4 ];
-  #endif
+  vtkFloatingPointType rgba[ 4 ];
 
   int index;
 
@@ -89,11 +85,7 @@ vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildForceLookupTable()
   vtkLookupTable->SetNumberOfColors( 256 );
   vtkLookupTable->Build();
 
-  #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-    double rgba[ 4 ];
-  #else
-    float rgba[ 4 ];
-  #endif
+  vtkFloatingPointType rgba[ 4 ];
 
   for (int i = 0; i<128; i++ )
   {

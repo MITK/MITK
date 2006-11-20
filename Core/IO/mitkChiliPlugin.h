@@ -55,7 +55,7 @@ public:
   itkNewMacro(ChiliPlugin);
   virtual ~ChiliPlugin();
 protected:
-  ChiliPlugin::ChiliPlugin() {}
+  ChiliPlugin() {}
 private:
   static QcPlugin* s_PluginInstance;
 };

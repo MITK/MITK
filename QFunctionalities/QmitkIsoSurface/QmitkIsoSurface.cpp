@@ -127,8 +127,8 @@ void QmitkIsoSurface::CreateSurface()
     }
 
     filter->SetInput( m_MitkImage );  
-    filter->SetStandardDeviation( 0.5 );
-    filter->SetUseStandardDeviation( true );
+    filter->SetGaussianStandardDeviation( 0.5 );
+    filter->SetUseGaussianImageSmooth( true );
     filter->SetThreshold( getThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
 
     filter->SetTargetReduction( targetReduction );

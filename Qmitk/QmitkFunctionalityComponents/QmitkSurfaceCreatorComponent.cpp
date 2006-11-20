@@ -494,10 +494,10 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
     filter->SetInput( m_MitkImage ); 
 
     //GAUSS FILTER (must be set befor threshold)
-    filter->SetUseStandardDeviation( m_GaussFlag );
+    filter->SetUseGaussianImageSmooth( m_GaussFlag );
     if(m_GaussFlag)
     {
-      filter->SetStandardDeviation( gauss );
+      filter->SetGaussianStandardDeviation( gauss );
     }
 
     //THRESHOLD FROM GUI 

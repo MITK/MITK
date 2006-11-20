@@ -76,14 +76,11 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   if (m_Smooth)
   {
-    int spIterations = m_SmoothIteration;
-    float spRelaxation = m_SmoothRelaxation;
-
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     //read poly1 (poly1 can be the original polygon, or the decimated polygon)
     smoother->SetInput(polydata);//RC++
-    smoother->SetNumberOfIterations( spIterations );
-    smoother->SetRelaxationFactor( spRelaxation );
+    smoother->SetNumberOfIterations( m_SmoothIteration );
+    smoother->SetRelaxationFactor( m_SmoothRelaxation );
     smoother->SetFeatureAngle( 60 );
     smoother->FeatureEdgeSmoothingOff();
     smoother->BoundarySmoothingOff();

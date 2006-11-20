@@ -107,9 +107,9 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   std::cout << "Create surface all optimised settings: ";
   //configure ImageToSurfaceFilter
   filter->MedianFilter3DOn();
-  filter->SetStandardDeviation(1.5);
+  filter->SetGaussianStandardDeviation(1.5);
   filter->InterpolationOn();
-  filter->UseStandardDeviationOn();
+  filter->UseGaussianImageSmoothOn();
   filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
   filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
   filter->SetTargetReduction(0.05f);

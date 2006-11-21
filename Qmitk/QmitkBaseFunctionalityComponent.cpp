@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 /***************       CONSTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt )
 : QObject(parent, name),
-m_Parent(parent),
 m_FuncName(name)
+m_Parent(parent),
 {
   SetDataTreeIterator(dataIt);
   
@@ -45,7 +45,7 @@ void QmitkBaseFunctionalityComponent::CreateConnections()
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-QWidget* QmitkBaseFunctionalityComponent::CreateControlWidget(QWidget* parent)
+QWidget* QmitkBaseFunctionalityComponent::CreateControlWidget(QWidget* /*parent*/)
 {
   return (QWidget*) NULL;
 }
@@ -55,7 +55,7 @@ void QmitkBaseFunctionalityComponent::TreeChanged()
 {
 }
 
-void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
+void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeFilter::Item * /*imageIt*/)
 {
 
 }

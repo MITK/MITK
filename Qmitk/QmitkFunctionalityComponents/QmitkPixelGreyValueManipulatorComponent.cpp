@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
 : QmitkFunctionalityComponentContainer(parent, parentName),
 m_PixelGreyValueManipulatorComponentGUI(NULL),
   m_MitkImage(NULL),

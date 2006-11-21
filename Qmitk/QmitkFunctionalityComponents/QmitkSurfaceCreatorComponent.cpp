@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector, bool allowExpertMode)
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool /*updateSelector*/, bool /*showSelector*/, bool allowExpertMode)
 : QmitkFunctionalityComponentContainer(parent, parentName),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),

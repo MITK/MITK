@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-QmitkInteractionFunctionalityComponent::QmitkInteractionFunctionalityComponent(QObject *parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt, bool updateSelector, bool showSelector)
+QmitkInteractionFunctionalityComponent::QmitkInteractionFunctionalityComponent(QObject *parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt, bool /*updateSelector*/, bool /*showSelector*/)
 : QmitkBaseFunctionalityComponent(parent, parentName, dataIt),
 m_GUI(NULL),
 m_MultiWidget(mitkStdMultiWidget),

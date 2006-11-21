@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase* it, bool /*updateSelector*/, bool /*showSelector*/)
 : QmitkFunctionalityComponentContainer(parent, parentName),
 m_ThresholdImageNode(NULL),
 m_ThresholdComponentGUI(NULL),

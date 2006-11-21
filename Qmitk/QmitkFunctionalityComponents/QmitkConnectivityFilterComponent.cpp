@@ -60,7 +60,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool /*updateSelector*/, bool /*showSelector*/)
 : QmitkInteractionFunctionalityComponent(parent, parentName, mitkStdMultiWidget, it),
 m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),

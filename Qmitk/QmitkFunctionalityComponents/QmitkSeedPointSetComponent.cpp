@@ -36,12 +36,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSeedPointSetComponent::QmitkSeedPointSetComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkSeedPointSetComponent::QmitkSeedPointSetComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool /*updateSelector*/, bool /*showSelector*/)
 : QmitkInteractionFunctionalityComponent(parent, parentName, mitkStdMultiWidget, it),
-m_It(it),
 m_PointSetComponentGUI(NULL),
 m_PointSetNodeExisting(false),
 m_PointSetNodeName("SeedPoints")
+m_It(it),
 {
   SetDataTreeIterator(it);
   SetAvailability(true);

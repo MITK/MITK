@@ -95,6 +95,14 @@ public:
     return m_VtkRenderer;
   };
 
+  //##Documentation
+  //## @brief returns the vtkLightKit which is used 
+  //## by default
+  inline vtkLightKit * GetLightKit() const
+  {
+    return m_LightKit;
+  }
+
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
 
   //##Documentation

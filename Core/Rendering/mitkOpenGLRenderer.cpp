@@ -76,6 +76,8 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_CurrentWorldGeometry2DNode->SetMapper(2, geometryMapper);
 
   m_VtkRenderer = vtkRenderer::New();
+  m_LightKit = vtkLightKit::New();
+  m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 }
 
 //##ModelId=3E3D28AB0018
@@ -142,12 +144,6 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 
   if(vicc!=NULL)
     vicc->GetVtkInteractor()->Enable();
-
-  if(m_NewRenderer)
-  {
-    m_LightKit = vtkLightKit::New();
-    m_LightKit->AddLightsToRenderer(m_VtkRenderer);
-  }
 
 #if (VTK_MAJOR_VERSION < 5)
   m_VtkRenderer->RemoveAllProps();

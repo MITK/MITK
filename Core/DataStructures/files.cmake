@@ -1,0 +1,97 @@
+SET(DATA_CPP  
+mitkAbstractTransformGeometry.cpp
+mitkAffineTransformationOperation.cpp
+mitkApplicationCursor.cpp
+mitkBaseData.cpp
+mitkBaseProperty.cpp
+mitkBoundingObject.cpp
+# mitkBoundingObjectGroup.cpp
+# mitkBoundingObjectImageFunctions.cpp
+mitkCellOperation.cpp
+# mitkChiliPlugin.cpp
+# mitkChiliPluginExtensionsStub.cpp
+mitkChiliPluginStub.cpp
+mitkColorConversions.cpp
+mitkColorProperty.cpp
+mitkColorSequence.cpp
+mitkColorSequenceCycleH.cpp
+mitkColorSequenceHalfTones.cpp
+mitkColorSequenceRainbow.cpp
+mitkCone.cpp
+mitkContour.cpp
+mitkContourSet.cpp
+mitkCuboid.cpp
+mitkCylinder.cpp
+mitkDataTree.cpp
+mitkDataTreeFilter.cpp
+mitkDataTreeFilterFunctions.cpp
+mitkDataTreeHelper.cpp
+mitkDataTreeNode.cpp
+mitkDisplayGeometry.cpp
+mitkDrawOperation.cpp
+mitkEllipsoid.cpp
+mitkEnumerationProperty.cpp
+mitkExternAbstractTransformGeometry.cpp
+mitkExtrudedContour.cpp
+mitkFrameOfReferenceUIDManager.cpp
+mitkGeometry2D.cpp
+mitkGeometry2DData.cpp
+mitkGeometry3D.cpp
+mitkGeometryData.cpp
+mitkImage.cpp
+mitkImageDataItem.cpp
+mitkItkBaseDataAdapter.cpp
+mitkLandmarkBasedCurvedGeometry.cpp
+mitkLandmarkProjectorBasedCurvedGeometry.cpp
+mitkLandmarkProjector.cpp
+mitkLevelWindow.cpp
+mitkLevelWindowManager.cpp
+mitkLevelWindowPreset.cpp
+mitkLevelWindowProperty.cpp
+mitkLineOperation.cpp
+mitkLookupTable.cpp
+mitkLookupTableProperty.cpp
+mitkMapClassIDToClassName.cpp
+mitkMaterialProperty.cpp
+mitkMesh.cpp
+mitkModeOperation.cpp
+mitkObjectFactory.cpp
+mitkOperationActor.cpp
+mitkOperation.cpp
+mitkPicHelper.cpp
+mitkPixelType.cpp
+mitkPlaneGeometry.cpp
+mitkPlaneLandmarkProjector.cpp
+mitkPointData.cpp
+mitkPointOperation.cpp
+mitkPointSet.cpp
+mitkProperties.cpp
+mitkPropertyList.cpp
+mitkPropertyManager.cpp
+mitkPropertyObserver.cpp
+mitkRotationOperation.cpp
+mitkSeedsImage.cpp
+mitkSeedsImageLookupTableSource.cpp
+# mitkShapeModelGeometry3D.cpp
+mitkSlicedData.cpp
+mitkSlicedGeometry3D.cpp
+mitkSmartPointerProperty.cpp
+mitkSphereLandmarkProjector.cpp
+mitkStateTransitionOperation.cpp
+mitkStringProperty.cpp
+mitkSurface.cpp
+mitkThinPlateSplineCurvedGeometry.cpp
+mitkTimeSlicedGeometry.cpp
+mitkTransferFunction.cpp
+# mitkUSLookupTableSource.cpp
+mitkVector.cpp
+# mitkVesselGraphOperation.cpp
+# mitkVesselTreeGeometry3D.cpp
+# mitkVesselTreeLookupTable.cpp
+# mitkVesselTreeOperation.cpp
+mitkVtkInterpolationProperty.cpp
+mitkVtkRepresentationProperty.cpp
+mitkVtkScalarModeProperty.cpp
+mitkWeakPointerProperty.cpp
+mitkXMLIO.cpp
+)

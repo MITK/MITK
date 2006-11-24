@@ -1,0 +1,3 @@
+INCLUDE(files.cmake)
+ADD_LIBRARY(mitkAlgorithms ${ALGORITHMS_CPP})
+TARGET_LINK_LIBRARIES(mitkAlgorithms ${LIBRARIES_FOR_MITK_CORE} ipFunc)

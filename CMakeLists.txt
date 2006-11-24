@@ -1,0 +1,74 @@
+INCLUDE(Dart)
+SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib CACHE INTERNAL "Single output directory for building all libraries.")
+SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")
+IF(UNIX)
+OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
+ELSE(UNIX)
+OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." OFF)
+ENDIF(UNIX)
+OPTION(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
+
+SET(CORE_DIRECTORIES DataStructures Algorithms IO Rendering Interactions Controllers)
+
+FIND_PACKAGE(ITK)
+FIND_PACKAGE(VTK)
+FIND_PACKAGE(GLUT)
+
+FOREACH(d ${CORE_DIRECTORIES})
+  SET(MITK_INCLUDE_DIRS ${MITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Core/${d})
+  SET(MITK_CORE_LIBRARIES ${MITK_CORE_LIBRARIES} mitk${d})
+ENDFOREACH(d)
+
+SET(MITK_INCLUDE_DIRS ${PROJECT_BINARY_DIR} ${MITK_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
+
+
+FOREACH(dir Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk)
+  SET(MITK_INCLUDE_DIRS ${MITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
+ENDFOREACH(dir)
+
+IF(WIN32)
+  SET(${MITK_INCLUDE_DIRS} ${MITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipPic/win32)
+ENDIF(WIN32)
+
+SET(MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/itkUNC ${MITK_INCLUDE_DIRS})
+LINK_DIRECTORIES(${ITK_LIBRARY_DIRS} ${VTK_LIBRARY_DIRS})
+
+IF(VTK_MAJOR_VERSION EQUAL 5)
+    SET(VTK_FOR_MITK_LIBRARIES
+      vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkpng vtkRendering vtkVolumeRendering vtkzlib
+)
+ELSE(VTK_MAJOR_VERSION EQUAL 5)
+    SET(VTK_FOR_MITK_LIBRARIES
+  vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkPatented  vtkpng vtkRendering vtkzlib
+)
+ENDIF(VTK_MAJOR_VERSION EQUAL 5)
+SET(UTIL_FOR_MITK_LIBRARIES
+  ipPic
+)
+SET(LIBRARIES_FOR_MITK_CORE
+  ${LIBRARIES_FOR_MITK_CORE} ${UTIL_FOR_MITK_LIBRARIES} ${VTK_FOR_MITK_LIBRARIES} ${ITK_LIBRARIES}
+)
+
+SUBDIRS(Utilities Core) 
+
+OPTION(BUILD_TESTING "Build the MITK tests." ON)
+IF(BUILD_TESTING)
+ENABLE_TESTING()
+ADD_SUBDIRECTORY(Testing)
+ENDIF(BUILD_TESTING)
+
+OPTION(USE_QT "Use Trolltech's Qt library" ON)
+IF(USE_QT)
+  FIND_PACKAGE(Qt3)
+  SET(QMITK_INCLUDE_DIRS ${MITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
+  FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase) 
+ SET(QMITK_INCLUDE_DIRS ${QMITK_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk/${dir})
+ENDFOREACH(dir)
+ INCLUDE(CMake/FunctionalityHelpers.cmake)
+ SUBDIRS(Qmitk QFunctionalities QApplications)
+ENDIF(USE_QT)
+
+ADD_SUBDIRECTORY(Documentation)
+#### mitkConfig.h ####
+SET(MITK_CONFIG_H ${PROJECT_BINARY_DIR}/mitkConfig.h)
+CONFIGURE_FILE(mitkConfig.h.in ${MITK_CONFIG_H})

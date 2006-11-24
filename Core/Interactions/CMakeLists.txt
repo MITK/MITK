@@ -1,0 +1,4 @@
+INCLUDE(files.cmake)
+ADD_LIBRARY(mitkInteractions ${INTERACTIONS_CPP})
+TARGET_LINK_LIBRARIES(mitkInteractions ${LIBRARIES_FOR_MITK_CORE})
+

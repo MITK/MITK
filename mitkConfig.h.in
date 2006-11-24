@@ -1,0 +1,6 @@
+/*
+  mitkConfig.h
+  this file is generated. Do not change!
+*/
+#define MITK_ROOT "${PROJECT_SOURCE_DIR}"
+#cmakedefine USE_ITKZLIB

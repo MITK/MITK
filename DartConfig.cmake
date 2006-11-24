@@ -1,0 +1,5 @@
+SET (DROP_METHOD xmlrpc)
+SET (DROP_SITE "http://makalu:8081")
+SET (DROP_LOCATION "MITK")
+SET (BUILDNAME NewBuildSystem)
+

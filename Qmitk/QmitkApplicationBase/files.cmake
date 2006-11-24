@@ -1,0 +1,25 @@
+SET(QMITK_CPP ${QMITK_CPP}
+QmitkApplicationBase/QmitkApplicationCursor.cpp
+QmitkApplicationBase/QmitkCommonFunctionality.cpp
+QmitkApplicationBase/QmitkSaveProjectWidget.cpp
+QmitkApplicationBase/QmitkFctMediator.cpp
+QmitkApplicationBase/QmitkFunctionality.cpp
+QmitkApplicationBase/QmitkFunctionalityFactory.cpp
+QmitkApplicationBase/QmitkFunctionalityTesting.cpp
+)
+SET(QMITK_UI ${QMITK_UI}
+QmitkApplicationBase/QmitkControlsLeftFctLayoutTemplate.ui
+QmitkApplicationBase/QmitkControlsRightFctLayoutTemplate.ui
+QmitkApplicationBase/QmitkMainTemplate.ui
+# QmitkApplicationBase/QmitkNablaBase.ui
+QmitkApplicationBase/QmitkOptionDialog.ui
+QmitkApplicationBase/QmitkRenderWindowSelector.ui
+QmitkApplicationBase/QmitkSystemInfo.ui
+QmitkApplicationBase/QmitkTreeNodeSelector.ui
+)
+SET(QMITK_MOC_H ${QMITK_MOC_H}
+QmitkApplicationBase/QmitkFctMediator.h
+QmitkApplicationBase/QmitkFunctionality.h
+QmitkApplicationBase/QmitkFunctionalityTesting.h
+QmitkApplicationBase/QmitkSaveProjectWidget.h
+)

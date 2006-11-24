@@ -1,0 +1,4 @@
+INCLUDE(files.cmake)
+ADD_LIBRARY(mitkControllers ${CONTROLLERS_CPP})
+TARGET_LINK_LIBRARIES(mitkControllers ${LIBRARIES_FOR_MITK_CORE})
+

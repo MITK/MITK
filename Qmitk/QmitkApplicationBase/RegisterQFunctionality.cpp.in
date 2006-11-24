@@ -1,0 +1,25 @@
+#include <mitkDataTree.h>
+#include <QmitkFunctionalityFactory.h>
+#include <@FUNCTIONALITY_NAME@.h>
+
+class QObject;
+class QmitkStdMultiWidget;
+
+bool Register@FUNCTIONALITY_NAME@();
+QmitkFunctionality* Create@FUNCTIONALITY_NAME@Instance(QObject *parent, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt); 
+ 
+
+bool Register@FUNCTIONALITY_NAME@()
+{
+  QmitkFunctionalityFactory::GetInstance().RegisterCreateFunctionalityCall(Create@FUNCTIONALITY_NAME@Instance);
+  return true;
+}
+
+QmitkFunctionality* Create@FUNCTIONALITY_NAME@Instance( QObject *parent, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt) {
+  
+ @FUNCTIONALITY_NAME@* newInstance = new @FUNCTIONALITY_NAME@(parent,"@FUNCTIONALITY_NAME@",mitkStdMultiWidget,dataIt);
+ return newInstance;
+}
+
+bool @FUNCTIONALITY_NAME@_dummy = Register@FUNCTIONALITY_NAME@();
+

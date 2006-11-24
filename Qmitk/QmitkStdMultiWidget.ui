@@ -167,7 +167,7 @@
 <variables>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground4;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>
-    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4 };</variable>
+    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 };</variable>
     <variable>int m_Layout;</variable>
     <variable>mitk::DisplayVectorInteractor* m_MoveAndZoomInteractor;</variable>
     <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
@@ -198,8 +198,8 @@
     <slot>changeLayoutToColumnWidget3And4()</slot>
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>Fit()</slot>
+    <slot>AddPositionTrackingPointSet( mitk::DataTreeIteratorBase * treeIterator )</slot>
     <slot>AddDisplayPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
-    <slot>AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* treeIterator)</slot>
     <slot>EnableStandardLevelWindow()</slot>
     <slot>DisableStandardLevelWindow()</slot>
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
@@ -213,6 +213,7 @@
     <slot>EnableSliceRotation( bool on )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
+    <slot>changeLayoutToRowWidgetSmall3andBig4()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

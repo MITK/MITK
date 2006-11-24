@@ -81,9 +81,6 @@
             <property name="name">
                 <cstring>redoButton</cstring>
             </property>
-            <property name="mode">
-                <enum>Redo</enum>
-            </property>
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
@@ -356,6 +353,17 @@
             </property>
             <property name="text">
                 <string>RowWidget3n4</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>RowWidgetSmall3nBig4</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>RowWidgetSmall3nBig4</string>
             </property>
         </action>
     </actiongroup>
@@ -880,6 +888,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>viewLinkSlices_toggled(bool)</slot>
     </connection>
+    <connection>
+        <sender>RowWidgetSmall3nBig4</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -952,6 +966,7 @@
     <slot>viewShowPlanesAction_toggled( bool on )</slot>
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
     <slot>viewLinkSlices_toggled( bool link )</slot>
+    <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

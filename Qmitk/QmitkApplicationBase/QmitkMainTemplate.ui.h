@@ -1071,3 +1071,9 @@ void QmitkMainTemplate::viewLinkSlices_toggled( bool link )
   m_MultiWidget->GetSlicesRotator()->SetLinkPlanes( link );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+
+void QmitkMainTemplate::changeToRowWidgetSmall3nBig4Layout()
+{
+  m_MultiWidget->changeLayoutToRowWidgetSmall3andBig4();
+}

@@ -912,3 +912,31 @@ mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
 {
   return m_SlicesRotator;
 }
+
+
+void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
+{
+  delete QmitkStdMultiWidgetLayout ;
+
+  std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
+  QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+
+  mitkWidget1->hide();
+  mitkWidget2->hide();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+
+  mitkWidget3->setMaximumSize(2000,200);
+  mitkWidget4->setMaximumSize(2000,1800);
+
+  layout3->addWidget( mitkWidget3,0,0);
+  layout3->addWidget( mitkWidget4,1,0);
+
+  layout4->addLayout(layout3);
+  layout4->addWidget( levelWindowWidget );
+  QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4;
+}

@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(. ..)
+INCLUDE_DIRECTORIES(. .. ${PROJECT_BINARY_DIR})
 SET(IPPIC_FILES
   ipPicInfo.c ipPicType.c                           
   ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c

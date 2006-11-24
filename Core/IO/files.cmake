@@ -2,7 +2,7 @@ SET(IO_CPP
 mitkBaseDataIOFactory.cpp
 mitkBaseXMLWriter.cpp
 mitkChiliPluginIpPicStub.c
-mitkDSRFileReader.cpp
+mitkChiliPlugin.cpp
 mitkFileReader.cpp
 mitkFileSeriesReader.cpp
 mitkFileWriter.cpp
@@ -10,7 +10,7 @@ mitkImageWriter.cpp
 mitkItkImageFileIOFactory.cpp
 mitkItkImageFileReader.cpp
 mitkItkImageWrite.cpp
-# mitkLightBoxImageReader.cpp
+mitkLightBoxImageReader.cpp
 mitkLightBoxResultImageWriter.cpp
 mitkMeshReader.cpp
 mitkObjFileIOFactory.cpp

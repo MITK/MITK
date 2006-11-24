@@ -5,12 +5,7 @@ mitkApplicationCursor.cpp
 mitkBaseData.cpp
 mitkBaseProperty.cpp
 mitkBoundingObject.cpp
-# mitkBoundingObjectGroup.cpp
-# mitkBoundingObjectImageFunctions.cpp
 mitkCellOperation.cpp
-# mitkChiliPlugin.cpp
-# mitkChiliPluginExtensionsStub.cpp
-mitkChiliPluginStub.cpp
 mitkColorConversions.cpp
 mitkColorProperty.cpp
 mitkColorSequence.cpp

@@ -1,6 +1,8 @@
 #ifndef _Qmitk_Video_Background_h_
 #define _Qmitk_Video_Background_h_
 
+#include "mitkVideoSource.h"
+
 // Q-Timer
 #include "qobject.h"
 class QTimer;
@@ -26,7 +28,7 @@ class QmitkVideoBackground : public QObject
   Q_OBJECT
 
 public:
-   QmitkVideoBackground();
+  QmitkVideoBackground(mitk::VideoSource* v);
    ~QmitkVideoBackground();
 
   mitk::RenderWindow* GetRenderWindow();
@@ -47,9 +49,8 @@ public:
     m_TimerDelay = ms;
     ResetVideoBackground();
   }
-
   
-  /**
+   /**
    * Checks, if the Video background is currently
    * enabled (visible)
    */
@@ -69,6 +70,9 @@ protected:
  
   //for framegrabbing
   QTimer*                     m_QTimer;
+
+  //VideoSource
+  mitk::VideoSource*            m_VideoSource;
 
   int m_ImageWidth, m_ImageHeight, m_TimerDelay;
 };

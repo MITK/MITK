@@ -1,12 +1,11 @@
 #include "QmitkVideoBackground.h"
-
+// MITK includes
 #include "mitkVtkLayerController.h"
 #include "mitkVtkRenderWindow.h"
 #include "mitkRenderWindow.h"
-#include "mitkVideoSource.h"
-
+// QT includes
 #include "qtimer.h"
-
+// VTK includes
 #include "vtkSystemIncludes.h"
 #include "vtkRenderer.h"
 #include "vtkMapper.h"
@@ -30,8 +29,9 @@ public:
   }
 };
 
-QmitkVideoBackground::QmitkVideoBackground()
-{ 
+QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v)
+{
+  m_VideoSource = v; 
   m_ImageWidth  = 720;
   m_ImageHeight = 576;
   m_TimerDelay  = 50;
@@ -129,7 +129,7 @@ bool QmitkVideoBackground::IsEnabled()
 void QmitkVideoBackground::UpdateVideo()
 {  
   unsigned char *src = 0;
-  src = mitk::VideoSource::GetInstance()->GetVideoTexture();
+  src = m_VideoSource->GetVideoTexture();
   if(src)
   {
     m_VtkImageImport->SetImportVoidPointer(src);

@@ -160,7 +160,14 @@ void QmitkDataTreeComboBox::disconnectNotifications()
 */
 void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
 {
-  if (tree)
+  if (
+       tree 
+       && 
+       (   ( m_DataTreeFilter.IsNull() )
+         ||
+           ( m_DataTreeFilter->GetDataTree() != tree )
+       )
+     )
   {
     disconnectNotifications(); 
 
@@ -179,7 +186,7 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
     SetDisplayedProperty("name");
     generateItems();
   }
-  else
+  else if (!tree)
   {
     disconnectNotifications(); 
     m_DataTreeFilter = NULL;

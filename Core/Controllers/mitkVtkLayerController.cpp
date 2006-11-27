@@ -267,8 +267,8 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
   this->m_RenderWindow->SetErase(i);
 
   RendererVectorType::iterator it;
-  /*for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
-    (*it)->SetErase(i);*/
+  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+    (*it)->SetErase(i);
   
   for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
    (*it)->SetErase(i);

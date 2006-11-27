@@ -22,10 +22,33 @@ class vtkVideoSizeCallback : public vtkCommand
 {
 public:
   static vtkVideoSizeCallback *New(){ return new vtkVideoSizeCallback; }
-   
+  
+  vtkRenderer * m_VideoRenderer;
+  int m_ImageWidth, m_ImageHeight;
+
+  void SetVtkVideoRenderer(vtkRenderer* r)
+  {
+    m_VideoRenderer = r;
+  }
+  void SetVideoDimensions(int x, int y)
+  {
+    m_ImageWidth = x; m_ImageHeight = y;
+  }
+
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    std::cout << "renderwindow modified" << std::endl;
+    vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
+    int * windowSize = RenderWindow->GetScreenSize();
+    int horRatio = windowSize[0]/m_ImageWidth;
+    int verRatio = windowSize[1]/m_ImageHeight;
+
+    //if(horRatio < verRatio)
+    //  m_VideoRenderer->GetActiveCamera()->SetParallelScale(m_ImageWidth/2);
+    //else
+    //  m_VideoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
+    //
+    //std::cout << "video size adjusted" << std::endl;
+    m_VideoRenderer->ResetCameraClippingRange();
   }
 };
 
@@ -77,8 +100,8 @@ void QmitkVideoBackground::SetRenderWindow( mitk::RenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 
-  vtkVideoSizeCallback * videoCallback = vtkVideoSizeCallback::New();
-  m_RenderWindow->GetVtkRenderWindow()->AddObserver(vtkCommand::ModifiedEvent,videoCallback);
+  m_VideoCallback = vtkVideoSizeCallback::New();
+  m_RenderWindow->GetVtkRenderWindow()->AddObserver(vtkCommand::ModifiedEvent,m_VideoCallback);
 }
 /**
  * Enables drawing of the color Video background.
@@ -97,6 +120,8 @@ void QmitkVideoBackground::Enable()
   m_VideoRenderer->GetActiveCamera()->ParallelProjectionOn();
   m_VideoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
  
+  m_VideoCallback->SetVtkVideoRenderer(m_VideoRenderer);
+  m_VideoCallback->SetVideoDimensions(m_ImageWidth, m_ImageHeight);
   m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_VideoRenderer,true);
   m_QTimer->start(m_TimerDelay);
   

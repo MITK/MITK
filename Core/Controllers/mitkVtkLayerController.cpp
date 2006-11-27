@@ -262,3 +262,18 @@ int mitk::VtkLayerController::GetNumberOfRenderers()
   return m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size();
 }
 
+void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
+{
+  this->m_RenderWindow->SetErase(i);
+
+  RendererVectorType::iterator it;
+  /*for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+    (*it)->SetErase(i);*/
+  
+  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
+   (*it)->SetErase(i);
+
+  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
+   (*it)->SetErase(i);
+}
+

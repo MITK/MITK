@@ -70,6 +70,8 @@ class VtkLayerController
     */
     int GetNumberOfRenderers();
 
+    void SetEraseForAllRenderers(int i);
+
 	protected:
     vtkRenderWindow*    m_RenderWindow;
        	

@@ -22,6 +22,10 @@ class RenderWindow;
 /**
  * Displays a video in the background
  * of a vtkRenderWindow.
+ * The video is provided by a mitkVideoSource / GetVideoTexture().
+ * Caution: As the texture data is not being copied, a user is responsible for a valid 
+ * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
+ * background.
  */
 class QmitkVideoBackground : public QObject
 {
@@ -31,30 +35,38 @@ public:
   QmitkVideoBackground(mitk::VideoSource* v);
    ~QmitkVideoBackground();
 
+  ////##Documentation
+  ////## @brief returns the mitkRenderWindow in which the video is displayed.
   mitk::RenderWindow* GetRenderWindow();
+  ////##Documentation
+  ////## @brief sets the mitkRenderWindow in which the video is displayed.
+  ////## must be initialized before enabling the background.
   void SetRenderWindow(mitk::RenderWindow* renderWindow);
-
-  void Enable();
-  void Disable();
-
+  ////##Documentation
+  ////## @brief sets the width and height of the video.
+  ////## must be correctly initialized before enabling the background.
   void SetImageDimensions(int x, int y)
   {
     m_ImageWidth  = x;
     m_ImageHeight = y;
     ResetVideoBackground();
   }
-
+  ////##Documentation
+  ////## @brief sets the update rate of the video in milli seconds, by default 50.
   void SetTimerDelay(int ms)
   {
     m_TimerDelay = ms;
     ResetVideoBackground();
   }
-  
-   /**
-   * Checks, if the Video background is currently
-   * enabled (visible)
-   */
-   bool IsEnabled();
+  ////##Documentation
+  ////## @brief visualizes the video. Requires image dimensions and an active mitkvideosource to be set.
+  void Enable();
+  ////##Documentation
+  ////## @brief disables visualization of the video.
+  void Disable();
+  ////##Documentation
+  ////## @brief Checks, if the Video background is currently enabled (visible).
+  bool IsEnabled();
   
   public slots:
     void UpdateVideo();
@@ -65,14 +77,16 @@ protected:
   mitk::RenderWindow*         m_RenderWindow;
   vtkRenderer*                m_VideoRenderer;
   vtkImageActor*              m_Actor;
-  vtkVideoSizeCallback*       m_VideoCallback;
   vtkImageImport*             m_VtkImageImport;
  
   //for framegrabbing
   QTimer*                     m_QTimer;
 
   //VideoSource
-  mitk::VideoSource*            m_VideoSource;
+  mitk::VideoSource*          m_VideoSource;
+
+  // Adjust Video Size
+  vtkVideoSizeCallback *      m_VideoCallback;
 
   int m_ImageWidth, m_ImageHeight, m_TimerDelay;
 };

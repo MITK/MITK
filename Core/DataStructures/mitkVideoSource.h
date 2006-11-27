@@ -44,3 +44,4 @@ namespace mitk
   };
 }
 #endif // Header
+

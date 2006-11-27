@@ -35,7 +35,7 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
 
 bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
 {
-  return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() > 3) && m_LandmarkProjector.IsNotNull();
+  return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
 }
 
 void mitk::ThinPlateSplineCurvedGeometry::SetSigma(float sigma)

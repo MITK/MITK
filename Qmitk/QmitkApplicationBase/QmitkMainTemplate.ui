@@ -366,6 +366,17 @@
                 <string>RowWidgetSmall3nBig4</string>
             </property>
         </action>
+        <action>
+            <property name="name">
+                <cstring>SmallUpperWidget2Big3n4</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>SmallUpperWidget2Big3n4</string>
+            </property>
+        </action>
     </actiongroup>
     <action>
         <property name="name">
@@ -894,6 +905,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
     </connection>
+    <connection>
+        <sender>SmallUpperWidget2Big3n4</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -967,6 +984,7 @@
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
     <slot>viewLinkSlices_toggled( bool link )</slot>
     <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
+    <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

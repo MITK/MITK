@@ -940,3 +940,37 @@ void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
 
   m_Layout = LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4;
 }
+
+
+void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
+{
+  delete QmitkStdMultiWidgetLayout ;
+
+  std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
+  QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
+  QGridLayout *layout5 = new QGridLayout( 0, 1, 2, 0, 6, "layout5");
+  
+
+  mitkWidget1->hide();
+  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+
+  mitkWidget2->setMaximumSize(2000,200);
+  mitkWidget3->setMaximumSize(1000,1800);
+  mitkWidget4->setMaximumSize(1000,1800);
+
+  layout5->addWidget(mitkWidget3,0,0);
+  layout5->addWidget(mitkWidget4,0,1);
+  
+  layout3->addWidget( mitkWidget2,0,0);
+  layout3->addLayout(layout5,1,0);
+
+  layout4->addLayout(layout3);
+  layout4->addWidget( levelWindowWidget );
+  QmitkStdMultiWidgetLayout->addLayout( layout4 );
+
+  m_Layout = LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4;
+}

@@ -1077,3 +1077,9 @@ void QmitkMainTemplate::changeToRowWidgetSmall3nBig4Layout()
 {
   m_MultiWidget->changeLayoutToRowWidgetSmall3andBig4();
 }
+
+
+void QmitkMainTemplate::changeToSmallUpperWidget2Big3n4Layout()
+{
+    m_MultiWidget->changeLayoutToSmallUpperWidget2Big3and4();
+}

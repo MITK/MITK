@@ -37,10 +37,10 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
+    /*vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
     int * windowSize = RenderWindow->GetScreenSize();
     int horRatio = windowSize[0]/m_ImageWidth;
-    int verRatio = windowSize[1]/m_ImageHeight;
+    int verRatio = windowSize[1]/m_ImageHeight;*/
 
     //if(horRatio < verRatio)
     //  m_VideoRenderer->GetActiveCamera()->SetParallelScale(m_ImageWidth/2);

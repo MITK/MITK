@@ -559,6 +559,8 @@ public:
   /// Alternative New() with iterator instead of DataTree
   static Pointer New(mitk::DataTreeIteratorBase*);
 
+  const DataTreeBase* GetDataTree() const;
+
   /// Labels (for Header) of visible properties
   void SetPropertiesLabels(const PropertyList);
   const PropertyList& GetPropertiesLabels() const;
@@ -688,6 +690,7 @@ private:
 #ifndef NDEBUG
 public:
   void SetDebugOn() { m_DEBUG = true; }
+  void PrintCurrentState() { PrintStateForDebug( std::cout ); }
 private:
   void PrintStateForDebug(std::ostream& out);
   bool m_DEBUG;

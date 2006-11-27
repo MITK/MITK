@@ -286,6 +286,11 @@ DataTreeFilter::~DataTreeFilter()
   m_SelectedItems.clear();
 }
 
+const DataTreeBase* DataTreeFilter::GetDataTree() const
+{
+  return m_DataTree.GetPointer();
+}
+
 void DataTreeFilter::ConnectTreeEvents()
 {
   // connect tree notifications to member functions

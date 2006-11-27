@@ -70,7 +70,6 @@ SET(UI_FILES
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkThresholdComponent.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui

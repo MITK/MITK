@@ -1,6 +1,4 @@
 INCLUDE(files.cmake)
-INCLUDE(QmitkPropertyObservers/files.cmake)
-INCLUDE(QmitkApplicationBase/files.cmake)
 
 INCLUDE_DIRECTORIES(${QMITK_INCLUDE_DIRS})
 QT_WRAP_UI(Qmitk QMITK_GENERATED_H QMITK_GENERATED_CPP ${QMITK_UI})

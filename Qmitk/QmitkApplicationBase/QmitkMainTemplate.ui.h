@@ -333,7 +333,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
     mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
     try
     {
-      factory->SetFileName(fileName);
+      factory->SetFileName(fileName.ascii());
       factory->SetImageSerie(false);
       if (start != stop)
       {

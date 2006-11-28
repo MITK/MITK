@@ -8,9 +8,12 @@ IF(DOT)
   ENDIF(USE_DOT)
 ENDIF(DOT)
 
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
-               ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf)
 
+CONFIGURE_FILE(doxygen.conf.in
+               ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+
+# CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
+#                ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf)
 FIND_PACKAGE(Doxygen)
 
 # Doxygen config file requires only the path to DOT, not DOT itself

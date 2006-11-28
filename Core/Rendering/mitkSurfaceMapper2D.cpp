@@ -38,7 +38,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPointData.h>
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
-#include <vtkPolyData.h>
 #include <vtkLinearTransform.h>
 #include <vtkAbstractMapper.h>
 

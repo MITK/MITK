@@ -173,11 +173,15 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
   {
     if((*it)!=NULL)
     {
-      //first ask for CalculateJurisdiction(..) and write it into the map if > 0
-      float value = (*it)->CalculateJurisdiction(stateEvent);
-      if (value > threshold)
+      mitk::Interactor* interactor = dynamic_cast<mitk::Interactor* >(*it);
+      if (interactor != NULL)
       {
-        m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
+        //first ask for CalculateJurisdiction(..) and write it into the map if > 0
+        float value = interactor->CalculateJurisdiction(stateEvent);
+        if (value > threshold)
+        {
+          m_JurisdictionMap.insert(InteractorMap::value_type(value, interactor));
+        }
       }
     }
   }

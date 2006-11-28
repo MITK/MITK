@@ -8,7 +8,6 @@
 
 const std::string mitk::StandardFileLocations::FindFile(const char* filename, const char* pathInSourceDir)
 {
-  std::cout << GetOptionDirectory() << std::endl;
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
   std::string xmlFileName;
 

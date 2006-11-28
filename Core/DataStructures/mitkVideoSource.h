@@ -10,13 +10,12 @@ namespace mitk
   /**
   * Simple base class for acquiring video data. 
   */
-  class VideoSource //: public itk::Object
+  class VideoSource : public itk::Object
   {
     public:
-      //mitkClassMacro( VideoSource, itk::Object );
-      //itkNewMacro( Self );
-      VideoSource();
-	    virtual ~VideoSource();      
+      mitkClassMacro( VideoSource, itk::Object );
+      itkNewMacro( Self );
+         
       
       ////##Documentation
       ////## @brief assigns the grabbing devices for acquiring the next frame. 
@@ -35,6 +34,8 @@ namespace mitk
       bool IsCapturingEnabled();
 
     protected:
+      VideoSource();
+	    virtual ~VideoSource();  
   	  
       unsigned char * m_CurrentVideoTexture;
       int m_CaptureWidth, m_CaptureHeight;

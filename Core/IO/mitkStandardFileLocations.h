@@ -23,14 +23,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  /*! \brief Provides a method to look for configuration files etc.
+  /*! \brief Provides a method to look for configuration and option files etc.
 
     Call mitk::StandardFileLocations::FindFile(filename) to look for configuration files.
+    Call mitk::StandardFileLocations::GetOptionDirectory() to look for/save option files.
   */
   class StandardFileLocations
   {
     public:
       /*!
+        \brief looks for a file in several standard locations
         \param filename         The file you want to fine, without any path
         \param pathInSourceDir  Where in the source tree hierarchy would that file be?
         \return The absolute path to the file including the filename
@@ -42,6 +44,19 @@ namespace mitk
           3. Use pathInSourceDir to look in a source code directory hierarchy (which is determined at compile time)
        */
       static const std::string FindFile(const char* filename, const char* pathInSourceDir = NULL );
+
+      /*!
+        \brief Return directory of/for option files
+        \return The absolute path to the directory for option files.
+
+        This method looks for the directory of/for option files in two ways. The logic is as follows
+
+          1. If there is an environment variable MITKOPTIONS, then use that directory.
+          2. Use .mitk-subdirectory in home directory of the user
+
+        The directory will be created if it does not exist.
+       */
+      static const std::string GetOptionDirectory();
   };
 
 } // namespace

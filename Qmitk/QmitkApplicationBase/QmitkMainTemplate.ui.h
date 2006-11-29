@@ -730,7 +730,9 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 
 void QmitkMainTemplate::destroy()
 {
-  SaveOptionsToFile("MITKOptions.xml");
+  std::string filename( mitk::StandardFileLocations::GetOptionDirectory() );
+  filename += "/MITKOptions.xml";
+  SaveOptionsToFile( filename.c_str() );
   
   delete qfm;
 #ifdef MBI_INTERNAL

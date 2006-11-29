@@ -80,7 +80,10 @@
         <widget class="QmitkUndoRedoButton">
             <property name="name">
                 <cstring>redoButton</cstring>
-            </property>
+	</property>
+	<property name="mode">
+		<enum>Redo</enum>
+	</property>
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>

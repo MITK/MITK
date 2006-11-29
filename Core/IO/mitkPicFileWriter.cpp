@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <sstream>
 
+extern "C" 
+{
+size_t _ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream);
+}
+
 mitk::PicFileWriter::PicFileWriter()
 {
   this->SetNumberOfRequiredInputs( 1 );
@@ -110,7 +115,7 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)geometryTag->value)[11] = spacing[2];
   }
   mitk::PicFileReader::ConvertHandedness(picImage);
-  ipPicPut((char*)(m_FileName.c_str()), picImage);
+  this->MITKIpPicPut((char*)(m_FileName.c_str()), picImage);
   mitk::PicFileReader::ConvertHandedness(picImage);
 }
 
@@ -129,4 +134,116 @@ const mitk::Image* mitk::PicFileWriter::GetInput()
   {
     return static_cast< const mitk::Image * >( this->ProcessObject::GetInput( 0 ) );
   }
+}
+
+int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic )
+{
+  FILE* outfile;
+
+  ipUInt4_t len;
+  ipUInt4_t tags_len;
+
+  if( pic->info->write_protect )
+  {
+    fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
+    return( -1 );
+  }
+
+  if( ipPicEncryptionType(pic) != ' ' )
+  {
+    fprintf( stderr, "ipPicPut: warning: was encrypted !!!\n" );
+  }
+
+  if( outfile_name == NULL )
+    outfile = stdout;
+  else if( strcmp(outfile_name, "stdout") == 0 )
+    outfile = stdout;
+  else
+  {
+    ipPicRemoveFile( outfile_name );
+
+    if( ipPicGetWriteCompression() )
+    {
+      char buff[1024];
+
+      sprintf( buff, "%s.gz", outfile_name );
+      outfile = (FILE*) ipPicFOpen( buff, "wb" ); // cast to prevent warning. 
+    }
+    else
+      outfile = fopen( outfile_name, "wb" );
+  }
+
+
+  if( outfile == NULL )
+  {
+    fprintf( stderr, "ipPicPut: sorry, error opening outfile\n" );
+    return( -1 );
+  }
+
+  tags_len = _ipPicTagsSize( pic->info->tags_head );
+
+  len = tags_len +        3 * sizeof(ipUInt4_t)
+      + pic->dim * sizeof(ipUInt4_t);
+
+  /* write oufile */
+  if( ipPicEncryptionType(pic) == ' ' )
+    ipPicFWrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  else
+    ipPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
+
+  ipPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+
+  ipPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
+  ipPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+
+  ipPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+
+  _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
+
+  if( ipPicGetWriteCompression() )
+    pic->info->pixel_start_in_file = ipPicFTell( outfile );
+  else
+    pic->info->pixel_start_in_file = ftell( outfile );
+
+  if( pic->data )
+  {
+    size_t number_of_elements = _ipPicElements(pic);
+    size_t bytes_per_element = pic->bpe / 8;
+    size_t number_of_bytes = number_of_elements * bytes_per_element;
+    size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
+    size_t number_of_blocks = number_of_bytes / block_size;
+    size_t remaining_bytes = number_of_bytes % block_size;
+    size_t bytes_written = 0;
+    size_t block_nr = 0;
+    ipUInt1_t* data = (ipUInt1_t*) pic->data;
+      
+    assert( data != NULL );
+      
+    if( pic->type == ipPicNonUniform )
+    {
+      for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
+        bytes_written += ipPicFWrite( data + ( block_nr * block_size ), 1, block_size, outfile );
+      bytes_written += ipPicFWrite( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
+    }
+    else
+    {
+      for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
+        bytes_written += ipPicFWriteLE( data + ( block_nr * block_size ), 1, block_size, outfile );
+      bytes_written += ipPicFWriteLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
+    }
+        
+    if ( bytes_written != number_of_bytes )
+      fprintf( stderr, "Error while writing (ferror indicates %u), only %lu bytes were written! Eof indicator is %u.\n", ferror(outfile), bytes_written, feof(outfile) );
+  }
+  
+  if( outfile != stdout )
+  {
+    if( ipPicGetWriteCompression() )
+      ipPicFClose( outfile );
+    else
+      fclose( outfile );
+  }
+
+  return( 0 );
 }

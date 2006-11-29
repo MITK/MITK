@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriter.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
+#include <ipPic/ipPic.h>
+
 
 namespace mitk
 {
@@ -101,6 +103,8 @@ protected:
     virtual ~PicFileWriter();
 
     virtual void GenerateData();
+    
+    virtual int MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic );
 
     std::string m_FileName;
 

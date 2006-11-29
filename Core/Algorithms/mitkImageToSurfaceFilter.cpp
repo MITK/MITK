@@ -44,19 +44,6 @@ mitk::ImageToSurfaceFilter::~ImageToSurfaceFilter()
 {
 }
 
-  template <class T1, class T2, class T3>
-inline void mitkVtkLinearTransformPoint(T1 matrix[4][4], 
-    T2 in[3], T3 out[3])
-{
-  T3 x = matrix[0][0]*in[0]+matrix[0][1]*in[1]+matrix[0][2]*in[2]+matrix[0][3];
-  T3 y = matrix[1][0]*in[0]+matrix[1][1]*in[1]+matrix[1][2]*in[2]+matrix[1][3];
-  T3 z = matrix[2][0]*in[0]+matrix[2][1]*in[1]+matrix[2][2]*in[2]+matrix[2][3];
-
-  out[0] = x;
-  out[1] = y;
-  out[2] = z;
-}
-
 void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold)
 {
   vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
@@ -178,7 +165,7 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
   int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgelöst
+  int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgelï¿½t
 
   int t;
   for( t=tstart; t < tmax; ++t)

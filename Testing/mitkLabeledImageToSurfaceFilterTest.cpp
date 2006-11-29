@@ -8,7 +8,7 @@ bool equals(const mitk::ScalarType& val1, const mitk::ScalarType& val2, mitk::Sc
   return ( std::fabs(val1 - val2) <= epsilon );
 }
 
-int mitkLabeledImageToSurfaceFilterTest(int argc, char** argv)
+int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
 {
   if(argc==0)
   {

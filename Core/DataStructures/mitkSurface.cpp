@@ -31,17 +31,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
-  if ( polydata == NULL )
-    return ;
-
   if ( t >= m_PolyDataSeries.size() )
   {
     m_PolyDataSeries.resize( t + 1, NULL );
     Initialize(t+1);
   }
+  if(m_PolyDataSeries[ t ] != NULL)
+  {
+    m_PolyDataSeries[ t ]->Delete();
+  }
   m_PolyDataSeries[ t ] = polydata;
   //@todo why do we have to call m_VtkPolyData->Register(NULL?)
-  m_PolyDataSeries[ t ]->Register( NULL );
+  if(m_PolyDataSeries[ t ] != NULL)
+  {
+    m_PolyDataSeries[ t ]->Register( NULL );
+  }
   this->Modified();
   m_CalculateBoundingBox = true;
 }
@@ -100,6 +104,7 @@ mitk::Surface::~Surface()
     if ( ( *it ) != NULL )
       ( *it )->Delete();
   }
+  m_PolyDataSeries.clear();
 }
 
 //##ModelId=3E70F66100AE

@@ -186,6 +186,10 @@ void QmitkDataTreeComboBox::SetDataTree(mitk::DataTreeBase* tree)
     SetDisplayedProperty("name");
     generateItems();
   }
+  else if (tree)
+  {
+    m_DataTreeFilter->Update();
+  }
   else if (!tree)
   {
     disconnectNotifications(); 

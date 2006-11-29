@@ -101,12 +101,12 @@ void mitk::RawImageFileReader::GenerateData()
    }
   else if (m_Dimensionality==3)
   {
-         if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 2 >();
-    else if (m_PixelType == USHORT) TypedGenerateData<unsigned short int, 2 >();
-    else if (m_PixelType == UINT)   TypedGenerateData<unsigned int, 2 >();
-    else if (m_PixelType == SINT)   TypedGenerateData<signed int, 2 >();
-    else if (m_PixelType == FLOAT)  TypedGenerateData<float, 2 >();
-    else if (m_PixelType == DOUBLE) TypedGenerateData<double, 2 >();
+         if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 3 >();
+    else if (m_PixelType == USHORT) TypedGenerateData<unsigned short int, 3 >();
+    else if (m_PixelType == UINT)   TypedGenerateData<unsigned int, 3 >();
+    else if (m_PixelType == SINT)   TypedGenerateData<signed int, 3 >();
+    else if (m_PixelType == FLOAT)  TypedGenerateData<float, 3 >();
+    else if (m_PixelType == DOUBLE) TypedGenerateData<double, 3 >();
     else
     {
       std::cout << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;

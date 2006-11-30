@@ -55,6 +55,7 @@ namespace mitk
   class Surface;
   class Image;
   class RenderWindow;
+  class VesselTreeData;
 }
 
 #ifdef MBI_INTERNAL
@@ -251,6 +252,7 @@ namespace CommonFunctionality
   void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );
   void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
   void SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
+  void SaveVesselTree( mitk::VesselTreeData* tree, const char* fileName = NULL );
 #endif
 
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );

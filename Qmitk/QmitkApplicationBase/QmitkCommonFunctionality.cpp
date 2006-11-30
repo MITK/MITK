@@ -12,6 +12,7 @@
 #include "mitkVesselGraphData.h"
 #include "mitkVesselGraphFileWriter.h"
 #include "mitkHOCVesselGraphFileWriter.h"
+#include "mitkVesselTreeFileWriter.h"
 #endif
 #define QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
 #include "QmitkCommonFunctionality.h"
@@ -129,6 +130,29 @@ void CommonFunctionality::SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVessel
   }
 }
 
+void CommonFunctionality::SaveVesselTree( mitk::VesselTreeData* vesselTree, const char* aFileName)
+{
+  if(vesselTree == NULL)
+  {
+    std::cout << "Warning in file " << __FILE__<< " line " << __LINE__ <<": vessel tree is NULL!" << std::endl;
+    return;
+  }
+  QString fileName;
+  if (aFileName == NULL)
+  {
+    fileName = QFileDialog::getSaveFileName(QString("VesselTree.ves"),"MITK VesselTree (*.ves)");
+  }
+  else
+    fileName = aFileName;
+
+  if (fileName.isEmpty() == false )
+  {
+    mitk::VesselTreeFileWriter::Pointer writer = mitk::VesselTreeFileWriter::New();
+    writer->SetInput( vesselTree );
+    writer->SetFileName( fileName.ascii() );
+    writer->Update();
+  }
+}
 
 
 #endif
@@ -187,6 +211,12 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     if (dvg.IsNotNull())
     {
       CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer(), NULL);
+    }
+    
+    mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(data);
+    if (vesselTree.IsNotNull())
+    {
+      CommonFunctionality::SaveVesselTree(vesselTree.GetPointer(), NULL);
     }
 #endif
   }

@@ -31,16 +31,11 @@ mitk::LabeledImageToSurfaceFilter::LabeledImageToSurfaceFilter()
 
 mitk::LabeledImageToSurfaceFilter::~LabeledImageToSurfaceFilter()
 {
-  
 }
 
-
-
-void mitk::LabeledImageToSurfaceFilter::GenerateData()
+void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
 {
-  mitk::Image* image =  ( mitk::Image* )GetInput();
-  mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
-
+  Superclass::GenerateOutputInformation();
   //
   // check which labels are available in the image
   //
@@ -86,7 +81,6 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
   if ( numberOfOutputs == 0 )
   {
     itkWarningMacro("Number of outputs == 0");
-    return;     
   }
   
   //
@@ -105,6 +99,24 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
       this->SetNthOutput( i, output.GetPointer() );
     }
   }
+}
+
+
+void mitk::LabeledImageToSurfaceFilter::GenerateData()
+{
+  mitk::Image* image =  ( mitk::Image* )GetInput();
+  if ( image == NULL )
+  {
+    itkWarningMacro("Image is NULL");
+    return;
+  }
+    
+  mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
+
+  m_IdxToLabels.clear();
+  
+  if ( this->GetNumberOfOutputs() == 0 )
+    return;
   
   //
   // traverse the known labels and create surfaces for them.
@@ -114,11 +126,13 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
   {
     if ( it->first == m_BackgroundLabel )
       continue;
-    if ( it->second == 0 )
+    if ( ( it->second == 0 ) && m_GenerateAllLabels )
       continue;
-    assert ( currentOutputIndex < numberOfOutputs );
+    
+    assert ( currentOutputIndex < this->GetNumberOfOutputs() );
     mitk::Surface::Pointer surface = this->GetOutput( currentOutputIndex );
     assert( surface.IsNotNull() );
+    
     int tstart=outputRegion.GetIndex(3);
     int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloet
     int t;

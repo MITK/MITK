@@ -82,7 +82,13 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   {
     itkWarningMacro("Number of outputs == 0");
   }
-  
+
+  //
+  // determine the number of timesteps of the input image
+  //
+  mitk::Image* image =  ( mitk::Image* )GetInput();
+  unsigned int numberOfTimeSteps = image->GetTimeSlicedGeometry()->GetTimeSteps();
+    
   //
   // set the number of outputs to the number of labels used.
   // initialize the output surfaces accordingly (incl. timesteps)
@@ -95,7 +101,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
     {
       mitk::Surface::Pointer output = static_cast<mitk::Surface*>( this->MakeOutput(0).GetPointer() );
       assert ( output.IsNotNull() );
-      output->Initialize( 1 ); //TODO: set number of timesteps
+      output->Initialize( numberOfTimeSteps ); 
       this->SetNthOutput( i, output.GetPointer() );
     }
   }

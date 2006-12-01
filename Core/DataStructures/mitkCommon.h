@@ -37,13 +37,45 @@ typedef  unsigned int MapperSlotId;
 //typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
 //typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIteratorClone;
 
-
 #define mitkClassMacro(className,SuperClassName) \
 	typedef className				Self; \
 	typedef SuperClassName			Superclass; \
 	typedef itk::SmartPointer<Self> Pointer; \
 	typedef itk::SmartPointer<const Self>  ConstPointer; \
     itkTypeMacro(className,SuperClassName)
+/**
+* Macro for Constructors with one parameter for classes derived from itk::Lightobject
+**/
+#define mitkNewMacro1Param(classname,type) \
+static Pointer New(type _arg) \
+{ \
+  Pointer smartPtr = new classname ( _arg ); \
+  smartPtr->UnRegister(); \
+  return smartPtr; \
+} \
+
+/**
+* Macro for Constructors with two parameters for classes derived from itk::Lightobject
+**/
+#define mitkNewMacro2Param(classname,typea,typeb) \
+static Pointer New(typea _arga, typeb _argb) \
+{ \
+  Pointer smartPtr = new classname ( _arga, _argb ); \
+  smartPtr->UnRegister(); \
+  return smartPtr; \
+} \
+
+/**
+* Macro for Constructors with three parameters for classes derived from itk::Lightobject
+**/
+#define mitkNewMacro3Param(classname,typea,typeb,typec) \
+static Pointer New(typea _arga, typeb _argb, typec _argc) \
+{ \
+  Pointer smartPtr = new classname ( _arga, _argb, _argc ); \
+  smartPtr->UnRegister(); \
+  return smartPtr; \
+} \
+
 
 /** Get a smart const pointer to an object.  Creates the member 
  * Get"name"() (e.g., GetPoints()). */

@@ -16,19 +16,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkSeedsInteractor.h>
+#include "mitkSeedsInteractor.h"
 
-#include <mitkProperties.h>
-#include <mitkStringProperty.h>
-#include <mitkAction.h>
-#include <mitkDisplayPositionEvent.h>
-#include <mitkOperationEvent.h>
-#include <mitkInteractionConst.h>
-#include <mitkUndoController.h>
-#include <mitkDataTreeNode.h>
-#include <mitkStateEvent.h>
-#include <mitkState.h>
-#include <mitkDrawOperation.h>
+#include "mitkProperties.h"
+#include "mitkStringProperty.h"
+#include "mitkAction.h"
+#include "mitkDisplayPositionEvent.h"
+#include "mitkOperationEvent.h"
+#include "mitkInteractionConst.h"
+#include "mitkUndoController.h"
+#include "mitkDataTreeNode.h"
+#include "mitkStateEvent.h"
+#include "mitkState.h"
+#include "mitkDrawOperation.h"
+
 
 mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
   : mitk::Interactor(type, dataTreeNode)
@@ -111,6 +112,8 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
       last_point = event_point;
       ok = true;
       this->Modified();
+      
+      this->InvokeEvent( itk::EndEvent() );
 
       break;
     }

@@ -22,5 +22,5 @@ SET(CPP_FILES
   # VtkQRenderWindowInteractor.cpp
 )
 IF(WIN32)
-  SET(CONTROLLERS_CPP ${CONTROLLERS_CPP} mitkMovieGeneratorWin32.cpp)
+  SET(CPP_FILES ${CPP_FILES} mitkMovieGeneratorWin32.cpp)
 ENDIF(WIN32)

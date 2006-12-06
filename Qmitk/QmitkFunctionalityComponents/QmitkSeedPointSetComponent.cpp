@@ -40,8 +40,8 @@ QmitkSeedPointSetComponent::QmitkSeedPointSetComponent(QObject * parent, const c
 : QmitkInteractionFunctionalityComponent(parent, parentName, mitkStdMultiWidget, it),
 m_PointSetComponentGUI(NULL),
 m_PointSetNodeExisting(false),
-m_PointSetNodeName("SeedPoints"),
-m_It(it)
+m_It(it),
+m_PointSetNodeName("SeedPoints")
 {
   SetDataTreeIterator(it);
   SetAvailability(true);

@@ -80,13 +80,15 @@ mitk::SplineVtkMapper3D::GenerateData()
     vtkCardinalSpline* splineX = vtkCardinalSpline::New();
     vtkCardinalSpline* splineY = vtkCardinalSpline::New();
     vtkCardinalSpline* splineZ = vtkCardinalSpline::New();
-
-    for ( unsigned int i = 0 ; i < numberOfInputPoints; ++i )
+    unsigned int index = 0;
+    mitk::PointSet::DataType::PointsContainer::Pointer pointsContainer = input->GetPointSet()->GetPoints();
+    for ( mitk::PointSet::DataType::PointsContainer::Iterator it = pointsContainer->Begin(); it != pointsContainer->End(); ++it, ++index )
+    //for ( unsigned int i = 0 ; i < numberOfInputPoints; ++i )
     {
-      mitk::PointSet::PointType point = input->GetPoint( i );
-      splineX->AddPoint( i, point[ 0 ] );
-      splineY->AddPoint( i, point[ 1 ] );
-      splineZ->AddPoint( i, point[ 2 ] );
+      mitk::PointSet::PointType point = it->Value();
+      splineX->AddPoint( index, point[ 0 ] );
+      splineY->AddPoint( index, point[ 1 ] );
+      splineZ->AddPoint( index, point[ 2 ] );
     }
     vtkPoints* points = vtkPoints::New();
     vtkPolyData* profileData = vtkPolyData::New();

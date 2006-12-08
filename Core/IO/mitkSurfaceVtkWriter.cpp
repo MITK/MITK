@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
 
 namespace mitk {
 
@@ -36,9 +37,18 @@ void SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
   m_Extension = ".vtk";
 }
 
+template<>
+void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
+{
+  m_Extension = ".vtp";
+}
+
+
 template class SurfaceVtkWriter<vtkSTLWriter>;
 
 template class SurfaceVtkWriter<vtkPolyDataWriter>;
+
+template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
 
 }
 

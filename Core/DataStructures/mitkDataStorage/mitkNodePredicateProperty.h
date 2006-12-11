@@ -37,7 +37,7 @@ namespace mitk {
     public:
       //##Documentation
       //## @brief Constructor to check for a named property
-      NodePredicateProperty(const char* propertyName, mitk::BaseProperty& p);
+      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p);
       
       //##Documentation
       //## @brief Constructor to check for the existence of a property with a given name
@@ -52,7 +52,7 @@ namespace mitk {
       virtual bool CheckNode(mitk::DataTreeNode* node) const;
 
     protected:
-      mitk::BaseProperty* m_ValidProperty;
+      mitk::BaseProperty::Pointer m_ValidProperty;
       std::string m_ValidPropertyName;
     };
 

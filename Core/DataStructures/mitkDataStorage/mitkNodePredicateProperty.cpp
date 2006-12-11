@@ -17,12 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNodePredicateProperty.h"
+#include "mitkDataTreeNode.h"
 
 
 
-
-mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName, mitk::BaseProperty& p)
-: NodePredicateBase(), m_ValidProperty(&p), m_ValidPropertyName(propertyName)
+mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p)
+: NodePredicateBase(), m_ValidProperty(p), m_ValidPropertyName(propertyName)
 {
 }
 
@@ -45,10 +45,10 @@ bool mitk::NodePredicateProperty::CheckNode(mitk::DataTreeNode* node) const
     throw 1;  // does it make sense to search a property without giving a name?
 
   // check, if any of the properties of node are equal to m_ValidProperty.
-  if (m_ValidProperty == NULL)
-    ; // search only for name
+  if (m_ValidProperty.IsNull())
+  {
+    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()).IsNotNull()); // search only for name
+  }
   else
-    ; // search for name and property
-
-  return true;
+    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()) == m_ValidProperty); // search for name and property
 }

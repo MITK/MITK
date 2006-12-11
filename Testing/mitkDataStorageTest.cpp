@@ -149,8 +149,8 @@ int mitkDataStorageTest(int argc, char* argv[])
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     //std::cout << "all Objects: " << all << std::flush;
     if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
-        && (find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-        && (find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
     {
       std::cout<<"[PASSED]"<<std::endl;
     }

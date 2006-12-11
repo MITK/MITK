@@ -80,7 +80,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
     if ((node->IsOn("IsDataStoreManaged",NULL, false) == true) && (condition.CheckNode(node) == true))
       resultset->InsertElement(index++, node);
   } 
-  return resultset;
+
+  return SetOfObjects::ConstPointer( resultset );
 }
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
@@ -97,5 +98,6 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
     if (node->IsOn("IsDataStoreManaged",NULL, false) == true)
       resultset->InsertElement(index++, node);
   } 
-  return resultset;
+  
+  return SetOfObjects::ConstPointer( resultset );
 }

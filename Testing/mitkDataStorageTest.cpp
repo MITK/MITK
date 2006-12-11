@@ -147,7 +147,6 @@ int mitkDataStorageTest(int argc, char* argv[])
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    //std::cout << "all Objects: " << all << std::flush;
     if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
       && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
@@ -157,10 +156,6 @@ int mitkDataStorageTest(int argc, char* argv[])
     else
     {
       std::cout << "[FAILED]" << std::endl;
-      //std::cout << " returned elements: ";
-      //for (mitk::DataStorage::SetOfObjects::ConstIterator i = all->Begin(); i != all->End(); i++)
-      //  std::cout << i << ", ";
-      //std::cout << std::endl;
       returnValue = EXIT_FAILURE;
     }
   } 
@@ -175,7 +170,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     mitk::StringProperty nameProp("Surface Node"); // build new property for the search criteria
-    mitk::NodePredicateProperty predicate("name", nameProp);
+    mitk::NodePredicateProperty predicate("name", &nameProp);
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     if ((all->Size() == 1) && (all->GetElement(0) == n2))  // check if correct object is in resultset
     {
@@ -221,7 +216,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   {
     mitk::NodePredicateDataType p1("Surface");
     mitk::ColorProperty colorprop(color);
-    mitk::NodePredicateProperty p2("color", colorprop);
+    mitk::NodePredicateProperty p2("color", &colorprop);
     mitk::NodePredicateAND predicate;
     predicate.AddPredicate(p1);
     predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
@@ -247,7 +242,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     mitk::ColorProperty::Pointer cp = new mitk::ColorProperty(color);
-    mitk::NodePredicateProperty proppred("color", *cp);
+    mitk::NodePredicateProperty proppred("color", cp);
     mitk::NodePredicateNOT predicate(proppred);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);

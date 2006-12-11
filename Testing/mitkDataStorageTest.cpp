@@ -246,7 +246,8 @@ int mitkDataStorageTest(int argc, char* argv[])
   std::cout << "Requesting objects that do not meet a criteria: " << std::flush;
   try 
   {
-    mitk::NodePredicateProperty proppred("color", mitk::ColorProperty(color));
+    mitk::ColorProperty::Pointer cp = new mitk::ColorProperty(color);
+    mitk::NodePredicateProperty proppred("color", *cp);
     mitk::NodePredicateNOT predicate(proppred);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);

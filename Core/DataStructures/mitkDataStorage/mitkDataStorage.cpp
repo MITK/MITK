@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataTreeNode.h>
 #include <mitkProperties.h>
+#include <mitkNodePredicateBase.h>
 
 mitk::DataStorage::DataStorage() 
 : itk::Object()

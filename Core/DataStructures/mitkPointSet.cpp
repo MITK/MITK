@@ -60,13 +60,16 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
 
 //##ModelId=3F0177E901DE
 //##Documentation
-//##@brief searches a point in the list with a given precision
+//##@brief searches a point in the list with a given precision in world coordinates
 //##returns -1 if no point has been found
 int mitk::PointSet::SearchPoint(Point3D point, float distance )
 {
 //out is the point which is checked to be the searched point
   PointType out;
   out.Fill(0);
+  PointType indexPoint;
+
+  this->GetGeometry(0)->WorldToIndex(point, indexPoint);
 
   //searching the first point in the Set, that is +- distance far away from the given point
   unsigned int i;
@@ -74,6 +77,11 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   end = m_ItkData->GetPoints()->End();
   int bestIndex=-1;
   distance = distance*distance;
+  
+  //to correct errors from converting index to world and world to index
+  if (distance == 0.0)
+    distance = 0.000001;
+
   ScalarType bestDist=distance;
   ScalarType dist, tmp;
   for (it = m_ItkData->GetPoints()->Begin(), i=0; it != end; ++it, ++i)
@@ -82,13 +90,13 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
     if (!ok)
       return -1;
     else 
-    if (point == out)//if totaly equal
+    if (indexPoint == out)//if totaly equal
       return it->Index();
 
     //distance calculation
-    tmp=out[0]-point[0]; dist  = tmp*tmp;
-    tmp=out[1]-point[1]; dist += tmp*tmp;
-    tmp=out[2]-point[2]; dist += tmp*tmp;
+    tmp=out[0]-indexPoint[0]; dist  = tmp*tmp;
+    tmp=out[1]-indexPoint[1]; dist += tmp*tmp;
+    tmp=out[2]-indexPoint[2]; dist += tmp*tmp;
     if(dist<bestDist)
     {
       bestIndex = it->Index();
@@ -109,18 +117,45 @@ mitk::PointSet::PointType mitk::PointSet::GetPoint(int position) const
   if (m_ItkData->GetPoints()->IndexExists(position))
   {
     m_ItkData->GetPoint(position, &out);
+    this->GetGeometry(0)->IndexToWorld(out, out);//not 3D+t!
     return out;
   }
   else
     return out;
 }
 
+
+bool mitk::PointSet::GetPointIfExists(PointIdentifier id, PointType* point)
+{
+  if ( m_ItkData->GetPoints()->GetElementIfIndexExists(id, point))
+  {
+    this->GetGeometry(0)->IndexToWorld(*point, *point);
+    return true;
+  }
+  else 
+    return false;
+}
+
+void mitk::PointSet::SetPoint(PointIdentifier id, PointType point)
+{
+  mitk::Point3D indexPoint;
+  this->GetGeometry(0)->WorldToIndex(point, indexPoint);//not yet 3D+t!
+  m_ItkData->SetPoint(id, indexPoint);
+}
+
+void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point)
+{
+  mitk::Point3D indexPoint;
+  this->GetGeometry(0)->WorldToIndex(point, indexPoint);//not yet 3D+t!
+  m_ItkData->GetPoints()->InsertElement(id, indexPoint);
+}
+
+
 bool mitk::PointSet::IndexExists(int position)
 {
   return m_ItkData->GetPoints()->IndexExists(position);
 }
 
-//##ModelId=3F0177E901DC
 bool mitk::PointSet::GetSelectInfo(int position)
 {
   if (m_ItkData->GetPoints()->IndexExists(position))
@@ -133,7 +168,6 @@ bool mitk::PointSet::GetSelectInfo(int position)
     return false;
 }
 
-//##ModelId=3F05B07B0147
 const int mitk::PointSet::GetNumberOfSelected()
 {
   int numberOfSelected = 0;
@@ -174,6 +208,9 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
+      //transfer from world to index coordinates 
+      this->GetGeometry(0)->WorldToIndex(pt, pt);
+
       m_ItkData->GetPoints()->InsertElement(position, pt);
 
       PointDataType pointData = {pointOp->GetIndex(), pointOp->GetSelected(), pointOp->GetPointType()};
@@ -190,6 +227,10 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
+      
+      //transfer from world to index coordinates 
+      this->GetGeometry(0)->WorldToIndex(pt, pt);
+
       m_ItkData->SetPoint(pointOp->GetIndex(), pt);
 
       this->OnPointSetChange();
@@ -259,9 +300,6 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 }
 
 
-void mitk::PointSet::OnPointSetChange(){}
-
-
 //##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
 {
@@ -288,16 +326,19 @@ void mitk::PointSet::UpdateOutputInformation()
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()
 {
 }
+
 //##ModelId=3F0177E901FD
 bool mitk::PointSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;
 }
+
 //##ModelId=3F0177E901FF
 bool mitk::PointSet::VerifyRequestedRegion()
 {
     return true;
 }
+
 //##ModelId=3F0177E9020B
 void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 {

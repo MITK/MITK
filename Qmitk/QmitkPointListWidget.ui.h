@@ -46,23 +46,21 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 //then this don't work anymore (then change the event here too)
 {  
   assert(m_PointSet.IsNotNull());
-  //assert(m_PointSet->IndexExists(ItemIndex));
   mitk::PointSet::PointType ppt;
-  mitk::PointSet::PointsContainer::Iterator it, end;  
-  int i=0;
-  for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); i<ItemIndex; it++) i++; ///the iterator will be set to the position needed 
-  m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
-  mitk::Point2D p2d;
-  mitk::Point3D p3d;
-  mitk::FillVector3D(p3d, (ppt)[0],(ppt)[1],(ppt)[2]);
-  mitk::PositionEvent event(NULL, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
-  mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
+  if ( m_PointSet->GetPointIfExists( (mitk::PointSet::PointIdentifier) ItemIndex, &ppt))
+  {
+    mitk::Point2D p2d;
+    mitk::Point3D p3d;
+    mitk::FillVector3D(p3d, (ppt)[0],(ppt)[1],(ppt)[2]);
+    mitk::PositionEvent event(NULL, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
+    mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
 
-  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
-  stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
-  mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
+    mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
+    stateEvent->Set(mitk::EIDLEFTMOUSERELEASE , &event);
+    mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );
 
-  delete stateEvent;
+    delete stateEvent;
+  }
 }
 
 
@@ -80,19 +78,20 @@ void QmitkPointListWidget::ItemsOfListUpdate()
   if (size!=0)
   {
     const mitk::PointSet::DataType::Pointer Pointlist= m_PointSet->GetPointSet();
-    ////
     mitk::PointSet::PointsContainer::Iterator it, end;
     end = m_PointSet->GetPointSet()->GetPoints()->End();
     unsigned int i=0;
     mitk::PointSet::PointType ppt;
     for (it = m_PointSet->GetPointSet()->GetPoints()->Begin(); it!=end; it++,i++)
     {
-      m_PointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(it->Index(), &ppt);
-      std::stringstream  aStrStream;
-      aStrStream<<prefix<<i+1<<"  ("<< (ppt)[0]<<",  "<<(ppt)[1]<<",  "<<(ppt)[2]<<")"<<", Index "<< it->Index();
-      const std::string s = aStrStream.str();
-      const char * Item =s.c_str();
-      this->InteractivePointList->insertItem(Item);
+      if ( m_PointSet->GetPointIfExists( it->Index(), &ppt))
+      {
+        std::stringstream  aStrStream;
+        aStrStream<<prefix<<i+1<<"  ("<< (ppt)[0]<<",  "<<(ppt)[1]<<",  "<<(ppt)[2]<<")"<<", Index "<< it->Index();
+        const std::string s = aStrStream.str();
+        const char * Item =s.c_str();
+        this->InteractivePointList->insertItem(Item);
+      }
     }
     //
     // if there is a selected point in the point set, it will

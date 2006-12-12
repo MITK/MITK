@@ -41,7 +41,7 @@ namespace mitk {
 //##Documentation
 //##@brief DataStructure which stores a set of points. Superclass of mitk::Mesh.
 //##
-//## This class supports 3D point definition.
+//## This class supports 3D point definition (not yet 3D+t).
 //## An entry is divided into the pointcoordinates and pointdata.
 //## The pointdata includes information about the pointId, the selection state of the point and an information about the type of the point.
 //## For further information about different types of a point see mitk::PointSpecificationType in mitkVector.h;
@@ -98,6 +98,7 @@ public:
 
   typedef MeshType DataType;
   typedef DataType::PointType PointType;
+  typedef DataType::PointIdentifier PointIdentifier;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;
   typedef DataType::PointsContainer::ConstIterator PointsConstIterator;
@@ -121,13 +122,30 @@ public:
 
   //##ModelId=3F0177E901CE
   //##Documentation
-  //## @brief Get the point on the given position
+  //## @brief Get the point on the given position in world coordinates
   //##
   //## check if index exists. If it doesn't exist, then return 0,0,0
   PointType GetPoint(int position) const;
 
+  /**
+  * @brief If the Id exists in mitkData, then point is set and true is returned in world coordinates
+  **/
+  bool GetPointIfExists(PointIdentifier id, PointType* point);
+
+  /**
+  * @brief Set the given point in world coordinate system into the itkPointSet.
+  **/
+  void SetPoint(PointIdentifier id, PointType point);
+
+  /**
+  * @brief Set the given point in world coordinate system into the itkPointSet.
+  **/
+  void InsertPoint(PointIdentifier id, PointType point);
+
+
   //##Documentation
-  //## @brief searches a selected point and returns the id of that point. if no point is found, then -1 is returned
+  //## @brief searches a selected point and returns the id of that point. 
+  //## If no point is found, then -1 is returned
   virtual int SearchSelectedPoint();
 
   //##Documentation
@@ -146,8 +164,10 @@ public:
 
   //##ModelId=3F0177E901DE
   //##Documentation
-  //## @brief searches a point in the List == point +/- distance
+  //## @brief searches a point in the list == point +/- distance
   //##
+  //## @param point is in world coordinates.
+  //## @param distance is in mm.
   //## returns -1 if no point is found
   //## or the position in the list of the first match
   int SearchPoint(Point3D point, float distance);
@@ -169,7 +189,7 @@ public:
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
   //Method for subclasses
-  virtual void OnPointSetChange();
+  virtual void OnPointSetChange(){};
 
 protected:
   //##ModelId=3F0177E901BD

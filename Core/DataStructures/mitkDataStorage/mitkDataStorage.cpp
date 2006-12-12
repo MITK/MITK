@@ -77,7 +77,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
     mitk::DataTreeNode* node = it.Get();
     if (node == NULL)
       continue;
-    if ((node->IsOn("IsDataStoreManaged",NULL, false) == true) && (condition.CheckNode(node) == true))
+    if (/*(node->IsOn("IsDataStoreManaged",NULL, false) == true) &&*/ (condition.CheckNode(node) == true))  // temporarily not used until all Reliver functionalities use the datastorage
       resultset->InsertElement(index++, node);
   } 
 
@@ -95,7 +95,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
     mitk::DataTreeNode* node = it.Get();
     if (node == NULL)
       continue;
-    if (node->IsOn("IsDataStoreManaged",NULL, false) == true)
+    /*if (node->IsOn("IsDataStoreManaged",NULL, false) == true)*/  // temporarily not used until all Reliver functionalities use the datastorage
       resultset->InsertElement(index++, node);
   } 
   

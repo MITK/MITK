@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataTreeNode.h>
 #include <mitkProperties.h>
-#include <mitkNodePredicateBase.h>
+#include "mitkNodePredicateBase.h"
 
 mitk::DataStorage::DataStorage() 
 : itk::Object()
@@ -43,8 +43,7 @@ void mitk::DataStorage::Initialize(mitk::DataTree* tree)
 inline bool mitk::DataStorage::IsInitialized()
 {
   return m_DataTree.IsNotNull();
-};
-
+}
 
 void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents)
 {
@@ -93,11 +92,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
   for (it.GoToBegin(); !it.IsAtEnd(); it++)
   {
     mitk::DataTreeNode* node = it.Get();
-    if (node == NULL)
+    if (node == NULL) 
       continue;
     /*if (node->IsOn("IsDataStoreManaged",NULL, false) == true)*/  // temporarily not used until all Reliver functionalities use the datastorage
       resultset->InsertElement(index++, node);
-  } 
-  
+  }  
   return SetOfObjects::ConstPointer( resultset );
 }

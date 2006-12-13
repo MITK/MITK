@@ -592,9 +592,11 @@
     </state>
   </stateMachine>
   <stateMachine NAME="PositionTracker">
-    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="212" Y_POS="188" WIDTH="100" HEIGHT="50"> 
-      <transition NAME="Mouse Move" EVENT_ID="520" NEXT_STATE_ID="1" >
-        <action ID="92"> <!--AcMove--> </action>
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="212" Y_POS="188" WIDTH="100" HEIGHT="50">
+      <transition NAME="Mouse Move" EVENT_ID="520" NEXT_STATE_ID="1">
+        <action ID="92">
+          <!--AcMove-->
+        </action>
       </transition>
     </state>
   </stateMachine>
@@ -1613,8 +1615,7 @@
           <!-- AcInitLine -->
         </action>
       </transition>
-      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="6">
-      </transition>
+      <transition NAME="OnYes" EVENT_ID="1004" NEXT_STATE_ID="6" />
     </state>
     <state NAME="Decide between left and right movement. Left?" ID="5">
       <transition NAME="OnNo" EVENT_ID="1003" NEXT_STATE_ID="6">
@@ -1628,16 +1629,15 @@
         </action>
       </transition>
     </state>
-     <state NAME="Decide between left and right movement. Left?" ID="6">
+    <state NAME="Decide between left and right movement. Left?" ID="6">
       <transition NAME="OnMouseMove" EVENT_ID="530" NEXT_STATE_ID="5">
         <action ID="8">
           <!-- AcInitMovement -->
         </action>
       </transition>
-      <transition NAME="OnMouseUp" EVENT_ID="505" NEXT_STATE_ID="0">
-      </transition>
+      <transition NAME="OnMouseUp" EVENT_ID="505" NEXT_STATE_ID="0" />
     </state>
-   </stateMachine>
+  </stateMachine>
   <stateMachine NAME="HierachicalInteractor">
     <!-- Behaviour of a HirachicalInteractor -->
     <state NAME="notSelected" ID="0" START_STATE="TRUE" X_POS="153" Y_POS="45" WIDTH="100" HEIGHT="50">
@@ -2840,56 +2840,135 @@
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <!-- mouse down: jump to decision state -->
       <transition NAME="mouse down" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="21"> <!-- AcCheckPoint --> </action>
+        <action ID="21">
+          <!-- AcCheckPoint -->
+        </action>
       </transition>
       <transition NAME="mouse move" NEXT_STATE_ID="5" EVENT_ID="520">
-        <action ID="21"> <!-- AcCheckPoint --> </action>
+        <action ID="21">
+          <!-- AcCheckPoint -->
+        </action>
       </transition>
-     </state>
+    </state>
     <state NAME="rotate?" ID="2">
-      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004"/>
+      <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004" />
       <transition NAME="no" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="92"> <!--AcMove--> </action>
+        <action ID="92">
+          <!--AcMove-->
+        </action>
       </transition>
     </state>
     <state NAME="rotate" ID="3">
       <!-- send rotate events -->
       <transition NAME="mouse move" NEXT_STATE_ID="3" EVENT_ID="530">
-        <action ID="1005"> <!--AcRotate--> </action>
+        <action ID="1005">
+          <!--AcRotate-->
+        </action>
       </transition>
       <transition NAME="mouse release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="1010"> <!--AcRotateEnd--> </action>
+        <action ID="1010">
+          <!--AcRotateEnd-->
+        </action>
       </transition>
     </state>
     <state NAME="move" ID="4">
       <!-- send move events -->
       <transition NAME="mouse move" NEXT_STATE_ID="4" EVENT_ID="530">
-        <action ID="92"> <!--AcMove--> </action>
+        <action ID="92">
+          <!--AcMove-->
+        </action>
       </transition>
-      <transition NAME="mouse release" NEXT_STATE_ID="1" EVENT_ID="505"/>
+      <transition NAME="mouse release" NEXT_STATE_ID="1" EVENT_ID="505" />
     </state>
     <state NAME="rotation possible?" ID="5">
       <transition NAME="yes" NEXT_STATE_ID="6" EVENT_ID="1004">
-        <action ID="1004"> <!--AcRotateStart--> </action>
+        <action ID="1004">
+          <!--AcRotateStart-->
+        </action>
       </transition>
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003"/>
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003" />
     </state>
     <state NAME="rotation possible!" ID="6">
       <!-- mouse down: jump to decision state -->
       <transition NAME="mouse down" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="21"> <!-- AcCheckPoint --> </action>
+        <action ID="21">
+          <!-- AcCheckPoint -->
+        </action>
       </transition>
       <transition NAME="mouse move" NEXT_STATE_ID="7" EVENT_ID="520">
-        <action ID="21"> <!-- AcCheckPoint --> </action>
-      </transition>
-     </state>
-    <state NAME="rotation possible?" ID="7">
-      <transition NAME="yes" NEXT_STATE_ID="6" EVENT_ID="1004"/>
-      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
-        <action ID="1010"> <!--AcRotateEnd--> </action>
+        <action ID="21">
+          <!-- AcCheckPoint -->
+        </action>
       </transition>
     </state>
-     </stateMachine>
+    <state NAME="rotation possible?" ID="7">
+      <transition NAME="yes" NEXT_STATE_ID="6" EVENT_ID="1004" />
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <action ID="1010">
+          <!--AcRotateEnd-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="shapemodelpointsetinteractor">
+    <state NAME="Interaction Activated, no point loaded yet" ID="1" START_STATE="TRUE" X_POS="457" Y_POS="506" WIDTH="226" HEIGHT="56">
+      <transition NAME="SetStateMachineOnDeselected" EVENT_ID="1031" NEXT_STATE_ID="1">
+        <action ID="1100" />
+      </transition>
+      <transition NAME="SetStateMachineOnSelected" EVENT_ID="1030" NEXT_STATE_ID="1">
+        <action ID="1101" />
+      </transition>
+      <transition NAME="Add Point" EVENT_ID="3" NEXT_STATE_ID="2">
+        <action ID="10" />
+      </transition>
+    </state>
+    <state NAME="One Point" ID="2" X_POS="567" Y_POS="145" WIDTH="100" HEIGHT="50">
+      <transition NAME="Move Point" EVENT_ID="3" NEXT_STATE_ID="2">
+        <action ID="103" />
+        <action ID="10" />
+      </transition>
+      <transition NAME="Remove Point" EVENT_ID="12" NEXT_STATE_ID="1">
+        <action ID="100" />
+      </transition>
+      <transition NAME="Check if point is hit by mouse click" EVENT_ID="1" NEXT_STATE_ID="3">
+        <action ID="30" />
+      </transition>
+      <transition NAME="name" EVENT_ID="14" NEXT_STATE_ID="2">
+        <action ID="72" />
+        <action ID="1100" />
+      </transition>
+    </state>
+    <state NAME="CheckPoint" ID="3" X_POS="64" Y_POS="52" WIDTH="100" HEIGHT="50">
+      <transition NAME="Point not hit" EVENT_ID="1003" NEXT_STATE_ID="2">
+        <action ID="72" />
+        <action ID="1100" />
+      </transition>
+      <transition NAME="Point is hit, check if is selected or not" EVENT_ID="1004" NEXT_STATE_ID="5">
+        <action ID="34" />
+        <action ID="1101" />
+      </transition>
+    </state>
+    <state NAME="PointMove" ID="4" X_POS="278" Y_POS="422" WIDTH="100" HEIGHT="50">
+      <transition NAME="Adjust the Mesh according to point move" EVENT_ID="505" NEXT_STATE_ID="2">
+        <action ID="42" />
+        <action ID="1234" />
+      </transition>
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="4">
+        <action ID="91" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="4">
+        <action ID="8" />
+      </transition>
+    </state>
+    <state NAME="Already Selected?" ID="5" X_POS="187" Y_POS="247" WIDTH="100" HEIGHT="50">
+      <transition NAME="Initialize Movement" EVENT_ID="1004" NEXT_STATE_ID="4">
+        <action ID="8" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="2">
+        <action ID="60" />
+      </transition>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

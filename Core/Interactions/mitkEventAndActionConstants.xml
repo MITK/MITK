@@ -313,6 +313,18 @@
       <action NAME="AcCHECKBARRIERSTATUS" ID="3010">
         <!--used in VesselGraphInteractor-->
       </action>
+      <action NAME="AcUPDATEMESH" ID="1234">
+        <!--For Shape Model Interaction-->
+      </action>
+      <action NAME="AcINCREASE" ID="49012">
+        <!---->
+      </action>
+      <action NAME="AcDECREASE" ID="49013">
+        <!---->
+      </action>
+      <action NAME="AcMODIFY" ID="49014">
+        <!---->
+      </action>
     </actionCategory>
     <actionCategory NAME="SegmentationInteractor">
       <action NAME="AcENTEROBJECT" ID="48000" />

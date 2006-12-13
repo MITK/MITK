@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   class DataTreeNode;
-  //##ModelId=3F017AFD00C3
   //##Documentation
   //## @brief Interaction with a set of points.
   //##
@@ -36,17 +35,15 @@ namespace mitk
   class PointSetInteractor : public Interactor
   {
   public:
-    //##ModelId=3F017B3200F2
+
     mitkClassMacro(PointSetInteractor, Interactor);
 
-    //##ModelId=3F017B3200F5
     //##Documentation
     //##@brief Constructor with Param n for limited Set of Points
     //##
     //## if no n is set, then the number of points is unlimited*
     PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
 
-    //##ModelId=3F017B320103
     virtual ~PointSetInteractor();
 
     //##Documentation
@@ -65,32 +62,20 @@ namespace mitk
 
 
   protected:
-    //##ModelId=3F017B320105
+
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
-    //##ModelId=3F017B320121
     //##Documentation
     //## @brief Deselects the Points in the PointSet.
     //## supports Undo if enabled
     void UnselectAll();
 
-    //##ModelId=3F05C0700185
     //##Documentation
     //## @brief Selects the point.
     //## supports Undo if enabled.
     //## @param position Needed for declaring operations
     void SelectPoint( int position );
 
-  private:
-
-    //##ModelId=3F017B3200E3
-    //##Documentation
-    //## @brief the number of possible points in this object
-    //##
-    //## if -1, then no limit set
-    int m_N;
-
-    //##ModelId=3F0AF6CF00C2
     //##Documentation
     //## @brief to calculate a direction vector from last point and actual point
     Point3D m_LastPoint;
@@ -98,6 +83,14 @@ namespace mitk
     //##Documentation
     //## @brief summ-vector for Movement
     Vector3D m_SumVec;
+
+  private:
+
+    //##Documentation
+    //## @brief the number of possible points in this object
+    //##
+    //## if -1, then no limit set
+    int m_N;
 
     //##Documentation
     //## @brief to store the value of precision to pick a point

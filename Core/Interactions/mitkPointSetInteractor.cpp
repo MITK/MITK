@@ -721,9 +721,11 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         ++it;
       }
 
-      //set every variable for movement calculation to sero
-      m_LastPoint.Fill(0);
-      m_SumVec.Fill(0);
+      //set every variable for movement calculation to zero
+      // commented out: increases usebility in derived classes.
+      /*m_LastPoint.Fill(0);
+      m_SumVec.Fill(0);*/
+
       //increase the GroupEventId, so that the Undo goes to here
       this->IncCurrGroupEventId();
       ok = true;

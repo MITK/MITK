@@ -21,6 +21,7 @@ SET(TESTS_WITHOUT_INPUT
   mitkImageDataItemTest.cpp
   mitkImageToItkTest.cpp
   mitkImageMapper2DTest.cpp
+  mitkInteractorTest.cpp
   mitkLevelWindowTest.cpp
   mitkLevelWindowManagerTest.cpp
   mitkMeshTest.cpp
@@ -31,6 +32,7 @@ SET(TESTS_WITHOUT_INPUT
   mitkRenderWindowTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkSlicedGeometry3DTest.cpp
+  mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp

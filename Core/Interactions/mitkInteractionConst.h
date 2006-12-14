@@ -213,6 +213,7 @@ typedef enum EActions
   AcINITFOREGROUND = 45,  // used in SeedsInteractor for setting the foreground seeds
   AcINITBACKGROUND = 46,  // used in SeedsInteractor for setting the background seeds
   AcINITNEUTRAL = 47,  // used in SeedsInteractor for setting the neutral seeds (rubber)
+  AcINITUPDATE = 1235,  // For shape model deformation
   AcADDPOINT = 10,
   AcADD = 11,
   AcADDLINE = 12,
@@ -321,9 +322,9 @@ typedef enum EActions
   AcSETVESSELELEMENT = 3008,  // used in VesselGraphInteractor
   AcCHECKBARRIERSTATUS = 3010,  // used in VesselGraphInteractor
   AcUPDATEMESH = 1234,  // For Shape Model Interaction
-  AcINCREASE = 49012,  // 
-  AcDECREASE = 49013,  // 
-  AcMODIFY = 49014,  // 
+  AcINCREASE = 49012,
+  AcDECREASE = 49013,
+  AcMODIFY = 49014,
   AcENTEROBJECT = 48000,
   AcLEAVEOBJECT = 48001,
   AcSWITCHOBJECT = 48002,

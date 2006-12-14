@@ -2951,10 +2951,10 @@
     <state NAME="PointMove" ID="4" X_POS="278" Y_POS="422" WIDTH="100" HEIGHT="50">
       <transition NAME="Adjust the Mesh according to point move" EVENT_ID="505" NEXT_STATE_ID="2">
         <action ID="42" />
-        <action ID="1234" />
       </transition>
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="4">
         <action ID="91" />
+        <action ID="1234" />
       </transition>
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="4">
         <action ID="8" />
@@ -2963,6 +2963,7 @@
     <state NAME="Already Selected?" ID="5" X_POS="187" Y_POS="247" WIDTH="100" HEIGHT="50">
       <transition NAME="Initialize Movement" EVENT_ID="1004" NEXT_STATE_ID="4">
         <action ID="8" />
+        <action ID="1235" />
       </transition>
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="2">
         <action ID="60" />

@@ -124,6 +124,9 @@
       <action NAME="AcINITNEUTRAL" ID="47">
         <!--used in SeedsInteractor for setting the neutral seeds (rubber)-->
       </action>
+      <action NAME="AcINITUPDATE" ID="1235">
+        <!--For shape model deformation-->
+      </action>
     </actionCategory>
     <actionCategory NAME="Add">
       <action NAME="AcADDPOINT" ID="10" />
@@ -316,15 +319,9 @@
       <action NAME="AcUPDATEMESH" ID="1234">
         <!--For Shape Model Interaction-->
       </action>
-      <action NAME="AcINCREASE" ID="49012">
-        <!---->
-      </action>
-      <action NAME="AcDECREASE" ID="49013">
-        <!---->
-      </action>
-      <action NAME="AcMODIFY" ID="49014">
-        <!---->
-      </action>
+      <action NAME="AcINCREASE" ID="49012" />
+      <action NAME="AcDECREASE" ID="49013" />
+      <action NAME="AcMODIFY" ID="49014" />
     </actionCategory>
     <actionCategory NAME="SegmentationInteractor">
       <action NAME="AcENTEROBJECT" ID="48000" />

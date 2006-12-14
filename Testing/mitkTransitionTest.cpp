@@ -31,20 +31,22 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   mitk::Transition* transition = new mitk::Transition("transitionname", nextStateId, eventId);
 
   //check nextStateId
-  std::cout << "Check StateId";
+  std::cout << "Check StateId: ";
   if (transition->GetNextStateId()!=nextStateId)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   //check EventId
-  std::cout << "Check EventId";
+  std::cout << "Check EventId: ";
   if (transition->GetEventId()!=eventId || !transition->IsEvent(eventId))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   int count = 1;
   //Create Action
@@ -52,12 +54,13 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   transition->AddAction(firstAction);
 
   //check ActionCount
-  std::cout << "Check ActionCount after first addition of an action";
+  std::cout << "Check ActionCount after first addition of an action: ";
   if (transition->GetActionCount()!=count)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
   
   ++count;
 
@@ -66,19 +69,20 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   transition->AddAction(secondAction);
 
   //check ActionCount
-  std::cout << "check action Count after second addition of an action";
+  std::cout << "check action Count after second addition of an action: ";
   if (transition->GetActionCount()!=count)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   count = 1;
   
   //check ActionIterators
-  std::cout << "check ActionIterators";
-  std::vector<mitk::Action*>::iterator iter = transition->GetActionBeginIterator();
-  const std::vector<mitk::Action*>::iterator end = transition->GetActionEndIterator();
+  std::cout << "Check ActionIterators: ";
+  mitk::Transition::ActionVectorIterator iter = transition->GetActionBeginIterator();
+  mitk::Transition::ActionVectorConstIterator end = transition->GetActionEndIterator();
   while (iter != end)
   {
     if((*iter)->GetActionId()!=count)
@@ -89,21 +93,23 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
     ++count;
     ++iter;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
   //check setting State
-  std::cout << "check setting a statepointer and reading it again";
+  std::cout << "Check setting a statepointer and reading it again: ";
   int stateId = 10000;
-  mitk::State * state = new mitk::State("statename", stateId);
+  mitk::State::Pointer state = mitk::State::New("statename", stateId);
   transition->SetNextState(state);
   if (transition->GetNextState()!=state)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
 
 
   //well done!!! Passed!
-  std::cout<<"[PASSED]"<<std::endl;
+  std::cout<<"[ALL PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -89,6 +89,8 @@ public:
 
     const PropertyMap* GetMap() const { return &m_Properties; }
 
+    bool IsEmpty() const { return m_Properties.empty(); }
+
     virtual Pointer Clone();
 
     virtual void Clear();

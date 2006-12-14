@@ -24,13 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include "mitkOperationActor.h"
 #include <string>
-
+#include "mitkState.h"
 #include "mitkUndoModel.h"
 #include <mitkXMLIO.h>
 
 namespace mitk {
 
-  class State;
   class Action;
   class StateEvent;
   class UndoController;
@@ -76,7 +75,6 @@ namespace mitk {
   StateMachine::AddActionFunction(a, new TSpecificStateMachineFunctor<Self>(this, &Self::f));
 
 
-//##ModelId=3E5A397B01D5
 /**
 @brief Superior statemachine
 @ingroup Interaction
@@ -136,115 +134,136 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
   public:
     mitkClassMacro(StateMachine,itk::Object);
    
-    /// map to connect action IDs with method calls
-    /// Use AddActionFunction or (even better) the CONNECT_ACTION macro to fill the map
+    /**
+    * @brief New Macro with one parameter for creating this object with static New(..) method
+    **/
+    mitkNewMacro1Param(Self, const char*);
+
+
+    /**
+    * @brief Map to connect action IDs with method calls. Use AddActionFunction or (even better) the CONNECT_ACTION macro to fill the map.
+    **/
     typedef std::map<int, TStateMachineFunctor*> ActionFunctionsMapType;
 
-    //##ModelId=3E5B2DB301FD
-    //##Documentation
-    //## Constructor
-    //## @brief connects the current State to a StateMachine of Type type;
-    //## 
-    //## Because of the use of Smartpointers in DataTree and the use of observer-technologies, a StateMachine is a Subclass of itk::Object.
-    //## default of m_UndoEnabled is true;
+    /**
+    * @brief Default Constructor. Obsolete to instanciate it with this method! Use ::New(..) method instead. Set the "type" and with this the pattern of the StateMachine
+    **/
     StateMachine(const char * type);
 
+    /**
+    * @brief Default Destructor
+    **/
     ~StateMachine();
 
-    //##ModelId=3E5B2E660087
+    /**
+    * @brief Get the name and with this the type of the StateMachine
+    **/
     std::string GetType() const;
 
-    //##ModelId=3E5B2DE30378
-    //##Documentation
-    //## @brief handles an Event accordingly to its current State
-    //##
-    //## statechange with Undo functionality;
-    //## EventMapper gives each event a new objectEventId
-    //## and a StateMachine::ExecuteAction can descide weather it gets a
-    //## new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId).
-    //## Object- and group-EventId can also be accessed through static methods from OperationEvent
+    /**
+    * @brief handles an Event accordingly to its current State
+    * 
+    * Statechange with Undo functionality;
+    * EventMapper gives each event a new objectEventId
+    * and a StateMachine::ExecuteAction can descide weather it gets a
+    * new GroupEventId or not, depending on its state (e.g. finishedNewObject then new GroupEventId).
+    * Object- and group-EventId can also be accessed through static methods from OperationEvent
+    **/
     virtual bool HandleEvent(StateEvent const* stateEvent);
 
-    //##ModelId=3EDCAECB0175
-    //##Documentation
-    //## if set to true, then UndoFunctionality is enabled
-    //## if false, then Undo is disabled
+    /**
+    * @brief Enables or disabled Undo. 
+    **/
     void EnableUndo(bool enable);
 
-    //##Documentation
-    //## so that UndoModel can call ExecuteOperation for Undo!
+    /**
+    * @brief Friend so that UndoModel can call ExecuteOperation for Undo.
+    **/
     friend class UndoModel;
 
-    //##
+    /**
+    * @brief To be able to save a StateMachine to an xml-file.
+    **/
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
-    //##
+    
+    /**
+    * @brief To be able to read a StateMachine from an xml-file.
+    **/
     virtual bool ReadXMLData( XMLReader& xmlReader );
 
     static const std::string XML_NODE_NAME;
 
   protected:
-
+    /**
+    * @brief Adds the Function to ActionList.
+    **/
     void AddActionFunction(int action, TStateMachineFunctor* functor);
 
-    //##ModelId=3E5B2E170228
-    //##Documentation
-    //## @brief Method called in HandleEvent after Statechange.
-    //##
-    //## Each statechange has actions, which can be assigned by it's number.
-    //## If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
-    //## Object- and group-EventId can also be accessed through static methods from OperationEvent
+    /**
+    * @brief Method called in HandleEvent after Statechange.
+    *
+    * Each statechange has actions, which can be assigned by it's number.
+    * If you are developing a new statemachine, declare all your operations here and send them to Undo-Controller and to the Data.
+    * Object- and group-EventId can also be accessed through static methods from OperationEvent
+    **/
     virtual bool ExecuteAction(Action* action, StateEvent const* stateEvent);
 
-    //##Documentation
-    //## @brief returns the current state
+    /**
+    * @brief returns the current state
+    **/
     const State* GetCurrentState() const;
 
-    //##ModelId=3EDCAECB00B9
-    //##Documentation
-    //## @brief if true, then UndoFunctionality is enabled
-    //## default on true;
+    /**
+    * @brief if true, then UndoFunctionality is enabled
+    * 
+    * Default value is true;
+    **/
     bool m_UndoEnabled;
 
-    //Documentation
-    //##ModelId=3EF099EA03C0
-    //## @brief friend protected function of OperationEvent, that way all StateMachines can set GroupEventId to be incremented!
+    /**
+    * @brief Friend protected function of OperationEvent; that way all StateMachines can set GroupEventId to be incremented!
+    **/
     void IncCurrGroupEventId();
 
-    //##ModelId=3EDCAECB0128
-    //##Documentation
-    //## @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
+    /**
+    * @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
+    **/
     UndoController* m_UndoController;
 
-    //##ModelId=3EAEEDC603D9
-    //##Documentation
-    //## @brief A statemachine is also an OperationActor due to the UndoMechanism. 
-    //## 
-    //## The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
-    //## Is set private here and in superclass it is set public, so UndoController
-    //## can reach ist, but it can't be overwritten by a subclass
+    /**
+    * @brief A statemachine is also an OperationActor due to the UndoMechanism. 
+    *
+    * The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
+    * Is set private here and in superclass it is set public, so UndoController
+    * can reach ist, but it can't be overwritten by a subclass
+    **/
     virtual void ExecuteOperation(Operation* operation);
 
-    //##Documentation
-    //## @brief resets the current state to the startstate with undo functionality! Use carefully!
+    /**
+    * @brief resets the current state to the startstate with undo functionality! Use carefully!
+    **/
     void ResetStatemachineToStartState();
 
-    //##Documentation
-    // XML
+   
     virtual const std::string& GetXMLNodeName() const;
 
     static const std::string STATE_MACHINE_TYPE;
     static const std::string STATE_ID;
 
   private:
-
-    //##ModelId=3E5B2D66027E
+    /**
+    * @brief The type of the StateMachine. This string specifies the StateMachinePattern that is loaded from the StateMachineFactory.
+    **/
     std::string m_Type;
 
-    //##ModelId=3E5B2D8F02B9
-    //##Documentation
-    //## @brief holds the current state the machine is in
-    State* m_CurrentState;
+    /**
+    * @brief Points to the current state.
+    **/
+    State::Pointer m_CurrentState;
     
+    /**
+    * @brief Map of the added Functions
+    **/
     ActionFunctionsMapType m_ActionFunctionsMap;
 
   };

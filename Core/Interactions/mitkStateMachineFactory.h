@@ -22,74 +22,82 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkState.h"
+#include "mitkTransition.h"
+#include "mitkAction.h"
 #include <vtkXMLParser.h> 
 #include <iostream>
 #include <set>
 
 
 namespace mitk {
-  class Action;
-  class Interactor;
 
-  //##ModelId=3E5A39550068
-  //##Documentation
-  //## @brief builds up all specifiyed statemachines and hold them for later
-  //## access
-  //##
-  //## According to the XML-File every different statemachine is build up. A new
-  //## Instance of a new StateMachine grabs a StartState of one certain
-  //## statemachine. Two instances of one kind of statemachine share that
-  //## statemachine. 
-  //## During buildprocess at runtime each statemachine is parsed for well formed style.
-  //## @ingroup Interaction
+  /**
+  *@brief builds up all specifiyed statemachines and hold them for later access
+  *
+  * According to the XML-File every different statemachine is build up. A new
+  * Instance of a new StateMachine grabs a StartState of one certain
+  * statemachine. Two instances of one kind of statemachine share that
+  * statemachine. 
+  * During buildprocess at runtime each statemachine is parsed for well formed style.
+  * @ingroup Interaction
+  **/
   class StateMachineFactory : public vtkXMLParser
   {
   public:
-    //##ModelId=3F0177090046
-    typedef std::map<std::string,mitk::State*> StartStateMap;
-    //##ModelId=3F0177090056
-    typedef std::map<std::string,mitk::State *>::iterator StartStateMapIter;
-    //##ModelId=3F0177090075
-    typedef std::set<int> HistorySet;
-    //##ModelId=3F0177090094
-    typedef std::set<int>::iterator HistorySetIter;
-    //##Documentation
-    //## this type holds all states of one statemachine
-    typedef std::map<int,State*> StateMachineMapType;
-    //## this type holds all states of all statemachines so that a specific state can be accessed for persistence
+    /**
+    * @brief Typedef for all states that are defined as start-states
+    **/
+    typedef std::map<std::string, mitk::State::Pointer> StartStateMap;
+    typedef StartStateMap::iterator                     StartStateMapIter;
+
+    /**
+    * @brief Typedef to be used for parsing all states of one statemachine
+    **/
+    typedef std::set<int>                               HistorySet;
+    typedef HistorySet::iterator                        HistorySetIter;
+    
+    /**
+    * @brief This type holds all states of one statemachine.
+    **/
+    typedef std::map<int,State::Pointer>                StateMachineMapType;
+    
+    /**
+    * @brief this type holds all states of all statemachines so that a specific state can be accessed for persistence
+    **/
     typedef std::map<std::string, StateMachineMapType* > AllStateMachineMapType;
 
-    //##ModelId=3E68B2C600BD
-    //##Documentation
-    //## Constructor
+    /**
+    * @brief Default Constructor
+    **/
     StateMachineFactory();
 
-    //##Documentation
-    //## Destructor
+    /**
+    * @brief Default Destructor
+    **/
     ~StateMachineFactory();
 
-    //##Documentation
-    //## @brief deletes all States, Transitions and Actions that have been build up
-    void DeleteAllStateMachines();
+    /**
+    * @brief Returns the StartState of the StateMachine with the name type;
+    *
+    * Returns NULL if no entry with name type is found.
+    * Here a Smartpointer is returned to ensure, that StateMachines are also considered during reference counting.
+    **/    
+    static State* GetStartState(const char* type);
 
-    //##ModelId=3E5B4144024F
-    //##Documentation
-    //## returns NULL if no entry with string type is found
-    static State* GetStartState(const char * type);
-
-    //##ModelId=3E5B41730261
-    //##Documentation
-    //## loads the xml file filename and generates the necessary instances
+    /**
+    * @brief loads the xml file filename and generates the necessary instances
+    **/
     static bool LoadBehavior(std::string fileName);
 
-    //##Documentation
-    //## Try to load standard behavior file "StateMachine.xml"
-    //##
-    //## Search strategy:
-    //## \li try environment variable "MITKCONF" (path to "StateMachine.xml")
-    //## \li try "./StateMachine.xml"
-    //## \li try via source directory (using MITKROOT from cmake-created 
-    //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
+    /**
+    * @brief Try to load standard behavior file "StateMachine.xml"
+    *
+    * Search strategy:
+    * \li try environment variable "MITKCONF" (path to "StateMachine.xml")
+    * \li try "./StateMachine.xml"
+    * \li try via source directory (using MITKROOT from cmake-created 
+    * mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
+    **/
     static bool LoadStandardBehavior();
 
     static const std::string& GetLastLoadedBehavior()
@@ -97,98 +105,111 @@ namespace mitk {
       return s_LastLoadedBehavior;
     }
 
-    //##ModelId=3E6773790098
-    void  StartElement (const char *elementName, const char **atts);
+    /**
+    * @brief Derived from XMLReader
+    **/
+    void  StartElement (const char* elementName, const char **atts);
 
-    void  EndElement (const char *elementName);
+    /**
+    * @brief Derived from XMLReader
+    **/
+    void  EndElement (const char* elementName);
 
+    /**
+    * brief To enable StateMachine to access states
+    **/
     friend class StateMachine;
 
   private:
-
+    /**
+    * @brief Derived from XMLReader
+    **/
     std::string ReadXMLStringAttribut( std::string name, const char** atts);
+    /**
+    * @brief Derived from XMLReader
+    **/
     float ReadXMLFloatAttribut( std::string name, const char** atts );
+    /**
+    * @brief Derived from XMLReader
+    **/
     double ReadXMLDoubleAttribut( std::string name, const char** atts );
+    /**
+    * @brief Derived from XMLReader
+    **/
     int ReadXMLIntegerAttribut( std::string name, const char** atts );
+    /**
+    * @brief Derived from XMLReader
+    **/
     bool ReadXMLBooleanAttribut( std::string name, const char** atts );
 
-    //##Documentation
-    //## returns NULL if no entry with string type is found
-    static mitk::State* GetState( const char * type, int StateId );
+    /**
+    * @brief Returns a Pointer to the desired state if found. 
+    **/
+    static mitk::State* GetState( const char* type, int StateId );
 
-    //##ModelId=3E5B428F010B
-    //##Documentation
-    //## sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
-    static bool ConnectStates(mitk::State::StateMap *states);
+    /**
+    * @brief Sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
+    **/
+    static bool ConnectStates(mitk::State::StateMap* states);
 
-    //##ModelId=3E77572A010E
-    //##Documentation
-    //## recusive method, that parses this brand of 
-    //## the stateMachine and returns if correct
-    static bool parse(mitk::State::StateMap *states, mitk::State::StateMapIter thisState, HistorySet *history);
+    /**
+    * @brief Recusive method, that parses this pattern of the stateMachine and returns true if correct
+    **/
+    static bool RParse(mitk::State::StateMap* states, mitk::State::StateMapIter thisState, HistorySet *history);
 
-    //##ModelId=3E5B423003DF
+     /**
+    * @brief Holds all created States that are defined as StartState
+    **/
     static StartStateMap m_StartStates;
 
-    //##ModelId=3E68C269032E
+    /**
+    * @brief Holds all States of one StateMachine to build up the pattern.
+    **/
     mitk::State::StateMap m_AllStatesOfOneStateMachine;
 
-    //##ModelId=3E6773290108
-    State* m_AktState;
+    /**
+    * @brief A pointer to a State to help building up the pattern
+    **/
+    State::Pointer m_AktState;
 
-    Transition* m_AktTransition;
+    /**
+    * @brief A pointer to a Transition to help building up the pattern
+    **/
+    Transition::Pointer m_AktTransition;
 
-    Action* m_AktAction;
+    /**
+    * @brief A pointer to an Action to help building up the pattern
+    **/
+    Action::Pointer m_AktAction;
 
-    static std::vector<mitk::State *> m_AllStates;
-    static std::vector<mitk::Transition *> m_AllTransitions;
-    static std::vector<mitk::Action *> m_AllActions;
+    /**
+    * @brief map to hold all statemachines to call GetState for friends
+    **/
     static AllStateMachineMapType m_AllStateMachineMap;
+
     static std::string s_LastLoadedBehavior;
 
-
-    //##ModelId=3E68B2C60040
     std::string m_AktStateMachineName;
 
-    //##ModelId=3E7757280322
     static const std::string STYLE;
-    //##ModelId=3E775728037F
     static const std::string NAME;
-    //##ModelId=3E77572803DD
     static const std::string ID;	  
-    //##ModelId=3E7757290053
     static const std::string START_STATE;
-    //##ModelId=3E77572900B1
     static const std::string NEXT_STATE_ID;
-    //##ModelId=3E775729010E
     static const std::string EVENT_ID;
-    //##ModelId=3E775729017C
     static const std::string SIDE_EFFECT_ID;
-    //##ModelId=3E7F18FF0131
     static const std::string ISTRUE;
-    //##ModelId=3E7F18FF01FD
     static const std::string ISFALSE;
-
-    static const std::string STATE_MACHIN;
-
+    static const std::string STATE_MACHINE;
     static const std::string TRANSITION;    
-
     static const std::string STATE;
-
-    static const std::string STATE_MACHIN_NAME;
-
+    static const std::string STATE_MACHINE_NAME;
     static const std::string ACTION;
-
     static const std::string BOOL_PARAMETER;
-
     static const std::string INT_PARAMETER;
-
     static const std::string FLOAT_PARAMETER;
-
     static const std::string DOUBLE_PARAMETER;
-
     static const std::string STRING_PARAMETER;
-
     static const std::string VALUE;
 
   };

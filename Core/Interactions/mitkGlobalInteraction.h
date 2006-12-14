@@ -22,7 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFocusManager.h"
 #include "mitkCommon.h"
-#include "mitkStateMachine.h"
+//#include "mitkStateMachine.h"
+#include "mitkInteractor.h"
 #include <string>
 #include <vector>
 #include "mitkInteractionDebugger.h"
@@ -30,9 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   class PositionEvent;
-  class Interactor;
 
-  //##ModelId=3E5B33000230
   //##Documentation
   //## @brief handles all global Events
   //##
@@ -64,21 +63,18 @@ namespace mitk {
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
+    mitkNewMacro1Param(Self, const char*);
 
-    //##ModelId=3F0177080324
-    typedef std::vector<StateMachine*> StateMachineList;
-    //##ModelId=3F0177080334
-    typedef std::vector<StateMachine*>::iterator StateMachineListIter;
-
-    typedef std::vector<Interactor*> InteractorList;
-
-    typedef InteractorList::iterator InteractorListIter;
-
-    typedef std::multimap<float, Interactor*, std::greater<double> > InteractorMap;
-
-    typedef InteractorMap::iterator  InteractorMapIter;
-
-    //##ModelId=3EAD420E0088
+    typedef std::vector<StateMachine::Pointer>  StateMachineList;
+    typedef StateMachineList::iterator          StateMachineListIter;
+    typedef std::vector<Interactor::Pointer>    InteractorList;
+    typedef InteractorList::iterator            InteractorListIter;
+    typedef std::multimap<float, Interactor::Pointer, std::greater<double> > InteractorMap;
+    typedef InteractorMap::iterator             InteractorMapIter;
+    
+    /**
+    * @brief Default Constructor with type to load the StateMachinePattern of the StateMachine
+    **/
     GlobalInteraction(const char * type);
 
     //##Documentation
@@ -149,7 +145,11 @@ namespace mitk {
     friend class Interactor;
 
   protected:
-    //##ModelId=3E7F497F01AE
+    /**
+    * @brief Default destructor.
+    **/
+    ~GlobalInteraction();
+
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
     /*
@@ -208,14 +208,13 @@ namespace mitk {
     //## @brief iterator on an entry in m_JurisdictionMap for stepping through interactors
     InteractorMapIter m_CurrentInteractorIter;
     
-    //##ModelId=3EF099E80373
     //##Documentation
     //## @brief holds a list of BaseRenderer and one focused
     FocusManager* m_FocusManager;
 
     InteractionDebugger::Pointer m_InteractionDebugger;
 
-    static GlobalInteraction *s_GlobalInteraction;
+    static GlobalInteraction::Pointer s_GlobalInteraction;
   };
 } // namespace mitk
 

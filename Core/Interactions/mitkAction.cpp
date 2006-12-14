@@ -16,29 +16,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkAction.h"
-
 
 namespace mitk {
 
 /**
- *
+ * Default Constructor
  */
 Action::Action( int actionId )
 :m_ActionId( actionId ), m_PropertiesList(NULL)
-{ 
-}
+{}
+
+Action::~Action()
+{}
 
 /**
- *
- */
-Action::~Action() 
-{
-}
-
-/**
- *
+ * add a property
  */
 void Action::AddProperty(const char* propertyKey, BaseProperty* property ) 
 {
@@ -49,7 +42,7 @@ void Action::AddProperty(const char* propertyKey, BaseProperty* property )
 
 
 /**
- *
+ * return the actionId of this object
  */
 int Action::GetActionId() const
 {
@@ -58,7 +51,7 @@ int Action::GetActionId() const
 
 
 /**
- *
+ * return the property with the given property key
  */
 mitk::BaseProperty* Action::GetProperty( const char *propertyKey ) const 
 {

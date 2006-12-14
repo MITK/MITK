@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkStateMachine.h"
 #include "mitkGeometry3D.h"
-//#include <mitkOperationActor.h>
 
 #include <string>
 
@@ -56,6 +55,18 @@ class HierarchicalInteractor;
 class Interactor : public StateMachine
 {
 public:
+    mitkClassMacro(Interactor, StateMachine);
+
+    /**
+    * @brief Obsolete! Call New(const char* DataTreeNode*) instead! To maintain interface for mitkObjectFactory.
+    **/
+    itkNewMacro(Self);
+
+    /**
+    * @brief NewMacro with two parameters for calling itk::Lightobject::New(..) method
+    **/
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+
 
   //##Documentation
   //##@brief Enumeration of the different modes an Interactor can be into. 
@@ -66,11 +77,10 @@ public:
     SMSELECTED,
     SMSUBSELECTED
   };
+
   typedef SMMode ModeType;
 
-  mitkClassMacro(Interactor,StateMachine);
-
-  Interactor( );
+  Interactor( );//obsolete!
 
   //##Documentation
   //## @brief Constructor

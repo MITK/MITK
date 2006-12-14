@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
 #include "mitkEvent.h"
-#include "mitkInteractor.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
 #include <mitkStatusBar.h>
@@ -28,9 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkWorldPointPicker.h>
 #include <mitkOpenGLRenderer.h>
 
-mitk::GlobalInteraction *mitk::GlobalInteraction::s_GlobalInteraction(NULL);
+mitk::GlobalInteraction::Pointer mitk::GlobalInteraction::s_GlobalInteraction(NULL);
 
-//##ModelId=3EAD420E0088
+
 mitk::GlobalInteraction::GlobalInteraction(const char * type)
 : StateMachine(type)
 {
@@ -38,6 +37,11 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
   m_FocusManager = new mitk::FocusManager();
   m_InteractionDebugger = InteractionDebugger::New();
   InteractionDebugger::Deactivate();
+}
+
+mitk::GlobalInteraction::~GlobalInteraction()
+{
+  //s_GlobalInteraction doesn't have to be set = NULL;
 }
 
 
@@ -137,7 +141,7 @@ void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent
 {
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
-    if((*it)!=NULL)
+    if((*it).IsNotNull())
       (*it)->HandleEvent(stateEvent);
   }
 }
@@ -171,17 +175,13 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
 
   for (InteractorListIter it = m_InteractorList.begin(); it != m_InteractorList.end(); it++)
   {
-    if((*it)!=NULL)
+    if ((*it).IsNotNull())
     {
-      mitk::Interactor* interactor = dynamic_cast<mitk::Interactor* >(*it);
-      if (interactor != NULL)
+      //first ask for CalculateJurisdiction(..) and write it into the map if > 0
+      float value = (*it)->CalculateJurisdiction(stateEvent);
+      if (value > threshold)
       {
-        //first ask for CalculateJurisdiction(..) and write it into the map if > 0
-        float value = interactor->CalculateJurisdiction(stateEvent);
-        if (value > threshold)
-        {
-          m_JurisdictionMap.insert(InteractorMap::value_type(value, interactor));
-        }
+        m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));
       }
     }
   }
@@ -243,7 +243,6 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
   return m_FocusManager;
 }
 
-//##ModelId=3E7F497F01AE
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;
@@ -288,7 +287,7 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
     result=mitk::StateMachineFactory::LoadBehavior(XMLbehaviorFile);
   if(result==false)
   {
-    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
+    s_GlobalInteraction = mitk::GlobalInteraction::New(NULL);
     return false;
   }
   // load event-mappings from XML-file
@@ -298,24 +297,24 @@ bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorF
     result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
   if(result==false)
   {
-    s_GlobalInteraction = new mitk::GlobalInteraction(NULL);
+    s_GlobalInteraction = mitk::GlobalInteraction::New(NULL);
     return false;
   }
   // setup interaction mechanism by creating GlobalInteraction
   if(globalInteractionName == NULL)
-    s_GlobalInteraction = new mitk::GlobalInteraction("global");
+    s_GlobalInteraction = mitk::GlobalInteraction::New("global");
   else
-    s_GlobalInteraction = new mitk::GlobalInteraction(globalInteractionName);
+    s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName);
   return true;
 }
 
 mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
 {
-  if(s_GlobalInteraction == NULL)
+  if(s_GlobalInteraction.IsNull())
   {
     mitk::GlobalInteraction::StandardInteractionSetup();
   }
-  return s_GlobalInteraction;
+  return s_GlobalInteraction.GetPointer();
 }
 
 bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)

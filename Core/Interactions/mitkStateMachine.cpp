@@ -40,12 +40,12 @@ const std::string mitk::StateMachine::STATE_MACHINE_TYPE = "STATE_MACHINE_TYPE";
 const std::string mitk::StateMachine::STATE_ID = "STATE_ID";
 
 
-//##ModelId=3E5B2DB301FD
-//##Documentation
-//## Constructor
-//## daclares a new StateMachine and connects
-//## it to a StateMachine of Type type;
-mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
+/**
+* @brief Constructor
+* daclares a new StateMachine and connects
+* it to a StateMachine of Type type;
+**/
+mitk::StateMachine::StateMachine(const char * type)
 {
   if(type!=NULL)
   {
@@ -59,9 +59,9 @@ mitk::StateMachine::StateMachine(const char * type) : m_CurrentState(NULL)
   m_UndoController = new UndoController(VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 
-  m_ReferenceCountLock.Lock();
+  /*m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();
+  m_ReferenceCountLock.Unlock();*/
 
   #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->NewStateMachine( type, this );
@@ -85,7 +85,6 @@ mitk::StateMachine::~StateMachine()
   #endif
 }
 
-//##ModelId=3E5B2E660087
 std::string mitk::StateMachine::GetType() const
 {
 	return m_Type;
@@ -94,7 +93,7 @@ std::string mitk::StateMachine::GetType() const
 const mitk::State* mitk::StateMachine::GetCurrentState() const
 {
   if (m_CurrentState)
-    return m_CurrentState;
+    return m_CurrentState.GetPointer();
   return NULL;
 }
 
@@ -115,14 +114,13 @@ void mitk::StateMachine::ResetStatemachineToStartState()
 
 }
 
-//##ModelId=3E5B2DE30378
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
   #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->Event( this, stateEvent->GetId() );
   #endif
 
-  if (m_CurrentState == NULL)
+  if (m_CurrentState.IsNull())
     return false;//m_CurrentState needs to be set first!
 
   //get the Transition from m_CurrentState which waits for this EventId
@@ -181,8 +179,8 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   #endif
 
 
-  std::vector<Action*>::iterator actionIdIterator = tempTransition->GetActionBeginIterator();
-  const std::vector<Action*>::iterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();
+  mitk::Transition::ActionVectorIterator actionIdIterator = tempTransition->GetActionBeginIterator();
+  mitk::Transition::ActionVectorConstIterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();
   bool ok = true;
 
   while ( actionIdIterator != actionIdIteratorEnd ) 
@@ -204,13 +202,11 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   return ok;
 }
 
-//##ModelId=3EDCAECB0175
 void mitk::StateMachine::EnableUndo(bool enable)
 {
 	m_UndoEnabled = enable;
 }
 
-//##ModelId=3EF099EA03C0
 void mitk::StateMachine::IncCurrGroupEventId()
 {
 	mitk::OperationEvent::IncCurrGroupEventId();
@@ -301,7 +297,7 @@ bool mitk::StateMachine::ReadXMLData( XMLReader& xmlReader )
   {
     m_CurrentState = StateMachineFactory::GetState( stateMachineType.c_str(), stateId );
 
-    if ( m_CurrentState != NULL )
+    if ( m_CurrentState.IsNotNull() )
       return true;
   }
 

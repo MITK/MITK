@@ -24,80 +24,103 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <map>
 #include <set>
-
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include "mitkTransition.h"
 
 namespace mitk {
 
-  class Transition;
-
-  //##ModelId=3E5A3986027B
-  //##Documentation
-  //## @brief represents one state with all its necessary information
-  //##
-  //## Name and ID are stored. Also methods for building up, connecting and
-  //## parsing for well formed statemachines are present.
-  //## This class holds a map of transitions to next States. 
-  //## @ingroup Interaction
-  class State
+  /**
+  * @brief represents one state with all its necessary information
+  *
+  * Name and ID are stored. Also methods for building up, connecting and
+  * parsing for well formed statemachines are present.
+  * This class holds a map of transitions to next States. 
+  * @ingroup Interaction
+  **/
+  class State : public itk::Object
   {
   public:
-    //##ModelId=3F0177080382
-    typedef std::map<int,mitk::State*> StateMap;
-    //##ModelId=3F0177080393
-    typedef std::map<int,mitk::Transition*> TransitionMap;
+    mitkClassMacro(State, itk::Object);
 
-    //##ModelId=3F01770803B1
-    typedef std::map<int,mitk::State*>::iterator StateMapIter;
-    //##ModelId=3F01770803C0
-    typedef std::map<int,mitk::Transition*>::iterator TransMapIter;
+    /**
+    * @brief static New method to use SmartPointer
+    **/
+    mitkNewMacro2Param(Self, std::string, int);
 
-    //##ModelId=3F01770803D0
-    typedef std::map<int,mitk::Transition*>::const_iterator TransMapConstIter;
+    typedef std::map<int, mitk::State::Pointer> StateMap;
+    typedef std::map<int, mitk::Transition::Pointer> TransitionMap;
 
-    //##ModelId=3E5B2A9203BD
+    typedef StateMap::iterator StateMapIter;
+    typedef TransitionMap::iterator TransMapIter;
+
+    typedef TransitionMap::const_iterator TransMapConstIter;
+
+    /**
+    * @brief Constructor. Use ::New instead!
+    * Set the name and the Id of the state. 
+    * Name is to maintain readability during debug and Id is to identify this state inside the StateMachinePattern
+    **/
     State(std::string name, int id);
 
-    //##ModelId=3E5B2B2E0304
+    /**
+    * @brief Add a transition to the map of transitions.
+    **/
     bool AddTransition( Transition* transition );
 
-    //##ModelId=3E5B2B9000AC
-    //##Documentation
-    //## hashmap-lookup and returning the Transition. if not located, then NULL
+    /**
+    * @brief hashmap-lookup and returning the Transition. Returns NULL Pointer if not located
+    **/
     const Transition* GetTransition(int eventId) const;
 
-    //##ModelId=3E5B2C0503D5
+    /**
+    * @brief Returns the name.
+    **/
     std::string GetName() const;
 
-    //##ModelId=3E5B2C14016A
+    /**
+    * @brief Returns the Id.
+    **/
     int GetId() const;
 
-    //##ModelId=3E7757280208
-    //##Documentation
-    //## gives all next States back. To parse through all States.
+    /**
+    * @brief Returns a set of all next States. E.g. to parse through all States.
+    **/
     std::set<int> GetAllNextStates() const;
 
-    //##ModelId=3E64B4360017
-    //##Documentation
-    //## to check, if this Event has a Transition. 
-    //## for menu Behavior e.g.
+    /**
+    * @brief Check, if this event (eventId) leads to a state. 
+    **/
     bool IsValidEvent(int eventId) const;
 
-    //##ModelId=3E68C573013F
-    //##Documentation
-    //## searches dedicated States of all Transitions and
-    //## sets *nextState of these Transitions.
-    //## allStates is a List of all build States of that StateMachine
-    bool ConnectTransitions(StateMap *allStates);
+    /**
+    * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions. 
+    * Required for this is a List of all build States of that StateMachine (allStates). This way the StateMachine can be build up.
+    **/
+    bool ConnectTransitions(StateMap* allStates);
 
+  protected:
+    /**
+    * @brief Default Destructor
+    **/
+    ~State(){}
 
   private:
-    //##ModelId=3E5B2A220069
+    /**
+    * @brief Name of this State to support readability during debug
+    **/
     std::string m_Name;
 
-    //##ModelId=3E5B2A350338
+    /**
+    * @brief Id of this State important for interaction mechanism in StateMachinePattern
+    *
+    * All states inside a StateMachinePattern (construct of several states connected with transitions and actions) have to have an own id with which it is identifyable.
+    **/
     int m_Id;
 
-    //##ModelId=3E5B2A460057
+    /**
+    * @brief map of transitions that lead from this state to the next state
+    **/
     TransitionMap m_Transitions;
 
   };

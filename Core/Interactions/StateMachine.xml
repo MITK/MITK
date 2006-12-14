@@ -2969,6 +2969,33 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="InteractorTestPattern">
+      <!-- To Test an Interactor for the right behavior -->
+  	<state NAME="neutral" ID="0" START_STATE="TRUE">
+        <transition NAME="to1" NEXT_STATE_ID="1" EVENT_ID="4">
+          <action ID="1101" />
+          <!--AcMODESELECT-->
+        </transition>
+        <transition NAME="to2" NEXT_STATE_ID="2" EVENT_ID="2">
+          <action ID="1011" />
+          <!--AcMODESELECT-->
+        </transition>
+      </state>
+      <state NAME="State1" ID="1">
+        <transition NAME="StayIn1" NEXT_STATE_ID="1" EVENT_ID="533" />
+        <transition NAME="to0" NEXT_STATE_ID="0" EVENT_ID="506">
+  	      <action ID="1100" />
+            <!--AcMODEDESELECT-->
+        </transition>
+      </state>
+      <state NAME="State2" ID="2">
+        <transition NAME="StayIn2" NEXT_STATE_ID="2" EVENT_ID="531" />
+        <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507">
+        	<action ID="1100" />
+  	    <!--AcMODEDESELECT-->
+        </transition>
+      </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

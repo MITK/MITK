@@ -43,7 +43,6 @@ mitk::PointSetInteractor::PointSetInteractor(const char * type, DataTreeNode* da
   m_SumVec.Fill(0);
 }
 
-
 mitk::PointSetInteractor::~PointSetInteractor()
 {
 }
@@ -108,13 +107,12 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
 //    const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 //    if (displayGeometry != NULL)
 //      displayGeometry->WorldToDisplay(, lineFrom);
-//    precision = 
+//    precision =
 //  }
-//  
+//
 //  return precision;
 //
 //}
-
 
 void mitk::PointSetInteractor::UnselectAll()
 {
@@ -190,12 +188,12 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     //to check if the given Event is a DisplayPositionEvent.
     {
       mitk::DisplayPositionEvent const  *dispPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      if (dispPosEvent != NULL) 
+      if (dispPosEvent != NULL)
       {
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
       }
-      else 
+      else
       {
         mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
@@ -210,7 +208,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     */
     {
       mitk::DisplayPositionEvent const  *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL) 
+      if (posEvent == NULL)
         //check if it is a DisplayEvent thrown in a 3D window.
         //Then the z-information is missing.
         //returning false might end in the state full, but the last point couldn't be added, so the set wouldn't be full.
@@ -357,8 +355,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           //execute the Operation
           pointSet->ExecuteOperation(doOp);
 
-          /*now select the point "position-1", 
-          and if it is the first in list, 
+          /*now select the point "position-1",
+          and if it is the first in list,
           then contine at the last in list*/
           if (pointSet->GetSize()>0)//only then a select of a point is possible!
           {
@@ -415,7 +413,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
                 it++;
             }
 
-            if (it == end) { break; }  
+            if (it == end) { break; }
 
           }//if
           it++;
@@ -575,7 +573,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         this->HandleEvent( newStateEvent );
         ok = true;
       }
-      else 
+      else
       {
         if (pointSet->GetSize()<(m_N-1))
           //pointset after addition won't be full
@@ -646,7 +644,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
   case AcDESELECTOBJECT:
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL) 
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D itkPoint;

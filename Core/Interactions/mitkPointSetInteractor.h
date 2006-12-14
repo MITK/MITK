@@ -35,8 +35,9 @@ namespace mitk
   class PointSetInteractor : public Interactor
   {
   public:
-
     mitkClassMacro(PointSetInteractor, Interactor);
+
+    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
 
     //##Documentation
     //##@brief Constructor with Param n for limited Set of Points
@@ -56,7 +57,7 @@ namespace mitk
 
     //##Documentation
     //## @brief calculates how good the data, this statemachine handles, is hit by the event.
-    //## 
+    //##
     //## overwritten, cause we don't look at the boundingbox, we look at each point
     virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 

@@ -36,6 +36,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(SeedsInteractor, Interactor);
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     SeedsInteractor(const char * type, DataTreeNode* dataTreeNode);
     virtual ~SeedsInteractor();

@@ -21,11 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkBaseData.h"
 
-#include <iostream>
-#include <itkExceptionObject.h>
-#include <stdexcept>
-
-
 mitk::NodePredicateDataType::NodePredicateDataType(const char* datatype)
 : NodePredicateBase()
 {

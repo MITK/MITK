@@ -18,12 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataStorage.h"
 
-#include <mitkDataTreeNode.h>
-#include <mitkProperties.h>
+#include "mitkDataTreeNode.h"
+#include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
 
 mitk::DataStorage::DataStorage() 
-: itk::Object()
+: itk::Object(), m_ManageCompleteTree(true) // true by default until all Reliver functionalities use the datastorage properly
 {
   m_DataTree = NULL;
 }
@@ -56,6 +56,9 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   mitk::DataTreePreOrderIterator it(m_DataTree);
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
   it.Add(node);
+  /* save node and parentlist in relations map */
+  m_CreatedByRelations.insert(make_pair(node, parents));
+
 }
 
 void mitk::DataStorage::Update(mitk::DataTreeNode* node)
@@ -71,15 +74,24 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
   mitk::DataTreePreOrderIterator it(m_DataTree);
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   unsigned int index = 0;
-  for (it.GoToBegin(); !it.IsAtEnd(); it++)
-  {
-    mitk::DataTreeNode* node = it.Get();
-    if (node == NULL)
-      continue;
-    if (/*(node->IsOn("IsDataStoreManaged",NULL, false) == true) &&*/ (condition.CheckNode(node) == true))  // temporarily not used until all Reliver functionalities use the datastorage
-      resultset->InsertElement(index++, node);
-  } 
-
+  if (m_ManageCompleteTree == true)
+    for (it.GoToBegin(); !it.IsAtEnd(); it++)
+    {
+      mitk::DataTreeNode* node = it.Get();
+      if (node == NULL)
+        continue;
+      if (condition.CheckNode(node) == true)  // check all elements in the datatree
+        resultset->InsertElement(index++, node);
+    } 
+  else
+    for (it.GoToBegin(); !it.IsAtEnd(); it++)
+    {
+      mitk::DataTreeNode* node = it.Get();
+      if (node == NULL)
+        continue;
+      if ((node->IsOn("IsDataStoreManaged",NULL, false) == true) && (condition.CheckNode(node) == true))  // check if node is managed by the datastorage object
+        resultset->InsertElement(index++, node);
+    } 
   return SetOfObjects::ConstPointer( resultset );
 }
 
@@ -89,13 +101,22 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the DataStorage object */
   unsigned int index = 0;
-  for (it.GoToBegin(); !it.IsAtEnd(); it++)
-  {
-    mitk::DataTreeNode* node = it.Get();
-    if (node == NULL) 
-      continue;
-    /*if (node->IsOn("IsDataStoreManaged",NULL, false) == true)*/  // temporarily not used until all Reliver functionalities use the datastorage
+  if (m_ManageCompleteTree == true)
+    for (it.GoToBegin(); !it.IsAtEnd(); it++)
+    {
+      mitk::DataTreeNode* node = it.Get();
+      if (node == NULL) 
+        continue;
       resultset->InsertElement(index++, node);
-  }  
+    }  
+  else
+    for (it.GoToBegin(); !it.IsAtEnd(); it++)
+    {
+      mitk::DataTreeNode* node = it.Get();
+      if (node == NULL) 
+        continue;
+      if (node->IsOn("IsDataStoreManaged",NULL, false) == true)  // check if node is managed by the datastorage object
+        resultset->InsertElement(index++, node);
+    }  
   return SetOfObjects::ConstPointer( resultset );
 }

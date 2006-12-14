@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKDATASTORAGE_H_HEADER_INCLUDED_
 #define MITKDATASTORAGE_H_HEADER_INCLUDED_
 
-#include <itkObject.h>
-#include <mitkCommon.h>
-#include <mitkDataTree.h>
+#include "itkObject.h"
+#include "mitkCommon.h"
+#include "mitkDataTree.h"
 
-#include <itkVectorContainer.h>
+#include "itkVectorContainer.h"
+#include <map>
 
 namespace mitk {
 
@@ -104,6 +105,12 @@ namespace mitk {
     //##
     void Initialize(mitk::DataTree* tree);
 
+    //##Documentation
+    //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
+    itkSetMacro(ManageCompleteTree, bool);
+    itkGetMacro(ManageCompleteTree, bool);
+    itkBooleanMacro(ManageCompleteTree);
+
   protected:
     //##Documentation
     //## @brief Standard Constructor for ::New() instantiation     
@@ -121,6 +128,12 @@ namespace mitk {
     //##Documentation
     //## @brief holds the data tree that is encapsulated by this class
     mitk::DataTree::Pointer m_DataTree;
+    
+    //##Documentation
+    //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
+    bool m_ManageCompleteTree;
+    //typedef std::map<mitk::DataTreeNode::Pointer, SetOfObjects::ConstPointer> AdjacencyMatrix;
+    //AdjacencyMatrix m_CreatedByRelations;
   };
 
 

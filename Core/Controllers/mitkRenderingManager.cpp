@@ -115,6 +115,8 @@ mitk::RenderingManager
 {
   m_RenderWindowList[renderWindow] = 0;
   s_RenderWindowList[renderWindow] = 0;
+  
+  m_AllRenderWindows.push_back( renderWindow );
 }
 
 void
@@ -126,6 +128,19 @@ mitk::RenderingManager
   {
     s_RenderWindowList.erase( renderWindow );
   }
+
+  RenderWindowVector::iterator thisRenderWindowsPosition = m_AllRenderWindows.find( renderWindow );
+  if ( thisRenderWindowsPosition != m_AllRenderWindows.end() )
+  {
+    m_AllRenderWindows.erase( thisRenderWindowsPosition );
+  }
+}
+
+const mitk::RenderingManager::RenderWindowVector&
+mitk::RenderingManager
+::GetAllRegisteredRenderWindows()
+{
+  return m_AllRenderWindows;
 }
 
 void

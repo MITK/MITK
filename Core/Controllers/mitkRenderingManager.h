@@ -72,6 +72,8 @@ class RenderingManager : public itk::Object
 public:
   mitkClassMacro(RenderingManager,itk::Object);
 
+  typedef std::vector< RenderWindow* > RenderWindowVector;
+
   static Pointer New();
 
   /** Set the object factory which produces the desired platform specific
@@ -97,6 +99,8 @@ public:
 
   /** Removes a RenderWindow. */
   void RemoveRenderWindow( RenderWindow *renderWindow );
+
+  const RenderWindowVector& GetAllRegisteredRenderWindows();
 
   /** Requests an update for the specified RenderWindow. The time of
    * execution usually depends on the specified minimum interval. */
@@ -164,6 +168,8 @@ private:
   typedef std::map< RenderWindow *, int > RenderWindowList;
 
   RenderWindowList m_RenderWindowList;
+  
+  RenderWindowVector m_AllRenderWindows;
 
   static RenderWindowList s_RenderWindowList;
 

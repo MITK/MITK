@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNODEPREDICATEPROPERTY_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEPROPERTY_H_HEADER_INCLUDED_
 
-#include <mitkNodePredicateBase.h>
-#include <mitkBaseProperty.h>
+#include "mitkNodePredicateBase.h"
+#include "mitkBaseProperty.h"
 
 namespace mitk {
 

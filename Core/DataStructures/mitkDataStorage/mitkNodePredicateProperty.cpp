@@ -50,5 +50,10 @@ bool mitk::NodePredicateProperty::CheckNode(mitk::DataTreeNode* node) const
     return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()).IsNotNull()); // search only for name
   }
   else
-    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()) == m_ValidProperty); // search for name and property
+  {
+    mitk::BaseProperty::Pointer p = node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str());
+    if (p.IsNull())
+      return false;
+    return (*p == *m_ValidProperty); // search for name and property
+  }
 }

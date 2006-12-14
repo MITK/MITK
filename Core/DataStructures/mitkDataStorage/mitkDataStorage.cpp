@@ -57,7 +57,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
   it.Add(node);
   /* save node and parentlist in relations map */
-  m_CreatedByRelations.insert(make_pair(node, parents));
+  m_CreatedByRelations.insert(make_pair(node, parents)); 
 
 }
 

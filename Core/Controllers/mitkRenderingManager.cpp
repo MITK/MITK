@@ -36,6 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
 
+#include <algorithm>
+
 mitk::RenderingManager::RenderWindowList mitk::RenderingManager::s_RenderWindowList;
 mitk::RenderingManager::Pointer mitk::RenderingManager::s_Instance = 0;
 mitk::RenderingManagerFactory *mitk::RenderingManager::s_RenderingManagerFactory = 0;
@@ -129,7 +131,7 @@ mitk::RenderingManager
     s_RenderWindowList.erase( renderWindow );
   }
 
-  RenderWindowVector::iterator thisRenderWindowsPosition = m_AllRenderWindows.find( renderWindow );
+  RenderWindowVector::iterator thisRenderWindowsPosition = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
   if ( thisRenderWindowsPosition != m_AllRenderWindows.end() )
   {
     m_AllRenderWindows.erase( thisRenderWindowsPosition );

@@ -25,6 +25,13 @@
 */
 
 /**
+  \defgroup DataStorage Data Storage Classes
+  \ingroup DataManagement
+
+  \brief This subcategory includes the classes to store and retrieve objects from the mitk::DataStorage
+*/
+
+/**
   \defgroup ProcessAdaptor Process and Adaptor Classes 
   \anchor ProcessAndAdaptorClasses
 

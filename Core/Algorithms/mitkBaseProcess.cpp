@@ -43,7 +43,7 @@ int mitk::BaseProcess::GetExternalReferenceCount() const
 
     m_ExternalReferenceCount = -1;
 
-    DataObjectPointerArray outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
+    DataObjectPointerArray& outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
 
     int realReferenceCount = GetReferenceCount();
 

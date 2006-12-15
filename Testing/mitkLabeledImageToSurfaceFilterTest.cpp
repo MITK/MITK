@@ -1,6 +1,8 @@
 #include "mitkLabeledImageToSurfaceFilter.h"
 #include <itksys/SystemTools.hxx>
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkReferenceCountWatcher.h"
+
 #include <cmath>
 
 bool equals(const mitk::ScalarType& val1, const mitk::ScalarType& val2, mitk::ScalarType epsilon = mitk::eps )
@@ -10,9 +12,9 @@ bool equals(const mitk::ScalarType& val1, const mitk::ScalarType& val2, mitk::Sc
 
 int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
 {
-  if(argc==0)
+  if(argc<2)
   {
-    std::cout<<"no file specified [FAILED]"<<std::endl;
+    std::cout<<"no path to testing specified [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   
@@ -248,8 +250,11 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
   {
      std::cout<<"[PASSED]"<<std::endl;
   }
+
+  mitk::ReferenceCountWatcher::Pointer outputSurface1Watcher = new mitk::ReferenceCountWatcher(filter->GetOutput(1), "outputSurface1");
+  mitk::ReferenceCountWatcher::Pointer filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter");
   
-  std::cout << "Create surface for background (label 0): ";
+  std::cout << "Create surface for background (label 0): " << std::flush;
   filter->GenerateAllLabelsOff();
   filter->SetLabel(0);
   filter->SetBackgroundLabel(257);
@@ -273,6 +278,25 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
   {
      std::cout<<"[PASSED]"<<std::endl;
   }
+  std::cout << "Testing reference count correctness of old output 1: " << std::flush;
+  if ( outputSurface1Watcher->GetReferenceCount() != 0 )
+  {
+     std::cout<<"outputSurface1Watcher->GetReferenceCount()=="
+       << outputSurface1Watcher->GetReferenceCount()
+       << "!=0, [FAILED]" << std::endl;
+     return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Testing reference count correctness of filter: " << std::flush;
+  if ( filterWatcher->GetReferenceCount() != 2 )
+  {
+     std::cout<<"filterWatcher->GetReferenceCount()=="
+       << outputSurface1Watcher->GetReferenceCount()
+       << "!=2, [FAILED]" << std::endl;
+     return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
   std::cout << "Testing index to label conversion: ";
   if ( filter->GetLabelForNthOutput( 0 ) != 0 )
   {

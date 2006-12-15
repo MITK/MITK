@@ -44,17 +44,17 @@ int mitkDataStorageTest(int argc, char* argv[])
   mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();   // node with image and name property
   mitk::Image::Pointer image = mitk::Image::New();
   n1->SetData(image);
-  n1->SetProperty("name", new mitk::StringProperty("Image Node"));
+  n1->SetProperty("name", new mitk::StringProperty("Node 1 - Image Node"));
   
   mitk::DataTreeNode::Pointer n2 = mitk::DataTreeNode::New();   // node with surface and name and color properties
   mitk::Surface::Pointer surface = mitk::Surface::New();
   n2->SetData(surface);
-  n2->SetProperty("name", new mitk::StringProperty("Surface Node"));
+  n2->SetProperty("name", new mitk::StringProperty("Node 2 - Surface Node"));
   mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
   n2->SetColor(color);
 
   mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();   // node without data but with name property
-  n3->SetProperty("name", new mitk::StringProperty("Empty Node"));
+  n3->SetProperty("name", new mitk::StringProperty("Node 3 - Empty Node"));
   
   mitk::DataTreeNode::Pointer n4 = mitk::DataTreeNode::New();   // node without data but with color property
   n4->SetColor(color);
@@ -74,9 +74,11 @@ int mitkDataStorageTest(int argc, char* argv[])
   /* Initialize Data Storage */
   std::cout << "Initialize Data Storage : " << std::flush;
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
+  int objectsInTree = tree->Count();
   try 
   {
     ds->Initialize(tree.GetPointer());
+    ds->SetManageCompleteTree(false);
     std::cout<<"[PASSED]"<<std::endl;
   } 
   catch(...)
@@ -90,11 +92,20 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     ds->Add(n1);
-    std::cout<<"[PASSED]"<<std::endl;
+    if ((tree->Count() == objectsInTree + 1) && (tree->Contains(n1)))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+      objectsInTree = tree->Count();
+    }
+    else
+    {
+      std::cout << "[FAILED] - node not found in tree" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
   } 
   catch(...)
   {
-    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    std::cout << "[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
 
@@ -103,12 +114,20 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     ds->Add(n1);
-    std::cout<<"[FAILED]"<<std::endl; // no exception thrown
+    std::cout << "[FAILED] - no exception thrown" << std::endl; // no exception thrown
     returnValue = EXIT_FAILURE;
   } 
   catch(...)
   {
-    std::cout<<"[PASSED]"<<std::endl; // exception thrown, as expected
+    if ((tree->Count() == objectsInTree ) && (tree->Contains(n1)))
+    {
+      std::cout<<"[PASSED]"<<std::endl;  // exception thrown, no object added, as expected
+    }
+    else
+    {
+      std::cout << "[FAILED] - exception thrown, but object count in tree is different" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
   }
 
   /* Add an object that has a source object */
@@ -148,7 +167,7 @@ int mitkDataStorageTest(int argc, char* argv[])
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -169,9 +188,9 @@ int mitkDataStorageTest(int argc, char* argv[])
   std::cout << "Requesting a named object: " << std::flush;
   try 
   {
-    mitk::StringProperty nameProp("Surface Node"); // build new property for the search criteria
-    mitk::NodePredicateProperty predicate("name", &nameProp);
+    mitk::NodePredicateProperty predicate("name", new mitk::StringProperty("Node 2 - Surface Node"));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+    // delete nameProp;
     if ((all->Size() == 1) && (all->GetElement(0) == n2))  // check if correct object is in resultset
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -215,8 +234,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     mitk::NodePredicateDataType p1("Surface");
-    mitk::ColorProperty colorprop(color);
-    mitk::NodePredicateProperty p2("color", &colorprop);
+    mitk::NodePredicateProperty p2("color", new mitk::ColorProperty(color));
     mitk::NodePredicateAND predicate;
     predicate.AddPredicate(p1);
     predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
@@ -246,7 +264,7 @@ int mitkDataStorageTest(int argc, char* argv[])
     mitk::NodePredicateNOT predicate(proppred);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    if (   (all->Size() == 2) // check if correct object is in resultset
+    if (   (all->Size() == 2) // check if correct objects are in resultset
         && (all->GetElement(0) == n1) && (all->GetElement(1) == n3))
     {
       std::cout<<"[PASSED]"<<std::endl;

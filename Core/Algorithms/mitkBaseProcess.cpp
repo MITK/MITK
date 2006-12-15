@@ -51,7 +51,7 @@ int mitk::BaseProcess::GetExternalReferenceCount() const
     for (idx = 0; idx < outputs.size(); ++idx)
     {
       //references of outputs that are not referenced from someone else (reference additional to the reference from this BaseProcess object) are interpreted as non-existent 
-      if((outputs[idx]) && (outputs[idx]->GetReferenceCount()==2)) //2 because the outputs array also holds a reference!
+      if((outputs[idx]) && (outputs[idx]->GetReferenceCount()==1))
         --realReferenceCount;
     }
     m_ExternalReferenceCount = realReferenceCount;

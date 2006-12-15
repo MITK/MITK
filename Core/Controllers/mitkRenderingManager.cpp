@@ -145,6 +145,23 @@ mitk::RenderingManager
   return m_AllRenderWindows;
 }
 
+mitk::RenderWindow* 
+mitk::RenderingManager::
+GetRenderWindowByName(const std::string& name)
+{
+  for (RenderWindowVector::iterator iter = m_AllRenderWindows.begin();
+       iter != m_AllRenderWindows.end();
+       ++iter)
+  {
+    if ( name == (*iter)->GetName() )
+    {
+      return *iter;
+    }
+  }
+
+  return NULL;
+}
+
 void
 mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )

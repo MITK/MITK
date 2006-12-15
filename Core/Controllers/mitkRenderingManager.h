@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include <vector>
+#include <string>
 #include <itkObject.h>
 
 namespace mitk
@@ -100,7 +101,10 @@ public:
   /** Removes a RenderWindow. */
   void RemoveRenderWindow( RenderWindow *renderWindow );
 
+  /** Get a list of all registered RenderWindows */
   const RenderWindowVector& GetAllRegisteredRenderWindows();
+
+  RenderWindow* GetRenderWindowByName(const std::string&);
 
   /** Requests an update for the specified RenderWindow. The time of
    * execution usually depends on the specified minimum interval. */

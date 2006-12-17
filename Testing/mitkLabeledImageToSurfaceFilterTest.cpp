@@ -258,7 +258,11 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
   filter->GenerateAllLabelsOff();
   filter->SetLabel(0);
   filter->SetBackgroundLabel(257);
+  //mitk::Surface::Pointer surface = filter->GetOutput(1);
+  //std::cout<< surface->GetReferenceCount() << std::endl;
   filter->Update();
+  //surface = NULL;
+  
   if ( filter->GetNumberOfOutputs() != 1 )
   {
      std::cout<<"Wrong number of outputs, [FAILED]"<<std::endl;
@@ -334,10 +338,15 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
   filter->GenerateAllLabelsOff();
   filter->SetLabel(1);
   filter->Update();
-  if ( filter->GetNumberOfOutputs() != 0 )
+  if ( filter->GetNumberOfOutputs() != 1 )
   {
-     std::cout<<"[FAILED]"<<std::endl;
+     std::cout<<"Number of outputs != 1, [FAILED]"<<std::endl;
      return EXIT_FAILURE;
+  }
+  else if ( filter->GetOutput()->GetVtkPolyData()->GetNumberOfPoints() != 0 )
+  {
+    std::cout<<"PolyData is not empty ("<<filter->GetOutput()->GetVtkPolyData()->GetNumberOfPoints()<<"), [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
   }
   else
   {

@@ -95,7 +95,7 @@ void QmitkStdMultiWidget::init()
   m_SlicesRotator->AddSliceController( mitkWidget3->GetSliceNavigationController() );
 
   //initialize timeNavigationController: send time via sliceNavigationControllers
-  timeNavigationController = new mitk::SliceNavigationController(NULL);
+  timeNavigationController = mitk::SliceNavigationController::New(NULL);
   timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
   timeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
   timeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController(), false);

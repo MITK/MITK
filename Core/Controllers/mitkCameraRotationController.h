@@ -15,15 +15,19 @@ class CameraRotationController : public BaseController
 {
 public:
   mitkClassMacro(CameraRotationController,BaseController);
+  itkNewMacro(Self);
+  mitkNewMacro1Param(Self, const char *);
 
-  CameraRotationController(const char * type = NULL);
-  virtual ~CameraRotationController();
   void RotateCamera();
   void AcquireCamera();
   itkSetMacro(RenderWindow, RenderWindow*);
   itkGetConstMacro(RenderWindow, const RenderWindow*);
 
   virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+
+protected:
+  CameraRotationController(const char * type = NULL);
+  virtual ~CameraRotationController();
 
 private:
   int m_LastStepperValue;

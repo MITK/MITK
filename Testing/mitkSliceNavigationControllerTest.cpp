@@ -136,7 +136,7 @@ int testGeometry(const mitk::Geometry3D * geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating and initializing a SliceNavigationController with the Geometry3D: ";
-  mitk::SliceNavigationController::Pointer sliceCtrl = new mitk::SliceNavigationController();
+  mitk::SliceNavigationController::Pointer sliceCtrl = mitk::SliceNavigationController::New();
   sliceCtrl->SetInputWorldGeometry(geometry);
   std::cout<<"[PASSED]"<<std::endl;
 

@@ -119,9 +119,8 @@ class SliceNavigationController : public BaseController
 {
   public:
     mitkClassMacro(SliceNavigationController,BaseController);
-
-    //itkNewMacro(Self);
-    SliceNavigationController(const char * type = NULL);
+    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, const char *);
   
     //##Documentation
     //## @brief Possible view directions, \a Original will uses 
@@ -309,8 +308,7 @@ class SliceNavigationController : public BaseController
 
 
   protected:
-
-    //##ModelId=3E189B1D00BF
+    SliceNavigationController(const char * type = NULL);
     virtual ~SliceNavigationController();
 
     mitk::Geometry3D::ConstPointer m_InputWorldGeometry;

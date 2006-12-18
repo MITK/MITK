@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraRotationController.h"
 #include "mitkVtkLayerController.h"
 
+#include <itkSmartPointerForwardReference.txx>
+
 
 
 #include <assert.h>
@@ -44,12 +46,12 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
 
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
 
-  m_SliceNavigationController = new mitk::SliceNavigationController( "navigation" );
+  m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
   m_SliceNavigationController->ConnectGeometrySliceEvent( renderer );
   m_SliceNavigationController->ConnectGeometryUpdateEvent( renderer );
   m_SliceNavigationController->ConnectGeometryTimeEvent( renderer, false );
 
-  m_CameraRotationController = new mitk::CameraRotationController();
+  m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow( this );
   m_CameraRotationController->AcquireCamera();
 

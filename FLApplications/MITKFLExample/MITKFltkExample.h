@@ -8,6 +8,6 @@ class FLmitkComfortWidget : public FLmitkRenderWindow {
 
   }
 
-  mitk::SliceNavigationController* sliceCtrl;
+    mitk::SliceNavigationController::Pointer sliceCtrl;
 }
 #endif

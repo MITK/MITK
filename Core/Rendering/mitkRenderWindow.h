@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkBaseRenderer.h"
+#include <itkSmartPointerForwardReference.h>
 
 #include <set>
 #include <string>
@@ -163,9 +164,9 @@ protected:
   
   BaseRenderer::Pointer m_Renderer;
 
-  mitk::SliceNavigationController* m_SliceNavigationController;
-  mitk::CameraRotationController*  m_CameraRotationController;
-  mitk::VtkLayerController*        m_VtkLayerController;
+  itk::SmartPointerForwardReference<SliceNavigationController> m_SliceNavigationController;
+  itk::SmartPointerForwardReference<CameraRotationController>  m_CameraRotationController;
+  mitk::VtkLayerController*                m_VtkLayerController;
 };
 
 } // namespace mitk

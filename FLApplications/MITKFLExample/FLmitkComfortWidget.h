@@ -9,7 +9,7 @@ class FLmitkComfortWidget : public FLmitkRenderWindow {
 
     void SetNode(mitk::DataTreeNode::Pointer node) {m_Node = node;}
     int handle(int event);
-   mitk::SliceNavigationController* sliceCtrl;
+    mitk::SliceNavigationController::Pointer sliceCtrl;
   int m_LastX,m_LastY;
     mitk::DataTreeNode::Pointer m_Node;     
 };

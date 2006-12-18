@@ -26,8 +26,8 @@ int main(int argc, char **argv) {
   if (!fileName) { exit(0);}
 
   UserInterface ui; 
-  mitk::SliceNavigationController* &sliceCtrl = ui.mainWid->sliceCtrl;    
-  sliceCtrl = new mitk::SliceNavigationController("navigation");
+  mitk::SliceNavigationController::Pointer &sliceCtrl = ui.mainWid->sliceCtrl;    
+  sliceCtrl = mitk::SliceNavigationController::New("navigation");
   ui.mainWid->InitRenderer();
   ui.mainWid->GetRenderer()->SetMapperID(1);
   mitk::DataTree::Pointer tree = mitk::DataTree::New();

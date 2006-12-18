@@ -75,10 +75,11 @@ int mitkDataStorageTest(int argc, char* argv[])
   std::cout << "Initialize Data Storage : " << std::flush;
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
   int objectsInTree = tree->Count();
+  int initialObjectsInTree = objectsInTree;
   try 
   {
     ds->Initialize(tree.GetPointer());
-    ds->SetManageCompleteTree(false);
+    //ds->SetManageCompleteTree(false);
     std::cout<<"[PASSED]"<<std::endl;
   } 
   catch(...)
@@ -137,11 +138,20 @@ int mitkDataStorageTest(int argc, char* argv[])
     mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
     parents->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
     ds->Add(n2, parents.GetPointer());
-    std::cout<<"[PASSED]"<<std::endl;
+    if ((tree->Count() == objectsInTree + 1) && (tree->Contains(n2)))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+      objectsInTree = tree->Count();
+    }
+    else
+    {
+      std::cout << "[FAILED] - node not found in tree" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
   } 
   catch(...)
   {
-    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    std::cout << "[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
 
@@ -150,8 +160,17 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     ds->Add(n3);   // 3. object that has name property
-    ds->Add(n4);   // 2. object that has color property
-    std::cout<<"[PASSED]"<<std::endl;
+    ds->Add(n4);   // 2. object that has color property    
+    if ((tree->Count() == objectsInTree + 2) && (tree->Contains(n3)) && (tree->Contains(n4)))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+      objectsInTree = tree->Count();
+    }
+    else
+    {
+      std::cout << "[FAILED] - node not found in tree" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
   } 
   catch(...)
   {
@@ -159,24 +178,36 @@ int mitkDataStorageTest(int argc, char* argv[])
     returnValue = EXIT_FAILURE;
   }
 
-
   /* Requesting all Objects */
   std::cout << "Requesting all Objects: " << std::flush;
   try 
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
-        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
-    {
-      std::cout<<"[PASSED]"<<std::endl;
-    }
+    if (ds->GetManageCompleteTree())
+      if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
+          && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED]" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
     else
-    {
-      std::cout << "[FAILED]" << std::endl;
-      returnValue = EXIT_FAILURE;
-    }
+      if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
+          && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED]" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
   } 
   catch(...)
   {
@@ -264,14 +295,15 @@ int mitkDataStorageTest(int argc, char* argv[])
     mitk::NodePredicateNOT predicate(proppred);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    if (   (all->Size() == 2) // check if correct objects are in resultset
-        && (all->GetElement(0) == n1) && (all->GetElement(1) == n3))
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (   (all->Size() == initialObjectsInTree + 2) // check if correct objects are in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()))
     {
       std::cout<<"[PASSED]"<<std::endl;
     }
     else
     {
-      std::cout<<"[FAILED]"<<std::endl;
+      std::cout << "[FAILED]" << std::endl;
       returnValue = EXIT_FAILURE;
     }
   } 

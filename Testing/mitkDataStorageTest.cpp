@@ -33,10 +33,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateSource.h"
 
+int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree);
+
+int mitkDataStorageTest(int argc, char* argv[])
+{
+  
+  std::cout << "1. Step: Testing DataStorage in 'Only manage added nodes' mode." << std::endl;
+  int returnValue1 = CheckDataStorage(argc, argv, false); // test the data storage in both operation modes
+  std::cout << "2. Step: Testing DataStorage in 'Manage complete datatree' mode." << std::endl;
+  int returnValue2 = CheckDataStorage(argc, argv, true);
+  
+  return (returnValue1 && returnValue2);
+}
 
 //##Documentation
 //## @brief Test for the DataStorage class and its associated classes (e.g. the predicate classes)
-int mitkDataStorageTest(int argc, char* argv[])
+int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
 {
   int returnValue = EXIT_SUCCESS;
 
@@ -79,7 +91,7 @@ int mitkDataStorageTest(int argc, char* argv[])
   try 
   {
     ds->Initialize(tree.GetPointer());
-    //ds->SetManageCompleteTree(false);
+    ds->SetManageCompleteTree(manageCompleteTree);
     std::cout<<"[PASSED]"<<std::endl;
   } 
   catch(...)
@@ -214,7 +226,51 @@ int mitkDataStorageTest(int argc, char* argv[])
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
-
+  
+  /* Adding a node directly to the tree to test if the DataStorage can handle that */
+  std::cout << "Adding a node directly to the tree to test if the DataStorage can handle that." << std::endl;
+  mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();   // node with image and name property
+  treeNode->SetProperty("name", new mitk::StringProperty("TreeNode - not added by DataStorage"));  
+  it.Add(treeNode);
+  /* Requesting all Objects again to check for new tree node */
+  std::cout << "Requesting all Objects again to check for new tree node: " << std::flush;
+  try 
+  {
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (ds->GetManageCompleteTree())
+      if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
+          && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), treeNode) != stlAll.end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED]" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+    else
+      if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
+          && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED]" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+  
   /* Requesting a named object */
   std::cout << "Requesting a named object: " << std::flush;
   try 
@@ -288,7 +344,7 @@ int mitkDataStorageTest(int argc, char* argv[])
 
   /* Requesting objects that do not meet a criteria */
   std::cout << "Requesting objects that do not meet a criteria: " << std::flush;
-  try 
+  try
   {
     mitk::ColorProperty::Pointer cp = new mitk::ColorProperty(color);
     mitk::NodePredicateProperty proppred("color", cp);
@@ -296,7 +352,13 @@ int mitkDataStorageTest(int argc, char* argv[])
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    if (   (all->Size() == initialObjectsInTree + 2) // check if correct objects are in resultset
+    int expectedCount;
+    if (ds->GetManageCompleteTree())
+      expectedCount = initialObjectsInTree + 2 + 1;  // all from init time, n1, n3 and the directly added node
+    else
+      expectedCount = 2;  // n1, n3
+
+    if (   (all->Size() == expectedCount) // check if correct objects are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()))
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -306,7 +368,7 @@ int mitkDataStorageTest(int argc, char* argv[])
       std::cout << "[FAILED]" << std::endl;
       returnValue = EXIT_FAILURE;
     }
-  } 
+  }
   catch(...)
   {
     std::cout<<"[FAILED] - Exception thrown" << std::endl;

@@ -45,33 +45,28 @@ class BaseController : public StateMachine
 {
 public:
   /** Standard class typedefs. */
-  //##ModelId=3E6D5DD301B0
   mitkClassMacro(BaseController, StateMachine);
+  itkNewMacro(Self);
+  mitkNewMacro1Param(Self, const char *);
 
   /** Method for creation through the object factory. */
   //itkNewMacro(Self);
-  BaseController(const char * type = NULL);
 
-  //##ModelId=3DF8F5CA03D8
   //##Documentation
   //## @brief Get the Stepper through the slices
   mitk::Stepper* GetSlice();
 
-  //##ModelId=3DF8F61101E3
   //##Documentation
   //## @brief Get the Stepper through the time
   mitk::Stepper* GetTime();
 
 protected:
-  //BaseController();
+  BaseController(const char * type = NULL);
 
-  //##ModelId=3E3AE32B0070
   virtual ~BaseController();
 
-  //##ModelId=3DF8C0140176
   //## @brief Stepper through the time
   Stepper::Pointer m_Time;
-  //##ModelId=3E189CAA0265
   //## @brief Stepper through the slices
   Stepper::Pointer m_Slice;
   

@@ -59,10 +59,6 @@ mitk::StateMachine::StateMachine(const char * type)
   m_UndoController = new UndoController(VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 
-  /*m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();*/
-
   #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->NewStateMachine( type, this );
   #endif

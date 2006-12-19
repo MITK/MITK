@@ -24,10 +24,6 @@ mitk::BaseController::BaseController(const char * type) : StateMachine(type), m_
 {
   m_Slice = Stepper::New();
   m_Time  = Stepper::New();
-
-  m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();
 }
 
 //##ModelId=3E3AE32B0070

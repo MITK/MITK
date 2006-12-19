@@ -37,7 +37,7 @@ public:
 
   virtual void Execute(vtkObject *caller, unsigned long, void*)
   {
-    vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
+    //vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
     //m_ImageRenderer->ResetCameraClippingRange();
   }
 };
@@ -244,5 +244,3 @@ void mitk::ImageBackground2D::Update(IplImage * image)
   m_RenderWindow->GetVtkRenderWindow()->Render();
 }
 #endif
-
- 

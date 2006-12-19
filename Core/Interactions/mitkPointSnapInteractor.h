@@ -41,7 +41,14 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointSnapInteractor, HierarchicalInteractor);
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
+    //##Documentation
+    //## @brief uses CalculateJurisdiction from PointInteractor
+    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+    //{return this->CalculateLowerJurisdiction(stateEvent);};
+
+  protected:
     //##Documentation
     //##@brief Constructor 
     PointSnapInteractor(const char * type, DataTreeNode* dataTreeNode);
@@ -50,12 +57,6 @@ namespace mitk
     //##@brief Destructor 
     virtual ~PointSnapInteractor();
 
-    //##Documentation
-    //## @brief uses CalculateJurisdiction from PointInteractor
-    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
-    //{return this->CalculateLowerJurisdiction(stateEvent);};
-
-  protected:
     //##Documentation
     //## @brief select the point on the given position
     virtual void SelectPoint(int position);

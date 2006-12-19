@@ -60,7 +60,9 @@ public:
     /**
     * @brief Obsolete! Call New(const char* DataTreeNode*) instead! To maintain interface for mitkObjectFactory.
     **/
-    itkNewMacro(Self);
+    //mitkNewMacro(Self);
+    
+    //Interactor( );//obsolete!
 
     /**
     * @brief NewMacro with two parameters for calling itk::Lightobject::New(..) method
@@ -80,20 +82,7 @@ public:
 
   typedef SMMode ModeType;
 
-  Interactor( );//obsolete!
 
-  //##Documentation
-  //## @brief Constructor
-  //##
-  //## @param dataTreeNode is the node, this Interactor is connected to
-  //## @params type is the type of StateMachine like declared in the XML-Configure-File
-  //##
-  //## Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
-  Interactor(const char * type, DataTreeNode* dataTreeNode);
-
-  //##Documentation
-  //## @brief Destructor
-  ~Interactor(){}
 
   //##Documentation
   //## @brief Get the Mode of the Interactor. Use enum SMMode for return parameter
@@ -122,6 +111,20 @@ public:
   static const std::string XML_NODE_NAME;
 
 protected:
+  /**
+  * @brief Constructor
+  * @param dataTreeNode is the node, this Interactor is connected to
+  * @params type is the type of StateMachine like declared in the XML-Configure-File
+  *
+  * Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
+  **/
+  Interactor(const char * type, DataTreeNode* dataTreeNode);
+
+  /** 
+  * @brief Destructor
+  **/
+  ~Interactor(){}
+
   //##Documentation
   //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
   virtual void ExecuteOperation(Operation* operation);

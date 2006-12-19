@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PrimStripInteractor::PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode)
 : HierarchicalInteractor(type, dataTreeNode)
 {
-  m_LineInteractor = new mitk::LineInteractor("lineinteractor",dataTreeNode);
+  m_LineInteractor = mitk::LineInteractor::New("lineinteractor",dataTreeNode);
   this->AddInteractor((Interactor::Pointer)m_LineInteractor);
 }
 

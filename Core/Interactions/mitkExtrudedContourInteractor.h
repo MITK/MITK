@@ -16,14 +16,15 @@ namespace mitk {
   {
   public:
     mitkClassMacro(ExtrudedContourInteractor, Interactor);
-
-    ExtrudedContourInteractor(const char * type, DataTreeNode* dataTreeNode);
-    virtual ~ExtrudedContourInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     itkGetObjectMacro(Contour, mitk::Contour);
     itkGetObjectMacro(ContourNode, mitk::DataTreeNode);
 
   protected:
+    ExtrudedContourInteractor(const char * type, DataTreeNode* dataTreeNode);
+    virtual ~ExtrudedContourInteractor();
+
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
     /**

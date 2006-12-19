@@ -16,6 +16,8 @@
     <event NAME="left MouseBN + Shift" ID="3" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_none" />
     <!-- middle MouseButton -->
     <event NAME="middle MouseBN" ID="4" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!-- left MouseButton DoubleClick-->
+    <event NAME="left MouseBN DC" ID="5" TYPE="Type_MouseButtonDblClick" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- Strg + N -->
     <event NAME="Strg + N" ID="10" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_N" />
     <!-- Strg + E -->
@@ -2969,6 +2971,12 @@
         <action ID="60" />
       </transition>
     </state>
+  </stateMachine>
+  <stateMachine NAME="dummy">
+        <!-- Dummy for a null interaction -->
+    	<state NAME="neutral" ID="0" START_STATE="TRUE">
+          <transition NAME="stay in dummy" NEXT_STATE_ID="0" EVENT_ID="0"/>
+        </state>
   </stateMachine>
   <stateMachine NAME="InteractorTestPattern">
       <!-- To Test an Interactor for the right behavior -->

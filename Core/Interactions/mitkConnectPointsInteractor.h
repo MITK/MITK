@@ -34,14 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ConnectPointsInteractor, Interactor);
-
-    //##Documentation
-    //##@brief Constructor with Param n for limited Set of Points
-    //##
-    //## if no n is set, then the number of points is unlimited*
-    ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
-
-    virtual ~ConnectPointsInteractor();
+    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief Sets the amount of precision
@@ -55,6 +49,14 @@ namespace mitk
 
 
   protected:
+    //##Documentation
+    //##@brief Constructor with Param n for limited Set of Points
+    //##
+    //## if no n is set, then the number of points is unlimited*
+    ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+
+    virtual ~ConnectPointsInteractor();
+
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
     //##ModelId=3F017B320121

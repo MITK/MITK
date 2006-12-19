@@ -146,16 +146,6 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     typedef std::map<int, TStateMachineFunctor*> ActionFunctionsMapType;
 
     /**
-    * @brief Default Constructor. Obsolete to instanciate it with this method! Use ::New(..) method instead. Set the "type" and with this the pattern of the StateMachine
-    **/
-    StateMachine(const char * type);
-
-    /**
-    * @brief Default Destructor
-    **/
-    ~StateMachine();
-
-    /**
     * @brief Get the name and with this the type of the StateMachine
     **/
     std::string GetType() const;
@@ -194,6 +184,16 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     static const std::string XML_NODE_NAME;
 
   protected:
+    /**
+    * @brief Default Constructor. Obsolete to instanciate it with this method! Use ::New(..) method instead. Set the "type" and with this the pattern of the StateMachine
+    **/
+    StateMachine(const char * type);
+
+    /**
+    * @brief Default Destructor
+    **/
+    ~StateMachine();
+
     /**
     * @brief Adds the Function to ActionList.
     **/

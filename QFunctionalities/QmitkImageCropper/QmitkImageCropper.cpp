@@ -253,9 +253,9 @@ void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataTreeIteratorClone& ite
     iterToNode->Add(m_CroppingObjectNode);
     m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
   
-    if (!m_AffineInteractor)
+    if (m_AffineInteractor.IsNull())
     {
-      m_AffineInteractor = new mitk::AffineInteractor("AffineInteractions ctrl-drag", m_CroppingObjectNode);
+      m_AffineInteractor = mitk::AffineInteractor::New("AffineInteractions ctrl-drag", m_CroppingObjectNode);
       mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
     }
   }

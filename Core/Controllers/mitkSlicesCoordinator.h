@@ -47,11 +47,8 @@ class SlicesCoordinator : public StateMachine
     typedef std::vector<SliceNavigationController*> SNCVector;
     
     mitkClassMacro(SlicesCoordinator, StateMachine);
-   
-    /// @TODO FIX StateMachine smart pointer handling
-    static Pointer New();
-    /// @TODO public ONLY because of StateMachine's meddling with m_ReferenceCount
-    SlicesCoordinator(const char* machine);
+    mitkNewMacro1Param(Self, const char*);   
+    
 
     /// Add to list of managed slices.
     /// Check if CreatedWorldGeometry of snc is managable (i.e. there is basically only one planegeometry)
@@ -64,7 +61,11 @@ class SlicesCoordinator : public StateMachine
     // void ResetAllSlices();
 
   protected:
-
+    /**
+    * @brief Default Constructor
+    **/
+    SlicesCoordinator(const char* machine);
+    
     // clear list of controllers
     virtual ~SlicesCoordinator();
 

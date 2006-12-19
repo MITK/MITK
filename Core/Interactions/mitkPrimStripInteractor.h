@@ -39,14 +39,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PrimStripInteractor, HierarchicalInteractor);
-
-    //##Documentation
-    //##@brief Constructor 
-    PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode);
-
-    //##Documentation
-    //##@brief Destructor 
-    virtual ~PrimStripInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to lines and points
@@ -55,6 +48,14 @@ namespace mitk
     virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   protected:
+    //##Documentation
+    //##@brief Constructor 
+    PrimStripInteractor(const char * type, DataTreeNode* dataTreeNode);
+
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~PrimStripInteractor();
+
     //##Documentation
     //## @brief Executes Actions
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );

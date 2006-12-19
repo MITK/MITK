@@ -28,7 +28,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   int eventId = 100;
   
   //Create Transition
-  mitk::Transition* transition = new mitk::Transition("transitionname", nextStateId, eventId);
+  mitk::Transition::Pointer transition = mitk::Transition::New("transitionname", nextStateId, eventId);
 
   //check nextStateId
   std::cout << "Check StateId: ";
@@ -50,7 +50,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
 
   int count = 1;
   //Create Action
-  mitk::Action* firstAction = new mitk::Action(count);
+  mitk::Action::Pointer firstAction = mitk::Action::New(count);
   transition->AddAction(firstAction);
 
   //check ActionCount
@@ -65,7 +65,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   ++count;
 
   //Create Action
-  mitk::Action* secondAction = new mitk::Action(count);
+  mitk::Action::Pointer secondAction = mitk::Action::New(count);
   transition->AddAction(secondAction);
 
   //check ActionCount

@@ -29,7 +29,6 @@ namespace mitk {
 
 class BaseRenderer;
 
-//##ModelId=3DF8F7EA01DA
 //##Documentation
 //## @brief Baseclass for renderer slice-/camera-control
 //##
@@ -47,10 +46,9 @@ public:
   /** Standard class typedefs. */
   mitkClassMacro(BaseController, StateMachine);
   itkNewMacro(Self);
-  mitkNewMacro1Param(Self, const char *);
 
-  /** Method for creation through the object factory. */
-  //itkNewMacro(Self);
+  /** Method for creation through ::New */
+  mitkNewMacro1Param(Self, const char *);
 
   //##Documentation
   //## @brief Get the Stepper through the slices
@@ -61,8 +59,14 @@ public:
   mitk::Stepper* GetTime();
 
 protected:
+  /**
+  * @brief Default Constructor
+  **/
   BaseController(const char * type = NULL);
 
+  /**
+  * @brief Default Destructor
+  **/
   virtual ~BaseController();
 
   //## @brief Stepper through the time

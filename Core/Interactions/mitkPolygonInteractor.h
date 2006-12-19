@@ -37,14 +37,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PolygonInteractor, HierarchicalInteractor);
-
-    //##Documentation
-    //##@brief Constructor 
-    PolygonInteractor(const char * type, DataTreeNode* dataTreeNode);
-
-    //##Documentation
-    //##@brief Destructor 
-    virtual ~PolygonInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to cells of a mesh
@@ -53,6 +46,14 @@ namespace mitk
     virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   protected:
+    //##Documentation
+    //##@brief Constructor 
+    PolygonInteractor(const char * type, DataTreeNode* dataTreeNode);
+
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~PolygonInteractor();
+
     //##Documentation
     //## @brief Executes Actions
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );

@@ -57,13 +57,6 @@ namespace mitk {
     typedef TransitionMap::const_iterator TransMapConstIter;
 
     /**
-    * @brief Constructor. Use ::New instead!
-    * Set the name and the Id of the state. 
-    * Name is to maintain readability during debug and Id is to identify this state inside the StateMachinePattern
-    **/
-    State(std::string name, int id);
-
-    /**
     * @brief Add a transition to the map of transitions.
     **/
     bool AddTransition( Transition* transition );
@@ -100,6 +93,13 @@ namespace mitk {
     bool ConnectTransitions(StateMap* allStates);
 
   protected:
+    /**
+    * @brief Default Constructor. Use ::New instead!
+    * Set the name and the Id of the state. 
+    * Name is to maintain readability during debug and Id is to identify this state inside the StateMachinePattern
+    **/
+    State(std::string name, int id);
+    
     /**
     * @brief Default Destructor
     **/

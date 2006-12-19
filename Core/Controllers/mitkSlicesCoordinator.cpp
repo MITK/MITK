@@ -20,15 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-SlicesCoordinator::Pointer SlicesCoordinator::New()
-{
-  // from itkNewMacro()
-  Pointer smartPtr;
-  SlicesCoordinator* rawPtr = new SlicesCoordinator("slices-coordinator");
-  smartPtr = rawPtr;
-  rawPtr->UnRegister();
-  return smartPtr;
-}
+//SlicesCoordinator::Pointer SlicesCoordinator::New()
+//{
+//  // from itkNewMacro()
+//  Pointer smartPtr;
+//  SlicesCoordinator* rawPtr = new SlicesCoordinator("slices-coordinator");
+//  smartPtr = rawPtr;
+//  rawPtr->UnRegister();
+//  return smartPtr;
+//}
 
 SlicesCoordinator::SlicesCoordinator(const char* machine)
 :StateMachine(machine)

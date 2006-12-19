@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   // create PointSetInteractor, associate to pointSetNode and add as
   // interactor to GlobalInteraction
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode)
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
 
   // *******************************************************

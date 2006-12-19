@@ -230,7 +230,7 @@ void QmitkSeedPointSetComponent::CreatePointSetNode()
         mitk::ColorProperty::Pointer color = new mitk::ColorProperty(0.2, 0.0, 0.8);
         mitk::Point3D colorTwo; 
         mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
-        m_PointSetInteractor = new mitk::PointSetInteractor("pointsetinteractor", m_PointSetNode, 2);
+        m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode, 2);
         m_PointSetInteractor->DebugOn();
         m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction(&m_PointSetInteractor, &m_PointSetNode, 2, colorTwo,"Points ");  //-1 for unlimited points
         m_PointSetNode->SetProperty("color",color);

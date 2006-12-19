@@ -171,9 +171,9 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
     //declaring a new Interactor
     if (numberOfPoints!=UNLIMITED)//limited number of points
-      *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode, numberOfPoints);
+      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode, numberOfPoints);
     else   //unlimited number of points
-      *sop = new mitk::PointSetInteractor("pointsetinteractor", dataTreeNode);
+      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode);
 
     //datatreenode: and give set the data, layer and Interactor
     dataTreeNode->SetData(pointset);
@@ -246,7 +246,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     //then crate a TreeNode, to connect the data to...
     mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
-    *sop = new mitk::PolygonInteractor("polygoninteractor", dataTreeNode);
+    *sop = mitk::PolygonInteractor::New("polygoninteractor", dataTreeNode);
 
 
     //datatreenode: and give set the data, layer and Interactor

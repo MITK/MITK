@@ -53,7 +53,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 
 
-//##ModelId=3E33ECF301AD
 mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   : BaseRenderer(name), 
   m_VtkMapperPresent(false), 
@@ -63,8 +62,8 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_PixelMapGL(NULL), 
   m_PixelMapGLValid(false)
 {
-  //m_CameraController = new VtkInteractorCameraController();
-  m_CameraController = new VtkInteractorCameraController();
+  //TODO: think of a better statemachinepattern. Currently this StateMachine takes all events and always stays in one state. 
+  m_CameraController = VtkInteractorCameraController::New(NULL);
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
 
@@ -80,7 +79,6 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
 }
 
-//##ModelId=3E3D28AB0018
 void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 {
   if(iterator!=GetData())
@@ -126,7 +124,6 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
   }
 }
 
-//##ModelId=3ED91D060305
 void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 {
   Update();
@@ -279,7 +276,6 @@ void mitk::OpenGLRenderer::Update(mitk::DataTreeNode* datatreenode)
   }
 }
 
-//##ModelId=3E330D260255
 void mitk::OpenGLRenderer::Update()
 {
   if(m_DataTreeIterator.IsNull()) return;
@@ -297,7 +293,6 @@ void mitk::OpenGLRenderer::Update()
   m_LastUpdateTime=GetMTime();
 }
 
-//##ModelId=3E330D2903CC
 void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 //first render vtkActors, then render mitkMappers
 {
@@ -482,7 +477,6 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 /*!
 \brief Destructs the OpenGLRenderer.
 */
-//##ModelId=3E33ECF301B7
 mitk::OpenGLRenderer::~OpenGLRenderer()
 {
   if(m_VtkRenderer!=NULL)
@@ -510,7 +504,6 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
 /*!
 \brief Initialize the OpenGL Window
 */
-//##ModelId=3E33145B0096
 void mitk::OpenGLRenderer::Initialize( )
 {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -520,7 +513,6 @@ void mitk::OpenGLRenderer::Initialize( )
 /*!
 \brief Resize the OpenGL Window
 */
-//##ModelId=3E33145B00D2
 void mitk::OpenGLRenderer::Resize(int w, int h)
 {
   glViewport (0, 0, w, h);
@@ -540,7 +532,6 @@ void mitk::OpenGLRenderer::Resize(int w, int h)
   Update();
 }
 
-//##ModelId=3E3799420227
 void mitk::OpenGLRenderer::InitSize(int w, int h)
 {
   m_RenderWindow->SetSize(w,h);
@@ -562,7 +553,6 @@ void mitk::OpenGLRenderer::InitSize(int w, int h)
   m_PixelMapGLValid = false;
 }
 
-//##ModelId=3EF59AD20235
 void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   if(m_MapperID != mapperId)
@@ -574,7 +564,6 @@ void mitk::OpenGLRenderer::SetMapperID(const MapperSlotId mapperId)
   }
 }
 
-//##ModelId=3EF162760271
 void mitk::OpenGLRenderer::MakeCurrent()
 {
   if(m_RenderWindow!=NULL)

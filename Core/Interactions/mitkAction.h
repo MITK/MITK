@@ -42,12 +42,6 @@ namespace mitk {
     mitkNewMacro1Param(Self, int);
     
     /**
-    * @brief Default Constructor.
-    * Set the actionId.
-    **/
-    Action( int actionId );
-
-    /**
     * @brief Adds a property to the list of properties.
     **/
     void AddProperty(const char* propertyKey, BaseProperty* property);
@@ -63,6 +57,12 @@ namespace mitk {
     mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
 
   protected: 
+    /**
+    * @brief Default Constructor.
+    * Set the actionId.
+    **/
+    Action( int actionId );
+
     /**
     * @brief Default Destructor
     **/

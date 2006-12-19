@@ -72,11 +72,6 @@ namespace mitk {
     typedef std::multimap<float, Interactor::Pointer, std::greater<double> > InteractorMap;
     typedef InteractorMap::iterator             InteractorMapIter;
     
-    /**
-    * @brief Default Constructor with type to load the StateMachinePattern of the StateMachine
-    **/
-    GlobalInteraction(const char * type);
-
     //##Documentation
     //## @brief add an Interactor to the list of all Interactors that are asked for handling an event
     //##
@@ -145,6 +140,11 @@ namespace mitk {
     friend class Interactor;
 
   protected:
+    /**
+    * @brief Default Constructor with type to load the StateMachinePattern of the StateMachine
+    **/
+    GlobalInteraction(const char * type);
+    
     /**
     * @brief Default destructor.
     **/

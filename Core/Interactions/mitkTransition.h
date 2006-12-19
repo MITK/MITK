@@ -54,13 +54,6 @@ namespace mitk {
     typedef const ActionVectorIterator ActionVectorConstIterator;
     
     /**
-    * @brief Default Constructor but use ::New() instead! 
-    * Sets the necessary informations name (to enhance readability during debug), 
-    * nextStateId (the Id of the next state) and eventId (the Id of the event that causes the statechange).
-    **/
-    Transition(std::string name, int nextStateId, int eventId);
-
-    /**
     * @brief Add the action to this object.
     **/
     void AddAction( Action* action );
@@ -109,6 +102,19 @@ namespace mitk {
     * @brief Set the next state of this object.
     **/
     void SetNextState(State* state);
+
+  protected:
+    /**
+    * @brief Default Constructor but use ::New() instead! 
+    * Sets the necessary informations name (to enhance readability during debug), 
+    * nextStateId (the Id of the next state) and eventId (the Id of the event that causes the statechange).
+    **/
+    Transition(std::string name, int nextStateId, int eventId);
+    
+    /**
+    * @brief Default Denstructor 
+    **/
+    ~Transition(){};
 
   private:
     /**

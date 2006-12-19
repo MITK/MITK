@@ -39,14 +39,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointInteractor, Interactor);
-
-    //##Documentation
-    //##@brief Constructor 
-    PointInteractor(const char * type, DataTreeNode* dataTreeNode);
-
-    //##Documentation
-    //##@brief Destructor 
-    virtual ~PointInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief Sets the amount of precision
@@ -60,6 +53,14 @@ namespace mitk
 
 
   protected:
+    //##Documentation
+    //##@brief Constructor 
+    PointInteractor(const char * type, DataTreeNode* dataTreeNode);
+
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~PointInteractor();
+
     //##Documentation
     //## @brief select the point on the given position
     virtual void SelectPoint(int position);

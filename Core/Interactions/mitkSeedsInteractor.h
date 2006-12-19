@@ -38,9 +38,6 @@ namespace mitk {
     mitkClassMacro(SeedsInteractor, Interactor);
     mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
-    SeedsInteractor(const char * type, DataTreeNode* dataTreeNode);
-    virtual ~SeedsInteractor();
-
     /// sets the radius of the seeds.
     void SetRadius(int val){m_Radius=val;};
 
@@ -48,6 +45,15 @@ namespace mitk {
     itkGetMacro(Config, unsigned int);
 
   protected:
+    /**
+    * @brief Default Constructor
+    **/
+    SeedsInteractor(const char * type, DataTreeNode* dataTreeNode);
+    /**
+    * @brief Default Destructor
+    **/
+    virtual ~SeedsInteractor();
+
     virtual bool ExecuteAction(Action* action, StateEvent const* stateEvent);
 
   protected:

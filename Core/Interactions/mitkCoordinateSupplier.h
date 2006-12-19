@@ -38,20 +38,18 @@ namespace mitk {
   class CoordinateSupplier : public StateMachine
   {
   public:
-    //##ModelId=3F0189F0024E
     mitkClassMacro(CoordinateSupplier, StateMachine);
+    mitkNewMacro2Param(Self, const char*, OperationActor*);
 
-    //##ModelId=3F0189F0025B
+    itkGetConstReferenceMacro(CurrentPoint, Point3D);
+
+  protected:
     //##Documentation
     //## @brief Constructor with needed arguments
     //## @param type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
     //## @param operationActor: the Data, operations (+ points) are send to
     CoordinateSupplier(const char * type, OperationActor* operationActor);
 
-    itkGetConstReferenceMacro(CurrentPoint, Point3D);
-
-  protected:
-    //##ModelId=3F0189F00269
     //##Documentation
     //## @brief executes the actions that are sent to this statemachine
     //## derived from StateMachine 

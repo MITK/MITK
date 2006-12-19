@@ -37,8 +37,11 @@ class AffineInteractor : public Interactor
 {
 public:
   mitkClassMacro(AffineInteractor,Interactor);
+//  itkNewMacro(Self);
+  mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
-  AffineInteractor();
+protected:
+//  AffineInteractor(); //obsolete
 
   //##Documentation
   //## @brief Constructor
@@ -50,8 +53,6 @@ public:
   //##Documentation
   //## @brief Destructor
   ~AffineInteractor(){};
-
-protected:
 
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 

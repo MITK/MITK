@@ -56,7 +56,7 @@ void Step6::Initialize()
   pointSetNode->SetProperty("layer", new mitk::IntProperty(2));
   it.Add(pointSetNode);
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode)
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
 }
 

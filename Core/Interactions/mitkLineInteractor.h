@@ -40,14 +40,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(LineInteractor, HierarchicalInteractor);
-
-    //##Documentation
-    //##@brief Constructor 
-    LineInteractor(const char * type, DataTreeNode* dataTreeNode);
-
-    //##Documentation
-    //##@brief Destructor 
-    virtual ~LineInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief derived from mitk::HierarchicalInteractor; calculates Jurisdiction according to lines
@@ -56,6 +49,14 @@ namespace mitk
     virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   protected:
+    //##Documentation
+    //##@brief Constructor 
+    LineInteractor(const char * type, DataTreeNode* dataTreeNode);
+
+    //##Documentation
+    //##@brief Destructor 
+    virtual ~LineInteractor();
+
     //##Documentation
     //## @brief unselect all Lines that exist in the mesh
     virtual void DeselectAllLines();

@@ -40,14 +40,7 @@ namespace mitk {
     typedef std::vector<Interactor::Pointer>::const_iterator InteractorListConstIter;
 
     mitkClassMacro(HierarchicalInteractor,Interactor);
-
-    //##Documentation
-    //## @brief Constructor
-    HierarchicalInteractor(const char * type, DataTreeNode* dataTreeNode);
-
-    //##Documentation
-    //## @brief Destructor
-    ~HierarchicalInteractor(){}
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief Check the interaction mode
@@ -71,6 +64,14 @@ namespace mitk {
 
 
   protected:
+    //##Documentation
+    //## @brief Constructor
+    HierarchicalInteractor(const char * type, DataTreeNode* dataTreeNode);
+
+    //##Documentation
+    //## @brief Destructor
+    ~HierarchicalInteractor(){}
+
     //##Documentation
     //## @brief transmitts the event
     bool TransmitEvent( StateEvent const* stateEvent );

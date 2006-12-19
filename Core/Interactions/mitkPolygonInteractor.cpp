@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PolygonInteractor::PolygonInteractor(const char * type, DataTreeNode* dataTreeNode)
 : HierarchicalInteractor(type, dataTreeNode)
 {
-  m_PrimStripInteractor = new mitk::PrimStripInteractor("primstripinteractor",NULL);
+  m_PrimStripInteractor = mitk::PrimStripInteractor::New("primstripinteractor",NULL);
   this->AddInteractor((Interactor::Pointer)m_PrimStripInteractor);
 }
 

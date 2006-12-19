@@ -92,7 +92,7 @@ void QmitkMeasurement::AddDistanceMeasurement()
   m_DataTreeIterator->Add(pointSetNode);
 
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode,2)
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,2)
   );
 }
 
@@ -108,7 +108,7 @@ void QmitkMeasurement::AddAngleMeasurement()
   m_DataTreeIterator->Add(pointSetNode);
 
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode,3)
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,3)
   );
 }
 
@@ -125,6 +125,6 @@ void QmitkMeasurement::AddPathMeasurement()
   m_DataTreeIterator->Add(pointSetNode);
 
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    new mitk::PointSetInteractor("pointsetinteractor", pointSetNode)
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
 }

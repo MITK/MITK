@@ -395,7 +395,7 @@ void QmitkDataManagerControls::AffineInteraction_clicked()
       {
         m_AffineInteractionNode = selected->GetDataTreeNode();
         m_PreviousInteractor = m_AffineInteractionNode->GetInteractor();     
-        m_AffineInteractor = new mitk::AffineInteractor("AffineInteractions ctrl-drag", m_AffineInteractionNode);
+        m_AffineInteractor = mitk::AffineInteractor::New("AffineInteractions ctrl-drag", m_AffineInteractionNode);
         m_AffineInteractionNode->SetInteractor(m_AffineInteractor);
 
         mitk::GlobalInteraction::GetInstance()->AddInteractor(m_AffineInteractor);

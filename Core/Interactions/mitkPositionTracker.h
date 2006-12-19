@@ -19,14 +19,15 @@ namespace mitk {
   {
   public:
     mitkClassMacro(PositionTracker, StateMachine);
+    mitkNewMacro2Param(Self, const char*, OperationActor*);
 
+  protected:
     //##Documentation
     //## @brief Constructor with needed arguments
     //## @param type: string, that describes the StateMachine-Scheme to take from all SM (see XML-File)
     //## @param operationActor: the Data, operations (+ points) are send to
     PositionTracker(const char * type, OperationActor* operationActor);
 
-  protected:
     //##Documentation
     //## @brief executes the actions that are sent to this statemachine
     //## derived from StateMachine 

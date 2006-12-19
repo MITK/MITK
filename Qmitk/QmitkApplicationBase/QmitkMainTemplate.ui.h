@@ -575,7 +575,7 @@ void QmitkMainTemplate::Initialize()
   {
       posOutputType* posOutput = new posOutputType(&it);
 
-      mitk::GlobalInteraction::GetInstance()->AddListener(new mitk::CoordinateSupplier("navigation", posOutput)); //sends PointOperations
+      mitk::GlobalInteraction::GetInstance()->AddListener(mitk::CoordinateSupplier::New("navigation", posOutput)); //sends PointOperations
   }
   else
   {

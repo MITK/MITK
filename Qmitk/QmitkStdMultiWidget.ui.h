@@ -109,9 +109,9 @@ void QmitkStdMultiWidget::init()
   mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
 
   // instantiate display interactor
-  m_MoveAndZoomInteractor = new mitk::DisplayVectorInteractor("moveNzoom", new mitk::DisplayInteractor() );
+  m_MoveAndZoomInteractor = mitk::DisplayVectorInteractor::New("moveNzoom", new mitk::DisplayInteractor() );
   
-  m_LastLeftClickPositionSupplier = new mitk::CoordinateSupplier("navigation", NULL);
+  m_LastLeftClickPositionSupplier = mitk::CoordinateSupplier::New("navigation", NULL);
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
   );
@@ -722,7 +722,7 @@ void QmitkStdMultiWidget::EnablePositionTracking()
 {
   if(!m_PositionTracker)
   {
-    m_PositionTracker = new mitk::PositionTracker("PositionTracker", NULL);
+    m_PositionTracker = mitk::PositionTracker::New("PositionTracker", NULL);
   }
 
   mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();

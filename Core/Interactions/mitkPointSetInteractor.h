@@ -36,16 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointSetInteractor, Interactor);
-
     mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
-
-    //##Documentation
-    //##@brief Constructor with Param n for limited Set of Points
-    //##
-    //## if no n is set, then the number of points is unlimited*
-    PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
-
-    virtual ~PointSetInteractor();
+    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     //##Documentation
     //## @brief Clears all the elements in the list with undo-functionality and resets the statemachine
@@ -63,6 +55,16 @@ namespace mitk
 
 
   protected:
+    //##Documentation
+    //##@brief Constructor with Param n for limited Set of Points
+    //##
+    //## if no n is set, then the number of points is unlimited*
+    PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+
+    /**
+    * brief Default Destructor
+    **/
+    virtual ~PointSetInteractor();
 
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 

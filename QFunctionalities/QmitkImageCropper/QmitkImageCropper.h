@@ -161,7 +161,7 @@ protected:
   /*!
   * \brief Interactor for moving and scaling the cuboid
   */
-  mitk::AffineInteractor* m_AffineInteractor;
+  mitk::AffineInteractor::Pointer m_AffineInteractor;
  
   /*!
    * \brief Creates the cuboid and its data tree node.

@@ -42,10 +42,10 @@ const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 /**
 * @brief Obsolete! Only to maintain interface!
 **/
-mitk::Interactor::Interactor( )
-  : mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
-{
-}
+//mitk::Interactor::Interactor( )
+//  : mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
+//{
+//}
 
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
   : mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)

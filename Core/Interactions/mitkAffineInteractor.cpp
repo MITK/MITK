@@ -56,9 +56,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-mitk::AffineInteractor::AffineInteractor()
-: Interactor()
-{ }
+//obsolete!
+//mitk::AffineInteractor::AffineInteractor()
+//: Interactor()
+//{ }
 
 mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
 : Interactor(type, dataTreeNode)

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PointSnapInteractor::PointSnapInteractor(const char * type, DataTreeNode* dataTreeNode)
 : HierarchicalInteractor(type, dataTreeNode), m_Position(0)
 {
-  m_PointInteractor = new mitk::PointInteractor("pointinteractor",dataTreeNode);
+  m_PointInteractor = mitk::PointInteractor::New("pointinteractor",dataTreeNode);
   this->AddInteractor((Interactor::Pointer)m_PointInteractor);
 }
 

@@ -39,16 +39,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::LineInteractor::LineInteractor(const char * type, DataTreeNode* dataTreeNode)
-  : HierarchicalInteractor(type, dataTreeNode), m_CurrentLineId(0), m_CurrentCellId(0)
+: HierarchicalInteractor(type, dataTreeNode), m_CurrentLineId(0), m_CurrentCellId(0)
 {
-    m_PointInteractor = new mitk::PointSnapInteractor("pointSNAPinteractor",NULL);
-    this->AddInteractor((Interactor::Pointer)m_PointInteractor);
-    m_LastPoint.Fill(0);
+  m_PointInteractor = mitk::PointSnapInteractor::New("pointSNAPinteractor",NULL);
+  this->AddInteractor((Interactor::Pointer)m_PointInteractor);
+  m_LastPoint.Fill(0);
 }
 
 mitk::LineInteractor::~LineInteractor()
 {
-    //delete m_PointInteractor;
 }
 
 void mitk::LineInteractor::DeselectAllLines()//\*todo: move to mitkMesh.cpp
@@ -91,7 +90,7 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
 //go through all lines and check, if the given Point lies near a line
 {
   float returnValue = 0;
-  
+
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
   //checking if a keyevent can be handled:
   if (posEvent == NULL)
@@ -172,12 +171,12 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
     //now we have the points and so we can calculate the distance
     Line<PointSet::CoordinateType> *line = new Line<PointSet::CoordinateType>();
     line->SetPoints(pointA, pointB);
-    
+
     double pointDistance = line->Distance(worldPoint);
-    
+
     //because we searched for a line in the distance, we now can set it according to distance between 0 and 1
     returnValue = 1 - ( pointDistance / distance );
-    
+
     //and now between 0,5 and 1
     returnValue = 0.5 + (returnValue / 2);
   }
@@ -189,7 +188,7 @@ float mitk::LineInteractor::CalculateJurisdiction(StateEvent const* stateEvent) 
 
   //now check all lower statemachines:
   float lowerJurisdiction = this->CalculateLowerJurisdiction(stateEvent);
-  
+
   if (returnValue<lowerJurisdiction)
     returnValue = lowerJurisdiction;
 
@@ -233,11 +232,11 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     ok = true;
     break;
   case AcDESELECTALL:
-  {
-    this->DeselectAllLines();//undo-supported able deselect of all points in the DataList
-    ok = true;
-  }
-  break;
+    {
+      this->DeselectAllLines();//undo-supported able deselect of all points in the DataList
+      ok = true;
+    }
+    break;
   case AcCHECKLINE:
     //checks if the position of the mouse lies over a line
     {
@@ -288,8 +287,8 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
 
         bool found = mesh->SearchLine(worldPoint, PRECISION, lineId, cellId);
         if (found && 
-            m_CurrentCellId == cellId &&
-            m_CurrentLineId == lineId )//found the same line again
+          m_CurrentCellId == cellId &&
+          m_CurrentLineId == lineId )//found the same line again
         {
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, posEvent);
           //call HandleEvent to leave the guard-state
@@ -337,8 +336,8 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
     break;
   case AcDESELECT:
     //deselects the line 
-  {
-     LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
+    {
+      LineOperation* doOp = new mitk::LineOperation(OpDESELECTLINE, m_CurrentCellId, 0, 0, m_CurrentLineId);
       //Undo
       if (m_UndoEnabled)  //write to UndoMechanism
       {
@@ -350,86 +349,86 @@ bool mitk::LineInteractor::ExecuteAction(Action* action, mitk::StateEvent const*
       //execute the Operation
       mesh->ExecuteOperation(doOp);
       ok = true;
-  }
-  break;
-  case AcINITMOVEMENT:
-  {
-     mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-     if (posEvent == NULL)
-      return false;
-
-    //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
-    m_LastPoint = posEvent->GetWorldPosition();
-    m_TempPoint = m_LastPoint;
-    ok = true;
+    }
     break;
-  }
-  break;
+  case AcINITMOVEMENT:
+    {
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      if (posEvent == NULL)
+        return false;
+
+      //start of the Movement is stored to calculate the undoKoordinate in FinishMovement
+      m_LastPoint = posEvent->GetWorldPosition();
+      m_TempPoint = m_LastPoint;
+      ok = true;
+      break;
+    }
+    break;
   case AcMOVE:
-  {
-    mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-    if (posEvent == NULL)
-      return false;
-
-    mitk::Point3D newPoint;
-    newPoint = posEvent->GetWorldPosition();
-
-    int idA, idB;
-    Vector3D vector;
-    
-    vector = newPoint - m_TempPoint;
-    m_TempPoint = newPoint;
-
-    //get the ids of the points
-    bool found = mesh->GetPointIds(m_CurrentCellId, m_CurrentLineId, idA, idB);
-    if (found)
     {
-      LineOperation* doOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, vector, idA, idB, m_CurrentLineId);
-      //execute the Operation
-      //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
-      m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-      ok = true;
-    }
-    else
-      ok = false;
-  }
-  break;
-  case AcFINISHMOVEMENT:
-  {
-    mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-    if (posEvent == NULL)
-      return false;
+      mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      if (posEvent == NULL)
+        return false;
 
-    //finish the movement:
-    // set undo-information and move it to the last position.
-    mitk::Point3D newPoint = posEvent->GetWorldPosition();
+      mitk::Point3D newPoint;
+      newPoint = posEvent->GetWorldPosition();
 
-    int idA, idB;
-    Vector3D vector;
-    
-    vector = m_TempPoint - newPoint;
-    m_TempPoint.Fill(0);//not needed any more
+      int idA, idB;
+      Vector3D vector;
 
-    //get the ids of the points
-    bool found = mesh->GetPointIds(m_CurrentCellId, m_CurrentLineId, idA, idB);
-    if (found)
-    {
-      LineOperation* doOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, vector, idA, idB, m_CurrentLineId);
-      if ( m_UndoEnabled )
+      vector = newPoint - m_TempPoint;
+      m_TempPoint = newPoint;
+
+      //get the ids of the points
+      bool found = mesh->GetPointIds(m_CurrentCellId, m_CurrentLineId, idA, idB);
+      if (found)
       {
-        LineOperation* undoOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, m_LastPoint-newPoint, idA, idB, m_CurrentLineId);
-        OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp, "Move line");
-        m_UndoController->SetOperationEvent(operationEvent);
+        LineOperation* doOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, vector, idA, idB, m_CurrentLineId);
+        //execute the Operation
+        //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
+        m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+        ok = true;
       }
-      //execute the Operation
-      //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
-      m_DataTreeNode->GetData()->ExecuteOperation(doOp);
-      ok = true;
+      else
+        ok = false;
     }
-    else
-      ok = false;
-  }
-  break;
+    break;
+  case AcFINISHMOVEMENT:
+    {
+      mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      if (posEvent == NULL)
+        return false;
+
+      //finish the movement:
+      // set undo-information and move it to the last position.
+      mitk::Point3D newPoint = posEvent->GetWorldPosition();
+
+      int idA, idB;
+      Vector3D vector;
+
+      vector = m_TempPoint - newPoint;
+      m_TempPoint.Fill(0);//not needed any more
+
+      //get the ids of the points
+      bool found = mesh->GetPointIds(m_CurrentCellId, m_CurrentLineId, idA, idB);
+      if (found)
+      {
+        LineOperation* doOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, vector, idA, idB, m_CurrentLineId);
+        if ( m_UndoEnabled )
+        {
+          LineOperation* undoOp = new mitk::LineOperation(OpMOVELINE, m_CurrentCellId, m_LastPoint-newPoint, idA, idB, m_CurrentLineId);
+          OperationEvent *operationEvent = new OperationEvent(m_DataTreeNode->GetData(), doOp, undoOp, "Move line");
+          m_UndoController->SetOperationEvent(operationEvent);
+        }
+        //execute the Operation
+        //here no undo is stored, because the movement-steps aren't interesting. only the start and the end is interisting to store for undo.
+        m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+        ok = true;
+      }
+      else
+        ok = false;
+    }
+    break;
   default:
     return Superclass::ExecuteAction( action, stateEvent );
   }

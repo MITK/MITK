@@ -77,6 +77,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_VtkRenderer = vtkRenderer::New();
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
+  m_DrawOverlayPosition.Fill(0);
 }
 
 void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)

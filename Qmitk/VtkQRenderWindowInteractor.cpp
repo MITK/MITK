@@ -48,7 +48,6 @@ VtkQRenderWindowInteractor::VtkQRenderWindowInteractor()
     //static int timerId           = 1;
     //this->WindowId           = 0;
     //this->TimerId            = timerId++;
-    //this->InstallMessageProc = 1;
     this->MouseInWindow = 0;
 }
 
@@ -86,32 +85,10 @@ void VtkQRenderWindowInteractor::Enable()
     {
         return;
     }
-    if (this->InstallMessageProc)
-    {
-        //// add our callback
-        //ren = (vtkWin32OpenGLRenderWindow *)(this->RenderWindow);
-        //this->OldProc = (WNDPROC)GetWindowLong(this->WindowId,GWL_WNDPROC);
-        //tmp=(vtkWin32OpenGLRenderWindow *)GetWindowLong(this->WindowId,4);
-        //// watch for odd conditions
-        //if (tmp != ren)
-        //  {
-        //  // OK someone else has a hold on our event handler
-        //  // so lets have them handle this stuff
-        //  // well send a USER message to the other
-        //  // event handler so that it can properly
-        //  // call this event handler if required
-        //  CallWindowProc(this->OldProc,this->WindowId,WM_USER+12,24,(LONG)vtkHandleMessage);
-        //  }
-        //else
-        //  {
-        //  SetWindowLong(this->WindowId,GWL_WNDPROC,(LONG)vtkHandleMessage);
-        //  }
-        // in case the size of the window has changed while we were away
-        int *size;
-        size = GetRenderWindow()->GetSize();
-        this->Size[0] = size[0];
-        this->Size[1] = size[1];
-    }
+    int *size;
+    size = GetRenderWindow()->GetSize();
+    this->Size[0] = size[0];
+    this->Size[1] = size[1];
     this->Enabled = 1;
     this->Modified();
 }
@@ -125,27 +102,6 @@ void VtkQRenderWindowInteractor::Disable()
         return;
     }
     
-    if (this->InstallMessageProc && this->GetEnabled())
-    {
-        //// we need to release any hold we have on a windows event loop
-        //vtkWin32OpenGLRenderWindow *ren;
-        //ren = (vtkWin32OpenGLRenderWindow *)(this->RenderWindow);
-        //tmp = (vtkWin32OpenGLRenderWindow *)GetWindowLong(this->WindowId,4);
-        //// watch for odd conditions
-        //if ((tmp != ren) && (ren != NULL))
-        //  {
-        //  // OK someone else has a hold on our event handler
-        //  // so lets have them handle this stuff
-        //  // well send a USER message to the other
-        //  // event handler so that it can properly
-        //  // call this event handler if required
-        //  CallWindowProc(this->OldProc,this->WindowId,WM_USER+14,28,(LONG)this->OldProc);
-        //  }
-        //else
-        //  {
-        //  SetWindowLong(this->WindowId,GWL_WNDPROC,(LONG)this->OldProc);
-        //  }
-    }
     this->Enabled = 0;
     this->Modified();
 }
@@ -248,7 +204,6 @@ VtkQRenderWindowInteractor::SetClassExitMethodArgDelete(void (*f)(void *))
 void VtkQRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent)
 {
     vtkRenderWindowInteractor::PrintSelf(os,indent);
-    os << indent << "InstallMessageProc: " << this->InstallMessageProc << endl;
 }
 
 //##ModelId=3E6D600F0147

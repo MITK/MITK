@@ -7,7 +7,7 @@
 #include "mitkOpenGLRenderer.h"
 
 mitk::CameraRotationController::CameraRotationController(const char * type)
-: BaseController(type), m_LastStepperValue(180), m_Camera(NULL)
+  : BaseController(type), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
 {
   m_Slice->SetAutoRepeat(true);
   m_Slice->SetSteps(360);

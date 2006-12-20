@@ -176,7 +176,7 @@
     <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
     <variable>mitk::DataTreeBase::Pointer planesSubTree;</variable>
     <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
-    <variable>mitk::DisplayVectorInteractor* m_MoveAndZoomInteractor;</variable>
+    <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
     <variable>int m_Layout;</variable>
     <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4};</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>

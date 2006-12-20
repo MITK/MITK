@@ -672,7 +672,7 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 
 mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
 {
-  return m_MoveAndZoomInteractor;
+  return m_MoveAndZoomInteractor.GetPointer();
 }
 
 void QmitkStdMultiWidget::ReInitializeStandardViews()

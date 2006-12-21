@@ -51,8 +51,7 @@ QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, m
 QmitkImageCropper::QmitkImageCropper(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it) 
 : QmitkFunctionality(parent, name, it),
   m_MultiWidget(mitkStdMultiWidget),
-  m_Controls(NULL),
-  m_AffineInteractor(NULL)
+  m_Controls(NULL)
 {
   CreateBoundingObject(); // Create cuboid. This should only happen once.
 }

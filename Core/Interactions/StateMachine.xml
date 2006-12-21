@@ -2912,6 +2912,39 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="dummy">
+    <!-- Dummy for a null interaction -->
+    <state NAME="neutral" ID="0" START_STATE="TRUE">
+      <transition NAME="stay in dummy" NEXT_STATE_ID="0" EVENT_ID="0" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="InteractorTestPattern">
+    <!-- To Test an Interactor for the right behavior -->
+    <state NAME="neutral" ID="0" START_STATE="TRUE">
+      <transition NAME="to1" NEXT_STATE_ID="1" EVENT_ID="4">
+        <action ID="1101" />
+        <!--AcMODESELECT-->
+      </transition>
+      <transition NAME="to2" NEXT_STATE_ID="2" EVENT_ID="2">
+        <action ID="1011" />
+        <!--AcMODESELECT-->
+      </transition>
+    </state>
+    <state NAME="State1" ID="1">
+      <transition NAME="StayIn1" NEXT_STATE_ID="1" EVENT_ID="533" />
+      <transition NAME="to0" NEXT_STATE_ID="0" EVENT_ID="506">
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
+      </transition>
+    </state>
+    <state NAME="State2" ID="2">
+      <transition NAME="StayIn2" NEXT_STATE_ID="2" EVENT_ID="531" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507">
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="shapemodelpointsetinteractor">
     <state NAME="Interaction Activated, no point loaded yet" ID="1" START_STATE="TRUE" X_POS="457" Y_POS="506" WIDTH="226" HEIGHT="56">
       <transition NAME="SetStateMachineOnDeselected" EVENT_ID="1031" NEXT_STATE_ID="1">
@@ -2955,6 +2988,7 @@
         <action ID="42" />
       </transition>
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="4">
+        <action ID="1236" />
         <action ID="91" />
         <action ID="1234" />
       </transition>
@@ -2971,39 +3005,6 @@
         <action ID="60" />
       </transition>
     </state>
-  </stateMachine>
-  <stateMachine NAME="dummy">
-        <!-- Dummy for a null interaction -->
-    	<state NAME="neutral" ID="0" START_STATE="TRUE">
-          <transition NAME="stay in dummy" NEXT_STATE_ID="0" EVENT_ID="0"/>
-        </state>
-  </stateMachine>
-  <stateMachine NAME="InteractorTestPattern">
-      <!-- To Test an Interactor for the right behavior -->
-  	<state NAME="neutral" ID="0" START_STATE="TRUE">
-        <transition NAME="to1" NEXT_STATE_ID="1" EVENT_ID="4">
-          <action ID="1101" />
-          <!--AcMODESELECT-->
-        </transition>
-        <transition NAME="to2" NEXT_STATE_ID="2" EVENT_ID="2">
-          <action ID="1011" />
-          <!--AcMODESELECT-->
-        </transition>
-      </state>
-      <state NAME="State1" ID="1">
-        <transition NAME="StayIn1" NEXT_STATE_ID="1" EVENT_ID="533" />
-        <transition NAME="to0" NEXT_STATE_ID="0" EVENT_ID="506">
-  	      <action ID="1100" />
-            <!--AcMODEDESELECT-->
-        </transition>
-      </state>
-      <state NAME="State2" ID="2">
-        <transition NAME="StayIn2" NEXT_STATE_ID="2" EVENT_ID="531" />
-        <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507">
-        	<action ID="1100" />
-  	    <!--AcMODEDESELECT-->
-        </transition>
-      </state>
   </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->

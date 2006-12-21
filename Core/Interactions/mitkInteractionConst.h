@@ -325,6 +325,7 @@ typedef enum EActions
   AcINCREASE = 49012,
   AcDECREASE = 49013,
   AcMODIFY = 49014,
+  AcUNDOUPDATE = 1236,  // For restoring a mesh after an update
   AcENTEROBJECT = 48000,
   AcLEAVEOBJECT = 48001,
   AcSWITCHOBJECT = 48002,

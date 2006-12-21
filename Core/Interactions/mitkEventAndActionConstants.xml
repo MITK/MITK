@@ -322,6 +322,9 @@
       <action NAME="AcINCREASE" ID="49012" />
       <action NAME="AcDECREASE" ID="49013" />
       <action NAME="AcMODIFY" ID="49014" />
+      <action NAME="AcUNDOUPDATE" ID="1236">
+        <!--For restoring a mesh after an update-->
+      </action>
     </actionCategory>
     <actionCategory NAME="SegmentationInteractor">
       <action NAME="AcENTEROBJECT" ID="48000" />

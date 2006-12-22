@@ -53,6 +53,10 @@ SliceNavigationController::SliceNavigationController(const char * type)
 
   m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
   m_Time->AddObserver(itk::ModifiedEvent(),  timeStepperChangedCommand);
+  
+  m_Top = false;
+  m_FrontSide = false;
+  m_Rotated = false;
 }
 
 SliceNavigationController::~SliceNavigationController()

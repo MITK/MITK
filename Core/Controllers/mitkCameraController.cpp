@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 
-mitk::CameraController::CameraController(const char * type) : BaseController(type)
+mitk::CameraController::CameraController(const char * type) : BaseController(type), m_Renderer(NULL)
 {}
 
 

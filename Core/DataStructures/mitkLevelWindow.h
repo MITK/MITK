@@ -143,6 +143,23 @@ public:
   * \brief sets level/window to the second min/max greyvalues of the given Image
   */
   void SetAuto(mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+  
+  /**
+   * If a level window is set to fixed, the set and get methods won't accept
+   * modifications to the level window settings anymore. This behaviour can
+   * be turned of by setting fixed to false;
+   */
+  void SetFixed( bool fixed );
+  
+  /** 
+   * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
+   */
+  bool GetFixed( );
+  
+  /** 
+   * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
+   */
+  bool IsFixed( );
 
   /*!
   * \brief equality operator implementation
@@ -209,6 +226,12 @@ protected:
   ScalarType m_DefaultWindow;
 
   /*!
+   * Defines whether the level window settings may be changed after
+   * initialization or not.
+   */
+  bool m_Fixed;
+
+  /*!
   * confidence tests
   *
   * if m_Min > m_Max, then the values for m_Min and m_Max will be exchanged
@@ -245,7 +268,7 @@ protected:
         m_Min += diff;
     }
   }
-
+  
 };
 
 } // namespace mitk

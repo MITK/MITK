@@ -95,6 +95,8 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     QString window;
     window.setNum((int)(m_LevelWindow.GetWindow()));
     m_WindowInput->setText(window);
+    m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());  
+    m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());  
     this->show();
   }
   catch(...)

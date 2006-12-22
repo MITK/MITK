@@ -249,6 +249,8 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 *
 */
 void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
+  if ( m_LevelWindow.IsFixed() )
+    return;
   if (!m_MouseDown)
   {
     if (((mouseEvent->pos().y() >= (m_Rect.topLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.topLeft().y() + 3))
@@ -373,6 +375,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
 *
 */
 void QmitkSliderLevelWindowWidget::mousePressEvent( QMouseEvent* mouseEvent ) {
+  if ( m_LevelWindow.IsFixed() )
+    return;
   m_MouseDown = true;
   m_StartPos = mouseEvent->pos();
 
@@ -407,6 +411,8 @@ void QmitkSliderLevelWindowWidget::resizeEvent ( QResizeEvent * event ) {
 */
 void QmitkSliderLevelWindowWidget::mouseReleaseEvent( QMouseEvent* ) 
 {
+  if ( m_LevelWindow.IsFixed() )
+    return;
   m_MouseDown = false;
 }
 

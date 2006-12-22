@@ -154,12 +154,12 @@ public:
   /** 
    * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
    */
-  bool GetFixed( );
+  bool GetFixed() const;
   
   /** 
    * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
    */
-  bool IsFixed( );
+  bool IsFixed() const;
 
   /*!
   * \brief equality operator implementation

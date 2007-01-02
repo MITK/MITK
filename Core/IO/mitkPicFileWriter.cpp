@@ -161,7 +161,11 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
   else
   {
     ipPicRemoveFile( outfile_name );
-
+    // Removed due to linker problems when compiling
+    // an mitk chili plugin using msvc: there appear
+    // unsresolved external symbol errors to function
+    // _ipPicGetWriteCompression()
+    /*
     if( ipPicGetWriteCompression() )
     {
       char buff[1024];
@@ -170,7 +174,8 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
       outfile = (FILE*) ipPicFOpen( buff, "wb" ); // cast to prevent warning. 
     }
     else
-      outfile = fopen( outfile_name, "wb" );
+    */
+    outfile = fopen( outfile_name, "wb" );
   }
 
 
@@ -200,11 +205,16 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
   ipPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
   _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
-
+   // Removed due to linker problems when compiling
+   // an mitk chili plugin using msvc: there appear
+   // unsresolved external symbol errors to function
+   // _ipPicGetWriteCompression()
+  /*
   if( ipPicGetWriteCompression() )
     pic->info->pixel_start_in_file = ipPicFTell( outfile );
   else
-    pic->info->pixel_start_in_file = ftell( outfile );
+  */
+  pic->info->pixel_start_in_file = ftell( outfile );
 
   if( pic->data )
   {
@@ -239,10 +249,16 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
   
   if( outfile != stdout )
   {
+    // Removed due to linker problems when compiling
+    // an mitk chili plugin using msvc: there appear
+    // unsresolved external symbol errors to function
+    // _ipPicGetWriteCompression()
+    /*    
     if( ipPicGetWriteCompression() )
       ipPicFClose( outfile );
     else
-      fclose( outfile );
+    */
+    fclose( outfile );
   }
 
   return( 0 );

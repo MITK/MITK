@@ -401,12 +401,12 @@ void mitk::LevelWindow::SetFixed( bool fixed )
   this->m_Fixed = fixed; 
 }
   
-bool mitk::LevelWindow::GetFixed( )
+bool mitk::LevelWindow::GetFixed() const
 {
   return m_Fixed;
 }
   
-bool mitk::LevelWindow::IsFixed( )
+bool mitk::LevelWindow::IsFixed() const
 {
   return m_Fixed;
 }

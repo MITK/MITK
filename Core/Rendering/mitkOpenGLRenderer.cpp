@@ -401,10 +401,9 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
         layers.pop();
       }
     }
-
     //------------------
     //rendering VTK-Mappers if present
-    if(m_VtkMapperPresent || m_RenderWindow->GetVtkLayerController()->GetNumberOfRenderers() > 1)
+    if((m_VtkMapperPresent && m_MapperID != 1) || m_RenderWindow->GetVtkLayerController()->GetNumberOfRenderers() > 1)
     {
       mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
       if (arRenderWindow)

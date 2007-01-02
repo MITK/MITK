@@ -29,6 +29,7 @@
     <item text="&amp;File" name="File">
         <action name="fileOpenAction"/>
         <action name="fileOpenImageSequenceAction"/>
+        <action name="fileOpenRawImageAction"/>
         <action name="fileOpenProjectAction"/>
         <separator/>
         <action name="fileSaveProjectAction"/>
@@ -688,6 +689,17 @@
             <string>During rotation the planes of a 2D view are rotated together.</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>fileOpenRawImageAction</cstring>
+        </property>
+        <property name="text">
+            <string>Open Raw Image...</string>
+        </property>
+        <property name="menuText">
+            <string>Open Raw Image...</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -914,6 +926,13 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
     </connection>
+    <connection>
+        <sender>fileOpenRawImageAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileOpenRawImage()</slot>
+    </connection>
+
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -988,6 +1007,8 @@
     <slot>viewLinkSlices_toggled( bool link )</slot>
     <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
     <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
+    <slot>fileOpenRawImage()</slot>
+    <slot>fileOpenRawImage( const char * fileName )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

@@ -80,6 +80,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
 #include <QmitkSystemInfo.h>
+#include <QmitkRawImageFileOpener.h>
 
 #include <QmitkOptionDialog.h>
 #include <qlistbox.h>
@@ -1085,3 +1086,36 @@ void QmitkMainTemplate::changeToSmallUpperWidget2Big3n4Layout()
 {
     m_MultiWidget->changeLayoutToSmallUpperWidget2Big3and4();
 }
+
+// New code for Raw Image reading
+void QmitkMainTemplate::fileOpenRawImage()
+{
+    QStringList fileNames = QFileDialog::getOpenFileName("/home","Raw images: (*.raw *.ct)", NULL);
+  for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
+  {
+    fileOpenRawImage((*it).ascii());
+  }
+}
+
+//new code for Raw Image reading
+void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
+{
+  // open dialog window and get parameters
+  QmitkRawImageFileOpener* rawFileOpener = new QmitkRawImageFileOpener(this, "QmitkRawFileOpener");
+  
+  mitk::Image::Pointer m_ResultImage = rawFileOpener->ShowAndTryToRead(fileName);
+  
+  if (m_ResultImage.IsNotNull())
+  {
+      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+      node->SetData(m_ResultImage);
+      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
+      node->SetProperty("name", new mitk::StringProperty( fileName ));
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      it.Add(node);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
+  }
+  
+}
+

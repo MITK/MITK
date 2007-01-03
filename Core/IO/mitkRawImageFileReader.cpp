@@ -154,6 +154,8 @@ void mitk::RawImageFileReader::TypedGenerateData()
   typename ReaderType::Pointer reader = ReaderType::New();
   typename IOType::Pointer io = IOType::New();
 
+  io->SetFileDimensionality(VImageDimensions);
+  
   for (unsigned short int dim = 0; dim < VImageDimensions; ++dim)
   { 
     io->SetDimensions(dim, m_Dimensions[dim] );
@@ -181,7 +183,7 @@ void mitk::RawImageFileReader::TypedGenerateData()
   }
   catch( itk::ExceptionObject & err )
   {
-    std::cerr<<"An error occurred during the reading process: ";
+    std::cerr<<"An error occurred during the raw image reading process: ";
     std::cout << err << std::endl;
   }
 

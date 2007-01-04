@@ -104,7 +104,7 @@ ConferenceToken::GetInstance()
   if ( !m_Instance )
   {
     m_Instance = new ConferenceToken();
-    std::cout<<"NEUE TOKEN INSTANCE"<<std::endl;
+    //std::cout<<"NEUE TOKEN INSTANCE"<<std::endl;
   }
 
   return m_Instance;

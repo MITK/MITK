@@ -24,6 +24,7 @@ SET(CPP_FILES
   mitkPicVolumeTimeSeriesReader.cpp
   mitkPointSetReader.cpp
   mitkPointSetWriter.cpp
+  mitkRawImageFileReader.cpp
   mitkStandardFileLocations.cpp
   mitkSTLFileIOFactory.cpp
   mitkSTLFileReader.cpp

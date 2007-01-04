@@ -25,6 +25,7 @@ SET(CPP_FILES
   mitkImageToSurfaceFilter.cpp
   mitkInterpolateLinesFilter.cpp
   #mitkItkProcessObjectAdapter.cpp
+  mitkLabeledImageToSurfaceFilter.cpp
   mitkLookupTableSource.cpp
   mitkManualSegmentationToSurfaceFilter.cpp
   mitkMaskImageFilter.cpp

@@ -40,7 +40,8 @@ mitk::PointSetMapper2D::PointSetMapper2D()
   m_ShowDistances(false),
   m_DistancesDecimalDigits(1),
   m_ShowAngles(false),
-  m_ShowDistantLines(true)
+  m_ShowDistantLines(true),
+  m_LineWidth(1)
 {
 }
 
@@ -69,6 +70,7 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetFloatProperty("distance decimal digits",     m_DistancesDecimalDigits);
   node->GetBoolProperty("show angles",        m_ShowAngles);
   node->GetBoolProperty("show distant lines", m_ShowDistantLines);
+  node->GetIntProperty("line width",          m_LineWidth);
 }
 
 static void WriteTextXY(float x, float y, const std::string & text)
@@ -272,10 +274,12 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
  
         if ( m_Polygon && counter > 0 && drawLinesEtc) // draw a line
         {
+          glLineWidth( m_LineWidth );
           glBegin (GL_LINES);
           glVertex2fv(&pt2d[0]);
           glVertex2fv(&lastPt2d[0]);
           glEnd ();
+          glLineWidth(1.0);
           if(m_ShowDistances) // calculate and print a distance
           {
             std::stringstream buffer;

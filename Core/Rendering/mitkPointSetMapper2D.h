@@ -38,6 +38,7 @@ class PointSet;
 //## and angles between adjacent points. Here is a complete list of boolean properties, which might be of interest:
 //##
 //## - \b "contour": Draw not only the points but also the connections between them (default false)
+//## - \b "line width": IntProperty which gives the width of the contour lines
 //## - \b "show points": Wheter or not to draw the actual points (default true)
 //## - \b "show distances": Wheter or not to calculate and print the distance between adjacent points (default false)
 //## - \b "show angles": Wheter or not to calculate and print the angle between adjacent points (default false)
@@ -77,6 +78,7 @@ protected:
     float m_DistancesDecimalDigits;
     bool m_ShowAngles;
     bool m_ShowDistantLines;
+    int  m_LineWidth;
 };
 
 } // namespace mitk

@@ -58,6 +58,7 @@ SET(UI_FILES
   QmitkApplicationBase/QmitkControlsLeftFctLayoutTemplate.ui
   QmitkApplicationBase/QmitkControlsRightFctLayoutTemplate.ui
   QmitkApplicationBase/QmitkMainTemplate.ui
+  QmitkApplicationBase/QmitkRawImageFileOpener.ui
   QmitkApplicationBase/QmitkNablaBase.ui
   QmitkApplicationBase/QmitkOptionDialog.ui
   QmitkApplicationBase/QmitkRenderWindowSelector.ui

@@ -23,9 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
+#include "mitkLine.h"
+#include "mitkGLUT.h"
 
 #include <vtkLinearTransform.h>
-#include "mitkGLUT.h"
 
 #include <algorithm>
 

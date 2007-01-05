@@ -1110,7 +1110,6 @@ bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter )
   std::string imageExtension = xmlWriter.GetImageExtension();
   if(!xmlWriter.IsFileExtension(imageExtension, fileName))
     fileName += imageExtension;
-  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
 
   if(xmlWriter.SaveSourceFiles()){
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -1122,7 +1121,9 @@ bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter )
     imageWriter->SetFileName( absolutePath.c_str() );
     imageWriter->SetExtension( imageExtension.c_str() );
     imageWriter->Write();
+    fileName = absolutePath + imageExtension;
   }
+  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
 
   mitk::Geometry3D* geomety = GetGeometry();
 

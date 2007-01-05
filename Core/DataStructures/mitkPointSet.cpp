@@ -350,8 +350,7 @@ bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
   std::string fileName = xmlWriter.GetRelativePath();
   if(!xmlWriter.IsFileExtension(".mps", fileName))
     fileName += ".mps";
-  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
+  
   if(xmlWriter.SaveSourceFiles()){
     PointSetWriter::Pointer writer = PointSetWriter::New();
     fileName = xmlWriter.GetAbsolutePath();
@@ -361,6 +360,7 @@ bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
     writer->SetInput( this );
     writer->Update();
   }
+  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
   return true;
 }
 

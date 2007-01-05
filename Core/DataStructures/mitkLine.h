@@ -113,7 +113,7 @@ public:
   void Set( const itk::Point<TCoordRep,NPointDimension>& point, const itk::Vector<TCoordRep,NPointDimension>& direction ) {
 
     this->m_Point = point;
-    this->m_Direction = direction;		
+    this->m_Direction = direction;    
   }
 
   //##Documentation
@@ -162,9 +162,9 @@ public:
   //##Documentation
   //## @brief Transform the line with a Transform
   void Transform(itk::Transform<TCoordRep, NPointDimension, NPointDimension>& transform)
-  {	
+  {  
     m_Direction = transform.TransformVector(m_Direction);
-    m_Point = transform.TransformPoint(m_Point);	
+    m_Point = transform.TransformPoint(m_Point);  
   }
 
   //##Documentation
@@ -295,14 +295,19 @@ public:
   }
 
   //##Documentation
-  //## @brief Calculates the intersection points of a straight line in 2D with a rectangle
+  //## @brief Calculates the intersection points of a straight line in 2D
+  //## with a rectangle
   //## 
-  //## @param x1,y1,x2,y2		rectangle
-  //## @param p,d				straight line: p point on it, d direction of line
-  //## @param s1				first intersection point (valid only if s_num>0)
-  //## @param s2				second intersection point (valid only if s_num==2)
-  //## @return				  number of intersection points (0<=s_num<=2)
-  static int RectangleLineIntersection( TCoordRep x1, TCoordRep y1, TCoordRep x2, TCoordRep y2, itk::Point<TCoordRep,2> p, itk::Vector<TCoordRep,2> d, itk::Point<TCoordRep,2> & s1, itk::Point<TCoordRep,2> & s2 )
+  //## @param x1,y1,x2,y2   rectangle
+  //## @param p,d           straight line: p point on it, d direction of line
+  //## @param s1            first intersection point (valid only if s_num>0)
+  //## @param s2            second intersection point (valid only if s_num==2)
+  //## @return              number of intersection points (0<=s_num<=2)
+  static int RectangleLineIntersection( 
+    TCoordRep x1, TCoordRep y1, 
+    TCoordRep x2, TCoordRep y2, 
+    itk::Point< TCoordRep, 2 > p, itk::Vector< TCoordRep, 2 > d, 
+    itk::Point< TCoordRep, 2 > &s1, itk::Point< TCoordRep, 2 > &s2 )
   {
     int s_num;
     TCoordRep t;
@@ -353,6 +358,66 @@ public:
     }
     return s_num;
   }
+
+
+  /**
+   * \brief Calculates the intersection points of a straight line in 3D with
+   * a box.
+   *  
+   * \param x1,y1,z1  first corner of the box
+   * \param x2,y2,z2  second corner of the box
+   * \param p,d       straight line: p point on it, d direction of line
+   * \param s1        first intersection point (valid only if s_num>0)
+   * \param s2        second intersection point (valid only if s_num==2)
+   * \return          number of intersection points (0<=s_num<=2)
+   */
+  static int BoxLineIntersection(
+    TCoordRep x1, TCoordRep y1, TCoordRep z1,
+    TCoordRep x2, TCoordRep y2, TCoordRep z2,
+    itk::Point< TCoordRep, 3 > p, itk::Vector< TCoordRep, 3 > d, 
+    itk::Point< TCoordRep, 3 > &s1, itk::Point< TCoordRep, 3 > &s2 )
+  {
+    int num = 0;
+
+    ScalarType box[6];
+    box[0] = x1; box[1] = x2;
+    box[2] = y1; box[3] = y2;
+    box[4] = z1; box[5] = z2;
+
+    itk::Point< TCoordRep, 3 > point;
+
+    int i, j;
+    for ( i = 0; i < 6; ++i )
+    {
+      j = i / 2;
+      if ( fabs( d[j] ) > eps )
+      {
+        ScalarType lambda = (box[i] - p[j]) / d[j];
+
+        point = p + lambda * d;
+
+        int k = (j + 1) % 3;
+        int l = (j + 2) % 3;
+
+        if ( (point[k] >= box[k*2]) && (point[k] <= box[k*2+1])
+          && (point[l] >= box[l*2]) && (point[l] <= box[l*2+1]) )
+        {
+          if ( num == 0 )
+          {
+            s1 = point;
+          }
+          else
+          {
+            s2 = point;
+          }
+          ++num;
+        }
+      }
+    }
+    return num;
+  }
+
+
 protected:
   itk::Point<TCoordRep,NPointDimension>  m_Point;
   itk::Vector<TCoordRep,NPointDimension> m_Direction;

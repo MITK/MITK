@@ -22,11 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMatrixConvert.h"
 #include "mitkOperation.h"
 #include "mitkRotationOperation.h"
+#include "mitkPlaneOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
+#include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
+
 #include <float.h>
 
 #include <vtkMatrixToLinearTransform.h>
@@ -50,11 +52,11 @@ mitk::Geometry3D::Geometry3D()
   Initialize();
 }
 
-//##ModelId=3E3456C50067
 mitk::Geometry3D::~Geometry3D()
 {
   m_VtkMatrix->Delete();
 }
+
 
 static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3])
 {
@@ -69,7 +71,7 @@ static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::V
   floatSpacing[2]=spacing[2];
 }
 
-//##ModelId=3E3453C703AF
+
 void mitk::Geometry3D::Initialize()
 {
   float b[6] = {0,1,0,1,0,1};
@@ -146,7 +148,6 @@ void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
 
 void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
-  //std::cout << " BOUNDS: " << bounds << std::endl;
   SetBoundsArray(bounds, m_ParametricBoundingBox);
 }
 
@@ -155,19 +156,16 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &p
   BackTransform(pt_mm, pt_units);
 }
 
-//##ModelId=3DDE65DC0151
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
   pt_mm = m_ParametricTransform->TransformPoint(pt_units);
 }
 
-//##ModelId=3E3B986602CF
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
   BackTransform(atPt3d_mm, vec_mm, vec_units);
 }
 
-//##ModelId=3E3B987503A3
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   vec_mm = m_ParametricTransform->TransformVector(vec_units);
@@ -330,6 +328,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       vtktransform->PreMultiply();
       break;
     }
+
   default:
     return;
   }
@@ -464,43 +463,43 @@ void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
 
 const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType ) 
 {
-	static char buffer[255];  
+  static char buffer[255];  
   for ( int j=0; j<255; j++) buffer[j] = '\0';
-	ostrstream out( buffer, 255 );
+  ostrstream out( buffer, 255 );
 
-	out << '[';
+  out << '[';
 
-	for( int i=0; i<3; ++i )
-	{
-		out << '[';
-		for( int j=0; j<3; ++j )
-			out << transformType->GetMatrix().GetVnlMatrix().get(i, j) << ' ';
-		out << ']';
-	}
+  for( int i=0; i<3; ++i )
+  {
+    out << '[';
+    for( int j=0; j<3; ++j )
+      out << transformType->GetMatrix().GetVnlMatrix().get(i, j) << ' ';
+    out << ']';
+  }
 
-	out << "][";
+  out << "][";
 
-	for( int i=0; i<3; ++i )
-		out << transformType->GetOffset()[i] << ' ';
+  for( int i=0; i<3; ++i )
+    out << transformType->GetOffset()[i] << ' ';
 
-	out << "]\0";
+  out << "]\0";
 
-	return buffer;
+  return buffer;
 }
 
 bool mitk::Geometry3D::WriteXMLData( XMLWriter& xmlWriter )
 {
-	if ( m_IndexToObjectTransform.IsNotNull() )
-		xmlWriter.WriteProperty( INDEX_TO_OBJECT_TRANSFORM, GetTransformAsString( m_IndexToObjectTransform.GetPointer() ) );
+  if ( m_IndexToObjectTransform.IsNotNull() )
+    xmlWriter.WriteProperty( INDEX_TO_OBJECT_TRANSFORM, GetTransformAsString( m_IndexToObjectTransform.GetPointer() ) );
 
-	if ( m_ObjectToNodeTransform.IsNotNull() )
-		xmlWriter.WriteProperty( OBJECT_TO_NODE_TRANSFORM, GetTransformAsString( m_ObjectToNodeTransform.GetPointer() ) );
+  if ( m_ObjectToNodeTransform.IsNotNull() )
+    xmlWriter.WriteProperty( OBJECT_TO_NODE_TRANSFORM, GetTransformAsString( m_ObjectToNodeTransform.GetPointer() ) );
 
-	if ( m_IndexToNodeTransform.IsNotNull() )
-		xmlWriter.WriteProperty( INDEX_TO_NODE_TRANSFORM, GetTransformAsString( m_IndexToNodeTransform.GetPointer() ) );
+  if ( m_IndexToNodeTransform.IsNotNull() )
+    xmlWriter.WriteProperty( INDEX_TO_NODE_TRANSFORM, GetTransformAsString( m_IndexToNodeTransform.GetPointer() ) );
 
-	if ( m_IndexToWorldTransform.IsNotNull() )
-		xmlWriter.WriteProperty( INDEX_TO_WORLD_TRANSFORM, GetTransformAsString( m_IndexToWorldTransform.GetPointer() ) );	
+  if ( m_IndexToWorldTransform.IsNotNull() )
+    xmlWriter.WriteProperty( INDEX_TO_WORLD_TRANSFORM, GetTransformAsString( m_IndexToWorldTransform.GetPointer() ) );  
 
   return true;
 }
@@ -512,7 +511,7 @@ bool mitk::Geometry3D::ReadXMLData( XMLReader& xmlReader )
   xmlReader.GetAttribute( INDEX_TO_NODE_TRANSFORM, *m_IndexToNodeTransform.GetPointer() );
   xmlReader.GetAttribute( INDEX_TO_WORLD_TRANSFORM, *m_IndexToWorldTransform.GetPointer() );
   TransferItkToVtkTransform();
-	return true;
+  return true;
 }
 
 /**

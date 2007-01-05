@@ -276,7 +276,6 @@
     </connection>
 </connections>
 <includes>
-    <include location="local" impldecl="in declaration">qwaitcondition.h</include>
     <include location="local" impldecl="in declaration">mitkRawImageFileReader.h</include>
     <include location="local" impldecl="in implementation">mitkRawImageFileReader.h</include>
     <include location="local" impldecl="in implementation">QmitkRawImageFileOpener.ui.h</include>
@@ -290,7 +289,6 @@
     <variable>bool m_ReadEnable;</variable>
     <variable>int m_SizeX;</variable>
     <variable>int m_SizeZ;</variable>
-    <variable>QWaitCondition m_ParametersRead;</variable>
 </variables>
 <slots>
     <slot>GetParameters()</slot>

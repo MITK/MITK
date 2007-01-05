@@ -441,3 +441,4 @@ protected:
 
 } // namespace mitk
 #endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
+

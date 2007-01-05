@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkGL.h>
 #include "mitkGeometry2DDataMapper2D.h"
-
+#include "mitkLine.h"
 #include "mitkBaseRenderer.h"
 
 #include "mitkPlaneGeometry.h"

@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMatrixConvert.h"
 #include "mitkOperation.h"
 #include "mitkRotationOperation.h"
-#include "mitkPlaneOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"

@@ -26,7 +26,7 @@ mitk::ContourSetToPointSetFilter::ContourSetToPointSetFilter()
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfOutputs( 1 );
-  this->SetOutput(0, output.GetPointer());
+  this->SetNthOutput(0, output.GetPointer());
   m_Frequency = 5;
 }
 
@@ -82,12 +82,12 @@ const mitk::ContourSet* mitk::ContourSetToPointSetFilter::GetInput(void)
   }
 
   return static_cast<const mitk::ContourSet * >
-    ( this->ProcessObject::GetInput(0) );
+    ( this->BaseProcess::GetInput(0) );
 }
 
 void mitk::ContourSetToPointSetFilter::SetInput(const mitk::ContourSet *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  this->BaseProcess::SetNthInput(0, 
     const_cast< mitk::ContourSet * >( input ) );
 }

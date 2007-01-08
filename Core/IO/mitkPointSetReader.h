@@ -40,10 +40,11 @@ namespace mitk
  * is not yet supported!
  * @ingroup IO
 */
-class PointSetReader: public mitk::PointSetSource, public mitk::FileReader
+class PointSetReader: public PointSetSource, public FileReader
 {
 public:
-    mitkClassMacro( PointSetReader, PointSetSource );
+
+    mitkClassMacro( PointSetReader, FileReader );
 
     itkNewMacro( Self );
 
@@ -79,6 +80,7 @@ public:
      */
     itkGetStringMacro( FilePattern );
     
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
     
 protected:
 

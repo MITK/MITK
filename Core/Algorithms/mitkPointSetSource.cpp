@@ -22,12 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSetSource::PointSetSource()
 {
-    // Create the output.
-    OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-    assert (output.IsNotNull());
-    this->SetNumberOfRequiredInputs(0);
-    this->SetNumberOfOutputs( 1 );
-    this->SetOutput(0, output.GetPointer());  
+  // Create the output.
+  OutputType::Pointer output = dynamic_cast<OutputType*>(this->MakeOutput(0).GetPointer()); 
+  Superclass::SetNumberOfRequiredInputs(0);
+  Superclass::SetNumberOfRequiredOutputs(1);
+  Superclass::SetNthOutput(0, output.GetPointer());
 }
 
 
@@ -50,17 +49,27 @@ itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( unsigned int /*idx *
 
 void mitk::PointSetSource::SetOutput( OutputType* output )
 {
+  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
     this->ProcessObject::SetNthOutput( 0, output );
 }
 
 
 
 
-void mitk::PointSetSource::SetOutput( unsigned int idx, OutputType* output )
+void mitk::PointSetSource::GraftOutput(OutputType *graft)
 {
-    this->ProcessObject::SetNthOutput(idx, output);    
+  this->GraftNthOutput(0, graft);
 }
 
+void mitk::PointSetSource::GraftNthOutput(unsigned int idx, OutputType* graft)
+{
+  itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
+  assert(false);
+  if (idx < this->GetNumberOfOutputs())
+    {
+    OutputType * output = this->GetOutput(idx);
+    }
+}
 
 
 
@@ -72,7 +81,8 @@ mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput()
     }
     else
     {
-        return dynamic_cast<OutputType*> ( this->GetOutput( 0 ) );
+      return dynamic_cast<OutputType*>
+                         (this->BaseProcess::GetOutput(0));
     }
 }
 

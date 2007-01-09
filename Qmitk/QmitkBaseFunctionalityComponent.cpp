@@ -73,7 +73,7 @@ mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator
 }
 
 /*************** GET DATA TREE ITERATOR ***************/
-QWidget*  QmitkBaseFunctionalityComponent::GetControls()
+QWidget*  QmitkBaseFunctionalityComponent::GetGUIControls()
 {
     return (QWidget*) NULL;
 }

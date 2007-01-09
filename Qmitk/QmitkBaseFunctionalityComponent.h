@@ -92,7 +92,7 @@ public:
  /** \brief Method to set the Name of the Functionality */
   void SetFunctionalityName(QString name);
 
-  virtual QWidget* GetControls();
+  virtual QWidget* GetGUIControls();
 
   /*!
   \brief getter for dataTree attribute. It returns the 

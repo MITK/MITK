@@ -305,7 +305,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject & geometryUpdateE
   const SliceNavigationController::GeometryUpdateEvent* updateEvent =
     dynamic_cast<const SliceNavigationController::GeometryUpdateEvent*>(&geometryUpdateEvent);
 
-  assert(updateEvent !=NULL);
+  if (updateEvent !=NULL) return;
 
   if (m_CurrentWorldGeometry.IsNotNull())
   {

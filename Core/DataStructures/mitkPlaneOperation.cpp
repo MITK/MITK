@@ -39,3 +39,4 @@ Vector3D mitk::PlaneOperation::GetNormal()
 }
 
 } // namespace mitk
+

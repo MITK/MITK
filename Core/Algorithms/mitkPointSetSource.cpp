@@ -61,14 +61,10 @@ void mitk::PointSetSource::GraftOutput(OutputType *graft)
   this->GraftNthOutput(0, graft);
 }
 
-void mitk::PointSetSource::GraftNthOutput(unsigned int idx, OutputType* graft)
+void mitk::PointSetSource::GraftNthOutput(unsigned int idx, OutputType* /*graft*/)
 {
   itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
   assert(false);
-  if (idx < this->GetNumberOfOutputs())
-    {
-    OutputType * output = this->GetOutput(idx);
-    }
 }
 
 

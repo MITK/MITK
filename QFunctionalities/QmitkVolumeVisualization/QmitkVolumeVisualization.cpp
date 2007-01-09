@@ -96,7 +96,7 @@ void QmitkVolumeVisualization::EnableRendering(bool state) {
     if (state && node) {
       node->SetProperty("volumerendering",new mitk::BoolProperty(true));
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-      assert(image);
+      if (!image) return;
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
     } else if (!state && node) {
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));

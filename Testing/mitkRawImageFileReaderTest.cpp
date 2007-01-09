@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRawImageFileReader.h"
 
-int mitkRawImageFileReaderTest(int argc, char* argv[])
+int mitkRawImageFileReaderTest(int /*argc*/, char* /*argv*/[])
 {
   // instantiation
   mitk::RawImageFileReader::Pointer reader = mitk::RawImageFileReader::New();

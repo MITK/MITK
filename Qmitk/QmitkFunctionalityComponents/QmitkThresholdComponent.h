@@ -83,8 +83,8 @@ public:
     /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
- ///** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
- //virtual void SetContentContainerVisibility();
+/** \brief Method to return the group-box that contains the tree-node-selector */
+virtual QGroupBox* GetImageContent();
 
   /***************      (DE)ACTIVATED     ***************/
 

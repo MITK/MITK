@@ -72,6 +72,12 @@ mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator
   return m_DataTreeIterator.GetPointer();
 }
 
+/*************** GET DATA TREE ITERATOR ***************/
+QWidget*  QmitkBaseFunctionalityComponent::GetControls()
+{
+    return (QWidget*) NULL;
+}
+
 /*************** SET FUNCTIONALITY NAME ***************/
 void QmitkBaseFunctionalityComponent::SetFunctionalityName(QString name)
 {

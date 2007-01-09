@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>171</red>
-            <green>212</green>
-            <blue>116</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>ThresholdComponent</string>
     </property>
@@ -41,13 +34,6 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_PixelGreyValueManipulatorGroupBox</cstring>
-            </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>170</red>
-                    <green>255</green>
-                    <blue>255</blue>
-                </color>
             </property>
             <property name="lineWidth">
                 <number>1</number>

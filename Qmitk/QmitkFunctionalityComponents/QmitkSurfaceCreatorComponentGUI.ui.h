@@ -192,3 +192,51 @@ void QmitkSurfaceCreatorComponentGUI::GetInterpolationValue( int & x, int & y, i
     y = atoi(m_InterpolateYValueLineEdit->text());
     z = atoi(m_InterpolateZValueLineEdit->text());
 }
+
+
+void QmitkSurfaceCreatorComponentGUI::SetMedian3DValue( int x, int y, int z )
+{
+  m_Median3DXValueLineEdit->setText(QString::number(x));
+  m_Median3DYValueLineEdit->setText(QString::number(y));
+  m_Median3DZValueLineEdit->setText(QString::number(z));
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetInterpolationValue( int x, int y, int z )
+{
+ m_InterpolateXValueLineEdit->setText(QString::number(x));
+ m_InterpolateYValueLineEdit->setText(QString::number(y));
+ m_InterpolateZValueLineEdit->setText(QString::number(z));
+ 
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetSmoothValue( int iteration, float relaxation )
+{
+    m_SmoothIterationValueLineEdit->setText(QString::number(iteration));
+    m_SmoothIRelaxationValueLineEdit->setText(QString::number(relaxation));
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetSmoothIterationValue( int iteration )
+{
+    m_SmoothIterationValueLineEdit->setText(QString::number(iteration));
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetSmoothRelaxationValue( float relaxation )
+{
+    m_SmoothIRelaxationValueLineEdit->setText(QString::number(relaxation));
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetGaussValue( float gsDev )
+{
+    m_GausValueLineEdit->setText(QString::number(gsDev));
+}
+
+
+void QmitkSurfaceCreatorComponentGUI::SetDecimateValue( float targetReduction )
+{
+   m_DecimateValueLineEdit->setText(QString::number( targetReduction));
+}

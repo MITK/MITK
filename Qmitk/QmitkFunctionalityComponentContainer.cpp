@@ -77,6 +77,19 @@ QString QmitkFunctionalityComponentContainer::GetComponentName()
   return m_ComponentName;
 }
 
+
+/************* SET SHOW TREE NODE SELECTOR ***********/
+void QmitkFunctionalityComponentContainer::SetShowTreeNodeSelector(bool show)
+{
+  GetImageContent()->setShown(show);
+}
+
+/***************   GET IMAGE CONTENT   ***************/
+QGroupBox*  QmitkFunctionalityComponentContainer::GetImageContent()
+{
+  return (QGroupBox*) m_FunctionalityComponentContainerGUI->GetImageContent();
+}
+
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkFunctionalityComponentContainer::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
@@ -103,7 +116,10 @@ QWidget* QmitkFunctionalityComponentContainer::GetGUI()
 /******** ******* GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector()
 {
-  return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
+  if(m_FunctionalityComponentContainerGUI)
+  {
+    return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
+  }
 }
 
 /******** *******    GET MULTI WIDGET    ***************/
@@ -187,7 +203,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateControlWidget(QWidget* pare
 /*************** GET CONTENT CONTAINER  ***************/
 QGroupBox * QmitkFunctionalityComponentContainer::GetContentContainer()
 {
- return m_FunctionalityComponentContainerGUI->GetSelectDataGroupBox();
+ return m_FunctionalityComponentContainerGUI->GetImageContent();
 }
 
 /************ GET MAIN CHECK BOX CONTAINER ************/
@@ -229,7 +245,7 @@ void QmitkFunctionalityComponentContainer::SetSelectorVisibility(bool visibility
 {
   if(m_GUI)
   {
-    m_FunctionalityComponentContainerGUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_FunctionalityComponentContainerGUI->GetImageContent()->setShown(visibility);
   }
   m_ShowSelector = visibility;
 }

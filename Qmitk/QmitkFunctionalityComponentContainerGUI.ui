@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>255</red>
-            <green>207</green>
-            <blue>15</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>ComponentContainer</string>
     </property>
@@ -50,13 +43,6 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>255</red>
-                    <green>207</green>
-                    <blue>15</blue>
-                </color>
-            </property>
             <property name="lineWidth">
                 <number>1</number>
             </property>
@@ -81,7 +67,7 @@
                 </property>
                 <widget class="QGroupBox">
                     <property name="name">
-                        <cstring>m_DataTreeNodeSelectorBox</cstring>
+                        <cstring>m_ImageContent</cstring>
                     </property>
                     <property name="title">
                         <string>Select Data</string>
@@ -150,7 +136,8 @@
     <function returnType="QGroupBox *">GetContainerBorder()</function>
     <function returnType="QLayout *">GetContainerLayout()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
-    <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
+    <function returnType="QGroupBox *">GetImageContent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

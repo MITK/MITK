@@ -75,6 +75,9 @@ public:
 
   /***************      SET AND GET       ***************/
 
+  /** \brief Method to return the group-box that contains the tree-node-selector */
+virtual QGroupBox* GetImageContent();
+
   /*************** SET DATA TREE ITERATOR ***************/
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 

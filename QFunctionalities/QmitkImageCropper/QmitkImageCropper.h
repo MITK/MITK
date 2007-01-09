@@ -121,6 +121,8 @@ public:
   */
   virtual void  ExecuteOperation (mitk::Operation*);
 
+   QWidget* GetControls();
+
 public slots:
 
   void ImageSelectionChanged();

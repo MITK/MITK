@@ -103,6 +103,12 @@ QmitkDataTreeComboBox* QmitkConnectivityFilterComponent::GetTreeNodeSelector()
   return  m_ConnectivityNode;
  }
 
+ /***************   GET IMAGE CONTENT   ***************/
+QGroupBox*  QmitkConnectivityFilterComponent::GetImageContent()
+{
+  return (QGroupBox*) m_ConnectivityFilterComponentGUI->GetImageContent();
+}
+
  /************ Update DATATREECOMBOBOX(ES) *************/
 void QmitkConnectivityFilterComponent::UpdateDataTreeComboBoxes()
 {
@@ -138,7 +144,7 @@ void QmitkConnectivityFilterComponent::ShowComponentContent()
 /*************** SHOW TREE NODE SELECTOR **************/
 void QmitkConnectivityFilterComponent::ShowTreeNodeSelector()
 {
-m_ConnectivityFilterComponentGUI->GetTreeNodeSelectorContentGroupBox()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
+ m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
 }
 
 /***************     IMAGE SELECTED     ***************/

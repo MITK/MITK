@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>171</red>
-            <green>212</green>
-            <blue>116</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>ThresholdComponent</string>
     </property>
@@ -42,14 +35,7 @@
             <property name="name">
                 <cstring>m_ThresholdFinder</cstring>
             </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>213</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                </color>
-            </property>
-            <property name="title">
+             <property name="title">
                 <string>Show ThresholdFinder</string>
             </property>
             <property name="flat">

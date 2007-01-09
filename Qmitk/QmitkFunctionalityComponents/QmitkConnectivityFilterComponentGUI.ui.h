@@ -19,9 +19,9 @@ QGroupBox* QmitkConnectivityFilterComponentGUI::GetShowTreeNodeSelectorGroupBox(
 }
 
 
-QGroupBox* QmitkConnectivityFilterComponentGUI::GetTreeNodeSelectorContentGroupBox()
+QGroupBox* QmitkConnectivityFilterComponentGUI::GetImageContent()
 {
-  return m_TreeNodeSelecotrContentGroupBox;
+  return m_ImageContent;
 }
 
 

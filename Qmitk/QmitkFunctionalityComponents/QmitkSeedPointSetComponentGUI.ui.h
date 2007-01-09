@@ -24,9 +24,9 @@ QGroupBox* QmitkSeedPointSetComponentGUI::GetShowTreeNodeSelectorGroupBox()
 }
 
 
-QGroupBox* QmitkSeedPointSetComponentGUI::GetTreeNodeSelectorContentGroupBox()
+QGroupBox* QmitkSeedPointSetComponentGUI::GetImageContent()
 {
-  return m_TreeNodeSelecotrContentGroupBox;
+  return m_ImageContent;
 }
 
 

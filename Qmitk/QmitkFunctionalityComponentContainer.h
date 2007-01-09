@@ -109,8 +109,14 @@ public:
     /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
+  /** \brief Method to set the Tree-Node-Selector visible or not as his parent group-box is set shown or not. */
+virtual void SetShowTreeNodeSelector(bool show);
 
-  /***************     ADD COMPONENTS     ***************/
+
+/** \brief Method to return the group-box that contains the tree-node-selector */
+virtual QGroupBox* GetImageContent();
+
+/***************     ADD COMPONENTS     ***************/
 
   /** \brief method to add components into this component. */
   virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer);

@@ -74,11 +74,11 @@ void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTree
   m_DataTreeIterator = it;
 }
 
-///*************** GET DATA TREE ITERATOR ***************/
-//mitk::DataTreeIteratorBase* QmitkPixelGreyValueManipulatorComponent::GetDataTreeIterator()
-//{
-//  return m_DataTreeIterator.GetPointer();
-//}
+ /***************   GET IMAGE CONTENT   ***************/
+QGroupBox*  QmitkPixelGreyValueManipulatorComponent::GetImageContent()
+{
+  return (QGroupBox*) m_PixelGreyValueManipulatorComponentGUI->GetImageContent();
+}
 
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkPixelGreyValueManipulatorComponent::GetTreeNodeSelector()

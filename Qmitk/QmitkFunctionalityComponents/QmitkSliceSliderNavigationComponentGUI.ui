@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>171</red>
-            <green>212</green>
-            <blue>116</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>ThresholdComponent</string>
     </property>
@@ -41,13 +34,6 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_SliceSliderNavigator</cstring>
-            </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>255</red>
-                    <green>170</green>
-                    <blue>0</blue>
-                </color>
             </property>
             <property name="title">
                 <string>Show SliceSliderNavigater</string>

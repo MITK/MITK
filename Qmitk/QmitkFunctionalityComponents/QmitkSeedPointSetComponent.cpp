@@ -55,11 +55,11 @@ QmitkSeedPointSetComponent::~QmitkSeedPointSetComponent()
 
 }
 
-///*************** GET DATA TREE ITERATOR ***************/
-//mitk::DataTreeIteratorBase* QmitkPixelGreyValueManipulatorComponent::GetDataTreeIterator()
-//{
-//  return m_DataTreeIterator.GetPointer();
-//}
+ /***************   GET IMAGE CONTENT   ***************/
+QGroupBox*  QmitkSeedPointSetComponent::GetImageContent()
+{
+  return (QGroupBox*) m_PointSetComponentGUI->GetImageContent();
+}
 
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkSeedPointSetComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
@@ -112,7 +112,7 @@ void QmitkSeedPointSetComponent::ShowComponentContent()
 /*************** SHOW TREE NODE SELECTOR **************/
 void QmitkSeedPointSetComponent::ShowTreeNodeSelector()
 {
-m_PointSetComponentGUI->GetTreeNodeSelectorContentGroupBox()->setShown(m_PointSetComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
+m_PointSetComponentGUI->GetImageContent()->setShown(m_PointSetComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
 }
 
 /***************     IMAGE SELECTED     ***************/

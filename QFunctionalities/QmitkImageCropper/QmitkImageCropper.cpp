@@ -85,6 +85,10 @@ QWidget * QmitkImageCropper::CreateControlWidget(QWidget *parent)
   return m_Controls;
 }
 
+QWidget* QmitkImageCropper::GetControls()
+{
+  return m_Controls;
+} 
 
 void QmitkImageCropper::CreateConnections()
 {

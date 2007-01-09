@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>170</red>
-            <green>0</green>
-            <blue>0</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>PointSetComponent</string>
     </property>
@@ -41,13 +34,6 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_ConnectivityFilter</cstring>
-            </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>213</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                </color>
             </property>
             <property name="title">
                 <string>Connectivity Filter</string>
@@ -113,7 +99,7 @@
                                 </property>
                                 <widget class="QGroupBox">
                                     <property name="name">
-                                        <cstring>m_TreeNodeSelecotrContentGroupBox</cstring>
+                                        <cstring>m_ImageContent</cstring>
                                     </property>
                                     <property name="title">
                                         <string></string>
@@ -327,7 +313,7 @@
 </slots>
 <functions>
     <function returnType="QGroupBox *">GetShowTreeNodeSelectorGroupBox()</function>
-    <function returnType="QGroupBox *">GetTreeNodeSelectorContentGroupBox()</function>
+    <function returnType="QGroupBox *">GetImageContent()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetComponentContent()</function>
     <function returnType="QGroupBox *">GetShowComponent()</function>
@@ -339,4 +325,5 @@
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

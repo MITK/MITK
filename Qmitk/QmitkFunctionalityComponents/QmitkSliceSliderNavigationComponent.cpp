@@ -71,6 +71,11 @@ void QmitkSliceSliderNavigationComponent::SetDataTreeIterator(mitk::DataTreeIter
   //m_Node = m_DataTreeIterator->Get();
 }
 
+ /***************   GET IMAGE CONTENT   ***************/
+QGroupBox* QmitkSliceSliderNavigationComponent::GetImageContent()
+{
+  return (QGroupBox*) m_SliceSliderComponentGUI->GetImageContent();
+}
 
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkSliceSliderNavigationComponent::GetTreeNodeSelector()

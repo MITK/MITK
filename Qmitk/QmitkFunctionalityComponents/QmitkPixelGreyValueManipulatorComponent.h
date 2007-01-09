@@ -81,20 +81,8 @@ public:
   /** \brief Method to set the Iterator to the DataTree */
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
-  ///** \brief Method to get the Iterator to the DataTree */
-  //mitk::DataTreeIteratorBase* GetDataTreeIterator();
-
-  ///** \brief Method to set the Name of the Functionality */
-  //void SetFunctionalityName(QString parentName);
-
-  ///** \brief Method to get the Name of the Functionality */
-  //virtual QString GetFunctionalityName();
-
-  ///** \brief Method to get the Name of the FunctionalityComponent */
-  //virtual QString GetComponentName();
-  
-  /** \brief Method to get the GUI of this component. This Method is obligatory */
-  //virtual QWidget* GetGUI();
+/** \brief Method to return the group-box that contains the tree-node-selector */
+virtual QGroupBox* GetImageContent();
 
   /** \brief Method to return the TreeNodeSelector-QmitkDataTreeComboBox */
   virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
@@ -108,8 +96,6 @@ public:
     /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
- ///** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
- //virtual void SetContentContainerVisibility();
 
   /***************      (DE)ACTIVATED     ***************/
 

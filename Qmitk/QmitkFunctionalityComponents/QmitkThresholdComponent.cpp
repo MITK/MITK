@@ -69,6 +69,13 @@ void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
   m_ShowSelector = visibility;
 }
 
+ /***************   GET IMAGE CONTENT   ***************/
+QGroupBox* QmitkThresholdComponent::GetImageContent()
+{
+  return (QGroupBox*) m_ThresholdComponentGUI->GetImageContent();
+}
+
+
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkThresholdComponent::GetTreeNodeSelector()
 {

@@ -35,13 +35,6 @@
             <property name="name">
                 <cstring>m_PointSet</cstring>
             </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>255</red>
-                    <green>255</green>
-                    <blue>127</blue>
-                </color>
-            </property>
             <property name="title">
                 <string>PointSet</string>
             </property>
@@ -103,7 +96,7 @@
                                 </property>
                                 <widget class="QGroupBox">
                                     <property name="name">
-                                        <cstring>m_TreeNodeSelecotrContentGroupBox</cstring>
+                                        <cstring>m_ImageContent</cstring>
                                     </property>
                                     <property name="title">
                                         <string></string>
@@ -190,10 +183,11 @@
 <functions>
     <function returnType="QmitkPointListWidget *">GetPointListWidget()</function>
     <function returnType="QGroupBox *">GetShowTreeNodeSelectorGroupBox()</function>
-    <function returnType="QGroupBox *">GetTreeNodeSelectorContentGroupBox()</function>
+    <function returnType="QGroupBox *">GetImageContent()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetComponentContent()</function>
     <function returnType="QGroupBox *">GetShowComponent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

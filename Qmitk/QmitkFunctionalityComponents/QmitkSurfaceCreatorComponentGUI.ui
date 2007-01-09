@@ -18,13 +18,6 @@
             <height>0</height>
         </size>
     </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>171</red>
-            <green>212</green>
-            <blue>116</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>ThresholdComponent</string>
     </property>
@@ -41,13 +34,6 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_SurfaceCreatorGroupBox</cstring>
-            </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>138</red>
-                    <green>209</green>
-                    <blue>90</blue>
-                </color>
             </property>
             <property name="title">
                 <string>SurfaceCreator</string>
@@ -838,6 +824,14 @@
     <function returnType="float">GetSmoothRelaxationValue()</function>
     <function returnType="QCheckBox *">GetReplaceExistingSurfaceCheckBox()</function>
     <function>GetInterpolationValue( int &amp; x, int &amp; y, int &amp; z )</function>
+    <function>SetMedian3DValue( int x, int y, int z )</function>
+    <function>SetInterpolationValue( int x, int y, int z )</function>
+    <function>SetSmoothValue( int iteration, float relaxation )</function>
+    <function>SetSmoothIterationValue( int iteration )</function>
+    <function>SetSmoothRelaxationValue( float relaxation )</function>
+    <function>SetGaussValue( float gsDev )</function>
+    <function>SetDecimateValue( float targetReduction )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

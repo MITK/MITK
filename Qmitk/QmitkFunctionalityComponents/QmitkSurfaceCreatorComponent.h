@@ -95,8 +95,30 @@ public:
     /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
- ///** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
- //virtual void SetContentContainerVisibility();
+/** \brief Method to return the group-box that contains the tree-node-selector */
+virtual QGroupBox* GetImageContent();
+
+///***************         SET VALUES      **************/
+/** \brief Method to set the x, y and z values of the median3D-Filter */
+void SetMedian3DValue(int x, int y, int z);
+
+/** \brief Method to set the interpolation-value of the dataset */
+void SetInterpolateValue(int x, int y, int z);
+
+/** \brief Method to set the smoot-values iteration (how often) and the relaxation (how much) */
+void SetSmoothValue(int iteration, float relaxation);
+
+/** \brief Method to set the numbers of iteration for the smooth-filter */
+void SetSmoothIterationValue(int iteration);
+
+/** \brief Method to set relaxation-value for the smooth-filter */
+void SetSmoothRelaxationValue(float relaxation);
+
+/** \brief Method to set gaussian-value */
+void SetGaussValue(float gsDev);
+
+/** \brief Method to set the reduce-factor to decimate the numbers of polygons of the surface */
+void SetDecimateValue(float targetReduction);
 
 
 public slots:  

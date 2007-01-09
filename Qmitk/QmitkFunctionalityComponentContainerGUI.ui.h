@@ -34,7 +34,7 @@ QmitkDataTreeComboBox*  QmitkFunctionalityComponentContainerGUI::GetTreeNodeSele
 }
 
 
-QGroupBox * QmitkFunctionalityComponentContainerGUI::GetSelectDataGroupBox()
+QGroupBox * QmitkFunctionalityComponentContainerGUI::GetImageContent()
 {
-  return m_DataTreeNodeSelectorBox;
+  return m_ImageContent;
 }

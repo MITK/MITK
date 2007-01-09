@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include <itkCovariantVector.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
+#include <itkCommand.h> //for the PointSetObserver
 //#include <itkPolygonCell.h>
 //#include <itkEventObject.h>
 
@@ -208,8 +209,49 @@ protected:
 
   itkEventMacro( NewPointEvent, itk::AnyEvent );
   itkEventMacro( RemovedPointEvent, itk::AnyEvent );
+
+
+
+/**
+* @brief Class to realize an observer, that listens to an event called by mitkPointSet
+* A pointer to a method of an other object, not derived from itk can be connected and called 
+**/
+template <class T> 
+class TPointSetObserver : public itk::Command 
+  {
+  public:
+    typedef  TPointSetObserver        Self;
+    typedef  itk::Command             Superclass;
+    typedef  itk::SmartPointer<Self>  Pointer;
+
+    itkNewMacro( Self );
+
+  protected:
+    TPointSetObserver(){}
+    ~TPointSetObserver(){}
+
+  public:
+    /**
+    * @brief Set the object and its method, that has to be called if an event is recieved
+    **/
+    void Set( T* object, void (T::*memberFunctionPointer)() ) {m_Object = object; m_MemberFunctionPointer = memberFunctionPointer;}
+
+    /**
+    * @brief Derive methods to call the registered method if an event is revieved
+    **/
+    void Execute(itk::Object *object, const itk::EventObject & event)
+    {Execute( (const itk::Object*) object, event );}
+    void Execute(const itk::Object * object, const itk::EventObject & event)
+    {
+      if ( typeid(event) == typeid(mitk::NewPointEvent) || 
+        typeid(event) == typeid(mitk::RemovedPointEvent) )
+        (*m_Object.*m_MemberFunctionPointer)();
+    }
+  private: 
+    T* m_Object;
+    void (T::*m_MemberFunctionPointer)();
+  };
+
 } // namespace mitk
-
-
 
 #endif /* MITKPointSet_H_HEADER_INCLUDED */

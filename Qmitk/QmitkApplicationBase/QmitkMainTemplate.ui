@@ -30,6 +30,7 @@
         <action name="fileOpenAction"/>
         <action name="fileOpenImageSequenceAction"/>
         <action name="fileOpenRawImageAction"/>
+        <action name="fileOpenRawImageSequenceAction"/>
         <action name="fileOpenProjectAction"/>
         <separator/>
         <action name="fileSaveProjectAction"/>
@@ -700,6 +701,28 @@
             <string>Open Raw Image...</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>filenew_itemAction</cstring>
+        </property>
+        <property name="text">
+            <string>new item</string>
+        </property>
+        <property name="menuText">
+            <string>new item</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileOpenRawImageSequenceAction</cstring>
+        </property>
+        <property name="text">
+            <string>Open Raw Image Sequence...</string>
+        </property>
+        <property name="menuText">
+            <string>Open Raw Image Sequence...</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -932,7 +955,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileOpenRawImage()</slot>
     </connection>
-
+    <connection>
+        <sender>fileOpenRawImageSequenceAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileOpenRawImageSequence()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -1009,6 +1037,8 @@
     <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
     <slot>fileOpenRawImage()</slot>
     <slot>fileOpenRawImage( const char * fileName )</slot>
+    <slot>fileOpenRawImageSequence()</slot>
+    <slot>fileOpenRawImageSequence( QStringList fileNames )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

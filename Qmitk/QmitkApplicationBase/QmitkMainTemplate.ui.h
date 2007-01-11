@@ -81,6 +81,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStatusBar.h>
 #include <QmitkSystemInfo.h>
 #include <QmitkRawImageFileOpener.h>
+#include <QmitkRawImageFileSequenceOpener.h>
 
 #include <QmitkOptionDialog.h>
 #include <qlistbox.h>
@@ -1100,6 +1101,9 @@ void QmitkMainTemplate::fileOpenRawImage()
 //new code for Raw Image reading
 void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
 {
+ 
+  if(!fileName) return;
+
   // open dialog window and get parameters
   QmitkRawImageFileOpener* rawFileOpener = new QmitkRawImageFileOpener(this, "QmitkRawFileOpener");
   
@@ -1118,4 +1122,37 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
   }
   
 }
+
+// code for Raw Image Sequence Reading (multiple 2D slices belonging to the same 3D stack) 
+void QmitkMainTemplate::fileOpenRawImageSequence()
+{
+  QStringList fileNames = QFileDialog::getOpenFileNames("Raw images: (*.raw *.ct)","/home", NULL);
+  fileOpenRawImageSequence(fileNames);
+  
+}
+
+void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
+{
+  if(!fileNames.empty())
+  {    
+    // open dialog window and get parameters
+    QmitkRawImageFileSequenceOpener* rawFileSequenceOpener = new QmitkRawImageFileSequenceOpener(this, "QmitkRawFileSequenceOpener");
+  
+    mitk::Image::Pointer m_ResultImage = rawFileSequenceOpener->ShowAndTryToRead(fileNames);
+  
+    if (m_ResultImage.IsNotNull())
+    {
+        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+        node->SetData(m_ResultImage);
+        mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
+        node->SetProperty("name", new mitk::StringProperty( fileNames.first().ascii() ));
+        mitk::DataTreePreOrderIterator it(m_Tree);
+        it.Add(node);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
+    }
+  }
+    
+}
+
 

@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderWindow.h"//*\todo remove later, when update ok!
 
-//##ModelId=3F0177E901BD
 mitk::PointSet::PointSet()
 {
   m_ItkData = DataType::New();
@@ -41,24 +40,20 @@ mitk::PointSet::PointSet()
   GetTimeSlicedGeometry()->Initialize(1);
 }
 
-//##ModelId=3F0177E901BE
 mitk::PointSet::~PointSet()
 {
 }
 
-//##ModelId=3F0177E901C1
 int mitk::PointSet::GetSize() const
 {
   return m_ItkData->GetNumberOfPoints();
 }
 
-//##ModelId=3F0177E901CC
 mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet() const
 {
   return m_ItkData;
 }
 
-//##ModelId=3F0177E901DE
 //##Documentation
 //##@brief searches a point in the list with a given precision in world coordinates
 //##returns -1 if no point has been found
@@ -106,7 +101,6 @@ int mitk::PointSet::SearchPoint(Point3D point, float distance )
   return bestIndex;
 }
 
-//##ModelId=3F0177E901CE
 //##Documentation
 //##@brief check if index exists. If it doesn't exist, then return 0,0,0
 mitk::PointSet::PointType mitk::PointSet::GetPoint(int position) const
@@ -189,7 +183,6 @@ int mitk::PointSet::SearchSelectedPoint()
   return -1;
 }
 
-//##ModelId=3F0177E901BF
 //##Documentation
 //## @brief executes the given Operation
 void mitk::PointSet::ExecuteOperation(Operation* operation)
@@ -300,7 +293,6 @@ void mitk::PointSet::ExecuteOperation(Operation* operation)
 }
 
 
-//##ModelId=3F0177E901EE
 void mitk::PointSet::UpdateOutputInformation()
 {
   if ( this->GetSource( ) )
@@ -322,24 +314,20 @@ void mitk::PointSet::UpdateOutputInformation()
   GetGeometry()->SetBounds(itkBounds);
 }
 
-//##ModelId=3F0177E901FB
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()
 {
 }
 
-//##ModelId=3F0177E901FD
 bool mitk::PointSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;
 }
 
-//##ModelId=3F0177E901FF
 bool mitk::PointSet::VerifyRequestedRegion()
 {
     return true;
 }
 
-//##ModelId=3F0177E9020B
 void mitk::PointSet::SetRequestedRegion(itk::DataObject*)
 {
 }

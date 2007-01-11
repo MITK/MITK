@@ -38,7 +38,6 @@ const unsigned int MaxTopologicalDimension = 3;
 
 namespace mitk {
 
-//##ModelId=3F0177E803A1
 //##Documentation
 //##@brief DataStructure which stores a set of points. Superclass of mitk::Mesh.
 //##
@@ -106,22 +105,18 @@ public:
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
-  //##ModelId=3F0177E901BF
   //##Documentation
   //## @brief executes the given Operation
   virtual void ExecuteOperation(Operation* operation);
 
-  //##ModelId=3F0177E901C1
   //##Documentation
   //## @brief returns the current size of the point-list
   virtual int GetSize() const;
 
-  //##ModelId=3F0177E901CC
   //##Documentation
   //## @brief returns the pointset
   virtual DataType::Pointer GetPointSet() const;
 
-  //##ModelId=3F0177E901CE
   //##Documentation
   //## @brief Get the point on the given position in world coordinates
   //##
@@ -153,17 +148,14 @@ public:
   //## @brief returns true if a point exists at this position
   virtual bool IndexExists(int position);
 
-  //##ModelId=3F0177E901DC
   //##Documentation
   //## @brief to get the state selected/unselected of the point on the position
   virtual bool GetSelectInfo(int position);
 
-  //##ModelId=3F05B07B0147
   //##Documentation
   //## @brief returns the number of selected points
   virtual const int GetNumberOfSelected();
 
-  //##ModelId=3F0177E901DE
   //##Documentation
   //## @brief searches a point in the list == point +/- distance
   //##
@@ -171,35 +163,26 @@ public:
   //## @param distance is in mm.
   //## returns -1 if no point is found
   //## or the position in the list of the first match
+  //'' Beware when using the position to 
   int SearchPoint(Point3D point, float distance);
 
   //virtual methods, that need to be implemented
-  //##ModelId=3F0177E901EE
   virtual void UpdateOutputInformation();
-  //##ModelId=3F0177E901FB
   virtual void SetRequestedRegionToLargestPossibleRegion();
-  //##ModelId=3F0177E901FD
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  //##ModelId=3F0177E901FF
   virtual bool VerifyRequestedRegion();
-  //##ModelId=3F0177E9020B
   virtual void SetRequestedRegion(itk::DataObject *data);
-  //##ModelId=3F0177E9020B
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##ModelId=3F0177E9020B
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
   //Method for subclasses
   virtual void OnPointSetChange(){};
 
 protected:
-  //##ModelId=3F0177E901BD
   PointSet();
 
-  //##ModelId=3F0177E901BE
   virtual ~PointSet();
 
-  //##ModelId=3F0177E90190
   //##Documentation
   //## @brief Data from ITK; List of Points; the object, the operations are ment for
   DataType::Pointer m_ItkData;
@@ -232,10 +215,26 @@ class TPointSetObserver : public itk::Command
 
   public:
     /**
-    * @brief Set the object and its method, that has to be called if an event is recieved
+    * @brief Set the object and its methods, that have to be called if an event is recieved
     **/
-    void Set( T* object, void (T::*memberFunctionPointer)() ) {m_Object = object; m_MemberFunctionPointer = memberFunctionPointer;}
-
+    void Set( T* object, void (T::*memberFunctionPointerNewPointEvent)(), void (T::*memberFunctionPointerRemovedPointEvent)() ) 
+    {
+      m_Object = object; 
+      m_MemberFunctionPointerNewPointEvent = memberFunctionPointerNewPointEvent;
+      m_MemberFunctionPointerRemovedPointEvent = memberFunctionPointerRemovedPointEvent;
+    }
+    /**
+    * @brief Set the parent, which methods are called
+    **/
+    void SetParent( T* object) {m_Object = object;}
+    /**
+    * @brief Set the method to be called if the pointset throughs a NewPointEvent()
+    **/
+    void SetNewPointEventMethod( void (T::*memberFunctionPointerNewPointEvent)() ) {m_MemberFunctionPointerNewPointEvent = memberFunctionPointerNewPointEvent;}
+    /**
+    * @brief Set the method to be called if the pointset throughs a RemovedPointEvent()
+    **/
+    void SetRemovedPointEventMethod( void (T::*memberFunctionPointerRemovedPointEvent)() ) {m_MemberFunctionPointerRemovedPointEvent = memberFunctionPointerRemovedPointEvent;}
     /**
     * @brief Derive methods to call the registered method if an event is revieved
     **/
@@ -243,13 +242,15 @@ class TPointSetObserver : public itk::Command
     {Execute( (const itk::Object*) object, event );}
     void Execute(const itk::Object * object, const itk::EventObject & event)
     {
-      if ( typeid(event) == typeid(mitk::NewPointEvent) || 
-        typeid(event) == typeid(mitk::RemovedPointEvent) )
-        (*m_Object.*m_MemberFunctionPointer)();
+      if ( typeid(event) == typeid(mitk::NewPointEvent) )
+        (*m_Object.*m_MemberFunctionPointerNewPointEvent)();
+      if ( typeid(event) == typeid(mitk::RemovedPointEvent) )
+        (*m_Object.*m_MemberFunctionPointerRemovedPointEvent)();
     }
   private: 
     T* m_Object;
-    void (T::*m_MemberFunctionPointer)();
+    void (T::*m_MemberFunctionPointerNewPointEvent)();
+    void (T::*m_MemberFunctionPointerRemovedPointEvent)();
   };
 
 } // namespace mitk

@@ -120,6 +120,7 @@ QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector
   {
     return m_FunctionalityComponentContainerGUI->GetTreeNodeSelector();
   }
+  else return NULL;
 }
 
 /******** *******    GET MULTI WIDGET    ***************/

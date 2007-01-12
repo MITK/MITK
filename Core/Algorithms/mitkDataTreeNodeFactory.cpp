@@ -131,6 +131,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
   // end file tests
 
   // part for DICOM
+  const char *numbers = "0123456789.";
+  std::string::size_type first_non_number;
+  first_non_number = itksys::SystemTools::GetFilenameName(m_FileName).find_first_not_of ( numbers );
+
   if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
     || this->FileNameEndsWith( ".ima" ) 
     || this->FileNameEndsWith( ".IMA" ) 
@@ -138,7 +142,8 @@ void mitk::DataTreeNodeFactory::GenerateData()
     || this->FilePatternEndsWith( ".DCM" ) 
     || this->FilePatternEndsWith( ".ima" ) 
     || this->FilePatternEndsWith( ".IMA" ) 
-    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) 
+    || first_non_number == std::string::npos )
   {
     if (m_Serie)
     {
@@ -583,7 +588,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   StringContainer::const_iterator seriesItr = seriesUID.begin();
   StringContainer::const_iterator seriesEnd = seriesUID.end();
 
-  std::cout << "The directory " << dir << "contains the following DICOM Series: " << std::endl;
+  std::cout << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
   while ( seriesItr != seriesEnd )
   {
     std::cout << *seriesItr << std::endl;

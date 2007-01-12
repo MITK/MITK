@@ -314,16 +314,25 @@ void QmitkMainTemplate::fileOpenImageSequence()
   {
     mitk::DataTreePreOrderIterator it(m_Tree);
 
-    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
+    std::string path = itksys::SystemTools::GetFilenamePath(fileName.ascii());
+    std::string name = itksys::SystemTools::GetFilenameName(fileName.ascii());
+
+    QString nameq = name.c_str();
+
+    int fnstart = nameq.findRev( QRegExp("[/\\\\]"), nameq.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
     if ( fnstart<0 ) fnstart=0;
-    int start = fileName.find( QRegExp("[0-9]*\\."), fnstart );
-    if ( start<0 )
+    int start = nameq.find( QRegExp("[0-9]*\\."), fnstart );
+    if ( start<=0 )
     {
       fileOpen(fileName.ascii());
       return;
     }
 
     char prefix[1024], pattern[1024];
+    // now we want to work with fileName again to include the path, thus
+    // add the length of the path to start; the variable "path" does not 
+    // contain trailing slashes, therefore the second addend in the followong line:
+    start += path.length()+(fileName.length()-path.length()-name.length());
 
     strncpy(prefix, fileName.ascii(), start);
     prefix[start]=0;

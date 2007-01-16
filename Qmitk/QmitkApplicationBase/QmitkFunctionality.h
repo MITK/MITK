@@ -48,6 +48,48 @@ It does @em not need to reverse the settings when it is Deactivated, since it ca
 know if the subsequently Activated functionality will use that settings or some other
 setting. Furthermore, most functionalities will connect interaction objects in Activated()
 and disconnect them in Deactivated().
+
+\section QmitkFunctionalityOptions Application option lists (Preferences)
+
+Each functionality has a mitk::PropertyList, where it can store application options. By 
+using this list you can recreate your application's status after the user closed and restarted
+the application.
+
+QmitkMainTemplate (and QmitkSampleApp) will read a list of options from file on startup and 
+tell the functionalities about it. This base class of all functionalities will store away
+your functionality's options in the m_Options variable. 
+
+You should react on changes to this list in Activated(). OR, if you want to overload the 
+SetFunctionalityOptionsList() method, make sure you know what you are doing and call
+QmitkFunctionality::SetFunctionalityOptionsList().
+
+\section QmitkFunctionalityOptionsDialog Application options dialog
+
+QmitkMainTemplate could ask your functionality to provide an options dialog. In that case, CreateOptionWidget()
+will be called. The default behaviour is to return NULL. Otherwise please create a QWidget with some option 
+fields.
+After the user closes the option dialog, the application will call OptionsChanged(QWidget*) on your functionality,
+with the parameter being your widget from CreateOptionWidget().
+OptionsChanged() is your chance to read the changed checkboxes, textedits, whatever from your QWidget*.
+
+\warning There is no automatic way yet to create an option dialog from the m_Options list or automatically
+         change the m_Options list from your widget. This should be solved some time in the future.
+         A small collection of classes derived from mitk::PropertyObserver could be part of the solution. 
+         They are able to display properties, react to changes in properties, and also change properties.
+
+\section QmitkFunctionalityUserManual User manual
+
+\warning This is work in progress. Not tested with DKFZ external functionalities.
+
+ 1. In your functionalities directory, create a subdirectory UserManual. (this is optional but useful)
+ 2. Inside UserManual, create a file that is called Qmitk<tt>YourFunctionalityName</tt>UserManual.dox
+ 3. Create a page Qmitk<tt>YourFunctionalityName</tt>UserManual inside that file:
+\verbatim
+\page QmitkEasySegmentationUserManual The Lymph Node Segmentation Functionality
+\endverbatim
+ 4. If you now run doxygen and copy the output somewhere, set the option in SampleApp's option dialog ("Global options"),
+    your documentation should be found when you press F1 inside your functionality.
+
 \ingroup Functionalities
 */
 class QmitkFunctionality : public QmitkBaseFunctionalityComponent

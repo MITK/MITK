@@ -29,6 +29,7 @@ QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Act
 {
   std::cout << "Instantiating QmitkFunctionality. QObject::name(): " << this->name() << std::endl;
   SetDataTree(dataIt);
+  m_Options = mitk::PropertyList::New();
 }
 
 QmitkFunctionality::~QmitkFunctionality()

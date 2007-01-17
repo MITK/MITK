@@ -932,7 +932,7 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
   {
     QmitkFunctionality* f = qfm->GetFunctionalityById(i);
     mitk::PropertyList* fo = f->GetFunctionalityOptionsList();
-    if (fo)
+    if (fo && !fo->IsEmpty())
     {
       fo->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty( f->GetFunctionalityName().ascii() ) );
 

@@ -5,6 +5,7 @@ SET(CPP_FILES
   mitkBaseData.cpp
   mitkBaseProperty.cpp
   mitkBoundingObject.cpp
+  mitkBoundingObjectGroup.cpp
   mitkCellOperation.cpp
   mitkColorConversions.cpp
   mitkColorProperty.cpp

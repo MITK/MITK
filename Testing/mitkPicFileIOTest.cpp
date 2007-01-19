@@ -168,6 +168,8 @@ int mitkPicFileIOTest(int argc, char* argv[])
         ++numberFailed;
         continue;
       }
+    
+    std::remove( "test_image.pic" );
   
     // compare
   

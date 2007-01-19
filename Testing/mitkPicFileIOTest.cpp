@@ -186,12 +186,12 @@ int mitkPicFileIOTest(int argc, char* argv[])
   if (numberFailed > 0)
   {
     std::cout << "[FAILED]: " << numberFailed << " of " << numberOfTestImages << " sub-tests failed." << std::endl;
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
   }
   else
   {
     std::cout << "[PASSED]" << std::endl;
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
 }
 

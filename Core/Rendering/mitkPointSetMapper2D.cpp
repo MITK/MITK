@@ -26,8 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <mitkStringProperty.h>
 #include <mitkPointSet.h>
-
-#include <mitkGLUT.h>
+#include "mitkGLUT.h"
 
 //##Documentation
 //##@brief color to mark a selected point
@@ -73,12 +72,7 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetIntProperty("line width",          m_LineWidth);
 }
 
-static void WriteTextXY(float x, float y, const std::string & text)
-{
-  glRasterPos2f ( x, y);
-  for (unsigned int i = 0; i < text.size(); i++)
-    glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, text[i]);
-}
+
 
 static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& out)
 {
@@ -224,7 +218,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
             sprintf(buffer,"%d",j+1);
             l.append(buffer);
           }
-          WriteTextXY(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+          this->WriteTextXY(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
         }
         
         if((m_ShowPoints) && (scalardiff<4.0))
@@ -296,7 +290,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
             Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
 
-            WriteTextXY(pos2d[0], pos2d[1], buffer.str());
+            this->WriteTextXY(pos2d[0], pos2d[1], buffer.str());
           }
 
           if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
@@ -313,7 +307,7 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
             Vector2D pos2d = lastPt2d.GetVectorFromOrigin()+vec2d*text2dDistance*text2dDistance;
 
-            WriteTextXY(pos2d[0], pos2d[1], buffer.str());
+            this->WriteTextXY(pos2d[0], pos2d[1], buffer.str());
           }
       }
         counter++;

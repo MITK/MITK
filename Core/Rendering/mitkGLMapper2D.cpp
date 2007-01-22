@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGL.h"
 #include "mitkGLMapper2D.h"
+#include "mitkGLUT.h"
 
 //##ModelId=3E681470037E
 mitk::GLMapper2D::GLMapper2D()
@@ -48,3 +49,9 @@ void mitk::GLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     glColor4fv(rgba);
 }
 
+void mitk::GLMapper2D::WriteTextXY(float x, float y, const std::string & text)
+{
+  glRasterPos2f ( x, y);
+  for (unsigned int i = 0; i < text.size(); i++)
+    glutBitmapCharacter (GLUT_BITMAP_HELVETICA_10, text[i]);
+}

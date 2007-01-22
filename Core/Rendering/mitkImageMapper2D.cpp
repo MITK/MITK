@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkDataTreeNode.h"
 
+#include <mitkGLUT.h>
+
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
@@ -85,6 +87,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   RendererInfo& renderinfo = AccessRendererInfo(renderer);
   iil4mitkPicImage* image = renderinfo.Get_iil4mitkImage();
 
+
   if ( image==NULL )
   {
     return;
@@ -136,6 +139,55 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   image->setInterpolation(renderinfo.m_IilInterpolation);
   image->display(renderer->GetRenderWindow());
 
+  /* display volume property, if it exists and should be displayed */
+  bool shouldShowVolume = false;
+  bool isSegmentation = false;
+  bool isBinary = false;
+  float segmentationVolume = -1.0;
+  if ((this->GetDataTreeNode()->GetBoolProperty("showVolume", shouldShowVolume) == true) &&
+      (this->GetDataTreeNode()->GetFloatProperty("volume", segmentationVolume) == true) &&
+      (segmentationVolume > 0))
+  {
+    /* calculate screen position for text by searching for the object border */
+    ipPicDescriptor* pic = image->image();
+    unsigned int xdim = pic->n[0];
+    unsigned int ydim = pic->n[1];
+    float y = 0.0, x = 0.0;
+
+    /* search object border in current slice */
+    ipInt1_t *current;
+    ipInt1_t *end = ((ipInt1_t*)pic->data) + (xdim * ydim);
+    for (current = (ipInt1_t*)pic->data; current<end; current++) 
+    {
+      if (*current != 0) // found object border
+      {
+        /* draw a callout line and text */
+        glBegin(GL_LINES);  
+          glVertex3f(x, y, 0.0f); // origin of the first line segment
+          glVertex3f(x + 15.0, y - 10.0, 0.0f); // ending point of the first line segment
+          glVertex3f(x + 15.0, y - 10.0, 0.0f); // origin  point of the second line segment
+          glVertex3f(x + 30.0, y - 10.0, 0.0f); // ending point of thesecond  line segment
+        glEnd( );
+        /* create text */
+        std::string dataName;
+        std::stringstream volumeString; 
+        if (this->GetDataTreeNode()->GetName(dataName) == true)
+          volumeString << dataName << ": volume = " << segmentationVolume << " ml";
+        else
+          volumeString << "volume = " << segmentationVolume << " ml";
+        /* draw text */
+        WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
+        break;  // stop searching, if object border was found
+      }
+      x += 1.0;
+      if (x >= xdim) 
+      {
+        x = 0.0;
+        y += 1.0;
+      }
+    }
+  }
+
   glDisable (GL_CLIP_PLANE0);
   glDisable (GL_CLIP_PLANE1);
   glDisable (GL_CLIP_PLANE2);
@@ -144,10 +196,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
   glPushMatrix ();
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  glOrtho(0, displayGeometry->GetDisplayWidth(), 0,
-    displayGeometry->GetDisplayHeight(),0.0,1.0
-  );
-
+  glOrtho(0, displayGeometry->GetDisplayWidth(), 0,displayGeometry->GetDisplayHeight(),0.0,1.0);
   glMatrixMode( GL_MODELVIEW );
   glPopMatrix ();
 }

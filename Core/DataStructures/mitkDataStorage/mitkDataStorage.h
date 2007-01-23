@@ -94,6 +94,8 @@ namespace mitk {
     //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the 
     //## conditions. A set of all objects can be retrieved with the GetAll() method;
     SetOfObjects::ConstPointer GetSubset(const NodePredicateBase& condition);
+
+    SetOfObjects::ConstPointer GetSources(mitk::DataTreeNode::Pointer node, bool onlyDirectSources = true);
     
     //##Documentation
     //## @brief returns a set of all dataobjects that are stored in the data storage

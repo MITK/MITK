@@ -118,5 +118,38 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
       if (node->IsOn("IsDataStoreManaged",NULL, false) == true)  // check if node is managed by the datastorage object
         resultset->InsertElement(index++, node);
     }  
-  return SetOfObjects::ConstPointer( resultset );
+  return SetOfObjects::ConstPointer(resultset);
+}
+
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk::DataTreeNode::Pointer node, bool onlyDirectSources)
+{
+  if (node.IsNull())
+    throw 1;
+  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
+  //std::vector<mitk::DataTreeNode::Pointer> stlresult = resultset->CastToSTLContainer();
+
+  AdjacencyMatrix::iterator it = m_CreatedByRelations.find(node); // check, if node is in the relations data structure
+  if (    (it == m_CreatedByRelations.end()) // node not found in list
+       || (it->second.IsNull())              // or no set of parents
+       || (it->second->Size() == 0))         // or empty set
+    return SetOfObjects::ConstPointer(resultset);  // return an empty set (stop criterion for recursive call)
+  
+  SetOfObjects::ConstPointer parents = it->second;  // get parents of current node
+
+  if (onlyDirectSources == true)
+    return parents;  // return the nodes direct parents
+  else  // recursively collect parents of parents too
+  {
+    for (SetOfObjects::ConstIterator parentIt = parents->Begin(); parentIt != parents->End(); parentIt++) // for each parent
+    {
+      mitk::DataTreeNode::Pointer parent = parentIt.Value();
+      mitk::DataStorage::SetOfObjects::ConstPointer s = this->GetSources(parent, false);  // get all parents of our parent
+      //stlresult.push_back(parent); // resultset is the current parent 
+      resultset->InsertElement(resultset->Size(), parent); // add current parent to resultset
+      for (SetOfObjects::ConstIterator parentsParentIt = s->Begin(); parentsParentIt != s->End(); parentsParentIt++)  // plus all parents of current parent
+        resultset->InsertElement(resultset->Size(), parentsParentIt->Value());
+        //stlresult.push_back(parentsParentIt->Value());
+    }
+    return SetOfObjects::ConstPointer(resultset);  // return all parents
+  }
 }

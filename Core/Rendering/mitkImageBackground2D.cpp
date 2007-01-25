@@ -100,7 +100,8 @@ void mitk::ImageBackground2D::SetParallelScale(int scale)
 }
 int mitk::ImageBackground2D::GetParallelScale()
 {
-  return m_ImageRenderer->GetActiveCamera()->GetParallelScale();
+  // TODO someone who knows this, check if double->int could cause problems
+  return static_cast<int>(m_ImageRenderer->GetActiveCamera()->GetParallelScale());
 }
 /**
  * Enables drawing of the color Video background.

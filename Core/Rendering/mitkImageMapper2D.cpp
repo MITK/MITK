@@ -141,8 +141,6 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   /* display volume property, if it exists and should be displayed */
   bool shouldShowVolume = false;
-  bool isSegmentation = false;
-  bool isBinary = false;
   float segmentationVolume = -1.0;
   if ((this->GetDataTreeNode()->GetBoolProperty("showVolume", shouldShowVolume) == true) &&
       (this->GetDataTreeNode()->GetFloatProperty("volume", segmentationVolume) == true) &&

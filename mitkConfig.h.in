@@ -4,3 +4,4 @@
 */
 #define MITK_ROOT "${PROJECT_SOURCE_DIR}"
 #cmakedefine USE_ITKZLIB
+#cmakedefine USE_ITK_3_ZLIB

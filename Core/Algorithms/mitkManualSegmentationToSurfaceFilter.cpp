@@ -1,6 +1,5 @@
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
-
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
 {
   m_MedianFilter3D = false;
@@ -15,28 +14,21 @@ mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
   m_InterpolationZ = 1.0f;
 };
 
-
 mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
-
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData() 
 {
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image    =  (mitk::Image*)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
-
   int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgelöst
+  int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 
 
   ScalarType thresholdExpanded = this->m_Threshold;
-
   for( int t=tstart; t<tmax; t++ )
   {
-
     vtkImageData *vtkimage = image->GetVtkImageData(t);
-
     //Inkrement Referenzcounter Counter (hier: RC)
     vtkimage->Register(NULL);
-
     // Median -->smooth 3D 
     if(m_MedianFilter3D)
     {
@@ -51,13 +43,11 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage->Register(NULL);
       median->Delete();
     }
-
     //Interpolate image spacing 
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);
-
       //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)      
       imageresample->SetAxisOutputSpacing(0, m_MedianKernelSizeX);
       imageresample->SetAxisOutputSpacing(1, m_MedianKernelSizeY);
@@ -69,7 +59,6 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage->Register(NULL);
       imageresample->Delete();
     }
-
     if(m_UseGaussianImageSmooth)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
@@ -78,10 +67,8 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->SetOutValue( 0 );
       vtkimagethreshold->ThresholdByUpper( this->m_Threshold ); 
       thresholdExpanded = 49;
-
       vtkimagethreshold->SetOutputScalarTypeToUnsignedChar();
       vtkimagethreshold->ReleaseDataFlagOn();
-
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
       gaussian->SetInput(vtkimagethreshold->GetOutput()); 
       gaussian->SetDimensionality(3);
@@ -95,12 +82,10 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->Register(NULL);
       gaussian->Delete();
     }
-
     // Create sureface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
   }
 };
-
 
 void mitk::ManualSegmentationToSurfaceFilter::SetMedianKernelSize(int x, int y, int z)
 {
@@ -108,11 +93,9 @@ void mitk::ManualSegmentationToSurfaceFilter::SetMedianKernelSize(int x, int y, 
   m_MedianKernelSizeY = y;
   m_MedianKernelSizeZ = z;
  }
-
 void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(vtkDouble x, vtkDouble y, vtkDouble z)
 {
   m_InterpolationX = x;
   m_InterpolationY = y;
   m_InterpolationZ = z;
 } 
-

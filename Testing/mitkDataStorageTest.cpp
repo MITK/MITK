@@ -57,19 +57,29 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   mitk::Image::Pointer image = mitk::Image::New();
   n1->SetData(image);
   n1->SetProperty("name", new mitk::StringProperty("Node 1 - Image Node"));
-  
+  mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();
+
+
   mitk::DataTreeNode::Pointer n2 = mitk::DataTreeNode::New();   // node with surface and name and color properties
   mitk::Surface::Pointer surface = mitk::Surface::New();
   n2->SetData(surface);
   n2->SetProperty("name", new mitk::StringProperty("Node 2 - Surface Node"));
   mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
   n2->SetColor(color);
+  mitk::DataStorage::SetOfObjects::Pointer parents2 = mitk::DataStorage::SetOfObjects::New();
+  parents2->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
+
 
   mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();   // node without data but with name property
   n3->SetProperty("name", new mitk::StringProperty("Node 3 - Empty Node"));
+  mitk::DataStorage::SetOfObjects::Pointer parents3 = mitk::DataStorage::SetOfObjects::New();
+  parents3->InsertElement(0, n2);  // n2 is source of n3 
   
   mitk::DataTreeNode::Pointer n4 = mitk::DataTreeNode::New();   // node without data but with color property
   n4->SetColor(color);
+  mitk::DataStorage::SetOfObjects::Pointer parents4 = mitk::DataStorage::SetOfObjects::New();
+  parents4->InsertElement(0, n2); 
+  parents4->InsertElement(1, n3);  // n2 and n3 are sources of n4 
   
   /* Create a DataStorage object */
   std::cout << "Instantiating a mitk::DataStorage object: " << std::flush;
@@ -104,7 +114,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Adding a new object: " << std::flush;
   try 
   {
-    ds->Add(n1);
+    ds->Add(n1, parents1);
     if ((tree->Count() == objectsInTree + 1) && (tree->Contains(n1)))
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -126,7 +136,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Check exception on adding the same object again: " << std::flush;
   try 
   {
-    ds->Add(n1);
+    ds->Add(n1, parents1);
     std::cout << "[FAILED] - no exception thrown" << std::endl; // no exception thrown
     returnValue = EXIT_FAILURE;
   } 
@@ -147,9 +157,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Adding an object that has a source object: " << std::flush;
   try 
   {
-    mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
-    parents->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
-    ds->Add(n2, parents);
+    ds->Add(n2, parents2);
     if ((tree->Count() == objectsInTree + 1) && (tree->Contains(n2)))
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -171,10 +179,8 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Adding some more objects needed for further tests: " << std::flush;
   try 
   {
-    mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
-    parents->InsertElement(0, n2);  // n2 is source of n3 (surface node)
-    ds->Add(n3, parents);   // n3 object that has name property and one parent
-    ds->Add(n4);   // n4 object that has color property
+    ds->Add(n3, parents3);   // n3 object that has name property and one parent
+    ds->Add(n4, parents4);   // n4 object that has color property
     if ((tree->Count() == objectsInTree + 2) && (tree->Contains(n3)) && (tree->Contains(n4)))
     {
       std::cout<<"[PASSED]"<<std::endl;
@@ -381,9 +387,9 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Requesting *direct* source objects: " << std::flush;
   try
   {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n2, true); // Get direct parents of n2 (=n1)
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, true); // Get direct parents of n3 (=n2)
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer(); 
-    if ((all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) )// check if n1 is the resultset
+    if ((all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()) )// check if n1 is the resultset
     {
       std::cout<<"[PASSED]"<<std::endl;
     }
@@ -422,6 +428,58 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
+
+  /* Requesting *all* sources of object with multiple parents */
+  std::cout << "Requesting *all* sources of object with multiple parents: " << std::flush;
+  try
+  {
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, false); // Get all parents of n4 (= n1 + n2 + n3)
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer(); 
+    if ((all->Size() == 3)
+      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())) // check if n1 and n2 and n3 are the resultset
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking for circular source relationships */
+  std::cout << "Checking for circular source relationships: " << std::flush;
+  try
+  {
+    parents1->InsertElement(0, n4);   // make n1 derived from n4 (which is derived from n2, which is derived from n1)
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, false); // Get all parents of n4 (= n1 + n2 + n3, not n4 itself and not multiple versions of the nodes!)
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer(); 
+    if ((all->Size() == 3)
+      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())) // check if n1 and n2 and n3 are the resultset
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
 
   /* finally return cumulated returnValue */
   return returnValue;

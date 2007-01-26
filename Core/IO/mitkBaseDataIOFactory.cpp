@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConfig.h"
 
 #include "mitkPicFileIOFactory.h"
+#include "mitkPointSetIOFactory.h"
 #include "mitkItkImageFileIOFactory.h"
 #include "mitkParRecFileIOFactory.h"
 #include "mitkSTLFileIOFactory.h"
@@ -125,6 +126,7 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
     if( firstTime )
     {
       itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+      itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );

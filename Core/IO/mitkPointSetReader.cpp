@@ -53,7 +53,7 @@ void mitk::PointSetReader::GenerateData()
     unsigned int i = 0;
     for ( mitk::vtkPointSetXMLParser::PointSetList::iterator it = pointSetList.begin(); it != pointSetList.end(); ++it, ++i )
     {
-        this->SetOutput( i, *it );
+        this->SetNthOutput( i, *it );
     }
     in.close();
 }
@@ -76,6 +76,43 @@ int mitk::PointSetReader::CanReadFile ( const char *name )
         in.close();
         return true;
     }
+}
+
+bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+{
+  // First check the extension
+  if(  filename == "" )
+  {
+      //std::cout<<"No filename specified."<<std::endl;
+    return false;
+  }
+
+  // check if image is serie
+  if( filePattern != "" && filePrefix != "" )
+    return false;
+
+  bool extensionFound = false;
+  std::string::size_type MPSPos = filename.rfind(".mps");
+  if ((MPSPos != std::string::npos)
+      && (MPSPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
+  MPSPos = filename.rfind(".MPS");
+  if ((MPSPos != std::string::npos)
+      && (MPSPos == filename.length() - 4))
+    {
+    extensionFound = true;
+    }
+
+  if( !extensionFound )
+    {
+      //std::cout<<"The filename extension is not recognized."<<std::endl;
+    return false;
+    }
+
+  return true;
 }
 
 void mitk::PointSetReader::ResizeOutputs( const unsigned int& num )

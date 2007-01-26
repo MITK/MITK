@@ -23,12 +23,58 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
     if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
   }
 
-  // 2. look in the current working directory
+  // 2. use .mitk-subdirectory in home directory of the user
+  std::string homeDirectory;
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  const char* homeDrive = itksys::SystemTools::GetEnv("HOMEDRIVE");
+  const char* homePath = itksys::SystemTools::GetEnv("HOMEPATH");
+  if((homeDrive==NULL) || (homePath==NULL))
+  {
+    itkGenericOutputMacro( << "Environment variables HOMEDRIVE and/or HOMEPATH not set" <<
+      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
+    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+  }
+  else
+  {
+    homeDirectory = homeDrive;
+    homeDirectory +=homePath;
+  }
+  if(itksys::SystemTools::FileExists(homeDirectory.c_str())==false)
+  {
+    itkGenericOutputMacro( << "Could not find home directory at " << homeDirectory << 
+      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
+    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+  }
+#else
+  const char* home = itksys::SystemTools::GetEnv("HOME");
+  if(home==NULL)
+  {
+    itkGenericOutputMacro( << "Environment variable HOME not set" <<
+      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
+    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+  }
+  else
+    homeDirectory = home;
+  if(itksys::SystemTools::FileExists(homeDirectory.c_str())==false)
+  {
+    itkGenericOutputMacro( << "Could not find home directory at " << homeDirectory << 
+      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
+    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+  }
+#endif // defined(_WIN32) && !defined(__CYGWIN__)
+  
+  xmlFileName = homeDirectory;
+  xmlFileName += "/.mitk/";
+  xmlFileName += filename;
+
+  if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
+
+  // 3. look in the current working directory
   xmlFileName = filename;
 
   if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
 
-  // 3. use a source tree location from compile time
+  // 4. use a source tree location from compile time
   xmlFileName = MITK_ROOT;
   if (pathInSourceDir)
   {

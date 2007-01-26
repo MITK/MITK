@@ -1,5 +1,6 @@
 #include "ToolBar.h"
 #include <qpushbutton.h>
+#include <qcheckbox.h>
 #include "mitkLightBoxImageReader.h"
 #include <qlayout.h>
 #include <qbuttongroup.h>
@@ -23,7 +24,8 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
 
     QGridLayout* layout2=new QGridLayout(toolbar,1,6,5);
 
-    for(int i=1;i<8;++i)
+    int i=1;
+    for(;i<6;++i)
     {
       // for some strange reason the "text" is not accepted
       // when set in the constructor, therefore it is set
@@ -33,6 +35,17 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
       layout2->addWidget(button,1,i-1);
       toolbar->insert(button,i);
     }
+
+    //KeepDataTree Checkbox
+    QCheckBox* cb = new QCheckBox( toolbar, "ToolbarCB" );
+    layout2->addWidget(cb,1,i-1);
+    toolbar->insert(cb,i++);
+
+    //ConferenceButton
+    QPushButton* button= new QPushButton(toolbar, QString("toolbarSelectLightBox%1").arg(i).latin1());
+    button->setToggleButton(true);
+    layout2->addWidget(button,1,i-1);
+    toolbar->insert(button,i);
 
     for (int i=1;i<5;++i)
       connect(toolbar->find(i),SIGNAL(toggled(bool)),this,SLOT(ButtonToggled(bool)));
@@ -58,6 +71,7 @@ void ToolBar::SetWidget(QWidget* app)
   widget=app;
   widget->hide();
   layout->addWidget(widget,1,0);
+  layout->setRowStretch(1,0);
   connect(toolbar,SIGNAL(clicked(int)),widget,SLOT(show()));
   widget->show();
   /////itkGenericOutputMacro(<<"set widget");
@@ -79,8 +93,8 @@ void ToolBar::ConnectButton(int number)
   {
     toolbar->find(i)->setText(QString("LightBox %1").arg(i));
   }
-  toolbar->find(5)->setText(QString("Reinitialise"));
-  toolbar->find(6)->setText(QString("Multi-Mode"));
+  toolbar->find(5)->setText(QString("Reinitialize"));
+  toolbar->find(6)->setText(QString("Keep data tree"));
   toolbar->find(7)->setText(QString("Conference INFO"));
   /////itkGenericOutputMacro(<<"connect buttons");
 }
@@ -141,8 +155,8 @@ void ToolBar::ToolbarMode(bool on)
 
   if (m_KeepDataTreeNodes)
   {
+    //TODO: when toggeled - button should be showed as pressed
     toolbar->setExclusive(false);
-    //emit ChangeWidget();
   }
   else
   {

@@ -23,8 +23,12 @@ public:
     bool KeepDataTreeNodes();
     
 public slots:
+    // restarts the application - the bool parameter can force a reinit. 
+    // usaly there is a check if something was loaded - to save time
     void Reinitialize(bool );
+    // Lightbox action 1-4 -> light box will be added or replaced in the mitk data tree
     void ButtonToggled(bool );
+    // to change the state to use multiple images in the data tree or only a single one
     void ToolbarMode(bool );
 
 signals:

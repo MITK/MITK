@@ -57,7 +57,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
   it.Add(node);
   /* save node and parentlist in relations map */
-  m_CreatedByRelations.insert(std::make_pair(node, parents)); 
+  m_CreatedByRelations.insert(std::make_pair(node, SetOfObjects::ConstPointer(parents))); 
 
 }
 
@@ -125,31 +125,49 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk
 {
   if (node.IsNull())
     throw 1;
-  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
-  //std::vector<mitk::DataTreeNode::Pointer> stlresult = resultset->CastToSTLContainer();
 
-  AdjacencyMatrix::iterator it = m_CreatedByRelations.find(node); // check, if node is in the relations data structure
-  if (    (it == m_CreatedByRelations.end()) // node not found in list
-       || (it->second.IsNull())              // or no set of parents
-       || (it->second->Size() == 0))         // or empty set
-    return SetOfObjects::ConstPointer(resultset);  // return an empty set (stop criterion for recursive call)
-  
-  SetOfObjects::ConstPointer parents = it->second;  // get parents of current node
-
-  if (onlyDirectSources == true)
-    return parents;  // return the nodes direct parents
-  else  // recursively collect parents of parents too
+  if (onlyDirectSources)
   {
-    for (SetOfObjects::ConstIterator parentIt = parents->Begin(); parentIt != parents->End(); parentIt++) // for each parent
-    {
-      mitk::DataTreeNode::Pointer parent = parentIt.Value();
-      mitk::DataStorage::SetOfObjects::ConstPointer s = this->GetSources(parent, false);  // get all parents of our parent
-      //stlresult.push_back(parent); // resultset is the current parent 
-      resultset->InsertElement(resultset->Size(), parent); // add current parent to resultset
-      for (SetOfObjects::ConstIterator parentsParentIt = s->Begin(); parentsParentIt != s->End(); parentsParentIt++)  // plus all parents of current parent
-        resultset->InsertElement(resultset->Size(), parentsParentIt->Value());
-        //stlresult.push_back(parentsParentIt->Value());
-    }
-    return SetOfObjects::ConstPointer(resultset);  // return all parents
+    AdjacencyList::iterator it = m_CreatedByRelations.find(node); // get parents of current node
+    if (   (it == m_CreatedByRelations.end()) // node not found in list
+        || (it->second.IsNull())              // or no set of parents
+        || (it->second->Size() == 0))         // or empty set
+      return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
+    else
+      return it->second;
   }
+  
+  std::vector<mitk::DataTreeNode::Pointer> resultset;
+  std::vector<mitk::DataTreeNode::Pointer> openlist;
+
+  /* initialize openlist with node. this will add node to resultset, 
+     but that is necessary to detect circular relations that would lead to endless recursion */
+  openlist.push_back(node);
+
+  while (openlist.size() > 0)
+  {
+    mitk::DataTreeNode::Pointer current = openlist.back();  // get element that needs to be processed
+    openlist.pop_back();            // remove last element, because it gets processed now
+    resultset.push_back(current);   // add current element to resultset
+    AdjacencyList::iterator it = m_CreatedByRelations.find(current); // get parents of current node
+    if (   (it == m_CreatedByRelations.end()) // if node not found in list
+        || (it->second.IsNull())              // or no set of parents available
+        || (it->second->Size() == 0))         // or empty set of parents
+      continue;                               // then continue with next node in open list
+    else
+      for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
+      {
+        mitk::DataTreeNode::Pointer p = parentIt.Value();
+        if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset 
+            && !(std::find(openlist.begin(), openlist.end(), p) != openlist.end()))     // and not already in openlist
+          openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
+      }
+  }
+  /* now finally copy the results to a proper SetOfObjects variable exluding the initial node */
+  mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
+  for (std::vector<mitk::DataTreeNode::Pointer>::iterator resultIt = resultset.begin(); resultIt != resultset.end(); resultIt++)
+    if (*resultIt != node)
+      realResultset->InsertElement(realResultset->Size(), *resultIt);
+  
+  return SetOfObjects::ConstPointer(realResultset); // return a const pointer
 }

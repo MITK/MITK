@@ -134,8 +134,8 @@ namespace mitk {
     //##Documentation
     //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
     bool m_ManageCompleteTree;
-    typedef std::map<mitk::DataTreeNode::Pointer, SetOfObjects::ConstPointer> AdjacencyMatrix;
-    AdjacencyMatrix m_CreatedByRelations;
+    typedef std::map<mitk::DataTreeNode::Pointer, SetOfObjects::ConstPointer> AdjacencyList;
+    AdjacencyList m_CreatedByRelations;
   };
 
 

@@ -47,7 +47,7 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     // still undocumented slot of QcPlugin
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
-    void CreateNewSampleApp();
+    void CreateNewSampleApp(bool force=false);
 
   protected:
 
@@ -63,7 +63,8 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     // the MITK toolbar for selecting a lightbox (to indicate it should be loaded)
     ToolBar* toolbar;
 
-    bool activated;
+    bool m_Activated;
+    bool m_IsFilledDataTree;
 
     // single instance of this plugin
     static QcPlugin* s_PluginInstance;

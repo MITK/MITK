@@ -12,11 +12,12 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
     task=parent;
     plugin=qcplugin;
     idLightbox=0;
+    m_KeepDataTreeNodes=false;
 
     toolbar=new QButtonGroup(parent);
     toolbar->setMaximumHeight(40);
     layout=new QGridLayout(parent,2,0,0,0);
-    toolbar->setExclusive(true);
+    toolbar->setExclusive(!m_KeepDataTreeNodes);
 
     layout->addWidget(toolbar,2,0);
 
@@ -35,6 +36,7 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
 
     for (int i=1;i<5;++i)
       connect(toolbar->find(i),SIGNAL(toggled(bool)),this,SLOT(ButtonToggled(bool)));
+    //connect(toolbar,SIGNAL(clicked(int)),this,SLOT(ButtonToggled(int))); // all buttons
     connect(toolbar->find(5),SIGNAL(toggled(bool)),this,SLOT(Reinitialize(bool)));
     connect(toolbar->find(6),SIGNAL(toggled(bool)),this,SLOT(ToolbarMode(bool)));
 
@@ -57,6 +59,7 @@ void ToolBar::SetWidget(QWidget* app)
   widget->hide();
   layout->addWidget(widget,1,0);
   connect(toolbar,SIGNAL(clicked(int)),widget,SLOT(show()));
+  widget->show();
   /////itkGenericOutputMacro(<<"set widget");
 }
 
@@ -88,6 +91,8 @@ void ToolBar::Reinitialize(bool on)
   {
     if (on)
     {
+      //force new instantiation of App
+      emit ChangeWidget(true);
       toolbar->setButton(idLightbox+1);
     }
     /////itkGenericOutputMacro(<<"reinitialize");
@@ -101,21 +106,20 @@ void ToolBar::Reinitialize(bool on)
 
 void ToolBar::ButtonToggled(bool on)
 {
-  if (!toolbar->find(6)->isOn())
+  if (m_KeepDataTreeNodes)
   {
-    if (on)
-    {
-      emit ChangeWidget();
-      int id=toolbar->id(toolbar->selected());
-      SelectLightbox(id-1);
-    }
+     for(int i=1;i<5;++i)
+      if (toolbar->find(i)->isOn())
+          SelectLightbox(i-1);
   }
   else
   {
-    emit ChangeWidget();
-    for(int i=1;i<5;++i)
-      if (toolbar->find(i)->isOn())
-          SelectLightbox(i-1);
+    if(on)
+    {
+      int id=toolbar->id(toolbar->selected());
+      SelectLightbox(id-1);
+    }
+
   }
 }
 
@@ -133,15 +137,23 @@ void ToolBar::SelectLightbox(int id)
 
 void ToolBar::ToolbarMode(bool on)
 {
-  if (on)
+  m_KeepDataTreeNodes = on;
+
+  if (m_KeepDataTreeNodes)
   {
     toolbar->setExclusive(false);
-    emit ChangeWidget();
+    //emit ChangeWidget();
   }
   else
   {
+    emit ChangeWidget();
     for(int i=1;i<6;++i)
         ((QPushButton*)(toolbar->find(i)))->setOn ( false );
     toolbar->setExclusive(true);
   }
+}
+
+bool ToolBar::KeepDataTreeNodes()
+{
+  return m_KeepDataTreeNodes;
 }

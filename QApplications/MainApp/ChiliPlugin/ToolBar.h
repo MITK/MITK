@@ -20,6 +20,7 @@ public:
     void SetWidget(QWidget* ap);
     QButtonGroup* GetToolBar();
     void ConnectButton(int number);
+    bool KeepDataTreeNodes();
     
 public slots:
     void Reinitialize(bool );
@@ -28,7 +29,7 @@ public slots:
 
 signals:
     void LightboxSelected(QcLightbox*);
-    void ChangeWidget();
+    void ChangeWidget(bool=false);
         
 private:
     QWidget* widget;
@@ -38,6 +39,7 @@ private:
     QButtonGroup* toolbar;    
     int idLightbox;
     void SelectLightbox(int id);
+    bool m_KeepDataTreeNodes;
 };
 
 #endif

@@ -36,7 +36,10 @@ Chili3ConferenceKitFactory chiliconferencekitfactory;
 QcPlugin* QcMITKSamplePlugin::s_PluginInstance = NULL;
 
 QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
-  : QcPlugin( parent ), app(NULL)
+  : QcPlugin( parent ), 
+  app(NULL),
+  m_Activated(false),
+  m_IsFilledDataTree(true)
 {
 
   task = new QcMITKTask( xpm(), parent, name() );
@@ -46,8 +49,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   QButtonGroup* tb = toolbar->GetToolBar();
 
   connect( toolbar, SIGNAL(LightboxSelected(QcLightbox*)), this, SLOT(selectSerie(QcLightbox*)) );
-  connect( toolbar, SIGNAL(ChangeWidget()), this, SLOT(CreateNewSampleApp()) );
-  activated = false;
+  connect( toolbar, SIGNAL(ChangeWidget(bool)), this, SLOT(CreateNewSampleApp(bool)) );
 
   s_PluginInstance = this;
 
@@ -85,6 +87,8 @@ QcEXPORT QObject* create( QWidget *parent )
 void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"lightbox filled");
+  if(!task->isVisible()) return;
+
   QcLightboxManager *lbm=lightboxManager();
   QPtrList<QcLightbox> list;
   list=lbm->getLightboxes();
@@ -93,9 +97,13 @@ void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
   int id=tb->id(tb->selected());
   if (id>0)
   {
-    if (!tb->find(6)->isOn())
-      if (activated && (list.take(id-1))->isActive())
-          selectSerie(lightbox);
+    if (!toolbar->KeepDataTreeNodes() )
+    {
+      if (m_Activated && (list.take(id-1))->isActive())
+      {        
+        selectSerie(lightbox);
+      }
+    }
   }
   else
     if (tb->find((list.find(lightbox))+1)->isOn())
@@ -113,9 +121,14 @@ void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"selectSerie");
-  activated=true;
-  if(lightbox->getFrames()==0)
+  if(!toolbar->KeepDataTreeNodes() || !m_Activated)
+    CreateNewSampleApp(true);
+
+  if(lightbox==NULL || lightbox->getFrames()==0)
     return;
+
+  m_Activated=true;
+  m_IsFilledDataTree = true;
 
   mitk::Image::Pointer image = mitk::Image::New();
 
@@ -432,14 +445,18 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 
 }
 
-void QcMITKSamplePlugin::CreateNewSampleApp()
+void QcMITKSamplePlugin::CreateNewSampleApp(bool force)
 {
-  if(app)
-    delete app;
-  
-  app = new SampleApp(task, "sample", 0);
+  // don instantiate new app if an emptyone allready esixts
+  if(m_Activated || force)
+  {
+    if(app)
+      delete app;
+    
+    app = new SampleApp(task, "sample", 0);
 
-  toolbar->SetWidget(app);
+    toolbar->SetWidget(app);
+  }
 }
 
 // teleconference methods

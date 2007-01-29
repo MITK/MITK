@@ -36,6 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 // STL-related includes
 #include <vector>
 #include <map>
+#include <istream>
+
 
 // VTK-related includes
 #include <vtkSTLReader.h>
@@ -112,25 +114,41 @@ void mitk::DataTreeNodeFactory::SetImageSerie(bool serie)
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
-  // Test if the file exists.
-  if( ! itksys::SystemTools::FileExists( m_FileName.c_str() ) )
+  // IF filename is something.pic, and something.pic does not exist, try to read something.pic.gz
+  // if there are both, something.pic and something.pic.gz, only the requested file is read
+  // not only for images, but for all formats
+  std::ifstream exists(m_FileName.c_str());
+  if (!exists)
   {
-    std::string message("File does not exist. Filename = ");
-    message += m_FileName;
-    throw itk::ImageFileReaderException( __FILE__, __LINE__, message.c_str() );
-  }
-
-  // Test if the file can be open for reading access.
-  std::ifstream readTester( m_FileName.c_str() );
-  if( !readTester )
+    std::string testfilename = m_FileName + ".gz";
+  
+    std::ifstream exists(testfilename.c_str());
+    if (exists.good()) 
+    {
+      m_FileName += ".gz";
+    }
+    else
+    {
+      testfilename = m_FileName + ".GZ";
+      std::ifstream exists(testfilename.c_str());
+      if (exists.good()) 
   {
-    std::string message("File cannot be read. Filename = ");
-    message += m_FileName;
-    throw itk::ImageFileReaderException( __FILE__, __LINE__, message.c_str() );
+        m_FileName += ".GZ";
   }
-  // end file tests
+      else
+  {
+        std::string message("File does not exist, or cannot be read. Filename = ");
+    message += m_FileName;
+        itkExceptionMacro( << message );
+      }
+    }
+  }
 
   // part for DICOM
+  const char *numbers = "0123456789.";
+  std::string::size_type first_non_number;
+  first_non_number = itksys::SystemTools::GetFilenameName(m_FileName).find_first_not_of ( numbers );
+
   if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
     || this->FileNameEndsWith( ".ima" ) 
     || this->FileNameEndsWith( ".IMA" ) 
@@ -138,7 +156,8 @@ void mitk::DataTreeNodeFactory::GenerateData()
     || this->FilePatternEndsWith( ".DCM" ) 
     || this->FilePatternEndsWith( ".ima" ) 
     || this->FilePatternEndsWith( ".IMA" ) 
-    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) )
+    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) 
+    || first_non_number == std::string::npos )
   {
     if (m_Serie)
     {
@@ -583,7 +602,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   StringContainer::const_iterator seriesItr = seriesUID.begin();
   StringContainer::const_iterator seriesEnd = seriesUID.end();
 
-  std::cout << "The directory " << dir << "contains the following DICOM Series: " << std::endl;
+  std::cout << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
   while ( seriesItr != seriesEnd )
   {
     std::cout << *seriesItr << std::endl;

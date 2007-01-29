@@ -36,6 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 // STL-related includes
 #include <vector>
 #include <map>
+#include <istream>
+
 
 // VTK-related includes
 #include <vtkSTLReader.h>
@@ -112,24 +114,36 @@ void mitk::DataTreeNodeFactory::SetImageSerie(bool serie)
 
 void mitk::DataTreeNodeFactory::GenerateData()
 {
-  // Test if the file exists.
-  if( ! itksys::SystemTools::FileExists( m_FileName.c_str() ) )
+  // IF filename is something.pic, and something.pic does not exist, try to read something.pic.gz
+  // if there are both, something.pic and something.pic.gz, only the requested file is read
+  // not only for images, but for all formats
+  std::ifstream exists(m_FileName.c_str());
+  if (!exists)
   {
-    std::string message("File does not exist. Filename = ");
-    message += m_FileName;
-    throw itk::ImageFileReaderException( __FILE__, __LINE__, message.c_str() );
+    std::string testfilename = m_FileName + ".gz";
+  
+    std::ifstream exists(testfilename.c_str());
+    if (exists.good()) 
+    {
+      m_FileName += ".gz";
+    }
+    else
+    {
+      testfilename = m_FileName + ".GZ";
+      std::ifstream exists(testfilename.c_str());
+      if (exists.good()) 
+      {
+        m_FileName += ".GZ";
+      }
+      else
+      {
+        std::string message("File does not exist, or cannot be read. Filename = ");
+        message += m_FileName;
+        itkExceptionMacro( << message );
+      }
+    }
   }
-
-  // Test if the file can be open for reading access.
-  std::ifstream readTester( m_FileName.c_str() );
-  if( !readTester )
-  {
-    std::string message("File cannot be read. Filename = ");
-    message += m_FileName;
-    throw itk::ImageFileReaderException( __FILE__, __LINE__, message.c_str() );
-  }
-  // end file tests
-
+  
   // part for DICOM
   const char *numbers = "0123456789.";
   std::string::size_type first_non_number;

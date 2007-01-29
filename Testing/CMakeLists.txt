@@ -3,8 +3,7 @@ INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS})
 ENABLE_TESTING()
 
 # tests with no extra command line parameter
-SET(TESTS_WITHOUT_INPUT
-  MITKTestDriver.cpp
+SET(${KITNAME}_TESTS
   mitkAbstractTransformGeometryTest.cpp
   mitkActionTest.cpp
   mitkAutoCropImageFilterTest.cpp
@@ -36,7 +35,6 @@ SET(TESTS_WITHOUT_INPUT
   mitkStateTest.cpp
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp
-  mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkTransitionTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
@@ -44,12 +42,12 @@ SET(TESTS_WITHOUT_INPUT
 )
 
 # test with image filename as an extra command line parameter
-CREATE_TEST_SOURCELIST(MITKIMAGETEST_SOURCE
-  MITKImageTestDriver.cpp
+SET(${KITNAME}_IMAGE_TESTS
   mitkPicFileReaderTest.cpp
   mitkImageTimeSelectorTest.cpp
   mitkImageSliceSelectorTest.cpp
   mitkCylindricToCartesianFilterTest.cpp
+  mitkManualSegmentationToSurfaceFilterTest.cpp
 )
 
 # list of images for which the tests are run
@@ -57,51 +55,45 @@ SET(${KITNAME}_TESTIMAGES
   US4DCyl.pic.gz
   Pic3D.pic.gz
   Pic2DplusT.pic.gz
+  BallBinary30x30x30.pic.gz
 )
 
-CREATE_TEST_SOURCELIST(MITKTEST_SOURCE
-  ${TESTS_WITHOUT_INPUT}
+CREATE_TEST_SOURCELIST(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 
+  ${${KITNAME}_TESTS} ${${KITNAME}_IMAGE_TESTS}
 )
-ADD_EXECUTABLE(MITKTestDriver ${MITKTEST_SOURCE})
-TARGET_LINK_LIBRARIES(MITKTestDriver ${${KITNAME}_CORE_LIBRARIES})
+ADD_EXECUTABLE(${KITNAME}TestDriver ${MITKTEST_SOURCE})
+TARGET_LINK_LIBRARIES(${KITNAME}TestDriver ${${KITNAME}_CORE_LIBRARIES})
 
-SET(MITKTestToRun ${MITKTEST_SOURCE})
-REMOVE(MITKTestToRun MITKTestDriver.cpp)
-
-FOREACH( test ${MITKTestToRun} )
+FOREACH( test ${${KITNAME}_TESTS} )
   GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-  ADD_TEST(${TName} ${EXECUTABLE_OUTPUT_PATH}/MITKTestDriver ${TName} ${PROJECT_SOURCE_DIR})
+  ADD_TEST(${TName} ${EXECUTABLE_OUTPUT_PATH}/MITKTestDriver ${TName})
 ENDFOREACH( test )
 
 # todo: this is probably needed somewhere else
-IF (CMAKE_CXX_COMPILER STREQUAL "cl")
-  SET_TARGET_PROPERTIES( MITKTestDriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt.lib")
-ENDIF (CMAKE_CXX_COMPILER STREQUAL "cl")
+# IF (CMAKE_CXX_COMPILER STREQUAL "cl")
+#  SET_TARGET_PROPERTIES( MITKTestDriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt.lib")
+# ENDIF (CMAKE_CXX_COMPILER STREQUAL "cl")
 
-ADD_EXECUTABLE(MITKImageTestDriver ${MITKIMAGETEST_SOURCE})
-TARGET_LINK_LIBRARIES(MITKImageTestDriver ${${KITNAME}_CORE_LIBRARIES})
+FOREACH(image ${${KITNAME}_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
+  IF(EXISTS ${image})
+    SET(IMAGE_FULL_PATH ${image})
+  ELSE(EXISTS ${image})
+    # todo: maybe search other paths as well
+    SET(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${image})
+  ENDIF(EXISTS ${image})
 
-SET(MITKImageTestToRun ${MITKIMAGETEST_SOURCE})
-REMOVE(MITKImageTestToRun MITKImageTestDriver.cpp)
-FOREACH(image ${${KITNAME}_TESTIMAGES} )
-  FOREACH( test ${MITKImageTestToRun} )
+  IF(EXISTS ${IMAGE_FULL_PATH})
+  FOREACH( test ${${KITNAME}_IMAGE_TESTS} )
     GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-#    STRING(REGEX REPLACE "/" "_" imageComp ${image})
-    ADD_TEST(${TName}_${image} ${EXECUTABLE_OUTPUT_PATH}/MITKImageTestDriver ${TName} ${image})
+    GET_FILENAME_COMPONENT(ImageName ${IMAGE_FULL_PATH} NAME)
+    ADD_TEST(${TName}_${ImageName} ${EXECUTABLE_OUTPUT_PATH}/MITKTestDriver ${TName} ${IMAGE_FULL_PATH})
   ENDFOREACH( test )
+  ELSE(EXISTS ${IMAGE_FULL_PATH})
+    MESSAGE("!!!!! No such file: ${IMAGE_FULL_PATH} !!!!!")
+  ENDIF(EXISTS ${IMAGE_FULL_PATH})
 ENDFOREACH( image )
-IF(ADDITIONAL_TEST_IMAGES)
-FOREACH(image ${ADDITIONAL_TEST_IMAGES})
-  FOREACH( test ${MITKImageTestToRun} )
-    GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-    GET_FILENAME_COMPONENT(ImageName ${image} NAME)
-    #    STRING(REGEX REPLACE "/" "_" imageComp ${image})
-    ADD_TEST(${TName}_${ImageName} ${EXECUTABLE_OUTPUT_PATH}/MITKImageTestDriver ${TName} ${image})
-  ENDFOREACH( test )
-ENDFOREACH( image )
-ENDIF(ADDITIONAL_TEST_IMAGES)
 
-IF (CMAKE_CXX_COMPILER STREQUAL "cl")
-  SET_TARGET_PROPERTIES( MITKImageTestDriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt.lib")
-ENDIF (CMAKE_CXX_COMPILER STREQUAL "cl")
+# IF (CMAKE_CXX_COMPILER STREQUAL "cl")
+#   SET_TARGET_PROPERTIES( MITKImageTestDriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libcmt.lib")
+# ENDIF (CMAKE_CXX_COMPILER STREQUAL "cl")
 

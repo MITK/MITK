@@ -224,7 +224,7 @@ void QmitkDataTreeFilterDemo::onListboxItemAdded(const mitk::DataTreeFilter::Ite
 
 void QmitkDataTreeFilterDemo::ListboxModifiedHandler( const itk::EventObject& /*e*/ )
 {
-  std::cout << "(Listbox) Something changed." << std::endl;
+  // std::cout << "(Listbox) Something changed." << std::endl;
  
   //const mitk::DataTreeFilter::ItemList* items = m_DataTreeFilter->GetItems(); //in case you want to iterate over them
 }

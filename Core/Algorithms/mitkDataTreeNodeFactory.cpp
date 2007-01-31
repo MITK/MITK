@@ -159,18 +159,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
     || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) 
     || first_non_number == std::string::npos )
   {
-    if (m_Serie)
-    {
-      m_FileName = m_FilePrefix;
-    }
     this->ReadFileSeriesTypeDCM();
   }
   else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) || this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
   {
-    if (m_Serie)
-    {
-      m_FileName = m_FilePrefix;
-    }
     this->ReadFileSeriesTypeGDCM();
   }
   else
@@ -181,13 +173,11 @@ void mitk::DataTreeNodeFactory::GenerateData()
     // for more details see the doxygen documentation (modules IO)
     bool usedNewDTNF = false;
 
-    if (m_Serie)
-    {
-      m_FileName = m_FilePrefix;
-    }
-
-    std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
-
+    std::vector<mitk::BaseData::Pointer>* baseDataVector;
+    if ( m_Serie )
+      baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FilePrefix, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
+    else
+      baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
     if(baseDataVector)
       this->ResizeOutputs((unsigned int)baseDataVector->size());
 

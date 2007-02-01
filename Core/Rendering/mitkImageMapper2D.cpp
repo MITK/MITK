@@ -170,7 +170,7 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
         std::string dataName;
         std::stringstream volumeString; 
         if (this->GetDataTreeNode()->GetName(dataName) == true)
-          volumeString << dataName << ": volume = " << segmentationVolume << " ml";
+          volumeString << dataName << ": " << std::endl  << "volume = " << segmentationVolume << " ml";
         else
           volumeString << "volume = " << segmentationVolume << " ml";
         /* draw text */

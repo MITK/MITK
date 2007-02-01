@@ -173,11 +173,8 @@ void mitk::DataTreeNodeFactory::GenerateData()
     // for more details see the doxygen documentation (modules IO)
     bool usedNewDTNF = false;
 
-    std::vector<mitk::BaseData::Pointer>* baseDataVector;
-    if ( m_Serie )
-      baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FilePrefix, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
-    else
-      baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode );
+    std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode, m_Serie );
+    
     if(baseDataVector)
       this->ResizeOutputs((unsigned int)baseDataVector->size());
 
@@ -495,8 +492,8 @@ void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
     std::vector <std::string>::iterator it;
 
     int OutputNumber=0;
-    i=0;// Laufvariable für die internen KanäleBilder aus DSRreader
-    count=0;// Laufvariable für die BilderAnzahl
+    i=0;// Laufvariable fr die internen Kanï¿½eBilder aus DSRreader
+    count=0;// Laufvariable fr die BilderAnzahl
     BirdDataFromFileReader Birdreader;
 
     for ( it= HpsonoPfadListe.begin( );it != HpsonoPfadListe.end( );it++ )
@@ -717,122 +714,23 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
   typedef itk::Image<int, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
   typedef itk::NumericSeriesFileNames NameGenerator;
-  typedef std::vector<std::string> StringContainer;
-  typedef std::map<unsigned int, std::string> SortedStringContainer;
-
-  StringContainer unmatchedFiles;
-  StringContainer matchedFiles;
-
-  //
-  // Load Directory
-  //
-  std::string directory = this->GetDirectory();
-  itksys::Directory itkDir;
-  if ( !itkDir.Load ( directory.c_str() ) )
+  
+  if ( ! this->GenerateFileList() )
   {
-    itkWarningMacro ( << "Directory " << directory << " cannot be read!" );
+    itkWarningMacro( "Sorry, file list could not be generated!" );
     return ;
   }
-
-  //
-  // Get a list of all files in the directory
-  //
-  for ( unsigned long i = 0; i < itkDir.GetNumberOfFiles(); i++ )
+  if ( m_MatchedFileNames.size() == 0 )
   {
-    // Only read files
-    std::string filename = directory + "/" + itkDir.GetFile( i );
-    if ( itksys::SystemTools::FileIsDirectory( filename.c_str() ) )
-      continue;
-
-    // store the filenames without path
-    unmatchedFiles.push_back( itkDir.GetFile( i ) );
+    itkWarningMacro( "Sorry, no files matched the given filename ("<< m_FileName <<")!" );
+    return ;
   }
-
-  //
-  // Match the file list against the file prefix and extension,
-  // the result should be only the files that should be read
-  //
-  std::string prefix = this->GetBaseFilePrefix();
-  std::string patternExtension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( m_FilePattern ) );
-  for ( StringContainer::iterator it = unmatchedFiles.begin() ; it != unmatchedFiles.end() ; ++it )
-  {
-    std::string extension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( *it ) );
-    if ( it->find( prefix ) == 0 && extension == patternExtension )
-      matchedFiles.push_back( *it );
-  }
-  if ( matchedFiles.size() == 0 )
-  {
-    itkWarningMacro( << "Sorry, none of the files matched the prefix!" );
-      return ;
-  }
-
-
-  //
-  // parse the file names from back to front for digits
-  // and convert them to a number. Store the filename and number
-  // in a SortedStringContainer
-  //
-  SortedStringContainer sortedFiles;
-  for ( StringContainer::iterator it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
-  {
-    //
-    //remove the last extension, until we have a digit at the end, or no extension is left!
-    //
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( *it );
-    while ( ( baseFilename[ baseFilename.length() - 1 ] < '0' || baseFilename[ baseFilename.length() - 1 ] > '9' ) && itksys::SystemTools::GetFilenameLastExtension( baseFilename ) != "" )
-      baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
-
-    std::string number;
-    for ( unsigned int i = baseFilename.length() - 1; ; --i )
-    {
-      char character = baseFilename[ i ];
-      //do we have a digit?
-      if ( character >= '0' && character <= '9' )
-      {
-        number.insert( 0, &character, 1 );
-      }
-      else
-      {
-        //end of digit series found, jump out of loop!
-        break;
-      }
-    }
-    if ( number.length() == 0 )
-    {
-      // The file is not numbered, this is an error!
-      // Nevertheless, we try the next files.
-      itkWarningMacro( << "The filename " << *it << "does not contain a valid digit sequence!" );
-    }
-    else
-    {
-      // convert the number string into an integer and
-      // insert the filname (including directory) into the SortedStringContainer
-      unsigned int num = atoi( number.c_str() );
-      sortedFiles.insert( std::make_pair( num, directory + "/" + *it ) );
-    }
-  }
-  if ( sortedFiles.size() == 0 )
-  {
-    itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." );
-      return ;
-  }
-
-  //
-  // Convert the sorted string container in a plain sorted vector of strings;
-  //
-  StringContainer filesToLoad;
-  for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it )
-  {
-    filesToLoad.push_back( it->second );
-    itkDebugMacro( << it->second );
-  }
-
 
   //
   // Finally, initialize the ITK-reader and load the files!
   //
   ReaderType::Pointer reader = ReaderType::New();
-  reader->SetFileNames( filesToLoad );
+  reader->SetFileNames( m_MatchedFileNames );
   try
   {
     reader->Update();
@@ -848,7 +746,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       mitk::DataTreeNode::Pointer node = this->GetOutput( i );
       node->SetData( image );
 
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( prefix );
+      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( m_FileName );
       node->SetProperty( "name", nameProp );
 
       if ( image->GetPixelType().GetNumberOfComponents() == 1 )
@@ -946,6 +844,7 @@ void mitk::DataTreeNodeFactory::SetDefaultVesselTreeProperties(mitk::DataTreeNod
     lutGenerator->Update(); 
     mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
     node->SetProperty( "VesselTreeLookupTable", lutProp );
+    node->SetProperty( "Render skeleton", new mitk::BoolProperty( false ) );
   }
 }
 

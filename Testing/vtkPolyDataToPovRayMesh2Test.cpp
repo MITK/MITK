@@ -4,7 +4,7 @@
 #include <itksys/SystemTools.hxx>
 
 
-int vtkPolyDataToPovRayMesh2Test (void)
+int vtkPolyDataToPovRayMesh2Test(int /*argc*/ , char ** /*argv[]*/ )
 {
   std::string fileOut = "ParameterizedMeshPOVWriterTest";
   fileOut = itksys::SystemTools::ConvertToOutputPath(fileOut.c_str());

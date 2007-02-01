@@ -188,8 +188,6 @@ protected:
 
   virtual void ReadFileSeriesTypeDCM();
 
-  virtual void ReadFileSeriesTypeGDCM();
-
   virtual void ReadFileSeriesTypeITKImageSeriesReader();
 };
 

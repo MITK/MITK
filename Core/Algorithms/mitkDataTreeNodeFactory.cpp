@@ -154,16 +154,14 @@ void mitk::DataTreeNodeFactory::GenerateData()
     || this->FileNameEndsWith( ".IMA" ) 
     || this->FilePatternEndsWith( ".dcm" ) 
     || this->FilePatternEndsWith( ".DCM" ) 
+    || this->FilePatternEndsWith( ".gdcm" ) 
+    || this->FilePatternEndsWith( ".GDCM" ) 
     || this->FilePatternEndsWith( ".ima" ) 
     || this->FilePatternEndsWith( ".IMA" ) 
     || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) 
     || first_non_number == std::string::npos )
   {
     this->ReadFileSeriesTypeDCM();
-  }
-  else if ( this->FileNameEndsWith( ".gdcm" ) || this->FileNameEndsWith( ".GDCM" ) || this->FilePatternEndsWith( ".gdcm" ) || this->FilePatternEndsWith( ".GDCM" ) )
-  {
-    this->ReadFileSeriesTypeGDCM();
   }
   else
   {
@@ -573,8 +571,8 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   typedef itk::Image<short, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
   typedef std::vector<std::string> StringContainer;
-  typedef itk::DICOMImageIO2 IOType;
-  typedef itk::DICOMSeriesFileNames NameGeneratorType;
+  typedef itk::GDCMImageIO IOType;
+  typedef itk::GDCMSeriesFileNames NameGeneratorType;
 
   std::string dir = this->GetDirectory();
   std::cout << "dir: " << dir << std::endl;
@@ -648,64 +646,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     }
   }
 }
-
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypeGDCM()
-{
-  std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM via gdcm..." << std::endl;
-  typedef itk::Image<short, 3> ImageType;
-  typedef itk::ImageSeriesReader< ImageType > ReaderType;
-  typedef std::vector<std::string> StringContainer;
-  typedef itk::GDCMImageIO ImageIOType;
-  typedef itk::GDCMSeriesFileNames SeriesFileNames;
-
-  ImageIOType::Pointer gdcmIO = ImageIOType::New();
-  SeriesFileNames::Pointer it = SeriesFileNames::New();
-
-  // Get the DICOM filenames from the directory
-  it->SetInputDirectory( this->GetDirectory() );
-
-  ReaderType::Pointer reader = ReaderType::New();
-
-  const ReaderType::FileNamesContainer & filenames = it->GetInputFileNames();
-  unsigned int numberOfFilenames =  filenames.size();
-  std::cout << numberOfFilenames << std::endl; 
-  for(unsigned int fni = 0; fni<numberOfFilenames; fni++)
-  {
-    std::cout << "filename # " << fni << " = ";
-    std::cout << filenames[fni] << std::endl;
-  }
-  
-  reader->SetFileNames( filenames );
-  reader->SetImageIO( gdcmIO );
-
-  try
-  {
-    reader->Update();
-  }
-  catch (itk::ExceptionObject &excp)
-  {
-    std::cerr << "Exception thrown while writing the image" << std::endl;
-    std::cerr << excp << std::endl;
-
-    return;
-  }
-    //Initialize mitk image from itk
-    mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( reader->GetOutput() );
-    image->SetVolume( reader->GetOutput()->GetBufferPointer() );
-    
-    //add the mitk image to the node
-    mitk::DataTreeNode::Pointer node = this->GetOutput();
-    node->SetData( image );
-    
-    SetDefaultImageProperties(node);
-    
-    // set filename without path as string property
-    std::string filename = std::string( this->GetBaseFilePrefix() );
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( "unknownName.gdcm" );
-    node->SetProperty( "name", nameProp );
-}
-
 
 
 

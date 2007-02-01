@@ -60,7 +60,7 @@ template <typename MeshType>
 class MeanCurvatureAccessor
 {
 public:
-  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0)
+  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
   {
     typename MeshType::PixelType dis;    
     mesh->GetPointData(idx, &dis);

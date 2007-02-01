@@ -318,11 +318,8 @@ void QmitkMainTemplate::fileOpenImageSequence()
     std::string name = itksys::SystemTools::GetFilenameName(fileName.ascii());
 
     QString nameq = name.c_str();
-
-    int fnstart = nameq.findRev( QRegExp("[/\\\\]"), nameq.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
-    if ( fnstart<0 ) fnstart=0;
-    int start = nameq.find( QRegExp("[0-9]*\\."), fnstart );
-    if ( start<=0 )
+    int start = nameq.find( QRegExp("[0-9]{1,}\\.") );
+    if ( start<0 )
     {
       fileOpen(fileName.ascii());
       return;

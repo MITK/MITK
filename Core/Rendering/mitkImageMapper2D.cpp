@@ -161,20 +161,28 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
       {
         /* draw a callout line and text */
         glBegin(GL_LINES);  
-          glVertex3f(x, y, 0.0f); // origin of the first line segment
-          glVertex3f(x + 15.0, y - 10.0, 0.0f); // ending point of the first line segment
-          glVertex3f(x + 15.0, y - 10.0, 0.0f); // origin  point of the second line segment
-          glVertex3f(x + 30.0, y - 10.0, 0.0f); // ending point of thesecond  line segment
+        glVertex3f(x, y, 0.0f); // origin of the first line segment
+        glVertex3f(x + 15.0, y - 10.0, 0.0f); // ending point of the first line segment
+        glVertex3f(x + 15.0, y - 10.0, 0.0f); // origin  point of the second line segment
+        glVertex3f(x + 30.0, y - 10.0, 0.0f); // ending point of the second  line segment
         glEnd( );
         /* create text */
         std::string dataName;
         std::stringstream volumeString; 
         if (this->GetDataTreeNode()->GetName(dataName) == true)
-          volumeString << dataName << ": " << std::endl  << "volume = " << segmentationVolume << " ml";
-        else
-          volumeString << "volume = " << segmentationVolume << " ml";
-        /* draw text */
-        WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
+        {
+          volumeString << dataName << ": ";
+          WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
+          volumeString.str("");
+          volumeString << "Volume = " << segmentationVolume << " ml";
+          WriteTextXY(x + 33.0, y - 16.5, volumeString.str());
+        }
+        else 
+        {
+          volumeString << "Volume =" << segmentationVolume << " ml";
+          /* draw text */
+          WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
+        }
         break;  // stop searching, if object border was found
       }
       x += 1.0;

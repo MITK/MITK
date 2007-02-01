@@ -57,9 +57,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode)
+std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode, bool series)
 {
-
   RegisterBuiltInFactories();
   std::vector<BaseData::Pointer>* baseDataVector = new std::vector<BaseData::Pointer>;
   std::list<IOAdapterBase::Pointer> possibleIOAdapter;
@@ -84,7 +83,15 @@ std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::s
   { 
     if( mode == ReadMode )
     {
-      if((*k)->CanReadFile(path, filePrefix, filePattern))
+      bool canReadFile = false;
+      
+      if ( series )
+        canReadFile = (*k)->CanReadFile(filePrefix, filePrefix, filePattern); // we have to provide a filename without extension here to 
+                                                                              // prevent the "normal" (non-series) readers to report that
+                                                                              // they could read the file
+      else
+        canReadFile = (*k)->CanReadFile(path, filePrefix, filePattern);
+      if(canReadFile)
       {
         BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, filePrefix, filePattern);
         ioObject->Update();

@@ -23,26 +23,113 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/Directory.hxx>
 #include <map>
 
+
+
 bool mitk::FileSeriesReader::GenerateFileList()
 {
     typedef std::vector<std::string> StringContainer;
     typedef std::map<unsigned int, std::string> SortedStringContainer;
-    // Check to see if we can read the file given the name or prefix
-    //
-    if ( m_FilePrefix == "" || m_FilePattern == "" )
+    
+    if ( m_FileName == "" )
     {
-        throw itk::ImageFileReaderException( __FILE__, __LINE__, "Both FilePattern and FilePrefix must be non-empty" );
+      throw itk::ImageFileReaderException( __FILE__, __LINE__, "FileName must be non-empty" );
     }
-
+    //std::cout << "FileName: "<< m_FileName <<", FilePrefix: "<< m_FilePrefix << ", FilePattern: "<< m_FilePattern << std::endl;
+    
+    // determine begin and end idexes of the last digit sequence in the 
+    // filename from the sample file name
+    // Therefore, walk backwards from the end of the filename until
+    // a number is found. The string in front of the number is the prefix,
+    // the string after the number is the extension.
+    std::string basename, path;
+    path = itksys::SystemTools::GetFilenamePath( m_FileName );
+    basename = itksys::SystemTools::GetFilenameName( m_FileName );
+    
+    unsigned int digitBegin = 0;
+    unsigned int digitEnd = 0;
+    bool digitFound = false;
+    for ( unsigned int i = basename.length() - 1; ; --i )
+    {
+      char character = basename[ i ];
+      if ( character >= '0' && character <= '9' )
+      {
+        if (!digitFound)
+        {
+          digitEnd = i;
+          digitBegin = i;  
+          digitFound = true;
+        } 
+        else
+          digitBegin = i;
+      }
+      else
+      {
+        //end of digit series found, jump out of loop!
+        if (digitFound)
+          break;
+      }
+      if ( i == 0 )
+        break;
+    }
+    
+    //
+    // if there is no digit in the filename, then we have a problem
+    // no matching filenames can be identified!
+    // 
+    if ( !digitFound )
+    {
+      itkWarningMacro("Filename contains no digit!");
+      return false;
+    }
+    
+    //
+    // determine prefix and extension start and length
+    //
+    unsigned int prefixBegin = 0;
+    unsigned int prefixLength = digitBegin;
+    unsigned int extensionBegin = digitEnd + 1;
+    unsigned int extensionLength = (digitEnd == basename.length() -1 ? 0 : basename.length() - 1 - digitEnd);    
+    unsigned int numberLength = digitEnd - digitBegin + 1;
+    
+    //
+    // extract prefix and extension
+    //
+    std::string prefix = "";
+    if (prefixLength != 0)
+      prefix = basename.substr( prefixBegin, prefixLength );
+    std::string extension = "";
+    if (extensionLength != 0)
+      extension = basename.substr( extensionBegin, extensionLength );
+    
+    //
+    // print debug information
+    //
+    /*
+    std::cout << "digitBegin      : " << digitBegin << std::endl;
+    std::cout << "digitEnd        : " << digitEnd << std::endl;
+    std::cout << "number of digits: " << numberLength << std::endl;
+    std::cout << "prefixBegin     : " << prefixBegin << std::endl;
+    std::cout << "prefixLength    : " << prefixLength << std::endl;
+    std::cout << "prefix          : " << prefix << std::endl;
+    std::cout << "extensionBegin  : " << extensionBegin << std::endl;
+    std::cout << "extensionLength : " << extensionLength << std::endl;
+    std::cout << "extension       : " << extension << std::endl;
+    */
+    if( (prefixLength + extensionLength + numberLength) != basename.length() )
+    {
+      throw itk::ImageFileReaderException( __FILE__, __LINE__, "prefixLength + extensionLength + numberLength != basenameLength" );
+    }
+    
+    
     //
     // Load Directory
     //
-    std::string directory = itksys::SystemTools::GetFilenamePath( m_FilePrefix );
+    std::string directory = itksys::SystemTools::GetFilenamePath( m_FileName );
     itksys::Directory itkDir;
     if ( !itkDir.Load ( directory.c_str() ) )
     {
-        itkWarningMacro ( << "Directory " << directory << " cannot be read!" );
-        return false;
+      itkWarningMacro ( << "Directory " << directory << " cannot be read!" );
+      return false;
     }
 
     //
@@ -66,20 +153,33 @@ bool mitk::FileSeriesReader::GenerateFileList()
     // the result should be only the files that should be read
     //
     StringContainer matchedFiles;
-    std::string prefix = itksys::SystemTools::GetFilenameName( m_FilePrefix );
-    std::string patternExtension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( m_FilePattern ) );
     for ( StringContainer::iterator it = unmatchedFiles.begin() ; it != unmatchedFiles.end() ; ++it )
     {
-        std::string extension = itksys::SystemTools::LowerCase( itksys::SystemTools::GetFilenameLastExtension( *it ) );
-        if ( it->find( prefix ) == 0 && extension == patternExtension )
+        bool prefixMatch = false;
+        bool extensionMatch = false;
+        
+        // check if the file prefix matches the current file
+        if ( prefixLength != 0 )
+          prefixMatch = ( it->find(prefix) == prefixBegin ); // check if prefix is found
+        else
+          prefixMatch = ( ( (*it)[0] >='0' ) && ( (*it)[0] <='9' ) ); //check if filename begins with digit
+        
+        // check if the file extension matches the current file
+        if ( extensionLength != 0 )
+          extensionMatch = ( it->find(extension) == it->length() - extensionLength ); // check if prefix is found
+        else
+          extensionMatch = ( ( (*it)[it->length()-1] >='0' ) && ( (*it)[it->length()-1] <='9' ) ); //check if filename ends with digit
+        
+        if ( prefixMatch && extensionMatch )
+        {
             matchedFiles.push_back( *it );
+        }
     }
     if ( matchedFiles.size() == 0 )
     {
-        itkWarningMacro( << "Sorry, none of the files matched the prefix!" )
-        return false;
+      itkWarningMacro( << "Sorry, none of the files matched the prefix!" );
+      return false;
     }
-
 
     //
     // parse the file names from back to front for digits
@@ -89,44 +189,44 @@ bool mitk::FileSeriesReader::GenerateFileList()
     SortedStringContainer sortedFiles;
     for ( StringContainer::iterator it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
     {
-        //remove the last extension, until we have a digit at the end, or no extension is left!
-        std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( *it );
-        while ( ( baseFilename[ baseFilename.length() - 1 ] < '0' || baseFilename[ baseFilename.length() - 1 ] > '9' ) && itksys::SystemTools::GetFilenameLastExtension( baseFilename ) != "" )
-            baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( baseFilename );
-
-        std::string number;
-        for ( unsigned int i = baseFilename.length() - 1; ; --i )
+      // parse the filename starting from pos digitBegin until we reach a non-digit
+      // or the end of filename
+      std::string number = "";
+      std::string currentFilename(*it);
+      for ( unsigned int i = digitBegin ; i < currentFilename.length() ; ++i)
+      {
+        char character = currentFilename[ i ];
+        //do we have a digit?
+        if ( character >= '0' && character <= '9' )
+          number += character;
+        else
+          break; //end of digit series found, jump out of loop!
+      }
+      if ( number.length() == 0 )
+      {
+        // The file is not numbered, this is an error!
+        // Nevertheless, we try the next files.
+        itkWarningMacro( << "The filename " << *it << "does not contain a valid digit sequence but matches prefix and extension. Skipping file!" );
+      }
+      else
+      {
+        if ( ( number.length() + prefix.length() + extension.length() ) != it->length() )
         {
-            char character = baseFilename[ i ];
-            //do we have a digit?
-            if ( character >= '0' && character <= '9' )
-            {
-                number.insert( 0, &character, 1 );
-            }
-            else
-            {
-                //end of digit series found, jump out of loop!
-                break;
-            }
-        }
-        if ( number.length() == 0 )
-        {
-            // The file is not numbered, this is an error!
-            // Nevertheless, we try the next files.
-            itkWarningMacro( << "The filename " << *it << "does not contain a valid digit sequence!" );
+          itkWarningMacro("The file "<< *it <<" matches prefix and extension, but the string in beteen is not a single digit-sequence. Skipping file!");
         }
         else
         {
-            // convert the number string into an integer and
-            // insert the filname (including directory) into the SortedStringContainer
-            unsigned int num = atoi( number.c_str() );
-            sortedFiles.insert( std::make_pair( num, directory + "/" + *it ) );
+        // convert the number string into an integer and
+        // insert the filname (including directory) into the SortedStringContainer
+        unsigned int num = atoi( number.c_str() );
+        sortedFiles.insert( std::make_pair( num, directory + "/" + *it ) );
         }
+      }
     }
     if ( sortedFiles.size() == 0 )
     {
-        itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." )
-        return false;
+      itkWarningMacro( << "Sorry, no numbered files found, I can't load anything..." );
+      return false;
     }
 
     //
@@ -138,7 +238,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it, ++i )
     {
         m_MatchedFileNames[ i ] = it->second ;
-        //std::cout << "Added " << it->second << " to the set of matched files!" << std::endl;
+        std::cout << "Added " << it->second << " to the set of matched files!" << std::endl;
     }
     return true;
 }
@@ -150,7 +250,7 @@ mitk::FileSeriesReader::MatchedFileNames mitk::FileSeriesReader::GetMatchedFileN
 }
 
 mitk::FileSeriesReader::FileSeriesReader()
-   : m_FileName( "" ), m_FilePrefix( "" ), m_FilePattern( "" )
+  : m_FileName( "" ), m_FilePrefix( "" ), m_FilePattern( "" )
 {}
 
 mitk::FileSeriesReader::~FileSeriesReader()

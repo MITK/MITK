@@ -45,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkFloatArray.h>
 
 #include <mitkGeometry3D.h>
+#include <mitkSurface.h>
 
 template <typename MeshType>
 class NullScalarAccessor
@@ -418,7 +419,7 @@ public:
   /*!
   create an itkMesh object from a vtkPolyData
   */
-  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly, mitk::Geometry3D* geometryFrame=NULL)
+  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly, mitk::Geometry3D* geometryFrame=NULL, mitk::Geometry3D* polyDataGeometryFrame=NULL)
   {
     // Create a new mesh
     typename MeshType::Pointer output = MeshType::New();
@@ -444,26 +445,59 @@ public:
     typename MeshType::PointType itkPhysicalPoint;
     if(geometryFrame==NULL)
     {
-      for(unsigned int i =0; i < numPoints; ++i)
+      if(polyDataGeometryFrame==NULL)
       {
-        vtkpoints->GetPoint(i, vtkpoint);
-        //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
-        //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
-        mitk::vtk2itk(vtkpoint, itkPhysicalPoint);
-        output->SetPoint( i, itkPhysicalPoint );
+        for(unsigned int i=0; i < numPoints; ++i)
+        {
+          vtkpoints->GetPoint(i, vtkpoint);
+          //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+          mitk::vtk2itk(vtkpoint, itkPhysicalPoint);
+          output->SetPoint( i, itkPhysicalPoint );
+        }
+      }
+      else
+      {
+        for(unsigned int i=0; i < numPoints; ++i)
+        {
+          vtkpoints->GetPoint(i, vtkpoint);
+          //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+          mitk::Point3D mitkWorldPoint;
+          mitk::vtk2itk(vtkpoint, mitkWorldPoint);
+          polyDataGeometryFrame->IndexToWorld(mitkWorldPoint, mitkWorldPoint);
+          mitk::vtk2itk(mitkWorldPoint, itkPhysicalPoint);
+          output->SetPoint( i, itkPhysicalPoint );
+        }
       }
     }
     else
     {
       mitk::Point3D mitkWorldPoint;
-      for(unsigned int i =0; i < numPoints; ++i)
+      if(polyDataGeometryFrame==NULL)
       {
-        vtkpoints->GetPoint(i, vtkpoint);
-        //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
-        //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
-        mitk::vtk2itk(vtkpoint, mitkWorldPoint);
-        geometryFrame->WorldToItkPhysicalPoint(mitkWorldPoint, itkPhysicalPoint);
-        output->SetPoint( i, itkPhysicalPoint );
+        for(unsigned int i=0; i < numPoints; ++i)
+        {
+          vtkpoints->GetPoint(i, vtkpoint);
+          //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+          mitk::vtk2itk(vtkpoint, mitkWorldPoint);
+          geometryFrame->WorldToItkPhysicalPoint(mitkWorldPoint, itkPhysicalPoint);
+          output->SetPoint( i, itkPhysicalPoint );
+        }
+      }
+      else
+      {
+        for(unsigned int i=0; i < numPoints; ++i)
+        {
+          vtkpoints->GetPoint(i, vtkpoint);
+          //std::cout << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
+          mitk::vtk2itk(vtkpoint, mitkWorldPoint);
+          polyDataGeometryFrame->IndexToWorld(mitkWorldPoint, mitkWorldPoint);
+          geometryFrame->WorldToItkPhysicalPoint(mitkWorldPoint, itkPhysicalPoint);
+          output->SetPoint( i, itkPhysicalPoint );
+        }
       }
     }
 
@@ -641,6 +675,15 @@ public:
       return output;
   }
 
+  /*!
+  create an itkMesh object from an mitk::Surface
+  */
+  static typename MeshType::Pointer MeshFromSurface(mitk::Surface* surface, mitk::Geometry3D* geometryFrame=NULL)
+  {
+    if(surface == NULL)
+      return NULL;
+    return MeshFromPolyData(surface->GetVtkPolyData(), geometryFrame, surface->GetGeometry());
+  }
 
   /*!
   create an vtkUnstructuredGrid object from an itkMesh

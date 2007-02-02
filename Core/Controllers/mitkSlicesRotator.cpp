@@ -263,8 +263,8 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         }
         else
         {
-          // @TODO here waits some bug to be found
-          if ( distancePixels <= ThreshHoldDistancePixels && m_SNCsToBeRotated.empty() )
+          // @TODO here waits some bug to be found - maybe fixed by the || m_LinkPlanes in next line
+          if ( distancePixels <= ThreshHoldDistancePixels && (m_SNCsToBeRotated.empty() || m_LinkPlanes) )
           {
             // this one is behind the clicked "line"
             m_SNCsToBeRotated.push_back(*iter);

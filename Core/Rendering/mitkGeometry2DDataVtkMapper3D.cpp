@@ -129,10 +129,26 @@ void mitk::Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if ( !this->IsVisible(renderer) )
   {
     m_Prop3DAssembly->VisibilityOff();
+    // visibility has explicitly to be set in the single actors
+    // due to problems when using cell picking:
+    // even if the assembly is invisible, the renderer contains 
+    // references to the assemblies parts. During picking the
+    // visibility of each part is checked, and not only for the
+    // whole assembly.
+    m_ImageActor->VisibilityOff(); 
+    m_EdgeActor->VisibilityOff(); 
     return;
   }
 
   m_Prop3DAssembly->VisibilityOn();
+  // visibility has explicitly to be set in the single actors
+  // due to problems when using cell picking:
+  // even if the assembly is invisible, the renderer contains 
+  // references to the assemblies parts. During picking the
+  // visibility of each part is checked, and not only for the
+  // whole assembly.
+  m_ImageActor->VisibilityOn();
+  m_EdgeActor->VisibilityOn();
 
   mitk::Geometry2DData::Pointer input  = const_cast<mitk::Geometry2DData*>(this->GetInput());
 

@@ -43,6 +43,11 @@ SET(CPP_FILES
   QmitkPropertyObservers/QmitkStringPropertyEditor.cpp
   QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
   QmitkPropertyObservers/QmitkStringPropertyView.cpp
+  QmitkPropertyObservers/QmitkSceneListView.cpp
+  QmitkPropertyObservers/QmitkBoolPropertyObserver.cpp
+  QmitkPropertyObservers/QmitkSceneListViewGroupItem.cpp
+  QmitkPropertyObservers/QmitkSceneListViewItem.cpp
+  QmitkPropertyObservers/QmitkStringPropertyObserver.cpp
   QmitkRenderingManager.cpp
   QmitkRenderingManagerFactory.cpp
   QmitkRenderWindow.cpp

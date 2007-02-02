@@ -667,6 +667,8 @@ QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 
 void QmitkMainTemplate::parseCommandLine()
 {
+  if(strstr(qApp->argv()[0], "chili") != NULL)
+    return;
   //command line arguments set?
   //The following is a simple method to assess command line arguments.
   int i;

@@ -136,19 +136,20 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
 //C:\home\ivo\data\coronaries\ucsf-wholeheart-2.par
       sliceSpacing = sliceThickness+sliceGap;
-      if(fabs(thickness[0]/dimensions[2]-sliceSpacing)<0.0001)
-        thickness[0]=thickness[1];
-      else
-      if(fabs(thickness[1]/dimensions[2]-sliceSpacing)<0.0001)
-        thickness[1]=thickness[0];
-      thickness[2]=sliceSpacing;
-
-      thickness[0]/=dimensions[0];
-      thickness[1]/=dimensions[1];
-      spacing=thickness+gap;
-
-      if((dimension>0) && (dimensions[0]>0) && (dimensions[1]>0))
+      if((dimension>0) && (dimensions[0]>0) && (dimensions[1]>0) && (sliceThickness>0) && (sliceSpacing>0))
+      {
         headerRead = true;
+        if(fabs(thickness[0]/dimensions[2]-sliceSpacing)<0.0001)
+          thickness[0]=thickness[1];
+        else
+        if(fabs(thickness[1]/dimensions[2]-sliceSpacing)<0.0001)
+          thickness[1]=thickness[0];
+        thickness[2]=sliceSpacing;
+
+        thickness[0]/=dimensions[0];
+        thickness[1]/=dimensions[1];
+        spacing=thickness+gap;
+      }
     }
     
     if( headerRead == false)

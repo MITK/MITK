@@ -78,12 +78,6 @@ void mitk::RawImageFileReader::GenerateData()
     return ;
   }
 
-  if ( m_FileName == "--no-server" )
-  {
-    return ;
-  }
-  
-      
   // check file dimensionality and pixel type and perform reading according to it
   if (m_Dimensionality == 2)
   {
@@ -142,11 +136,6 @@ void mitk::RawImageFileReader::TypedGenerateData()
     return ;
   }
 
-  if ( m_FileName == "--no-server" )
-  {
-    return ;
-  }
-  
   typedef itk::Image< TPixel, VImageDimensions > ImageType;
   typedef itk::ImageFileReader< ImageType > ReaderType;
   typedef itk::RawImageIO< TPixel, VImageDimensions >  IOType;

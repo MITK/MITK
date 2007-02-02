@@ -52,11 +52,6 @@ void mitk::ItkImageFileReader::GenerateData()
     return ;
   }
 
-  if ( m_FileName == "--no-server" )
-  {
-    return ;
-  }
-
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( m_FileName.c_str(), itk::ImageIOFactory::ReadMode );
   if ( imageIO.IsNull() )
   {

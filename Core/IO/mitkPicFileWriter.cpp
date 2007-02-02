@@ -115,7 +115,8 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)geometryTag->value)[11] = spacing[2];
   }
   mitk::PicFileReader::ConvertHandedness(picImage);
-  this->MITKIpPicPut((char*)(m_FileName.c_str()), picImage);
+  strncpy(picImage->info->version, ipPicVERSION, sizeof(ipPicTag_t));
+  ipPicPut((char*)(m_FileName.c_str()), picImage);
   mitk::PicFileReader::ConvertHandedness(picImage);
 }
 

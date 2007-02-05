@@ -41,7 +41,7 @@ public:
   ////##Documentation
   ////## @brief sets the mitkRenderWindow in which the video is displayed.
   ////## must be initialized before enabling the background.
-  void SetRenderWindow(mitk::RenderWindow* renderWindow);
+  void SetRenderWindow(const mitk::RenderWindow* renderWindow);
   ////##Documentation
   ////## @brief sets the width and height of the video.
   ////## must be correctly initialized before enabling the background.
@@ -74,7 +74,7 @@ public:
 protected:
   void ResetVideoBackground();
 
-  mitk::RenderWindow*         m_RenderWindow;
+  const mitk::RenderWindow*   m_RenderWindow;
   vtkRenderer*                m_VideoRenderer;
   vtkImageActor*              m_Actor;
   vtkImageImport*             m_VtkImageImport;

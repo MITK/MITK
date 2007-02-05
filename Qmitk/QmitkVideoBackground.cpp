@@ -48,7 +48,7 @@ public:
     //  m_VideoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
     //
     //std::cout << "video size adjusted" << std::endl;
-    m_VideoRenderer->ResetCameraClippingRange();
+    //m_VideoRenderer->ResetCameraClippingRange();
   }
 };
 
@@ -88,15 +88,12 @@ QmitkVideoBackground::~QmitkVideoBackground()
   if ( m_VtkImageImport != NULL)
     m_VtkImageImport->Delete();
 }
-
-
-
 /**
  * Sets the renderwindow, in which the Video background
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void QmitkVideoBackground::SetRenderWindow( mitk::RenderWindow* renderWindow )
+void QmitkVideoBackground::SetRenderWindow(const mitk::RenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 

@@ -56,10 +56,6 @@ namespace mitk
     
     void Update(unsigned char * dataPointer);
     
-    #ifdef OPEN_CV
-      void Update(IplImage* image);
-    #endif
-
     ////##Documentation
     ////## @brief visualizes the video. Requires image dimensions and an active mitkvideosource to be set.
     void Enable();

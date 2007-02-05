@@ -5,10 +5,6 @@
 
 #include "mitkConfig.h"
 
-#ifdef OPEN_CV
-  #include "cv.h"
-#endif
-
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkImageActor;

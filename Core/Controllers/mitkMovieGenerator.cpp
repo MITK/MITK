@@ -22,10 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkConfig.h"
 
-#ifdef OPEN_CV
-#include "mitkMovieGeneratorOpenCV.h"
-#endif
-
 #ifdef WIN32
 #ifndef __GNUC__
 #include "mitkMovieGeneratorWin32.h"
@@ -41,11 +37,6 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
   if(rawPtr == NULL) {
 
-
-#ifdef OPEN_CV
-     mitk::MovieGenerator::Pointer cp = static_cast<mitk::MovieGenerator*>(MovieGeneratorOpenCV::New());
-    return cp;
-#endif
 
 #ifdef WIN32
 #ifndef __GNUC__

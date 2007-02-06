@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  mitkARMapper2D.cpp
   mitkBaseRenderer.cpp
   mitkBaseVtkMapper2D.cpp
   mitkBaseVtkMapper3D.cpp
@@ -11,6 +10,7 @@ SET(CPP_FILES
   mitkGeometry2DDataVtkMapper3D.cpp
   mitkGLMapper2D.cpp
   mitkGradientBackground.cpp
+  mitkImageBackground2D.cpp
   mitkImageMapper2D.cpp
   mitkLineMapper2D.cpp
   # mitkLineVtkMapper3D.cpp
@@ -29,14 +29,12 @@ SET(CPP_FILES
   mitkRenderWindow.cpp
   mitkSplineVtkMapper3D.cpp
   mitkSurfaceMapper2D.cpp
-  mitkSurfaceStencilVtkMapper3D.cpp
   mitkSurfaceVtkMapper3D.cpp
   # mitkVectorImageMapper2D.cpp
   # mitkVectorImageVtkGlyphMapper3D.cpp
   mitkVolumeDataVtkMapper3D.cpp
   mitkVtkARRenderWindow.cpp
   mitkVtkRenderWindow.cpp
-  mitkVtkStencilOpenGLActor.cpp
   mitkVtkStencilRenderWindow.cpp
 )
 IF(WIN32)

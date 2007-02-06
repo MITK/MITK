@@ -51,6 +51,7 @@ SET(CPP_FILES
   QmitkStepperAdapter.cpp
   QmitkTransferFunctionCanvas.cpp
   QmitkUndoRedoButton.cpp
+  QmitkVideoBackground.cpp
   qundoredobutton.cpp
   VtkQRenderWindowInteractor.cpp
 )
@@ -132,5 +133,6 @@ SET(MOC_H_FILES
   QmitkStepperAdapter.h
   QmitkTransferFunctionCanvas.h
   QmitkUndoRedoButton.h
+  QmitkVideoBackground.h
   qundoredobutton.h
 )

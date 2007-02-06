@@ -81,6 +81,7 @@ SET(CPP_FILES
   mitkTransferFunction.cpp
   # mitkUSLookupTableSource.cpp
   mitkVector.cpp
+  mitkVideoSource.cpp
   # mitkVesselGraphOperation.cpp
   # mitkVesselTreeGeometry3D.cpp
   # mitkVesselTreeLookupTable.cpp

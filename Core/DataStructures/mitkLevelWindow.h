@@ -44,7 +44,7 @@ class Image;
 class LevelWindow
 {
 public:
-  LevelWindow(ScalarType level=128, ScalarType window=256);
+  LevelWindow(ScalarType level=127.5, ScalarType window=255.0);
   LevelWindow(const mitk::LevelWindow& levWin);
   virtual ~LevelWindow();
 

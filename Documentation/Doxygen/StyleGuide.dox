@@ -25,7 +25,7 @@ protected:
     virtual ~ExampleClass();
 }    
 @endcode
-\li The standard indention is two spaces (see <a href="www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
+\li The standard indention is two spaces (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
 editor accordingly. <b>Do not use tabs!</b>
 \li @a SmartPointers must be used for classes that have @a itk::Object as a base class. 
 Assignment of a just created instance to a normal pointer, e.g., 

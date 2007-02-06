@@ -111,7 +111,7 @@ void mitk::ImageBackground2D::Enable()
 {
   m_ImageRenderer = vtkRenderer::New();
   
-  unsigned char * c = 0;
+  char * c = 0;
   Update(c);
   m_Actor->SetInput(m_VtkImageImport->GetOutput());
  
@@ -148,12 +148,12 @@ bool mitk::ImageBackground2D::IsEnabled()
       return false;    
 }
 
-void mitk::ImageBackground2D::Update(unsigned char * datapointer)
+void mitk::ImageBackground2D::Update(char * dataPointer)
 {
   if(!IsEnabled())
     return;
 
-  if(!datapointer)
+  if(!dataPointer)
   {// no valid image pointer provided -> initialize black image
     m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
     unsigned char* b = m_ImageData;
@@ -161,6 +161,69 @@ void mitk::ImageBackground2D::Update(unsigned char * datapointer)
       *b++ = 0;
   }
   
+  m_VtkImageImport->SetImportVoidPointer(m_ImageData);
+  m_VtkImageImport->Modified();
+  m_VtkImageImport->Update();
+  m_RenderWindow->GetVtkRenderWindow()->Render();
+   
+}
+
+void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, int imageScalarComponents)
+{
+  // no image-backround layer is rendered
+  if(!IsEnabled())
+    return;
+
+  // image contains no data, OR image scalar components missmatch (no RGB, no greyscale)
+  if(!dataPointer || (imageScalarComponents != 1 && imageScalarComponents != 3))
+  {
+    // no valid image pointer provided -> we initialize black image
+    m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
+    unsigned char* b = m_ImageData;
+    for ( int textCounter = 0; textCounter < (m_ImageHeight*m_ImageWidth*m_ImageScalarComponents); textCounter++ )
+      *b++ = 0;
+  }
+  else
+  {
+    m_ImageHeight = height;
+    m_ImageWidth  = width;
+    int column, row;
+    unsigned char* tex = m_ImageData;
+    char* data = dataPointer;
+
+    // PREPARE image Data for VTKImageImport Filter //
+    
+     
+    if(imageScalarComponents == 1)
+    {        
+      unsigned char g;
+      for (column = 0; column < m_ImageHeight; column++)
+        for (row = 0; row < m_ImageWidth; row++)
+        {
+              g   = *data++;
+              *tex++  = g;
+        }        
+    }
+    else if(imageScalarComponents == 3)
+    {
+      // flip image, change color channels
+      unsigned char r, g, b;
+      for (column = 0; column < m_ImageHeight; column++)
+        for (row = 0; row < m_ImageWidth; row++)
+        {   //change r with b
+            b = *data++;
+            g = *data++;
+            r = *data++;
+            *tex++ = r;
+            *tex++ = g;
+            *tex++ = b;
+          }        
+    } // else if(imageScalarComponents == 3)
+    
+  } // end else image data present
+
+
+  // Initialize VTK-ImageImport Filter //
   m_VtkImageImport->SetImportVoidPointer(m_ImageData);
   m_VtkImageImport->Modified();
   m_VtkImageImport->Update();

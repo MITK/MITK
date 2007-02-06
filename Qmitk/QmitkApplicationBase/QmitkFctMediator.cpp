@@ -27,13 +27,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidgetstack.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
+#include <qscrollview.h>
 #include <qtoolbar.h>
 #include <qaction.h>
 #include <qlayout.h>
 
+
 #include <stdio.h>
 
 #include <qapplication.h>
+#include <QmitkControlsRightFctLayoutTemplate.h>
+#include <QmitkControlsLeftFctLayoutTemplate.h>
 
 const QSizePolicy ignored(QSizePolicy::Ignored, QSizePolicy::Ignored);
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -44,14 +48,14 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 QmitkFctMediator::QmitkFctMediator(QObject *parent, const char *name) : QObject(parent, name), 
                                                                         m_LayoutTemplate(NULL),
-                                                                       m_MainStack(NULL), 
-                                                                       m_ControlStack(NULL), 
-                                                                       m_ButtonMenu(NULL), 
-                                                                       m_ToolBar(NULL), 
-                                                                       m_DefaultMain(NULL), 
-                                                                       m_NumOfFuncs(0), 
-                                                                       m_FunctionalityActionGroup(NULL), 
-                                                                       m_CurrentFunctionality(0)
+                                                                        m_MainStack(NULL), 
+                                                                        m_ControlStack(NULL), 
+                                                                        m_ButtonMenu(NULL), 
+                                                                        m_ToolBar(NULL), 
+                                                                        m_DefaultMain(NULL), 
+                                                                        m_NumOfFuncs(0), 
+                                                                        m_FunctionalityActionGroup(NULL), 
+                                                                        m_CurrentFunctionality(0)
 {
 
 }
@@ -89,8 +93,6 @@ void QmitkFctMediator::Initialize(QWidget *aLayoutTemplate)
     hlayout->setAutoAdd(true);
     m_MainStack = new QWidgetStack(w, "QmitkFctMediator::mainStack");
 
-    //m_MainStack->setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum, 1, 0, m_MainStack->sizePolicy().hasHeightForWidth()) );
-
     m_DefaultMain = new QWidget(m_MainStack,"QmitkFctMediator::m_DefaultMain");
     m_MainStack->addWidget(m_DefaultMain, 0);
 
@@ -102,7 +104,6 @@ void QmitkFctMediator::Initialize(QWidget *aLayoutTemplate)
     QHBoxLayout* hlayout=new QHBoxLayout(w);
     hlayout->setAutoAdd(true);
     m_ControlStack = new QWidgetStack(w, "QmitkFctMediator::controlStack");
-    //m_ControlStack->setSizePolicy( QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum, 0, 1, m_ControlStack->sizePolicy().hasHeightForWidth()) );
   }
 
   if((w=static_cast<QWidget*>(aLayoutTemplate->child("ButtonMenuParent", "QButtonGroup")))!=NULL)
@@ -192,8 +193,10 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality * functionality)
     QWidget * controlWidget = functionality->CreateControlWidget(m_ControlStack);
     if(controlWidget!=NULL)
     {
-      controlWidget->setSizePolicy(ignored);
-      m_ControlStack->addWidget(controlWidget, m_NumOfFuncs);
+      QScrollView* scrollView = new QScrollView();
+      scrollView->addChild(controlWidget);
+      scrollView->setResizePolicy(QScrollView::AutoOneFit);
+      m_ControlStack->addWidget(scrollView, m_NumOfFuncs);
     }
     else
       m_ControlStack->addWidget(new QWidget(m_ControlStack, "QmitkFctMediator::dummyControl"), m_NumOfFuncs);
@@ -307,27 +310,43 @@ void QmitkFctMediator::RaiseFunctionality(int id)
     ((QButtonGroup*)m_ToolBar)->setButton(id);
 
   Selecting(id);
-  QWidget *oldVisibleWidget, *newVisibleWidget;
+  QWidget /* *oldVisibleWidget, */ *newVisibleWidget;
   
-  oldVisibleWidget = m_ControlStack->visibleWidget();
+  //oldVisibleWidget = m_ControlStack->visibleWidget();
   newVisibleWidget = m_ControlStack->widget(id);
-  if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
+  
+  /*if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
   {
     oldVisibleWidget->setSizePolicy(ignored);
     newVisibleWidget->setSizePolicy(preferred);
-  }
+  }*/
   m_ControlStack->raiseWidget(newVisibleWidget);
-  m_ControlStack->adjustSize();
+  int scrollBarWidth = 20;//((QScrollView*)newVisibleWidget)->verticalScrollBar()->size().width();  //// doesn´t work on initialization
+  //m_ControlStack->resize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height());
+  
+  
 
-  oldVisibleWidget = m_MainStack->visibleWidget();
+  //if (m_LayoutTemplate != NULL){
+  //  ((QmitkControlsRightFctLayoutTemplate*)m_LayoutTemplate)->setControlSizeHint(&QSize(m_ControlStack->size().width(), m_ControlStack->size().height()));
+  //}
+
+  QmitkControlsRightFctLayoutTemplate* rightLayout;
+  QmitkControlsLeftFctLayoutTemplate* leftLayout;
+  if ( (rightLayout = dynamic_cast<QmitkControlsRightFctLayoutTemplate*>(m_LayoutTemplate)) )
+    rightLayout->setControlSizeHint(&QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
+
+  if ( (leftLayout = dynamic_cast<QmitkControlsLeftFctLayoutTemplate*>(m_LayoutTemplate)) )
+    leftLayout->setControlSizeHint(&QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
+  
+  //oldVisibleWidget = m_MainStack->visibleWidget();
   newVisibleWidget = m_MainStack->widget(id+1);
   if(strcmp(newVisibleWidget->name(),"QmitkFctMediator::dummyMain")==0)
     newVisibleWidget = m_MainStack->widget(0);
-  if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
+  /*if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
   {
     oldVisibleWidget->setSizePolicy(ignored);
     newVisibleWidget->setSizePolicy(preferred);
-  }
+  }*/
   m_MainStack->raiseWidget(newVisibleWidget);
   
   FunctionalitySelected(id+1);

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>211</width>
-            <height>920</height>
+            <height>194</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -115,7 +115,7 @@
         </widget>
         <spacer>
             <property name="name">
-                <cstring>spacer6</cstring>
+                <cstring>spacer1</cstring>
             </property>
             <property name="orientation">
                 <enum>Vertical</enum>
@@ -126,7 +126,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>700</height>
+                    <height>50</height>
                 </size>
             </property>
         </spacer>
@@ -137,8 +137,8 @@
         <class>QmitkSliderNavigator</class>
         <header location="global">QmitkSliderNavigator.h</header>
         <sizehint>
-            <width>150</width>
-            <height>20</height>
+            <width>10</width>
+            <height>0</height>
         </sizehint>
         <container>0</container>
         <sizepolicy>
@@ -202,11 +202,4 @@
     <function returnType="QWidget *">getMovieNavigatorTime()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
-<includehints>
-    
-    
-    
-    
-    
-</includehints>
 </UI>

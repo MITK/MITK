@@ -24,7 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPic.h>
 #include <algorithm>
 
-mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window) : m_Min(level-window/2.0), m_Max(level+window/2.0), m_RangeMin(-2048), m_RangeMax(4096), m_DefaultRangeMin(-2048), m_DefaultRangeMax(4096), m_DefaultLevel(level), m_DefaultWindow(window), m_Fixed(false)
+mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
+: m_Min( level - window / 2.0 ), m_Max( level + window / 2.0 ),
+  m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
+  m_DefaultRangeMin( -2048.0 ), m_DefaultRangeMax( 4096.0 ),
+  m_DefaultLevel( level ), m_DefaultWindow( window ),
+  m_Fixed( false )
 {
 }
 
@@ -39,7 +44,7 @@ mitk::LevelWindow::~LevelWindow()
 
 mitk::ScalarType mitk::LevelWindow::GetLevel() const
 {
-  return (m_Max-m_Min)/2.0 + m_Min;
+  return (m_Max-m_Min) / 2.0 + m_Min;
 }
 
 mitk::ScalarType mitk::LevelWindow::GetWindow() const

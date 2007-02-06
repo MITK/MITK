@@ -43,75 +43,49 @@ void mitk::SeedsImageLookupTableSource::GenerateData()
 vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildSeedsLookupTable()
 {
   vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
-  vtkLookupTable->SetTableRange(0,255);
-
-  vtkFloatingPointType rgba[ 4 ];
-
-  int index;
-
-  // red
-  index = 254;
-  rgba[ 0 ] = 1.0;    // red
-  rgba[ 1 ] = 0.0;    // green
-  rgba[ 2 ] = 0.0;    // blue
-  rgba[ 3 ] = 0.7;    // alpha
-  vtkLookupTable->SetTableValue ( index, rgba );
-
-  // blue
-  index = 253;
-  rgba[ 0 ] = 0.0;    // red
-  rgba[ 1 ] = 0.0;    // green
-  rgba[ 2 ] = 1.0;    // blue
-  rgba[ 3 ] = 0.7;    // alpha
-  vtkLookupTable->SetTableValue ( index, rgba );
+  vtkLookupTable->SetNumberOfTableValues( 256 );
+  vtkLookupTable->SetTableRange( 0.0, 255.0 );
 
   // black
-  for (int i = 0; i<253 ; i++ )
+  int i;
+  for ( i = 0; i < 253; i++ )
   {
-    rgba[ 0 ] = 0.0;    // red
-    rgba[ 1 ] = 0.0;    // green
-    rgba[ 2 ] = 0.0;    // blue
-    rgba[ 3 ] = 0.0;    // alpha
-    vtkLookupTable->SetTableValue ( i, rgba );
+    vtkLookupTable->SetTableValue ( i, 0.0, 0.0, 0.0, 0.0 );
   }
-  return( vtkLookupTable );
+
+  // blue
+  vtkLookupTable->SetTableValue( 254, 0.0, 0.0, 1.0, 0.7 );
+
+  // red
+  vtkLookupTable->SetTableValue( 255, 1.0, 0.0, 0.0, 0.7 );
+
+  return vtkLookupTable;
 }
 
 vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildForceLookupTable()
 {
   vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
-  vtkLookupTable->SetTableRange(0,1);
-  vtkLookupTable->SetValueRange(0,1);
+  vtkLookupTable->SetTableRange( 0.0, 1.0 );
+  vtkLookupTable->SetValueRange( 0.0, 1.0 );
   vtkLookupTable->SetNumberOfColors( 256 );
   vtkLookupTable->Build();
 
-  vtkFloatingPointType rgba[ 4 ];
-
-  for (int i = 0; i<128; i++ )
+  int i;
+  for ( i = 0; i < 128; i++ )
   {
-    rgba[ 0 ] = 0.0;    // red
-    rgba[ 1 ] = 0.0;    // green
-    rgba[ 2 ] = 1.0;    // blue
-    rgba[ 3 ] = 0.2 + fabs((float)128-i)/256.0;    // alpha
-    vtkLookupTable->SetTableValue ( i, rgba );
-  }
-  rgba[ 0 ] = 0.0;    // red
-  rgba[ 1 ] = 0.0;    // green
-  rgba[ 2 ] = 1.0;    // blue
-  rgba[ 3 ] = 0.0;    // alpha
-  vtkLookupTable->SetTableValue ( 127, rgba );
-
-
-  for (int i = 128; i<256; i++ )
-  {
-    rgba[ 0 ] = 1.0;    // red
-    rgba[ 1 ] = 0.0;    // green
-    rgba[ 2 ] = 0.0;    // blue
-    rgba[ 3 ] = 0.2 + fabs((float)i-128)/256.0;    // alpha
-    vtkLookupTable->SetTableValue ( i, rgba );
+    vtkLookupTable->SetTableValue ( i, 
+      0.0, 0.0, 1.0, 0.2 + fabs(128.0 - i) / 256.0 );
   }
 
-  return( vtkLookupTable );
+  vtkLookupTable->SetTableValue ( 127, 0.0, 0.0, 1.0, 0.0 );
+
+  for ( i = 128; i < 256; i++ )
+  {
+    vtkLookupTable->SetTableValue ( i,
+      1.0, 1.0, 0.0, 0.2 + fabs(i - 128.0) / 256.0 );
+  }
+
+  return vtkLookupTable;
 }
 
 vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildDefaultLookupTable()

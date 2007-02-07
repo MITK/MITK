@@ -226,6 +226,10 @@ void mitk::PixelType::Initialize( ipPicType_t type, int bpe, int numberOfCompone
       case 16:
          m_TypeId = &typeid( unsigned short );
          break;
+      case 24:
+         m_TypeId = &typeid( unsigned char );
+         m_NumberOfComponents = numberOfComponents = 3;
+         break;
       case 32:
          m_TypeId = &typeid( unsigned int );
          break;

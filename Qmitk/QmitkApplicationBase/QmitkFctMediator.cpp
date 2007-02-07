@@ -310,43 +310,26 @@ void QmitkFctMediator::RaiseFunctionality(int id)
     ((QButtonGroup*)m_ToolBar)->setButton(id);
 
   Selecting(id);
-  QWidget /* *oldVisibleWidget, */ *newVisibleWidget;
+  QWidget *newVisibleWidget;
   
-  //oldVisibleWidget = m_ControlStack->visibleWidget();
   newVisibleWidget = m_ControlStack->widget(id);
   
-  /*if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
-  {
-    oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(preferred);
-  }*/
   m_ControlStack->raiseWidget(newVisibleWidget);
-  int scrollBarWidth = 20;//((QScrollView*)newVisibleWidget)->verticalScrollBar()->size().width();  //// doesn´t work on initialization
-  //m_ControlStack->resize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height());
-  
-  
 
-  //if (m_LayoutTemplate != NULL){
-  //  ((QmitkControlsRightFctLayoutTemplate*)m_LayoutTemplate)->setControlSizeHint(&QSize(m_ControlStack->size().width(), m_ControlStack->size().height()));
-  //}
-
+  int scrollBarWidth = 20;  //((QScrollView*)newVisibleWidget)->verticalScrollBar()->size().width();  //// doesn´t work at initialization
   QmitkControlsRightFctLayoutTemplate* rightLayout;
   QmitkControlsLeftFctLayoutTemplate* leftLayout;
   if ( (rightLayout = dynamic_cast<QmitkControlsRightFctLayoutTemplate*>(m_LayoutTemplate)) )
-    rightLayout->setControlSizeHint(&QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
+    rightLayout->setControlSizeHint(QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
 
   if ( (leftLayout = dynamic_cast<QmitkControlsLeftFctLayoutTemplate*>(m_LayoutTemplate)) )
-    leftLayout->setControlSizeHint(&QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
+    leftLayout->setControlSizeHint(QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
   
-  //oldVisibleWidget = m_MainStack->visibleWidget();
+  
   newVisibleWidget = m_MainStack->widget(id+1);
   if(strcmp(newVisibleWidget->name(),"QmitkFctMediator::dummyMain")==0)
     newVisibleWidget = m_MainStack->widget(0);
-  /*if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
-  {
-    oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(preferred);
-  }*/
+  
   m_MainStack->raiseWidget(newVisibleWidget);
   
   FunctionalitySelected(id+1);

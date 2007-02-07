@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkControlsLeftFctLayoutTemplate</class>
 <widget class="QWidget">
     <property name="name">
@@ -77,9 +77,11 @@
     <include location="global" impldecl="in implementation">qvaluelist.h</include>
     <include location="local" impldecl="in implementation">QmitkControlsLeftFctLayoutTemplate.ui.h</include>
 </includes>
+<slots>
+    <slot>setControlSizeHint( QSize size )</slot>
+</slots>
 <functions>
     <function access="protected">init()</function>
-    <function>setControlSizeHint( QSize * size )</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

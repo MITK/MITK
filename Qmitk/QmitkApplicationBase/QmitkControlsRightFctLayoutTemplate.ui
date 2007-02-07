@@ -91,9 +91,11 @@
     <include location="global" impldecl="in implementation">qvaluelist.h</include>
     <include location="local" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.ui.h</include>
 </includes>
+<slots>
+    <slot>setControlSizeHint( QSize size )</slot>
+</slots>
 <functions>
     <function access="protected">init()</function>
-    <function>setControlSizeHint( QSize * size )</function>
 </functions>
 <pixmapinproject/>
 <layoutdefaults spacing="6" margin="11"/>

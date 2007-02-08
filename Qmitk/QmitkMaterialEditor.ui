@@ -15,11 +15,11 @@
     <property name="caption">
         <string>Form1</string>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QFrame">
+        <widget class="QFrame" row="0" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>m_GridContainer</cstring>
             </property>
@@ -45,231 +45,221 @@
                 <enum>Raised</enum>
             </property>
         </widget>
-        <widget class="QLayoutWidget">
+        <widget class="QSlider" row="2" column="1">
             <property name="name">
-                <cstring>layout5</cstring>
+                <cstring>m_SlCoefficients</cstring>
             </property>
-            <grid>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QComboBox" row="5" column="1">
+            <item>
+                <property name="text">
+                    <string>Flat</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Gouraud</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Phong</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>m_CbInterpolation</cstring>
+            </property>
+            <property name="currentItem">
+                <number>1</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="5" column="0">
+            <property name="name">
+                <cstring>textLabel2</cstring>
+            </property>
+            <property name="text">
+                <string>Interpolation</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="6" column="0">
+            <property name="name">
+                <cstring>textLabel3_2</cstring>
+            </property>
+            <property name="text">
+                <string>Representation</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="2" column="0">
+            <property name="name">
+                <cstring>textLabel1_2</cstring>
+            </property>
+            <property name="text">
+                <string>Coefficients</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>You would call it brightness. Defines the attenuation coefficients for ambient, diffuse and specular color.</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="1" column="0">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLayoutWidget" row="6" column="0" rowspan="1" colspan="2">
+                <widget class="QLabel">
                     <property name="name">
-                        <cstring>layout2</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>m_PbOK</cstring>
-                            </property>
-                            <property name="text">
-                                <string>OK</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>m_PbCancel</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Cancel</string>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QSlider" row="1" column="1">
-                    <property name="name">
-                        <cstring>m_SlCoefficients</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="4" column="1">
-                    <item>
-                        <property name="text">
-                            <string>Flat</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>Gouraud</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>Phong</string>
-                        </property>
-                    </item>
-                    <property name="name">
-                        <cstring>m_CbInterpolation</cstring>
-                    </property>
-                    <property name="currentItem">
-                        <number>1</number>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="4" column="0">
-                    <property name="name">
-                        <cstring>textLabel2</cstring>
+                        <cstring>textLabel1</cstring>
                     </property>
                     <property name="text">
-                        <string>Interpolation</string>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="5" column="0">
-                    <property name="name">
-                        <cstring>textLabel3_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Representation</string>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="0">
-                    <property name="name">
-                        <cstring>textLabel1_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Coefficients</string>
+                        <string>Color</string>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>You would call it brightness. Defines the attenuation coefficients for ambient, diffuse and specular color.</string>
+                        <string>Defines the ambient and diffuse color of the object. If you want arbitrary colors, press the select button.</string>
                     </property>
                 </widget>
-                <widget class="QLayoutWidget" row="0" column="0">
+                <widget class="QPushButton">
                     <property name="name">
-                        <cstring>layout4</cstring>
+                        <cstring>m_PbSelectColor</cstring>
                     </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>textLabel1</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Color</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Defines the ambient and diffuse color of the object. If you want arbitrary colors, press the select button.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>pushButton6</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>4</hsizetype>
-                                    <vsizetype>4</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="maximumSize">
-                                <size>
-                                    <width>32767</width>
-                                    <height>17</height>
-                                </size>
-                            </property>
-                            <property name="text">
-                                <string>select</string>
-                            </property>
-                            <property name="autoDefault">
-                                <bool>false</bool>
-                            </property>
-                            <property name="flat">
-                                <bool>true</bool>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Here you may select from the complete rgb color space.</string>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QSlider" row="2" column="1">
-                    <property name="name">
-                        <cstring>m_SlSpecularPower</cstring>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                    <property name="maxValue">
-                        <number>100</number>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                </widget>
-                <widget class="QSlider" row="0" column="1">
-                    <property name="name">
-                        <cstring>m_SlColor</cstring>
-                    </property>
-                    <property name="maxValue">
-                        <number>255</number>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="3" column="0">
-                    <property name="name">
-                        <cstring>textLabel5</cstring>
+                    <property name="maximumSize">
+                        <size>
+                            <width>32767</width>
+                            <height>17</height>
+                        </size>
                     </property>
                     <property name="text">
-                        <string>Opacity</string>
+                        <string>select</string>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>false</bool>
+                    </property>
+                    <property name="flat">
+                        <bool>true</bool>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Defines the transparency of the object.</string>
+                        <string>Here you may select from the complete rgb color space.</string>
                     </property>
                 </widget>
-                <widget class="QLabel" row="2" column="0">
-                    <property name="name">
-                        <cstring>textLabel3</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Specular power</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Defines the specular power. The more the slider moves to the right, the more the object looks like plastic. The specular color is set to white.</string>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="5" column="1">
-                    <item>
-                        <property name="text">
-                            <string>Points</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>Wireframe</string>
-                        </property>
-                    </item>
-                    <item>
-                        <property name="text">
-                            <string>Surface</string>
-                        </property>
-                    </item>
-                    <property name="name">
-                        <cstring>m_CbRepresentation</cstring>
-                    </property>
-                    <property name="currentItem">
-                        <number>2</number>
-                    </property>
-                </widget>
-                <widget class="QSlider" row="3" column="1">
-                    <property name="name">
-                        <cstring>m_SlOpacity</cstring>
-                    </property>
-                    <property name="maxValue">
-                        <number>100</number>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                </widget>
-            </grid>
+            </hbox>
         </widget>
-    </vbox>
+        <widget class="QSlider" row="3" column="1">
+            <property name="name">
+                <cstring>m_SlSpecularPower</cstring>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QSlider" row="1" column="1">
+            <property name="name">
+                <cstring>m_SlColor</cstring>
+            </property>
+            <property name="maxValue">
+                <number>255</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLabel" row="4" column="0">
+            <property name="name">
+                <cstring>textLabel5</cstring>
+            </property>
+            <property name="text">
+                <string>Opacity</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Defines the transparency of the object.</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="3" column="0">
+            <property name="name">
+                <cstring>textLabel3</cstring>
+            </property>
+            <property name="text">
+                <string>Specular power</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Defines the specular power. The more the slider moves to the right, the more the object looks like plastic. The specular color is set to white.</string>
+            </property>
+        </widget>
+        <widget class="QComboBox" row="6" column="1">
+            <item>
+                <property name="text">
+                    <string>Points</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Wireframe</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Surface</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>m_CbRepresentation</cstring>
+            </property>
+            <property name="currentItem">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QSlider" row="4" column="1">
+            <property name="name">
+                <cstring>m_SlOpacity</cstring>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="7" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_PbOK</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OK</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_PbCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </grid>
 </widget>
 <connections>
     <connection>
@@ -303,7 +293,7 @@
         <slot>OnOpacityChanged(int)</slot>
     </connection>
     <connection>
-        <sender>pushButton6</sender>
+        <sender>m_PbSelectColor</sender>
         <signal>clicked()</signal>
         <receiver>QmitkMaterialEditor</receiver>
         <slot>OnColorSelectButtonClickedClicked()</slot>
@@ -340,7 +330,11 @@
     <variable>std::vector&lt;QmitkMaterialShowcase*&gt; m_Showcases;</variable>
     <variable>unsigned int m_ActiveShowcase;</variable>
     <variable>mitk::MaterialPropertyVectorContainer::Pointer m_OriginalMaterialProperties;</variable>
+    <variable>bool m_Inline</variable>
 </variables>
+<signals>
+    <signal>ChangesAccepted(QmitkMaterialEditor*)</signal>
+</signals>
 <slots>
     <slot access="protected">OnColorChanged( int value )</slot>
     <slot access="protected">OnSpecularPowerChanged( int value )</slot>
@@ -358,6 +352,7 @@
     <slot access="protected">OnInterpolationChanged( int item )</slot>
     <slot access="protected">OnRepresentationChanged( int item )</slot>
     <slot access="protected">OnMaterialShowcaseSelected( QmitkMaterialShowcase * showcase )</slot>
+    <slot>setInline( bool i )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

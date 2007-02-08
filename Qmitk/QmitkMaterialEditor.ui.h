@@ -37,6 +37,7 @@
 #include <qlayout.h>
 #include <qcolordialog.h>
 #include <qcolor.h>
+#include <mitkRenderingManager.h>
 
 
 /**
@@ -47,6 +48,7 @@ void QmitkMaterialEditor::init()
     m_MaterialProperties = mitk::MaterialPropertyVectorContainer::New();
     m_OriginalMaterialProperties = mitk::MaterialPropertyVectorContainer::New();
     m_ActiveShowcase = 0;
+    m_Inline = false; // normally not inside some popup menu with live feedback
 }
 
 
@@ -69,6 +71,8 @@ void QmitkMaterialEditor::OnColorChanged( int value )
     mitk::MaterialProperty::Color color = this->ValueToColor( value );
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
     m_Showcases[ m_ActiveShowcase ]->SetColor( color );
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -88,6 +92,8 @@ void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
       m_MaterialProperties->GetElement( index )->SetSpecularPower( power );
       m_Showcases[ index ]->SetSpecularPower( power );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -106,6 +112,8 @@ void QmitkMaterialEditor::OnOpacityChanged( int value )
       m_MaterialProperties->GetElement( index )->SetOpacity( opacity );
       m_Showcases[ index ]->SetOpacity( opacity );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -126,7 +134,19 @@ void QmitkMaterialEditor::OnOKClicked()
         assert ( m_MaterialProperties->GetElement( i ).IsNotNull() );        
         m_OriginalMaterialProperties->GetElement( i )->Initialize( * ( m_MaterialProperties->GetElement( i ) ), false ) ;
     }
-    this->accept();
+
+    if (m_Inline)
+    {
+      emit ChangesAccepted(this);
+      if ( isVisible() && parentWidget() && parentWidget()->inherits("QPopupMenu") )
+      {
+        parentWidget()->close();
+      }
+    }
+    else
+    {
+      this->accept();
+    }
 }
 
 
@@ -159,9 +179,17 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
 {
     assert ( materialProperty != NULL );
     ClearMaterialProperties();
-    mitk::MaterialProperty* internalProperty = new mitk::MaterialProperty( *materialProperty );
-    internalProperty->SetDataTreeNode( NULL );
-    internalProperty->SetRenderer( NULL );
+    mitk::MaterialProperty* internalProperty;
+    if (m_Inline)
+    {
+      internalProperty = materialProperty;
+    }
+    else
+    {
+      internalProperty = new mitk::MaterialProperty( *materialProperty );
+      internalProperty->SetDataTreeNode( NULL );
+      internalProperty->SetRenderer( NULL );
+    }
     m_MaterialProperties->push_back( internalProperty );
     m_OriginalMaterialProperties->push_back( materialProperty );
     Initialize();
@@ -188,6 +216,13 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Poi
         m_OriginalMaterialProperties->push_back( materialProperty );
     }
     Initialize();
+
+    if ( m_Inline )
+    {
+      m_PbOK->setText(tr("Apply"));
+      m_PbOK->setPaletteBackgroundColor( Qt::green ); // be more offensive
+      m_PbOK->show();
+    }
 }
 
 /**
@@ -374,6 +409,8 @@ void QmitkMaterialEditor::OnColorSelectButtonClickedClicked()
         m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
         m_Showcases[ m_ActiveShowcase ]->SetColor( color );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -398,6 +435,8 @@ void QmitkMaterialEditor::OnCoefficientsChanged( int value )
       m_Showcases[ index ]->SetColorCoefficient( coefficient );
       m_Showcases[ index ]->SetSpecularCoefficient( coefficient );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 /**
@@ -414,6 +453,8 @@ void QmitkMaterialEditor::OnInterpolationChanged( int item )
       m_MaterialProperties->GetElement( index )->SetInterpolation( interpolation );
       m_Showcases[ index ]->SetInterpolation( interpolation );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -431,6 +472,8 @@ void QmitkMaterialEditor::OnRepresentationChanged( int item )
       m_MaterialProperties->GetElement( index )->SetRepresentation( representation );
       m_Showcases[ index ]->SetRepresentation( representation );
     }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -455,4 +498,22 @@ void QmitkMaterialEditor::OnMaterialShowcaseSelected( QmitkMaterialShowcase * sh
 mitk::MaterialPropertyVectorContainer* QmitkMaterialEditor::GetMaterialProperties()
 {
   return m_OriginalMaterialProperties.GetPointer();
+}
+
+
+void QmitkMaterialEditor::setInline( bool i )
+{
+  m_Inline = i;
+  if (i)
+  {
+    m_PbOK->hide();
+    m_PbCancel->hide();
+    m_PbSelectColor->hide();
+  }
+  else
+  {
+    m_PbOK->show();
+    m_PbCancel->show();
+    m_PbSelectColor->show();
+  }
 }

@@ -335,7 +335,7 @@ public:
     /** 
      * @eturns the name associated with the material property
      */
-    itkGetMacro( Name, std::string );
+    itkGetConstMacro( Name, std::string );
 
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 

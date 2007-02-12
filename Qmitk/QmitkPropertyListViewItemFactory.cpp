@@ -45,7 +45,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItemFactory::CreateQmitkProperty
       newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
       newItem->m_Control = new QCheckBox(parent);
       ((QCheckBox*)(newItem->m_Control))->setChecked(boolProp->GetValue());
-      QObject::QObject::connect((QObject*)(newItem->m_Control),SIGNAL(toggled(bool)),(QObject*)(newItem),SLOT(CheckBoxControlActivated(bool)));
+      QObject::connect((QObject*)(newItem->m_Control),SIGNAL(toggled(bool)),(QObject*)(newItem),SLOT(CheckBoxControlActivated(bool)));
     }
     else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
     {

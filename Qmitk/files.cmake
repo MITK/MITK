@@ -28,6 +28,7 @@ SET(CPP_FILES
   QmitkLineEditLevelWindowWidget.cpp
   QmitkPiecewiseFunctionCanvas.cpp
   QmitkPropertyListViewItem.cpp
+  QmitkPropertyListViewItemFactory.cpp
   QmitkPropertyObservers/PropertyViewTestWidget.cpp
   QmitkPropertyObservers/QmitkBasePropertyView.cpp
   QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp

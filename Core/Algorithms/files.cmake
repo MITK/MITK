@@ -34,7 +34,6 @@ SET(CPP_FILES
   mitkPlaneCutFilter.cpp
   mitkPlaneFit.cpp
   mitkPlanesPerpendicularToLinesFilter.cpp
-  mitkPointLocator.cpp
   mitkPointSetSource.cpp
   mitkPolygonToRingFilter.cpp
   mitkProbeFilter.cpp

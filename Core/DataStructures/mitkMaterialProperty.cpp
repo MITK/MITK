@@ -20,6 +20,7 @@ mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opac
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  m_Name = "";
 }
 
 
@@ -37,6 +38,7 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  m_Name = "";
 }
 
 
@@ -56,6 +58,7 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  m_Name = "";
 }
 
 
@@ -401,6 +404,7 @@ void mitk::MaterialProperty::Initialize( const MaterialProperty& property, const
   this->SetOpacity( property.GetOpacity() );
   this->SetInterpolation( property.GetInterpolation() );
   this->SetRepresentation( property.GetRepresentation() );
+  this->SetName( property.GetName() );
 }
 
 
@@ -420,6 +424,7 @@ bool mitk::MaterialProperty::operator==( const BaseProperty& property ) const
              m_SpecularPower == other->GetSpecularPower() &&
              m_Opacity == other->GetOpacity() &&
              m_Interpolation == other->GetInterpolation() &&
+             m_Name == other->GetName() &&
              m_Representation == other->GetRepresentation()
            );
 }
@@ -443,6 +448,7 @@ void mitk::MaterialProperty::InitializeStandardValues()
   m_Opacity = 1.0 ;
   m_Interpolation = Gouraud;
   m_Representation = Surface;
+  m_Name = "";
 }
 
 void mitk::MaterialProperty::Update()
@@ -461,6 +467,7 @@ void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
 {
   os << "Data tree node: " << GetDataTreeNode() << std::endl;
   os << "Renderer: " << GetRenderer() << std::endl;
+  os << "Name: " << GetName() << std::endl;
   os << "Color: " << GetColor() << std::endl;
   os << "ColorCoefficient" << GetColorCoefficient() << std::endl;
   os << "SpecularColor: " << GetSpecularColor() << std::endl;
@@ -532,7 +539,6 @@ bool mitk::MaterialProperty::ReadXMLData( XMLReader& xmlReader )
   if(xmlReader.GetAttribute(REPRESENTATION, representation))
     SetRepresentation((RepresentationType)representation);
 
-  std::cout << "read mitk::MaterialProperty: " << " " << std::endl;
   return true;
 }
 

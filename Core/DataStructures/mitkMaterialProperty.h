@@ -7,6 +7,7 @@
 #include <itkObject.h>
 #include <itkVectorContainer.h>
 #include <vtkSystemIncludes.h>
+#include <string>
 
 namespace mitk
 {
@@ -323,6 +324,18 @@ public:
      * Dumps the properties to the out stream out
      */
     void PrintSelf ( std::ostream &os ) const;
+    
+    /**
+     * Sets an optional name which may be associated with the material property
+     * Please note, that this name is NOT forwarded to the data tree node
+     * as the node name 
+     */
+    itkSetMacro( Name, std::string );
+    
+    /** 
+     * @eturns the name associated with the material property
+     */
+    itkGetMacro( Name, std::string );
 
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
@@ -333,6 +346,8 @@ protected:
     virtual void InitializeStandardValues();
 
     virtual void Update();
+    
+    std::string m_Name;
 
     Color m_Color;
 

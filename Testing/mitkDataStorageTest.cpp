@@ -22,7 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "mitkSurface.h"
 #include "mitkStringProperty.h"
-#include <mitkColorProperty.h>
+#include "mitkColorProperty.h"
+#include "mitkGroupTagProperty.h"
 #include "mitkDataTreeNode.h"
 
 #include "mitkDataStorage.h"
@@ -66,48 +67,48 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   n2->SetProperty("name", new mitk::StringProperty("Node 2 - Surface Node"));
   mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
   n2->SetColor(color);
+  n2->SetProperty("Resection Proposal 1", new mitk::GroupTagProperty());
   mitk::DataStorage::SetOfObjects::Pointer parents2 = mitk::DataStorage::SetOfObjects::New();
   parents2->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
 
 
   mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();   // node without data but with name property
   n3->SetProperty("name", new mitk::StringProperty("Node 3 - Empty Node"));
+  n3->SetProperty("Resection Proposal 1", new mitk::GroupTagProperty());
+  n3->SetProperty("Resection Proposal 2", new mitk::GroupTagProperty());
   mitk::DataStorage::SetOfObjects::Pointer parents3 = mitk::DataStorage::SetOfObjects::New();
   parents3->InsertElement(0, n2);  // n2 is source of n3 
   
   mitk::DataTreeNode::Pointer n4 = mitk::DataTreeNode::New();   // node without data but with color property
   n4->SetColor(color);
+  n4->SetProperty("Resection Proposal 2", new mitk::GroupTagProperty());
   mitk::DataStorage::SetOfObjects::Pointer parents4 = mitk::DataStorage::SetOfObjects::New();
   parents4->InsertElement(0, n2); 
   parents4->InsertElement(1, n3);  // n2 and n3 are sources of n4 
-  
-  /* Create a DataStorage object */
-  std::cout << "Instantiating a mitk::DataStorage object: " << std::flush;
-  mitk::DataStorage::Pointer ds = mitk::DataStorage::New();
-  if (ds.IsNull())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    returnValue = EXIT_FAILURE;
-    return returnValue; // makes no sense to continue testing the datastorage, if it does not exist
-  }
-  else
-    std::cout<<"[PASSED]"<<std::endl;
 
-  /* Initialize Data Storage */
-  std::cout << "Initialize Data Storage : " << std::flush;
+  /* Get Data Storage for given tree */
+  std::cout << "Get Data Storage for given tree : " << std::flush;
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
   int objectsInTree = tree->Count();
   int initialObjectsInTree = objectsInTree;
+  mitk::DataStorage::Pointer ds;
   try 
   {
-    ds->Initialize(tree.GetPointer());
+    ds = mitk::DataStorage::CreateInstance(tree);
     ds->SetManageCompleteTree(manageCompleteTree);
-    std::cout<<"[PASSED]"<<std::endl;
+    if (ds.IsNotNull())
+      std::cout<<"[PASSED]"<<std::endl;
+    else
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      returnValue = EXIT_FAILURE;
+    }
   } 
   catch(...)
   {
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
+    return returnValue;   // further tests not possible, if no datastorage object could be created
   }
 
   /* Add an object */

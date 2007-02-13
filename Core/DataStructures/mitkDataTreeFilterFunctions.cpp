@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkDataTreeFilterFunctions.h>
+#include "mitkDataTreeNode.h"
 
 namespace mitk
 {
@@ -44,6 +45,20 @@ bool IsGoodDataTreeNode::NodeMatches(DataTreeNode* node) const
 DataTreeFilterFunction* IsGoodDataTreeNode::Clone() const
 {
   return new IsGoodDataTreeNode();
+}
+
+bool IsInResultSet::NodeMatches(DataTreeNode* node) const
+{
+  if ((node == NULL) || (m_ResultSet.IsNull()))
+    return false;
+
+  DataStorage::SetOfObjects::STLContainerType rs = m_ResultSet->CastToSTLConstContainer();
+  return (std::find(rs.begin(), rs.end(), mitk::DataTreeNode::Pointer(node)) != rs.end()); // search for node in resultset
+}
+
+DataTreeFilterFunction* IsInResultSet::Clone() const
+{
+  return new IsInResultSet(m_ResultSet);
 }
 
 } // namespace

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 
 #include <mitkProperties.h>
+#include <mitkDataStorage.h>
 
 namespace mitk
 {
@@ -217,6 +218,24 @@ namespace mitk
       virtual ~IsGoodDataTreeNode() {}
       virtual bool NodeMatches(DataTreeNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
+  };
+
+  /*! \brief Accepts all data objects (accepts nodes that have associated mitk::BaseData (tested via GetData)).
+
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
+    \endcode
+  */
+  class IsInResultSet : public DataTreeFilterFunction
+  {
+    public:
+      IsInResultSet(const DataStorage::SetOfObjects* rs):m_ResultSet(rs){}
+      virtual ~IsInResultSet() {}
+      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual DataTreeFilterFunction* Clone() const;
+    protected:
+      DataStorage::SetOfObjects::ConstPointer m_ResultSet;
   };
 
 } // namespace mitk

@@ -5,7 +5,7 @@
 #include <itkSmartPointerVectorContainer.h>
 #include "itkMacro.h"
 #include <set>
-
+#include "mitkDataStorage.h"
 /*
 
    TODO / Ideen:
@@ -582,6 +582,11 @@ public:
   void SetFilter(const DataTreeFilterFunction*);
   void SetFilter(const DataTreeFilterFunction&);
   const DataTreeFilterFunction* GetFilter() const;
+
+  /// Sets a set of objects that should be displayed instead of the filtered datatree.
+  /// This is used in conjunction with mitk::DataStorage.
+  /// This method will overwrite any DataTreeFilterFunction that was set before it was called.
+  void SetDataStorageResultset(const mitk::DataStorage::SetOfObjects* rs);
 
   /// Set the selection mode (single/multi)
   void SetSelectionMode(const SelectionMode);

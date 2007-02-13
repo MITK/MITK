@@ -394,7 +394,12 @@ void DataTreeFilter::SetFilter(const DataTreeFilterFunction& filter)
 {
   SetFilter(&filter);
 }
-      
+
+void DataTreeFilter::SetDataStorageResultset(const mitk::DataStorage::SetOfObjects* rs)
+{
+  this->SetFilter(IsInResultSet(rs));
+}
+
 const DataTreeFilterFunction* DataTreeFilter::GetFilter() const
 {
   return m_Filter;

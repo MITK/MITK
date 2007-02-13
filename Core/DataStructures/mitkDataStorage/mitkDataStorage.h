@@ -50,7 +50,7 @@ namespace mitk {
   public:
     mitkClassMacro(DataStorage, itk::Object);
 
-    static DataStorage* DataStorage::CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
+    static DataStorage* CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
     static DataStorage* GetInstance();    // Singleton pattern like access method
     
     //##Documentation

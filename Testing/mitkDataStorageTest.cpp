@@ -205,7 +205,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    if (ds->GetManageCompleteTree())
+    if (ds->GetManageCompleteTree() == true)
       if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
@@ -248,7 +248,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    if (ds->GetManageCompleteTree())
+    if (ds->GetManageCompleteTree() == true)
       if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
@@ -362,7 +362,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     int expectedCount;
-    if (ds->GetManageCompleteTree())
+    if (ds->GetManageCompleteTree() == true)
       expectedCount = initialObjectsInTree + 2 + 1;  // all from init time, n1, n3 and the directly added node
     else
       expectedCount = 2;  // n1, n3
@@ -481,6 +481,56 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
+  /* Checking GroupTagProperty */
+  std::cout << "Checking GroupTagProperty 1: " << std::flush;
+  try
+  {
+    mitk::GroupTagProperty::Pointer tp = new mitk::GroupTagProperty();
+    mitk::NodePredicateProperty pred("Resection Proposal 1", tp);
+
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (   (all->Size() == 2) // check if n2 and n3 are in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+  /* Checking GroupTagProperty */
+  std::cout << "Checking GroupTagProperty 2: " << std::flush;
+  try
+  {
+    mitk::GroupTagProperty::Pointer tp = new mitk::GroupTagProperty();
+    mitk::NodePredicateProperty pred("Resection Proposal 2", tp);
+
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (   (all->Size() == 2) // check if n3 and n4 are in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
 
   /* finally return cumulated returnValue */
   return returnValue;

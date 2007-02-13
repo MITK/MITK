@@ -54,8 +54,7 @@ class GLMapper2D : public Mapper2D
     //## @brief Writes the string text on the screen starting at screen coordinates x,y
     //## WriteTextXY uses GLUT to write Text on the screen. It uses GLUT_BITMAP_HELVETICA_10
     //## as the font. 
-    void WriteTextXY(float x, float y, const std::string& text);
-
+    void WriteTextXY(float x, float y, const std::string& text, bool drawLabel = true);
 };
 
 } // namespace mitk

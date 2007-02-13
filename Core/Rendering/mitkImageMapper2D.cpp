@@ -169,20 +169,9 @@ void mitk::ImageMapper2D::Paint(mitk::BaseRenderer * renderer)
         /* create text */
         std::string dataName;
         std::stringstream volumeString; 
-        if (this->GetDataTreeNode()->GetName(dataName) == true)
-        {
-          volumeString << dataName << ": ";
-          WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
-          volumeString.str("");
-          volumeString << "Volume = " << segmentationVolume << " ml";
-          WriteTextXY(x + 33.0, y - 16.5, volumeString.str());
-        }
-        else 
-        {
-          volumeString << "Volume =" << segmentationVolume << " ml";
-          /* draw text */
-          WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
-        }
+        volumeString << "volume = " << segmentationVolume << " ml";
+        /* draw text */
+        WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
         break;  // stop searching, if object border was found
       }
       x += 1.0;

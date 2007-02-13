@@ -49,8 +49,10 @@ namespace mitk {
   {
   public:
     mitkClassMacro(DataStorage, itk::Object);
-    itkNewMacro(Self);
 
+    static DataStorage* DataStorage::CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
+    static DataStorage* GetInstance();    // Singleton pattern like access method
+    
     //##Documentation
     //## @brief A Container of objects that is used as a resultset of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
     typedef itk::VectorContainer<unsigned int, mitk::DataTreeNode::Pointer> SetOfObjects;
@@ -114,6 +116,8 @@ namespace mitk {
     itkBooleanMacro(ManageCompleteTree);
 
   protected:
+    itkNewMacro(Self);    // New Makro is protected, because we use Singleton pattern for DataStorage
+
     //##Documentation
     //## @brief Standard Constructor for ::New() instantiation     
     DataStorage();
@@ -136,6 +140,8 @@ namespace mitk {
     bool m_ManageCompleteTree;
     typedef std::map<mitk::DataTreeNode::Pointer, SetOfObjects::ConstPointer> AdjacencyList;
     AdjacencyList m_CreatedByRelations;
+
+    static mitk::DataStorage::Pointer s_Instance;
   };
 
 

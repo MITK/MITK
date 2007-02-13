@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
 
+mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
+
 mitk::DataStorage::DataStorage() 
 : itk::Object(), m_ManageCompleteTree(true) // true by default until all Reliver functionalities use the datastorage properly
 {
@@ -29,8 +31,33 @@ mitk::DataStorage::DataStorage()
 }
 
 mitk::DataStorage::~DataStorage()
+{  
+  m_DataTree = NULL; 
+}
+
+mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
 {
-  m_DataTree = NULL;
+  s_Instance = NULL;
+  try
+  {
+    s_Instance = mitk::DataStorage::New();
+    s_Instance->Initialize(tree);   // If no datastore created yet, and tree is NULL, then this will raise an exception, because the datastorage must be initialized with a datatree
+    tree->Register();   // needed to prevent premature destruction of the datatree (e.g. before the static DataStorage is destroyed)
+  }
+  catch(...)
+  {
+    s_Instance = NULL;
+    throw 1;  // insert exception handling here
+  }
+  return s_Instance;
+}
+
+mitk::DataStorage* mitk::DataStorage::GetInstance()
+{
+  if (DataStorage::s_Instance.IsNull())
+   throw 1;  // insert exception handling here
+  else  
+    return s_Instance;
 }
 
 void mitk::DataStorage::Initialize(mitk::DataTree* tree)

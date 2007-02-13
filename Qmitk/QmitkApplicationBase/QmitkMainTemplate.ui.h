@@ -1163,4 +1163,14 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
     
 }
 
-
+void QmitkMainTemplate::enableGradientBackground( bool enable)
+{
+  if(enable)
+  {
+    m_MultiWidget->EnableGradientBackground();
+  }
+  else
+  {
+    m_MultiWidget->DisableGradientBackground();
+  }
+}

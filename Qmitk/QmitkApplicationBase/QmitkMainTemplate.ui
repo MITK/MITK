@@ -56,6 +56,7 @@
     <item text="&amp;Options" name="Options">
         <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
+        <action name="optionsShow_Gradient_BackgroundAction"/>
         <separator/>
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
@@ -82,10 +83,7 @@
         <widget class="QmitkUndoRedoButton">
             <property name="name">
                 <cstring>redoButton</cstring>
-	</property>
-	<property name="mode">
-		<enum>Redo</enum>
-	</property>
+            </property>
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
@@ -723,6 +721,23 @@
             <string>Open Raw Image Sequence...</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsShow_Gradient_BackgroundAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show Gradient Background</string>
+        </property>
+        <property name="menuText">
+            <string>Show Gradient Background</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -961,6 +976,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileOpenRawImageSequence()</slot>
     </connection>
+    <connection>
+        <sender>optionsShow_Gradient_BackgroundAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>enableGradientBackground(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -1039,6 +1060,7 @@
     <slot>fileOpenRawImage( const char * fileName )</slot>
     <slot>fileOpenRawImageSequence()</slot>
     <slot>fileOpenRawImageSequence( QStringList fileNames )</slot>
+    <slot>enableGradientBackground( bool enable )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

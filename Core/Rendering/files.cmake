@@ -37,11 +37,4 @@ SET(CPP_FILES
   mitkVtkRenderWindow.cpp
   mitkVtkStencilRenderWindow.cpp
 )
-IF(WIN32)
-  SET(CPP_FILES ${CPP_FILES}
-    mitkVtkWin32ARRenderWindow.cpp
-    mitkVtkWin32StencilRenderWindow.cpp
-    mitkWin32ARMapper2D.cpp
-  )
-ENDIF(WIN32)
 

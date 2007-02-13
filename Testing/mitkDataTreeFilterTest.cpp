@@ -3,6 +3,7 @@
 #include "mitkDataTreeFilter.h"
 #include "mitkDataTreeFilterEvents.h"
 #include "mitkDataTreeFilterFunctions.h"
+#include "mitkNodePredicateProperty.h"
 
 #include <string>
 #include <itkVectorContainer.h>
@@ -650,6 +651,129 @@ void smart_pointer_vector_container_test()
 
 }
 
+/// This test checks, if the DataTreeFilter works in conjunction with the mitk::DataStorage.
+/// It creates a DataStorage with some elements in it and a assoiated DataTree with some more elements
+/// and checks which elements the DataTreeFilter returns
+
+
+int testDataStorageCompliance()
+{
+  int returnValue = EXIT_SUCCESS;
+
+  mitk::DataTree::Pointer tree = mitk::DataTree::New();
+  mitk::DataStorage::Pointer ds = mitk::DataStorage::CreateInstance(tree);
+  ds->SetManageCompleteTree(false);
+  mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
+
+  /* create some objects and add them to the datastorage. */
+  mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();
+  ds->Add(n1);
+  mitk::DataTreeNode::Pointer n2 = mitk::DataTreeNode::New();
+  n2->SetColor(color);
+  ds->Add(n2);
+  mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();
+  n3->SetColor(color);
+  ds->Add(n3);
+
+  /* now create some more nodes and add them to the tree directly */
+  mitk::DataTreePreOrderIterator it(tree);
+  mitk::DataTreeNode::Pointer t1 = mitk::DataTreeNode::New();
+  it.Add(t1);
+  mitk::DataTreeNode::Pointer t2 = mitk::DataTreeNode::New();
+  t2->SetColor(color);
+  it.Add(t2);
+  mitk::DataTreeNode::Pointer t3 = mitk::DataTreeNode::New();
+  t3->SetColor(color);
+  it.Add(t3);
+
+  /* create a DataTreeFilter and assign the resultset to it */
+  mitk::DataTreeFilter::Pointer dTF = mitk::DataTreeFilter::New(tree);
+
+  /* get a resultset of n1-n3 */
+  std::cout << "Testing all of DataStorage: ";
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetAll();
+  dTF->SetDataStorageResultset(rs);
+
+  const mitk::DataTreeFilter::ItemList* items = dTF->GetItems();
+  if (   (items->Size() == 3))    // HIER GEHTS WEITER: items besser testen ob n1-n3 drin ist und dann weitere tests
+  {
+    bool n1found = false;
+    bool n2found = false;
+    bool n3found = false;
+    for (mitk::DataTreeFilter::ConstItemIterator it = items->Begin(); it != items->End(); it++)  // search n1
+      if (it->GetNode() == n1)
+      {
+        n1found = true;
+        break;
+      };
+    for (mitk::DataTreeFilter::ConstItemIterator it = items->Begin(); it != items->End(); it++)  // search n2
+      if (it->GetNode() == n2)
+      {
+        n2found = true;
+        break;
+      };
+    for (mitk::DataTreeFilter::ConstItemIterator it = items->Begin(); it != items->End(); it++)  // search n3
+      if (it->GetNode() == n3)
+      {
+        n3found = true;
+        break;
+      };
+    if (n1found && n2found && n3found)
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+
+  }
+  else
+  {
+    std::cout << "[FAILED]" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+  /* next, get a resultset of n2-n3 */
+  std::cout << "Testing subset of DataStorage: ";
+  mitk::NodePredicateProperty p("color", new mitk::ColorProperty(color));
+  mitk::DataStorage::SetOfObjects::ConstPointer rs2 = ds->GetSubset(p);
+  dTF->SetDataStorageResultset(rs2);
+
+  const mitk::DataTreeFilter::ItemList* items2 = dTF->GetItems();
+  if (   (items2->Size() == 2))    // HIER GEHTS WEITER: items2 besser testen ob n1-n3 drin ist und dann weitere tests
+  {
+    bool n2found = false;
+    bool n3found = false;
+    for (mitk::DataTreeFilter::ConstItemIterator it = items2->Begin(); it != items2->End(); it++)  // search n2
+      if (it->GetNode() == n2)
+      {
+        n2found = true;
+        break;
+      };
+    for (mitk::DataTreeFilter::ConstItemIterator it = items2->Begin(); it != items2->End(); it++)  // search n3
+      if (it->GetNode() == n3)
+      {
+        n3found = true;
+        break;
+      };
+    if (n2found && n3found)
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+
+  }
+  else
+  {
+    std::cout << "[FAILED]" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  return returnValue;
+}
+
+
 int mitkDataTreeFilterTest(int argc, char ** const /*argv*/)
 {
   verbose = argc - 1;
@@ -676,7 +800,11 @@ int mitkDataTreeFilterTest(int argc, char ** const /*argv*/)
 
   std::cout << "[TEST DONE]" << std::endl;
 
-  return EXIT_SUCCESS;
+  /* now test the compliance to mitk::DataStorage */
+  int result = testDataStorageCompliance();
+  return result;
+
+  //return EXIT_SUCCESS;
 }
 
 #endif 

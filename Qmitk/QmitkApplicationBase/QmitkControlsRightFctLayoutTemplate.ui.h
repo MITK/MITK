@@ -26,10 +26,16 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
+#include <QmitkProgressBar.h>
+#include <mitkProgressBar.h>
 
 void QmitkControlsRightFctLayoutTemplate::init()
 {
-  MainSplitter->setResizeMode(ControlParent,QSplitter::Auto);
+  //MainSplitter->setResizeMode(ControlParent,QSplitter::Auto);
+  //creating a QmitkProgressBar for Output on the QProgressBar and connecting it with the MainProgressBar
+  QmitkProgressBar *progressBar = new QmitkProgressBar(this->progBar);
+  //disabling the SizeGrip in the lower right corner
+  progressBar->SetPercentageVisible(true);
 }
 
 

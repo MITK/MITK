@@ -15,7 +15,7 @@
     <property name="caption">
         <string>Form2</string>
     </property>
-    <hbox>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -71,7 +71,12 @@
                 </property>
             </widget>
         </widget>
-    </hbox>
+        <widget class="QProgressBar">
+            <property name="name">
+                <cstring>progBar</cstring>
+            </property>
+        </widget>
+    </vbox>
 </widget>
 <includes>
     <include location="global" impldecl="in implementation">qvaluelist.h</include>

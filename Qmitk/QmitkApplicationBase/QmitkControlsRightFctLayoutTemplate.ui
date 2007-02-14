@@ -15,7 +15,7 @@
     <property name="caption">
         <string>Form2</string>
     </property>
-    <grid>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
@@ -25,17 +25,9 @@
         <property name="spacing">
             <number>0</number>
         </property>
-        <widget class="QSplitter" row="0" column="0">
+        <widget class="QSplitter">
             <property name="name">
                 <cstring>MainSplitter</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>
@@ -85,7 +77,15 @@
                 </property>
             </widget>
         </widget>
-    </grid>
+        <widget class="QProgressBar">
+            <property name="name">
+                <cstring>progBar</cstring>
+            </property>
+            <property name="percentageVisible">
+                <bool>true</bool>
+            </property>
+        </widget>
+    </vbox>
 </widget>
 <includes>
     <include location="global" impldecl="in implementation">qvaluelist.h</include>

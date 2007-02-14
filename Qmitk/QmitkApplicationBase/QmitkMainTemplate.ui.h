@@ -552,6 +552,9 @@ void QmitkMainTemplate::init()
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
 
+  // create the DataStorage
+  mitk::DataStorage::CreateInstance(m_Tree);
+
   m_Options = mitk::PropertyList::New();
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
 }

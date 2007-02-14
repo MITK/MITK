@@ -1000,6 +1000,7 @@
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="local" impldecl="in implementation">QmitkUndoRedoButton.h</include>
+    <include location="global" impldecl="in implementation">mitkDataStorage.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
 <forwards>

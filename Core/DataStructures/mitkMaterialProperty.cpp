@@ -98,6 +98,15 @@ mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property ) : m
   Initialize( property );
 }
 
+mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity, std::string name )
+{
+  Initialize( property );
+  SetColor( red, green, blue );
+  SetOpacity( opacity );
+  SetName( name );
+}
+
+
 void mitk::MaterialProperty::SetDataTreeNode( mitk::DataTreeNode* node )
 {
   m_DataTreeNode = node;

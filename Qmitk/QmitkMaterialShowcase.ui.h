@@ -13,7 +13,12 @@
 #include <vtkPolyData.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
+#include <vtkTextActor.h>
 #include <mitkOpenGLRenderer.h>
+#include <vtkRenderer.h>
+#include <vtkTextProperty.h>
+#include <vtkCoordinate.h>
+#include <mitkVtkLayerController.h>
 
 /**
  * A material showcase simply displays a sphere which is visualized with some
@@ -39,16 +44,39 @@ void QmitkMaterialShowcase::init()
     m_SelectableGLWidget->GetRenderer()->SetData( &it );
     m_SelectableGLWidget->GetRenderer()->SetMapperID( 2 );
     sphereSource->Delete();    
+    
+    m_TextActor = vtkTextActor::New();
+    //m_TextActor->SetAlignmentPoint( 2);
+    m_TextActor->SetInput( "Hello World!");
+    m_TextActor->ScaledTextOff();
+    vtkTextProperty* textProperty = m_TextActor->GetTextProperty();
+    textProperty->SetFontSize( 13 );
+    textProperty->SetFontFamilyToArial();
+    textProperty->SetJustificationToCentered();
+    textProperty->ItalicOn();
+    textProperty->SetColor( 1, 1, 1 );
+    m_TextRenderer = vtkRenderer::New();
+    m_TextRenderer->AddActor( m_TextActor );
+    m_TextRenderer->InteractiveOff();
 }
 
 void QmitkMaterialShowcase::destroy()
 {
+  m_SelectableGLWidget->GetRenderWindow()->GetVtkLayerController()->RemoveRenderer( m_TextRenderer );
+  m_TextRenderer->Delete();
+  m_TextActor->Delete();
 }
 
 void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* property )
 {
     m_MaterialProperty = new mitk::MaterialProperty( *property );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
+    if ( m_MaterialProperty->GetName() != "" )
+    {
+      m_TextActor->SetInput( m_MaterialProperty->GetName().c_str() );
+      m_TextActor->SetAlignmentPoint( 2);
+      m_SelectableGLWidget->GetRenderWindow()->GetVtkLayerController()->InsertForegroundRenderer( m_TextRenderer, true );
+    }
     this->UpdateRenderWindow();
 }
 
@@ -112,7 +140,7 @@ void  QmitkMaterialShowcase::SetOpacity( vtkFloatingPointType opacity )
 
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
-    m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();
+  m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();
 }
 
 

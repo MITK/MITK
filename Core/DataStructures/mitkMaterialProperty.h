@@ -128,6 +128,12 @@ public:
      * Copy constructor
      */
     MaterialProperty( const MaterialProperty& property );
+    
+    /**
+     * Copy constructor, provided for convinience. The values are copied from property
+     * and afterwards the values provided for red green blue and opacity are written into the object.
+     */
+    MaterialProperty( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "");
 
     
     /**

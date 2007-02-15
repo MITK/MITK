@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionIteratorWithIndex.h"
 
 mitk::GeometryClipImageFilter::GeometryClipImageFilter() 
-  : m_ClippingGeometry(NULL), m_ClipPartAboveGeometry(true), m_OutsideValue(0), m_AutoOutsideValue(false)
+  : m_ClippingGeometry(NULL), m_ClipPartAboveGeometry(true), m_OutsideValue(0), m_AutoOutsideValue(false), m_LabelBothSides(false), m_AboveGeometryLabel(1), m_BelowGeometryLabel(2)
 {
   this->SetNumberOfInputs(2);
   this->SetNumberOfRequiredInputs(2);
@@ -134,6 +134,10 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   int i, dim=IndexType::GetIndexDimension();
   Point3D pointInMM;
   bool above = geometryClipper->m_ClipPartAboveGeometry;
+  bool labelBothSides = geometryClipper->GetLabelBothSides();
+  typename ItkOutputImageType::PixelType aboveLabel = (typename ItkOutputImageType::PixelType)geometryClipper->GetAboveGeometryLabel();
+  typename ItkOutputImageType::PixelType belowLabel = (typename ItkOutputImageType::PixelType)geometryClipper->GetBelowGeometryLabel();
+  
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {
     if((typename ItkOutputImageType::PixelType)inputIt.Get() == outsideValue)
@@ -145,14 +149,19 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
       for(i=0;i<dim;++i)
         indexPt[i]=(mitk::ScalarType)inputIt.GetIndex()[i];
       inputGeometry->IndexToWorld(indexPt, pointInMM);
-
       if(clippingGeometry2D->IsAbove(pointInMM) == above)
       {
-        outputIt.Set(outsideValue);
+        if ( labelBothSides )
+          outputIt.Set( aboveLabel );
+        else
+          outputIt.Set( outsideValue );
       }
       else
       {
-        outputIt.Set(inputIt.Get());
+        if ( labelBothSides)
+          outputIt.Set( belowLabel );
+        else
+          outputIt.Set( inputIt.Get() );
       }
     }
   }

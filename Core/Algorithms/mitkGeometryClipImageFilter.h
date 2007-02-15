@@ -69,15 +69,36 @@ public:
   //## @brief Set value for outside pixels (default: 0), 
   //## used when m_AutoOutsideValue is \a false
   itkSetMacro(OutsideValue, ScalarType);
-  itkGetMacro(OutsideValue, ScalarType);
+  itkGetConstMacro(OutsideValue, ScalarType);
 
   //##Description 
   //## @brief If set to \a true the minimum of the ouput pixel type is
   //## used as outside value (default: \a false)
   itkSetMacro(AutoOutsideValue, bool);
-  itkGetMacro(AutoOutsideValue, bool);
+  itkGetConstMacro(AutoOutsideValue, bool);
   itkBooleanMacro(AutoOutsideValue);
-protected:
+  
+  //##Description 
+  //## @brief If set to \a true both sides of the clipping
+  //## geometry will be labeld using m_AboveGeometryLabel and
+  //## m_BelowGeometryLabel
+  itkSetMacro(LabelBothSides, bool);
+  itkGetConstMacro(LabelBothSides, bool);
+  itkBooleanMacro(LabelBothSides);
+  
+  //##Description 
+  //## @brief Set for voxels above the clipping geometry.
+  //## This value is only used, if m_LabelBothSides is set to true.
+  itkSetMacro(AboveGeometryLabel, ScalarType);
+  itkGetConstMacro(AboveGeometryLabel, ScalarType);
+  
+  //##Description 
+  //## @brief Set for voxels below the clipping geometry.
+  //## This value is only used, if m_LabelBothSides is set to true.
+  itkSetMacro(BelowGeometryLabel, ScalarType);
+  itkGetConstMacro(BelowGeometryLabel, ScalarType);
+  
+  protected:
   GeometryClipImageFilter();
 
   ~GeometryClipImageFilter();
@@ -111,6 +132,21 @@ protected:
   //## @brief If \a true the minimum of the ouput pixel type is
   //## used as outside value (default: \a false)
   bool m_AutoOutsideValue;
+  
+  //##Description 
+  //## @brief If \a true all pixels above and below the geometry
+  //## are labeled with m_AboveGeometryLabel and m_BelowGeometryLabel
+  bool m_LabelBothSides;
+  
+  //##Description 
+  //## @brief Is used for labeling all pixels above the geometry
+  //## when m_LabelBothSides is on
+  ScalarType m_AboveGeometryLabel;
+  
+  //##Description 
+  //## @brief Is used for labeling all pixels below the geometry
+  //## when m_LabelBothSides is on
+  ScalarType m_BelowGeometryLabel;
 
   //##Description 
   //## @brief Time when Header was last initialized

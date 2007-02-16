@@ -31,9 +31,10 @@ ENDFOREACH(d)
 
 SET(${KITNAME}_INCLUDE_DIRS ${PROJECT_BINARY_DIR} ${${KITNAME}_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
 
-FOREACH(dir Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk)
+FOREACH(dir Core/DataStructures/mitkDataStorage Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk)
   SET(${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 ENDFOREACH(dir)
+  
 
 IF(WIN32)
   SET(${${KITNAME}_INCLUDE_DIRS} ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipPic/win32)

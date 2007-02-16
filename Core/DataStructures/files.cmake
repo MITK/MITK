@@ -91,4 +91,13 @@ SET(CPP_FILES
   mitkVtkScalarModeProperty.cpp
   mitkWeakPointerProperty.cpp
   mitkXMLIO.cpp
+  mitkDataStorage/mitkDataStorage.cpp
+  mitkDataStorage/mitkNodePredicateAND.cpp
+  mitkDataStorage/mitkNodePredicateBase.cpp
+  mitkDataStorage/mitkNodePredicateCompositeBase.cpp
+  mitkDataStorage/mitkNodePredicateDataType.cpp
+  mitkDataStorage/mitkNodePredicateNOT.cpp
+  mitkDataStorage/mitkNodePredicateOR.cpp
+  mitkDataStorage/mitkNodePredicateProperty.cpp
+  mitkDataStorage/mitkNodePredicateSource.cpp
 )

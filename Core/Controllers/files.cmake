@@ -7,6 +7,7 @@ SET(CPP_FILES
   mitkMovieGenerator.cpp
   mitkMultiStepper.cpp
   mitkOperationEvent.cpp
+  mitkProgressBar.cpp
   mitkRenderingManager.cpp
   mitkReportGenerator.cpp
   mitkSliceNavigationController.cpp

@@ -27,6 +27,7 @@ SET(CPP_FILES
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkPiecewiseFunctionCanvas.cpp
+  QmitkProgressBar.cpp
   QmitkPropertyListViewItem.cpp
   QmitkPropertyListViewItemFactory.cpp
   QmitkPropertyObservers/PropertyViewTestWidget.cpp

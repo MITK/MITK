@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
+#include "mitkNodePredicateProperty.h"
 
 mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
 
@@ -84,8 +85,24 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
   it.Add(node);
   /* save node and parentlist in relations map */
-  m_CreatedByRelations.insert(std::make_pair(node, SetOfObjects::ConstPointer(parents))); 
+  m_CreatedByRelations.insert(std::make_pair(node, SetOfObjects::ConstPointer(parents)));
 
+  /* create entry in m_CreatedFromRelations for each parent and add node to the list of derived objects for that parent */
+  for (SetOfObjects::ConstIterator it = parents->Begin(); it != parents->End(); it++)
+  {
+    mitk::DataTreeNode::Pointer parent = it.Value();
+    mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects = m_CreatedFromRelations[parent]; // get or create pointer to list of derived objects for that parent node
+    if (derivedObjects.IsNull())
+      m_CreatedFromRelations[parent] = mitk::DataStorage::SetOfObjects::New();  // Create a set of Objects, if it does not already exist
+    mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_CreatedFromRelations[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
+    deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
+  }
+}
+void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent)
+{
+  mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
+  parents->InsertElement(0, parent);
+  this->Add(node, parents);
 }
 
 void mitk::DataStorage::Update(mitk::DataTreeNode* node)
@@ -148,7 +165,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll()
   return SetOfObjects::ConstPointer(resultset);
 }
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk::DataTreeNode::Pointer node, bool onlyDirectSources)
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition, bool onlyDirectSources)
 {
   if (node.IsNull())
     throw 1;
@@ -175,7 +192,11 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk
   {
     mitk::DataTreeNode::Pointer current = openlist.back();  // get element that needs to be processed
     openlist.pop_back();            // remove last element, because it gets processed now
-    resultset.push_back(current);   // add current element to resultset
+    if (condition == NULL)
+      resultset.push_back(current);   // add current element to resultset
+    else
+      if (condition->CheckNode(current))    // @TODO: This Code continues to evaluate derived objects, even if the current node does not pass the condition. Is this the desired behavior?
+        resultset.push_back(current);   // add current element to resultset
     AdjacencyList::iterator it = m_CreatedByRelations.find(current); // get parents of current node
     if (   (it == m_CreatedByRelations.end()) // if node not found in list
         || (it->second.IsNull())              // or no set of parents available
@@ -198,3 +219,92 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk
   
   return SetOfObjects::ConstPointer(realResultset); // return a const pointer
 }
+
+
+//mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk::DataTreeNode::Pointer node, bool onlyDirectSources, const NodePredicateBase& condition)
+//{
+//  /* Get all sources */
+//  mitk::DataStorage::SetOfObjects::ConstPointer s = GetSources(node, onlyDirectSources);
+//  /* Filter sources */
+//  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
+//  unsigned int index = 0;
+//  for(mitk::DataStorage::SetOfObjects::ConstIterator rsIt = s->Begin(); rsIt != s->End(); rsIt++)
+//    if (condition.CheckNode(rsIt.Value()) == true)
+//      resultset->InsertElement(index++, rsIt.Value());
+//
+//  return SetOfObjects::ConstPointer(resultset); // return a const pointer
+//}
+
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetDerivations(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition, bool onlyDirectDerivations)
+{
+  if (node.IsNull())
+    throw 1;
+
+  if (onlyDirectDerivations)
+  {
+    AdjacencyList::iterator it = m_CreatedFromRelations.find(node); // get parents of current node
+    if (   (it == m_CreatedByRelations.end()) // node not found in list
+        || (it->second.IsNull())              // or no set of parents
+        || (it->second->Size() == 0))         // or empty set
+      return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
+    else
+      return it->second;
+  }
+  
+  std::vector<mitk::DataTreeNode::Pointer> resultset;
+  std::vector<mitk::DataTreeNode::Pointer> openlist;
+
+  /* initialize openlist with node. this will add node to resultset, 
+     but that is necessary to detect circular relations that would lead to endless recursion */
+  openlist.push_back(node);
+
+  while (openlist.size() > 0)
+  {
+    mitk::DataTreeNode::Pointer current = openlist.back();  // get element that needs to be processed
+    openlist.pop_back();            // remove last element, because it gets processed now
+    if (condition == NULL)
+      resultset.push_back(current);   // add current element to resultset
+    else
+      if (condition->CheckNode(current))    // @TODO: This Code continues to evaluate derived objects, even if the current node does not pass the condition. Is this the desired behavior?
+        resultset.push_back(current);   // add current element to resultset
+    AdjacencyList::iterator it = m_CreatedFromRelations.find(current); // get parents of current node
+    if (   (it == m_CreatedFromRelations.end()) // if node not found in list
+        || (it->second.IsNull())              // or no set of parents available
+        || (it->second->Size() == 0))         // or empty set of parents
+      continue;                               // then continue with next node in open list
+    else
+      for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
+      {
+        mitk::DataTreeNode::Pointer p = parentIt.Value();
+        if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset 
+            && !(std::find(openlist.begin(), openlist.end(), p) != openlist.end()))     // and not already in openlist
+          openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
+      }
+  }
+  /* now finally copy the results to a proper SetOfObjects variable exluding the initial node */
+  mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
+  for (std::vector<mitk::DataTreeNode::Pointer>::iterator resultIt = resultset.begin(); resultIt != resultset.end(); resultIt++)
+    if (*resultIt != node)
+      realResultset->InsertElement(realResultset->Size(), *resultIt);
+  
+  return SetOfObjects::ConstPointer(realResultset); // return a const pointer
+}
+
+mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name)
+{
+  if (name == NULL)
+    return NULL;
+
+  mitk::StringProperty s(name);
+  mitk::NodePredicateProperty p("name", &s);
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(p);
+  if (rs->Size() >= 1)
+    return rs->GetElement(0);
+  else
+    return NULL;
+}
+
+//mitk::DataTreeNode* GetNamedChildNode(const char* name, mitk::DataTreeNode::Pointer parent)
+//{
+//
+//}

@@ -66,7 +66,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <mitkStringProperty.h>
-#include <mitkMapClassIDToClassName.h>
 #include <QmitkStringPropertyEditor.h>
 #include <mitkImageTimeSelector.h>
 

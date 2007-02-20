@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qlcdnumber.h>
 #include <qslider.h>
+#include <qapplication.h>
+#include <qcursor.h>
 #include <itkCommand.h>
 
 
@@ -154,4 +156,17 @@ void QmitkFunctionality::SetFunctionalityOptionsList(mitk::PropertyList* pl)
   // more meaningful implementation, i.e. reaction to property values, to be done in sub-classes
 }
 
+
+
+void QmitkFunctionality::WaitCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+}
+
+
+
+void QmitkFunctionality::WaitCursorOff()
+{
+  QApplication::restoreOverrideCursor();
+}
 

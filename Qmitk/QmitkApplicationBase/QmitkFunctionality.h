@@ -213,6 +213,17 @@ public:
   this method returns!
   */
   virtual void SetFunctionalityOptionsList(mitk::PropertyList*);
+  
+  /**
+   * Overrides the current application cursor with a wait cursor. 
+   * Use WaitCursorOff() to restore it.
+   */
+  void WaitCursorOn();
+  
+  /**
+   * Restores the applications cursor, which has been overridden using WaitCursorOn()
+   */
+  void WaitCursorOff();
 
 signals:
   void Signal_dummy();

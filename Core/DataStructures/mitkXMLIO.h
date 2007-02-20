@@ -46,6 +46,8 @@ namespace mitk {
   public:
 
     virtual ~XMLIO() {};
+    
+    virtual const char* GetNameOfClass() const = 0;
 
     /// writes a XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).
     bool WriteXML( XMLWriter& xmlWriter );

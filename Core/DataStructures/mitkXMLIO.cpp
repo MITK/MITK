@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkXMLIO.h"
 #include <mitkXMLWriter.h>
+#include <iostream>
 
 namespace mitk {
 

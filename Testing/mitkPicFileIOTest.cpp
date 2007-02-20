@@ -117,8 +117,8 @@ void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::
   identical = true;
 }
  
-int mitkPicFileIOTest(int argc, char* argv[])
-{
+int mitkPicFileIOTest(int /*argc*/, char** /*argv[]*/)
+{ 
   unsigned int numberFailed(0);
 
   for (unsigned int i = 0; i < numberOfTestImages; ++i)

@@ -49,7 +49,7 @@ void mitk::GLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     glColor4fv(rgba);
 }
 
-void mitk::GLMapper2D::WriteTextXY(float x, float y, const std::string & text, bool drawLabel)
+void mitk::GLMapper2D::WriteTextXY(float x, float y, const std::string & text, bool /*drawLabel*/)
 {
   // This code is work in progress. It does not work correctly yet, because the size of the text can not be calculated in screen(pixel) coordinates this way
   //if (drawLabel == true)
@@ -73,3 +73,4 @@ void mitk::GLMapper2D::WriteTextXY(float x, float y, const std::string & text, b
   for (unsigned int i = 0; i < text.size(); i++)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]);
 }
+

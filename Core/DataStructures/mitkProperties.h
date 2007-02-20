@@ -22,26 +22,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGenericProperty.h"
 #include "mitkVector.h"
-#include <string>
 
 namespace mitk {
 
-   typedef GenericProperty<bool> BoolProperty;
-
-   typedef GenericProperty<int> IntProperty;
-
-   typedef GenericProperty<float> FloatProperty;
-
-   typedef GenericProperty<double> DoubleProperty;
-
-   typedef GenericProperty<Vector3D> Vector3DProperty;
-
-   typedef GenericProperty<Point3D> Point3dProperty;
-
-   typedef GenericProperty<Point4D> Point4dProperty;
-
-   typedef GenericProperty<itk::Point<int, 3> > Point3iProperty;
-
+   mitkSpecializeGenericProperty(BoolProperty,bool);
+   
+   mitkSpecializeGenericProperty(IntProperty,int);
+   
+   mitkSpecializeGenericProperty(FloatProperty,float);
+   
+   mitkSpecializeGenericProperty(DoubleProperty,double);
+   
+   mitkSpecializeGenericProperty(Vector3DProperty,Vector3D);
+   
+   mitkSpecializeGenericProperty(Point3dProperty,Point3D);
+   
+   mitkSpecializeGenericProperty(Point4dProperty,Point4D);
+   
+   mitkSpecializeGenericProperty(Point3iProperty,Point3I);
+   
 } // namespace mitk  
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

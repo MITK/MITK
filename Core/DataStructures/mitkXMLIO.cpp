@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkXMLIO.h"
 #include <mitkXMLWriter.h>
-#include <mitkMapClassIDToClassName.h>
 
 namespace mitk {
 
@@ -31,7 +30,7 @@ bool XMLIO::WriteXML( XMLWriter& xmlWriter )
   const std::string& nodeName = GetXMLNodeName();
   std::cout << nodeName.c_str() << std::endl; // test
   xmlWriter.BeginNode( nodeName );
-  xmlWriter.WriteProperty( CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( *this ).name()) );
+  xmlWriter.WriteProperty( CLASS_NAME, this->GetNameOfClass() );
 
   bool result = WriteXMLData( xmlWriter );
 

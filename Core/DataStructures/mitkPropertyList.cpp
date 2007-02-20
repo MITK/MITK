@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
-#include <mitkMapClassIDToClassName.h>
 
 const std::string mitk::PropertyList::XML_NODE_NAME = "propertyList";
 const std::string mitk::PropertyList::XML_ALREADY_SEEN = "PROPERTY_REFERENCE";
@@ -184,7 +183,7 @@ bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter )
     std::string property_name( iter->first );
     
     xmlWriter.BeginNode( property->GetXMLNodeName() );
-    xmlWriter.WriteProperty( XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName( typeid(*property).name() ) );
+    xmlWriter.WriteProperty( XMLIO::CLASS_NAME, property->GetNameOfClass() );
     xmlWriter.WriteProperty( XMLReader::PROPERTY_KEY, property_name.c_str() );
  
     // lookup pointer in m_AlreadyWrittenToXML

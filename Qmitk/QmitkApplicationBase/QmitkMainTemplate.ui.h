@@ -921,9 +921,9 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
   // write SampleApp's options
   xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
   xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
-  xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::DataTreeNode ).name()));
+  xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "DataTreeNode");
     xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
-    xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::PropertyList ).name()));
+    xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
       m_Options->WriteXMLData( xmlw );
     xmlw.EndNode();
   xmlw.EndNode();
@@ -940,9 +940,9 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
 
       xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
       xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
-      xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::DataTreeNode ).name()));
+      xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "DataTreeNode");
         xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
-        xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, mitk::MapClassIDToClassName::MapIDToName(typeid( mitk::PropertyList ).name()));
+        xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
           fo->WriteXMLData( xmlw );
         xmlw.EndNode();
       xmlw.EndNode();

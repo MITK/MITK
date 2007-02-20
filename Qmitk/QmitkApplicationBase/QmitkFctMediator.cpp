@@ -310,21 +310,16 @@ void QmitkFctMediator::RaiseFunctionality(int id)
     ((QButtonGroup*)m_ToolBar)->setButton(id);
 
   Selecting(id);
-  QWidget *newVisibleWidget;
-  
+  QWidget *newVisibleWidget, *oldVisibleWidget;
+  oldVisibleWidget = m_ControlStack->visibleWidget();
   newVisibleWidget = m_ControlStack->widget(id);
-  
+  if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
+  {
+    oldVisibleWidget->setSizePolicy(ignored);
+    newVisibleWidget->setSizePolicy(preferred);
+  }
   m_ControlStack->raiseWidget(newVisibleWidget);
-
-  int scrollBarWidth = 20;  //((QScrollView*)newVisibleWidget)->verticalScrollBar()->size().width();  //// doesn´t work at initialization
-  QmitkControlsRightFctLayoutTemplate* rightLayout;
-  QmitkControlsLeftFctLayoutTemplate* leftLayout;
-  if ( (rightLayout = dynamic_cast<QmitkControlsRightFctLayoutTemplate*>(m_LayoutTemplate)) )
-    rightLayout->setControlSizeHint(QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
-
-  if ( (leftLayout = dynamic_cast<QmitkControlsLeftFctLayoutTemplate*>(m_LayoutTemplate)) )
-    leftLayout->setControlSizeHint(QSize((newVisibleWidget->sizeHint().width() + scrollBarWidth), m_ControlStack->size().height()));
-  
+  m_ControlStack->updateGeometry();
   
   newVisibleWidget = m_MainStack->widget(id+1);
   if(strcmp(newVisibleWidget->name(),"QmitkFctMediator::dummyMain")==0)

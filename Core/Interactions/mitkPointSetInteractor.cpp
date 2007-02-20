@@ -128,7 +128,7 @@ void mitk::PointSetInteractor::UnselectAll()
     int position = it->Index();
     PointSet::PointDataType pointData;
     itkPointSet->GetPointData(position, &pointData);
-    if ( pointData && pointData.selected )//then declare an operation which unselects this point; UndoOperation as well!
+    if ( pointData.selected )//then declare an operation which unselects this point; UndoOperation as well!
     {
       mitk::Point3D noPoint;
       noPoint.Fill(0);

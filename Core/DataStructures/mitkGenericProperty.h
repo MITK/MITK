@@ -40,6 +40,10 @@ namespace mitk {
     - an operator<< so that the properties value can be put into a std::stringstream
     - an operator== so that two properties can be checked for equality
 
+  Note: you must use the macro mitkSpecializeGenericProperty to provide specializations
+  for concrete types (e.g. BoolProperty). Please see mitkProperties.h for examples. If you
+  don't use the mitkSpecializeGenericProperty Macro, GetNameOfClass() returns a wrong name.
+
 */
 template <typename T>
 class GenericProperty : public BaseProperty
@@ -82,7 +86,7 @@ class GenericProperty : public BaseProperty
       return false;
     }
 
-    std::string GetValueAsString() const 
+    virtual std::string GetValueAsString() const 
     {
       std::stringstream myStr;
       myStr << GetValue() ;
@@ -147,8 +151,24 @@ bool GenericProperty<T>::ReadXMLData( XMLReader& xmlReader )
   return true;
 }
 
-
 } // namespace mitk
+
+/**
+ * Generates a specialized subclass of mitk::GenericProperty. 
+ * This way, GetNameOfClass() returns the value provided by PropertyName.
+ * Please see mitkProperties.h for examples.
+ * @param PropertyName the name of the instantiation of GenericProperty
+ * @param Type the value type of the GenericProperty
+ */
+#define mitkSpecializeGenericProperty(PropertyName,Type)  \
+class PropertyName: public GenericProperty< Type >        \
+{                                                         \
+public:                                                   \
+  mitkClassMacro(PropertyName, GenericProperty< Type >);  \
+  PropertyName() {}                                       \
+  PropertyName(Type x) {m_Value = x;}                     \
+  virtual ~PropertyName() {}                              \
+};
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */
 

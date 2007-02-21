@@ -323,9 +323,9 @@ mitk::SlicedGeometry3D
   // This is done by calculating the radius of the ellipsoid defined by the
   // original volume spacing axes, in the direction of the respective axis of the
   // reference frame.
-  mitk::Vector3D &axis0 = firstPlane->GetAxisVector(0);
-  mitk::Vector3D &axis1 = firstPlane->GetAxisVector(1);
-  mitk::Vector3D &normal = firstPlane->GetNormal();
+  mitk::Vector3D axis0 = firstPlane->GetAxisVector(0);
+  mitk::Vector3D axis1 = firstPlane->GetAxisVector(1);
+  mitk::Vector3D normal = firstPlane->GetNormal();
   normal.Normalize();
 
   Vector3D spacing;

@@ -18,46 +18,67 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlaneGeometry.h"
+#include "mitkPlaneOperation.h"
+#include "mitkInteractionConst.h"
+#include "mitkLine.h"
+
+#include <vtkTransform.h>
+
 #include <vnl/vnl_cross.h>
 
-//##ModelId=3E395F22035A
+
+namespace mitk
+{
+
 mitk::PlaneGeometry::PlaneGeometry()
 {
   Initialize();
 }
 
 
-//##ModelId=3E395F220382
 mitk::PlaneGeometry::~PlaneGeometry()
 {
 }
 
-void mitk::PlaneGeometry::Initialize()
+
+void
+PlaneGeometry::Initialize()
 {
   Superclass::Initialize();
 }
 
-void mitk::PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D* transform)
+
+void
+PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D *transform)
 {
   //ensure row(2) of transform to be perpendicular to plane, keep length.
-  VnlVector normal = vnl_cross_3d(transform->GetMatrix().GetVnlMatrix().get_column(0),transform->GetMatrix().GetVnlMatrix().get_column(1));
+  VnlVector normal = vnl_cross_3d(
+    transform->GetMatrix().GetVnlMatrix().get_column(0),
+    transform->GetMatrix().GetVnlMatrix().get_column(1) );
+
   normal.normalize();
-  ScalarType len = transform->GetMatrix().GetVnlMatrix().get_column(2).two_norm();
-  if(len==0) len = 1;
+  ScalarType len = transform->GetMatrix()
+    .GetVnlMatrix().get_column(2).two_norm();
+
+  if (len==0) len = 1;
   normal*=len;
-  mitk::Matrix3D matrix = transform->GetMatrix();
+  Matrix3D matrix = transform->GetMatrix();
   matrix.GetVnlMatrix().set_column(2, normal);
   transform->SetMatrix(matrix);
 }
 
-void mitk::PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+
+void
+PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D *transform)
 {
   EnsurePerpendicularNormal(transform);
 
   Superclass::SetIndexToWorldTransform(transform);
 }
 
-void mitk::PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType& bounds)
+
+void
+PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType &bounds)
 {
   //currently the unit rectangle must be starting at the origin [0,0]
   assert(bounds[0]==0);
@@ -69,41 +90,52 @@ void mitk::PlaneGeometry::SetBounds(const BoundingBox::BoundsArrayType& bounds)
   Superclass::SetBounds(bounds);
 }
 
-//##ModelId=3E3B9C730262
-void mitk::PlaneGeometry::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
+
+void 
+PlaneGeometry::IndexToWorld( const Point2D &pt_units, Point2D &pt_mm ) const
 {
   pt_mm[0]=m_ScaleFactorMMPerUnitX*pt_units[0];
   pt_mm[1]=m_ScaleFactorMMPerUnitY*pt_units[1];
 }
 
-//##ModelId=3E3B9C760112
-void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
+
+void PlaneGeometry::WorldToIndex( const Point2D &pt_mm, Point2D &pt_units ) const
 {
   pt_units[0]=pt_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
   pt_units[1]=pt_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
 }
 
-//##ModelId=3E3B9C8C0145
-void mitk::PlaneGeometry::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+
+void PlaneGeometry::IndexToWorld( const Point2D &atPt2d_units, 
+  const Vector2D &vec_units, Vector2D &vec_mm) const
 {
-  vec_mm[0]=m_ScaleFactorMMPerUnitX*vec_units[0];
-  vec_mm[1]=m_ScaleFactorMMPerUnitY*vec_units[1];
+  vec_mm[0] = m_ScaleFactorMMPerUnitX * vec_units[0];
+  vec_mm[1] = m_ScaleFactorMMPerUnitY * vec_units[1];
 }
 
-//##ModelId=3E3B9C8E0152
-void mitk::PlaneGeometry::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+
+void
+PlaneGeometry::WorldToIndex( const Point2D &atPt2d_mm,
+  const Vector2D &vec_mm, Vector2D &vec_units) const
 {
-  vec_units[0]=vec_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
-  vec_units[1]=vec_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
+  vec_units[0] = vec_mm[0] * ( 1.0 / m_ScaleFactorMMPerUnitX );
+  vec_units[1] = vec_mm[1] * ( 1.0 / m_ScaleFactorMMPerUnitY );
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D & spacing, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
+
+void
+PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width, 
+  ScalarType height, const Vector3D & spacing, 
+  PlaneGeometry::PlaneOrientation planeorientation, 
+  ScalarType zPosition, bool frontside, bool rotated )
 {
   AffineTransform3D::Pointer transform;
 
   transform = AffineTransform3D::New();
   AffineTransform3D::MatrixType matrix;
-  AffineTransform3D::MatrixType::InternalMatrixType & vnlmatrix = matrix.GetVnlMatrix();
+  AffineTransform3D::MatrixType::InternalMatrixType &vnlmatrix = 
+    matrix.GetVnlMatrix();
+
   vnlmatrix.set_identity();
   vnlmatrix(0,0) = spacing[0];
   vnlmatrix(1,1) = spacing[1];
@@ -111,15 +143,21 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
   transform->SetIdentity();
   transform->SetMatrix(matrix);
   
-  InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside, rotated);
+  InitializeStandardPlane(width, height, transform.GetPointer(), 
+    planeorientation, zPosition, frontside, rotated);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const mitk::AffineTransform3D* transform, mitk::PlaneGeometry::PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
+
+void
+PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width, 
+  ScalarType height, const AffineTransform3D* transform,
+  PlaneGeometry::PlaneOrientation planeorientation, ScalarType zPosition, 
+  bool frontside, bool rotated )
 {
   Superclass::Initialize();
 
   //construct standard view
-  mitk::Point3D  origin; 
+  Point3D  origin; 
   VnlVector rightDV(3), bottomDV(3);
   origin.Fill(0);
   int normalDirection;
@@ -227,34 +265,53 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
     default:
       itkExceptionMacro("unknown PlaneOrientation");
   }
-  if(transform!=NULL)
+  if ( transform != NULL )
   {
-    origin   = transform->TransformPoint(origin);
-    rightDV  = transform->TransformVector(rightDV);
-    bottomDV = transform->TransformVector(bottomDV);
+    origin = transform->TransformPoint( origin );
+    rightDV = transform->TransformVector( rightDV );
+    bottomDV = transform->TransformVector( bottomDV );
   }
 
-  ScalarType bounds[6]={0, width, 0, height, 0, 1};
-  SetBounds(bounds);
+  ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
+  this->SetBounds( bounds );
 
-  if(transform==NULL)
-    SetMatrixByVectors(rightDV, bottomDV);
+  if ( transform == NULL )
+  {
+    this->SetMatrixByVectors( rightDV, bottomDV );
+  }
   else
-    SetMatrixByVectors(rightDV, bottomDV, transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).magnitude());
+  {
+    this->SetMatrixByVectors(
+      rightDV, bottomDV,
+      transform->GetMatrix().GetVnlMatrix()
+        .get_column(normalDirection).magnitude()
+    );
+  }
 
-  SetOrigin(origin);
+  this->SetOrigin(origin);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, PlaneOrientation planeorientation, mitk::ScalarType zPosition, bool frontside, bool rotated)
-{
-  mitk::ScalarType width, height;
 
-  const BoundingBox::BoundsArrayType& boundsarray = geometry3D->GetBoundingBox()->GetBounds();
-  mitk::Vector3D  originVector; 
+void
+PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D, 
+  PlaneOrientation planeorientation, ScalarType zPosition, 
+  bool frontside, bool rotated )
+{
+  this->SetReferenceGeometry( const_cast< Geometry3D * >( geometry3D ) );
+
+  ScalarType width, height;
+
+  const BoundingBox::BoundsArrayType& boundsarray = 
+    geometry3D->GetBoundingBox()->GetBounds();
+
+  Vector3D  originVector; 
   FillVector3D(originVector,  boundsarray[0], boundsarray[2], boundsarray[4]);
   if(geometry3D->GetImageGeometry())
   {
-    FillVector3D(originVector, originVector[0]-0.5, originVector[1]-0.5, originVector[2]-0.5);
+    FillVector3D( originVector,
+      originVector[0] - 0.5, 
+      originVector[1] - 0.5, 
+      originVector[2] - 0.5 );
   }
   switch(planeorientation)
   {
@@ -274,20 +331,27 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
       itkExceptionMacro("unknown PlaneOrientation");
   }
 
-  InitializeStandardPlane(width, height, geometry3D->GetIndexToWorldTransform(), planeorientation, zPosition, frontside, rotated);
+  InitializeStandardPlane( width, height, 
+    geometry3D->GetIndexToWorldTransform(),
+    planeorientation, zPosition, frontside, rotated );
 
-  ScalarType bounds[6]={0, width, 0, height, 0, 1};
-  SetBounds(bounds);
+  ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
+  this->SetBounds( bounds );
 
-  mitk::Point3D  origin; 
-  originVector = geometry3D->GetIndexToWorldTransform()->TransformVector(originVector);
-  origin = GetOrigin()+originVector;
+  Point3D origin; 
+  originVector = geometry3D->GetIndexToWorldTransform()
+    ->TransformVector( originVector );
+
+  origin = GetOrigin() + originVector;
   SetOrigin(origin);
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geometry3D, bool top, PlaneOrientation planeorientation, bool frontside, bool rotated)
+
+void 
+PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D, 
+  bool top, PlaneOrientation planeorientation, bool frontside, bool rotated )
 {
-  mitk::ScalarType zPosition;
+  ScalarType zPosition;
 
   switch(planeorientation)
   {
@@ -304,35 +368,56 @@ void mitk::PlaneGeometry::InitializeStandardPlane(const mitk::Geometry3D* geomet
       itkExceptionMacro("unknown PlaneOrientation");
   }
 
-  InitializeStandardPlane(geometry3D, planeorientation, zPosition, frontside, rotated);
+  InitializeStandardPlane( geometry3D, planeorientation, 
+    zPosition, frontside, rotated );
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing)
+
+void
+PlaneGeometry::InitializeStandardPlane( const Vector3D &rightVector, 
+  const Vector3D &downVector, const Vector3D *spacing )
 {
-  InitializeStandardPlane(rightVector.Get_vnl_vector(), downVector.Get_vnl_vector(), spacing);
+  InitializeStandardPlane( rightVector.Get_vnl_vector(), 
+    downVector.Get_vnl_vector(), spacing );
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing)
+
+void
+PlaneGeometry::InitializeStandardPlane( const VnlVector& rightVector, 
+  const VnlVector &downVector, const Vector3D *spacing )
 {
-  mitk::ScalarType width  = rightVector.magnitude();
-  mitk::ScalarType height = downVector.magnitude();
+  ScalarType width  = rightVector.magnitude();
+  ScalarType height = downVector.magnitude();
 
-  InitializeStandardPlane(width, height, rightVector, downVector, spacing);
+  InitializeStandardPlane( width, height, rightVector, downVector, spacing );
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const Vector3D& rightVector, const Vector3D& downVector, const Vector3D * spacing)
+
+void 
+PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width, 
+  ScalarType height, const Vector3D &rightVector, const Vector3D &downVector, 
+  const Vector3D *spacing )
 {
-  InitializeStandardPlane(width, height, rightVector.Get_vnl_vector(), downVector.Get_vnl_vector(), spacing);
+  InitializeStandardPlane( 
+    width, height, 
+    rightVector.Get_vnl_vector(), downVector.Get_vnl_vector(), 
+    spacing );
 }
 
-void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::ScalarType height, const VnlVector& rightVector, const VnlVector& downVector, const Vector3D * spacing)
+
+void 
+PlaneGeometry::InitializeStandardPlane( 
+  mitk::ScalarType width, ScalarType height, 
+  const VnlVector &rightVector, const VnlVector &downVector, 
+  const Vector3D *spacing )
 {
   assert(width > 0);
   assert(height > 0);
 
   VnlVector rightDV = rightVector; rightDV.normalize();
   VnlVector downDV  = downVector;  downDV.normalize();
-  VnlVector normal  = vnl_cross_3d(rightVector, downVector); normal.normalize();
+  VnlVector normal  = vnl_cross_3d(rightVector, downVector); 
+  normal.normalize();
 
   if(spacing!=NULL)
   {
@@ -341,23 +426,28 @@ void mitk::PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width, mitk::
     normal  *= (*spacing)[2];
   }
 
-  mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
-  mitk::Matrix3D matrix;
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  Matrix3D matrix;
   matrix.GetVnlMatrix().set_column(0, rightDV);
   matrix.GetVnlMatrix().set_column(1, downDV);
   matrix.GetVnlMatrix().set_column(2, normal);
   transform->SetMatrix(matrix);
   transform->SetOffset(m_IndexToWorldTransform->GetOffset());
-  ScalarType bounds[6]={0, width, 0, height, 0, 1};
-  SetBounds(bounds);
-  SetIndexToWorldTransform(transform);
+
+  ScalarType bounds[6] = { 0, width, 0, height, 0, 1 };
+  this->SetBounds( bounds );
+
+  this->SetIndexToWorldTransform( transform );
 }
 
-void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mitk::Vector3D& normal)
+
+void 
+PlaneGeometry::InitializePlane( const Point3D &origin,
+  const Vector3D &normal )
 {
   VnlVector rightVectorVnl(3), downVectorVnl;
 
-  if( mitk::Equal( normal[1], 0.0f ) == false )
+  if( Equal( normal[1], 0.0f ) == false )
   {
     FillVector3D( rightVectorVnl, 1.0f, -normal[0]/normal[1], 0.0f ); 
     rightVectorVnl.normalize();
@@ -374,17 +464,242 @@ void mitk::PlaneGeometry::InitializePlane(const mitk::Point3D& origin, const mit
   SetOrigin(origin);
 }
 
-mitk::ScalarType mitk::PlaneGeometry::SignedDistance(const mitk::Point3D& pt3d_mm) const
+
+void 
+PlaneGeometry::SetMatrixByVectors( const VnlVector &rightVector, 
+  const VnlVector &downVector, ScalarType thickness )
+{
+  VnlVector normal = vnl_cross_3d(rightVector, downVector);
+  normal.normalize();
+  normal *= thickness;
+
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  Matrix3D matrix;
+  matrix.GetVnlMatrix().set_column(0, rightVector);
+  matrix.GetVnlMatrix().set_column(1, downVector);
+  matrix.GetVnlMatrix().set_column(2, normal);
+  transform->SetMatrix(matrix);
+  transform->SetOffset(m_IndexToWorldTransform->GetOffset());
+  SetIndexToWorldTransform(transform);
+}
+
+
+Vector3D 
+PlaneGeometry::GetNormal() const
+{
+  Vector3D frontToBack;
+  frontToBack.Set_vnl_vector( m_IndexToWorldTransform
+    ->GetMatrix().GetVnlMatrix().get_column(2) );
+
+  return frontToBack;
+}
+
+
+VnlVector
+PlaneGeometry::GetNormalVnl() const
+{
+  return m_IndexToWorldTransform
+    ->GetMatrix().GetVnlMatrix().get_column(2);
+}
+
+
+ScalarType 
+PlaneGeometry::DistanceFromPlane( const Point3D &pt3d_mm ) const
+{
+  return fabs(SignedDistance( pt3d_mm ));
+}
+
+
+ScalarType
+PlaneGeometry::SignedDistance( const Point3D &pt3d_mm ) const
 {
   return SignedDistanceFromPlane(pt3d_mm);
 }
 
-bool mitk::PlaneGeometry::IsAbove(const mitk::Point3D& pt3d_mm) const
+
+bool
+PlaneGeometry::IsAbove( const Point3D &pt3d_mm ) const
 {
-  return SignedDistanceFromPlane(pt3d_mm)>0;
+  return SignedDistanceFromPlane(pt3d_mm) > 0;
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const
+
+bool
+PlaneGeometry::IntersectionLine( 
+  const PlaneGeometry* plane, Line3D& crossline ) const
+{
+  VnlVector direction;
+
+  Vector3D normal, planenormal;
+  normal = GetNormal();
+  planenormal = plane->GetNormal();
+
+  direction = vnl_cross_3d(normal.Get_vnl_vector(), 
+    planenormal.Get_vnl_vector());
+
+  if ( direction.squared_magnitude() < eps )
+    return false; 
+
+  Vector3D itkdirection;
+  itkdirection.Set_vnl_vector(direction);
+  crossline.SetDirection(itkdirection);
+
+  double N1sq = normal.GetSquaredNorm();
+  double N2sq = planenormal.GetSquaredNorm();
+  double N1dN2 = normal*planenormal;
+
+  double determinant = N1sq * N2sq - N1dN2*N1dN2;
+
+  double d1=dot_product(normal.Get_vnl_vector(),GetOriginVnl());
+  double d2=dot_product(planenormal.Get_vnl_vector(),plane->GetOriginVnl());
+
+  double c1 = ( d1*N2sq - d2*N1dN2 ) / determinant;
+  double c2 = ( d2*N1sq - d1*N1dN2) / determinant ;
+
+  Vector3D vpoint;
+  vpoint = normal*((ScalarType)c1)+planenormal*((ScalarType)c2);
+  crossline.GetPoint().Get_vnl_vector()=vpoint.Get_vnl_vector();
+
+  return true;
+}
+
+
+unsigned int
+PlaneGeometry::IntersectWithPlane2D(
+  const PlaneGeometry* plane, Point2D& lineFrom, Point2D &lineTo ) const
+{
+  VnlVector ptest;
+  ptest = vnl_cross_3d(GetNormalVnl(), plane->GetNormalVnl());
+  if(ptest.squared_magnitude()<vnl_math::float_sqrteps)
+    return 0;
+
+  Line3D crossline;
+  if (IntersectionLine( plane, crossline ) == false)
+    return 0;
+
+  Point2D  point2; 
+  Vector2D direction2; 
+
+  Map(crossline.GetPoint(), point2);
+  Map(crossline.GetPoint(), crossline.GetDirection(), direction2);
+
+  return 
+    Line3D::RectangleLineIntersection( 
+    0, 0, GetExtentInMM(0), GetExtentInMM(1), 
+    point2, direction2, lineFrom, lineTo );
+}
+
+
+double PlaneGeometry::Angle( const PlaneGeometry *plane ) const
+{
+  return angle(plane->GetMatrixColumn(2), GetMatrixColumn(2));
+}
+
+
+double PlaneGeometry::Angle( const Line3D &line ) const
+{
+  return vnl_math::pi_over_2
+    - angle( line.GetDirection().Get_vnl_vector(), GetMatrixColumn(2) );
+}
+
+
+bool PlaneGeometry::IntersectionPoint( 
+  const Line3D &line, Point3D &intersectionPoint ) const
+{
+  Vector3D normal;
+  normal.Set_vnl_vector(GetMatrixColumn(2));
+
+  double t = normal*line.GetDirection();
+
+  if ( fabs(t) < eps )
+  {
+    return false;
+  }
+
+  Vector3D diff;
+  diff = GetOrigin() - line.GetPoint();
+  t = (normal*diff) / t;
+
+  intersectionPoint = line.GetPoint()+line.GetDirection()*t;
+
+  return true;
+}
+
+
+bool
+PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
+{
+  Vector3D normal;
+  normal.Set_vnl_vector(GetMatrixColumn(2));
+
+  t = normal*line.GetDirection();
+
+  if ( fabs(t) < eps )
+  {
+    return false;
+  }
+
+  Vector3D diff;
+  diff = GetOrigin() - line.GetPoint();
+  t = (normal*diff) / t;
+
+  return true;
+}
+
+
+bool
+PlaneGeometry::IsParallel( const PlaneGeometry *plane ) const 
+{
+  return Angle(plane) < eps;
+} 
+
+
+bool
+PlaneGeometry::IsOnPlane( const Point3D &point ) const
+{
+  return Distance(point) < eps;
+}
+
+
+bool
+PlaneGeometry::IsOnPlane( const Line3D &line ) const
+{
+  return ( (Distance( line.GetPoint() ) < eps)
+    && (Distance( line.GetPoint2() ) < eps) );
+}
+
+
+bool 
+PlaneGeometry::IsOnPlane( const PlaneGeometry *plane ) const 
+{
+  return ( IsParallel( plane ) && (Distance( plane->GetOrigin() ) < eps) );
+}
+
+
+Point3D
+PlaneGeometry::Lot( const Point3D& pt ) const
+{
+  ScalarType len = GetNormalVnl().two_norm();
+  return pt-GetNormal()*Distance(pt)/len;
+}
+
+
+bool
+PlaneGeometry::operator==( const PlaneGeometry *plane ) const 
+{
+  return IsOnPlane( plane );
+}
+
+
+bool
+PlaneGeometry::operator!=( const PlaneGeometry *plane ) const 
+{
+  return !IsOnPlane( plane );
+}
+
+
+AffineGeometryFrame3D::Pointer
+PlaneGeometry::Clone() const
 {
   Self::Pointer newGeometry = Self::New();
   newGeometry->Initialize();
@@ -392,13 +707,63 @@ mitk::AffineGeometryFrame3D::Pointer mitk::PlaneGeometry::Clone() const
   return newGeometry.GetPointer();
 }
 
-void mitk::PlaneGeometry::InitializeGeometry(Self * newGeometry) const
+
+void 
+PlaneGeometry::ExecuteOperation( Operation *operation )
+{
+  vtkTransform *vtktransform = vtkTransform::New();
+  vtktransform->SetMatrix( m_VtkMatrix );
+
+  switch ( operation->GetOperationType() )
+  {
+  case OpORIENT:
+    {
+      mitk::PlaneOperation *planeOp = dynamic_cast< mitk::PlaneOperation * >( operation );
+      if ( planeOp == NULL )
+      {
+        return;
+      }
+      vtkFloatingPointType *origin = vtktransform->GetPosition();
+
+      Vector3D orientationVector = planeOp->GetNormal();
+      Vector3D defaultVector;
+      FillVector3D( defaultVector, 0.0, 0.0, 1.0 );
+
+      Vector3D rotationAxis = CrossProduct( orientationVector, defaultVector );
+      //vtkFloatingPointType rotationAngle = acos( orientationVector[2] / orientationVector.GetNorm() );
+
+      vtkFloatingPointType rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
+      rotationAngle *= 180.0 / vnl_math::pi;
+
+      vtktransform->Identity();
+      vtktransform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
+      //vtktransform->Translate( origin[0], origin[1], origin[2] );
+      break;
+    }
+
+
+  default:
+    Superclass::ExecuteOperation( operation );
+    return;
+  }
+
+  m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
+  TransferVtkToItkTransform();
+  this->Modified();
+}
+
+
+void PlaneGeometry::InitializeGeometry( Self *newGeometry ) const
 {
   Superclass::InitializeGeometry(newGeometry);
 }
 
-void mitk::PlaneGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+
+void PlaneGeometry::PrintSelf( std::ostream& os, itk::Indent indent ) const
 {
   Superclass::PrintSelf(os,indent);
   os << indent << " Normal: " << GetNormal() << std::endl;
 }
+
+
+} // namespace

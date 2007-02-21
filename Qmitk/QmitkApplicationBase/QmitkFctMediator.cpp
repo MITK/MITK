@@ -196,6 +196,7 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality * functionality)
       QScrollView* scrollView = new QScrollView();
       scrollView->addChild(controlWidget);
       scrollView->setResizePolicy(QScrollView::AutoOneFit);
+      scrollView->setSizePolicy(ignored);
       m_ControlStack->addWidget(scrollView, m_NumOfFuncs);
     }
     else
@@ -316,8 +317,8 @@ void QmitkFctMediator::RaiseFunctionality(int id)
   if((oldVisibleWidget!=NULL) && (oldVisibleWidget!=newVisibleWidget))
   {
     oldVisibleWidget->setSizePolicy(ignored);
-    newVisibleWidget->setSizePolicy(preferred);
   }
+  newVisibleWidget->setSizePolicy(preferred);
   m_ControlStack->raiseWidget(newVisibleWidget);
   m_ControlStack->updateGeometry();
   

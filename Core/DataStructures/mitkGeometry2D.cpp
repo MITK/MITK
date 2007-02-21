@@ -22,22 +22,29 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 
-std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_X = "SCALAR_FACTOR_MM_PRT_UNIT_X";
-std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_Y = "SCALAR_FACTOR_MM_PRT_UNIT_Y";
+std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_X =
+  "SCALAR_FACTOR_MM_PRT_UNIT_X";
 
-//##ModelId=3E395E0802E6
-mitk::Geometry2D::Geometry2D() : 
-  m_ScaleFactorMMPerUnitX(1.0), 
-  m_ScaleFactorMMPerUnitY(1.0)
+std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_Y =
+  "SCALAR_FACTOR_MM_PRT_UNIT_Y";
+
+
+mitk::Geometry2D::Geometry2D()
+: m_ScaleFactorMMPerUnitX( 1.0 ), 
+  m_ScaleFactorMMPerUnitY( 1.0 ),
+  m_ReferenceGeometry( NULL )
 {
 }
 
-//##ModelId=3E395E080318
+
 mitk::Geometry2D::~Geometry2D()
 {
 }
 
-void mitk::Geometry2D::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+
+void 
+mitk::Geometry2D::SetIndexToWorldTransform(
+  mitk::AffineTransform3D* transform)
 {
   Superclass::SetIndexToWorldTransform(transform);
   
@@ -48,7 +55,9 @@ void mitk::Geometry2D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
   assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
 }
 
-void mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
+
+void 
+mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
 {
   Superclass::SetExtentInMM(direction, extentInMM);
 
@@ -59,8 +68,10 @@ void mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
   assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
 }
 
-//##ModelId=3DDE65E00122
-bool mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+
+bool 
+mitk::Geometry2D::Map(
+  const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -73,8 +84,9 @@ bool mitk::Geometry2D::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm)
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-//##ModelId=3DDE65E301DE
-void mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
+
+void 
+mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -86,8 +98,10 @@ void mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm)
   pt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
 }
 
-//##ModelId=3DE7895602F7
-void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
+
+void 
+mitk::Geometry2D::IndexToWorld(
+  const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -98,18 +112,24 @@ void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D
   pt_mm[1]=pt3d[1];
 }
 
-//##ModelId=3DE7895C01CE
-void mitk::Geometry2D::WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
+
+void 
+mitk::Geometry2D::WorldToIndex(
+  const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) possible. Has to be implemented in sub-class.");
+  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general" \
+    " WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units)" \
+    " possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
   pt_units[0]=pt_mm[0]/m_ScaleFactorMMPerUnitX;
   pt_units[1]=pt_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
-//##ModelId=3E3B98C5019F
-void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+
+void 
+mitk::Geometry2D::IndexToWorld(const mitk::Point2D &atPt2d_units, 
+  const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -120,17 +140,22 @@ void mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, const
   vec_mm[1]=vec3d[1];
 }
 
-//##ModelId=3E3B98C9019B
-void mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+
+void 
+mitk::Geometry2D::WorldToIndex(const mitk::Point2D &atPt2d_mm,
+  const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) possible. Has to be implemented in sub-class.");
+  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general" \
+    " WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units)" \
+    " possible. Has to be implemented in sub-class.");
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
   vec_units[0]=vec_mm[0]/m_ScaleFactorMMPerUnitX;
   vec_units[1]=vec_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
-void mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
+void 
+mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
 {
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   ScalarType extent, newextentInMM;
@@ -155,8 +180,10 @@ void mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType h
   SetBounds(bounds);
 }
 
-//##ModelId=3EF48EA10320
-bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
+
+bool 
+mitk::Geometry2D::Project(
+  const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
 
@@ -167,8 +194,10 @@ bool mitk::Geometry2D::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &proj
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-//##ModelId=3EF48F170280
-bool mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
+
+bool 
+mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
+  const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {
   Point2D pt2d_mm_start, pt2d_mm_end;
   Point3D pt3d_mm_end;
@@ -179,15 +208,19 @@ bool mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D
   return inside;
 }
 
-//##ModelId=3EF48F2E00D4
-void mitk::Geometry2D::Map(const mitk::Point2D & /*atPt2d_mm*/, const mitk::Vector2D &/*vec2d_mm*/, mitk::Vector3D &/*vec3d_mm*/) const
+
+void 
+mitk::Geometry2D::Map(const mitk::Point2D &atPt2d_mm,
+  const mitk::Vector2D &vec2d_mm, mitk::Vector3D &/*vec3d_mm*/) const
 {
   //@todo implement parallel to the other Map method!
   assert(false);
 }
 
-//##ModelId=3EF48F8F01B0
-bool mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+
+bool 
+mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
+  const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
 
@@ -201,7 +234,9 @@ bool mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vect
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-mitk::ScalarType mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
+
+mitk::ScalarType 
+mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
 {
   Point3D projectedPoint;
   Project(pt3d_mm, projectedPoint);
@@ -214,14 +249,16 @@ mitk::ScalarType mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) 
   return distance;
 }
 
-bool mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
+bool 
+mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
 {
   Point3D pt3d_units;
   Geometry3D::WorldToIndex(pt3d_mm, pt3d_units);
   return (pt3d_units[2] > m_BoundingBox->GetBounds()[4]);
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::Geometry2D::Clone() const
+mitk::AffineGeometryFrame3D::Pointer 
+mitk::Geometry2D::Clone() const
 {
   Self::Pointer newGeometry = Self::New();
   newGeometry->Initialize();
@@ -229,32 +266,66 @@ mitk::AffineGeometryFrame3D::Pointer mitk::Geometry2D::Clone() const
   return newGeometry.GetPointer();
 }
 
-void mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
+
+void 
+mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
+
+  newGeometry->SetReferenceGeometry( m_ReferenceGeometry );
 }
 
-void mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
+void 
+mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
-  os << indent << " ScaleFactorMMPerUnitX: " << m_ScaleFactorMMPerUnitX << std::endl;
-  os << indent << " ScaleFactorMMPerUnitY: " << m_ScaleFactorMMPerUnitY << std::endl;
+  os << indent << " ScaleFactorMMPerUnitX: "
+     << m_ScaleFactorMMPerUnitX << std::endl;
+  os << indent << " ScaleFactorMMPerUnitY: "
+     << m_ScaleFactorMMPerUnitY << std::endl;
 }
 
-bool mitk::Geometry2D::WriteXMLData( XMLWriter& xmlWriter )
+
+bool 
+mitk::Geometry2D::WriteXMLData( XMLWriter& xmlWriter )
 {
   mitk::Geometry3D::WriteXMLData( xmlWriter );
-  xmlWriter.WriteProperty( SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
-  xmlWriter.WriteProperty( SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
+  xmlWriter.WriteProperty(
+    SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
+  xmlWriter.WriteProperty( 
+    SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
   return true;
 }
 
-bool mitk::Geometry2D::ReadXMLData( XMLReader& xmlReader )
+
+bool 
+mitk::Geometry2D::ReadXMLData( XMLReader& xmlReader )
 {
   Geometry3D::ReadXMLData( xmlReader );
-  bool resul = true;
-  resul &= mitk::Geometry3D::ReadXMLData( xmlReader );
-  resul &= xmlReader.GetAttribute( SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
-  resul &= xmlReader.GetAttribute( SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
-  return resul;
+  bool result = true;
+  result &= mitk::Geometry3D::ReadXMLData( xmlReader );
+  result &= xmlReader.GetAttribute( 
+    SCALAR_FACTOR_MM_PRT_UNIT_X, m_ScaleFactorMMPerUnitX );
+  result &= xmlReader.GetAttribute( 
+    SCALAR_FACTOR_MM_PRT_UNIT_Y, m_ScaleFactorMMPerUnitY );
+  return result;
+}
+
+
+void
+mitk::Geometry2D::SetReferenceGeometry( mitk::Geometry3D *geometry )
+{
+  m_ReferenceGeometry = geometry;
+}
+
+mitk::Geometry3D *
+mitk::Geometry2D::GetReferenceGeometry() const
+{
+  return m_ReferenceGeometry;
+}
+
+bool
+mitk::Geometry2D::HasReferenceGeometry() const
+{
+  return ( m_ReferenceGeometry != NULL );
 }

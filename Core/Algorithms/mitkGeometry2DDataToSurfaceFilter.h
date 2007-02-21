@@ -21,9 +21,23 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkSurfaceSource.h"
+#include "mitkGeometry3D.h"
+#include "vtkType.h"
 
 class vtkPlaneSource;
+class vtkLinearTransform;
 class vtkTransformPolyDataFilter;
+class vtkCubeSource;
+class vtkTransform;
+class vtkTransformPolyDataFilter;
+class vtkPlane;
+class vtkCutter;
+class vtkStripper;
+class vtkPolyData;
+class vtkTriangleFilter;
+class vtkTextureMapToPlane;
+class vtkBox;
+class vtkClipPolyData;
 
 namespace mitk {
 
@@ -80,7 +94,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief Get x-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in x-direction (see vtkPlaneSource::SetXResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the x-bounds of Geometry3D::GetParametricBounds() are used.
@@ -89,7 +103,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief Set x-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in x-direction (see vtkPlaneSource::SetXResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the x-bounds of Geometry3D::GetParametricBounds() are used.
@@ -99,7 +113,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief Get y-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in y-direction (see vtkPlaneSource::SetYResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the y-bounds of Geometry3D::GetParametricBounds() are used.
@@ -108,7 +122,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief Set y-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in y-direction (see vtkPlaneSource::SetYResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the y-bounds of Geometry3D::GetParametricBounds() are used.
@@ -136,6 +150,16 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //## \sa m_PlaceByGeometry
     itkSetMacro(PlaceByGeometry, bool);
     itkBooleanMacro(PlaceByGeometry);
+
+
+    itkGetConstMacro( UseBoundingBox, bool );
+    itkSetMacro( UseBoundingBox, bool );
+    itkBooleanMacro( UseBoundingBox );
+
+    void SetBoundingBox( const mitk::BoundingBox *boundingBox );
+    const mitk::BoundingBox *GetBoundingBox() const;
+
+    
   protected:
     //##ModelId=3EF4A4A70345
     Geometry2DDataToSurfaceFilter();
@@ -146,12 +170,12 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##ModelId=3EF5734B013A
     //##Documentation
     //## @brief Source to create the vtk-representation of the parameter space rectangle of the Geometry2D
-    vtkPlaneSource* m_VtkPlaneSource;
+    vtkPlaneSource* m_PlaneSource;
 
     //##ModelId=3EF5734B01DA
     //##Documentation
     //## @brief Filter to create the vtk-representation of the Geometry2D, which is a
-    //## transformation of the m_VtkPlaneSource
+    //## transformation of the m_PlaneSource
     vtkTransformPolyDataFilter* m_VtkTransformPlaneFilter;
 
     //##Documentation
@@ -163,7 +187,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief X-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in x-direction (see vtkPlaneSource::SetXResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the x-bounds of Geometry3D::GetParametricBounds() are used.
@@ -174,7 +198,7 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //##Documentation
     //## @brief Y-resolution in parameter space
     //##
-    //## The m_VtkPlaneSource will create this many sub-rectangles
+    //## The m_PlaneSource will create this many sub-rectangles
     //## in y-direction (see vtkPlaneSource::SetYResolution)
     //## @note Only used, when GetUseGeometryParametricBounds() is @a false, otherwise the
     //## the y-bounds of Geometry3D::GetParametricBounds() are used.
@@ -189,6 +213,24 @@ class Geometry2DDataToSurfaceFilter : public SurfaceSource
     //## at the origin and the actual position is determined by the transform of the 
     //## Geometry.
     bool m_PlaceByGeometry;
+
+    bool m_UseBoundingBox;
+
+    mitk::BoundingBox::ConstPointer m_BoundingBox;
+
+    vtkCubeSource *m_CubeSource;
+    vtkTransform *m_Transform;
+    vtkTransformPolyDataFilter *m_PolyDataTransformer;
+    
+    vtkPlane *m_Plane;
+    vtkCutter *m_PlaneCutter;
+    vtkStripper *m_PlaneStripper;
+    vtkPolyData *m_PlanePolyData;
+    vtkTriangleFilter *m_PlaneTriangler;
+    vtkTextureMapToPlane *m_TextureMapToPlane;
+
+    vtkBox *m_Box;
+    vtkClipPolyData *m_PlaneClipper;
 };
 
 } // namespace mitk

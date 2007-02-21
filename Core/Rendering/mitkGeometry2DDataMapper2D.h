@@ -28,55 +28,59 @@ namespace mitk {
 
 class BaseRenderer;
 
-//##ModelId=3E639D57030F
-//##Documentation
-//## @brief OpenGL-based mapper to display a Geometry2D in a 2D window
-//##
-//## Currently implemented for mapping on PlaneGeometry. 
-//## The result is normally a line. An important usage of this class is to show
-//## the orientation of the slices displayed in other 2D windows.
-//## @todo implement for AbstractTransformGeometry.
-//## @ingroup Mapper
+/**
+ * \brief OpenGL-based mapper to display a Geometry2D in a 2D window
+ *
+ * Currently implemented for mapping on PlaneGeometry. 
+ * The result is normally a line. An important usage of this class is to show
+ * the orientation of the slices displayed in other 2D windows.
+ *
+ * \todo implement for AbstractTransformGeometry.
+ * \ingroup Mapper
+ */
 class Geometry2DDataMapper2D : public GLMapper2D
 {
+
 public:
-    //##ModelId=3E6423D2032C
-    mitkClassMacro(Geometry2DDataMapper2D, Mapper2D);
+  mitkClassMacro(Geometry2DDataMapper2D, Mapper2D);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##ModelId=3E6423D20341
-    //##Documentation
-    //## @brief Get the Geometry2DData to map
-    const mitk::Geometry2DData * GetInput(void);
+  /**
+    * \brief Get the Geometry2DData to map
+    */
+  const mitk::Geometry2DData * GetInput(void);
 
-    //##ModelId=3E67D77A0109
-    virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint(mitk::BaseRenderer * renderer);
 
-    //## @brief Leave a little gap when crossing other nodes containing 
-    //## Geometry2DData accessible by traversing the iterator
-    //##
-    //## \note works currently for PlaneGeometry only
-    virtual void SetDataIteratorToOtherGeometry2Ds(const mitk::DataTreeIteratorBase* iterator);
+  /**
+    * \brief Leave a little gap when crossing other nodes containing 
+    * Geometry2DData accessible by traversing the iterator
+    *
+    * \note works currently for PlaneGeometry only
+    */
+  virtual void SetDataIteratorToOtherGeometry2Ds(const mitk::DataTreeIteratorBase* iterator);
+
+
 protected:
-    //##ModelId=3E639E100243
-    Geometry2DDataMapper2D();
+  Geometry2DDataMapper2D();
 
-    //##ModelId=3E639E100257
-    virtual ~Geometry2DDataMapper2D();
+  virtual ~Geometry2DDataMapper2D();
 
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-    SurfaceMapper2D::Pointer m_SurfaceMapper;
+  SurfaceMapper2D::Pointer m_SurfaceMapper;
 
-    //## @brief Leave a little gap when crossing other nodes containing 
-    //## Geometry2DData accessible by traversing this iterator (if set)
-    //##
-    //## \note works currently for PlaneGeometry only
-    mitk::DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
+  /**
+    * \brief Leave a little gap when crossing other nodes containing 
+    * Geometry2DData accessible by traversing this iterator (if set)
+    *
+    * \note works currently for PlaneGeometry only
+    */
+  mitk::DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
 
-    typedef std::vector<mitk::DataTreeNode*> NodesVectorType;
-    NodesVectorType m_OtherGeometry2Ds;
+  typedef std::vector<mitk::DataTreeNode*> NodesVectorType;
+  NodesVectorType m_OtherGeometry2Ds;
 };
 
 } // namespace mitk

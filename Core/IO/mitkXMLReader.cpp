@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkXMLDataElement.h>
 #include <mitkStatusBar.h>
-#include <mitkObjectFactory.h>
+#include <mitkCoreObjectFactory.h>
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkEventMapper.h>
@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkBaseXMLWriter.h>
 #include <itksys/SystemTools.hxx>
 #include <vtkObjectFactory.h>
-
 
 #include <fstream>
 #include <string>
@@ -586,7 +585,7 @@ namespace mitk {
     if ( className.empty() )
       return NULL;
 
-    return mitk::ObjectFactory::CreateObject( className );
+    return mitk::CoreObjectFactory::CreateCoreObject( className );
   }
 
   std::string XMLReader::GetSourceFilePath()

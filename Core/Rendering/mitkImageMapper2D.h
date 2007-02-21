@@ -55,7 +55,7 @@ class RenderWindow;
 //## @ingroup Mapper
 class ImageMapper2D : public GLMapper2D
 {
-  friend class MapperFactory;
+  friend class CoreObjectFactory;
 public:
   /** Standard class typedefs. */
   mitkClassMacro(ImageMapper2D,GLMapper2D);

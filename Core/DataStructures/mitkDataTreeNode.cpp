@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkDataTreeNode.h"
-#include "mitkMapperFactory.h"
+#include "mitkCoreObjectFactory.h"
 #include <vtkTransform.h>
 #include <itkSmartPointerForwardReference.txx>
 
@@ -49,7 +49,7 @@ mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 //      int i, size=id-m_Mappers.capacity()+10;
       m_Mappers.resize(id+10);
     }
-    m_Mappers[id] = MapperFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
+    m_Mappers[id] = CoreObjectFactory::CreateMapper(const_cast<DataTreeNode*>(this),id);
   }
   return m_Mappers[id];
 }

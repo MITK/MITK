@@ -141,7 +141,13 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   {
     if ( nit[i] != 0 )
     {
-      nit.SetPixel( i, m_DrawState );
+      try
+      {
+        nit.SetPixel( i, m_DrawState );
+      }
+      catch( itk::RangeError & )
+      {
+      }
     }
   }
 }
@@ -176,6 +182,10 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   typedef itk::LineConstIterator< SeedsImageType > LineIteratorType;
   LineIteratorType lit( itkImage, itkIndexBegin, itkIndexEnd );
 
+  // Disable warnings (which would otherwise be displayed if line leaves the
+  // region).
+  bool warningDisplay = itk::Object::GetGlobalWarningDisplay();
+  itk::Object::GlobalWarningDisplayOff();
   for ( lit.GoToBegin(); !lit.IsAtEnd(); ++lit )
   {
     nit.SetLocation( lit.GetIndex() );
@@ -185,10 +195,17 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
     {
       if ( nit[i] != 0 )
       {
-        nit.SetPixel( i, m_DrawState );
+        try
+        {
+          nit.SetPixel( i, m_DrawState );
+        }
+        catch( itk::RangeError & )
+        {
+        }
       }
     }
   }
+  itk::Object::SetGlobalWarningDisplay( warningDisplay );
 }
 
 void mitk::SeedsImage::ClearBuffer()

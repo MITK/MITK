@@ -101,12 +101,12 @@ namespace mitk {
     //## (see definition of NodePredicateBase for details).
     //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the 
     //## conditions. A set of all objects can be retrieved with the GetAll() method;
-    SetOfObjects::ConstPointer GetSubset(const NodePredicateBase& condition);
+    SetOfObjects::ConstPointer GetSubset(const NodePredicateBase& condition) const;
 
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s). 
     //##
-    SetOfObjects::ConstPointer GetSources(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true);
+    SetOfObjects::ConstPointer GetSources(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
@@ -118,29 +118,29 @@ namespace mitk {
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset() 
     //## method by providing a predicate as the condition parameter.
-    SetOfObjects::ConstPointer GetDerivations(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true);
+    SetOfObjects::ConstPointer GetDerivations(mitk::DataTreeNode::Pointer node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const;
 
 
     //##Documentation
     //## @brief returns a set of all dataobjects that are stored in the data storage
     //##
-    SetOfObjects::ConstPointer GetAll();
+    SetOfObjects::ConstPointer GetAll() const;
 
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
-    mitk::DataTreeNode* GetNamedNode(const char* name);
+    mitk::DataTreeNode* GetNamedNode(const char* name) const;
     
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
     //##
-    //mitk::DataTreeNode* GetNamedDerivedNode(const char* name, mitk::DataTreeNode::Pointer sourceNode);
+    mitk::DataTreeNode* GetNamedDerivedNode(const char* name, mitk::DataTreeNode::Pointer sourceNode, bool onlyDirectDerivations = true) const;
 
     //##Documentation
     //## @brief Convenience method to get the first data object of a given datatype with a given name
     //##
     template <class DataType>
-    DataType* GetNamedObject(const char* name)
+    DataType* GetNamedObject(const char* name) const
     {
       if (name == NULL)
         return NULL;
@@ -173,7 +173,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief convenience method to check if the object has been initialized (i.e. a data tree has been set)
-    bool IsInitialized();
+    bool IsInitialized() const;
 
     //mitk::DataTreeIteratorBase& GetElementsIterator();
 
@@ -185,8 +185,10 @@ namespace mitk {
     //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
     bool m_ManageCompleteTree;
     typedef std::map<mitk::DataTreeNode::Pointer, SetOfObjects::ConstPointer> AdjacencyList;
-    AdjacencyList m_CreatedByRelations;
-    AdjacencyList m_CreatedFromRelations;
+    AdjacencyList m_SourceNodes;
+    AdjacencyList m_DerivedNodes;
+
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
     static mitk::DataStorage::Pointer s_Instance;
   };

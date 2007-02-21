@@ -286,6 +286,10 @@ class SliceNavigationController : public BaseController
     //##
     virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
+    void SelectSliceByPoint( const mitk::Point3D &point );
+
+    void ReorientSlices( const mitk::Point3D &point, const mitk::Vector3D &normal );
+
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent);
 
     void ExecuteOperation(Operation* operation);
@@ -312,6 +316,7 @@ class SliceNavigationController : public BaseController
     virtual ~SliceNavigationController();
 
     mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
+    mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
 
     mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 

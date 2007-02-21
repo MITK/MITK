@@ -24,126 +24,133 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataTree.h"
 
+#include <vtkType.h>
+
 class vtkActor;
 class vtkTexture;
-class vtkPlaneSource;
 class vtkImageMapToWindowLevelColors;
 class vtkPolyData;
 class vtkPolyDataMapper;
+class vtkDataSetMapper;
 class vtkLookupTable;
 class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
 
+
 namespace mitk {
 
 class Geometry2DData;
 class BaseRenderer;
+class ImageMapper2D;
 
-//##ModelId=3E691E09014F
-//##Documentation
-//## @brief Vtk-based mapper to display a Geometry2D in a 3D window
-//##
-//## @ingroup Mapper
+/**
+ *  \brief Vtk-based mapper to display a Geometry2D in a 3D window
+ * 
+ *  \ingroup Mapper
+ */
 class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
-  public:
-    //##ModelId=3E691E09036C
-    mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
+public:
+  mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
 
-    itkNewMacro(Geometry2DDataVtkMapper3D);
+  itkNewMacro(Geometry2DDataVtkMapper3D);
 
-    //##ModelId=3E691E090380
-    //##Documentation
-    //## @brief Get the Geometry2DData to map
-    virtual const mitk::Geometry2DData *GetInput();
-  
-    //##ModelId=3E6E874F0007
-    //##Documentation
-    //## @brief The first image found when traversing the @a iterator (stored in m_DataTreeIterator)
-    //## will be used as a texture on the mapped Geometry2D, when it has 
-    //## been resliced by an ImageMapper2D according to the Geometry2D.
-    //## See ImageMapper2D for problems of the current version.
-    //## @warning Works only when the node to the Geometry2DData was created by 
-    //## calling BaseRenderer::GetCurrentWorldGeometry2DNode()
-    virtual void SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator);
+  /**
+   *  \brief Get the Geometry2DData to map
+   */
+  virtual const mitk::Geometry2DData *GetInput();
 
-  protected:
-    //##ModelId=3E691E09038E
-    Geometry2DDataVtkMapper3D();
+  /**
+   * \brief All images found when traversing the (sub-) tree starting at
+   * \a iterator which are resliced by an ImageMapper2D will be mapped.
+   */
+  virtual void SetDataIteratorForTexture(
+    const mitk::DataTreeIteratorBase *iterator );
 
-    //##ModelId=3E691E090394
-    virtual ~Geometry2DDataVtkMapper3D();
+protected:
+  Geometry2DDataVtkMapper3D();
 
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual ~Geometry2DDataVtkMapper3D();
 
-    //##ModelId=3E691E090331
-    //##Documentation
-    //## @brief vtk-mapper to map the vtk-representation of the Geometry2D
-    vtkPolyDataMapper* m_VtkPolyDataMapper;
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-    //##ModelId=3E691E090344
-    //##Documentation
-    //## @brief vtk-actor containing the m_VtkPolyDataMapper and the m_VtkTexture
-	//## if set.
-    vtkActor* m_ImageActor;
+  /**
+   * \brief Construct an extended lookup table from the given one.
+   *
+   * In order to overlay differently sized images over each other, it is 
+   * necessary to have a special translucent value, so that the empty
+   * surroundings of the smaller image do not occlude the bigger image.
+   *
+   * The smallest possible short (-32768) is used for this. Due to the
+   * implementation of vtkLookupTable, the lookup table needs to be extended
+   * so that this value is included. Entries between -32768 and the actual
+   * table minimum will be set to the lowest entry in the input lookup table.
+   * From this point onward, the input lookup is just copied into the output
+   * lookup table.
+   *
+   * See also mitk::ImageMapper2D, where -32768 is defined as BackgroundLevel
+   * for resampling.
+   *
+   * NOTE: This method is currently not used; to make sure that the plane is
+   * not rendered with translucent "holes", a black background plane is first
+   * rendered under all other planes.
+   */
+  virtual void BuildPaddedLookupTable( 
+    vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
+    vtkFloatingPointType min, vtkFloatingPointType max );
 
-    //##Documentation
-    //## @brief PropAssembly to hold the plane and its tubal frame
-    vtkAssembly* m_Prop3DAssembly;
+  int FindPowerOfTwo( int i );
 
-    //##ModelId=3E691E090358
-    //##Documentation
-    //## @brief vtk-representation of the Geometry2D
-    vtkPolyData* m_VtkPolyData;
 
-    //##ModelId=3E691E090362
-    //##Documentation
-    //## @brief source to create the vtk-representation of a PlaneGeometry
-    vtkPlaneSource* m_VtkPlaneSource;
+  /** \brief PropAssembly to hold the plane and its tubal frame */
+  vtkAssembly *m_Prop3DAssembly;
 
-    //##Documentation
-    //## @brief Edge extractor for tube-shaped frame
-    vtkFeatureEdges* m_Edges;
+  /** \brief Edge extractor for tube-shaped frame */
+  vtkFeatureEdges *m_Edges;
 
-    //##Documentation
-    //## @brief Source to create the tube-shaped frame
-    vtkTubeFilter* m_EdgeTuber;
+  /** \brief Source to create the tube-shaped frame  */
+  vtkTubeFilter *m_EdgeTuber;
 
-    //##Documentation
-    //## @brief Mapper for the tube-shaped frame
-    vtkPolyDataMapper* m_EdgeMapper;
+  /** \brief Mapper for the tube-shaped frame  */
+  vtkPolyDataMapper *m_EdgeMapper;
 
-    //##Documentation
-    //## @brief Actor for the tube-shaped frame
-    vtkActor* m_EdgeActor;
+  /** \brief Actor for the tube-shaped frame */
+  vtkActor *m_EdgeActor;
 
-    //##ModelId=3E6E8AA40375
-    //## @brief The first image found when traversing the this iterator (if set)
-    //## will be used as a texture on the mapped Geometry2D, when it has 
-    //## been resliced by an ImageMapper2D according to the Geometry2D.
-    //## \sa SetDataIteratorForTexture
-    mitk::DataTreeIteratorClone m_DataTreeIterator;
 
-    //##ModelId=3E691E09034E
-    //##Documentation
-    //## @brief vtk-texture when m_DataTreeIterator is set (by SetDataIteratorForTexture)
-    //## if set.
-    vtkTexture* m_VtkTexture;
+  mitk::DataTreeIteratorClone m_DataTreeIterator;
 
-    //##ModelId=3E6E8AA4034C
-    //##Documentation
-    //## @brief lookup-table for texture (m_VtkTexture)
-    vtkLookupTable *m_VtkLookupTable;
 
-    //##Documentation
-    //## @brief default lookup-table for texture (m_VtkTexture)
-    vtkLookupTable *m_VtkLookupTableDefault;
+  /** A default grayscale lookup-table, used for reference */
+  vtkLookupTable *m_DefaultLookupTable;
 
-    //##ModelId=3EDD039F0240
-    //##Documentation
-    //## @brief timestamp of last update of texture (m_VtkTexture) from image data
-    unsigned long int m_LastTextureUpdateTime;
+
+  /** \brief List holding the vtkActor to map the image into 3D for each 
+   * ImageMapper 
+   */
+  typedef std::map< mitk::ImageMapper2D *, vtkActor * > ActorList;
+  ActorList m_ImageActors;
+
+  struct LookupTableProperties
+  {
+    vtkLookupTable *LookupTableSource;
+    vtkFloatingPointType windowMin;
+    vtkFloatingPointType windowMax;
+  };
+
+  typedef std::map< mitk::ImageMapper2D *, LookupTableProperties > 
+    LookupTablePropertiesList;
+
+  /** \brief List holding some lookup table properties of the previous pass */
+  LookupTablePropertiesList m_LookupTableProperties;
+
+  typedef std::multimap< int, vtkActor * > LayerSortedActorList;
+
+  /** \brief List holding the last update times for each ImageMapper. */
+  typedef std::map< mitk::ImageMapper2D *, int > LastUpdateTimeList;
+  LastUpdateTimeList m_LastTextureUpdateTimes;
+
 };
 
 } // namespace mitk

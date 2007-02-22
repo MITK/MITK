@@ -6,6 +6,7 @@ SET(CPP_FILES
   mitkBoundingObjectCutter.cpp
   mitkCallbackFromGUIThread.cpp
   mitkContourSetToPointSetFilter.cpp
+  mitkCoreObjectFactory.cpp
   mitkCylindricToCartesianFilter.cpp
   mitkDataTreeNodeFactory.cpp
   mitkDataTreeNodeSource.cpp

@@ -47,11 +47,9 @@ SET(CPP_FILES
   mitkLineOperation.cpp
   mitkLookupTable.cpp
   mitkLookupTableProperty.cpp
-  mitkMapClassIDToClassName.cpp
   mitkMaterialProperty.cpp
   mitkMesh.cpp
   mitkModeOperation.cpp
-  mitkObjectFactory.cpp
   mitkOperationActor.cpp
   mitkOperation.cpp
   mitkPicHelper.cpp

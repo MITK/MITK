@@ -17,7 +17,6 @@ SET(CPP_FILES
   mitkMapper2D.cpp
   mitkMapper3D.cpp
   mitkMapper.cpp
-  mitkMapperFactory.cpp
   mitkMeshMapper2D.cpp
   mitkMeshVtkMapper3D.cpp
   mitkNativeRenderWindowInteractor.cpp

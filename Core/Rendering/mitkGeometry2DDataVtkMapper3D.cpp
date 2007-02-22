@@ -124,53 +124,56 @@ Geometry2DDataVtkMapper3D
   }
 }
 
-void
-Geometry2DDataVtkMapper3D::BuildPaddedLookupTable( 
-  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
-  vtkFloatingPointType min, vtkFloatingPointType max )
-{
-  // Copy the table values from the input lookup table
-  vtkUnsignedCharArray *inputTable = vtkUnsignedCharArray::New();
-  inputTable->DeepCopy( inputLookupTable->GetTable() );
-
-  vtkUnsignedCharArray *outputTable = outputLookupTable->GetTable();
-
-  // Calculate the size of one lookup table "bin"
-  vtkFloatingPointType binSize = (max - min) / 256.0;
-
-  // Calculate the extended table size, assuming the range [-32767, max],
-  // increased by 1.
-  int tableSize = (int) ((max + 32767) / binSize) + 1;
-  outputLookupTable->SetNumberOfTableValues( tableSize );
-
-  unsigned char *inputPtr = inputTable->WritePointer( 0, 0 );
-  unsigned char *outputPtr = outputTable->WritePointer( 0, 0 );
-
-  // Initialize the first (translucent) bin.
-  *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; 
-  
-  int i;
-  for ( i = 1; i < tableSize; ++i )
-  {
-    *outputPtr++ = *inputPtr++;
-    *outputPtr++ = *inputPtr++;
-    *outputPtr++ = *inputPtr++;
-    *outputPtr++ = *inputPtr++;
-
-    // While filling the padded part of the table, use the default value
-    // (the first value of the input table)
-    if ( i < (tableSize - 256) )
-    {
-      inputPtr -= 4;
-    }
-  }
-
-  // Apply the new table range; the lower boundary is decreased by binSize
-  // since we have one additional translucent bin.
-  outputLookupTable->SetTableRange( -32767.0 - binSize, max );
-
-  inputTable->Delete();
-}
+//
+// METHOD COMMENTED OUT SINCE IT IS CURRENTLY UNUSED
+//
+//void
+//Geometry2DDataVtkMapper3D::BuildPaddedLookupTable( 
+//  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
+//  vtkFloatingPointType min, vtkFloatingPointType max )
+//{
+//  // Copy the table values from the input lookup table
+//  vtkUnsignedCharArray *inputTable = vtkUnsignedCharArray::New();
+//  inputTable->DeepCopy( inputLookupTable->GetTable() );
+//
+//  vtkUnsignedCharArray *outputTable = outputLookupTable->GetTable();
+//
+//  // Calculate the size of one lookup table "bin"
+//  vtkFloatingPointType binSize = (max - min) / 256.0;
+//
+//  // Calculate the extended table size, assuming the range [-32767, max],
+//  // increased by 1.
+//  int tableSize = (int) ((max + 32767) / binSize) + 1;
+//  outputLookupTable->SetNumberOfTableValues( tableSize );
+//
+//  unsigned char *inputPtr = inputTable->WritePointer( 0, 0 );
+//  unsigned char *outputPtr = outputTable->WritePointer( 0, 0 );
+//
+//  // Initialize the first (translucent) bin.
+//  *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; 
+//  
+//  int i;
+//  for ( i = 1; i < tableSize; ++i )
+//  {
+//    *outputPtr++ = *inputPtr++;
+//    *outputPtr++ = *inputPtr++;
+//    *outputPtr++ = *inputPtr++;
+//    *outputPtr++ = *inputPtr++;
+//
+//    // While filling the padded part of the table, use the default value
+//    // (the first value of the input table)
+//    if ( i < (tableSize - 256) )
+//    {
+//      inputPtr -= 4;
+//    }
+//  }
+//
+//  // Apply the new table range; the lower boundary is decreased by binSize
+//  // since we have one additional translucent bin.
+//  outputLookupTable->SetTableRange( -32767.0 - binSize, max );
+//
+//  inputTable->Delete();
+//}
 
 
 int

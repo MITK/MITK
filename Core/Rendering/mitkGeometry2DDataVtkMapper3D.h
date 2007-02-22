@@ -75,7 +75,7 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-  /**
+  /*
    * \brief Construct an extended lookup table from the given one.
    *
    * In order to overlay differently sized images over each other, it is 
@@ -96,9 +96,9 @@ protected:
    * not rendered with translucent "holes", a black background plane is first
    * rendered under all other planes.
    */
-  virtual void BuildPaddedLookupTable( 
-    vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
-    vtkFloatingPointType min, vtkFloatingPointType max );
+  //virtual void BuildPaddedLookupTable( 
+  //  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
+  //  vtkFloatingPointType min, vtkFloatingPointType max );
 
   int FindPowerOfTwo( int i );
 

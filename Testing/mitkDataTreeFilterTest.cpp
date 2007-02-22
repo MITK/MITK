@@ -695,7 +695,7 @@ int testDataStorageCompliance()
   dTF->SetDataStorageResultset(rs);
 
   const mitk::DataTreeFilter::ItemList* items = dTF->GetItems();
-  if (   (items->Size() == 3))    // HIER GEHTS WEITER: items besser testen ob n1-n3 drin ist und dann weitere tests
+  if (   (items->Size() == 3))
   {
     bool n1found = false;
     bool n2found = false;
@@ -725,7 +725,6 @@ int testDataStorageCompliance()
       std::cout << "[FAILED]" << std::endl;
       returnValue = EXIT_FAILURE;
     }
-
   }
   else
   {
@@ -739,7 +738,7 @@ int testDataStorageCompliance()
   dTF->SetDataStorageResultset(rs2);
 
   const mitk::DataTreeFilter::ItemList* items2 = dTF->GetItems();
-  if (   (items2->Size() == 2))    // HIER GEHTS WEITER: items2 besser testen ob n1-n3 drin ist und dann weitere tests
+  if (   (items2->Size() == 2))
   {
     bool n2found = false;
     bool n3found = false;

@@ -108,7 +108,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   /* create entry in derivations adjacency list for each parent of the new node */
   for (SetOfObjects::ConstIterator it = sp->Begin(); it != sp->End(); it++)
   {
-    mitk::DataTreeNode::ConstPointer parent = it.Value();
+    mitk::DataTreeNode::ConstPointer parent = it.Value().GetPointer();
     mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects = m_DerivedNodes[parent]; // get or create pointer to list of derived objects for that parent node
     if (derivedObjects.IsNull())
       m_DerivedNodes[parent] = mitk::DataStorage::SetOfObjects::New();  // Create a set of Objects, if it does not already exist
@@ -199,7 +199,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
     else
       for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
       {
-        mitk::DataTreeNode::ConstPointer p = parentIt.Value();
+        mitk::DataTreeNode::ConstPointer p = parentIt.Value().GetPointer();
         if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset 
             && !(std::find(openlist.begin(), openlist.end(), p) != openlist.end()))     // and not already in openlist
           openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed

@@ -27,9 +27,9 @@ public slots:
     // usaly there is a check if something was loaded - to save time
     void Reinitialize(bool );
     // Lightbox action 1-4 -> light box will be added or replaced in the mitk data tree
-    void ButtonToggled(bool );
+    void ButtonToggled(int );
     // to change the state to use multiple images in the data tree or only a single one
-    void ToolbarMode(bool );
+    void KeepDataTreeNodesCBtoggled(bool );
 
 signals:
     void LightboxSelected(QcLightbox*);
@@ -43,6 +43,7 @@ private:
     QButtonGroup* toolbar;    
     int idLightbox;
     void SelectLightbox(int id);
+    void ResetLightboxButtons(int select=0);
     bool m_KeepDataTreeNodes;
 };
 

@@ -8,17 +8,20 @@
 #include <qptrlist.h>
 
 
-ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
+ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin):
+task(parent),
+plugin(qcplugin),
+idLightbox(0),
+m_KeepDataTreeNodes(false)
 {
-    task=parent;
+    /*task=parent;
     plugin=qcplugin;
     idLightbox=0;
-    m_KeepDataTreeNodes=false;
+    m_KeepDataTreeNodes=false;*/
 
     toolbar=new QButtonGroup(parent);
     toolbar->setMaximumHeight(40);
     layout=new QGridLayout(parent,2,0,0,0);
-    toolbar->setExclusive(!m_KeepDataTreeNodes);
 
     layout->addWidget(toolbar,2,0);
 
@@ -43,16 +46,17 @@ ToolBar::ToolBar(QWidget* parent,QcPlugin* qcplugin)
 
     //ConferenceButton
     QPushButton* button= new QPushButton(toolbar, QString("toolbarSelectLightBox%1").arg(i).latin1());
-    button->setToggleButton(true);
     layout2->addWidget(button,1,i-1);
     toolbar->insert(button,i);
 
-    for (int i=1;i<5;++i)
-      connect(toolbar->find(i),SIGNAL(toggled(bool)),this,SLOT(ButtonToggled(bool)));
+    connect(toolbar,SIGNAL(clicked(int)),this,SLOT(ButtonToggled(int)));
+    //for (int i=1;i<5;++i)
+    //  connect(toolbar->find(i),SIGNAL(clicked(int)),this,SLOT(ButtonToggled(int)));
     //connect(toolbar,SIGNAL(clicked(int)),this,SLOT(ButtonToggled(int))); // all buttons
     connect(toolbar->find(5),SIGNAL(toggled(bool)),this,SLOT(Reinitialize(bool)));
-    connect(toolbar->find(6),SIGNAL(toggled(bool)),this,SLOT(ToolbarMode(bool)));
+    connect(toolbar->find(6),SIGNAL(toggled(bool)),this,SLOT(KeepDataTreeNodesCBtoggled(bool)));
 
+    //toolbar->setExclusive(false);
 }
 
 ToolBar::~ToolBar()
@@ -101,39 +105,31 @@ void ToolBar::ConnectButton(int number)
 
 void ToolBar::Reinitialize(bool on)
 {
-  if (!toolbar->find(6)->isOn())
-  {
-    if (on)
-    {
-      //force new instantiation of App
-      emit ChangeWidget(true);
-      toolbar->setButton(idLightbox+1);
-    }
-    /////itkGenericOutputMacro(<<"reinitialize");
-  }
-  else
-  {
-    this->ButtonToggled(true);
-    ((QPushButton*)(toolbar->find(5)))->setOn ( false );
-  }
+  ((QPushButton*)(toolbar->find(5)))->setOn ( false );
+  
+  //force new instantiation of App
+  emit ChangeWidget(true);
+
+  ResetLightboxButtons();
 }
 
-void ToolBar::ButtonToggled(bool on)
+void ToolBar::ButtonToggled(int lbId)
 {
-  if (m_KeepDataTreeNodes)
+  if(lbId>4) return;
+
+  if (!m_KeepDataTreeNodes)
   {
-     for(int i=1;i<5;++i)
-      if (toolbar->find(i)->isOn())
-          SelectLightbox(i-1);
+    this->ResetLightboxButtons(lbId);
   }
   else
   {
-    if(on)
-    {
-      int id=toolbar->id(toolbar->selected());
-      SelectLightbox(id-1);
-    }
+    ((QPushButton*)(toolbar->find(lbId)))->setOn(true);
+  }
 
+
+  if(((QPushButton*)(toolbar->find(lbId)))->isOn())
+  {
+    SelectLightbox(lbId-1);
   }
 }
 
@@ -149,25 +145,42 @@ void ToolBar::SelectLightbox(int id)
     /////itkGenericOutputMacro(<<"select lightbox");
 }
 
-void ToolBar::ToolbarMode(bool on)
+void ToolBar::KeepDataTreeNodesCBtoggled(bool on)
 {
   m_KeepDataTreeNodes = on;
-
-  if (m_KeepDataTreeNodes)
+  int lb;
+  int lbcount=0;
+  
+  for(int i=1;i<5;++i)
   {
-    //TODO: when toggeled - button should be showed as pressed
-    toolbar->setExclusive(false);
+    if(((QPushButton*)(toolbar->find(i)))->isOn())
+    {
+      lb = i;
+      lbcount++;
+    }
   }
-  else
-  {
-    emit ChangeWidget();
-    for(int i=1;i<6;++i)
-        ((QPushButton*)(toolbar->find(i)))->setOn ( false );
-    toolbar->setExclusive(true);
+
+  // change style to slecte only one button or more.
+ if(!m_KeepDataTreeNodes && lbcount>1) 
+ {
+    emit ChangeWidget(true);
+    this->ResetLightboxButtons(idLightbox+1);
+    SelectLightbox(idLightbox);
   }
 }
 
 bool ToolBar::KeepDataTreeNodes()
 {
   return m_KeepDataTreeNodes;
+}
+
+void ToolBar::ResetLightboxButtons(int select)
+{
+  for(int i=1;i<5;++i)
+  {
+    if(((QPushButton*)(toolbar->find(i)))->isOn() && i!=select)
+    {
+      ((QPushButton*)(toolbar->find(i)))->setOn(false);
+    }
+  }
 }

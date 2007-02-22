@@ -64,6 +64,7 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     ToolBar* toolbar;
 
     bool m_Activated;
+    int m_PicCounter;
     bool m_IsFilledDataTree;
 
     // single instance of this plugin

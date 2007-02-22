@@ -1,3 +1,5 @@
+#include <QcMITKSamplePlugin.h>
+
 #include <plugin.xpm>
 #include <qclightbox.h>
 #include <qclightboxmanager.h>
@@ -19,11 +21,10 @@
 #include <QmitkStdMultiWidget.h>
 #include <QmitkCommonFunctionality.h>
 
-#include "SampleApp.h"
-#include "ToolBar.h"
-#include "mitkChiliPlugin.h"
-#include "mitkChiliPluginFactory.h"
-#include "QcMITKSamplePlugin.h"
+#include <SampleApp.h>
+#include <ToolBar.h>
+#include <mitkChiliPlugin.h>
+#include <mitkChiliPluginFactory.h>
 
 #include <ipPic.h>
 #include <ipFunc.h>
@@ -39,6 +40,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   : QcPlugin( parent ), 
   app(NULL),
   m_Activated(false),
+  m_PicCounter(1),
   m_IsFilledDataTree(true)
 {
 
@@ -121,13 +123,14 @@ void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"selectSerie");
-  if(!toolbar->KeepDataTreeNodes() || !m_Activated)
-    CreateNewSampleApp(true);
+  if(!toolbar->KeepDataTreeNodes() && m_PicCounter!=0)
+    CreateNewSampleApp();
 
   if(lightbox==NULL || lightbox->getFrames()==0)
     return;
 
   m_Activated=true;
+  m_PicCounter++;
   m_IsFilledDataTree = true;
 
   mitk::Image::Pointer image = mitk::Image::New();
@@ -448,12 +451,14 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 void QcMITKSamplePlugin::CreateNewSampleApp(bool force)
 {
   // don instantiate new app if an emptyone allready esixts
-  if(m_Activated || force)
+  if(/*m_Activated &&*/ m_PicCounter>0 || force)
   {
     if(app)
       delete app;
     
     app = new SampleApp(task, "sample", 0);
+    m_Activated = false;
+    m_PicCounter = 0;
 
     toolbar->SetWidget(app);
   }

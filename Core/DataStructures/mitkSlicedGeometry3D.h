@@ -267,8 +267,7 @@ protected:
     const Point3D &referencePoint );
 
 
-  mitk::ScalarType mitk::SlicedGeometry3D::GetLargestExtent(
-    const Geometry3D *geometry );
+  ScalarType GetLargestExtent( const Geometry3D *geometry );
 
 
   virtual bool WriteXMLData( XMLWriter& xmlWriter );

@@ -86,6 +86,9 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   parents4->InsertElement(0, n2); 
   parents4->InsertElement(1, n3);  // n2 and n3 are sources of n4 
 
+  mitk::DataTreeNode::Pointer n5 = mitk::DataTreeNode::New();   // extra node
+  n5->SetProperty("name", new mitk::StringProperty("Node 5"));
+
   /* Get Data Storage for given tree */
   std::cout << "Get Data Storage for given tree : " << std::flush;
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
@@ -199,6 +202,28 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
+  /* Adding a node without parents */
+  std::cout << "Adding a node without parents: " << std::flush;
+  try 
+  {
+    ds->Add(n5);
+    if ((tree->Count() == objectsInTree + 1) && (tree->Contains(n5)))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+      objectsInTree = tree->Count();
+    }
+    else
+    {
+      std::cout << "[FAILED] - node not found in tree" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
   /* Requesting all Objects */
   std::cout << "Requesting all Objects: " << std::flush;
   try 
@@ -208,7 +233,8 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     if (ds->GetManageCompleteTree() == true)
       if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
       {
         std::cout<<"[PASSED]"<<std::endl;
       }
@@ -218,9 +244,10 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
         returnValue = EXIT_FAILURE;
       }
     else
-      if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
+      if (   (stlAll.size() == 5)  // check if all added nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
       {
         std::cout<<"[PASSED]"<<std::endl;
       }
@@ -262,9 +289,10 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
         returnValue = EXIT_FAILURE;
       }
     else
-      if (   (stlAll.size() == 4)  // check if all added nodes are in resultset
+      if (   (stlAll.size() == 5)  // check if all added nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()))
+          && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+          && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
       {
         std::cout<<"[PASSED]"<<std::endl;
       }
@@ -364,12 +392,14 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     int expectedCount;
     if (ds->GetManageCompleteTree() == true)
-      expectedCount = initialObjectsInTree + 2 + 1;  // all from init time, n1, n3 and the directly added node
+      expectedCount = initialObjectsInTree + 3 + 1;  // all from init time, n1, n3, n5 and the directly added node
     else
-      expectedCount = 2;  // n1, n3
+      expectedCount = 3;  // n1, n3, n5
 
     if (   (all->Size() == expectedCount) // check if correct objects are in resultset
-        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()))
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) 
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
     {
       std::cout<<"[PASSED]"<<std::endl;
     }
@@ -478,8 +508,8 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
-  /* Requesting *direct* derived objects with multiple parents */
-  std::cout << "Requesting *direct* derived objects with multiple parents : " << std::flush;
+  /* Requesting *direct* derived objects with multiple parents/derivations */
+  std::cout << "Requesting *direct* derived objects with multiple parents/derivations: " << std::flush;
   try
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n2, NULL, true); // Get direct childs of n2 (=n3 + n4)
@@ -581,7 +611,8 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
-  /* Checking GroupTagProperty */
+
+  /* Checking GroupTagProperty 2 */
   std::cout << "Checking GroupTagProperty 2: " << std::flush;
   try
   {
@@ -607,8 +638,33 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
-  /* Checking sources with condition */
-  std::cout << "Checking sources with condition: " << std::flush;
+  /* Checking direct sources with condition */
+  std::cout << "Checking direct sources with condition: " << std::flush;
+  try
+  {
+    mitk::NodePredicateDataType pred("Surface");
+
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, &pred, true);
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (   (all->Size() == 1) // check if n2 is in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+  
+  /* Checking all sources with condition */
+  std::cout << "Checking all sources with condition: " << std::flush;
   try
   {
     
@@ -633,11 +689,59 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
-  /* Checking derivations with condition */
-  std::cout << "Checking derivations with condition: " << std::flush;
+  /* Checking all sources with condition with empty resultset */
+  std::cout << "Checking all sources with condition with empty resultset: " << std::flush;
+  try
+  { 
+    mitk::NodePredicateDataType pred("VesselTree");
+
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, &pred, false);
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (all->Size() == 0) // check if resultset is empty
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking direct derivations with condition */
+  std::cout << "Checking direct derivations with condition: " << std::flush;
   try
   {
-    
+    mitk::NodePredicateProperty pred("color");
+
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, &pred, true);
+    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    if (   (all->Size() == 1) // check if n2 is in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking all derivations with condition */
+  std::cout << "Checking all derivations with condition: " << std::flush;
+  try
+  {
     mitk::NodePredicateProperty pred("color");
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, &pred, false);
@@ -681,12 +785,155 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
+  /* Checking named node method with wrong name */
+  std::cout << "Checking named node method with wrong name: " << std::flush;
+  try
+  {
+    
+    if (ds->GetNamedNode("This name does not exist") == NULL)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
   /* Checking named object method */
   std::cout << "Checking named object method: " << std::flush;
   try
   {
     
     if (ds->GetNamedObject<mitk::Image>("Node 1 - Image Node") == image)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking named object method with wrong DataType */
+  std::cout << "Checking named object method with wrong DataType: " << std::flush;
+  try
+  {
+    
+    if (ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == NULL)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking named object method with wrong name */
+  std::cout << "Checking named object method with wrong name: " << std::flush;
+  try
+  {
+    
+    if (ds->GetNamedObject<mitk::Image>("This name does not exist") == NULL)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking GetNamedDerivedNode with valid name and direct derivation only */
+  std::cout << "Checking GetNamedDerivedNode with valid name and direct derivation only: " << std::flush;
+  try
+  {
+    if (ds->GetNamedDerivedNode("Node 2 - Surface Node", n1, true) == n2)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
+  std::cout << "Checking GetNamedDerivedNode with invalid Name and direct derivation only: " << std::flush;
+  try
+  {
+    if (ds->GetNamedDerivedNode("wrong name", n1, true) == NULL)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
+  std::cout << "Checking GetNamedDerivedNode with valid Name and complete derivation: " << std::flush;
+  try
+  {
+    if (ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, false) == n3)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking GetNamedDerivedNode with valid Name but direct derivation only */
+  std::cout << "Checking GetNamedDerivedNode with valid Name and complete derivation: " << std::flush;
+  try
+  {
+    if (ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, true) == NULL)
     {
       std::cout<<"[PASSED]"<<std::endl;
     }

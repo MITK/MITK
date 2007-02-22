@@ -45,7 +45,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief This method will be used to evaluate the node. Has to be overwritten in subclasses
-    virtual bool CheckNode(mitk::DataTreeNode* node) const = 0;
+    virtual bool CheckNode(const mitk::DataTreeNode* node) const = 0;
   };
 
 

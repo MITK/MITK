@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNODEPREDICATECOMPOSITEBASE_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATECOMPOSITEBASE_H_HEADER_INCLUDED_
 
-#include <mitkNodePredicateBase.h>
+#include "mitkNodePredicateBase.h"
 #include <list>
 
 namespace mitk {

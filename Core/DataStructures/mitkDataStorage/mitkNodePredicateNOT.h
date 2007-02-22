@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNODEPREDICATENOT_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATENOT_H_HEADER_INCLUDED_
 
-#include <mitkNodePredicateBase.h>
+#include "mitkNodePredicateBase.h"
 
 namespace mitk {
 
@@ -45,7 +45,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the node does not fulfill the child predicate condition
-    virtual bool CheckNode(mitk::DataTreeNode* node) const;
+    virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
 
   protected:

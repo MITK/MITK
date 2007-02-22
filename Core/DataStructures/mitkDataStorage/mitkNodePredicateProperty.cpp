@@ -36,7 +36,7 @@ mitk::NodePredicateProperty::~NodePredicateProperty()
 }
 
 
-bool mitk::NodePredicateProperty::CheckNode(mitk::DataTreeNode* node) const
+bool mitk::NodePredicateProperty::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
     throw 1;  // Insert Exception Handling here
@@ -45,7 +45,8 @@ bool mitk::NodePredicateProperty::CheckNode(mitk::DataTreeNode* node) const
     throw 1;  // does it make sense to search a property without giving a name?
 
   // check, if any of the properties of node are equal to m_ValidProperty.
-  if (m_ValidProperty.IsNull())
+  //if (m_ValidProperty.IsNull())
+  if (m_ValidProperty == NULL)
   {
     return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()).IsNotNull()); // search only for name
   }

@@ -38,7 +38,7 @@ mitk::NodePredicateAND::~NodePredicateAND()
 }
 
 
-bool mitk::NodePredicateAND::CheckNode(mitk::DataTreeNode* node) const
+bool mitk::NodePredicateAND::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (m_ChildPredicates.empty())
     throw 1;  // Insert Exception Handling here

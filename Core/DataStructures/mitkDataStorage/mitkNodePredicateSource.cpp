@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateSource.h"
 
-mitk::NodePredicateSource::NodePredicateSource(mitk::DataTreeNode& n, bool allsources)
-: NodePredicateBase(), m_BaseNode(n), m_SearchAllSources(allsources)
+mitk::NodePredicateSource::NodePredicateSource(mitk::DataTreeNode* n, bool allsources, mitk::DataStorage* ds)
+: NodePredicateBase(), m_BaseNode(n), m_SearchAllSources(allsources), m_DataStorage(ds)
 {
 }
 
@@ -28,7 +28,7 @@ mitk::NodePredicateSource::~NodePredicateSource()
 }
 
 
-bool mitk::NodePredicateSource::CheckNode(mitk::DataTreeNode* node) const
+bool mitk::NodePredicateSource::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (!node)
     throw 1;  // Insert Exception Handling here
@@ -37,6 +37,9 @@ bool mitk::NodePredicateSource::CheckNode(mitk::DataTreeNode* node) const
   if (m_SearchAllSources)
     ;   // also search recursivly in sources of sources
   else
+  {
+    //mitk::DataStorage::SetOfObjects parents = m_DataStorage->GetSubset();
+  }
     ;   // only search in direct sources
 
   return true;

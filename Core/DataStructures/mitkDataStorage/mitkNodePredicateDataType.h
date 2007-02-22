@@ -44,7 +44,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type 
-    virtual bool CheckNode(mitk::DataTreeNode* node) const;
+    virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
   protected:
     std::string m_ValidDataType;

@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateCompositeBase.h"
 
 
-
-
 mitk::NodePredicateCompositeBase::NodePredicateCompositeBase()
 : NodePredicateBase()
 {

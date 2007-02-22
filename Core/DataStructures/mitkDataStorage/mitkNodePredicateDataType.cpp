@@ -35,7 +35,7 @@ mitk::NodePredicateDataType::~NodePredicateDataType()
 }
 
 
-bool mitk::NodePredicateDataType::CheckNode(mitk::DataTreeNode* node) const
+bool mitk::NodePredicateDataType::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
     throw 1;  // Insert Exception Handling here

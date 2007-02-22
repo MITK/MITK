@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNODEPREDICATESOURCE_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATESOURCE_H_HEADER_INCLUDED_
 
-#include <mitkNodePredicateBase.h>
+#include "mitkNodePredicateBase.h"
+#include "mitkDataStorage.h"
+#include "mitkDataTreeNode.h"
 
 namespace mitk {
 
@@ -36,18 +38,19 @@ namespace mitk {
     public:
       //##Documentation
       //## @brief Constructor - This class can either search only for direct source objects or for all source objects
-      NodePredicateSource(mitk::DataTreeNode& n, bool allsources);
+      NodePredicateSource(mitk::DataTreeNode* n, bool allsources, mitk::DataStorage* ds);
       //##Documentation
       //## @brief Standard Destructor
       virtual ~NodePredicateSource();
 
       //##Documentation
       //## @brief Checks, if the node is a source node of m_BaseNode (e.g. if m_BaseNode "was created from" node)
-      virtual bool CheckNode(mitk::DataTreeNode* node) const;
+      virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
     protected:
-      mitk::DataTreeNode& m_BaseNode;
+      mitk::DataTreeNode::Pointer m_BaseNode;
       bool m_SearchAllSources;
+      mitk::DataStorage::Pointer m_DataStorage;
     };
 
 } // namespace mitk

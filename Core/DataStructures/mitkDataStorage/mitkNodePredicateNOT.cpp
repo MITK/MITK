@@ -29,7 +29,7 @@ mitk::NodePredicateNOT::~NodePredicateNOT()
 }
 
 
-bool mitk::NodePredicateNOT::CheckNode(mitk::DataTreeNode* node) const
+bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (!node)
     throw 1;  // Insert Exception Handling here

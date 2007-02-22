@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSurfaceSource.h"
 #include "mitkGeometry3D.h"
-#include "vtkType.h"
+#include "vtkSystemIncludes.h"
 
 class vtkPlaneSource;
 class vtkLinearTransform;

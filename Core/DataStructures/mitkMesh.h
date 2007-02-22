@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <itkPolygonCell.h>
 #if (VTK_MAJOR_VERSION >= 5)
-#include <vtkType.h>
+#include <vtkSystemIncludes.h>
 #else
 #include <vtkIdType.h>
 #endif

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include <itkEventObject.h>
 
-#include <vtkType.h>
+#include <vtkSystemIncludes.h>
 
 
 class iil4mitkPicImage;

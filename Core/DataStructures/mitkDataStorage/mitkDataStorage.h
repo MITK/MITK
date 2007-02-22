@@ -175,7 +175,7 @@ namespace mitk {
     //## @brief convenience method to check if the object has been initialized (i.e. a data tree has been set)
     bool IsInitialized() const;
 
-    //mitk::DataTreeIteratorBase& GetElementsIterator();
+    const SetOfObjects* FilterSetOfObjects(const SetOfObjects* set, const NodePredicateBase* condition) const;
 
     //##Documentation
     //## @brief holds the data tree that is encapsulated by this class

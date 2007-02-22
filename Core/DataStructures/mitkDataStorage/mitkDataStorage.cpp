@@ -184,11 +184,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSources(mitk
   if (onlyDirectSources)
   {
     AdjacencyList::const_iterator it = m_SourceNodes.find(node); // get parents of current node
-    if (   (it == m_SourceNodes.end()) // node not found in list
-        || (it->second.IsNull()))      // or no set of parents
+    if ((it == m_SourceNodes.end()) || (it->second.IsNull())) // node not found in list or no set of parents
       return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
     else
-      return it->second;
+      return this->FilterSetOfObjects(it->second, condition);
   }
   
   std::vector<mitk::DataTreeNode::Pointer> resultset;
@@ -257,11 +256,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetDerivations(
     //    || (it->second.IsNull())              // or no set of parents
     //    || (it->second->Size() == 0))         // or empty set
     //  return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
-    if (it == m_DerivedNodes.end()) // node not found in list
+    if (it == m_DerivedNodes.end() || (it->second.IsNull())) // node not found in list
       return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
-    if (it->second.IsNull())              // or no set of parents
-      return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
-    return it->second;
+    else
+      return this->FilterSetOfObjects(it->second, condition);
   }
   
   std::vector<mitk::DataTreeNode::Pointer> resultset;
@@ -362,4 +360,17 @@ void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
     }
   }
   os << std::endl;
+}
+
+const mitk::DataStorage::SetOfObjects* mitk::DataStorage::FilterSetOfObjects(const SetOfObjects* set, const NodePredicateBase* condition) const
+{  
+  if (set == NULL)
+    return NULL;
+  if (condition == NULL)
+    return set;
+  mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
+    if (condition->CheckNode(it.Value()) == true)
+      result->InsertElement(result->Size(), it.Value());
+  return result;
 }

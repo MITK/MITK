@@ -89,9 +89,16 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
   if (m_DataTree->Contains(node))
     throw 2;
   /* save node in tree */
-  mitk::DataTreePreOrderIterator it(m_DataTree);
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
-  it.Add(node);
+  mitk::DataTreeNode::ConstPointer parent;
+  if ((parents != NULL) && (parents->Size() > 0))
+    parent = parents->ElementAt(0);
+  else 
+    parent = NULL;
+  DataTreeIteratorClone it = m_DataTree->GetIteratorToNode(parent);
+  if (it->IsAtEnd()) 
+    it->GoToBegin();
+  it->Add(node); 
   /* create parentlist if it does not exist */
   mitk::DataStorage::SetOfObjects::ConstPointer sp;
   if (parents != NULL)
@@ -115,6 +122,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
     mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
+  this->Print(std::cout, itk::Indent()); //@TODO: only for debugging
 }
 
 

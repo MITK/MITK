@@ -94,6 +94,12 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
   m_Manager->SetLevelWindow(m_LevelWindow);
 }
 
+void QmitkLevelWindowWidgetContextMenu::setMaximumWindow()
+{
+  m_LevelWindow.SetToMaxWindowSize();
+  m_Manager->SetLevelWindow(m_LevelWindow);
+}
+
 void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
 {
   m_LevelWindow.ResetDefaultRangeMinMax();
@@ -136,6 +142,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
 
     QPopupMenu* contextMenu = contextmenu;
     Q_CHECK_PTR( contextMenu );
+    contextMenu->insertItem(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
     contextMenu->insertSeparator();
     contextMenu->insertItem(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
@@ -209,6 +216,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
 
     QPopupMenu* contextMenu = new QPopupMenu( this );
     Q_CHECK_PTR( contextMenu );
+    contextMenu->insertItem(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
     contextMenu->insertSeparator();
     contextMenu->insertItem(tr("Change Scale Range"), this, SLOT(changeScaleRange()));

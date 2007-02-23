@@ -107,5 +107,8 @@ protected slots:
   /// sets the selected image or the topmost layer image to the new current image
   void setImage(int imageID);
 
+  /// sets the window to its maximum Size to fit the scalerange
+  void setMaximumWindow();
+
 };
 #endif

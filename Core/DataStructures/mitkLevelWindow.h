@@ -95,6 +95,11 @@ public:
   void SetMinMax(ScalarType min, ScalarType max);
 
   /*!
+  * sets the window to its maximum Size in scaleRange
+  */
+  void SetToMaxWindowSize();
+
+  /*!
   * setter for total range minimum and maximum value
   */
   void SetRangeMinMax(ScalarType min, ScalarType max);

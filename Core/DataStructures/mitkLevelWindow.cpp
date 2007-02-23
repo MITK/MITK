@@ -120,6 +120,12 @@ void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
   testValues();
 }
 
+void mitk::LevelWindow::SetToMaxWindowSize()
+{
+ m_Max = m_RangeMax;
+ m_Min = m_RangeMin;
+}
+
 void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
   if ( IsFixed() )

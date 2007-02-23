@@ -234,8 +234,6 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       // draw text
       WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
-
-      std::cout << "WE HAVE ANNOTATION: " << x << " " << y << std::endl;
     }
   }
 

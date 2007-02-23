@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 // because otherwise microsoft visual c++ generates
 // an internal compiler error
 #include <mitkConfig.h> //for MBI_INTERNAL
-
+#include <mitkCoreObjectFactory.h>
 #ifdef MBI_INTERNAL
   #include <mitkVesselTreeFileReader.h>
   #include <mitkVesselGraphFileReader.h>
@@ -251,7 +251,7 @@ QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 void QmitkMainTemplate::fileOpen()
 {
-  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetFileExtensions(), NULL);
+  QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     fileOpen((*it).ascii());
@@ -307,7 +307,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,CommonFunctionality::GetFileExtensions(), 0, 0, "Open Sequence");
+  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
 
   if ( !fileName.isNull() )
   {

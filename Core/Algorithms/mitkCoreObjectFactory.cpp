@@ -70,7 +70,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
 
-itk::Object::Pointer mitk::CoreObjectFactory::CreateSpecialCoreObject( const std::string& className ) 
+itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className ) 
 {  
   itk::Object::Pointer pointer;
 
@@ -125,73 +125,29 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateSpecialCoreObject( const std
   return pointer;
 }  
 
-
-void mitk::CoreObjectFactory::RegisterSelfOnce() {
-  static bool registeredFactory = false;
-  if (! registeredFactory) {
-    std::cout << "Registering standard CoreObjectFactory factory ..." << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-    registeredFactory = true; 
+mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
+  static mitk::CoreObjectFactory::Pointer instance;
+  if (instance.IsNull()) {
+    std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
+    if (allobjects.empty()) {
+      std::cout << "Creating instance with mitk::CoreObjectFactory::New()" << std::endl;
+      instance = mitk::CoreObjectFactory::New();
+    } else if (allobjects.size() == 1) {
+      std::cout << "Got one instance from the factory. GetNameOfClass returns " << (*allobjects.begin())->GetNameOfClass() << std::endl;
+      instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
+    } else {
+      std::cout << "Got more than one instance from the factory... ERROR!" << std::endl;
+      assert(false);
+    } 
   }
-}
-
-itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className )  {
-  RegisterSelfOnce();
-  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
-  for(std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
-      i != allobjects.end(); ++i)
-  {
-    mitk::CoreObjectFactoryBase::Pointer mf = dynamic_cast<mitk::CoreObjectFactoryBase*>(i->GetPointer());
-    if(mf)
-    {
-      itk::Object::Pointer object = mf->CreateSpecialCoreObject(className);
-      if(object.IsNotNull()) {
-        return object;
-      }
-    }
-    else
-    {
-      std::cerr << "Error ObjectFactory did not return an CoreObjectFactoryBase "
-        << (*i)->GetNameOfClass() 
-        << std::endl;
-    }
-  }
-  return NULL;
-}
-
-mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId) {
-  RegisterSelfOnce();
-  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
-  for(std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
-      i != allobjects.end(); ++i)
-  {
-    mitk::CoreObjectFactoryBase::Pointer mf = dynamic_cast<mitk::CoreObjectFactoryBase*>(i->GetPointer());
-    if(mf)
-    {
-      mitk::Mapper::Pointer mapper = mf->CreateSpecialMapper(node,slotId);
-      if(mapper.IsNotNull()) {
-        return mapper;
-      }
-    }
-    else
-    {
-      std::cerr << "Error ObjectFactory did not return an CoreObjectFactoryBase "
-        << (*i)->GetNameOfClass() 
-        << std::endl;
-    }
-  }
-  return NULL;
+  return instance;
 }
 
 mitk::CoreObjectFactory::CoreObjectFactory() {
-  this->RegisterOverride("mitkCoreObjectFactoryBase",
-      "mitkCoreObjectFactory",
-      "mitk Mapper Creation",
-      1,
-      itk::CreateObjectFunction<mitk::CoreObjectFactory>::New());
+
 };
 
-mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateSpecialMapper(mitk::DataTreeNode* node, MapperSlotId id)
+mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper=NULL;
 
@@ -309,4 +265,39 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateSpecialMapper(mitk::DataTre
   return newMapper;
 }
 
+#define EXTERNAL_FILE_EXTENSIONS \
+    "All known formats(*.dcm *.DCM *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.hdr);;" \
+    "DICOM files(*.dcm *.DCM *.gdcm);;" \
+    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
+    "Point sets (*.mps);;" \
+    "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
+    "Surface files (*.stl *.vtk *.vtp *.obj)"
 
+#define INTERNAL_FILE_EXTENSIONS \
+    "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.ves " \
+         "*.uvg *.dvg *.par *.dcm *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
+    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
+    "Point sets (*.mps);;" \
+    "surface files (*.stl *.vtk *.vtp *.obj);;" \
+    "stl files (*.stl);;" \
+    "vtk surface files (*.vtk);;" \
+    "vtk image files (*.pvtk);;" \
+    "vessel files (*.ves *.uvg *.dvg);;" \
+    "par/rec files (*.par);;" \
+    "DSR files (hpsonos.db HPSONOS.DB);;" \
+    "DICOM files (*.dcm *.gdcm *.ima)"
+
+#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg)"
+
+const char* mitk::CoreObjectFactory::GetFileExtensions() 
+{
+  return EXTERNAL_FILE_EXTENSIONS;
+};
+
+const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
+  return SAVE_FILE_EXTENSIONS; 
+};
+
+mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
+  return m_FileWriters;
+}

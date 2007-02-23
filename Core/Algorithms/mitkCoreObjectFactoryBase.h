@@ -18,14 +18,10 @@ class CoreObjectFactoryBase : public itk::ObjectFactoryBase
 {
   public:
     mitkClassMacro(CoreObjectFactoryBase,itk::ObjectFactoryBase);
-    /**
-     * Actual implementation. Should never be called directly. Use static method mitk::CoreObjectFactory::CreateMapper instead.
-     */
-    virtual Mapper::Pointer CreateSpecialMapper(mitk::DataTreeNode* node, MapperSlotId slotId) = 0;
-    /**
-     * Actual implementation. Should never be called directly. Use static method mitk::CoreObjectFactory::CreateCoreObject instead.
-     */
-    virtual itk::Object::Pointer CreateSpecialCoreObject( const std::string& className ) = 0;
+    virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId) = 0;
+    virtual itk::Object::Pointer CreateCoreObject( const std::string& className ) = 0;
+    virtual const char* GetFileExtensions() = 0;
+    virtual const char* GetSaveFileExtensions() = 0;
     virtual const char* GetITKSourceVersion() const
     { 
       return ITK_SOURCE_VERSION;

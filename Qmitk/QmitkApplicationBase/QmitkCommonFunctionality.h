@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTree.h>
 #include <mitkSurface.h>
 #include "itkImage.h"
+#include <mitkFileWriterWithInformation.h>
 
 #include <qstring.h>
 #include <qfiledialog.h>
@@ -82,9 +83,6 @@ namespace mitk
  */
 namespace CommonFunctionality
 {
-
-  const char* GetFileExtensions();
-  const char* GetSaveFileExtensions();
 
   typedef std::vector<mitk::DataTreeIteratorClone> DataTreeIteratorVector;
   typedef std::vector<mitk::DataTreeNode*> DataTreeNodeVector;
@@ -248,11 +246,12 @@ namespace CommonFunctionality
    */
   std::string SaveScreenshot( mitk::RenderWindow* renderWindow , const char* filename = NULL );
 
+  void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
+
 #ifdef MBI_INTERNAL
   void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );
   void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
   void SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
-  void SaveVesselTree( mitk::VesselTreeData* tree, const char* fileName = NULL );
 #endif
 
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );

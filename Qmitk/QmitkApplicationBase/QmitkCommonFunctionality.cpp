@@ -8,6 +8,7 @@
 #include "mitkConfig.h"
 #include "mitkRenderWindow.h"
 #include "QmitkRenderWindow.h"
+#include "mitkCoreObjectFactory.h"
 #ifdef MBI_INTERNAL
 #include "mitkVesselGraphData.h"
 #include "mitkVesselGraphFileWriter.h"
@@ -18,68 +19,6 @@
 #include "QmitkCommonFunctionality.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
-
-#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
-
-#define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.hdr);;" \
-    "DICOM files(*.dcm *.DCM *.gdcm);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "Point sets (*.mps);;" \
-    "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
-    "Surface files (*.stl *.vtk *.vtp *.obj)"
-
-#define INTERNAL_FILE_EXTENSIONS \
-    "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.ves " \
-         "*.uvg *.dvg *.par *.dcm *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "Point sets (*.mps);;" \
-    "surface files (*.stl *.vtk *.vtp *.obj);;" \
-    "stl files (*.stl);;" \
-    "vtk surface files (*.vtk);;" \
-    "vtk image files (*.pvtk);;" \
-    "vessel files (*.ves *.uvg *.dvg);;" \
-    "par/rec files (*.par);;" \
-    "DSR files (hpsonos.db HPSONOS.DB);;" \
-    "DICOM files (*.dcm *.gdcm *.ima)"
-
-  #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg)"
-
-#else
-
-  #define EXTERNAL_FILE_EXTENSIONS "All known formats(*.dcm *.DCM *.gdcm *.ima *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.obj *.hdr);;" \
-    "DICOM files(*.dcm *.DCM *.gdcm);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima);;" \
-    "surface files (*.stl *.vtk *.obj);;" \
-    "stl files (*.stl)"
-
-  #define INTERNAL_FILE_EXTENSIONS "all (*.seq *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.obj *.ves " \
-                                        "*.uvg *.dvg *.par *.gdcm *.dcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.jpg *.png *.tiff);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "surface files (*.stl *.vtk *.obj);;" \
-    "stl files (*.stl);;" \
-    "vtk surface files (*.vtk);;" \
-    "vtk image files (*.pvtk);;" \
-    "vessel files (*.ves *.uvg *.dvg);;" \
-    "par/rec files (*.par);;" \
-    "DSR files (hpsonos.db HPSONOS.DB);;" \
-    "DICOM files (*.dcm *.gdcm *.ima)"
-
-  #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.hdr *.png *.tiff *.jpg)"
-#endif
-
-const char* CommonFunctionality::GetFileExtensions() 
-{
-#ifdef MBI_INTERNAL
-  return INTERNAL_FILE_EXTENSIONS; 
-#else
-  return EXTERNAL_FILE_EXTENSIONS;
-#endif
-};
-
-const char* CommonFunctionality::GetSaveFileExtensions() { return SAVE_FILE_EXTENSIONS; };
-
 
 #ifdef MBI_INTERNAL
 /**
@@ -170,27 +109,24 @@ void CommonFunctionality::SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVessel
   }
 }
 
-void CommonFunctionality::SaveVesselTree( mitk::VesselTreeData* vesselTree, const char* aFileName)
-{
-  if(vesselTree == NULL)
-  {
-    std::cout << "Warning in file " << __FILE__<< " line " << __LINE__ <<": vessel tree is NULL!" << std::endl;
+void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
+{ 
+  if (! fileWriter->CanWrite(data) ) {
+    std::cout << "ERROR: wrong data in SaveToFileWriter" << std::endl;
     return;
   }
   QString fileName;
   if (aFileName == NULL)
   {
-    fileName = QFileDialog::getSaveFileName(QString("VesselTree.ves"),"MITK VesselTree (*.ves)");
+    fileName = QFileDialog::getSaveFileName(QString(fileWriter->GetDefaultFilename()),fileWriter->GetFileDialogPattern());
   }
   else
     fileName = aFileName;
 
   if (fileName.isEmpty() == false )
   {
-    mitk::VesselTreeFileWriter::Pointer writer = mitk::VesselTreeFileWriter::New();
-    writer->SetInput( vesselTree );
-    writer->SetFileName( fileName.ascii() );
-    writer->Update();
+    fileWriter->SetFileName( fileName.ascii() );
+    fileWriter->DoWrite( data );
   }
 }
 
@@ -240,6 +176,14 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       CommonFunctionality::SaveSurface(surface, aFileName);
     }
 
+    // now try the file writers provided by the CoreObjectFactory
+    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) {
+      if ( (*it)->CanWrite(data) ) {
+        SaveToFileWriter(*it, data, NULL); 
+      } 
+    }
+    
 #ifdef MBI_INTERNAL
     mitk::UndirectedVesselGraphData::Pointer uvg = dynamic_cast<mitk::UndirectedVesselGraphData*>(data);
     if (uvg.IsNotNull())
@@ -253,11 +197,6 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       CommonFunctionality::SaveDirectedVesselGraph(dvg.GetPointer(), NULL);
     }
     
-    mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(data);
-    if (vesselTree.IsNotNull())
-    {
-      CommonFunctionality::SaveVesselTree(vesselTree.GetPointer(), NULL);
-    }
 #endif
   }
 }
@@ -418,7 +357,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const cha
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions());
+  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
 
   if ( !fileName.isNull() )
   {
@@ -432,7 +371,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions() );
+  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
   if ( !fileName.isNull() )
   {
     mitk::DataTreeNode::Pointer result = FileOpen(fileName.ascii());
@@ -455,7 +394,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
 {
   mitk::DataTreeNode::Pointer newNode = NULL;
 
-  QString fileName = QFileDialog::getOpenFileName(NULL,GetFileExtensions() );
+  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
   if ( !fileName.isNull() )
   {
     newNode = CommonFunctionality::FileOpen(fileName);
@@ -639,7 +578,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   std::string fileName;
   if(aFileName == NULL)
   {
-    QString qfileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),GetSaveFileExtensions());
+    QString qfileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
     if (qfileName == NULL )
       return "";
     fileName = qfileName.ascii();

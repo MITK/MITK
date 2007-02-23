@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkRenderWindow.h>
 #include <mitkAffineInteractor.h>
 #include <QmitkSystemInfo.h>
+#include <mitkCoreObjectFactory.h>
 
 #include <itkImage.h>
 
@@ -375,7 +376,7 @@ void QmitkDataManagerControls::LoadButton_clicked()
     selectedIterator = m_DataTreeIterator;
   }
 
-  QStringList fileNames = QFileDialog::getOpenFileNames(CommonFunctionality::GetFileExtensions(), NULL);
+  QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     FileOpen((*it).ascii(), selectedIterator.GetPointer());

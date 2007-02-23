@@ -585,7 +585,7 @@ namespace mitk {
     if ( className.empty() )
       return NULL;
 
-    return mitk::CoreObjectFactory::CreateCoreObject( className );
+    return mitk::CoreObjectFactory::GetInstance()->CreateCoreObject( className );
   }
 
   std::string XMLReader::GetSourceFilePath()

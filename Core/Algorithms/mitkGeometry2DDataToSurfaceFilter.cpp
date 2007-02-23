@@ -135,20 +135,31 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     {
       // Take the coordinate axes and origin directly from the input geometry.
       origin = planeGeometry->GetOrigin();
-      right = planeGeometry->GetCornerPoint( false, false );
+      right = planeGeometry->GetCornerPoint( false, true );
       bottom = planeGeometry->GetCornerPoint( true, false );
     }
 
-    
-    // Since the plane is planar, there is no need to subdivide the grid
-    // (cf. AbstractTransformGeometry case)
-    m_PlaneSource->SetXResolution( 1 );
-    m_PlaneSource->SetYResolution( 1 );
+    if ( !m_UseBoundingBox)
+    {
+      // We do not have a bounding box, so no clipping is required.
+      
+      
+      // Since the plane is planar, there is no need to subdivide the grid
+      // (cf. AbstractTransformGeometry case)
+      m_PlaneSource->SetXResolution( 1 );
+      m_PlaneSource->SetYResolution( 1 );
 
-    mitk::BoundingBox::PointType boundingBoxMin;
-    mitk::BoundingBox::PointType boundingBoxMax;
-    mitk::BoundingBox::PointType boundingBoxCenter;
-    if ( m_UseBoundingBox )
+      m_PlaneSource->SetOrigin( origin[0], origin[1], origin[2] );
+      m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
+      m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
+      std::cout << "Origin: " << origin << std::endl;
+      std::cout << "Right: " << right << std::endl;
+      std::cout << "Bottom: " << bottom << std::endl;
+
+      planeSurface = m_PlaneSource->GetOutput();
+      planeSurface->Update();
+    }
+    else
     {
       // Set up a cube with the extent and origin of the bounding box. This
       // cube will be clipped by a plane later on. The intersection of the
@@ -158,100 +169,92 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       // available herein which bounding box to use. In most cases, this
       // would be the bounding box of the input geometry's reference
       // geometry, but this is not an inevitable requirement.
-      boundingBoxMin = m_BoundingBox->GetMinimum();
-      boundingBoxMax = m_BoundingBox->GetMaximum();
-      boundingBoxCenter = m_BoundingBox->GetCenter();
+      mitk::BoundingBox::PointType boundingBoxMin = m_BoundingBox->GetMinimum();
+      mitk::BoundingBox::PointType boundingBoxMax = m_BoundingBox->GetMaximum();
+      mitk::BoundingBox::PointType boundingBoxCenter = m_BoundingBox->GetCenter();
 
-    }
-    else
-    {
-      // Plane will not be clipped
-      boundingBoxMin.Fill( -10000.0 );
-      boundingBoxMax.Fill( 10000.0 );
-      boundingBoxCenter.Fill( 0.0 );
-    }
-
-    m_CubeSource->SetXLength( boundingBoxMax[0] - boundingBoxMin[0] );
-    m_CubeSource->SetYLength( boundingBoxMax[1] - boundingBoxMin[1] );
-    m_CubeSource->SetZLength( boundingBoxMax[2] - boundingBoxMin[2] );
-    m_CubeSource->SetCenter(
-      boundingBoxCenter[0],
-      boundingBoxCenter[1],
-      boundingBoxCenter[2] );
+      m_CubeSource->SetXLength( boundingBoxMax[0] - boundingBoxMin[0] );
+      m_CubeSource->SetYLength( boundingBoxMax[1] - boundingBoxMin[1] );
+      m_CubeSource->SetZLength( boundingBoxMax[2] - boundingBoxMin[2] );
+      m_CubeSource->SetCenter(
+        boundingBoxCenter[0],
+        boundingBoxCenter[1],
+        boundingBoxCenter[2] );
 
 
-    // Now we have to transform the cube, so that it will cut our plane
-    // appropriately. (As can be seen below, the plane corresponds to the
-    // z-plane in the coordinate system and is *not* transformed.) Therefore,
-    // we get the inverse of the plane geometry's transform and concatenate
-    // it with the transform of the reference geometry, if available.
-    m_Transform->Identity();
-    m_Transform->Concatenate(
-      planeGeometry->GetVtkTransform()->GetLinearInverse()
-    );
-
-    Geometry3D *referenceGeometry = planeGeometry->GetReferenceGeometry();
-    if ( referenceGeometry )
-    {
+      // Now we have to transform the cube, so that it will cut our plane
+      // appropriately. (As can be seen below, the plane corresponds to the
+      // z-plane in the coordinate system and is *not* transformed.) Therefore,
+      // we get the inverse of the plane geometry's transform and concatenate
+      // it with the transform of the reference geometry, if available.
+      m_Transform->Identity();
       m_Transform->Concatenate(
-        referenceGeometry->GetVtkTransform()
+        planeGeometry->GetVtkTransform()->GetLinearInverse()
+      );
+
+      Geometry3D *referenceGeometry = planeGeometry->GetReferenceGeometry();
+      if ( referenceGeometry )
+      {
+        m_Transform->Concatenate(
+          referenceGeometry->GetVtkTransform()
+        );
+      }
+
+      // Transform the cube accordingly (s.a.)
+      m_PolyDataTransformer->SetInput( m_CubeSource->GetOutput() );
+      m_PolyDataTransformer->SetTransform( m_Transform );
+      
+      // Initialize the plane to clip the cube with, as lying on the z-plane
+      m_Plane->SetOrigin( 0.0, 0.0, 0.0 );
+      m_Plane->SetNormal( 0.0, 0.0, 1.0 );
+
+      // Cute the plane with the cube.
+      m_PlaneCutter->SetInput( m_PolyDataTransformer->GetOutput() );
+      m_PlaneCutter->SetCutFunction( m_Plane );
+
+      // The output of the cutter must be converted into appropriate poly data.
+      m_PlaneStripper->SetInput( m_PlaneCutter->GetOutput() );
+      m_PlaneStripper->Update();
+
+      m_PlanePolyData->SetPoints( m_PlaneStripper->GetOutput()->GetPoints() );
+      m_PlanePolyData->SetPolys( m_PlaneStripper->GetOutput()->GetLines() );
+
+      m_PlaneTriangler->SetInput( m_PlanePolyData );
+
+      
+      // Get bounds of the resulting surface and use it to generate the texture
+      // mapping information
+      m_PlaneTriangler->Update();
+      m_PlaneTriangler->GetOutput()->ComputeBounds();
+      vtkFloatingPointType *surfaceBounds = 
+        m_PlaneTriangler->GetOutput()->GetBounds();
+
+      origin[0] = surfaceBounds[0];
+      origin[1] = surfaceBounds[2];
+      origin[2] = surfaceBounds[4];
+
+      right[0] = surfaceBounds[1];
+      right[1] = surfaceBounds[2];
+      right[2] = surfaceBounds[4];
+
+      bottom[0] = surfaceBounds[0];
+      bottom[1] = surfaceBounds[3];
+      bottom[2] = surfaceBounds[4];
+
+      // Now we tell the data how it shall be textured afterwards; description
+      // see above.
+      m_TextureMapToPlane->SetInput( m_PlaneTriangler->GetOutput() );
+      m_TextureMapToPlane->AutomaticPlaneGenerationOn();
+      m_TextureMapToPlane->SetOrigin( origin[0], origin[1], origin[2] );
+      m_TextureMapToPlane->SetPoint1( right[0], right[1], right[2] );
+      m_TextureMapToPlane->SetPoint2( bottom[0], bottom[1], bottom[2] );
+
+      
+      // Return the output of this generation process
+      planeSurface = dynamic_cast< vtkPolyData * >(
+        m_TextureMapToPlane->GetOutput()
       );
     }
-
-    // Transform the cube accordingly (s.a.)
-    m_PolyDataTransformer->SetInput( m_CubeSource->GetOutput() );
-    m_PolyDataTransformer->SetTransform( m_Transform );
-    
-    // Initialize the plane to clip the cube with, as lying on the z-plane
-    m_Plane->SetOrigin( 0.0, 0.0, 0.0 );
-    m_Plane->SetNormal( 0.0, 0.0, 1.0 );
-
-    // Cute the plane with the cube.
-    m_PlaneCutter->SetInput( m_PolyDataTransformer->GetOutput() );
-    m_PlaneCutter->SetCutFunction( m_Plane );
-
-    // The output of the cutter must be converted into appropriate poly data.
-    m_PlaneStripper->SetInput( m_PlaneCutter->GetOutput() );
-    m_PlaneStripper->Update();
-
-    m_PlanePolyData->SetPoints( m_PlaneStripper->GetOutput()->GetPoints() );
-    m_PlanePolyData->SetPolys( m_PlaneStripper->GetOutput()->GetLines() );
-
-    m_PlaneTriangler->SetInput( m_PlanePolyData );
-
-    
-    // Get bounds of the resulting surface and use it to generate the texture
-    // mapping information
-    m_PlaneTriangler->Update();
-    m_PlaneTriangler->GetOutput()->ComputeBounds();
-    vtkFloatingPointType *surfaceBounds = 
-      m_PlaneTriangler->GetOutput()->GetBounds();
-
-    origin[0] = surfaceBounds[0];
-    origin[1] = surfaceBounds[2];
-    origin[2] = surfaceBounds[4];
-
-    right[0] = surfaceBounds[1];
-    right[1] = surfaceBounds[2];
-    right[2] = surfaceBounds[4];
-
-    bottom[0] = surfaceBounds[0];
-    bottom[1] = surfaceBounds[3];
-    bottom[2] = surfaceBounds[4];
-
-    // Now we tell the data how it shall be textured afterwards; description
-    // see above.
-    m_TextureMapToPlane->SetInput( m_PlaneTriangler->GetOutput() );
-    m_TextureMapToPlane->AutomaticPlaneGenerationOn();
-    m_TextureMapToPlane->SetOrigin( origin[0], origin[1], origin[2] );
-    m_TextureMapToPlane->SetPoint1( right[0], right[1], right[2] );
-    m_TextureMapToPlane->SetPoint2( bottom[0], bottom[1], bottom[2] );
-
-    
-    // Return the output of this generation process
-    planeSurface = dynamic_cast< vtkPolyData * >(
-      m_TextureMapToPlane->GetOutput()
-    );
   }
 
   // Does the Geometry2DData contain an AbstractTransformGeometry?
@@ -327,6 +330,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   }
 
   output->SetVtkPolyData( planeSurface );
+  output->CalculateBoundingBox();
 }
 
 

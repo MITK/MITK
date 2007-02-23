@@ -37,11 +37,11 @@ class Image;
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
  * @ingroup IO
  */
-class ImageWriter : public itk::ProcessObject, public mitk::FileWriter
+class ImageWriter :  public mitk::FileWriter
 {
 public:
 
-    mitkClassMacro( ImageWriter, itk::ProcessObject );
+    mitkClassMacro( ImageWriter, mitk::FileWriter );
 
     itkNewMacro( Self );
 

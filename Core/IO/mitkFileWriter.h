@@ -21,15 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 #define FILEWRITER_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include <itkProcessObject.h>
 
 namespace mitk {
 
 //##Documentation
 //## @brief Interface class of writers that write data to files
 //## @ingroup Process
-class FileWriter
+class FileWriter : public itk::ProcessObject
 {
   public:
+    mitkClassMacro(FileWriter,itk::ProcessObject);
     //##Documentation
     //## @brief Get the specified the file to write
     //## 

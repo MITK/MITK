@@ -38,11 +38,11 @@ class Image;
  * @brief Writer for mitk::Image
  * @ingroup IO
  */
-class PicFileWriter : public itk::ProcessObject, public mitk::FileWriter
+class PicFileWriter : public mitk::FileWriter
 {
 public:
 
-    mitkClassMacro( PicFileWriter, itk::ProcessObject );
+    mitkClassMacro( PicFileWriter, mitk::FileWriter );
 
     itkNewMacro( Self );
 

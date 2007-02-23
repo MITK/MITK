@@ -36,11 +36,11 @@ namespace mitk
  * yet supported.
  * @ingroup Process
  */
-class PointSetWriter : public itk::ProcessObject, public mitk::FileWriter
+class PointSetWriter : public mitk::FileWriter
 {
 public:
 
-    mitkClassMacro( PointSetWriter, itk::ProcessObject );
+    mitkClassMacro( PointSetWriter, mitk::FileWriter );
 
     mitkWriterMacro;
 

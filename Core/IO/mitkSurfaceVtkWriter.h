@@ -45,11 +45,11 @@ namespace mitk
  * @ingroup Process
 */
 template <class VTKWRITER>
-class SurfaceVtkWriter : public itk::ProcessObject, public mitk::FileWriter
+class SurfaceVtkWriter : public mitk::FileWriter
 {
 public:
 
-    mitkClassMacro( SurfaceVtkWriter, itk::ProcessObject );
+    mitkClassMacro( SurfaceVtkWriter, mitk::FileWriter );
 
     itkNewMacro( Self );
 

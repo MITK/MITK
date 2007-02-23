@@ -149,6 +149,22 @@ namespace mitk {
       else
         return dynamic_cast<DataType*>(n->GetData());
     }
+
+    //##Documentation
+    //## @brief Convenience method to get the first data object of a given datatype with a given name that is derived from a specific node
+    //##
+    template <class DataType>
+    DataType* GetNamedDerivedObject(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations = true) const
+    {
+      if (name == NULL)
+        return NULL;
+      mitk::DataTreeNode* n = this->GetNamedDerivedNode(name, sourceNode, onlyDirectDerivations);
+      if (n == NULL)
+        return NULL;
+      else
+        return dynamic_cast<DataType*>(n->GetData());
+    }
+
     //##Documentation
     //## @brief Initializes the class by providing the data tree that should be used for data storage
     //##

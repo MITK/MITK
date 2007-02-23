@@ -1059,9 +1059,6 @@ mitk::ImageMapper2D::RendererInfo
 
   m_Reslicer = vtkImageReslice::New();
   
-  // Diminish ugly boundary effects with rotated planes
-  m_Reslicer->BorderOn();
-
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 }

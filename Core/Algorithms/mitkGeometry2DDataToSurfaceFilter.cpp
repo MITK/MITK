@@ -93,8 +93,6 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   mitk::Geometry2DData::ConstPointer input = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
 
-
-
   if ( input.IsNull() || (input->GetGeometry2D() == NULL)
     || (input->GetGeometry2D()->IsValid() == false)
     || (m_UseBoundingBox && (m_BoundingBox->GetDiagonalLength2() < mitk::eps)) )
@@ -113,15 +111,11 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   {
     mitk::PlaneGeometry *planeGeometry = 
       dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
+
     if ( m_PlaceByGeometry )
     {
-      // Derive coordinate axes and origin from input geometry extent and let
-      // the output use the input geometry to appropriately transform the
+      // Let the output use the input geometry to appropriately transform the
       // coordinate system.
-      origin.Fill( 0.0 );
-      FillVector3D( right,  planeGeometry->GetExtent(0), 0.0, 0.0 );
-      FillVector3D( bottom, 0.0, planeGeometry->GetExtent(1), 0.0 );
-
       mitk::AffineGeometryFrame3D::TransformType *affineTransform = 
         planeGeometry->GetIndexToWorldTransform();
 
@@ -131,18 +125,25 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       mitk::Geometry3D *g3d = timeGeometry->GetGeometry3D( 0 );
       g3d->SetIndexToWorldTransform( affineTransform );
     }
-    else
-    {
-      // Take the coordinate axes and origin directly from the input geometry.
-      origin = planeGeometry->GetOrigin();
-      right = planeGeometry->GetCornerPoint( false, true );
-      bottom = planeGeometry->GetCornerPoint( true, false );
-    }
 
     if ( !m_UseBoundingBox)
     {
       // We do not have a bounding box, so no clipping is required.
       
+      if ( m_PlaceByGeometry )
+      {
+        // Derive coordinate axes and origin from input geometry extent
+        origin.Fill( 0.0 );
+        FillVector3D( right,  planeGeometry->GetExtent(0), 0.0, 0.0 );
+        FillVector3D( bottom, 0.0, planeGeometry->GetExtent(1), 0.0 );
+      }
+      else
+      {
+        // Take the coordinate axes and origin directly from the input geometry.
+        origin = planeGeometry->GetOrigin();
+        right = planeGeometry->GetCornerPoint( false, true );
+        bottom = planeGeometry->GetCornerPoint( true, false );
+      }
       
       // Since the plane is planar, there is no need to subdivide the grid
       // (cf. AbstractTransformGeometry case)
@@ -152,9 +153,6 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlaneSource->SetOrigin( origin[0], origin[1], origin[2] );
       m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
       m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
-      std::cout << "Origin: " << origin << std::endl;
-      std::cout << "Right: " << right << std::endl;
-      std::cout << "Bottom: " << bottom << std::endl;
 
       planeSurface = m_PlaneSource->GetOutput();
       planeSurface->Update();
@@ -208,7 +206,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_Plane->SetOrigin( 0.0, 0.0, 0.0 );
       m_Plane->SetNormal( 0.0, 0.0, 1.0 );
 
-      // Cute the plane with the cube.
+      // Cut the plane with the cube.
       m_PlaneCutter->SetInput( m_PolyDataTransformer->GetOutput() );
       m_PlaneCutter->SetCutFunction( m_Plane );
 
@@ -241,13 +239,17 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       bottom[1] = surfaceBounds[3];
       bottom[2] = surfaceBounds[4];
 
-      // Now we tell the data how it shall be textured afterwards; description
-      // see above.
+      // Now we tell the data how it shall be textured afterwards;
+      // description see above.
       m_TextureMapToPlane->SetInput( m_PlaneTriangler->GetOutput() );
       m_TextureMapToPlane->AutomaticPlaneGenerationOn();
       m_TextureMapToPlane->SetOrigin( origin[0], origin[1], origin[2] );
       m_TextureMapToPlane->SetPoint1( right[0], right[1], right[2] );
       m_TextureMapToPlane->SetPoint2( bottom[0], bottom[1], bottom[2] );
+      
+      // Need to call update so that output data and bounds are immediately
+      // available
+      m_TextureMapToPlane->Update();
 
       
       // Return the output of this generation process

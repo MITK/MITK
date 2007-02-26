@@ -108,6 +108,7 @@ void CommonFunctionality::SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVessel
     writer->Update();
   }
 }
+#endif
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
 { 
@@ -131,7 +132,6 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
 }
 
 
-#endif
 
 /**
  * Saves the given mitk::BaseData to a file. The user is prompted to

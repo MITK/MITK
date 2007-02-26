@@ -129,17 +129,25 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
   if (instance.IsNull()) {
     std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
-    if (allobjects.empty()) {
-      std::cout << "Creating instance with mitk::CoreObjectFactory::New()" << std::endl;
-      instance = mitk::CoreObjectFactory::New();
-    } else if (allobjects.size() == 1) {
-      std::cout << "Got one instance from the factory. GetNameOfClass returns " << (*allobjects.begin())->GetNameOfClass() << std::endl;
-      instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
-    } else {
-      std::cout << "Got more than one instance from the factory... ERROR!" << std::endl;
-      assert(false);
+    std::list<itk::LightObject::Pointer>::iterator factoryIt = allobjects.begin();
+    while (instance.IsNull() && factoryIt != allobjects.end() ) {
+      if ((*factoryIt)->GetNameOfClass() == "SBCoreObjectFactory") {
+        instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
+        ++factoryIt;
+      }
     } 
-  }
+    factoryIt = allobjects.begin(); 
+    while (instance.IsNull() && factoryIt != allobjects.end() ) {
+      if ((*factoryIt)->GetNameOfClass() == "QMCoreObjectFactory") {
+        instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
+        ++factoryIt;
+      }
+    } 
+    if (instance.IsNull()) {
+      instance = mitk::CoreObjectFactory::New();
+    }
+    std::cout << "CoreObjectFactory: created instance of " << instance->GetNameOfClass() << std::endl;
+  } 
   return instance;
 }
 

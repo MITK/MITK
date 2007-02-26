@@ -38,19 +38,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
-#ifdef MBI_INTERNAL
-#include "mitkVesselTreeFileIOFactory.h"
-//#include "mitkVesselGraphFileIOFactory.h"
-#include "mitkDvgFileIOFactory.h"
-#include "mitkUvgFileIOFactory.h"
-#include "mitkSsmFileIOFactory.h"
-#include "mitkMSMFileIOFactory.h"
-//#include "mitkTusFileIOFactory.h"
-#ifdef HAVE_IPDICOM
-#include "mitkDICOMFileIOFactory.h"
-#endif // HAVE_IPDICOM 
-#endif // MBI_INTERNAL
-
 #include "itkMutexLock.h"
 #include "itkMutexLockHolder.h"
 
@@ -144,18 +131,6 @@ void BaseDataIOFactory::RegisterBuiltInFactories()
       itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
       itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
-#ifdef MBI_INTERNAL
-      itk::ObjectFactoryBase::RegisterFactory( VesselTreeFileIOFactory::New() );
-      //itk::ObjectFactoryBase::RegisterFactory( VesselGraphFileIOFactory<Directed>::New() );
-      itk::ObjectFactoryBase::RegisterFactory( UvgFileIOFactory::New() );
-      itk::ObjectFactoryBase::RegisterFactory( DvgFileIOFactory::New() );
-      itk::ObjectFactoryBase::RegisterFactory( SsmFileIOFactory::New() );
-      itk::ObjectFactoryBase::RegisterFactory( MsmFileIOFactory::New() );
-#ifdef HAVE_IPDICOM
-      itk::ObjectFactoryBase::RegisterFactory( DICOMFileIOFactory::New() );
-#endif // HAVE_IPDICOM 
-      //itk::ObjectFactoryBase::RegisterFactory( TusFileIOFactory::New() );
-#endif // MBI_INTERNAL
 
       //ObjectFactoryBase::RegisterFactory( LSMBaseDataIOFactory::New()); //should be before TIFF
       //ObjectFactoryBase::RegisterFactory( NiftiBaseDataIOFactory::New());

@@ -59,24 +59,6 @@ namespace mitk
   class VesselTreeData;
 }
 
-#ifdef MBI_INTERNAL
-#ifndef QMITKCOMMONFUNCTIONALITYIMPLEMENTATION
-//#include <boost/graph/graph_traits.hpp>
-//#include <boost/graph/graph_selectors.hpp>
-namespace boost
-{
-  struct directedS;
-  struct undirectedS;
-}
-namespace mitk
-{
-  template <typename DirectedCategory> class VesselGraphData;
-  typedef VesselGraphData< boost::undirectedS  > UndirectedVesselGraphData;
-  typedef VesselGraphData< boost::directedS > DirectedVesselGraphData;
-}
-#endif
-#endif
-
 /**
  * This class provides some data handling methods, like loading data or adding different 
  * types to the data tree...
@@ -248,12 +230,8 @@ namespace CommonFunctionality
 
   void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
 
-#ifdef MBI_INTERNAL
-  void SaveDirectedVesselGraph( mitk::DirectedVesselGraphData* graph, const char* fileName = NULL );
-  void SaveUndirectedVesselGraph( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
-  void SaveUndirectedVesselGraphAsHOC( mitk::UndirectedVesselGraphData* graph, const char* fileName = NULL );
-#endif
-
+  // internal vessel graph save code removed ...
+  
   void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
   mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);

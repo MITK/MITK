@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qapplication.h>
 #include <qcursor.h>
 #include <itkCommand.h>
-
+#include <QmitkPropertyListView.h>
 
 QmitkFunctionality::QmitkFunctionality(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt) : 
 QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Activated(false), m_DataTreeIterator(NULL), m_TreeChangedWhileInActive(false), m_InTreeChanged(false), m_ObserverTag(0)
@@ -129,9 +129,11 @@ void QmitkFunctionality::TreeChanged()
 {
 }
 
-QWidget * QmitkFunctionality::CreateOptionWidget(QWidget *itkNotUsed(parent))
+QWidget * QmitkFunctionality::CreateOptionWidget(QWidget* parent)
 {
-  return NULL;
+  QmitkPropertyListView* dialog = new QmitkPropertyListView(parent);
+  dialog->SetPropertyList(this->GetFunctionalityOptionsList());
+  return dialog;
 }
 
 void QmitkFunctionality::OptionsChanged(QWidget* itkNotUsed(optionDialog))

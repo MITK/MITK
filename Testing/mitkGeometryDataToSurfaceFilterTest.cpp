@@ -227,6 +227,29 @@ int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   }
 
 
+
+  // test with specified BoundingBox (m_PlaceByGeometry is irrelevant for this test)
+  mitk::BoundingBox::Pointer boundingBox = mitk::BoundingBox::New();
+  mitk::Point3D bbMin, bbMax;
+  mitk::FillVector3D( bbMin, 10.0, 10.0, -6.0 );
+  mitk::FillVector3D( bbMax, 40.0, 90.0, 6.0 );
+
+  mitk::BoundingBox::PointsContainer::Pointer pointsContainer = mitk::BoundingBox::PointsContainer::New();
+  pointsContainer->InsertElement( 0, bbMin );
+  pointsContainer->InsertElement( 1, bbMax );
+  boundingBox->SetPoints( pointsContainer );
+  boundingBox->ComputeBoundingBox();
+
+
+  geometryToSurfaceFilter->SetPlaceByGeometry( true );
+  geometryToSurfaceFilter->SetBoundingBox( boundingBox );
+  mitk::ScalarType expectedIndexBoundsWithBB[6] = {9.0, 39.0, 8.0, 88.0, 0.0, 0.0};
+  mitk::ScalarType expectedAxisParallelBoundsWithBB[6] = {10.0, 40.0, 10.0, 90.0, 3.0, 3.0};
+  if((result=testGeometryDataToSurfaceFilter(geometryToSurfaceFilter, expectedIndexBoundsWithBB, expectedAxisParallelBoundsWithBB, true)) != EXIT_SUCCESS) {
+    return result;
+  }
+
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

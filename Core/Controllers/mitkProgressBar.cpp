@@ -25,32 +25,32 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 ProgressBarImplementation *ProgressBar::m_Instance = NULL;
+int ProgressBar::m_TotalSteps = 0;
+int ProgressBar::m_Progress = 0;
 
 /**
- * Sets the total number of steps to totalSteps.
+ * Sets the current amount of progress to current progress + steps.
+ * @param: steps the number of steps done since last Progress(int steps) call.
  */
-void ProgressBar::SetTotalSteps(int totalSteps)
+void ProgressBar::Progress(int steps)
 {
-    if (m_Instance != NULL)
-      m_Instance->SetTotalSteps(totalSteps);
+  m_Progress += steps;
+  if (m_Instance != NULL)
+    m_Instance->SetProgress(m_Progress);
+  if (m_Progress >= m_TotalSteps)
+    Reset();
 }
 
 /**
- * Sets the current amount of progress to progress.
+ * Adds steps to totalSteps.
  */
-void ProgressBar::SetProgress(int progress)
+void ProgressBar::AddStepsToDo(int steps)
 {
   if (m_Instance != NULL)
-    m_Instance->SetProgress(progress);
-}
-
-/**
- * Sets the amount of progress to progress and the total number of steps to totalSteps.
- */
-void ProgressBar::SetProgress(int progress, int totalSteps)
-{
-  if (m_Instance != NULL)
-    m_Instance->SetProgress(progress, totalSteps);
+  {
+    m_TotalSteps += steps;
+    m_Instance->SetProgress(m_Progress, m_TotalSteps);
+  }
 }
 
 /**
@@ -60,6 +60,8 @@ void ProgressBar::Reset()
 {
   if ( m_Instance != NULL)
     m_Instance->Reset();
+  m_Progress = 0;
+  m_TotalSteps = 0;
 }
 
 /**

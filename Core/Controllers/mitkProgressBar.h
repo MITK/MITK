@@ -52,27 +52,33 @@ public:
   static void SetInstance(ProgressBarImplementation* instance);
 
   //##Documentation
-  //## @brief Sets the total number of steps to totalSteps.
-  static void SetTotalSteps(int totalSteps);
+  //## @brief Adds steps to totalSteps.
+  static void AddStepsToDo(int steps);
+  
   //##Documentation
-  //## @brief Sets the current amount of progress to progress.
-  static void SetProgress(int progress);
-  //##Documentation
-  //## @brief Sets the amount of progress to progress and the total number of steps to totalSteps.
-  static void SetProgress(int progress, int totalSteps);
-
-  //##Documentation
-  //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
-  static void Reset();
+  //## @brief Sets the current amount of progress to current progress + steps.
+  //## @param: steps the number of steps done since last Progress(int steps) call.
+  static void Progress(int steps = 1);
 
   //##Documentation
   //## @brief Sets whether the current progress value is displayed.
   static void SetPercentageVisible (bool visible);
 
 protected:
+
+  //##Documentation
+  //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
+  static void Reset();
+  
   ProgressBar();
+  
   virtual ~ProgressBar();
+  
   static ProgressBarImplementation* m_Instance;
+
+  static int m_Progress;
+
+  static int m_TotalSteps;
 };
 
 }// end namespace mitk

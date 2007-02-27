@@ -26,15 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 //##Documentation
 //## @brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
 //##
-//## The application sets the Instance to mitkProgressBar so that
-//## all mitk-classes will call this class for output:
-//## mitk::ProgressBar::SetInstance(QmitkProgressBar::GetInstance());
-//## 
-//## Then the applikation sets the MainWindow ProgressBar by:
-//## QmitkProgressBar::SetProgressBar(QMainWindow::progressBar());
+//## All mitk-classes will call this class for output:
+//## mitk::ProgressBar::GetInstance();
 
 class QmitkProgressBar : public mitk::ProgressBarImplementation
 {
+
 public:
 
   mitkClassMacro(QmitkProgressBar, mitk::ProgressBarImplementation);
@@ -49,26 +46,30 @@ public:
   virtual ~QmitkProgressBar();
 
   //##Documentation
-  //## @brief Sets the total number of steps to totalSteps.
-  virtual void SetTotalSteps(int totalSteps);
+  //## @brief Sets whether the current progress value is displayed.
+  virtual void SetPercentageVisible(bool visible);
+
   //##Documentation
-  //## @brief Sets the current amount of progress to progress.
-  virtual void SetProgress(int progress);
+  //## @brief Adds steps to totalSteps.
+  virtual void AddStepsToDo(int steps);
+  
   //##Documentation
-  //## @brief Sets the amount of progress to progress and the total number of steps to totalSteps.
-  virtual void SetProgress(int progress, int totalSteps);
+  //## @brief Sets the current amount of progress to current progress + steps.
+  //## @param: steps the number of steps done since last Progress(int steps) call.
+  virtual void Progress(int steps = 1);
+    
+private:
 
   //##Documentation
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
-  virtual void Reset();
+  void Reset();
 
-  //##Documentation
-  //## @brief Sets whether the current progress value is displayed.
-  virtual void SetPercentageVisible(bool visible);
-    
-private:
-    //static Pointer m_Instance;
-    QProgressBar* m_ProgressBar;
+  //static Pointer m_Instance;
+  QProgressBar* m_ProgressBar;
+  
+  int m_TotalSteps;
+  
+  int m_Progress;
 
 };
 

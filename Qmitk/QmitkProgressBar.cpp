@@ -23,42 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 /**
- * Sets the total number of steps to totalSteps.
- */
-void QmitkProgressBar::SetTotalSteps(int totalSteps)
-{
-  if (m_ProgressBar != NULL)
-  {
-    m_ProgressBar->setTotalSteps(totalSteps);
-    m_ProgressBar->show();
-  }
-}
-
-/**
- * Sets the current amount of progress to progress.
- */
-void QmitkProgressBar::SetProgress(int progress)
-{
-  if (m_ProgressBar != NULL)
-  {
-    m_ProgressBar->setProgress(progress);
-    m_ProgressBar->show();
-  }
-}
-
-/**
- * Sets the amount of progress to progress and the total number of steps to totalSteps.
- */
-void QmitkProgressBar::SetProgress(int progress, int totalSteps)
-{
-  if (m_ProgressBar != NULL)
-  {
-    m_ProgressBar->setProgress(progress, totalSteps);
-    m_ProgressBar->show();
-  }
-}
-
-/**
  * Reset the progress bar. The progress bar "rewinds" and shows no progress.
  */
 void QmitkProgressBar::Reset()
@@ -67,6 +31,8 @@ void QmitkProgressBar::Reset()
   {
     m_ProgressBar->reset();
     m_ProgressBar->hide();
+    m_TotalSteps = 0;
+    m_Progress = 0;
   }
 }
 
@@ -79,13 +45,46 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
     m_ProgressBar->setPercentageVisible(visible);
 }
 
+/**
+ *Documentation
+ *@brief Adds steps to totalSteps.
+ */
+void QmitkProgressBar::AddStepsToDo(int steps)
+{
+  if (m_ProgressBar != NULL)
+  {
+    m_TotalSteps += steps;
+    m_ProgressBar->setProgress(m_Progress, m_TotalSteps);
+    m_ProgressBar->show();
+  }
+}
+  
+/**
+ *Documentation
+ *@brief Sets the current amount of progress to current progress + steps.
+ *@param: steps the number of steps done since last Progress(int steps) call.
+ */
+void QmitkProgressBar::Progress(int steps)
+{
+  if (m_ProgressBar != NULL)
+  {
+    m_Progress += steps;
+    m_ProgressBar->setProgress(m_Progress);
+    m_ProgressBar->show();
+  }
+  if (m_Progress >= m_TotalSteps)
+    Reset();
+}
+
 
 QmitkProgressBar::QmitkProgressBar(QProgressBar* instance)
 :ProgressBarImplementation()
 {
     m_ProgressBar = instance;
+    m_TotalSteps = 0;
+    m_Progress = 0;
     m_ProgressBar->hide();
-    mitk::ProgressBar::SetInstance(this);
+    mitk::ProgressBar::SetImplementationInstance(this);
 }
 
 QmitkProgressBar::~QmitkProgressBar()

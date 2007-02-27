@@ -20,37 +20,38 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPROGRESSBARIMPLEMENTATION_H
 #define MITKPROGRESSBARIMPLEMENTATION_H
 
-namespace mitk {
-//##Documentation
-//## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
-class ProgressBarImplementation
+namespace mitk 
 {
-public:
-  //##Documentation
-  //## @brief Constructor
-  ProgressBarImplementation(){};
-  //##Documentation
-  //## @brief Destructor
-  virtual ~ProgressBarImplementation(){};
 
   //##Documentation
-  //## @brief Sets the total number of steps to totalSteps.
-  virtual void SetTotalSteps(int totalSteps) =0;
-  //##Documentation
-  //## @brief Sets the current amount of progress to progress.
-  virtual void SetProgress(int progress) =0;
-  //##Documentation
-  //## @brief Sets the amount of progress to progress and the total number of steps to totalSteps.
-  virtual void SetProgress(int progress, int totalSteps) =0;
+  //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
+  class ProgressBarImplementation
+  {
 
-  //##Documentation
-  //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
-  virtual void Reset() =0;
+  public:
+    
+    //##Documentation
+    //## @brief Constructor
+    ProgressBarImplementation(){};
+    
+    //##Documentation
+    //## @brief Destructor
+    virtual ~ProgressBarImplementation(){};
 
-  //##Documentation
-  //## @brief Sets whether the current progress value is displayed.
-  virtual void SetPercentageVisible (bool visible) =0;
-};
+    //##Documentation
+    //## @brief Sets whether the current progress value is displayed.
+    virtual void SetPercentageVisible (bool visible) =0;
+
+    //##Documentation
+    //## @brief Adds steps to totalSteps.
+    virtual void AddStepsToDo(int steps) =0;
+  
+    //##Documentation
+    //## @brief Sets the current amount of progress to current progress + steps.
+    //## @param: steps the number of steps done since last Progress(int steps) call.
+    virtual void Progress(int steps = 1) =0;
+  };
 
 }// end namespace mitk
+
 #endif /* define MITKPROGRESSBARIMPLEMENTATION_H */

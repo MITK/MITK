@@ -309,3 +309,6 @@ const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
   return m_FileWriters;
 }
+void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
+
+}

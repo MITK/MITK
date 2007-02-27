@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFileWriterWithInformation.h"
 namespace mitk {
 
+class Event;
+
 class CoreObjectFactory : public CoreObjectFactoryBase
 {
   public:
@@ -37,6 +39,7 @@ class CoreObjectFactory : public CoreObjectFactoryBase
     virtual const char* GetSaveFileExtensions();
     virtual FileWriterList GetFileWriters();
     itk::Object::Pointer CreateCoreObject( const std::string& className );
+    virtual void MapEvent(const mitk::Event* event, const int eventID);
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 

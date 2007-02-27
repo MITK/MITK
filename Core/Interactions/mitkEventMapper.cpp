@@ -42,6 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
+#include "mitkCoreObjectFactory.h"
 
 #ifdef MBI_INTERNAL_CONFERENCE
   #include <mitkGeometry3D.h>
@@ -530,43 +531,11 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
   }
 
 #ifdef MBI_INTERNAL_CONFERENCE
-  //Conferen Stop and Enable Events
+  //Conference - pass local events through 
   if ( mitkPostedEventID == 0 )
   {
-    mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
-    if(!ct->HaveToken() && !( eventID == mitk::Type_MouseMove ) )
-    {
-      ct->GetToken();
-      std::cout<<"TOKEN: WILL BE REQUESTED "<<eventID<<std::endl;
-    }
-
-    mitk::DisplayPositionEvent *dpe = dynamic_cast<mitk::DisplayPositionEvent *>(event);
-    if ( dpe )
-    {
-      mitk::BaseRenderer* bp = event->GetSender();
-      const char* baseRendererName = bp->GetName();
-
-      mitk::Point3D p3;
-      p3 = dpe->GetWorldPosition();
-
-      ConferenceKit* ck = ConferenceKit::GetInstance();
-      if( ck != NULL )
-      {
-        if( eventID == mitk::Type_MouseMove ) // MouseMove
-        {
-          ck->MouseMove( baseRendererName,  p3[0], p3[1], p3[2] );
-        }
-        else
-        {
-          mitk::Point2D p2; 
-          p2 = dpe->GetDisplayPosition();
-
-          ck->SendMITK( eventID, baseRendererName, event->GetType(), event->GetButton(), event->GetButtonState(), event->GetKey(), p3[0], p3[1], p3[2], (p2[0]/bp->GetSizeX()), (p2[1]/bp->GetSizeY()) );
-          //std::cout<<bp->GetSizeX()<<" / (("<<p2[0]<<")) =X "<<p2[0]/bp->GetSizeX()<<"   UND "<<bp->GetSizeY()<<" / (("<< p2[1] <<")) =Y "<<p2[1]/bp->GetSizeY()<<std::endl;
-        }
-      }
-    }
-  }
+    mitk::CoreObjectFactory::GetInstance()->MapEvent(event,eventID);
+ }
 #endif //MBI_INTERNAL_CONFERENCE
 
   mitk::OperationEvent::ExecuteIncrement();

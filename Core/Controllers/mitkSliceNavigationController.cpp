@@ -423,6 +423,39 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
 }
 
 
+const mitk::TimeSlicedGeometry *
+SliceNavigationController::GetCreatedWorldGeometry()
+{
+  return m_CreatedWorldGeometry;
+}
+
+
+const mitk::Geometry3D *
+SliceNavigationController::GetCurrentGeometry3D()
+{
+  return m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos() );
+}
+
+
+const mitk::PlaneGeometry *
+SliceNavigationController::GetCurrentPlaneGeometry()
+{
+  const mitk::SlicedGeometry3D *slicedGeometry = dynamic_cast< const mitk::SlicedGeometry3D * >
+    ( this->GetCurrentGeometry3D() );
+
+  if ( slicedGeometry )
+  {
+    const mitk::PlaneGeometry *planeGeometry = dynamic_cast< mitk::PlaneGeometry * >
+      ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
+    return planeGeometry;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+
 void
 SliceNavigationController::ExecuteOperation( Operation *operation )
 {

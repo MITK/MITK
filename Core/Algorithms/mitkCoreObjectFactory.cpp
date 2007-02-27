@@ -131,15 +131,15 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
     std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
     std::list<itk::LightObject::Pointer>::iterator factoryIt = allobjects.begin();
     while (instance.IsNull() && factoryIt != allobjects.end() ) {
-      if ((*factoryIt)->GetNameOfClass() == "SBCoreObjectFactory") {
-        instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
+      if (std::string("SBCoreObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
+        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
       }
       ++factoryIt;
     } 
     factoryIt = allobjects.begin(); 
     while (instance.IsNull() && factoryIt != allobjects.end() ) {
-      if ((*factoryIt)->GetNameOfClass() == "QMCoreObjectFactory") {
-        instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
+      if ( std::string("QMCoreObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
+        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
       }
       ++factoryIt;
     } 

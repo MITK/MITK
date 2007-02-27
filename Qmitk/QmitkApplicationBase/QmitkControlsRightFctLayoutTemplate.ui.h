@@ -32,10 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkControlsRightFctLayoutTemplate::init()
 {
   MainSplitter->setResizeMode(ControlParent,QSplitter::FollowSizeHint);
-  //creating a QmitkProgressBar for Output on the QProgressBar and connecting it with the MainProgressBar
-  QmitkProgressBar *progressBar = new QmitkProgressBar(this->progBar);
-  //disabling the SizeGrip in the lower right corner
-  progressBar->SetPercentageVisible(true);
+  progBar->setPercentageVisible(true);
 }
 
 

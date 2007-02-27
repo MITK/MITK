@@ -27,13 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
  */
 void QmitkProgressBar::Reset()
 {
-  if (m_ProgressBar != NULL)
-  {
-    m_ProgressBar->reset();
-    m_ProgressBar->hide();
-    m_TotalSteps = 0;
-    m_Progress = 0;
-  }
+  this->reset();
+  this->hide();
+  m_TotalSteps = 0;
+  m_Progress = 0;
 }
 
 /**
@@ -41,8 +38,7 @@ void QmitkProgressBar::Reset()
  */
 void QmitkProgressBar::SetPercentageVisible(bool visible)
 {
-  if (m_ProgressBar != NULL)
-    m_ProgressBar->setPercentageVisible(visible);
+  this->setPercentageVisible(visible);
 }
 
 /**
@@ -51,12 +47,9 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
  */
 void QmitkProgressBar::AddStepsToDo(int steps)
 {
-  if (m_ProgressBar != NULL)
-  {
-    m_TotalSteps += steps;
-    m_ProgressBar->setProgress(m_Progress, m_TotalSteps);
-    m_ProgressBar->show();
-  }
+  m_TotalSteps += steps;
+  this->setProgress(m_Progress, m_TotalSteps);
+  this->show();
 }
   
 /**
@@ -66,24 +59,21 @@ void QmitkProgressBar::AddStepsToDo(int steps)
  */
 void QmitkProgressBar::Progress(int steps)
 {
-  if (m_ProgressBar != NULL)
-  {
-    m_Progress += steps;
-    m_ProgressBar->setProgress(m_Progress);
-    m_ProgressBar->show();
-  }
+  m_Progress += steps;
+  this->setProgress(m_Progress);
+  this->show();
+  
   if (m_Progress >= m_TotalSteps)
     Reset();
 }
 
 
-QmitkProgressBar::QmitkProgressBar(QProgressBar* instance)
-:ProgressBarImplementation()
+QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char * name, WFlags f)
+:QProgressBar(parent, name, f), ProgressBarImplementation()
 {
-    m_ProgressBar = instance;
     m_TotalSteps = 0;
     m_Progress = 0;
-    m_ProgressBar->hide();
+    this->hide();
     mitk::ProgressBar::SetImplementationInstance(this);
 }
 

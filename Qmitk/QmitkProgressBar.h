@@ -29,17 +29,17 @@ PURPOSE.  See the above copyright notices for more information.
 //## All mitk-classes will call this class for output:
 //## mitk::ProgressBar::GetInstance();
 
-class QmitkProgressBar : public mitk::ProgressBarImplementation
+class QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 
-public:
+  Q_OBJECT
 
-  mitkClassMacro(QmitkProgressBar, mitk::ProgressBarImplementation);
+public:
  
   //##Documentation
   //##@brief Constructor;
   //## holds param instance internaly and connects this to the mitkProgressBar
-  QmitkProgressBar(QProgressBar* instance);
+  QmitkProgressBar(QWidget * parent = 0, const char * name = 0, WFlags f = 0);
   
   //##Documentation
   //##@brief Destructor
@@ -63,9 +63,6 @@ private:
   //##Documentation
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
   void Reset();
-
-  //static Pointer m_Instance;
-  QProgressBar* m_ProgressBar;
   
   int m_TotalSteps;
   

@@ -25,17 +25,19 @@ PURPOSE.  See the above copyright notices for more information.
 ** init() function in place of a constructor, and a destroy() function in
 ** place of a destructor.
 *****************************************************************************/
-#include <mitkProperties.h>
-#include <mitkStringProperty.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkGeometry2DDataMapper2D.h>
-#include <mitkOpenGLRenderer.h>
-#include <mitkPositionEvent.h>
-#include <mitkInteractionConst.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkPositionTracker.h>
-#include <mitkPointSet.h>
-#include <mitkStateEvent.h>
+#include "mitkProperties.h"
+#include "mitkStringProperty.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkGeometry2DDataMapper2D.h"
+#include "mitkOpenGLRenderer.h"
+#include "mitkPositionEvent.h"
+#include "mitkInteractionConst.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkPositionTracker.h"
+#include "mitkPointSet.h"
+#include "mitkStateEvent.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkLine.h"
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -43,93 +45,124 @@ PURPOSE.  See the above copyright notices for more information.
 
 void QmitkStdMultiWidget::init()
 {
-  mitkWidget1->setPaletteBackgroundColor ("red");
-  mitkWidget2->setPaletteBackgroundColor ("green");
-  mitkWidget3->setPaletteBackgroundColor ("blue");
-  mitkWidget4->setPaletteBackgroundColor ("yellow");
+  mitkWidget1->setPaletteBackgroundColor("red");
+  mitkWidget2->setPaletteBackgroundColor("green");
+  mitkWidget3->setPaletteBackgroundColor("blue");
+  mitkWidget4->setPaletteBackgroundColor("yellow");
 
   planesIterator = NULL;
   m_PositionTracker = NULL;
 
-  //transfer colors in WorldGeometry-Nodes of the associated Renderer
+  // transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
   float color[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
+
   // ... of widget 1
   qcolor=mitkWidget1->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
+  color[0]=qcolor.red()/255.0;
+  color[1]=qcolor.green()/255.0;
+  color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
+
   // ... of widget 2
   qcolor=mitkWidget2->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
+  color[0]=qcolor.red()/255.0;
+  color[1]=qcolor.green()/255.0;
+  color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
+
   // ... of widget 3
   qcolor=mitkWidget3->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
+  color[0]=qcolor.red()/255.0;
+  color[1]=qcolor.green()/255.0;
+  color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
+
   // ... of widget 4
   qcolor=mitkWidget4->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0; color[1]=qcolor.green()/255.0; color[2]=qcolor.blue()/255.0;
+  color[0]=qcolor.red()/255.0;
+  color[1]=qcolor.green()/255.0; 
+  color[2]=qcolor.blue()/255.0;
   planeNode=mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(color);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
   // create a slice rotator
-  //m_SlicesRotator = mitk::SlicesRotator::New();
+  // m_SlicesRotator = mitk::SlicesRotator::New();
   // @TODO next line causes sure memory leak
-  m_SlicesRotation = false; // rotator will be created nonetheless (will be switched on and off)
+  // rotator will be created nonetheless (will be switched on and off)
+  m_SlicesRotation = false; 
   m_SlicesRotator = new mitk::SlicesRotator("slices-rotator");
-  m_SlicesRotator->AddSliceController( mitkWidget1->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController( mitkWidget2->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController( mitkWidget3->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController( 
+    mitkWidget1->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController( 
+    mitkWidget2->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController(
+    mitkWidget3->GetSliceNavigationController() );
 
   //initialize timeNavigationController: send time via sliceNavigationControllers
   timeNavigationController = mitk::SliceNavigationController::New(NULL);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController(), false);
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(mitkWidget4->GetRenderer());
+  timeNavigationController->ConnectGeometryTimeEvent(
+    mitkWidget1->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(
+    mitkWidget2->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(
+    mitkWidget3->GetSliceNavigationController(), false);
+  timeNavigationController->ConnectGeometryTimeEvent(
+    mitkWidget4->GetSliceNavigationController(), false);
+  mitkWidget1->GetSliceNavigationController()
+    ->ConnectGeometrySendEvent(mitkWidget4->GetRenderer());
 
   //reverse connection between sliceNavigationControllers and timeNavigationController
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget1->GetSliceNavigationController()
+    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget2->GetSliceNavigationController()
+    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget3->GetSliceNavigationController()
+    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  mitkWidget4->GetSliceNavigationController()
+    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
 
   // instantiate display interactor
-  m_MoveAndZoomInteractor = mitk::DisplayVectorInteractor::New("moveNzoom", new mitk::DisplayInteractor() );
+  m_MoveAndZoomInteractor = mitk::DisplayVectorInteractor::New(
+    "moveNzoom", new mitk::DisplayInteractor() );
   
-  m_LastLeftClickPositionSupplier = mitk::CoordinateSupplier::New("navigation", NULL);
+  m_LastLeftClickPositionSupplier = 
+    mitk::CoordinateSupplier::New("navigation", NULL);
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
   );
   
   m_GradientBackground1 = mitk::GradientBackground::New();
-  m_GradientBackground1->SetRenderWindow( mitkWidget1->GetRenderer()->GetRenderWindow() );
+  m_GradientBackground1->SetRenderWindow(
+    mitkWidget1->GetRenderer()->GetRenderWindow() );
   m_GradientBackground1->Disable();
   
   m_GradientBackground2 = mitk::GradientBackground::New();
-  m_GradientBackground2->SetRenderWindow( mitkWidget2->GetRenderer()->GetRenderWindow() );
+  m_GradientBackground2->SetRenderWindow( 
+    mitkWidget2->GetRenderer()->GetRenderWindow() );
   m_GradientBackground2->Disable();
   
   m_GradientBackground3 = mitk::GradientBackground::New();
-  m_GradientBackground3->SetRenderWindow( mitkWidget3->GetRenderer()->GetRenderWindow() );
+  m_GradientBackground3->SetRenderWindow( 
+    mitkWidget3->GetRenderer()->GetRenderWindow() );
   m_GradientBackground3->Disable();
   
   m_GradientBackground4 = mitk::GradientBackground::New();
-  m_GradientBackground4->SetRenderWindow( mitkWidget4->GetRenderer()->GetRenderWindow() );
+  m_GradientBackground4->SetRenderWindow(
+    mitkWidget4->GetRenderer()->GetRenderWindow() );
   m_GradientBackground4->Enable();
 }
 
@@ -138,7 +171,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to 2D images up... " << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0,02, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0,02, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout * layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   QGridLayout* layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
@@ -173,7 +207,8 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to 2D images left... " << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0,0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0,0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   QGridLayout *layout3 = new QGridLayout( 0, 1, 2, 0, 6, "layout3");
@@ -208,7 +243,8 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to default... " << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   QGridLayout *layout3 = new QGridLayout( 0, 2, 2, 0, 6, "layout3");
@@ -239,7 +275,8 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to big 3D ..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   mitkWidget1->hide();
@@ -259,7 +296,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to big Widget1 ..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
@@ -282,7 +320,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to big Widget2 ..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
   mitkWidget2->setMaximumSize(2000,2000);
@@ -304,7 +343,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to big Widget1 ..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
@@ -328,7 +368,8 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 
   std::cout << "changing layout to 2 x 2D and 3D Widget" << std::endl;
 
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
 
   QVBoxLayout *layout1 = new QVBoxLayout( );
   QHBoxLayout *layout2 = new QHBoxLayout( );
@@ -357,7 +398,8 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
@@ -384,7 +426,8 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to Widget3 and 4 in one Column..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
   mitkWidget1->hide();
@@ -422,36 +465,52 @@ void QmitkStdMultiWidget::Fit()
 
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))
+    ->GetVtkRenderer();
   if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))
+    ->GetVtkRenderer();
+
   if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))
+    ->GetVtkRenderer();
+
   if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))->GetVtkRenderer();
+  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))
+    ->GetVtkRenderer();
+
   if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-void QmitkStdMultiWidget::AddPositionTrackingPointSet(mitk::DataTreeIteratorBase* treeIterator)
+void QmitkStdMultiWidget::AddPositionTrackingPointSet(
+  mitk::DataTreeIteratorBase* treeIterator)
 {
   if (treeIterator) m_Tree = treeIterator->GetTree(); 
 
   //PoinSetNode for MouseOrientation
   m_PositionTrackerNode = mitk::DataTreeNode::New();
-  m_PositionTrackerNode->SetProperty("name", new mitk::StringProperty("Mouse Position"));
+  m_PositionTrackerNode->SetProperty(
+    "name", new mitk::StringProperty("Mouse Position"));
   m_PositionTrackerNode->SetData( mitk::PointSet::New() );
   m_PositionTrackerNode->SetColor(1.0,0.33,0.0);
-  m_PositionTrackerNode->SetProperty("layer", new mitk::IntProperty(1001));
-  m_PositionTrackerNode->SetProperty( "visible", new mitk::BoolProperty(true) );
-  m_PositionTrackerNode->SetProperty( "inputdevice", new mitk::BoolProperty(true) );
-  m_PositionTrackerNode->SetProperty( "BaseRendererMapperID", new mitk::IntProperty(0) );//point position 2D mouse
-  m_PositionTrackerNode->SetProperty("baserenderer", new mitk::StringProperty("N/A"));
+  m_PositionTrackerNode->SetProperty(
+    "layer", new mitk::IntProperty(1001));
+  m_PositionTrackerNode->SetProperty(
+    "visible", new mitk::BoolProperty(true) );
+  m_PositionTrackerNode->SetProperty(
+    "inputdevice", new mitk::BoolProperty(true) );
+  m_PositionTrackerNode->SetProperty(
+    "BaseRendererMapperID", new mitk::IntProperty(0) );//point position 2D mouse
+  m_PositionTrackerNode->SetProperty(
+    "baserenderer", new mitk::StringProperty("N/A"));
   
 }
-void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
+void QmitkStdMultiWidget
+::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
 {
-  // add the diplayed planes of the multiwidget to a node to which the subtree @a planesSubTree points ...
+  // add the diplayed planes of the multiwidget to a node to which the subtree 
+  // @a planesSubTree points ...
 
   mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
   node->SetProperty("name", new mitk::StringProperty("Widgets"));
@@ -463,6 +522,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   float white[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;
   mitk::Geometry2DDataMapper2D::Pointer mapper;
+
   // ... of widget 1
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
@@ -473,6 +533,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   dit->Add(planeNode);
   mitk::DataTreeChildIterator childIterator(*(dit.GetPointer()));
   mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
+
   // ... of widget 2
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
@@ -482,6 +543,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
   planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
   dit->Add(planeNode);
+
   // ... of widget 3
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
@@ -495,10 +557,12 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it)
   planesIterator = dit;
 }
 
-mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
+mitk::SliceNavigationController* 
+QmitkStdMultiWidget::GetTimeNavigationController()
 {
   return timeNavigationController.GetPointer();
 }
+
 
 void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
@@ -508,25 +572,36 @@ void QmitkStdMultiWidget::EnableStandardLevelWindow()
   levelWindowWidget->show();
 }
 
+
 void QmitkStdMultiWidget::DisableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
   levelWindowWidget->hide();
 }
 
-bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * it)
+
+bool QmitkStdMultiWidget::InitializeStandardViews(
+  mitk::DataTreeIteratorBase * it)
 {
   bool boundingBoxInitialized = false;
 
-  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal    = mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal     = mitkWidget3->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorWidget4     = mitkWidget4->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorTransversal =
+    mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal = 
+    mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal = 
+    mitkWidget3->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorWidget4 = 
+    mitkWidget4->GetSliceNavigationController();
 
-  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
-  sliceNavigatorWidget4->SetViewDirection(mitk::SliceNavigationController::Original);
+  sliceNavigatorTransversal->SetViewDirection(
+    mitk::SliceNavigationController::Transversal);
+  sliceNavigatorSagittal->SetViewDirection(
+    mitk::SliceNavigationController::Sagittal);
+  sliceNavigatorFrontal->SetViewDirection(
+    mitk::SliceNavigationController::Frontal);
+  sliceNavigatorWidget4->SetViewDirection(
+    mitk::SliceNavigationController::Original);
 
   if ( it==NULL )
   {
@@ -538,20 +613,24 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   }
   else
   {
-    const mitk::BoundingBox::Pointer boundingbox = mitk::DataTree::ComputeVisibleBoundingBox(it, NULL, "includeInBoundingBox");
+    const mitk::BoundingBox::Pointer boundingbox = 
+      mitk::DataTree::ComputeVisibleBoundingBox(it, NULL, "includeInBoundingBox");
     if ( boundingbox->GetPoints()->Size()>0 )
     {
       mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
       geometry->Initialize();
       geometry->SetBounds(boundingbox->GetBounds());
 
-      //lets see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = mitk::DataTree::ComputeTimeBounds(it, NULL, "includeInBoundingBox");
+      // let's see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds =
+        mitk::DataTree::ComputeTimeBounds(it, NULL, "includeInBoundingBox");
+
       if ( timebounds[1]<mitk::ScalarTypeNumericTraits::max() )
       {
         mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
-        mitk::TimeSlicedGeometry::Pointer timegeometry = mitk::TimeSlicedGeometry::New();
+        mitk::TimeSlicedGeometry::Pointer timegeometry = 
+          mitk::TimeSlicedGeometry::New();
         timegeometry->InitializeEvenlyTimed(geometry, (unsigned int) duration);
         timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
 
@@ -561,7 +640,9 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         geometry=timegeometry;
       }
 
-      double diagonalLength  = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2();
+      double diagonalLength  = const_cast<mitk::BoundingBox*>(
+        geometry->GetBoundingBox())->GetDiagonalLength2();
+
       if ( (diagonalLength > mitk::eps) && (diagonalLength < mitk::large) )
       {
         boundingBoxInitialized=true;
@@ -569,15 +650,18 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
         // steppers are set so that the cross is centered in the image
         sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorTransversal->Update();
-        sliceNavigatorTransversal->GetSlice()->SetPos( sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
+        sliceNavigatorTransversal->GetSlice()->SetPos( 
+          sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorSagittal->Update();
-        sliceNavigatorSagittal->GetSlice()->SetPos( sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
+        sliceNavigatorSagittal->GetSlice()->SetPos( 
+          sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorFrontal->Update();
-        sliceNavigatorFrontal->GetSlice()->SetPos( sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
+        sliceNavigatorFrontal->GetSlice()->SetPos( 
+          sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
 
         sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());
         sliceNavigatorWidget4->Update();
@@ -596,19 +680,28 @@ bool QmitkStdMultiWidget::InitializeStandardViews(mitk::DataTreeIteratorBase * i
   return boundingBoxInitialized;
 }
 
-bool QmitkStdMultiWidget::InitializeStandardViews( const mitk::Geometry3D * geometry )
+
+bool QmitkStdMultiWidget
+::InitializeStandardViews( const mitk::Geometry3D * geometry )
 {
   bool boundingBoxInitialized = false;
 
-  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal    = mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal     = mitkWidget3->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorTransversal =
+    mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal =
+    mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal =
+    mitkWidget3->GetSliceNavigationController();
 
-  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+  sliceNavigatorTransversal->SetViewDirection(
+    mitk::SliceNavigationController::Transversal);
+  sliceNavigatorSagittal->SetViewDirection(
+    mitk::SliceNavigationController::Sagittal);
+  sliceNavigatorFrontal->SetViewDirection(
+    mitk::SliceNavigationController::Frontal);
 
-  if ( (geometry==NULL) || (const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps) )
+  if ( (geometry==NULL) || (const_cast<mitk::BoundingBox*>(
+    geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps) )
   {
     sliceNavigatorTransversal->Update();
     sliceNavigatorSagittal->Update();
@@ -618,22 +711,30 @@ bool QmitkStdMultiWidget::InitializeStandardViews( const mitk::Geometry3D * geom
   }
   else
   {
-    mitk::Geometry3D::Pointer clonedgeometry = static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
+    mitk::Geometry3D::Pointer clonedgeometry = 
+      static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
 
     // steppers are set so that the cross is centered in the image
-    sliceNavigatorTransversal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorTransversal->SetInputWorldGeometry(
+      clonedgeometry.GetPointer());
     sliceNavigatorTransversal->Update();
-    sliceNavigatorTransversal->GetSlice()->SetPos( sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
+    sliceNavigatorTransversal->GetSlice()->SetPos( 
+      sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
 
-    sliceNavigatorSagittal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorSagittal->SetInputWorldGeometry(
+      clonedgeometry.GetPointer());
     sliceNavigatorSagittal->Update();
-    sliceNavigatorSagittal->GetSlice()->SetPos( sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
+    sliceNavigatorSagittal->GetSlice()->SetPos( 
+      sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
 
-    sliceNavigatorFrontal->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    sliceNavigatorFrontal->SetInputWorldGeometry(
+      clonedgeometry.GetPointer());
     sliceNavigatorFrontal->Update();
-    sliceNavigatorFrontal->GetSlice()->SetPos( sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
+    sliceNavigatorFrontal->GetSlice()->SetPos( 
+      sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
 
-    timeNavigationController->SetInputWorldGeometry(clonedgeometry.GetPointer());
+    timeNavigationController->SetInputWorldGeometry(
+      clonedgeometry.GetPointer());
     timeNavigationController->Update();
     
     // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
@@ -677,13 +778,19 @@ mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
 
 void QmitkStdMultiWidget::ReInitializeStandardViews()
 {
-  mitk::SliceNavigationController* sliceNavigatorTransversal = mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal    = mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal     = mitkWidget3->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorTransversal = 
+    mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorSagittal = 
+    mitkWidget2->GetSliceNavigationController();
+  mitk::SliceNavigationController* sliceNavigatorFrontal = 
+    mitkWidget3->GetSliceNavigationController();
 
-  sliceNavigatorTransversal->SetViewDirection(mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(mitk::SliceNavigationController::Frontal);
+  sliceNavigatorTransversal->SetViewDirection(
+    mitk::SliceNavigationController::Transversal);
+  sliceNavigatorSagittal->SetViewDirection(
+    mitk::SliceNavigationController::Sagittal);
+  sliceNavigatorFrontal->SetViewDirection(
+    mitk::SliceNavigationController::Frontal);
 
   sliceNavigatorTransversal->Update();
   sliceNavigatorSagittal->Update();
@@ -713,8 +820,31 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
   return mitkWidget4->GetRenderWindow();
 }
 
-const mitk::Point3D & QmitkStdMultiWidget::GetCrossPosition() const
+const mitk::Point3D &
+QmitkStdMultiWidget::GetLastLeftClickPosition() const
 {
+  return m_LastLeftClickPositionSupplier->GetCurrentPoint();
+}
+
+const mitk::Point3D &
+QmitkStdMultiWidget::GetCrossPosition() const
+{
+  const mitk::PlaneGeometry *plane1 = 
+    mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  const mitk::PlaneGeometry *plane2 = 
+    mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  const mitk::PlaneGeometry *plane3 = 
+    mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+  mitk::Line3D line;
+  if ( plane1->IntersectionLine( plane2, line ) )
+  {
+    mitk::Point3D point;
+    if ( plane3->IntersectionPoint( line, point ) )
+    {
+      return point;
+    }
+  }
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
@@ -725,7 +855,8 @@ void QmitkStdMultiWidget::EnablePositionTracking()
     m_PositionTracker = mitk::PositionTracker::New("PositionTracker", NULL);
   }
 
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction = 
+    mitk::GlobalInteraction::GetInstance();
 
   if(globalInteraction)
   {
@@ -737,7 +868,8 @@ void QmitkStdMultiWidget::EnablePositionTracking()
 
 void QmitkStdMultiWidget::DisablePositionTracking()
 {
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction =
+    mitk::GlobalInteraction::GetInstance();
 
   if(globalInteraction)
   {
@@ -756,14 +888,16 @@ void QmitkStdMultiWidget::DisablePositionTracking()
   }
 }
 
-void QmitkStdMultiWidget::EnsureDisplayContainsPoint(mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
+void QmitkStdMultiWidget::EnsureDisplayContainsPoint(
+  mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
 {
   mitk::Point2D pointOnPlane;
   displayGeometry->Map( p, pointOnPlane );
 
   // point minus origin < width or height ==> outside ?
   mitk::Vector2D pointOnRenderWindow_MM;
-  pointOnRenderWindow_MM = pointOnPlane.GetVectorFromOrigin() - displayGeometry->GetOriginInMM();
+  pointOnRenderWindow_MM = pointOnPlane.GetVectorFromOrigin() 
+    - displayGeometry->GetOriginInMM();
   
   mitk::Vector2D sizeOfDisplay( displayGeometry->GetSizeInMM() );
 
@@ -773,19 +907,22 @@ void QmitkStdMultiWidget::EnsureDisplayContainsPoint(mitk::DisplayGeometry* disp
       ||                0 > pointOnRenderWindow_MM[1] )
   {
     // point is not visible -> move geometry
-    mitk::Vector2D offset( (pointOnRenderWindow_MM - sizeOfDisplay / 2.0) / displayGeometry->GetScaleFactorMMPerDisplayUnit() );
+    mitk::Vector2D offset( (pointOnRenderWindow_MM - sizeOfDisplay / 2.0) 
+      / displayGeometry->GetScaleFactorMMPerDisplayUnit() );
     
     displayGeometry->MoveBy( offset );
   }
 }
 
-void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
+void QmitkStdMultiWidget::MoveCrossToPosition(
+  const mitk::Point3D& newPosition)
 {
   // create a PositionEvent with the given position and
   // tell the slice navigation controllers to move there
 
   mitk::Point2D p2d;
-  mitk::PositionEvent event( mitkWidget1->GetRenderer(), 0, 0, 0, mitk::Key_unknown, p2d, newPosition );
+  mitk::PositionEvent event( mitkWidget1->GetRenderer(), 0, 0, 0, 
+    mitk::Key_unknown, p2d, newPosition );
   mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
   mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
 
@@ -793,7 +930,8 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
   {
     m_SlicesRotator->HandleEvent( &stateEvent );
     
-    // just in case SNCs will develop something that depends on the mouse button being released again
+    // just in case SNCs will develop something that depends on the mouse 
+    // button being released again
     m_SlicesRotator->HandleEvent( &stateEvent2 );
   }
   else
@@ -802,7 +940,8 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
     mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent );
     mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent );
     
-    // just in case SNCs will develop something that depends on the mouse button being released again
+    // just in case SNCs will develop something that depends on the mouse
+    // button being released again
     mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
     mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
     mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
@@ -810,9 +949,12 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
   
   // determine if cross is now out of display
   // if so, move the display window
-  EnsureDisplayContainsPoint( mitkWidget1->GetRenderer()->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitkWidget2->GetRenderer()->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitkWidget3->GetRenderer()->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitkWidget1->GetRenderer()
+    ->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitkWidget2->GetRenderer()
+    ->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitkWidget3->GetRenderer()
+    ->GetDisplayGeometry(), newPosition );
 
   // update displays
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -821,7 +963,8 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 {
   // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction = 
+    mitk::GlobalInteraction::GetInstance();
   
   if (m_SlicesRotation)
   {
@@ -841,7 +984,8 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
 {
   // Do not let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction = 
+    mitk::GlobalInteraction::GetInstance();
 
   if (m_SlicesRotation)
   {
@@ -849,10 +993,14 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
   }
   else
   {
-    globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController());
+    globalInteraction->RemoveListener(
+      mitkWidget1->GetSliceNavigationController());
+    globalInteraction->RemoveListener( 
+      mitkWidget2->GetSliceNavigationController());
+    globalInteraction->RemoveListener( 
+      mitkWidget3->GetSliceNavigationController());
+    globalInteraction->RemoveListener( 
+      mitkWidget4->GetSliceNavigationController());
   }
   
   globalInteraction->RemoveListener( timeNavigationController );
@@ -864,22 +1012,31 @@ void QmitkStdMultiWidget::EnableSliceRotation(bool on)
 
   m_SlicesRotation = on;
   // @ TODO add bool m_NavigationControllerListeningEnable!
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction* globalInteraction = 
+    mitk::GlobalInteraction::GetInstance();
   if (on)
   {
-    globalInteraction->RemoveListener( mitkWidget1->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget2->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget3->GetSliceNavigationController());
-    globalInteraction->RemoveListener( mitkWidget4->GetSliceNavigationController());
+    globalInteraction->RemoveListener( 
+      mitkWidget1->GetSliceNavigationController());
+    globalInteraction->RemoveListener(
+      mitkWidget2->GetSliceNavigationController());
+    globalInteraction->RemoveListener(
+      mitkWidget3->GetSliceNavigationController());
+    globalInteraction->RemoveListener(
+      mitkWidget4->GetSliceNavigationController());
     globalInteraction->AddListener( m_SlicesRotator );
   }
   else
   {
     globalInteraction->RemoveListener( m_SlicesRotator );
-    globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
+    globalInteraction->AddListener( 
+      mitkWidget1->GetSliceNavigationController() );
+    globalInteraction->AddListener(
+      mitkWidget2->GetSliceNavigationController() );
+    globalInteraction->AddListener(
+      mitkWidget3->GetSliceNavigationController() );
+    globalInteraction->AddListener(
+      mitkWidget4->GetSliceNavigationController() );
 
     ReInitializeStandardViews();
   }
@@ -893,7 +1050,8 @@ int QmitkStdMultiWidget::GetLayout() const
 
 void QmitkStdMultiWidget::EnableGradientBackground()
 {
-  // gradient background is by default only in widget 4, otherwise interferences between 2D rendering and VTK rendering may occur. 
+  // gradient background is by default only in widget 4, otherwise
+  // interferences between 2D rendering and VTK rendering may occur. 
   //m_GradientBackground1->Enable();
   //m_GradientBackground2->Enable();
   //m_GradientBackground3->Enable();
@@ -920,7 +1078,8 @@ void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
 
@@ -948,7 +1107,8 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   delete QmitkStdMultiWidgetLayout ;
 
   std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
-  QmitkStdMultiWidgetLayout = new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
+  QmitkStdMultiWidgetLayout = 
+    new QHBoxLayout( this, 0, 0, "QmitkStdMultiWidgetLayout");
   QGridLayout *layout3 = new QGridLayout( 0, 2, 1, 0, 6, "layout3");
   QHBoxLayout *layout4 = new QHBoxLayout( 0, 0, 6, "layout4");
   QGridLayout *layout5 = new QGridLayout( 0, 1, 2, 0, 6, "layout5");
@@ -974,4 +1134,10 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   QmitkStdMultiWidgetLayout->addLayout( layout4 );
 
   m_Layout = LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4;
+}
+
+
+void QmitkStdMultiWidget::newFunction()
+{
+
 }

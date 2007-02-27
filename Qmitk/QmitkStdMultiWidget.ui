@@ -226,11 +226,13 @@
     <function returnType="QmitkRenderWindow *">GetRenderWindow2() const</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow3() const</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow4() const</function>
+    <function returnType="const mitk::Point3D &amp;">GetLastLeftClickPosition() const</function>
     <function returnType="const mitk::Point3D &amp;">GetCrossPosition() const</function>
     <function>EnablePositionTracking()</function>
     <function>DisablePositionTracking()</function>
     <function returnType="int">GetLayout() const</function>
     <function specifier="non virtual" returnType="mitk::SlicesRotator *">GetSlicesRotator() const</function>
+    <function>newFunction()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

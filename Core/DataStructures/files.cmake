@@ -55,6 +55,7 @@ SET(CPP_FILES
   mitkPicHelper.cpp
   mitkPixelType.cpp
   mitkPlaneGeometry.cpp
+  mitkPlaneOperation.cpp
   mitkPlaneLandmarkProjector.cpp
   mitkPointData.cpp
   mitkPointOperation.cpp

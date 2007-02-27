@@ -30,10 +30,8 @@ namespace mitk
   //## @brief Sending a message to the applications ProgressBar
   //##
   //## Holds a GUI dependent ProgressBarImplementation and sends the progress further.
-  //## nearly equal to itk::OutputWindow, 
-  //## no Window, but one line of text and a delay for clear. 
-  //## all mitk-classes use this class to display progress on GUI-ProgressBar.
-  //## The mainapplication has to set the internal held ProgressBarImplementation with SetInstance(..).
+  //## All mitk-classes use this class to display progress on GUI-ProgressBar.
+  //## The mainapplication has to set the internal held ProgressBarImplementation with SetImplementationInstance(..).
   //## @ingroup Interaction
   class ProgressBar : public itk::Object
   {
@@ -43,15 +41,13 @@ namespace mitk
   
     //##Documentation
     //## @brief static method to get the GUI dependent ProgressBar-instance 
-    //## so the methods DisplayText, etc. can be called
+    //## so the methods for steps to do and progress can be called
     //## No reference counting, cause of decentral static use!
     static ProgressBar* GetInstance();
 
     //##Documentation
     //## @brief Supply a GUI- dependent ProgressBar. Has to be set by the application
     //## to connect the application dependent subclass of mitkProgressBar
-    //## if you create an instance, then call ->Delete() on the supplied
-    //## instance after setting it.
     static void SetImplementationInstance(ProgressBarImplementation* implementation);
 
     //##Documentation

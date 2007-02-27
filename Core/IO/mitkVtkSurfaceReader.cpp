@@ -39,7 +39,7 @@ void mitk::VtkSurfaceReader::GenerateData()
   if( m_FileName != "")
   {
     bool success = false;
-    std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
+    std::cout << "Loading " << m_FileName << " as vtk" << std::endl;
 
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
     ext = itksys::SystemTools::LowerCase(ext);

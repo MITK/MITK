@@ -35,7 +35,7 @@ void mitk::VtkImageReader::GenerateData()
 {
   if( m_FileName != "")
   {
-    std::cout << "Loading " << m_FileName << " as vtk" << std::flush;
+    std::cout << "Loading " << m_FileName << " as vtk" << std::endl;
 
     ///We create a Generic Reader to test de .vtk/
     vtkDataReader *chooser=vtkDataReader::New();

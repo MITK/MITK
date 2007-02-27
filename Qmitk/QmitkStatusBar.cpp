@@ -64,7 +64,7 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
-    mitk::StatusBar::SetInstance(this);
+    mitk::StatusBar::SetImplementation(this);
 }
 
 QmitkStatusBar::~QmitkStatusBar()

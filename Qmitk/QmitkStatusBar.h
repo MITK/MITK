@@ -27,13 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 //## @brief QT-Toolkit/GUI dependent class that provides to send a Message to the QT's StatusBar
 //##
 //## A delay time can be set.
-//## The application sets the Instance to mitkStatusBar so that
-//## all mitk-classes will call this class for output:
-//## mitk::StatusBar::SetInstance(QmitkStatusBar::GetInstance());
-//## 
-//## Then the applikation sets the MainWindow StatusBar by:
-//## QmitkStatusBar::SetStatusBar(QMainWindow::statusBar());
-
+//##
+//## All mitk-classes will call this class for output:
+//## mitk::StatusBar::GetInstance();
 class QmitkStatusBar : public mitk::StatusBarImplementation
 {
 public:

@@ -42,41 +42,42 @@ public:
   //## @brief static method to get the GUI dependent StatusBar-instance 
   //## so the methods DisplayText, etc. can be called
   //## No reference counting, cause of decentral static use!
-  static StatusBarImplementation* GetInstance();
+  static StatusBar* GetInstance();
 
   //##Documentation
   //## @brief Supply a GUI- dependent StatusBar. Has to be set by the application
   //## to connect the application dependent subclass of mitkStatusBar
   //## if you create an instance, then call ->Delete() on the supplied
   //## instance after setting it.
-  static void SetInstance(StatusBarImplementation* instance);
+  static void SetImplementation(StatusBarImplementation* instance);
 
   //##Documentation
   //## @brief Send a string to the applications StatusBar
-  static void DisplayText(const char* t);
+  void DisplayText(const char* t);
   //##Documentation
   //## @brief Send a string with a time delay to the applications StatusBar
-  static void DisplayText(const char* t, int ms);
-  static void DisplayErrorText(const char *t);
-  static void DisplayWarningText(const char *t);
-  static void DisplayWarningText(const char *t, int ms);
-  static void DisplayGenericOutputText(const char *t);
-  static void DisplayDebugText(const char *t);
+  void DisplayText(const char* t, int ms);
+  void DisplayErrorText(const char *t);
+  void DisplayWarningText(const char *t);
+  void DisplayWarningText(const char *t, int ms);
+  void DisplayGenericOutputText(const char *t);
+  void DisplayDebugText(const char *t);
 
   //##Documentation
   //## @brief removes any temporary message being shown.
-  static void Clear();
+  void Clear();
 
   //##Documentation
   //## @brief Set the SizeGrip of the window 
   //## (the triangle in the lower right Windowcorner for changing the size) 
   //## to enabled or disabled 
-  static void SetSizeGripEnabled(bool enable);
+  void SetSizeGripEnabled(bool enable);
 
 protected:
   StatusBar();
   virtual ~StatusBar();
-  static StatusBarImplementation* m_Instance;
+  static StatusBarImplementation* m_Implementation;
+  static StatusBar* m_Instance;
 };
 
 }// end namespace mitk

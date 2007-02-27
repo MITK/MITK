@@ -133,15 +133,15 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
     while (instance.IsNull() && factoryIt != allobjects.end() ) {
       if ((*factoryIt)->GetNameOfClass() == "SBCoreObjectFactory") {
         instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
-        ++factoryIt;
       }
+      ++factoryIt;
     } 
     factoryIt = allobjects.begin(); 
     while (instance.IsNull() && factoryIt != allobjects.end() ) {
       if ((*factoryIt)->GetNameOfClass() == "QMCoreObjectFactory") {
         instance = dynamic_cast<mitk::CoreObjectFactory*>(allobjects.begin()->GetPointer());
-        ++factoryIt;
       }
+      ++factoryIt;
     } 
     if (instance.IsNull()) {
       instance = mitk::CoreObjectFactory::New();

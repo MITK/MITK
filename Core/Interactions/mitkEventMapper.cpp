@@ -638,7 +638,7 @@ inline const int mitk::EventMapper::convertConstString2ConstInt(std::string inpu
     return (tempIt)->second;
   }
 
-  mitk::StatusBar::DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
+  mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
 

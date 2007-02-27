@@ -331,7 +331,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
     break;
   default:
     return Superclass::ExecuteAction( action, stateEvent );
-    //mitk::StatusBar::DisplayText("Message from mitkConnectPointsInteractor: I do not understand the Action!", 10000);
+    //mitk::StatusBar::GetInstance()->DisplayText("Message from mitkConnectPointsInteractor: I do not understand the Action!", 10000);
     //ok = false;
     //a false here causes the statemachine to undo its last statechange.
     //otherwise it will end up in a different state, but without done Action.

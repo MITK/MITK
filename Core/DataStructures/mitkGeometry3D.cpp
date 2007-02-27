@@ -267,7 +267,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
       if (pointOp == NULL)
       {
-        mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
         return;
       }
       mitk::Point3D newPos = pointOp->GetPoint();
@@ -283,7 +283,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
       if (pointOp == NULL)
       {
-        mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
         return;
       }
       mitk::Point3D newScale = pointOp->GetPoint();
@@ -312,7 +312,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
       if (rotateOp == NULL)
       {
-        mitk::StatusBar::DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
         return;
       }
       Vector3D rotationVector = rotateOp->GetVectorOfRotation();

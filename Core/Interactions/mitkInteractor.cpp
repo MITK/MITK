@@ -111,7 +111,7 @@ bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* /*s
     }
   case AcMODESUBSELECT:
     {
-      mitk::StatusBar::DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
+      mitk::StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
       return false;
     }
   default:

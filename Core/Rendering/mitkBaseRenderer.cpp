@@ -343,7 +343,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   //set the Focus on the renderer
   bool success = mitk::GlobalInteraction::GetInstance()->SetFocus(this);
   if (! success) 
-    mitk::StatusBar::DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
+    mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
 
   if (m_CameraController)
   {

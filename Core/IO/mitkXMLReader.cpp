@@ -80,7 +80,7 @@ namespace mitk {
 
    if ( xmlReader->Parse() == 0 )    
    {
-     mitk::StatusBar::DisplayErrorText( "Could not parse xml-Project File!" );
+     mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse xml-Project File!" );
      xmlReader->Delete();  
      return false;
    }

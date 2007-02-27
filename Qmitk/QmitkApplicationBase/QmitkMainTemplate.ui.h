@@ -231,7 +231,7 @@ public:
                 __buildstring(pic, pi, s, (unsigned char) 1);
             }
           }
-          mitk::StatusBar::DisplayText(s.ascii(), 10000);
+          mitk::StatusBar::GetInstance()->DisplayText(s.ascii(), 10000);
           break;
         }
       case mitk::OpNOTHING:

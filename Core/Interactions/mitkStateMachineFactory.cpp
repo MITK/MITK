@@ -112,7 +112,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   //parse the XML input. Method is implemented in vtkXMLParser
   if ( ! stateMachineFactory->Parse() )    
   {
-    mitk::StatusBar::DisplayErrorText( "Could not parse behavior!" );
+    mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse behavior!" );
   }
 
   stateMachineFactory->Delete();
@@ -156,7 +156,7 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   //nextStatesSet is empty, so deadlock!
   if ( nextStatesSet.empty() )
   {
-    StatusBar::DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+    StatusBar::GetInstance()->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
     return true;//but it is allowed as an end-state
   }
   bool ok = false;
@@ -199,7 +199,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     else //ether !ok or sizeA!=sizeB
     {
       delete history;
-      mitk::StatusBar::DisplayText("Warning: An unreachable state was produced! Please check the StateMachinePattern-File.");    
+      mitk::StatusBar::GetInstance()->DisplayText("Warning: An unreachable state was produced! Please check the StateMachinePattern-File.");    
       //return false;//better go on and build/ connect the states than quit
     }
   }
@@ -210,7 +210,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
     if ( tempbool = false )
     {
-      mitk::StatusBar::DisplayText("Warning: The connection of the states was not successful!");    
+      mitk::StatusBar::GetInstance()->DisplayText("Warning: The connection of the states was not successful!");    
       return false;//abort!
     }
   }

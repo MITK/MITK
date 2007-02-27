@@ -645,7 +645,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
       if (lineOp == NULL)
       {
-        mitk::StatusBar::DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
+        mitk::StatusBar::GetInstance()->DisplayText("Message from mitkMesh: Recieved wrong type of operation!See mitkMeshInteractor.cpp", 10000);
         return;
       }
 

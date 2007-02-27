@@ -560,7 +560,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       }
       else //the position wasn't set properly. If necessary: search the given point in list and set var position
       {
-        mitk::StatusBar::DisplayText("Message from mitkPointSetInteractor: Error in Actions! Check Config XML-file", 10000);
+        mitk::StatusBar::GetInstance()->DisplayText("Message from mitkPointSetInteractor: Error in Actions! Check Config XML-file", 10000);
         ok = false;
       }
     }

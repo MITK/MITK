@@ -51,6 +51,83 @@ class CallbackFromGUIThreadImplementation
    This class is useful for use with GUI toolkits that are not thread-safe, e.g. Qt. Any thread that 
    needs to work with the GUI at some time during its execution (e.g. at the end, to display some results)
    can use this class to ask for a call to a member function from the GUI thread.
+
+  <b>Usage example</b>
+
+  We assume that you have a class ThreadedClass, that basically lives in a thread that is different
+  from the GUI thread. Now this class has to change some element of the GUI to indicate its status. 
+  This could be dangerous (with Qt it is for sure). 
+  
+  The solution is, that ThreadedClass asks mitk::CallbackFromGUIThread to call a method from the GUI 
+  thread (main thread).
+
+  Here is part of the header of ThreadedClass:
+
+\code
+class ThreadedClass : public ParentClass
+{
+  public:
+
+    ... // All you need
+
+    // This function runs in its own thread !
+    void ThreadedFunction();
+
+    // This should be called from the GUI thread
+    void ChangeGUIElementsToIndicateProgress(const itk::EventObject&);
+
+    ... 
+};
+\endcode
+
+\code
+#include "mitkCallbackFromGUIThread.h"
+#include <itkCommand.h>
+
+
+// This method runs in a thread of its own! So it can't manipulate GUI elements directly without causing trouble
+void ThreadedClass::ThreadedFunction()
+{
+
+  ...
+
+  // Create a command object (passing parameters comes later)
+  itk::ReceptorMemberCommand<ThreadedClass>::Pointer command = itk::ReceptorMemberCommand<ThreadedClass>::New();
+  command->SetCallbackFunction(this, &ThreadedClass::ChangeGUIElementsToIndicateProgress);
+
+  // Ask to execute that command from the GUI thread
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
+
+  ...
+
+}
+
+
+// Do dangerous GUI changing stuff here
+void ThreadedClass::ChangeGUIElementsToIndicateProgress(const itk::EventObject& e)
+{
+  Application::GetButtonGrid()->AddButton("Stop");    // this is pseudo code
+}
+\endcode
+
+  This obviously won't allow you to pass parameters to ChangeGUIElementsToIndicateProgress. If you need to do that,
+  you have to create a kind of itk::EventObject that can be asked for a parameter (this solution is not nice, if you see
+  a better solution, please mail to mitk-users@lists.sourceforge.net).
+
+  The itk::EventObject has to be created with "new" (which can also be done by calling MakeObject on an existing EventObject).
+
+\code
+    const mitk::OneParameterEvent* event = new mitk::OneParameterEvent(1); // this class is not yet defined but will be
+
+    itk::ReceptorMemberCommand<ThreadedClass>::Pointer command = itk::ReceptorMemberCommand<ThreadedClass>::New();
+    command->SetCallbackFunction(this, &ThreadedClass::ChangeGUIElementsToIndicateProgress);
+    
+    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+
+    // DO NOT delete event now. This will be done by CallThisFromGUIThread after the command will executed.
+\endcode
+
+\todo Create a set of "normal" parameter-event-objects that people might want to use.
 */
 class CallbackFromGUIThread
 {

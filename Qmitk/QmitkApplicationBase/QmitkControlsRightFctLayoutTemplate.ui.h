@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkControlsRightFctLayoutTemplate::init()
 {
   MainSplitter->setResizeMode(ControlParent,QSplitter::FollowSizeHint);
-  progBar->setPercentageVisible(true);
 }
 
 

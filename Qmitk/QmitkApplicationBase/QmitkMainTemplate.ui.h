@@ -78,6 +78,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
+#include <QmitkProgressBar.h>
 #include <QmitkSystemInfo.h>
 #include <QmitkRawImageFileOpener.h>
 #include <QmitkRawImageFileSequenceOpener.h>
@@ -537,6 +538,10 @@ void QmitkMainTemplate::init()
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
+
+  QmitkProgressBar *progBar = new QmitkProgressBar();
+  this->statusBar()->addWidget(progBar, 0, true);
+  progBar->hide();
 
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");

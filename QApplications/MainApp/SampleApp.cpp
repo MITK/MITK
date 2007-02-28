@@ -70,7 +70,7 @@ void SampleApp::InitializeFunctionality()
    qfm->AddFunctionality((*it)(qfm,m_MultiWidget,&iterator)); 
   }
 
-  mitk::StatusBar::DisplayText("Functionalities added",3000);
+  mitk::StatusBar::GetInstance()->DisplayText("Functionalities added",3000);
 }
 
 void SampleApp::InitializeQfm()

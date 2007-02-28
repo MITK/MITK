@@ -74,6 +74,7 @@ QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char * name, WFlags f
     m_TotalSteps = 0;
     m_Progress = 0;
     this->hide();
+    this->SetPercentageVisible(true);
     mitk::ProgressBar::SetImplementationInstance(this);
 }
 

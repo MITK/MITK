@@ -388,8 +388,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 // RendererInfo for renderer. By calling GetRendererInfo
                 // a RendererInfo will be created for renderer (if it does not
                 // exist yet).
-                const ImageMapper2D::RendererInfo *ri = 
-                  imageMapper->GetRendererInfo( planeRenderer );
+                imageMapper->GetRendererInfo( planeRenderer );
 
                 imageMapper->GenerateAllData();
 

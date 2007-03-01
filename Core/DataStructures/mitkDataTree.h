@@ -85,7 +85,28 @@ public:
 
   static DataTreeIteratorClone GetIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL );
 
-  //##ModelId=3ED91D050085
+  //##Documentation
+  //## @brief Compute the axis-parallel bounding geometry of the data tree
+  //## (bounding box, minimal spacing of the considered nodes, live-span)
+  //##
+  //## @param it an iterator to a data tree structure
+  //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+  //## and is set to @a false, the node is ignored for the bounding-box calculation.
+  //## @param renderer see @a boolPropertyKey
+  //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
+  static Geometry3D::Pointer ComputeBoundingGeometry3D(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+
+  //##Documentation
+  //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
+  //## data tree bounding box, minimal spacing of the considered nodes, live-span)
+  //##
+  //## Simply calls ComputeBoundingGeometry3D(it, "visible", renderer, boolPropertyKey).
+  //## @param it an iterator of a data tree structure
+  //## @param renderer the reference to the renderer
+  //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+  //## and is set to @a false, the node is ignored for the bounding-box calculation.
+  static mitk::Geometry3D::Pointer ComputeVisibleBoundingGeometry3D(mitk::DataTreeIteratorBase* it, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
+
   //##Documentation
   //## @brief Compute the bounding box of data tree structure
   //## @param it an iterator to a data tree structure

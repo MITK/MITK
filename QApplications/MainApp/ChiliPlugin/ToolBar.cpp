@@ -117,6 +117,15 @@ void ToolBar::ButtonToggled(int lbId)
 {
   if(lbId>4) return;
 
+  // reset lightbox buttons
+  if (m_KeepDataTreeReinitNeeded)
+  {
+    ResetLightboxButtons(lbId);
+    m_KeepDataTreeReinitNeeded=false;
+    //emit ChangeWidget();
+  }
+
+  // show buttons toggled the way needed
   if (!m_KeepDataTreeNodes)
   {
     this->ResetLightboxButtons(lbId);
@@ -126,7 +135,7 @@ void ToolBar::ButtonToggled(int lbId)
     ((QPushButton*)(toolbar->find(lbId)))->setOn(true);
   }
 
-
+  // select the lightbox
   if(((QPushButton*)(toolbar->find(lbId)))->isOn())
   {
     SelectLightbox(lbId-1);
@@ -161,12 +170,15 @@ void ToolBar::KeepDataTreeNodesCBtoggled(bool on)
   }
 
   // change style to slecte only one button or more.
- if(!m_KeepDataTreeNodes && lbcount>1) 
- {
-    emit ChangeWidget(true);
-    this->ResetLightboxButtons(idLightbox+1);
-    SelectLightbox(idLightbox);
-  }
+  m_KeepDataTreeReinitNeeded = (!m_KeepDataTreeNodes && lbcount>1)?true:false;
+
+  //if(!m_KeepDataTreeNodes && lbcount>1) 
+  //{
+    //emit ChangeWidget(true);
+    //this->ResetLightboxButtons(idLightbox+1);
+    //SelectLightbox(idLightbox);
+  //}
+
 }
 
 bool ToolBar::KeepDataTreeNodes()

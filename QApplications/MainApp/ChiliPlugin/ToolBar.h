@@ -45,6 +45,7 @@ private:
     void SelectLightbox(int id);
     void ResetLightboxButtons(int select=0);
     bool m_KeepDataTreeNodes;
+    bool m_KeepDataTreeReinitNeeded;
 };
 
 #endif

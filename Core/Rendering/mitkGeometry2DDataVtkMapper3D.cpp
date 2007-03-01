@@ -485,7 +485,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 imageActor->GetProperty()->SetOpacity( opacity );
 
                 // Set texture interpolation on/off
-                bool textureInterpolation = true;
+                bool textureInterpolation = node->IsOn( "texture interpolation", renderer );
                 texture->SetInterpolate( textureInterpolation );
 
 

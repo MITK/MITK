@@ -38,6 +38,7 @@ SET(CPP_FILES
   mitkImage.cpp
   mitkImageDataItem.cpp
   mitkItkBaseDataAdapter.cpp
+  mitkLabeledImageLookupTable.cpp
   mitkLandmarkBasedCurvedGeometry.cpp
   mitkLandmarkProjectorBasedCurvedGeometry.cpp
   mitkLandmarkProjector.cpp

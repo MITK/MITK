@@ -55,7 +55,10 @@ mitk::LookupTable::LookupTable()
 
 
 mitk::LookupTable::~LookupTable()
-{}
+{
+  if ( m_LookupTable != NULL )
+    m_LookupTable->Delete();
+}
 
 void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 {

@@ -115,6 +115,7 @@ SET(MOC_H_FILES
   QmitkLevelWindowWidgetContextMenu.h
   QmitkLineEditLevelWindowWidget.h
   QmitkPiecewiseFunctionCanvas.h
+  QmitkProgressBar.h
   QmitkPropertyListViewItem.h
   QmitkPropertyObservers/PropertyViewTestWidget.h
   QmitkPropertyObservers/QmitkBasePropertyView.h

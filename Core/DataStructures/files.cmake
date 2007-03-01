@@ -34,6 +34,7 @@ SET(CPP_FILES
   mitkGeometry2DData.cpp
   mitkGeometry3D.cpp
   mitkGeometryData.cpp
+  mitkGroupTagProperty.cpp
   mitkImage.cpp
   mitkImageDataItem.cpp
   mitkItkBaseDataAdapter.cpp

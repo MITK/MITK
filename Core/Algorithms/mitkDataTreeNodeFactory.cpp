@@ -719,6 +719,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
   node->SetOpacity(1.0f);
   node->SetColor(1.0,1.0,1.0);  
+  node->SetVisibility(true);
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull())
@@ -751,6 +752,7 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
   node->SetProperty( "representation", new mitk::VtkRepresentationProperty );
   node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
   node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
+  node->SetVisibility(true);
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
@@ -778,6 +780,7 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
 void mitk::DataTreeNodeFactory::SetDefaultVesselTreeProperties(mitk::DataTreeNode::Pointer &node)
 {
   mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<VesselTreeData*>(node->GetData());
+  node->SetVisibility(true);
   if(vesselTree.IsNotNull()){
     mitk::VesselTreeToLookupTableFilter::Pointer lutGenerator = mitk::VesselTreeToLookupTableFilter::New();
     lutGenerator->SetInput( vesselTree );

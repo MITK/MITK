@@ -826,7 +826,7 @@ QmitkStdMultiWidget::GetLastLeftClickPosition() const
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
-const mitk::Point3D &
+const mitk::Point3D
 QmitkStdMultiWidget::GetCrossPosition() const
 {
   const mitk::PlaneGeometry *plane1 = 

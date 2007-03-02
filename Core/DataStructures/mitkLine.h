@@ -394,7 +394,7 @@ public:
       {
         ScalarType lambda = (box[i] - p[j]) / d[j];
 
-        point = p + lambda * d;
+        point = p + d * lambda;
 
         int k = (j + 1) % 3;
         int l = (j + 2) % 3;

@@ -45,7 +45,7 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
  *Documentation
  *@brief Adds steps to totalSteps.
  */
-void QmitkProgressBar::AddStepsToDo(int steps)
+void QmitkProgressBar::AddStepsToDo(unsigned int steps)
 {
   m_TotalSteps += steps;
   this->setProgress(m_Progress, m_TotalSteps);
@@ -57,7 +57,7 @@ void QmitkProgressBar::AddStepsToDo(int steps)
  *@brief Sets the current amount of progress to current progress + steps.
  *@param: steps the number of steps done since last Progress(int steps) call.
  */
-void QmitkProgressBar::Progress(int steps)
+void QmitkProgressBar::Progress(unsigned int steps)
 {
   m_Progress += steps;
   this->setProgress(m_Progress);

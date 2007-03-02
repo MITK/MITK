@@ -51,12 +51,12 @@ public:
 
   //##Documentation
   //## @brief Adds steps to totalSteps.
-  virtual void AddStepsToDo(int steps);
+  virtual void AddStepsToDo(unsigned int steps);
   
   //##Documentation
   //## @brief Sets the current amount of progress to current progress + steps.
   //## @param: steps the number of steps done since last Progress(int steps) call.
-  virtual void Progress(int steps = 1);
+  virtual void Progress(unsigned int steps);
     
 private:
 
@@ -64,9 +64,9 @@ private:
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
   void Reset();
   
-  int m_TotalSteps;
+  unsigned int m_TotalSteps;
   
-  int m_Progress;
+  unsigned int m_Progress;
 
 };
 

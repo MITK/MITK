@@ -74,6 +74,10 @@ namespace mitk {
     //##
     void Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent);
 
+    //##Documentation
+    //## @brief Removes node from the DataStorage
+    //##
+    void Remove(mitk::DataTreeNode* node);
 
     //##Documentation
     //## @brief Notifies the DataStorage that the object in node has been modified

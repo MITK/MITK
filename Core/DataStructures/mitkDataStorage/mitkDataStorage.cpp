@@ -85,9 +85,15 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
 {
   if (!IsInitialized())
     throw 1;  // insert exception handling here
+  
   /* Check, if node is already in the DataTree */
   if (m_DataTree->Contains(node))
     throw 2;
+
+  /* check if node is in its own list of sources */
+  if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
+    throw 3;
+
   /* save node in tree */
   node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
   mitk::DataTreeNode::ConstPointer parent;
@@ -122,7 +128,6 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
     mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
-  this->Print(std::cout, itk::Indent()); //@TODO: only for debugging
 }
 
 
@@ -131,6 +136,63 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
   parents->InsertElement(0, parent);
   this->Add(node, parents);
+}
+
+
+void mitk::DataStorage::Remove(mitk::DataTreeNode* node)
+{
+  bool rmTree = false;
+  bool rmSources = false;
+  bool rmDerivations = false;
+  if (!IsInitialized())
+    throw 1;  // insert exception handling here
+  if (node == NULL)
+    return;
+
+  mitk::DataTreeIteratorClone it = m_DataTree->GetIteratorToNode(node);   // search node in tree
+  if (it->IsAtEnd())
+    return;       // node not found
+ 
+  if (it->Disconnect() == false)   // remove node from tree, but keep its children 
+    throw 2;
+  else
+    rmTree = true;
+
+  /* remove node from both relation adjacency lists */
+  for (AdjacencyList::const_iterator mapIter = m_SourceNodes.begin(); mapIter != m_SourceNodes.end(); ++mapIter)  // for each node in sources relation
+    if (mapIter->second.IsNotNull())      // if he has a list of parents
+    {
+      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the parent list
+      SetOfObjects::STLContainerType::iterator sourceNodeIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the source list does not contain duplicates (which should be safe to assume)
+      if (sourceNodeIter != s->end())     // if node to be deleted is in parentlist
+        s->erase(sourceNodeIter);         // remove it from parentlist
+    }
+  /* now remove node from source relation */
+  AdjacencyList::iterator adIt;
+  adIt = m_SourceNodes.find(node);
+  if (adIt != m_SourceNodes.end())
+  {
+    m_SourceNodes.erase(adIt);
+    rmSources = true;
+  }
+  for (AdjacencyList::const_iterator mapIter = m_DerivedNodes.begin(); mapIter != m_DerivedNodes.end(); ++mapIter)  // for each node in sources relation
+    if (mapIter->second.IsNotNull())      // if he has a list of parents
+    {
+      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the parent list
+      SetOfObjects::STLContainerType::iterator derivedNodeIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the source list does not contain duplicates (which should be safe to assume)
+      if (derivedNodeIter != s->end())    // if node to be deleted is in parentlist
+        s->erase(derivedNodeIter);        // remove it from parentlist
+    }
+  /* now remove node from source relation */
+  adIt = m_DerivedNodes.find(node);
+  if (adIt != m_DerivedNodes.end())
+  {
+    m_DerivedNodes.erase(adIt);
+    rmDerivations = true;
+  }
+
+  if (!(rmTree && rmSources && rmDerivations))
+    throw 3;  // something went wrong during remove
 }
 
 
@@ -148,27 +210,24 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetAll() const
 {
+  if (!IsInitialized())
+    throw 1;  // insert exception handling here
+  
   mitk::DataTreePreOrderIterator it(m_DataTree);
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the DataStorage object */
   unsigned int index = 0;
-  if (m_ManageCompleteTree == true)
-    for (it.GoToBegin(); !it.IsAtEnd(); it++)
-    {
-      mitk::DataTreeNode* node = it.Get();
-      if (node == NULL) 
-        continue;
+  for (it.GoToBegin(); !it.IsAtEnd(); it++)
+  {
+    mitk::DataTreeNode* node = it.Get();
+    if (node == NULL) 
+      continue;
+    if (m_ManageCompleteTree == true)
       resultset->InsertElement(index++, node);
-    }  
-  else
-    for (it.GoToBegin(); !it.IsAtEnd(); it++)
-    {
-      mitk::DataTreeNode* node = it.Get();
-      if (node == NULL) 
-        continue;
+    else
       if (node->IsOn("IsDataStoreManaged",NULL, false) == true)  // check if node is managed by the datastorage object
         resultset->InsertElement(index++, node);
-    }  
+  }  
   return SetOfObjects::ConstPointer(resultset);
 }
 
@@ -178,7 +237,14 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
   if (node == NULL)
     throw 1;
 
-  if (onlyDirectlyRelated)
+  if ((m_ManageCompleteTree == false) && (node->IsOn("IsDataStoreManaged",NULL, false) == false))   // node is not managed by DataStorage
+    throw 2;
+
+  if (m_DataTree->GetIteratorToNode(node)->IsAtEnd()) // node not in tree
+    throw 3;
+
+  /* Either read direct relations directly from adjacency list */
+  if (onlyDirectlyRelated)  
   {
     AdjacencyList::const_iterator it = relation.find(node); // get parents of current node
     if ((it == relation.end()) || (it->second.IsNull())) // node not found in list or no set of parents
@@ -187,20 +253,21 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
       return this->FilterSetOfObjects(it->second, condition);
   }
   
+  /* Or traverse adjacency list to collect all related nodes */
   std::vector<mitk::DataTreeNode::ConstPointer> resultset;
   std::vector<mitk::DataTreeNode::ConstPointer> openlist;
 
-  /* initialize openlist with node. this will add node to resultset, 
+  /* Initialize openlist with node. this will add node to resultset, 
      but that is necessary to detect circular relations that would lead to endless recursion */
   openlist.push_back(node);
 
   while (openlist.size() > 0)
   {
     mitk::DataTreeNode::ConstPointer current = openlist.back();  // get element that needs to be processed
-    openlist.pop_back();            // remove last element, because it gets processed now
-    resultset.push_back(current);   // add current element to resultset
+    openlist.pop_back();                      // remove last element, because it gets processed now
+    resultset.push_back(current);             // add current element to resultset
     AdjacencyList::const_iterator it = relation.find(current); // get parents of current node
-    if (   (it == relation.end()) // if node not found in list
+    if (   (it == relation.end())             // if node not found in list
         || (it->second.IsNull())              // or no set of parents available
         || (it->second->Size() == 0))         // or empty set of parents
       continue;                               // then continue with next node in open list
@@ -213,6 +280,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
           openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
       }
   }
+
   /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition if any is given */
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
   if (condition != NULL)
@@ -227,7 +295,6 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
       if (*resultIt != node)
         realResultset->InsertElement(realResultset->Size(), mitk::DataTreeNode::Pointer(const_cast<mitk::DataTreeNode*>((*resultIt).GetPointer())));
   }
-
   return SetOfObjects::ConstPointer(realResultset);
 }
 

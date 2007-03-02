@@ -54,7 +54,7 @@ mitk::ImageBackground2D::ImageBackground2D()
   m_ImageRenderer     = vtkRenderer::New();
   m_VtkImageImport    = vtkImageImport::New();
   
-  m_ImageData         = 0;
+  m_ImageData         = NULL;
 
   InitVtkImageImport();
 }
@@ -153,9 +153,12 @@ void mitk::ImageBackground2D::Update(char * dataPointer)
   if(!IsEnabled())
     return;
 
+  // VTK import image data must be allocated before import (with correct parameters)
+  if(m_ImageData == NULL)
+    m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
+
   if(!dataPointer)
   {// no valid image pointer provided -> initialize black image
-    m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
     unsigned char* b = m_ImageData;
     for ( int textCounter = 0; textCounter < (m_ImageHeight*m_ImageWidth*m_ImageScalarComponents); textCounter++ )
       *b++ = 0;
@@ -174,11 +177,15 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, 
   if(!IsEnabled())
     return;
 
+ 
+
   // image contains no data, OR image scalar components missmatch (no RGB, no greyscale)
   if(!dataPointer || (imageScalarComponents != 1 && imageScalarComponents != 3))
   {
     // no valid image pointer provided -> we initialize black image
-    m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
+    if(m_ImageData == NULL)
+      m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
+    
     unsigned char* b = m_ImageData;
     for ( int textCounter = 0; textCounter < (m_ImageHeight*m_ImageWidth*m_ImageScalarComponents); textCounter++ )
       *b++ = 0;
@@ -187,22 +194,30 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, 
   {
     m_ImageHeight = height;
     m_ImageWidth  = width;
+
+    // VTK import image data must be allocated before import (with correct parameters)
+    if(m_ImageData == NULL)
+      m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*imageScalarComponents];
+    
     int column, row;
-    unsigned char* tex = m_ImageData;
-    char* data = dataPointer;
+    unsigned char* tex  = m_ImageData;
+    char*          data = dataPointer;
 
     // PREPARE image Data for VTKImageImport Filter //
     
      
     if(imageScalarComponents == 1)
-    {        
+    {
+      m_ImageScalarComponents = 1;
+      m_VtkImageImport->SetNumberOfScalarComponents(m_ImageScalarComponents);
+
       unsigned char g;
       for (column = 0; column < m_ImageHeight; column++)
         for (row = 0; row < m_ImageWidth; row++)
         {
               g   = *data++;
               *tex++  = g;
-        }        
+        }      
     }
     else if(imageScalarComponents == 3)
     {

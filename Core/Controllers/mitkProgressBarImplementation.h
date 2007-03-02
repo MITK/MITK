@@ -44,12 +44,12 @@ namespace mitk
 
     //##Documentation
     //## @brief Adds steps to totalSteps.
-    virtual void AddStepsToDo(int steps) =0;
+    virtual void AddStepsToDo(unsigned int steps) =0;
   
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param: steps the number of steps done since last Progress(int steps) call.
-    virtual void Progress(int steps = 1) =0;
+    virtual void Progress(unsigned int steps) =0;
   };
 
 }// end namespace mitk

@@ -52,16 +52,20 @@ namespace mitk
 
     //##Documentation
     //## @brief Adds steps to totalSteps.
-    void AddStepsToDo(int steps);
+    void AddStepsToDo(unsigned int steps);
   
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param: steps the number of steps done since last Progress(int steps) call.
-    void Progress(int steps = 1);
+    void Progress(unsigned int steps = 1);
 
     //##Documentation
     //## @brief Sets whether the current progress value is displayed.
     void SetPercentageVisible (bool visible);
+    
+    void AddStepsToDo(const itk::EventObject&);
+    void Progress(const itk::EventObject&);
+    void SetPercentageVisible(const itk::EventObject&);
 
   protected:
   

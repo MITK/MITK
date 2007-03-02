@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkGroupTagProperty.h"
 #include "mitkDataTreeNode.h"
+#include "mitkReferenceCountWatcher.h"
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
@@ -948,6 +949,321 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
+
+  /* Checking removal of a node without relations */
+  std::cout << "Checking removal of a node without relations: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+   
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    int refCountbeforeDS = watcher->GetReferenceCount();
+    ds->Add(extra);
+    if ((tree->Contains(extra) == false) 
+      && (ds->GetNamedNode("extra") != extra))
+    {
+      std::cout << "[FAILED] - could not add extra node for this test" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      ds->Remove(extra);
+      if ((tree->Contains(extra) == false)
+        && (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED] - extra node is still in Tree/DataStorage" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+      extra = NULL;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking removal of a node with a parent */
+  std::cout << "Checking removal of a node with a parent: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+   
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    int refCountbeforeDS = watcher->GetReferenceCount();
+    ds->Add(extra, n1);   // n1 is parent of extra
+    
+    if ((tree->Contains(extra) == false)
+      && (ds->GetNamedNode("extra") != extra)
+      && (ds->GetDerivations(n1)->Size() != 2))   // n2 and extra should be derived from n1
+    {
+      std::cout << "[FAILED] - could not add extra node for this test" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      ds->Remove(extra);
+      
+      if ((tree->Contains(extra) == false)
+        && (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetDerivations(n1)->Size() == 1))   // after remove, only n2 should be derived from n1
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED] - extra node is still in Tree/DataStorage" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+      extra = NULL;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
+ /* Checking removal of a node with two parents */
+  std::cout << "Checking removal of a node with two parents: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+   
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    int refCountbeforeDS = watcher->GetReferenceCount();
+    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+    p->push_back(n1);
+    p->push_back(n2);
+    ds->Add(extra, p);   // n1 and n2 are parents of extra
+    
+    if ((tree->Contains(extra) == false)
+      && (ds->GetNamedNode("extra") != extra)
+      && (ds->GetDerivations(n1)->Size() != 2)    // n2 and extra should be derived from n1
+      && (ds->GetDerivations(n2)->Size() != 3))   // n3, n4 and extra should be derived from n2
+    {
+      std::cout << "[FAILED] - could not add extra node for this test" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      ds->Remove(extra);
+      
+      if ((tree->Contains(extra) == false)
+        && (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetDerivations(n1)->Size() == 1)   // after remove, only n2 should be derived from n1
+        && (ds->GetDerivations(n2)->Size() == 2))   // after remove, only n3 and n4 should be derived from n2
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED] - extra node is still in Tree/DataStorage" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+      extra = NULL;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
+ /* Checking removal of a node with two derived nodes */
+  std::cout << "Checking removal of a node with two derived nodes: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    int refCountbeforeDS = watcher->GetReferenceCount();
+    ds->Add(extra);
+    
+    mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
+    d1->SetProperty("name", new mitk::StringProperty("d1"));
+    ds->Add(d1, extra);
+    mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
+    d2->SetProperty("name", new mitk::StringProperty("d2"));    
+    ds->Add(d2, extra);
+    
+
+    if ((tree->Contains(extra) == false)
+      && (ds->GetNamedNode("extra") != extra)
+      && (ds->GetNamedNode("d1") != d1)
+      && (ds->GetNamedNode("d2") != d2)
+      && (ds->GetSources(d1)->Size() != 1)    // extra should be source of d1
+      && (ds->GetSources(d2)->Size() != 1)    // extra should be source of d2
+      && (ds->GetDerivations(extra)->Size() != 2))    // d1 and d2 should be derived from extra
+    {
+      std::cout << "[FAILED] - could not add nodes for this test" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      ds->Remove(extra);
+      
+      if ((tree->Contains(extra) == false)
+        && (ds->GetNamedNode("extra") == NULL)
+        && (ds->GetNamedNode("d1") == d1)                   // HIER GEHTS WEITER
+        && (ds->GetNamedNode("d2") == d2)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetSources(d1)->Size() == 0)   // after remove, d1 should not have a source anymore
+        && (ds->GetSources(d2)->Size() == 0))   // after remove, d2 should not have a source anymore
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED] - extra node is still in Tree/DataStorage" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+      extra = NULL;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
+ /* Checking removal of a node with two parents and two derived nodes */
+  std::cout << "Checking removal of a node with two parents and two derived nodes: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
+    int refCountbeforeDS = watcher->GetReferenceCount();
+    int n1refCountbeforeDS = n1watcher->GetReferenceCount();
+
+    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+    p->push_back(n1);
+    p->push_back(n2);
+    ds->Add(extra, p);   // n1 and n2 are parents of extra
+
+    mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
+    d1->SetProperty("name", new mitk::StringProperty("d1x"));
+    ds->Add(d1, extra);
+    mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
+    d2->SetProperty("name", new mitk::StringProperty("d2x"));    
+    ds->Add(d2, extra);
+
+    if ((tree->Contains(extra) == false)
+      && (ds->GetNamedNode("extra") != extra)
+      && (ds->GetNamedNode("d1x") != d1)
+      && (ds->GetNamedNode("d2x") != d2)
+      && (ds->GetSources(d1)->Size() != 1)    // extra should be source of d1
+      && (ds->GetSources(d2)->Size() != 1)    // extra should be source of d2
+      && (ds->GetDerivations(n1)->Size() != 2)    // n2 and extra should be derived from n1
+      && (ds->GetDerivations(n2)->Size() != 3)   // n3, n4 and extra should be derived from n2
+      && (ds->GetDerivations(extra)->Size() != 2))    // d1 and d2 should be derived from extra
+    {
+      std::cout << "[FAILED] - could not add nodes for this test" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      ds->Remove(extra);
+
+      if ((tree->Contains(extra) == false)
+        && (ds->GetNamedNode("extra") == NULL)
+        && (ds->GetNamedNode("d1x") == d1)
+        && (ds->GetNamedNode("d2x") == d2)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetDerivations(n1)->Size() == 1)    // after remove, only n2 should be derived from n1
+        && (ds->GetDerivations(n2)->Size() == 2)    // after remove, only n3 and n4 should be derived from n2
+        && (ds->GetSources(d1)->Size() == 0)        // after remove, d1 should not have a source anymore
+        && (ds->GetSources(d2)->Size() == 0))       // after remove, d2 should not have a source anymore
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout << "[FAILED] - extra node is still in Tree/DataStorage" << std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+      extra = NULL;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
+ /* Checking for node is it's own parent exception */
+  std::cout << "Checking for node is it's own parent exception: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+
+    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+    p->push_back(n1);
+    p->push_back(extra); // extra is parent of extra!!!
+    ds->Add(extra, p); 
+
+    if ((tree->Contains(extra) == true) 
+      && (ds->GetNamedNode("extra") == extra)
+      && (ds->GetNamedDerivedNode("extra", extra) == extra))
+    {
+      std::cout << "[FAILED] - node was added, no exception was thrown " << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    else
+    {
+      std::cout << "[FAILED] - node was not added but no exception was thrown " << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[PASSED] - Exception thrown as expected" << std::endl;
+  }
+
+
+ /* Checking reference count of node after add and remove */
+  std::cout << "Checking reference count of node after add and remove: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+    p->push_back(n1);
+    p->push_back(n3); 
+    ds->Add(extra, p); 
+    extra = NULL;
+    ds->Remove(ds->GetNamedNode("extra"));
+
+    if (watcher->GetReferenceCount() == 0)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED] - reference count is " << watcher->GetReferenceCount() << ", but 0 was expected" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
 
   /* finally return cumulated returnValue */
   return returnValue;

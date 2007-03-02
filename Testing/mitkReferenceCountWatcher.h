@@ -27,7 +27,8 @@ namespace mitk
 //## 
 //## Example usage:
 //## \code
-//##   ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
+//##   SomeFilter* filter = GetSomeFilter();
+//##   ReferenceCountWatcher::Pointer filterWatcher;
 //##   filterWatcher = new ReferenceCountWatcher(filter, "name of filter");
 //##   filterWatcher->GetReferenceCount();
 //## \endcode

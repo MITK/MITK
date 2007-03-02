@@ -228,9 +228,8 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       glEnd( );
 
       // create text
-      std::string dataName;
       std::stringstream volumeString; 
-      volumeString << "volume = " << segmentationVolume << " ml";
+      volumeString << segmentationVolume << " ml";
 
       // draw text
       WriteTextXY(x + 33.0, y - 10.0, volumeString.str());

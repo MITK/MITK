@@ -25,6 +25,51 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+  /*!
+    \brief Used by CallbackFromGUIThread to pass parameters.
+  */
+  template <class T>
+  class CallbackEventOneParameter : public itk::AnyEvent
+  { 
+  public: 
+    typedef CallbackEventOneParameter Self; 
+    typedef itk::AnyEvent Superclass; 
+
+    CallbackEventOneParameter(const T t )
+      : m_Data(t) {} 
+
+    virtual ~CallbackEventOneParameter() {} 
+
+    virtual const char * GetEventName() const 
+    { 
+      return "CallbackEventOneParameter"; 
+    } 
+
+    virtual bool CheckEvent(const ::itk::EventObject* e) const 
+    { 
+      return dynamic_cast<const Self*>(e); 
+    } 
+
+    virtual ::itk::EventObject* MakeObject() const 
+    { 
+      return new Self( m_Data ); 
+    } 
+
+    const T GetData() const 
+    { 
+      return m_Data;
+    }
+    
+    CallbackEventOneParameter(const Self& s) : itk::AnyEvent(s), m_Data(s.m_Data) {}; 
+
+  protected:
+    const T m_Data;
+  
+  private: 
+    void operator=(const Self&); 
+  };
+
+
 /*!
   \brief Toolkit specific implementation of mitk::CallbackFromGUIThread
 

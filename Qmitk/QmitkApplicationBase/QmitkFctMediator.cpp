@@ -182,8 +182,12 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality * functionality)
     QWidget * mainWidget = functionality->CreateMainWidget(m_MainStack);
     if((mainWidget!=NULL) && (mainWidget->parent()!=m_DefaultMain))
     {
-      mainWidget->setSizePolicy(ignored);
-      m_MainStack->addWidget(mainWidget, m_NumOfFuncs+1);
+      QScrollView* scrollView = new QScrollView();
+      scrollView->addChild(mainWidget);
+      scrollView->setResizePolicy(QScrollView::AutoOneFit);
+      scrollView->setSizePolicy(ignored);
+
+      m_MainStack->addWidget(scrollView, m_NumOfFuncs+1);
     }
     else
       m_MainStack->addWidget(new QWidget(m_MainStack, "QmitkFctMediator::dummyMain"), m_NumOfFuncs+1);

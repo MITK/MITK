@@ -23,24 +23,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
-//#include "mitkImageAccessByItk.h"
 
 #include "itkImage.h"
-
-//namespace itk {
-//  template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
-//}
 
 
 namespace mitk {
 
-//##Documentation
-//## @brief PadImageFilter class pads the first input image to the size of the second input image.
-//##
-//## Two Images have to be set.
-//## The first image is the image to pad. The second image defines the pad size.
-//## It is also possible to use an included binary filter.
-//## @ingroup Process
+/**
+ * \brief PadImageFilter class pads the first input image to the size of the second input image.
+ * Two Images have to be set.
+ * The first image is the image to pad. The second image defines the pad size.
+ * It is also possible to use an included binary filter.
+ *
+ * \ingroup Process
+ */
 class PadImageFilter : public ImageToImageFilter
 {
 public:    
@@ -48,16 +44,16 @@ public:
 
   itkNewMacro(Self);  
 
-  /// sets the intensity of the pixel to pad
-  itkSetMacro(PadConstante, int);
+  /** \brief Sets the intensity of the pixel to pad */
+  itkSetMacro(PadConstant, int);
 
-  /// sets the binary filter on or off
+  /** \brief sets the binary filter ON or OFF */
   itkSetMacro(BinaryFilter, bool);
 
-  /// sets the lower threshold of the included binary filter
+  /** \brief Sets the lower threshold of the included binary filter */
   itkSetMacro(LowerThreshold, int);
 
-  /// sets the upper threshold of the included binary filter
+  /** \brief Sets the upper threshold of the included binary filter */
   itkSetMacro(UpperThreshold, int);
 
 protected:
@@ -65,18 +61,11 @@ protected:
   
   virtual ~PadImageFilter();
   
-  //virtual void GenerateInputRequestedRegion();
-  
-  //virtual void GenerateOutputInformation();
-
   virtual void GenerateData();
 
 private:
   bool m_BinaryFilter;
-  int  m_PadConstante, m_LowerThreshold, m_UpperThreshold;
-
-  //template < typename TPixel, unsigned int VImageDimension >
-  //  friend void PadIt(itk::Image< TPixel, VImageDimension >* padImage, mitk::Image::ConstPointer origImage);
+  int  m_PadConstant, m_LowerThreshold, m_UpperThreshold;
 
 };
 

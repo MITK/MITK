@@ -92,6 +92,8 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   topLeft += rendererInfo.m_Overlap;
   bottomRight += rendererInfo.m_Overlap;
 
+  Vector2D diag = ( topLeft - bottomRight );
+  float size = diag.GetNorm();
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -217,13 +219,13 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       glVertex3f(x, y, 0.0f);
 
       // ending point of the first line segment
-      glVertex3f(x + 15.0, y - 10.0, 0.0f);
+      glVertex3f(x + (size / 20.0), y - (size / 20.0), 0.0f);
 
       // origin  point of the second line segment
-      glVertex3f(x + 15.0, y - 10.0, 0.0f);
+      glVertex3f(x + (size / 20.0), y - (size / 20.0), 0.0f);
 
-      // ending point of the second  line segment
-      glVertex3f(x + 30.0, y - 10.0, 0.0f);
+      // ending point of the second line segment
+      glVertex3f(x + (size / 10.0), y - (size / 20.0), 0.0f);
 
       glEnd( );
 
@@ -232,7 +234,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       volumeString << segmentationVolume << " ml";
 
       // draw text
-      WriteTextXY(x + 33.0, y - 10.0, volumeString.str());
+      WriteTextXY(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str());
     }
   }
 

@@ -41,13 +41,12 @@ mitk::NodePredicateOR::~NodePredicateOR()
 bool mitk::NodePredicateOR::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (m_ChildPredicates.empty())
-    throw;  // Insert Exception Handling here
+    throw 1;  // Insert Exception Handling here
 
   if (node == NULL)
-    throw;  // Insert Exception Handling here
+    throw 1;  // Insert Exception Handling here
 
-  /* return the disjunction of the child predicate. If any predicate returns true, we return true too. 
-     Return false only if all child predicates return false */
+  /* return the disjunction of the child predicate. If any predicate returns true, we return true too. Return false only if all child predicates return false */
   for (ChildPredicates::const_iterator it = m_ChildPredicates.begin(); it != m_ChildPredicates.end(); ++it)
     if ((*it)->CheckNode(node) == true)
       return true;

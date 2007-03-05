@@ -38,11 +38,11 @@ namespace mitk {
       //## @brief Standard constructor
       NodePredicateAND();
       //##Documentation
-      //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
-      NodePredicateAND(mitk::NodePredicateBase& p1, mitk::NodePredicateBase& p2);
-      //##Documentation
       //## @brief Standard Destructor
       virtual ~NodePredicateAND();
+      //##Documentation
+      //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
+      NodePredicateAND(mitk::NodePredicateBase& p1, mitk::NodePredicateBase& p2);
 
       //##Documentation
       //## @brief Checks, if the node fulfills all of the subpredicates conditions

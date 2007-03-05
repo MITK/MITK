@@ -47,12 +47,6 @@ namespace mitk {
       //##Documentation
       //## @brief Checks, if the node fulfills any of the subpredicates conditions
       virtual bool CheckNode(const mitk::DataTreeNode* node) const;
-
-    protected:
-      typedef std::list<mitk::NodePredicateBase*> ChildPredicates;
-      //##Documentation
-      //## @brief list of child predicates
-      std::list<mitk::NodePredicateBase*> m_ChildPredicates;
     };
 
 } // namespace mitk

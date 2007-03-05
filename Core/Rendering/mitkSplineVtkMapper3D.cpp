@@ -155,35 +155,16 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
   if ( IsVisible( renderer ) == false )
   {
     m_SplinesActor->VisibilityOff();
-    //don't care if added or not
-    m_PointsAssembly->VisibilityOff();
     m_SplineAssembly->VisibilityOff();
   }
   else
   {
     m_SplinesActor->VisibilityOn();
-    //don't care if added or not!
-    m_PointsAssembly->VisibilityOn();
     m_SplineAssembly->VisibilityOn();
 
-    bool doNotDrawPoints;
-    if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer()) == NULL)
-      doNotDrawPoints = true;
-    else
-      doNotDrawPoints = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("dontdrawpoints").GetPointer())->GetValue();
-
-    //add or remove the PointsAssembly according to the property doNotDrawPoints
-    if (!doNotDrawPoints)
-    {
-      Superclass::GenerateData( renderer );
-      if( ! m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
-        m_SplineAssembly->AddPart( m_PointsAssembly );
-    }
-    else
-    {
-      if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
-        m_SplineAssembly->RemovePart(m_PointsAssembly);
-    }
+    //remove the PointsAssembly if it was added insuperclass. No need to display points and spline!
+    if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
+      m_SplineAssembly->RemovePart(m_PointsAssembly);
     this->ApplyProperties();
    
   }

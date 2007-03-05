@@ -32,7 +32,6 @@ namespace mitk
   //##
   //## properties looked for:
   //## "linewidth" = with of the spline
-  //## "dontdrawpoints" = don't draw points between spline (default = false)
   //## @ingroup Mapper
 class SplineVtkMapper3D : public PointSetVtkMapper3D
 {

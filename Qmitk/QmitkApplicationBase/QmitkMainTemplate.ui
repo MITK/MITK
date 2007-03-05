@@ -56,7 +56,6 @@
     <item text="&amp;Options" name="Options">
         <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
-        <action name="optionsShow_Gradient_BackgroundAction"/>
         <separator/>
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
@@ -83,9 +82,6 @@
         <widget class="QmitkUndoRedoButton">
             <property name="name">
                 <cstring>redoButton</cstring>
-            </property>
-	    <property name="mode"> 	 
-                 <enum>Redo</enum> 	 
             </property>
         </widget>
         <action name="Fullscreen"/>
@@ -1003,7 +999,6 @@
     <include location="global" impldecl="in implementation">qstring.h</include>
     <include location="global" impldecl="in implementation">qapplication.h</include>
     <include location="local" impldecl="in implementation">QmitkUndoRedoButton.h</include>
-    <include location="global" impldecl="in implementation">mitkDataStorage.h</include>
     <include location="local" impldecl="in implementation">QmitkMainTemplate.ui.h</include>
 </includes>
 <forwards>

@@ -67,6 +67,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStringProperty.h>
 #include <QmitkStringPropertyEditor.h>
+#include <QmitkBoolPropertyEditor.h>
+#include <QmitkColorPropertyEditor.h>
+
 #include <mitkImageTimeSelector.h>
 
 #include <mitkStateMachineFactory.h>
@@ -384,7 +387,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       if ( node->GetData() != NULL )
       {
         dataFound = true;
-        it.Add( node );
+        mitk::DataStorage::GetInstance()->Add(node);
       }
     }
   }
@@ -560,7 +563,11 @@ void QmitkMainTemplate::init()
   mitk::DataStorage::CreateInstance(m_Tree);
 
   m_Options = mitk::PropertyList::New();
+  m_Options->SetProperty( "Use gradient background", new mitk::BoolProperty(true) );
+  m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f, 0.0f, 0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
+
+
 }
 
 /*!
@@ -627,6 +634,11 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
   }
+  // initialize multiwidget with options
+  mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
+  if (gradProperty != NULL)
+    this->enableGradientBackground(gradProperty->GetValue());
+
   InitializeFunctionality();
 
 
@@ -874,15 +886,26 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     // first add a global options panel
   optionDialog->m_FunctionalitySelectionList->insertItem("Global options", 1);  // start at index 1, because index 0 does not show up in gui
  
-  // TODO this building up of the options widget should be placed elsewhere...
+   //TODO this building up of the options widget should be placed elsewhere...
   QWidget* globalOptionsWidget = new QGrid(2, this);
-  new QLabel("Path to HTML documentation", globalOptionsWidget);
-        
-  mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
+  new QLabel("Path to HTML documentation", globalOptionsWidget);       
+  mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("HTML documentation path");
   mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
   new QmitkStringPropertyEditor(pathproperty, globalOptionsWidget); 
-  // end TODO
   
+  new QLabel("Use Gradient Background in 3D View", globalOptionsWidget);
+  bp =  m_Options->GetProperty("Use gradient background");
+  mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
+  new QmitkBoolPropertyEditor(gradProperty, globalOptionsWidget); 
+
+  //new QLabel("Background color in 3D View", globalOptionsWidget);
+  //bp =  m_Options->GetProperty("Background color");
+  //mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
+  //QmitkColorPropertyEditor* qcw = new QmitkColorPropertyEditor(colProperty, globalOptionsWidget); 
+  //qcw->setMaximumWidth(100);
+  //qcw->setMaximumHeight(50);  
+  // end TODO
+
   optionDialog->m_OptionWidgetStack->addWidget(globalOptionsWidget, 1);
   
   // for each functionality: If the funcionality has an option widget, 
@@ -904,6 +927,11 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   // show the dialog
   if (optionDialog->exec() == QDialog::Accepted)
   {
+    // process global options
+    this->enableGradientBackground(gradProperty->GetValue());
+    //mitk::Color c = colProperty->GetColor();
+    //m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));    
+
     // if the dialog is closed with 'Okay', notify the functionalities of changes
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
     {
@@ -985,12 +1013,14 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
         mitk::BaseProperty::Pointer bp = pl->GetProperty("MITKSampleAppFunctionalityName");
         mitk::StringProperty* id = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
         std::string idstring;
-        if (id) idstring = id->GetValueAsString();
+        if (id) 
+          idstring = id->GetValueAsString();
         
         if (idstring == "MITKSampleApp")
         {
-          //take it as global options
-          m_Options = pl->Clone();
+          // set all global options read from the config file
+          for (mitk::PropertyList::PropertyMap::const_iterator it = pl->GetMap()->begin(); it != pl->GetMap()->end(); it++)
+            m_Options->SetProperty(it->first.c_str(), it->second.first);          
         }
         else
         {
@@ -1130,9 +1160,9 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
       node->SetData(m_ResultImage);
       mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
       node->SetProperty("name", new mitk::StringProperty( fileName ));
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      it.Add(node);
+      mitk::DataStorage::GetInstance()->Add(node);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::DataTreePreOrderIterator it(m_Tree);
       m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
   }
   
@@ -1161,9 +1191,9 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
         node->SetData(m_ResultImage);
         mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
         node->SetProperty("name", new mitk::StringProperty( fileNames.first().ascii() ));
-        mitk::DataTreePreOrderIterator it(m_Tree);
-        it.Add(node);
+        mitk::DataStorage::GetInstance()->Add(node);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        mitk::DataTreePreOrderIterator it(m_Tree);
         m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
     }
   }

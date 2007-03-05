@@ -381,6 +381,35 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
+  /* Requesting objects that meet a disjunction criteria */
+  std::cout << "Requesting objects that meet a disjunction criteria: " << std::flush;
+  try 
+  {
+    mitk::NodePredicateDataType p1("Surface");
+    mitk::NodePredicateProperty p2("color", new mitk::ColorProperty(color));
+    mitk::NodePredicateOR predicate;
+    predicate.AddPredicate(p1);
+    predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+    if ((all->Size() == 3) 
+        && (std::find(all->begin(), all->end(), n1) != all->end()) 
+        && (std::find(all->begin(), all->end(), n2) != all->end())
+        && (std::find(all->begin(), all->end(), n4) != all->end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
   /* Requesting objects that do not meet a criteria */
   std::cout << "Requesting objects that do not meet a criteria: " << std::flush;
   try

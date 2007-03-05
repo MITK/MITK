@@ -56,6 +56,7 @@ void mitk::PointSetReader::GenerateData()
         this->SetNthOutput( i, *it );
     }
     in.close();
+    parser->Delete();
 }
 
 

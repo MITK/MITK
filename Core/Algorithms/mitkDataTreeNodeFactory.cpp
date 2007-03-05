@@ -253,6 +253,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
           this->ReadFileSeriesTypeITKImageSeriesReader();
       }
     }
+    delete baseDataVector;
   }
 }
 

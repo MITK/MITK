@@ -204,7 +204,14 @@ public:
             if(time>mitk::ScalarTypeNumericTraits::min())
               timestep = inputTimeGeometry->MSToTimeStep( time );
             if( inputTimeGeometry->IsValidTime( timestep ) == false )
+            {
+              //if(m_TimeSelector->GetOutput()!=NULL)
+              //{
+              //  m_TimeSelector->GetOutput()->DisconnectPipeline();
+              //}
+              m_TimeSelector->SetInput(NULL);
               return;
+            }
 
             m_TimeSelector->SetTimeNr(timestep);
             m_TimeSelector->UpdateLargestPossibleRegion();
@@ -236,6 +243,11 @@ public:
             }
           }
           mitk::StatusBar::GetInstance()->DisplayText(s.ascii(), 10000);
+          //if(m_TimeSelector->GetOutput()!=NULL)
+          //{
+          //  m_TimeSelector->GetOutput()->DisconnectPipeline();
+          //}
+          m_TimeSelector->SetInput(NULL);
           break;
         }
       case mitk::OpNOTHING:

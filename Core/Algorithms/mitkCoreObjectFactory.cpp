@@ -66,6 +66,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
+#include "mitkGLUT.h"
 
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
@@ -151,8 +152,20 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   return instance;
 }
 
-mitk::CoreObjectFactory::CoreObjectFactory() {
-
+mitk::CoreObjectFactory::CoreObjectFactory() 
+{
+  static bool glutInitialized = false;
+  if ( ! glutInitialized )
+  {
+    // glutInit must be called on systems using freeglut 2.4 and
+    // above. On other systems it doesn't hurt anyway...
+    std::string dummy("dummy");
+    const char* dummy_str = dummy.c_str();
+    char** argv = (char**) &dummy_str;
+    int argc = 1;
+    glutInit( &argc, argv );
+    glutInitialized = true;
+  }
 };
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)

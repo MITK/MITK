@@ -3,7 +3,6 @@
 
 #include "mitkLookupTable.h"
 #include "mitkLevelWindow.h"
-#include <itkObject.h> // without this compilation fails due to an error in itkGetMacro.
 #include <iostream>
 #include <string>
 

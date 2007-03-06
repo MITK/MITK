@@ -206,8 +206,16 @@ mitk::DisplayGeometry::~DisplayGeometry()
 //##ModelId=3E3C36920345
 void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion)
 {
-  Vector2D centerInMM;
-  centerInMM =  m_SizeInMM*0.5;
+  Vector2D oldSizeInMM;
+  Point2D oldCenterInMM;
+  if(keepDisplayedRegion)
+  {
+    oldSizeInMM = m_SizeInMM;
+    Point2D centerInDisplayUnits;
+    centerInDisplayUnits[0] = m_SizeInDisplayUnits[0]*0.5;
+    centerInDisplayUnits[1] = m_SizeInDisplayUnits[1]*0.5;
+    DisplayToWorld(centerInDisplayUnits, oldCenterInMM);
+  }
 
   m_SizeInDisplayUnits[0]=width;
   m_SizeInDisplayUnits[1]=height;
@@ -221,17 +229,18 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
 
   if(keepDisplayedRegion)
   {
-    Vector2D newCenterInMM;
-    newCenterInMM = m_SizeInMM*0.5;
+    Point2D positionOfOldCenterInCurrentDisplayUnits;
+    WorldToDisplay(oldCenterInMM, positionOfOldCenterInCurrentDisplayUnits);
+
+    Point2D currentNewCenterInDisplayUnits;
+    currentNewCenterInDisplayUnits[0] = m_SizeInDisplayUnits[0]*0.5;
+    currentNewCenterInDisplayUnits[1] = m_SizeInDisplayUnits[1]*0.5;
 
     Vector2D shift;
-    shift=centerInMM-newCenterInMM;
-    WorldToDisplay(shift, shift);
-
-    m_ScaleFactorMMPerDisplayUnit *= sqrt(centerInMM.GetSquaredNorm()/newCenterInMM.GetSquaredNorm());
-    assert(m_ScaleFactorMMPerDisplayUnit<ScalarTypeNumericTraits::infinity());
+    shift=positionOfOldCenterInCurrentDisplayUnits.GetVectorFromOrigin()-currentNewCenterInDisplayUnits;
 
     MoveBy(shift);
+    Zoom(m_SizeInMM.GetNorm()/oldSizeInMM.GetNorm(), currentNewCenterInDisplayUnits);
   }
 
   Modified();

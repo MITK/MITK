@@ -87,9 +87,6 @@ public:
   //## will also be kept.
   //## When the aspect ration changes, the displayed region includes the old displayed region, but
   //## cannot be exaclty the same.
-  //## @warning the described behaviour is implemented, but does not work yet. Sorry, didn't have the time to debug it yet.
-  //## Therefore, the old behaviour is used in BaseRenderer::Resize (calling Fit).
-  //## @todo debug!
   virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion=true);
   //##ModelId=3E3C36CD02D2
   virtual void SetOriginInMM(const mitk::Vector2D& origin_mm);

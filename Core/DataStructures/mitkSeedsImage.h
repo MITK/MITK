@@ -58,11 +58,6 @@ protected:
   SeedsImage();
   virtual ~SeedsImage();
 
-  void CreateBrush();
-
-  template < int Dimension >
-  itk::Neighborhood< float, Dimension >& GetBrush();
-
   template< typename SeedsImageType >
     itk::NeighborhoodIterator< SeedsImageType >& GetNit( SeedsImageType* image );
 
@@ -90,12 +85,6 @@ protected:
   float sphere_distance;
 
   typedef itk::Image<float,3> MaskImageType;
-  MaskImageType::Pointer m_Brush;
-
-  typedef itk::Neighborhood< float, 3 > Brush3DType;
-  Brush3DType m_Brush3D;
-  typedef itk::Neighborhood< float, 2 > Brush2DType;
-  Brush2DType m_Brush2D;
 
   typedef itk::GaussianSpatialFunction< int, 3 > GaussianFunction3DType;
   GaussianFunction3DType::Pointer m_GaussianFunction3D;

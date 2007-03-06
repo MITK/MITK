@@ -53,7 +53,8 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
   for(unsigned int i=0; i<this->GetDimension(); i++)
     orig_size[i] = this->GetDimension(i);
 
-  mitk::DrawOperation * seedsOp = dynamic_cast<mitk::DrawOperation*>( operation );
+  mitk::DrawOperation * seedsOp = 
+    dynamic_cast< mitk::DrawOperation * >( operation );
 
   if ( seedsOp != NULL )
   {
@@ -62,8 +63,6 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
     if (m_Radius != seedsOp->GetRadius())
     {
       m_Radius = seedsOp->GetRadius();
-      m_Radius = 1;
-      //CreateBrush();
     }
 
     switch (operation->GetOperationType())
@@ -88,7 +87,10 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
         m_Point = seedsOp->GetPoint();
         m_LastPoint = m_Point;
         m_DrawState = 0;
-        m_Radius = m_Radius+4;  // todo - operation is not equal with its inverse operation - possible approximation problems in the function PointInterpolation()
+        
+        // todo - operation is not equal with its inverse operation - possible 
+        // approximation problems in the function PointInterpolation()
+        m_Radius = m_Radius+4;
         AccessByItk(this, AddSeedPoint);
         break;
       }
@@ -96,7 +98,10 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
       {
         m_Point = seedsOp->GetPoint();
         m_DrawState = 0;
-        m_Radius = m_Radius+4; // todo - operation is not equal with its inverse operation - possible approximation problems in the function PointInterpolation()
+        
+        // todo - operation is not equal with its inverse operation - possible 
+        // approximation problems in the function PointInterpolation()
+        m_Radius = m_Radius+4;
         AccessByItk(this, AddSeedPoint);
         AccessByItk(this, PointInterpolation);
         m_LastPoint = m_Point;
@@ -122,7 +127,8 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
 
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
-  const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+  const unsigned int dimension =
+    ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
 
   mitk::Point3D index;
   this->GetGeometry()->WorldToIndex( m_Point, index );
@@ -161,10 +167,10 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   typedef typename NeighborhoodIteratorType::IndexType IndexType;
 
 
-
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
-  const unsigned int dimension = ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+  const unsigned int dimension = 
+    ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
 
   mitk::Point3D indexBegin, indexEnd;
   this->GetGeometry()->WorldToIndex( m_Point, indexBegin );
@@ -219,14 +225,6 @@ void mitk::SeedsImage::ClearBuffer(SeedsImageType* itkImage)
   itkImage->FillBuffer(0);
 }
 
-template < int Dimension >
-itk::Neighborhood< float, Dimension >&
-mitk::SeedsImage::GetBrush()
-{
-  static itk::Neighborhood< float, Dimension > brush;
-  return brush;
-}
-
 template < typename SeedsImageType >
 itk::NeighborhoodIterator< SeedsImageType >&
 mitk::SeedsImage::GetNit( SeedsImageType* image )
@@ -252,138 +250,23 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
     iteratedImage = image;
   }
 
-  if ( !initialized )
+  nit.SetRadius( m_Radius );
+
+  unsigned int i;
+  for ( i = 0; i < nit.GetCenterNeighborhoodIndex()*2+1; ++i )
   {
-    nit.SetRadius( m_Radius );
+    OffsetType offset = nit.GetOffset( i );
 
-    unsigned int i;
-    for ( i = 0; i < nit.GetCenterNeighborhoodIndex()*2+1; ++i )
+    typename GaussianFunctionType::InputType point;
+    double dist = 0;
+    unsigned int d;
+    for ( d = 0; d < SeedsImageType::ImageDimension; ++d )
     {
-      OffsetType offset = nit.GetOffset( i );
-
-      typename GaussianFunctionType::InputType point;
-      double dist = 0;
-      unsigned int d;
-      for ( d = 0; d < SeedsImageType::ImageDimension; ++d )
-      {
-        point[d] = offset[d];
-        dist += offset[d] * offset[d];
-      }
-      /*
-      if ( dist <= m_Radius*m_Radius )
-      {
-        nit.ActivateOffset( nit.GetOffset( i ) );
-        // *nit[i] = gaussianFunction->Evaluate( point );
-      }
-      else
-      {
-        nit.DeactivateOffset( nit.GetOffset( i ) );
-        // *nit[i] = 0;
-      }
-      */
+      point[d] = offset[d];
+      dist += offset[d] * offset[d];
     }
-    initialized = true;
   }
 
   return nit;
 }
 
-void mitk::SeedsImage::CreateBrush()
-{
-  // Initializie structuring element (brush form)
-  m_StructuringElement3D.SetRadius( m_Radius );
-  m_StructuringElement3D.CreateStructuringElement();
-
-  m_StructuringElement2D.SetRadius( m_Radius );
-  m_StructuringElement2D.CreateStructuringElement();
-
-  // Create brushes
-  m_Brush3D.SetRadius( m_Radius );
-
-  GaussianFunction3DType::ArrayType sigma3D;
-  sigma3D.Fill( m_Radius );
-  GaussianFunction3DType::ArrayType mean3D;
-  mean3D.Fill( m_Radius );
-
-  m_GaussianFunction3D->SetScale( 100.0 );
-  m_GaussianFunction3D->SetSigma( sigma3D );
-  m_GaussianFunction3D->SetMean( mean3D );
-
-  m_Brush2D.SetRadius( m_Radius );
-
-  GaussianFunction2DType::ArrayType sigma2D;
-  sigma2D.Fill( m_Radius );
-  GaussianFunction2DType::ArrayType mean2D;
-  mean2D.Fill( m_Radius );
-
-  m_GaussianFunction2D->SetScale( 100.0 );
-  m_GaussianFunction2D->SetSigma( sigma2D );
-  m_GaussianFunction2D->SetMean( mean2D );
-
-  Brush3DType::OffsetType offset3D;
-  GaussianFunction3DType::InputType point3D;
-  Brush2DType::OffsetType offset2D;
-  GaussianFunction2DType::InputType point2D;
-  int x, y, z;
-  for ( x = 0; x < m_Radius*2+1; ++x )
-  {
-    point3D[0] = offset3D[0] = x;
-    point2D[0] = offset2D[0] = x;
-    for ( y = 0; y < m_Radius*2+1; ++y )
-    {
-      point3D[1] = offset3D[1] = y;
-      point2D[1] = offset2D[1] = y;
-      m_Brush2D[offset2D] = m_GaussianFunction2D->Evaluate( point2D );
-      for ( z = 0; z < m_Radius*2+1; ++z )
-      {
-        offset3D[2] = z;
-        point3D[2] = z;
-        m_Brush3D[offset3D] = m_GaussianFunction3D->Evaluate( point3D );
-      }
-    }
-  }
-
-
-  
-  /*
-  m_Brush =  MaskImageType::New();
-  MaskImageType::SpacingType spacing;
-  spacing.Fill(1);
-  double origin[3] = {m_Spacing[0],m_Spacing[1],m_Spacing[2]};
-  m_Brush->SetOrigin(origin);
-  MaskImageType::SizeType size;
-  size.Fill(2*m_Radius+1);
-  MaskImageType::IndexType start;
-  start.Fill(0);
-  MaskImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
-  m_Brush->SetRegions(region);
-  m_Brush->Allocate();
-  m_Brush->FillBuffer(0);
-  MaskImageType::IndexType idx;
-  idx.Fill(m_Radius);
-
-  MaskImageType::IndexType center;
-  center.Fill(m_Radius);
-  MaskImageType::IndexType half;
-  half.Fill( (unsigned long)(ceil(m_Radius/2.0)) );
-
-  for (idx[0] = center[0]-half[0]; idx[0] < center[0]+half[0]; idx[0]++)   
-    for (idx[1] = center[1]-half[1]; idx[1] < center[1]+half[1]; idx[1]++)
-      for (idx[2] = center[2]-half[2]; idx[2] < center[2]+half[2]; idx[2]++)
-  {
-    m_Brush->SetPixel(idx, 100);
-  }
-
-  typedef itk::DiscreteGaussianImageFilter<MaskImageType,MaskImageType> BlurFT;
-  BlurFT::Pointer blurring = BlurFT::New();
-  blurring->SetInput( m_Brush );
-  float variance[3] = {m_Radius,m_Radius,m_Radius};
-  blurring->SetVariance( variance );
-  blurring->Update();
-
-  m_Brush = blurring->GetOutput();
-  m_Brush->DisconnectPipeline();
-  */
-}

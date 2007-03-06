@@ -170,6 +170,12 @@ namespace mitk {
     }
 
     //##Documentation
+    //## @brief Returns a list of used grouptags
+    //##
+    const std::set<std::string> GetGroupTags() const;
+
+
+    //##Documentation
     //## @brief Initializes the class by providing the data tree that should be used for data storage
     //##
     void Initialize(mitk::DataTree* tree);

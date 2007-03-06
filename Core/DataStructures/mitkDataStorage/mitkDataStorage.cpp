@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
+#include "mitkGroupTagProperty.h"
 
 
 mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
@@ -386,4 +387,25 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
     if (condition->CheckNode(it.Value()) == true)
       result->InsertElement(result->Size(), it.Value());
   return mitk::DataStorage::SetOfObjects::ConstPointer(result);
+}
+
+
+const std::set<std::string> mitk::DataStorage::GetGroupTags() const
+{
+
+  //itk::VectorContainer<unsigned int, std::string>::Pointer result = itk::VectorContainer<unsigned int, std::string>::New();
+  std::set<std::string> result;
+  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetAll();
+  if (all.IsNull())
+    return result;
+
+  for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = all->Begin(); nodeIt != all->End(); nodeIt++)  // for each node
+  {
+    mitk::PropertyList* pl = nodeIt.Value()->GetPropertyList();
+    for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end(); propIt++)
+      if (dynamic_cast<mitk::GroupTagProperty*>(propIt->second.first.GetPointer()) != NULL)
+        result.insert(propIt->first);
+  }
+
+  return result;
 }

@@ -385,11 +385,11 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   std::cout << "Requesting objects that meet a disjunction criteria: " << std::flush;
   try 
   {
-    mitk::NodePredicateDataType p1("Surface");
+    mitk::NodePredicateDataType p1("Image");
     mitk::NodePredicateProperty p2("color", new mitk::ColorProperty(color));
     mitk::NodePredicateOR predicate;
     predicate.AddPredicate(p1);
-    predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
+    predicate.AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     if ((all->Size() == 3) 
         && (std::find(all->begin(), all->end(), n1) != all->end()) 
@@ -1233,7 +1233,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   }  
 
  /* Checking for node is it's own parent exception */
-  std::cout << "Checking for node is it's own parent exception: " << std::flush;
+  std::cout << "Checking for 'node is it's own parent' exception: " << std::flush;
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
@@ -1293,6 +1293,32 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }  
 
+ /* Checking GetGrouptags() */
+  std::cout << "Checking GetGrouptags(): " << std::flush;
+  try
+  {
+    const std::set<std::string> groupTags = ds->GetGroupTags();
+
+    if ( (groupTags.size() == 2)
+      && (std::find(groupTags.begin(), groupTags.end(), "Resection Proposal 1") != groupTags.end())
+      && (std::find(groupTags.begin(), groupTags.end(), "Resection Proposal 2") != groupTags.end()))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
+
+  
 
   /* finally return cumulated returnValue */
   return returnValue;

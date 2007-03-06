@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGroupTagProperty.h"
 #include "mitkDataTreeNode.h"
 #include "mitkReferenceCountWatcher.h"
+#include "mitkDataTreeHelper.h"
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
@@ -1318,9 +1319,34 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
   }  
 
 
-  
+ /* Checking DataTree Delete Oberver funtionality */
+  std::cout << "Checking DataTree Delete Oberver funtionality: " << std::flush;
+  try
+  {
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    ds->Add(extra, n5); // add extra to DataStorage. Reference count should be 5 (extra smartpointer, tree, sources map, derivations map, derivations list of n5)
+    mitk::DataTreeIteratorClone it = mitk::DataTreeHelper::FindIteratorToNode(tree, extra); // remove extra directly from tree
+    it->Disconnect(); // delete node directly from tree. the observer mechanism should delete it from the internal relations too
+    extra = NULL; // delete last reference to the node. its memory should be freed now
+
+    if (watcher->GetReferenceCount() == 0)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+ 
 
   /* finally return cumulated returnValue */
   return returnValue;
 }
-

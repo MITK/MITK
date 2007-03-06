@@ -613,18 +613,11 @@ bool QmitkStdMultiWidget::InitializeStandardViews(
   }
   else
   {
-    const mitk::BoundingBox::Pointer boundingbox = 
-      mitk::DataTree::ComputeVisibleBoundingBox(it, NULL, "includeInBoundingBox");
-    if ( boundingbox->GetPoints()->Size()>0 )
+    mitk::Geometry3D::Pointer geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(it, NULL, "includeInBoundingBox");
+    if ( geometry.IsNotNull() )
     {
-      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
-      geometry->Initialize();
-      geometry->SetBounds(boundingbox->GetBounds());
-
-      // let's see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds =
-        mitk::DataTree::ComputeTimeBounds(it, NULL, "includeInBoundingBox");
-
+      //lets see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
       if ( timebounds[1]<mitk::ScalarTypeNumericTraits::max() )
       {
         mitk::ScalarType duration = timebounds[1]-timebounds[0];
@@ -672,8 +665,8 @@ bool QmitkStdMultiWidget::InitializeStandardViews(
         // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
         // that Fit() resets the camera according to the new geometry.
         //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
         this->Fit();
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
       }
     }
   }

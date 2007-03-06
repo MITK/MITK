@@ -1,2 +1,0 @@
-CREATE_CORE_LIB()
-

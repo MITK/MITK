@@ -343,7 +343,11 @@ void QmitkDataTreeListView::paintListBackground(QPainter& painter, QmitkListView
 */
 void QmitkDataTreeListView::paintEvent(QPaintEvent*)
 {
-  if (m_Grid) m_Grid->activate(); // after clearItems there is no m_Grid
+  if (m_Grid) 
+  {
+    m_Grid->activate(); // after clearItems there is no m_Grid
+    m_SizeHint = m_Grid->sizeHint();
+  }
   QPainter painter(this);
   paintListBackground(painter,this);
 }
@@ -365,7 +369,11 @@ void QmitkDataTreeListView::mouseReleaseEvent ( QMouseEvent* e )
   // 
   // initiate paintEvent
 
-  if (m_Grid) m_Grid->activate(); // don't know why this has to be here, but it fixes a selection problem. It SHOULD do calling this in generateItems(), but it doesn't...
+  if (m_Grid) 
+  {
+    m_Grid->activate(); // don't know why this has to be here, but it fixes a selection problem. It SHOULD do calling this in generateItems(), but it doesn't...
+    m_SizeHint = m_Grid->sizeHint();
+  }
 
   QmitkListViewItemIndex* index(this);
   int row(-1);

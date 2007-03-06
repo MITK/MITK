@@ -594,7 +594,6 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryM
 
 void mitk::Image::Initialize()
 {
-
   if(m_TimeSelectorForExtremaObject.IsNull())
   {
     m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
@@ -1102,6 +1101,8 @@ void mitk::Image::ReleaseData()
   {
     (*it)=NULL;
   }
+  m_CompleteData = NULL;
+  Superclass::ReleaseData();
 }
 
 bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 

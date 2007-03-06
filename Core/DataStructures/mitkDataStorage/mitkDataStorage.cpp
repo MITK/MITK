@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
+#include "itkCommand.h"
 
 
 mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
@@ -73,6 +74,23 @@ void mitk::DataStorage::Initialize(mitk::DataTree* tree)
   if (tree == NULL)
     throw 1;  // insert exception handling here 
   m_DataTree = tree;
+  itk::ReceptorMemberCommand<Self>::Pointer command = itk::ReceptorMemberCommand<Self>::New();
+  command->SetCallbackFunction(this, &mitk::DataStorage::NodeDeletedInTree);
+  m_DeleteInTreeObserverTag = m_DataTree->AddObserver(itk::TreeRemoveEvent<mitk::DataTreeBase>(), command);
+}
+
+void mitk::DataStorage::NodeDeletedInTree(const itk::EventObject & treeChangedEvent)
+{
+  const itk::TreeRemoveEvent<mitk::DataTreeBase>* rme = dynamic_cast< const itk::TreeRemoveEvent<mitk::DataTreeBase>* >(&treeChangedEvent);
+  if (rme == NULL)
+    return;
+  const mitk::DataTreeIteratorClone it(rme->GetChangePosition());
+  mitk::DataTreeNode* node = it->Get();
+  if (node == NULL)
+    return;
+  /* remove the node from our relation, now that it was removed from the tree */
+  this->RemoveFromRelation(node, m_SourceNodes);
+  this->RemoveFromRelation(node, m_DerivedNodes);
 }
 
 
@@ -140,7 +158,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent
 }
 
 
-void mitk::DataStorage::Remove(mitk::DataTreeNode* node)
+void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
 {
   bool rmTree = false;
   bool rmSources = false;
@@ -160,41 +178,28 @@ void mitk::DataStorage::Remove(mitk::DataTreeNode* node)
     rmTree = true;
 
   /* remove node from both relation adjacency lists */
-  for (AdjacencyList::const_iterator mapIter = m_SourceNodes.begin(); mapIter != m_SourceNodes.end(); ++mapIter)  // for each node in sources relation
-    if (mapIter->second.IsNotNull())      // if he has a list of parents
-    {
-      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the parent list
-      SetOfObjects::STLContainerType::iterator sourceNodeIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the source list does not contain duplicates (which should be safe to assume)
-      if (sourceNodeIter != s->end())     // if node to be deleted is in parentlist
-        s->erase(sourceNodeIter);         // remove it from parentlist
-    }
-  /* now remove node from source relation */
-  AdjacencyList::iterator adIt;
-  adIt = m_SourceNodes.find(node);
-  if (adIt != m_SourceNodes.end())
-  {
-    m_SourceNodes.erase(adIt);
-    rmSources = true;
-  }
-  for (AdjacencyList::const_iterator mapIter = m_DerivedNodes.begin(); mapIter != m_DerivedNodes.end(); ++mapIter)  // for each node in sources relation
-    if (mapIter->second.IsNotNull())      // if he has a list of parents
-    {
-      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the parent list
-      SetOfObjects::STLContainerType::iterator derivedNodeIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the source list does not contain duplicates (which should be safe to assume)
-      if (derivedNodeIter != s->end())    // if node to be deleted is in parentlist
-        s->erase(derivedNodeIter);        // remove it from parentlist
-    }
-  /* now remove node from source relation */
-  adIt = m_DerivedNodes.find(node);
-  if (adIt != m_DerivedNodes.end())
-  {
-    m_DerivedNodes.erase(adIt);
-    rmDerivations = true;
-  }
-
-  if (!(rmTree && rmSources && rmDerivations))
-    throw 3;  // something went wrong during remove
+  this->RemoveFromRelation(node, m_SourceNodes);
+  this->RemoveFromRelation(node, m_DerivedNodes);
 }
+
+
+void mitk::DataStorage::RemoveFromRelation(const mitk::DataTreeNode* node, AdjacencyList& relation)
+{
+  for (AdjacencyList::const_iterator mapIter = relation.begin(); mapIter != relation.end(); ++mapIter)  // for each node in the relation
+    if (mapIter->second.IsNotNull())      // if node has a relation list
+    {
+      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the relation list
+      SetOfObjects::STLContainerType::iterator relationListIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the relation list does not contain duplicates (which should be safe to assume)
+      if (relationListIter != s->end())     // if node to be deleted is in relation list
+        s->erase(relationListIter);         // remove it from parentlist
+    }
+  /* now remove node from the relation */
+  AdjacencyList::iterator adIt;
+  adIt = relation.find(node);
+  if (adIt != relation.end())
+    relation.erase(adIt);
+}
+
 
 
 void mitk::DataStorage::Update(mitk::DataTreeNode* node)

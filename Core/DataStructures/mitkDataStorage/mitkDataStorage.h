@@ -77,7 +77,7 @@ namespace mitk {
     //##Documentation
     //## @brief Removes node from the DataStorage
     //##
-    void Remove(mitk::DataTreeNode* node);
+    void Remove(const mitk::DataTreeNode* node);
 
     //##Documentation
     //## @brief Notifies the DataStorage that the object in node has been modified
@@ -179,6 +179,11 @@ namespace mitk {
     //## @brief Initializes the class by providing the data tree that should be used for data storage
     //##
     void Initialize(mitk::DataTree* tree);
+    
+    //##Documentation
+    //## @brief Callback method to get notified, if a node in the underlying DataTree gets removed
+    //##
+    void NodeDeletedInTree(const itk::EventObject & treeChangedEvent);
 
     //##Documentation
     //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
@@ -211,6 +216,15 @@ namespace mitk {
     SetOfObjects::ConstPointer GetRelations(const mitk::DataTreeNode* node, const AdjacencyList& relation, const NodePredicateBase* condition = NULL, bool onlyDirectlyRelated = true) const;
 
     //##Documentation
+    //## @brief deletes all references to a node in a given relation (used in Remove() and TreeListener)
+    void RemoveFromRelation(const mitk::DataTreeNode* node, AdjacencyList& relation);
+
+    //##Documentation
+    //## @brief Prints the contents of the DataStorage to os. Do not call directly, call ->Print() instead
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
+
+    //##Documentation
     //## @brief holds the data tree that is encapsulated by this class
     mitk::DataTree::Pointer m_DataTree;
     
@@ -220,8 +234,8 @@ namespace mitk {
 
     AdjacencyList m_SourceNodes;
     AdjacencyList m_DerivedNodes;
-
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    
+    unsigned long m_DeleteInTreeObserverTag;
 
     static mitk::DataStorage::Pointer s_Instance;
   };

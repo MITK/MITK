@@ -30,7 +30,7 @@ mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
 
 
 mitk::DataStorage::DataStorage() 
-: itk::Object(), m_ManageCompleteTree(true) // true by default until all Reliver functionalities use the datastorage properly
+: itk::Object(), m_ManageCompleteTree(true), m_DuringRemove(false) // true by default until all Reliver functionalities use the datastorage properly
 {
   m_DataTree = NULL;
 }
@@ -81,6 +81,9 @@ void mitk::DataStorage::Initialize(mitk::DataTree* tree)
 
 void mitk::DataStorage::NodeDeletedInTree(const itk::EventObject & treeChangedEvent)
 {
+  if (m_DuringRemove == true) // this notification is from our own Remove() method and should not be processed further)
+    return;
+
   const itk::TreeRemoveEvent<mitk::DataTreeBase>* rme = dynamic_cast< const itk::TreeRemoveEvent<mitk::DataTreeBase>* >(&treeChangedEvent);
   if (rme == NULL)
     return;
@@ -160,9 +163,6 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent
 
 void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
 {
-  bool rmTree = false;
-  bool rmSources = false;
-  bool rmDerivations = false;
   if (!IsInitialized())
     throw 1;  // insert exception handling here
   if (node == NULL)
@@ -172,14 +172,17 @@ void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
   if (it->IsAtEnd())
     return;       // node not found
  
+  m_DuringRemove = true;
   if (it->Disconnect() == false)   // remove node from tree, but keep its children 
+  {
+    m_DuringRemove = false;
     throw 2;
-  else
-    rmTree = true;
-
+  }
+  
   /* remove node from both relation adjacency lists */
   this->RemoveFromRelation(node, m_SourceNodes);
   this->RemoveFromRelation(node, m_DerivedNodes);
+  m_DuringRemove = false;
 }
 
 

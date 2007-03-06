@@ -232,6 +232,10 @@ namespace mitk {
     //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
     bool m_ManageCompleteTree;
 
+    //##Documentation
+    //## @brief Flag that is set in Remove() method to prevent tree notification mechanism from deleting the same object we are just about to delete
+    bool m_DuringRemove;
+
     AdjacencyList m_SourceNodes;
     AdjacencyList m_DerivedNodes;
     

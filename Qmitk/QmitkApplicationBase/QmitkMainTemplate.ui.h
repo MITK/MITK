@@ -197,6 +197,7 @@ public:
           if ( image )
           {
             m_TimeSelector->SetInput(image);
+            mitk::Image* image3D = m_TimeSelector->GetOutput();
 
             const mitk::TimeSlicedGeometry* inputTimeGeometry = image->GetUpdatedTimeSlicedGeometry();
 
@@ -205,10 +206,10 @@ public:
               timestep = inputTimeGeometry->MSToTimeStep( time );
             if( inputTimeGeometry->IsValidTime( timestep ) == false )
             {
-              //if(m_TimeSelector->GetOutput()!=NULL)
-              //{
-              //  m_TimeSelector->GetOutput()->DisconnectPipeline();
-              //}
+              if(image3D!=NULL)
+              {
+                image3D->ReleaseData();
+              }
               m_TimeSelector->SetInput(NULL);
               return;
             }
@@ -216,9 +217,7 @@ public:
             m_TimeSelector->SetTimeNr(timestep);
             m_TimeSelector->UpdateLargestPossibleRegion();
 
-            image = m_TimeSelector->GetOutput();
-
-            image->GetGeometry()->WorldToIndex(pointoperation->GetPoint(), p);
+            image3D->GetGeometry()->WorldToIndex(pointoperation->GetPoint(), p);
 
             QString pixel;
             if(time>mitk::ScalarTypeNumericTraits::min())
@@ -227,10 +226,10 @@ public:
               pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
             s+=pixel;
 
-            ipPicDescriptor* pic = image->GetPic();
+            ipPicDescriptor* pic = image3D->GetPic();
 
             mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
-            if ( image->GetGeometry()->IsIndexInside(p) )
+            if ( image3D->GetGeometry()->IsIndexInside(p) )
             {
               itk::Point<int, 3> pi;
               mitk::itk2vtk(p, pi);
@@ -241,13 +240,13 @@ public:
               else
                 __buildstring(pic, pi, s, (unsigned char) 1);
             }
+            if(image3D!=NULL)
+            {
+              image3D->ReleaseData();
+            }
+            m_TimeSelector->SetInput(NULL);
           }
           mitk::StatusBar::GetInstance()->DisplayText(s.ascii(), 10000);
-          //if(m_TimeSelector->GetOutput()!=NULL)
-          //{
-          //  m_TimeSelector->GetOutput()->DisconnectPipeline();
-          //}
-          m_TimeSelector->SetInput(NULL);
           break;
         }
       case mitk::OpNOTHING:

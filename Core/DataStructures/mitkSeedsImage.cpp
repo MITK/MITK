@@ -42,7 +42,6 @@ mitk::SeedsImage::~SeedsImage()
 void mitk::SeedsImage::Initialize() 
 {
   m_Radius = 1;
-  std::cout << "seeds image radius reset" << std::endl;
 }
 
 

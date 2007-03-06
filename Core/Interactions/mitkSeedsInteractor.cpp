@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
   : mitk::Interactor(type, dataTreeNode)
 {
-  m_Radius = 4;
+  m_Radius = 1;
   m_Config = 0; // default config 254, 255 are added for fore- and backgrund seeds
 }
 

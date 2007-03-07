@@ -44,6 +44,8 @@ const QString Seperator = QString("&&");
 bool
 EventCollector::eventFilter( QObject *o, QEvent *e )
 {
+  if(m_EventObject == NULL ) return false;
+
   mitk::ConferenceToken* ct = mitk::ConferenceToken::GetInstance();
 
   if(m_ReadyToSend)

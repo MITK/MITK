@@ -62,6 +62,9 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
 
   mitk::ChiliPluginFactory::RegisterOneFactory();
   mitk::ChiliPlugin::SetPluginInstance(s_PluginInstance);
+
+  //when reloaded through the CHILI-config first time no text is set
+  toolbar->SetButtonText();
   
 }
 

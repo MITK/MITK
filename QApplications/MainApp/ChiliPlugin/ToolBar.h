@@ -20,6 +20,7 @@ public:
     void SetWidget(QWidget* ap);
     QButtonGroup* GetToolBar();
     void ConnectButton(int number);
+    void SetButtonText();
     bool KeepDataTreeNodes();
     
 public slots:

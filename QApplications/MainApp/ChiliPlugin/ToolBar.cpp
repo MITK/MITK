@@ -88,6 +88,13 @@ void ToolBar::ConnectButton(int number)
 
   for (int i=number+1;i<5;++i)
     toolbar->find(i)->hide();
+
+  SetButtonText();
+  /////itkGenericOutputMacro(<<"connect buttons");
+}
+
+void ToolBar::SetButtonText()
+{  
   // for some strange reason the "text" is not accepted
   // when set in the constructor (if the plugin was already
   // enabled on chili-startup - if it was not enabled in the
@@ -100,7 +107,6 @@ void ToolBar::ConnectButton(int number)
   toolbar->find(5)->setText(QString("Reinitialize"));
   toolbar->find(6)->setText(QString("Keep data tree"));
   toolbar->find(7)->setText(QString("Conference INFO"));
-  /////itkGenericOutputMacro(<<"connect buttons");
 }
 
 void ToolBar::Reinitialize(bool on)

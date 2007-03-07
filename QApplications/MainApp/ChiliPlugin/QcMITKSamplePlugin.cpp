@@ -126,13 +126,12 @@ void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"selectSerie");
-  if(!toolbar->KeepDataTreeNodes() && m_PicCounter!=0)
+  if((!toolbar->KeepDataTreeNodes() && m_PicCounter!=0) || !m_Activated)
     CreateNewSampleApp();
 
   if(lightbox==NULL || lightbox->getFrames()==0)
     return;
 
-  m_Activated=true;
   m_PicCounter++;
   m_IsFilledDataTree = true;
 
@@ -460,7 +459,7 @@ void QcMITKSamplePlugin::CreateNewSampleApp(bool force)
       delete app;
     
     app = new SampleApp(task, "sample", 0);
-    m_Activated = false;
+    m_Activated = true;
     m_PicCounter = 0;
 
     toolbar->SetWidget(app);

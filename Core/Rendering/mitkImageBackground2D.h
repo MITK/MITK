@@ -51,7 +51,7 @@ namespace mitk
     int  GetParallelScale();
     
     void Update(char * dataPointer);
-    void Update(char * dataPointer, int imageScalarComponents, int height, int width);
+    void Update(char * dataPointer, int width, int height, int imageScalarComponents);
     
     ////##Documentation
     ////## @brief visualizes the video. Requires image dimensions and an active mitkvideosource to be set.

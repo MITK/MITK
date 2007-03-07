@@ -61,6 +61,8 @@ mitk::ImageBackground2D::ImageBackground2D()
 
 void mitk::ImageBackground2D::InitVtkImageImport()
 { 
+  /*m_VtkImageImport->Delete();
+  m_VtkImageImport  = vtkImageImport::New();*/
   m_VtkImageImport->SetDataScalarTypeToUnsignedChar();
   m_VtkImageImport->SetNumberOfScalarComponents(m_ImageScalarComponents);
   m_VtkImageImport->SetWholeExtent(0,m_ImageWidth-1,0,m_ImageHeight-1,0,1-1);
@@ -171,13 +173,11 @@ void mitk::ImageBackground2D::Update(char * dataPointer)
    
 }
 
-void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, int imageScalarComponents)
+void mitk::ImageBackground2D::Update(char * dataPointer, int width, int height, int imageScalarComponents)
 {
   // no image-backround layer is rendered
   if(!IsEnabled())
     return;
-
- 
 
   // image contains no data, OR image scalar components missmatch (no RGB, no greyscale)
   if(!dataPointer || (imageScalarComponents != 1 && imageScalarComponents != 3))
@@ -194,10 +194,13 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, 
   {
     m_ImageHeight = height;
     m_ImageWidth  = width;
+    m_ImageScalarComponents = imageScalarComponents;
+
+    //InitVtkImageImport();
 
     // VTK import image data must be allocated before import (with correct parameters)
     if(m_ImageData == NULL)
-      m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*imageScalarComponents];
+      m_ImageData = new unsigned char[m_ImageHeight*m_ImageWidth*m_ImageScalarComponents];
     
     int column, row;
     unsigned char* tex  = m_ImageData;
@@ -208,7 +211,6 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int height, int width, 
      
     if(imageScalarComponents == 1)
     {
-      m_ImageScalarComponents = 1;
       m_VtkImageImport->SetNumberOfScalarComponents(m_ImageScalarComponents);
 
       unsigned char g;

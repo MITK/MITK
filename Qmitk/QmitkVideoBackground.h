@@ -17,7 +17,8 @@ class vtkVideoSizeCallback;
 
 
 namespace mitk {
-class RenderWindow;
+
+  class RenderWindow;
 }
 /**
  * Displays a video in the background
@@ -90,6 +91,7 @@ protected:
 
   int m_ImageWidth, m_ImageHeight, m_TimerDelay;
 };
+
 
 
 #endif

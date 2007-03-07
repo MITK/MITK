@@ -32,9 +32,15 @@ ENDFOREACH(FUNC_NAME)
 CONFIGURE_FILE(RegisterFunctionalityCalls.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/RegisterFunctionalityCalls.cpp @ONLY)
 # CONFIGURE_FILE(RegisterFunctionalityCalls.h.in RegisterFunctionalityCalls.h @ONLY)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-SET(MAIN_APP_CPP SampleApp.cpp SampleAppMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/RegisterFunctionalityCalls.cpp)
+SET(REGISTER_FUNCTIONALITY_CALLS_CPP ${CMAKE_CURRENT_BINARY_DIR}/RegisterFunctionalityCalls.cpp)
+SET(MAIN_APP_CPP SampleApp.cpp SampleAppMain.cpp ${REGISTER_FUNCTIONALITY_CALLS_CPP})
 QT_WRAP_CPP(MainApp MAIN_APP_CPP SampleApp.h)
 
 ADD_EXECUTABLE(MainApp ${MAIN_APP_CPP})
 TARGET_LINK_LIBRARIES(MainApp Qmitk ${FUNC_LIBRARIES}) 
 ADD_TEST(MainAppWithoutData ${EXECUTABLE_OUTPUT_PATH}/MainApp -testing)
+IF(MITK_CHILI_PLUGIN)
+   ADD_SUBDIRECTORY(ChiliPlugin)
+ENDIF(MITK_CHILI_PLUGIN)
+
+

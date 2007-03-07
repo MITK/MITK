@@ -54,6 +54,9 @@
  *   public defines for the pic-format
  *
  * $Log$
+ * Revision 1.2  2007/03/07 17:23:18  nolden
+ * fixes for chili plugin build
+ *
  * Revision 1.1  2006/12/13 11:54:43  nolden
  * *** empty log message ***
  *
@@ -209,6 +212,15 @@
  *--------------------------------------------------------------------
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
+
+#include <mitkConfig.h>
+
+#ifdef MITK_CHILI_PLUGIN
+
+#include MITK_CHILI_PLUGIN_SDK_IPTYPES_H
+#include MITK_CHILI_PLUGIN_SDK_IPPIC_H
+
+#else
 
 #ifndef _ipPic_h
 #define _ipPic_h
@@ -564,7 +576,6 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   ipPicFORALL_5(_ipPicPUT_PIXEL_RGB,PIC,X,Y,R,G,B);   \
 }
 
-#include <mitkConfig.h>
 #define USE_ZLIB /**/
 #ifdef USE_ZLIB
 #ifdef USE_ITKZLIB
@@ -887,6 +898,6 @@ extern char *ipPicTypeName( ipUInt4_t type );
 #if defined(__cplusplus) || defined(c_plusplus)
 }
 #endif
-
+#endif  /* MITK_CHILI_PLUGIN */
 #endif  /* _ipPic_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

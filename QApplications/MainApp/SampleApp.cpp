@@ -36,9 +36,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 // #include "AddFunctionalityCalls.h"
 
+void RegisterFunctionalities();
+
 SampleApp::SampleApp( QWidget* parent, const char* name, WFlags fl ):
 QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false )
 {
+  RegisterFunctionalities();
   this->setCaption("MITK Application");
   std::cout << "Instantiating new SampleApp..." << std::endl;
 

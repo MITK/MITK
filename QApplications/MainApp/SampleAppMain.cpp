@@ -28,14 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkFunctionalityTesting.h>
 
-void RegisterFunctionalities();
 
 
 int main(int argc, char* argv[])
 {
   try
   {
-    RegisterFunctionalities();
     itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
     QApplication a( argc, argv );
     SampleApp mainWindow(NULL, "mainwindow");

@@ -1,0 +1,154 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkStandardViews</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkStandardViews</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>149</width>
+            <height>114</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>QmitkStandardViews</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QButtonGroup">
+            <property name="name">
+                <cstring>m_StandardViews</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Standard views</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>m_Anterior</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>ant.</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>m_Posterior</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>post.</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>m_Sinister</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>sin.</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>m_Dexter</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>dex.</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>m_Cranial</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>cran.</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>m_Caudal</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>caud.</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>m_StandardViews</sender>
+        <signal>clicked(int)</signal>
+        <receiver>QmitkStandardViews</receiver>
+        <slot>OnStandardViewDefined(int)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in declaration">mitkCameraController.h</include>
+    <include location="local" impldecl="in declaration">mitkRenderWindow.h</include>
+    <include location="local" impldecl="in implementation">QmitkStandardViews.ui.h</include>
+</includes>
+<variables>
+    <variable access="public">mitk::CameraController::Pointer m_CameraController;</variable>
+</variables>
+<signals>
+    <signal>StandardViewDefined(mitk::CameraController::StandardView)</signal>
+</signals>
+<slots>
+    <slot>SetCameraController( mitk::CameraController * controller )</slot>
+    <slot>SetCameraControllerFromRenderWindow( mitk::RenderWindow * window )</slot>
+    <slot access="protected">OnStandardViewDefined(int id)</slot>
+</slots>
+<functions>
+    <function access="private" specifier="non virtual">init()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

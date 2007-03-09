@@ -112,7 +112,8 @@ int mitk::ImageBackground2D::GetParallelScale()
 void mitk::ImageBackground2D::Enable()
 {
   m_ImageRenderer = vtkRenderer::New();
-  
+  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_ImageRenderer,true);
+    
   char * c = 0;
   Update(c);
   m_Actor->SetInput(m_VtkImageImport->GetOutput());
@@ -126,7 +127,7 @@ void mitk::ImageBackground2D::Enable()
  
   //m_SizeCallback->SetVtkVideoRenderer(m_ImageRenderer);
   //m_SizeCallback->SetVideoDimensions(m_ImageWidth, m_ImageHeight);
-  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_ImageRenderer,true); 
+   
 }
 
 /**

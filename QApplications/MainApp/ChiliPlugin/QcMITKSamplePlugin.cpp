@@ -10,6 +10,11 @@
 #include <qptrlist.h>
 #include <qbuttongroup.h>
 #include <qapplication.h>
+#include <qeventloop.h>
+#include <3d-millenium_png_embedded.h> 
+#include <qsplashscreen.h>
+#include <qimage.h>
+#include <qpixmap.h>
 
 #include <mitkLightBoxImageReader.h>
 #include <mitkDataTreeHelper.h>
@@ -126,8 +131,17 @@ void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"selectSerie");
+  QSplashScreen* splash = NULL;
   if((!toolbar->KeepDataTreeNodes() && m_PicCounter!=0) || !m_Activated)
+  {
     CreateNewSampleApp();
+    QImage image = qembed_findImage("3d-millenium");
+    QPixmap pixmap(image);
+    splash = new QSplashScreen( pixmap );
+    splash->setFixedSize( pixmap.size() );    
+    splash->show();
+    QApplication::eventLoop()->processEvents( QEventLoop::ExcludeUserInput );
+  }
 
   if(lightbox==NULL || lightbox->getFrames()==0)
     return;
@@ -447,7 +461,11 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     app->GetMultiWidget()->Fit();
 
   }
-
+  if (splash!=NULL)
+  {
+    splash->close();
+    delete splash;
+  }
 }
 
 void QcMITKSamplePlugin::CreateNewSampleApp(bool force)

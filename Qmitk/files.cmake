@@ -86,6 +86,7 @@ SET(UI_FILES
   QmitkSelectableGLWidget.ui
   QmitkSliceWidget.ui
   QmitkSliderNavigator.ui
+  QmitkStandardViews.ui
   QmitkStdMultiWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkTwoButtonNavigator.ui

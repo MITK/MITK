@@ -13,6 +13,7 @@
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
 
+#include <ipPic/ipPic.h>
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
 { 

@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <vector>
 
-#include <ipPic/ipPic.h>
 
 // itk includes
 #include <itkMinimumMaximumImageCalculator.h>
@@ -50,6 +49,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindow.h"
 #include "vtkPolyData.h"
+
+struct ipPicDescriptor;
 
 namespace mitk
 {

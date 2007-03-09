@@ -11,10 +11,11 @@
 #include <qbuttongroup.h>
 #include <qapplication.h>
 #include <qeventloop.h>
-#include <3d-millenium_png_embedded.h> 
 #include <qsplashscreen.h>
 #include <qimage.h>
 #include <qpixmap.h>
+#include <qcursor.h>
+#include <3d-millenium_png_embedded.h>
 
 #include <mitkLightBoxImageReader.h>
 #include <mitkDataTreeHelper.h>
@@ -131,6 +132,7 @@ void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
 {
   /////itkGenericOutputMacro(<<"selectSerie");
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
   QSplashScreen* splash = NULL;
   if((!toolbar->KeepDataTreeNodes() && m_PicCounter!=0) || !m_Activated)
   {
@@ -143,8 +145,16 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     QApplication::eventLoop()->processEvents( QEventLoop::ExcludeUserInput );
   }
 
-  if(lightbox==NULL || lightbox->getFrames()==0)
+  if( lightbox==NULL || lightbox->getFrames()==0 )
+  {
+    if (splash!=NULL)
+    {
+      splash->close();
+      delete splash;
+    }
+    QApplication::restoreOverrideCursor();
     return;
+  }
 
   m_PicCounter++;
   m_IsFilledDataTree = true;
@@ -466,6 +476,7 @@ void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
     splash->close();
     delete splash;
   }
+  QApplication::restoreOverrideCursor();
 }
 
 void QcMITKSamplePlugin::CreateNewSampleApp(bool force)

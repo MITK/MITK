@@ -133,6 +133,11 @@ template<> class VectorTraits< itk::Point<float,3> > {
     typedef float ValueType;
 };
 
+template<> class VectorTraits< itk::Point<float,4> > {
+  public:
+    typedef float ValueType;
+};
+
 template<> class VectorTraits< itk::Vector<double,3> > {
   public:
     typedef double ValueType;
@@ -175,7 +180,14 @@ template <class Tout>
   out[1] = (typename VectorTraits<Tout>::ValueType)y;
   out[2] = (typename VectorTraits<Tout>::ValueType)z;
 }
-
+template <class Tout>
+  inline void FillVector4D(Tout& out, ScalarType x, ScalarType y, ScalarType z, ScalarType t)
+{
+  out[0] = (typename VectorTraits<Tout>::ValueType)x;
+  out[1] = (typename VectorTraits<Tout>::ValueType)y;
+  out[2] = (typename VectorTraits<Tout>::ValueType)z;
+  out[3] = (typename VectorTraits<Tout>::ValueType)t;
+}
 
 
 template <class Tin, class Tout>

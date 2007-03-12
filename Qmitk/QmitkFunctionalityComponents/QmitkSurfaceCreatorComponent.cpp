@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkManualSegmentationToSurfaceFilter.h>
 //#include <mitkImageToSurfaceFilter.h>
 
+#include "QmitkSelectableGLWidget.h"
+
 #include <qlineedit.h>
 #include <qslider.h>
 #include <qgroupbox.h>
@@ -43,7 +45,8 @@ QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, con
 : QmitkFunctionalityComponentContainer(parent, parentName),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
-m_SurfaceCreatorComponentGUI(NULL)
+m_SurfaceCreatorComponentGUI(NULL),
+m_SurfaceNode(NULL)
 {
   SetDataTreeIterator(it);
   SetComponentName("SurfaceCreator");
@@ -118,6 +121,7 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
 
     //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
+    connect((QObject*)(m_SurfaceCreatorComponentGUI->GetShowSurfaceContourCheckBox()), SIGNAL(clicked()), this, SLOT(ShowSurfaceContour()) );
   }
 }
 
@@ -565,6 +569,7 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
     mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = iT;
 
     mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
+    m_SurfaceNode = surfaceNode;
     surfaceNode->SetData( filter->GetOutput() );
 
     int layer = 0;
@@ -639,6 +644,34 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
     m_Color = m_RainbowColor->GetNextColor();
     surfaceNode->SetColor(m_Color);
     surfaceNode->SetVisibility(true);
-
+    ShowSurfaceContour();
     m_MultiWidget->RequestUpdate();
 }
+
+mitk::DataTreeNode::Pointer QmitkSurfaceCreatorComponent::getSurfaceNode()
+{
+  return m_SurfaceNode;
+}//end of getSurfaceNode()
+
+//*****************************************SHOW SURFACE CONTUR******************************
+//
+void QmitkSurfaceCreatorComponent::ShowSurfaceContour()
+{  
+  if(m_SurfaceCreatorComponentGUI->GetShowSurfaceContourCheckBox()->isChecked() == true)
+  {
+    if(getSurfaceNode())
+    {
+      getSurfaceNode()->SetVisibility(true);
+    }
+  }
+
+  if(m_SurfaceCreatorComponentGUI->GetShowSurfaceContourCheckBox()->isChecked()== false)
+  {
+    if(getSurfaceNode())
+    {
+      getSurfaceNode()->SetVisibility(false, NULL);
+      getSurfaceNode()->SetVisibility(true, m_MultiWidget->mitkWidget4->GetRenderer());
+    }
+  }
+  m_MultiWidget->RequestUpdate();
+}//end of ShowSurfaceContur

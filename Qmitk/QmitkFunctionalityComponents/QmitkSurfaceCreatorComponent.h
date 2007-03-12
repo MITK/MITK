@@ -164,6 +164,9 @@ protected slots:
   void SetSmoothFlag(bool flag);
   void SetGaussFlag(bool flag);
   void SetDecimateFlag(bool flag);
+  void ShowSurfaceContour();
+
+
 
 protected:
 
@@ -188,6 +191,8 @@ protected:
   a reference to the MultiWidget
   */
   QmitkStdMultiWidget * m_MultiWidget;
+
+
 
   /*!
   a reference to a data tree iterator object
@@ -225,6 +230,9 @@ protected:
 
   /** \brief Attribute to decide whether the Decimate-Paramter is checked an shall be used or not */
   bool m_DecimateFlag;
+
+
+mitk::DataTreeNode::Pointer getSurfaceNode();
 
 
 private:
@@ -319,6 +327,10 @@ private:
   /** \brief Spacer added at the end of the component */
   QSpacerItem* m_Spacer;
 
+        /*!
+  * Node which includes the surface of the threshold-segmentation 
+  */
+  mitk::DataTreeNode::Pointer m_SurfaceNode;
 
 };
 

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>547</width>
-            <height>664</height>
+            <height>758</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -745,16 +745,34 @@
                                 <string>Create Surface</string>
                             </property>
                         </widget>
-                        <widget class="QCheckBox">
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>m_ReplaceExistingSurfaceCheckBox</cstring>
+                                <cstring>layout10</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>false</bool>
-                            </property>
-                            <property name="text">
-                                <string>Replace existing Surface</string>
-                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>m_ShowContourChekckBox</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Show SurfaceContour</string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>m_ReplaceExistingSurfaceCheckBox</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="text">
+                                        <string>Replace existing Surface</string>
+                                    </property>
+                                </widget>
+                            </vbox>
                         </widget>
                     </vbox>
                 </widget>
@@ -831,7 +849,7 @@
     <function>SetSmoothRelaxationValue( float relaxation )</function>
     <function>SetGaussValue( float gsDev )</function>
     <function>SetDecimateValue( float targetReduction )</function>
+    <function returnType="QCheckBox *">GetShowSurfaceContourCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

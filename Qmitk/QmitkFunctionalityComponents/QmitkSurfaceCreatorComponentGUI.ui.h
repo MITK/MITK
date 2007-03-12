@@ -240,3 +240,9 @@ void QmitkSurfaceCreatorComponentGUI::SetDecimateValue( float targetReduction )
 {
    m_DecimateValueLineEdit->setText(QString::number( targetReduction));
 }
+
+QCheckBox* QmitkSurfaceCreatorComponentGUI::GetShowSurfaceContourCheckBox()
+{
+ return m_ShowContourChekckBox;
+}
+

@@ -25,17 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 //add only those headers here that are really necessary for all classes!
 #include "itkObject.h"
 
-//#include "itkRegion.h"
-//#include "vecmath.h"
-//#include "itkTransform.h"
-//#include "itkProcessObject.h"
-//#include "ipPic.h"
-//#include "vtkImageData.h"
-//#include "vtkImageReslice.h"
-//
-typedef  unsigned int MapperSlotId;
-//typedef	Tree<mitk::DataTreeNode::Pointer> DataTree;
-//typedef	TreeIterator<mitk::DataTreeNode::Pointer> DataTreeIteratorClone;
+typedef unsigned int MapperSlotId;
 
 #define mitkClassMacro(className,SuperClassName) \
 	typedef className				Self; \

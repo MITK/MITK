@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
+#include <mitkDataTreeNodeFactory.h>
 
 #include "QmitkSeedPointSetComponent.h"
 
@@ -193,6 +194,7 @@ void QmitkConnectivityFilterComponent::CreatePointSet()
   m_PointSet->CreateConnections();
   m_PointSet->SetDataTreeName("SeedPointsForConnectivity");
   m_ConnectivityFilterComponentGUI->repaint();
+  m_PointSet->GetMainCheckBoxContainer()->setChecked(false);
 }
 
 /*************** GET CONTENT CONTAINER  ***************/
@@ -406,6 +408,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
         iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
         connectivityNode->SetIntProperty("layer", layer+1);
+        mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
         connectivityNode->SetProperty("deprecated usePointDataForColouring", new mitk::BoolProperty(true));
         connectivityNode->SetProperty("name", new mitk::StringProperty("connectivity") );
         connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));

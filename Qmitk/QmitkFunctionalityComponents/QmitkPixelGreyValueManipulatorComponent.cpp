@@ -259,6 +259,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
   m_PixelGreyValueManipulatorComponentGUI->layout()->add(m_PointSet->GetGUI());
   m_PointSet->CreateConnections();
   m_PixelGreyValueManipulatorComponentGUI->repaint();
+  m_PointSet->GetMainCheckBoxContainer()->setChecked(false);
 }
 
 

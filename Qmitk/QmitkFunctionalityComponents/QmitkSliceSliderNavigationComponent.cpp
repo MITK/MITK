@@ -180,7 +180,7 @@ QWidget* QmitkSliceSliderNavigationComponent::CreateControlWidget(QWidget* paren
   new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetCoronalSlider(), m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorCoronal");
   new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetTemporalSlider(), m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTemporal");
 
-
+  SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
 
   return m_SliceSliderComponentGUI;
 }

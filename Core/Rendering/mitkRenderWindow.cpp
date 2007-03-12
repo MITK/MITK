@@ -46,11 +46,6 @@ mitk::RenderWindow::RenderWindow(const char *name, mitk::BaseRenderer* renderer)
 
   m_MitkVtkRenderWindow = mitk::VtkRenderWindow::New();
 
-  m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
-  m_SliceNavigationController->ConnectGeometrySliceEvent( renderer );
-  m_SliceNavigationController->ConnectGeometryUpdateEvent( renderer );
-  m_SliceNavigationController->ConnectGeometryTimeEvent( renderer, false );
-
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow( this );
   m_CameraRotationController->AcquireCamera();
@@ -136,6 +131,11 @@ void mitk::RenderWindow::InitRenderer()
   int * size = m_MitkVtkRenderWindow->GetSize();
   if((size[0]>10) && (size[1]>10))
     m_Renderer->InitSize(size[0], size[1]);
+
+  m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
+  m_SliceNavigationController->ConnectGeometrySliceEvent( m_Renderer.GetPointer());
+  m_SliceNavigationController->ConnectGeometryUpdateEvent( m_Renderer.GetPointer() );
+  m_SliceNavigationController->ConnectGeometryTimeEvent( m_Renderer.GetPointer(), false );
 
   // VTK Layer Controller
   m_VtkLayerController->InsertSceneRenderer(r);

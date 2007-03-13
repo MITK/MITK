@@ -38,8 +38,8 @@ const std::string
 mitk::SlicedGeometry3D::SlicedGeometry3D()
 : m_EvenlySpaced( true ),
   m_Slices( 0 ),
-  m_SliceNavigationController( NULL ),
-  m_ReferenceGeometry( NULL )
+  m_ReferenceGeometry( NULL ),
+  m_SliceNavigationController( NULL )
 {
   this->Initialize( m_Slices );
 }
@@ -280,7 +280,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  slices = directedExtent / viewSpacing;
+  slices = (unsigned int) directedExtent / viewSpacing;
 
   bool flipped = (top == false);
   
@@ -346,7 +346,7 @@ mitk::SlicedGeometry3D
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  m_Slices = directedExtent / spacing[2];
+  m_Slices = (unsigned int) directedExtent / spacing[2];
 
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's
@@ -376,7 +376,7 @@ mitk::SlicedGeometry3D
   double referencePointDistance =
     firstPlane->SignedDistanceFromPlane( referencePoint );
 
-  int referencePointSlice = referencePointDistance / spacing[2];
+  int referencePointSlice = (int) referencePointDistance / spacing[2];
 
   double alignmentValue =
     referencePointDistance / spacing[2] - referencePointSlice;

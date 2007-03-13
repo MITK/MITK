@@ -28,6 +28,11 @@ template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageTy
 void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
+  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
+  {
+    itkOutputImage = reinterpret_cast<ItkOutputImageType*>(itkInputImage);
+    return;
+  }
   typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
   typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
   castImageFilter->SetInput( itkInputImage );

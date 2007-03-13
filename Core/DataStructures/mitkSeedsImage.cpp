@@ -235,7 +235,6 @@ mitk::SeedsImage::GetNit( SeedsImageType* image )
   typedef itk::GaussianSpatialFunction< int, SeedsImageType::ImageDimension >
     GaussianFunctionType;
 
-  static bool initialized = false;
   static SeedsImageType* iteratedImage = 0;
   static NeighborhoodIteratorType nit;
   static typename GaussianFunctionType::Pointer gaussianFunction

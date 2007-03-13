@@ -157,7 +157,7 @@ PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width,
   Superclass::Initialize();
 
   //construct standard view
-  Point3D  origin; 
+  Point3D origin; 
   VnlVector rightDV(3), bottomDV(3);
   origin.Fill(0);
   int normalDirection;
@@ -723,7 +723,6 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       {
         return;
       }
-      vtkFloatingPointType *origin = vtktransform->GetPosition();
 
       Vector3D orientationVector = planeOp->GetNormal();
       Vector3D defaultVector;
@@ -737,7 +736,6 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
 
       vtktransform->Identity();
       vtktransform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
-      //vtktransform->Translate( origin[0], origin[1], origin[2] );
       break;
     }
 

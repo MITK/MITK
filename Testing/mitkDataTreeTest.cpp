@@ -413,6 +413,7 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   mitk::ReferenceCountWatcher::Pointer image4Watcher = new mitk::ReferenceCountWatcher(image4, "image4");
   node4->SetData(image4);
   image4 = NULL;
+  rootIt2.Add(node4);
   std::cout << "Find node4 again and go there: " << std::flush;
   res = static_cast<mitk::DataTreePreOrderIterator*>(rootIt2.Clone());
   res->GoToChild(res->ChildPosition(node4));
@@ -430,6 +431,7 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   mitk::ReferenceCountWatcher::Pointer image5Watcher = new mitk::ReferenceCountWatcher(image5, "image5");
   node5->SetData(image5);
   image5 = NULL;
+  res->Add(node5);
   node5 = NULL;
 
   mitk::ReferenceCountWatcher::Pointer treeWatcher = new mitk::ReferenceCountWatcher(tree, "tree");

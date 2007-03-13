@@ -62,6 +62,9 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeMapper = vtkPolyDataMapper::New();
   m_Edges = vtkFeatureEdges::New();
   m_EdgeActor = vtkActor::New();
+  m_BackgroundMapper = vtkDataSetMapper::New();
+  m_BackgroundActor = vtkActor::New();
+  m_Prop3DAssembly = vtkAssembly::New();
 
   m_EdgeTuber->SetInput( m_Edges->GetOutput() );
   m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
@@ -73,7 +76,15 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
   m_EdgeActor->SetMapper( m_EdgeMapper );
 
-  m_Prop3DAssembly = vtkAssembly::New();
+
+  m_BackgroundMapper->ImmediateModeRenderingOn();
+
+  m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
+  m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
+  m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
+  m_BackgroundActor->SetMapper( m_BackgroundMapper );
+
+
   
   m_Prop3D = m_Prop3DAssembly;
   m_Prop3D->Register(NULL);
@@ -95,6 +106,8 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_EdgeMapper->Delete();
   m_Edges->Delete();
   m_EdgeActor->Delete();
+  m_BackgroundMapper->Delete();
+  m_BackgroundActor->Delete();
 
   // Delete entries in m_ImageActors list one by one
   ActorList::iterator it;
@@ -288,16 +301,8 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 
     // Add black background for all images (which may be transparent)
-    vtkDataSetMapper *backgroundMapper = vtkDataSetMapper::New();
-    backgroundMapper->ImmediateModeRenderingOn();
-    backgroundMapper->SetInput( surfaceCreator->GetOutput()->GetVtkPolyData() );
-
-    vtkActor *backgroundActor = vtkActor::New();
-    backgroundActor->GetProperty()->SetAmbient( 0.5 );
-    backgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
-    backgroundActor->GetProperty()->SetOpacity( 1.0 );
-    backgroundActor->SetMapper( backgroundMapper );
-    m_Prop3DAssembly->AddPart( backgroundActor );
+    m_BackgroundMapper->SetInput( surfaceCreator->GetOutput()->GetVtkPolyData() );
+    m_Prop3DAssembly->AddPart( m_BackgroundActor );
 
 
     LayerSortedActorList layerSortedActors;

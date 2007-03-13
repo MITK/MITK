@@ -118,6 +118,12 @@ protected:
   /** \brief Actor for the tube-shaped frame */
   vtkActor *m_EdgeActor;
 
+  /** \brief Mapper for black plane background */
+  vtkDataSetMapper *m_BackgroundMapper;
+
+  /** \brief Actor for black plane background */
+  vtkActor *m_BackgroundActor;
+
 
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 

@@ -398,6 +398,143 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   else
     std::cout<<"[PASSED]"<<std::endl;
 
+  // testing destruction of complete tree
+  // start with new datatree
+  tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  std::cout << "Now preparing to test desctruction of complete tree: " << std::endl;
+  mitk::DataTreePreOrderIterator rootIt2(tree);
+  mitk::DataTreeNode::Pointer nodeEmpty = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer nodeEmptyWatcher = new mitk::ReferenceCountWatcher(nodeEmpty, "nodeEmpty");
+  rootIt2.Add(nodeEmpty);
+  nodeEmpty = NULL;
+  mitk::DataTreeNode::Pointer node4 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer node4Watcher = new mitk::ReferenceCountWatcher(node4, "node4");
+  mitk::Image::Pointer image4 = mitk::Image::New();
+  mitk::ReferenceCountWatcher::Pointer image4Watcher = new mitk::ReferenceCountWatcher(image4, "image4");
+  node4->SetData(image4);
+  image4 = NULL;
+  std::cout << "Find node4 again and go there: " << std::flush;
+  res = static_cast<mitk::DataTreePreOrderIterator*>(rootIt2.Clone());
+  res->GoToChild(res->ChildPosition(node4));
+  if((res->IsAtEnd()) || (res->Get() != node4.GetPointer()))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  node4 = NULL;
+  mitk::DataTreeNode::Pointer node5 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer node5Watcher = new mitk::ReferenceCountWatcher(node5, "node5");
+  mitk::Image::Pointer image5 = mitk::Image::New();
+  mitk::ReferenceCountWatcher::Pointer image5Watcher = new mitk::ReferenceCountWatcher(image5, "image5");
+  node5->SetData(image5);
+  image5 = NULL;
+  node5 = NULL;
+
+  mitk::ReferenceCountWatcher::Pointer treeWatcher = new mitk::ReferenceCountWatcher(tree, "tree");
+  std::cout << "Before tree destruction: Testing correctness of tree reference count: ";
+  if(treeWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of nodeEmpty reference count: ";
+  if(nodeEmptyWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of node4 reference count: ";
+  if(node4Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of image4 reference count: ";
+  if(image4Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of node5 reference count: ";
+  if(node5Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of image5 reference count: ";
+  if(image5Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Destroying tree";
+  tree = NULL;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "After tree destruction: Testing correctness of tree reference count: ";
+  if(treeWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "After tree destruction: Testing correctness of nodeEmpty reference count: ";
+  if(nodeEmptyWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "After tree destruction: Testing correctness of node4 reference count: ";
+  if(node4Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "After tree destruction: Testing correctness of image4 reference count: ";
+  if(image4Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "After tree destruction: Testing correctness of node5 reference count: ";
+  if(node5Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "After tree destruction: Testing correctness of image5 reference count: ";
+  if(image5Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

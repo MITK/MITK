@@ -46,6 +46,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
   
     const PositionEvent* posEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     
+    PointOperation* doOp=NULL;
     if(posEvent!=NULL)
     {
       ScalarType timeInMS = 0;
@@ -68,13 +69,14 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             return false;
           m_OldPoint = posEvent->GetWorldPosition();
 
-          PointOperation* doOp = new mitk::PointOperation(OpADD, timeInMS, m_OldPoint, 0);
+          doOp = new mitk::PointOperation(OpADD, timeInMS, m_OldPoint, 0);
           //Undo
           if (m_UndoEnabled)
           {
             PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
             OperationEvent *operationEvent = new OperationEvent( m_Destination, doOp, undoOp );
             m_UndoController->SetOperationEvent(operationEvent);
+            delete undoOp;
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
@@ -88,7 +90,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           //move the point to the coordinate //not used, cause same to MovePoint... check xml-file
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
 
-          PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
+          doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
           ok = true;
@@ -101,7 +103,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           m_CurrentPoint = movePoint;
           if (m_Destination == NULL)
             return false;
-          PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
+          doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
           ok = true;
@@ -117,7 +119,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           mitk::Point3D movePoint = posEvent->GetWorldPosition();
           mitk::Point3D oldMovePoint; oldMovePoint.Fill(0);
 
-          PointOperation* doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
+          doOp = new mitk::PointOperation(OpMOVE, timeInMS, movePoint, 0);
           PointOperation* finishOp = new mitk::PointOperation(OpTERMINATE, movePoint, 0);
           if (m_UndoEnabled )
           {
@@ -134,27 +136,34 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             PointOperation* undoOp = new PointOperation(OpMOVE, timeInMS, oldMovePoint, 0);
             OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
             m_UndoController->SetOperationEvent(operationEvent);
+            delete undoOp;
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
           m_Destination->ExecuteOperation(finishOp);
           ok = true;
+          delete finishOp;
+
           break;
         }
         default:
           ok = false;
           break;
         }
-       return ok;
+        return ok;
     }
     else if(action->GetActionId() == AcREMOVEPOINT)
     {
       if (m_Destination == NULL)
         return false;
       mitk::Point3D p;
-      m_Destination->ExecuteOperation( new mitk::PointOperation(OpREMOVE, p ) );
+      doOp = new mitk::PointOperation(OpREMOVE, p );
+      m_Destination->ExecuteOperation( doOp );
       ok = true;
     }
+
+    if(doOp!=NULL)
+      delete doOp;
  
     const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
     if(displPosEvent!=NULL)

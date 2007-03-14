@@ -25,7 +25,7 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
 }
 
-mitk::TransferFunction::Pointer CreateForMitkImage(const mitk::Image* image) {
+mitk::TransferFunction::Pointer mitk::TransferFunction::CreateForMitkImage(const mitk::Image* image) {
   mitk::TransferFunction::Pointer newTF = mitk::TransferFunction::New();
   newTF->InitializeByMitkImage(image);
   return newTF;

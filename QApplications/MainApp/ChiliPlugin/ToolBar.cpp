@@ -111,12 +111,14 @@ void ToolBar::SetButtonText()
 
 void ToolBar::Reinitialize(bool on)
 {
-  ((QPushButton*)(toolbar->find(5)))->setOn ( false );
-  
-  //force new instantiation of App
-  emit ChangeWidget(true);
-
-  ResetLightboxButtons();
+  if(on)
+  {
+    ((QPushButton*)(toolbar->find(5)))->setOn ( false );
+    //force new instantiation of App
+    emit ChangeWidget(true);
+    
+    ResetLightboxButtons();
+  }
 }
 
 void ToolBar::ButtonToggled(int lbId)

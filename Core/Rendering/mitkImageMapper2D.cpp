@@ -642,11 +642,11 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     rendererInfo.m_Overlap[1] = 
       (maxPlaneSize / mmPerPixel[1] - rendererInfo.m_Extent[1]) / 2.0;
 
-    xMin = (int) -(rendererInfo.m_Overlap[0] + 0.5);
-    xMax = (int)  (xMin + rendererInfo.m_Extent[0]
+    xMin = static_cast< int >( -(rendererInfo.m_Overlap[0] + 0.5) );
+    xMax = static_cast< int >( xMin + rendererInfo.m_Extent[0]
       + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] );
-    yMin = (int) -(rendererInfo.m_Overlap[1] + 0.5);
-    yMax = (int)  (yMin + rendererInfo.m_Extent[1]
+    yMin = static_cast< int >( -(rendererInfo.m_Overlap[1] + 0.5) );
+    yMax = static_cast< int >( yMin + rendererInfo.m_Extent[1]
       + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] );
   }
   else
@@ -656,8 +656,10 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     rendererInfo.m_Overlap.Fill( 0.0 );
 
     xMin = yMin = 0;
-    xMax = (int) rendererInfo.m_Extent[0] - rendererInfo.m_PixelsPerMM[0];
-    yMax = (int) rendererInfo.m_Extent[1] - rendererInfo.m_PixelsPerMM[1];
+    xMax = static_cast< int >( rendererInfo.m_Extent[0]
+      - rendererInfo.m_PixelsPerMM[0] );
+    yMax = static_cast< int >( rendererInfo.m_Extent[1] 
+      - rendererInfo.m_PixelsPerMM[1] );
   }
 
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
@@ -707,13 +709,15 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   int originalSize[2];
   if ( worldGeometry->GetReferenceGeometry() )
   {
-    originalSize[0] = (int) (bounds[1] - bounds[0]) / mmPerPixel[0];
-    originalSize[1] = (int) (bounds[3] - bounds[2]) / mmPerPixel[1];
+    originalSize[0] = static_cast< int >( 
+      (bounds[1] - bounds[0]) / mmPerPixel[0] );
+    originalSize[1] = static_cast< int >(
+      (bounds[3] - bounds[2]) / mmPerPixel[1] );
   }
   else
   {
-    originalSize[0] = (int) rendererInfo.m_Extent[0];
-    originalSize[1] = (int) rendererInfo.m_Extent[1];
+    originalSize[0] = static_cast< int >( rendererInfo.m_Extent[0] );
+    originalSize[1] = static_cast< int >( rendererInfo.m_Extent[1] );
   }
 
   // Extend to nearest power-of-two number for OpenGL optimization
@@ -722,10 +726,12 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   newSize[1] = this->FindPowerOfTwo( originalSize[1] );
 
   int newExtent[6];
-  newExtent[0] = (int) bounds[0] / mmPerPixel[0] * newSize[0] / originalSize[0];
-  newExtent[1] = (int) newExtent[0] + newSize[0] - 1;
-  newExtent[2] = (int) bounds[2] / mmPerPixel[1] * newSize[1] / originalSize[1];
-  newExtent[3] = (int) newExtent[2] + newSize[1] - 1;
+  newExtent[0] = static_cast< int >( 
+    bounds[0] / mmPerPixel[0] * newSize[0] / originalSize[0] );
+  newExtent[1] = static_cast< int >( newExtent[0] + newSize[0] - 1 );
+  newExtent[2] = static_cast< int >(
+    bounds[2] / mmPerPixel[1] * newSize[1] / originalSize[1] );
+  newExtent[3] = static_cast< int >( newExtent[2] + newSize[1] - 1 );
   newExtent[4] = 0;
   newExtent[5] = 1;
 

@@ -280,7 +280,7 @@ mitk::SlicedGeometry3D::InitializePlanes(
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  slices = (unsigned int) directedExtent / viewSpacing;
+  slices = static_cast< int >(directedExtent / viewSpacing);
 
   bool flipped = (top == false);
   
@@ -346,7 +346,7 @@ mitk::SlicedGeometry3D
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  m_Slices = (unsigned int) directedExtent / spacing[2];
+  m_Slices = static_cast< unsigned int >(directedExtent / spacing[2]);
 
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's
@@ -376,7 +376,8 @@ mitk::SlicedGeometry3D
   double referencePointDistance =
     firstPlane->SignedDistanceFromPlane( referencePoint );
 
-  int referencePointSlice = (int) referencePointDistance / spacing[2];
+  int referencePointSlice = static_cast< int >(
+    referencePointDistance / spacing[2]);
 
   double alignmentValue =
     referencePointDistance / spacing[2] - referencePointSlice;
@@ -845,11 +846,16 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         const mitk::Vector3D &currentNormal = planeGeometry->GetNormal();
         const mitk::Vector3D &newNormal = planeOp->GetNormal();
 
+        std::cout << "currentNormal: " << currentNormal << std::endl;
+        std::cout << "newNormal: " << newNormal << std::endl;
+
         Vector3D rotationAxis = itk::CrossProduct( newNormal, currentNormal );
 
         vtkFloatingPointType rotationAngle = atan2( 
           (double) rotationAxis.GetNorm(),
           (double) (newNormal * currentNormal) );
+
+        std::cout << "rotationAngle: " << rotationAngle << std::endl;
 
         rotationAngle *= 180.0 / vnl_math::pi;
 
@@ -871,6 +877,8 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         {
           m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
         }
+
+        Geometry3D::ExecuteOperation( &centeredRotation );
       }
     }
     else

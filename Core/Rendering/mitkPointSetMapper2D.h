@@ -50,7 +50,7 @@ class PointSetMapper2D : public GLMapper2D
 {
 public:
     //##ModelId=3F0189F00363
-    mitkClassMacro(PointSetMapper2D, Mapper2D);
+    mitkClassMacro(PointSetMapper2D, GLMapper2D);
 
     //##ModelId=3F0189F00354
     itkNewMacro(Self);
@@ -58,7 +58,7 @@ public:
     //##ModelId=3F0189F00366
     //##Documentation
     //## @brief Get the PointDataList to map
-    const mitk::PointSet * GetInput(void);
+    virtual const mitk::PointSet * GetInput(void);
 
     //##ModelId=3F0189F00373
     virtual void Paint(mitk::BaseRenderer * renderer);

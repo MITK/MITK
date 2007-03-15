@@ -38,6 +38,7 @@ mitk::SplineVtkMapper3D::SplineVtkMapper3D()
 {
   m_SplinesActor = vtkActor::New();
   m_SplineAssembly = vtkPropAssembly::New();
+  m_SplineResolution = 500;
 }
 
 
@@ -66,70 +67,14 @@ void
 mitk::SplineVtkMapper3D::GenerateData()
 {
   Superclass::GenerateData();
-  mitk::PointSet::Pointer input = const_cast<mitk::PointSet*>( this->GetInput( ) );
-//  input->Update();//already done in superclass
 
-  // Number of points on the spline
-  unsigned int numberOfOutputPoints = 400;
-  unsigned int numberOfInputPoints = input->GetSize();
-
-
-  if ( numberOfInputPoints >= 2 )
+  // only update spline if UpdateSpline has not been called from
+  // external, e.g. by the SplineMapper2D.
+  if ( m_SplineUpdateTime < m_LastUpdateTime ) 
   {
-    m_SplinesAvailable = true;
-    vtkCardinalSpline* splineX = vtkCardinalSpline::New();
-    vtkCardinalSpline* splineY = vtkCardinalSpline::New();
-    vtkCardinalSpline* splineZ = vtkCardinalSpline::New();
-    unsigned int index = 0;
-    mitk::PointSet::DataType::PointsContainer::Pointer pointsContainer = input->GetPointSet()->GetPoints();
-    for ( mitk::PointSet::DataType::PointsContainer::Iterator it = pointsContainer->Begin(); it != pointsContainer->End(); ++it, ++index )
-    //for ( unsigned int i = 0 ; i < numberOfInputPoints; ++i )
-    {
-      mitk::PointSet::PointType point = it->Value();
-      splineX->AddPoint( index, point[ 0 ] );
-      splineY->AddPoint( index, point[ 1 ] );
-      splineZ->AddPoint( index, point[ 2 ] );
-    }
-    vtkPoints* points = vtkPoints::New();
-    vtkPolyData* profileData = vtkPolyData::New();
-
-
-    // Interpolate x, y and z by using the three spline filters and
-    // create new points
-    double t = 0.0f;
-    for ( unsigned int i = 0; i < numberOfOutputPoints; ++i )
-    {
-      t = ( ( ( ( double ) numberOfInputPoints ) - 1.0f ) / ( ( ( double ) numberOfOutputPoints ) - 1.0f ) ) * ( ( double ) i );
-      points->InsertPoint( i, splineX->Evaluate( t ), splineY->Evaluate( t ), splineZ->Evaluate( t ) ) ;
-    }
-
-    // Create the polyline.
-    vtkCellArray* lines = vtkCellArray::New();
-    lines->InsertNextCell( numberOfOutputPoints );
-    for ( unsigned int i = 0; i < numberOfOutputPoints; ++i )
-      lines->InsertCellPoint( i );
-
-    profileData->SetPoints( points );
-    profileData->SetLines( lines );
-
-    // Add thickness to the resulting line.
-    //vtkTubeFilter* profileTubes = vtkTubeFilter::New();
-    //profileTubes->SetNumberOfSides(8);
-    //profileTubes->SetInput(profileData);
-    //profileTubes->SetRadius(.005);
-
-    vtkPolyDataMapper* profileMapper = vtkPolyDataMapper::New();
-    profileMapper->SetInput( profileData );
-
-    m_SplinesActor->SetMapper( profileMapper );
-
+    UpdateSpline();
     this->ApplyProperties();
   }
-  else
-  {
-    m_SplinesAvailable = false;
-  }
-
 
   if ( m_SplinesAvailable )
   {
@@ -208,7 +153,7 @@ vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
   if ( m_SplinesAvailable )
     return ( dynamic_cast<vtkPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
   else
-    return vtkPolyData::New();
+    return NULL;
 }
 
 vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
@@ -218,5 +163,76 @@ vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
     return m_SplinesActor;
   else
     return vtkActor::New();
+}
+
+unsigned long mitk::SplineVtkMapper3D::GetLastUpdateTime() const
+{
+  return m_LastUpdateTime.GetMTime();
+}
+
+void mitk::SplineVtkMapper3D::UpdateSpline()
+{
+  mitk::PointSet::Pointer input = const_cast<mitk::PointSet*>( this->GetInput( ) );
+//  input->Update();//already done in superclass
+
+  // Number of points on the spline
+  unsigned int numberOfOutputPoints = m_SplineResolution;
+  unsigned int numberOfInputPoints = input->GetSize();
+
+
+  if ( numberOfInputPoints >= 2 )
+  {
+    m_SplinesAvailable = true;
+    vtkCardinalSpline* splineX = vtkCardinalSpline::New();
+    vtkCardinalSpline* splineY = vtkCardinalSpline::New();
+    vtkCardinalSpline* splineZ = vtkCardinalSpline::New();
+    unsigned int index = 0;
+    mitk::PointSet::DataType::PointsContainer::Pointer pointsContainer = input->GetPointSet()->GetPoints();
+    for ( mitk::PointSet::DataType::PointsContainer::Iterator it = pointsContainer->Begin(); it != pointsContainer->End(); ++it, ++index )
+    //for ( unsigned int i = 0 ; i < numberOfInputPoints; ++i )
+    {
+      mitk::PointSet::PointType point = it->Value();
+      splineX->AddPoint( index, point[ 0 ] );
+      splineY->AddPoint( index, point[ 1 ] );
+      splineZ->AddPoint( index, point[ 2 ] );
+    }
+    vtkPoints* points = vtkPoints::New();
+    vtkPolyData* profileData = vtkPolyData::New();
+
+
+    // Interpolate x, y and z by using the three spline filters and
+    // create new points
+    double t = 0.0f;
+    for ( unsigned int i = 0; i < numberOfOutputPoints; ++i )
+    {
+      t = ( ( ( ( double ) numberOfInputPoints ) - 1.0f ) / ( ( ( double ) numberOfOutputPoints ) - 1.0f ) ) * ( ( double ) i );
+      points->InsertPoint( i, splineX->Evaluate( t ), splineY->Evaluate( t ), splineZ->Evaluate( t ) ) ;
+    }
+
+    // Create the polyline.
+    vtkCellArray* lines = vtkCellArray::New();
+    lines->InsertNextCell( numberOfOutputPoints );
+    for ( unsigned int i = 0; i < numberOfOutputPoints; ++i )
+      lines->InsertCellPoint( i );
+
+    profileData->SetPoints( points );
+    profileData->SetLines( lines );
+
+    // Add thickness to the resulting line.
+    //vtkTubeFilter* profileTubes = vtkTubeFilter::New();
+    //profileTubes->SetNumberOfSides(8);
+    //profileTubes->SetInput(profileData);
+    //profileTubes->SetRadius(.005);
+
+    vtkPolyDataMapper* profileMapper = vtkPolyDataMapper::New();
+    profileMapper->SetInput( profileData );
+
+    m_SplinesActor->SetMapper( profileMapper );
+  }
+  else
+  {
+    m_SplinesAvailable = false;
+  }
+  m_SplineUpdateTime.Modified();
 }
 

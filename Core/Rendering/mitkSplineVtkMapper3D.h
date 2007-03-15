@@ -49,6 +49,13 @@ public:
     
     vtkActor* GetSplinesActor();
     
+    unsigned long GetLastUpdateTime() const;
+    
+    virtual void UpdateSpline();
+    
+    itkSetMacro( SplineResolution, unsigned int );
+    
+    itkGetMacro( SplineResolution, unsigned int );
     
 protected:
 
@@ -69,6 +76,10 @@ protected:
     bool m_SplinesAvailable;
     
     bool m_SplinesAddedToAssembly;
+    
+    unsigned int m_SplineResolution;
+    
+    itk::TimeStamp m_SplineUpdateTime;
 };
 
 

@@ -63,20 +63,29 @@ public:
   //##Documentation
   //## @brief Constructor requiring object to be watched and allowing
   //## an optional comment.
-  ReferenceCountWatcher(itk::Object* o, const char *comment="") : m_Object(o), m_Comment(comment), m_Deleted(false)
+  ReferenceCountWatcher(itk::Object* o, const char *comment="") : m_Object(o), m_Comment(comment), m_Deleted(false), m_ObserverTag(0)
   {
     m_DeleteCommand = CommandType::New();
     m_DeleteCommand->SetCallbackFunction(this, &ReferenceCountWatcher::DeleteObserver);
     if(m_Object!=NULL)
-      m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
+      m_ObserverTag = m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
     m_ReferenceCountLock.Lock();
     m_ReferenceCount = 0;
     m_ReferenceCountLock.Unlock();
   }
   //##Documentation
+  //## @brief Destructor: remove observer
+  ~ReferenceCountWatcher()
+  {
+    if((m_Deleted == false) && (m_Object != NULL))
+    {
+      m_Object->RemoveObserver(m_ObserverTag);
+    }
+  }
+  //##Documentation
   //## @brief Return the reference count of the watched object or
   //## 0 if it has been destroyed
-  int GetReferenceCount() const 
+  int GetReferenceCount() const
   {
     if(m_Object == NULL) return -1;
     if(m_Deleted) return 0;
@@ -93,6 +102,7 @@ protected:
   {
     m_Deleted = true;
   }
+  unsigned long m_ObserverTag;
 };
 
 }

@@ -172,7 +172,7 @@ namespace mitk {
     //##Documentation
     //## @brief Returns a list of used grouptags
     //##
-    const std::set<std::string> GetGroupTags() const;
+    const DataTreeNode::GroupTagList GetGroupTags() const;
 
 
     //##Documentation

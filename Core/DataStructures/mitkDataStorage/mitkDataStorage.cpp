@@ -398,12 +398,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
 }
 
 
-const std::set<std::string> mitk::DataStorage::GetGroupTags() const
+const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 {
-
-  //itk::VectorContainer<unsigned int, std::string>::Pointer result = itk::VectorContainer<unsigned int, std::string>::New();
-  std::set<std::string> result;
-  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetAll();
+  DataTreeNode::GroupTagList result;
+  SetOfObjects::ConstPointer all = this->GetAll();
   if (all.IsNull())
     return result;
 

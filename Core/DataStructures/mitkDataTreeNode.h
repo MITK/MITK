@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 
 #include <map>
+#include <set>
 #include "mitkLevelWindow.h"
 #include "mitkXMLIO.h"
 
@@ -70,6 +71,7 @@ public:
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
   typedef std::vector<Mapper::Pointer> MapperVector;
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::set<std::string> GroupTagList;
 
   mitkClassMacro(DataTreeNode, itk::DataObject);
 
@@ -226,6 +228,9 @@ public:
 #else
   ;
 #endif
+
+  // @brief Get a set of all group tags from this node's property list
+  GroupTagList GetGroupTags() const;
 
   //##Documentation
   //## @brief Convenience access method for bool properties (instances of

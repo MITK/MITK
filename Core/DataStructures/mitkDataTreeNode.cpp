@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
+#include "mitkGroupTagProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkMaterialProperty.h"
 #include "mitkColorProperty.h"
@@ -243,6 +244,25 @@ mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *property
   if(property.IsNotNull())
     return property;
   return NULL;
+}
+  
+mitk::DataTreeNode::GroupTagList mitk::DataTreeNode::GetGroupTags() const
+{
+  GroupTagList groups;
+  const PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
+
+  for ( PropertyList::PropertyMap::const_iterator groupIter = propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
+        groupIter != propertyMap->end();
+        ++groupIter )
+  {
+    const BaseProperty* bp = groupIter->second.first;
+    if ( dynamic_cast<const GroupTagProperty*>(bp) && groupIter->second.second )
+    {
+      groups.insert( groupIter->first );
+    }
+  }
+
+  return groups;
 }
 
 bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const

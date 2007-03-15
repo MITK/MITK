@@ -182,7 +182,7 @@ void mitk::SplineMapper2D::ApplyProperties ( mitk::BaseRenderer* renderer )
 
 mitk::SplineMapper2D::SplineMapper2D()
 {
-  m_MaxProjectionDistance = mitk::eps;
+  m_MaxProjectionDistance = 1;
   m_ShowDistantLines = false ;
   m_LineWidth = 1;
 }

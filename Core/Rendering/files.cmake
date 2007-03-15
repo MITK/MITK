@@ -26,6 +26,7 @@ SET(CPP_FILES
   mitkPointSetVtkMapper3D.cpp
   mitkPolyDataGLMapper2D.cpp
   mitkRenderWindow.cpp
+  mitkSplineMapper2D.cpp
   mitkSplineVtkMapper3D.cpp
   mitkSurfaceMapper2D.cpp
   mitkSurfaceVtkMapper3D.cpp

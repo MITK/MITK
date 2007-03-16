@@ -73,6 +73,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK-related includes
 #include "mitkSurface.h"
+#include "mitkPointSet.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkMaterialProperty.h"
@@ -216,6 +217,11 @@ void mitk::DataTreeNodeFactory::GenerateData()
         mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
         if(surface.IsNotNull())
           this->SetDefaultSurfaceProperties(node);
+
+        //beware! mitkCoreObjectFactory opens an *.mps file as a mesh, not as a pointset! Thus mitkMestVtkMapper3D is used to map the data
+        mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(node->GetData());
+        if(pointset.IsNotNull())
+          this->SetDefaultPointSetProperties(node);
 
         node->SetVisibility(true);
         this->SetOutput(i, node);
@@ -764,6 +770,22 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
     }
   }
 }
+
+void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
+{
+  node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
+  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "pointsize", new mitk::IntProperty(1));
+  node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));
+  node->SetProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
+  //node->SetProperty( "contour", new mitk::BoolProperty(false) );
+  //node->SetProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
+  //node->SetProperty( "close", new mitk::BoolProperty(false) );
+    
+  //node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  node->SetVisibility(true);
+}
+
 
 void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
 {

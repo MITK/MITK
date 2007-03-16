@@ -91,6 +91,11 @@ public:
   static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
   
   /**
+   * Sets default properites common to all data types representing a PointSet
+   */
+  static void SetDefaultPointSetProperties(DataTreeNode::Pointer &node);
+  
+  /**
    * Sets default common properites
    */
   void SetDefaultCommonProperties(DataTreeNode::Pointer &node);

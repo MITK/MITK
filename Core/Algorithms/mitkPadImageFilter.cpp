@@ -66,10 +66,12 @@ void mitk::PadImageFilter::GenerateData()
   for ( i = 0; i < 3; ++i )
   {
     outputOrigin[i] = referenceOrigin[i];
-    padLowerBound[i] = static_cast< unsigned long >((origin[i] - referenceOrigin[i]) / spacing[i]);
-    padUpperBound[i] = static_cast< unsigned long >
-        ((referenceOrigin[i] + referenceImageGeometry->GetExtentInMM( i )
-      - (origin[i] + imageGeometry->GetExtentInMM( i ))) / spacing[i]);
+   
+    padLowerBound[i] = static_cast< unsigned long >
+      ((origin[i] - referenceOrigin[i]) / spacing[i] + 0.5);
+
+    padUpperBound[i] = referenceImage->GetDimension( i ) 
+      - image->GetDimension( i ) - padLowerBound[i];
   }
 
   // The origin of the input image is passed through the filter and used as 

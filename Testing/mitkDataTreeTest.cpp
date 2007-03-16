@@ -437,6 +437,14 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   mitk::ReferenceCountWatcher::Pointer nodeEmpty2Watcher = new mitk::ReferenceCountWatcher(nodeEmpty2, "nodeEmpty2");
   res->Add(nodeEmpty2);
   nodeEmpty2 = NULL;
+  mitk::DataTreeNode::Pointer nodeEmpty3 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer nodeEmpty3Watcher = new mitk::ReferenceCountWatcher(nodeEmpty3, "nodeEmpty3");
+  res->Add(nodeEmpty3);
+  nodeEmpty3 = NULL;
+  mitk::DataTreeNode::Pointer nodeEmpty4 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer nodeEmpty4Watcher = new mitk::ReferenceCountWatcher(nodeEmpty4, "nodeEmpty4");
+  res->Add(nodeEmpty4);
+  nodeEmpty4 = NULL;
 
   std::cout << "Find node5 again and go there: " << std::flush;
   res->GoToChild(res->ChildPosition(node5));
@@ -507,6 +515,22 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[PASSED]"<<std::endl;
   std::cout << "Before tree destruction: Testing correctness of nodeEmpty2 reference count: ";
   if(nodeEmpty2Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of nodeEmpty3 reference count: ";
+  if(nodeEmpty3Watcher->GetReferenceCount()!=1)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of nodeEmpty4 reference count: ";
+  if(nodeEmpty4Watcher->GetReferenceCount()!=1)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -585,6 +609,22 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[PASSED]"<<std::endl;
   std::cout << "Before tree destruction: Testing correctness of nodeEmpty2 reference count: ";
   if(nodeEmpty2Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of nodeEmpty3 reference count: ";
+  if(nodeEmpty3Watcher->GetReferenceCount()!=0)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+    std::cout<<"[PASSED]"<<std::endl;
+  std::cout << "Before tree destruction: Testing correctness of nodeEmpty4 reference count: ";
+  if(nodeEmpty4Watcher->GetReferenceCount()!=0)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

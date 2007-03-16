@@ -66,7 +66,8 @@ QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * par
 m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),
 m_DataIt(it),
-m_PointSet(NULL)
+m_PointSet(NULL),
+m_ConnectivityCounter(0)
 {
   SetDataTreeIterator(it);
   SetAvailability(true);
@@ -393,7 +394,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
   {
     i++;
 //    std::cout<<i<<std::endl;
-    mitk::DataTreeNode::Pointer aNode = itConnectivity->Get();
+    mitk::DataTreeNode::Pointer aNode = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
     if ( aNode->GetData() != NULL )
     {
       mitk::Surface::Pointer sf = dynamic_cast<mitk::Surface*>( aNode->GetData() );
@@ -405,61 +406,125 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         connectivityNode->SetData(sf);
 
         int layer = 0;
+
+        ++m_ConnectivityCounter;
+
+
+        std::ostringstream buffer;
+        QString connectivityDataName = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->currentText();
+        buffer << connectivityDataName.ascii();
+        buffer << "_";
+        buffer << m_ConnectivityCounter;
+
+        std::string connectivityNodeName = "Connectivity_" + buffer.str();
+
+
+
+
         mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
         iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
         connectivityNode->SetIntProperty("layer", layer+1);
         mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
         connectivityNode->SetProperty("deprecated usePointDataForColouring", new mitk::BoolProperty(true));
-        connectivityNode->SetProperty("name", new mitk::StringProperty("connectivity") );
+        connectivityNode->SetProperty("name", new mitk::StringProperty(connectivityNodeName) );
         connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
         connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
+        connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
 
         mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 
         bool isSurface = false;
         bool isConnectivity = false;
 
-        while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
+        //while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
+        //{
+        //  iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface);
+        //  if(isSurface == false)
+        //  {
+        //    ++iteratorConnectivity;
+        //  }
+        //  std::cout <<iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface)<<std::endl;
+        //}//end of while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
+        //while(!(iteratorConnectivity->IsAtEnd())&&(iteratorConnectivity->Get() != m_SelectedItem->GetNode()))
+          while(!(iteratorConnectivity->IsAtEnd()))
         {
-          iteratorConnectivity->Get()->GetBoolProperty("Surface", isSurface);
-          if(isSurface == false)
+          if(iteratorConnectivity->Get() != m_SelectedItem->GetNode())
           {
-            ++iteratorConnectivity;
+            std::cout <<"Ungleicher Knoten"<<std::endl;
           }
-        }//end of while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
-
-        if(isSurface == false)
-        {
-          while(!(iteratorConnectivity->IsAtEnd())&&(isConnectivity == false))
-          {
-            iteratorConnectivity->Get()->GetBoolProperty("connectivity", isConnectivity);
-            if(isConnectivity == false)
-            {
-              ++iteratorConnectivity;
-            }
-          }
-        }//end of if(isSurface == false)
-
-        if(isSurface == true)
-        {
-          itConnectivity->Set(connectivityNode);
-          itConnectivity->GetTree()->Modified();
-        }//end of if(isSurface == true)
-
-        if(isSurface == false)
-        {
-          if(isConnectivity == true)
+          else if(iteratorConnectivity->Get() == m_SelectedItem->GetNode())
           {
 
-            itConnectivity->Set(connectivityNode);
-            itConnectivity->GetTree()->Modified();
+            std::cout <<"Gleicher Knoten"<<std::endl;
+            iteratorConnectivity->Set(connectivityNode);
+            //mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
+            iteratorConnectivity->GetTree()->Modified();
+            std::cout <<"SET"<<std::endl;
+            break;
+          }
+          else
+          {
+            iteratorConnectivity->Add(connectivityNode);
+            std::cout <<"ADD"<<std::endl;
           }
 
-          if(isConnectivity == false)
-          {
-            itConnectivity->Add(connectivityNode);
-          }
-        }//end of if(isSurface == false)
+          ++iteratorConnectivity;
+
+        }
+
+        //if(isSurface == false)
+        //{
+        //  while(!(iteratorConnectivity->IsAtEnd())&&(isConnectivity == false))
+        //  {
+        //    iteratorConnectivity->Get()->GetBoolProperty("connectivity", isConnectivity);
+        //    if(isConnectivity == false)
+        //    {
+        //      ++iteratorConnectivity;
+        //    }
+        //  }
+        //}//end of if(isSurface == false)
+
+        ////if(isSurface == true)
+        ////{
+        ////  itConnectivity->Set(connectivityNode);
+        ////  itConnectivity->GetTree()->Modified();
+        ////}//end of if(isSurface == true)
+
+        ////if(isSurface == false)
+        ////{
+        ////  if(isConnectivity == true)
+        ////  {
+
+        ////    itConnectivity->Set(connectivityNode);
+        ////    itConnectivity->GetTree()->Modified();
+        ////  }
+
+        ////  if(isConnectivity == false)
+        ////  {
+        ////    itConnectivity->Add(connectivityNode);
+        ////  }
+        ////}//end of if(isSurface == false)
+
+        //if(isSurface == true)
+        //{
+        //  iteratorConnectivity->Set(connectivityNode);
+        //  iteratorConnectivity->GetTree()->Modified();
+        //}//end of if(isSurface == true)
+
+        //if(isSurface == false)
+        //{
+        //  if(isConnectivity == true)
+        //  {
+
+        //    iteratorConnectivity->Set(connectivityNode);
+        //    iteratorConnectivity->GetTree()->Modified();
+        //  }
+
+        //  if(isConnectivity == false)
+        //  {
+        //    iteratorConnectivity->Add(connectivityNode);
+        //  }
+        //}//end of if(isSurface == false)
 
         break;
       }//end of if (sf.IsNotNull())

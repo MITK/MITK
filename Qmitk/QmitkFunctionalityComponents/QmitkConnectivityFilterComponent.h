@@ -159,6 +159,7 @@ private:
   mitk::DataTreeIteratorBase* m_DataIt;
 
   QmitkSeedPointSetComponent* m_PointSet;
+  int m_ConnectivityCounter;
 
 
 

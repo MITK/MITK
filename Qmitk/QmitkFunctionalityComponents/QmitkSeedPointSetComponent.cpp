@@ -107,6 +107,7 @@ void QmitkSeedPointSetComponent::CreateConnections()
 void QmitkSeedPointSetComponent::ShowComponentContent()
 {
  m_PointSetComponentGUI->GetComponentContent()->setShown(m_PointSetComponentGUI->GetShowComponent()->isChecked());
+ SetContentContainerVisibility(m_PointSetComponentGUI->GetShowComponent()->isChecked());
 }
 
 /*************** SHOW TREE NODE SELECTOR **************/
@@ -147,6 +148,8 @@ QWidget* QmitkSeedPointSetComponent::CreateControlWidget(QWidget* parent)
   m_PointSetComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
   //m_PointSetComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithProperty<mitk::Image>("Points"));
   m_PointSetComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithProperty<mitk::PointSet>("SeedPoints"));
+  GetMainCheckBoxContainer()->setChecked(false);
+  SetContentContainerVisibility(m_PointSetComponentGUI->GetShowComponent()->isChecked());
 
   return m_PointSetComponentGUI;
 }
@@ -189,10 +192,13 @@ void QmitkSeedPointSetComponent::SetDataTreeName(std::string pointSetNodeName)
 /***************        ACTIVATED       ***************/
 void QmitkSeedPointSetComponent::Activated()
 {
+  if(m_PointSetComponentGUI->GetShowComponent()->isChecked())
+  {
   QmitkBaseFunctionalityComponent::Activated();
   m_Active = true;
   IsNodeExisting();
   CreatePointSetNode();
+  }
 }
 
 void QmitkSeedPointSetComponent::IsNodeExisting()
@@ -276,10 +282,10 @@ void QmitkSeedPointSetComponent::Deactivated()
   //}
   //BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
   //deactivate m_SeedPointSetNode when leaving SurfaceCreator
-  if (m_PointSetNode.IsNotNull())
-  {
+  //if (m_PointSetNode.IsNotNull())
+  //{
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-  }
+  //}
   //END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
 }
 

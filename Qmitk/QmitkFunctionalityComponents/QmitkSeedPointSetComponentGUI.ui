@@ -44,6 +44,9 @@
             <property name="checkable">
                 <bool>true</bool>
             </property>
+            <property name="checked">
+                <bool>true</bool>
+            </property>
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>

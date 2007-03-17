@@ -6,6 +6,7 @@
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 {
   m_initialized = false;
+  m_aviWriter   = NULL;
   m_dwRate = 20;
 }
 

@@ -67,7 +67,7 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
 bool mitk::MovieGeneratorOpenCV::AddFrame( void *data )
 {
   //cvSetImageData(m_currentFrame,data,m_width*3);
-  memcpy(data,m_currentFrame->imageData,m_width*m_height*3);
+  memcpy(m_currentFrame->imageData,data,m_width*m_height*3);
   cvWriteFrame(m_aviWriter,m_currentFrame);
   return true;
 }

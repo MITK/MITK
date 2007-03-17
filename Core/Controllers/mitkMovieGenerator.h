@@ -48,6 +48,13 @@ public:
 
   //!  uses given stepper and filename  to create a movie from the active OpenGL context    
   virtual bool WriteMovie();
+  
+  //!  alternativ way, which does not use a stepper; 
+  //   it adds a single frame to a movie each time the function is called
+  //   Initialization is done with first function call; Renderer and Filename have to be set up properly before.
+  virtual bool WriteCurrentFrameToMovie();
+  //!  releases a movie writer after usage of WriteCurrentFrameToMovie()
+  virtual void ReleaseMovieWriter();
 
 protected:
 
@@ -81,6 +88,8 @@ protected:
 
   //!  InitGenerator()  stores movie size  in those variables
   int           m_width, m_height;
+
+  bool          m_initialized;
 };
 
 } //namespace mitk

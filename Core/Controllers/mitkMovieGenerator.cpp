@@ -86,3 +86,36 @@ bool mitk::MovieGenerator::WriteMovie()
   }
   return ok;
 }
+
+bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
+{  
+  if (m_renderer) 
+  {
+    m_renderer->MakeCurrent();
+    
+    if(!m_initialized)
+    {
+      RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
+      m_initialized = InitGenerator();
+    }
+    if (!m_initialized) 
+    {
+      TerminateGenerator();
+      return false;
+    }
+    int imgSize = 3 * m_width * m_height;
+    GLbyte *data = new GLbyte[imgSize];
+    
+    RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
+    glReadPixels( 0, 0, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
+    AddFrame( data );    
+    delete[] data;  
+  }
+  return true;
+}
+
+void mitk::MovieGenerator::ReleaseMovieWriter()
+{
+  TerminateGenerator();
+  m_initialized = false;
+}

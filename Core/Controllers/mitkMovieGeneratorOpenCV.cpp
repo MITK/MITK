@@ -5,6 +5,7 @@
 
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 {
+  m_initialized = false;
   m_dwRate = 20;
 }
 
@@ -29,7 +30,18 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
   /*
   m_sFile = Name of the output video file. 
   -1 = 4-character code of codec used to compress the frames. For example, CV_FOURCC('P','I','M','1') is MPEG-1 codec, 
-  CV_FOURCC('M','J','P','G') is motion-jpeg codec etc. Under Win32 it is possible to pass -1 in order to choose compression 
+  CV_FOURCC('M','J','P','G') is motion-jpeg codec etc.
+  
+  CV_FOURCC('P','I','M','1')    = MPEG-1 codec
+  CV_FOURCC('M','J','P','G')    = motion-jpeg codec (does not work well)
+  CV_FOURCC('M', 'P', '4', '2') = MPEG-4.2 codec
+  CV_FOURCC('D', 'I', 'V', '3') = MPEG-4.3 codec
+  CV_FOURCC('D', 'I', 'V', 'X') = MPEG-4 codec
+  CV_FOURCC('U', '2', '6', '3') = H263 codec
+  CV_FOURCC('I', '2', '6', '3') = H263I codec
+  CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
+  
+  Under Win32 it is possible to pass -1 in order to choose compression 
   method and additional compression parameters from dialog. 
   m_dwRate = Framerate of the created video stream. 
   frame_size Size of video frames. 

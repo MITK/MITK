@@ -37,19 +37,26 @@ mitk::DataStorage::DataStorage()
 
 
 mitk::DataStorage::~DataStorage()
-{  
+{
   m_DataTree = NULL; 
 }
 
 
 mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
 {
+  // workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
+  // which happens when a PlugIn is re-initialized within Chili
+  if(s_Instance.IsNotNull())
+  {
+    s_Instance->m_DataTree->UnRegister();
+  }
   s_Instance = NULL;
   try
   {
     s_Instance = mitk::DataStorage::New();
     s_Instance->Initialize(tree);   // If no datastore created yet, and tree is NULL, then this will raise an exception, because the datastorage must be initialized with a datatree
-    tree->Register();   // needed to prevent premature destruction of the datatree (e.g. before the static DataStorage is destroyed)
+    /// \todo additional register on tree needed to prevent crash in itkTimeStamp.cxx (see bug #343)
+    tree->Register();
   }
   catch(...)
   {

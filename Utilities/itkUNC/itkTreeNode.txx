@@ -24,9 +24,8 @@ namespace itk
 
 /** Constructor */
 template <class TValueType>
-TreeNode<TValueType>::TreeNode()
+TreeNode<TValueType>::TreeNode() : m_Parent(NULL), m_Freeing(false)
 {
-  m_Parent = NULL;
 }
 
 /** Destructor */
@@ -40,6 +39,27 @@ TreeNode<TValueType>::~TreeNode()
     
   m_Children.clear();
   m_Data = 0;
+}
+
+template <class TValueType>
+void
+TreeNode<TValueType>::UnRegister() const
+{
+  int size = m_Children.size();
+  if((size > 0) && (size == GetReferenceCount()-1) && (m_Freeing==false))
+  {
+    // we have a dead reference loop, thus we are 
+    // going to free ourselves and our children
+    m_Freeing = true;
+    for ( int i=0; i<size; ++i )
+      {
+      m_Children[i]->SetParent(NULL);
+      }
+    const_cast<ChildrenListType*>(&m_Children)->clear();
+
+    //assert(m_ReferenceCount==1);
+  }
+  Superclass::UnRegister();
 }
 
 /** Return the parent node */
@@ -125,8 +145,10 @@ TreeNode<TValueType>
   pos = std::find(m_Children.begin(), m_Children.end(), n );
   if ( pos != m_Children.end() ) 
     {
-    n->SetParent(NULL);
+    //keep node alive just a bit longer
+    Pointer position = n;
     m_Children.erase(pos);
+    n->SetParent(NULL);
     return true;
     }
   return false;

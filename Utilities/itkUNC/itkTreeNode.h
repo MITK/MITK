@@ -109,12 +109,17 @@ public:
   /** Set the data of the node */
   //virtual void SetData(TValueType data) {m_Data = data;}
 
+  /** Special unregister to avoid dead reference loops
+    * between a parent and its children */
+  virtual void UnRegister() const;
+
 protected:
 
   TreeNode();
   virtual ~TreeNode();
   TValueType m_Data;
   Pointer m_Parent;
+  mutable bool m_Freeing;
   ChildrenListType m_Children;
 };
 

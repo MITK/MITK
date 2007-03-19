@@ -507,7 +507,8 @@ TreeIteratorBase<TTreeType>::Remove()
     int size = m_Position->CountChildren();
     for( int i=0; i< size; i++ ) 
       {
-      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+      //always remove first child (id 0)
+      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));
       m_Position->Remove( child );
       }
     }
@@ -520,7 +521,8 @@ TreeIteratorBase<TTreeType>::Remove()
     int size = m_Position->CountChildren();
     for( int i=0; i< size; i++ ) 
       {
-      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+      //always remove first child (id 0)
+      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));
       m_Position->Remove( child );
       }
     }

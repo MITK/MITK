@@ -123,6 +123,7 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
 		  m_Spheres->AddInput(sphere->GetOutput());
+      sphere->Delete();
 	  }
 
     // setup mapper, actor and add to assembly

@@ -106,6 +106,34 @@ mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property, vtkF
   SetName( name );
 }
 
+bool mitk::MaterialProperty::Assignable(const BaseProperty& other) const
+{
+  try
+  {
+    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away! Thanks.
+    return true;
+  }
+  catch (std::bad_cast)
+  {
+  }
+  return false;
+}
+
+mitk::BaseProperty& mitk::MaterialProperty::operator=(const mitk::BaseProperty& other)
+{
+  try
+  {
+    const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+    Initialize(otherProp, false);
+  }
+  catch (std::bad_cast)
+  {
+    // nothing to do then
+  }
+
+  return *this;
+}
 
 void mitk::MaterialProperty::SetDataTreeNode( mitk::DataTreeNode* node )
 {

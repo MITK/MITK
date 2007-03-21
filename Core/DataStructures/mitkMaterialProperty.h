@@ -135,6 +135,8 @@ public:
      */
     MaterialProperty( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "");
 
+    virtual bool Assignable(const BaseProperty& other) const;
+    virtual BaseProperty& operator=(const BaseProperty& other);
     
     /**
      * The material Property is associated with a data tree node, which may be

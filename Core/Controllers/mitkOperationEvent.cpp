@@ -19,9 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkOperationEvent.h"
 
-//##ModelId=3E9B07B40374
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;
-//##ModelId=3E9B07B5002B
 int mitk::UndoStackItem::m_CurrGroupEventId = 0;
 
 bool mitk::UndoStackItem::m_IncrObjectEventId = false;
@@ -56,37 +54,31 @@ void mitk::UndoStackItem::ExecuteIncrement()
   }
 }
 
-//##ModelId=3E9B07B501A7
 int mitk::UndoStackItem::GetCurrObjectEventId()
 {
   return m_CurrObjectEventId;
 }
 
-//##ModelId=3E9B07B50220
 int mitk::UndoStackItem::GetCurrGroupEventId()
 {
   return m_CurrGroupEventId;
 }
 
-//##ModelId=3EF099E90289
 void mitk::UndoStackItem::IncCurrObjectEventId()
 {
   m_IncrObjectEventId = true;
 }
 
-//##ModelId=3EF099E90269
 void mitk::UndoStackItem::IncCurrGroupEventId()
 {
   m_IncrGroupEventId = true;
 }
 
-//##ModelId=3EF099E90259
 int mitk::UndoStackItem::GetObjectEventId()
 {
   return m_ObjectEventId;
 }
 
-//##ModelId=3EF099E90249
 int mitk::UndoStackItem::GetGroupEventId()
 {
   return m_GroupEventId;
@@ -109,13 +101,11 @@ void mitk::UndoStackItem::ReverseAndExecute()
 
 // ******************** mitk::OperationEvent ********************
 
-//##ModelId=3E5F610D00BB
 mitk::Operation* mitk::OperationEvent::GetOperation()
 {
   return m_Operation;
 }
 
-//##ModelId=3E957AE700E6
 mitk::OperationEvent::OperationEvent(OperationActor* destination, 
                                      Operation* operation, Operation* undoOperation,
                                      std::string description)
@@ -126,14 +116,12 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
   // nothing to do
 }
 
-//##ModelId=3F0451960212
 mitk::OperationEvent::~OperationEvent()
 {
   delete m_Operation;
   delete m_UndoOperation;
 }
 
-//##ModelId=3E957C1102E3
 //##Documentation
 //##  swaps the Undo and Redo- operation and changes m_Reversed
 void mitk::OperationEvent::ReverseOperations()
@@ -155,7 +143,6 @@ void mitk::OperationEvent::ReverseAndExecute()
     m_Destination->ExecuteOperation( m_Operation );
 }
 
-//##ModelId=3E9B07B502AC
 mitk::OperationActor* mitk::OperationEvent::GetDestination() 
 {
   return m_Destination;

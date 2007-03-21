@@ -51,7 +51,6 @@ class UndoStackItem
 
     virtual ~UndoStackItem();
   
-    //##ModelId=3E9B07B50220
     //##Documentation
     //## @brief For combining operations in groups
     //##
@@ -61,7 +60,6 @@ class UndoStackItem
     //## then they share one group and will be undone in case of Undo(fine==false)
     static int GetCurrGroupEventId();
 
-    //##ModelId=3E9B07B501A7
     //##Documentation
     //## @brief For combining operations in Objects
     //##
@@ -73,62 +71,55 @@ class UndoStackItem
     //## for example: OE_statechange and OE_addlastpoint
     static int GetCurrObjectEventId();
 
-    //##ModelId=3EF099E90249
     //##Documentation
     //## @brief Returns the GroupEventId for this object
     int GetGroupEventId();
 
-    //##ModelId=3EF099E90259
     //##Documentation
     //## @brief Returns the ObjectEventId for this object
     int GetObjectEventId();
   
-    //##NoModelId
     //##Documentation
     //## @brief Returns the textual description of this object
     std::string GetDescription();
 
-    friend class StateMachine; //for IncCurrGroupEventId
-    friend class EventMapper;  //for IncCurrObjectEventId
-    
     virtual void ReverseOperations();
     virtual void ReverseAndExecute();
 
-  protected:
-    //##ModelId=3E9B07B500D5
     //##Documentation
-    //## @brief true, if operation and undooperation have been swaped/changed
-    bool m_Reversed;
+    //## @brief Sets the current ObjectEventId to be incremended when ExecuteIncrement is called
+    //## For example if a button click generates operations the ObjectEventId has to be incremented to be able to undo the operations.
+    //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one event. 
+    //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be undone with one Undo call.
+    static void IncCurrObjectEventId();
+
+    //##Documentation
+    //## @brief Sets the current GroupEventId to be incremended when ExecuteIncrement is called
+    //## For example if a button click generates operations the GroupEventId has to be incremented to be able to undo the operations.
+    //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one event. 
+    //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be undone with one Undo call.
+    static void IncCurrGroupEventId();
 
     //##Documentation
     //## @brief Executes the incrementation of objectEventId and groupEventId if they are set to be incremented
     static void ExecuteIncrement();
 
-    //##ModelId=3EF099E90289
+  protected:
     //##Documentation
-    //## @brief Sets the current ObjectEventId to be incremended when ExecuteIncrement is called
-    static void IncCurrObjectEventId();
+    //## @brief true, if operation and undooperation have been swaped/changed
+    bool m_Reversed;
 
-    //##ModelId=3EF099E90269
-    //##Documentation
-    //## @brief Sets the current GroupEventId to be incremended when ExecuteIncrement is called
-    static void IncCurrGroupEventId();
-  
   private:
-    //##ModelId=3E9B07B40374
     static int m_CurrObjectEventId;
 
-    //##ModelId=3E9B07B5002B
     static int m_CurrGroupEventId;
   
     static bool m_IncrObjectEventId;
   
     static bool m_IncrGroupEventId;
   
-    //##ModelId=3E7F488E022B
     int m_ObjectEventId;
 
-    //##ModelId=3E7F48C60335
     int m_GroupEventId;
   
     std::string m_Description;
@@ -138,7 +129,6 @@ class UndoStackItem
 
 };
 
-//##ModelId=3E5F60F301A4
 //##Documentation
 //## @brief Represents a pair of operations: undo and the according redo.
 //##
@@ -152,23 +142,18 @@ class UndoStackItem
 class OperationEvent : public UndoStackItem
 {
 public:
-  //##ModelId=3E957AE700E6
   //OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId );
   OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, std::string description = "" );
 
-  //##ModelId=3F0451960212
   virtual ~OperationEvent();
 
-  //##ModelId=3E5F610D00BB
   Operation* GetOperation();
 
-  //##ModelId=3E9B07B502AC
   //## @brief Returns the destination of the operations
   OperationActor* GetDestination();
 
   friend class UndoModel;
 
-  //##ModelId=3E957C1102E3  //##Documentation
   //## @brief Swaps the two operations and sets a flag, 
   //## that it has been swapped and do is undo and undo is do
   virtual void ReverseOperations();
@@ -176,13 +161,10 @@ public:
 protected:
 
 private:
-  //##ModelId=3E5F61DB00D6
   OperationActor* m_Destination;
 
-  //##ModelId=3E5F6B1E0107
   Operation* m_Operation;
 
-  //##ModelId=3E5F6B2E0060
   Operation* m_UndoOperation;
 
   OperationEvent(OperationEvent&);             // hide copy constructor

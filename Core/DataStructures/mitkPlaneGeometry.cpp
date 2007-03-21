@@ -106,7 +106,7 @@ void PlaneGeometry::WorldToIndex( const Point2D &pt_mm, Point2D &pt_units ) cons
 }
 
 
-void PlaneGeometry::IndexToWorld( const Point2D &atPt2d_units, 
+void PlaneGeometry::IndexToWorld( const Point2D &/*atPt2d_units*/, 
   const Vector2D &vec_units, Vector2D &vec_mm) const
 {
   vec_mm[0] = m_ScaleFactorMMPerUnitX * vec_units[0];
@@ -115,7 +115,7 @@ void PlaneGeometry::IndexToWorld( const Point2D &atPt2d_units,
 
 
 void
-PlaneGeometry::WorldToIndex( const Point2D &atPt2d_mm,
+PlaneGeometry::WorldToIndex( const Point2D &/*atPt2d_mm*/,
   const Vector2D &vec_mm, Vector2D &vec_units) const
 {
   vec_units[0] = vec_mm[0] * ( 1.0 / m_ScaleFactorMMPerUnitX );

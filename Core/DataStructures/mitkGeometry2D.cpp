@@ -128,7 +128,7 @@ mitk::Geometry2D::WorldToIndex(
 
 
 void 
-mitk::Geometry2D::IndexToWorld(const mitk::Point2D &atPt2d_units, 
+mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, 
   const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
@@ -142,7 +142,7 @@ mitk::Geometry2D::IndexToWorld(const mitk::Point2D &atPt2d_units,
 
 
 void 
-mitk::Geometry2D::WorldToIndex(const mitk::Point2D &atPt2d_mm,
+mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
   const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
   itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general" \
@@ -210,8 +210,8 @@ mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
 
 
 void 
-mitk::Geometry2D::Map(const mitk::Point2D &atPt2d_mm,
-  const mitk::Vector2D &vec2d_mm, mitk::Vector3D &/*vec3d_mm*/) const
+mitk::Geometry2D::Map(const mitk::Point2D &/*atPt2d_mm*/,
+  const mitk::Vector2D &/*vec2d_mm*/, mitk::Vector3D &/*vec3d_mm*/) const
 {
   //@todo implement parallel to the other Map method!
   assert(false);

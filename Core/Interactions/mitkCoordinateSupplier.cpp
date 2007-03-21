@@ -152,15 +152,6 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         }
         return ok;
     }
-    else if(action->GetActionId() == AcREMOVEPOINT)
-    {
-      if (m_Destination == NULL)
-        return false;
-      mitk::Point3D p;
-      doOp = new mitk::PointOperation(OpREMOVE, p );
-      m_Destination->ExecuteOperation( doOp );
-      ok = true;
-    }
 
     if(doOp!=NULL)
       delete doOp;

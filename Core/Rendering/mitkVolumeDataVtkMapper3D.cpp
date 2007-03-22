@@ -41,7 +41,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCallbackCommand.h>
 #include <vtkImageShiftScale.h>
 
-#include <qeventloop.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
 #include <vtkVolumeTextureMapper2D.h> 

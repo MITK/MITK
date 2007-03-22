@@ -18,12 +18,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkRenderingManager.h"
+#include "QmitkAbortEventFilter.h"
 #include <qtimer.h>
+
 
 QmitkRenderingManager::QmitkRenderingManager()
 {
   m_QmitkRenderingManagerInternal = new QmitkRenderingManagerInternal;
   m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
+}
+
+void QmitkRenderingManager::DoMonitorRendering()
+{
+  QmitkAbortEventFilter::GetInstance()->ProcessEvents();
+}
+
+void QmitkRenderingManager::DoFinishAbortRendering()
+{ 
+  QmitkAbortEventFilter::GetInstance()->IssueQueuedEvents();
 }
 
 QmitkRenderingManager::~QmitkRenderingManager()

@@ -47,6 +47,7 @@ namespace mitk
       itkGetMacro(Min,int);
       itkGetMacro(Max,int);
       itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
+      itkGetMacro(GradientOpacityFunction,vtkPiecewiseFunction*); 
       itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
       itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
       void InitializeByMitkImage(const mitk::Image* image);
@@ -54,20 +55,24 @@ namespace mitk
       ~TransferFunction() {
         m_ColorTransferFunction->Delete();
         m_ScalarOpacityFunction->Delete();
+        m_GradientOpacityFunction->Delete();
       }
       itkNewMacro(Self);
     protected:
-      TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL)  {
+      TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_GradientOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL)  {
         this->m_ScalarOpacityFunction->Initialize();
+        this->m_GradientOpacityFunction->Initialize();
       }
-      TransferFunction() : m_Min(0), m_Max(255) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL) {
+      TransferFunction() : m_Min(0), m_Max(255) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()),m_GradientOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL) {
         this->m_ScalarOpacityFunction->Initialize();
+        this->m_GradientOpacityFunction->Initialize();
       }
        int m_Min;
       int m_Max;
 
       vtkColorTransferFunction* m_ColorTransferFunction;
       vtkPiecewiseFunction* m_ScalarOpacityFunction;
+      vtkPiecewiseFunction* m_GradientOpacityFunction;
       mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram; 
 
   };

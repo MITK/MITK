@@ -80,16 +80,13 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
 	m_Contour->Delete();
 }
 
-void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::MeshVtkMapper3D::GenerateData()
 {
-  if(IsVisible(renderer)==false)
-  {
-    m_PropAssemply->VisibilityOff();
-    return;
-  }
-  m_PropAssemply->VisibilityOn();
+  if(m_PropAssemply->GetParts()->IsItemPresent(m_SpheresActor))
+    m_PropAssemply->RemovePart(m_SpheresActor);
+  if(m_PropAssemply->GetParts()->IsItemPresent(m_ContourActor))
+    m_PropAssemply->RemovePart(m_ContourActor);
 
-  m_PropAssemply->GetParts()->RemoveAllItems();
 	m_Spheres->RemoveAllInputs();
   m_Contour->Initialize();
 
@@ -103,9 +100,19 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 	int j;
 
   vtkFloatingPointType rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  mitk::Color tmpColor;
 
   // check for color prop and use it for rendering if it exists
-  GetColor((float*)rgba, renderer);
+  m_DataTreeNode->GetColor((float*)rgba, NULL); 
+ 
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer())->GetValue();
+    rgba[0] = tmpColor[0];
+    rgba[1] = tmpColor[1];
+    rgba[2] = tmpColor[2];
+    rgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+  }
 
   if(mesh->GetNumberOfPoints()>0)
   {
@@ -146,7 +153,7 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       // setup mapper, actor and add to assembly
       m_ContourMapper->SetInput(m_Contour);
       bool wireframe=true;
-      GetDataTreeNode()->GetVisibility(wireframe, renderer, "wireframe");
+      GetDataTreeNode()->GetVisibility(wireframe, NULL, "wireframe");
       if(wireframe)
         m_ContourActor->GetProperty()->SetRepresentationToWireframe();
       else
@@ -154,5 +161,39 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       m_ContourActor->GetProperty()->SetColor(rgba);
       m_PropAssemply->AddPart(m_ContourActor);
     }
+  }
+}
+
+
+void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false)
+  {
+    m_SpheresActor->VisibilityOff();
+    m_ContourActor->VisibilityOff();
+    return;
+  }
+
+  bool makeContour = false;
+  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
+
+  if (makeContour)
+  {
+    m_ContourActor->VisibilityOn();
+  }
+  else
+  {
+    m_ContourActor->VisibilityOff();
+  }
+
+  bool showPoints = true;
+  this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+  if(showPoints)
+  {
+    m_SpheresActor->VisibilityOn();
+  }
+  else
+  {
+    m_SpheresActor->VisibilityOff();
   }
 }

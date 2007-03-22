@@ -68,6 +68,8 @@ class MeshVtkMapper3D : public BaseVtkMapper3D
 
     virtual ~MeshVtkMapper3D();
 
+    virtual void GenerateData();
+
     virtual void GenerateData(mitk::BaseRenderer* renderer);
 
     vtkPropAssembly* m_PropAssemply;

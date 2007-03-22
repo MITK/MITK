@@ -95,7 +95,7 @@ SliceNavigationController::SetInputWorldGeometry( const Geometry3D *geometry )
   if ( m_InputWorldGeometry != geometry )
   {
     m_InputWorldGeometry = geometry;
-    Modified();
+    this->Modified();
   }
 }
 

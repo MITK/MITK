@@ -21,9 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcolordialog.h>
 #include <mitkRenderingManager.h>
 
-QmitkColorTransferFunctionCanvas::QmitkColorTransferFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QmitkTransferFunctionCanvas(parent,name,f), m_ColorTransferFunction(0) { 
+QmitkColorTransferFunctionCanvas
+::QmitkColorTransferFunctionCanvas(QWidget * parent, const char * name, WFlags f)
+: QmitkTransferFunctionCanvas(parent,name,f), m_ColorTransferFunction(0) 
+{ 
 
 }
+
 void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* ) {
 
   QPainter painter( this );
@@ -83,9 +87,16 @@ void QmitkColorTransferFunctionCanvas::DoubleClickOnHandle(int handle) {
   }
 }
 
-void QmitkColorTransferFunctionCanvas::MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) {
+void 
+QmitkColorTransferFunctionCanvas
+::MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) 
+{
   vtkFloatingPointType color[3];
   m_ColorTransferFunction->GetColor(GetFunctionX(index),color);
   RemoveFunctionPoint(GetFunctionX(index));
   m_ColorTransferFunction->AddRGBPoint(pos.first,color[0],color[1],color[2]);
+}
+
+void QmitkColorTransferFunctionCanvas::AddRGB(double x, double r, double g, double b){
+ m_ColorTransferFunction->AddRGBPoint(x,r,g,b);
 }

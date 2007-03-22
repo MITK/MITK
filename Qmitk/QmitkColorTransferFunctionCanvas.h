@@ -51,11 +51,38 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
     vtkFloatingPointType GetFunctionX(int index) {
       return m_ColorTransferFunction->GetDataPointer()[index*4];
     }
-    int GetFunctionSize() {
+    int GetFunctionSize(){
       return m_ColorTransferFunction->GetSize();
     }
     void DoubleClickOnHandle(int handle);
     void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
+
+    void AddRGB(double x, double r, double g, double b);
+
+    int GetFunctionMax(){
+      return m_ColorTransferFunction->GetRange()[1];
+    }
+    int GetFunctionMin(){
+      return m_ColorTransferFunction->GetRange()[0];
+    }
+    
+    int GetFunctionRange(){
+      double range;
+      if((m_ColorTransferFunction->GetRange()[0])==0){
+        range = m_ColorTransferFunction->GetRange()[1];
+        return range;
+      }
+      else{
+        range = (m_ColorTransferFunction->GetRange()[1])-(m_ColorTransferFunction->GetRange()[0]);
+        return range;
+      }
+    }
+
+    void RemoveAllFunctionPoints(){
+    m_ColorTransferFunction->AddRGBSegment(this->GetFunctionMin(),1,0,0,this->GetFunctionMax(),1,1,0);      
+    }
+
+
   protected: 
     vtkColorTransferFunction* m_ColorTransferFunction;
 

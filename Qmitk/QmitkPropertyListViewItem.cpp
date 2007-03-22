@@ -161,7 +161,7 @@ void QmitkPropertyListViewItem::UpdateView()
      if (QCheckBox* cb = dynamic_cast<QCheckBox*>(m_Control)) {
       cb ->setChecked(boolProp->GetValue());
      } else {
-       std::cout << "warning: non-checkbox control for bool property " << m_Name << std::endl;
+       //std::cout << "warning: non-checkbox control for bool property " << m_Name << std::endl;
      }
   }
   else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
@@ -169,7 +169,7 @@ void QmitkPropertyListViewItem::UpdateView()
     if (QLineEdit* qle = dynamic_cast<QLineEdit*>(m_Control)) {
     qle->setText(QString(stringProp->GetValue()));
 } else {
-       std::cout << "warning: non-lineedit control for string property " << m_Name << std::endl;
+       //std::cout << "warning: non-lineedit control for string property " << m_Name << std::endl;
 }
 
   }

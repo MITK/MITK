@@ -508,12 +508,12 @@ void QmitkMaterialEditor::setInline( bool i )
   {
     m_PbOK->hide();
     m_PbCancel->hide();
-    m_PbSelectColor->hide();
+    //m_PbSelectColor->hide();
   }
   else
   {
     m_PbOK->show();
     m_PbCancel->show();
-    m_PbSelectColor->show();
+    //m_PbSelectColor->show();
   }
 }

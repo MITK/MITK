@@ -8,7 +8,6 @@
 #include <ipMsg/ipMsgTypes.h>
 #include <ipPic/ipTypes.h>
 
-#include "QmitkEventCollector.h"
 
 class QcMITKTask;
 class SampleApp;

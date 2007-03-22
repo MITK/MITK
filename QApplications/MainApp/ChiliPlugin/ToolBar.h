@@ -3,7 +3,7 @@
 
 #include <qwidget.h>
 #include <qlayout.h>
-#include <qclightbox.h>
+#include <chili/qclightbox.h>
 #include <chili/plugin.h>
 
 class QWidget;

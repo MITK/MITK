@@ -1,8 +1,13 @@
-#include <QcMITKSamplePlugin.h>
+#include <QmitkStdMultiWidget.h>
+#include <QmitkCommonFunctionality.h>
+#include <SampleApp.h>
+#include <ToolBar.h>
+#include <QmitkEventCollector.h>
+#include <QmitkChili3ConferenceKitFactory.h>
 
-#include <plugin.xpm>
-#include <qclightbox.h>
-#include <qclightboxmanager.h>
+#include <chili/plugin.xpm>
+#include <chili/qclightbox.h>
+#include <chili/qclightboxmanager.h>
 #include <QcMITKTask.h>
 
 #include <qlayout.h>
@@ -20,22 +25,17 @@
 #include <mitkLightBoxImageReader.h>
 #include <mitkDataTreeHelper.h>
 #include <mitkConferenceToken.h>
-#include <QmitkEventCollector.h>
 #include <mitkConferenceEventMapper.h>
-#include <QmitkChili3ConferenceKitFactory.h>
 
-#include <QmitkStdMultiWidget.h>
-#include <QmitkCommonFunctionality.h>
 
-#include <SampleApp.h>
-#include <ToolBar.h>
 #include <mitkChiliPlugin.h>
 #include <mitkChiliPluginFactory.h>
 
-#include <ipPic.h>
-#include <ipFunc.h>
+#include <ipPic/ipPic.h>
+#include <ipFunc/ipFunc.h>
 #include <ipDicom/ipDicom.h>
 
+#include <QcMITKSamplePlugin.h>
 
 // create event-logging object (ConferenceKit)
 Chili3ConferenceKitFactory chiliconferencekitfactory;

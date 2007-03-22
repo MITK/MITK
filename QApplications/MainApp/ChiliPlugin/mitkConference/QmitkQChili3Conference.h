@@ -14,6 +14,8 @@ class QChili3Conference:public mitk::ConferenceKit
     typedef itk::SmartPointer<Self>   Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
 
+    mitkClassMacro(QChili3Conference,mitk::ConferenceKit);
+
     itkNewMacro(Self);
 
     //static mitk::ConferenceKit::Pointer QChili3Conference::GetInstance();

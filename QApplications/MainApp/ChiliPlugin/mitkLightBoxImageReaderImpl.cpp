@@ -27,13 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdlib.h>
 
 #include "QcMITKSamplePlugin.h"
-#include <plugin.h>
-#include <qclightbox.h>
-#include <qclightboxmanager.h>
-#include <isg.h>
+#include <chili/plugin.h>
+#include <chili/qclightbox.h>
+#include <chili/qclightboxmanager.h>
+#include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
-#include <ipPic.h>
-#include <ipFunc.h>
+#include <ipPic/ipPic.h>
+#include <ipFunc/ipFunc.h>
 #include <qmessagebox.h>
 
 void mitk::LightBoxImageReaderImpl::SetLightBox(QcLightbox* lightbox)

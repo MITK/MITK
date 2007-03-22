@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLightBoxResultImageWriterImpl.h"
 
-#include <plugin.h>
-#include <qclightbox.h>
-#include <qclightboxmanager.h>
-#include <isg.h>
+#include <chili/plugin.h>
+#include <chili/qclightbox.h>
+#include <chili/qclightboxmanager.h>
+#include <chili/isg.h>
 
 #include <mitkImage.h>
 #include <mitkImageSliceSelector.h>

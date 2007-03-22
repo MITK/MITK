@@ -48,7 +48,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
+
+#if (VTK_MAJOR_VERSION >= 5)
 #include <vtkVolumeTextureMapper3D.h>
+#endif
 
 #include <itkMultiThreader.h>
 
@@ -63,7 +66,9 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_Firstcall = true;
 
+#if (VTK_MAJOR_VERSION >= 5)
   m_T3DMapper = vtkVolumeTextureMapper3D::New();
+#endif
   m_LowResMapper =  vtkVolumeTextureMapper2D::New();
   m_MedResMapper =  vtkVolumeRayCastMapper::New();
   m_HiResMapper = vtkVolumeRayCastMapper::New();
@@ -103,11 +108,16 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   int m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumeProperty2,0.0);
   //int lowres_id = m_VolumeLOD->AddLOD(m_LowResMapper,m_VolumeProperty,0.0);
-  #ifdef WIN32
+
+#ifdef WIN32
+#if (VTK_MAJOR_VERSION >= 5)
   m_MedResID = m_VolumeLOD->AddLOD(m_T3DMapper,m_VolumeProperty,0.0); // TextureMapper3D
-  #else
+#elif
   m_MedResID = m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
-  #endif
+#endif
+#else
+  m_MedResID = m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
+#endif
 
 
   m_VolumeLOD->SetLODLevel(m_HiResID,1.0);
@@ -288,8 +298,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_LowResMapper->SetInput(m_Resampler->GetOutput());
   m_MedResMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
   m_HiResMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
+
+#if (VTK_MAJOR_VERSION >= 5)
   //m_T3DMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
   m_T3DMapper->SetInput(m_Resampler->GetOutput());
+#endif
   
   vtkPiecewiseFunction *opacityTransferFunction;
   vtkPiecewiseFunction *gradientTransferFunction;

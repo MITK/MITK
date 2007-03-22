@@ -35,7 +35,10 @@ class vtkImageShiftScale;
 class vtkImageChangeInformation;
 class vtkLODProp3D;
 class vtkImageResample;
+
+#if (VTK_MAJOR_VERSION >= 5)
 class vtkVolumeTextureMapper3D;
+#endif
 
 namespace mitk {
 
@@ -74,9 +77,13 @@ protected:
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
   vtkVolumeTextureMapper2D* m_LowResMapper;
-  vtkVolumeTextureMapper3D* m_T3DMapper;
   vtkVolumeRayCastMapper* m_MedResMapper;
   vtkVolumeRayCastMapper* m_HiResMapper;
+
+#if (VTK_MAJOR_VERSION >= 5)
+  vtkVolumeTextureMapper3D* m_T3DMapper;
+#endif
+
   vtkImageResample* m_Resampler; 
   vtkLODProp3D* m_VolumeLOD;
   int m_MedResID;

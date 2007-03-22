@@ -1,2 +1,2 @@
 CREATE_CORE_LIB()
-TARGET_LINK_LIBRARIES(mitkDataStructures ipFunc)
+TARGET_LINK_LIBRARIES(mitkDataStructures ${IPFUNC_LIBRARY})

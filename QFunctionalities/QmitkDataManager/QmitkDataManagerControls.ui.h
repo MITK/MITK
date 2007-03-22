@@ -123,7 +123,7 @@ void QmitkDataManagerControls::RemoveButtonClicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
 
-  switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want do delete this item?"),
+  switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want to delete this item?"),
         QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
   {
     case QMessageBox::Yes: //Remove the item from view and tree

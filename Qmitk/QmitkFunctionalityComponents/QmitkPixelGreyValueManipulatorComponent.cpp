@@ -27,6 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"
+#include <mitkCuboid.h>
+#include <mitkCone.h>
+#include <mitkEllipsoid.h>
+#include <mitkCylinder.h>
+#include <mitkExtrudedContour.h>
+#include "QmitkStdMultiWidget.h"
+#include <mitkDataTreeNodeFactory.h>
 
 #include <mitkImageAccessByItk.h>
 
@@ -38,22 +45,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
 : QmitkFunctionalityComponentContainer(parent, parentName),
+m_MultiWidget(mitkStdMultiWidget),
 m_PixelGreyValueManipulatorComponentGUI(NULL),
-  m_MitkImage(NULL),
-  m_Segmentation(NULL),
-  m_MitkImageIterator(NULL),
-  m_PixelChangedImage(NULL),
-  m_PixelChangedImageNode(NULL),
-  m_SegmentedShiftResultNode(NULL),
-  m_ItNewBuildSeg(NULL),
-  m_SegmentationNode(NULL),
-  m_PixelChangedImageCounter(0),
-  m_ManipulationMode(0),
-  m_ManipulationArea(0),
-  m_PointSet(NULL),
-  m_DataIt(it)
+m_MitkImage(NULL),
+m_Segmentation(NULL),
+m_MitkImageIterator(NULL),
+m_PixelChangedImage(NULL),
+m_PixelChangedImageNode(NULL),
+m_SegmentedShiftResultNode(NULL),
+m_ItNewBuildSeg(NULL),
+m_SegmentationNode(NULL),
+m_PixelChangedImageCounter(0),
+m_ManipulationMode(0),
+m_ManipulationArea(0),
+m_PointSet(NULL),
+m_DataIt(it),
+m_BoundingObject(NULL),
+m_BoundingObjectInteractor(NULL),
+m_BoundingObjectExistingFlag(false)
 {
   SetDataTreeIterator(it);
   SetAvailability(true);
@@ -74,7 +85,7 @@ void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTree
   m_DataTreeIterator = it;
 }
 
- /***************   GET IMAGE CONTENT   ***************/
+/***************   GET IMAGE CONTENT   ***************/
 QGroupBox*  QmitkPixelGreyValueManipulatorComponent::GetImageContent()
 {
   return (QGroupBox*) m_PixelGreyValueManipulatorComponentGUI->GetImageContent();
@@ -89,8 +100,8 @@ QmitkDataTreeComboBox* QmitkPixelGreyValueManipulatorComponent::GetTreeNodeSelec
 /************ Update DATATREECOMBOBOX(ES) *************/
 void QmitkPixelGreyValueManipulatorComponent::UpdateDataTreeComboBoxes()
 {
-    m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
-    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
+  m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->Update();
+  m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->Update();
 }
 
 /***************       CONNECTIONS      ***************/
@@ -113,9 +124,13 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
     //Button "create new manipulated image" pressed
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetCreateNewManipulatedImageButton()), SIGNAL(clicked()), (QObject*) this, SLOT(PipelineControllerToCreateManipulatedImage()));
     connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HideOrShowValue2(int))); 
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HandleSegmentationArea(int))); 
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(HandleSegmentationArea(int))); 
 
     //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
-    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
+    connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetBoundingObjectTypeComboBox()),  SIGNAL(activated(int)), (QObject*) this, SLOT(CreateBoundingBox(int))); 
+
+
   }
 }
 
@@ -228,7 +243,7 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
   }
   m_PixelGreyValueManipulatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation"));
-  //CreateConnections();
+
   CreatePointSet();
   return m_PixelGreyValueManipulatorComponentGUI;
 }
@@ -236,13 +251,13 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
 /*************** GET CONTENT CONTAINER  ***************/
 QGroupBox * QmitkPixelGreyValueManipulatorComponent::GetContentContainer()
 {
- return m_PixelGreyValueManipulatorComponentGUI->GetPixelManipulatorContentGroupBox();
+  return m_PixelGreyValueManipulatorComponentGUI->GetPixelManipulatorContentGroupBox();
 }
 
 /************ GET MAIN CHECK BOX CONTAINER ************/
 QGroupBox * QmitkPixelGreyValueManipulatorComponent::GetMainCheckBoxContainer()
 {
- return m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox();
+  return m_PixelGreyValueManipulatorComponentGUI->GetPixelGreyValueManipulatorGroupBox();
 }
 
 /*************** CREATE SEEDPOINT WIDGET **************/
@@ -251,11 +266,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
   m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);
   m_PointSet->CreateControlWidget(m_PixelGreyValueManipulatorComponentGUI);
   m_AddedChildList.push_back(m_PointSet);
-    //  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    //{
-    //  std::cout << "In der ChildList ist  " << m_AddedChildList[i]->GetFunctionalityName() << " drin." << std::endl;
-    //  std::cout << "In der ChildList ist  " << m_AddedChildList[i] << " drin." << std::endl;
-    //} 
+
   m_PixelGreyValueManipulatorComponentGUI->layout()->add(m_PointSet->GetGUI());
   m_PointSet->CreateConnections();
   m_PixelGreyValueManipulatorComponentGUI->repaint();
@@ -282,6 +293,10 @@ void QmitkPixelGreyValueManipulatorComponent::Activated()
   {
     m_AddedChildList[i]->Activated();
   } 
+  if(m_BoundingObject)
+  {
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+  }
 }
 
 /***************       DEACTIVATED      ***************/
@@ -292,6 +307,10 @@ void QmitkPixelGreyValueManipulatorComponent::Deactivated()
   {
     m_AddedChildList[i]->Deactivated();
   } 
+  if(m_BoundingObjectInteractor)
+  {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+  }
 }
 
 /***************      SET THRESHOLD     ***************/
@@ -312,6 +331,7 @@ void QmitkPixelGreyValueManipulatorComponent::ShowImageContent(bool)
   m_PixelGreyValueManipulatorComponentGUI->GetImageContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSelectDataGroupBox()->isChecked());
 }
 
+///***************   HIDE OR SHOW VALUE "  **************/
 void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
 { 
   if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem() == 2)
@@ -324,9 +344,122 @@ void QmitkPixelGreyValueManipulatorComponent::HideOrShowValue2(int /*index*/)
   }
 }
 
+
+///*************CREATE / DESTROY BOUNDING BOX************/
+void QmitkPixelGreyValueManipulatorComponent::HandleSegmentationArea(int area)
+{ 
+  m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->setChecked(false);
+  switch(area)
+  {
+  case 0: 
+    //nothing selected
+    if(m_BoundingObjectInteractor)
+    {
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+    }
+    break;
+  case 1: 
+    //whole image
+    if(m_BoundingObjectInteractor)
+    {
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+    }
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->isChecked());
+    break;
+  case 2: 
+    if(m_BoundingObjectInteractor)
+    {
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+    }
+    //segmentation
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->setChecked(true);
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->isChecked());
+    break;
+  case 3:
+    //bounding object
+    m_PixelGreyValueManipulatorComponentGUI->GetSegmentationContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->isChecked());
+    break;
+  default:
+    if(m_BoundingObjectInteractor)
+    {
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+    }
+    break;
+  }
+}
+
+void QmitkPixelGreyValueManipulatorComponent::CreateBoundingBox(int boundingObjectType)
+{
+  switch(boundingObjectType)
+  {
+  case 0: 
+    m_BoundingObject = mitk::Cuboid::New();
+    break;
+  case 1: 
+    m_BoundingObject = mitk::Cuboid::New();
+    break;
+  case 2: 
+    m_BoundingObject = mitk::Cone::New();
+    break;
+  case 3:
+    m_BoundingObject = mitk::Cylinder::New();
+    break;
+  case 4:
+    m_BoundingObject = mitk::Ellipsoid::New();
+    break;
+  case 5:
+    m_BoundingObject = mitk::ExtrudedContour::New();
+    break;
+  default:
+    m_BoundingObject = mitk::Cuboid::New();
+    break;
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+
+  if(!m_BoundingObjectExistingFlag)
+  {
+    AddBoundingObjectToNode();
+  }
+  else
+  {
+    m_BoundingObjectNode->SetData( m_BoundingObject );
+      mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+  m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+  }
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+
+  m_BoundingObjectExistingFlag = true;
+
+}
+
+void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::DataTreeIteratorClone& iterToNode*/)
+{
+  m_BoundingObjectNode = mitk::DataTreeNode::New(); 
+  mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+  m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+  mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_BoundingObjectNode );
+  m_BoundingObjectNode->SetData( m_BoundingObject );
+  m_BoundingObjectNode->SetProperty( "name", new mitk::StringProperty( "BoundingObject" ) );
+  m_BoundingObjectNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
+  m_BoundingObjectNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
+  m_BoundingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
+  m_BoundingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+
+  m_BoundingObjectNode->SetVisibility(true);
+  mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
+  iteratorBoundingObject->Add(m_BoundingObjectNode);
+  m_BoundingObjectInteractor = mitk::AffineInteractor::New( "AffineInteractions ctrl-drag", m_BoundingObjectNode );
+}
+
+
 /****PIPELINE CONTROLLER TO CREATE MANIPULATED IMAGE***/
 void QmitkPixelGreyValueManipulatorComponent::PipelineControllerToCreateManipulatedImage()
 {
+  if(!(m_BoundingObjectExistingFlag))
+  {
+   CreateBoundingBox(0);
+  }
+
   int manipulationMode;
   int manipulationArea;
   GetManipulationModeAndAreaFromGUI(manipulationMode, manipulationArea);
@@ -367,7 +500,7 @@ void QmitkPixelGreyValueManipulatorComponent::PipelineControllerToCreateManipula
 void QmitkPixelGreyValueManipulatorComponent::GetManipulationModeAndAreaFromGUI(int & manipulationMode, int & manipulationArea)
 {
   manipulationMode = m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem(); // 0 = Nothing selected, 1 = linear shift, 2 = gradient shift, 3 = change grey value, 4 = lighten / shade
-  manipulationArea = m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem(); // 0 = Nothing selected, 1 = on Image, 2 = on Segmentation
+  manipulationArea = m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem(); // 0 = Nothing selected, 1 = on Image, 2 = on Segmentation, 3 = inside BoundingObject
 
   //default is Mode = linear, Area = Segmentation
   if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->currentItem() == 0)
@@ -490,7 +623,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
     }//if(m_Segmentation != NULL)
   }//end of manipulation on segmented area
 
-  else //manipulation shall be on entire image
+  else if(m_ManipulationArea == 1) //manipulation shall be on entire image
   {
     while(!(it.IsAtEnd()))
     {
@@ -506,8 +639,29 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
     }//end of while
   }//end of manipulation on entire image
 
-  AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
+  else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
+  {
+    if(m_BoundingObject)
+    {
+      while(!(it.IsAtEnd()))
+      {
+        mitk::Point3D point3D;
+        itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+        if(m_BoundingObject->IsInside(point3D))
+        {
+          itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
+        }
+        else
+        {
+          itShifted.Set(it.Get());
+        }
+        ++it;
+        ++itShifted;
+      }//end of while
+    }//if(m_BoundingObject)
+  }//end of manipulation inside BoundingObject area
 
+  AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 }// end of CreateLinearShiftedImage
 
 /***************    GRADIENT TEMPLATE   ***************/
@@ -589,7 +743,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
         }//end of if(m_Segmentation.IsNotNull()
       }// end of if manipulation shall be only on segmented parts
 
-      else //if manipulation area is entier image
+      else if(m_ManipulationArea == 1)//if manipulation area is entier image
       {
         while(!(it.IsAtEnd()))
         {
@@ -606,8 +760,30 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
         }//end of while(!(it.IsAtEnd())
       }//end of else -> manipulation area is entier image
     }// end of if (numberOfPoints == 2)
-  } //end of if(m_PointSetNode != NULL)
 
+    else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
+    {
+      if(m_BoundingObject)
+      {
+        while(!(it.IsAtEnd()))
+        {
+          mitk::Point3D point3D;
+          itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+          if(m_BoundingObject->IsInside(point3D))
+          {
+            InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+          }
+          else
+          {
+            itShifted.Set(it.Get());
+          }
+          ++it;
+          ++itShifted;
+        }//end of while
+      }//if(m_BoundingObject)
+    }//end of manipulation inside BoundingObject area
+
+  } //end of if(m_PointSetNode != NULL)
   AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 
 }// end of CreateGradientShiftedImage
@@ -743,7 +919,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
   }//end of manipulation on segmented area
 
 
-  else //manipulation shall be on entire image
+  else if(m_ManipulationArea == 1)//manipulation shall be on entire image
   {
     while(!(it.IsAtEnd()))
     {
@@ -760,6 +936,28 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
       }
     }//end of while (!(it.IsAtEnd()))
   }//end of manipulation on entire image
+
+  else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
+  {
+    if(m_BoundingObject)
+    {
+      while(!(it.IsAtEnd()))
+      {
+        mitk::Point3D point3D;
+        itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+        if(m_BoundingObject->IsInside(point3D))
+        {
+          itShifted.Set(pixelChangeValue);
+        }
+        else
+        {
+          itShifted.Set(it.Get());
+        }
+        ++it;
+        ++itShifted;
+      }//end of while
+    }//if(m_BoundingObject)
+  }//end of manipulation inside BoundingObject area
 
   AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 
@@ -829,7 +1027,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
   }//end of manipulation on segmented area
 
 
-  else //manipulation shall be on entire image
+  else if(m_ManipulationArea == 1)//manipulation shall be on entire image
   {
     while(!(it.IsAtEnd()))
     {
@@ -846,6 +1044,28 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
       }
     }//end of while (!(it.IsAtEnd()))
   }//end of manipulation on entire image
+
+  else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
+  {
+    if(m_BoundingObject)
+    {
+      while(!(it.IsAtEnd()))
+      {
+        mitk::Point3D point3D;
+        itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+        if(m_BoundingObject->IsInside(point3D))
+        {
+          itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
+        }
+        else
+        {
+          itShifted.Set(it.Get());
+        }
+        ++it;
+        ++itShifted;
+      }//end of while
+    }//if(m_BoundingObject)
+  }//end of manipulation inside BoundingObject area
 
   AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 

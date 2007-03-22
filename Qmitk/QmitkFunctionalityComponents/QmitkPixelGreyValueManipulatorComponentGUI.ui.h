@@ -144,3 +144,9 @@ QGroupBox * QmitkPixelGreyValueManipulatorComponentGUI::GetSegmentationContent()
 {
  return m_SegmentationContent;
 }
+
+
+QComboBox* QmitkPixelGreyValueManipulatorComponentGUI::GetBoundingObjectTypeComboBox()
+{
+  return m_BoundingObjectTypeComboBox;
+}

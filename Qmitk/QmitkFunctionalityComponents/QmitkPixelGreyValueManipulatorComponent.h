@@ -24,11 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
-
+#include <mitkBoundingObject.h>
 //NUR FUER POINTSET
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
-
+#include "mitkAffineInteractor.h"
 
 class QmitkPixelGreyValueManipulatorComponentGUI;
 class QmitkStdMultiWidget;
@@ -142,6 +142,12 @@ public slots:
   /** \brief Method to hide or show specific GroupBoxes*/
   void HideOrShow();
 
+  /** \brief Method to handle the selected Area*/
+  void HandleSegmentationArea(int);
+
+  /** \brief Method to Create a BoundingObject as ManipulationArea if selected*/
+  void CreateBoundingBox(int boundingObjectType);
+
 protected:
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
@@ -159,6 +165,7 @@ protected:
   /** \brief Method to call the lightenOrShade-TemplateMethod */
   void LightenOrShade();
 
+  void AddBoundingObjectToNode();
 
 
   /***************        ATTRIBUTES      ***************/
@@ -173,10 +180,7 @@ protected:
   //*/
   //QString m_ComponentName;
 
-  ///*!
-  //a reference to the MultiWidget
-  //*/
-  //QmitkStdMultiWidget * m_MultiWidget;
+
 
   ///*!
   //a reference to a data tree iterator object
@@ -198,6 +202,11 @@ private:
   void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
+
+  /*!
+  a reference to the MultiWidget
+  */
+  QmitkStdMultiWidget * m_MultiWidget;
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
   QmitkPixelGreyValueManipulatorComponentGUI * m_PixelGreyValueManipulatorComponentGUI;
@@ -266,6 +275,16 @@ private:
 
   QmitkSeedPointSetComponent* m_PointSet;
 
+  /*!
+  * \brief The cuboid used for cropping.
+  */
+  mitk::BoundingObject::Pointer m_BoundingObject;
+
+    /*!
+  * \brief Tree node of the cuboid used for cropping.
+  */
+  mitk::DataTreeNode::Pointer m_BoundingObjectNode;
+
   ////BEGIN ONLY FOR SEEDPOINTS******************************************************************************************************************************************
   //  /*!
   //* Node for the seed-points for threshold-gradient
@@ -283,6 +302,16 @@ private:
   //mitk::PointSet::Pointer m_Seeds;
   ////END ONLY FOR SEEDPOINTS******************************************************************************************************************************************
 mitk::DataTreeIteratorBase* m_DataIt;
+
+    /*!
+  * \brief Interactor to transform the BoundingObject
+  */
+mitk::AffineInteractor::Pointer m_BoundingObjectInteractor;
+
+    /*!
+  * \brief Flag if a boundingObject ist existing
+  */
+bool m_BoundingObjectExistingFlag;
 
   /** \brief Method to calculate the shiftvalue for the gradient shift and add it into new image */
   template < typename ItkImageType >  

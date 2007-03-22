@@ -35,6 +35,7 @@ class vtkImageShiftScale;
 class vtkImageChangeInformation;
 class vtkLODProp3D;
 class vtkImageResample;
+class vtkVolumeTextureMapper3D;
 
 namespace mitk {
 
@@ -46,7 +47,6 @@ namespace mitk {
 class VolumeDataVtkMapper3D : public BaseVtkMapper3D
 {
 public:
-
   mitkClassMacro(VolumeDataVtkMapper3D, BaseVtkMapper3D);
 
   itkNewMacro(Self);
@@ -55,6 +55,9 @@ public:
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
   static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
+  static void EndCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
+  static void StartCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
+
 protected:
 
 
@@ -65,19 +68,22 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
+
   vtkActor* m_Actor;
-  // vtkVolume* m_Volume; 
   vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
-  //vtkVolumeRayCastMapper* m_VtkVolumeMapper;
-	// vtkVolumeMapper* m_VtkVolumeMapper;
-	// vtkVolumeTextureMapper2D* m_VtkVolumeMapper;
   vtkVolumeTextureMapper2D* m_LowResMapper;
+  vtkVolumeTextureMapper3D* m_T3DMapper;
   vtkVolumeRayCastMapper* m_MedResMapper;
   vtkVolumeRayCastMapper* m_HiResMapper;
-  vtkLODProp3D* m_VolumeLOD;
   vtkImageResample* m_Resampler; 
+  vtkLODProp3D* m_VolumeLOD;
+  int m_MedResID;
+  int m_HiResID;
+  bool m_Firstcall;
+
+  vtkVolumeProperty* m_VolumeProperty2;
 };
 
 } // namespace mitk

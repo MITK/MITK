@@ -30,8 +30,8 @@ SET(IPFUNC_FILES
   ExtrROI.c   Extrema.c   FillArea.c   Frame.c   GaussF.c   Grad.c   Grav.c   Hist.c   Histo.c   HitMiss.c   HitMissI.c   Inertia.c   Inv.c   LN.c   Label.c   Laplace.c   LevWind.c   Log.c   MakePicName.c   Malloc.c   Mean.c   MeanC.c   MeanF.c   MeanR.c   MeanROI.c   Median.c   Morph.c   MultC.c   MultI.c   Norm.c   NormXY.c   Not.c   OpCl.c   Open.c   Or.c   Pot.c   Range.c   Rank.c   Refl.c   RegGrow.c   Roberts.c   Rotate.c   SDev.c   SDevC.c   SDevR.c   SDevROI.c   ScBl.c   ScFact.c   ScNN.c   Scale.c   SelInv.c   SelMM.c   Select.c   SetErrno.c   SetTag.c   Shp.c   Skewness.c   SkewnessR.c   Sobel.c   Sqrt.c   SubC.c   SubI.c   Thresh.c   Transpose.c   Var.c   VarC.c   VarR.c   VarROI.c   Window.c   WindowR.c   Xchange.c   ZeroCr.c   _BorderX.c   _DrawPoly.c   ipGetANew.c
   )  
 INCLUDE_DIRECTORIES(. ..)
-ADD_LIBRARY(ipFunc ${IPFUNC_FILES})
-TARGET_LINK_LIBRARIES(ipFunc ${IPPIC_LIBRARY})
+ADD_LIBRARY(mitkIpFunc ${IPFUNC_FILES})
+TARGET_LINK_LIBRARIES(mitkIpFunc ${IPPIC_LIBRARY})
 
 # IF(WIN32)
 #  SET(IPFUNC_INCLUDE_DIRS ${IPFUNC_INCLUDE_DIRS} ${IP_ROOT}/DataStructures/ipPic/itkzlib)

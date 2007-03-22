@@ -1,4 +1,7 @@
 INCLUDE_DIRECTORIES(. .. ${PROJECT_BINARY_DIR})
+
+ADD_DEFINITIONS(-DMITK_IPPIC_COMPILE)
+
 SET(IPPIC_FILES
   ipPicInfo.c ipPicType.c                           
   ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c
@@ -13,8 +16,8 @@ SET(IPPIC_FILES
   ipPicSize.c ipPicElements.c                       
   ipPicTSVSize.c ipPicTSVElements.c
   )
-ADD_LIBRARY(ipPic ${IPPIC_FILES})
-TARGET_LINK_LIBRARIES(ipPic itkzlib)
+ADD_LIBRARY(mitkIpPic ${IPPIC_FILES})
+TARGET_LINK_LIBRARIES(mitkIpPic itkzlib)
 # SET(IPPIC_INCLUDE_DIRS ${IP_ROOT}/DataStructures)
 # IF(WIN32)
 #  SET(IPPIC_INCLUDE_DIRS ${IPPIC_INCLUDE_DIRS} ${IP_ROOT}/DataStructures/ipPic/itkzlib)

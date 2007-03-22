@@ -54,6 +54,9 @@
  *   public defines for the pic-format
  *
  * $Log$
+ * Revision 1.3  2007/03/22 13:41:29  nolden
+ * FIX: resolve problems with chili plugin
+ *
  * Revision 1.2  2007/03/07 17:23:18  nolden
  * fixes for chili plugin build
  *
@@ -215,7 +218,7 @@
 
 #include <mitkConfig.h>
 
-#ifdef MITK_CHILI_PLUGIN
+#if defined ( MITK_CHILI_PLUGIN ) && ( ! defined ( MITK_IPPIC_COMPILE ) )
 
 #include MITK_CHILI_PLUGIN_SDK_IPTYPES_H
 #include MITK_CHILI_PLUGIN_SDK_IPPIC_H

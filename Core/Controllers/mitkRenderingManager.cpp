@@ -34,13 +34,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkRenderWindow.h"
+#include "mitkVtkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
 
+#include <itkCommand.h>
 #include <algorithm>
 
 mitk::RenderingManager::RenderWindowList mitk::RenderingManager::s_RenderWindowList;
 mitk::RenderingManager::Pointer mitk::RenderingManager::s_Instance = 0;
 mitk::RenderingManagerFactory *mitk::RenderingManager::s_RenderingManagerFactory = 0;
+
 
 void
 mitk::RenderingManager
@@ -78,7 +81,7 @@ mitk::RenderingManager::Pointer mitk::RenderingManager::New()
 mitk::RenderingManager *
 mitk::RenderingManager
 ::GetInstance()
-{
+{ 
   if ( !RenderingManager::s_Instance )
   {
     if ( s_RenderingManagerFactory )
@@ -89,6 +92,7 @@ mitk::RenderingManager
 
   return s_Instance;
 }
+
 
 bool
 mitk::RenderingManager
@@ -119,6 +123,34 @@ mitk::RenderingManager
   s_RenderWindowList[renderWindow] = 0;
   
   m_AllRenderWindows.push_back( renderWindow );
+
+  typedef itk::MemberCommand< RenderingManager > MemberCommandType;
+
+  mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
+
+  MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
+  startCallbackCommand->SetCallbackFunction(
+    this, &RenderingManager::RenderingStartCallback
+  );
+  renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+
+  MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
+  progressCallbackCommand->SetCallbackFunction(
+    this, &RenderingManager::RenderingProgressCallback
+  );
+  renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
+
+  MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
+  endCallbackCommand->SetCallbackFunction( 
+    this, &RenderingManager::RenderingEndCallback
+  );
+  renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
+
+  m_IsRendering[renderWindow] = false;
+
+
+
+
 }
 
 void
@@ -167,6 +199,12 @@ mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )
 {
   s_RenderWindowList[renderWindow] = 2;
+   
+  if (m_IsRendering[renderWindow])
+  {
+    this->AbortRendering( renderWindow );
+  }
+  m_RenderWindowList[renderWindow] = 2;
   
   if ( !m_UpdatePending )
   {
@@ -178,8 +216,7 @@ mitk::RenderingManager
 void
 mitk::RenderingManager
 ::CheckUpdatePending()
-{
-  // Check if there are pending requests for any other windows
+{ // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
@@ -196,6 +233,7 @@ void
 mitk::RenderingManager
 ::ForceImmediateUpdate( RenderWindow *renderWindow )
 {
+
   bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
   bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 ) && ( s_RenderWindowList[renderWindow] == 3 )) ?true:false;
 
@@ -207,9 +245,12 @@ mitk::RenderingManager
     if ( openGLRenderer ) openGLRenderer->UpdateIncludingVtkActors();
 
   }
- 
-  // Immediately repaint this window (implementation platform specific)
-  renderWindow->Repaint(onlyOverlay);
+
+   if ( m_IsRendering[renderWindow] )
+  {
+      this->AbortRendering( renderWindow );
+      this->RequestUpdate( renderWindow );
+  } 
 
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = 0;
@@ -224,6 +265,9 @@ mitk::RenderingManager
   {
     this->StopTimer();
   }
+
+  // Immediately repaint this window (implementation platform specific)
+  renderWindow->Repaint(onlyOverlay);
 }
 
 void
@@ -231,12 +275,13 @@ mitk::RenderingManager
 ::RequestUpdateAll( bool includeVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
 {
   int magicUpdateFlag = includeVtkActors?3:2;
-
+//  std::cout<<"RMUA \n";
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     it->second = magicUpdateFlag;
     s_RenderWindowList[it->first] = magicUpdateFlag;
+    this->RequestUpdate( it->first);
   }
 
   // Restart the timer if there are no requests already
@@ -334,7 +379,7 @@ void
 mitk::RenderingManager
 ::UpdateCallback()
 {
-  m_UpdatePending = false;
+ m_UpdatePending = false;
 
   // Satisfy all pending update requests
   if(s_Instance == this)
@@ -443,6 +488,79 @@ public:
     return smartPtr;
   };
 };
+}
+
+void
+mitk::RenderingManager
+::RenderingStartCallback( itk::Object* object, const itk::EventObject& event )
+{ 
+  mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
+  if (renderer)
+  { 
+    std::cout<<"S ";
+    m_IsRendering[renderer->GetRenderWindow()] = true;
+  }
+}
+
+void
+mitk::RenderingManager
+::RenderingProgressCallback( itk::Object* object, const itk::EventObject& event )
+{
+  this->DoMonitorRendering();
+
+}
+
+void
+mitk::RenderingManager
+::RenderingEndCallback( itk::Object* object, const itk::EventObject& event )
+{ 
+  mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
+  if (renderer)
+  {
+    std::cout<<"E ";
+    m_IsRendering[renderer->GetRenderWindow()] = false;
+  }
+  this->DoFinishAbortRendering();
+}
+
+bool
+mitk::RenderingManager
+::IsRendering() const
+{
+  bool rendering = false;
+
+  RenderWindowList::const_iterator it;
+  for ( it = m_IsRendering.begin(); it != m_IsRendering.end(); ++it )
+  {
+    if ( it->second )
+    {
+      rendering = true;
+    }
+  }
+
+  return rendering;
+}
+
+void
+mitk::RenderingManager
+::AbortRendering( mitk::RenderWindow* renderWindow )
+{ std::cout<<"abort ";
+  if ( renderWindow && m_IsRendering[renderWindow] )
+  { 
+    renderWindow->GetVtkRenderWindow()->SetAbortRender( true );
+  }
+  else
+  {
+    RenderWindowList::iterator it;
+    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    {
+      if ( m_IsRendering[it->first] )
+      { 
+        it->first->GetVtkRenderWindow()->SetAbortRender( true );
+        
+      }
+    }
+  }
 }
 
 // Create and register generic RenderingManagerFactory.

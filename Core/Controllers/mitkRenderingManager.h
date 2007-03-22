@@ -146,6 +146,13 @@ public:
    * timer used by concrete RenderingManager implementations. */
   virtual void UpdateCallback();
 
+  bool IsRendering() const;
+  void AbortRendering( RenderWindow* renderWindow );
+
+  virtual void DoMonitorRendering() {};
+  virtual void DoFinishAbortRendering() {};
+
+
 protected:
   RenderingManager();
 
@@ -168,11 +175,16 @@ protected:
   bool m_UpdatePending;
   int m_Interval;
 
+  void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
+  void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
+  void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
+
+
 private:
   typedef std::map< RenderWindow *, int > RenderWindowList;
 
   RenderWindowList m_RenderWindowList;
-  
+  RenderWindowList m_IsRendering;
   RenderWindowVector m_AllRenderWindows;
 
   static RenderWindowList s_RenderWindowList;

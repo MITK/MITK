@@ -19,15 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 #define QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 
+#include "mitkHistogramGenerator.h"
+
 #include <set>
 #include <qwidget.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <math.h>
-// #include "mitkTransferFunction.h"
+
 #include <vtkPiecewiseFunction.h>
-#include <mitkHistogramGenerator.h>
+
 
 class vtkColorTransferFunction;
 class QmitkTransferFunctionCanvas : public QWidget
@@ -91,6 +93,9 @@ class QmitkTransferFunctionCanvas : public QWidget
     void mouseReleaseEvent( QMouseEvent* mouseEvent );
     void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
     void PaintHistogram(QPainter &p);
+
+    void PaintHistogramGO(QPainter &p);
+
     virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6) = 0;
     virtual void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) = 0;
     virtual void RemoveFunctionPoint(vtkFloatingPointType x) = 0;

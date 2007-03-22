@@ -51,6 +51,40 @@ mitk::ColorProperty::~ColorProperty()
 {
 }
 
+bool mitk::ColorProperty::Assignable(const mitk::BaseProperty& other) const
+{
+  try
+  {
+    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
+    return true;
+  }
+  catch (std::bad_cast)
+  {
+  }
+  return false;
+}
+
+mitk::BaseProperty& mitk::ColorProperty::operator=(const mitk::BaseProperty& other)
+{
+  try
+  {
+    const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+    if (this->m_Color != otherProp.m_Color)
+    {
+      this->m_Color = otherProp.m_Color;
+      this->Modified();
+    }
+  }
+  catch (std::bad_cast)
+  {
+    // nothing to do then
+  }
+
+  return *this;
+ }
+
+
 //##ModelId=3E86A35F000B
 bool mitk::ColorProperty::operator==(const BaseProperty& property) const
 {

@@ -58,7 +58,10 @@ public:
   
   //##ModelId=3E86A345014E
   virtual ~ColorProperty();
-  
+   
+  virtual bool Assignable(const BaseProperty& other) const;
+  virtual BaseProperty& operator=(const BaseProperty& other);
+ 
   //##ModelId=3E86A35F000B
   virtual bool operator==(const BaseProperty& property) const;
   

@@ -21,23 +21,44 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkTransferFunctionCanvas.h"
 #include <vtkPiecewiseFunction.h>
+
 class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
   Q_OBJECT
 
   public:
-
+    
     QmitkPiecewiseFunctionCanvas( QWidget * parent=0, const char * name=0, WFlags f = false );
     virtual void paintEvent( QPaintEvent* e );
     int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6);
+
     void SetPiecewiseFunction(vtkPiecewiseFunction* piecewiseFunction)
     {
       this->m_PiecewiseFunction = piecewiseFunction;
       this->SetMin(m_PiecewiseFunction->GetRange()[0]);
       this->SetMax(m_PiecewiseFunction->GetRange()[1]);
       setEnabled(true);
+      
+      m_IsGradientOpacityFunction = false;
+
       update();
 
     };
+
+     void SetPiecewiseFunctionGO(vtkPiecewiseFunction* piecewiseFunction)
+     {
+      this->m_PiecewiseFunction = piecewiseFunction;
+          //this->SetMin(m_PiecewiseFunction->GetRange()[0]);
+          this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.01);
+      //this->SetMin(0);
+      this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
+      setEnabled(true);
+
+      m_IsGradientOpacityFunction = true;
+     
+      update();
+
+    };
+
     void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) {
       m_PiecewiseFunction->AddPoint(x,val);
     };  
@@ -57,8 +78,42 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     }
     void DoubleClickOnHandle(int /*handle*/) {};
     void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
+
+
+    int GetFunctionMax(){
+      return m_PiecewiseFunction->GetRange()[1];
+    }
+
+    int GetFunctionMin(){
+      return m_PiecewiseFunction->GetRange()[0];
+    }
+
+    int GetFunctionRange(){
+      double range;
+      if((m_PiecewiseFunction->GetRange()[0])<0){
+        range = (m_PiecewiseFunction->GetRange()[1])-(m_PiecewiseFunction->GetRange()[0]);
+        return range;
+      }
+      else{
+        range = m_PiecewiseFunction->GetRange()[1];
+        return range;
+      }
+    }
+
+    void RemoveAllFunctionPoints(){
+    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,this->GetFunctionMax(),1);
+    }
+
+    void ResetGO(){ //Gradient Opacity
+     m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),1,0,1);
+     m_PiecewiseFunction->AddSegment(0,1,((this->GetFunctionRange())*0.125),1);
+     m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.125),1,((this->GetFunctionRange())*0.2),1);
+     m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.2),1,((this->GetFunctionRange())*0.25),1);
+    }
+
   protected: 
     vtkPiecewiseFunction* m_PiecewiseFunction;
+    bool m_IsGradientOpacityFunction;
 
 };
 #endif

@@ -23,9 +23,15 @@ QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent, con
 
 }
 void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
-
+  
   QPainter painter( this );
-  PaintHistogram(painter);
+  
+  if (m_IsGradientOpacityFunction){
+    PaintHistogramGO(painter);
+  }
+  else{
+    PaintHistogram(painter);
+  }
   painter.save();
   painter.setPen(Qt::green);
   painter.drawRect(0,0,width(),height());

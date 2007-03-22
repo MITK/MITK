@@ -250,6 +250,29 @@ void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opa
   free(alphasHead);
 }
 
+void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction)
+{
+  if(gradientFunction==NULL)
+    gradientFunction = vtkPiecewiseFunction::New();
+
+  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
+  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
+
+  vtkFloatingPointType *alphas;
+  vtkFloatingPointType *alphasHead;
+  alphasHead=alphas=(vtkFloatingPointType*)malloc(sizeof(vtkFloatingPointType)*num_of_values);
+
+  rgba+=3;
+  for(i=0;i<num_of_values;++i)
+  {
+    *alphas=*rgba * 1024.0; ++alphas; rgba+=4;
+  }
+
+  gradientFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
+
+  free(alphasHead);
+}
+
 bool mitk::LookupTable::WriteXMLData( XMLWriter& xmlWriter )
 {
   vtkFloatingPointType color[ 4 ], lowerRange, upperRange;

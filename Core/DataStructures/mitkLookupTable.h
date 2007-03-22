@@ -118,6 +118,7 @@ public:
 
     void CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction);
     void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
+    void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction);
 
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
 

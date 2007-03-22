@@ -78,6 +78,11 @@ class QmitkVolumeVisualization : public QmitkFunctionality
      */
     void ImageSelected(const mitk::DataTreeFilter::Item* item);
     void EnableRendering(bool state);
+
+    void GetChoice(int number);
+    void GetCStyle(int number);
+    void GetPreset(int number);
+
   protected:  
     /*!  
      * default main widget containing 4 windows showing 3   
@@ -89,6 +94,7 @@ class QmitkVolumeVisualization : public QmitkFunctionality
      * controls containing sliders for scrolling through the slices  
      */  
     QmitkVolumeVisualizationControls * m_Controls;
+    bool image_ok;
 
 };
 #endif // !defined(QMITK_VOLUMEVISUALIZATION_H__INCLUDED)

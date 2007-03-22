@@ -19,6 +19,23 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel2</cstring>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>32767</width>
+                    <height>30</height>
+                </size>
+            </property>
+            <property name="frameShape">
+                <enum>Box</enum>
+            </property>
+            <property name="text">
+                <string>&lt;font size="+1"&gt;&lt;p align="center"&gt;scalar opacity&lt;/p&gt;&lt;/font&gt;</string>
+            </property>
+        </widget>
         <widget class="QmitkPiecewiseFunctionCanvas">
             <property name="name">
                 <cstring>m_ScalarOpacityFunctionCanvas</cstring>
@@ -28,6 +45,23 @@
                     <width>0</width>
                     <height>200</height>
                 </size>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel3</cstring>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>32767</width>
+                    <height>30</height>
+                </size>
+            </property>
+            <property name="frameShape">
+                <enum>Box</enum>
+            </property>
+            <property name="text">
+                <string>&lt;font size="+1"&gt;&lt;p align="center"&gt;color&lt;/p&gt;&lt;/font&gt;</string>
             </property>
         </widget>
         <widget class="QmitkColorTransferFunctionCanvas">
@@ -85,7 +119,7 @@
                     </property>
                     <property name="sizeHint">
                         <size>
-                            <width>161</width>
+                            <width>430</width>
                             <height>20</height>
                         </size>
                     </property>
@@ -93,6 +127,93 @@
                 <widget class="QLabel">
                     <property name="name">
                         <cstring>m_MaxLabel</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <pointsize>7</pointsize>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>max</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignRight</set>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>32767</width>
+                    <height>30</height>
+                </size>
+            </property>
+            <property name="frameShape">
+                <enum>Box</enum>
+            </property>
+            <property name="text">
+                <string>&lt;p align="center"&gt;&lt;font size="+1"&gt;gradient opacity&lt;/font&gt;&lt;/p&gt;</string>
+            </property>
+        </widget>
+        <widget class="QmitkPiecewiseFunctionCanvas">
+            <property name="name">
+                <cstring>m_GradientOpacityCanvas</cstring>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>100</height>
+                </size>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout2_2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_MinLabelGO</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <pointsize>7</pointsize>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>min</string>
+                    </property>
+                    <property name="alignment">
+                        <set>AlignVCenter|AlignLeft</set>
+                    </property>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer2_2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>430</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_MaxLabelGO</cstring>
                     </property>
                     <property name="font">
                         <font>
@@ -146,21 +267,28 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="PNG" length="1125">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000042c49444154789cb5954f6c14551cc73fefcd7476b65bdaae4bb78bb5502a14d404e4801c88182d1c4c2c693da847400f9c24c68b878684238660e2b1e01f12c19493012ef2478c814412d354a46017a8a564bb6da5bbedccee767776e63d0ffb073751d483bfe49799974c3eeffb7ebf37df9fd05a530b2184040cc0042420aaf9a4d0d554800f045a6b256ae0e1e1e1d6bebebe838ee31c48a7d39b5cd7fd075e251cc7617272f2ded8d8d819cff33e0316819259537aead4a9839d5dd6d1784f91f55b0a94830242088404d304292bef68a89f520802a598fecddaa04f1a876f5c250c7c0a64cdeac686e33807e23d45e6b297c8b877f1831542614550b6599835c83c2a81b6786a75134faf2f1169f12997350881d9021d0903e06de0745d3160a6d3e94dbd5b0a64dcbb94b5831d0e3375ab892b1772dcf9790528543f8dd0d367b36768153b5e31503a0f1aecb004580b44ffac58baae8b1714f0833c7638cc8dab303a320f4822ab4c7a37c69196203de3319d5ce1c4d13c733331dedc67a129a154fd128401ab0616d55a130ac3d42d93d1913940d13fd0c9ee0183685c60da01c5421bd72f7a8c8efccef9afd374267ad93d642365be0636a0d28ec7600941d9e6f23917f0e97f23ce5bef35d19ec863da0ed9059b2be70bec196c66dfa10ec0e49b338f7017258651bf95021035c595429bb0903248fe52a2b5b595dd7b4d945cc2340cdca536be389ee3f67886c5798f773fe8e0dac508c989659277a2180da4ca4ff07821058b8b251445d63d6b13ed1098a6417e39cac85197dbe31962ab9bd9f1f22a226d45366f6d0620fdb08c900d281af6110284b20085b414861d905d88f2e52739ee8cbb8022143259d3dd84691730aa2d52da441a8de0c6958068870022a41e9629ad3473fd3b8fdbe319dadb9b4924da994d2d716c7896fbe35152f78b48245d6b2da4507faf582be8eaf159b721cc837b05ae7debb1f79d08cb8b515edad942a22bc4b1c33eb3d34b1c797f06af90a72d16e2f96d9a74aa11dca8586b222d01af0fb60070f6c402d72f15d97f28c6f6d7027a5f5ce6c3233dc4e2ede496b278be4fff608cee8d3e1add806aeca51094cbb06397c1ecc328e746537c7e3ccdb5cb1136bf60635882d4d41c6ec6836ab37efa214f72208ed9f4d7cdd38ee310280542e38b1c43fb6de26b3672e1ec3cc99bcb246f66a938a3241ab3e91f7c861fbf77710b1e5e49915bae974203ba0e9e9c9cbc373d6d6d305a040a89c2a77f50b27d5782bbbf7acccf28349235dd16cf6dd374f7295e1de8a45c02d37499182b01cc0201a085d61a2144d8b2ac8fb6ed340e77240c4261890e04c250185262546d534a032154b59e0ad394e41c98182bf268ce6721ed9f064e0253356f6da2e24c1f030f783c15fe6da680af8021602bd051532ca9b8521488559f61aa86c29343578fbf0264a94c906c7d3409214c20043457a116ff6de6795578012889ff6b98fe016ea0ce1c203e47720000000049454e44ae426082</data>
+        <data format="PNG" length="836">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000030b49444154789cb5953f681c4714873f9915bc0515b320c32e28a08518acc210893412b890ca0b2a2e814092ca8834811486542e837020a94d0aa12660a908890b23bb10dc757b8de10436ac408135e8600e2c982904fbc0074eb17ba7fb13810b659add79bbf3bddffede9bd9b9ac93311c1beb1b1fb8819175b2b9b921b875dcfa902ea7b84b873db7f84bff5110e71dc55941e755070657f160a8f4e91f4f8997c0cc2be93d45df2b02303f7c0ba4beea606cf5008a02744fe8b675120ce02e1d665eb1ee05de17408988a203c1f642fcbb120831b7215d2e9185ab04b200490cddb12f1981edb925bda735d42122e4af235acf1df98907866a84f4aeb0d58c58df0406651595498b46607fe9d1f73a82666d38f8ddd68a84f4ae4102b03da53855f67fb1d8b786ef1e844039e37d303e913a73fe3aaca1cad6764ca31962160129514dc85e2a077b9617877d9238a5f175044c16fbd6c46c1e7420b49eb911f4dbef434cec401cfe22a4f5ccf14553d8f9310184bf0e1deeddb4c4e96900b61792bff11863683443081c04a03e62ffd792fcc4e32f60e76144762ce46f3cf96934ea98ff560c75f5956459aacfafa14f1e5745348bc2eafd10899495d5aa62b6286b23af015759c3ea5e2a4f7d3fe2c9e392fc44014504d225a99e0761bd329cb16246b1b90d20143d4535226b532935421c1bfa3dcfee234bde35d8b3aa1b9254a63193797450357ffaa950fca3642f95c63782bf30acdf0f499684dd47d07febd9fda14055318bc2da67cad1b94e806714cb02349a1100077b96ceb1b2f330626d13d255c74f3fa798d8e0bd4707ca563321be332378da994af5c626d89ee1efc33efbbf59b26361654540c09e59f442472bbb6d47b19d1006c2d5ee1c3f2bbc1b054b4abe7a1012c529477f56dd909f8cd56151683453b2b6c3a9a20ace4f5a310217670545012c5cc11b5f86ac6f26e4a711b6a8e2c927c2dae74a7c07b6b6934a64e0c8bbd7803baf3ae89e90c475ab0d80c043306c43a9369085a3e7004a1808ce43de556cff3a8f07d06debc4d137e5fe47c6aa31d31537356e41f58ffa5fc0370dcf3ad9dcbfc9d559b7e14398dd0000000049454e44ae426082</data>
     </image>
 </images>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in implementation">mitkProperties.h</include>
+    <include location="local" impldecl="in implementation">QmitkTransferFunctionWidget.ui.h</include>
 </includes>
 <forwards>
     <forward>class QListViewItem</forward>
 </forwards>
 <slots>
     <slot>SetDataTreeNode( mitk::DataTreeNode * node )</slot>
+    <slot>UpdateMinMaxLabels()</slot>
+    <slot>ChooseTF( int choice )</slot>
 </slots>
 <functions>
-    <function>UpdateMinMaxLabels()</function>
+    <function>AddPoints()</function>
+    <function>ResetTF()</function>
+    <function>ChooseCS( int cstyle )</function>
+    <function>ResetCS()</function>
+    <function>AddCS()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

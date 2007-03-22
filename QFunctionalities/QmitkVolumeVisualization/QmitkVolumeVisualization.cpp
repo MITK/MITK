@@ -56,6 +56,16 @@ void QmitkVolumeVisualization::CreateConnections()
     connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(activated(const mitk::DataTreeFilter::Item*)),(QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item*)) );
     m_Controls->m_TreeNodeSelector->SetDataTree(this->GetDataTreeIterator());
     connect( (QObject*)(m_Controls), SIGNAL(EnableRenderingToggled(bool)),(QObject*) this, SLOT(EnableRendering(bool)));
+
+    //TF-Auswahl
+    connect( (QObject*)(m_Controls), SIGNAL(Choice(int)),(QObject*) this, SLOT(GetChoice(int)));
+
+    //Color Style-Auswahl
+    connect( (QObject*)(m_Controls), SIGNAL(StyleChoice(int)),(QObject*) this, SLOT(GetCStyle(int)));
+
+    //Preset-TF
+    connect( (QObject*)(m_Controls), SIGNAL(PresetTF(int)),(QObject*) this, SLOT(GetPreset(int)));
+  
   }
 }
 
@@ -85,10 +95,12 @@ void QmitkVolumeVisualization::ImageSelected(const mitk::DataTreeFilter::Item* i
   m_Controls->m_EnableRenderingCB->setChecked(enabled);
   if (enabled) {
 m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
 }
 }
 void QmitkVolumeVisualization::EnableRendering(bool state) {
   std::cout << "EnableRendering:" << state << std::endl;
+  image_ok = false;
   const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
   if (item)
   {
@@ -97,10 +109,46 @@ void QmitkVolumeVisualization::EnableRendering(bool state) {
       node->SetProperty("volumerendering",new mitk::BoolProperty(true));
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
       if (!image) return;
+      image_ok = true;
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+      m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
     } else if (!state && node) {
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));
     }
   }
 }
+
+//�ergabe der Auswahl
+void QmitkVolumeVisualization::GetChoice(int number){
+  if(image_ok){
+    m_Controls->m_TransferFunctionWidget->ChooseTF(number);
+    m_Controls->m_TransferFunctionWidget_2->ChooseTF(number);
+}
+  else{
+    std::cout<<"No image selected!\n";
+  }
+    
+}
+
+void QmitkVolumeVisualization::GetCStyle(int number){
+  if(image_ok){
+    m_Controls->m_TransferFunctionWidget->ChooseCS(number);
+    m_Controls->m_TransferFunctionWidget_2->ChooseCS(number);
+  }
+  else{
+    std::cout<<"No image selected!\n";
+  }
+
+}
+void QmitkVolumeVisualization::GetPreset(int number){
+  if(image_ok){
+    m_Controls->m_TransferFunctionWidget->ChooseTF(number);
+    m_Controls->m_TransferFunctionWidget_2->ChooseTF(number);
+  }
+  else{
+    std::cout<<"No image selected!\n";
+  }
+
+}
+
 

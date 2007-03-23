@@ -618,14 +618,6 @@ void QmitkMainTemplate::Initialize()
   //initialize functionality management
   InitializeQfm();
 
-  std::string optionsFile(mitk::StandardFileLocations::FindFile("MITKOptions.xml"));
-  
-  if (!optionsFile.empty())
-  {
-    LoadOptionsFromFile(optionsFile.c_str());
-  }
-  m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
-
   QWidget* defaultMain = qfm->GetDefaultMain();
 
   if ( defaultMain!=NULL )
@@ -645,12 +637,21 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
   }
+
+  InitializeFunctionality();
+
+  std::string optionsFile(mitk::StandardFileLocations::FindFile("MITKOptions.xml"));
+  
+  if (!optionsFile.empty())
+  {
+    LoadOptionsFromFile(optionsFile.c_str());
+  }
+  m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
+
   // initialize multiwidget with options
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
-
-  InitializeFunctionality();
 
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as

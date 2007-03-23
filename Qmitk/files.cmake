@@ -2,6 +2,7 @@ SET(CPP_FILES
   plugin/plugin_QmitkUndoRedoButton.cpp
   popupactionhistory.cpp
   popupundoredo.cpp
+  QmitkAbortEventFilter.cpp
   QmitkAlgorithmFunctionalityComponent.cpp
   QmitkApplicationBase/QmitkApplicationCursor.cpp
   QmitkApplicationBase/QmitkCommonFunctionality.cpp

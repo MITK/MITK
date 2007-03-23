@@ -108,6 +108,7 @@ ENDIF(BUILD_TESTING)
 OPTION(USE_QT "Use Trolltech's Qt library" ON)
 
 IF(USE_QT)
+  SET(QT_MT_REQUIRED 1)
   FIND_PACKAGE(Qt3)
   SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
   FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents) 

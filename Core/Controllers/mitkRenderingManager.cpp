@@ -128,28 +128,28 @@ mitk::RenderingManager
 
   mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
 
-  MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
-  startCallbackCommand->SetCallbackFunction(
+  if( false && renderer) // TODO change when abort mechanism is ready
+  {
+   MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
+   startCallbackCommand->SetCallbackFunction(
     this, &RenderingManager::RenderingStartCallback
   );
-  renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+  //renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
 
   MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
   progressCallbackCommand->SetCallbackFunction(
     this, &RenderingManager::RenderingProgressCallback
   );
-  renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
+  //renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
 
   MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
   endCallbackCommand->SetCallbackFunction( 
     this, &RenderingManager::RenderingEndCallback
   );
-  renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
+  //renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
 
   m_IsRendering[renderWindow] = false;
-
-
-
+ }
 
 }
 

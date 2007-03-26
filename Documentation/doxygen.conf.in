@@ -69,12 +69,12 @@ FILE_PATTERNS          = *.h \
                          *.txx \
                          *.cxx
 RECURSIVE              = YES
-EXCLUDE                = @PROJECT_SOURCE_DIR@/DataStructures/ipPic/ \
-                         @PROJECT_SOURCE_DIR@/Algorithms/ipFunc/ \
+EXCLUDE                = @PROJECT_SOURCE_DIR@/Utilities/ipPic/ \
+                         @PROJECT_SOURCE_DIR@/Utilities/ipFunc/ \
                          @PROJECT_SOURCE_DIR@/DataStructures/vecmath/ \
                          @PROJECT_SOURCE_DIR@/DataStructures/pic2vtk/ \
                          @PROJECT_SOURCE_DIR@/Algorithms/Fill3D/ \
-                         @PROJECT_SOURCE_DIR@/AppModules/IIL4MITK/ \
+                         @PROJECT_SOURCE_DIR@/Utilities/IIL4MITK/ \
                          @PROJECT_SOURCE_DIR@/DataStructures/ThreeDPicAccessor/ \
                          @PROJECT_SOURCE_DIR@/Build/Testing/ 
 EXCLUDE_SYMLINKS       = NO

@@ -101,11 +101,6 @@ public:
   void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
 
   /**
-   * Sets default properites common to all vessel trees
-   */
-  static void SetDefaultVesselTreeProperties(DataTreeNode::Pointer &node);
-
-  /**
    * Sets default properites common to ultrasound content
    */
   void SetDefaultUltraSoundProperties(DataTreeNode::Pointer &node);

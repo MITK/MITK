@@ -152,6 +152,11 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   return instance;
 }
 
+void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node) 
+{
+  // don't do anything. Implementation is in subclasses.
+}
+
 mitk::CoreObjectFactory::CoreObjectFactory() 
 {
   static bool glutInitialized = false;

@@ -20,16 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkBaseDataIOFactory.h>
 
-// these files have to be included at this location, 
-// otherwise visual c++ will produce an internal 
-// compiler error :(
-#ifdef MBI_INTERNAL
- #include <mitkVesselGraphFileReader.h>
- #include <mitkVesselTreeFileReader.h>
- #include <mitkVesselTreeToLookupTableFilter.h>
- #include <mitkVesselTreeLookupTableProperty.h>
-#endif
-
 // C-Standard library includes
 #include <stdlib.h>
 
@@ -86,6 +76,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTable.h"
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
+#include "mitkCoreObjectFactory.h"
 
 #ifdef MBI_INTERNAL
  #ifdef HAVE_IPDICOM
@@ -208,12 +199,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
           }
 #endif // MBI_INTERNAL
         }
-#ifdef MBI_INTERNAL
-        mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<mitk::VesselTreeData*>(node->GetData());
-        if(vesselTree.IsNotNull())
-          this->SetDefaultVesselTreeProperties(node);
-#endif // MBI_INTERNAL
-
+        mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(node);
         mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
         if(surface.IsNotNull())
           this->SetDefaultSurfaceProperties(node);
@@ -800,20 +786,6 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
 }
 
 #ifdef MBI_INTERNAL
-void mitk::DataTreeNodeFactory::SetDefaultVesselTreeProperties(mitk::DataTreeNode::Pointer &node)
-{
-  mitk::VesselTreeData::Pointer vesselTree = dynamic_cast<VesselTreeData*>(node->GetData());
-  node->SetVisibility(true);
-  if(vesselTree.IsNotNull()){
-    mitk::VesselTreeToLookupTableFilter::Pointer lutGenerator = mitk::VesselTreeToLookupTableFilter::New();
-    lutGenerator->SetInput( vesselTree );
-    lutGenerator->Update(); 
-    mitk::VesselTreeLookupTableProperty::Pointer lutProp = new mitk::VesselTreeLookupTableProperty( dynamic_cast<mitk::VesselTreeLookupTable*>( lutGenerator->GetOutput() ) );
-    node->SetProperty( "VesselTreeLookupTable", lutProp );
-    node->SetProperty( "Render skeleton", new mitk::BoolProperty( false ) );
-  }
-}
-
 void mitk::DataTreeNodeFactory::SetDefaultUltraSoundProperties(mitk::DataTreeNode::Pointer &node) 
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

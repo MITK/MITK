@@ -130,6 +130,7 @@ SET(MOC_H_FILES
   QmitkPropertyObservers/QmitkDataTreeListViewExpander.h
   QmitkPropertyObservers/QmitkDataTreeListView.h
   QmitkPropertyObservers/QmitkNumberPropertyEditor.h
+  QmitkPropertyObservers/QmitkNumberPropertySlider.h
   QmitkPropertyObservers/QmitkNumberPropertyView.h
   QmitkPropertyObservers/QmitkStringPropertyEditor.h
   QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h

@@ -2,7 +2,7 @@
   mitkConfig.h
   this file is generated. Do not change!
 */
-#define MITK_ROOT "${PROJECT_SOURCE_DIR}"
+#define MITK_ROOT "${PROJECT_SOURCE_DIR}/"
 #cmakedefine USE_ITKZLIB
 #cmakedefine USE_ITK_3_ZLIB
 #cmakedefine MITK_CHILI_PLUGIN

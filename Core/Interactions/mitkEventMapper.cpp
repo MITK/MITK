@@ -589,7 +589,7 @@ bool mitk::EventMapper::LoadStandardBehavior()
     return LoadBehavior(xmlFileName);
 
   xmlFileName = MITK_ROOT;
-  xmlFileName += "Interactions/mitkBaseInteraction/StateMachine.xml";
+  xmlFileName += "/Core/Interactions/StateMachine.xml";
   if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
     return LoadBehavior(xmlFileName);
 

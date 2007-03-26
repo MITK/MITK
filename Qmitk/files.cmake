@@ -41,6 +41,7 @@ SET(CPP_FILES
   QmitkPropertyObservers/QmitkDataTreeListView.cpp
   QmitkPropertyObservers/QmitkDataTreeListViewExpander.cpp
   QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
+  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
   QmitkPropertyObservers/QmitkNumberPropertyView.cpp
   QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
   QmitkPropertyObservers/QmitkStringPropertyEditor.cpp

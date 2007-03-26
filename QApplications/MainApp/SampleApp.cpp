@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#
 #include "SampleApp.h"
 
 #include <QmitkStdMultiWidget.h>

@@ -111,7 +111,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 #ifdef WIN32
 #if (VTK_MAJOR_VERSION >= 5)
   m_MedResID = m_VolumeLOD->AddLOD(m_T3DMapper,m_VolumeProperty,0.0); // TextureMapper3D
-#elif
+#else
   m_MedResID = m_VolumeLOD->AddLOD(m_MedResMapper,m_VolumeProperty,0.0);
 #endif
 #else
@@ -120,7 +120,6 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
 
   m_VolumeLOD->SetLODLevel(m_HiResID,1.0);
-  //m_VolumeLOD->SetLODLevel(lowres_id,1.5);
   m_VolumeLOD->SetLODLevel(m_MedResID,2.0);
   m_Resampler = vtkImageResample::New();
   m_Resampler->SetAxisMagnificationFactor(0,0.1);

@@ -90,8 +90,7 @@ std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::s
         it = baseDataVector->begin();
         for(int i=0; i<numberOfContents; i++){
           baseData = dynamic_cast<BaseData*>(ioObject->GetOutputs()[i].GetPointer());
-          baseDataVector->insert(it, baseData);
-          ++it;
+          it = baseDataVector->insert(it, baseData);
         }
         return baseDataVector;
       }

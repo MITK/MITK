@@ -79,7 +79,7 @@ FOREACH(image ${${KITNAME}_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
     SET(IMAGE_FULL_PATH ${image})
   ELSE(EXISTS ${image})
     # todo: maybe search other paths as well
-    SET(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${image})
+    SET(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Data/${image})
   ENDIF(EXISTS ${image})
 
   IF(EXISTS ${IMAGE_FULL_PATH})

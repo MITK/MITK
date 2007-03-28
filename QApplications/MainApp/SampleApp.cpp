@@ -31,9 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkControlsLeftFctLayoutTemplate.h>
 
 #include <qlayout.h>
-#include <qlibrary.h>
-#include <qfiledialog.h>
-// #include "AddFunctionalityCalls.h"
 
 void RegisterFunctionalities();
 

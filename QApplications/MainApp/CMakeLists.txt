@@ -54,7 +54,17 @@ QT_WRAP_CPP(MainApp MAIN_APP_CPP SampleApp.h)
 
 ADD_EXECUTABLE(MainApp ${MAIN_APP_CPP})
 TARGET_LINK_LIBRARIES(MainApp Qmitk ${FUNC_LIBRARIES}) 
+
+
 ADD_TEST(MainAppWithoutData ${EXECUTABLE_OUTPUT_PATH}/MainApp -testing)
+FILE(GLOB testdatalist ${MITK_SOURCE_DIR}/Testing/Data/*.*)
+LIST(REMOVE_ITEM testdatalist "${MITK_SOURCE_DIR}/Testing/Data/.svn")
+MESSAGE("testdatalist ${testdatalist}")
+FOREACH(testdataitem ${testdatalist})
+GET_FILENAME_COMPONENT(testdataname ${testdataitem} NAME)
+ADD_TEST(MainApp_${testdataname} ${EXECUTABLE_OUTPUT_PATH}/MainApp ${testdataitem} -testing)
+ENDFOREACH(testdataitem)
+
 IF(MITK_CHILI_PLUGIN)
    ADD_SUBDIRECTORY(ChiliPlugin)
 ENDIF(MITK_CHILI_PLUGIN)

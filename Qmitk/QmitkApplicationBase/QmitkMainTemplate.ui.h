@@ -58,6 +58,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkStructuredPoints.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
+#include <vtkRenderer.h>
+
 #include <map>
 
 #include <mitkProperties.h>
@@ -66,9 +68,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <mitkStringProperty.h>
-#include <QmitkStringPropertyEditor.h>
-#include <QmitkBoolPropertyEditor.h>
-#include <QmitkColorPropertyEditor.h>
+//#include <QmitkStringPropertyEditor.h>
+//#include <QmitkBoolPropertyEditor.h>
+//#include <QmitkColorPropertyEditor.h>
+#include <QmitkPropertyListView.h>
+
 
 #include <mitkImageTimeSelector.h>
 
@@ -895,30 +899,13 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 {
   QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
   
-    // first add a global options panel
+  // first add a global options panel
   optionDialog->m_FunctionalitySelectionList->insertItem("Global options", 1);  // start at index 1, because index 0 does not show up in gui
- 
-   //TODO this building up of the options widget should be placed elsewhere...
-  QWidget* globalOptionsWidget = new QGrid(2, this);
-  new QLabel("Path to HTML documentation", globalOptionsWidget);       
-  mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("HTML documentation path");
-  mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
-  new QmitkStringPropertyEditor(pathproperty, globalOptionsWidget); 
-  
-  new QLabel("Use Gradient Background in 3D View", globalOptionsWidget);
-  bp =  m_Options->GetProperty("Use gradient background");
-  mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
-  new QmitkBoolPropertyEditor(gradProperty, globalOptionsWidget); 
 
-  //new QLabel("Background color in 3D View", globalOptionsWidget);
-  //bp =  m_Options->GetProperty("Background color");
-  //mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
-  //QmitkColorPropertyEditor* qcw = new QmitkColorPropertyEditor(colProperty, globalOptionsWidget); 
-  //qcw->setMaximumWidth(100);
-  //qcw->setMaximumHeight(50);  
-  // end TODO
-
-  optionDialog->m_OptionWidgetStack->addWidget(globalOptionsWidget, 1);
+  // use a PropertyListView widget to display global options
+  QmitkPropertyListView* dialog = new QmitkPropertyListView(this);
+  dialog->SetPropertyList(m_Options);
+  optionDialog->m_OptionWidgetStack->addWidget(dialog, 1);
   
   // for each functionality: If the funcionality has an option widget, 
   // add it to the  m_FunctionalitySelectionList and the m_OptionWidgetStack
@@ -939,12 +926,18 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   // show the dialog
   if (optionDialog->exec() == QDialog::Accepted)
   {
-    // process global options
+    // first process global options
+    mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
+    mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
     this->enableGradientBackground(gradProperty->GetValue());
-    //mitk::Color c = colProperty->GetColor();
-    //m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));    
 
-    // if the dialog is closed with 'Okay', notify the functionalities of changes
+    bp =  m_Options->GetProperty("Background color");
+    mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
+    mitk::Color c = colProperty->GetColor();
+    m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));
+    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+    // next, notify the functionalities of changes in their options
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
     {
       QmitkFunctionality* f = qfm->GetFunctionalityById(i);

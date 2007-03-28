@@ -24,6 +24,21 @@ PURPOSE.  See the above copyright notices for more information.
 //##ModelId=3E681470037E
 mitk::GLMapper2D::GLMapper2D()
 {
+  static bool glutInitialized = false;
+  if ( ! glutInitialized )
+  {
+    // glutInit must be called on systems using freeglut 2.4 and
+    // above. On other systems it doesn't hurt anyway...
+    //
+    // @todo: (maybe) on linux check for DISPLAY environment. Otherwise 
+    // glutInit fails anyway.
+    std::string dummy("dummy");
+    const char* dummy_str = dummy.c_str();
+    char** argv = (char**) &dummy_str;
+    int argc = 1;
+    glutInit( &argc, argv );
+    glutInitialized = true;
+  }
 }
 
 

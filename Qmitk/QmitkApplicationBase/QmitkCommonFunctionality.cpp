@@ -487,6 +487,14 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     if (extension == "")
       extension = ".pic";
 
+    if (extension == ".gz")
+    {
+      QMessageBox::critical( NULL, "SaveDialog", "Warning: You can not save an image in the compressed \n"
+                                                 ".pic.gz format. You must save as a normal .pic file.\n"
+                                                 "Please press Save again and choose a filename with a .pic ending.",
+                                                 QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+      return "";
+    }
     dir += "/";
     dir += baseFilename;
 

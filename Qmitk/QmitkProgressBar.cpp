@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkProgressBar.h"
 #include <qprogressbar.h>
 #include <mitkProgressBar.h>
-#include <qmainwindow.h>
-#include <itkObjectFactory.h>
+//#include <qmainwindow.h>
+#include <qapplication.h>
+//#include <itkObjectFactory.h>
 
 /**
  * Reset the progress bar. The progress bar "rewinds" and shows no progress.
@@ -50,6 +51,7 @@ void QmitkProgressBar::AddStepsToDo(unsigned int steps)
   m_TotalSteps += steps;
   this->setProgress(m_Progress, m_TotalSteps);
   this->show();
+  qApp->processEvents();
 }
   
 /**
@@ -65,6 +67,8 @@ void QmitkProgressBar::Progress(unsigned int steps)
   
   if (m_Progress >= m_TotalSteps)
     Reset();
+
+  qApp->processEvents();
 }
 
 

@@ -9,6 +9,7 @@ SET(${KITNAME}_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkContourTest.cpp
   mitkContourMapper2DTest.cpp
+  mitkDataStorageTest.cpp
   mitkDataTreeTest.cpp
   mitkDataTreeFilterTest.cpp
   mitkEventTest.cpp

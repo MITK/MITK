@@ -212,7 +212,7 @@ void mitk::DataStorage::RemoveFromRelation(const mitk::DataTreeNode* node, Adjac
 
 
 
-void mitk::DataStorage::Update(mitk::DataTreeNode* node)
+void mitk::DataStorage::Update(mitk::DataTreeNode* /* node */)
 {
 }
 

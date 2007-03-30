@@ -82,15 +82,19 @@ std::vector<BaseData::Pointer>* BaseDataIOFactory::CreateBaseDataIO(const std::s
       {
         BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, filePrefix, filePattern);
         ioObject->Update();
-        //return dynamic_cast<BaseData*>(ioObject->GetOutputs()[0].GetPointer());
         int numberOfContents = (int)ioObject->GetNumberOfOutputs();
-        baseDataVector->resize(numberOfContents-1);
-        BaseData::Pointer baseData;
-        std::vector <BaseData::Pointer>::iterator it;
-        it = baseDataVector->begin();
-        for(int i=0; i<numberOfContents; i++){
-          baseData = dynamic_cast<BaseData*>(ioObject->GetOutputs()[i].GetPointer());
-          it = baseDataVector->insert(it, baseData);
+        
+        if (numberOfContents > 0)
+        {
+          BaseData::Pointer baseData;
+          for(int i=0; i<numberOfContents; ++i)
+          {
+            baseData = dynamic_cast<BaseData*>(ioObject->GetOutputs()[i].GetPointer());
+            if (baseData) // this is what's wanted, right?
+            {
+              baseDataVector->push_back( baseData );
+            }
+          }
         }
         return baseDataVector;
       }

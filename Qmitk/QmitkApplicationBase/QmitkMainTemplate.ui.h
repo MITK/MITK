@@ -406,22 +406,21 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       }
     }
   }
+  
+  m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
+  m_MultiWidget->RequestUpdate();
+  m_MultiWidget->Fit();
+  m_StandardViewsInitialized = true;
+  
   if ( dataFound ) //assure that we have at least one valid output
   {
-    if ( m_StandardViewsInitialized == false )
-    {
-      m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
-
-      if (firstImage!=NULL)
-        if ( firstImage->GetDimension(2) == 1 )
-        {
-          m_MultiWidget->changeLayoutToWidget1();
-        }
-    }
-    m_MultiWidget->RequestUpdate();
-    m_MultiWidget->Fit();
+    if (firstImage!=NULL)
+      if ( firstImage->GetDimension(2) == 1 )
+      {
+        m_MultiWidget->changeLayoutToWidget1();
+      }
   }
-} // fileOpenGetFactoryOutput()
+} 
 
 void QmitkMainTemplate::fileOpenProject()
 {

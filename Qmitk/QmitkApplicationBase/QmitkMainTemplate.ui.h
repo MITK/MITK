@@ -100,6 +100,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qgrid.h>
 #include <qpixmap.h>
 #include <qiconset.h>
+#include <qmessagebox.h>
 
 #include <ipPicTypeMultiplex.h>
 #include <mitkPointOperation.h>
@@ -108,6 +109,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <PlaneCrossPoints.xpm>
 #include <PlaneCross.xpm>
+
+#include <stdexcept>
 
 
 template <class T>
@@ -270,10 +273,17 @@ QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 void QmitkMainTemplate::fileOpen()
 {
-  QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
-  for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
+  try
   {
-    fileOpen((*it).ascii());
+    QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
+    for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
+    {
+      fileOpen((*it).ascii());
+    }
+  }
+  catch (std::exception& e)
+  {
+    QMessageBox::critical ( this, "Exception caught!", e.what() );
   }
 }
 
@@ -326,59 +336,66 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
+ try
+ {
+    QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
 
-  if ( !fileName.isNull() )
-  {
-    mitk::DataTreePreOrderIterator it(m_Tree);
-
-    std::string path = itksys::SystemTools::GetFilenamePath(fileName.ascii());
-    std::string name = itksys::SystemTools::GetFilenameName(fileName.ascii());
-
-    QString nameq = name.c_str();
-    int start = nameq.find( QRegExp("[0-9]{1,}\\.") );
-    if ( start<0 )
+    if ( !fileName.isNull() )
     {
-      fileOpen(fileName.ascii());
-      return;
-    }
+      mitk::DataTreePreOrderIterator it(m_Tree);
 
-    char prefix[1024], pattern[1024];
-    // now we want to work with fileName again to include the path, thus
-    // add the length of the path to start; the variable "path" does not 
-    // contain trailing slashes, therefore the second addend in the followong line:
-    start += path.length()+(fileName.length()-path.length()-name.length());
+      std::string path = itksys::SystemTools::GetFilenamePath(fileName.ascii());
+      std::string name = itksys::SystemTools::GetFilenameName(fileName.ascii());
 
-    strncpy(prefix, fileName.ascii(), start);
-    prefix[start]=0;
-
-    int stop=fileName.find( QRegExp("[^0-9]"), start );
-    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
-
-
-    mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-    try
-    {
-      factory->SetFileName(fileName.ascii());
-      factory->SetImageSerie(false);
-      if (start != stop)
+      QString nameq = name.c_str();
+      int start = nameq.find( QRegExp("[0-9]{1,}\\.") );
+      if ( start<0 )
       {
-        factory->SetImageSerie(true);
-        factory->SetFilePattern( pattern );
-        factory->SetFilePrefix( prefix );
+        fileOpen(fileName.ascii());
+        return;
       }
-      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
-      factory->Update();
-      factory->SetImageSerie(false);
-      fileOpenGetFactoryOutput(*factory.GetPointer());
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-      itkGenericOutputMacro( << "Exception during file open: " << ex );
-    }
+      char prefix[1024], pattern[1024];
+      // now we want to work with fileName again to include the path, thus
+      // add the length of the path to start; the variable "path" does not 
+      // contain trailing slashes, therefore the second addend in the followong line:
+      start += path.length()+(fileName.length()-path.length()-name.length());
 
-    QApplication::restoreOverrideCursor();
+      strncpy(prefix, fileName.ascii(), start);
+      prefix[start]=0;
+
+      int stop=fileName.find( QRegExp("[^0-9]"), start );
+      sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+
+
+      mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+      try
+      {
+        factory->SetFileName(fileName.ascii());
+        factory->SetImageSerie(false);
+        if (start != stop)
+        {
+          factory->SetImageSerie(true);
+          factory->SetFilePattern( pattern );
+          factory->SetFilePrefix( prefix );
+        }
+        QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
+        factory->Update();
+        factory->SetImageSerie(false);
+        fileOpenGetFactoryOutput(*factory.GetPointer());
+      }
+      catch ( itk::ExceptionObject & ex )
+      {
+        itkGenericOutputMacro( << "Exception during file open: " << ex );
+      }
+
+      QApplication::restoreOverrideCursor();
+    }
+  }
+  catch (std::exception& e)
+  {
+    QMessageBox::critical ( this, "Exception caught!", e.what() );
   }
 }
 
@@ -511,7 +528,7 @@ void QmitkMainTemplate::fileSave()
   {
     itkGenericOutputMacro( << "Exception during file open project: " << ex );
   }
-#else
+#else  
   QString fileName;
 
   if ( m_ProjectFileName.length() > 5 )

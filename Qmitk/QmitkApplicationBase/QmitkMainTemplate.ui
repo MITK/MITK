@@ -1073,7 +1073,6 @@
     <slot>fileOpenRawImageSequence( QStringList fileNames )</slot>
     <slot>enableGradientBackground( bool enable )</slot>
     <slot>enableDarkPalette( bool enable )</slot>
-    <slot>optionsUse_Dark_PaletteAction_toggled( bool )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

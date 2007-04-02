@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageDataItem.h"
+#include "mitkMemoryUtilities.h"
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 
@@ -94,7 +95,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
     m_PicDescriptor->n[i] = 1;
   if(m_Data == NULL)
   {
-    m_Data=new unsigned char[_ipPicSize(m_PicDescriptor)];
+    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( _ipPicSize(m_PicDescriptor) );
     m_ManageMemory = true;
   }
   m_PicDescriptor->data=m_Data;

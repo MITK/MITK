@@ -106,6 +106,10 @@ public:
      */
     PointSet* GetInput( const unsigned int& num );
 
+    /**
+     * @returns whether the last write attempt was successful or not.
+     */
+    bool GetSuccess() const;
     
 protected:
 
@@ -191,6 +195,10 @@ protected:
     unsigned int m_IndentDepth;
 
     unsigned int m_Indent;
+    
+    bool m_Success;
+    
+    
     
 public:
 

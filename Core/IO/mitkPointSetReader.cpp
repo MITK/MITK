@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSetReader::PointSetReader()
 {
+  m_Success = false;
 }
 
 
@@ -33,6 +34,7 @@ mitk::PointSetReader::~PointSetReader()
 
 void mitk::PointSetReader::GenerateData()
 {
+    m_Success = false;
     if ( m_FileName == "" )
     {
         itkWarningMacro( << "Sorry, filename has not been set!" );
@@ -44,9 +46,18 @@ void mitk::PointSetReader::GenerateData()
         return ;
     }
     std::ifstream in( m_FileName.c_str() );
+    if ( ! in.good() )
+    {
+        itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
+        return ;
+    }
     mitk::vtkPointSetXMLParser* parser = new mitk::vtkPointSetXMLParser();
     parser->SetStream( &in );
-    parser->Parse();
+    if ( parser->Parse() == 0 ) //Parse returns zero as error indicator
+    {
+        itkWarningMacro( << "Sorry, an error occurred during parsing!" );
+        return ;
+    }
     mitk::vtkPointSetXMLParser::PointSetList pointSetList = parser->GetParsedPointSets();
     this->ResizeOutputs( pointSetList.size() );
 
@@ -57,6 +68,7 @@ void mitk::PointSetReader::GenerateData()
     }
     in.close();
     parser->Delete();
+    m_Success = true;
 }
 
 
@@ -127,3 +139,7 @@ void mitk::PointSetReader::ResizeOutputs( const unsigned int& num )
 }
 
 
+void mitk::PointSetReader::GetSuccess() const
+{
+    return m_Success;  
+}

@@ -55,6 +55,7 @@ mitk::PointSetWriter::PointSetWriter()
     this->SetNthOutput( 0, mitk::PointSet::New().GetPointer() );
     m_Indent = 2;
     m_IndentDepth = 0;
+    m_Success = false;
 }
 
 
@@ -68,6 +69,7 @@ mitk::PointSetWriter::~PointSetWriter()
 
 void mitk::PointSetWriter::GenerateData()
 {
+    m_Success = false;
     m_IndentDepth = 0;
 
     //
@@ -109,6 +111,7 @@ void mitk::PointSetWriter::GenerateData()
     WriteEndElement( XML_POINT_SET_FILE, out );
 
     out.close();
+    m_Success = true;
 }
 
 
@@ -288,3 +291,9 @@ void mitk::PointSetWriter::WriteIndent( std::ofstream& file )
     file << spaces.c_str();
 }
 
+
+
+void mitk::PointSetWriter::GetSuccess() const
+{
+    return m_Success;  
+}

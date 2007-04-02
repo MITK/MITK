@@ -82,6 +82,11 @@ public:
     
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
     
+    /**
+     * @returns whether the last read attempt was successful or not.
+     */
+    bool GetSuccess() const;
+    
 protected:
 
     /**
@@ -124,6 +129,8 @@ protected:
     std::string m_FilePrefix;
     
     std::string m_FilePattern;  
+    
+    bool m_Success;
     
 };
     

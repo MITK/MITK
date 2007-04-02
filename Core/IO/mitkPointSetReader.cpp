@@ -139,7 +139,7 @@ void mitk::PointSetReader::ResizeOutputs( const unsigned int& num )
 }
 
 
-void mitk::PointSetReader::GetSuccess() const
+bool mitk::PointSetReader::GetSuccess() const
 {
     return m_Success;  
 }

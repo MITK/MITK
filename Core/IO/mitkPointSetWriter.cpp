@@ -293,7 +293,7 @@ void mitk::PointSetWriter::WriteIndent( std::ofstream& file )
 
 
 
-void mitk::PointSetWriter::GetSuccess() const
+bool mitk::PointSetWriter::GetSuccess() const
 {
     return m_Success;  
 }

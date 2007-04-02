@@ -110,6 +110,12 @@ void mitk::PointSetWriter::GenerateData()
 
     WriteEndElement( XML_POINT_SET_FILE, out );
 
+    if ( !out.good() ) // some error during output
+    {
+      out.close();
+      throw std::ios_base::failure("Some error during point set writing.");
+    }
+ 
     out.close();
     m_Success = true;
 }
@@ -297,3 +303,4 @@ bool mitk::PointSetWriter::GetSuccess() const
 {
     return m_Success;  
 }
+

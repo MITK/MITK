@@ -115,9 +115,17 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)geometryTag->value)[11] = spacing[2];
   }
   mitk::PicFileReader::ConvertHandedness(picImage);
-  strncpy(picImage->info->version, ipPicVERSION, sizeof(ipPicTag_t));
-  ipPicPut((char*)(m_FileName.c_str()), picImage);
-  mitk::PicFileReader::ConvertHandedness(picImage);
+
+  // Following line added to detect write errors. If saving .pic files from the plugin is broken again,
+  // please report a bug, don't just remove this line!
+  int ret = MITKIpPicPut((char*)(m_FileName.c_str()), picImage);
+
+  if (ret != 0)
+  {
+    throw std::ios_base::failure("Error during .pic file writing in "__FILE__);
+  }
+
+  mitk::PicFileReader::ConvertHandedness(picImage); // why this?
 }
 
 void mitk::PicFileWriter::SetInput( mitk::Image* image )
@@ -147,7 +155,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
   if( pic->info->write_protect )
   {
     fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
-    return( -1 );
+    //return( -1 );
   }
 
   if( ipPicEncryptionType(pic) != ' ' )
@@ -245,7 +253,11 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     }
         
     if ( bytes_written != number_of_bytes )
+    {
       fprintf( stderr, "Error while writing (ferror indicates %u), only %lu bytes were written! Eof indicator is %u.\n", ferror(outfile), bytes_written, feof(outfile) );
+      fclose( outfile );
+      return( -1 );
+    }
   }
   
   if( outfile != stdout )
@@ -264,3 +276,4 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
 
   return( 0 );
 }
+

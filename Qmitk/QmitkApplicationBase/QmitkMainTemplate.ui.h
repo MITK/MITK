@@ -580,7 +580,8 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Use gradient background", new mitk::BoolProperty(true) );
   m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f, 0.0f, 0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
-
+  m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(true) );
+  
 
 }
 
@@ -656,6 +657,14 @@ void QmitkMainTemplate::Initialize()
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
 
+  mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
+  if (darkProperty != NULL)
+    this->enableDarkPalette(darkProperty->GetValue());
+
+    mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
+    mitk::Color c = colProperty->GetColor();
+    m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));
+    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
@@ -929,6 +938,10 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
     mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
     this->enableGradientBackground(gradProperty->GetValue());
+
+    mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
+  if (darkProperty != NULL)
+    this->enableDarkPalette(darkProperty->GetValue());
 
     bp =  m_Options->GetProperty("Background color");
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
@@ -1213,5 +1226,20 @@ void QmitkMainTemplate::enableGradientBackground( bool enable)
   else
   {
     m_MultiWidget->DisableGradientBackground();
+  }
+}
+
+
+void QmitkMainTemplate::enableDarkPalette( bool enable )
+{
+  if(enable)
+  {
+    QPalette p( QColor( 64,64,64), QColor(64,64,64));
+    QApplication::setPalette(p,TRUE);
+  }
+  else
+  {
+    QPalette p( QColor( 196,196,196), QColor(196,196,196));
+    QApplication::setPalette(p,TRUE);
   }
 }

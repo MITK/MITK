@@ -97,7 +97,11 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
       m_VtkWriter->SetInput(polyData);
 #endif
       
-      m_VtkWriter->Write();
+      if (!m_VtkWriter->Write())
+      {
+        transformPolyData->Delete();
+        throw std::ios_base::failure("Error during surface writing.");
+      }
     }
   }
   else
@@ -116,7 +120,11 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     m_VtkWriter->SetInput(polyData);
 #endif
     
-    m_VtkWriter->Write();
+    if (!m_VtkWriter->Write())
+    {
+      transformPolyData->Delete();
+      throw std::ios_base::failure("Error during surface writing.");
+    }
   }
   transformPolyData->Delete();
 }

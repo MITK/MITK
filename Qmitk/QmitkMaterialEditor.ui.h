@@ -400,7 +400,7 @@ int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
 void QmitkMaterialEditor::OnColorSelectButtonClickedClicked()
 {
     mitk::MaterialProperty::Color color = m_MaterialProperties->GetElement( m_ActiveShowcase )->GetColor( );
-    QColor result = QColorDialog::getColor( QColor( ( int ) ( color.GetRed() * 255 ), ( int ) ( color.GetGreen() * 255 ), ( int ) ( color.GetBlue() * 255 ) ) );
+    QColor result = QColorDialog::getColor( QColor( ( int ) ( color.GetRed() * 255 ), ( int ) ( color.GetGreen() * 255 ), ( int ) ( color.GetBlue() * 255 ) ), this );
     if ( result.isValid() )
     {
         color.SetRed( result.red() / 255.0 );

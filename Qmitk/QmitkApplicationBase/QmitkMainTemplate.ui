@@ -83,9 +83,6 @@
             <property name="name">
                 <cstring>redoButton</cstring>
             </property>
-            <property name="mode"> 	 
-                <enum>Redo</enum> 	 
-            </property> 	 
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
@@ -571,10 +568,16 @@
     </action>
     <action>
         <property name="name">
-            <cstring>Action</cstring>
+            <cstring>optionsUse_Dark_PaletteAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
         </property>
         <property name="text">
-            <string>Unnamed</string>
+            <string>Use dark palette</string>
         </property>
     </action>
     <action>
@@ -984,6 +987,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>enableGradientBackground(bool)</slot>
     </connection>
+    <connection>
+        <sender>optionsUse_Dark_PaletteAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>enableDarkPalette(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -1063,6 +1072,8 @@
     <slot>fileOpenRawImageSequence()</slot>
     <slot>fileOpenRawImageSequence( QStringList fileNames )</slot>
     <slot>enableGradientBackground( bool enable )</slot>
+    <slot>enableDarkPalette( bool enable )</slot>
+    <slot>optionsUse_Dark_PaletteAction_toggled( bool )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

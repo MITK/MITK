@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNOT.h"
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateOR.h"
@@ -355,6 +356,73 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     std::cout<<"[FAILED] - Exception thrown" << std::endl;
     returnValue = EXIT_FAILURE;
   }
+
+  /* Requesting objects with specific data object */
+  std::cout << "Requesting objects with specific data object : " << std::flush;
+  try 
+  {
+    mitk::NodePredicateData predicate(image);
+    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+    if ((all->Size() == 1) && (all->GetElement(0) == n1))  // check if correct object is in resultset
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Requesting objects with NULL data */
+  std::cout << "Requesting objects with NULL data: " << std::flush;
+  try 
+  {
+    mitk::NodePredicateData predicate(NULL);
+    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+    if (manageCompleteTree)   // more than n1-n5 is returned and the extra nodes do not have a dataobject
+    {
+      if ((all->Size() == tree->Count() - 2)  // we want to get all but n1 and n2
+          && (std::find(all->begin(), all->end(), n3) != all->end()) // and especially n3-n5
+          && (std::find(all->begin(), all->end(), n4) != all->end())
+          && (std::find(all->begin(), all->end(), n5) != all->end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout<<"[FAILED]"<<std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+
+    }
+    else
+    {
+      if ((all->Size() == 3)
+          && (std::find(all->begin(), all->end(), n3) != all->end()) 
+          && (std::find(all->begin(), all->end(), n4) != all->end())
+          && (std::find(all->begin(), all->end(), n5) != all->end()))
+      {
+        std::cout<<"[PASSED]"<<std::endl;
+      }
+      else
+      {
+        std::cout<<"[FAILED]"<<std::endl;
+        returnValue = EXIT_FAILURE;
+      }
+    }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
 
   /* Requesting objects that meet a conjunction criteria */
   std::cout << "Requesting objects that meet a conjunction criteria: " << std::flush;

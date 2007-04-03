@@ -171,7 +171,7 @@ void QmitkDataManagerControls::SaveButton_clicked()
 
 void QmitkDataManagerControls::SaveLightBox_clicked()
 {
-  if(mitk::ChiliPlugin::IsPlugin()==false)
+  if(mitk::ChiliPlugin::GetInstance()->IsPlugin()==false)
   {
     QMessageBox::critical( this, "Save Selected to LightBox",
         "Saving to LightBox not possible:\n"

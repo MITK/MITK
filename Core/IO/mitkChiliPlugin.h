@@ -26,10 +26,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 
 class QcPlugin;
+class QcMITKSamplePlugin;
 
 namespace mitk {
 
+//TODO wird aktuell so genutzt mitk::m_QmitkChiliPluginConferenceID (QmitkChili3ConferenceKit), nicht über die GetConferenceID-Funktion
 const int m_QmitkChiliPluginConferenceID = 5001;
+
 typedef enum
 {
   MITKc = 0,
@@ -46,21 +49,24 @@ class ChiliPlugin : public itk::Object
 
 {
 public:
-  static bool IsPlugin();
-  static QcPlugin* GetPluginInstance();
-  static void SetPluginInstance(QcPlugin* instance);
-  static int GetConferenceID();
+
+  virtual bool IsPlugin();
+  virtual int GetConferenceID();
+  virtual QcPlugin* GetPluginInstance();
+  static mitk::ChiliPlugin* GetInstance();
 
   mitkClassMacro(ChiliPlugin,itk::Object);
   itkNewMacro(ChiliPlugin);
   virtual ~ChiliPlugin();
+
 protected:
+
+  friend class QcMITKSamplePlugin;
+
+  virtual void SetPluginInstance(QcPlugin* instance);
   ChiliPlugin() {}
-private:
-  static QcPlugin* s_PluginInstance;
+
 };
-
-
 
 } // namespace mitk
 

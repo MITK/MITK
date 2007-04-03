@@ -148,7 +148,7 @@ void mitk::LightBoxResultImageWriterImpl::SetLightBox(QcLightbox* lightbox)
 
 void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
   if(plugin==NULL)
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
@@ -158,7 +158,7 @@ void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 
 bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToNewLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
   if(plugin==NULL)
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
@@ -185,7 +185,7 @@ bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToNewLightBox()
 
 bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToCorrespondingLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
   if(plugin==NULL)
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");

@@ -18,39 +18,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkChiliPlugin.h"
 
-QcPlugin* mitk::ChiliPlugin::s_PluginInstance = 0;
-
 bool mitk::ChiliPlugin::IsPlugin()
 {
-  return true;
+  return false;
+}
+
+int mitk::ChiliPlugin::GetConferenceID()
+{
+  return 0;
 }
 
 QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
 {
-  return s_PluginInstance;
+  return 0;
+}
+
+mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance()
+{
+  static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
+  return s_Instance;
 }
 
 void mitk::ChiliPlugin::SetPluginInstance(QcPlugin* instance)
-{
-  s_PluginInstance = instance;
-} 
+{ }
+
 mitk::ChiliPlugin::~ChiliPlugin() 
-{ 
-  //std::cout << "ChiliPlugin d'tor" << std::endl; 
-}
-/*
- * this was another workaround. replaced by own createobjectfunction in the
- * plugin factory
- *
-mitk::ChiliPlugin::Pointer mitk::ChiliPlugin::New(void)
-{
-  Pointer smartPtr; 
-  smartPtr = ::itk::ObjectFactory<ChiliPlugin>::Create(); 
-  if(smartPtr.IsNull() ) 
-    { 
-    smartPtr = new ChiliPlugin();     
-    } 
-  return smartPtr; 
-} 
-*/
+{ }
 

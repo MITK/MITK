@@ -26,7 +26,7 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     QString name();
     const char** xpm();
 
-    SampleApp* app;
+    SampleApp* app; // TODO warum? protected machen
 
     static QcPlugin* GetPluginInstance()
     {

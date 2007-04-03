@@ -33,21 +33,25 @@ class ChiliPluginImpl : public ChiliPlugin
 
 {
 public:
-  static bool IsPlugin();
-  static QcPlugin* GetPluginInstance();
-  static void SetPluginInstance(QcPlugin* instance);
-  static int GetConferenceID();
+
+  virtual bool IsPlugin();
+  virtual int GetConferenceID();
+  virtual QcPlugin* GetPluginInstance();
 
   mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
   itkNewMacro(ChiliPluginImpl);
   virtual ~ChiliPluginImpl();
+
 protected:
+
   ChiliPluginImpl::ChiliPluginImpl() { }
+
 private:
+
   static QcPlugin* s_PluginInstance;
+
+  virtual void SetPluginInstance(QcPlugin* instance);
 };
-
-
 
 } // namespace mitk
 

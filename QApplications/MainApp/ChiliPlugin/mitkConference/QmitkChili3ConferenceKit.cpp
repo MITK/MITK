@@ -11,7 +11,7 @@ void
 Chili3Conference::SendQt(const char* s)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 
@@ -30,7 +30,7 @@ void
 Chili3Conference::SendMITK(signed int eventID, const char* sender, int etype, int estate, int ebuttonstate, int ekey, float w1, float w2, float w3, float p1, float p2)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 
@@ -59,7 +59,7 @@ void
 Chili3Conference::MouseMove( const char* sender, float w1, float w2, float w3 )
 { 
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 
@@ -81,7 +81,7 @@ void
 Chili3Conference::MyTokenPriority(long int tid)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 
@@ -101,7 +101,7 @@ void
 Chili3Conference::AskForToken(long int tid)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 
@@ -120,7 +120,7 @@ void
 Chili3Conference::SetToken(long int sender, long int requester)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetPluginInstance();
+  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 

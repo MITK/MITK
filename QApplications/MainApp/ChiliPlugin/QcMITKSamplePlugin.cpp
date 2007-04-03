@@ -67,11 +67,12 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
   //std::cout<< "QEventLogger initialisiert..."<<std::endl;
 
   mitk::ChiliPluginFactory::RegisterOneFactory();
-  mitk::ChiliPlugin::SetPluginInstance(s_PluginInstance);
+  mitk::ChiliPlugin::GetInstance()->SetPluginInstance(s_PluginInstance);
 
+  //TODO doesnt work at first time
   //when reloaded through the CHILI-config first time no text is set
   toolbar->SetButtonText();
-  
+
 }
 
 QString QcMITKSamplePlugin::name()
@@ -111,7 +112,7 @@ void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
     if (!toolbar->KeepDataTreeNodes() )
     {
       if (m_Activated && (list.take(id-1))->isActive())
-      {        
+      {
         selectSerie(lightbox);
       }
     }

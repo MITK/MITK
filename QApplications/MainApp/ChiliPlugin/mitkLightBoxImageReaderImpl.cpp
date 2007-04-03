@@ -47,7 +47,7 @@ void mitk::LightBoxImageReaderImpl::SetLightBox(QcLightbox* lightbox)
 
 void mitk::LightBoxImageReaderImpl::SetLightBoxToCurrentLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetPluginInstance();
+  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
   if(plugin==NULL)
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");

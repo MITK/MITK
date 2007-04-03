@@ -25,6 +25,11 @@ bool mitk::ChiliPluginImpl::IsPlugin()
   return true;
 }
 
+int mitk::ChiliPluginImpl::GetConferenceID()
+{
+  return m_QmitkChiliPluginConferenceID;
+}
+
 QcPlugin* mitk::ChiliPluginImpl::GetPluginInstance()
 {
   return s_PluginInstance;
@@ -32,9 +37,10 @@ QcPlugin* mitk::ChiliPluginImpl::GetPluginInstance()
 
 void mitk::ChiliPluginImpl::SetPluginInstance(QcPlugin* instance)
 {
-  s_PluginInstance = instance;
+  if(s_PluginInstance == 0)
+    s_PluginInstance = instance;
 }
+
 mitk::ChiliPluginImpl::~ChiliPluginImpl() 
-{ 
-}
+{ }
 

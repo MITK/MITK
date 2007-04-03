@@ -108,7 +108,6 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
   
   typename TreeNodeType::Pointer node = TreeNodeType::New();
   node->Set(element);
-  node->SetParent(m_Position);
   m_Position->AddChild( node );
   m_Tree->Modified();
 
@@ -130,7 +129,6 @@ TreeIteratorBase<TTreeType>::Add( int itkNotUsed(childPosition), ValueType eleme
     {
     typename TreeNodeType::Pointer node = TreeNodeType::New();
     node->Set(element);
-    node->SetParent(m_Position);
     m_Position->AddChild(node) ;
     m_Tree->Modified();
     
@@ -312,9 +310,8 @@ TreeIteratorBase<TTreeType>::Disconnect()
 
   for( int i=0; i< size; i++ ) 
     {
-    TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(i));
+    TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));	// always add first child in list, because AddChild() removes the added node from its former parent (== m_position)
     parent->AddChild( child );
-    child->SetParent( parent );
     }
 
   m_Position = NULL;
@@ -499,9 +496,10 @@ TreeIteratorBase<TTreeType>::Remove()
     typename TreeNodeType::Pointer position = m_Position;
     parent->Remove( m_Position );                        // removes this node (and implicitly all children, too)
     //restore parent, which was set to NULL in the previous line ( so the event receiver can still find the parent )
-    m_Position->SetParent(parent);                               
+//  m_Position->SetParent(parent);                       // restoring the parent did not work since about revision 7010 
+                                                         // and the new SetParent() behaviour does not allow calling randomly
     m_Tree->Modified();
-    m_Position->SetParent(NULL);
+//   m_Position->SetParent(NULL);
     m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
 
     int size = m_Position->CountChildren();

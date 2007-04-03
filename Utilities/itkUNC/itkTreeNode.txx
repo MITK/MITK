@@ -53,11 +53,25 @@ TreeNode<TValueType>::UnRegister() const
     m_Freeing = true;
     for ( int i=0; i<size; ++i )
       {
-      m_Children[i]->SetParent(NULL);
+      // always use position 0, because child is
+      // automatically removed from m_Children
+      // in SetParent
+      m_Children[0]->SetParent(NULL);
       }
-    const_cast<ChildrenListType*>(&m_Children)->clear();
-
-    //assert(m_ReferenceCount==1);
+    
+    assert(m_Children.size()==0);
+/*    if(m_Children.size()!=0) //XXX
+      {
+      std::cout << "child size!=0" << std::endl;
+	  const_cast<ChildrenListType*>(&m_Children)->clear();
+      }
+*/
+    assert(m_ReferenceCount==1);
+/*    if(m_ReferenceCount!=1) //XXX
+      {
+      std::cout << "m_ReferenceCount!=1" << std::endl;
+      }
+*/
   }
   Superclass::UnRegister();
 }
@@ -116,6 +130,12 @@ template <class TValueType>
 void 
 TreeNode<TValueType>::SetParent( TreeNode<TValueType>* node) 
 {
+  //keep ourself alive just a bit longer
+  Pointer ourself = this;
+  if(m_Parent.IsNotNull())
+    {
+    m_Parent->Remove(this);		//XXX Disconnect instead of remove???
+    }
   m_Parent = node;
 }
 
@@ -201,8 +221,8 @@ int TreeNode<TValueType>::ChildPosition( TValueType element ) const
 template <class TValueType>
 void TreeNode<TValueType>::AddChild( TreeNode<TValueType> *node ) 
 {
-  node->SetParent(this);
   m_Children.push_back(node);
+  node->SetParent(this);
 }
 
 /** Add a child at a specific position in the children list */

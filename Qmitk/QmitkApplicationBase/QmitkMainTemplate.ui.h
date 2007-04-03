@@ -964,7 +964,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     bp =  m_Options->GetProperty("Background color");
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
     mitk::Color c = colProperty->GetColor();
-    m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));
+    m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
     // next, notify the functionalities of changes in their options

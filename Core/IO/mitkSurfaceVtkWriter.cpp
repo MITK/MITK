@@ -29,19 +29,33 @@ template<>
 void SurfaceVtkWriter<vtkSTLWriter>::SetDefaultExtension()
 {
   m_Extension = ".stl";
+  m_WriterWriteHasReturnValue = false;
 }
 
 template<>
 void SurfaceVtkWriter<vtkPolyDataWriter>::SetDefaultExtension()
 {
   m_Extension = ".vtk";
+  m_WriterWriteHasReturnValue = false;
 }
 
 template<>
 void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
 {
   m_Extension = ".vtp";
+  m_WriterWriteHasReturnValue = true;
 }
+
+template<>
+void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* transformPolyData )
+{
+  if (!m_VtkWriter->Write())
+  {
+    transformPolyData->Delete();
+    throw std::ios_base::failure("Error during surface writing.");
+  }
+}
+
 
 
 template class SurfaceVtkWriter<vtkSTLWriter>;

@@ -26,6 +26,7 @@ class vtkDataObject;
 
 template <class VTKWRITER>
 mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
+: m_WriterWriteHasReturnValue( false )
 {
   this->SetNumberOfRequiredInputs( 1 );
   
@@ -34,7 +35,7 @@ mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
   //enable to write ascii-formatted-file
   //m_VtkWriter->SetFileTypeToASCII();
 
-  SetDefaultExtension();
+  SetDefaultExtension(); // and information about the Writer's Write() method
 }
 
 template <class VTKWRITER>
@@ -47,6 +48,12 @@ template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
 {
   m_Extension = ".vtk";
+}
+
+template<class VTKWRITER>
+void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* transformPolyData )
+{
+  m_VtkWriter->Write(); // without any return type. see .cpp for an alternative
 }
 
 template <class VTKWRITER>
@@ -96,12 +103,8 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 #else
       m_VtkWriter->SetInput(polyData);
 #endif
-      
-      if (!m_VtkWriter->Write())
-      {
-        transformPolyData->Delete();
-        throw std::ios_base::failure("Error during surface writing.");
-      }
+     
+      ExecuteWrite( m_VtkWriter, transformPolyData );
     }
   }
   else
@@ -120,11 +123,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     m_VtkWriter->SetInput(polyData);
 #endif
     
-    if (!m_VtkWriter->Write())
-    {
-      transformPolyData->Delete();
-      throw std::ios_base::failure("Error during surface writing.");
-    }
+    ExecuteWrite( m_VtkWriter, transformPolyData );
   }
   transformPolyData->Delete();
 }

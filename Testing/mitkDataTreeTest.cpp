@@ -660,6 +660,68 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   memcheck;
   std::cout<<"[PASSED]"<<std::endl;
 
+  /*------------------- Part 5 -------------------*/
+  std::cout << "Testing part 5: Disconnecting a node that has two subnodes" << std::endl;
+
+  std::cout << "Creating node hierarchie: ";
+  node5 = mitk::DataTreeNode::New();
+  node5Watcher = new mitk::ReferenceCountWatcher(node5);
+  mitk::DataTreeNode::Pointer child1 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer child1Watcher = new mitk::ReferenceCountWatcher(child1);
+  mitk::DataTreeNode::Pointer child2 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer child2Watcher = new mitk::ReferenceCountWatcher(child2);
+  mitk::DataTreeNode::Pointer childChild2 = mitk::DataTreeNode::New();
+  mitk::ReferenceCountWatcher::Pointer childChild2Watcher = new mitk::ReferenceCountWatcher(childChild2);
+
+  mitk::DataTree::Pointer tree5 = mitk::DataTree::New();
+  mitk::ReferenceCountWatcher::Pointer tree5Watcher = new mitk::ReferenceCountWatcher(tree5);
+  mitk::DataTreePreOrderIterator it5(tree5);
+  it5.GoToBegin();
+  it5.Add(node5);
+  it5.GoToChild();
+  it5.Add(child1);
+  it5.Add(child2);
+  it5.GoToChild();
+  it5.Add(childChild2);
+  if ((node5Watcher->GetReferenceCount() != 2) &&
+     (child1Watcher->GetReferenceCount() != 2) &&
+     (child2Watcher->GetReferenceCount() != 2) &&
+     (childChild2Watcher->GetReferenceCount() != 2) &&
+     (tree5Watcher->GetReferenceCount() != 1))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Now disconnecting the node: "<<std::endl;
+  try
+  {
+    mitk::DataTreeIteratorClone rmIt = tree5->GetIteratorToNode(node5);
+    if (rmIt->IsAtEnd())
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    rmIt->Disconnect();
+    if ((node5Watcher->GetReferenceCount() != 1) &&
+      (child1Watcher->GetReferenceCount() != 2) &&
+      (child2Watcher->GetReferenceCount() != 2) &&
+      (childChild2Watcher->GetReferenceCount() != 2) &&
+      (tree5Watcher->GetReferenceCount() != 1))
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+  catch (...)
+  {
+      std::cout<<"[FAILED] - Exception thrown"<<std::endl;
+      return EXIT_FAILURE;
+  }
+  
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

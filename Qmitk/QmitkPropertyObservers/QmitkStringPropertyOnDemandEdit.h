@@ -23,25 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qlabel.h>
 
-class QClickableLabel : public QLabel
-{
-  Q_OBJECT
-
-  signals:
-    void clicked();
-
-  public:
-
-    QClickableLabel( QWidget * parent, const char * name = 0, WFlags f = 0 )
-    :QLabel(parent, name, f)
-    {
-    }
-  
-    virtual void mouseReleaseEvent( QMouseEvent* )
-    {
-      emit clicked();
-    }
-};
+class QClickableLabel;
 
 /// @ingroup Widgets
 class QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor

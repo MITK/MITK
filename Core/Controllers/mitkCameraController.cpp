@@ -115,9 +115,7 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
       vtkRenderer->GetActiveCamera()->SetPosition(middle[0],middle[1],-100000);
       break;
     }
-    mitk::Point3D min =bb->GetMinimum();
-    mitk::Point3D max =bb->GetMaximum();
-    vtkRenderer->ResetCamera(min[0],max[0],min[1],max[1],min[2],max[2]);
+    vtkRenderer->ResetCamera();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -1274,12 +1274,12 @@ void QmitkMainTemplate::fileCloseProject()
   mitk::NodePredicateProperty w4("name", new mitk::StringProperty("widget3Plane"));
   mitk::NodePredicateData w5(NULL);   // keep objects without data (e.g. root node of the tree!)
   mitk::NodePredicateOR orpred;
-  or.AddPredicate(w1);
-  or.AddPredicate(w2);
-  or.AddPredicate(w3);
-  or.AddPredicate(w4);
-  or.AddPredicate(w5);
-  mitk::NodePredicateNOT notpred(or);
+  orpred.AddPredicate(w1);
+  orpred.AddPredicate(w2);
+  orpred.AddPredicate(w3);
+  orpred.AddPredicate(w4);
+  orpred.AddPredicate(w5);
+  mitk::NodePredicateNOT notpred(orpred);
   mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(notpred);
   mitk::DataStorage::GetInstance()->Remove(all);
 }

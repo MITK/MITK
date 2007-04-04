@@ -588,7 +588,7 @@
             <cstring>fileCloseProjectAction</cstring>
         </property>
         <property name="text">
-            <string>Close Project</string>
+            <string>&amp;Close Project</string>
         </property>
         <property name="menuText">
             <string>&amp;Close Project</string>
@@ -996,6 +996,12 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>enableDarkPalette(bool)</slot>
     </connection>
+    <connection>
+        <sender>fileCloseProjectAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>fileCloseProject()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="global" impldecl="in declaration">mitkDataTreeNodeFactory.h</include>
@@ -1076,6 +1082,7 @@
     <slot>fileOpenRawImageSequence( QStringList fileNames )</slot>
     <slot>enableGradientBackground( bool enable )</slot>
     <slot>enableDarkPalette( bool enable )</slot>
+    <slot>fileCloseProject()</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

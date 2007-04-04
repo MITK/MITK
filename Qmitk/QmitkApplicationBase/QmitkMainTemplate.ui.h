@@ -68,9 +68,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include <mitkStringProperty.h>
-//#include <QmitkStringPropertyEditor.h>
-//#include <QmitkBoolPropertyEditor.h>
-//#include <QmitkColorPropertyEditor.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateOR.h>
+#include <mitkNodePredicateNOT.h>
+
 #include <QmitkPropertyListView.h>
 
 
@@ -681,7 +683,6 @@ void QmitkMainTemplate::Initialize()
 
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
     mitk::Color c = colProperty->GetColor();
-    m_MultiWidget->setBackgroundColor(QColor(c.GetRed(), c.GetGreen(), c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
@@ -1247,7 +1248,6 @@ void QmitkMainTemplate::enableGradientBackground( bool enable)
   }
 }
 
-
 void QmitkMainTemplate::enableDarkPalette( bool enable )
 {
   if(enable)
@@ -1260,4 +1260,26 @@ void QmitkMainTemplate::enableDarkPalette( bool enable )
     QPalette p( QColor( 196,196,196), QColor(196,196,196));
     QApplication::setPalette(p,TRUE);
   }
+}
+
+void QmitkMainTemplate::fileCloseProject()
+{
+  /* This method deletes all nodes but the three widget planes, their grouping node 
+     and nodes that do not have a data object. This should free most of the used memory.
+     If other nodes (with helper objects like the widget planes) should be kept, they have
+     to be added here as a predicate. */
+  mitk::NodePredicateProperty w1("name", new mitk::StringProperty("Widgets"));        // keep helper objects
+  mitk::NodePredicateProperty w2("name", new mitk::StringProperty("widget1Plane"));
+  mitk::NodePredicateProperty w3("name", new mitk::StringProperty("widget2Plane"));
+  mitk::NodePredicateProperty w4("name", new mitk::StringProperty("widget3Plane"));
+  mitk::NodePredicateData w5(NULL); // keep objects without data (e.g. root node of the tree!)
+  mitk::NodePredicateOR or;
+  or.AddPredicate(w1);
+  or.AddPredicate(w2);
+  or.AddPredicate(w3);
+  or.AddPredicate(w4);
+  or.AddPredicate(w5);
+  mitk::NodePredicateNOT not(or);
+  mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(not);
+  mitk::DataStorage::GetInstance()->Remove(all);
 }

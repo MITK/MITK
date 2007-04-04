@@ -8,22 +8,16 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>149</width>
-            <height>114</height>
+            <width>163</width>
+            <height>141</height>
         </rect>
     </property>
     <property name="caption">
         <string>QmitkStandardViews</string>
     </property>
-    <vbox>
+    <hbox>
         <property name="name">
             <cstring>unnamed</cstring>
-        </property>
-        <property name="margin">
-            <number>0</number>
-        </property>
-        <property name="spacing">
-            <number>0</number>
         </property>
         <widget class="QButtonGroup">
             <property name="name">
@@ -37,100 +31,76 @@
             <property name="title">
                 <string>Standard views</string>
             </property>
-            <grid>
+            <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QPushButton" row="0" column="0">
+                <spacer>
                     <property name="name">
-                        <cstring>m_Anterior</cstring>
+                        <cstring>spacer3</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
                     </property>
-                    <property name="text">
-                        <string>ant.</string>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QClickableLabel">
+                    <property name="name">
+                        <cstring>m_ClickablePicture</cstring>
                     </property>
                 </widget>
-                <widget class="QPushButton" row="0" column="1">
+                <spacer>
                     <property name="name">
-                        <cstring>m_Posterior</cstring>
+                        <cstring>spacer4</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
                     </property>
-                    <property name="text">
-                        <string>post.</string>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
                     </property>
-                </widget>
-                <widget class="QPushButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>m_Sinister</cstring>
+                    <property name="sizeHint">
+                        <size>
+                            <width>21</width>
+                            <height>20</height>
+                        </size>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>sin.</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="1" column="1">
-                    <property name="name">
-                        <cstring>m_Dexter</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>dex.</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="0">
-                    <property name="name">
-                        <cstring>m_Cranial</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>cran.</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="1">
-                    <property name="name">
-                        <cstring>m_Caudal</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>caud.</string>
-                    </property>
-                </widget>
-            </grid>
+                </spacer>
+            </hbox>
         </widget>
-    </vbox>
+    </hbox>
 </widget>
-<connections>
-    <connection>
-        <sender>m_StandardViews</sender>
-        <signal>clicked(int)</signal>
-        <receiver>QmitkStandardViews</receiver>
-        <slot>OnStandardViewDefined(int)</slot>
-    </connection>
-</connections>
+<customwidgets>
+    <customwidget>
+        <class>QClickableLabel</class>
+        <header location="global">qclickablelabel.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="808">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ef49444154789ccd953168dc5618c77f2e1a3e81034f7005093ce8c0433c5ea1cb990ce7f168862b74483aa5812ea54b3a662aa4e99039743078b4874232049cc1902b85bb1b127a8694a8e0826e3890c006bd21a00f22b80e4f3efbee6c68a185be45e8e97bbfefaffffbeb696d301cf05f0c6f7962fc7a3ccbf28ce27df1b700d65ad29394d19b11835f076b578255d359dc2a8951b452e4bca2aef2eb6b595d5a5dc12405dd15b6dbdbb3c1d0c1e7e0f1ebf12c6e95e4f690a24801c5f795f283904f85e24c01216840b3a9c83a68dd406e4014c1f82a2bb23c23466ba8c5f785776f0dfd1796e4d8025a570af14d61a767687780cacd8b2c5a340717ef0bb4d23974d887fd9f72b7685d68de348807d95499fca1ecfd98934f0c77efc9a5a657809d16f07d78f7566aa8d2f92ca4db13828f01515423862f4bf677730e0f72c230a6fb4500d805f047cb6dca0f42ffb99d43bffc5a08220b62294e8557cf0bba3d9fafbe0d01e1d981c59e2d4b5cbef5209f0ac9ef16630cdd9e8067c103b586bd274a726c294ee1fe8380d191ab4d1267d3f58aa1de7d258aebd7afa14f1fbb4d340de1935b829892ad96dbb16ca2b591d7805d4e5d8188f3b4c80c4f1f2bc9b16b2802cd0ddf3df7ce61b262c58ae2a0e10ad3a9a21a30fa05a7d4086168c8a796470f3392714076e2d210c5fe3266b14f59b9f0c79bc2e44f65f8b2a47bc7a73835b46f09d186cfa387904f2c3f7c93a2aa9886d06a9564d3c5c8ad289675e8f60c00fbbb39c3a392fb0f025a1d885b05df7ddfc484066b2d5a293bbd90687345f0ea21a415b43b904f0dcf0e72f69ee48c8e84ad2d0181ec2443cf74bef2b7be25bd1d21dee28732075b7b117045f9fc9e60c298c39f5d1a92e38be6a621747b31c3bec5aaa20ad62e5a3107a727299314b87101eff684762722490cd9c4cd471b3ead4f4ba24dd8b91d39915e4132be063c7a3342778528aaa356313f32e53c861e64b9257be15a8b27580bc958c9f2454bd72eff41b6dbdbb365cfffc9383f8b57c0ffe65889dbff1efc174cac4fc530b953010000000049454e44ae426082</data>
+    </image>
+</images>
 <includes>
     <include location="local" impldecl="in declaration">mitkCameraController.h</include>
     <include location="local" impldecl="in declaration">mitkRenderWindow.h</include>
@@ -145,7 +115,7 @@
 <slots>
     <slot>SetCameraController( mitk::CameraController * controller )</slot>
     <slot>SetCameraControllerFromRenderWindow( mitk::RenderWindow * window )</slot>
-    <slot access="protected">OnStandardViewDefined(int id)</slot>
+    <slot access="protected">hotspotClicked( const QString &amp; s )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

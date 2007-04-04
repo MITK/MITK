@@ -11,11 +11,40 @@
 *****************************************************************************/
 
 #include "mitkBaseRenderer.h"
+
+#include <qpixmap.h>
+
 #include <iostream>
+
+#include "torso.h"
 
 void QmitkStandardViews::init()
 {
   m_CameraController = NULL;  
+  
+  QImage icon = qembed_findImage("torso");
+  QPixmap pixmap(icon);
+  m_ClickablePicture->setPixmap( pixmap );
+
+  m_ClickablePicture->AddHotspot( "Left", QRect(QPoint(0,64), 
+                                                QPoint(21, 83)) );
+
+  m_ClickablePicture->AddHotspot( "Right", QRect(QPoint(128, 64), 
+                                                 QPoint(149, 83)) );
+
+  m_ClickablePicture->AddHotspot( "Top", QRect(QPoint(66, 0), 
+                                               QPoint(83, 75)) );
+
+  m_ClickablePicture->AddHotspot( "Bottom", QRect(QPoint(66, 128), 
+                                                  QPoint(83, 149)) );
+
+  m_ClickablePicture->AddHotspot( "Front", QRect(QPoint(10, 102), 
+                                                 QPoint(29, 119)) );
+
+  m_ClickablePicture->AddHotspot( "Back", QRect(QPoint(119, 30), 
+                                                QPoint(138, 48)) );
+
+  connect( m_ClickablePicture, SIGNAL( mouseReleased(const QString&)), this, SLOT(hotspotClicked(const QString&)) );
 }
 
 void QmitkStandardViews::SetCameraController( mitk::CameraController * controller )
@@ -33,33 +62,36 @@ void QmitkStandardViews::SetCameraControllerFromRenderWindow( mitk::RenderWindow
   }
   else
   {
-    std::cout << "Warning in "<<__FILE__<<", "<<__LINE__<<": render window is NULL!" << std::endl;  
+    std::cerr << "Warning in "<<__FILE__<<", "<<__LINE__<<": render window is NULL!" << std::endl;  
   }  
 }
 
-void QmitkStandardViews::OnStandardViewDefined( int id )
+void QmitkStandardViews::hotspotClicked(const QString& s)
 {
   mitk::CameraController::StandardView view;
-  if ( m_StandardViews->find( id ) == m_Anterior )
-    view = mitk::CameraController::ANTERIOR;
-  else if ( m_StandardViews->find( id ) == m_Posterior )
-    view = mitk::CameraController::POSTERIOR;
-  else if ( m_StandardViews->find( id ) == m_Sinister )
-    view = mitk::CameraController::SINISTER;
-  else if ( m_StandardViews->find( id ) == m_Dexter )
-    view = mitk::CameraController::DEXTER;
-  else if ( m_StandardViews->find( id ) == m_Cranial )
-    view = mitk::CameraController::CRANIAL;
-  else if ( m_StandardViews->find( id ) == m_Caudal )
-    view = mitk::CameraController::CAUDAL;
+  bool good(true);
+
+       if ( s == "Left"    ) view = mitk::CameraController::DEXTER;
+  else if ( s == "Right"   ) view = mitk::CameraController::SINISTER;
+  else if ( s == "Top"     ) view = mitk::CameraController::CRANIAL;
+  else if ( s == "Bottom"  ) view = mitk::CameraController::CAUDAL;
+  else if ( s == "Front"   ) view = mitk::CameraController::ANTERIOR;
+  else if ( s == "Back"    ) view = mitk::CameraController::POSTERIOR;
   else
   {
-    std::cout << "Warning in "<<__FILE__<<", "<<__LINE__<<": unknown standard view ("<<id<<")!" << std::endl;  
+    std::cerr << "Warning in "<<__FILE__<<", "<<__LINE__<<": unknown standard view '" << s.ascii() << "'" << std::endl;  
     view = mitk::CameraController::ANTERIOR;
+    good = false;
   }
-  if ( m_CameraController.IsNotNull() )
+
+  if (good)
   {
-    m_CameraController->SetStandardView( view );
+    if ( m_CameraController.IsNotNull() )
+    {
+      m_CameraController->SetStandardView( view );
+    }
+
+    emit StandardViewDefined( view );
   }
-  emit StandardViewDefined( view );
 }
+

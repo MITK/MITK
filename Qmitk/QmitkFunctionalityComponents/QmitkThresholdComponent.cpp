@@ -341,7 +341,7 @@ void QmitkThresholdComponent::SetSliderRange()
       if(currentImage)
       {
         m_ThresholdComponentGUI->GetThresholdInputSlider()->setMinValue((int)currentImage->GetScalarValueMin());
-        m_ThresholdComponentGUI->GetThresholdInputSlider()->setMaxValue((int)currentImage->GetScalarValueMax());
+        m_ThresholdComponentGUI->GetThresholdInputSlider()->setMaxValue((int)currentImage->GetScalarValueMaxNoRecompute());
       }
     }
   }

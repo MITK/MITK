@@ -193,6 +193,15 @@ void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
 }
 
 
+void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
+{
+  if (nodes == NULL)
+    return;
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
+    this->Remove(it.Value());  
+}
+
+
 void mitk::DataStorage::RemoveFromRelation(const mitk::DataTreeNode* node, AdjacencyList& relation)
 {
   for (AdjacencyList::const_iterator mapIter = relation.begin(); mapIter != relation.end(); ++mapIter)  // for each node in the relation
@@ -209,7 +218,6 @@ void mitk::DataStorage::RemoveFromRelation(const mitk::DataTreeNode* node, Adjac
   if (adIt != relation.end())
     relation.erase(adIt);
 }
-
 
 
 void mitk::DataStorage::Update(mitk::DataTreeNode* /* node */)

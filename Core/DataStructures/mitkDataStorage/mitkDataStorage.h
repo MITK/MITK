@@ -80,6 +80,11 @@ namespace mitk {
     void Remove(const mitk::DataTreeNode* node);
 
     //##Documentation
+    //## @brief Removes a set of nodes from the DataStorage
+    //##
+    void Remove(const mitk::DataStorage::SetOfObjects* nodes);
+
+    //##Documentation
     //## @brief Notifies the DataStorage that the object in node has been modified
     //##
     //## Calling the Update() method will start the nofitication mechanism that will notifiy 

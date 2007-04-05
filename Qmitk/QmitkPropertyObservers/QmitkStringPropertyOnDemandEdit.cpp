@@ -17,26 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include <QmitkStringPropertyOnDemandEdit.h>
 #include <qinputdialog.h>
-class QClickableLabel : public QLabel
-{
-  Q_OBJECT
-
-  signals:
-    void clicked();
-
-  public:
-
-    QClickableLabel( QWidget * parent, const char * name = 0, WFlags f = 0 )
-    :QLabel(parent, name, f)
-    {
-    }
-  
-    virtual void mouseReleaseEvent( QMouseEvent* )
-    {
-      emit clicked();
-    }
-};
-
 
 QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit( mitk::StringProperty* property, QWidget* parent, const char* name )
 : QFrame( parent, name ),
@@ -53,7 +33,7 @@ QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit( mitk::StringPr
   m_label = new QLabel(this);
   m_layout->addWidget(m_label);
   
-  m_toolbutton = new QClickableLabel(this);
+  m_toolbutton = new QClickableLabel2(this);
   m_toolbutton->setText("...");
   m_layout->addWidget(m_toolbutton);
   

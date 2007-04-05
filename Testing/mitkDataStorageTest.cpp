@@ -1067,9 +1067,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     else
     {
       ds->Remove(extra);
-      if ((tree->Contains(extra) == false)
-        && (ds->GetNamedNode("extra") == NULL)
-        && (refCountbeforeDS == watcher->GetReferenceCount()))
+      if ((ds->GetNamedNode("extra") == NULL) && (refCountbeforeDS == watcher->GetReferenceCount()))
       {
         std::cout<<"[PASSED]"<<std::endl;
       }
@@ -1098,8 +1096,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     int refCountbeforeDS = watcher->GetReferenceCount();
     ds->Add(extra, n1);   // n1 is parent of extra
     
-    if ((tree->Contains(extra) == false)
-      && (ds->GetNamedNode("extra") != extra)
+    if ((ds->GetNamedNode("extra") != extra)
       && (ds->GetDerivations(n1)->Size() != 2))   // n2 and extra should be derived from n1
     {
       std::cout << "[FAILED] - could not add extra node for this test" << std::endl;
@@ -1109,8 +1106,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     {
       ds->Remove(extra);
       
-      if ((tree->Contains(extra) == false)
-        && (ds->GetNamedNode("extra") == NULL)
+      if ( (ds->GetNamedNode("extra") == NULL)
         && (refCountbeforeDS == watcher->GetReferenceCount())
         && (ds->GetDerivations(n1)->Size() == 1))   // after remove, only n2 should be derived from n1
       {
@@ -1144,8 +1140,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     p->push_back(n2);
     ds->Add(extra, p);   // n1 and n2 are parents of extra
     
-    if ((tree->Contains(extra) == false)
-      && (ds->GetNamedNode("extra") != extra)
+    if ( (ds->GetNamedNode("extra") != extra)
       && (ds->GetDerivations(n1)->Size() != 2)    // n2 and extra should be derived from n1
       && (ds->GetDerivations(n2)->Size() != 3))   // n3, n4 and extra should be derived from n2
     {
@@ -1156,8 +1151,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     {
       ds->Remove(extra);
       
-      if ((tree->Contains(extra) == false)
-        && (ds->GetNamedNode("extra") == NULL)
+      if ( (ds->GetNamedNode("extra") == NULL)
         && (refCountbeforeDS == watcher->GetReferenceCount())
         && (ds->GetDerivations(n1)->Size() == 1)   // after remove, only n2 should be derived from n1
         && (ds->GetDerivations(n2)->Size() == 2))   // after remove, only n3 and n4 should be derived from n2
@@ -1196,8 +1190,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     ds->Add(d2, extra);
     
 
-    if ((tree->Contains(extra) == false)
-      && (ds->GetNamedNode("extra") != extra)
+    if ( (ds->GetNamedNode("extra") != extra)
       && (ds->GetNamedNode("d1") != d1)
       && (ds->GetNamedNode("d2") != d2)
       && (ds->GetSources(d1)->Size() != 1)    // extra should be source of d1
@@ -1211,8 +1204,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     {
       ds->Remove(extra);
       
-      if ((tree->Contains(extra) == false)
-        && (ds->GetNamedNode("extra") == NULL)
+      if ( (ds->GetNamedNode("extra") == NULL)
         && (ds->GetNamedNode("d1") == d1)                   // HIER GEHTS WEITER
         && (ds->GetNamedNode("d2") == d2)
         && (refCountbeforeDS == watcher->GetReferenceCount())
@@ -1258,8 +1250,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     d2->SetProperty("name", new mitk::StringProperty("d2x"));    
     ds->Add(d2, extra);
 
-    if ((tree->Contains(extra) == false)
-      && (ds->GetNamedNode("extra") != extra)
+    if ( (ds->GetNamedNode("extra") != extra)
       && (ds->GetNamedNode("d1x") != d1)
       && (ds->GetNamedNode("d2x") != d2)
       && (ds->GetSources(d1)->Size() != 1)    // extra should be source of d1
@@ -1275,8 +1266,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     {
       ds->Remove(extra);
 
-      if ((tree->Contains(extra) == false)
-        && (ds->GetNamedNode("extra") == NULL)
+      if ( (ds->GetNamedNode("extra") == NULL)
         && (ds->GetNamedNode("d1x") == d1)
         && (ds->GetNamedNode("d2x") == d2)
         && (refCountbeforeDS == watcher->GetReferenceCount())
@@ -1313,9 +1303,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     p->push_back(extra); // extra is parent of extra!!!
     ds->Add(extra, p); 
 
-    if ((tree->Contains(extra) == true) 
-      && (ds->GetNamedNode("extra") == extra)
-      && (ds->GetNamedDerivedNode("extra", extra) == extra))
+    if ( (ds->GetNamedNode("extra") == extra) && (ds->GetNamedDerivedNode("extra", extra) == extra))
     {
       std::cout << "[FAILED] - node was added, no exception was thrown " << std::endl;
       returnValue = EXIT_FAILURE;

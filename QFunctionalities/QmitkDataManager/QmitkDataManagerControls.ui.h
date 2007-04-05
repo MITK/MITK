@@ -494,4 +494,8 @@ void QmitkDataManagerControls::init()
 #ifndef MBI_INTERNAL
   m_AffineInteraction->hide();
 #endif
+  if(mitk::ChiliPlugin::GetInstance()->IsPlugin()==false)
+  {
+    m_SaveToLightBox->hide();
+  }
 }

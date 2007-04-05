@@ -173,7 +173,7 @@ QWidget* QmitkSingleTimeStepExporterComponent::CreateControlWidget(QWidget* pare
 
   typedef itk::SimpleMemberCommand<QmitkSingleTimeStepExporterComponent> CommandType;
   CommandType::Pointer command = CommandType::New();
-  command->SetCallbackFunction(this, Refetch);
+  command->SetCallbackFunction(this, &QmitkSingleTimeStepExporterComponent::Refetch);
   m_Stepper->AddObserver(itk::ModifiedEvent(), command);
 
   return m_SingleTimeStepExporterComponentGUI;

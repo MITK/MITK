@@ -43,7 +43,7 @@ void QmitkBoolPropertyEditor::onToggle(bool on)
     BeginModifyProperty();  // deregister from events
   
     const_cast<mitk::BoolProperty*>(m_BoolProperty)->SetValue(on);
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
   
     EndModifyProperty();  // again register for events
   }

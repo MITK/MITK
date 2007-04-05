@@ -228,7 +228,7 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
         break;
       }
   }
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
   
   EndModifyProperty();
 }
@@ -236,7 +236,7 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
 void QmitkNumberPropertySlider::PropertyChanged()
 {
   DisplayNumber();
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
 }
 
 void QmitkNumberPropertySlider::PropertyRemoved()

@@ -427,7 +427,7 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
     e->ignore();
   }
 
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
 }
 
 /**

@@ -40,7 +40,7 @@ void QmitkMemoryUsageIndicator::UpdateMemoryUsage()
   size_t processSize = mitk::MemoryUtilities::GetProcessMemoryUsage();
   size_t totalSize =  mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
   float percentage = ( (float) processSize / (float) totalSize ) * 100.0;
-  m_Label->setText( GetMemoryDescription( processSize, percentage ) );
+  m_Label->setText( GetMemoryDescription( processSize, percentage ).c_str() );
   if ( percentage < 50.0 )
     m_LED->setPixmap(m_LEDGreen);
   else if ( percentage < 65.0 )

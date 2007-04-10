@@ -9,6 +9,20 @@ namespace mitk
 class MemoryUtilities
 {
 public:
+  /** 
+   * Returns the memory usage of the current process in bytes.
+   * On linux, this refers to the virtual memory allocated by 
+   * the process (the VIRT column in top).
+   * On windows, this refery to the size in bytes of the working 
+   * set pages (the "Speicherauslastung" column in the task manager).
+   */
+  static size_t GetProcessMemoryUsage();
+  
+  /**
+   * Returns the total size of phyiscal memory in bytes
+   */
+  static size_t GetTotalSizeOfPhysicalRam();
+  
   /**
    * Allocates an array of a given number of elements. Each element
    * has a size of sizeof(ElementType). The function returns NULL, if the array
@@ -53,6 +67,12 @@ public:
       delete[] elements;  
     }  
   }
+  
+protected:
+  #ifndef _MSC_VER 
+  static int ReadStatmFromProcFS( int* size, int* res, int* shared, int* text, int* sharedLibs, int* stack, int* dirtyPages );
+  #endif
+     
 };
 } //end of namespace mitk
 

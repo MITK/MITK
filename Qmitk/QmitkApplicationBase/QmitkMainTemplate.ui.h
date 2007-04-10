@@ -88,6 +88,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
+#include <QmitkMemoryUsageIndicator.h>
 #include <QmitkSystemInfo.h>
 #include <QmitkRawImageFileOpener.h>
 #include <QmitkRawImageFileSequenceOpener.h>
@@ -576,6 +577,9 @@ void QmitkMainTemplate::init()
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
+  QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
+  this->statusBar()->addWidget(memoryIndicator, 0, true);
+  
   QmitkProgressBar *progBar = new QmitkProgressBar();
   this->statusBar()->addWidget(progBar, 0, true);
   progBar->hide();

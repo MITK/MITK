@@ -50,6 +50,7 @@ SET(CPP_FILES
   mitkLookupTable.cpp
   mitkLookupTableProperty.cpp
   mitkMaterialProperty.cpp
+  mitkMemoryUtilities.cpp
   mitkMesh.cpp
   mitkModeOperation.cpp
   mitkOperationActor.cpp

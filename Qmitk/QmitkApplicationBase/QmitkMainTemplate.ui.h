@@ -751,8 +751,10 @@ void QmitkMainTemplate::parseCommandLine()
     //        }
     //    }
     //    if(qApp->argc()>1)
-    if(strcmp(qApp->argv()[i], "-testing")!=0)
-      fileOpen(qApp->argv()[i]);
+    if(strcmp(qApp->argv()[i], "-testing")==0) {
+      break;
+    }
+    fileOpen(qApp->argv()[i]);
   }
 }
 

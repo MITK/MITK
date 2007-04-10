@@ -34,8 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 void RegisterFunctionalities();
 
-SampleApp::SampleApp( QWidget* parent, const char* name, WFlags fl ):
-QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false )
+SampleApp::SampleApp( QWidget* parent, const char* name, WFlags fl, const char* testingParameter ):
+QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false ), m_TestingParameter(testingParameter)
 {
   RegisterFunctionalities();
   this->setCaption("MITK Application");
@@ -66,7 +66,10 @@ void SampleApp::InitializeFunctionality()
 
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
   for (std::list<QmitkFunctionalityFactory::CreateFunctionalityPtr>::const_iterator it = qff.GetCreateFunctionalityPtrList().begin() ; it != qff.GetCreateFunctionalityPtrList().end(); it++) {
-   qfm->AddFunctionality((*it)(qfm,m_MultiWidget,&iterator)); 
+    QmitkFunctionality* functionalityInstance = (*it)(qfm,m_MultiWidget,&iterator);
+    if (!m_TestingParameter || strcmp(m_TestingParameter,functionalityInstance->GetFunctionalityName().ascii()) == 0) {
+      qfm->AddFunctionality(functionalityInstance); 
+    }
   }
 
   mitk::StatusBar::GetInstance()->DisplayText("Functionalities added",3000);

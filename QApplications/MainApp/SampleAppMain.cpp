@@ -42,8 +42,18 @@ int main(int argc, char* argv[])
     std::stringstream caption;
     caption << executableName << ", Builddate " << __DATE__ << ", " << __TIME__ << ".";
     itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
+    // parse testing parameters
+    bool enableFunctionalityTesting = false;
+    const char * testingParameter = NULL;
+    if (strcmp(argv[argc-1], "-testing")==0) {
+      enableFunctionalityTesting = true;
+    } else if (argc >= 2 && strcmp(argv[argc-2], "-testing")==0) {
+      testingParameter = argv[argc-1];
+      enableFunctionalityTesting = true;
+    }
+
     QApplication a( argc, argv );
-    SampleApp mainWindow(NULL, "mainwindow");
+    SampleApp mainWindow(NULL, "mainwindow",Qt::WType_TopLevel,testingParameter);
     mainWindow.setCaption( caption.str().c_str() );
     a.setMainWidget(&mainWindow);
 #ifdef USEDARKPALETTE
@@ -58,7 +68,7 @@ int main(int argc, char* argv[])
     */
     //vtkMapper::GlobalImmediateModeRenderingOn();
     mainWindow.showMaximized();
-    if(strcmp(argv[argc-1], "-testing")==0) {
+    if(enableFunctionalityTesting) {
       std::cout.setf(std::ios_base::unitbuf);
       return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator());
     }

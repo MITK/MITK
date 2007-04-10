@@ -26,12 +26,13 @@ class SampleApp : public QmitkMainTemplate
   Q_OBJECT
 
   bool m_ControlsLeft;
+  const char* m_TestingParameter;
 
 public:
   /*!
   \brief Default constructor
   */
-  SampleApp( QWidget* parent = 0, const char* name = 0, WFlags fl = WType_TopLevel );
+  SampleApp( QWidget* parent = 0, const char* name = 0, WFlags fl = WType_TopLevel, const char* testingParameter=NULL );
 
   /*!
   \brief Default destructor

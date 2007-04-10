@@ -577,13 +577,13 @@ void QmitkMainTemplate::init()
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
-  QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
-  this->statusBar()->addWidget(memoryIndicator, 0, true);
-  
   QmitkProgressBar *progBar = new QmitkProgressBar();
   this->statusBar()->addWidget(progBar, 0, true);
   progBar->hide();
 
+  QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
+  this->statusBar()->addWidget(memoryIndicator, 0, true);
+  
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
 

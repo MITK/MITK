@@ -31,6 +31,7 @@ class SampleApp : public QmitkMainTemplate
 public:
   /*!
   \brief Default constructor
+  \param testingParameter something that was passed after '-testing' on the command line.
   */
   SampleApp( QWidget* parent = 0, const char* name = 0, WFlags fl = WType_TopLevel, const char* testingParameter=NULL );
 

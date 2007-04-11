@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
+Module:    $RCSfile: mitkImageMapper2D.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -439,71 +439,9 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // Calculate the actual bounds of the transformed plane clipped by the
       // dataset bounding box; this is required for drawing the texture at the
       // correct position during 3D mapping.
-      //
-      // To do so, the corner points of the bounding box are transformed by
-      // the inverse transformation matrix, and the transformed bounding box
-      // edges derived therefrom are clipped with the plane z=0. The
-      // resulting min/max values are taken as bounds for the image reslicer.
-      const mitk::BoundingBox *boundingBox = 
-        rendererInfo.m_ReferenceGeometry->GetBoundingBox();
 
-      mitk::BoundingBox::PointType bbMin = boundingBox->GetMinimum();
-      mitk::BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-      mitk::BoundingBox::PointType bbCenter = boundingBox->GetCenter();
-
-      vtkPoints *points = vtkPoints::New();
-      points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
-      points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
-      points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
-      points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
-      points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
-      points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
-      points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
-      points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
-
-      vtkPoints *newPoints = vtkPoints::New();
-
-      vtkTransform *transform = vtkTransform::New();
-      transform->Identity();
-      transform->Concatenate(
-        planeGeometry->GetVtkTransform()->GetLinearInverse()
-      );
-
-      transform->Concatenate(
-        rendererInfo.m_ReferenceGeometry->GetVtkTransform()
-      );
-
-
-      transform->TransformPoints( points, newPoints );
-
-
-      bounds[0] = bounds[2] = 10000000.0;
-      bounds[1] = bounds[3] = -10000000.0;
-      bounds[4] = bounds[5] = 0.0;
-
-      this->LineIntersectZero( newPoints, 0, 1, bounds );
-      this->LineIntersectZero( newPoints, 1, 2, bounds );
-      this->LineIntersectZero( newPoints, 2, 3, bounds );
-      this->LineIntersectZero( newPoints, 3, 0, bounds );
-      this->LineIntersectZero( newPoints, 0, 4, bounds );
-      this->LineIntersectZero( newPoints, 1, 5, bounds );
-      this->LineIntersectZero( newPoints, 2, 6, bounds );
-      this->LineIntersectZero( newPoints, 3, 7, bounds );
-      this->LineIntersectZero( newPoints, 4, 5, bounds );
-      this->LineIntersectZero( newPoints, 5, 6, bounds );
-      this->LineIntersectZero( newPoints, 6, 7, bounds );
-      this->LineIntersectZero( newPoints, 7, 4, bounds );
-      
-
-      // The resulting bounds must be adjusted by the plane spacing, since we
-      // we have so far dealt with index coordinates
-      const float *planeSpacing = planeGeometry->GetFloatSpacing();
-      bounds[0] *= planeSpacing[0];
-      bounds[1] *= planeSpacing[0];
-      bounds[2] *= planeSpacing[1];
-      bounds[3] *= planeSpacing[1];
-      bounds[4] *= planeSpacing[2];
-      bounds[5] *= planeSpacing[2];
+      this->CalculateClippedPlaneBounds( rendererInfo.m_ReferenceGeometry, 
+        planeGeometry, bounds );
     }
   }
 
@@ -616,38 +554,24 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
 
   
-  // Now the image reslicing is done. We have two passes: one for 2D
-  // rendering, the other one for 3D rendering. This differentiation is done
-  // for increase performance; for OpenGL based 3D rendering the resampling
-  // becomes optimal for power-of-two extents. For 2D however, we need the
-  // actual extent to prevent spacing modifications.
-  //
-  // Note that the same vtkImageReslice object is used for both passes, with
-  // different initializations.
-  //
-  // 1. PASS: RESLICE FOR 2D RENDERING
-  //
 
   // Determine output extent for reslicing
+  ScalarType size[2];
+  size[0] = (bounds[1] - bounds[0]) / mmPerPixel[0];
+  size[1] = (bounds[3] - bounds[2]) / mmPerPixel[1];
+
   int xMin, xMax, yMin, yMax;
   if ( worldGeometry->GetReferenceGeometry() )
   {
+    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] );
+    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] );
+    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] );
+    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] );
+
     // Calculate the extent by which the maximal plane (due to plane rotation)
     // overlaps the regular plane size.
-    ScalarType maxPlaneSize = worldGeometry
-      ->GetReferenceGeometry()->GetDiagonalLength();
-
-    rendererInfo.m_Overlap[0] =
-      (maxPlaneSize / mmPerPixel[0] - rendererInfo.m_Extent[0]) / 2.0;
-    rendererInfo.m_Overlap[1] = 
-      (maxPlaneSize / mmPerPixel[1] - rendererInfo.m_Extent[1]) / 2.0;
-
-    xMin = static_cast< int >( -(rendererInfo.m_Overlap[0] + 0.5) );
-    xMax = static_cast< int >( xMin + rendererInfo.m_Extent[0]
-      + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] );
-    yMin = static_cast< int >( -(rendererInfo.m_Overlap[1] + 0.5) );
-    yMax = static_cast< int >( yMin + rendererInfo.m_Extent[1]
-      + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] );
+    rendererInfo.m_Overlap[0] = -bounds[0] / mmPerPixel[0];
+    rendererInfo.m_Overlap[1] = -bounds[2] / mmPerPixel[1];
   }
   else
   {
@@ -673,7 +597,12 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.m_Reslicer->ReleaseDataFlagOn();
   rendererInfo.m_Reslicer->Update();
 
-  // Convert the resampling result to PIC image format
+
+  // The reslicing result is used both for 2D and for 3D mapping. 2D mapping
+  // currently uses PIC data structures, while 3D mapping uses VTK data. Thus,
+  // the reslicing result needs to be stored twice.
+
+  // 1. Convert the resampling result to PIC image format
   ipPicDescriptor *pic = Pic2vtk::convert( rendererInfo.m_Reslicer->GetOutput() );
 
   if ( pic->dim == 1 )
@@ -700,57 +629,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 
 
-
-  //
-  // 2. PASS: RESLICE FOR 3D RENDERING
-  //
-  
-  // Get size of image to extract
-  int originalSize[2];
-  if ( worldGeometry->GetReferenceGeometry() )
-  {
-    originalSize[0] = static_cast< int >( 
-      (bounds[1] - bounds[0]) / mmPerPixel[0] );
-    originalSize[1] = static_cast< int >(
-      (bounds[3] - bounds[2]) / mmPerPixel[1] );
-  }
-  else
-  {
-    originalSize[0] = static_cast< int >( rendererInfo.m_Extent[0] );
-    originalSize[1] = static_cast< int >( rendererInfo.m_Extent[1] );
-  }
-
-  // Extend to nearest power-of-two number for OpenGL optimization
-  int newSize[2];
-  newSize[0] = this->FindPowerOfTwo( originalSize[0] );
-  newSize[1] = this->FindPowerOfTwo( originalSize[1] );
-
-  int newExtent[6];
-  newExtent[0] = static_cast< int >( 
-    bounds[0] / mmPerPixel[0] * newSize[0] / originalSize[0] );
-  newExtent[1] = static_cast< int >( newExtent[0] + newSize[0] - 1 );
-  newExtent[2] = static_cast< int >(
-    bounds[2] / mmPerPixel[1] * newSize[1] / originalSize[1] );
-  newExtent[3] = static_cast< int >( newExtent[2] + newSize[1] - 1 );
-  newExtent[4] = 0;
-  newExtent[5] = 1;
-
-  // Adjust spacing accordingly
-  rendererInfo.m_Reslicer->SetOutputSpacing( 
-    mmPerPixel[0] * originalSize[0] / newSize[0],
-    mmPerPixel[1] * originalSize[1] / newSize[1],
-    1.0 );
-
-  rendererInfo.m_Reslicer->SetOutputExtent( 
-    newExtent[0], newExtent[1],
-    newExtent[2], newExtent[3],
-    newExtent[4], newExtent[5] );
-
-  // Do the reslicing
-  rendererInfo.m_Reslicer->Modified();
-  rendererInfo.m_Reslicer->Update();
-
-  // Store the extracted image
+  // 2. Store the result in a VTK image
   rendererInfo.m_Image->Delete();
   rendererInfo.m_Image = vtkImageData::New();
   rendererInfo.m_Image->DeepCopy( rendererInfo.m_Reslicer->GetOutput() );
@@ -808,6 +687,77 @@ mitk::ImageMapper2D
   }
   return false;
 }
+
+
+void 
+mitk::ImageMapper2D
+::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+  const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+{
+  // Clip the plane with the bounding geometry. To do so, the corner points 
+  // of the bounding box are transformed by the inverse transformation 
+  // matrix, and the transformed bounding box edges derived therefrom are 
+  // clipped with the plane z=0. The resulting min/max values are taken as 
+  // bounds for the image reslicer.
+  const mitk::BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
+
+  mitk::BoundingBox::PointType bbMin = boundingBox->GetMinimum();
+  mitk::BoundingBox::PointType bbMax = boundingBox->GetMaximum();
+  mitk::BoundingBox::PointType bbCenter = boundingBox->GetCenter();
+
+  vtkPoints *points = vtkPoints::New();
+  points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
+  points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
+  points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
+  points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
+  points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
+  points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
+  points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
+  points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
+
+  vtkPoints *newPoints = vtkPoints::New();
+
+  vtkTransform *transform = vtkTransform::New();
+  transform->Identity();
+  transform->Concatenate(
+    planeGeometry->GetVtkTransform()->GetLinearInverse()
+  );
+
+  transform->Concatenate( boundingGeometry->GetVtkTransform() );
+
+
+  transform->TransformPoints( points, newPoints );
+
+
+  bounds[0] = bounds[2] = 10000000.0;
+  bounds[1] = bounds[3] = -10000000.0;
+  bounds[4] = bounds[5] = 0.0;
+
+  this->LineIntersectZero( newPoints, 0, 1, bounds );
+  this->LineIntersectZero( newPoints, 1, 2, bounds );
+  this->LineIntersectZero( newPoints, 2, 3, bounds );
+  this->LineIntersectZero( newPoints, 3, 0, bounds );
+  this->LineIntersectZero( newPoints, 0, 4, bounds );
+  this->LineIntersectZero( newPoints, 1, 5, bounds );
+  this->LineIntersectZero( newPoints, 2, 6, bounds );
+  this->LineIntersectZero( newPoints, 3, 7, bounds );
+  this->LineIntersectZero( newPoints, 4, 5, bounds );
+  this->LineIntersectZero( newPoints, 5, 6, bounds );
+  this->LineIntersectZero( newPoints, 6, 7, bounds );
+  this->LineIntersectZero( newPoints, 7, 4, bounds );
+  
+
+  // The resulting bounds must be adjusted by the plane spacing, since we
+  // we have so far dealt with index coordinates
+  const float *planeSpacing = planeGeometry->GetFloatSpacing();
+  bounds[0] *= planeSpacing[0];
+  bounds[1] *= planeSpacing[0];
+  bounds[2] *= planeSpacing[1];
+  bounds[3] *= planeSpacing[1];
+  bounds[4] *= planeSpacing[2];
+  bounds[5] *= planeSpacing[2];
+}
+
 
 
 void
@@ -968,17 +918,6 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
   }
 }
 
-int
-mitk::ImageMapper2D::FindPowerOfTwo( int i )
-{
-  int size;
-
-  for ( --i, size = 1; i > 0; size *= 2 )
-  {
-    i /= 2;
-  }
-  return size;
-}
 
 mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()

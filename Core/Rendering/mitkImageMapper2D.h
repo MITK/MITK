@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
+Module:    $RCSfile: mitkImageMapper2D.h,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -201,13 +201,14 @@ protected:
     return rendererInfo;
   }
 
-  int FindPowerOfTwo( int i );
-
   double CalculateSpacing( const mitk::Geometry3D *geometry, 
     const mitk::Vector3D &d ) const;
 
   bool LineIntersectZero( vtkPoints *points, int p1, int p2, 
     vtkFloatingPointType *bounds );
+
+  void CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+    const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
   /** \brief Number of renderers data is stored for
    * \todo General concept for keeping data for rendering required

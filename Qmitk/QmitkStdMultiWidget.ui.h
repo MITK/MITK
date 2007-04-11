@@ -707,6 +707,8 @@ bool QmitkStdMultiWidget
     mitk::Geometry3D::Pointer clonedgeometry = 
       static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
 
+    clonedgeometry->ImageGeometryOff();
+
     // steppers are set so that the cross is centered in the image
     sliceNavigatorTransversal->SetInputWorldGeometry(
       clonedgeometry.GetPointer());

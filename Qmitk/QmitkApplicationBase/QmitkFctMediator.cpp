@@ -55,7 +55,7 @@ QmitkFctMediator::QmitkFctMediator(QObject *parent, const char *name) : QObject(
                                                                         m_DefaultMain(NULL), 
                                                                         m_NumOfFuncs(0), 
                                                                         m_FunctionalityActionGroup(NULL), 
-                                                                        m_CurrentFunctionality(0)
+                                                                        m_CurrentFunctionality(-1)
 {
 
 }
@@ -255,11 +255,13 @@ void QmitkFctMediator::Selecting(int id)
 {
   if(id!=m_CurrentFunctionality)
   {    
-    qfl.at(m_CurrentFunctionality)->Deactivated();
-    if(qfl.at(m_CurrentFunctionality)->m_Activated)
-    {
-      itkGenericOutputMacro(<<"Method Deactivated() of functionality '"<<qfl.at(m_CurrentFunctionality)->GetFunctionalityName().latin1()<< "' did not call QmitkFunctionality::Deactivated().");
-      qfl.at(m_CurrentFunctionality)->m_Activated = false;
+    if( qfl.at(m_CurrentFunctionality) ) {
+      qfl.at(m_CurrentFunctionality)->Deactivated();
+      if(qfl.at(m_CurrentFunctionality)->m_Activated)
+      {
+        itkGenericOutputMacro(<<"Method Deactivated() of functionality '"<<qfl.at(m_CurrentFunctionality)->GetFunctionalityName().latin1()<< "' did not call QmitkFunctionality::Deactivated().");
+        qfl.at(m_CurrentFunctionality)->m_Activated = false;
+      }
     }
   }
 }

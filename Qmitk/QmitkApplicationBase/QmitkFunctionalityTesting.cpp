@@ -105,7 +105,13 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
   QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
-  std::cout << "Testing Functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+  if (qfm->GetActiveFunctionality()) {
+    std::cout << "Testing Functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+  } 
+  else
+  { 
+    std::cout << "No active functionality yet ..." << std::endl << std::flush;
+  }
   qApp->exec();
   std::cout<<"[PASSED]"<<std::endl;
 

@@ -67,8 +67,13 @@ void SampleApp::InitializeFunctionality()
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
   for (std::list<QmitkFunctionalityFactory::CreateFunctionalityPtr>::const_iterator it = qff.GetCreateFunctionalityPtrList().begin() ; it != qff.GetCreateFunctionalityPtrList().end(); it++) {
     QmitkFunctionality* functionalityInstance = (*it)(qfm,m_MultiWidget,&iterator);
-    if (!m_TestingParameter || strcmp(m_TestingParameter,functionalityInstance->GetFunctionalityName().ascii()) == 0) {
+    if (!m_TestingParameter) {
       qfm->AddFunctionality(functionalityInstance); 
+    } else if (strcmp(m_TestingParameter,functionalityInstance->name()) == 0) {
+      std::cout << "adding selected " << functionalityInstance->name() << std::endl;
+      qfm->AddFunctionality(functionalityInstance); 
+    } else {
+      std::cout << "rejecting functionality " << functionalityInstance->name() << std::endl;
     }
   }
 

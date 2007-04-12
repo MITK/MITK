@@ -224,6 +224,16 @@ public:
    * Restores the applications cursor, which has been overridden using WaitCursorOn()
    */
   void WaitCursorOff();
+  
+  /**
+   * Outputs an error message to the console and displays a message box containing
+   * the exception description.
+   * @param e the exception which should be handled
+   * @param showDialog controls, whether additionally a message box should be
+   *        displayed to inform the user that something went wrong
+   */
+  void HandleException( std::exception& e, QWidget* parent = NULL, bool showDialog = true ) const;
+  void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
 
 signals:
   void Signal_dummy();

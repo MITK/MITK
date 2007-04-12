@@ -284,8 +284,9 @@ void QmitkMainTemplate::fileOpen()
       fileOpen((*it).ascii());
     }
   }
-  catch (std::exception& e)
+  catch ( std::exception& e )
   {
+    itkGenericOutputMacro( << "Exception caught: " << e.what() );
     QMessageBox::critical ( this, "Exception caught!", e.what() );
   }
 }

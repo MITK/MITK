@@ -403,14 +403,18 @@ void QmitkMaterialEditor::OnColorSelectButtonClickedClicked()
     QColor result = QColorDialog::getColor( QColor( ( int ) ( color.GetRed() * 255 ), ( int ) ( color.GetGreen() * 255 ), ( int ) ( color.GetBlue() * 255 ) ), this );
     if ( result.isValid() )
     {
-        color.SetRed( result.red() / 255.0 );
-        color.SetGreen( result.green() / 255.0 );
-        color.SetBlue( result.blue() / 255.0 );
-        m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
-        m_Showcases[ m_ActiveShowcase ]->SetColor( color );
+      color.SetRed( result.red() / 255.0 );
+      color.SetGreen( result.green() / 255.0 );
+      color.SetBlue( result.blue() / 255.0 );
+      m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
+      m_Showcases[ m_ActiveShowcase ]->SetColor( color );
+      
+      if (m_Inline ) 
+      {
+        OnOKClicked(); // here we are being closed because inside some popup menu, so the user can't possibly hit the accept button anymore
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
     }
-    
-    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 

@@ -572,6 +572,7 @@ void QmitkMainTemplate::init()
   m_MultiWidget=NULL;
   m_StandardViewsInitialized = false;
   m_FineUndoEnabled = true;
+  m_StandardPalette = QApplication::palette();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -1259,13 +1260,13 @@ void QmitkMainTemplate::enableDarkPalette( bool enable )
 {
   if(enable)
   {
+    this->m_StandardPalette = QApplication::palette();
     QPalette p( QColor( 64,64,64), QColor(64,64,64));
     QApplication::setPalette(p,TRUE);
   }
   else
   {
-    QPalette p( QColor( 196,196,196), QColor(196,196,196));
-    QApplication::setPalette(p,TRUE);
+    QApplication::setPalette(this->m_StandardPalette,TRUE);
   }
 }
 

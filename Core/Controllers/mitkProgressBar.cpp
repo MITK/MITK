@@ -32,38 +32,58 @@ namespace mitk
    * Sets the current amount of progress to current progress + steps.
    * @param: steps the number of steps done since last Progress(int steps) call.
    */
-  void ProgressBar::Progress(unsigned int steps)
+  void ProgressBar::Progress(unsigned int steps, bool callFromThread)
   {
-    if (m_Implementation != NULL)
+    if (callFromThread)
     {
-      // what to do
-      itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
-      command->SetCallbackFunction(this, &ProgressBar::Progress);
+      if (m_Implementation != NULL)
+      {
+        // what to do
+        itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
+        command->SetCallbackFunction(this, &ProgressBar::Progress);
 
-      // what parameters
-      CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
+        // what parameters
+        CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
 
-      // make sure to proceed in GUI thread
-      CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+        // make sure to proceed in GUI thread
+        CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+      }
+    }
+    else
+    {
+      if (m_Implementation != NULL)
+      {
+        m_Implementation->Progress(steps);
+      }
     }
   }
 
   /**
    * Adds steps to totalSteps.
    */
-  void ProgressBar::AddStepsToDo(unsigned int steps)
+  void ProgressBar::AddStepsToDo(unsigned int steps, bool callFromThread)
   {
-    if (m_Implementation != NULL)
+    if (callFromThread)
     {
-      // what to do
-      itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
-      command->SetCallbackFunction(this, &ProgressBar::AddStepsToDo);
+      if (m_Implementation != NULL)
+      {
+        // what to do
+        itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
+        command->SetCallbackFunction(this, &ProgressBar::AddStepsToDo);
 
-      // what parameters
-      CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
+        // what parameters
+        CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
 
-      // make sure to proceed in GUI thread
-      CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+        // make sure to proceed in GUI thread
+        CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+      }
+    }
+    else
+    {
+      if (m_Implementation)
+      {
+        m_Implementation->AddStepsToDo(steps);
+      }
     }
   }
 

@@ -52,12 +52,12 @@ namespace mitk
 
     //##Documentation
     //## @brief Adds steps to totalSteps.
-    void AddStepsToDo(unsigned int steps);
+    void AddStepsToDo(unsigned int steps, bool callFromThread = false);
   
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param: steps the number of steps done since last Progress(int steps) call.
-    void Progress(unsigned int steps = 1);
+    void Progress(unsigned int steps = 1, bool callFromThread = false);
 
     //##Documentation
     //## @brief Sets whether the current progress value is displayed.

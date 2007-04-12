@@ -279,7 +279,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
   if (image->GetPixelType().GetType() == ipPicInt && image->GetPixelType().GetBpe() >= 8)
   {
-    if (minValue == -(pow(2,image->GetPixelType().GetBpe())/2))
+    if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
     {
       minValue = min2ndValue;
     }

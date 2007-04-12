@@ -183,7 +183,7 @@ void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool
   }
 }
 
-void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog = true ) const
+void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog ) const
 {
   HandleException( e.what(), parent, showDialog );
 }

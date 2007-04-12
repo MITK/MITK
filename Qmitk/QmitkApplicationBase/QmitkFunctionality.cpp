@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlcdnumber.h>
 #include <qslider.h>
 #include <qapplication.h>
+#include <qmessagebox.h>
+#include <stdexcept>
 #include <qcursor.h>
 #include <itkCommand.h>
 #include <QmitkPropertyListView.h>
@@ -172,3 +174,16 @@ void QmitkFunctionality::WaitCursorOff()
   QApplication::restoreOverrideCursor();
 }
 
+void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
+{
+  itkGenericOutputMacro( << "Exception caught: " << str );
+  if ( showDialog )
+  {
+    QMessageBox::critical ( parent, "Exception caught!", str );
+  }
+}
+
+void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog = true ) const
+{
+  HandleException( e.what(), parent, showDialog );
+}

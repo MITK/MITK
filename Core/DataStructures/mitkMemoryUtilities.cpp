@@ -56,7 +56,7 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 #else
   struct sysinfo info;
   if ( ! sysinfo( &info ) )
-    return info.totalram;
+    return info.totalram * info.mem_unit;
   else
     return 0;
 #endif 

@@ -155,39 +155,39 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
 void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *vtkimage, mitk::Surface * surface, mitk::LabeledImageToSurfaceFilter::LabelType label )
 {
   vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
-  indexCoordinatesImageFilter->SetInput( vtkimage );
-  indexCoordinatesImageFilter->SetOutputOrigin( 0.0,0.0,0.0 );
+  indexCoordinatesImageFilter->SetInput(vtkimage);
+  indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
-  vtkImageThreshold* threshold = vtkImageThreshold::New();
-  threshold->SetInput( indexCoordinatesImageFilter->GetOutput() );
-  indexCoordinatesImageFilter->Delete();
-  threshold->SetInValue( 100 );
-  threshold->SetOutValue( 0 );
-  threshold->ThresholdBetween( label, label ); 
-  threshold->SetOutputScalarTypeToUnsignedChar();
-  threshold->ReleaseDataFlagOn();
+    vtkImageThreshold* threshold = vtkImageThreshold::New();
+    threshold->SetInput( indexCoordinatesImageFilter->GetOutput() );
+    //indexCoordinatesImageFilter->Delete();
+    threshold->SetInValue( 100 );
+    threshold->SetOutValue( 0 );
+    threshold->ThresholdBetween( label, label ); 
+    threshold->SetOutputScalarTypeToUnsignedChar();
+    threshold->ReleaseDataFlagOn();
 
-  vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-  gaussian->SetInput( threshold->GetOutput() ); 
-  threshold->Delete();
-  gaussian->SetDimensionality( 3  );
-  gaussian->SetRadiusFactor( 0.49 );
-  gaussian->SetStandardDeviation( 1.5 );
-  gaussian->ReleaseDataFlagOn();
-  gaussian->UpdateInformation();
-  gaussian->Update();
-  
+    vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
+    gaussian->SetInput( threshold->GetOutput() ); 
+    //threshold->Delete();
+    gaussian->SetDimensionality( 3  );
+    gaussian->SetRadiusFactor( 0.49 );
+    gaussian->SetStandardDeviation( 1.5 );
+    gaussian->ReleaseDataFlagOn();
+    gaussian->UpdateInformation();
+    gaussian->Update();
+
   //MarchingCube -->create Surface
-  vtkImageMarchingCubes *mc = vtkImageMarchingCubes::New();
-  mc->SetInput( gaussian->GetOutput() );//RC++
-  gaussian->Delete();
-  mc->ReleaseDataFlagOn();
-  mc->SetValue( 0, 50 );
+  vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
+  skinExtractor->ReleaseDataFlagOn();
+  skinExtractor->SetInput(gaussian->GetOutput());//RC++
+  indexCoordinatesImageFilter->Delete();
+  skinExtractor->SetValue(0, 50);
 
   vtkPolyData *polydata;
-  polydata = mc->GetOutput();
-  polydata->Register( NULL );//RC++
-  mc->Delete();
+  polydata = skinExtractor->GetOutput();
+  polydata->Register(NULL);//RC++
+  skinExtractor->Delete();
 
   if (m_Smooth)
   {
@@ -200,7 +200,6 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     smoother->FeatureEdgeSmoothingOff();
     smoother->BoundarySmoothingOff();
     smoother->SetConvergence( 0 );
-    smoother->ReleaseDataFlagOn();
 
     polydata->Delete();//RC--
     polydata = smoother->GetOutput();
@@ -231,7 +230,6 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->SetInput(polydata);//RC++
     decimate->SetTargetReduction(m_TargetReduction);
     decimate->SetMaximumError(0.002);
-    decimate->ReleaseDataFlagOn();
 
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
@@ -246,7 +244,6 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->PreserveTopologyOn();
     decimate->BoundaryVertexDeletionOff();
     decimate->SetTargetReduction( m_TargetReduction );
-    decimate->ReleaseDataFlagOn();
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
@@ -286,6 +283,9 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
 
   surface->SetVtkPolyData(polydata, time);
   polydata->UnRegister(NULL);
+
+  gaussian->Delete();
+  threshold->Delete();
 }
 
 template < typename TPixel, unsigned int VImageDimension >

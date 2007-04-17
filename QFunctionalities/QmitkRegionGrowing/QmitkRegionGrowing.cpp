@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
 
+#include "mitkPointSetInteractor.h"
+#include "mitkGlobalInteraction.h"
+
 QmitkRegionGrowing::QmitkRegionGrowing(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
     : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
@@ -73,6 +76,21 @@ void QmitkRegionGrowing::TreeChanged()
 void QmitkRegionGrowing::Activated()
 {
   QmitkFunctionality::Activated();
+
+  if (m_PointSetNode.IsNull()) // only once create a new DataTreeNode containing a PointSet with some interaction
+  {
+    // new node and data item
+    m_PointSetNode = mitk::DataTreeNode::New();
+    m_PointSet = mitk::PointSet::New();
+    m_PointSetNode->SetData( m_PointSet );
+
+    // new behaviour/interaction for the pointset node
+    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+    // add the pointset to the data tree (for rendering)
+    GetDataTreeIterator()->Add( m_PointSetNode );
+  }
 }
 
 void QmitkRegionGrowing::ImageSelected(mitk::DataTreeIteratorClone imageIt)

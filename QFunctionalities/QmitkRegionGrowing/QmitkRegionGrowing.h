@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkRegionGrowing_H__INCLUDED
 
 #include "QmitkFunctionality.h"
+#include "mitkPointSet.h"
 
 class QmitkStdMultiWidget;
 class QmitkRegionGrowingControls;
@@ -89,5 +90,10 @@ protected:
   */  
   QmitkRegionGrowingControls * m_Controls;
 
+  // we'll access these members from different member functions
+  mitk::DataTreeNode::Pointer m_PointSetNode;
+  mitk::PointSet::Pointer m_PointSet;
+
 };
 #endif // !defined(QmitkRegionGrowing_H__INCLUDED)
+

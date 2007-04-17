@@ -29,6 +29,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkDataTreeHelper.h"
+#include "mitkProperties.h"
+#include "mitkColorProperty.h"
+#include "mitkITKImageImport.h"
+#include "mitkDataStorage.h"
+
+#include <itkConnectedThresholdImageFilter.h>
 
 QmitkRegionGrowing::QmitkRegionGrowing(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
     : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -152,8 +159,14 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
   typedef typename InputImageType::IndexType    IndexType;
-  IndexType seedIndex;
   
+  // instantiate an ITK region growing filter, set its parameters
+  typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
+  typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+  regionGrower->SetInput( itkImage ); // don't forget this
+
+  // determine a thresholding interval
+  IndexType seedIndex;
   TPixel min( std::numeric_limits<TPixel>::max() );
   TPixel max( std::numeric_limits<TPixel>::min() );
   for ( mitk::PointSet::PointsConstIterator pointsIterator = m_PointSet->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
@@ -176,8 +189,34 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 
     if (currentPixelValue < min)
       min = currentPixelValue;
+
+    regionGrower->AddSeed( seedIndex );
   }
 
   std::cout << "Values between " << min << " and " << max << std::endl;
+
+  min -= 30;
+  max += 30;
+
+  // set thresholds and execute filter
+  regionGrower->SetLower( min );
+  regionGrower->SetUpper( max );
+
+  regionGrower->Update();
+
+  // add result to data tree
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
+  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  newNode->SetData( resultImage );
+
+  // set some properties
+  mitk::DataTreeNodeFactory::SetDefaultImageProperties( newNode );
+  newNode->SetProperty("binary", new mitk::BoolProperty(true));
+  newNode->SetProperty("name", new mitk::StringProperty("dumb segmentation"));
+  newNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
+  //newNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
+  newNode->SetProperty("layer", new mitk::IntProperty(1));
+
+  mitk::DataStorage::GetInstance()->Add( newNode );
 }
 

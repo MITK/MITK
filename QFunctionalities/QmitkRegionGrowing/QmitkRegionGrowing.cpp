@@ -16,35 +16,40 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkRegionGrowing.h"
 #include "QmitkRegionGrowingControls.h"
+#include "QmitkRegionGrowing.h"
+#include "QmitkStdMultiWidget.h"
+#include "QmitkTreeNodeSelector.h"
+
 #include <qaction.h>
 #include <qmessagebox.h>
-#include "icon.xpm"
-#include "QmitkTreeNodeSelector.h"
-#include "QmitkStdMultiWidget.h"
 
-#include <limits>
-
-#include "mitkImageAccessByItk.h"
-#include "mitkPointSetInteractor.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkDataTreeHelper.h"
-#include "mitkProperties.h"
 #include "mitkColorProperty.h"
-#include "mitkITKImageImport.h"
 #include "mitkDataStorage.h"
+#include "mitkDataTreeHelper.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkITKImageImport.h"
+#include "mitkPointSetInteractor.h"
+#include "mitkProperties.h"
 
 #include <itkConnectedThresholdImageFilter.h>
 
+#include <limits>
+
+#include "icon.xpm"
+
 QmitkRegionGrowing::QmitkRegionGrowing(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
+: QmitkFunctionality(parent, name, it), 
+  m_MultiWidget(mitkStdMultiWidget), 
+  m_Controls(NULL)
 {
   SetAvailability(true);
 }
 
 QmitkRegionGrowing::~QmitkRegionGrowing()
-{}
+{
+}
 
 QWidget * QmitkRegionGrowing::CreateMainWidget(QWidget *parent)
 {
@@ -76,13 +81,13 @@ void QmitkRegionGrowing::CreateConnections()
 QAction * QmitkRegionGrowing::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "ToolTip" ), QPixmap((const char**)icon_xpm), tr( "MenueEintrag" ), 0, parent, "QmitkRegionGrowing" );
+  action = new QAction( tr( "Quite simple region grower" ), QPixmap((const char**)icon_xpm), tr( "You will never see this" ), 0, parent, "QmitkRegionGrowing" );
   return action;
 }
 
 void QmitkRegionGrowing::TreeChanged()
 {
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
+  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator( GetDataTreeIterator() );
 }
 
 void QmitkRegionGrowing::Activated()

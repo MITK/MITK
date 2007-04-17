@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRegionGrowing.h"
 #include "QmitkRegionGrowingControls.h"
 #include <qaction.h>
+#include <qmessagebox.h>
 #include "icon.xpm"
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
@@ -57,8 +58,6 @@ void QmitkRegionGrowing::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)), 
-                                                   this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
     connect( (QObject*)(m_Controls->btnRegionGrow), SIGNAL(clicked()), 
                                               this, SLOT(DoRegionGrowing()) );
   }
@@ -96,22 +95,22 @@ void QmitkRegionGrowing::Activated()
   }
 }
 
-void QmitkRegionGrowing::ImageSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkRegionGrowing::DoRegionGrowing()
 {
-  assert( imageIt.IsNotNull() ); // should never fail, the selection widget cares for that
+  const mitk::DataTreeIteratorClone* iterator = m_Controls->m_TreeNodeSelector->GetSelectedIterator(); // should never fail, the selection widget cares for that
+  if (!iterator)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information( NULL, "Region growing functionality", "Please load and select an image before region growing.");
+    return;
+  }
     
-  mitk::DataTreeNode* node = imageIt->Get();
+  mitk::DataTreeNode* node = (*iterator)->Get();
   if ( node )
   {
     // here we have a valid mitk::DataTreeNode
-    std::string name;
-    if (node->GetName(name))
-    {
-      // a property called "name" was found for this DataTreeNode
-      std::cout << "Tree node selected with name '" << name << "'" << std::endl;
-    }
 
-    // a node itself is not very useful, we need its data item
+    // a node itself is not very useful, we need its data item (the image)
     mitk::BaseData* data = node->GetData();
     if (data)
     {
@@ -119,13 +118,27 @@ void QmitkRegionGrowing::ImageSelected(mitk::DataTreeIteratorClone imageIt)
       mitk::Image* image = dynamic_cast<mitk::Image*>( data );
       if (image)
       {
-        std::cout << "Surprise: this node contains a real image dataset." << std::endl;
+        std::string name;
+        std::cout << "Performing region growing for image";
+        if (node->GetName(name))
+        {
+          // a property called "name" was found for this DataTreeNode
+          std::cout << "'" << name << "'";
+        }
+        std::cout << "." << std::endl;
+
+        // So we have an image. Let's see if the user has set some seed points already
+        if ( m_PointSet->GetSize() == 0 )
+        {
+          // no points there. Not good for region growing
+          QMessageBox::information( NULL, "Region growing functionality", "Please set some seed points inside the image first.\n(hold Shift key and click left mouse button inside the image.)");
+          return;
+        }
+
+        // TODO actually perform region growing. Here we have both an image and some seed points, so we could just start
+
       }
     }
   }
-}
 
-void QmitkRegionGrowing::DoRegionGrowing()
-{
-  std::cout << "Button clicked" << std::endl;
 }

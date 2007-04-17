@@ -118,6 +118,7 @@ void Step6::SetupWidgets()
   m_TopLevelWidget = new QVBox(this);
   // create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
+  viewParent->setSpacing(2);
   // Part Ia: 3D view
   // create a renderwindow
   QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);

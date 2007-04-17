@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
   //Part IV: Create windows and pass the tree to it
   // create toplevel widget with horizontal layout
   QHBox toplevelWidget;
+  toplevelWidget.setSpacing(2);
   // Part IVa: 3D view
   // create a renderwindow
   QmitkRenderWindow renderWindow(&toplevelWidget);

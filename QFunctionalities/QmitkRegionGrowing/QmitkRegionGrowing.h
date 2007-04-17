@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionality.h"
 #include "mitkPointSet.h"
+#include <itkImage.h>
 
 class QmitkStdMultiWidget;
 class QmitkRegionGrowingControls;
@@ -77,6 +78,10 @@ protected slots:
   void DoRegionGrowing();
 
 protected:  
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry = NULL );
+
   /*!  
   * default main widget containing 4 windows showing 3   
   * orthogonal slices of the volume and a 3d render window  

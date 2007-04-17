@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
 
+#include "mitkImageAccessByItk.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkGlobalInteraction.h"
 
@@ -135,10 +136,29 @@ void QmitkRegionGrowing::DoRegionGrowing()
           return;
         }
 
-        // TODO actually perform region growing. Here we have both an image and some seed points, so we could just start
+        // actually perform region growing. Here we have both an image and some seed points
+        AccessByItk_1( image, ItkImageProcessing, image->GetGeometry() ); // some magic to call the correctly templated function
 
       }
     }
   }
 
 }
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry )
+{
+  typedef itk::Image< TPixel, VImageDimension > InputImageType;
+  typedef typename InputImageType::IndexType    IndexType;
+  IndexType seedIndex;
+  
+  for ( mitk::PointSet::PointsConstIterator pointsIterator = m_PointSet->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
+        pointsIterator != m_PointSet->GetPointSet()->GetPoints()->End();
+        ++pointsIterator ) 
+  {
+    imageGeometry->WorldToIndex( pointsIterator.Value(), seedIndex);
+    std::cout << seedIndex << std::endl;
+    //TODO use these points for a region grower and somehow display the result
+  }
+}
+

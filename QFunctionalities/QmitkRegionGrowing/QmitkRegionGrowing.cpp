@@ -209,7 +209,6 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 
   regionGrower->Update();
 
-  // add result to data tree
   mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
   mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
   newNode->SetData( resultImage );
@@ -221,7 +220,9 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   newNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
   //newNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
   newNode->SetProperty("layer", new mitk::IntProperty(1));
+  newNode->SetProperty("opacity", new mitk::FloatProperty(0.5));
 
+  // add result to data tree
   mitk::DataStorage::GetInstance()->Add( newNode );
 }
 

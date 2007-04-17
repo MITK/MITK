@@ -163,7 +163,7 @@ void QmitkMovieMaker::CreateConnections()
       this, SLOT(AdvanceAnimation()) );
 
     // movie generation
-    // when the movie button is clickethe movie button is clicked
+    // when the movie button is clicked 
     connect( (QObject*) m_Controls->btnMovie, SIGNAL(clicked()),
       this, SLOT(GenerateMovie()) );
       

@@ -28,13 +28,13 @@ class QmitkFunctionalityTesting : public QObject
 public:
   QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent = 0, const char * name = 0 );
   ~QmitkFunctionalityTesting();
+  QTimer m_CloseMessagesTimer;
 protected slots:
   virtual void ActivateNextFunctionality();
   virtual void CloseFirstMessageBox();
 protected:
   QmitkFctMediator* m_QmitkFctMediator;
   QTimer m_ActivateTimer;
-  QTimer m_CloseMessagesTimer;
 };
 
 int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);

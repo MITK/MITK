@@ -1,2 +1,0 @@
-addExternalFunctionality(@FUNCTIONALITY_NAME@ @FUNCTIONALITY_DIR@)
-

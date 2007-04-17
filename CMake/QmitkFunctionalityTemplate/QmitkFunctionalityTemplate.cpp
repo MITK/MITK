@@ -77,9 +77,30 @@ void @FUNCTIONALITY_NAME@::Activated()
 
 void @FUNCTIONALITY_NAME@::ImageSelected(mitk::DataTreeIteratorClone imageIt)
 {
-  std::string name;
-  if (imageIt->Get()->GetName(name))
+  assert( imageIt.IsNotNull() ); // should never fail, the selection widget cares for that
+    
+  mitk::DataTreeNode* node = imageIt->Get();
+  if ( node )
   {
-    std::cout << "Tree node selected with name '" << name << "'" << std::endl;
+    // here we have a valid mitk::DataTreeNode
+    std::string name;
+    if (node->GetName(name))
+    {
+      // a property called "name" was found for this DataTreeNode
+      std::cout << "Tree node selected with name '" << name << "'" << std::endl;
+    }
+
+    // a node itself is not very useful, we need its data item
+    mitk::BaseData* data = node->GetData();
+    if (data)
+    {
+      // test if this data item is an image or not (could also be a surface or something totally different)
+      mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+      if (image)
+      {
+        std::cout << "Surprise: this node contains a real image dataset." << std::endl;
+      }
+    }
   }
 }
+

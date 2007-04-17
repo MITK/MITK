@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
 
+#include <limits>
+
 #include "mitkImageAccessByItk.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkGlobalInteraction.h"
@@ -152,13 +154,30 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   typedef typename InputImageType::IndexType    IndexType;
   IndexType seedIndex;
   
+  TPixel min( std::numeric_limits<TPixel>::max() );
+  TPixel max( std::numeric_limits<TPixel>::min() );
   for ( mitk::PointSet::PointsConstIterator pointsIterator = m_PointSet->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
         pointsIterator != m_PointSet->GetPointSet()->GetPoints()->End();
         ++pointsIterator ) 
   {
+    // first test if this point is inside the image at all
+    if ( !imageGeometry->IsInside( pointsIterator.Value()) ) 
+      continue;
+
+    // convert world coordinates to image indices
     imageGeometry->WorldToIndex( pointsIterator.Value(), seedIndex);
-    std::cout << seedIndex << std::endl;
-    //TODO use these points for a region grower and somehow display the result
+
+    // get the pixel value at this point
+    TPixel currentPixelValue = itkImage->GetPixel( seedIndex );
+
+    // adjust minimum and maximum values
+    if (currentPixelValue > max)
+      max = currentPixelValue;
+
+    if (currentPixelValue < min)
+      min = currentPixelValue;
   }
+
+  std::cout << "Values between " << min << " and " << max << std::endl;
 }
 

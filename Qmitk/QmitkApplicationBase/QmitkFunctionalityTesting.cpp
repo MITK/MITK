@@ -103,6 +103,7 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
   QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
 
   QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
+  testing->m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
   if (qfm->GetActiveFunctionality()) {

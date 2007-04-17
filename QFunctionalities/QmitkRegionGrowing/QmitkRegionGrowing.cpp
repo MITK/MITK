@@ -57,7 +57,10 @@ void QmitkRegionGrowing::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)),(QObject*) this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
+    connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)), 
+                                                   this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
+    connect( (QObject*)(m_Controls->btnRegionGrow), SIGNAL(clicked()), 
+                                              this, SLOT(DoRegionGrowing()) );
   }
 }
 
@@ -122,3 +125,7 @@ void QmitkRegionGrowing::ImageSelected(mitk::DataTreeIteratorClone imageIt)
   }
 }
 
+void QmitkRegionGrowing::DoRegionGrowing()
+{
+  std::cout << "Button clicked" << std::endl;
+}

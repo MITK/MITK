@@ -78,6 +78,8 @@ protected slots:
    */
   void ImageSelected(mitk::DataTreeIteratorClone imageIt);
 
+  void DoRegionGrowing();
+
 protected:  
   /*!  
   * default main widget containing 4 windows showing 3   

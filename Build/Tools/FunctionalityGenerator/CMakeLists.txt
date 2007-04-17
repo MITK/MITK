@@ -1,0 +1,27 @@
+PROJECT(FunctionalityGenerator)
+
+SET(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality")
+SET(FUNCTIONALITY_NAME "" CACHE STRING "Name of the new functionality")
+FIND_FILE(FUNCTIONALITY_TEMPLATE QmitkFunctionalityTemplate 
+  ${PROJECT_SOURCE_DIR}/../../../CMake
+  DOC "Path to the func template") 
+
+SET(FUNCTIONALITY_DIR "" CACHE PATH "Target directory for functionality generation")
+
+IF(GENERATE_FUNCTIONALITY)
+  IF(FUNCTIONALITY_TEMPLATE)
+    MESSAGE(STATUS "Generating ${FUNCTIONALITY_NAME} from template ${FUNCTIONALITY_TEMPLATE} in directory ${FUNCTIONALITY_DIR} ...")
+    FILE(GLOB TEMPLATE_FILES ${FUNCTIONALITY_TEMPLATE}/*.*)
+    FOREACH(F ${TEMPLATE_FILES})
+      FILE(RELATIVE_PATH RELPATH ${FUNCTIONALITY_TEMPLATE} ${F})
+      STRING(REPLACE QmitkFunctionalityTemplate ${FUNCTIONALITY_NAME} NEW_RELPATH ${RELPATH})
+      MESSAGE(STATUS "Generating ${FUNCTIONALITY_DIR}/${NEW_RELPATH}")
+      IF(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
+        MESSAGE(FATAL_ERROR "Won't overwrite existing functionality. Please remove all files from ${FUNCTIONALITY_DIR}!") 
+      ENDIF(EXISTS ${FUNCTIONALITY_DIR}/${NEW_RELPATH})
+      CONFIGURE_FILE(${F} ${FUNCTIONALITY_DIR}/${NEW_RELPATH} @ONLY)
+    ENDFOREACH(F)
+    SET(GENERATE_FUNCTIONALITY OFF CACHE BOOL "Turn this on for final generation of functionality" FORCE)
+  ENDIF(FUNCTIONALITY_TEMPLATE)
+ENDIF(GENERATE_FUNCTIONALITY)
+

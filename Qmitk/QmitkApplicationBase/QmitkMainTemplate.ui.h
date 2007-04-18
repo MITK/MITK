@@ -606,7 +606,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Use gradient background", new mitk::BoolProperty(true) );
   m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f, 0.0f, 0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
-  m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(true) );
+  m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
   
 
 }

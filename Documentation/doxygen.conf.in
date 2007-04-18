@@ -62,7 +62,7 @@ INPUT                  = ./ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
                          @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \
-                         @ALL_FUNCTIONALITY_DIRS@
+                         @FUNCTIONALITY_DIRS@
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \

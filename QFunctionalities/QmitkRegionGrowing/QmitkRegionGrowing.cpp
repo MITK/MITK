@@ -98,7 +98,8 @@ void QmitkRegionGrowing::Activated()
   {
     // new node and data item
     m_PointSetNode = mitk::DataTreeNode::New();
-    m_PointSet = mitk::PointSet::New();
+	m_PointSetNode->GetPropertyList()->SetProperty("name", new mitk::StringProperty("Seedpoints for region growing")); 
+	m_PointSet = mitk::PointSet::New();
     m_PointSetNode->SetData( m_PointSet );
 
     // new behaviour/interaction for the pointset node

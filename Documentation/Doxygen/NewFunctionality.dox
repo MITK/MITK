@@ -5,7 +5,7 @@
 The FunctionalityGenerator is a tool to simplify the process of creating your own MITK functionality and integrating it into the SampleApp.
 
 \par Introduction
-Start by building a MITKSampleApp. If everything works you have to think about a name for your new functionality and where you want
+Start by building a MainApp. If everything works you have to think about a name for your new functionality and where you want
 to put the source code. The generator uses the CMake GUI for configuration.  
 
 \par Windows
@@ -13,28 +13,31 @@ to put the source code. The generator uses the CMake GUI for configuration.
 \li Choose \c Build/Tools/FunctionalityGenerator as source directory
 \li Choose a temporary directory as binary directory (create it if it doesn't exist)
 \li Press "Configure" and don't care about the generator
-\li Select a direcory for the source code of your new functionality in the FUNCTIONALITY_DIR field. CMake will create it for you.
 \li Enter a name for the new functionality in the FUNCTIONALITY_NAME field
 \li Check that FUNCTIONALITY_TEMPLATE was found
 \li Turn on GENERATE_FUNCTIONALITY and press "Configure" once more.
+\li After successfull generation CMake shows a message where you can find your new functionality.
 
 \par Linux
 \li Create a temporary directory and cd into it. 
 \li Start <tt>ccmake</tt> with <tt>Build/Tools/FunctionalityGenerator</tt> as source directory
 \li Press "Configure" 
-\li Select a direcory for the source code of your new functionality in the FUNCTIONALITY_DIR field. CMake will create it for you.
 \li Enter a name for the new functionality in the FUNCTIONALITY_NAME field
 \li Check that FUNCTIONALITY_TEMPLATE was found
 \li Turn on GENERATE_FUNCTIONALITY and press "Configure" once more.
+\li After successfull generation CMake shows a message where you can find your new functionality.
 
 \par Integrating your new functionality
-Switch back to the configuration of your MITK build. On Windows you can switch the "Where to build the binaries" combobox back 
-to your MITK binary directory. In the CMake GUI you can find a variable EXTERNAL_FUNCTIONALITIES_CMAKE. Set it to the <tt>AddToMITK.cmake</tt>
-which is located in your newly created functionality source directory.
-\note If you want to add multiple external functionalities to your MITK build, you have to merge the different <tt>AddToMITK.cmake</tt> files. 
+Copy your new functionality from the temporary directory to a place you like, inside or outside of your MITK source tree.
+(Hint for members of MBI: put it in \c mbi-sb/QFunctionalitites !)
+
+Switch back to the configuration of your MITK build. On Windows you can just switch the "Where to build the binaries" combobox back 
+to your MITK binary directory. In the CMake GUI you can find a variable EXTERNAL_FUNCTIONALITIES_DIR. Set it to your newly created functionality source directory.
+
+\par Integrating multiple functionalities
+If you want to add multiple external functionalities to your MITK build, you have to put them all in one directory and point the EXTERNAL_FUNCTIONALITIES_DIR variable (see above) to this directory. In this directory you have to put a file named \c CMakeLists.txt which contains a line \c ADD_SUBDIRECTORY(<functionality_name>) for each of your functionalities. 
 
 \section BuildSystem Build system for functionalities
 
-To be written. Until then please have a look at a functionality generated with the FunctionalityGenerator and the macros in <tt>AppModules/QmitkApplicationBase/QmitkFunctionalityBaseInclude.cmake</tt>.
-
+Just put new files in your functionality directory and edit the \c files.cmake file there. If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
 */

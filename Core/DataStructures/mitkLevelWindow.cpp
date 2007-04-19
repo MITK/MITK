@@ -233,8 +233,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   if ( IsFixed() )
     return;
   
-  if ( ( image == NULL ) || ( !image->IsInitialized()) )
-        return;
+  if ( image == NULL ) return;
 
   mitk::Image* wholeImage = image;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
@@ -248,6 +247,13 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
 
     image = sliceSelector->GetOutput();
   }
+  else
+  {
+    image->Update();
+  }
+  
+  if ( !image->IsInitialized() ) return;
+
   ScalarType minValue    = image->GetScalarValueMin();
   ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
   ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();

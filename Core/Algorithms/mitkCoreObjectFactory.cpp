@@ -67,6 +67,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 
+#include "mitkPicFileIOFactory.h"
+#include "mitkPointSetIOFactory.h"
+#include "mitkItkImageFileIOFactory.h"
+#include "mitkParRecFileIOFactory.h"
+#include "mitkSTLFileIOFactory.h"
+#include "mitkObjFileIOFactory.h"
+#include "mitkVtkSurfaceIOFactory.h"
+#include "mitkVtkImageIOFactory.h"
+#include "mitkVtiFileIOFactory.h"
+#include "mitkPicVolumeTimeSeriesIOFactory.h"
+#include "mitkStlVolumeTimeSeriesIOFactory.h"
+#include "mitkVtkVolumeTimeSeriesIOFactory.h"
+
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
 
@@ -158,6 +171,18 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
 
 mitk::CoreObjectFactory::CoreObjectFactory() 
 {
+  itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
 }
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)

@@ -157,20 +157,17 @@ void mitk::DataTreeNodeFactory::GenerateData()
   }
   else
   {
-    /***************************************** new datatreenode factory mechanism **********************************************/
-    // the mitkBaseDataIOFactory class returns a pointer of a vector of BaseData objects
-    // the IO factories of the file readers are registered in the class mitkBaseDataIOFactory
-    // for more details see the doxygen documentation (modules IO)
     bool usedNewDTNF = false;
-    std::cout << "serie: " << m_Serie << std::endl;
-    std::vector<mitk::BaseData::Pointer>* baseDataVector = mitk::BaseDataIOFactory::CreateBaseDataIO( m_FileName, m_FilePrefix, m_FilePattern, mitk::BaseDataIOFactory::ReadMode, m_Serie );
     
-    if(baseDataVector)
-      this->ResizeOutputs((unsigned int)baseDataVector->size());
+    // the mitkBaseDataIO class returns a pointer of a vector of BaseData objects
+    std::vector<mitk::BaseData::Pointer> baseDataVector = mitk::BaseDataIO::LoadBaseDataFromFile( m_FileName, m_FilePrefix, m_FilePattern, m_Serie );
+    
+    if( !baseDataVector.empty() )
+      this->ResizeOutputs((unsigned int)baseDataVector.size());
 
-    for(int i=0; i<(int)baseDataVector->size(); i++)
+    for(int i=0; i<(int)baseDataVector.size(); i++)
     {
-      mitk::BaseData::Pointer baseData = baseDataVector->at(i);
+      mitk::BaseData::Pointer baseData = baseDataVector.at(i);
 
       if( baseData.IsNotNull() )
       {
@@ -245,7 +242,6 @@ void mitk::DataTreeNodeFactory::GenerateData()
           this->ReadFileSeriesTypeITKImageSeriesReader();
       }
     }
-    delete baseDataVector; // do NOT remove!
   }
 }
 

@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __mitkBaseDataIOFactory_h
-#define __mitkBaseDataIOFactory_h
+#ifndef __mitkBaseDataIO_h
+#define __mitkBaseDataIO_h
 
 #include "mitkBaseData.h"
 
@@ -25,15 +25,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-//##Documentation
-//## @brief BaseDataIOFactory class creates instances of BaseDataIO objects using an object factory.
-//##
-//## @ingroup IO
-class BaseDataIOFactory : public itk::Object
+
+/*!
+ @brief BaseDataIO creates instances of BaseData objects using an object factory.
+
+ @todo Add file writing method, move writers into a similar factory scheme
+ @ingroup IO
+*/
+class BaseDataIO : public itk::Object
 {
 public:  
+
   /** Standard class typedefs. */
-  typedef BaseDataIOFactory   Self;
+  typedef BaseDataIO   Self;
   typedef itk::Object  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -41,26 +45,17 @@ public:
   /** Class Methods used to interface with the registered factories */
   
   /** Run-time type information (and related methods). */
-  itkTypeMacro(BaseDataIOFactory, Object);
+  itkTypeMacro(BaseDataIO, Object);
 
-  /** Convenient typedefs. */
-  //typedef ::mitk::IOAdapter::Pointer ImageIOBasePointer;
-
-  /** Mode in which the files is intended to be used */
-  typedef enum { ReadMode, WriteMode } FileModeType;
-  
   /** Create the appropriate BaseData depending on the particulars of the file. */
-  static std::vector<mitk::BaseData::Pointer>* CreateBaseDataIO(const std::string path, const std::string filePrefix, const std::string filePattern, FileModeType mode, bool series);
-
-  /** Register Built-in factories */
-  static void RegisterBuiltInFactories();
+  static std::vector<mitk::BaseData::Pointer> LoadBaseDataFromFile(const std::string path, const std::string filePrefix, const std::string filePattern, bool series);
 
 protected:
-  BaseDataIOFactory();
-  ~BaseDataIOFactory();
+  BaseDataIO();
+  ~BaseDataIO();
 
 private:
-  BaseDataIOFactory(const Self&); //purposely not implemented
+  BaseDataIO(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
   
 };
@@ -69,3 +64,4 @@ private:
 } // end namespace mitk
 
 #endif
+

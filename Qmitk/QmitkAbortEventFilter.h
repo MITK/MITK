@@ -36,11 +36,18 @@ public:
 
   void ProcessEvents();
   void IssueQueuedEvents();
+
+  bool GetMouseMoved() const;
+  void SetMouseMoved(bool moved);
  
 protected:
   QmitkAbortEventFilter();
 
   bool eventFilter( QObject* object, QEvent* event );
+
+  bool m_ButtonPressed;
+  
+  bool m_MouseMoved;
   
 private:
   typedef std::pair< QObject*, QEvent* > ObjectEventPair;

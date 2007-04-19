@@ -42,6 +42,7 @@ public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
   virtual ~QmitkRenderingManager();
 
+  virtual void DoStartRendering();
   virtual void DoMonitorRendering();
   virtual void DoFinishAbortRendering();
 

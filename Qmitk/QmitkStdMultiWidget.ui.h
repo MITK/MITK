@@ -39,12 +39,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkLine.h"
 
+#include "QmitkAbortEventFilter.h"
+
+#include <qapplication.h>
+
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 
 
 void QmitkStdMultiWidget::init()
-{
+{ 
+  qApp->installEventFilter( QmitkAbortEventFilter::GetInstance() );
   mitkWidget1->setPaletteBackgroundColor("red");
   mitkWidget2->setPaletteBackgroundColor("green");
   mitkWidget3->setPaletteBackgroundColor("blue");

@@ -576,22 +576,22 @@ void QmitkTransferFunctionWidget::ChooseCS(int cstyle){
   if(cstyle == 2){//bone - high contrast
    ResetCS();
    number_c=4;
-   color_pointsX[0]=170;
+   color_pointsX[0]=140;
    color_pointsR[0]=0;
    color_pointsG[0]=1;
    color_pointsB[0]=0;
 
-   color_pointsX[1]=550;
+   color_pointsX[1]=300;
    color_pointsR[1]=1;
    color_pointsG[1]=0;
    color_pointsB[1]=0;
 
-   color_pointsX[2]=1000;
+   color_pointsX[2]=500;
    color_pointsR[2]=0;
    color_pointsG[2]=0;
    color_pointsB[2]=1;
 
-   color_pointsX[3]=1450;
+   color_pointsX[3]=700;
    color_pointsR[3]=1;
    color_pointsG[3]=1;
    color_pointsB[3]=0;

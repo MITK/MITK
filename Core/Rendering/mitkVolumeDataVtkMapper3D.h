@@ -71,26 +71,24 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-
   vtkActor* m_Actor;
   vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumeProperty;
-  vtkVolumeTextureMapper2D* m_LowResMapper;
-  vtkVolumeRayCastMapper* m_MedResMapper;
+  vtkVolumeProperty* m_VolumeProperty2;
+  vtkVolumeTextureMapper2D* m_T2DMapper;
+  vtkVolumeTextureMapper2D* m_T2DMapperHi;
   vtkVolumeRayCastMapper* m_HiResMapper;
 
-#if (VTK_MAJOR_VERSION >= 5)
-  vtkVolumeTextureMapper3D* m_T3DMapper;
-#endif
-
   vtkImageResample* m_Resampler; 
+  vtkImageResample* m_ResamplerHi; 
   vtkLODProp3D* m_VolumeLOD;
+
+  int m_LowResID;
   int m_MedResID;
   int m_HiResID;
   bool m_Firstcall;
 
-  vtkVolumeProperty* m_VolumeProperty2;
 };
 
 } // namespace mitk

@@ -105,7 +105,7 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     }
 
     void ResetGO(){ //Gradient Opacity
-     m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),1,0,1);
+     m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,0,1);
      m_PiecewiseFunction->AddSegment(0,1,((this->GetFunctionRange())*0.125),1);
      m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.125),1,((this->GetFunctionRange())*0.2),1);
      m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.2),1,((this->GetFunctionRange())*0.25),1);

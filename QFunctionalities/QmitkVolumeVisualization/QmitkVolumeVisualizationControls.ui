@@ -8,11 +8,23 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>447</width>
-            <height>831</height>
+            <width>385</width>
+            <height>732</height>
         </rect>
     </property>
     <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="maximumSize">
+        <size>
+            <width>32767</width>
+            <height>32767</height>
+        </size>
+    </property>
+    <property name="baseSize">
         <size>
             <width>0</width>
             <height>0</height>
@@ -42,6 +54,20 @@
             <property name="name">
                 <cstring>tabWidget</cstring>
             </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>2</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>32767</width>
+                    <height>32767</height>
+                </size>
+            </property>
             <widget class="QWidget">
                 <property name="name">
                     <cstring>tab</cstring>
@@ -53,29 +79,29 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-        <widget class="QmitkTransferFunctionWidget">
-            <property name="name">
-                <cstring>m_TransferFunctionWidget</cstring>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>textLabel2</cstring>
-            </property>
-            <property name="frameShape">
-                <enum>Box</enum>
-            </property>
-            <property name="text">
-                <string>Shift-Left-Click to add control point in opacity function or color gradient.
+                    <widget class="QmitkTransferFunctionWidget">
+                        <property name="name">
+                            <cstring>m_TransferFunctionWidget</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="frameShape">
+                            <enum>Box</enum>
+                        </property>
+                        <property name="text">
+                            <string>Shift-Left-Click to add control point in opacity function or color gradient.
 Double click on color gradient control points to change color.
 Press delete to remove selected handle.</string>
-            </property>
-            <property name="alignment">
-                <set>WordBreak|AlignVCenter</set>
-            </property>
-        </widget>
-        <spacer>
-            <property name="name">
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignVCenter</set>
+                        </property>
+                    </widget>
+                    <spacer>
+                        <property name="name">
                             <cstring>spacer61</cstring>
                         </property>
                         <property name="orientation">
@@ -87,7 +113,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>20</width>
-                                <height>50</height>
+                                <height>20</height>
                             </size>
                         </property>
                     </spacer>
@@ -251,7 +277,7 @@ Press delete to remove selected handle.</string>
                                 </property>
                                 <property name="sizeHint">
                                     <size>
-                                        <width>281</width>
+                                        <width>250</width>
                                         <height>21</height>
                                     </size>
                                 </property>
@@ -260,18 +286,18 @@ Press delete to remove selected handle.</string>
                     </widget>
                     <spacer>
                         <property name="name">
-                <cstring>spacer2</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                                <height>330</height>
+                            <cstring>spacer2</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>300</height>
                             </size>
                         </property>
                     </spacer>
@@ -744,11 +770,11 @@ Press delete to remove selected handle.</string>
                             <size>
                                 <width>31</width>
                                 <height>300</height>
-                </size>
-            </property>
-        </spacer>
-    </vbox>
-</widget>
+                            </size>
+                        </property>
+                    </spacer>
+                </vbox>
+            </widget>
         </widget>
     </vbox>
 </widget>
@@ -823,7 +849,7 @@ Press delete to remove selected handle.</string>
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
     <image name="image11">
-        <data format="PNG" length="832">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000030749444154789cb59531681c4714863f9935bc0515b320c32e28e085182c573991460217527941c52510485219912690c290ca65100e24b54921d4042c152131c49c5d0874dd5e6338810d2b50600d3998030b660ac33ef08253ecde497717810be535bb33bbf3bd7ffff7667621eb678c637d6dfd3d5710593f5b581883bb7f75dfdf59b983f30e6b2dfeadff2088f38ee2b4a0ffa20fd5f97c3056faf8b7c7c4cb6052256d29fa4e1180ebe3b7409aab561756575014a0bbc2a0a7d3e07166932ad63dc3fb02281151b412ec30c4bf2981107303d29b25b2789e401621896170e14b26606b2d694b1ba84344c85f461c3d75e4c71e18ab11d2dbc26627626d03a8ca7a56a62d9a80fd5b8fbed30934ebc1feafb65124a4b70d12801d2ac589b2f793c5be367c732f04ca39ef838b036932e72fc306aa6c6ec5b43b2166099012d584ecb9b2bf6b797630228953da5f46c074b1af4d8dae8356c2d11337817efd6d88891d88c39f851c3d717cd611b6bf4f00e18f03877b332b717618801d86e4af3cc618da9d10020701a88fd8fbb9243ff6f833d8be1f911d0af92b4f7e124d3ae6bf1543537d25b929f5e737d0470feb229a25a17537442265a55557cc166563e425e03a6b58df4beda91f453c7a58921f2ba08840ba2cf5f3206c56867356cc293637008462a8a846643d6aa5468863c368e8d97960c907067b5a774392ca2c663a8f5675f3a71f0bc5df4af65c697f25f833c3dadd906459d87900a3d79e9def0a5415b324ac7ea274ffd129f09c625984762702607fd7d23f54b6ef47ac6e40da72fcf0638a890dde7bb452363b09f1ad39c1b3ced4aad737c00e0d7f1e8cd8fbc5921d0a2b2b0202f6d4a2673a5939e8398aad843010ce77e7cc59318e92922fee8544714af7f7ba1bf2e30b755812da9d94ace770aaa882f3d3564cc0c5694151008be7f0f6e7216b1b09f949842deaf9e42361f55325be059b5b492d3270e4834bc0fd177d745748e2a6d52a20f0108cdb50ea0d64a1fb14400903c179c8078a1d5de67105839e4e1d7d33ee7fe05c1d735d7155710dea7fd4ff02be6a78d6cf16fe05747f59f701fe50070000000049454e44ae426082</data>
+        <data format="PNG" length="824">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ff49444154789cb59531681c4714863f992dde820cb370815b50600f54e8ca0ba43970712a8fb838438a3895634813d238a5ab80e314ae4d0a812060a4226017c27221c8a9da6b8c4fe0e00d28b0571cec82043b85611f78c12966efa4bb8bc085f29a6567df7cef9f7fdeccaec571cc2cbaddee47ae21e2385e5b9b815f1ebcfcd8de6a63ad25cb338af7c52741acb5a4a729a3d723a82ec6bd99d267bf3f23fc1c4cab2442d14a915986e792fdfa59569766573049417784f1b12e8267954dab24b78714450a28beaf941f847c2a14e70a0841035a2d45d641eb027213c210c69756320767794684d6508bef0befde1a860796e4c402333542b4256c0f0cdd1e50b97191458be6e0e27d81563a87c643d8fb2d7793d685d696413cc8a6cae46f65f7d79c7c62b87b4f2e15fd0fb0d302be0fefde4a0d557a5f35e90f84e0334014d590f855c9de4ecee17e4eb319d1ff3a00ec02f8c67299f283307c61e7d06fbf1782d082588a33e1cf1705fd81cf773f3601e1f9bec59e2f4b5c7ef5209f0ac95f16630cfd818067c103b586dd274a726229cee0fe8380d191cb4d1267d3d58aa1de7d258ceae5d7d0a78fdd269a86f0c52d414c49bbe3762c9b686de41560d7a72e41c4795a6486a78f95e4c4151481d686efbe7b3398ac58b1a23868b8c474aaa8068c8e714a8dd06c1af2a9e5d1c38c641c909dba6e08237f19b358a7ac5cf3479bc2e41f257e55d2ffc6a73833746f09e186cfa387904f2cbffc90a2aa9886d0e99464d3c5965b512cebd01f1800f67672e2a392fb0f023a3d883a053ffddcc2340dd65ab452b6074dc2cd15c1cbceb863daed413e353cdfcfd97d92333a12da6d0181ec3443cf753ef3cdd092de0e116ff1a02cdc157338ca9d7b8269461cfee1ba2139b9286e1a427f10110f2d561555b076d18a39383d4d99a4c0cd0b787f20747b214962c8266e3cdcf0e97c59126ec2f6edd089f40a92f115e0d1eb11ba238461dd6a15f32b53666de841965bb203575a3cc15a48c64a965fe57105e3635db8fa96dcffc431172b5d715d7103dc3fea7f015f373c8ee3b57f0135105a0ffe02a8010000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -1074,9 +1100,6 @@ Press delete to remove selected handle.</string>
         <slot>setEnabled(bool)</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">QmitkVolumeVisualizationControls.ui.h</include>
-</includes>
 <signals>
     <signal>EnableRenderingToggled(bool)</signal>
     <signal>Choice(int)</signal>

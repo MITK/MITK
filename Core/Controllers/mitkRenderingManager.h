@@ -71,6 +71,7 @@ class RenderingManagerFactory;
 class RenderingManager : public itk::Object
 {
 public:
+
   mitkClassMacro(RenderingManager,itk::Object);
 
   typedef std::vector< RenderWindow* > RenderWindowVector;
@@ -149,9 +150,12 @@ public:
   bool IsRendering() const;
   void AbortRendering( RenderWindow* renderWindow );
 
+  virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
 
+  int GetCurrentLOD();
+  void SetCurrentLOD(int lod);
 
 protected:
   RenderingManager();
@@ -174,11 +178,11 @@ protected:
 
   bool m_UpdatePending;
   int m_Interval;
+  int m_CurrentLOD;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
-
 
 private:
   typedef std::map< RenderWindow *, int > RenderWindowList;

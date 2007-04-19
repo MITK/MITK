@@ -73,7 +73,7 @@ void QmitkTransferFunctionCanvas::mousePressEvent( QMouseEvent* mouseEvent )
     // mode = add
     this->AddFunctionPoint(this->CanvasToFunction(std::make_pair(mouseEvent->x(),mouseEvent->y())).first,this->CanvasToFunction(std::make_pair(mouseEvent->x(),mouseEvent->y())).second);
     m_GrabbedHandle = GetNearHandle(mouseEvent->x(),mouseEvent->y());
-    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else if ((mouseEvent->button() & Qt::LeftButton) || (mouseEvent->button() & Qt::MidButton))
   {
@@ -136,7 +136,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent( QMouseEvent* mouseEvent )
     }
     assert(m_GrabbedHandle != -1);
     update();
-   // mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 void QmitkTransferFunctionCanvas::mouseReleaseEvent( QMouseEvent*  )

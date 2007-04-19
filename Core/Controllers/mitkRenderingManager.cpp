@@ -128,28 +128,29 @@ mitk::RenderingManager
 
   mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
 
-  if( false && renderer) // TODO change when abort mechanism is ready
-  {
+  if(renderer){
    MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
    startCallbackCommand->SetCallbackFunction(
     this, &RenderingManager::RenderingStartCallback
   );
-  //renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+  renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
 
   MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
   progressCallbackCommand->SetCallbackFunction(
     this, &RenderingManager::RenderingProgressCallback
   );
-  //renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
+  renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
 
   MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
   endCallbackCommand->SetCallbackFunction( 
     this, &RenderingManager::RenderingEndCallback
   );
-  //renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
+  renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
 
   m_IsRendering[renderWindow] = false;
  }
+
+
 
 }
 
@@ -232,8 +233,7 @@ mitk::RenderingManager
 void
 mitk::RenderingManager
 ::ForceImmediateUpdate( RenderWindow *renderWindow )
-{
-
+{ 
   bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
   bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 ) && ( s_RenderWindowList[renderWindow] == 3 )) ?true:false;
 
@@ -268,6 +268,7 @@ mitk::RenderingManager
 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
+
 }
 
 void
@@ -295,7 +296,7 @@ mitk::RenderingManager
 void
 mitk::RenderingManager
 ::ForceImmediateUpdateAll()
-{
+{ 
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -389,8 +390,8 @@ mitk::RenderingManager
     {
       if ( it->second )
       {
-        this->ForceImmediateUpdate( it->first );
         it->second = 0;
+        this->ForceImmediateUpdate( it->first );
       }
     }
   }
@@ -401,8 +402,8 @@ mitk::RenderingManager
     {
       if ( it->second )
       {
-        this->ForceImmediateUpdate( it->first );
         it->second = 0;
+        this->ForceImmediateUpdate( it->first );
       }
     }
   }
@@ -497,8 +498,9 @@ mitk::RenderingManager
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)
   { 
-    std::cout<<"S ";
+    //std::cout<<"S ";
     m_IsRendering[renderer->GetRenderWindow()] = true;
+    this->DoStartRendering();
   }
 }
 
@@ -517,7 +519,7 @@ mitk::RenderingManager
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)
   {
-    std::cout<<"E ";
+    //std::cout<<"E ";
     m_IsRendering[renderer->GetRenderWindow()] = false;
   }
   this->DoFinishAbortRendering();
@@ -544,7 +546,9 @@ mitk::RenderingManager
 void
 mitk::RenderingManager
 ::AbortRendering( mitk::RenderWindow* renderWindow )
-{ std::cout<<"abort ";
+{ 
+  //std::cout<<" abort ";
+
   if ( renderWindow && m_IsRendering[renderWindow] )
   { 
     renderWindow->GetVtkRenderWindow()->SetAbortRender( true );
@@ -555,11 +559,24 @@ mitk::RenderingManager
     for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
     {
       if ( m_IsRendering[it->first] )
-      { 
-        it->first->GetVtkRenderWindow()->SetAbortRender( true );
-        
+      {
+        it->first->GetVtkRenderWindow()->SetAbortRender( true );       
       }
     }
+  }
+}
+
+int mitk::RenderingManager::GetCurrentLOD() //returns the LOD requested for the next rendering
+{ 
+  return m_CurrentLOD;
+}
+
+void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for the next rendering
+{ 
+  if(m_CurrentLOD != lod)
+  {
+    //std::cout<<"SetCurrentLOD("<<lod<<") ";
+    m_CurrentLOD=lod;
   }
 }
 

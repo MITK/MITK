@@ -28,6 +28,11 @@ QmitkRenderingManager::QmitkRenderingManager()
   m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
 }
 
+void QmitkRenderingManager::DoStartRendering()
+{
+  QmitkAbortEventFilter::GetInstance()->SetMouseMoved(false);
+}
+
 void QmitkRenderingManager::DoMonitorRendering()
 {
   QmitkAbortEventFilter::GetInstance()->ProcessEvents();
@@ -80,6 +85,7 @@ void QmitkRenderingManagerInternal::StopTimer()
 
 void QmitkRenderingManagerInternal::QUpdateCallback()
 {
+  //std::cout << "QUpdateCallback()" << std::endl;
   m_QmitkRenderingManager->UpdateCallback();
 }
 

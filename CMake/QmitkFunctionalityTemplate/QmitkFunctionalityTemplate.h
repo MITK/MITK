@@ -76,6 +76,11 @@ protected slots:
    * just an example slot for the example TreeNodeSelector widget
    */
   void ImageSelected(mitk::DataTreeIteratorClone imageIt);
+  
+  /*
+   * just an example slot for the example "Start!" button
+   */
+   void StartButtonClicked();
 
 protected:  
   /*!  

@@ -55,6 +55,7 @@ void @FUNCTIONALITY_NAME@::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_TreeNodeSelector), SIGNAL(Activated(mitk::DataTreeIteratorClone)),(QObject*) this, SLOT(ImageSelected(mitk::DataTreeIteratorClone)) );
+    connect( (QObject*)(m_Controls->m_StartButton), SIGNAL(clicked()),(QObject*) this, SLOT(StartButtonClicked()));
   }
 }
 
@@ -102,5 +103,9 @@ void @FUNCTIONALITY_NAME@::ImageSelected(mitk::DataTreeIteratorClone imageIt)
       }
     }
   }
+}
+void @FUNCTIONALITY_NAME@::StartButtonClicked() 
+{
+  std::cout << "Start Button clicked!" << std::endl;
 }
 

@@ -30,7 +30,15 @@
                 <cstring>m_TreeNodeSelector</cstring>
             </property>
         </widget>
-        <spacer>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_StartButton</cstring>
+            </property>
+            <property name="text">
+                <string>Start!</string>
+            </property>
+        </widget>
+     <spacer>
             <property name="name">
                 <cstring>spacer2</cstring>
             </property>

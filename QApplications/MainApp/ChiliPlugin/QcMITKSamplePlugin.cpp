@@ -77,7 +77,7 @@ QcMITKSamplePlugin::QcMITKSamplePlugin( QWidget *parent )
 
 QString QcMITKSamplePlugin::name()
 {
-  return QString( "MITK PlugIn" );
+  return QString( "MITK" );
 }
 
 const char** QcMITKSamplePlugin::xpm()

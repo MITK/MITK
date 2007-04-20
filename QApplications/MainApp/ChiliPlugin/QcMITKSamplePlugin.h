@@ -36,6 +36,8 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     virtual void handleMessage( ipInt4_t type, ipMsgParaList_t *list );
 
   public slots:
+    
+    virtual void studySelected( study_t* );
 
     // image selection methods
     void selectSerie (QcLightbox*);

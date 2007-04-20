@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
+#include "mitkChiliPluginEvents.h"
+
 class QcPlugin;
 class QcMITKSamplePlugin;
 
@@ -46,7 +48,6 @@ typedef enum
 } ConfMsgType;
 
 class ChiliPlugin : public itk::Object
-
 {
 public:
 
@@ -59,12 +60,19 @@ public:
   itkNewMacro(ChiliPlugin);
   virtual ~ChiliPlugin();
 
+  virtual std::string GetCurrentStudyID();
+
 protected:
 
   friend class QcMITKSamplePlugin;
 
   virtual void SetPluginInstance(QcPlugin* instance);
+
+  virtual void SetCurrentStudyID( const std::string& );
+
   ChiliPlugin() {}
+
+  std::string m_CurrentStudyID;
 
 };
 

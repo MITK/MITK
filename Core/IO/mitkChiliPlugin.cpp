@@ -45,3 +45,15 @@ void mitk::ChiliPlugin::SetPluginInstance(QcPlugin* instance)
 mitk::ChiliPlugin::~ChiliPlugin() 
 { }
 
+void mitk::ChiliPlugin::SetCurrentStudyID( const std::string& newID )
+{
+  m_CurrentStudyID = newID;
+
+  InvokeEvent( PluginStudySelected() ); // throw ITK event (defined in mitkChiliPluginEvents.h)
+}
+
+std::string mitk::ChiliPlugin::GetCurrentStudyID()
+{
+  return m_CurrentStudyID;
+}
+

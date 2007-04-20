@@ -616,3 +616,16 @@ void QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
       break;
   }
 }
+    
+void QcMITKSamplePlugin::studySelected( study_t* study )
+{
+  if (study)
+  {
+    mitk::ChiliPlugin::GetInstance()->SetCurrentStudyID( study->oid );
+  }
+  else
+  {
+    mitk::ChiliPlugin::GetInstance()->SetCurrentStudyID( "" );
+  }
+}
+

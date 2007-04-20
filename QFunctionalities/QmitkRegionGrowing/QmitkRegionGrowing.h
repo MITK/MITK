@@ -77,6 +77,8 @@ protected slots:
 
 protected:  
   
+  void chiliStudySelected(const itk::EventObject&);
+
   /*!
     \brief ITK image processing function
     This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and dimensionality of

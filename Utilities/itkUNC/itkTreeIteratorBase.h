@@ -157,7 +157,10 @@ public:
   TreeIteratorBase<TTreeType> &
   operator++()
   {
-    this->Next();
+    if ( !IsAtEnd() )
+    {
+      this->Next();
+    }
     return *this;
   }
 

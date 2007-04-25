@@ -96,6 +96,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_CPP( DoubleProperty, "DoubleProperty" )
     CREATE_CPP( Vector3DProperty, "Vector3DProperty" )
     CREATE_CPP( Point3dProperty, "Point3dProperty" )
+    CREATE_CPP( Point4dProperty, "Point4dProperty" )
     CREATE_CPP( Point3iProperty, "Point3iProperty" )
     CREATE_CPP( BoolProperty, "BoolProperty" )
     CREATE_CPP( ColorProperty, "ColorProperty" )

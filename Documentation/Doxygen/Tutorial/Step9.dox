@@ -1,0 +1,68 @@
+/**
+ 
+\page Step9Page MITK Tutorial - Step 9: A functionality
+
+In MITK there is one example application called MainApp, which combines an 
+arbitrary number of task oriented modules, so called "functionalities". 
+
+For a description of the basic idea of functionalities see "Modules / Functionalities".
+
+There is a separate page, which describes \ref NewFunctionalityPage "how to create a functionality" 
+with a simple tool that comes with the MITK build system.
+
+The mentioned tool was used to create a functionality QmitkRegionGrowing, which can be found
+in your MITK source tree at "mitk/QFunctionalities/QmitkRegionGrowing". We created this 
+functionality to show you how to apply your knowlege from the previous tutorial steps to a functionality,
+which is the most common development setting at the DKFZ and for most other people.
+
+Let's first look at what files the functionality generator created:
+
+\verbatim
+AddToMITK.cmake  \
+CMakeLists.txt    |............... Build system related files for CMake
+files.cmake      /
+
+icon.xpm ......................... The icon of your functionality. This Gimp or other programs (including your text editor)
+                                   can be used to change this
+
+QmitkRegionGrowingControls.ui .... XML file of the Qt Designer, describes buttons, combo boxes, etc. of your controls
+QmitkRegionGrowingControls.ui.h .. Code for the Qt controls event handlers can be included here
+QmitkRegionGrowing.cpp ........... The most important file, implementing behaviour
+QmitkRegionGrowing.h ............. Header file of the functionality
+\endverbatim
+
+If you are not familiar with Qt development, please look into 
+<a href="http://doc.trolltech.com/3.3/designer-manual-5.html">this Trolltech page describing .ui files</a> (no, forget about the please, DO it!)
+
+The C++ files implement a subclass of QmitkFunctionality, so they ARE functionalities. In this
+special case of QmitkRegionGrowing, we added the ability to set some seed points and run a region grower.
+The algorithmic part here is largely the same as demonstrated in this tutorial. 
+This was needed to make it work inside a functionality 
+
+ - In the functionality's Activated() method, we add a PointSet to the DataTree and associate an interactor with it.
+   This Activated() method is called every time the functionality is activated by the user, 
+   so we have to care that we don't add a new PointSet every time.
+ - In CreateConnections() we add a Qt signal-slot-connection to react whenever the user clicks a button in the GUI.
+   The Qt concept of signals and slots is nicely described <a href="http://doc.trolltech.com/3.3/signalsandslots.html">here</a> (please read it).
+ - We added the slot DoRegionGrowing() to actually start the region growing. In this method we
+   only have an mitk::Image and cannot apply an ITK filter to it. We use the AccessByItk macro described in step 6
+   to convert the mitk::Image to an itk::Image with the correct template parameters. 
+ - The templated method which does
+   the region growing is called ItkImageProcessing. It is templated as an itk::Image is, so it knows the concrete pixel type
+   and dimension. This enables the method to use an ITK filter to perform the region growing.
+ - After the ITK processing we want to display the result, which means to add the image to the DataTree.
+   Since the DataTree can only contain MITK images, we have to convert the result from an ITK to a MITK image,
+   which is done by mitk::ImportItkImage.
+
+
+The functionality works nicely now, but for "real worl use" we would have to take some more care, not to add a new result
+each time the region growing is done (this would sure confuse the user). This and other interesting tasks are left as an exercise for the reader (you).
+
+Have fun using MITK!
+
+If you meet any difficulties during your first steps, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net! 
+People there are kind and will try to help you.
+ 
+ \ref Step8Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"
+ 
+*/

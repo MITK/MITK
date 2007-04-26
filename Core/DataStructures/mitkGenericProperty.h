@@ -85,7 +85,7 @@ class GenericProperty : public BaseProperty
 
       return false;
     }
-
+    
     virtual std::string GetValueAsString() const 
     {
       std::stringstream myStr;
@@ -166,7 +166,7 @@ class PropertyName: public GenericProperty< Type >        \
 public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \
   PropertyName() {}                                       \
-  PropertyName(Type x) {m_Value = x;}                     \
+  PropertyName(Type x) : GenericProperty<Type>(x) {}      \
   virtual ~PropertyName() {}                              \
 };
 

@@ -531,6 +531,7 @@ void QmitkStdMultiWidget
   // ... of widget 1
   planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
   mapper = mitk::Geometry2DDataMapper2D::New();
@@ -542,6 +543,7 @@ void QmitkStdMultiWidget
   // ... of widget 2
   planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
   mapper = mitk::Geometry2DDataMapper2D::New();
@@ -552,6 +554,7 @@ void QmitkStdMultiWidget
   // ... of widget 3
   planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
   planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
   mapper = mitk::Geometry2DDataMapper2D::New();

@@ -81,7 +81,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(const mitk::DataTreeNode* node)
         m_CalcButton->setEnabled(true);
       }
       int minVal = (int)image->GetScalarValue2ndMin();
-      int maxVal = (int)image->GetScalarValueMax();
+      int maxVal = (int)image->GetScalarValueMaxNoRecompute();
       if (minVal == maxVal)
         --minVal;
       m_ThresholdSlider->setMinValue(minVal);

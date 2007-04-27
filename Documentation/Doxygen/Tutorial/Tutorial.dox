@@ -26,7 +26,7 @@ This file contains a surface.
 \li \ref Step6Page "Step 6: Use an interactive region-grower"
 \li \ref Step7Page "Step 7: Convert result of region growing into a surface"
 \li \ref Step8Page "Step 8: Use QmitkStdMultiWidget as widget"
-\li \ref Step8Page "Step 8: A functionality"
+\li \ref Step9Page "Step 9: A functionality"
 
 Enjoy MITK!
 

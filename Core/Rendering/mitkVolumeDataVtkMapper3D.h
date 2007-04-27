@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVolumeProperty.h>
 
 class vtkVolumeRayCastMapper;
+class vtkFixedPointVolumeRayCastMapper;
 class vtkVolumeTextureMapper2D;
 class vtkVolumeMapper;
 class vtkVolume;
@@ -35,10 +36,6 @@ class vtkImageShiftScale;
 class vtkImageChangeInformation;
 class vtkLODProp3D;
 class vtkImageResample;
-
-#if (VTK_MAJOR_VERSION >= 5)
-class vtkVolumeTextureMapper3D;
-#endif
 
 namespace mitk {
 
@@ -79,9 +76,11 @@ protected:
   vtkVolumeTextureMapper2D* m_T2DMapper;
   vtkVolumeTextureMapper2D* m_T2DMapperHi;
   vtkVolumeRayCastMapper* m_HiResMapper;
-
+#if (VTK_MAJOR_VERSION >= 5)
+  vtkFixedPointVolumeRayCastMapper* m_FPRCMapper;
+  int m_FPRCID;
+#endif
   vtkImageResample* m_Resampler; 
-  vtkImageResample* m_ResamplerHi; 
   vtkLODProp3D* m_VolumeLOD;
 
   int m_LowResID;

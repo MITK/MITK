@@ -30,6 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkVolumeRayCastMapper.h>
+
+#if (VTK_MAJOR_VERSION >= 5)
+#include <vtkFixedPointVolumeRayCastMapper.h>
+#endif
+
+#include <vtkVolumeTextureMapper2D.h> 
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 #include <vtkColorTransferFunction.h>
@@ -40,10 +46,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCallbackCommand.h>
 #include <vtkImageShiftScale.h>
-
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
-#include <vtkVolumeTextureMapper2D.h> 
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
@@ -62,8 +66,16 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_Firstcall = true;
 
   m_T2DMapper =  vtkVolumeTextureMapper2D::New();
-  m_T2DMapperHi =  vtkVolumeTextureMapper2D::New();
   m_HiResMapper = vtkVolumeRayCastMapper::New();
+  m_HiResMapper->SetSampleDistance(0.5); // 4 rays for every pixel
+#if (VTK_MAJOR_VERSION >= 5)
+  m_FPRCMapper = vtkFixedPointVolumeRayCastMapper::New();
+  m_FPRCMapper->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
+  m_FPRCMapper->IntermixIntersectingGeometryOn();
+  m_FPRCMapper->SetSampleDistance(5); // 1 ray for every 25 (5x5) pixels
+#else
+  m_T2DMapperHi =  vtkVolumeTextureMapper2D::New();
+#endif
 
   m_HiResMapper->IntermixIntersectingGeometryOn();
   m_HiResMapper->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
@@ -85,17 +97,16 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumeProperty,0.0); // TextureMapper2D
 
+#if (VTK_MAJOR_VERSION >= 5)
+  m_FPRCID = m_VolumeLOD->AddLOD(m_FPRCMapper,m_VolumeProperty2,0.0);
+#else
   m_MedResID = m_VolumeLOD->AddLOD(m_T2DMapperHi,m_VolumeProperty2,0.0); // TextureMapper2D (higher quality)
+#endif
 
   m_Resampler = vtkImageResample::New();
-  m_Resampler->SetAxisMagnificationFactor(0,0.1);
-  m_Resampler->SetAxisMagnificationFactor(1,0.1);
-  m_Resampler->SetAxisMagnificationFactor(2,0.1);
-
-  m_ResamplerHi = vtkImageResample::New();
-  m_ResamplerHi->SetAxisMagnificationFactor(0,0.25);
-  m_ResamplerHi->SetAxisMagnificationFactor(1,0.25);
-  m_ResamplerHi->SetAxisMagnificationFactor(2,0.25);
+  m_Resampler->SetAxisMagnificationFactor(0,0.25);
+  m_Resampler->SetAxisMagnificationFactor(1,0.25);
+  m_Resampler->SetAxisMagnificationFactor(2,0.25);
   
   // For abort rendering mechanism
   m_VolumeLOD->AutomaticLODSelectionOff();
@@ -118,8 +129,13 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_UnitSpacingImageFilter->Delete();
   m_ImageCast->Delete();
   m_T2DMapper->Delete();
-  m_T2DMapperHi->Delete();
+
   m_HiResMapper->Delete();
+#if (VTK_MAJOR_VERSION >= 5)
+  m_FPRCMapper->Delete();
+#else  
+  m_T2DMapperHi->Delete();
+#endif
   m_Resampler->Delete();
   m_VolumeProperty->Delete();
   m_VolumeProperty2->Delete();
@@ -167,18 +183,22 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_VolumeLOD->SetSelectedLODID(m_LowResID);
     //std::cout<<" Low ";
   }
+  else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 1)
+  {
+#if (VTK_MAJOR_VERSION >= 5)
+    m_VolumeLOD->SetSelectedLODID(m_FPRCID);
+#else
+    m_VolumeLOD->SetSelectedLODID(m_MedResID);
+#endif
+    //std::cout<<" Med ";
+  }
   else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 2)
   {
     m_VolumeLOD->SetSelectedLODID(m_HiResID);
     //std::cout<<" Hi ";
   }
-  else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 1)
-  {
-    m_VolumeLOD->SetSelectedLODID(m_MedResID);
-    //std::cout<<" Med ";
-  }
   else{
-    std::cout<<"Could not get current LOD ";
+    //std::cout<<"Could not get current LOD ";
   }
 
 
@@ -244,12 +264,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
 
   m_Resampler->SetInput(m_UnitSpacingImageFilter->GetOutput());  
-  m_ResamplerHi->SetInput(m_UnitSpacingImageFilter->GetOutput());
     
   m_T2DMapper->SetInput(m_Resampler->GetOutput());
-  m_T2DMapperHi->SetInput(m_ResamplerHi->GetOutput());
   m_HiResMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
-  
+#if (VTK_MAJOR_VERSION >= 5)
+  m_FPRCMapper->SetInput(m_UnitSpacingImageFilter->GetOutput());
+#else
+  m_T2DMapperHi->SetInput(m_Resampler->GetOutput());
+#endif
   vtkPiecewiseFunction *opacityTransferFunction;
   vtkPiecewiseFunction *gradientTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
@@ -338,7 +360,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_VolumeProperty->SetInterpolationTypeToNearest();
 
   m_T2DMapper->SetMaximumNumberOfPlanes(100);
+#if (VTK_MAJOR_VERSION < 5)
   m_T2DMapperHi->SetMaximumNumberOfPlanes(150);
+#endif
 
   m_VolumeProperty2->SetColor( colorTransferFunction );
   m_VolumeProperty2->SetScalarOpacity( opacityTransferFunction ); 
@@ -354,8 +378,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
 
-  if (vtkRendWin && m_Firstcall) {
-
+  if (vtkRendWin && m_Firstcall) 
+  {
     vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
     cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
     vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
@@ -368,15 +392,23 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     endCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
     vtkRendWin->AddObserver( vtkCommand::EndEvent, endCommand );
     m_Firstcall=false;
+    
+    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
 
-  } else {
+  } 
+  else 
+  {
     //std::cout << "no vtk renderwindow" << std::endl;
   }
   
-  /*std::cout<<"RenderTime LowRes: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
-  std::cout<<"RenderTime MedRes: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_MedResID)<<std::endl;
-  std::cout<<"RenderTime HiRes: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_HiResID)<<std::endl;*/
-
+/*  std::cout<<"RenderTime LowRes (T2D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
+#if (VTK_MAJOR_VERSION >= 5)
+  std::cout<<"RenderTime FPRC: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_FPRCID)<<std::endl;
+#else
+  std::cout<<"RenderTime MedRes (T2DHi): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_MedResID)<<std::endl;
+#endif
+  std::cout<<"RenderTime HiRes(T3D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_HiResID)<<std::endl;  
+*/
 }
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)

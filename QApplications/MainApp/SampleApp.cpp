@@ -45,6 +45,7 @@ QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false ), m_TestingParame
 
   parseCommandLine();
 
+  // TODO: Move this slot to MainApp! Or find a good reason to keep it here
   connect (this, SIGNAL(ShowWidgetPlanesToggled(bool)), this, SLOT(SetWidgetPlanesEnabled(bool)));
   resize(1024,768);
 

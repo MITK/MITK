@@ -1311,15 +1311,22 @@ mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
 void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   unsigned char i;
-  os << indent << " PixelType: " << m_PixelType.GetTypeId()->name() << std::endl;
-  os << indent << " BitsPerElement: " << m_PixelType.GetBpe() << std::endl;
-  os << indent << " NumberOfComponents: " << m_PixelType.GetNumberOfComponents() << std::endl;
-  os << indent << " BitsPerComponent: " << m_PixelType.GetBitsPerComponent() << std::endl;
-  os << indent << " Dimension: " << m_Dimension << std::endl;
-  os << indent << " Dimensions: ";
-  for(i=0; i < m_Dimension; ++i)
-    os << GetDimension(i) << " ";
-  os << std::endl;
+  if(m_Initialized)
+  {
+    os << indent << " PixelType: " << m_PixelType.GetTypeId()->name() << std::endl;
+    os << indent << " BitsPerElement: " << m_PixelType.GetBpe() << std::endl;
+    os << indent << " NumberOfComponents: " << m_PixelType.GetNumberOfComponents() << std::endl;
+    os << indent << " BitsPerComponent: " << m_PixelType.GetBitsPerComponent() << std::endl;
+    os << indent << " Dimension: " << m_Dimension << std::endl;
+    os << indent << " Dimensions: ";
+    for(i=0; i < m_Dimension; ++i)
+      os << GetDimension(i) << " ";
+    os << std::endl;
+  }
+  else
+  {
+    os << indent << " Image not initialized: m_Initialized: false" << std::endl;
+  }
 
   Superclass::PrintSelf(os,indent);
 }

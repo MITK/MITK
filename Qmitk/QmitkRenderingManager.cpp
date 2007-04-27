@@ -28,11 +28,6 @@ QmitkRenderingManager::QmitkRenderingManager()
   m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
 }
 
-void QmitkRenderingManager::DoStartRendering()
-{
-  QmitkAbortEventFilter::GetInstance()->SetMouseMoved(false);
-}
-
 void QmitkRenderingManager::DoMonitorRendering()
 {
   QmitkAbortEventFilter::GetInstance()->ProcessEvents();

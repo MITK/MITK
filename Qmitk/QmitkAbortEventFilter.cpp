@@ -92,11 +92,10 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     { 
       if(m_ButtonPressed)
       {
-        SetMouseMoved(true);
         //std::cout << "#MM ";
-        //mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         if(mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
         {
+          mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
           mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
         }
       }
@@ -165,7 +164,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     {
       if(m_ButtonPressed){
         //std::cout << "#MM2 ";
-        SetMouseMoved(true);
         mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
       }
       return false;
@@ -185,7 +183,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return false;
     } 
-    
+
   }
  
   //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
@@ -208,32 +206,4 @@ void QmitkAbortEventFilter::IssueQueuedEvents()
     m_EventQueue.pop();
   }
 
-  if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 1)
-  {
-    std::cout<<"LOD 1->2"<<std::endl;
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-
-
-  if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 0 && !GetMouseMoved())
-  { 
-    std::cout<<"LOD 0->1"<<std::endl;
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(1);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  if(GetMouseMoved())
-  {
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();   
-  }
-
-}
-void QmitkAbortEventFilter::SetMouseMoved(bool moved)
-{
-  m_MouseMoved = moved;
-}
-
-bool QmitkAbortEventFilter::GetMouseMoved() const
-{
-  return m_MouseMoved;
 }

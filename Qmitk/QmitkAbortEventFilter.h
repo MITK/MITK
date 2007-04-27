@@ -34,9 +34,6 @@ public:
 
   void ProcessEvents();
   void IssueQueuedEvents();
-
-  bool GetMouseMoved() const;
-  void SetMouseMoved(bool moved);
  
 protected:
   QmitkAbortEventFilter();

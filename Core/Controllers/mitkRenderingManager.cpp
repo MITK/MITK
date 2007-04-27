@@ -276,7 +276,7 @@ mitk::RenderingManager
 ::RequestUpdateAll( bool includeVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
 {
   int magicUpdateFlag = includeVtkActors?3:2;
-//  std::cout<<"RMUA \n";
+  //std::cout<<"RMUA \n";
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -500,7 +500,6 @@ mitk::RenderingManager
   { 
     //std::cout<<"S ";
     m_IsRendering[renderer->GetRenderWindow()] = true;
-    this->DoStartRendering();
   }
 }
 
@@ -523,6 +522,20 @@ mitk::RenderingManager
     m_IsRendering[renderer->GetRenderWindow()] = false;
   }
   this->DoFinishAbortRendering();
+
+  if(GetCurrentLOD() == 1)
+  {
+    std::cout<<"LOD 1->2"<<std::endl;
+    SetCurrentLOD(2);
+    RequestUpdateAll();
+  }
+
+  if(GetCurrentLOD() == 0)
+  { 
+    std::cout<<"LOD 0->1"<<std::endl;
+    SetCurrentLOD(1);
+    RequestUpdateAll();
+  }
 }
 
 bool

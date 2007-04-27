@@ -3,23 +3,23 @@
 \page Step6Page MITK Tutorial - Step 6: Use an interactive region-grower
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
-We will see how MITK images can be accessed as ITK images.\n
-We now load the image file only (mitk/Build/Testing/Pic3D.pic.gz) since the surface will be the result of the region-growing.
+We will see how MITK images can be accessed as ITK images.
+We now load the image file only (mitk/Testing/Data/Pic3D.pic.gz) since the surface will be the result of the region-growing.
 
 \image html step6_result.png 
 
 The source is now split among several files:
 
-\li \ref Step6.cpp "Step6.cpp"\n 
-\li \ref Step6.h "Step6.h"\n 
+\li \ref Step6.cpp "Step6.cpp" 
+\li \ref Step6.h "Step6.h" 
 \li \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"
 \li \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp"
 \li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
 \li \ref Step6main.cpp "Step6main.cpp"
 
-The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.\n
-As in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
-Function names start with capital letters. To learn more about style conventions in MITK read \ref StylesAndNotesPage "The MITK Style Guide".\n\n
+The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.
+Like in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
+Function names start with capital letters. To learn more about style conventions in MITK read \ref StylesAndNotesPage "The MITK Style Guide".
 
 \dontinclude Step6.cpp
 
@@ -37,21 +37,24 @@ Then a button is created to start the segmentation and its clicked() signal is c
 
 \section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
 
-ITK images are templated whereas mitk::Images are not.\n
-Define an access method:
+ITK images are templated whereas mitk::Images are not. To use ITK filters with MITK images, we have to convert From MITK to ITK. To do so, first
+define an access method, which is templated as an ITK image is:
 
 \code
-template<...>
-MyAccessMethod(itk::Image<...>* itkImage, ..)
+template<TPixel, VImageDimension>
+MyAccessMethod(itk::Image<TPixel, VImageDimension>* itkImage)
 {
 ...
 }
 \endcode
 
-Then call the access method:
+If you don't understand this template syntax, you should read any C++ text book. Understanding template syntax is crucial to successfully using ITK.
+
+To call this templated method with an (untemplated) mitk::Image, you can use the AccessByItk macro from mitkImageAccessByItk.h. This macro checks for
+the actual image type of the mitk::Image and does any neccessary conversions. Look into "Modules / Adaptor classes" for more information.
 
 \code
-AccessByItk(mitkImage, MyAccessMethod, ...)
+AccessByItk(mitkImage, MyAccessMethod)
 \endcode
 
 \dontinclude Step6RegionGrowing.txx
@@ -82,10 +85,10 @@ The method StartRegionGrowing() finally calls our access method RegionGrowing():
 
 \section ConvertingITKMITKSection Converting ITK images to MITK images and vice versa
 
-In some cases it is useful to simply convert between ITK and MITK images. The direction ITK to MITK is easy, since mitk::Image can handle all (most) data types. The direction MITK to ITK is more critical, since ITK images have to instantiated with a fixed pixel type and fixed dimension at compile time. 
+In some cases it is useful to simply convert between ITK and MITK images. The direction ITK to MITK is easy, since mitk::Image can handle most data types. The direction MITK to ITK is more critical, since ITK images have to be instantiated with a fixed pixel type and fixed dimension at compile time. 
 
-\li \code mitk::CastToMitkImage(itk::Image<...>, mitkImage) \endcode : Convert ITK to MITK image.
-\li \code mitk::CastToItkImage(mitkImage, itk::Image<...>) \endcode : Convert MITK to ITK image. Warning: Data types are converted if neccessary. The dimensions of the mitkImage and the itk::Image have to be equal.
+\li \code mitk::Image mitk::ImportItkImage(itk::Image<...>) \endcode
+\li \code mitk::CastToItkImage(mitkImage, itk::Image<...>) \endcode
 
 
 \section ConnectingMITKToVTKSection Connecting MITK images to VTK

@@ -4,9 +4,11 @@
  
 As in the previous step one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
 The QmitkRenderWindow is now used for displaying a 3D view, by setting the used mapper-slot to Standard3D. 
-Since volume-rendering is a (rather) slow procedure, the default is that images are not displayed in the 3D view.\n
-In Step 3a the default is kept whereas in Step 3b volume rendering is turned on.\n
-As in the previous step, to obtain the results the program has to be executed using the image file mitk/Build/Testing/Pic3D.pic.gz and the surface file mitk/Build/Testing/lungs.vtk.\n
+Since volume-rendering is a (rather) slow procedure, the default is that images are not displayed in the 3D view.
+
+In Step 3a the default is kept whereas in Step 3b volume rendering is turned on.
+
+As in the previous step, to obtain the results the program has to be executed using the image file mitk/Testing/Data/Pic3D.pic.gz and the surface file mitk/Testing/Data/lungs.vtk.
 
 
 \li \ref Step3.cpp "Step3.cpp" \n
@@ -24,7 +26,8 @@ Tell the renderer to create a 3D view:
 \skipline // use it as a 3D view!
 \skipline renderWindow.GetRenderer()->SetMapperID
 
-The rest of the code remains unchanged.\n
+The rest of the code remains unchanged.
+
 The picture above shows the result of the program when reading both the image and the surface file.
 As volume rendering is off the image is not visible.
  
@@ -32,7 +35,8 @@ As volume rendering is off the image is not visible.
  
 \image html step3b_result.png 
  
-Volume Rendering is now turned on as shown in the picture above.\n
+Volume Rendering is now turned on as shown in the picture above.
+
 \dontinclude Step3.cpp 
 The property "volumerendering" has to be turned on on the node containing the image.
  

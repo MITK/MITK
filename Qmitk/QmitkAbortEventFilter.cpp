@@ -135,6 +135,13 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         //std::cout << "#L ";
         return false;
       }
+     case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)
+      {
+        //std::cout << "#CI ";
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        return false;
+      }
 
       case QEvent::KeyPress:
       { 
@@ -147,8 +154,10 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         m_EventQueue.push( ObjectEventPair(object, newEvent) );
         return true;
       }
-    }
 
+      //std::cout<<"Event Type: (Rendering)"<<event->type()<<std::endl;
+
+    }
     return true;
   }
  else
@@ -179,15 +188,21 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     if(event->type()==QEvent::Resize)
     {
       //std::cout << "#R2 ";
-      //mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+      //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return false;
     } 
+   
+    if(event->type()==QEvent::ChildInserted)
+    {
+      //std::cout << "#CI2 ";
+      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+      return false;
+    }
+
+    //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
 
   }
- 
-  //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
-  
   return false;
 }
 

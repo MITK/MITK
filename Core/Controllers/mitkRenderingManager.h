@@ -156,6 +156,7 @@ public:
 
   int GetCurrentLOD();
   void SetCurrentLOD(int lod);
+  void SetNumberOfLOD(int number);
 
 protected:
   RenderingManager();
@@ -179,6 +180,7 @@ protected:
   bool m_UpdatePending;
   int m_Interval;
   int m_CurrentLOD;
+  int m_MaxLOD;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );

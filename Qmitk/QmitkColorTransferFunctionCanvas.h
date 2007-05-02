@@ -59,14 +59,14 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
 
     void AddRGB(double x, double r, double g, double b);
 
-    int GetFunctionMax(){
+    double GetFunctionMax(){
       return m_ColorTransferFunction->GetRange()[1];
     }
-    int GetFunctionMin(){
+    double GetFunctionMin(){
       return m_ColorTransferFunction->GetRange()[0];
     }
     
-    int GetFunctionRange(){
+    double GetFunctionRange(){
       double range;
       if((m_ColorTransferFunction->GetRange()[0])==0){
         range = m_ColorTransferFunction->GetRange()[1];

@@ -29,7 +29,7 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     
     QmitkPiecewiseFunctionCanvas( QWidget * parent=0, const char * name=0, WFlags f = false );
     virtual void paintEvent( QPaintEvent* e );
-    int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6);
+    int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
 
     void SetPiecewiseFunction(vtkPiecewiseFunction* piecewiseFunction)
     {
@@ -80,15 +80,15 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
 
 
-    int GetFunctionMax(){
+    double GetFunctionMax(){
       return m_PiecewiseFunction->GetRange()[1];
     }
 
-    int GetFunctionMin(){
+    double GetFunctionMin(){
       return m_PiecewiseFunction->GetRange()[0];
     }
 
-    int GetFunctionRange(){
+    double GetFunctionRange(){
       double range;
       if((m_PiecewiseFunction->GetRange()[0])<0){
         range = (m_PiecewiseFunction->GetRange()[1])-(m_PiecewiseFunction->GetRange()[0]);

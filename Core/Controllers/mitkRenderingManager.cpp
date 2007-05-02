@@ -523,17 +523,11 @@ mitk::RenderingManager
   }
   this->DoFinishAbortRendering();
 
-  if(GetCurrentLOD() == 1)
+  /** Level-Of-Detail **/
+  if(GetCurrentLOD() < m_MaxLOD)
   {
-    std::cout<<"LOD 1->2"<<std::endl;
-    SetCurrentLOD(2);
-    RequestUpdateAll();
-  }
-
-  if(GetCurrentLOD() == 0)
-  { 
-    std::cout<<"LOD 0->1"<<std::endl;
-    SetCurrentLOD(1);
+    int nextLOD = GetCurrentLOD()+1;
+    SetCurrentLOD(nextLOD);
     RequestUpdateAll();
   }
 }
@@ -591,6 +585,11 @@ void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for
     //std::cout<<"SetCurrentLOD("<<lod<<") ";
     m_CurrentLOD=lod;
   }
+}
+
+void mitk::RenderingManager::SetNumberOfLOD(int number)
+{
+    m_MaxLOD = number-1;
 }
 
 // Create and register generic RenderingManagerFactory.

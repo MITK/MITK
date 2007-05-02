@@ -121,6 +121,8 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput());
   m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
+
+  mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
 }
 
 

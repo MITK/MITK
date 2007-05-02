@@ -96,7 +96,7 @@ class QmitkTransferFunctionCanvas : public QWidget
 
     void PaintHistogramGO(QPainter &p);
 
-    virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 6) = 0;
+    virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
     virtual void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) = 0;
     virtual void RemoveFunctionPoint(vtkFloatingPointType x) = 0;
     virtual void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) = 0;

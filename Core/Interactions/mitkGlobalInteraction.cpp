@@ -127,9 +127,9 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
   {
     if ((*it).second == interactor)
     {
-      m_JurisdictionMap.erase(it);
       if (m_CurrentInteractorIter == it)
-        m_CurrentInteractorIter == m_JurisdictionMap.end();
+        m_CurrentInteractorIter = m_JurisdictionMap.end();
+      m_JurisdictionMap.erase(it);
       break;
     }
   }

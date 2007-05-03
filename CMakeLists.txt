@@ -1,4 +1,11 @@
 PROJECT(MITK)
+
+# only configure dart here if not already configured in the 
+# parent directory
+IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
+INCLUDE(Dart)
+IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
+
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")

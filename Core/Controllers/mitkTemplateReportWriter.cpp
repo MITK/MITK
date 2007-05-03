@@ -20,11 +20,43 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <ios>
 #include "mitkTemplateReportWriter.h"
+
+//#include <qregexp.h>
  
+
+mitk::TemplateReportWriter::TemplateReportWriter()
+: m_OutputFileName(""), m_TemplateFileName("")
+{
+}
+
 
 void mitk::TemplateReportWriter::AddKey(std::string key,std::string value) 
 {
   m_KeyValueMap.insert(KeyValueMapType::value_type(key,value));
+}
+
+
+void mitk::TemplateReportWriter::ReadKeywordsFromTemplateFile()
+{
+  if (m_TemplateFileName.empty())
+    return;
+
+  std::ifstream templateFile(m_TemplateFileName.c_str(), std::ios::in);
+  if (!templateFile)
+    return;
+
+  //QRegExp reg("(#.+#)");
+  //std::string line;
+  //while (!std::getline(templateFile,line).eof())    // for each line in the file
+  //{
+  //  int pos = 0;
+  //  while ( (pos = reg.search(line, pos)) != -1 )   // if it contains a keyword
+  //  {
+  //    this->AddKey(reg.cap(1),"");                      // add keyword and search in remainder of string
+  //    pos += rx.matchedLength();
+  //  }
+  //}
+  templateFile.close();
 }
 
 
@@ -40,7 +72,6 @@ void mitk::TemplateReportWriter::Generate()
 
   while (!std::getline(templateFile,line).eof())
   {
-
     for (KeyValueMapType::iterator it = m_KeyValueMap.begin(); it != m_KeyValueMap.end() ; it++)
     {
       std::string key = it->first;

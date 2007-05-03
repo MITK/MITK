@@ -39,7 +39,7 @@ namespace mitk {
 
     mitkClassMacro(TemplateReportWriter, itk::Object);
     itkNewMacro(Self);
-    itkGetMacro(OutputFileName,std::string);
+    
     /** 
     * The filename to write the generated report to
     */
@@ -52,15 +52,27 @@ namespace mitk {
     itkGetStringMacro(TemplateFileName);
 
     /** 
-    * The write the report file keywords replaced by their value (as set before with the AddKey() method)
+    * returns a reference to the key->value replacement map 
     */
     KeyValueMapType& GetKeyValueMap() { return m_KeyValueMap; }
     
+    /** 
+    * Adds an entry to the key->value replacement map
+    */
     void AddKey(std::string key, std::string value);
-    
+
+    /** 
+    * Searches the template file for keywords and adds them to the key->value map (without values)
+    */
+    void ReadKeywordsFromTemplateFile();
+
+
+    /** 
+    * The write the report file keywords replaced by their value (as set before with the AddKey() method)
+    */   
     void Generate();
   protected:
-    TemplateReportWriter() {}
+    TemplateReportWriter();
 
     std::string m_OutputFileName;
     std::string m_TemplateFileName;

@@ -1,34 +1,34 @@
 /**
 \page BuildInstructionsPage Build Instructions
 
-For the following examples we assume that you have your source in /src
-
 \section one Get a source tree
 
-Since MITK is under active development we recommend to use the CVS version. To make sure you get a stable tree, check the
-<a href="http://public.kitware.com/MITK/Dashboard/MostRecentResults-Nightly/Dashboard.html">MITK dashboard</a> at Kitware before checking out. If the CVS is not clean, better get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
-To checkout MITK's current cvs repository via anonymous cvs do (when asked for a password, just press enter):
+Since MITK is under active development we recommend to use subversion to get
+the most recent version. To make sure you get a stable tree, check the <a
+href="http://public.kitware.com/MITK/Dashboard/MostRecentResults-Nightly/Dashboard.html">MITK
+dashboard</a> at Kitware before checking out. If the build tree is not clean, you can specify an older revision for the checkout or get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
+
+To checkout MITK's current subversion repository do:
 
 <tt>
-cd /src
-cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot login<br>
-cvs -d :pserver:anonymous@mbi.dkfz-heidelberg.de:/usr/local/cvsroot co mitk 
+svn co svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk mitk
 </tt>
+
+If you prefer a graphical client (look <a href="http://subversion.tigris.org/links.html#clients">here [subversion.tigris.org]</a> for a list), use <tt>svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk</tt> as the repository URL for the trunk.
 
 \section two Build MITK with CMake 
 
 Create a new directory for the binary tree, change to it and call CMake:
 
 <tt>
-cd /src<br>
 mkdir mitkBinary<br>
 cd mitkBinary<br>
-ccmake ../mitk<br>
-make<br>
+ccmake ../mitk</tt> (assuming you are still in the directory you did the checkout in<br>
+<tt>make<br>
 </tt>
 
 If you use Windows, then you just start the CMake GUI and enter the location of the source and of the binary tree. 
 CMake will create a Visual Studio solution in the root of your binary tree.
 
-\note "Installing" MITK via cmake (or using "make install") is not yet supported.
+\note "Installing" MITK via cmake (or using "make install") is not yet supported. You can find the application in <tt>&lt;binary_dir&gt;/mitk/bin</tt> and the libraries in <tt>&lt;binary_dir&gt;/mitk/lib</tt>.
 */

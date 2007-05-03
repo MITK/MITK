@@ -9,7 +9,6 @@ SET(CPP_FILES
   mitkOperationEvent.cpp
   mitkProgressBar.cpp
   mitkRenderingManager.cpp
-  mitkTemplateReportWriter.cpp
   mitkSliceNavigationController.cpp
   mitkSlicesCoordinator.cpp
   mitkSlicesRotator.cpp

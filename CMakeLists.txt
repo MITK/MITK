@@ -4,7 +4,7 @@ PROJECT(MITK)
 # parent directory
 IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
 INCLUDE(Dart)
-IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
+ENDIF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
 
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)

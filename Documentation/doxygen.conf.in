@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = mitk
 PROJECT_NUMBER         = 
-OUTPUT_DIRECTORY       = @MITK_BINARY_DIR@/Documentation/Doxygen
+OUTPUT_DIRECTORY       = @MITK_DOXYGEN_OUTPUT_DIR@
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO

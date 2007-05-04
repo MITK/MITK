@@ -158,6 +158,22 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(ipPicDesc
   return node;
 }
 
+
+void CommonFunctionality::SetWidgetPlaneEnabled( mitk::DataTree *dataTree, const char *name, bool enable )
+{
+  // widget plane are made visible again
+  mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty(name));
+  if (!it->IsAtEnd())
+  {
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if ( node.IsNotNull() )
+    {
+      node->SetVisibility(enable, NULL);
+    }
+  }
+}
+
+
 void CommonFunctionality::SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool enable)
 {
   // widget plane are made visible again
@@ -189,6 +205,8 @@ void CommonFunctionality::SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool 
     }
   }
 }
+
+
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName )
 {
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();

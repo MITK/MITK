@@ -206,8 +206,9 @@ namespace CommonFunctionality
   */
   mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
 
-  void SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool enable);
-  mitk::DataTreeNode::Pointer FileOpen( const char * fileName );
+  void SetWidgetPlaneEnabled( mitk::DataTree *dataTree, const char *name, bool enable );
+  void SetWidgetPlanesEnabled( mitk::DataTree *dataTree, bool enable );
+  mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
   mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
   mitk::DataTreeNode::Pointer FileOpenImageSequence();
   mitk::DataTreeNode::Pointer FileOpen();

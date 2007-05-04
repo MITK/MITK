@@ -1,3 +1,8 @@
+# 
+# Variables:
+#  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
+
+
 OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
 MARK_AS_ADVANCED(USE_DOT)
 

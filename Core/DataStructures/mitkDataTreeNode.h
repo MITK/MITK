@@ -261,7 +261,7 @@ public:
   //## @brief Convenience access method for color properties (instances of
   //## ColorProperty)
   //## @return @a true property was found
-  bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey = "color") const;
+  bool GetColor(float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color") const;
 
   //##ModelId=3EF194220204
   //##Documentation

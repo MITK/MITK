@@ -92,7 +92,14 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     { 
       if(m_ButtonPressed)
       {
-        //std::cout << "#MM ";
+
+        QMouseEvent* me = ( QMouseEvent* )( event );
+        QMouseEvent* newEvent = new QMouseEvent(
+          me->type(), me->pos(), me->globalPos(), me->button(), me->state()
+        );
+        m_EventQueue.push( ObjectEventPair(object, newEvent) );
+
+  //std::cout << "#MM ";
         if(mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
         {
           mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);

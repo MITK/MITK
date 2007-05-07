@@ -156,9 +156,11 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
 
       //std::cout<<"Event Type: (Rendering)"<<event->type()<<std::endl;
-
+      default:
+      {
+        return true;
+      }
     }
-    return true;
   }
  else
   {

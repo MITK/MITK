@@ -37,6 +37,7 @@ ColorSequenceCycleH::~ColorSequenceCycleH()
 Color ColorSequenceCycleH::GetNextColor()
 {
   color_h += 60.0;
+  if ( color_h < 0.0 ) color_h = 0.0; 
 
   if (color_h >= 360.0)
   {
@@ -102,14 +103,23 @@ void ColorSequenceCycleH::GoToBegin()
   color_cycle = 0;
 }
 
-void ColorSequenceCycleH::IncreaseHueValueByCycleSteps( int steps )
+void ColorSequenceCycleH::ChangeHueValueByCycleSteps( int steps )
 {
   color_h += (float)(steps*60.0);
 }
 
-void ColorSequenceCycleH::IncreaseHueValueByAbsoluteNumber( float number )
+void ColorSequenceCycleH::ChangeHueValueByAbsoluteNumber( float number )
 {
   color_h += number;
+}
+
+void ColorSequenceCycleH::SetColorCycle( unsigned short cycle )
+{
+if ( cycle > 5 ) cycle = 5;
+color_cycle = cycle;
+color_h = 360.0;
+this->GetNextColor();
+
 }
 
 }  // mitk

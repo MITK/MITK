@@ -207,7 +207,7 @@ protected:
   bool LineIntersectZero( vtkPoints *points, int p1, int p2, 
     vtkFloatingPointType *bounds );
 
-  void CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+  bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
     const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
   /** \brief Number of renderers data is stored for

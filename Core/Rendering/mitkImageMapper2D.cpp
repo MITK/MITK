@@ -354,6 +354,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // Bounds information for reslicing (only required if reference geometry 
   // is present)
   vtkFloatingPointType bounds[6];
+  bool boundsInitialized = false;
 
   int i;
   for ( i = 0; i < 6; ++i )
@@ -440,8 +441,8 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // dataset bounding box; this is required for drawing the texture at the
       // correct position during 3D mapping.
 
-      this->CalculateClippedPlaneBounds( rendererInfo.m_ReferenceGeometry, 
-        planeGeometry, bounds );
+      boundsInitialized = this->CalculateClippedPlaneBounds(
+        rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
     }
   }
 
@@ -561,7 +562,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   size[1] = (bounds[3] - bounds[2]) / mmPerPixel[1];
 
   int xMin, xMax, yMin, yMax;
-  if ( worldGeometry->GetReferenceGeometry() )
+  if ( boundsInitialized )
   {
     xMin = static_cast< int >( bounds[0] / mmPerPixel[0] );
     xMax = static_cast< int >( bounds[1] / mmPerPixel[0] );
@@ -689,7 +690,7 @@ mitk::ImageMapper2D
 }
 
 
-void 
+bool 
 mitk::ImageMapper2D
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
   const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
@@ -745,17 +746,25 @@ mitk::ImageMapper2D
   this->LineIntersectZero( newPoints, 5, 6, bounds );
   this->LineIntersectZero( newPoints, 6, 7, bounds );
   this->LineIntersectZero( newPoints, 7, 4, bounds );
-  
 
-  // The resulting bounds must be adjusted by the plane spacing, since we
-  // we have so far dealt with index coordinates
-  const float *planeSpacing = planeGeometry->GetFloatSpacing();
-  bounds[0] *= planeSpacing[0];
-  bounds[1] *= planeSpacing[0];
-  bounds[2] *= planeSpacing[1];
-  bounds[3] *= planeSpacing[1];
-  bounds[4] *= planeSpacing[2];
-  bounds[5] *= planeSpacing[2];
+  if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
+    || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
+  {
+    return false;
+  }
+  else
+  {
+    // The resulting bounds must be adjusted by the plane spacing, since we
+    // we have so far dealt with index coordinates
+    const float *planeSpacing = planeGeometry->GetFloatSpacing();
+    bounds[0] *= planeSpacing[0];
+    bounds[1] *= planeSpacing[0];
+    bounds[2] *= planeSpacing[1];
+    bounds[3] *= planeSpacing[1];
+    bounds[4] *= planeSpacing[2];
+    bounds[5] *= planeSpacing[2];
+    return true;
+  }
 }
 
 

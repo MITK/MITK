@@ -102,5 +102,15 @@ void ColorSequenceCycleH::GoToBegin()
   color_cycle = 0;
 }
 
+void ColorSequenceCycleH::IncreaseHueValueByCycleSteps( int steps )
+{
+  color_h += (float)(steps*60.0);
+}
+
+void ColorSequenceCycleH::IncreaseHueValueByAbsoluteNumber( float number )
+{
+  color_h += number;
+}
+
 }  // mitk
 

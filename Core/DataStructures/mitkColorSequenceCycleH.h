@@ -52,7 +52,16 @@ class ColorSequenceCycleH : public ColorSequence
     /*!  
     \brief Rewind to first color
     */ 
-    virtual void GoToBegin(); 
+    virtual void GoToBegin();
+
+    /*!
+    \brief Increase the Hue value if you don't want to start with red...
+    This can be done by steps ( = steps * 60 increase of Hue )
+    or absolute ( 0.0 < Hue < 360.0).
+    Note: This does not change the other values, i.e. the color cycle.
+    */
+    virtual void IncreaseHueValueByCycleSteps( int steps );
+    virtual void IncreaseHueValueByAbsoluteNumber( float number );
     
   protected:
       

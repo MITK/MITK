@@ -233,7 +233,7 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   if ( IsFixed() )
     return;
   
-  if ( image == NULL ) return;
+  if ( image == NULL || !image->IsInitialized() ) return;
 
   mitk::Image* wholeImage = image;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();

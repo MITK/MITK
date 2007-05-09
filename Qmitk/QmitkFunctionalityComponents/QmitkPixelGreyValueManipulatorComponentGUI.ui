@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>467</width>
-            <height>341</height>
+            <width>585</width>
+            <height>285</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -285,7 +285,7 @@
                                                     <cstring>unnamed</cstring>
                                                 </property>
                                                 <property name="margin">
-                                                    <number>8</number>
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLabel">
                                                     <property name="name">
@@ -965,7 +965,7 @@
                                                     </widget>
                                                     <widget class="QCheckBox">
                                                         <property name="name">
-                                                            <cstring>checkBox1_2</cstring>
+                                                            <cstring>m_InverseCheckBox</cstring>
                                                         </property>
                                                         <property name="text">
                                                             <string>Inverse OperationArea</string>
@@ -1064,7 +1064,6 @@
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="local" impldecl="in implementation">QmitkPixelGreyValueManipulatorComponentGUI.ui.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
@@ -1094,7 +1093,11 @@
     <function returnType="QGroupBox *">GetShowBaseThresholdGroupBox()</function>
     <function returnType="QGroupBox *">GetSegmentationContent()</function>
     <function returnType="QComboBox *">GetBoundingObjectTypeComboBox()</function>
+    <function returnType="QCheckBox*">GetInverseCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

@@ -150,3 +150,8 @@ QComboBox* QmitkPixelGreyValueManipulatorComponentGUI::GetBoundingObjectTypeComb
 {
   return m_BoundingObjectTypeComboBox;
 }
+
+QCheckBox* QmitkPixelGreyValueManipulatorComponentGUI::GetInverseCheckBox()
+{
+  return m_InverseCheckBox;
+}

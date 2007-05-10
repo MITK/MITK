@@ -756,6 +756,13 @@ void QmitkMainTemplate::parseCommandLine()
     if(strcmp(qApp->argv()[i], "-testing")==0) {
       break;
     }
+    if(strcmp(qApp->argv()[i], "-testdata")==0) {
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
+      treeNode->SetData(mitk::Image::New());
+      it.Add(treeNode);
+      break;
+    }
     fileOpen(qApp->argv()[i]);
   }
 }

@@ -264,6 +264,17 @@ void mitk::LevelWindow::SetAuto(mitk::Image* image, bool tryPicTags, bool guessB
   unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
   float minCountFraction = minCount/float(numPixelsInSlice);
   float maxCountFraction = maxCount/float(numPixelsInSlice);
+
+  // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
+  if (image->GetPixelType().GetType() == ipPicInt && image->GetPixelType().GetBpe() >= 8)
+  {
+    if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
+    {
+      minValue = min2ndValue;
+    }
+  }
+  // End fix
+
   if ( minValue == maxValue )
   {
     // guessByCentralSlice seems to have failed, lets look at all data

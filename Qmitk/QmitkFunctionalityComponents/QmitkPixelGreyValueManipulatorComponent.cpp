@@ -787,30 +787,30 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 					mitk::Point3D point3D;
 					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 
-						if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
-				{
-					if(m_BoundingObject->IsInside(point3D))
+					if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 					{
-						InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+						if(m_BoundingObject->IsInside(point3D))
+						{
+							InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+						}
+						else
+						{
+							itShifted.Set(it.Get());
+						}
 					}
-					else
+					else //manipulate outsidethe bounding box
 					{
-						itShifted.Set(it.Get());
+						if(!(m_BoundingObject->IsInside(point3D)))
+						{
+							InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+						}
+						else
+						{
+							itShifted.Set(it.Get());
+						}
 					}
-				}
-				else //manipulate outsidethe bounding box
-				{
-					if(!(m_BoundingObject->IsInside(point3D)))
-					{
-						InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
-					}
-					else
-					{
-						itShifted.Set(it.Get());
-					}
-				}
-				++it;
-				++itShifted;
+					++it;
+					++itShifted;
 				}//end of while
 			}//if(m_BoundingObject)
 		}//end of manipulation inside BoundingObject area
@@ -978,7 +978,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 				mitk::Point3D point3D;
 				itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 
-								if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
+				if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 				{
 					if(m_BoundingObject->IsInside(point3D))
 					{
@@ -1101,7 +1101,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 				mitk::Point3D point3D;
 				itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 
-								if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
+				if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 				{
 					if(m_BoundingObject->IsInside(point3D))
 					{
@@ -1178,6 +1178,7 @@ void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(typena
 	std::string sPName = "PixelChanged Image " + buffer.str();
 	m_PixelChangedImageNode = mitk::DataTreeNode::New();//m_GradientShiftedImageNode = mitk::DataTreeNode::New();
 	m_PixelChangedImageNode->SetData(m_PixelChangedImage);
+	mitk::DataTreeNodeFactory::SetDefaultImageProperties(m_PixelChangedImageNode);
 	m_PixelChangedImageNode->SetProperty("name", new mitk::StringProperty(sPName ) );
 	m_PixelChangedImageNode->SetIntProperty("layer", 2);
 	selectedIterator->Add(m_PixelChangedImageNode);

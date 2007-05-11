@@ -32,5 +32,29 @@ class CoreObjectFactoryBase : public itk::ObjectFactoryBase
     }
 };
 
+template <class T>
+class CreateOverrideObjectFunction : public itk::CreateObjectFunctionBase
+{
+public:
+  /** Standard class typedefs. */
+  typedef CreateOverrideObjectFunction  Self;
+  typedef itk::SmartPointer<Self>    Pointer;
+    
+  /** Methods from itk:LightObject. */
+  itkFactorylessNewMacro(Self);
+  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New(); 
+    p->Register();
+    return p.GetPointer(); 
+  }
+
+protected:
+  CreateOverrideObjectFunction() {}
+  ~CreateOverrideObjectFunction() {}
+  
+private:
+  CreateOverrideObjectFunction(const Self&); //purposely not implemented
+  void operator=(const Self&); //purposely not implemented
+};
+
 }
 #endif

@@ -164,6 +164,7 @@ mitk::EventMapper::EventMapper()
   m_EventConstMap["Type_Style"] =                                       91;     // internal style event
   m_EventConstMap["Type_TabletPress"] =                         92;     // tablet press
   m_EventConstMap["Type_TabletRelease"] =                       93;     // tablet release
+  m_EventConstMap["Type_TDMouseInput"] =                        mitk::Type_TDMouseInput;     // 3D mouse input occured
   m_EventConstMap["Type_User"] =                                        1000;   // first user event id
   m_EventConstMap["Type_MaxUser"] =                             65535;  // last user event id
 

@@ -159,54 +159,6 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(ipPicDesc
 }
 
 
-void CommonFunctionality::SetWidgetPlaneEnabled( mitk::DataTree *dataTree, const char *name, bool enable )
-{
-  // widget plane are made visible again
-  mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty(name));
-  if (!it->IsAtEnd())
-  {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if ( node.IsNotNull() )
-    {
-      node->SetVisibility(enable, NULL);
-    }
-  }
-}
-
-
-void CommonFunctionality::SetWidgetPlanesEnabled(mitk::DataTree* dataTree, bool enable)
-{
-  // widget plane are made visible again
-  mitk::DataTreeIteratorClone it = dataTree->GetNext("name", new mitk::StringProperty("widget1Plane"));
-  if (!it->IsAtEnd())
-  {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if ( node.IsNotNull() )
-    {
-      node->SetVisibility(enable, NULL);
-    }
-  }
-  it = dataTree->GetNext("name", new mitk::StringProperty("widget2Plane"));
-  if (!it->IsAtEnd())
-  {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if ( node.IsNotNull() )
-    {
-      node->SetVisibility(enable, NULL);
-    }
-  }
-  it = dataTree->GetNext("name", new mitk::StringProperty("widget3Plane"));
-  if (!it->IsAtEnd())
-  {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if ( node.IsNotNull() )
-    {
-      node->SetVisibility(enable, NULL);
-    }
-  }
-}
-
-
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName )
 {
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();

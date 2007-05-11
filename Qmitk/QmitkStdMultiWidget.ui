@@ -163,6 +163,7 @@
     <include location="global" impldecl="in declaration">mitkGradientBackground.h</include>
     <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
+    <include location="local" impldecl="in implementation">QmitkCommonFunctionality.h</include>
 </includes>
 <variables>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
@@ -184,6 +185,7 @@
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
+    <signal>WidgetPlanesVisibilityChanged(bool)</signal>
 </signals>
 <slots>
     <slot>changeLayoutTo2DImagesUp()</slot>
@@ -211,6 +213,8 @@
     <slot>EnableNavigationControllerEventListening()</slot>
     <slot>DisableNavigationControllerEventListening()</slot>
     <slot>EnableSliceRotation( bool on )</slot>
+    <slot>SetWidgetPlaneVisibility( const char* name, bool visible )</slot>
+    <slot>SetWidgetPlanesVisibility( bool visible )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
     <slot>changeLayoutToRowWidgetSmall3andBig4()</slot>
@@ -232,7 +236,6 @@
     <function>DisablePositionTracking()</function>
     <function returnType="int">GetLayout() const</function>
     <function specifier="non virtual" returnType="mitk::SlicesRotator *">GetSlicesRotator() const</function>
-    <function>newFunction()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -50,8 +50,5 @@ public:
 
   virtual void InitializeQfm();
 
-public slots:
-
-  void SetWidgetPlanesEnabled(bool enable);
 };
 

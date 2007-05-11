@@ -1139,8 +1139,28 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   m_Layout = LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4;
 }
 
-
-void QmitkStdMultiWidget::newFunction()
+void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible)
 {
+  mitk::DataTree* tree = dynamic_cast<mitk::DataTree*>( m_Tree.GetPointer() );
+  if (!tree) return;
 
+  mitk::DataTreeIteratorClone it = tree->GetNext("name", new mitk::StringProperty(widgetName));
+  if (!it->IsAtEnd())
+  {
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if ( node.IsNotNull() )
+    {
+      node->SetVisibility(visible);
+    }
+  }
 }
+ 
+void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
+{
+  SetWidgetPlaneVisibility("widget1Plane", visible);
+  SetWidgetPlaneVisibility("widget2Plane", visible);
+  SetWidgetPlaneVisibility("widget3Plane", visible);
+
+  emit WidgetPlanesVisibilityChanged(visible);
+}
+

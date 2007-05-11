@@ -595,7 +595,7 @@ void QmitkMainTemplate::init()
   showPlanes.setPixmap(QPixmap( planecrosspoints_xpm ) ,QIconSet::Automatic, QIconSet::Active, QIconSet::On) ;
   toolbarShowPlanes->setIconSet(showPlanes);
   toolbarShowPlanes->setOn(true);
-
+  
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
 
@@ -666,6 +666,13 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->AddDisplayPlaneSubTree(&it);
     m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
+  
+    // show/hide plane widgets when the corresponding buttons/menu items are checked
+    connect(toolbarShowPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
+    connect(viewShowPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
+    
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), toolbarShowPlanes, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), viewShowPlanesAction, SLOT(setOn(bool)));
   }
 
   InitializeFunctionality();
@@ -1143,12 +1150,8 @@ void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
     toolbarShowPlanes->setToolTip("Show Planes"); 
   }
 
-  emit ShowWidgetPlanesToggled(on);
-
-  // sign significant places in menu->view and the toolbar
   toolbarShowPlanes->setOn( on );
   viewShowPlanesAction->setOn( on );
-
 }
 
 

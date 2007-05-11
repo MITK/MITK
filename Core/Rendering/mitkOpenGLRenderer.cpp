@@ -63,7 +63,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_PixelMapGLValid(false)
 {
   //TODO: think of a better statemachinepattern. Currently this StateMachine takes all events and always stays in one state. 
-  m_CameraController = VtkInteractorCameraController::New(NULL);
+  m_CameraController = VtkInteractorCameraController::New();
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
 

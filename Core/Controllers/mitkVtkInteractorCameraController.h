@@ -35,9 +35,8 @@ class VtkInteractorCameraController : public CameraController
 {
 public:
   mitkClassMacro(VtkInteractorCameraController, CameraController);
-  mitkNewMacro1Param(Self, const char*);
+  itkNewMacro(Self);
   
-
   //##Documentation
   //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController
   vtkRenderWindowInteractor* GetVtkInteractor();
@@ -56,7 +55,7 @@ protected:
   /**
   * @brief Default Constructor
   **/
-  VtkInteractorCameraController(const char * type = NULL);
+  VtkInteractorCameraController(const char* type = NULL);
 
   /**
   * @brief Default Destructor

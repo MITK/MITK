@@ -63,7 +63,7 @@ protected:
   **/
   virtual ~VtkInteractorCameraController();
 
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+//  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
   vtkRenderWindowInteractor* m_VtkInteractor;
 };

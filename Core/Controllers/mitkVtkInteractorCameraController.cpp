@@ -257,8 +257,9 @@ vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor
   return m_VtkInteractor;
 }
 
-bool mitk::VtkInteractorCameraController::ExecuteAction(Action*, mitk::StateEvent const * /*stateEvent*/)
-{
-  return false;
-}
-
+///*
+//bool mitk::VtkInteractorCameraController::ExecuteAction(Action*, mitk::StateEvent const * /*stateEvent*/)
+//{
+//  return false;
+//}
+//*/

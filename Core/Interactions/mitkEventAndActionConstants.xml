@@ -4,6 +4,9 @@
     <eventCategory NAME="NullEvent">
       <event NAME="EIDNULLEVENT" ID="0" />
     </eventCategory>
+    <eventCategory NAME="TDMouseEvents">
+      <event NAME="EIDTDMOUSEINPUT" ID="4001" />
+    </eventCategory>
     <eventCategory NAME="MouseEvents">
       <event NAME="EIDLEFTMOUSEBTN" ID="1" />
       <event NAME="EIDRIGHTMOUSEBTN" ID="2" />
@@ -324,6 +327,8 @@
       <action NAME="AcMODIFY" ID="49014" />
       <action NAME="AcUNDOUPDATE" ID="1236">
         <!--For restoring a mesh after an update-->
+      </action>
+      <action NAME="AcONTDMOUSEINPUT" ID="4002">
       </action>
     </actionCategory>
     <actionCategory NAME="SegmentationInteractor">

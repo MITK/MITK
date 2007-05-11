@@ -2918,6 +2918,14 @@
       <transition NAME="stay in dummy" NEXT_STATE_ID="0" EVENT_ID="0" />
     </state>
   </stateMachine>
+  <stateMachine NAME="TDMouseInteraction">
+    <state NAME="neutral" ID="1" START_STATE="TRUE">
+      <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4001">
+        <action ID="4002" />
+        <!--AcONTDMOUSEINPUT-->
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="InteractorTestPattern">
     <!-- To Test an Interactor for the right behavior -->
     <state NAME="neutral" ID="0" START_STATE="TRUE">

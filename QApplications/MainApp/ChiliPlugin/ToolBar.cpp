@@ -204,3 +204,4 @@ void ToolBar::ResetLightboxButtons(int select)
     }
   }
 }
+

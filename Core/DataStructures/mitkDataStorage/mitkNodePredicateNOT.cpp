@@ -37,3 +37,4 @@ bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
   // return the negation of the child predicate
   return !m_ChildPredicate.CheckNode(node);
 }
+

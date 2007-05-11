@@ -675,3 +675,4 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceContour()
   }
   m_MultiWidget->RequestUpdate();
 }//end of ShowSurfaceContur
+

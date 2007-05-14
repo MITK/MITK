@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 
 #include "mitkOpenGLRenderer.h"
-#include "mitkMovieGenerator.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkRenderWindow.h"
 
@@ -57,6 +56,15 @@ QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
   mitk::GlobalInteraction::GetInstance()->GetFocusManager()->AddObserver(
     mitk::FocusEvent(), m_FocusManagerCallback
   );
+
+  m_movieGenerator = mitk::MovieGenerator::New();
+
+  if ( m_movieGenerator.IsNull() )
+  {
+    std::cerr << "Either mitk::MovieGenerator is not implemented for your";
+    std::cerr << " platform or an error occurred during";
+    std::cerr << " mitk::MovieGenerator::New()" << std::endl;
+  }
 }
 
 QmitkMovieMaker::~QmitkMovieMaker()
@@ -123,6 +131,9 @@ QWidget* QmitkMovieMaker::CreateControlWidget(QWidget *parent)
       m_Controls->cmbSelectedStepperWindow->insertItem((*iter)->GetName(), -1);
       m_Controls->cmbSelectedRecordingWindow->insertItem((*iter)->GetName(), -1);
     }
+
+    if(m_movieGenerator.IsNull())
+      m_Controls->btnMovie->setEnabled( false );
   }
   return m_Controls;
 }
@@ -409,12 +420,10 @@ void QmitkMovieMaker::GenerateMovie()
   emit StartBlockControls();
   
   // provide the movie generator with the stepper and rotate the camera each step
-  mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
-
-  if ( movieGenerator.IsNotNull() )
+  if ( m_movieGenerator.IsNotNull() )
   {
-    movieGenerator->SetStepper( this->GetAspectStepper() );
-    movieGenerator->SetRenderer(m_RecordingRenderer);
+    m_movieGenerator->SetStepper( this->GetAspectStepper() );
+    m_movieGenerator->SetRenderer(m_RecordingRenderer);
 
     QString movieFileName = QFileDialog::getSaveFileName(
       QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name"
@@ -422,8 +431,8 @@ void QmitkMovieMaker::GenerateMovie()
 
     if(movieFileName.isEmpty() == false)
     {
-      movieGenerator->SetFileName( movieFileName.ascii() );
-      movieGenerator->WriteMovie();
+      m_movieGenerator->SetFileName( movieFileName.ascii() );
+      m_movieGenerator->WriteMovie();
     }
   }
   else

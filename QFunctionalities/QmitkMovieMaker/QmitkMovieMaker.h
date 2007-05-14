@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraRotationController.h"
 #include "mitkStepper.h"
 #include "mitkMultiStepper.h"
+#include "mitkMovieGenerator.h"
 #include "itkCommand.h"
 
 class QmitkStdMultiWidget;
@@ -239,6 +240,8 @@ private:
   int m_Aspect;
   mitk::MultiStepper::Pointer m_Stepper;
   mitk::BaseRenderer * m_RecordingRenderer;
+
+  mitk::MovieGenerator::Pointer m_movieGenerator;
 
 };
 #endif // !defined(QMITK_MOVIEMAKER_H__INCLUDED)

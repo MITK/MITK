@@ -105,6 +105,12 @@ void QmitkMovieMakerControls::UnBlockControls()
   BlockControls( false );    
 }
 
+void QmitkMovieMakerControls::UnBlockControlsMovieDeactive()
+{
+  BlockControls( false );    
+  btnMovie->setEnabled( false );
+}
+
 
 void QmitkMovieMakerControls::init()
 {

@@ -131,10 +131,12 @@ QWidget* QmitkMovieMaker::CreateControlWidget(QWidget *parent)
       m_Controls->cmbSelectedStepperWindow->insertItem((*iter)->GetName(), -1);
       m_Controls->cmbSelectedRecordingWindow->insertItem((*iter)->GetName(), -1);
     }
-
-    if(m_movieGenerator.IsNull())
-      m_Controls->btnMovie->setEnabled( false );
   }
+
+  m_Controls->btnPause->setHidden(true);
+  if(m_movieGenerator.IsNull())
+      m_Controls->btnMovie->setEnabled( false );
+
   return m_Controls;
 }
 
@@ -187,6 +189,9 @@ void QmitkMovieMaker::CreateConnections()
 
     connect( (QObject*) this, SIGNAL(EndBlockControls()),
       (QObject*) m_Controls , SLOT(UnBlockControls()) );
+
+    connect( (QObject*) this, SIGNAL(EndBlockControlsMovieDeactive()),
+      (QObject*) m_Controls , SLOT(UnBlockControlsMovieDeactive()) );
   }
 }
 
@@ -275,11 +280,21 @@ void QmitkMovieMaker::StartPlaying()
   m_Timer->start( 5 );
 
   m_Time->restart();
+
+  m_Controls->btnPlay->setHidden( true );
+  m_Controls->btnPause->setHidden( false );
+  if(m_movieGenerator.IsNull())
+      m_Controls->btnMovie->setEnabled( false );
 }
 
 void QmitkMovieMaker::PausePlaying()
 {
   m_Timer->stop();
+
+  m_Controls->btnPlay->setHidden( false );
+  m_Controls->btnPause->setHidden( true );
+  if(m_movieGenerator.IsNull())
+      m_Controls->btnMovie->setEnabled( false );
 }
 
 void QmitkMovieMaker::StopPlaying()
@@ -299,6 +314,9 @@ void QmitkMovieMaker::StopPlaying()
 
   // Reposition slider GUI element
   m_StepperAdapter->SetStepper( this->GetAspectStepper() );
+
+  if(m_movieGenerator.IsNull())
+      m_Controls->btnMovie->setEnabled( false );
 }
 
 void QmitkMovieMaker::SetLooping( bool looping )
@@ -434,14 +452,17 @@ void QmitkMovieMaker::GenerateMovie()
       m_movieGenerator->SetFileName( movieFileName.ascii() );
       m_movieGenerator->WriteMovie();
     }
+
+    emit EndBlockControls();
   }
   else
   {
     std::cerr << "Either mitk::MovieGenerator is not implemented for your";
     std::cerr << " platform or an error occurred during";
     std::cerr << " mitk::MovieGenerator::New()" << std::endl;
+
+    emit EndBlockControlsMovieDeactive();
   }
-  emit EndBlockControls();
 }
 
 void QmitkMovieMaker::GenerateScreenshot()
@@ -450,6 +471,9 @@ void QmitkMovieMaker::GenerateScreenshot()
   
   CommonFunctionality::SaveScreenshot( mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow() );
   
-  emit EndBlockControls();
+  if(m_movieGenerator.IsNotNull())
+    emit EndBlockControls();
+  else
+    emit EndBlockControlsMovieDeactive();
 }
 

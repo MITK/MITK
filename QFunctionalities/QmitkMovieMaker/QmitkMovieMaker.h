@@ -166,6 +166,7 @@ public:
 signals:
   void StartBlockControls();
   void EndBlockControls();
+  void EndBlockControlsMovieDeactive();
 
 public slots:
    

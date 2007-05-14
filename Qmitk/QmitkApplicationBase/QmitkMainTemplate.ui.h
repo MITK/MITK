@@ -114,7 +114,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <PlaneCross.xpm>
 
 #include <stdexcept>
-
+#include "mitkChiliPlugin.h"
 
 template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)
@@ -691,9 +691,13 @@ void QmitkMainTemplate::Initialize()
     this->enableGradientBackground(gradProperty->GetValue());
 
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-  if (darkProperty != NULL)
-    this->enableDarkPalette(darkProperty->GetValue());
 
+  if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
+    this->enableDarkPalette(true);
+  else
+    if (darkProperty != NULL)
+      this->enableDarkPalette(darkProperty->GetValue());
+  
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
     mitk::Color c = colProperty->GetColor();
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
@@ -981,8 +985,11 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     this->enableGradientBackground(gradProperty->GetValue());
 
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-  if (darkProperty != NULL)
-    this->enableDarkPalette(darkProperty->GetValue());
+  if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
+    this->enableDarkPalette(true);
+  else
+    if (darkProperty != NULL)
+      this->enableDarkPalette(darkProperty->GetValue());
 
     bp =  m_Options->GetProperty("Background color");
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );

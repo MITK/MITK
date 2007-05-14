@@ -90,21 +90,11 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
     case QEvent::MouseMove:
     { 
-      if(m_ButtonPressed)
+      if(m_ButtonPressed && mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
       {
-
-        QMouseEvent* me = ( QMouseEvent* )( event );
-        QMouseEvent* newEvent = new QMouseEvent(
-          me->type(), me->pos(), me->globalPos(), me->button(), me->state()
-        );
-        m_EventQueue.push( ObjectEventPair(object, newEvent) );
-
-  //std::cout << "#MM ";
-        if(mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
-        {
+      //std::cout << "#MM ";
           mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
           mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
-        }
       }
       return true;
     }
@@ -162,9 +152,18 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         return true;
       }
 
-      //std::cout<<"Event Type: (Rendering)"<<event->type()<<std::endl;
+      case QEvent::Timer:
+      { 
+        //std::cout << "#T ";
+        QTimerEvent* te = ( QTimerEvent* )( event );
+        QTimerEvent* newEvent = new QTimerEvent(te->timerId());
+        m_EventQueue.push( ObjectEventPair(object, newEvent) );
+        return true;
+      }
+
       default:
       {
+        //std::cout<<"Event Type: (Rendering)"<<event->type()<<std::endl;
         return false;
       }
     }

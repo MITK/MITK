@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
 #include "mitkAffineInteractor.h"
+#include <qcheckbox.h>
 
 class QmitkPixelGreyValueManipulatorComponentGUI;
 class QmitkStdMultiWidget;
@@ -59,6 +60,8 @@ class QmitkPixelGreyValueManipulatorComponent : public QmitkFunctionalityCompone
   Q_OBJECT
 
 public:
+
+	QCheckBox* m_CheckBox;
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
   QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = false, bool showSelector = true);
@@ -110,6 +113,7 @@ virtual QGroupBox* GetImageContent();
 
   ///** \brief Vector with all added components */
   //std::vector<QmitkFunctionalityComponentContainer*> m_AddedChildList; 
+  bool m_CheckBoxChecked;
 
 
 public slots:  
@@ -147,6 +151,9 @@ public slots:
 
   /** \brief Method to Create a BoundingObject as ManipulationArea if selected*/
   void CreateBoundingBox(int boundingObjectType);
+
+  void SetInverseCheckBox(bool check);
+
 
 protected:
 

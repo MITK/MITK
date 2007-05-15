@@ -72,6 +72,7 @@ m_BoundingObjectExistingFlag(false)
 	SetComponentName("PixelGreyValueManipulatorComponent");
 	m_UpdateSelector = updateSelector; 
 	m_ShowSelector = showSelector;
+	m_CheckBoxChecked = false;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -130,10 +131,16 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 
 		//to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
 		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetBoundingObjectTypeComboBox()),  SIGNAL(activated(int)), (QObject*) this, SLOT(CreateBoundingBox(int))); 
-
+        connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInverseCheckBox(bool)));
 
 	}
 }
+
+void QmitkPixelGreyValueManipulatorComponent::SetInverseCheckBox(bool check)
+{
+  m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->setChecked(check);
+}
+
 
 /***************      HIDE OR SHOW      ***************/
 void QmitkPixelGreyValueManipulatorComponent::HideOrShow()
@@ -246,6 +253,7 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
 	m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("segmentation"));
 
 	CreatePointSet();
+	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
 	return m_PixelGreyValueManipulatorComponentGUI;
 }
 
@@ -607,22 +615,44 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 		if(m_Segmentation.IsNotNull())
 		{
 			itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
-			while(!(it.IsAtEnd()))
+			if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the segmentation
 			{
-				if(itSeg.Get()!=0)
-					itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
-				else
-					itShifted.Set(it.Get());
-				++it;
-				++itShifted;
-				++itSeg;
-
-				--imageDim;//Kontrollausgabe
-				if(imageDim % 1000 == 0)
+				while(!(it.IsAtEnd()))
 				{
-					std::cout<<imageDim<<std::endl;
-				}
-			}//end of while
+					if(itSeg.Get()!=0)
+						itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
+					else
+						itShifted.Set(it.Get());
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}
+			else//manipulate outside the segmentation
+			{
+				while(!(it.IsAtEnd()))
+				{
+					if(itSeg.Get()==0)
+						itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
+					else
+						itShifted.Set(it.Get());
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}
 		}//if(m_Segmentation != NULL)
 	}//end of manipulation on segmented area
 
@@ -681,6 +711,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 	AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 }// end of CreateLinearShiftedImage
 
+
 /***************    GRADIENT TEMPLATE   ***************/
 template < typename TPixel, unsigned int VImageDimension >    
 void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation)
@@ -730,34 +761,60 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 
 		if(numberOfPoints == 2)
 		{
-
 			if(m_ManipulationArea == 2) //if manipulation shall be only on segmented parts
-			{     
+			{    
+
 				if(m_Segmentation.IsNotNull())
 				{
 					itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
-					while(!(it.IsAtEnd()))
+					if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the segmentation
 					{
-						if(itSeg.Get()!=0)//da wo segmentiert ist
+						while(!(it.IsAtEnd()))
 						{
-							InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
-						}
-						else
-						{
-							itShifted.Set(it.Get());
-						}
-						++itSeg;
-						++it;
-						++itShifted;
+							if(itSeg.Get()!=0)//da wo segmentiert ist
+							{
+								InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+							}
+							else
+							{
+								itShifted.Set(it.Get());
+							}
+							++it;
+							++itShifted;
+							++itSeg;
 
-						//control output: how many Pixels are still to change
-						--imageDim;
-						if(imageDim % 1000 == 0)
+							--imageDim;//Kontrollausgabe
+							if(imageDim % 1000 == 0)
+							{
+								std::cout<<imageDim<<std::endl;
+							}
+						}//end of while
+					}
+					else//manipulate outside the segmentation
+					{
+						while(!(it.IsAtEnd()))
 						{
-							std::cout<<imageDim<<std::endl;
-						}
-					}//end of while(!(it.IsAtEnd())
-				}//end of if(m_Segmentation.IsNotNull()
+							if(itSeg.Get()==0)//da wo segmentiert ist
+							{
+								InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
+							}
+							else
+							{
+								itShifted.Set(it.Get());
+							}
+							++it;
+							++itShifted;
+							++itSeg;
+
+							--imageDim;//Kontrollausgabe
+							if(imageDim % 1000 == 0)
+							{
+								std::cout<<imageDim<<std::endl;
+							}
+						}//end of while
+					}
+				}//if(m_Segmentation != NULL)
+
 			}// end of if manipulation shall be only on segmented parts
 
 			else if(m_ManipulationArea == 1)//if manipulation area is entier image
@@ -892,6 +949,8 @@ void QmitkPixelGreyValueManipulatorComponent::InternalGradientShiftCalculation(i
 template < typename TPixel, unsigned int VImageDimension >    
 void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::Image< TPixel, VImageDimension >* itkImage, const mitk::Image* segmentation)
 {
+	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
+	std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
 	typedef itk::Image< TPixel, VImageDimension > ItkImageType;
 	itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetLargestPossibleRegion() );
 
@@ -930,26 +989,61 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 		if(m_Segmentation.IsNotNull())
 		{
 			itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
-			while(!(it.IsAtEnd()))
-			{
-				if(itSeg.Get()!=0)
-					itShifted.Set(pixelChangeValue);
-				else
-					itShifted.Set(it.Get());
-				++it;
-				++itShifted;
-				++itSeg;
+			std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
 
-				//control output: how many Pixels are still to change
-				--imageDim;
-				if(imageDim % 1000 == 0)
+			if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())
+			{
+			//if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())//manipulate outside the segmentation
+			//{
+				while(!(it.IsAtEnd()))
 				{
-					std::cout<<imageDim<<std::endl;
-				}
-			}//end of while (!(it.IsAtEnd()))
+					if(itSeg.Get()== 0)
+					{
+						itShifted.Set(pixelChangeValue);
+					}
+
+					else
+					{
+						itShifted.Set(it.Get());
+					}
+
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						//std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}//end of if checked
+
+			else //manipulate inside the segmentation
+			{
+				while(!(it.IsAtEnd()))
+				{
+					if(itSeg.Get()!=0)
+					{
+						itShifted.Set(pixelChangeValue);
+					}
+					else
+					{
+						itShifted.Set(it.Get());
+					}
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						//std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}//end of else ! checked
 		}//if(m_Segmentation != NULL)
 	}//end of manipulation on segmented area
-
 
 	else if(m_ManipulationArea == 1)//manipulation shall be on entire image
 	{
@@ -973,13 +1067,13 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 	{
 		if(m_BoundingObject)
 		{
-			while(!(it.IsAtEnd()))
+			std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
+			if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 			{
-				mitk::Point3D point3D;
-				itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
-
-				if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
+				while(!(it.IsAtEnd()))
 				{
+					mitk::Point3D point3D;
+					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 					if(m_BoundingObject->IsInside(point3D))
 					{
 						itShifted.Set(pixelChangeValue);
@@ -988,9 +1082,22 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 					{
 						itShifted.Set(it.Get());
 					}
-				}
-				else //manipulate outsidethe bounding box
+					++it;
+					++itShifted;
+					--imageDim;
+					if(imageDim % 1000 == 0)
+					{
+						//std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}//end of !checked
+
+			else //manipulate outsidethe bounding box
+			{
+				while(!(it.IsAtEnd()))
 				{
+					mitk::Point3D point3D;
+					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 					if(!(m_BoundingObject->IsInside(point3D)))
 					{
 						itShifted.Set(pixelChangeValue);
@@ -999,10 +1106,15 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 					{
 						itShifted.Set(it.Get());
 					}
-				}
-				++it;
-				++itShifted;
-			}//end of while
+					++it;
+					++itShifted;
+					--imageDim;
+					if(imageDim % 1000 == 0)
+					{
+						//std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}//end of checked
 		}//if(m_BoundingObject)
 	}//end of manipulation inside BoundingObject area
 
@@ -1053,26 +1165,54 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 		if(m_Segmentation.IsNotNull())
 		{
 			itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
-			while(!(it.IsAtEnd()))// for each pixel int the image
+			if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the segmentation
 			{
-				if(itSeg.Get()!=0)// if there is a segmentation 
-					itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
-				else // else leave the value the old one
-					itShifted.Set(it.Get());
-				++it;
-				++itShifted;
-				++itSeg;
-
-				//control output: how many Pixels are still to change
-				--imageDim;
-				if(imageDim % 1000 == 0)
+				while(!(it.IsAtEnd()))
 				{
-					std::cout<<imageDim<<std::endl;
-				}
-			}//end of while (!(it.IsAtEnd()))
+					if(itSeg.Get()!=0)// if there is a segmentation 
+					{
+						itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
+					}
+					else // else leave the value the old one
+					{
+						itShifted.Set(it.Get());
+					}
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}
+			else//manipulate outside the segmentation
+			{
+				while(!(it.IsAtEnd()))
+				{
+					if(itSeg.Get()==0)// if there is a segmentation 
+					{
+						itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
+					}
+					else // else leave the value the old one
+					{
+						itShifted.Set(it.Get());
+					}
+					++it;
+					++itShifted;
+					++itSeg;
+
+					--imageDim;//Kontrollausgabe
+					if(imageDim % 1000 == 0)
+					{
+						std::cout<<imageDim<<std::endl;
+					}
+				}//end of while
+			}
 		}//if(m_Segmentation != NULL)
 	}//end of manipulation on segmented area
-
 
 	else if(m_ManipulationArea == 1)//manipulation shall be on entire image
 	{

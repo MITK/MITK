@@ -121,17 +121,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         return true;
       }
 
-     case QEvent::ShowWindowRequest:
-      { 
-        //std::cout << "#WR ";
-        return false;
-      }
-
-      case QEvent::LayoutHint:
-      { 
-        //std::cout << "#L ";
-        return false;
-      }
      case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)
       {
         //std::cout << "#CI ";
@@ -170,48 +159,54 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
   }
  else
   {
-    if(event->type()==QEvent::MouseButtonPress)
+    switch ( event->type() )
     {
-      m_ButtonPressed = true;
-      //std::cout << "#BP2 ";
-      return false;
-    }
-
-    if(event->type()==QEvent::MouseMove)
-    {
-      if(m_ButtonPressed){
-        //std::cout << "#MM2 ";
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+      case QEvent::MouseButtonPress:
+      {
+        m_ButtonPressed = true;
+        //std::cout << "#BP2 ";
+        return false;
       }
-      return false;
+
+      case QEvent::MouseMove:
+      {
+        if(m_ButtonPressed)
+        {
+        //std::cout << "#MM2 ";
+          mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        }
+        return false;
+      }
+
+      case QEvent::MouseButtonRelease:
+      {
+        m_ButtonPressed = false;
+        //std::cout << "#BR2 ";
+        return false;
+      }
+    
+      case QEvent::Resize:
+      {
+        //std::cout << "#R2 ";
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        return false;
+      } 
+
+      case QEvent::ChildInserted:
+      {
+        //std::cout << "#CI2 ";
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        return false;
+      }
+
+      default:
+      {
+        //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
+        return false;
+      }
     }
-
-    if(event->type()==QEvent::MouseButtonRelease)
-    {
-      m_ButtonPressed = false;
-      //std::cout << "#BR2 ";
-      return false;
-    }
-
-    if(event->type()==QEvent::Resize)
-    {
-      //std::cout << "#R2 ";
-      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-      //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      return false;
-    } 
-   
-    if(event->type()==QEvent::ChildInserted)
-    {
-      //std::cout << "#CI2 ";
-      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-      return false;
-    }
-
-    //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
-
   }
-  return false;
 }
 
 void QmitkAbortEventFilter::ProcessEvents()

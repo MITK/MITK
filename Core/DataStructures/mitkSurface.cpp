@@ -31,11 +31,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
+  // check if the vector is long enouth to contain the new element
+  // at the given position. If not, expand it with sufficient zero-filled elements.
   if ( t >= m_PolyDataSeries.size() )
   {
-    m_PolyDataSeries.resize( t + 1, NULL );
-    Initialize(t+1);
+    vtkPolyData* pdnull = NULL;
+    m_PolyDataSeries.resize( t + 1, pdnull );
+    Initialize( t + 1 );
   }
+
   if(m_PolyDataSeries[ t ] != NULL)
   {
     m_PolyDataSeries[ t ]->Delete();
@@ -63,10 +67,6 @@ void mitk::Surface::Initialize(unsigned int timeSteps)
   // if EvenlyTimed is true...
   //
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
-
-  vtkPolyData* pdnull = NULL;
-  m_PolyDataSeries.reserve(timeSteps);
-  m_PolyDataSeries.assign(timeSteps, pdnull);
 }
 
 vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
@@ -93,7 +93,9 @@ vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
 //##ModelId=3E70F66100C4
 mitk::Surface::Surface() : m_CalculateBoundingBox( false )
 {
-
+  vtkPolyData* pdnull = NULL;
+  m_PolyDataSeries.resize( 1, pdnull );
+  Initialize(1);
 }
 
 //##ModelId=3E70F66100CA
@@ -239,9 +241,13 @@ void mitk::Surface::Update()
   Superclass::Update();
 }
 
+// Caution: If Resize is used explicitely, the vector is emptied.
 void mitk::Surface::Resize( unsigned int timeSteps )
 {
   m_PolyDataSeries.resize( timeSteps, NULL );
+  Initialize( timeSteps );
+  vtkPolyData* pdnull;
+  m_PolyDataSeries.assign( timeSteps, pdnull );
   this->Modified();
   m_CalculateBoundingBox = true;
 }

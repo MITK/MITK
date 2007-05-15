@@ -69,7 +69,7 @@ public:
   
   virtual void Update();
   
-  virtual void Resize( unsigned int timeSteps );
+  virtual void Resize( unsigned int timeSteps = 1 );
 
   const RegionType& GetLargestPossibleRegion() const
   {
@@ -87,8 +87,6 @@ public:
     return m_RequestedRegion;
   }
 
-  virtual void Initialize(unsigned int timeSteps=1);
-
   //## 
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
@@ -98,9 +96,13 @@ public:
   void CalculateBoundingBox();
 
 protected:
- 
+
   typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
 
+  // Initialize should not be called manually;
+  // The poly data vector is initialized automatically when enlarged;
+  virtual void Initialize( unsigned int timeSteps = 1 );
+ 
   //##ModelId=3E70F66100C4
   Surface();
   

@@ -101,7 +101,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
     {
       mitk::Surface::Pointer output = static_cast<mitk::Surface*>( this->MakeOutput(0).GetPointer() );
       assert ( output.IsNotNull() );
-      output->Initialize( numberOfTimeSteps ); 
+      output->Resize( numberOfTimeSteps ); 
       this->SetNthOutput( i, output.GetPointer() );
     }
   }

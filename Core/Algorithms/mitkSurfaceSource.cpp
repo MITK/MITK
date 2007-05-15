@@ -27,7 +27,6 @@ mitk::SurfaceSource::SurfaceSource()
   // output must be of type TOutputImage
   mitk::Surface::Pointer output
     = static_cast<mitk::Surface*>(this->MakeOutput(0).GetPointer());
-  output->Initialize(1);
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());

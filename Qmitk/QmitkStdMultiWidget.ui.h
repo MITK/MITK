@@ -1162,5 +1162,14 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
   SetWidgetPlaneVisibility("widget3Plane", visible);
 
   emit WidgetPlanesVisibilityChanged(visible);
+
+  if (visible)
+  {
+    EnableNavigationControllerEventListening();
+  }
+  else
+  {
+    DisableNavigationControllerEventListening();
+  }
 }
 

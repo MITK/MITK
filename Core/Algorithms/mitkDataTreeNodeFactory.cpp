@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkConfig.h>
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkBaseDataIOFactory.h>
+#include <mitkCoreObjectFactory.h>
 
 // C-Standard library includes
 #include <stdlib.h>
@@ -94,6 +95,8 @@ mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {
   m_Serie = false;
   this->Modified();
+  //ensure that a CoreObjectFactory has been instantiated
+  mitk::CoreObjectFactory::GetInstance();
 }
 
 mitk::DataTreeNodeFactory::~DataTreeNodeFactory()

@@ -49,4 +49,4 @@ class CoreObjectFactory : public CoreObjectFactoryBase
 
 } // namespace mitk
 
-#endif /* MAPPERFACTORY_H_HEADER_INCLUDED_C179C58F */
+#endif 

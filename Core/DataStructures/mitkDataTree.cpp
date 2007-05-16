@@ -197,6 +197,11 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeVisibleBoundingGeometry3D(mitk:
 
 mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
+  if(it == NULL)
+  {
+    return NULL;
+  }
+
   mitk::DataTreeIteratorClone _it=it;
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
 
@@ -236,6 +241,11 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
 
 mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
+  if(it == NULL)
+  {
+    return NULL;
+  }
+
   TimeBounds timeBounds;
 
   mitk::DataTreeIteratorClone _it=it;

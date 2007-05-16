@@ -95,7 +95,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
   if ( input.IsNull() || (input->GetGeometry2D() == NULL)
     || (input->GetGeometry2D()->IsValid() == false)
-    || (m_UseBoundingBox && (m_BoundingBox->GetDiagonalLength2() < mitk::eps)) )
+    || (m_UseBoundingBox && (m_BoundingBox.IsNull() || (m_BoundingBox->GetDiagonalLength2() < mitk::eps))) )
   {
     return;
   }

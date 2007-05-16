@@ -522,7 +522,6 @@ void QmitkStdMultiWidget
   mitk::DataTreeIteratorClone dit = it;
   dit->Add(node);
   dit->GoToChild(dit->ChildPosition(node));
-  planesSubTree=dit->GetSubTree();
 
   float white[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;

@@ -152,7 +152,10 @@ public slots:
   /** \brief Method to Create a BoundingObject as ManipulationArea if selected*/
   void CreateBoundingBox(int boundingObjectType);
 
+
   void SetInverseCheckBox(bool check);
+
+  void Repaste(const QString& text);
 
 
 protected:

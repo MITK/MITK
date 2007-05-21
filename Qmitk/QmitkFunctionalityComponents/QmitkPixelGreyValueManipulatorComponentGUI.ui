@@ -1189,24 +1189,6 @@
 </images>
 <connections>
     <connection>
-        <sender>m_Value1LineEdit_2</sender>
-        <signal>textChanged(const QString&amp;)</signal>
-        <receiver>m_Value1LineEdit</receiver>
-        <slot>insert(const QString&amp;)</slot>
-    </connection>
-    <connection>
-        <sender>m_Value1LineEdit_3</sender>
-        <signal>textChanged(const QString&amp;)</signal>
-        <receiver>m_Value1LineEdit</receiver>
-        <slot>insert(const QString&amp;)</slot>
-    </connection>
-    <connection>
-        <sender>m_Value1LineEdit_4</sender>
-        <signal>textChanged(const QString&amp;)</signal>
-        <receiver>m_Value1LineEdit</receiver>
-        <slot>insert(const QString&amp;)</slot>
-    </connection>
-    <connection>
         <sender>m_ManipulationModeComboBox</sender>
         <signal>activated(int)</signal>
         <receiver>m_ManipulationModeWidgetStack</receiver>
@@ -1221,6 +1203,7 @@
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="local" impldecl="in implementation">QmitkPixelGreyValueManipulatorComponentGUI.ui.h</include>
 </includes>
 <variables>
     <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
@@ -1250,7 +1233,7 @@
     <function returnType="QGroupBox *">GetShowBaseThresholdGroupBox()</function>
     <function returnType="QGroupBox *">GetSegmentationContent()</function>
     <function returnType="QComboBox *">GetBoundingObjectTypeComboBox()</function>
-    <function returnType="QCheckBox*">GetInverseCheckBox()</function>
+    <function returnType="QCheckBox *">GetInverseCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

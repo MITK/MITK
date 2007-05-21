@@ -43,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 #include <qapplication.h>
 #include <qcheckbox.h>
+#include <qstring.h>
 
 
 /***************       CONSTRUCTOR      ***************/
@@ -132,8 +133,18 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 		//to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
 		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetBoundingObjectTypeComboBox()),  SIGNAL(activated(int)), (QObject*) this, SLOT(CreateBoundingBox(int))); 
         connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInverseCheckBox(bool)));
+        connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_2), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
+		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_3), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
+		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_4), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
 
 	}
+}
+
+
+
+void QmitkPixelGreyValueManipulatorComponent::Repaste(const QString& text)
+{
+  m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit->setText(text);
 }
 
 void QmitkPixelGreyValueManipulatorComponent::SetInverseCheckBox(bool check)
@@ -254,6 +265,7 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
 
 	CreatePointSet();
 	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
+	
 	return m_PixelGreyValueManipulatorComponentGUI;
 }
 
@@ -584,7 +596,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 
 	if(segmentation != NULL)
 	{
-		mitk::CastToItkImage(segmentation, itkSegmentation);
+		mitk::CastToItkImage(segmentation, itkSegmentation); 
 	}
 
 	typename ItkImageType::Pointer itkShiftedImage = ItkImageType::New();

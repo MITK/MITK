@@ -157,6 +157,8 @@ public slots:
 
   void Repaste(const QString& text);
 
+  void CheckModeForPointSet(int mode);
+
 
 protected:
 

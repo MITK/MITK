@@ -132,10 +132,14 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 
 		//to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
 		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetBoundingObjectTypeComboBox()),  SIGNAL(activated(int)), (QObject*) this, SLOT(CreateBoundingBox(int))); 
-        connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInverseCheckBox(bool)));
-        connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_2), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
+
+		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetInverseCheckBox(bool)));
+
+		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_2), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
 		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_3), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
 		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit_4), SIGNAL(textChanged(const QString&)), (QObject*) this, SLOT(Repaste(const QString&)));
+
+		connect( (QObject*)(m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()), SIGNAL(activated (int)), (QObject*) this, SLOT(CheckModeForPointSet(int)));
 
 	}
 }
@@ -144,12 +148,27 @@ void QmitkPixelGreyValueManipulatorComponent::CreateConnections()
 
 void QmitkPixelGreyValueManipulatorComponent::Repaste(const QString& text)
 {
-  m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit->setText(text);
+	m_PixelGreyValueManipulatorComponentGUI->m_Value1LineEdit->setText(text);
 }
+
+void QmitkPixelGreyValueManipulatorComponent::CheckModeForPointSet(int mode)
+{
+	if(mode == 2)
+	{
+		m_PointSet->GetMainCheckBoxContainer()->setChecked(true);
+		m_PointSet->Activated();
+	}
+	else
+	{
+		m_PointSet->Deactivated();
+	}
+}
+
+
 
 void QmitkPixelGreyValueManipulatorComponent::SetInverseCheckBox(bool check)
 {
-  m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->setChecked(check);
+	m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->setChecked(check);
 }
 
 
@@ -265,7 +284,7 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
 
 	CreatePointSet();
 	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
-	
+
 	return m_PixelGreyValueManipulatorComponentGUI;
 }
 
@@ -291,7 +310,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
 	m_PixelGreyValueManipulatorComponentGUI->layout()->add(m_PointSet->GetGUI());
 	m_PointSet->CreateConnections();
 	m_PixelGreyValueManipulatorComponentGUI->repaint();
-	m_PointSet->GetMainCheckBoxContainer()->setChecked(false);
+	m_PointSet->Deactivated();
 }
 
 
@@ -1005,8 +1024,8 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 
 			if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())
 			{
-			//if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())//manipulate outside the segmentation
-			//{
+				//if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())//manipulate outside the segmentation
+				//{
 				while(!(it.IsAtEnd()))
 				{
 					if(itSeg.Get()== 0)

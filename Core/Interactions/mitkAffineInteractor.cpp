@@ -84,7 +84,6 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     if(worldgeometry->IsValid()==false)
       return false;
 
-    int timestep=0;
     ScalarType time = worldgeometry->GetTimeBounds()[0];
     if(time>-ScalarTypeNumericTraits::max())
       timestep = inputtimegeometry->MSToTimeStep(time);
@@ -95,7 +94,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
   Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
 
-  mitk::DisplayPositionEvent const  *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+  mitk::DisplayPositionEvent const *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   switch (action->GetActionId())
   {
   case AcCHECKELEMENT:

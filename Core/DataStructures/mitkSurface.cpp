@@ -246,7 +246,7 @@ void mitk::Surface::Resize( unsigned int timeSteps )
 {
   m_PolyDataSeries.resize( timeSteps, NULL );
   Initialize( timeSteps );
-  vtkPolyData* pdnull;
+  vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.assign( timeSteps, pdnull );
   this->Modified();
   m_CalculateBoundingBox = true;

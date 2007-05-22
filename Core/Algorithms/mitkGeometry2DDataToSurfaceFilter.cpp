@@ -214,6 +214,11 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlaneStripper->SetInput( m_PlaneCutter->GetOutput() );
       m_PlaneStripper->Update();
 
+      if ( m_PlaneStripper->GetOutput()->GetNumberOfPoints() < 3 )
+      {
+        return;
+      }
+
       m_PlanePolyData->SetPoints( m_PlaneStripper->GetOutput()->GetPoints() );
       m_PlanePolyData->SetPolys( m_PlaneStripper->GetOutput()->GetLines() );
 

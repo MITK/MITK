@@ -190,7 +190,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
       lut = m_LUT; 
     }
 
-    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(timestep);
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry

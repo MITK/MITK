@@ -132,6 +132,8 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if(visible)
     m_Actor->VisibilityOn();
+
+  m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform(timestep));
 }
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)

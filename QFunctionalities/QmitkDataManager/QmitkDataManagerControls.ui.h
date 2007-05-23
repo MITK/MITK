@@ -199,14 +199,7 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
           if(image.IsNotNull())
           {
             mitk::LightBoxResultImageWriter::Pointer lbwriter =  mitk::LightBoxResultImageWriter::New();
-            lbwriter->SetInputByNode(node);
-            if(lbwriter->SetSourceByTreeSearch(selectedIterator)==false)
-            {
-              QMessageBox::critical( this, "Save Selected to LightBox",
-                  "Saving to LightBox not possible:\n"
-                  "Unable to find parent image that came from Chili.", QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
-              return;
-            }
+            lbwriter->SetInput( image );
             lbwriter->SetLightBoxToCurrentLightBox();
             lbwriter->Write();
           }

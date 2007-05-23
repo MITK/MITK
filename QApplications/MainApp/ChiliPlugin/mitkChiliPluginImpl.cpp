@@ -20,9 +20,28 @@ PURPOSE.  See the above copyright notices for more information.
 
 QcPlugin* mitk::ChiliPluginImpl::s_PluginInstance = 0;
 
+mitk::ChiliPluginImpl::ChiliPluginImpl()
+{
+  m_CurrentStudy.StudyInstanceUID == "";
+}
+
+mitk::ChiliPluginImpl::~ChiliPluginImpl()
+{
+}
+
 bool mitk::ChiliPluginImpl::IsPlugin()
 {
   return true;
+}
+
+mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetCurrentStudy()
+{
+  return m_CurrentStudy;
+}
+
+mitk::ChiliPlugin::SeriesList mitk::ChiliPluginImpl::GetCurrentSeries()
+{
+  return m_CurrentSeries;
 }
 
 int mitk::ChiliPluginImpl::GetConferenceID()
@@ -41,6 +60,8 @@ void mitk::ChiliPluginImpl::SetPluginInstance(QcPlugin* instance)
     s_PluginInstance = instance;
 }
 
-mitk::ChiliPluginImpl::~ChiliPluginImpl() 
-{ }
-
+void mitk::ChiliPluginImpl::SendStudySelectedEvent()
+{
+  //throw ITK event (defined in mitkChiliPluginEvents.h)
+  InvokeEvent( PluginStudySelected() );
+}

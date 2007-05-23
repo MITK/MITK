@@ -34,8 +34,12 @@ class ChiliPluginImpl : public ChiliPlugin
 {
 public:
 
+  virtual StudyInformation GetCurrentStudy();
+  virtual SeriesList GetCurrentSeries();
+
   virtual bool IsPlugin();
   virtual int GetConferenceID();
+
   virtual QcPlugin* GetPluginInstance();
 
   mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
@@ -44,13 +48,23 @@ public:
 
 protected:
 
-  ChiliPluginImpl::ChiliPluginImpl() { }
+  friend class QcMITKSamplePlugin;
+
+  virtual void SetPluginInstance(QcPlugin* instance);
+
+  void SendStudySelectedEvent();
+  //void SendSeriesSelectedEvent();
+  //..
+
+  ChiliPluginImpl::ChiliPluginImpl();
+
+  StudyInformation m_CurrentStudy;
+  SeriesList m_CurrentSeries;
 
 private:
 
   static QcPlugin* s_PluginInstance;
 
-  virtual void SetPluginInstance(QcPlugin* instance);
 };
 
 } // namespace mitk

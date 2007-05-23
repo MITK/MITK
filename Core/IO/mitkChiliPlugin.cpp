@@ -18,6 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkChiliPlugin.h"
 
+mitk::ChiliPlugin::ChiliPlugin()
+{
+}
+
+mitk::ChiliPlugin::~ChiliPlugin()
+{
+}
+
 bool mitk::ChiliPlugin::IsPlugin()
 {
   return false;
@@ -33,6 +41,18 @@ QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
   return 0;
 }
 
+mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetCurrentStudy()
+{
+  mitk::ChiliPlugin::StudyInformation emptyList;
+  return emptyList;
+}
+
+mitk::ChiliPlugin::SeriesList mitk::ChiliPlugin::GetCurrentSeries()
+{
+  mitk::ChiliPlugin::SeriesList emptyList;
+  return emptyList;
+}
+
 mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance()
 {
   static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
@@ -40,20 +60,5 @@ mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance()
 }
 
 void mitk::ChiliPlugin::SetPluginInstance(QcPlugin* instance)
-{ }
-
-mitk::ChiliPlugin::~ChiliPlugin() 
-{ }
-
-void mitk::ChiliPlugin::SetCurrentStudyID( const std::string& newID )
 {
-  m_CurrentStudyID = newID;
-
-  InvokeEvent( PluginStudySelected() ); // throw ITK event (defined in mitkChiliPluginEvents.h)
 }
-
-std::string mitk::ChiliPlugin::GetCurrentStudyID()
-{
-  return m_CurrentStudyID;
-}
-

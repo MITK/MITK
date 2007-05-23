@@ -61,7 +61,7 @@ public:
 
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
-  QmitkFunctionalityComponentContainer(QObject *parent=0, const char * parentName = 0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkFunctionalityComponentContainer(QObject *parent=0, const char * parentName = 0,  bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
   
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -133,6 +133,12 @@ virtual QGroupBox* GetImageContent();
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
 
+    /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
+  bool m_UpdateSelector;
+
+  /** \brief Attribute to decide whether the selector shall be shown or not */
+  bool m_ShowSelector;
+
 protected slots:  
 
 
@@ -165,12 +171,6 @@ protected:
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;
-
-  /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
-  bool m_UpdateSelector;
-
-  /** \brief Attribute to decide whether the selector shall be shown or not */
-  bool m_ShowSelector;
 
     /** \brief Item on the actual selected Image in the TreeNodeSelector */
   const mitk::DataTreeFilter::Item * m_SelectedItem;

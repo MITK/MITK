@@ -37,12 +37,12 @@ PURPOSE.  See the above copyright notices for more information.
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
 /***************       CONSTRUCTOR      ***************/
-QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
+QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkBaseFunctionalityComponent(parent, parentName, it),
-m_GUI(NULL),
-m_Active(false),
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
+m_GUI(NULL),
+m_Active(false),
 m_SelectedItem(NULL),
 m_FunctionalityComponentContainerGUI(NULL),
 m_Parent(parent), 

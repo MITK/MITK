@@ -168,7 +168,7 @@ SliceNavigationController::Update(
         worldTimeSlicedGeometry = m_CreatedWorldGeometry.GetPointer();
 
         slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
-          m_CreatedWorldGeometry->GetGeometry3D(0));
+          m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos() ) );
 
         if ( slicedWorldGeometry.IsNotNull() )
         {
@@ -237,10 +237,10 @@ SliceNavigationController::Update(
       m_Time->SetPos( 0 );
       m_BlockUpdate = false;
 
-      assert( worldTimeSlicedGeometry->GetGeometry3D( 0 ) != NULL );
+      assert( worldTimeSlicedGeometry->GetGeometry3D( this->GetTime()->GetPos() ) != NULL );
 
       slicedWorldGeometry->SetTimeBounds(
-        worldTimeSlicedGeometry->GetGeometry3D(0)->GetTimeBounds() );
+        worldTimeSlicedGeometry->GetGeometry3D( this->GetTime()->GetPos() )->GetTimeBounds() );
 
       //@todo implement for non-evenly-timed geometry!
       m_CreatedWorldGeometry->InitializeEvenlyTimed(
@@ -357,7 +357,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
 {
   //@todo add time to PositionEvent and use here!!
   SlicedGeometry3D* slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
-    m_CreatedWorldGeometry->GetGeometry3D(0) );
+    m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos() ) );
 
   if ( slicedWorldGeometry )
   {

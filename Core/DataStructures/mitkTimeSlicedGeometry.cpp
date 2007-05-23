@@ -374,6 +374,6 @@ void mitk::TimeSlicedGeometry::ExecuteOperation(Operation* operation)
     
   Geometry3D::ExecuteOperation(operation);
 
-  Modified();
+  this->Modified();
 }
 

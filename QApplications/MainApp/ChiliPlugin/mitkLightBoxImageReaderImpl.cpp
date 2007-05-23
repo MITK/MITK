@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPic.h>
+#include <ipPic/ipPicTags.h>
 #include <ipFunc/ipFunc.h>
 #include <qmessagebox.h>
 
@@ -41,7 +42,7 @@ void mitk::LightBoxImageReaderImpl::SetLightBox(QcLightbox* lightbox)
   if(lightbox!=m_LightBox)
   {
     m_LightBox=lightbox;
-    Modified();    
+    Modified();
   }
 }
 
@@ -62,28 +63,32 @@ QcLightbox* mitk::LightBoxImageReaderImpl::GetLightBox() const
 
 void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 {
+  if(m_LightBox == NULL)
+  {
+    itkWarningMacro(<<"Lightbox not set, using current lightbox");
+    SetLightBoxToCurrentLightBox();
+  }
+
+  if (m_LightBox == NULL) 
+  {
+    itk::OStringStream msg;
+    itkWarningMacro(<< "No lightbox found.");
+    return;
+  }
+
+  if( m_LightBox->getFrames() == 0 )
+    return;
+
   int RealPosition;
   SliceInfoArray sliceInfos;
 
   itkDebugMacro(<<"GenerateOutputInformation");
 
-  //did someone tell us which lightbox we shall read?
-  if(m_LightBox==NULL)
-  {
-    itk::ImageFileReaderException e(__FILE__, __LINE__);
-    itk::OStringStream msg;
-    msg << "lightbox not set";
-    e.SetDescription(msg.str().c_str());
-    itkWarningMacro(<<"lightbox not set");
-    throw e;
-    return;
-  }
-
   mitk::Image::Pointer output = this->GetOutput();
 
   //did we already do it since the last change in the lightbox?
   if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
-    return;    
+    return;
 
   itkDebugMacro(<<"Reading lightbox for GenerateOutputInformation()");
 
@@ -94,6 +99,31 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   mitk::Point3D originLastSlice;
   mitk::Point3D originFirstSlice;
   sliceInfo sliceInfo;
+
+  //get SeriesDescription
+  ipPicTSV_t* srd = ipPicQueryTag( m_LightBox->fetchHeader(0), tagSERIES_DESCRIPTION );
+  if( srd )
+    m_SeriesDescription = (char*)(srd->value);
+  else
+  {
+    srd = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
+    if( srd )
+    {
+      void* data;
+      ipUInt4_t len;
+      char * tmp;
+      if ( dicomFindElement((unsigned char*) srd->value, 0x0008, 0x103e, &data, &len) )
+      {
+         tmp = new char[len+1];
+         strncpy(tmp, (char*)data, len);
+         tmp[len] = 0;
+         m_SeriesDescription = tmp;
+         delete [] tmp;
+       }
+    }
+  }
+  if( m_SeriesDescription == "" )
+    m_SeriesDescription = "empty";
 
   //virtually sort the lightbox
   m_ImageNumbers.clear();
@@ -123,7 +153,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
     //is it an image?
     if (m_LightBox->fetchHeader(RealPosition) != NULL)
-    {         
+    {
       //get the isg
       isg=m_LightBox->fetchDicomGeometry(RealPosition);
       if(isg!=NULL)
@@ -155,7 +185,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
       originLastSlice=originCurrentSlice;
       //timeconv2=timeconv1;
-      ++numberOfImages;                 
+      ++numberOfImages;
     }
 
   }
@@ -202,7 +232,6 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
       itkWarningMacro(<<"numberOfSlices!=numberOfImages/numberOfTimePoints: " << numberOfSlices << " != " << numberOfImages/numberOfTimePoints);
     }
   }
-
 
   //build pic-header to initialize output information
   itkDebugMacro(<<"copy header");
@@ -256,7 +285,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     itkDebugMacro(<<"origin: "<<origin);
     planegeometry->SetOrigin(origin);
     planegeometry->SetFrameOfReferenceID(FrameOfReferenceUIDManager::AddFrameOfReferenceUID(interSliceGeometry->forUID));
-     
+
     ipPicTSV_t *tsv = ipPicQueryTag(originalHeader, "SOURCE HEADER");
 
     void* data; 
@@ -274,17 +303,16 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
       {
         tmp = new char[len+1];
         strncpy(tmp, (char*)data, len);
-        tmp[len]=0;   
+        tmp[len]=0;
         repetitionTime = (int) atof((char*) tmp);
       }
 
-      //0x0018, 0x1060 : Trigger Time 
-      
+      //0x0018, 0x1060 : Trigger Time
       if (dicomFindElement((unsigned char*) tsv->value, 0x0018, 0x1060, &data, &len))
       {
         tmp = new char[len+1];
         strncpy(tmp, (char*)data, len);
-        tmp[len]=0;   
+        tmp[len]=0;
         timearray[0] = atof((char*) tmp);
         timearray[1] = timearray[0]+repetitionTime;
         delete [] tmp;
@@ -329,16 +357,17 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
 void mitk::LightBoxImageReaderImpl::GenerateData()
 {
-  itkDebugMacro(<<"GenerateData ");
-  if(m_LightBox==NULL)
-  {
-    itk::ImageFileReaderException e(__FILE__, __LINE__);
-    itk::OStringStream msg;
-    msg << "lightbox not set";
-    e.SetDescription(msg.str().c_str());
-    throw e;
+  if(m_LightBox == NULL)
+    SetLightBoxToCurrentLightBox();
+
+  if (m_LightBox == NULL) 
     return;
-  }
+
+  if( m_LightBox->getFrames() == 0 )
+    return;
+
+  itkDebugMacro(<<"GenerateData ");
+
   itkDebugMacro(<<"request output ");
 
   mitk::Image::Pointer output = this->GetOutput();
@@ -400,7 +429,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
           //                  itkDebugMacro("origin1: "<<origin1<<" origin0: "<<origin0);
           ++numberOfImages;
           time=time1;
-          origin0=origin1;                
+          origin0=origin1;
         }
         else 
         {
@@ -416,13 +445,22 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
         }
       }
       else
+      {
         ++numberOfImages;
-      output->SetPicSlice(pic, numberOfImages,time);
+      }
+
+      if (!pic)
+      {
+        itkWarningMacro(<<"Image number " << numberOfImages << "has pic-header but no pic-data.");
+        continue;
+      }
+
+      output->SetPicSlice(pic, numberOfImages, time);
       itkDebugMacro("setting slice: "<<numberOfImages<<" lb pos: "<<RealPosition<< "origin:"<<origin1);
       //itkDebugMacro(<<"add slice  "<< numberOfImages <<" x:" <<pic->n[0]<<"y:"<<pic->n[1]);
       //output->SetPicSlice(pic, zDim-1-numberOfImages,time);
       //itkDebugMacro(<<" add slice   successful "<< numberOfImages<<"  "<< pic->n[0]<<"  "<<pic->n[1]);
-      //++numberOfImages;                    
+      //++numberOfImages;
     }
   }
   itkDebugMacro(<<"fertig ");
@@ -466,7 +504,7 @@ bool mitk::LightBoxImageReaderImpl::ImageOriginLesser ( const LocalImageInfo& el
       return elem1.pos < elem2.pos;
     return elem1.imageNumber < elem2.imageNumber;
   }
-  return elem1.origin**elem1.direction < elem2.origin**elem2.direction;
+  return elem1.origin**elem1.direction < elem2.origin**elem2.direction; // projection of origin on inter-slice-direction
 };
 
 bool mitk::LightBoxImageReaderImpl::ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
@@ -491,6 +529,12 @@ void mitk::LightBoxImageReaderImpl::SortImage(LocalImageInfoArray& imageNumbers)
     info.pos=position;
 
     pic = m_LightBox->fetchHeader(position);
+    if (!pic)
+    {
+      std::cout << "****** LightBoxImageReaderImpl::SortImage(): pic is NULL" << std::endl;
+      continue;
+    }
+
     tsv=ipPicQueryTag(pic,"SOURCE HEADER");
     if (tsv)
     {
@@ -502,16 +546,23 @@ void mitk::LightBoxImageReaderImpl::SortImage(LocalImageInfoArray& imageNumbers)
       }
       else
       {
-        info.imageNumber=position;
-        itkWarningMacro(<<"Something is wrong with the source header at lighbox-position "<<position);
+        ipPicTSV_t* imagenumberTag = ipPicQueryTag( pic, tagIMAGE_NUMBER);
+        if( imagenumberTag && imagenumberTag->type == ipPicInt )
+        {
+          info.imageNumber = *( (int*)(imagenumberTag->value) );
+        }
+        else
+        {
+          info.imageNumber = position;
+          itkWarningMacro(<<"No information about the imagenumber found in pic/dicom-header. At lighbox-position: "<<position);
+        }
       }
-
       //itkDebugMacro(<<"number image: "<<imageNumber);
     }
     else
     {
-      info.imageNumber=position;
-      itkWarningMacro(<<"DICOM header not available (pic tag SOURCE HEADER is NULL) at lighbox-position "<<position);
+      info.imageNumber = position;
+      itkWarningMacro(<<"Pic-tag SOURCE HEADER is NULL at lighbox-position: "<<position);
     }
     interSliceGeometry_t *isg;
     isg = m_LightBox->fetchDicomGeometry(position);
@@ -534,6 +585,7 @@ void mitk::LightBoxImageReaderImpl::SortImage(LocalImageInfoArray& imageNumbers)
     {
       FillVector3D(info.origin, 0, 0, -info.imageNumber);
       itkWarningMacro(<<"interSliceGeometry not available at lighbox-position "<<position);
+      continue;
     }
 
     imageNumbers.push_back(info);
@@ -561,9 +613,13 @@ int mitk::LightBoxImageReaderImpl::GetRealPosition(int position, LocalImageInfoA
   return list[position].pos;
 }
 
-
 mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl() : m_LightBox(NULL)
 {
+}
+
+const std::string mitk::LightBoxImageReaderImpl::GetSeriesDescription()
+{
+  return m_SeriesDescription;
 }
 
 mitk::LightBoxImageReaderImpl::~LightBoxImageReaderImpl()

@@ -53,6 +53,8 @@ public:
   //## \sa SetLightBox
     void SetLightBoxToCurrentLightBox();
 
+    virtual const std::string GetSeriesDescription();
+
     //##Description 
     //## @brief Get the lightbox to read from
     QcLightbox* GetLightBox() const;
@@ -113,10 +115,12 @@ protected:
     void SortImage(LocalImageInfoArray& imageNumbers);
 
     mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& imageNumbers);
-    
+
     QcLightbox* m_LightBox;
 
     LocalImageInfoArray m_ImageNumbers;
+
+    std::string m_SeriesDescription;
 };
 
 } // namespace mitk

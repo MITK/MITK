@@ -1,22 +1,19 @@
 #ifndef QCMITKSAMPLEPLUGIN_H
 #define QCMITKSAMPLEPLUGIN_H
 
+#include <mitkChiliPluginImpl.h>
 #include <chili/plugin.h>
-#include "ToolBar.h"
 #include <chili/ipUtil.h>
 #include <ipMsg/ipMsg.h>
 #include <ipMsg/ipMsgTypes.h>
 #include <ipPic/ipTypes.h>
 
-
 class QcMITKTask;
 class SampleApp;
-class ToolBar;
 
 class QcEXPORT QcMITKSamplePlugin: public QcPlugin
 {
-
-    Q_OBJECT
+  Q_OBJECT
 
   public:
 
@@ -26,17 +23,18 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     QString name();
     const char** xpm();
 
-    SampleApp* app; // TODO warum? protected machen
-
     static QcPlugin* GetPluginInstance()
     {
-      return s_PluginInstance;
+      return s_QmitkPluginInstance;
     }
 
     virtual void handleMessage( ipInt4_t type, ipMsgParaList_t *list );
 
+    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
+
   public slots:
-    
+
+    //Slot from QcPlugin, when study is selected
     virtual void studySelected( study_t* );
 
     // image selection methods
@@ -44,11 +42,9 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
 
     // still undocumented slot of QcPlugin
     virtual void lightboxFilled (QcLightbox* lightbox);
-    
+
     // still undocumented slot of QcPlugin
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
-
-    void CreateNewSampleApp(bool force=false);
 
   protected:
 
@@ -58,19 +54,15 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
 
   private:
 
+    SampleApp* app;
+
     // the Chili task object
     QcMITKTask* task;
 
-    // the MITK toolbar for selecting a lightbox (to indicate it should be loaded)
-    ToolBar* toolbar;
-
-    bool m_Activated;
-    int m_PicCounter;
-    bool m_IsFilledDataTree;
-
     // single instance of this plugin
-    static QcPlugin* s_PluginInstance;
+    static QcPlugin* s_QmitkPluginInstance;
+
+    mitk::ChiliPluginImpl* m_MITKPluginInstance;
 };
 
 #endif
-

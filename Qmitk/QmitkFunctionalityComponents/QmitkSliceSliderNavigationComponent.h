@@ -50,7 +50,7 @@ class QmitkSliceSliderNavigationComponent : public QmitkFunctionalityComponentCo
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkSliceSliderNavigationComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = false);
+  QmitkSliceSliderNavigationComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = false, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */

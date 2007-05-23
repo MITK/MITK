@@ -334,6 +334,8 @@ void QmitkMovieMaker::SetDirection( int direction )
 void QmitkMovieMaker::SetAspect( int aspect )
 {
   m_Aspect = aspect;
+
+  m_StepperAdapter->SetStepper( this->GetAspectStepper() );
   this->UpdateLooping();
   this->UpdateDirection();
 }

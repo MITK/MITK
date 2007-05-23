@@ -616,11 +616,14 @@ mitk::SlicedGeometry3D::Clone() const
 void
 mitk::SlicedGeometry3D::InitializeGeometry( Self *newGeometry ) const
 {
-  Superclass::InitializeGeometry(newGeometry);
+  Superclass::InitializeGeometry( newGeometry );
 
-  newGeometry->SetEvenlySpaced(m_EvenlySpaced);
-  newGeometry->SetSpacing(GetSpacing());
-  newGeometry->SetDirectionVector(GetDirectionVector());
+  newGeometry->SetEvenlySpaced( m_EvenlySpaced );
+  newGeometry->SetSpacing( this->GetSpacing() );
+  newGeometry->SetDirectionVector( this->GetDirectionVector() );
+
+  newGeometry->SetSliceNavigationController( m_SliceNavigationController );
+  newGeometry->m_ReferenceGeometry = m_ReferenceGeometry;
 
   if ( m_EvenlySpaced )
   {

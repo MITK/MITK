@@ -52,6 +52,8 @@ namespace mitk {
       //## \sa SetLightBox
       virtual void SetLightBoxToCurrentLightBox();
 
+      virtual const std::string GetSeriesDescription();
+
       //##Description 
       //## @brief Get the lightbox to read from
       virtual QcLightbox* GetLightBox() const;

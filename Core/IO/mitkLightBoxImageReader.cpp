@@ -33,6 +33,12 @@ void mitk::LightBoxImageReader::SetLightBoxToCurrentLightBox()
 {
 }
 
+const std::string mitk::LightBoxImageReader::GetSeriesDescription()
+{
+  std::string result;
+  return result;
+}
+
 QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 {
   return NULL;

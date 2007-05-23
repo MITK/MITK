@@ -182,6 +182,7 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
 
   CreatePointSet();
+  m_PointSet->Deactivated();
   return m_ConnectivityFilterComponentGUI;
 }
 
@@ -195,7 +196,7 @@ void QmitkConnectivityFilterComponent::CreatePointSet()
   m_PointSet->CreateConnections();
   m_PointSet->SetDataTreeName("SeedPointsForConnectivity");
   m_ConnectivityFilterComponentGUI->repaint();
-  m_PointSet->GetMainCheckBoxContainer()->setChecked(false);
+  
 }
 
 /*************** GET CONTENT CONTAINER  ***************/

@@ -555,7 +555,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       m_EdgeActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
     }
 
-    m_Prop3D->SetUserTransform( GetDataTreeNode()->GetVtkTransform() );
+    m_Prop3D->SetUserTransform( GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(GetDataTreeNode()->GetData())) );
   }
 }
 

@@ -72,6 +72,8 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)pixelSizeTag->value)[1] = spacing[1];
     ((float*)pixelSizeTag->value)[2] = spacing[2];
     //set tag "ISG"
+    //ISG == offset/origin           transformationmatrix(matrix)                                                              spancings
+    //ISG == offset0 offset1 offset2 spalte0_0 spalte0_1 spalte0_2 spalte1_0 spalte1_1 spalte1_2 spalte2_0 spalte2_1 spalte2_2 spacing0 spacing1 spacing2
     ipPicTSV_t *geometryTag;
     geometryTag = ipPicQueryTag( picImage, "ISG" );
     if (!geometryTag)

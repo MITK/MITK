@@ -147,7 +147,7 @@ public:
   /**!
   * \brief sets level/window to the second min/max greyvalues of the given Image
   */
-  void SetAuto(mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+  void SetAuto(const mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
   
   /**
    * If a level window is set to fixed, the set and get methods won't accept

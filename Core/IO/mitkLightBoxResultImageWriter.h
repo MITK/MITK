@@ -16,13 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22
 #define LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkBaseProcess.h"
 #include "mitkCommon.h"
-#include "mitkDataTree.h"
+#include <mitkImage.h>
 
 class QcLightbox;
 
@@ -31,16 +30,10 @@ namespace mitk {
 class Image;
 
 /**
-* @brief Writer for result images into a Chili lightbox. The result image
-* must be of the same size and geometry as an @em source image (set of 
-* slices), which is already in the Chili database and has to be provided 
-* to the writer
-*
-* @ingroup IO
-* @ingroup Chili
-* 
-* itk::BaseProcess inputs: 1. image to store in database
-*                          2. sample image, that is already in the database and has the same dimensions as 1.
+ @brief Writes mitk::Images into a Chili lightbox.
+
+ @ingroup IO
+ @ingroup Chili
 */
 class LightBoxResultImageWriter : public BaseProcess
 {
@@ -52,16 +45,13 @@ public:
   itkNewMacro(Self);
 
   virtual void SetInput(const mitk::Image *image);
-  virtual const mitk::Image *GetInput(void);
+
+  virtual void SetSeriesDescription( const std::string& );
 
   //##Documentation
-  //## @brief Sets the input to node->GetData() and additionally 
-  //## m_LevelWindow and m_ImageTypeName from the node properties
-  virtual void SetInputByNode(const mitk::DataTreeNode *node);
-
-  virtual const mitk::Image *GetSourceImage(void);
-  virtual void SetSourceImage(const mitk::Image *source); 
-  virtual bool SetSourceByTreeSearch(mitk::DataTreeIteratorBase* iterator);
+  //## @brief Set the level-window, which will be written in the
+  //## lightbox
+  virtual void SetLevelWindow(LevelWindow levelwindow);
 
   //##Description 
   //## @brief Set the lightbox to write into
@@ -82,61 +72,16 @@ public:
   //## \sa SetLightBox
   virtual bool SetLightBoxToNewLightBox();
 
-  //##Description 
-  //## @brief Set the lightbox to write into to the lightbox containing the image to be written
-  //##
-  //## The lightbox that contains the image to be written is set as lightbox to write into.
-  //## \sa SetLightBox
-  virtual bool SetLightBoxToCorrespondingLightBox();
-
-  //##Description 
-  //## @brief Get the lightbox to write into
-  virtual QcLightbox* GetLightBox() const;
-
-  itkSetStringMacro( ImageTypeName );
-  itkGetStringMacro( ImageTypeName );
-
-  itkSetStringMacro( Name );
-  itkGetStringMacro( Name );
-
-
-  //##Documentation
-  //## @brief Get the level-window, which will be written in the
-  //## lightbox
-  const LevelWindow& GetLevelWindow() const
-  {
-    return m_LevelWindow;
-  }
-
-  //##Documentation
-  //## @brief Set the level-window, which will be written in the
-  //## lightbox
-  virtual void SetLevelWindow(const LevelWindow& levelwindow)
-  {
-    if(m_LevelWindow!=levelwindow)
-    {
-      m_LevelWindow = levelwindow;
-      Modified();
-    }
-  }
-
-  virtual void Write() const;
+  virtual void Write();
 
 protected:
-  LightBoxResultImageWriter();
 
+  LightBoxResultImageWriter();
   virtual ~LightBoxResultImageWriter();
 
-  QcLightbox* m_LightBox;
-  
-  LevelWindow m_LevelWindow;
-  
-  std::string m_ImageTypeName;
-
-  // the series description
-  std::string m_Name;
 };
 
 } // namespace mitk
 
 #endif /* LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22 */
+

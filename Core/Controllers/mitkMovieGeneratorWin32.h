@@ -45,9 +45,6 @@ protected:
   //! name of output file
   _bstr_t m_sFile;
 
-  //! frame rate 
-  DWORD m_dwRate;
-
   //! structure contains information for a single stream
   BITMAPINFOHEADER m_bih;
 

@@ -4,7 +4,6 @@
 
 mitk::MovieGeneratorWin32::MovieGeneratorWin32()
 {
-  m_dwRate = 20;
 }
 
 
@@ -104,7 +103,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   strHdr.fccType                = streamtypeVIDEO;  // video stream type
   strHdr.fccHandler             = 0;
   strHdr.dwScale                = 1;          // should be one for video
-  strHdr.dwRate                 = m_dwRate;        // fps
+  strHdr.dwRate                 = static_cast<DWORD>(m_FrameRate);        // fps
   strHdr.dwSuggestedBufferSize  = m_bih.biSizeImage;  // Recommended buffer size, in bytes, for the stream.
   SetRect(&strHdr.rcFrame, 0, 0,        // rectangle for stream
     (int) m_bih.biWidth,
@@ -220,3 +219,4 @@ bool mitk::MovieGeneratorWin32::TerminateGenerator()
   AVIFileExit();
   return true;
 }
+

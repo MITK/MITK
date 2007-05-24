@@ -61,7 +61,7 @@ bool mitk::MovieGenerator::WriteMovie()
   if (m_stepper)
   {
     if (m_renderer) m_renderer->MakeCurrent();
-    m_stepper->First();
+    //m_stepper->First();
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
 
     ok = InitGenerator();
@@ -119,3 +119,14 @@ void mitk::MovieGenerator::ReleaseMovieWriter()
   TerminateGenerator();
   m_initialized = false;
 }
+
+void mitk::MovieGenerator::SetFrameRate(unsigned int rate)
+{
+  m_FrameRate = rate;
+}
+
+unsigned int mitk::MovieGenerator::GetFrameRate()
+{
+  return m_FrameRate;
+}
+

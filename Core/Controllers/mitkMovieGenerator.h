@@ -56,6 +56,10 @@ public:
   //!  releases a movie writer after usage of WriteCurrentFrameToMovie()
   virtual void ReleaseMovieWriter();
 
+  virtual void SetFrameRate(unsigned int rate);
+
+  unsigned int GetFrameRate();
+
 protected:
 
   //!  default  constructor
@@ -65,6 +69,7 @@ protected:
     m_renderer = 0;
     m_width  =  0;
     m_height = 0;
+    m_FrameRate = 20;
   }
 
   //!  called directly  before the first frame is  added, determines  movie  size from  renderer
@@ -90,6 +95,8 @@ protected:
   int           m_width, m_height;
 
   bool          m_initialized;
+
+  unsigned int  m_FrameRate;
 };
 
 } //namespace mitk

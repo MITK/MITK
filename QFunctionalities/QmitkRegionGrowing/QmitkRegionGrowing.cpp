@@ -33,8 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetInteractor.h"
 #include "mitkProperties.h"
 
-#include "mitkChiliPlugin.h"
-
 #include <itkConnectedThresholdImageFilter.h>
 
 #include <itkCommand.h>
@@ -49,15 +47,6 @@ QmitkRegionGrowing::QmitkRegionGrowing(QObject *parent, const char *name, QmitkS
   m_Controls(NULL)
 {
   SetAvailability(true);
-
-  // register to chili plugin as observer
-  mitk::ChiliPlugin* plugin = mitk::ChiliPlugin::GetInstance();
-  if (plugin)
-  {
-    itk::ReceptorMemberCommand<QmitkRegionGrowing>::Pointer command = itk::ReceptorMemberCommand<QmitkRegionGrowing>::New();
-    command->SetCallbackFunction( this, &QmitkRegionGrowing::chiliStudySelected );
-    plugin->AddObserver( mitk::PluginStudySelected(), command );
-  }
 }
 
 QmitkRegionGrowing::~QmitkRegionGrowing()
@@ -238,11 +227,5 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 
   // add result to data tree
   mitk::DataStorage::GetInstance()->Add( newNode );
-}
-
-void QmitkRegionGrowing::chiliStudySelected(const itk::EventObject&)
-{
-  std::cout << "Study selected" << std::endl;
-  std::cout << "Current study ID is " << mitk::ChiliPlugin::GetInstance()->GetCurrentStudyID() << std::endl;
 }
 

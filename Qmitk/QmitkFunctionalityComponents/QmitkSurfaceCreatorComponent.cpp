@@ -41,8 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, const char * parentName, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool /*updateSelector*/, bool /*showSelector*/, bool allowExpertMode)
-: QmitkFunctionalityComponentContainer(parent, parentName),
+QmitkSurfaceCreatorComponent::QmitkSurfaceCreatorComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool allowExpertMode)
+: QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_MultiWidget(mitkStdMultiWidget),
 m_DataTreeIteratorClone(NULL),
 m_SurfaceCreatorComponentGUI(NULL),
@@ -177,10 +177,15 @@ QWidget* QmitkSurfaceCreatorComponent::CreateControlWidget(QWidget* parent)
 
   m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
 
-  if(!m_ShowSelector)
-  {
-   m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(false);
-  }
+ 	if(m_ShowSelector)
+	{
+		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
+	}
+	else
+	{
+		m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+	}
+
   m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   InitSurfaceGUI();
   ShowSurfaceParameter(false);
@@ -202,9 +207,9 @@ void QmitkSurfaceCreatorComponent::SetSelectorVisibility(bool visibility)
 {
   if(m_SurfaceCreatorComponentGUI)
   {
-    m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
+    m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
   }
-  m_ShowSelector = visibility;
+  //m_ShowSelector = visibility;
 }
 
 void QmitkSurfaceCreatorComponent::SetExpertMode(bool visibility)
@@ -223,6 +228,10 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceCreatorContent(bool)
   if(m_ShowSelector)
   {
     m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()->isChecked());
+  }
+  else
+  {
+   m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
   }
 
   for(unsigned int i = 0;  i < m_ParameterList.size(); i++)
@@ -246,7 +255,16 @@ QGroupBox * QmitkSurfaceCreatorComponent::GetMainCheckBoxContainer()
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkSurfaceCreatorComponent::ShowImageContent(bool)
 {
-  m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
+	if(m_ShowSelector)
+	{
+		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
+	}
+	else
+	{
+		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_ShowSelector);
+	}
+
+
 }
 
 

@@ -57,7 +57,7 @@ class QmitkSurfaceCreatorComponent : public QmitkFunctionalityComponentContainer
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true, bool allowExpertMode = true);
+  QmitkSurfaceCreatorComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool allowExpertMode = true);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -202,8 +202,8 @@ protected:
   /** \brief Attribute to decide whether the selector shall be updated when a parent-Selector is updatet or not */
   bool m_UpdateSelector;
 
-  /** \brief Attribute to decide whether the selector shall be shown or not */
-  bool m_ShowSelector;
+  ///** \brief Attribute to decide whether the selector shall be shown or not */
+  //bool m_ShowSelector;
 
   /** \brief Attribute to that will be set to true by the first activation of the functionality */
   bool m_Active;

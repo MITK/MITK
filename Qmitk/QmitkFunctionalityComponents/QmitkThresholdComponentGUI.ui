@@ -35,8 +35,11 @@
             <property name="name">
                 <cstring>m_ThresholdFinder</cstring>
             </property>
-             <property name="title">
-                <string>Show ThresholdFinder</string>
+            <property name="frameShape">
+                <enum>GroupBoxPanel</enum>
+            </property>
+            <property name="title">
+                <string>ThresholdFinder</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -58,6 +61,9 @@
                     <property name="name">
                         <cstring>m_ContainerContent</cstring>
                     </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
                     <property name="lineWidth">
                         <number>0</number>
                     </property>
@@ -78,8 +84,11 @@
                             <property name="name">
                                 <cstring>m_ThresholdSelectDataGroupBox</cstring>
                             </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
                             <property name="lineWidth">
-                                <number>1</number>
+                                <number>0</number>
                             </property>
                             <property name="midLineWidth">
                                 <number>0</number>
@@ -107,11 +116,14 @@
                                     <property name="name">
                                         <cstring>m_ImageContent</cstring>
                                     </property>
+                                    <property name="frameShape">
+                                        <enum>NoFrame</enum>
+                                    </property>
                                     <property name="lineWidth">
-                                        <number>1</number>
+                                        <number>0</number>
                                     </property>
                                     <property name="midLineWidth">
-                                        <number>1</number>
+                                        <number>0</number>
                                     </property>
                                     <property name="title">
                                         <string></string>
@@ -162,17 +174,26 @@
                             <property name="enabled">
                                 <bool>true</bool>
                             </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
                             <property name="title">
-                                <string>Show Threshold</string>
+                                <string></string>
                             </property>
                             <property name="flat">
                                 <bool>true</bool>
                             </property>
                             <property name="checkable">
-                                <bool>true</bool>
+                                <bool>false</bool>
                             </property>
                             <property name="checked">
-                                <bool>true</bool>
+                                <bool>false</bool>
                             </property>
                             <vbox>
                                 <property name="name">
@@ -187,6 +208,12 @@
                                 <widget class="QGroupBox">
                                     <property name="name">
                                         <cstring>m_ThresholdValueContent</cstring>
+                                    </property>
+                                    <property name="frameShape">
+                                        <enum>NoFrame</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
                                     </property>
                                     <property name="lineWidth">
                                         <number>0</number>
@@ -481,6 +508,9 @@
                                                     <property name="frameShadow">
                                                         <enum>Sunken</enum>
                                                     </property>
+                                                    <property name="lineWidth">
+                                                        <number>1</number>
+                                                    </property>
                                                     <property name="text">
                                                         <string>1</string>
                                                     </property>
@@ -590,7 +620,7 @@ if Component is deactivated</string>
     <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
     <function returnType="QGroupBox *">GetThresholdValueContent()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
-    <function returnType="QCheckBox *">GetDeleateImageIfDeactivatedCheckBox()</function>
+    <function returnType="QCheckBox *">GetDeleteImageIfDeactivatedCheckBox()</function>
     <function returnType="QGroupBox *">GetContainerContent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>

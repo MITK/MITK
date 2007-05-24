@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>289</width>
-            <height>158</height>
+            <height>141</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -36,7 +36,7 @@
                 <cstring>m_SliceSliderNavigator</cstring>
             </property>
             <property name="title">
-                <string>Show SliceSliderNavigater</string>
+                <string>SliceSliderNavigater</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -57,6 +57,9 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_SliceSliderNavigatorContentGroupBox</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
                     </property>
                     <property name="frameShadow">
                         <enum>Plain</enum>
@@ -304,6 +307,22 @@
 </widget>
 <customwidgets>
     <customwidget>
+        <class>QmitkDataTreeComboBox</class>
+        <header location="global">QmitkDataTreeComboBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
+    <customwidget>
         <class>QmitkSliderNavigator</class>
         <header location="global">QmitkSliderNavigator.h</header>
         <sizehint>
@@ -322,22 +341,6 @@
         <slot access="public" specifier="">SetStepper(mitk::Stepper*)</slot>
         <slot access="public" specifier="">Refetch()</slot>
         <property type="0">4</property>
-    </customwidget>
-    <customwidget>
-        <class>QmitkDataTreeComboBox</class>
-        <header location="global">QmitkDataTreeComboBox.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image0</pixmap>
     </customwidget>
 </customwidgets>
 <images>

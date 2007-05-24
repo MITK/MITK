@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>547</width>
-            <height>758</height>
+            <width>231</width>
+            <height>508</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -34,6 +34,9 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_SurfaceCreatorGroupBox</cstring>
+            </property>
+            <property name="lineWidth">
+                <number>1</number>
             </property>
             <property name="title">
                 <string>SurfaceCreator</string>
@@ -87,6 +90,9 @@
                             <property name="name">
                                 <cstring>m_ImageContent</cstring>
                             </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
                             <property name="lineWidth">
                                 <number>0</number>
                             </property>
@@ -121,6 +127,12 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_CreateSurfaceGroupBox</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
                     </property>
                     <property name="title">
                         <string></string>
@@ -191,11 +203,14 @@
                             <property name="name">
                                 <cstring>m_ShowSurfaceParameterGroupBox</cstring>
                             </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
                             <property name="lineWidth">
                                 <number>0</number>
                             </property>
                             <property name="title">
-                                <string>ShowSurfaceParameter</string>
+                                <string> -- Parameter --</string>
                             </property>
                             <property name="checkable">
                                 <bool>true</bool>
@@ -217,8 +232,14 @@
                                     <property name="name">
                                         <cstring>m_ShowExpertModeGroupBox</cstring>
                                     </property>
+                                    <property name="frameShape">
+                                        <enum>PopupPanel</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>1</number>
+                                    </property>
                                     <property name="title">
-                                        <string>ShowExpertMode</string>
+                                        <string> -- ExpertMode --</string>
                                     </property>
                                     <property name="checkable">
                                         <bool>true</bool>
@@ -251,12 +272,24 @@
                                             <property name="enabled">
                                                 <bool>false</bool>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>NoFrame</enum>
+                                            </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
-                                                <string>Median</string>
+                                                <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLayoutWidget">
                                                     <property name="name">
@@ -367,12 +400,24 @@
                                             <property name="enabled">
                                                 <bool>false</bool>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>NoFrame</enum>
+                                            </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
-                                                <string>Interpolate</string>
+                                                <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLayoutWidget">
                                                     <property name="name">
@@ -486,12 +531,24 @@
                                             <property name="enabled">
                                                 <bool>false</bool>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>NoFrame</enum>
+                                            </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
-                                                <string>Smooth</string>
+                                                <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLayoutWidget">
                                                     <property name="name">
@@ -602,12 +659,24 @@
                                             <property name="enabled">
                                                 <bool>false</bool>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>NoFrame</enum>
+                                            </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
-                                                <string>Gauss</string>
+                                                <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLayoutWidget">
                                                     <property name="name">
@@ -678,12 +747,24 @@
                                             <property name="enabled">
                                                 <bool>false</bool>
                                             </property>
+                                            <property name="frameShape">
+                                                <enum>NoFrame</enum>
+                                            </property>
+                                            <property name="lineWidth">
+                                                <number>0</number>
+                                            </property>
                                             <property name="title">
-                                                <string>Decimate</string>
+                                                <string></string>
                                             </property>
                                             <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
+                                                </property>
+                                                <property name="margin">
+                                                    <number>0</number>
+                                                </property>
+                                                <property name="spacing">
+                                                    <number>0</number>
                                                 </property>
                                                 <widget class="QLayoutWidget">
                                                     <property name="name">
@@ -747,20 +828,18 @@
                         </widget>
                         <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>layout10</cstring>
+                                <cstring>layout11</cstring>
                             </property>
                             <vbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
                                 </property>
-                                <widget class="QCheckBox">
-                                    <property name="name">
-                                        <cstring>m_ShowContourChekckBox</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Show SurfaceContour</string>
-                                    </property>
-                                </widget>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
                                 <widget class="QCheckBox">
                                     <property name="name">
                                         <cstring>m_ReplaceExistingSurfaceCheckBox</cstring>
@@ -770,6 +849,14 @@
                                     </property>
                                     <property name="text">
                                         <string>Replace existing Surface</string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox">
+                                    <property name="name">
+                                        <cstring>m_ShowContourChekckBox</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Show SurfaceContour</string>
                                     </property>
                                 </widget>
                             </vbox>

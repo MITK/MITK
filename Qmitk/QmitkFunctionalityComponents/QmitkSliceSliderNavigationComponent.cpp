@@ -112,8 +112,6 @@ void QmitkSliceSliderNavigationComponent::HideOrShow()
 	{
 		m_SliceSliderComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
 	}
-
-
 }
 
 /***************     IMAGE SELECTED     ***************/

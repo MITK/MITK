@@ -30,7 +30,7 @@ namespace mitk {
 
 //##ModelId=3F0189F0016F
 //##Documentation
-//## @brief Operation, that handles all aktions on one Point.
+//## @brief Operation that handles all actions on one Point.
 //##
 //## Stores everything for Adding, Moving and Deleting a Point.
 //## @ingroup Undo
@@ -39,17 +39,17 @@ class PointOperation : public Operation
   public:
   //##ModelId=3F0189F003A2
 	//##Documentation
-	//##@brief Operation, that handles all aktions on one Point.
+	//##@brief Operation that handles all actions on one Point.
 	//##
-	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+	//## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
   //## @param point is the information of the point to add or is the information to change a point into
   //## @param index is e.g. the position in a list which describes the element to change
   PointOperation(OperationType operationType,	Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
  
 	//##Documentation
-	//##@brief Operation, that handles all aktions on one Point.
+	//##@brief Operation that handles all actions on one Point.
 	//##
-	//## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+	//## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
   //## @param point is the information of the point to add or is the information to change a point into
   //## @param index is e.g. the position in a list which describes the element to change
   PointOperation(OperationType operationType,	ScalarType timeInMS, Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);

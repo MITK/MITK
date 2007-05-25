@@ -88,19 +88,20 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_HiResMapper->SetGradientEstimator(gradientEstimator);
   gradientEstimator->Delete();
 
-  m_VolumeProperty = vtkVolumeProperty::New();
-  m_VolumeProperty2 = vtkVolumeProperty::New(); 
+  m_VolumePropertyLow = vtkVolumeProperty::New();
+  m_VolumePropertyMed = vtkVolumeProperty::New();
+  m_VolumePropertyHigh = vtkVolumeProperty::New(); 
 
   m_VolumeLOD = vtkLODProp3D::New();
 
-  m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumeProperty2,0.0);
+  m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0);
 
-  m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumeProperty,0.0); // TextureMapper2D
+  m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumePropertyLow,0.0); // TextureMapper2D
 
 #if (VTK_MAJOR_VERSION >= 5)
-  m_FPRCID = m_VolumeLOD->AddLOD(m_FPRCMapper,m_VolumeProperty2,0.0);
+  m_FPRCID = m_VolumeLOD->AddLOD(m_FPRCMapper,m_VolumePropertyMed,0.0);
 #else
-  m_MedResID = m_VolumeLOD->AddLOD(m_T2DMapperHi,m_VolumeProperty2,0.0); // TextureMapper2D (higher quality)
+  m_MedResID = m_VolumeLOD->AddLOD(m_T2DMapperHi,m_VolumePropertyMed,0.0); // TextureMapper2D
 #endif
 
   m_Resampler = vtkImageResample::New();
@@ -139,8 +140,9 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_T2DMapperHi->Delete();
 #endif
   m_Resampler->Delete();
-  m_VolumeProperty->Delete();
-  m_VolumeProperty2->Delete();
+  m_VolumePropertyLow->Delete();
+  m_VolumePropertyMed->Delete();
+  m_VolumePropertyHigh->Delete();
   m_VolumeLOD->Delete();
 }
 
@@ -180,6 +182,8 @@ void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long
 
 void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 { 
+  SetPreferences();
+
   if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 0)
   {
     m_VolumeLOD->SetSelectedLODID(m_LowResID);
@@ -214,7 +218,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     if (m_Prop3D) {
       //      std::cout << "visibility off" <<std::endl;
 
-      m_Prop3D->VisibilityOff();
+      m_Prop3D->VisibilityOff(); 
     }
     return;
   }
@@ -356,21 +360,25 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     colorTransferFunction->ClampingOn();
   }
-  m_VolumeProperty->SetColor( colorTransferFunction );
-  m_VolumeProperty->SetScalarOpacity( opacityTransferFunction ); 
-  m_VolumeProperty->SetGradientOpacity( gradientTransferFunction ); 
-  m_VolumeProperty->SetInterpolationTypeToNearest();
+  m_VolumePropertyLow->SetColor( colorTransferFunction );
+  m_VolumePropertyLow->SetScalarOpacity( opacityTransferFunction ); 
+  m_VolumePropertyLow->SetGradientOpacity( gradientTransferFunction ); 
+  m_VolumePropertyLow->SetInterpolationTypeToNearest();
 
   m_T2DMapper->SetMaximumNumberOfPlanes(100);
 #if (VTK_MAJOR_VERSION < 5)
   m_T2DMapperHi->SetMaximumNumberOfPlanes(150);
 #endif
 
-  m_VolumeProperty2->SetColor( colorTransferFunction );
-  m_VolumeProperty2->SetScalarOpacity( opacityTransferFunction ); 
-  m_VolumeProperty2->SetGradientOpacity( gradientTransferFunction ); 
-  m_VolumeProperty2->SetInterpolationTypeToLinear();
-  m_VolumeProperty2->ShadeOn();
+  m_VolumePropertyMed->SetColor( colorTransferFunction );
+  m_VolumePropertyMed->SetScalarOpacity( opacityTransferFunction ); 
+  m_VolumePropertyMed->SetGradientOpacity( gradientTransferFunction ); 
+  m_VolumePropertyMed->SetInterpolationTypeToLinear();
+
+  m_VolumePropertyHigh->SetColor( colorTransferFunction );
+  m_VolumePropertyHigh->SetScalarOpacity( opacityTransferFunction ); 
+  m_VolumePropertyHigh->SetGradientOpacity( gradientTransferFunction ); 
+  m_VolumePropertyHigh->SetInterpolationTypeToLinear();
 
   mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
   assert(openGlRenderer);
@@ -382,7 +390,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if (vtkRendWin && m_Firstcall) 
   {
-    vtkCallbackCommand* cbc = vtkCallbackCommand::New(); 
+    vtkCallbackCommand* cbc = vtkCallbackCommand::New();
     cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
     vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
 
@@ -396,11 +404,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Firstcall=false;
     
     mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-
+    
+    mitk::RenderingManager::GetInstance()->SetShading(true,0);
+    mitk::RenderingManager::GetInstance()->SetShading(true,1);
+    mitk::RenderingManager::GetInstance()->SetShading(true,2);
   } 
   else 
   {
-    //std::cout << "no vtk renderwindow" << std::endl;
+    //std::cout << "no vtk renderwindow" << std::endl;m_VolumePropertyMed->ShadeOn();
   }
   
 /*  std::cout<<"RenderTime LowRes (T2D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
@@ -411,6 +422,41 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 #endif
   std::cout<<"RenderTime HiRes(T3D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_HiResID)<<std::endl;  
 */
+}
+
+void mitk::VolumeDataVtkMapper3D::SetPreferences()
+{
+  //Shading
+  //LOD 0
+  if(mitk::RenderingManager::GetInstance()->GetShading(0))
+  {
+    m_VolumePropertyLow->ShadeOn();
+  }
+  else
+  {
+    m_VolumePropertyLow->ShadeOff();
+  }
+  
+  //LOD 1
+  if(mitk::RenderingManager::GetInstance()->GetShading(1))
+  {
+    m_VolumePropertyMed->ShadeOn();
+  }
+  else
+  {
+    m_VolumePropertyMed->ShadeOff();
+  }
+
+  //LOD 2
+  if(mitk::RenderingManager::GetInstance()->GetShading(2))
+  {
+    m_VolumePropertyHigh->ShadeOn();
+  }
+  else
+  {
+    m_VolumePropertyHigh->ShadeOff();
+  }
+   
 }
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)

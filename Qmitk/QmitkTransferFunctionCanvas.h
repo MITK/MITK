@@ -93,7 +93,6 @@ class QmitkTransferFunctionCanvas : public QWidget
     void mouseReleaseEvent( QMouseEvent* mouseEvent );
     void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
     void PaintHistogram(QPainter &p);
-
     void PaintHistogramGO(QPainter &p);
 
     virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
@@ -109,6 +108,14 @@ class QmitkTransferFunctionCanvas : public QWidget
     std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);
     mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram;
     void keyPressEvent ( QKeyEvent * e ); 
+    
+    void SetImmediateUpdate(bool state);
+    
+  protected: 
+    bool m_UpdateHistogram;
+    float m_GrabbedHandleY;
+    
+    bool m_ImmediateUpdate;
 };
 #endif
 

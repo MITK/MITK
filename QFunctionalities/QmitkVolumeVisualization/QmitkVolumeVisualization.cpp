@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDataTreeComboBox.h"
 #include <mitkDataTreeNode.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 
   QmitkVolumeVisualization::QmitkVolumeVisualization(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget) ,m_Controls(NULL)
@@ -65,7 +66,12 @@ void QmitkVolumeVisualization::CreateConnections()
 
     //Preset-TF
     connect( (QObject*)(m_Controls), SIGNAL(PresetTF(int)),(QObject*) this, SLOT(GetPreset(int)));
-  
+    
+    //Preferences
+    connect( (QObject*)(m_Controls), SIGNAL(EnableShadingToggled(bool, int)),(QObject*) this, SLOT(SetShading(bool, int)));
+    
+    //Immediate Update
+    connect( (QObject*)(m_Controls), SIGNAL(ImmUpdate(bool)),(QObject*) this, SLOT(ImmediateUpdate(bool)));
   }
 }
 
@@ -98,7 +104,8 @@ m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
 m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
 }
 }
-void QmitkVolumeVisualization::EnableRendering(bool state) {
+void QmitkVolumeVisualization::EnableRendering(bool state) 
+{
   std::cout << "EnableRendering:" << state << std::endl;
   image_ok = false;
   const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
@@ -112,43 +119,63 @@ void QmitkVolumeVisualization::EnableRendering(bool state) {
       image_ok = true;
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
       m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
-    } else if (!state && node) {
+    } 
+    else if (!state && node) 
+    {
       node->SetProperty("volumerendering",new mitk::BoolProperty(false));
     }
   }
 }
 
 //�ergabe der Auswahl
-void QmitkVolumeVisualization::GetChoice(int number){
-  if(image_ok){
+void QmitkVolumeVisualization::GetChoice(int number)
+{
+  if(image_ok)
+  {
     m_Controls->m_TransferFunctionWidget->ChooseTF(number);
     m_Controls->m_TransferFunctionWidget_2->ChooseTF(number);
-}
-  else{
+  }
+  else
+  {
     std::cout<<"No image selected!\n";
   }
-    
 }
 
-void QmitkVolumeVisualization::GetCStyle(int number){
-  if(image_ok){
+void QmitkVolumeVisualization::GetCStyle(int number)
+{
+  if(image_ok)
+  {
     m_Controls->m_TransferFunctionWidget->ChooseCS(number);
     m_Controls->m_TransferFunctionWidget_2->ChooseCS(number);
   }
-  else{
+  else
+  {
     std::cout<<"No image selected!\n";
   }
 
 }
-void QmitkVolumeVisualization::GetPreset(int number){
-  if(image_ok){
+void QmitkVolumeVisualization::GetPreset(int number)
+{
+  if(image_ok)
+  {
     m_Controls->m_TransferFunctionWidget->ChooseTF(number);
     m_Controls->m_TransferFunctionWidget_2->ChooseTF(number);
   }
-  else{
+  else
+  {
     std::cout<<"No image selected!\n";
   }
 
 }
 
+void QmitkVolumeVisualization::SetShading(bool state, int lod)
+{
+ mitk::RenderingManager::GetInstance()->SetShading(state, lod);
+ mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
+
+void QmitkVolumeVisualization::ImmediateUpdate(bool state)
+{
+  m_Controls->m_TransferFunctionWidget->ImmediateUpdate(state);
+}

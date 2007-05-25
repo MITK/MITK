@@ -59,7 +59,8 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
     else 
     {
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-      if (mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData())) {
+      if (mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData())) 
+      {
         tf->InitializeByMitkImage(image);
         m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction(tf->GetScalarOpacityFunction());
         m_ScalarOpacityFunctionCanvas->SetHistogram(tf->GetHistogram());
@@ -68,7 +69,9 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
         m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
         UpdateMinMaxLabels();
         node->SetProperty("TransferFunction", new mitk::TransferFunctionProperty(tf.GetPointer()));
-      } else {
+      } 
+      else 
+      {
         std::cerr << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node" << std::endl;
       }
     }
@@ -556,6 +559,7 @@ void QmitkTransferFunctionWidget::ResetTF()
 
 }
 
+/*** Color ***/
 void QmitkTransferFunctionWidget::ChooseCS(int cstyle){
 
   if(cstyle == 1){//bone - natural
@@ -695,5 +699,11 @@ void QmitkTransferFunctionWidget::AddCS()
  }
  m_ColorTransferFunctionCanvas->update();
  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
+void QmitkTransferFunctionWidget::ImmediateUpdate(bool state)
+{
+    m_ScalarOpacityFunctionCanvas->SetImmediateUpdate(state);
+    m_ColorTransferFunctionCanvas->SetImmediateUpdate(state);
+    m_GradientOpacityCanvas->SetImmediateUpdate(state);	    
 }

@@ -138,3 +138,26 @@ void QmitkVolumeVisualizationControls::SetPreset10()
 {
 emit PresetTF(110);
 }
+
+void QmitkVolumeVisualizationControls::ImmediateUpdate(bool state)
+{
+emit ImmUpdate(state);
+}
+
+//Preferences
+
+void QmitkVolumeVisualizationControls::EnableShadingLow( bool state)
+{
+  emit EnableShadingToggled(state,0);
+}
+
+void QmitkVolumeVisualizationControls::EnableShadingMed( bool state)
+{
+  emit EnableShadingToggled(state,1);
+}
+
+void QmitkVolumeVisualizationControls::EnableShadingHigh( bool state)
+{
+  emit EnableShadingToggled(state,2);
+}
+

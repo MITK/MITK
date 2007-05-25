@@ -246,12 +246,6 @@ mitk::RenderingManager
 
   }
 
-   if ( m_IsRendering[renderWindow] )
-  {
-      this->AbortRendering( renderWindow );
-      this->RequestUpdate( renderWindow );
-  } 
-
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = 0;
   s_RenderWindowList[renderWindow] = 0;
@@ -589,7 +583,19 @@ void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for
 
 void mitk::RenderingManager::SetNumberOfLOD(int number)
 {
-    m_MaxLOD = number-1;
+  m_MaxLOD = number-1;
+}
+
+void mitk::RenderingManager::SetShading(bool state, int lod)
+{ 
+  //std::cout<<"setshading("<<state<<","<<lod<<")\n";
+  m_ShadingEnabled[lod] = state;
+}
+
+bool mitk::RenderingManager::GetShading(int lod)
+{ 
+  //std::cout<<"getshading("<<lod<<")\n";
+  return m_ShadingEnabled[lod];
 }
 
 // Create and register generic RenderingManagerFactory.

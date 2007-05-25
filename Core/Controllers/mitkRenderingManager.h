@@ -157,6 +157,9 @@ public:
   int GetCurrentLOD();
   void SetCurrentLOD(int lod);
   void SetNumberOfLOD(int number);
+  
+  void SetShading(bool state, int lod);
+  bool GetShading(int lod);
 
 protected:
   RenderingManager();
@@ -181,6 +184,7 @@ protected:
   int m_Interval;
   int m_CurrentLOD;
   int m_MaxLOD;
+  bool m_ShadingEnabled[];
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );

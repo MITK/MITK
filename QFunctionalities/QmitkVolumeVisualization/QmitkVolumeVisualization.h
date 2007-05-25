@@ -82,6 +82,8 @@ class QmitkVolumeVisualization : public QmitkFunctionality
     void GetChoice(int number);
     void GetCStyle(int number);
     void GetPreset(int number);
+    void SetShading(bool state, int lod);
+    void ImmediateUpdate(bool state);
 
   protected:  
     /*!  

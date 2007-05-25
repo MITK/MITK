@@ -68,11 +68,14 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
+  void SetPreferences();
+
   vtkActor* m_Actor;
   vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
-  vtkVolumeProperty* m_VolumeProperty;
-  vtkVolumeProperty* m_VolumeProperty2;
+  vtkVolumeProperty* m_VolumePropertyLow;
+  vtkVolumeProperty* m_VolumePropertyMed;
+  vtkVolumeProperty* m_VolumePropertyHigh;
   vtkVolumeTextureMapper2D* m_T2DMapper;
   vtkVolumeTextureMapper2D* m_T2DMapperHi;
   vtkVolumeRayCastMapper* m_HiResMapper;

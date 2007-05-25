@@ -589,13 +589,21 @@ void mitk::RenderingManager::SetNumberOfLOD(int number)
 void mitk::RenderingManager::SetShading(bool state, int lod)
 { 
   //std::cout<<"setshading("<<state<<","<<lod<<")\n";
-  m_ShadingEnabled[lod] = state;
+  
+  
+  //commented due to compiler problems
+  //m_ShadingEnabled[lod] = state;
+
 }
 
 bool mitk::RenderingManager::GetShading(int lod)
 { 
   //std::cout<<"getshading("<<lod<<")\n";
-  return m_ShadingEnabled[lod];
+  
+  //commented due to compiler problems
+  //return m_ShadingEnabled[lod];
+  
+  return false;
 }
 
 // Create and register generic RenderingManagerFactory.

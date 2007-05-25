@@ -184,7 +184,7 @@ protected:
   int m_Interval;
   int m_CurrentLOD;
   int m_MaxLOD;
-  bool m_ShadingEnabled[];
+  bool *m_ShadingEnabled;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );

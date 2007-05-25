@@ -25,6 +25,67 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
+/**
+
+  \class QmitkMainTemplate
+
+  Base application that is used by most MITK applications.
+
+  \section QmitkMainTemplateHelpBrowser Help window
+
+  \subsection QmitkMainTemplateHelpBrowserSub1 Which help file is displayed
+
+  QmitkMainTemplate supports a very basic help system. If the users presses F1 or chooses Help/Content from the menu,
+  QmitkMainTemplate opens a QmitkHelpBrowser to display a HTML page that should explain the currently active functionality.
+
+  The intelligence behind finding the correct help page is not very sophisticated: from the application options, the value
+  of "HTML documentation path" is read. It is expected that there are HTML pages in this directory. To this path is added
+  "FUNCTIONALITY_CLASS_NAMEUserManual.html", where FUNCTIONALITY_CLASS_NAME is the class name of a concrete functionality.
+
+  <b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose 
+           "HTML documentation path" to point to "~/mitk/doxygen/". The help browser will then try to open
+           ~/mitk/doxygen/QmitkSimpleExampleFunctionalityUserManual.html
+  
+
+  \subsection QmitkMainTemplateHelpBrowserSub2 How to create the help page
+
+  If you have Doxygen installed on your system, the MITK build system is able to generate a lot of HTML documentation from
+  all the classes of the source tree. To do that you have to build the target "doc" (Visual Studio: right-click the target, 
+  choose "Build/Erzeugen"; Linux: make doc)
+
+  To add a help page to the Doxygen output, you should create a directory "UserManual" inside your functionality directory 
+  (because the build system configures Doxygen to look for images in these directories).
+  Inside the directory "UserManual" you create a file called FUNCTIONALITY_CLASS_NAMEUserManual.dox with basically this content 
+
+\verbatim
+
+\/**
+\page QmitkFUNCTIONALITY_CLASS_NAMEUserManual The functionality to solve all problems
+
+Available sections:
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualOverview 
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails 
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen 
+
+\section QmitkLymphNodeVolumetryUserManualOverview Overview of the problems
+
+Bla
+
+\section QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails Complications in details
+
+Blaa
+
+\section QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen How to solve everything using FUNCTIONALITY_CLASS_NAME
+
+Tadaa
+
+*\/
+\endverbatim
+
+  However, it is nice to actually replace the nonsense :-)
+
+*/
+
 // these files have to be included at this location
 // because otherwise microsoft visual c++ generates
 // an internal compiler error

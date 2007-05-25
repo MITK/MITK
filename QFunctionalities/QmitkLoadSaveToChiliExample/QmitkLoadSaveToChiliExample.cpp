@@ -187,13 +187,13 @@ void QmitkLoadSaveToChiliExample::SaveToLightbox()
 void QmitkLoadSaveToChiliExample::ImageSelected( mitk::DataTreeIteratorClone imageIt )
 {
   //fill the textfield with the new seriesdescription if another node get selected
-  m_Controls->DescriptionInput->setText( m_Controls->m_TreeNodeSelector->GetSelectedNode()->GetPropertyList()->GetProperty( "name" )->GetValueAsString() );
+  m_Controls->DescriptionInput->setText( m_Controls->m_TreeNodeSelector->GetSelectedNode()->GetPropertyList()->GetProperty( "name" )->GetValueAsString().c_str() );
 }
 
 void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
 {
   //show the studydescription
-  m_Controls->StudyDescription->setText( ( QString )( mitk::ChiliPlugin::GetInstance()->GetCurrentStudy().StudyDescription ) );
+  m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentStudy().StudyDescription.c_str() );
   //clear the listview
   m_Controls->ListView->clear();
   //get the current serieslist and iterate
@@ -203,7 +203,7 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
     //if there are no description show "no description" else show the saved one
     if( iter->SeriesDescription == "" )
       QListViewItem* item = new QListViewItem( m_Controls->ListView, "no description" );
-    else QListViewItem* item = new QListViewItem( m_Controls->ListView, iter->SeriesDescription );
+    else QListViewItem* item = new QListViewItem( m_Controls->ListView, iter->SeriesDescription.c_str() );
   }
 }
 

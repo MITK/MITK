@@ -17,10 +17,11 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   m_Max = (int)GetHistogram()->GetBinMax(0, GetHistogram()->Size()-1);
   m_ScalarOpacityFunction->Initialize();
   m_ScalarOpacityFunction->AddPoint(m_Min,0.0);
+  m_ScalarOpacityFunction->AddPoint(0.0,0.0);
   m_ScalarOpacityFunction->AddPoint(m_Max,1.0);
   m_GradientOpacityFunction->Initialize();
   m_GradientOpacityFunction->AddPoint(m_Min,0.0);
-  m_GradientOpacityFunction->AddPoint(0,1.0);
+  m_GradientOpacityFunction->AddPoint(0.0,1.0);
   m_GradientOpacityFunction->AddPoint((m_Max*0.125),1.0);
   m_GradientOpacityFunction->AddPoint((m_Max*0.2),1.0);
   m_GradientOpacityFunction->AddPoint((m_Max*0.25),1.0);

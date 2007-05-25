@@ -444,6 +444,7 @@ void QmitkMovieMaker::GenerateMovie()
   {
     m_movieGenerator->SetStepper( this->GetAspectStepper() );
     m_movieGenerator->SetRenderer(m_RecordingRenderer);
+    m_movieGenerator->SetFrameRate(static_cast<unsigned int>( 360 / ( m_Controls->spnDuration->value() ) ) );
 
     QString movieFileName = QFileDialog::getSaveFileName(
       QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name"

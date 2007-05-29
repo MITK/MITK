@@ -227,7 +227,6 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
   {
     SetAutoTopMostImage(true);
   }
-  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 // returns the DataTree

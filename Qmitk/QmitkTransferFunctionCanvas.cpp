@@ -42,11 +42,13 @@ void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)
 }
 std::pair<int,int> QmitkTransferFunctionCanvas::FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType> functionPoint)
 {
+  //std::cout<<"F2C.first: "<<(int)((functionPoint.first - m_Lower) /  (m_Upper - m_Lower) * width())<<" F2C.second: "<<(int)(height() * (1 - functionPoint.second))<<std::endl;
   return std::make_pair((int)((functionPoint.first - m_Lower) /  (m_Upper - m_Lower) * width()),(int)(
         height() * (1 - functionPoint.second)));
 }
 std::pair<vtkFloatingPointType,vtkFloatingPointType> QmitkTransferFunctionCanvas::CanvasToFunction(std::pair<int,int> canvasPoint)
 {
+  //std::cout<<"C2F.first: "<<(canvasPoint.first * (m_Upper - m_Lower) / width() + m_Lower)<<" C2F.second: "<<(1.0 - (vtkFloatingPointType)canvasPoint.second / height())<<std::endl;
   return std::make_pair(canvasPoint.first * (m_Upper - m_Lower) / width() + m_Lower,  1.0 - (vtkFloatingPointType)canvasPoint.second / height());
 }
 
@@ -67,8 +69,6 @@ int QmitkTransferFunctionCanvas::GetNearHandle(int /*x*/,int /*y*/,unsigned int 
 void QmitkTransferFunctionCanvas::mousePressEvent( QMouseEvent* mouseEvent )
 {   
   m_GrabbedHandle = GetNearHandle(mouseEvent->x(),mouseEvent->y());
-  float m_TFCanvasSizeY = 200.0; //TODO: GET HEIGHT OF CANVAS AUTOMATICALLY
-  m_GrabbedHandleY = ((((mouseEvent->y())/m_TFCanvasSizeY)-1)*-1);
   
   if (( mouseEvent->state() & Qt::ShiftButton ) &&
       (mouseEvent->button() & Qt::LeftButton) && m_GrabbedHandle == -1)
@@ -127,7 +127,6 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent( QMouseEvent* mouseEvent )
    // std::cout << " after:" << newPos.first << "/" << newPos.second << std::endl;
     //this->RemoveFunctionPoint(this->GetFunctionX(m_GrabbedHandle));
     this->MoveFunctionPoint(m_GrabbedHandle,newPos);
-    m_GrabbedHandleY = newPos.second;
     m_GrabbedHandle = -1;
     //this->AddFunctionPoint(newPos.first,newPos.second);
     for (int i=0 ; i<this->GetFunctionSize() ; i++)
@@ -155,7 +154,7 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent( QMouseEvent*  )
 
 void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
 {
-  if(/*m_UpdateHistogram*/true){
+  if(/*m_UpdateHistogram*/ true){
     if (m_Histogram.IsNotNull())
     {
       p.save();
@@ -167,11 +166,11 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
         //int tfIndex = static_cast<int> (x  * scaleFactor *0.5);
         int tfIndex = static_cast<int> ( x * scaleFactor );
         float freq = this->GetHistogram()->GetFrequency(tfIndex);
-  
+        //std::cout<<"x: "<<x<<" tfIndex: "<<tfIndex<<" freq: "<<freq;
         if (freq>0)
         {
           int y = static_cast<int>( ( 1 - vcl_log(freq) / maxFreqLog ) * height() );
-  
+          //std::cout<<" y: "<<y<<std::endl;
           //p.drawLine(x-width()*0.5,height(),x-width()*0.5,y);
           p.drawLine(x,height(),x,y);
         }
@@ -187,6 +186,16 @@ void QmitkTransferFunctionCanvas::PaintHistogramGO(QPainter &p)
 }
 
 void QmitkTransferFunctionCanvas::keyPressEvent ( QKeyEvent * e ) {
+  
+  if(m_Min<0)
+  {
+    m_Range = (m_Min*-1)+m_Max;
+  }
+  else
+  {
+    m_Range = m_Min+m_Max;
+  }
+  
   if (e->key() == Qt::Key_Delete && 
       m_GrabbedHandle  != -1 && 
       m_GrabbedHandle != 0 && 
@@ -203,8 +212,16 @@ void QmitkTransferFunctionCanvas::keyPressEvent ( QKeyEvent * e ) {
       m_GrabbedHandle != 0 && 
       m_GrabbedHandle != this->GetFunctionSize()-1 )
   {
-    this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle)-1,m_GrabbedHandleY));
+    if (GetFunctionX(m_GrabbedHandle)-(m_Range*0.01)>=m_Min)
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle)-(m_Range*0.01),GetFunctionY(m_GrabbedHandle)));
+    }
+    else
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(m_Min,GetFunctionY(m_GrabbedHandle)));
+    }
     update();
+    //std::cout<<"X: "<<GetFunctionX(m_GrabbedHandle)<<"Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();   
   }
   
@@ -213,8 +230,16 @@ void QmitkTransferFunctionCanvas::keyPressEvent ( QKeyEvent * e ) {
       m_GrabbedHandle != 0 && 
       m_GrabbedHandle != this->GetFunctionSize()-1 )
   {
-    this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle)+1,m_GrabbedHandleY));
+    if (GetFunctionX(m_GrabbedHandle)+(m_Range*0.01)<=m_Max)
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle)+(m_Range*0.01),GetFunctionY(m_GrabbedHandle)));
+    }
+    else
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(m_Max,GetFunctionY(m_GrabbedHandle)));
+    }
     update();
+    //std::cout<<"X: "<<GetFunctionX(m_GrabbedHandle)<<"Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
   }
   
@@ -222,10 +247,18 @@ void QmitkTransferFunctionCanvas::keyPressEvent ( QKeyEvent * e ) {
       m_GrabbedHandle  != -1 && 
       m_GrabbedHandle != 0 && 
       m_GrabbedHandle != this->GetFunctionSize()-1 &&
-      m_GrabbedHandleY <1)
+      GetFunctionY(m_GrabbedHandle)<1)
   {
-    this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),m_GrabbedHandleY=m_GrabbedHandleY+0.01));
+    if(GetFunctionY(m_GrabbedHandle)+0.01<=1)
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),GetFunctionY(m_GrabbedHandle)+0.01));
+    }
+    else
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),1));
+    }    
     update();
+    //std::cout<<"X: "<<GetFunctionX(m_GrabbedHandle)<<"Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();   
   }
   
@@ -233,14 +266,23 @@ void QmitkTransferFunctionCanvas::keyPressEvent ( QKeyEvent * e ) {
       m_GrabbedHandle  != -1 && 
       m_GrabbedHandle != 0 && 
       m_GrabbedHandle != this->GetFunctionSize()-1 &&
-      m_GrabbedHandleY >0)
+      GetFunctionY(m_GrabbedHandle) >0)
   {
-    this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),m_GrabbedHandleY=m_GrabbedHandleY-0.01));
+    if(GetFunctionY(m_GrabbedHandle)-0.01>=0)
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),GetFunctionY(m_GrabbedHandle)-0.01));
+    }
+    else
+    {
+      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),0));
+    }
     update();
+    //std::cout<<"X: "<<GetFunctionX(m_GrabbedHandle)<<"Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();   
   }  
 }
 
+// Update immediatly while changing the transfer function
 void QmitkTransferFunctionCanvas::SetImmediateUpdate(bool state)
 {
   m_ImmediateUpdate=state;

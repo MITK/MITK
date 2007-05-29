@@ -81,6 +81,10 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
     void RemoveAllFunctionPoints(){
     m_ColorTransferFunction->AddRGBSegment(this->GetFunctionMin(),1,0,0,this->GetFunctionMax(),1,1,0);      
     }
+    
+    float GetFunctionY(int index) {
+      return 0.0;
+    }
 
 
   protected: 

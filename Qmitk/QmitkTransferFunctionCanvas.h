@@ -100,6 +100,7 @@ class QmitkTransferFunctionCanvas : public QWidget
     virtual void RemoveFunctionPoint(vtkFloatingPointType x) = 0;
     virtual void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) = 0;
     virtual vtkFloatingPointType GetFunctionX(int index) = 0;
+    virtual float GetFunctionY(int index) = 0;
     virtual int GetFunctionSize() = 0;
     int m_GrabbedHandle;
     std::pair<int,int> m_MoveStart;
@@ -113,9 +114,8 @@ class QmitkTransferFunctionCanvas : public QWidget
     
   protected: 
     bool m_UpdateHistogram;
-    float m_GrabbedHandleY;
-    
     bool m_ImmediateUpdate;
+    float m_Range;
 };
 #endif
 

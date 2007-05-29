@@ -73,6 +73,11 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
     vtkFloatingPointType GetFunctionX(int index) {
       return m_PiecewiseFunction->GetDataPointer()[index*2];
     }
+    
+    float GetFunctionY(int index) {
+      return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index*2]);
+    }
+    
     int GetFunctionSize() {
       return m_PiecewiseFunction->GetSize();
     }
@@ -102,6 +107,7 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
 
     void RemoveAllFunctionPoints(){
     m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,this->GetFunctionMax(),1);
+    m_PiecewiseFunction->AddPoint(0.0,0.0);
     }
 
     void ResetGO(){ //Gradient Opacity

@@ -268,7 +268,7 @@ public:
   //## @brief Convenience access method for level-window properties (instances of
   //## LevelWindowProperty)
   //## @return @a true property was found
-  bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey = "levelwindow") const;
+  bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow") const;
 
   //## 
   //##Documentation 

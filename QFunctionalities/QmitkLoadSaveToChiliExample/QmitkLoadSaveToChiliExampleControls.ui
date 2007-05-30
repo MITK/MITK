@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>213</width>
+            <width>232</width>
             <height>755</height>
         </rect>
     </property>
@@ -59,22 +59,19 @@
             <property name="title">
                 <string>StudyDescription</string>
             </property>
-            <widget class="QLabel">
+            <vbox>
                 <property name="name">
-                    <cstring>StudyDescription</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>20</y>
-                        <width>170</width>
-                        <height>16</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-            </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>StudyDescription</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QGroupBox">
             <property name="name">
@@ -83,36 +80,33 @@
             <property name="title">
                 <string>SeriesDescription</string>
             </property>
-            <widget class="QListView">
-                <column>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="clickable">
-                        <bool>false</bool>
-                    </property>
-                    <property name="resizable">
-                        <bool>false</bool>
-                    </property>
-                </column>
+            <vbox>
                 <property name="name">
-                    <cstring>ListView</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>20</y>
-                        <width>170</width>
-                        <height>370</height>
-                    </rect>
-                </property>
-                <property name="rootIsDecorated">
-                    <bool>true</bool>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Its an example to show information about the studies or series</string>
-                </property>
-            </widget>
+                <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="clickable">
+                            <bool>false</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>false</bool>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>ListView</cstring>
+                    </property>
+                    <property name="rootIsDecorated">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Its an example to show information about the studies or series</string>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QGroupBox">
             <property name="name">
@@ -121,35 +115,24 @@
             <property name="title">
                 <string>Change SeriesDescription</string>
             </property>
-            <widget class="QPushButton">
+            <vbox>
                 <property name="name">
-                    <cstring>SetDescription</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>50</y>
-                        <width>170</width>
-                        <height>20</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Set current SeriesDescription</string>
-                </property>
-            </widget>
-            <widget class="QLineEdit">
-                <property name="name">
-                    <cstring>DescriptionInput</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>10</x>
-                        <y>20</y>
-                        <width>170</width>
-                        <height>20</height>
-                    </rect>
-                </property>
-            </widget>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>DescriptionInput</cstring>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>SetDescription</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Set current SeriesDescription</string>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <spacer>
             <property name="name">
@@ -188,6 +171,7 @@
         <pixmap>image0</pixmap>
         <signal>Activated(mitk::DataTreeNode* node)</signal>
         <signal>Activated(mitk::DataTreeIteratorClone node)</signal>
+        <signal>signal()</signal>
         <slot access="public" specifier="">slot()</slot>
         <slot access="public" specifier="">SetDataTreeNodeIterator(mitk::DataTreeIteratorClone)</slot>
     </customwidget>

@@ -10,6 +10,9 @@
 //MITKPlugin
 #include <mitkChiliPlugin.h>
 #include <mitkChiliPluginFactory.h>
+#include <mitkLightBoxImageReader.h>
+#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataStorage.h>
 //teleconference
 #include <mitkConferenceToken.h>
 #include <mitkConferenceEventMapper.h>
@@ -19,6 +22,13 @@
 #include <qapplication.h>
 #include <qeventloop.h>
 #include <qcursor.h>
+#include <qpixmap.h>
+#include <qmessagebox.h>
+#include <qtooltip.h>
+
+#include "chili_lightbox_import.xpm"
+
+#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
 
 // create event-logging object (ConferenceKit)
 Chili3ConferenceKitFactory chiliconferencekitfactory;
@@ -72,7 +82,27 @@ void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
 void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 {
   m_MITKPluginInstance->m_LightBoxCount = tiles;
-  m_MITKPluginInstance->SendLightBoxCountChangedEvent();
+  
+  for (int row = 0; row < tiles; ++row)
+  {
+    try 
+    {
+      QIDToolButton* button = m_LightBoxImportButtons.at(row);
+      button->show();
+    }
+    catch(...) {}
+  }
+  for (int row = tiles; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row)
+  {
+    try 
+    {
+      QIDToolButton* button = m_LightBoxImportButtons.at(row);
+      button->hide();
+    }
+    catch(...) {}
+  }
+
+  m_MITKPluginInstance->SendLightBoxCountChangedEvent(); // tell the application
 }
 
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
@@ -188,13 +218,57 @@ void QcMITKSamplePlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 
 void QcMITKSamplePlugin::studySelected( study_t* study )
 {
+  // create a gui the first time a study is selected
   static bool done = false;
-  if( !done )
+  if( !done ) // this is done here, beause if it's done in the constructor, then many button labels get wrong... (qt names as labels)
   {
-    // TODO why not in constructor ??
-    QVBoxLayout* layout = new QVBoxLayout( task );
+    // toplevel layout
+    QHBoxLayout* horzlayout = new QHBoxLayout( task );
+    QVBoxLayout* vertlayout = new QVBoxLayout( horzlayout );
+
+    // 4 lightbox import buttons
+    for (unsigned int row = 0; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row)
+    {
+      QIDToolButton* toolbutton = new QIDToolButton( row, task );
+      toolbutton->setUsesTextLabel( true );
+      QToolTip::add( toolbutton, "Import this lightbox to MITK");
+      toolbutton->setTextPosition( QToolButton::BelowIcon );
+      toolbutton->setPixmap( QPixmap(chili_lightbox_import_xpm) );
+    
+      QSizePolicy policy = toolbutton->sizePolicy();
+      policy.setVerStretch( 2 );
+      toolbutton->setSizePolicy( policy );
+
+      connect( toolbutton, SIGNAL(clicked(int)), this, SLOT(lightBoxImportButtonClicked(int)));
+
+      m_LightBoxImportButtons.push_back( toolbutton ); // we need to know these for import of lightboxes
+      vertlayout->addWidget( toolbutton );
+  
+      if (row < m_MITKPluginInstance->m_LightBoxCount)
+      {
+        toolbutton->show();
+      }
+      else
+      {
+        toolbutton->hide();
+      }
+     }
+     
+    // unused toggle button. How to hide without integrating the hide/show button into the actual application?
+    m_LightBoxImportToggleButton = new QToolButton( task );
+    m_LightBoxImportToggleButton->setText(" "); // just some space that generates one short empty line of text
+    //m_LightBoxImportToggleButton->setToggleButton(true);
+    //m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_lightbox_import) );
+    m_LightBoxImportToggleButton->setAutoRaise(true);
+    m_LightBoxImportToggleButton->setEnabled(false);
+    QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
+    policy.setVerStretch( 1 );
+    m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());
+    vertlayout->addWidget( m_LightBoxImportToggleButton );
+
+    // create one instance of SampleApp
     app = new SampleApp( task, "sample", 0 );
-    layout->addWidget( app );
+    horzlayout->addWidget( app ); // fromRow, toRow, fromCol, toCol
 
     done = true;
   }
@@ -267,5 +341,48 @@ ipBool_t QcMITKSamplePlugin::GlobalIterateSeriesCallback( int rows, int row, ser
   callingObject->m_MITKPluginInstance->m_CurrentSeries.push_back( newSeries );
 
   return ipTrue; // enum from ipTypes.h
+}
+
+void QcMITKSamplePlugin::lightBoxImportButtonClicked(int row)
+{
+  std::cout << "clicked " << row << std::endl;
+  QPtrList<QcLightbox>& lightboxes = QcPlugin::lightboxManager()->getLightboxes();
+  QcLightbox* selectedLightbox = lightboxes.at(row);
+  if (selectedLightbox)
+  {
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    mitk::LightBoxImageReader::Pointer reader = mitk::LightBoxImageReader::New();
+    reader->SetLightBox( selectedLightbox );
+    mitk::Image::Pointer image = reader->GetOutput();
+    image->Update();
+  QApplication::restoreOverrideCursor();
+  
+    if( image->IsInitialized() )
+    {
+      // add to scene
+      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();                                         // create a new empty node
+      node->SetData( image );
+      mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
+      node->SetProperty( "name", new mitk::StringProperty( reader->GetSeriesDescription() ) );
+      mitk::ChiliPlugin::GetInstance()->SetPropertyToNode( reader->GetPropertyList(), node.GetPointer() );
+      mitk::DataStorage::GetInstance()->Add( node );
+
+      // stupid, that this is still necessary
+      mitk::DataTreePreOrderIterator treeiter( app->GetTree() );
+      app->GetMultiWidget()->InitializeStandardViews( &treeiter );
+      app->GetMultiWidget()->Fit();
+      app->GetMultiWidget()->ReInitializeStandardViews();
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else
+    {
+      QMessageBox::information(NULL, "MITK", "Couldn't read this image. \n\nIf you feel this should be possible, report a bug to mitk-users@lists.sourceforge.net", QMessageBox::Ok);
+    }
+  }
+  else
+  {
+    std::cerr << "Lightbox import selected for lightbox #" << row << ", but lightbox manager doesn't know this lightbox." << std::endl;
+  }
 }
 

@@ -8,8 +8,13 @@
 #include <ipMsg/ipMsgTypes.h>
 #include <ipPic/ipTypes.h>
 
+#include <qtoolbutton.h>
+
+#include <vector>
+
 class QcMITKTask;
 class SampleApp;
+class QIDToolButton;
 
 class QcEXPORT QcMITKSamplePlugin: public QcPlugin
 {
@@ -45,7 +50,9 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
 
     // still undocumented slot of QcPlugin
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
-
+    
+    // called when a lightbox import button is clicked
+    void lightBoxImportButtonClicked(int row);
   protected:
 
     // teleconference methods
@@ -63,6 +70,41 @@ class QcEXPORT QcMITKSamplePlugin: public QcPlugin
     static QcPlugin* s_QmitkPluginInstance;
 
     mitk::ChiliPluginImpl* m_MITKPluginInstance;
+
+    std::vector<QIDToolButton*> m_LightBoxImportButtons;
+    QToolButton* m_LightBoxImportToggleButton;
 };
+
+class QIDToolButton : public QToolButton
+{
+
+  Q_OBJECT
+
+  public:
+
+    QIDToolButton( int id, QWidget* parent = NULL, const char* name = NULL )
+    : QToolButton(parent, name),
+      m_ID(id)
+    {
+    }
+
+    virtual ~QIDToolButton()
+    {
+    }
+
+  signals:
+    void clicked(int);
+
+  protected:
+
+    virtual void mouseReleaseEvent ( QMouseEvent* e )
+    {
+      QToolButton::mouseReleaseEvent(e);
+      emit clicked(m_ID);
+    }
+
+    int m_ID;
+};
+
 
 #endif

@@ -17,7 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkPiecewiseFunctionCanvas.h"
+#include <qstring.h>
 #include <qpainter.h>
+#include <qlineedit.h>
 
 QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QmitkTransferFunctionCanvas(parent,name,f), m_PiecewiseFunction(0) { 
 
@@ -49,18 +51,21 @@ void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
         painter.setPen( Qt::black );
         painter.drawLine(point.first,point.second,nextPoint.first,nextPoint.second);
       }
-      painter.setPen( Qt::black );
       
       if(i == m_GrabbedHandle)
       {
         painter.setBrush(QBrush(Qt::red));
-        //std::cout<<"RED X: "<<GetFunctionX(m_GrabbedHandle)<<"RED Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
+        //std::cout<<"RED X: "<<GetFunctionX(m_GrabbedHandle)<<" RED Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
+ 
+        m_TFWidget->GetEditX()->clear();
+        m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
+        m_TFWidget->GetEditY()->clear();
+        m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
       }
       else
       {
         painter.setBrush(QBrush(Qt::green));
       }
-      //painter.setBrush( (i == m_GrabbedHandle) ? QBrush(Qt::red) : QBrush(Qt::green));
       painter.drawEllipse(point.first-4,point.second-4,8,8);
     }
     painter.setBrush(Qt::NoBrush);

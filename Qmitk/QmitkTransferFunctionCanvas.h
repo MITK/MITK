@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <math.h>
 
+#include "QmitkTransferFunctionWidget.h"
+
 #include <vtkPiecewiseFunction.h>
 
 
@@ -112,10 +114,16 @@ class QmitkTransferFunctionCanvas : public QWidget
     
     void SetImmediateUpdate(bool state);
     
+    void SetTFWidget(QmitkTransferFunctionWidget* widget)
+    {
+      m_TFWidget = widget;
+    }
+    
   protected: 
     bool m_UpdateHistogram;
     bool m_ImmediateUpdate;
     float m_Range;
+    QmitkTransferFunctionWidget* m_TFWidget;
 };
 #endif
 

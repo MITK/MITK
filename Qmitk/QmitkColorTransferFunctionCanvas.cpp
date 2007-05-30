@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkColorTransferFunctionCanvas.h"
 #include <qpainter.h>
+#include <qlineedit.h>
 #include <qcolordialog.h>
 #include <mitkRenderingManager.h>
 
@@ -49,12 +50,21 @@ void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* ) {
     // now paint the handles
     painter.setBrush(Qt::black);
     painter.setPen(Qt::black);
-    for (int i=0 ; i<this->GetFunctionSize(); i++) {
+    for (int i=0 ; i<this->GetFunctionSize(); i++) 
+    {
       int handleHeight = (i == m_GrabbedHandle) ? (int)(height() / 1.5) : height() / 2;
       int handleWidth= (i == m_GrabbedHandle) ? 6 : 4;
       std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(GetFunctionX(i),0.0f));
       int y = height() / 2;
       painter.drawRoundRect(point.first-handleWidth/2,y-handleHeight/2,handleWidth,handleHeight,50,50);
+      
+      if(i == m_GrabbedHandle)
+      {
+        m_TFWidget->GetEditX()->clear();
+        m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
+        m_TFWidget->GetEditY()->clear();
+        m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+      }
     }
   }
   painter.restore();

@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>354</width>
+            <width>345</width>
             <height>544</height>
         </rect>
     </property>
@@ -68,6 +68,62 @@
                     <height>200</height>
                 </size>
             </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout25</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_textLabelX</cstring>
+                    </property>
+                    <property name="text">
+                        <string>X</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>m_XEdit</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer34</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>30</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_textLabelY</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Y</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>m_YEdit</cstring>
+                    </property>
+                </widget>
+            </hbox>
         </widget>
         <widget class="QLabel">
             <property name="name">
@@ -312,6 +368,8 @@
     <function>ChooseCS( int cstyle )</function>
     <function>ResetCS()</function>
     <function>AddCS()</function>
+    <function returnType="QLineEdit *">GetEditX()</function>
+    <function returnType="QLineEdit *">GetEditY()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

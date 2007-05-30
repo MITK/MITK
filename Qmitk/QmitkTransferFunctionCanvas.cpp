@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 
 #include <qcolordialog.h>
+#include <qpixmap.h>
 
 #include <sstream>
 #include <iostream>
@@ -172,7 +173,12 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
           int y = static_cast<int>( ( 1 - vcl_log(freq) / maxFreqLog ) * height() );
           //std::cout<<" y: "<<y<<std::endl;
           //p.drawLine(x-width()*0.5,height(),x-width()*0.5,y);
+
+          p.setPen(Qt::blue);
           p.drawLine(x,height(),x,y);
+
+
+
         }
       }
       p.restore();

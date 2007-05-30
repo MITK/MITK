@@ -26,11 +26,15 @@ mitk::LightBoxResultImageWriter::~LightBoxResultImageWriter()
 {
 }
 
-void mitk::LightBoxResultImageWriter::SetInput(const mitk::Image *)
+void mitk::LightBoxResultImageWriter::SetInput( const mitk::Image* )
 {
 }
 
-void mitk::LightBoxResultImageWriter::SetLevelWindow(LevelWindow levelwindow)
+void mitk::LightBoxResultImageWriter::SetInputByDataTreeNode( const mitk::DataTreeNode* )
+{
+}
+
+void mitk::LightBoxResultImageWriter::SetLevelWindow( LevelWindow levelwindow )
 {
 }
 
@@ -38,7 +42,11 @@ void mitk::LightBoxResultImageWriter::SetSeriesDescription( const std::string& )
 {
 }
 
-void mitk::LightBoxResultImageWriter::SetLightBox(QcLightbox* )
+void mitk::LightBoxResultImageWriter::SetPropertyList( const mitk::PropertyList::Pointer )
+{
+}
+
+void mitk::LightBoxResultImageWriter::SetLightBox( QcLightbox* )
 {
 }
 

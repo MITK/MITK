@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLightBoxResultImageWriterImpl.h"
-#include "mitkChiliPlugin.h"
 
 //ChiliIncludes
 #include <chili/plugin.h>
@@ -27,10 +26,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPicTags.h>
 //reading single-slices
 #include <mitkImageSliceSelector.h>
-#include <list>
 //geometry
 #include <chili/isg.h>
 #include <mitkFrameOfReferenceUIDManager.h>
+
+#include <mitkPropertyList.h>
+#include <mitkGenericProperty.h>
+#include <mitkLevelWindowProperty.h>
 
 mitk::LightBoxResultImageWriterImpl::LightBoxResultImageWriterImpl()
 {
@@ -38,22 +40,47 @@ mitk::LightBoxResultImageWriterImpl::LightBoxResultImageWriterImpl()
   m_LevelWindow = -1;
   m_Image = NULL;
   m_SeriesDescription = "";
+  m_PropertyList = NULL;
 }
 
 mitk::LightBoxResultImageWriterImpl::~LightBoxResultImageWriterImpl()
 {
 }
 
-void mitk::LightBoxResultImageWriterImpl::SetInput(const mitk::Image* image)
+void mitk::LightBoxResultImageWriterImpl::SetInput( const mitk::Image* image )
 {
-  m_Image=image;
+  m_Image = image;
 }
 
-void mitk::LightBoxResultImageWriterImpl::SetLightBox(QcLightbox* lightbox)
+void mitk::LightBoxResultImageWriterImpl::SetInputByDataTreeNode( const mitk::DataTreeNode* node )
 {
-  if(lightbox!=m_LightBox)
+  if ( node )
   {
-    m_LightBox=lightbox;
+    mitk::BaseData* data = node->GetData();
+    if ( data )
+    {
+      mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+      if ( image )
+      {
+        m_Image = image;
+        m_PropertyList = node->GetPropertyList();
+        m_SeriesDescription = node->GetPropertyList()->GetProperty( "name" )->GetValueAsString();
+        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>( node->GetProperty("levelwindow").GetPointer() );
+        if( levelWindowProperty.IsNotNull() )
+          m_LevelWindow = levelWindowProperty->GetLevelWindow();
+        else
+          m_LevelWindow = -1;
+      }
+      else m_Image = NULL;
+    }
+  }
+}
+
+void mitk::LightBoxResultImageWriterImpl::SetLightBox( QcLightbox* lightbox )
+{
+  if(lightbox != m_LightBox)
+  {
+    m_LightBox = lightbox;
     Modified();
   }
 }
@@ -66,225 +93,246 @@ void mitk::LightBoxResultImageWriterImpl::SetSeriesDescription( const std::strin
 void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 {
   QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
-  if(plugin==NULL)
+  if( plugin == NULL )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
-  SetLightBox(plugin->lightboxManager()->getActiveLightbox());
+  SetLightBox( plugin->lightboxManager()->getActiveLightbox() );
 }
 
 bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToNewLightBox()
 {
   QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
-  if(plugin==NULL)
+  if( plugin == NULL )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
   int lightboxCount = plugin->lightboxManager()->getLightboxes().count();
   QcLightbox * newLightbox;
-  for (int i = 0; i < lightboxCount; i++)
+  for( int i = 0; i < lightboxCount; i++ )
   {
     newLightbox = plugin->lightboxManager()->getLightboxes().at(i);
-    if (newLightbox->getFrames() == 0)
+    if( newLightbox->getFrames() == 0 )
     {
       newLightbox->activate();
       newLightbox->show();
-      SetLightBox(newLightbox);
+      SetLightBox( newLightbox );
       return true;
     }
   }
   return false;
 }
 
-void mitk::LightBoxResultImageWriterImpl::SetLevelWindow(LevelWindow levelwindow)
+void mitk::LightBoxResultImageWriterImpl::SetLevelWindow( LevelWindow levelwindow )
 {
-  if(m_LevelWindow!=levelwindow)
+  if( m_LevelWindow!=levelwindow )
   {
     m_LevelWindow = levelwindow;
     Modified();
   }
 }
 
+void mitk::LightBoxResultImageWriterImpl::SetPropertyList( const mitk::PropertyList::Pointer property )
+{
+  m_PropertyList = property;
+}
+
+ipPicTSV_t* mitk::LightBoxResultImageWriterImpl::CreateASCIITag( std::string Description, std::string Content )
+{
+  if( Description != NULL && Content != NULL )
+  {
+    //create the ASCII-tags
+    ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+    strcpy( tsv->tag, Description.c_str() );
+    tsv->type = ipPicASCII;
+    tsv->bpe = 8;
+    tsv->dim = 1;
+    tsv->value = strdup( Content.c_str() );
+    tsv->n[0] = strlen( Content.c_str() );
+    return tsv;
+  }
+  else return 0;
+}
+
+ipPicTSV_t* mitk::LightBoxResultImageWriterImpl::CreateIntTag( std::string Description, int Content )
+{
+  if( Description != NULL )
+  {
+    //create the ASCII-tags
+    int* IntTag = new int( Content );
+    ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+    strcpy( tsv->tag, Description.c_str() );
+    tsv->type = ipPicInt;
+    tsv->bpe = 32;
+    tsv->dim = 1;
+    tsv->value = IntTag;
+    tsv->n[0] = 1;
+    return tsv;
+  }
+  else return 0;
+}
+
+ipPicTSV_t* mitk::LightBoxResultImageWriterImpl::CreateUIntTag( std::string Description, int Content )
+{
+  if( Description != NULL )
+  {
+    int* UIntTag = new int( Content );
+    ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+    strcpy( tsv->tag, Description.c_str() );
+    tsv->type = ipPicUInt;
+    tsv->bpe = 8;
+    tsv->dim = 1;
+    tsv->value = UIntTag;
+    tsv->n[0] = 1;
+    return tsv;
+  }
+  else return 0;
+}
+
+void mitk::LightBoxResultImageWriterImpl::DeleteTag( ipPicDescriptor* cur, std::string Description )
+{
+  if( Description != NULL && cur != NULL )
+  {
+    //search
+    ipPicTSV_t* tag = ipPicQueryTag( cur, (char*)Description.c_str() );
+    if( tag != NULL )
+    {
+      //delete if exist
+      ipPicTSV_t *tsvSH;
+      tsvSH = ipPicDelTag( cur, (char*)Description.c_str() );
+      ipPicFreeTag(tsvSH);
+    }
+  }
+}
+
 void mitk::LightBoxResultImageWriterImpl::Write()
 {
-  //reasons to abort
+  //check + default
   if( m_Image == NULL )
   {
-    std::cout<< "Image not set." <<std::endl;
+    std::cout<< "No input set." <<std::endl;
     return;
   }
   mitk::ChiliPlugin::StudyInformation CurrentStudy = mitk::ChiliPlugin::GetInstance()->GetCurrentStudy();
-  if( CurrentStudy.StudyInstanceUID == "" )
+  if( CurrentStudy.InstanceUID == "" )
   {
     std::cout<< "There is no Study (no StudyInstanceUID) selected." <<std::endl;
     return;
   }
-  //check the input
+
   if( m_LevelWindow == -1 )
     m_LevelWindow.SetAuto( m_Image );
   if( m_LightBox == NULL )
     SetLightBoxToNewLightBox();
   if( m_SeriesDescription == "" )
     m_SeriesDescription = "empty";
-
-  bool firstTime = true;
-  ipPicDescriptor* firstSlice = new ipPicDescriptor();
-
   m_LightBox->clear();
 
-  //captions and content for the tags
+  //used var
+  ipPicDescriptor* cur;
+  int s, t;
+  int smax, tmax;
+  int number = 1;
+  bool firstTime = true;
+  ImageSliceSelector::Pointer resultslice = ImageSliceSelector::New();
+  ipPicDescriptor* firstSlice = new ipPicDescriptor();
+  mitk::SlicedGeometry3D* SlicedGeometry;
+  mitk::Geometry3D* geometry3DofSlice;
+  Point3D origin;
+  Vector3D v;
+  interSliceGeometry_t isg;
+
+  //captions and content for the tags which are needed to create a new series; DONT CHANGE!!!
   std::string MyTags[6][2]=
   {
     { tagMODALITY, CurrentStudy.Modality },
-    { tagSTUDY_DESCRIPTION, CurrentStudy.StudyDescription },
-    { tagSTUDY_DATE, CurrentStudy.StudyDate },
-    { tagSTUDY_TIME, CurrentStudy.StudyTime },
-    { tagSTUDY_INSTANCE_UID, CurrentStudy.StudyInstanceUID },
+    { tagSTUDY_DESCRIPTION, CurrentStudy.Description },
+    { tagSTUDY_DATE, CurrentStudy.Date },
+    { tagSTUDY_TIME, CurrentStudy.Time },
+    { tagSTUDY_INSTANCE_UID, CurrentStudy.InstanceUID },
     { tagSERIES_DESCRIPTION, m_SeriesDescription.c_str() }
+    // tagSERIES_NUMBER --> is int (look at line266)
   };
 
   typedef std::list<ipPicTSV_t*> TagList;
+  //this is the list with all needed chilitags; m_PropertyList is the list of additional chilitags which are important for the patient and dataset
   TagList* MyTagList = new TagList();
 
   for(int x = 0; x < 6; x++)
   {
-     //create the ASCII-tags
-     ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-     strcpy( tsv->tag, MyTags[x][0].c_str() );
-     tsv->type = ipPicASCII;
-     tsv->bpe = 8;
-     tsv->dim = 1;
-     tsv->value = strdup( MyTags[x][1].c_str() );
-     tsv->n[0] = strlen( MyTags[x][1].c_str() );
-     //add to list
-     MyTagList->push_back( tsv );
+    MyTagList->push_back( CreateASCIITag( MyTags[x][0], MyTags[x][1] ) );  //add ASCII-Tags to list
   }
-  //SERIES NUMBER is an INT-tag
-  int* tagSeriesNumber = new int( mitk::ChiliPlugin::GetInstance()->GetCurrentSeries().size()+1 );
-  ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-  strcpy( tsv->tag, tagSERIES_NUMBER );
-  tsv->type = ipPicInt;
-  tsv->bpe = 32;
-  tsv->dim = 1;
-  tsv->value = tagSeriesNumber;
-  tsv->n[0] = 1;
-  MyTagList->push_back( tsv );
+  MyTagList->push_back( CreateIntTag( tagSERIES_NUMBER, mitk::ChiliPlugin::GetInstance()->GetCurrentSeries().size()+1 ) );  //SERIES NUMBER is an INT-tag
 
-  ipPicDescriptor *cur;
-  ipPicTSV_t* tag;
-  int s, t;
-  int smax, tmax;
-  int number = 1;
-
-  ImageSliceSelector::Pointer resultslice = ImageSliceSelector::New();
   resultslice->SetInput( m_Image );
   smax = m_Image->GetDimension(2);
   tmax = m_Image->GetDimension(3);
 
   //GeomtryInformation
-  mitk::SlicedGeometry3D* SlicedGeometry;
-  mitk::Geometry3D* geometry3DofSlice;
-  Point3D origin;
-  Vector3D v;
-
   SlicedGeometry = m_Image->GetSlicedGeometry();
   origin = SlicedGeometry->GetCornerPoint();
-
-  interSliceGeometry_t isg;
   memcpy(isg.forUID, mitk::FrameOfReferenceUIDManager::GetFrameOfReferenceUID(SlicedGeometry->GetFrameOfReferenceID()), 128);
   isg.psu = ipPicUtilMillimeter;
 
-  //Slices
-  for( s = smax-1; s >= 0; --s )
+  for( s = smax-1; s >= 0; --s )  //Slices
   {
     resultslice->SetSliceNr(s);
-    //Time
-    for( t = 0; t < tmax; ++t )
+    for( t = 0; t < tmax; ++t )  //Time
     {
       resultslice->SetTimeNr(t);
       resultslice->Update();
-      cur = ipPicClone(resultslice->GetOutput()->GetPic());
+      cur = ipPicClone( resultslice->GetOutput()->GetPic() );
 
-      //the first slice got a new pic-header, the other become a copy
-      if( firstTime )
+      if( firstTime )  //the first slice got a new pic-header, the other become a copy of the first one
       {
-        firstTime = false;
         //to create a new series use addTags( ..., ..., true)
         //we want to create one new series, so we use this for the first slice only (for the other slices look at --> else ... )
         QcPlugin::addTags( cur, cur, true );
-
-        while( !MyTagList->empty() )
+        while( !MyTagList->empty() )  //thats the needed tags to save
         {
-          //if one tag which we created always exist
-          char* tagName = MyTagList->front()->tag;
-          tag = ipPicQueryTag( cur, tagName );
-          if( tag != NULL )
-          {
-            //delete it
-            ipPicTSV_t *tsvSH;
-            tsvSH = ipPicDelTag( cur, tagName );
-            ipPicFreeTag(tsvSH);
-          }
-          //add own tag
+          //delete tag (if exist) and add our own
+          DeleteTag( cur, MyTagList->front()->tag );
           ipPicAddTag( cur, MyTagList->front() );
           MyTagList->pop_front();
         }
-        //save the first slice
-        firstSlice = cur;
+        firstSlice = cur;  //save the first slice
+        firstTime = false;
       }
       else QcPlugin::addTags ( cur, firstSlice , false );
 
-      //delete the SOURCE HEADER if exist
-      tag = ipPicQueryTag( cur, "SOURCE HEADER" );
-      if( tag != NULL )
+      //add the properties from the list; thats the additianal tags
+      if( m_PropertyList.IsNotNull() )
       {
-        ipPicTSV_t *tsvSH;
-        tsvSH = ipPicDelTag( cur, "SOURCE HEADER" );
-        ipPicFreeTag(tsvSH);
+        std::string Description;
+        for( mitk::PropertyList::PropertyMap::const_iterator iter = m_PropertyList->GetMap()->begin(); iter != m_PropertyList->GetMap()->end(); iter++ )
+        {
+          if( !iter->first.find("Chili: ", 0) )
+          {
+            Description = iter->first;
+            Description = Description.erase( 0, 7 );  //delete "Chili: " from Description
+            DeleteTag( cur, Description );
+            mitk::BaseProperty* unknownProperty = NULL;
+            unknownProperty = iter->second.first;
+            if( mitk::StringProperty* StringProp = dynamic_cast<mitk::StringProperty*>( unknownProperty ) )
+              ipPicAddTag( cur, CreateASCIITag( Description, StringProp->GetValueAsString() ) );
+            else
+              if( mitk::GenericProperty<int>* IntProp = dynamic_cast<mitk::GenericProperty<int>*>( unknownProperty ) )
+                if( Description == tagPATIENT_SEX ) //actually the only one with type ipPicUInt
+                  ipPicAddTag( cur, CreateUIntTag( Description, IntProp->GetValue() ) );
+                else
+                  ipPicAddTag( cur, CreateIntTag( Description, IntProp->GetValue() ) );
+          }
+        }
       }
 
-      //delete the IMAGE NUMBER
-      tag = ipPicQueryTag( cur, tagIMAGE_NUMBER );
-      if( tag != NULL )
-      {
-        ipPicTSV_t *tsvSH;
-        tsvSH = ipPicDelTag( cur, tagIMAGE_NUMBER );
-        ipPicFreeTag(tsvSH);
-      }
-      //create a new one
-      int* tagImageNumber = new int(number);
-      ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-      strcpy( tsv->tag, tagIMAGE_NUMBER );
-      tsv->type = ipPicInt;
-      tsv->bpe = 32;
-      tsv->dim = 1;
-      tsv->value = tagImageNumber;
-      tsv->n[0] = 1;
-      ipPicAddTag( cur, tsv );
+      DeleteTag( cur, "SOURCE HEADER" );  //delete the SOURCE HEADER (thats the binary Dicom-Header)
+      DeleteTag( cur, tagIMAGE_NUMBER );  //delete the IMAGE NUMBER and create a new one
+      ipPicAddTag( cur, CreateIntTag( tagIMAGE_NUMBER, number ) );
       number++;
-
-      //delete the STUDY ID
-      tag = ipPicQueryTag( cur, tagSTUDY_ID );
-      if( tag != NULL )
-      {
-        ipPicTSV_t *tsvSH;
-        tsvSH = ipPicDelTag( cur, tagSTUDY_ID );
-        ipPicFreeTag(tsvSH);
-      }
-      //create a new one (QcPlugin::addTag dont copy it)
-      ipPicTSV_t* tsv1 = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-      strcpy( tsv1->tag, tagSTUDY_ID );
-      tsv1->type = ipPicASCII;
-      tsv1->bpe = 8;
-      tsv1->dim = 1;
-      tsv1->value = strdup( CurrentStudy.StudyID.c_str() );
-      tsv1->n[0] = strlen( CurrentStudy.StudyID.c_str() );
-      ipPicAddTag( cur, tsv1 );
-
-      //create an icon for the lightbox
-      QcPlugin::addIcon( cur, true );
-      //Level/Window
-      QcPlugin::addLevelWindow( cur, (int)(m_LevelWindow.GetLevel()), (int)(m_LevelWindow.GetWindow()) );
+      DeleteTag( cur, tagSTUDY_ID );  //delete the STUDY ID and create a new one (QcPlugin::addTag dont copy it)
+      ipPicAddTag( cur, CreateASCIITag( tagSTUDY_ID, CurrentStudy.ID ) );
+      QcPlugin::addIcon( cur, true );  //create an icon for the lightbox
+      QcPlugin::addLevelWindow( cur, (int)(m_LevelWindow.GetLevel()), (int)(m_LevelWindow.GetWindow()) );  //add the Level/Window
 
       //create the GeometryInformation
       geometry3DofSlice = SlicedGeometry->GetGeometry2D(s);
@@ -298,12 +346,10 @@ void mitk::LightBoxResultImageWriterImpl::Write()
       isg.ps[0]=v.GetNorm();
       v/=isg.ps[0];
       itk2vtk(v, isg.u);
-
       v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(1));
       isg.ps[1]=v.GetNorm();
       v/=isg.ps[1];
       itk2vtk(v, isg.v);
-
       v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(2));
       isg.ps[2]=v.GetNorm();
       v/=isg.ps[2];
@@ -311,10 +357,8 @@ void mitk::LightBoxResultImageWriterImpl::Write()
 
       cur->dim = 2;
 
-      //create the Dicom-Header with the GeomtryInformation
-      QcPlugin::addDicomHeader( cur, &isg );
-      //add the pic to the lightbox
-      m_LightBox->addImage( cur );
+      QcPlugin::addDicomHeader( cur, &isg );  //create the Dicom-Header with the GeomtryInformation
+      m_LightBox->addImage( cur );  //add the pic to the lightbox
     }
   }
   delete MyTagList;

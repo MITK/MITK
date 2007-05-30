@@ -53,6 +53,11 @@ QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
     command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliStudySelected );
     plugin->AddObserver( mitk::PluginStudySelected(), command );
+
+    //itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer 
+    command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
+    command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliLightBoxCountChanged );
+    plugin->AddObserver( mitk::PluginLightBoxCountChanged(), command );
   }
 }
 
@@ -130,6 +135,7 @@ void QmitkLoadSaveToChiliExample::LoadFromLightbox()
     node->SetData( image );
     mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
     node->SetProperty( "name", new mitk::StringProperty( reader->GetSeriesDescription() ) );
+    mitk::ChiliPlugin::GetInstance()->SetPropertyToNode( reader->GetPropertyList(), node.GetPointer() );
     mitk::DataStorage::GetInstance()->Add( node /* , parent */ );
     //initialize the multiwidget (input changed)
     m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
@@ -170,6 +176,8 @@ void QmitkLoadSaveToChiliExample::SaveToLightbox()
           writer->SetLevelWindow( levelWindowProperty->GetLevelWindow() );
         //->the seriesdescription
         writer->SetSeriesDescription( node->GetPropertyList()->GetProperty( "name" )->GetValueAsString() );
+        //->set the propertylist
+        writer->SetPropertyList( node->GetPropertyList() );
         //->the lightbox to write
         writer->SetLightBoxToNewLightBox();
         //->you have to set the image, the other inputs get set automatically if there are empty
@@ -193,7 +201,7 @@ void QmitkLoadSaveToChiliExample::ImageSelected( mitk::DataTreeIteratorClone ima
 void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
 {
   //show the studydescription
-  m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentStudy().StudyDescription.c_str() );
+  m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentStudy().Description.c_str() );
   //clear the listview
   m_Controls->ListView->clear();
   //get the current serieslist and iterate
@@ -201,11 +209,17 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
   for( mitk::ChiliPlugin::SeriesList::iterator iter = temp.begin(); iter != temp.end(); iter++)
   {
     //if there are no description show "no description" else show the saved one
-    if( iter->SeriesDescription == "" )
-      QListViewItem* item = new QListViewItem( m_Controls->ListView, "no description" );
-    else QListViewItem* item = new QListViewItem( m_Controls->ListView, iter->SeriesDescription.c_str() );
+    if( iter->Description == "" )
+      new QListViewItem( m_Controls->ListView, "no description" );
+    else new QListViewItem( m_Controls->ListView, iter->Description.c_str() );
   }
 }
+
+void QmitkLoadSaveToChiliExample::chiliLightBoxCountChanged( const itk::EventObject& )
+{
+  std::cout<< "active lightbox(es): " << mitk::ChiliPlugin::GetInstance()->GetLightBoxCount() <<std::endl;
+}
+
 
 void QmitkLoadSaveToChiliExample::TreeChanged()
 {

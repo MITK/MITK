@@ -16,54 +16,70 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
 #define MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
 
-#include <itkObject.h>
-#include <itkObjectFactory.h>
-#include <mitkCommon.h>
 #include <mitkChiliPlugin.h>
 
 class QcPlugin;
 
 namespace mitk {
 
+  /**Documentation
+  @brief interface between Chili and MITK
+  @ingroup Process
+  @ingroup Chili
+  */
+
 class ChiliPluginImpl : public ChiliPlugin
-
 {
-public:
+  public:
 
-  virtual StudyInformation GetCurrentStudy();
-  virtual SeriesList GetCurrentSeries();
+    /** return the StudyInformation of the current selected study */
+    virtual StudyInformation GetCurrentStudy();
+    /** return the list of the series to the current selected study */
+    virtual SeriesList GetCurrentSeries();
+    /** return the number of Lightboxes in chili */
+    virtual unsigned int GetLightBoxCount();
 
-  virtual bool IsPlugin();
-  virtual int GetConferenceID();
+    /** return if the application run as standalone or as chiliplugin*/
+    virtual bool IsPlugin();
+    /** return the conferenceid */
+    virtual int GetConferenceID();
 
-  virtual QcPlugin* GetPluginInstance();
+    /** Set the properties from the list to the datatreenode. The description of the properties get the prefix "Chili: ". */
+    virtual void SetPropertyToNode( const mitk::PropertyList::Pointer property, mitk::DataTreeNode* );
 
-  mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
-  itkNewMacro(ChiliPluginImpl);
-  virtual ~ChiliPluginImpl();
+    /** return the PluginInstance */
+    virtual QcPlugin* GetPluginInstance();
 
-protected:
+    mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
+    itkNewMacro(ChiliPluginImpl);
+    virtual ~ChiliPluginImpl();
 
-  friend class QcMITKSamplePlugin;
+  protected:
 
-  virtual void SetPluginInstance(QcPlugin* instance);
+    /** someone have to set the study- and seriesinformation and the instance */
+    friend class QcMITKSamplePlugin;
 
-  void SendStudySelectedEvent();
-  //void SendSeriesSelectedEvent();
-  //..
+    virtual void SetPluginInstance(QcPlugin* instance);
 
-  ChiliPluginImpl::ChiliPluginImpl();
+    /** Invoke an event if a study selected and the information about the study and series changed */
+    void SendStudySelectedEvent();
+    void SendLightBoxCountChangedEvent();
+    //void SendSeriesSelectedEvent();
+    //..
 
-  StudyInformation m_CurrentStudy;
-  SeriesList m_CurrentSeries;
+    ChiliPluginImpl::ChiliPluginImpl();
 
-private:
+    StudyInformation m_CurrentStudy;
+    SeriesList m_CurrentSeries;
+    unsigned int m_LightBoxCount;
 
-  static QcPlugin* s_PluginInstance;
+  private:
+
+    /** make the plugin a singleton */
+    static QcPlugin* s_PluginInstance;
 
 };
 

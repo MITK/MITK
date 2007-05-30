@@ -15,17 +15,17 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
 #ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
+#include <list>
 
 #include "mitkChiliPluginEvents.h"
-
-#include "mitkImage.h"
-#include <mitkLevelWindow.h>
+#include <mitkDataTreeNode.h>
 
 class QcPlugin;
 class QcMITKSamplePlugin;
@@ -47,53 +47,98 @@ typedef enum
   MOUSEMOVEc ,
 } ConfMsgType;
 
+  /** Documentation
+  @brief interface between Chili and MITK
+  @ingroup IO
+  @ingroup Chili
+
+  this is the default-implementation, for the real implementation look at mitkChiliPluginImpl
+  */
+
 class ChiliPlugin : public itk::Object
 {
-public:
+  public:
 
- struct StudyInformation
-  {
-    std::string StudyInstanceUID;
-    std::string StudyDescription;
-    std::string StudyID;
-    std::string StudyDate;
-    std::string StudyTime;
-    std::string Modality;
-  };
+    /** This struct contain all possible informations about the studies. */
+    struct StudyInformation
+    {
+      std::string OID;
+      std::string InstanceUID;
+      std::string ID;
+      std::string Date;
+      std::string Time;
+      std::string Modality;
+      std::string Manufacturer;
+      std::string ReferingPhysician;
+      std::string Description;
+      std::string ManufacturersModelName;
+      std::string ImportTime;
+      std::string ChiliSenderID;
+      std::string AccessionNumber;
+      std::string InstitutionName;
+      std::string WorkflowState;
+      std::string Flags;
+      std::string PerformingPhysician;
+      std::string ReportingPhysician;
+      std::string LastAccess;
+    };
 
- struct SeriesInformation
-  {
-    std::string SeriesDescription;
-    std::string SeriesUID;
-    std::string Seriesiod;
-  };
+    /** This struct contain all possible informations about the series. */
+    struct SeriesInformation
+    {
+      std::string IOD;
+      std::string InstanceUID;
+      std::string Number;
+      std::string Acquisition;
+      std::string EchoNumber;
+      std::string TemporalPosition;
+      std::string Date;
+      std::string Time;
+      std::string Description;
+      std::string Contrast;
+      std::string BodyPartExamined;
+      std::string ScanningSequence;
+      std::string FrameOfReferenceUID;
+    };
 
-  typedef std::list<SeriesInformation> SeriesList;
+    /** there can be a lot´s of series to one study, so we need a list */
+    typedef std::list<SeriesInformation> SeriesList;
 
-  virtual StudyInformation GetCurrentStudy();
-  virtual SeriesList GetCurrentSeries();
+    /** return the StudyInformation of the current selected study */
+    virtual StudyInformation GetCurrentStudy();
+    /** return the list of the series to the current selected study */
+    virtual SeriesList GetCurrentSeries();
+    /** return the number of Lightboxes in chili */
+    virtual unsigned int GetLightBoxCount();
 
-  virtual bool IsPlugin();
-  virtual int GetConferenceID();
+    /** return if the application run as standalone or as chiliplugin*/
+    virtual bool IsPlugin();
+    /** return the conferenceid */
+    virtual int GetConferenceID();
 
-  virtual QcPlugin* GetPluginInstance();
-  static ChiliPlugin* GetInstance();
+    /** Set the properties from the list to the datatreenode. The description of the properties get the prefix "Chili: ". */
+    virtual void SetPropertyToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* );
 
-  mitkClassMacro(ChiliPlugin,itk::Object);
-  itkNewMacro(ChiliPlugin);
-  virtual ~ChiliPlugin();
+    /** return the PluginInstance */
+    virtual QcPlugin* GetPluginInstance();
+    /** return the Plugin */
+    static ChiliPlugin* GetInstance();
 
-protected:
+    mitkClassMacro( ChiliPlugin,itk::Object );
+    itkNewMacro( ChiliPlugin );
+    virtual ~ChiliPlugin();
 
-  friend class QcMITKSamplePlugin;
+  protected:
 
-  virtual void SetPluginInstance(QcPlugin* instance);
+    /** someone have to set the study- and seriesinformation and the instance */
+    friend class QcMITKSamplePlugin;
 
-  ChiliPlugin();
+    virtual void SetPluginInstance( QcPlugin* instance );
+
+    ChiliPlugin();
 
 };
 
 } // namespace mitk
 
 #endif /* MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD */
-

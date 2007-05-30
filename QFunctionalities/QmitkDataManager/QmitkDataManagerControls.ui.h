@@ -199,7 +199,7 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
           if(image.IsNotNull())
           {
             mitk::LightBoxResultImageWriter::Pointer lbwriter =  mitk::LightBoxResultImageWriter::New();
-            lbwriter->SetInput( image );
+            lbwriter->SetInputByDataTreeNode( node );
             lbwriter->SetLightBoxToCurrentLightBox();
             lbwriter->Write();
           }

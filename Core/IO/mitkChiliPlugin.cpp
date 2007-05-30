@@ -41,6 +41,11 @@ QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
   return 0;
 }
 
+unsigned int mitk::ChiliPlugin::GetLightBoxCount()
+{
+  return 0;
+}
+
 mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetCurrentStudy()
 {
   mitk::ChiliPlugin::StudyInformation emptyList;
@@ -59,6 +64,10 @@ mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance()
   return s_Instance;
 }
 
-void mitk::ChiliPlugin::SetPluginInstance(QcPlugin* instance)
+void mitk::ChiliPlugin::SetPropertyToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* )
+{
+}
+
+void mitk::ChiliPlugin::SetPluginInstance( QcPlugin* instance )
 {
 }

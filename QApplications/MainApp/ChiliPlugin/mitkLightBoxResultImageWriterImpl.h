@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define LIGHTBOXRESULTIMAGEWRITERIMPL_H_HEADER_INCLUDED
 
 #include <mitkLightBoxResultImageWriter.h>
-#include "mitkBaseProcess.h"
-#include "mitkCommon.h"
 
 class QcLightbox;
 
@@ -29,61 +27,82 @@ namespace mitk {
 
 class Image;
 
+/**
+ @brief Writes mitk::Images into a Chili lightbox.
+  @ingroup Process
+ @ingroup Chili
+*/
+
 class LightBoxResultImageWriterImpl : public LightBoxResultImageWriter
 {
-public:
-  /** Standard class typedefs. */
-  mitkClassMacro(LightBoxResultImageWriterImpl, LightBoxResultImageWriter);
+  public:
+    /** Standard class typedefs. */
+    mitkClassMacro(LightBoxResultImageWriterImpl, LightBoxResultImageWriter);
 
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
-  virtual void SetInput(const mitk::Image *image);
+   /** Set the input as MITK::Image */
+    virtual void SetInput( const Image* image );
 
-  virtual void SetSeriesDescription( const std::string& description );
+    /**
+    Set the input as MITK::DataTreeNode 
+    Set the image, levelwindow and description automatically. It doesnt set the propertylist.
+    */
+    virtual void SetInputByDataTreeNode( const mitk::DataTreeNode* node );
 
-  //##Documentation
-  //## @brief Set the level-window, which will be written in the
-  //## lightbox
-  virtual void SetLevelWindow(LevelWindow levelwindow);
+    /** Set the SeriesDescription for the new Series */
+    virtual void SetSeriesDescription( const std::string& );
 
-  //##Description 
-  //## @brief Set the lightbox to write into
-  virtual void SetLightBox(QcLightbox* lightbox);
+    /** Set the LevelWindow for the right view in chili  */
+    virtual void SetLevelWindow( LevelWindow levelwindow );
 
-  //##Description 
-  //## @brief Set the lightbox to write into to the current lightbox
-  //##
-  //## The current lightbox at the time of the method
-  //## call is set as lightbox to write into.
-  //## \sa SetLightBox
-  virtual void SetLightBoxToCurrentLightBox();
+    /**
+    Set the propertylist, which get saved to chili in the pic-header.
+    Only tags which start with "Chili: " get read and save from the propertylist.
+    Warning:
+    It is possible that the information always exist in the pic-header.
+    If you want to change them, then set the input.
+    If you dont want to change them, then dont set the input.
+    The pic-header get override by the propertylist. But only this one, which are twice.
+    Look at LightBoxImageReaderImpl::GetTagList() to know, which tags get override.
+    These tags are not important to save the series, but maybe for the patient!
+    "Save" works without setting the TagList. Use it for new Images without any information.
+    */
+    virtual void SetPropertyList( const mitk::PropertyList::Pointer );
 
-  //##Description 
-  //## @brief Set the lightbox to write into to a new lightbox
-  //##
-  //## A new lightbox is set as lightbox to write into.
-  //## \sa SetLightBox
-  virtual bool SetLightBoxToNewLightBox();
+    /** Set the lightbox to write into */
+    virtual void SetLightBox(QcLightbox* lightbox);
 
-  virtual void Write();
+    /** Set the lightbox to write into to the current lightbox */
+    virtual void SetLightBoxToCurrentLightBox();
 
-protected:
+    /** Set the lightbox to write into to a new lightbox */
+    virtual bool SetLightBoxToNewLightBox();
 
-  LightBoxResultImageWriterImpl();
+    /** Save the input to a lightbox */
+    virtual void Write();
 
-  virtual ~LightBoxResultImageWriterImpl();
+  protected:
 
-  QcLightbox* m_LightBox;
+    ipPicTSV_t* CreateASCIITag( std::string Description = "", std::string Content = "" );
+    ipPicTSV_t* CreateIntTag( std::string Description = "", int Content = 0 );
+    ipPicTSV_t* CreateUIntTag( std::string Description = "", int Content = 0 );
 
-  LevelWindow m_LevelWindow;
+    void DeleteTag( ipPicDescriptor* cur = NULL, std::string Description = "" );
 
-  const Image* m_Image;
+    LightBoxResultImageWriterImpl();
+    virtual ~LightBoxResultImageWriterImpl();
 
-  std::string m_SeriesDescription;
+    QcLightbox* m_LightBox;
+
+    LevelWindow m_LevelWindow;
+    const Image* m_Image;
+    std::string m_SeriesDescription;
+    mitk::PropertyList::Pointer m_PropertyList;
+
 };
 
 } // namespace mitk
 
 #endif /* LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22 */
-

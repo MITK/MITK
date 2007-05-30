@@ -16,114 +16,118 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef LIGHTBOXIMAGEREADERIMPL_H
 #define LIGHTBOXIMAGEREADERIMPL_H
 
-#include "mitkImageSource.h"
-#include "mitkCommon.h"
 #include "mitkLightBoxImageReader.h"
 
 class QcLightbox;
 
 namespace mitk {
 
-//##Documentation
-//## @brief Read images from Chili LightBox
-//## @ingroup Process
-//## @ingroup Chili
-class LightBoxImageReaderImpl : public LightBoxImageReader 
-{
-public:
-    /** Standard class typedefs. */
-    mitkClassMacro(LightBoxImageReaderImpl, LightBoxImageReader);
+  /**Documentation
+  @brief Read images from Chili LightBox
+  @ingroup Process
+  @ingroup Chili
+  */
 
-    /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+  class LightBoxImageReaderImpl : public LightBoxImageReader
+  {
+    public:
+      /** Standard class typedefs. */
+      mitkClassMacro( LightBoxImageReaderImpl, LightBoxImageReader );
 
-    //##Description 
-    //## @brief Set the lightbox to read from
-    void SetLightBox(QcLightbox* lightbox);
+      /** Method for creation through the object factory. */
+      itkNewMacro( Self );
 
-    //##Description 
-    //## @brief Set the lightbox to read from to the current lightbox
-    //##
-    //## The current lightbox at the time of the method
-    //## call is set as lightbox to read from.
-  //## \sa SetLightBox
-    void SetLightBoxToCurrentLightBox();
+      /** Set the lightbox to read from. */
+      void SetLightBox( QcLightbox* lightbox );
 
-    virtual const std::string GetSeriesDescription();
+      /**Set the lightbox to read from to the current lightbox. */
+      void SetLightBoxToCurrentLightBox();
 
-    //##Description 
-    //## @brief Get the lightbox to read from
-    QcLightbox* GetLightBox() const;
+      /** Return the SeriesDescription from the current selected lightBox. */
+      virtual const std::string GetSeriesDescription();
 
-protected:
-    //##Description 
-    //## @brief Struct used to sort the image slices
-    typedef struct _localImageInfo
-    {
-      int pos;
-      int imageNumber;
-      mitk::Vector3D origin;
-      mitk::Vector3D* direction;
-    } LocalImageInfo;
-    //##Description 
-    //## @brief Vector of structs used to sort the image slices
-    typedef std::vector<LocalImageInfo> LocalImageInfoArray;
+      /**
+      Return a propertylist from the current selected lightBox.
+      For the tags look at mitkLightBoxImageReaderImpl.cpp.
+      This method reads the information from the pic-header. It is possible, that the information exist in the dicom- but not in the pic-header.
+      */
+      virtual const mitk::PropertyList::Pointer GetPropertyList();
 
-    //##Description 
-    //## @brief Struct to store time information of the slices
-    typedef struct _sliceInfo
-    {
-      int numberOfTimePoints;
-      //float imagetime;
-      mitk::Point3D startPosition;
-    } sliceInfo;
-    //##Description 
-    //## @brief Vector of structs to store time information of the slices
-    typedef std::list<sliceInfo> SliceInfoArray;
+      /** Get the lightbox to read from. */
+      QcLightbox* GetLightBox() const;
 
-    //##Description 
-    //## @brief Functors for sorting the image slices
-    static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
-    static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
+    protected:
 
-    virtual void GenerateData();
+      /** Description
+      @brief Struct used to sort the image slices
+      */
+      typedef struct _localImageInfo
+      {
+        int pos;
+        int imageNumber;
+        mitk::Vector3D origin;
+        mitk::Vector3D* direction;
+      } LocalImageInfo;
 
-    virtual void GenerateOutputInformation();
+      /** Description
+      @brief Vector of structs used to sort the image slices
+      */
+      typedef std::vector<LocalImageInfo> LocalImageInfoArray;
 
-    LightBoxImageReaderImpl();
+      /** Description
+      @brief Struct to store time information of the slices
+      */
+      typedef struct _sliceInfo
+      {
+        int numberOfTimePoints;
+        //float imagetime;
+        mitk::Point3D startPosition;
+      } sliceInfo;
 
-    ~LightBoxImageReaderImpl();
+      /** Description
+      @brief Vector of structs to store time information of the slices
+      */
+      typedef std::list<sliceInfo> SliceInfoArray;
 
-    //##Description 
-    //## @brief Time when Header was last read
-    itk::TimeStamp m_ReadHeaderTime;
+      /** Description
+      @brief Functors for sorting the image slices
+      */
+      static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
+      static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
 
-    //##Description 
-    //## @brief Convert the position of the sorted image slices into the lightbox position
-    //##
-    //## @param position The position in the virtually sorted lightbox
-    //## @param list The list with the image number of the virtually sorted lightbox, created by 
-    //## SortImage()
-    int GetRealPosition(int position, LocalImageInfoArray& list);
+      /** Generate outpu */
+      virtual void GenerateData();
+      virtual void GenerateOutputInformation();
 
-    //##Description 
-    //## @brief Virtually sort the lightbox
-    void SortImage(LocalImageInfoArray& imageNumbers);
+      LightBoxImageReaderImpl();
+      ~LightBoxImageReaderImpl();
 
-    mitk::Vector3D GetSpacingFromLB(LocalImageInfoArray& imageNumbers);
+      /** Description
+      @brief Time when Header was last read
+      */
+      itk::TimeStamp m_ReadHeaderTime;
 
-    QcLightbox* m_LightBox;
+      /** Description
+      @brief Convert the position of the sorted image slices into the lightbox position
+      @param position The position in the virtually sorted lightbox
+      @param list The list with the image number of the virtually sorted lightbox, created by SortImage()
+      */
+      int GetRealPosition( int position, LocalImageInfoArray& list );
 
-    LocalImageInfoArray m_ImageNumbers;
+      /** Description
+      @brief Virtually sort the lightbox
+      */
+      void SortImage( LocalImageInfoArray& imageNumbers );
 
-    std::string m_SeriesDescription;
+      mitk::Vector3D GetSpacingFromLB( LocalImageInfoArray& imageNumbers );
+
+      QcLightbox* m_LightBox;
+      LocalImageInfoArray m_ImageNumbers;
 };
 
 } // namespace mitk
-
 
 #endif /* LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22 */

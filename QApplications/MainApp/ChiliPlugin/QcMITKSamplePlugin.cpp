@@ -1,37 +1,24 @@
+#include <QcMITKSamplePlugin.h>
 #include <QmitkStdMultiWidget.h>
 #include <QmitkCommonFunctionality.h>
 #include <SampleApp.h>
 #include <QmitkEventCollector.h>
-#include <QmitkChili3ConferenceKitFactory.h>
-
-#include <chili/plugin.xpm>
-#include <chili/qclightbox.h>
-#include <chili/qclightboxmanager.h>
 #include <QcMITKTask.h>
-
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qptrlist.h>
-#include <qbuttongroup.h>
-#include <qapplication.h>
-#include <qeventloop.h>
-#include <qsplashscreen.h>
-#include <qimage.h>
-#include <qpixmap.h>
-#include <qcursor.h>
-#include <3d-millenium_png_embedded.h>
-
-#include <mitkConferenceToken.h>
-#include <mitkConferenceEventMapper.h>
-
-#include <QcMITKSamplePlugin.h>
-
+//Chili
+#include <chili/plugin.xpm>
+#include <chili/qclightboxmanager.h> //needed for iterateseries, ...
+//MITKPlugin
 #include <mitkChiliPlugin.h>
 #include <mitkChiliPluginFactory.h>
-
-#include <ipPic/ipPic.h>
-#include <ipFunc/ipFunc.h>
-#include <ipDicom/ipDicom.h>
+//teleconference
+#include <mitkConferenceToken.h>
+#include <mitkConferenceEventMapper.h>
+#include <QmitkChili3ConferenceKitFactory.h>
+//GUI
+#include <qlayout.h>
+#include <qapplication.h>
+#include <qeventloop.h>
+#include <qcursor.h>
 
 // create event-logging object (ConferenceKit)
 Chili3ConferenceKitFactory chiliconferencekitfactory;
@@ -84,6 +71,8 @@ void QcMITKSamplePlugin::lightboxFilled (QcLightbox* lightbox)
 
 void QcMITKSamplePlugin::lightboxTiles (QcLightboxManager *lbm, int tiles)
 {
+  m_MITKPluginInstance->m_LightBoxCount = tiles;
+  m_MITKPluginInstance->SendLightBoxCountChangedEvent();
 }
 
 void QcMITKSamplePlugin::selectSerie (QcLightbox* lightbox)
@@ -202,6 +191,7 @@ void QcMITKSamplePlugin::studySelected( study_t* study )
   static bool done = false;
   if( !done )
   {
+    // TODO why not in constructor ??
     QVBoxLayout* layout = new QVBoxLayout( task );
     app = new SampleApp( task, "sample", 0 );
     layout->addWidget( app );
@@ -213,14 +203,28 @@ void QcMITKSamplePlugin::studySelected( study_t* study )
   {
     //set StudyInformation
     mitk::ChiliPlugin::StudyInformation newStudy;
-    newStudy.StudyInstanceUID  = study->instanceUID;
-    newStudy.StudyDescription   = study->description;
-    newStudy.StudyID                = study->id;
-    newStudy.StudyDate             = study->date;
-    newStudy.StudyTime           = study->time;
-    newStudy.Modality               = study->modality;
 
-    m_MITKPluginInstance->m_CurrentStudy = newStudy; //this is freind of ChiliPluginImpl
+    newStudy.OID = study->oid;
+    newStudy.InstanceUID = study->instanceUID;
+    newStudy.ID = study->id;
+    newStudy.Date = study->date;
+    newStudy.Time = study->time;
+    newStudy.Modality = study->modality;
+    newStudy.Manufacturer = study->manufacturer;
+    newStudy.ReferingPhysician = study->referingPhysician;
+    newStudy.Description = study->description;
+    newStudy.ManufacturersModelName = study->manufacturersModelName;
+    newStudy.ImportTime = study->importTime;
+    newStudy.ChiliSenderID = study->chiliSenderID;
+    newStudy.AccessionNumber = study->accessionNumber;
+    newStudy.InstitutionName = study->institutionName;
+    newStudy.WorkflowState = study->workflow_state;
+    newStudy.Flags = study->flags;
+    newStudy.PerformingPhysician = study->performingPhysician;
+    newStudy.ReportingPhysician = study->reportingPhysician;
+    newStudy.LastAccess = study->last_access;
+
+    m_MITKPluginInstance->m_CurrentStudy = newStudy; //this is friend of ChiliPluginImpl
     m_MITKPluginInstance->m_CurrentSeries.clear();
 
     //get new OID for iterate
@@ -245,9 +249,20 @@ ipBool_t QcMITKSamplePlugin::GlobalIterateSeriesCallback( int rows, int row, ser
   QcMITKSamplePlugin* callingObject = static_cast<QcMITKSamplePlugin*>(user_data);
 
   mitk::ChiliPlugin::SeriesInformation newSeries;
-  newSeries.SeriesDescription = series->description;
-  newSeries.SeriesUID             = series->instanceUID;
-  newSeries.Seriesiod             = series->oid;
+
+  newSeries.IOD = series->oid;
+  newSeries.InstanceUID = series->instanceUID;
+  newSeries.Number = series->number;
+  newSeries.Acquisition = series->acquisition;
+  newSeries.EchoNumber = series->echoNumber;
+  newSeries.TemporalPosition = series->temporalPosition;
+  newSeries.Date = series->date;
+  newSeries.Time = series->time;
+  newSeries.Description = series->description;
+  newSeries.Contrast = series->contrast;
+  newSeries.BodyPartExamined = series->bodyPartExamined;
+  newSeries.ScanningSequence = series->scanningSequence;
+  newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
 
   callingObject->m_MITKPluginInstance->m_CurrentSeries.push_back( newSeries );
 

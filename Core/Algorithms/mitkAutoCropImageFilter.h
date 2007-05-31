@@ -4,6 +4,7 @@
 #include "mitkCommon.h"
 #include "mitkSubImageSelector.h"
 #include "mitkImageTimeSelector.h"
+
 #include <itkImageRegion.h>
 #include <itkCropImageFilter.h>
 
@@ -11,8 +12,11 @@ namespace mitk {
 
 /** 
  *
- * @brief This filter determines the bounding box of all pixels different 
+ * @brief Shrink the image borders to a minimum considering a background color.
+ * 
+ * This filter determines the bounding box of all pixels different.
  * from the background, crops the input image and returns it.
+ *
  * @ingroup Process
  * 
  */
@@ -22,15 +26,15 @@ public:
 
   typedef itk::ImageRegion<3> RegionType;
 
-	mitkClassMacro(AutoCropImageFilter,SubImageSelector);
+  mitkClassMacro(AutoCropImageFilter, SubImageSelector);
 
-	itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-	itkGetConstMacro(BackgroundValue,float);
-	itkSetMacro(BackgroundValue,float);
+  itkGetConstMacro(BackgroundValue,float);
+  itkSetMacro(BackgroundValue,float);
 
-	itkGetConstMacro(MarginFactor,float);
-	itkSetMacro(MarginFactor,float);
+  itkGetConstMacro(MarginFactor,float);
+  itkSetMacro(MarginFactor,float);
 
   virtual const std::type_info& GetOutputPixelType();
 
@@ -39,26 +43,22 @@ protected:
   void ComputeNewImageBounds();
 
   template < typename TPixel, unsigned int VImageDimension> 
-    friend void _Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* autoCropFilter);
+  void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage );
 
 
 protected:
-	//##ModelId=3E1B1975031E
-	AutoCropImageFilter();
 
-	//##ModelId=3E1B1975033C
-	virtual ~AutoCropImageFilter();
+  AutoCropImageFilter();
 
-	//##ModelId=3E3BD0CC0232
-    virtual void GenerateOutputInformation();
+  virtual ~AutoCropImageFilter();
+
+  virtual void GenerateOutputInformation();
 
   virtual void GenerateInputRequestedRegion();
 
-	//##ModelId=3E3BD0CE0194
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-  //##ModelId=3E1B1A0501C7
-	float m_BackgroundValue;
+  float m_BackgroundValue;
 
   RegionType m_CroppingRegion;
 
@@ -84,6 +84,5 @@ protected:
 
 } // namespace mitk
 
+#endif
 
-
-#endif /* AutoCropImageFilter_H_HEADER_INCLUDED_C1E4861D */

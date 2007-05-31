@@ -1,8 +1,6 @@
 #include "mitkAutoCropImageFilter.h"
 
 #include "mitkImageCast.h"
-//#include "itkLinearInterpolateImageFunction.h"
-//#include <itkBinaryMedianImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
 #include <mitkImage.h>
@@ -13,11 +11,8 @@
 #include "mitkStatusBar.h"
 
 
-namespace mitk
-{
-
 template < typename TPixel, unsigned int VImageDimension>
-  void _Crop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::AutoCropImageFilter* autoCropFilter)
+void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage)
 {
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
   typedef typename InternalImageType::Pointer            InternalImagePointer;
@@ -28,8 +23,8 @@ template < typename TPixel, unsigned int VImageDimension>
   InternalImagePointer outputItk = InternalImageType::New();
 
   FilterPointer cropFilter = FilterType::New();
-  cropFilter->SetLowerBoundaryCropSize( autoCropFilter->m_LowerBounds );
-  cropFilter->SetUpperBoundaryCropSize( autoCropFilter->m_UpperBounds );
+  cropFilter->SetLowerBoundaryCropSize( m_LowerBounds );
+  cropFilter->SetUpperBoundaryCropSize( m_UpperBounds );
   cropFilter->SetInput( inputItkImage );
   cropFilter->Update();
   outputItk = cropFilter->GetOutput();
@@ -68,7 +63,7 @@ template < typename TPixel, unsigned int VImageDimension>
 
   // PART 2: get access to the MITK output image via an ITK image
   typename mitk::ImageToItk<InternalImageType>::Pointer outputimagetoitk = mitk::ImageToItk<InternalImageType>::New();
-  mitk::Image::Pointer timeImage = autoCropFilter->m_OutputTimeSelector->GetOutput();
+  mitk::Image::Pointer timeImage = m_OutputTimeSelector->GetOutput();
   outputimagetoitk->SetInput(timeImage);
   outputimagetoitk->Update();
   typename InternalImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
@@ -98,7 +93,6 @@ template < typename TPixel, unsigned int VImageDimension>
 ////  this->GraftNthOutput(0,output);  
 //  this->SetNthOutput(0,output);  
 }
-}
 
 
 mitk::AutoCropImageFilter::AutoCropImageFilter() : m_BackgroundValue(0), m_MarginFactor(1.0)
@@ -116,13 +110,13 @@ mitk::AutoCropImageFilter::~AutoCropImageFilter()
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
 {
   ComputeNewImageBounds();
-//	mitk::Image::ConstPointer input  = this->GetInput();
+//  mitk::Image::ConstPointer input  = this->GetInput();
   mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
-	mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput();
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
-	itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<<"GenerateOutputInformation()");
 
   mitk::Geometry3D* inputImageGeometry = input->GetSlicedGeometry();
   
@@ -231,7 +225,8 @@ void mitk::AutoCropImageFilter::GenerateData()
 
     timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
 
-    AccessFixedDimensionByItk_1( m_InputTimeSelector->GetOutput(), _Crop3DImage, 3, this);
+    // TODO what about 2D?
+    AccessFixedDimensionByItk( m_InputTimeSelector->GetOutput(), ITKCrop3DImage, 3);
   }
 
   //float origin[3];
@@ -290,9 +285,9 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
   m_RegionSize[2] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
   m_RegionIndex = minima;
 
-  m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2 ;
-  m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2 ;
-  m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2 ;
+  m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2;
+  m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2;
+  m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2;
 
   ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
   ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);

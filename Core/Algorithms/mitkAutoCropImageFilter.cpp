@@ -31,7 +31,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   outputItk->DisconnectPipeline();
 
 
-// *************************
+  // ************************* MITK import
 
   typedef typename itk::ImageBase<VImageDimension>::RegionType ItkRegionType;
   typedef itk::ImageRegionIteratorWithIndex< InternalImageType > ItkInputImageIteratorType;
@@ -83,9 +83,6 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   {
     outputIt.Set(inputIt.Get());
   }
-
-  std::cout << "GenerateData done." << std::endl;
-
 
   // *************************
 

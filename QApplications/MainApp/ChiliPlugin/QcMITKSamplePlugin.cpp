@@ -345,7 +345,6 @@ ipBool_t QcMITKSamplePlugin::GlobalIterateSeriesCallback( int rows, int row, ser
 
 void QcMITKSamplePlugin::lightBoxImportButtonClicked(int row)
 {
-  std::cout << "clicked " << row << std::endl;
   QPtrList<QcLightbox>& lightboxes = QcPlugin::lightboxManager()->getLightboxes();
   QcLightbox* selectedLightbox = lightboxes.at(row);
   if (selectedLightbox)

@@ -60,10 +60,11 @@ void QmitkColorTransferFunctionCanvas::paintEvent( QPaintEvent* ) {
       
       if(i == m_GrabbedHandle)
       {
-        m_TFWidget->GetEditX()->clear();
-        m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
-        m_TFWidget->GetEditY()->clear();
-        m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+        if(m_TFWidgetAvailable)
+        {
+          m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
+          m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+        }
       }
     }
   }

@@ -21,12 +21,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpainter.h>
 #include <qlineedit.h>
 
-QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QmitkTransferFunctionCanvas(parent,name,f), m_PiecewiseFunction(0) { 
+QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent, const char * name, WFlags f) : QmitkTransferFunctionCanvas(parent,name,f), m_PiecewiseFunction(0) 
+{ 
 
 }
-void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
+
+void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) 
+{
   
-  QPainter painter( this );
+  QPainter painter(this );
   
   if (m_IsGradientOpacityFunction)
   {
@@ -43,7 +46,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
     vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
     for (int i=0; i< m_PiecewiseFunction->GetSize(); i++)
     {
-      //converts values (X|Y)of the TF-point to pixel locations on the canvas-point
+      //converts values (X/Y)of the TF-point to pixel locations on the canvas-point
       std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(dp[i*2],dp[i*2+1]));
       if (i+1 < m_PiecewiseFunction->GetSize())
       {
@@ -55,12 +58,12 @@ void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
       if(i == m_GrabbedHandle)
       {
         painter.setBrush(QBrush(Qt::red));
-        //std::cout<<"RED X: "<<GetFunctionX(m_GrabbedHandle)<<" RED Y: "<<GetFunctionY(m_GrabbedHandle)<<std::endl;
- 
-        m_TFWidget->GetEditX()->clear();
-        m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
-        m_TFWidget->GetEditY()->clear();
-        m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+        if(m_TFWidgetAvailable)
+        { 
+          //inserts X/Y values of the grabbed function point into QLineEdit 
+          m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
+          m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+        }
       }
       else
       {
@@ -69,13 +72,15 @@ void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) {
       painter.drawEllipse(point.first-4,point.second-4,8,8);
     }
     painter.setBrush(Qt::NoBrush);
-  } else {
-
+  }
+  else 
+  {
     painter.setPen(Qt::red);
     painter.drawRect(1,1,width()-2,height()-2);
   }
   painter.restore();
 }
+
 int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x,int y,unsigned int maxSquaredDistance)
 {
   vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
@@ -91,7 +96,8 @@ int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x,int y,unsigned int maxSqua
   return -1;
 }
 
-void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) {
+void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos) 
+{
   RemoveFunctionPoint(GetFunctionX(index));
   AddFunctionPoint(pos.first,pos.second);
   //std::cout<<" AddFunctionPoint x: "<<pos.first<<" AddFunctionPoint y: "<<pos.second<<std::endl;

@@ -82,7 +82,7 @@ class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
     m_ColorTransferFunction->AddRGBSegment(this->GetFunctionMin(),1,0,0,this->GetFunctionMax(),1,1,0);      
     }
     
-    float GetFunctionY(int index) {
+    float GetFunctionY(int) {
       return 0.0;
     }
 

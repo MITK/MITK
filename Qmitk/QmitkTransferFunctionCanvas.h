@@ -117,12 +117,13 @@ class QmitkTransferFunctionCanvas : public QWidget
     void SetTFWidget(QmitkTransferFunctionWidget* widget)
     {
       m_TFWidget = widget;
+      m_TFWidgetAvailable = true;
     }
     
   protected: 
-    bool m_UpdateHistogram;
     bool m_ImmediateUpdate;
     float m_Range;
+    bool m_TFWidgetAvailable;
     QmitkTransferFunctionWidget* m_TFWidget;
 };
 #endif

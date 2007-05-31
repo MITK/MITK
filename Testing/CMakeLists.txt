@@ -28,6 +28,7 @@ SET(${KITNAME}_TESTS
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneGeometryTest.cpp
   mitkPointSetTest.cpp
+  mitkPointSetFileIOTest.cpp
   mitkPropertyListTest.cpp
   mitkRenderWindowTest.cpp
   mitkSliceNavigationControllerTest.cpp

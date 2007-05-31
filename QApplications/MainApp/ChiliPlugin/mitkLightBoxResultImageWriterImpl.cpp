@@ -73,7 +73,9 @@ void mitk::LightBoxResultImageWriterImpl::SetInputByDataTreeNode( const mitk::Da
       }
       else m_Image = NULL;
     }
+    else m_Image = NULL;
   }
+  else m_Image = NULL;
 }
 
 void mitk::LightBoxResultImageWriterImpl::SetLightBox( QcLightbox* lightbox )
@@ -141,7 +143,6 @@ ipPicTSV_t* mitk::LightBoxResultImageWriterImpl::CreateASCIITag( std::string Des
 {
   if( Description != NULL && Content != NULL )
   {
-    //create the ASCII-tags
     ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
     strcpy( tsv->tag, Description.c_str() );
     tsv->type = ipPicASCII;
@@ -158,7 +159,6 @@ ipPicTSV_t* mitk::LightBoxResultImageWriterImpl::CreateIntTag( std::string Descr
 {
   if( Description != NULL )
   {
-    //create the ASCII-tags
     int* IntTag = new int( Content );
     ipPicTSV_t* tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
     strcpy( tsv->tag, Description.c_str() );
@@ -256,13 +256,13 @@ void mitk::LightBoxResultImageWriterImpl::Write()
 
   typedef std::list<ipPicTSV_t*> TagList;
   //this is the list with all needed chilitags; m_PropertyList is the list of additional chilitags which are important for the patient and dataset
-  TagList* MyTagList = new TagList();
+  TagList tagList;
 
   for(int x = 0; x < 6; x++)
   {
-    MyTagList->push_back( CreateASCIITag( MyTags[x][0], MyTags[x][1] ) );  //add ASCII-Tags to list
+    tagList.push_back( CreateASCIITag( MyTags[x][0], MyTags[x][1] ) );  //add ASCII-Tags to list
   }
-  MyTagList->push_back( CreateIntTag( tagSERIES_NUMBER, mitk::ChiliPlugin::GetInstance()->GetCurrentSeries().size()+1 ) );  //SERIES NUMBER is an INT-tag
+  tagList.push_back( CreateIntTag( tagSERIES_NUMBER, ( mitk::ChiliPlugin::GetInstance()->GetCurrentSeries().size()+1 ) ) );  //SERIES NUMBER is an INT-tag
 
   resultslice->SetInput( m_Image );
   smax = m_Image->GetDimension(2);
@@ -271,7 +271,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
   //GeomtryInformation
   SlicedGeometry = m_Image->GetSlicedGeometry();
   origin = SlicedGeometry->GetCornerPoint();
-  memcpy(isg.forUID, mitk::FrameOfReferenceUIDManager::GetFrameOfReferenceUID(SlicedGeometry->GetFrameOfReferenceID()), 128);
+  memcpy( isg.forUID, mitk::FrameOfReferenceUIDManager::GetFrameOfReferenceUID(SlicedGeometry->GetFrameOfReferenceID()), 128 );
   isg.psu = ipPicUtilMillimeter;
 
   for( s = smax-1; s >= 0; --s )  //Slices
@@ -288,12 +288,12 @@ void mitk::LightBoxResultImageWriterImpl::Write()
         //to create a new series use addTags( ..., ..., true)
         //we want to create one new series, so we use this for the first slice only (for the other slices look at --> else ... )
         QcPlugin::addTags( cur, cur, true );
-        while( !MyTagList->empty() )  //thats the needed tags to save
+        while( !tagList.empty() )  //thats the needed tags to save
         {
           //delete tag (if exist) and add our own
-          DeleteTag( cur, MyTagList->front()->tag );
-          ipPicAddTag( cur, MyTagList->front() );
-          MyTagList->pop_front();
+          DeleteTag( cur, tagList.front()->tag );
+          ipPicAddTag( cur, tagList.front() );
+          tagList.pop_front();
         }
         firstSlice = cur;  //save the first slice
         firstTime = false;
@@ -361,5 +361,4 @@ void mitk::LightBoxResultImageWriterImpl::Write()
       m_LightBox->addImage( cur );  //add the pic to the lightbox
     }
   }
-  delete MyTagList;
 }

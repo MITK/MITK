@@ -101,7 +101,7 @@ class ChiliPlugin : public itk::Object
       std::string FrameOfReferenceUID;
     };
 
-    /** there can be a lot´s of series to one study, so we need a list */
+    /** there can be lots of series to one study, so we need a list */
     typedef std::list<SeriesInformation> SeriesList;
 
     /** return the StudyInformation of the current selected study */

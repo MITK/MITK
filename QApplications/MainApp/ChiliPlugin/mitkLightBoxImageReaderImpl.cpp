@@ -33,7 +33,31 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include <itkImageFileReader.h>
 
-#include <mitkGenericProperty.h>
+#include "mitkProperties.h"
+
+// helper class for property import from pic/dicom-headers (see mitk::LightBoxImageReaderImpl::GetPropertyList())
+class HeaderTagInfo
+{
+  public:
+
+    typedef enum { MissingInDicom, String, Int, UnsignedInt } DataType;
+
+    HeaderTagInfo( const char* ppicTagKey, ipUInt2_t pdicomGroup, ipUInt2_t pdicomElement, DataType ptype )
+    : picTagKey( ppicTagKey ), dicomGroup( pdicomGroup ), dicomElement( pdicomElement ), type( ptype )
+    {
+    }
+
+  std::string picTagKey;
+  ipUInt2_t dicomGroup;
+  ipUInt2_t dicomElement;
+  DataType type;
+};
+
+mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl() 
+: m_LightBox(NULL)
+{
+}
+
 
 void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
 {
@@ -46,7 +70,7 @@ void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
 
 void mitk::LightBoxImageReaderImpl::SetLightBoxToCurrentLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
+  QcPlugin* plugin = ChiliPlugin::GetInstance()->GetPluginInstance();
   if( plugin == NULL )
   {
     itkExceptionMacro( <<"GetPluginInstance()==NULL: Plugin is not initialized correctly !" );
@@ -82,7 +106,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
   itkDebugMacro( <<"GenerateOutputInformation" );
 
-  mitk::Image::Pointer output = this->GetOutput();
+  Image::Pointer output = this->GetOutput();
 
   //did we already do it since the last change in the lightbox?
   if ( (output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()) )
@@ -94,9 +118,9 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   unsigned int position;
   //ipPicDescriptor*  pic2 = NULL;
   interSliceGeometry_t *isg;
-  mitk::Point3D originCurrentSlice;
-  mitk::Point3D originLastSlice;
-  mitk::Point3D originFirstSlice;
+  Point3D originCurrentSlice;
+  Point3D originLastSlice;
+  Point3D originFirstSlice;
   sliceInfo sliceInfo;
 
   //virtually sort the lightbox
@@ -111,7 +135,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     isg = m_LightBox->fetchDicomGeometry( RealPosition );
     if( isg != NULL )
     {
-      mitk::vtk2itk( isg->o, originFirstSlice );
+      vtk2itk( isg->o, originFirstSlice );
       originLastSlice = originFirstSlice;
     }
   }
@@ -133,7 +157,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
       if( isg != NULL )
       {
         itkDebugMacro( <<numberOfImages );
-        mitk::vtk2itk( isg->o,originCurrentSlice );
+        vtk2itk( isg->o,originCurrentSlice );
         //timeconv1=ConvertTime(pic2);
 
         //check if we are still on the same slice
@@ -238,23 +262,23 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   interSliceGeometry = m_LightBox->fetchDicomGeometry( RealPosition );
   if( interSliceGeometry != NULL )
   {
-    mitk::Vector3D rightVector;
-    mitk::Vector3D downVector;
-    mitk::Vector3D spacing;
+    Vector3D rightVector;
+    Vector3D downVector;
+    Vector3D spacing;
 
-    mitk::vtk2itk( interSliceGeometry->u, rightVector );
-    mitk::vtk2itk( interSliceGeometry->v, downVector );
-    mitk::vtk2itk( interSliceGeometry->ps, spacing );
+    vtk2itk( interSliceGeometry->u, rightVector );
+    vtk2itk( interSliceGeometry->v, downVector );
+    vtk2itk( interSliceGeometry->ps, spacing );
     itkDebugMacro( <<"spacing: "<<spacing );
 
-    mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+    PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
     spacing = GetSpacingFromLB( m_ImageNumbers );
     itkDebugMacro( <<"get spacing: "<<spacing );
     planegeometry->InitializeStandardPlane( output->GetDimension(0), output->GetDimension(1), rightVector, downVector, &spacing );
     //planegeometry->InitializeStandardPlane( rightVector,downVector,&GetSpacingFromLB());
 
-    mitk::Point3D origin;
-    mitk::vtk2itk( interSliceGeometry->o, origin );
+    Point3D origin;
+    vtk2itk( interSliceGeometry->o, origin );
     itkDebugMacro( <<"origin: "<<origin );
     planegeometry->SetOrigin( origin );
     planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID(interSliceGeometry->forUID) );
@@ -265,7 +289,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     ipUInt4_t len;
     //double wert;
     //int s = 0, t = 0; 
-    mitk::ScalarType timearray[2];
+    ScalarType timearray[2];
     int repetitionTime = 0;
 
     if( tsv )
@@ -297,7 +321,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     //workaround FIXME
     if( numberOfTimePoints>1 )
     {
-      mitk::ScalarType timeBounds[] = {0.0, 1.0};
+      ScalarType timeBounds[] = {0.0, 1.0};
       planegeometry->SetTimeBounds( timeBounds );
     }
 //    planegeometry->SetTimeBounds(timebounds);
@@ -350,7 +374,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
 
   itkDebugMacro(<<"request output ");
 
-  mitk::Image::Pointer output = this->GetOutput();
+  Image::Pointer output = this->GetOutput();
 
   int numberOfImages = 0, time = 0, time1 = 0, time2 = 0;
   unsigned int position;
@@ -358,9 +382,9 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   ipPicDescriptor*  pic = NULL;
   interSliceGeometry_t* isg0;
   interSliceGeometry_t* isg;
-  mitk::Point3D origin1;
-  mitk::Point3D origin0;
-  mitk::Point3D origin;
+  Point3D origin1;
+  Point3D origin0;
+  Point3D origin;
 
   //sort image
   int RealPosition;
@@ -372,7 +396,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   isg0 = m_LightBox->fetchDicomGeometry( RealPosition );
   if( isg0!=NULL )
   {
-    mitk::vtk2itk( isg0->o,origin0 );
+    vtk2itk( isg0->o,origin0 );
     origin=origin0;
     itkDebugMacro( <<"origin    "<<origin );
   }
@@ -404,7 +428,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
       isg = m_LightBox->fetchDicomGeometry( RealPosition );
       if( isg != NULL )
       {
-        mitk::vtk2itk( isg->o,origin1 );
+        vtk2itk( isg->o,origin1 );
         if( origin1 != origin0 && origin1!=origin )
         {
           //itkDebugMacro("origin1: "<<origin1<<" origin0: "<<origin0);
@@ -449,23 +473,23 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
 
 mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoArray& imageNumbers )
 {
-  mitk::Vector3D spacing;
+  Vector3D spacing;
   spacing.Fill(1.0);
   interSliceGeometry_t*  isg_t  = m_LightBox->fetchDicomGeometry(0);
   if( isg_t != NULL )
   {
-    mitk::vtk2itk( isg_t->ps, spacing );
+    vtk2itk( isg_t->ps, spacing );
   }
 
   if( imageNumbers.size() == 0 ) return spacing;
 
   LocalImageInfoArray::iterator it = imageNumbers.begin(), infoEnd = imageNumbers.end();
 
-  mitk::Vector3D& origin0 = it->origin;
+  Vector3D& origin0 = it->origin;
 
   while( it != infoEnd)
   {
-    if( mitk::Equal( it->origin, origin0 ) == false)
+    if( Equal( it->origin, origin0 ) == false)
       break;
     ++it;
   }
@@ -479,7 +503,7 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
 
 bool mitk::LightBoxImageReaderImpl::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
 {
-  if( mitk::Equal( elem1.origin, elem2.origin ) )
+  if( Equal( elem1.origin, elem2.origin ) )
   {
     if( elem1.imageNumber == elem2.imageNumber )
       return elem1.pos < elem2.pos;
@@ -548,12 +572,12 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
     isg = m_LightBox->fetchDicomGeometry( position );
     if( isg != NULL )
     {
-      mitk::vtk2itk( isg->o, info.origin );
+      vtk2itk( isg->o, info.origin );
       if( directionInitialized == false )
       {
         VnlVector u(3), v(3);
-        mitk::vtk2vnl( isg->u, u );
-        mitk::vtk2vnl( isg->v, v );
+        vtk2vnl( isg->u, u );
+        vtk2vnl( isg->v, v );
         VnlVector normal = vnl_cross_3d(u, v);
         normal.normalize();
         direction.Set_vnl_vector( normal );
@@ -590,10 +614,6 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
 int mitk::LightBoxImageReaderImpl::GetRealPosition( int position, LocalImageInfoArray& list )
 {
   return list[position].pos;
-}
-
-mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl() : m_LightBox(NULL)
-{
 }
 
 const std::string mitk::LightBoxImageReaderImpl::GetSeriesDescription()
@@ -642,7 +662,8 @@ const std::string mitk::LightBoxImageReaderImpl::GetSeriesDescription()
 
 const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList()
 {
-  mitk::PropertyList::Pointer resultPropertyList = mitk::PropertyList::New();
+  PropertyList::Pointer resultPropertyList = PropertyList::New(); // TODO We want to return an empty list instead of NULL?
+
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
@@ -659,70 +680,128 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
     return resultPropertyList;
   }
 
-  std::string TagsToRead[19] =
+  // TODO I would put the = PropertyList::New() here.
+
+  #define NUMBER_OF_CHILI_PIC_TAGS 19
+  HeaderTagInfo tagsToImport[NUMBER_OF_CHILI_PIC_TAGS] =
   {
-    tagPATIENT_NAME,
-    tagPATIENT_ID,
-    tagPATIENT_BIRTHDATE,
-    tagPATIENT_BIRTHTIME,
-    tagMEDICAL_RECORD_LOCATOR,
-    tagPERFORMING_PHYSICIAN_NAME,
-    tagREFERING_PHYSICIAN_NAME,
-    tagINSTITUTION_NAME,
-    tagMANUFACTURER,
-    tagMODEL_NAME,
-    tagSERIES_CONTRAST,
-    tagSERIES_BODY_PART_EXAMINED,
-    tagSERIES_FRAME_OF_REFERENCE_UID,
-    tagSERIES_SCANNING_SEQUENCE,
-    tagIMAGE_TYPE,
-    tagPATIENT_SEX,
-    tagSERIES_ECHO_NUMBER,
-    tagSERIES_ACQUISITION,
-    tagSERIES_TEMPORAL_POSITION,
+    HeaderTagInfo( tagPATIENT_NAME,                  0x0010, 0x0010, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_ID,                    0x0010, 0x0020, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_BIRTHDATE,             0x0010, 0x0030, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_BIRTHTIME,             0x0010, 0x0032, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMEDICAL_RECORD_LOCATOR,        0x0010, 0x1090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPERFORMING_PHYSICIAN_NAME,     0x0000, 0x0000, HeaderTagInfo::MissingInDicom ), // TODO this is not in DICOM header ??
+    HeaderTagInfo( tagREFERING_PHYSICIAN_NAME,       0x0008, 0x0090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagINSTITUTION_NAME,              0x0008, 0x0080, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMANUFACTURER,                  0x0008, 0x0070, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMODEL_NAME,                    0x0008, 0x1090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_CONTRAST,               0x0018, 0x0010, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_BODY_PART_EXAMINED,     0x0018, 0x0015, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_FRAME_OF_REFERENCE_UID, 0x0020, 0x0052, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_SCANNING_SEQUENCE,      0x0018, 0x0020, HeaderTagInfo::String ),
+    HeaderTagInfo( tagIMAGE_TYPE,                    0x0008, 0x0008, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_SEX,                   0x0010, 0x0040, HeaderTagInfo::UnsignedInt ),
+    HeaderTagInfo( tagSERIES_ECHO_NUMBER,            0x0018, 0x0086, HeaderTagInfo::Int ),
+    HeaderTagInfo( tagSERIES_ACQUISITION,            0x0020, 0x1001, HeaderTagInfo::Int ),
+    HeaderTagInfo( tagSERIES_TEMPORAL_POSITION,      0x0010, 0x0010, HeaderTagInfo::MissingInDicom )  // TODO this is not in DICOM header ??
   };
 
-  ipPicTSV_t* srd;
+  ipPicTSV_t* srd; // FIXME soft rubber duck?
   std::string PropertyName;
-  for( int x = 0; x < 19; x++)
+
+  for( int x = 0; x < NUMBER_OF_CHILI_PIC_TAGS; ++x )
   {
-    srd = ipPicQueryTag( m_LightBox->fetchHeader(0), (char*)TagsToRead[x].c_str() );
+    //first try to read from the pic-header
+    PropertyName = "Chili: " + tagsToImport[x].picTagKey;
+    srd = ipPicQueryTag( m_LightBox->fetchHeader(0), (char*)tagsToImport[x].picTagKey.c_str() );
     if( srd )
     {
-      PropertyName = "Chili: " + TagsToRead[x];
+      BaseProperty::Pointer tagProperty;
+
       switch( srd->type )
       {
         case ipPicASCII:
         {
-          mitk::StringProperty* newStringProperty = new mitk::StringProperty( (char*)srd->value );
-          resultPropertyList->SetProperty ( PropertyName.c_str() , newStringProperty );
+          tagProperty = new StringProperty( static_cast<char*>(srd->value) );
           break;
         }
         case ipPicInt:
-        {
-          mitk::GenericProperty<int>* newIntProperty = new mitk::GenericProperty<int>( *( (int*)(srd->value) ) );
-          resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
-          break;
-        }
         case ipPicUInt:
         {
-          void* data;
-          ipUInt4_t len;
-          char * tmp;
-          data = srd->value;
-          len = sizeof(data);
-          tmp = new char[len];
-          strncpy( tmp, (char*)data, len );
-          tmp[len-1]=0;
-          mitk::GenericProperty<int>* newIntProperty = new mitk::GenericProperty<int>( (int)*(tmp) );
-          resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
-          delete [] tmp;
+          tagProperty = new IntProperty( *static_cast<int*>(srd->value) );
           break;
         }
         default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
         {
-          std::cout << "WARNING: " << TagsToRead[x] << " not read from chili." << std::endl;
+          std::cout << "WARNING: Type of PIC-Tag '" << tagsToImport[x].picTagKey << "' not handled in LightBoxImageReader." << std::endl;
           break;
+        }
+      }
+
+      if (tagProperty.IsNotNull())
+      {
+        resultPropertyList->SetProperty( PropertyName.c_str() , tagProperty );
+      }
+    }
+    else // unable to find/read PIC-Tag from header
+    {
+      //read from Dicom-Header
+      ipPicTSV_t *dch = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
+      void* data;
+      ipUInt4_t len;
+      if( dch )
+      {
+        switch (tagsToImport[x].type)
+        {
+          case HeaderTagInfo::String:
+          {
+            // TODO what about "data". Do we have to free that memory somehow? how? delete? free?
+            if ( dicomFindElement( (unsigned char*) dch->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
+            {
+              /* TODO remove if not necessary!
+              tmp = new char[len+1];
+              strncpy( tmp, (char*)data, len );
+              tmp[len]=0;
+              StringProperty* newStringProperty = new StringProperty( tmp );
+              resultPropertyList->SetProperty ( PropertyName.c_str(), newStringProperty );
+              delete [] tmp;
+              */
+              resultPropertyList->SetProperty ( PropertyName.c_str(), new StringProperty( (char*)data ) );
+             }
+            break;
+          }
+          case HeaderTagInfo::UnsignedInt:
+          {
+            /* TODO remove if not necessary!
+            tmp = new char[len+1];
+            strncpy( tmp, (char*)data, len );
+            tmp[len]=0;
+            GenericProperty<int>* newIntProperty = new GenericProperty<int>( (int)*( tmp ) );
+            resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
+            delete [] tmp;
+            */
+            resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( *(int*)data));
+            break;
+          }
+          case HeaderTagInfo::Int:
+          {
+            /* TODO how is this different to the above? can't UnsignedInt and Int be unified into one case block? sytax: see around l. 723
+            tmp = new char[len+1];
+            strncpy( tmp, (char*)data, len );
+            tmp[len]=0;
+            GenericProperty<int>* newIntProperty = new GenericProperty<int>( atoi( tmp ) );
+            resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
+            delete [] tmp;
+            */
+            resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
+            break;
+          }
+          case HeaderTagInfo::MissingInDicom:
+          {
+            // can't do anything
+            break;
+          }
+        
         }
       }
     }

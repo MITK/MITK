@@ -52,8 +52,7 @@ namespace mitk {
       virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
     protected:
-      //mitk::BaseProperty::Pointer m_ValidProperty;
-      mitk::BaseProperty* m_ValidProperty;
+      mitk::BaseProperty::Pointer m_ValidProperty;
       std::string m_ValidPropertyName;
     };
 

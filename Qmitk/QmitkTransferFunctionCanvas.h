@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 
 #include "mitkHistogramGenerator.h"
+#include "mitkRenderingManager.h"
 
 #include <set>
 #include <qwidget.h>
@@ -118,6 +119,26 @@ class QmitkTransferFunctionCanvas : public QWidget
     {
       m_TFWidget = widget;
       m_TFWidgetAvailable = true;
+    }
+    
+    void SetX(float x)
+    {
+      if (m_GrabbedHandle != -1 && GetFunctionX(m_GrabbedHandle) != m_Min && GetFunctionX(m_GrabbedHandle) != m_Max)
+      {
+        this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(x,GetFunctionY(m_GrabbedHandle)));
+        update();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }   
+    }
+    
+    void SetY(float y)
+    {
+      if (m_GrabbedHandle != -1 && y>=0 && y<=1)
+      {
+        this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),y));
+        update();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }   
     }
     
   protected: 

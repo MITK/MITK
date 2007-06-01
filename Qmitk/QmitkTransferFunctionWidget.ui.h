@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransferFunctionProperty.h"
 #include <mitkDataTreeNode.h>
 #include <mitkRenderingManager.h>
+#include <qstring.h>
 
 /**
  * \class QmitkTransferFunctionWidget
@@ -711,14 +712,26 @@ void QmitkTransferFunctionWidget::ImmediateUpdate(bool state)
     m_GradientOpacityCanvas->SetImmediateUpdate(state);	    
 }
 
-
 QLineEdit* QmitkTransferFunctionWidget::GetEditX()
 {
   return m_XEdit;
 }
 
-
 QLineEdit* QmitkTransferFunctionWidget::GetEditY( )
 {
   return m_YEdit;
+}
+
+void QmitkTransferFunctionWidget::SetXValue()
+{
+  m_ScalarOpacityFunctionCanvas->SetX(m_XEdit->text().toFloat());
+  m_ColorTransferFunctionCanvas->SetX(m_XEdit->text().toFloat());
+  m_GradientOpacityCanvas->SetX(m_XEdit->text().toFloat());
+}
+
+
+void QmitkTransferFunctionWidget::SetYValue()
+{
+  m_ScalarOpacityFunctionCanvas->SetY(m_YEdit->text().toFloat());
+  m_GradientOpacityCanvas->SetY(m_YEdit->text().toFloat());
 }

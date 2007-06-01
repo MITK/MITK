@@ -802,7 +802,7 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
         newItem->m_Selected = true; // probably not neccessary
       }
 
-      if (verbose) InvokeEvent( TreeFilterItemAddedEvent(m_Items->ElementAt(newIndex)) );
+      if (verbose) InvokeEvent( TreeFilterItemAddedEvent(list->ElementAt(newIndex)) );
 
       if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
       {

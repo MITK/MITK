@@ -298,19 +298,23 @@ public:
             s+=pixel;
 
             ipPicDescriptor* pic = image3D->GetPic();
-
-            mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
-            if ( image3D->GetGeometry()->IsIndexInside(p) )
+            if ( pic )
             {
-              itk::Point<int, 3> pi;
-              mitk::itk2vtk(p, pi);
-              if(pic->bpe!=24)
+
+              mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
+              if ( image3D->GetGeometry()->IsIndexInside(p) )
               {
-                ipPicTypeMultiplex2(__buildstring, pic, pi, s);
+                itk::Point<int, 3> pi;
+                mitk::itk2vtk(p, pi);
+                if(pic->bpe!=24)
+                {
+                  ipPicTypeMultiplex2(__buildstring, pic, pi, s);
+                }
+                else
+                  __buildstring(pic, pi, s, (unsigned char) 1);
               }
-              else
-                __buildstring(pic, pi, s, (unsigned char) 1);
             }
+
             if(image3D!=NULL)
             {
               image3D->ReleaseData();

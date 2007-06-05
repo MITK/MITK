@@ -116,7 +116,8 @@ mitk::Geometry3D* mitk::TimeSlicedGeometry::GetGeometry3D(int t) const
       assert(firstgeometry != NULL);
 
       mitk::Geometry3D::Pointer requestedgeometry;
-      requestedgeometry = static_cast<Geometry3D*>(firstgeometry->Clone().GetPointer());
+      requestedgeometry = dynamic_cast<Geometry3D*>(firstgeometry->Clone().GetPointer());
+      if ( requestedgeometry.IsNull() ) itkExceptionMacro("Geometry is NULL!");
 
       TimeBounds timebounds = requestedgeometry->GetTimeBounds();
       if(timebounds[1]<ScalarTypeNumericTraits::max())

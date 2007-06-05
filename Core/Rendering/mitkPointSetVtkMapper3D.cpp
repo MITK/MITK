@@ -268,12 +268,18 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   m_vtkSelectedPointList = vtkAppendPolyData::New();
   m_vtkUnselectedPointList = vtkAppendPolyData::New();
   //now add an object for each point in data
-  for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(), pointDataIter = itkPointSet->GetPointData()->Begin(); 
+  pointDataIter = itkPointSet->GetPointData()->Begin();
+  for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); 
     pointsIter!=itkPointSet->GetPoints()->End();
-    pointsIter++, pointDataIter++, j++)
+    pointsIter++, j++)
   {
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
-    int pointType = pointDataIter.Value().pointSpec;
+    int pointType;
+  
+    if(itkPointSet->GetPointData()->size() ==0)
+      pointType = mitk::PTUNDEFINED;
+    else
+      pointType = pointDataIter.Value().pointSpec;
 
 #if (VTK_MAJOR_VERSION >= 5)
     vtkPolyDataAlgorithm *source;
@@ -352,7 +358,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       }
       break;
     }
-    if (pointDataIter.Value().selected)
+    if (pointType)
     {
       m_vtkSelectedPointList->AddInput(source->GetOutput());
       ++m_NumberOfSelectedAdded;
@@ -391,7 +397,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       label->Delete();
 
       //add it to the wright PointList
-      if (pointDataIter.Value().selected)
+      if (pointType)
       {
         m_vtkSelectedPointList->AddInput(labelTransform->GetOutput());
         ++m_NumberOfSelectedAdded;
@@ -403,7 +409,10 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       }
       labelTransform->Delete();
     }
-  }
+
+     if(pointDataIter != itkPointSet->GetPointData()->End())
+      pointDataIter++;
+  } // end FOR
 
   //now according to number of elements added to selected or unselected, build up the rendering pipeline
   if (m_NumberOfSelectedAdded > 0)

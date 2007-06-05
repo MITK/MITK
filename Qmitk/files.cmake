@@ -25,6 +25,8 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
   QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
+  QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
+  QmitkFunctionalityComponents/QmitkEmptyComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
@@ -81,6 +83,8 @@ SET(UI_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkEmptyComponentGUI.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui
@@ -119,6 +123,8 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
   QmitkFunctionalityComponents/QmitkThresholdComponent.h
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
+  QmitkFunctionalityComponents/QmitkImageCropperComponent.h
+  QmitkFunctionalityComponents/QmitkEmptyComponent.h
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h

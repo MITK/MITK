@@ -131,6 +131,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,0.0f};//red
 
   mitk::Color tmpColor;
+  double opacity = 1.0;
 
   //get unselected from node
   float unselectedColorTMP[4]={1.0f,1.0f,1.0f,1.0f};
@@ -171,7 +172,13 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     contourColor[2] = tmpColor[2];
     contourColor[3] = 1.0f;
   }
-  //finished color fishing!
+
+  if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer()) != NULL)
+  {
+    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer());
+    opacity = pointOpacity->GetValue();
+  }
+  //finished color / opacity fishing!
 
   //check if a contour shall be drawn
   bool makeContour = false;
@@ -242,6 +249,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_ContourActor->SetMapper(m_vtkContourPolyDataMapper);
     m_vtkContourPolyDataMapper->Delete();
     m_ContourActor->GetProperty()->SetColor(contourColor);
+    m_ContourActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_ContourActor);
   }
 
@@ -410,7 +418,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       labelTransform->Delete();
     }
 
-     if(pointDataIter != itkPointSet->GetPointData()->End())
+    if(pointDataIter != itkPointSet->GetPointData()->End())
       pointDataIter++;
   } // end FOR
 
@@ -428,6 +436,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_SelectedActor->SetMapper(m_VtkSelectedPolyDataMapper);
     m_VtkSelectedPolyDataMapper->Delete();
     m_SelectedActor->GetProperty()->SetColor(selectedColor);
+    m_SelectedActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_SelectedActor);
   }
 
@@ -444,6 +453,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_UnselectedActor->SetMapper(m_VtkUnselectedPolyDataMapper);
     m_VtkUnselectedPolyDataMapper->Delete();
     m_UnselectedActor->GetProperty()->SetColor(unselectedColor);
+    m_UnselectedActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
 }
@@ -475,7 +485,15 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();
   }
-
+ 
+  if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer()) != NULL)
+  {  
+    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer());
+    float opacity = pointOpacity->GetValue();
+    m_ContourActor->GetProperty()->SetOpacity(opacity);
+    m_UnselectedActor->GetProperty()->SetOpacity(opacity);
+    m_SelectedActor->GetProperty()->SetOpacity(opacity);
+  }
   if (makeContour)
   {
     m_ContourActor->VisibilityOn();

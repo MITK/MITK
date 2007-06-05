@@ -84,3 +84,4 @@ QLabel* QmitkSliceSliderNavigationComponentGUI::GetTextLabelTemporal()
 {
  return m_TextLabelTemporal;
 }
+

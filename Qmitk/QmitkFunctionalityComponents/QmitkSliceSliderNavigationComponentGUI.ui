@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>289</width>
-            <height>141</height>
+            <width>166</width>
+            <height>125</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -34,6 +34,11 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_SliceSliderNavigator</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
             <property name="title">
                 <string>SliceSliderNavigater</string>
@@ -80,6 +85,11 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_SelectDataGroupBox</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                             <property name="lineWidth">
                                 <number>1</number>
@@ -137,23 +147,6 @@
                                                 <cstring>m_TreeNodeSelector</cstring>
                                             </property>
                                         </widget>
-                                        <spacer>
-                                            <property name="name">
-                                                <cstring>spacer2</cstring>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Fixed</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>20</width>
-                                                    <height>16</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
                                     </vbox>
                                 </widget>
                             </vbox>
@@ -199,6 +192,11 @@
                                                     <height>32767</height>
                                                 </size>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                             <property name="text">
                                                 <string>Transversal:</string>
                                             </property>
@@ -227,6 +225,11 @@
                                                     <width>70</width>
                                                     <height>32767</height>
                                                 </size>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                             <property name="text">
                                                 <string>Sagittal:</string>
@@ -257,6 +260,11 @@
                                                     <height>32767</height>
                                                 </size>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                             <property name="text">
                                                 <string>Coronal:</string>
                                             </property>
@@ -285,6 +293,11 @@
                                                     <width>70</width>
                                                     <height>32767</height>
                                                 </size>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                             <property name="text">
                                                 <string>Temporal:</string>

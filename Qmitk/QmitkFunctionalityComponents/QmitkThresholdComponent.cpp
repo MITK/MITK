@@ -310,7 +310,6 @@ void QmitkThresholdComponent::ShowThreshold(bool)
         m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((false)) );
       }
     }
-    //m_ThresholdComponentGUI->GetThresholdValueContent()->setShown(m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -92,3 +92,9 @@ QCheckBox* QmitkConnectivityFilterComponentGUI::GetReplaceSurfaceCheckBox()
 
 
 
+
+
+QPushButton* QmitkConnectivityFilterComponentGUI::GetSurfaceToImageButton()
+{
+  return m_SurfaceToImageButton;
+}

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_CONNECTIVITYFILTERCOMPONENT_H
 #define MITK_CONNECTIVITYFILTERCOMPONENT_H
 
-#include "QmitkInteractionFunctionalityComponent.h"
+#include "QmitkFunctionalityComponentContainer.h"
 
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
@@ -51,7 +51,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkConnectivityFilterComponent : public QmitkInteractionFunctionalityComponent
+class QmitkConnectivityFilterComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT
@@ -59,7 +59,7 @@ class QmitkConnectivityFilterComponent : public QmitkInteractionFunctionalityCom
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkConnectivityFilterComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkConnectivityFilterComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -116,10 +116,21 @@ public slots:
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
 
+  void SurfaceToImage();
+
 protected:
 
   /************ Update DATATREECOMBOBOX(ES) *************/
   virtual void UpdateDataTreeComboBoxes();
+  //  /*!
+  //* image which is used to create the surface
+  //*/
+  //mitk::Image* m_MitkImage;
+
+  ///*!
+  //* iterator on current image
+  //*/
+  //mitk::DataTreeIteratorClone m_MitkImageIterator;
 
 
 

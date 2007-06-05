@@ -571,7 +571,6 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
       filter->SetDecimate(mitk::ImageToSurfaceFilter::NoDecimation );
     }
 
-
     InsertSurfaceIntoDataTree(filter, iteratorOnImageToBeSkinExtracted);
     
 
@@ -693,4 +692,6 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceContour()
   }
   m_MultiWidget->RequestUpdate();
 }//end of ShowSurfaceContur
+
+
 

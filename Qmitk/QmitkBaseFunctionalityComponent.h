@@ -105,6 +105,17 @@ public:
   */
   virtual QString GetFunctionalityName();
 
+     /*!
+  * image selected in MainSelector
+  */
+  mitk::Image* m_ParentMitkImage;
+
+
+  /*!
+  * iterator on current image
+  */
+  mitk::DataTreeIteratorClone m_ParentMitkImageIterator;
+
     /*************** GET CONTENT CONTAINER  ***************/
 virtual QGroupBox * GetContentContainer();
 

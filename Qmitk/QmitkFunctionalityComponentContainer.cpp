@@ -42,6 +42,8 @@ QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObje
 m_UpdateSelector(updateSelector), 
 m_ShowSelector(showSelector),
 m_GUI(NULL),
+//m_ParentMitkImage(NULL),
+//m_ParentMitkImageIterator(NULL),
 m_Active(false),
 m_SelectedItem(NULL),
 m_FunctionalityComponentContainerGUI(NULL),
@@ -112,7 +114,11 @@ QWidget* QmitkFunctionalityComponentContainer::GetGUI()
   return m_GUI;
 }
 
-
+/*************** GET PARTENT MITK IMAGE ***************/
+mitk::Image* QmitkFunctionalityComponentContainer::GetParentMitkImage()
+{
+	return m_ParentMitkImage;
+}
 /******** ******* GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkFunctionalityComponentContainer::GetTreeNodeSelector()
 {
@@ -173,15 +179,36 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 /***************     IMAGE SELECTED     ***************/
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedItem = imageIt;
-  if(m_FunctionalityComponentContainerGUI != NULL)
-  {
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
-    }   
-  }
-  TreeChanged();
+	m_SelectedItem = imageIt;
+	if(m_FunctionalityComponentContainerGUI != NULL)
+	{
+		for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+		{
+			m_AddedChildList[i]->ImageSelected(m_SelectedItem);
+		}   
+	}
+
+	if(m_FunctionalityComponentContainerGUI)
+	{
+		mitk::DataTreeFilter* filter = m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter();
+		m_ParentMitkImageIterator = filter->GetIteratorToSelectedItem();
+
+		if(m_ParentMitkImageIterator.GetPointer())
+		{
+			m_ParentMitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
+		}
+
+		if(m_FunctionalityComponentContainerGUI != NULL)
+		{
+			for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+			{
+				m_AddedChildList[i]->m_ParentMitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
+				m_AddedChildList[i]->m_ParentMitkImageIterator = m_ParentMitkImageIterator;
+
+			}   
+		}
+	}
+	TreeChanged();
 }
 
 /*************** CREATE CONTAINER WIDGET **************/

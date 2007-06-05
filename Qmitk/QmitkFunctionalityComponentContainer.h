@@ -116,6 +116,10 @@ virtual void SetShowTreeNodeSelector(bool show);
 /** \brief Method to return the group-box that contains the tree-node-selector */
 virtual QGroupBox* GetImageContent();
 
+/** \brief Method to return the Image Selected in the Container Combo Box */
+virtual mitk::Image* GetParentMitkImage();
+
+
 /***************     ADD COMPONENTS     ***************/
 
   /** \brief method to add components into this component. */
@@ -168,6 +172,17 @@ protected:
 
   /** \brief Graphical User Interface for the component in general QWidget-Type */
   QWidget* m_GUI;
+
+  // /*!
+  //* image selected in MainSelector
+  //*/
+  //mitk::Image* m_ParentMitkImage;
+
+
+  ///*!
+  //* iterator on current image
+  //*/
+  //mitk::DataTreeIteratorClone m_ParentMitkImageIterator;
 
   /** \brief Attribute whether the component is active or not */
   bool m_Active;

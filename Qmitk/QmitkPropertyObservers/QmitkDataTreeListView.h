@@ -139,63 +139,61 @@ class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
     QmitkDataTreeListView(mitk::DataTreeIteratorBase* filter,QWidget* parent = 0, const char* name = 0);
     ~QmitkDataTreeListView();
 
-    void SetDataTree(mitk::DataTreeBase*);
-    void SetDataTree(mitk::DataTreeIteratorBase*);
+    virtual void SetDataTree(mitk::DataTreeBase*);
+    virtual void SetDataTree(mitk::DataTreeIteratorBase*);
 
-    void SetFilter(mitk::DataTreeFilter*);
-    mitk::DataTreeFilter* GetFilter();
+    virtual void SetFilter(mitk::DataTreeFilter*);
+    virtual mitk::DataTreeFilter* GetFilter();
 
-    void SetViewType(const std::string& property, unsigned int type); /// use QmitkPropertyViewFactory::ViewTypes or QmitkPropertyViewFactory::EditorTypes for type
+    virtual void SetViewType(const std::string& property, unsigned int type); /// use QmitkPropertyViewFactory::ViewTypes or QmitkPropertyViewFactory::EditorTypes for type
 
-    int stretchedColumn();
-    void setStretchedColumn(int);
+    virtual int stretchedColumn();
+    virtual void setStretchedColumn(int);
    
     virtual QSize sizeHint() const;
 
     // handler for event notification
-    void removeItemHandler( const itk::EventObject& e );
-    void removeChildrenHandler( const itk::EventObject& e );
-    void removeAllHandler( const itk::EventObject& e );
-    void selectionChangedHandler( const itk::EventObject& e );
-    void itemAddedHandler( const itk::EventObject& e );
-    void updateAllHandler( const itk::EventObject& e );
-    void newItemHandler( const itk::EventObject& e );
+    virtual void removeItemHandler( const itk::EventObject& e );
+    virtual void removeChildrenHandler( const itk::EventObject& e );
+    virtual void removeAllHandler( const itk::EventObject& e );
+    virtual void selectionChangedHandler( const itk::EventObject& e );
+    virtual void itemAddedHandler( const itk::EventObject& e );
+    virtual void updateAllHandler( const itk::EventObject& e );
+    virtual void newItemHandler( const itk::EventObject& e );
     
-    void SetAutoUpdate(bool);
-    void Update();
+    virtual void SetAutoUpdate(bool);
+    virtual void Update();
 
   signals:
     
-    void clicked(const mitk::DataTreeFilter::Item*, bool selected);
-    void activated(const mitk::DataTreeFilter::Item*, bool);
-    void newItem(const mitk::DataTreeFilter::Item*);
+    virtual void clicked(const mitk::DataTreeFilter::Item*, bool selected);
+    virtual void activated(const mitk::DataTreeFilter::Item*, bool);
+    virtual void newItem(const mitk::DataTreeFilter::Item*);
    
   protected:
 
-    void initialize();
-    void generateItems();
+    virtual void initialize();
+    virtual void generateItems();
 
-    void paintListBackground(QPainter& painter, QmitkListViewItemIndex* index);
+    virtual void paintListBackground(QPainter& painter, QmitkListViewItemIndex* index);
     virtual void paintEvent(QPaintEvent*);
 
     virtual void mouseReleaseEvent (QMouseEvent*);
     virtual void keyReleaseEvent(QKeyEvent*);
 
-    void clearItems();
-    
-  private:
+    virtual void clearItems();   
 
     typedef std::map<std::string, unsigned int> PropertyViewTypeMap;
 
-    void AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
+    virtual void AddItemsToList(QWidget* parent, QmitkListViewItemIndex* index,
                                                const mitk::DataTreeFilter::ItemList* items,
                                                const mitk::DataTreeFilter::PropertyList& visibleProps,
                                                const mitk::DataTreeFilter::PropertyList& editableProps);
 
-    void connectNotifications();
-    void disconnectNotifications();
+    virtual void connectNotifications();
+    virtual void disconnectNotifications();
 
-    bool selectItemInGrid(const mitk::DataTreeFilter::Item* item, bool selected, QmitkListViewItemIndex* index);
+    virtual bool selectItemInGrid(const mitk::DataTreeFilter::Item* item, bool selected, QmitkListViewItemIndex* index);
     
     mitk::DataTreeFilter::Pointer m_DataTreeFilter;
     int m_StretchedColumn;

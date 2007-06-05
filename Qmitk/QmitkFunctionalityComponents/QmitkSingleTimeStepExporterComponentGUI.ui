@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>198</height>
+            <width>209</width>
+            <height>93</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -130,11 +130,35 @@
                         </widget>
                     </vbox>
                 </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_ExportTimeSliceButton</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Export Time Slice</string>
+                    </property>
+                </widget>
             </vbox>
         </widget>
     </vbox>
 </widget>
 <customwidgets>
+    <customwidget>
+        <class>QmitkDataTreeComboBox</class>
+        <header location="global">QmitkDataTreeComboBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+    </customwidget>
     <customwidget>
         <class>QmitkSliderNavigator</class>
         <header location="global">QmitkSliderNavigator.h</header>
@@ -154,22 +178,6 @@
         <slot access="public" specifier="">SetStepper(mitk::Stepper*)</slot>
         <slot access="public" specifier="">Refetch()</slot>
         <property type="0">4</property>
-    </customwidget>
-    <customwidget>
-        <class>QmitkDataTreeComboBox</class>
-        <header location="global">QmitkDataTreeComboBox.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image0</pixmap>
     </customwidget>
 </customwidgets>
 <images>
@@ -194,6 +202,11 @@
     <function returnType="QGroupBox *">GetComponentContent()</function>
     <function returnType="QGroupBox *">GetShowComponent()</function>
     <function returnType="QmitkSliderNavigator *">GetQmitkSliderNavigator()</function>
+    <function returnType="QPushButton *">GetExportButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+    <includehint>QmitkSliderNavigator.h</includehint>
+</includehints>
 </UI>

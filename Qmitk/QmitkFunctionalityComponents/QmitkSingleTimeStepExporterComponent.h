@@ -64,7 +64,7 @@ class QmitkSingleTimeStepExporterComponent : public QmitkInteractionFunctionalit
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkSingleTimeStepExporterComponent(QObject *parent=0, const char *parentName=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = true, bool showSelector = true);
+  QmitkSingleTimeStepExporterComponent(QObject *parent=0, const char *parentName=0,  bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -124,10 +124,16 @@ public slots:
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
 
+  /** \brief Method to export a 3D-image at the selected timestep of a 4D-image dataset */
+  void AddSliceImage();
+
 protected:
 
   /************ Update DATATREECOMBOBOX(ES) *************/
   virtual void UpdateDataTreeComboBoxes();
+
+  mitk::DataTreeFilter::Item* m_CurrentItem;
+  bool m_4D;
 
 private:
 

@@ -54,3 +54,9 @@ QmitkSliderNavigator* QmitkSingleTimeStepExporterComponentGUI::GetQmitkSliderNav
 {
   return m_QmitkSliderNavigator;
 }
+
+
+QPushButton* QmitkSingleTimeStepExporterComponentGUI::GetExportButton()
+{
+ return m_ExportTimeSliceButton;
+}

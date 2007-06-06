@@ -45,6 +45,11 @@ public:
   //## ExitMethod for alternative behavior (i.e. suppression of keyboard exit)
   void TerminateApp(void);
 
+  // Description:
+  // Render the scene. Just pass the render call on to the 
+  // associated vtkRenderWindow.
+  virtual void Render();
+
   //##Documentation
   //## Win32 timer methods
   int CreateTimer(int timertype);

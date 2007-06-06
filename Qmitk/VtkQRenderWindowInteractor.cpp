@@ -4,6 +4,8 @@
 #include <math.h>
 #include "VtkQRenderWindowInteractor.h"
 
+#include "mitkRenderingManager.h"
+
 #include "vtkInteractorStyle.h"
 #include "vtkActor.h"
 #include "vtkObjectFactory.h"
@@ -109,8 +111,23 @@ void VtkQRenderWindowInteractor::Disable()
 //##ModelId=3E6D600F0113
 void VtkQRenderWindowInteractor::TerminateApp(void)
 {
-    
 }
+
+void VtkQRenderWindowInteractor::Render()
+{
+  if (this->RenderWindow && this->Enabled)
+  {
+    //this->RenderWindow->Render();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  }
+  // outside the above test so that third-party code can redirect
+  // the render to the appropriate class
+#if (VTK_MAJOR_VERSION >= 5)
+  this->InvokeEvent(vtkCommand::RenderEvent, NULL);
+#endif
+}
+
 
 //##ModelId=3E6D600F0115
 int VtkQRenderWindowInteractor::CreateTimer(int timertype)

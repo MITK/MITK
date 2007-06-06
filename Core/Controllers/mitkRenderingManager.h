@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
 #include "mitkCommon.h"
-#include <vector.h>
+//#include <vector.h>
 #include <string>
 #include <itkObject.h>
 
@@ -187,7 +187,8 @@ protected:
   int m_Interval;
   int m_CurrentLOD;
   int m_MaxLOD;
-  vector<bool> m_ShadingEnabled;
+  //vector<bool> m_ShadingEnabled;
+  bool* m_ShadingEnabled;
   bool m_ClippingPlaneStatus;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );

@@ -54,7 +54,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
 
-
 #include <itkMultiThreader.h>
 
 
@@ -396,7 +395,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   
   if (vtkRendWin && m_Firstcall) 
   {
-    
+
     vtkCallbackCommand* cbc = vtkCallbackCommand::New();
     cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
     vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
@@ -416,6 +415,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,1);
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
     
+    mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(true);
   } 
   else 
   {
@@ -470,9 +470,6 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
 /* Adds A Clipping Plane to the Mapper */
 void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* interactor)
 {
-  /**** wird später über GUI / Preferences gesetzt ****/
-  mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(true);
-  /***************************************************/
   
   if(mitk::RenderingManager::GetInstance()->GetClippingPlaneStatus()) //if clipping plane is enabled
   {
@@ -486,7 +483,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     m_PlaneWidget->SetPlaceFactor(1.0);
     m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput());
     m_PlaneWidget->OutlineTranslationOff();
-    m_PlaneWidget->ScaleEnabledOff();
+    //m_PlaneWidget->ScaleEnabledOff();
     m_PlaneWidget->DrawPlaneOff();
     //mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
     //std::cout<<"X: "<<input->GetDimension(0)<<" Y: "<<input->GetDimension(1)<<" Z: "<<input->GetDimension(2)<<std::endl;
@@ -499,8 +496,8 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     m_T2DMapperHi->AddClippingPlane(m_ClippingPlane);
 #endif
     m_HiResMapper->AddClippingPlane(m_ClippingPlane);
+    //std::cout<<"plane added"<<std::endl;
     }
-    
     m_PlaneWidget->GetPlane(m_ClippingPlane);
     
     m_PlaneSet = true;
@@ -511,7 +508,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     if(m_PlaneSet) //if plane exists
     {
     DelClippingPlane();
-    std::cout<<"Plane removed"<<std::endl;
+    //std::cout<<"Plane removed"<<std::endl;
     }
   }
 

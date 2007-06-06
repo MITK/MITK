@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkCuboid.h>
+#include <mitkEllipsoid.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkUndoController.h>
 #include <mitkBoundingObjectCutter.h>
@@ -59,13 +60,14 @@ QmitkImageCropperComponent::opExchangeNodes::opExchangeNodes( mitk::OperationTyp
 }
 
 /***************       CONSTRUCTOR      ***************/
-QmitkImageCropperComponent::QmitkImageCropperComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+QmitkImageCropperComponent::QmitkImageCropperComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, QmitkFunctionalityComponentContainer * parentObject)
 : QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_ImageCropperImageNode(NULL),
 m_ImageCropperComponentGUI(NULL),
 m_ImageCropperNodeExisting(false),
 m_MultiWidget(mitkStdMultiWidget),
-m_BoundingObjectExists(false)
+m_BoundingObjectExists(false),
+m_ParentObject(parentObject)
 {
   SetDataTreeIterator(it);
   SetAvailability(true);
@@ -164,6 +166,7 @@ void QmitkImageCropperComponent::ImageSelected(const mitk::DataTreeFilter::Item 
 		m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
 		//mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 	}
+   
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
@@ -375,11 +378,24 @@ void QmitkImageCropperComponent::CropImage()
                                                               resultImage, 
                                                               m_MitkImageIterator->Get()->GetData());
 
+  //if(m_ParentObject){m_ParentObject->TreeChanged();}
   mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( 
-      new mitk::OperationEvent(this, doOp, undoOp, "Crop image") ); // tell the undo controller about the action
+  new mitk::OperationEvent(this, doOp, undoOp, "Crop image") ); // tell the undo controller about the action
   ExecuteOperation(doOp); // execute action
-  }
+  
+  m_MitkImage = resultImage;
+  
 
+  if(m_MitkImageIterator.GetPointer())
+    {
+      m_MitkImageIterator->Get()->SetData(resultImage);
+	  if(m_ParentObject)
+	  {
+		  m_ParentObject->SetTreeIterator(m_MitkImageIterator);  
+	  }
+	}
+  emit mitkImageChanged();
+  }
 }
 
 void QmitkImageCropperComponent::CreateBoundingObject()
@@ -388,8 +404,9 @@ void QmitkImageCropperComponent::CreateBoundingObject()
 	{
 		if(! m_BoundingObjectExists)
 		{
-			m_CroppingObject = mitk::Cuboid::New();
-
+			//m_CroppingObject = mitk::Cuboid::New();
+            m_CroppingObject = mitk::Ellipsoid::New();
+			
 			m_CroppingObjectNode = mitk::DataTreeNode::New(); 
 			mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_CroppingObjectNode );
 			m_CroppingObjectNode->SetData( m_CroppingObject );
@@ -399,8 +416,8 @@ void QmitkImageCropperComponent::CreateBoundingObject()
 			m_CroppingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
 			m_CroppingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
 			m_BoundingObjectExists = true;
-
-			    if(m_MitkImageIterator.GetPointer())
+		}
+	if(m_MitkImageIterator.GetPointer())
     {
       m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
 	}
@@ -408,7 +425,6 @@ void QmitkImageCropperComponent::CreateBoundingObject()
       m_MitkImageIterator->Get()->SetVisibility(true);
       m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
 		}
-	}
 }
 //
 //

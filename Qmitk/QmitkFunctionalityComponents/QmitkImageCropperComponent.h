@@ -50,6 +50,7 @@ class QmitkStdMultiWidget;
 
 class QmitkImageCropperComponent : public QmitkFunctionalityComponentContainer, public mitk::OperationActor
 {
+	Q_OBJECT
  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode) 
   /// and to two data sets (mitk::BaseData) instances
   class opExchangeNodes: public mitk::Operation
@@ -64,12 +65,10 @@ class QmitkImageCropperComponent : public QmitkFunctionalityComponentContainer, 
              mitk::BaseData::Pointer m_OldData;
              mitk::BaseData::Pointer m_NewData;
   };
-  Q_OBJECT
-
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkImageCropperComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkImageCropperComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, QmitkFunctionalityComponentContainer * parentObject = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */
@@ -112,6 +111,9 @@ virtual QGroupBox* GetImageContent();
 
   ///** \brief Method to set m_Activated to false */
   virtual void Deactivated();
+
+signals:
+void mitkImageChanged();
 
 public slots:  
   /***************      OHTER METHODS     ***************/
@@ -215,7 +217,7 @@ protected:
 
 private:
 
-
+  QmitkFunctionalityComponentContainer* m_ParentObject;
   /***************        ATTRIBUTES      ***************/
 
   /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/

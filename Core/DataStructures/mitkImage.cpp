@@ -270,7 +270,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
   // volume is unavailable. Can we calculate it?
   if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
-    // ... wir m�ssen rechnen!!! ....
+    // ... wir muessen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, 0);
@@ -358,7 +358,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
   // channel is unavailable. Can we calculate it?
   if((GetSource()!=NULL) && (GetSource()->Updating()==false))
   {
-    // ... wir m�ssen rechnen!!! ....
+    // ... wir muessen rechnen!!! ....
     m_RequestedRegion.SetIndex(0, 0);
     m_RequestedRegion.SetIndex(1, 0);
     m_RequestedRegion.SetIndex(2, 0);
@@ -885,13 +885,10 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
 
   ImageDataItemPointer dnull=NULL;
 
-  m_Channels.reserve(GetNumberOfChannels());
   m_Channels.assign(GetNumberOfChannels(), dnull);
 
-  m_Volumes.reserve(GetNumberOfChannels()*m_Dimensions[3]);
   m_Volumes.assign(GetNumberOfChannels()*m_Dimensions[3], dnull);
 
-  m_Slices.reserve(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2]);
   m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();

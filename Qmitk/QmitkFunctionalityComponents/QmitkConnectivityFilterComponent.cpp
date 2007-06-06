@@ -207,7 +207,7 @@ void QmitkConnectivityFilterComponent::SurfaceToImage()
 				mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceImageNode);
 				surfaceImageNode->SetIntProperty("layer", 15);
 				surfaceImageNode->SetProperty("name", new mitk::StringProperty("SurfaceImageNode"));
-				m_ParentMitkImageIterator->Add(surfaceImageNode);
+				m_MitkImageIterator->Add(surfaceImageNode);
 			}
 
 		}

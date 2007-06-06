@@ -176,6 +176,34 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
   }
 }
 
+void QmitkFunctionalityComponentContainer::SetTreeIterator(mitk::DataTreeIteratorClone dataIt)
+{
+	if(dataIt.IsNotNull())
+	{
+		if(m_FunctionalityComponentContainerGUI)
+		{
+			//mitk::DataTreeFilter* filter = m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter();
+			m_MitkImageIterator  = dataIt;
+
+			if(m_MitkImageIterator.GetPointer())
+			{
+				m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+			}
+
+			if(m_FunctionalityComponentContainerGUI != NULL)
+			{
+				for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+				{
+					//m_AddedChildList[i]->m_MitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
+					m_AddedChildList[i]->m_DataTreeIterator = m_MitkImageIterator;
+					m_AddedChildList[i]->TreeChanged();
+
+				}   
+			}
+		}
+	}
+}
+
 /***************     IMAGE SELECTED     ***************/
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
@@ -191,19 +219,19 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFil
 	if(m_FunctionalityComponentContainerGUI)
 	{
 		mitk::DataTreeFilter* filter = m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter();
-		m_ParentMitkImageIterator = filter->GetIteratorToSelectedItem();
+		m_MitkImageIterator = filter->GetIteratorToSelectedItem();
 
-		if(m_ParentMitkImageIterator.GetPointer())
+		if(m_MitkImageIterator.GetPointer())
 		{
-			m_ParentMitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
+			m_ParentMitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
 		}
 
 		if(m_FunctionalityComponentContainerGUI != NULL)
 		{
 			for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
 			{
-				m_AddedChildList[i]->m_ParentMitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
-				m_AddedChildList[i]->m_ParentMitkImageIterator = m_ParentMitkImageIterator;
+				m_AddedChildList[i]->m_ParentMitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+				m_AddedChildList[i]->m_MitkImageIterator = m_MitkImageIterator;
 
 			}   
 		}

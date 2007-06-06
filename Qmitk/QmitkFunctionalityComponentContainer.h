@@ -116,6 +116,9 @@ virtual void SetShowTreeNodeSelector(bool show);
 /** \brief Method to return the group-box that contains the tree-node-selector */
 virtual QGroupBox* GetImageContent();
 
+  /** \brief Method to set the DataTreeIterator*/
+ virtual void SetTreeIterator(mitk::DataTreeIteratorClone dataIt);
+
 /** \brief Method to return the Image Selected in the Container Combo Box */
 virtual mitk::Image* GetParentMitkImage();
 

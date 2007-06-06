@@ -57,6 +57,11 @@ class QmitkBaseFunctionalityComponent : public QObject
 
 public:
 
+	  /*!
+  a reference to a data tree iterator object
+  */
+  mitk::DataTreeIteratorClone m_DataTreeIterator;
+
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
   QmitkBaseFunctionalityComponent(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
@@ -94,6 +99,10 @@ public:
 
   virtual QWidget* GetGUIControls();
 
+  /** \brief Method to set the the iterator of the selected image */
+  virtual void SetMitkImageIterator(mitk::DataTreeIteratorClone mitkImageIterator);
+
+
   /*!
   \brief getter for dataTree attribute. It returns the 
   reference to a data tree iterator object
@@ -110,11 +119,20 @@ public:
   */
   mitk::Image* m_ParentMitkImage;
 
-
   /*!
+  * image selected in MainSelector
+  */
+  mitk::Image* m_MitkImage;
+
+    /*!
   * iterator on current image
   */
-  mitk::DataTreeIteratorClone m_ParentMitkImageIterator;
+  mitk::DataTreeIteratorClone m_MitkImageIterator;
+
+  ///*!
+  //* iterator on current image
+  //*/
+  //mitk::DataTreeIteratorClone m_ParentMitkImageIterator;
 
     /*************** GET CONTENT CONTAINER  ***************/
 virtual QGroupBox * GetContentContainer();
@@ -124,6 +142,11 @@ virtual QGroupBox * GetMainCheckBoxContainer();
 
  /** \brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" */
  virtual void SetContentContainerVisibility(bool);
+
+
+  /** \brief Method to set the DataTreeIterator*/
+ virtual void SetTreeIterator(mitk::DataTreeIteratorClone dataIt);
+
 
   /***************      OHTER METHODS     ***************/
   /*!
@@ -186,10 +209,7 @@ protected:
   */
   QString m_FuncName;
   
-  /*!
-  a reference to a data tree iterator object
-  */
-  mitk::DataTreeIteratorClone m_DataTreeIterator;
+
 
 private:
 

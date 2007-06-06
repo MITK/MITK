@@ -28,7 +28,7 @@ QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent
 m_FuncName(name),
 m_Parent(parent),
 m_ParentMitkImage(NULL),
-m_ParentMitkImageIterator(NULL)
+m_MitkImageIterator(NULL)
 {
   SetDataTreeIterator(dataIt);
   
@@ -68,6 +68,15 @@ void QmitkBaseFunctionalityComponent::SetDataTreeIterator(mitk::DataTreeIterator
   m_DataTreeIterator = it;
 }
 
+void QmitkBaseFunctionalityComponent::SetMitkImageIterator(mitk::DataTreeIteratorClone mitkImageIterator)
+{
+ m_MitkImageIterator = mitkImageIterator;
+}
+
+void QmitkBaseFunctionalityComponent::SetTreeIterator(mitk::DataTreeIteratorClone dataIt)
+{
+  m_DataTreeIterator = dataIt;
+}
 /*************** GET DATA TREE ITERATOR ***************/
 mitk::DataTreeIteratorBase* QmitkBaseFunctionalityComponent::GetDataTreeIterator()
 {

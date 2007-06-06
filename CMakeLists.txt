@@ -83,7 +83,7 @@ IF(VTK_MAJOR_VERSION EQUAL 5)
 )
 ELSE(VTK_MAJOR_VERSION EQUAL 5)
     SET(VTK_FOR_MITK_LIBRARIES
-  vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkPatented  vtkpng vtkRendering vtkzlib vtkWidgets
+  vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkPatented  vtkpng vtkRendering vtkzlib 
 )
 ENDIF(VTK_MAJOR_VERSION EQUAL 5)
 

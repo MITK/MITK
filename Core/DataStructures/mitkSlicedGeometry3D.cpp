@@ -127,10 +127,7 @@ mitk::SlicedGeometry3D::Initialize( unsigned int slices )
   Superclass::Initialize();
   m_Slices = slices;
 
-  m_Geometry2Ds.clear();
- 
   Geometry2D::Pointer gnull = NULL;
-  m_Geometry2Ds.reserve( m_Slices );
   m_Geometry2Ds.assign( m_Slices, gnull );
  
   Vector3D spacing;
@@ -170,9 +167,8 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   bounds[4] = 0;
   bounds[5] = slices;
 
-  m_Geometry2Ds.clear(); 
+  // clear and reserve
   Geometry2D::Pointer gnull = NULL;
-  m_Geometry2Ds.reserve( m_Slices );
   m_Geometry2Ds.assign( m_Slices, gnull );
 
   Vector3D directionVector = geometry2D->GetAxisVector(2);
@@ -388,8 +384,6 @@ mitk::SlicedGeometry3D
   
   // Finally, we can clear the previous geometry stack and initialize it with
   // our re-initialized "first plane".
-  m_Geometry2Ds.clear();
-  m_Geometry2Ds.reserve( m_Slices );
   m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
 
   if ( m_Slices > 0 )
@@ -530,10 +524,7 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
   }
 
   //clear and reserve
-  m_Geometry2Ds.clear();
-
   Geometry2D::Pointer gnull=NULL;
-  m_Geometry2Ds.reserve(m_Slices);
   m_Geometry2Ds.assign(m_Slices, gnull);
 
   if ( m_Slices > 0 )

@@ -211,11 +211,8 @@ void mitk::TimeSlicedGeometry::InitializeEmpty(unsigned int timeSteps)
 
   m_TimeSteps = timeSteps;
   
-  m_Geometry3Ds.clear();  
-
+  // initialize with empty geometries
   Geometry3D::Pointer gnull=NULL;
- 
-  m_Geometry3Ds.reserve(m_TimeSteps);
   m_Geometry3Ds.assign(m_TimeSteps, gnull);
 }
 

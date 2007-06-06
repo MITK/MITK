@@ -489,7 +489,7 @@ public:
 
 void
 mitk::RenderingManager
-::RenderingStartCallback( itk::Object* object, const itk::EventObject& event )
+::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 { 
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)
@@ -501,7 +501,7 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::RenderingProgressCallback( itk::Object* object, const itk::EventObject& event )
+::RenderingProgressCallback( itk::Object* /*object*/, const itk::EventObject& /*event*/ )
 {
   this->DoMonitorRendering();
 
@@ -509,7 +509,7 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::RenderingEndCallback( itk::Object* object, const itk::EventObject& event )
+::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 { 
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)

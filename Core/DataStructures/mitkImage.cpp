@@ -666,13 +666,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   ImageDataItemPointer dnull=NULL;
 
-  m_Channels.reserve(GetNumberOfChannels());
   m_Channels.assign(GetNumberOfChannels(), dnull);
 
-  m_Volumes.reserve(GetNumberOfChannels()*m_Dimensions[3]);
   m_Volumes.assign(GetNumberOfChannels()*m_Dimensions[3], dnull);
 
-  m_Slices.reserve(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2]);
   m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
 
   ComputeOffsetTable();

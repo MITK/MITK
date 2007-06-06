@@ -128,7 +128,20 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
-   void CropImage();
+  /** \brief Slot method that will be called if the cube-Button was pressed */ 
+  void CubePressed();
+
+  /** \brief Slot method that will be called if the Ellipsoid-Button was pressed */ 
+  void EllipsoidPressed();
+
+  /** \brief Slot method that will be called if the Cone-Button was pressed */ 
+  void ConePressed();
+
+  /** \brief Slot method that will be called if the Cylinder-Button was pressed */ 
+  void CylinderPressed();
+
+  /** \brief Slot method that will be called if the CropImage-Button was pressed to crop the image*/ 
+  void CropImage();
 
 
 protected:
@@ -191,7 +204,7 @@ protected:
   /*!
    * \brief Creates the cuboid and its data tree node.
    */
-  virtual void CreateBoundingObject();
+  virtual void CreateBoundingObject(int type);
 
   /*!
    * \brief Finds the given node in the data tree and fits the cuboid to it

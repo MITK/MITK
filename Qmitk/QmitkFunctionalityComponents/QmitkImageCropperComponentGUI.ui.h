@@ -67,3 +67,26 @@ QPushButton * QmitkImageCropperComponentGUI::GetCropImageButton()
 {
   return m_CropImageButton;
 }
+
+QPushButton* QmitkImageCropperComponentGUI::GetCubeButton()
+{
+  return m_CubeButton;
+}
+
+
+QPushButton* QmitkImageCropperComponentGUI::GetEllipsoidButton()
+{
+  return m_EllipsoidButton;
+}
+
+
+QPushButton* QmitkImageCropperComponentGUI::GetCylinderButton()
+{
+  return m_CylinderButton;
+}
+
+
+QPushButton* QmitkImageCropperComponentGUI::GetConeButton()
+{
+ return m_ConeButton;
+}

@@ -79,11 +79,11 @@ LINK_DIRECTORIES(${MITK_LINK_DIRECTORIES})
 
 IF(VTK_MAJOR_VERSION EQUAL 5)
     SET(VTK_FOR_MITK_LIBRARIES
-      vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkpng vtkRendering vtkVolumeRendering vtkzlib
+      vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkpng vtkRendering vtkVolumeRendering vtkzlib vtkWidgets
 )
 ELSE(VTK_MAJOR_VERSION EQUAL 5)
     SET(VTK_FOR_MITK_LIBRARIES
-  vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkPatented  vtkpng vtkRendering vtkzlib
+  vtkGraphics vtkCommon vtkFiltering vtkGraphics vtkHybrid vtkImaging vtkIO vtkjpeg vtkParallel vtkPatented  vtkpng vtkRendering vtkzlib vtkWidgets
 )
 ENDIF(VTK_MAJOR_VERSION EQUAL 5)
 

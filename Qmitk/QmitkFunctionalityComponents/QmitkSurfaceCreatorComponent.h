@@ -80,7 +80,11 @@ public:
   /** \brief Method to get the Iterator to the DataTree */
   mitk::DataTreeIteratorBase* GetDataTreeIterator();
 
+  /** \brief Method to get TreeNodeSelectorComboBox */
   virtual QmitkDataTreeComboBox* GetTreeNodeSelector();
+
+  /** \brief Method to inform that the DataTree has changed */
+  void TreeChanged();
 
 
   /** \brief Method to set the Image Selector visible or invisible */
@@ -287,10 +291,10 @@ private:
   */
   float getThreshold();
 
-  /*!
-  * iterator on current image
-  */
-  mitk::DataTreeIteratorClone m_MitkImageIterator;
+  ///*!
+  //* iterator on current image
+  //*/
+  //mitk::DataTreeIteratorClone m_MitkImageIterator;
 
   /*!
   *  variable to count Surfaces and hang it after the name in the DataTree 

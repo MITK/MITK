@@ -51,6 +51,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
+#include <vtkPlane.h>
+#include <vtkImplicitPlaneWidget.h>
+
 
 #include <itkMultiThreader.h>
 
@@ -62,9 +65,9 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {
-
   m_Firstcall = true;
-
+  m_PlaneSet = false;
+  
   m_T2DMapper =  vtkVolumeTextureMapper2D::New();
   m_HiResMapper = vtkVolumeRayCastMapper::New();
   m_HiResMapper->SetSampleDistance(0.5); // 4 rays for every pixel
@@ -122,8 +125,9 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput());
   m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
-
+    
   mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
+  
 }
 
 
@@ -388,8 +392,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
 
+  SetClippingPlane(interactor);
+  
   if (vtkRendWin && m_Firstcall) 
   {
+    
     vtkCallbackCommand* cbc = vtkCallbackCommand::New();
     cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 
     vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc); 
@@ -408,6 +415,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,0);
     mitk::RenderingManager::GetInstance()->SetShading(true,1);
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
+    
   } 
   else 
   {
@@ -424,9 +432,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 */
 }
 
+/* Shading enabled / disabled */
 void mitk::VolumeDataVtkMapper3D::SetPreferences()
 {
-  //Shading
   //LOD 0
   if(mitk::RenderingManager::GetInstance()->GetShading(0))
   {
@@ -458,6 +466,71 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   }
    
 }
+
+/* Adds A Clipping Plane to the Mapper */
+void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* interactor)
+{
+  /**** wird später über GUI / Preferences gesetzt ****/
+  mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(true);
+  /***************************************************/
+  
+  if(mitk::RenderingManager::GetInstance()->GetClippingPlaneStatus()) //if clipping plane is enabled
+  {
+      
+    if(!m_PlaneSet)
+    {
+    m_ClippingPlane = vtkPlane::New();
+    
+    m_PlaneWidget = vtkImplicitPlaneWidget::New();
+    m_PlaneWidget->SetInteractor(interactor);
+    m_PlaneWidget->SetPlaceFactor(1.0);
+    m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput());
+    m_PlaneWidget->OutlineTranslationOff();
+    m_PlaneWidget->ScaleEnabledOff();
+    m_PlaneWidget->DrawPlaneOff();
+    //mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
+    //std::cout<<"X: "<<input->GetDimension(0)<<" Y: "<<input->GetDimension(1)<<" Z: "<<input->GetDimension(2)<<std::endl;
+    m_PlaneWidget->PlaceWidget(); //TODO: muss noch an den Datensatz angepasst werden
+    
+    m_T2DMapper->AddClippingPlane(m_ClippingPlane);
+#if (VTK_MAJOR_VERSION >= 5)
+    m_FPRCMapper->AddClippingPlane(m_ClippingPlane);
+#else  
+    m_T2DMapperHi->AddClippingPlane(m_ClippingPlane);
+#endif
+    m_HiResMapper->AddClippingPlane(m_ClippingPlane);
+    }
+    
+    m_PlaneWidget->GetPlane(m_ClippingPlane);
+    
+    m_PlaneSet = true;
+    
+  }
+  else //if clippingplane is disabled
+  { 
+    if(m_PlaneSet) //if plane exists
+    {
+    DelClippingPlane();
+    std::cout<<"Plane removed"<<std::endl;
+    }
+  }
+
+}    
+
+/* Removes the clipping plane */
+void mitk::VolumeDataVtkMapper3D::DelClippingPlane(){
+
+  m_T2DMapper->RemoveAllClippingPlanes();
+#if (VTK_MAJOR_VERSION >= 5)
+  m_FPRCMapper->RemoveAllClippingPlanes();
+#else  
+  m_T2DMapperHi->RemoveAllClippingPlanes();
+#endif
+  m_HiResMapper->RemoveAllClippingPlanes();
+  m_PlaneSet = false;
+
+}
+
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
 {

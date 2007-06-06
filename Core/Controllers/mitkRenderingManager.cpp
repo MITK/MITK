@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkCommand.h>
 #include <algorithm>
+#include <vector.h>
 
 mitk::RenderingManager::RenderWindowList mitk::RenderingManager::s_RenderWindowList;
 mitk::RenderingManager::Pointer mitk::RenderingManager::s_Instance = 0;
@@ -107,6 +108,7 @@ mitk::RenderingManager
 mitk::RenderingManager::RenderingManager()
 : m_UpdatePending( false ), m_Interval( 10 )
 {
+  m_ShadingEnabled.resize(3);
   // The default (minimum) interval is 10 msec, theoretically enabling a
   // maximum frame rate of 100 Hz.
 }
@@ -592,7 +594,7 @@ void mitk::RenderingManager::SetShading(bool state, int lod)
   
   
   //commented due to compiler problems
-  //m_ShadingEnabled[lod] = state;
+  m_ShadingEnabled[lod] = state;
 
 }
 
@@ -600,10 +602,19 @@ bool mitk::RenderingManager::GetShading(int lod)
 { 
   //std::cout<<"getshading("<<lod<<")\n";
   
-  //commented due to compiler problems
-  //return m_ShadingEnabled[lod];
+  return m_ShadingEnabled[lod];
   
   return false;
+}
+
+void mitk::RenderingManager::SetClippingPlaneStatus(bool status)
+{
+  m_ClippingPlaneStatus = status;
+}
+
+bool mitk::RenderingManager::GetClippingPlaneStatus()
+{
+  return m_ClippingPlaneStatus;
 }
 
 // Create and register generic RenderingManagerFactory.

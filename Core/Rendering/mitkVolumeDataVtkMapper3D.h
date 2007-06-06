@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
 #include <vtkVolumeProperty.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkPlane.h>
+#include <vtkImplicitPlaneWidget.h>
 
 class vtkVolumeRayCastMapper;
 class vtkFixedPointVolumeRayCastMapper;
@@ -69,6 +72,9 @@ protected:
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   void SetPreferences();
+  
+  void SetClippingPlane(vtkRenderWindowInteractor* interactor);
+  void DelClippingPlane();
 
   vtkActor* m_Actor;
   vtkImageShiftScale* m_ImageCast;
@@ -86,10 +92,17 @@ protected:
   vtkImageResample* m_Resampler; 
   vtkLODProp3D* m_VolumeLOD;
 
+  vtkPlane* m_ClippingPlane;
+  vtkImplicitPlaneWidget* m_PlaneWidget;
+  
   int m_LowResID;
   int m_MedResID;
   int m_HiResID;
   bool m_Firstcall;
+  bool m_PlaneSet;
+  double m_PlaneNormalA;
+  double m_PlaneNormalB;
+  double m_PlaneNormalC;
 
 };
 

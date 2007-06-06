@@ -89,6 +89,11 @@ public:
    * Sets default properites common to all data types representing a surface
    */
   static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
+
+  /**
+   * Sets default properites common to all data types representing a binary segmentation
+   */
+  static void SetDefaultSegmentationProperties(DataTreeNode::Pointer &node);
   
   /**
    * Sets default properites common to all data types representing a PointSet

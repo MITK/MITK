@@ -80,15 +80,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCoreObjectFactory.h"
 
 #ifdef MBI_INTERNAL
- #ifdef HAVE_IPDICOM
-  #include "mitkDICOMFileReader.h"
- #endif // HAVE_IPDICOM 
- #include "mitkBirdDataFromFileReader.h"
- #include "mitkTrackedUSDataFileParser.h"
- #include "mitkUSLookupTableSource.h"
- #include "mitkCylindricToCartesianFilter.h"
- #include "mitkDSRFileReader.h"
- #include "mitkShapeModelFileReader.h"
+#ifdef HAVE_IPDICOM
+#include "mitkDICOMFileReader.h"
+#endif // HAVE_IPDICOM 
+#include "mitkBirdDataFromFileReader.h"
+#include "mitkTrackedUSDataFileParser.h"
+#include "mitkUSLookupTableSource.h"
+#include "mitkCylindricToCartesianFilter.h"
+#include "mitkDSRFileReader.h"
+#include "mitkShapeModelFileReader.h"
 #endif // MBI_INTERNAL
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
@@ -116,7 +116,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
   if (!exists)
   {
     std::string testfilename = m_FileName + ".gz";
-  
+
     std::ifstream exists(testfilename.c_str());
     if (exists.good()) 
     {
@@ -138,7 +138,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       }
     }
   }
-  
+
   // part for DICOM
   const char *numbers = "0123456789.";
   std::string::size_type first_non_number;
@@ -161,10 +161,10 @@ void mitk::DataTreeNodeFactory::GenerateData()
   else
   {
     bool usedNewDTNF = false;
-    
+
     // the mitkBaseDataIO class returns a pointer of a vector of BaseData objects
     std::vector<mitk::BaseData::Pointer> baseDataVector = mitk::BaseDataIO::LoadBaseDataFromFile( m_FileName, m_FilePrefix, m_FilePattern, m_Serie );
-    
+
     if( !baseDataVector.empty() )
       this->ResizeOutputs((unsigned int)baseDataVector.size());
 
@@ -242,7 +242,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       // part for series of data
       else if ( m_FilePattern != "" && m_FilePrefix != "" )
       {
-          this->ReadFileSeriesTypeITKImageSeriesReader();
+        this->ReadFileSeriesTypeITKImageSeriesReader();
       }
     }
   }
@@ -471,59 +471,59 @@ void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
 {
   unsigned int i,count;
 
-    mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
-    cout<<m_FileName<<endl;   
-    parser->LoadBehavior(m_FileName); 
-    
-    //Parse die Tus-File and get BirdDataPfadliste+ HpsonoPfadListe
-    std::vector< std::string > BirdDataPfadListe = mitk::TrackedUSDataFileParser::GetBirdDataPfadListe();
-    
-    std::vector< std::string > HpsonoPfadListe = mitk::TrackedUSDataFileParser::GetHpsonoPfadListe();
-    std::vector <std::string>::iterator it;
+  mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
+  cout<<m_FileName<<endl;   
+  parser->LoadBehavior(m_FileName); 
 
-    int OutputNumber=0;
-    i=0;// Laufvariable fr die internen Kan�eBilder aus DSRreader
-    count=0;// Laufvariable fr die BilderAnzahl
-    BirdDataFromFileReader Birdreader;
+  //Parse die Tus-File and get BirdDataPfadliste+ HpsonoPfadListe
+  std::vector< std::string > BirdDataPfadListe = mitk::TrackedUSDataFileParser::GetBirdDataPfadListe();
 
-    for ( it= HpsonoPfadListe.begin( );it != HpsonoPfadListe.end( );it++ )
-    {  
-      mitk::DataTreeNodeFactory::Pointer HPSonoReader=mitk::DataTreeNodeFactory::New();
-      std::string name=*it;
+  std::vector< std::string > HpsonoPfadListe = mitk::TrackedUSDataFileParser::GetHpsonoPfadListe();
+  std::vector <std::string>::iterator it;
 
-      //Lese USBilder mittels ReadFileTypeHPSONOS()
-      HPSonoReader->SetFileName(name.c_str() );           
-      HPSonoReader->Update(); 
+  int OutputNumber=0;
+  i=0;// Laufvariable fr die internen Kan�eBilder aus DSRreader
+  count=0;// Laufvariable fr die BilderAnzahl
+  BirdDataFromFileReader Birdreader;
 
-      OutputNumber+=HPSonoReader->GetNumberOfOutputs(); // Aktualisiere Anzahl Bilder
+  for ( it= HpsonoPfadListe.begin( );it != HpsonoPfadListe.end( );it++ )
+  {  
+    mitk::DataTreeNodeFactory::Pointer HPSonoReader=mitk::DataTreeNodeFactory::New();
+    std::string name=*it;
 
-      this->ResizeOutputs(OutputNumber);
+    //Lese USBilder mittels ReadFileTypeHPSONOS()
+    HPSonoReader->SetFileName(name.c_str() );           
+    HPSonoReader->Update(); 
 
-      Birdreader.SetFilename(BirdDataPfadListe[count].c_str()); 
-      mitk::BirdData BD= Birdreader.GetBirdData();
-      
-      //Set PositionProperty
-      mitk::Point3D PositionData= BD.GetPositionMean();
-      mitk::Point3dProperty::Pointer positionProp;
-      positionProp = new mitk::Point3dProperty(PositionData);
-      HPSonoReader->GetOutput(0)->SetProperty( "PositionData",positionProp );
-      HPSonoReader->GetOutput(1)->SetProperty( "PositionData",positionProp );
-      
-      Birdreader.getRotationMatrix();
-      
-      //Set RotationProperty
-      mitk::Point4D QuaternionData =BD.GetRotationMean();
-      mitk::Point4dProperty::Pointer quaternionProp;
-      quaternionProp = new mitk::Point4dProperty(QuaternionData);     
-      HPSonoReader->GetOutput(0)->SetProperty( "QuaternionData", quaternionProp );
-      HPSonoReader->GetOutput(1)->SetProperty( "QuaternionData", quaternionProp );
+    OutputNumber+=HPSonoReader->GetNumberOfOutputs(); // Aktualisiere Anzahl Bilder
 
-      this->SetOutput(i,HPSonoReader->GetOutput(0));
-      this->SetOutput(i+1,HPSonoReader->GetOutput(1));
+    this->ResizeOutputs(OutputNumber);
 
-      i+=2;
-      count++;
-    }
+    Birdreader.SetFilename(BirdDataPfadListe[count].c_str()); 
+    mitk::BirdData BD= Birdreader.GetBirdData();
+
+    //Set PositionProperty
+    mitk::Point3D PositionData= BD.GetPositionMean();
+    mitk::Point3dProperty::Pointer positionProp;
+    positionProp = new mitk::Point3dProperty(PositionData);
+    HPSonoReader->GetOutput(0)->SetProperty( "PositionData",positionProp );
+    HPSonoReader->GetOutput(1)->SetProperty( "PositionData",positionProp );
+
+    Birdreader.getRotationMatrix();
+
+    //Set RotationProperty
+    mitk::Point4D QuaternionData =BD.GetRotationMean();
+    mitk::Point4dProperty::Pointer quaternionProp;
+    quaternionProp = new mitk::Point4dProperty(QuaternionData);     
+    HPSonoReader->GetOutput(0)->SetProperty( "QuaternionData", quaternionProp );
+    HPSonoReader->GetOutput(1)->SetProperty( "QuaternionData", quaternionProp );
+
+    this->SetOutput(i,HPSonoReader->GetOutput(0));
+    this->SetOutput(i+1,HPSonoReader->GetOutput(1));
+
+    i+=2;
+    count++;
+  }
 }
 #endif //USE_TUS_READER
 
@@ -646,7 +646,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
   typedef itk::Image<int, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
   typedef itk::NumericSeriesFileNames NameGenerator;
-  
+
   if ( ! this->GenerateFileList() )
   {
     itkWarningMacro( "Sorry, file list could not be generated!" );
@@ -722,7 +722,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   }
-  
+
   // add a default rainbow lookup table for color mapping
   mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
   vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
@@ -756,6 +756,23 @@ void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::
   }
 }
 
+void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::Pointer &node)
+{
+  node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
+  node->SetProperty( "use color", new mitk::BoolProperty( true ) );
+  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
+  node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
+  node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
+  node->SetProperty( "layer", new mitk::IntProperty(1));
+  node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
+  node->SetProperty( "binary", new mitk::BoolProperty(true) );
+  node->SetProperty( "segmentation", new mitk::BoolProperty(true) );
+  node->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
+  node->SetProperty( "color" , new mitk::ColorProperty( 1.0f, 0.0f, 0.0f ));
+  node->SetOpacity(0.5f);
+  node->SetVisibility(true);
+}
+
 void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
 {
   node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
@@ -766,7 +783,7 @@ void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode:
   //node->SetProperty( "contour", new mitk::BoolProperty(false) );
   //node->SetProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
   //node->SetProperty( "close", new mitk::BoolProperty(false) );
-    
+
   //node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetVisibility(true);
 }
@@ -797,7 +814,7 @@ void mitk::DataTreeNodeFactory::SetDefaultUltraSoundProperties(mitk::DataTreeNod
     dopplerChannelSelector->SetInput( image );
 
     // insert morphology
-//    mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
+    //    mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
     node->SetData( morphologyChannelSelector->GetOutput() );
     mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
     node->SetProperty( "ultrasound", ultrasoundProp );

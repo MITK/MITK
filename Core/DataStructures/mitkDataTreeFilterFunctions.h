@@ -238,6 +238,45 @@ namespace mitk
       DataStorage::SetOfObjects::ConstPointer m_ResultSet;
   };
 
+  /*! \brief Tests if the node contains an image with a specified dimensionality (template parameter)
+
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::ImageWithDimensionAndProperty<3>("volume") );
+    \endcode
+  */
+  template <unsigned int DIM>
+  class IsImageWithDimensionAndWithoutProperty : public DataTreeFilterFunction
+  {
+    public:
+
+      IsImageWithDimensionAndWithoutProperty(const char* propertyName)
+      :m_PropertyName(propertyName)
+      {
+      }
+      
+      virtual bool NodeMatches(DataTreeNode* node) const
+      {
+        return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<mitk::Image*>(node->GetData() )                            // data is an image
+                 && (dynamic_cast<mitk::Image*>(node->GetData() )->GetDimension() == DIM)
+                 && (   node->GetProperty(m_PropertyName.c_str()).IsNull()    // there is a certain property
+                    )
+                );
+      }
+
+      virtual DataTreeFilterFunction* Clone() const
+      {
+        return new IsImageWithDimensionAndWithoutProperty<DIM>(m_PropertyName.c_str());
+      }
+
+      virtual ~IsImageWithDimensionAndWithoutProperty() {}
+
+    private:
+      
+      std::string m_PropertyName;
+  };
+
 } // namespace mitk
 
 #endif

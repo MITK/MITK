@@ -669,7 +669,9 @@ void QmitkMainTemplate::init()
 
   m_Options = mitk::PropertyList::New();
   m_Options->SetProperty( "Use gradient background", new mitk::BoolProperty(true) );
-  m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f, 0.0f, 0.0f) );
+  m_Options->SetProperty( "Gradient color 1", new mitk::ColorProperty( 0.0f, 0.1f, 0.3f ) );
+  m_Options->SetProperty( "Gradient color 2", new mitk::ColorProperty( 0.7f, 0.7f, 0.8f ) );
+  m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
   m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
   
@@ -754,6 +756,13 @@ void QmitkMainTemplate::Initialize()
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
+  
+  mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1").GetPointer() );
+  mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2").GetPointer() );
+  if  ( upperColProp && lowerColProp )
+  {
+    m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
+  }
 
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
 
@@ -1048,6 +1057,13 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
     mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
     this->enableGradientBackground(gradProperty->GetValue());
+
+    mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1").GetPointer() );
+    mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2").GetPointer() );
+    if  ( upperColProp && lowerColProp )
+    {
+      m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
+    }
 
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
   if(mitk::ChiliPlugin::GetInstance()->IsPlugin())

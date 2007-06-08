@@ -168,6 +168,7 @@ void QmitkStdMultiWidget::init()
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
     mitkWidget4->GetRenderer()->GetRenderWindow() );
+  m_GradientBackground4->SetGradientColors(0.0,0.1,0.3,0.7,0.7,0.8);
   m_GradientBackground4->Enable();
 }
 
@@ -1172,3 +1173,12 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
   }
 }
 
+
+
+void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
+{
+  m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+  m_GradientBackground2->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+  m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+  m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
+}

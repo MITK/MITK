@@ -235,6 +235,14 @@ public:
   void HandleException( std::exception& e, QWidget* parent = NULL, bool showDialog = true ) const;
   void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
 
+  /**
+    * \brief Executed during application testing.
+    * 
+    * You should put any testing code that might be useful in here. When this code is
+    * activated, the functionality has just been activated with some kind of data in the DataTree.
+    */
+  virtual bool TestYourself();
+
 signals:
   void Signal_dummy();
   void AvailabilityChanged(QmitkFunctionality*);

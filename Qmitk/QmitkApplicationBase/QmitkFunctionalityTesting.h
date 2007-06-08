@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qobject.h>
 #include <qtimer.h>
+#include <list>
+#include <string>
 
 class QmitkFctMediator;
 class QTimer;
@@ -29,12 +31,14 @@ public:
   QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent = 0, const char * name = 0 );
   ~QmitkFunctionalityTesting();
   QTimer m_CloseMessagesTimer;
+  unsigned int m_NumberOfFunctionalitiesFailed;
 protected slots:
   virtual void ActivateNextFunctionality();
   virtual void CloseFirstMessageBox();
 protected:
   QmitkFctMediator* m_QmitkFctMediator;
   QTimer m_ActivateTimer;
+  std::list<std::string> m_NamesOfFailedFunctionalties;
 };
 
 int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);

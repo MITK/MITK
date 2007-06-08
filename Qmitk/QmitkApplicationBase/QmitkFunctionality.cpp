@@ -187,3 +187,9 @@ void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bo
 {
   HandleException( e.what(), parent, showDialog );
 }
+  
+bool QmitkFunctionality::TestYourself()
+{
+  std::cout << "NO TEST IMPLEMENTED : ";
+  return true;
+}

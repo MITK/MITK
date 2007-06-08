@@ -81,12 +81,33 @@ void QmitkFunctionalityTesting::CloseFirstMessageBox() {
 
 void QmitkFunctionalityTesting::ActivateNextFunctionality()
 {
+  // last one passed
   std::cout<<"[PASSED]"<<std::endl;
+
+#ifdef BUILD_TESTING
+  std::cout << "Executing voluntary testing methods of functionality \"" << m_QmitkFctMediator->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+  QmitkFunctionality* activeFunctionality = m_QmitkFctMediator->GetActiveFunctionality();
+  if (activeFunctionality)
+  {
+    if ( activeFunctionality->TestYourself() )
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      ++m_NumberOfFunctionalitiesFailed;
+      m_NamesOfFailedFunctionalties.push_back( activeFunctionality->className() );
+    }
+  }
+#endif
+
+  // activate next functionality
   int nextId = m_QmitkFctMediator->GetActiveFunctionalityId()+1;
   QmitkFunctionality * nextFunctionality = m_QmitkFctMediator->GetFunctionalityById(nextId);
   if(nextFunctionality != NULL)
   {
-    std::cout << "Testing Functionality \"" << nextFunctionality->className() <<"\" "<< std::flush;
+    std::cout << "Testing activation of functionality \"" << nextFunctionality->className() <<"\" "<< std::flush;
     m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
     m_QmitkFctMediator->RaiseFunctionality(nextId);
     m_CloseMessagesTimer.stop();
@@ -101,21 +122,30 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
 int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
 {
   QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
+  testing->m_NumberOfFunctionalitiesFailed = 0;
 
   QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
   testing->m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
   if (qfm->GetActiveFunctionality()) {
-    std::cout << "Testing Functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+    std::cout << "Testing activation of functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::endl;
   } 
   else
   { 
     std::cout << "No active functionality yet ..." << std::endl << std::flush;
   }
   qApp->exec();
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  if (testing->m_NumberOfFunctionalitiesFailed > 0)
+  {
+    std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesFailed << " functionalities failed during testing themselves:" <<std::endl;
+    std::cout<<"Test done [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+  {
+    std::cout<<"Test done [PASSED]"<<std::endl;
+    return EXIT_SUCCESS;
+  }
 }

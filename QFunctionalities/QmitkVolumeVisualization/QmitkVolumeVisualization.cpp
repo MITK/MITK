@@ -61,14 +61,17 @@ void QmitkVolumeVisualization::CreateConnections()
     //TF-Auswahl
     connect( (QObject*)(m_Controls), SIGNAL(Choice(int)),(QObject*) this, SLOT(GetChoice(int)));
 
-    //Color Style-Auswahl
+    //Color TF
     connect( (QObject*)(m_Controls), SIGNAL(StyleChoice(int)),(QObject*) this, SLOT(GetCStyle(int)));
 
     //Preset-TF
     connect( (QObject*)(m_Controls), SIGNAL(PresetTF(int)),(QObject*) this, SLOT(GetPreset(int)));
     
-    //Preferences
+    //***Preferences***
+    //Shading
     connect( (QObject*)(m_Controls), SIGNAL(EnableShadingToggled(bool, int)),(QObject*) this, SLOT(SetShading(bool, int)));
+    //Clipping plane
+    connect( (QObject*)(m_Controls), SIGNAL(EnableCPToggled(bool)),(QObject*) this, SLOT(EnableClippingPlane(bool)));
     
     //Immediate Update
     connect( (QObject*)(m_Controls), SIGNAL(ImmUpdate(bool)),(QObject*) this, SLOT(ImmediateUpdate(bool)));
@@ -127,7 +130,6 @@ void QmitkVolumeVisualization::EnableRendering(bool state)
   }
 }
 
-//�ergabe der Auswahl
 void QmitkVolumeVisualization::GetChoice(int number)
 {
   if(image_ok)
@@ -178,4 +180,10 @@ void QmitkVolumeVisualization::SetShading(bool state, int lod)
 void QmitkVolumeVisualization::ImmediateUpdate(bool state)
 {
   m_Controls->m_TransferFunctionWidget->ImmediateUpdate(state);
+}
+
+void QmitkVolumeVisualization::EnableClippingPlane(bool state)
+{
+  mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(state);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

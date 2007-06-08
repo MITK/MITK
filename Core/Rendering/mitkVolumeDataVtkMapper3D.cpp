@@ -390,8 +390,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkRenderWindowInteractor* interactor = vtkRendWin->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
-
-  SetClippingPlane(interactor);
   
   if (vtkRendWin && m_Firstcall) 
   {
@@ -415,12 +413,15 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,1);
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
     
+    m_ClippingPlane = vtkPlane::New();  
+    m_PlaneWidget = vtkImplicitPlaneWidget::New();
     mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(true);
   } 
   else 
   {
-    //std::cout << "no vtk renderwindow" << std::endl;m_VolumePropertyMed->ShadeOn();
+    //std::cout << "no vtk renderwindow" << std::endl;
   }
+  SetClippingPlane(interactor);
   
 /*  std::cout<<"RenderTime LowRes (T2D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
 #if (VTK_MAJOR_VERSION >= 5)
@@ -476,18 +477,27 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
       
     if(!m_PlaneSet)
     {
-    m_ClippingPlane = vtkPlane::New();
-    
-    m_PlaneWidget = vtkImplicitPlaneWidget::New();
+
     m_PlaneWidget->SetInteractor(interactor);
     m_PlaneWidget->SetPlaceFactor(1.0);
     m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput());
     m_PlaneWidget->OutlineTranslationOff();
-    //m_PlaneWidget->ScaleEnabledOff();
+#if (VTK_MAJOR_VERSION >= 5)
+    m_PlaneWidget->ScaleEnabledOff();
+#endif
     m_PlaneWidget->DrawPlaneOff();
-    //mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
-    //std::cout<<"X: "<<input->GetDimension(0)<<" Y: "<<input->GetDimension(1)<<" Z: "<<input->GetDimension(2)<<std::endl;
-    m_PlaneWidget->PlaceWidget(); //TODO: muss noch an den Datensatz angepasst werden
+    mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
+    
+    /*std::cout<<"X: "<<input->GetDimension(0)<<" Y: "<<input->GetDimension(1)<<" Z: "<<input->GetDimension(2)<<std::endl;
+    
+    std::cout<<"X spacing: "<<input->GetVtkImageData()->GetSpacing()[0]<<" Y spacing: "<<input->GetVtkImageData()->GetSpacing()[1]<<" Z spacing: "<<input->GetVtkImageData()->GetSpacing()[2]<<std::endl;
+    
+    std::cout<<"X extend 1: "<<input->GetVtkImageData()->GetExtent()[0]<<" X extend 2: "<<input->GetVtkImageData()->GetExtent()[1]<<" Y extend 1: "<<input->GetVtkImageData()->GetExtent()[2]<<" Y extend 2: "<<input->GetVtkImageData()->GetExtent()[3]<<" Z extend 1: "<<input->GetVtkImageData()->GetExtent()[4]<<" Z extend 2: "<<input->GetVtkImageData()->GetExtent()[5]<<std::endl;
+    
+    std::cout<<"X origin: "<<input->GetVtkImageData()->GetOrigin()[0]<<" Y origin: "<<input->GetVtkImageData()->GetOrigin()[1]<<" Z origin: "<<input->GetVtkImageData()->GetOrigin()[2]<<std::endl;*/
+    
+    //TODO: PlaceWidget() muss noch an den Datensatz angepasst werden
+    m_PlaneWidget->PlaceWidget(input->GetVtkImageData()->GetOrigin()[0],(input->GetDimension(0))*(input->GetVtkImageData()->GetSpacing()[0]),input->GetVtkImageData()->GetOrigin()[1],(input->GetDimension(1))*(input->GetVtkImageData()->GetSpacing()[1]),input->GetVtkImageData()->GetOrigin()[2],(input->GetDimension(2))*(input->GetVtkImageData()->GetSpacing()[2]));
     
     m_T2DMapper->AddClippingPlane(m_ClippingPlane);
 #if (VTK_MAJOR_VERSION >= 5)

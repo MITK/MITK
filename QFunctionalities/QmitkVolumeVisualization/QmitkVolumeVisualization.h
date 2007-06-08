@@ -84,6 +84,7 @@ class QmitkVolumeVisualization : public QmitkFunctionality
     void GetPreset(int number);
     void SetShading(bool state, int lod);
     void ImmediateUpdate(bool state);
+    void EnableClippingPlane(bool state);
 
   protected:  
     /*!  

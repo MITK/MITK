@@ -161,3 +161,7 @@ void QmitkVolumeVisualizationControls::EnableShadingHigh( bool state)
   emit EnableShadingToggled(state,2);
 }
 
+void QmitkVolumeVisualizationControls::EnableClippingPlane( bool state )
+{
+  emit EnableCPToggled(state);
+}

@@ -827,6 +827,20 @@ Press delete to remove selected handle.</string>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
+                    <widget class="QCheckBox">
+                        <property name="name">
+                            <cstring>m_ClippingPlaneCB</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>false</bool>
+                        </property>
+                        <property name="text">
+                            <string>enable clipping plane</string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
                     <widget class="QLayoutWidget">
                         <property name="name">
                             <cstring>layout31</cstring>
@@ -1263,7 +1277,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>320</height>
+                                <height>300</height>
                             </size>
                         </property>
                     </spacer>
@@ -1641,6 +1655,18 @@ Press delete to remove selected handle.</string>
         <receiver>m_ImmediateUpdate</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>m_ClippingPlaneCB</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_ClippingPlaneCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>EnableClippingPlane(bool)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QmitkVolumeVisualizationControls.ui.h</include>
@@ -1652,6 +1678,7 @@ Press delete to remove selected handle.</string>
     <signal>PresetTF(int)</signal>
     <signal>EnableShadingToggled(bool, int)</signal>
     <signal>ImmUpdate(bool)</signal>
+    <signal>EnableCPToggled(bool)</signal>
 </signals>
 <slots>
     <slot>EnableRenderingCB_toggled( bool state )</slot>
@@ -1674,6 +1701,7 @@ Press delete to remove selected handle.</string>
     <slot>EnableShadingLow( bool state )</slot>
     <slot>EnableShadingMed( bool state )</slot>
     <slot>EnableShadingHigh( bool state )</slot>
+    <slot>EnableClippingPlane( bool state )</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -415,7 +415,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     
     m_ClippingPlane = vtkPlane::New();  
     m_PlaneWidget = vtkImplicitPlaneWidget::New();
-    mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(true);
+    mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
   } 
   else 
   {

@@ -838,7 +838,7 @@ Press delete to remove selected handle.</string>
                             <string>enable clipping plane</string>
                         </property>
                         <property name="checked">
-                            <bool>true</bool>
+                            <bool>false</bool>
                         </property>
                     </widget>
                     <widget class="QLayoutWidget">

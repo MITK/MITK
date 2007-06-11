@@ -88,6 +88,12 @@ void mitk::PointSet::AdaptPointSetSeriesSize( int timeSteps )
 }
 
 
+int mitk::PointSet::GetPointSetSeriesSize() const
+{
+  return m_PointSetSeries.size();
+}
+
+
 int mitk::PointSet::GetSize( int t ) const
 {
   if ( t < m_PointSetSeries.size() )

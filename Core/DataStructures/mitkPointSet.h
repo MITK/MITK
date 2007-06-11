@@ -137,6 +137,8 @@ public:
 
   virtual void AdaptPointSetSeriesSize( int timeSteps );
 
+  virtual int GetPointSetSeriesSize() const;
+
   /** \brief returns the pointset */
   virtual DataType::Pointer GetPointSet( int t = 0 ) const;
 

@@ -1,17 +1,21 @@
-#include <mitkPlaneFit.h>
+#include "mitkPlaneFit.h"
 
-#include <mitkPlaneGeometry.h>
-#include <mitkGeometryData.h>
+#include "mitkPlaneGeometry.h"
+#include "mitkGeometryData.h"
+
 #include <vnl/algo/vnl_svd.h>
 #include <vcl_iostream.h>
 
 
-mitk::PlaneFit::PlaneFit()/*:m_Centroid(NULL)*/
+mitk::PlaneFit::PlaneFit()
+: m_PointSet( NULL )
 {
-  m_Plane = mitk::PlaneGeometry::New();
+  m_TimeSlicedGeometry = mitk::TimeSlicedGeometry::New();
 }
 
-mitk::PlaneFit::~PlaneFit(){}
+mitk::PlaneFit::~PlaneFit()
+{
+}
 
 
 void mitk::PlaneFit::GenerateOutputInformation()
@@ -21,30 +25,67 @@ void mitk::PlaneFit::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if(input.IsNull()) return;
+  if (input.IsNull()) return;
 
-  output->SetGeometry( m_Plane );
+  if ( m_PointSet == NULL )
+  {
+    return;
+  }
+
+  mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
+
+  m_TimeSlicedGeometry->InitializeEvenlyTimed( 
+    planeGeometry, m_PointSet->GetPointSetSeriesSize() );
+
+  int t;
+  for ( t = 0;
+        (t < m_PointSet->GetPointSetSeriesSize())
+        && (t < m_Planes.size());
+        ++t )
+  {
+    m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], t );
+  }
+
+  output->SetGeometry( m_TimeSlicedGeometry );
 }
 
 void mitk::PlaneFit::GenerateData()
 {
-  // set the timeslice globaly known.
-  m_PointSet = static_cast<const mitk::PointSet * > (this->ProcessObject::GetInput( 0 ));
+  int t;
+  for ( t = 0; t < m_PointSet->GetPointSetSeriesSize(); ++t )
+  {
+    // check number of data points - less then 3points isn't enough
+    if ( m_PointSet->GetSize( t ) < 3 )
+    {
+      break;
+    }
 
-  // check number of data points - less then 3points isn't enough
-  if(m_PointSet->GetSize() < 3 ) return;
+    this->CalculateCentroid( t );
 
-  CalculateCentroid();
+    this->ProcessPointSet( t );
 
-  ProcessPointSet();
-
-  InitializePlane();
+    this->InitializePlane( t );
+  }
 }
 
-void mitk::PlaneFit::SetInput( const mitk::PointSet* ps )
+void mitk::PlaneFit::SetInput( const mitk::PointSet* pointSet )
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, const_cast< mitk::PointSet * >( ps ) );
+  this->ProcessObject::SetNthInput(0, 
+    const_cast< mitk::PointSet * >( pointSet ) );
+
+  m_PointSet = pointSet;
+  int pointSetSize = pointSet->GetPointSetSeriesSize();
+
+  m_Planes.resize( pointSetSize );
+  m_Centroids.resize( pointSetSize );
+  m_PlaneVectors.resize( pointSetSize );
+
+  int t;
+  for ( t = 0; t < pointSetSize; ++t )
+  {
+    m_Planes[t] = mitk::PlaneGeometry::New();
+  }
 }
 
 const mitk::PointSet* mitk::PlaneFit::GetInput()
@@ -58,49 +99,51 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 }
 
 
-void mitk::PlaneFit::CalculateCentroid()
+void mitk::PlaneFit::CalculateCentroid( int t )
 {  
-  if( m_PointSet == NULL ) return;
+  if ( m_PointSet == NULL ) return;
 
-  int ps_total = m_PointSet->GetSize();
-  m_Centroid[0]=m_Centroid[1]=m_Centroid[2]=0;
+  int ps_total = m_PointSet->GetSize( t );
+  
+  m_Centroids[t][0] = m_Centroids[t][1] = m_Centroids[t][2] = 0.0;
 
-  // summ of all points
+  // sum of all points
   mitk::PointSet::PointsContainer::Iterator pit, end;
-  pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
-  end = m_PointSet->GetPointSet()->GetPoints()->End();
-  for (; pit!=end; pit++)
+  pit = m_PointSet->GetPointSet( t )->GetPoints()->Begin();
+  end = m_PointSet->GetPointSet( t )->GetPoints()->End();
+  for ( ; pit!=end; ++pit )
   {
     mitk::Point3D p3d = pit.Value();
-    m_Centroid[0] += p3d[0]; 
-    m_Centroid[1] += p3d[1];
-    m_Centroid[2] += p3d[2];
+    m_Centroids[t][0] += p3d[0]; 
+    m_Centroids[t][1] += p3d[1];
+    m_Centroids[t][2] += p3d[2];
   }
 
   // calculation of centroid
-  m_Centroid[0] = m_Centroid[0]/ps_total;
-  m_Centroid[1] = m_Centroid[1]/ps_total;
-  m_Centroid[2] = m_Centroid[2]/ps_total;
+  m_Centroids[t][0] /= ps_total;
+  m_Centroids[t][1] /= ps_total;
+  m_Centroids[t][2] /= ps_total;
 }
 
 
-void mitk::PlaneFit::ProcessPointSet()
+void mitk::PlaneFit::ProcessPointSet( int t )
 {
   if (m_PointSet == NULL ) return;
 
   // int matrix with POINTS x (X,Y,Z)
-  vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize(), 3);
+  vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize( t ), 3);
 
   // calculate point distance to centroid and inserting it in the matrix
   mitk::PointSet::PointsContainer::Iterator pit, end;
   pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
   end = m_PointSet->GetPointSet()->GetPoints()->End();
+  
   for (int p=0; pit!=end; pit++, p++)
   {
     mitk::Point3D p3d = pit.Value();
-    dataM[p][0] = p3d[0] - m_Centroid[0];
-    dataM[p][1] = p3d[1] - m_Centroid[1];
-    dataM[p][2] = p3d[2] - m_Centroid[2];
+    dataM[p][0] = p3d[0] - m_Centroids[t][0];
+    dataM[p][1] = p3d[1] - m_Centroids[t][1];
+    dataM[p][2] = p3d[2] - m_Centroids[t][2];
   }
 
   // process the SVD (singular value decomposition) from ITK
@@ -118,29 +161,29 @@ void mitk::PlaneFit::ProcessPointSet()
     v = -v;
   }
 
-  m_PlaneVector[0] = v[0];
-  m_PlaneVector[1] = v[1];
-  m_PlaneVector[2] = v[2];
+  m_PlaneVectors[t][0] = v[0];
+  m_PlaneVectors[t][1] = v[1];
+  m_PlaneVectors[t][2] = v[2];
 
 }
 
-mitk::PlaneGeometry::Pointer mitk::PlaneFit::GetPlaneGeometry()
+mitk::PlaneGeometry::Pointer mitk::PlaneFit::GetPlaneGeometry( int t )
 {
-  return m_Plane;
+  return m_Planes[t];
 }
 
-const mitk::Vector3D &mitk::PlaneFit::GetPlaneNormal() const
+const mitk::Vector3D &mitk::PlaneFit::GetPlaneNormal( int t ) const
 {
-  return m_PlaneVector;
+  return m_PlaneVectors[t];
 }
 
-const mitk::Point3D &mitk::PlaneFit::GetCentroid() const
+const mitk::Point3D &mitk::PlaneFit::GetCentroid( int t ) const
 {
-  return m_Centroid;
+  return m_Centroids[t];
 }
 
-void mitk::PlaneFit::InitializePlane()
+void mitk::PlaneFit::InitializePlane( int t )
 {
-  m_Plane->InitializePlane (m_Centroid, m_PlaneVector);
+  m_Planes[t]->InitializePlane( m_Centroids[t], m_PlaneVectors[t] );
 }
 

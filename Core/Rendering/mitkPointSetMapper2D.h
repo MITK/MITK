@@ -28,57 +28,56 @@ namespace mitk {
 class BaseRenderer;
 class PointSet;
 
-//##ModelId=3F0189F0014F
-//##Documentation
-//## @brief OpenGL-based mapper to display a mitk::PointSet in a 2D window.
-//##
-//## This mapper can actually more than just draw a number of points of a mitk::PointSet.
-//## If you set the right properties of the mitk::DataTreeNode, which contains the point set,
-//## then this mapper will also draw lines connecting the points, and calculate and display distances
-//## and angles between adjacent points. Here is a complete list of boolean properties, which might be of interest:
-//##
-//## - \b "contour": Draw not only the points but also the connections between them (default false)
-//## - \b "line width": IntProperty which gives the width of the contour lines
-//## - \b "show points": Wheter or not to draw the actual points (default true)
-//## - \b "show distances": Wheter or not to calculate and print the distance between adjacent points (default false)
-//## - \b "show angles": Wheter or not to calculate and print the angle between adjacent points (default false)
-//## - \b "show distant lines": When true, the mapper will also draw contour lines that are far away form the current slice (default true)
-//## - \b "label": StringProperty with a label for this point set
-//##
-//## @ingroup Mapper
+/**
+ * @brief OpenGL-based mapper to display a mitk::PointSet in a 2D window.
+ *
+ * This mapper can actually more than just draw a number of points of a 
+ * mitk::PointSet. If you set the right properties of the mitk::DataTreeNode, 
+ * which contains the point set, then this mapper will also draw lines 
+ * connecting the points, and calculate and display distances and angles 
+ * between adjacent points. Here is a complete list of boolean properties, 
+ * which might be of interest:
+ *
+ * - \b "contour": Draw not only the points but also the connections between 
+ *     them (default false)
+ * - \b "line width": IntProperty which gives the width of the contour lines
+ * - \b "show points": Wheter or not to draw the actual points (default true)
+ * - \b "show distances": Wheter or not to calculate and print the distance 
+ *     between adjacent points (default false)
+ * - \b "show angles": Wheter or not to calculate and print the angle between 
+ *     adjacent points (default false)
+ * - \b "show distant lines": When true, the mapper will also draw contour 
+ *     lines that are far away form the current slice (default true)
+ * - \b "label": StringProperty with a label for this point set
+ *
+ * @ingroup Mapper
+ */
 class PointSetMapper2D : public GLMapper2D
 {
 public:
-    //##ModelId=3F0189F00363
-    mitkClassMacro(PointSetMapper2D, GLMapper2D);
+  mitkClassMacro(PointSetMapper2D, GLMapper2D);
 
-    //##ModelId=3F0189F00354
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##ModelId=3F0189F00366
-    //##Documentation
-    //## @brief Get the PointDataList to map
-    virtual const mitk::PointSet * GetInput(void);
+  /** @brief Get the PointDataList to map */
+  virtual const mitk::PointSet * GetInput(void);
 
-    //##ModelId=3F0189F00373
-    virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint(mitk::BaseRenderer * renderer);
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+  virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
 protected:
-    //##ModelId=3F0189F00378
-    PointSetMapper2D();
+  PointSetMapper2D();
 
-    //##ModelId=3F0189F00382
-    virtual ~PointSetMapper2D();
+  virtual ~PointSetMapper2D();
 
-    bool m_Polygon;
-    bool m_ShowPoints;
-    bool m_ShowDistances;
-    float m_DistancesDecimalDigits;
-    bool m_ShowAngles;
-    bool m_ShowDistantLines;
-    int  m_LineWidth;
+  bool m_Polygon;
+  bool m_ShowPoints;
+  bool m_ShowDistances;
+  float m_DistancesDecimalDigits;
+  bool m_ShowAngles;
+  bool m_ShowDistantLines;
+  int  m_LineWidth;
 };
 
 } // namespace mitk

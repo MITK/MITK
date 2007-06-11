@@ -34,29 +34,37 @@ class vtkPolyDataMapper;
 namespace mitk {
 
   class PointSet;
-  //##ModelId=3E70F60202EA
-  //##Documentation
-  //## @brief Vtk-based mapper for PointSet
-  //##
-  //## Due to the need of different colors for selected 
-  //## and unselected points and the facts, that we also have a contour and labels for the points,
-  //## the vtk structure is build up the following way: 
-  //## We have two AppendPolyData, one selected, and one unselected and one for a contour between the points.
-  //## Each one is connected to an own PolyDaraMapper and an Actor.
-  //## The different color for the unselected and selected state and for the contour is read from properties.
-  //## "unselectedcolor", "selectedcolor" and "contourcolor" are the strings, that are looked for.
-  //## Pointlabels are added besides the selected or the deselected points.
-  //## Then the three Actors are combined inside a vtkPropAssembly and this object is returned in GetProp()
-  //## and so hooked up into the rendering pipeline.
-  //## Other properties looked for are:
-  //##
-  //##   - \b "contour": if set to on, lines between the points are shown
-  //##   - \b "close": if set to on, the open strip is closed (first point connected with last point)
-  //##   - \b "pointsize": size of the points mapped
-  //##   - \b "label": text of the Points to show besides points
-  //##   - \b "contoursize": size of the contour drawn between the points (if not set, the pointsize is taken)
-  //##
-  //## @ingroup Mapper
+  
+  /**
+   * @brief Vtk-based mapper for PointSet
+   *
+   * Due to the need of different colors for selected 
+   * and unselected points and the facts, that we also have a contour and 
+   * labels for the points, the vtk structure is build up the following way: 
+   *
+   * We have two AppendPolyData, one selected, and one unselected and one 
+   * for a contour between the points. Each one is connected to an own 
+   * PolyDaraMapper and an Actor. The different color for the unselected and 
+   * selected state and for the contour is read from properties.
+   *
+   * "unselectedcolor", "selectedcolor" and "contourcolor" are the strings, 
+   * that are looked for. Pointlabels are added besides the selected or the 
+   * deselected points.
+   *
+   * Then the three Actors are combined inside a vtkPropAssembly and this 
+   * object is returned in GetProp() and so hooked up into the rendering 
+   * pipeline. Other properties looked for are:
+   *
+   *   - \b "contour": if set to on, lines between the points are shown
+   *   - \b "close": if set to on, the open strip is closed (first point 
+   *       connected with last point)
+   *   - \b "pointsize": size of the points mapped
+   *   - \b "label": text of the Points to show besides points
+   *   - \b "contoursize": size of the contour drawn between the points 
+   *       (if not set, the pointsize is taken)
+   *
+   * @ingroup Mapper
+   */
   class PointSetVtkMapper3D : public BaseVtkMapper3D
   {
   public:
@@ -64,17 +72,15 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    //##ModelId=3E70F60301D5
     virtual const mitk::PointSet* GetInput();
 
-    //overwritten from BaseVtkMapper3D to be able to return a m_PointsAssembly which is much faster than a vtkAssembly
+    //overwritten from BaseVtkMapper3D to be able to return a 
+    //m_PointsAssembly which is much faster than a vtkAssembly
     virtual vtkProp* GetProp();
 
   protected:
-    //##ModelId=3E70F60301F4
     PointSetVtkMapper3D();
 
-    //##ModelId=3E70F60301F5
     virtual ~PointSetVtkMapper3D();
 
     virtual void GenerateData();

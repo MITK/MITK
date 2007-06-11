@@ -20,46 +20,57 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPointSet_H_HEADER_INCLUDED
 #define MITKPointSet_H_HEADER_INCLUDED
 
-#include <mitkCommon.h>
-#include <mitkVector.h>
-#include <mitkBaseData.h>
-//#include <itkPoint.h>
+#include "mitkCommon.h"
+#include "mitkVector.h"
+#include "mitkBaseData.h"
+
 #include <itkPointSet.h>
-//#include <itkCovariantVector.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
-#include <itkCommand.h> //for the PointSetObserver
-//#include <itkPolygonCell.h>
-//#include <itkEventObject.h>
+#include <itkCommand.h>
 
-const unsigned int PointDimension = 3;
-const unsigned int MaxTopologicalDimension = 3;
+#include <vector>
 
 
 namespace mitk {
 
-//##Documentation
-//##@brief DataStructure which stores a set of points. Superclass of mitk::Mesh.
-//##
-//## This class supports 3D point definition (not yet 3D+t).
-//## An entry is divided into the pointcoordinates and pointdata.
-//## The pointdata includes information about the pointId, the selection state of the point and an information about the type of the point.
-//## For further information about different types of a point see mitk::PointSpecificationType in mitkVector.h;
-//## Inserting a point is accompanied by an event, containing an index. The new point is set into the list 
-//## at the indexed position. At the same time an internal ID is set in data of the point.
-//##
-//## The points of itk::PointSet stores the points in a pointContainer = MapContainer. To read the points, do it with an constIteractor of MapContainer and not with size.
-//## That way all the indexed points are iterated and the points, that are deleted by deleting the index aren't shown.
-//##
-//## The class uses an itkMesh internaly, because mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure which is also derived from itk::PointSet.
-//## Thus several typedefs, that seem to be in wrong place, are declared here (for example SelectedLinesType).
-//##
-//## \subsection mitkPointSetDisplayOptions
-//## 
-//## The default mappers for this data structure are mitk::PointSetMapper2D and mitk::PointSetVtkMapper3D. See these classes for display options, that can be
-//## set via properties.
-//##
-//## @ingroup Data
+/**
+ * \brief Data structure which stores a set of points. Superclass of
+ * mitk::Mesh.
+ *
+ * 3D points are grouped within a point set; for time resolved usage, one point
+ * set is created and maintained per time step. A point entry consists of the
+ * point coordinates and point data.
+ *
+ * The point data includes a point ID (unique identifier to address this point
+ * within the point set), the selection state of the point and the type of
+ * the point.
+ *
+ * For further information about different point types see
+ * mitk::PointSpecificationType in mitkVector.h.
+ *
+ * Inserting a point is accompanied by an event, containing an index. The new
+ * point is inserted into the list at the specified position. At the same time
+ * an internal ID is generated and stored for the point. Points at specific time
+ * steps are accessed by specifying the time step number (which defaults to 0).
+ *
+ * The points of itk::PointSet stores the points in a pointContainer
+ * (MapContainer). The points are best accessed by using a ConstIterator (as
+ * defined in MapContainer); avoid access via index.
+ *
+ * The class internally uses an itk::Mesh for each time step, because
+ * mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure
+ * which is also derived from itk::PointSet. Thus several typedefs which seem
+ * to be in wrong place, are declared here (for example SelectedLinesType).
+ *
+ * \subsection mitkPointSetDisplayOptions
+ * 
+ * The default mappers for this data structure are mitk::PointSetMapper2D and
+ * mitk::PointSetVtkMapper3D. See these classes for display options which can
+ * can be set via properties.
+ *
+ * \ingroup Data
+ */
 class PointSet : public BaseData
 {
 public:
@@ -70,25 +81,38 @@ public:
   
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
-  //##Documentation
-  //##@brief struct for data of a point
+
+  static const unsigned int PointDimension = 3;
+  static const unsigned int MaxTopologicalDimension = 3;
+
+  /**
+   * \brief struct for data of a point
+   */
   typedef struct PointDataType 
   {
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
     mitk::PointSpecificationType pointSpec;  //specifies the type of the point
   };
-  //##Documentation
-  //##@brief cellDataType, that stores all indexes of the lines, that are selected
-  //## e.g.: points A,B and C.Between A and B there is a line with index 0.
-  //## if vector of cellData contains 1 and 2, then the lines between B and C and C and A is selected.
+
+  /**
+   * \brief cellDataType, that stores all indexes of the lines, that are
+   * selected e.g.: points A,B and C.Between A and B there is a line with
+   * index 0. If vector of cellData contains 1 and 2, then the lines between
+   * B and C and C and A is selected.
+   */
   typedef std::vector<unsigned int> SelectedLinesType;
   typedef SelectedLinesType::iterator SelectedLinesIter;
   typedef struct CellDataType 
   {
-    bool selected; //used to set the whole cell on selected
-    SelectedLinesType selectedLines;//indexes of selected lines. 0 is between pointId 0 and 1
-    bool closed; //is the polygon already finished and closed
+    //used to set the whole cell on selected
+    bool selected;
+    
+    //indexes of selected lines. 0 is between pointId 0 and 1
+    SelectedLinesType selectedLines;
+    
+    //is the polygon already finished and closed
+    bool closed;
   };
 
   typedef itk::DefaultDynamicMeshTraits<
@@ -105,66 +129,67 @@ public:
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
-  //##Documentation
-  //## @brief executes the given Operation
+  /** \brief executes the given Operation */
   virtual void ExecuteOperation(Operation* operation);
 
-  //##Documentation
-  //## @brief returns the current size of the point-list
-  virtual int GetSize() const;
+  /** \brief returns the current size of the point-list */
+  virtual int GetSize( int t = 0 ) const;
 
-  //##Documentation
-  //## @brief returns the pointset
-  virtual DataType::Pointer GetPointSet() const;
+  virtual void AdaptPointSetSeriesSize( int timeSteps );
 
-  //##Documentation
-  //## @brief Get the point on the given position in world coordinates
-  //##
-  //## check if index exists. If it doesn't exist, then return 0,0,0
-  PointType GetPoint(int position) const;
+  /** \brief returns the pointset */
+  virtual DataType::Pointer GetPointSet( int t = 0 ) const;
 
   /**
-  * @brief If the Id exists in mitkData, then point is set and true is returned in world coordinates
-  **/
-  bool GetPointIfExists(PointIdentifier id, PointType* point);
+   * \brief Get the point on the given position in world coordinates
+   *
+   * check if index exists. If it doesn't exist, then return 0,0,0
+   */
+  PointType GetPoint( int position, int t = 0 ) const;
 
   /**
-  * @brief Set the given point in world coordinate system into the itkPointSet.
-  **/
-  void SetPoint(PointIdentifier id, PointType point);
+   * \brief If the Id exists in mitkData, then point is set and true is 
+   * returned in world coordinates
+   */
+  bool GetPointIfExists( PointIdentifier id, PointType* point, int t = 0 );
 
   /**
-  * @brief Set the given point in world coordinate system into the itkPointSet.
-  **/
-  void InsertPoint(PointIdentifier id, PointType point);
+   * \brief Set the given point in world coordinate system into the itkPointSet.
+   */
+  void SetPoint( PointIdentifier id, PointType point, int t = 0 );
+
+  /**
+   * \brief Set the given point in world coordinate system into the itkPointSet.
+   */
+  void InsertPoint( PointIdentifier id, PointType point, int t = 0 );
 
 
-  //##Documentation
-  //## @brief searches a selected point and returns the id of that point. 
-  //## If no point is found, then -1 is returned
-  virtual int SearchSelectedPoint();
+  /**
+   * \brief searches a selected point and returns the id of that point. 
+   * If no point is found, then -1 is returned
+   */
+  virtual int SearchSelectedPoint( int t = 0 );
 
-  //##Documentation
-  //## @brief returns true if a point exists at this position
-  virtual bool IndexExists(int position);
+  /** \brief returns true if a point exists at this position */
+  virtual bool IndexExists( int position, int t = 0 );
 
-  //##Documentation
-  //## @brief to get the state selected/unselected of the point on the position
-  virtual bool GetSelectInfo(int position);
+  /** \brief to get the state selected/unselected of the point on the
+   * position
+   */
+  virtual bool GetSelectInfo( int position, int t = 0 );
 
-  //##Documentation
-  //## @brief returns the number of selected points
-  virtual const int GetNumberOfSelected();
+  /** \brief returns the number of selected points */
+  virtual const int GetNumberOfSelected( int t = 0 );
 
-  //##Documentation
-  //## @brief searches a point in the list == point +/- distance
-  //##
-  //## @param point is in world coordinates.
-  //## @param distance is in mm.
-  //## returns -1 if no point is found
-  //## or the position in the list of the first match
-  //'' Beware when using the position to 
-  int SearchPoint(Point3D point, float distance);
+  /**
+   * \brief searches a point in the list == point +/- distance
+   *
+   * \param point is in world coordinates.
+   * \param distance is in mm.
+   * returns -1 if no point is found
+   * or the position in the list of the first match
+   */
+  int SearchPoint( Point3D point, float distance, int t = 0 );
 
   //virtual methods, that need to be implemented
   virtual void UpdateOutputInformation();
@@ -183,10 +208,11 @@ protected:
 
   virtual ~PointSet();
 
-  //##Documentation
-  //## @brief Data from ITK; List of Points; the object, the operations are ment for
-  DataType::Pointer m_ItkData;
+  virtual void Initialize( int timeSteps );
 
+  typedef std::vector< DataType::Pointer > PointSetSeries;
+
+  PointSetSeries m_PointSetSeries;
 
 };
 
@@ -196,8 +222,11 @@ protected:
 
 
 /**
-* @brief Class to realize an observer, that listens to an event called by mitkPointSet
-* A pointer to a method of an other object, not derived from itk can be connected and called 
+* \brief Class to realize an observer, that listens to an event called by
+* mitk::PointSet.
+*
+* A pointer to a method of an other object, not derived from itk can be 
+* connected and called 
 **/
 template <class T> 
 class TPointSetObserver : public itk::Command 
@@ -215,31 +244,58 @@ class TPointSetObserver : public itk::Command
 
   public:
     /**
-    * @brief Set the object and its methods, that have to be called if an event is recieved
+    * \brief Set the object and its methods, that have to be called if an
+    * event is recieved
     **/
-    void Set( T* object, void (T::*memberFunctionPointerNewPointEvent)(), void (T::*memberFunctionPointerRemovedPointEvent)() ) 
+    void Set( T* object, void (T::*memberFunctionPointerNewPointEvent)(), 
+              void (T::*memberFunctionPointerRemovedPointEvent)() ) 
     {
       m_Object = object; 
-      m_MemberFunctionPointerNewPointEvent = memberFunctionPointerNewPointEvent;
-      m_MemberFunctionPointerRemovedPointEvent = memberFunctionPointerRemovedPointEvent;
+      m_MemberFunctionPointerNewPointEvent = 
+        memberFunctionPointerNewPointEvent;
+      m_MemberFunctionPointerRemovedPointEvent = 
+        memberFunctionPointerRemovedPointEvent;
     }
+    
     /**
-    * @brief Set the parent, which methods are called
-    **/
-    void SetParent( T* object) {m_Object = object;}
+     * \brief Set the parent, which methods are called
+     **/
+    void SetParent( T* object)
+    {
+      m_Object = object;
+    }
+    
     /**
-    * @brief Set the method to be called if the pointset throughs a NewPointEvent()
-    **/
-    void SetNewPointEventMethod( void (T::*memberFunctionPointerNewPointEvent)() ) {m_MemberFunctionPointerNewPointEvent = memberFunctionPointerNewPointEvent;}
+     * \brief Set the method to be called if the pointset throughs a
+     * NewPointEvent()
+     */
+    void SetNewPointEventMethod( 
+      void (T::*memberFunctionPointerNewPointEvent)() )
+    {
+      m_MemberFunctionPointerNewPointEvent = 
+        memberFunctionPointerNewPointEvent;
+    }
+
     /**
-    * @brief Set the method to be called if the pointset throughs a RemovedPointEvent()
-    **/
-    void SetRemovedPointEventMethod( void (T::*memberFunctionPointerRemovedPointEvent)() ) {m_MemberFunctionPointerRemovedPointEvent = memberFunctionPointerRemovedPointEvent;}
+     * \brief Set the method to be called if the pointset throughs a
+     * RemovedPointEvent()
+     */
+    void SetRemovedPointEventMethod( 
+      void (T::*memberFunctionPointerRemovedPointEvent)() ) 
+    {
+      m_MemberFunctionPointerRemovedPointEvent = 
+        memberFunctionPointerRemovedPointEvent;
+    }
+    
     /**
-    * @brief Derive methods to call the registered method if an event is revieved
-    **/
+     * \brief Derive methods to call the registered method if an event is 
+     * revieved
+     */
     void Execute(itk::Object *object, const itk::EventObject & event)
-    {Execute( (const itk::Object*) object, event );}
+    {
+      this->Execute( (const itk::Object*) object, event );
+    }
+
     void Execute(const itk::Object * object, const itk::EventObject & event)
     {
       if ( typeid(event) == typeid(mitk::NewPointEvent) )
@@ -247,6 +303,7 @@ class TPointSetObserver : public itk::Command
       if ( typeid(event) == typeid(mitk::RemovedPointEvent) )
         (*m_Object.*m_MemberFunctionPointerRemovedPointEvent)();
     }
+
   private: 
     T* m_Object;
     void (T::*m_MemberFunctionPointerNewPointEvent)();

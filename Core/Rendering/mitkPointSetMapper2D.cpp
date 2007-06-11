@@ -17,22 +17,20 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkPointSetMapper2D.h>
-#include <mitkPointSet.h>
-#include <mitkBaseRenderer.h>
-#include <mitkPlaneGeometry.h>
-#include <mitkColorProperty.h>
-#include <mitkProperties.h>
-#include <vtkLinearTransform.h>
-#include <mitkStringProperty.h>
-#include <mitkPointSet.h>
+#include "mitkPointSetMapper2D.h"
+#include "mitkPointSet.h"
+#include "mitkBaseRenderer.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkColorProperty.h"
+#include "mitkProperties.h"
+#include "vtkLinearTransform.h"
+#include "mitkStringProperty.h"
+#include "mitkPointSet.h"
 #include "mitkGLUT.h"
 
-//##Documentation
-//##@brief color to mark a selected point
 const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
-//##ModelId=3F0189F00378
+
 mitk::PointSetMapper2D::PointSetMapper2D()
 : m_Polygon(false),
   m_ShowPoints(true),
@@ -44,12 +42,12 @@ mitk::PointSetMapper2D::PointSetMapper2D()
 {
 }
 
-//##ModelId=3F0189F00382
+
 mitk::PointSetMapper2D::~PointSetMapper2D()
 {
 }
 
-//##ModelId=3F0189F00366
+
 const mitk::PointSet *mitk::PointSetMapper2D::GetInput(void)
 {
   return static_cast<const mitk::PointSet * > ( GetData() );
@@ -95,14 +93,14 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
     return false;
 }
 
-//##ModelId=3F0189F00373
-void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
+
+void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
   const int text2dDistance = 5;
 
   if(IsVisible(renderer)==false) return;
 
-  //	@FIXME: Logik fuer update
+  // @FIXME: Logik fuer update
   bool updateNeccesary=true;
 
   if (updateNeccesary) 
@@ -110,6 +108,40 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     // ok, das ist aus GenerateData kopiert
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
+    // Get the TimeSlicedGeometry of the input object
+    const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
+    if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    {
+      return;
+    }
+
+    //
+    // get the world time
+    //
+    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    assert( worldGeometry != NULL );
+    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+
+    //
+    // convert the world time in time steps of the input object
+    //
+    int timeStep=0;
+    if ( time > -ScalarTypeNumericTraits::max() )
+      timeStep = inputTimeGeometry->MSToTimeStep( time );
+    if ( inputTimeGeometry->IsValidTime( timeStep ) == false )
+    {
+      return;
+    }
+
+
+    mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timeStep );
+
+    if ( itkPointSet.GetPointer() == NULL) 
+    {
+      return;
+    }
+
+    
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
     assert(displayGeometry.IsNotNull());
@@ -121,20 +153,22 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     //List of the Points
     PointSet::DataType::PointsContainerConstIterator it, end;      
-    it=input->GetPointSet()->GetPoints()->Begin();
-    end=input->GetPointSet()->GetPoints()->End();
+    it = itkPointSet->GetPoints()->Begin();
+    end = itkPointSet->GetPoints()->End();
 
     //iterator on the additional data of each point
     PointSet::DataType::PointDataContainerIterator selIt, selEnd;
-    selIt=input->GetPointSet()->GetPointData()->Begin();
-    selEnd=input->GetPointSet()->GetPointData()->End();
+    selIt = itkPointSet->GetPointData()->Begin();
+    selEnd = itkPointSet->GetPointData()->End();
+
     int counter = 0;
 
     //for writing text 
-    int j=0;
+    int j = 0;
 
     //for switching back to old color after using selected color
     float unselectedColor[4];
+
     //get current color to recall colorchange after paint
     glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
 
@@ -208,9 +242,11 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         vert[0]=0;                vert[1]=8.0-scalardiff*2;
 
         // now paint text if available
-        if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) != NULL)
+        if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()
+              ->GetProperty("label").GetPointer()) != NULL)
         {
-          const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+          const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
+            this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
           char buffer[20];
           std::string l = pointLabel;
           if (input->GetSize()>1)
@@ -218,7 +254,8 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
             sprintf(buffer,"%d",j+1);
             l.append(buffer);
           }
-          this->WriteTextXY(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+          this->WriteTextXY(pt2d[0] + text2dDistance, 
+            pt2d[1] + text2dDistance, l);
         }
         
         if((m_ShowPoints) && (scalardiff<4.0))
@@ -281,7 +318,9 @@ void mitk::PointSetMapper2D::Paint(mitk::BaseRenderer * renderer)
           {
             std::stringstream buffer;
             float distance = vec.GetNorm();
-            // std::stringstream::setprecision not used because this would set the length of the whole string (including digits before the decimal point)
+            // std::stringstream::setprecision not used because this would set
+            // the length of the whole string (including digits before the 
+            // decimal point)
             buffer << static_cast<int>(distance); // cut of decimal digits
             buffer << '.';
             buffer <<     (int)(distance - static_cast<float>(static_cast<int>(distance))) // decimal digits

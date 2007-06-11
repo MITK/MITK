@@ -17,12 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkPointSetVtkMapper3D.h>
-#include <mitkDataTreeNode.h>
-#include <mitkProperties.h>
-#include <mitkColorProperty.h>
-#include <mitkOpenGLRenderer.h>
-#include <mitkPointSet.h>
+#include "mitkPointSetVtkMapper3D.h"
+#include "mitkDataTreeNode.h"
+#include "mitkProperties.h"
+#include "mitkColorProperty.h"
+#include "mitkOpenGLRenderer.h"
+#include "mitkPointSet.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -50,13 +50,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-//##ModelId=3E70F60301D5
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
   return static_cast<const mitk::PointSet * > ( GetData() );
 }
 
-//##ModelId=3E70F60301F4
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D() 
 : m_vtkSelectedPointList(NULL), 
 m_vtkUnselectedPointList(NULL), 
@@ -79,7 +77,6 @@ m_NumberOfUnselectedAdded(0)
   m_ContourActor = vtkActor::New();
 }
 
-//##ModelId=3E70F60301F5
 mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 {
   m_PointsAssembly->Delete();
@@ -90,8 +87,10 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 }
 
 
-void mitk::PointSetVtkMapper3D::GenerateData()
+void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
+  m_PointsAssembly->VisibilityOn();
+
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_SelectedActor))
     m_PointsAssembly->RemovePart(m_SelectedActor);
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_UnselectedActor))
@@ -110,9 +109,45 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     }
   }
 
+  // Get and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
   input->Update();
-  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet();
+
+  // Get the TimeSlicedGeometry of the input object
+  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
+  if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ))
+  {
+    m_PointsAssembly->VisibilityOff();
+    return;
+  }
+
+  //
+  // get the world time
+  //
+  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  assert( worldGeometry != NULL );
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+
+  //
+  // convert the world time in time steps of the input object
+  //
+  int timeStep=0;
+  if( time > -ScalarTypeNumericTraits::max() )
+    timeStep = inputTimeGeometry->MSToTimeStep( time );
+  if( inputTimeGeometry->IsValidTime( timeStep ) == false )
+  {
+    m_PointsAssembly->VisibilityOff();
+    return;
+  }
+
+
+  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timeStep );
+
+  if ( itkPointSet.GetPointer() == NULL) 
+  {
+    m_PointsAssembly->VisibilityOff();
+    return;
+  }
 
   mitk::PointSet::PointsContainer::Iterator pointsIter;
   mitk::PointSet::PointDataContainer::Iterator pointDataIter;
@@ -456,12 +491,47 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_UnselectedActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
+
+
+
+  if(IsVisible(renderer)==false)
+  {
+    m_UnselectedActor->VisibilityOff();
+    m_SelectedActor->VisibilityOff();
+    m_ContourActor->VisibilityOff();
+    return;
+  }
+
+  bool showPoints = true;
+  this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+  if(showPoints)
+  {
+    m_UnselectedActor->VisibilityOn();
+    m_SelectedActor->VisibilityOn();
+  }
+  else
+  {
+    m_UnselectedActor->VisibilityOff();
+    m_SelectedActor->VisibilityOff();
+  }
+
+  if (makeContour)
+  {
+    m_ContourActor->VisibilityOn();
+  }
+  else
+  {
+    m_ContourActor->VisibilityOff();
+  }
 }
 
 
-//##ModelId=3EF19FA803BF
-void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::GenerateData(/*mitk::BaseRenderer *renderer*/)
 {
+  //TEST
+  return;
+
+  /*
   bool makeContour = false;
   this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
 
@@ -502,6 +572,7 @@ void mitk::PointSetVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   {
     m_ContourActor->VisibilityOff();
   }
+  */
 }
 
 vtkProp* mitk::PointSetVtkMapper3D::GetProp()

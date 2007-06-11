@@ -68,6 +68,18 @@ public:
   //## \brief Set the input itk::Image of this image importer.
   void SetInput(const InputImageType*);
 
+  //##Documentation
+  //## \brief Set the Geometry of the result image (optional)
+  //##
+  //## The Geometry has to fit the dimension and size of
+  //## the input image. The Geometry will be cloned, not
+  //## referenced!
+  //##
+  //## Providing the Geometry is optional.
+  //## The default behavior is to set the geometry by
+  //## the itk::Image::GetDirection() information.
+  void SetGeometry(const Geometry3D* geometry);
+
 protected:
   ITKImageImport();
 
@@ -85,6 +97,8 @@ protected:
    * output region to an input region. */
   typedef itk::ImageToImageFilterDetail::ImageRegionCopier<itkGetStaticConstMacro(InputImageDimension),
                     itkGetStaticConstMacro(RegionDimension)> OutputToInputRegionCopierType;
+
+  Geometry3D::Pointer m_Geometry;
 };
 
 //##Documentation
@@ -98,7 +112,7 @@ protected:
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
 template <typename ItkOutputImageType> 
-Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, bool update = true);
+Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry = NULL, bool update = true);
 
 //##Documentation
 //## @brief Imports an itk::Image (with a specific type) as an mitk::Image.
@@ -111,7 +125,7 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
 template <typename ItkOutputImageType> 
-Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, bool update = true);
+Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry = NULL, bool update = true);
 
 } // namespace mitk
 

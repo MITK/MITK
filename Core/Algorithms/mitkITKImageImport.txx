@@ -46,6 +46,20 @@ void mitk::ITKImageImport<TInputImage>::SetInput(const InputImageType* input)
 }
 
 template <class TInputImage>
+void mitk::ITKImageImport<TInputImage>::SetGeometry(const Geometry3D* geometry)
+{
+  if(geometry != NULL)
+  {
+    m_Geometry = static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
+  }
+  else
+  {
+    m_Geometry = NULL;
+  }
+  Modified();
+}
+
+template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::GenerateOutputInformation()
 {
 	InputImageConstPointer input  = this->GetInput();
@@ -54,6 +68,11 @@ void mitk::ITKImageImport<TInputImage>::GenerateOutputInformation()
 	itkDebugMacro(<<"GenerateOutputInformation()");
 
 	output->InitializeByItk(input.GetPointer());
+
+  if(m_Geometry.IsNotNull())
+  {
+    output->SetGeometry(m_Geometry);
+  }
 }
 
 template <class TInputImage>
@@ -104,20 +123,22 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
 }
 
 template <typename ItkOutputImageType> 
-mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, bool update)
+mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry, bool update)
 {
   typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
   importer->SetInput(itkimage);
+  importer->SetGeometry(geometry);
   if(update)
     importer->Update();
   return importer->GetOutput();
 }
 
 template <typename ItkOutputImageType> 
-mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, bool update)
+mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry, bool update)
 {
   typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
   importer->SetInput(itkimage);
+  importer->SetGeometry(geometry);
   if(update)
     importer->Update();
   return importer->GetOutput();

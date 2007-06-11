@@ -32,13 +32,13 @@ public:
   ~QmitkFunctionalityTesting();
   QTimer m_CloseMessagesTimer;
   unsigned int m_NumberOfFunctionalitiesFailed;
+  std::list<std::string> m_NamesOfFailedFunctionalities;
 protected slots:
   virtual void ActivateNextFunctionality();
   virtual void CloseFirstMessageBox();
 protected:
   QmitkFctMediator* m_QmitkFctMediator;
   QTimer m_ActivateTimer;
-  std::list<std::string> m_NamesOfFailedFunctionalties;
 };
 
 int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);

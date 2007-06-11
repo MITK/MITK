@@ -97,7 +97,7 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
     {
       std::cout<<"[FAILED]"<<std::endl;
       ++m_NumberOfFunctionalitiesFailed;
-      m_NamesOfFailedFunctionalties.push_back( activeFunctionality->className() );
+      m_NamesOfFailedFunctionalities.push_back( activeFunctionality->className() );
     }
   }
 #endif
@@ -140,6 +140,12 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
   if (testing->m_NumberOfFunctionalitiesFailed > 0)
   {
     std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesFailed << " functionalities failed during testing themselves:" <<std::endl;
+    for ( std::list<std::string>::iterator iter = testing->m_NamesOfFailedFunctionalities.begin();
+          iter != testing->m_NamesOfFailedFunctionalities.end();
+          ++iter )
+    {
+      std::cout << *iter << std::endl;
+    }
     std::cout<<"Test done [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }

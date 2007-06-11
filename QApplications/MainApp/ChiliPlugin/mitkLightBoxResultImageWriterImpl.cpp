@@ -251,7 +251,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
     { tagSTUDY_TIME, CurrentStudy.Time },
     { tagSTUDY_INSTANCE_UID, CurrentStudy.InstanceUID },
     { tagSERIES_DESCRIPTION, m_SeriesDescription.c_str() }
-    // tagSERIES_NUMBER --> is int (look at line266)
+    // tagSERIES_NUMBER --> is int
   };
 
   typedef std::list<ipPicTSV_t*> TagList;
@@ -290,8 +290,12 @@ void mitk::LightBoxResultImageWriterImpl::Write()
         QcPlugin::addTags( cur, cur, true );
         while( !tagList.empty() )  //thats the needed tags to save
         {
-          //delete tag (if exist) and add our own
+          std::string temp = "Chili: " + (std::string)tagList.front()->tag;
+          //if we dont delete the "old" property, we override our new studyassociation
+          m_PropertyList->DeleteProperty( temp.c_str() );
+          //delete tag (if exist)
           DeleteTag( cur, tagList.front()->tag );
+          //add the new studyassociation
           ipPicAddTag( cur, tagList.front() );
           tagList.pop_front();
         }
@@ -310,7 +314,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
           {
             Description = iter->first;
             Description = Description.erase( 0, 7 );  //delete "Chili: " from Description
-            DeleteTag( cur, Description );
+            DeleteTag( cur, Description );  //delete the tag if exist
             mitk::BaseProperty* unknownProperty = NULL;
             unknownProperty = iter->second.first;
             if( mitk::StringProperty* StringProp = dynamic_cast<mitk::StringProperty*>( unknownProperty ) )
@@ -331,6 +335,8 @@ void mitk::LightBoxResultImageWriterImpl::Write()
       number++;
       DeleteTag( cur, tagSTUDY_ID );  //delete the STUDY ID and create a new one (QcPlugin::addTag dont copy it)
       ipPicAddTag( cur, CreateASCIITag( tagSTUDY_ID, CurrentStudy.ID ) );
+      DeleteTag( cur, tagSTUDY_DESCRIPTION );  //delete the STUDY DESCRIPTION and create a new one (QcPlugin::addTag dont copy it, if it "")
+      ipPicAddTag( cur, CreateASCIITag( tagSTUDY_DESCRIPTION, CurrentStudy.Description ) );
       QcPlugin::addIcon( cur, true );  //create an icon for the lightbox
       QcPlugin::addLevelWindow( cur, (int)(m_LevelWindow.GetLevel()), (int)(m_LevelWindow.GetWindow()) );  //add the Level/Window
 

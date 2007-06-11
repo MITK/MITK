@@ -31,12 +31,6 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReader::GetPropertyList()
   return NULL;
 }
 
-const std::string mitk::LightBoxImageReader::GetSeriesDescription()
-{
-  std::string result;
-  return result;
-}
-
 QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 {
   return NULL;

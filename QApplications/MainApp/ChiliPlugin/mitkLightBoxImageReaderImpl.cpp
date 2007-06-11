@@ -616,54 +616,8 @@ int mitk::LightBoxImageReaderImpl::GetRealPosition( int position, LocalImageInfo
   return list[position].pos;
 }
 
-const std::string mitk::LightBoxImageReaderImpl::GetSeriesDescription()
-{
-  if( m_LightBox == NULL )
-  {
-    itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    SetLightBoxToCurrentLightBox();
-  }
-  if ( m_LightBox == NULL )
-  {
-    itkWarningMacro( << "No lightbox found." );
-    return "";
-  }
-  if( m_LightBox->getFrames() == 0 )
-  {
-    itkWarningMacro( << "Lightbox empty." );
-    return "";
-  }
-  std::string SeriesDescription;
-  ipPicTSV_t* srd = ipPicQueryTag( m_LightBox->fetchHeader(0), tagSERIES_DESCRIPTION );
-  if( srd )
-    SeriesDescription = (char*)(srd->value);
-  else
-  {
-    srd = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
-    if( srd )
-    {
-      void* data;
-      ipUInt4_t len;
-      char * tmp;
-      if ( dicomFindElement((unsigned char*) srd->value, 0x0008, 0x103e, &data, &len) )
-      {
-        tmp = new char[len+1];
-        strncpy(tmp, (char*)data, len);
-        tmp[len] = 0;
-        SeriesDescription = tmp;
-        delete [] tmp;
-       }
-    }
-  }
-  if( SeriesDescription == "" )
-     SeriesDescription = "empty";
-  return SeriesDescription;
-}
-
 const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList()
 {
-  PropertyList::Pointer resultPropertyList = PropertyList::New(); // TODO We want to return an empty list instead of NULL?
-
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
@@ -672,25 +626,34 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
   if ( m_LightBox == NULL )
   {
     itkWarningMacro( << "No lightbox found." );
-    return resultPropertyList;
+    return NULL;
   }
   if( m_LightBox->getFrames() == 0 )
   {
     itkWarningMacro( << "Lightbox empty." );
-    return resultPropertyList;
+    return NULL;
   }
 
-  // TODO I would put the = PropertyList::New() here.
+  PropertyList::Pointer resultPropertyList = PropertyList::New();
 
-  #define NUMBER_OF_CHILI_PIC_TAGS 19
+  #define NUMBER_OF_CHILI_PIC_TAGS 24
   HeaderTagInfo tagsToImport[NUMBER_OF_CHILI_PIC_TAGS] =
   {
+    //this information are important to save the series
+    //we use it to control, if all nodes are loaded from the same study
+    HeaderTagInfo( tagMODALITY,                      0x0008, 0x0060, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_DESCRIPTION,            0x0008, 0x103e, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSTUDY_INSTANCE_UID,            0x0020, 0x000d, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSTUDY_DATE,                    0x0008, 0x0020, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSTUDY_TIME,                    0x0008, 0x0030, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSTUDY_DESCRIPTION,             0x0008, 0x1030, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_NUMBER,                 0x0020, 0x0011, HeaderTagInfo::Int ),
+    //additional information ( define as "ChiliTag" ( ipPic/ipPicTags.h) )
     HeaderTagInfo( tagPATIENT_NAME,                  0x0010, 0x0010, HeaderTagInfo::String ),
     HeaderTagInfo( tagPATIENT_ID,                    0x0010, 0x0020, HeaderTagInfo::String ),
     HeaderTagInfo( tagPATIENT_BIRTHDATE,             0x0010, 0x0030, HeaderTagInfo::String ),
     HeaderTagInfo( tagPATIENT_BIRTHTIME,             0x0010, 0x0032, HeaderTagInfo::String ),
     HeaderTagInfo( tagMEDICAL_RECORD_LOCATOR,        0x0010, 0x1090, HeaderTagInfo::String ),
-    HeaderTagInfo( tagPERFORMING_PHYSICIAN_NAME,     0x0000, 0x0000, HeaderTagInfo::MissingInDicom ), // TODO this is not in DICOM header ??
     HeaderTagInfo( tagREFERING_PHYSICIAN_NAME,       0x0008, 0x0090, HeaderTagInfo::String ),
     HeaderTagInfo( tagINSTITUTION_NAME,              0x0008, 0x0080, HeaderTagInfo::String ),
     HeaderTagInfo( tagMANUFACTURER,                  0x0008, 0x0070, HeaderTagInfo::String ),
@@ -702,33 +665,58 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
     HeaderTagInfo( tagIMAGE_TYPE,                    0x0008, 0x0008, HeaderTagInfo::String ),
     HeaderTagInfo( tagPATIENT_SEX,                   0x0010, 0x0040, HeaderTagInfo::UnsignedInt ),
     HeaderTagInfo( tagSERIES_ECHO_NUMBER,            0x0018, 0x0086, HeaderTagInfo::Int ),
-    HeaderTagInfo( tagSERIES_ACQUISITION,            0x0020, 0x1001, HeaderTagInfo::Int ),
-    HeaderTagInfo( tagSERIES_TEMPORAL_POSITION,      0x0010, 0x0010, HeaderTagInfo::MissingInDicom )  // TODO this is not in DICOM header ??
+    HeaderTagInfo( tagSERIES_ACQUISITION,            0x0020, 0x1001, HeaderTagInfo::Int )
   };
 
-  ipPicTSV_t* srd; // FIXME soft rubber duck?
+    /*
+    if you want additional information self define
+    -define MITK-TAGS ( for example in MITKTags.h )
+    #define tagMITK_INSTITUTION_ADDRESS "MITK INSTITUTION ADDRESS"
+    #define tagMITK_STATION_NAME "MITK STATION NAME"
+    #define tagMITK_PATIENT_POSTION "MITK PATIENT POSITION"
+    ...
+
+    -#include <MITKTags.h>
+
+    -change #define NUMBER_OF_CHILI_PIC_TAGS
+
+    -add to list (the Dicom-Address is right):
+    HeaderTagInfo( tagMITK_INSTITUTION_ADDRESS,     0x0008, 0x0081, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMITK_STATION_NAME,     0x0008, 0x0010, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMITK_PATIENT_POSTION,     0x0018, 0x5100, HeaderTagInfo::String ),
+
+    ->that´s all;
+    the reader read first from the Pic-Header, then from the Dicom-Header an add it as "Chili: " + HeaderTagInfo.picTagKey to the propertylist
+    the writer take all "Chili: " + * Tags and wrote them as * Tags to the Pic-Header
+    */
+
+  ipPicTSV_t* picHeader;
   std::string PropertyName;
 
   for( int x = 0; x < NUMBER_OF_CHILI_PIC_TAGS; ++x )
   {
     //first try to read from the pic-header
     PropertyName = "Chili: " + tagsToImport[x].picTagKey;
-    srd = ipPicQueryTag( m_LightBox->fetchHeader(0), (char*)tagsToImport[x].picTagKey.c_str() );
-    if( srd )
+    picHeader = ipPicQueryTag( m_LightBox->fetchHeader(0), (char*)tagsToImport[x].picTagKey.c_str() );
+    if( picHeader )
     {
       BaseProperty::Pointer tagProperty;
 
-      switch( srd->type )
+      switch( picHeader->type )
       {
         case ipPicASCII:
         {
-          tagProperty = new StringProperty( static_cast<char*>(srd->value) );
+          tagProperty = new StringProperty( static_cast<char*>(picHeader->value) );
           break;
         }
         case ipPicInt:
+        {
+          tagProperty = new IntProperty( *static_cast<int*>(picHeader->value) );
+          break;
+        }
         case ipPicUInt:
         {
-          tagProperty = new IntProperty( *static_cast<int*>(srd->value) );
+          tagProperty = new IntProperty( (int)*((char*)(picHeader->value)) );
           break;
         }
         default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
@@ -746,66 +734,48 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
     else // unable to find/read PIC-Tag from header
     {
       //read from Dicom-Header
-      ipPicTSV_t *dch = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
-      void* data;
+      ipPicTSV_t *dicomHeader = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
+      void* data; // dicomfindelement point it to a dicomaddress, dont delete it or free if you want to work with the dicomheader
       ipUInt4_t len;
-      if( dch )
+      if( dicomHeader )
       {
         switch (tagsToImport[x].type)
         {
           case HeaderTagInfo::String:
           {
-            // TODO what about "data". Do we have to free that memory somehow? how? delete? free?
-            if ( dicomFindElement( (unsigned char*) dch->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
-            {
-              /* TODO remove if not necessary!
-              tmp = new char[len+1];
-              strncpy( tmp, (char*)data, len );
-              tmp[len]=0;
-              StringProperty* newStringProperty = new StringProperty( tmp );
-              resultPropertyList->SetProperty ( PropertyName.c_str(), newStringProperty );
-              delete [] tmp;
-              */
+            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
               resultPropertyList->SetProperty ( PropertyName.c_str(), new StringProperty( (char*)data ) );
-             }
             break;
           }
           case HeaderTagInfo::UnsignedInt:
           {
-            /* TODO remove if not necessary!
-            tmp = new char[len+1];
-            strncpy( tmp, (char*)data, len );
-            tmp[len]=0;
-            GenericProperty<int>* newIntProperty = new GenericProperty<int>( (int)*( tmp ) );
-            resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
-            delete [] tmp;
-            */
-            resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( *(int*)data));
+            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
+              //resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( (int)*((char*)data) ));
+              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
             break;
           }
           case HeaderTagInfo::Int:
           {
-            /* TODO how is this different to the above? can't UnsignedInt and Int be unified into one case block? sytax: see around l. 723
-            tmp = new char[len+1];
-            strncpy( tmp, (char*)data, len );
-            tmp[len]=0;
-            GenericProperty<int>* newIntProperty = new GenericProperty<int>( atoi( tmp ) );
-            resultPropertyList->SetProperty ( PropertyName.c_str() , newIntProperty );
-            delete [] tmp;
-            */
-            resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
+            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
+              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
             break;
           }
           case HeaderTagInfo::MissingInDicom:
           {
-            // can't do anything
             break;
           }
-        
         }
       }
     }
   }
+
+  BaseProperty::Pointer name = resultPropertyList->GetProperty( "Chili: SERIES DESCRIPTION" );
+  if( name )
+  {
+    resultPropertyList->SetProperty( "name", new mitk::StringProperty( name->GetValueAsString() ) );
+  }
+  else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "empty Name!" ) );
+
   return resultPropertyList;
 }
 

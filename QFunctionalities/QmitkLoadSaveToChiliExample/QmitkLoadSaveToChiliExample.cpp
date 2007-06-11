@@ -134,7 +134,6 @@ void QmitkLoadSaveToChiliExample::LoadFromLightbox()
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
     node->SetData( image );
     mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
-    node->SetProperty( "name", new mitk::StringProperty( reader->GetSeriesDescription() ) );
     mitk::ChiliPlugin::GetInstance()->SetPropertyToNode( reader->GetPropertyList(), node.GetPointer() );
     mitk::DataStorage::GetInstance()->Add( node /* , parent */ );
     //initialize the multiwidget (input changed)
@@ -167,7 +166,7 @@ void QmitkLoadSaveToChiliExample::SaveToLightbox()
         //we got a real image -> make the cursor to a clock, create a writer
         QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
         mitk::LightBoxResultImageWriter::Pointer writer = mitk::LightBoxResultImageWriter::New();
-        //SET THE INPUT
+        //SET INPUT (detailed variant)
         //->the image
         writer->SetInput( image );
         //->the level-window-property
@@ -181,6 +180,8 @@ void QmitkLoadSaveToChiliExample::SaveToLightbox()
         //->the lightbox to write
         writer->SetLightBoxToNewLightBox();
         //->you have to set the image, the other inputs get set automatically if there are empty
+        //SET INPUT (short variant)
+        //writer->SetInputByDataTreeNode( node );
         writer->Write();//write the image to the lightbox
         //make the cursor normal
         QApplication::restoreOverrideCursor();
@@ -217,7 +218,7 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
 
 void QmitkLoadSaveToChiliExample::chiliLightBoxCountChanged( const itk::EventObject& )
 {
-  std::cout<< "active lightbox(es): " << mitk::ChiliPlugin::GetInstance()->GetLightBoxCount() <<std::endl;
+  //std::cout<< "active lightbox(es): " << mitk::ChiliPlugin::GetInstance()->GetLightBoxCount() <<std::endl;
 }
 
 

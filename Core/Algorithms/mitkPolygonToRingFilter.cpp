@@ -65,33 +65,41 @@ void mitk::PolygonToRingFilter::GenerateData()
   mitk::Mesh::ConstPointer input  = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
 
-  vtkPolyData *polyData = vtkPolyData::New();
-  vtkPoints *vPoints = vtkPoints::New();
-  vtkCellArray *polys = vtkCellArray::New();
-  //polys->Initialize();
-  //vPoints->Initialize();
-
-  mitk::Mesh::PointType thisPoint;
-
-  //iterate through all cells and build tubes
-  Mesh::CellIterator cellIt, cellEnd;
-  cellEnd = input->GetMesh()->GetCells()->End();
-  for( cellIt = input->GetMesh()->GetCells()->Begin(); cellIt != cellEnd; ++cellIt )
+  int t;
+  for ( t = 0; t < input->GetPointSetSeriesSize(); ++t )
   {
-    m_PointList.clear();
-    m_VectorList.clear();
-    BuildPointAndVectorList(*cellIt->Value(), m_PointList, m_VectorList);
-    BuildVtkTube(vPoints, polys, m_PointList, m_VectorList);
+
+    vtkPolyData *polyData = vtkPolyData::New();
+    vtkPoints *vPoints = vtkPoints::New();
+    vtkCellArray *polys = vtkCellArray::New();
+    //polys->Initialize();
+    //vPoints->Initialize();
+
+    mitk::Mesh::PointType thisPoint;
+
+    //iterate through all cells and build tubes
+    Mesh::CellIterator cellIt, cellEnd;
+    cellEnd = input->GetMesh( t )->GetCells()->End();
+    for ( cellIt = input->GetMesh( t )->GetCells()->Begin();
+          cellIt != cellEnd; 
+          ++cellIt )
+    {
+      m_PointList.clear();
+      m_VectorList.clear();
+      BuildPointAndVectorList(*cellIt->Value(), m_PointList, m_VectorList);
+      BuildVtkTube(vPoints, polys, m_PointList, m_VectorList);
+    }
+
+    polyData->SetPoints( vPoints );
+    vPoints->Delete();
+    polyData->SetPolys( polys );
+    polys->Delete();
+
+    output->SetVtkPolyData( polyData, t );
+    polyData->Delete();
+  
   }
 
-  polyData->SetPoints( vPoints );
-  vPoints->Delete();
-  polyData->SetPolys( polys );
-  polys->Delete();
-
-  output->SetVtkPolyData(polyData);
-
-  polyData->Delete();
 }
 
 

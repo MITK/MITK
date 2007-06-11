@@ -470,6 +470,11 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
   if(IsSliceSet(s,t,n))
   {
     sl=GetSliceData(s,t,n,data,importMemoryManagement);
+    if(sl->GetManageMemory()==false)
+    {
+      sl=AllocateSliceData(s,t,n,data,importMemoryManagement);
+      if(sl.GetPointer()==NULL) return false;
+    }
     memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
     sl->Modified();
     //we have changed the data: call Modified()! 
@@ -493,6 +498,11 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
   if(IsVolumeSet(t,n))
   {
     vol=GetVolumeData(t,n,data,importMemoryManagement);
+    if(vol->GetManageMemory()==false)
+    {
+      vol=AllocateVolumeData(t,n,data,importMemoryManagement);
+      if(vol.GetPointer()==NULL) return false;
+    }
     memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
     vol->Modified();
     vol->SetComplete(true);
@@ -518,7 +528,12 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
   if(IsChannelSet(n))
   {
     ch=GetChannelData(n,data,importMemoryManagement);
-    memcpy(ch->GetData(), ch, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+    if(ch->GetManageMemory()==false)
+    {
+      ch=AllocateChannelData(n,data,importMemoryManagement);
+      if(ch.GetPointer()==NULL) return false;
+    }
+    memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
     ch->Modified();
     ch->SetComplete(true);
     //we have changed the data: call Modified()! 

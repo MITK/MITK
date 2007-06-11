@@ -83,6 +83,11 @@ public:
     return m_VtkImageData;
   }
 
+  bool GetManageMemory() const
+  {
+    return m_ManageMemory;
+  }
+
   virtual void ConstructVtkImageData() const;
   
   virtual void Modified() const;

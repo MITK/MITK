@@ -56,7 +56,7 @@ int compareGeometries(mitk::Geometry3D* geometry1, mitk::Geometry3D* geometry2)
 }
 
 template <class ImageType>
-int testBackCasting(mitk::Image* imgMem, typename ImageType::Pointer & itkImage)
+int testBackCasting(mitk::Image* imgMem, typename ImageType::Pointer & itkImage, bool disconnectAfterImport)
 {
   int result;
 
@@ -93,6 +93,13 @@ int testBackCasting(mitk::Image* imgMem, typename ImageType::Pointer & itkImage)
   std::cout << "Testing mitk::ImportItkImage: " << std::flush;
   mitkImage = mitk::ImportItkImage(itkImage);
   std::cout<<"[PASSED]"<<std::endl;
+
+  if(disconnectAfterImport)
+  {
+    std::cout << "Testing DisconnectPipeline() on mitk::Image into which was imported : " << std::flush;
+    mitkImage->DisconnectPipeline();
+    std::cout<<"[PASSED]"<<std::endl;
+  }
 
   result = compareGeometries(imgMem->GetGeometry(), mitkImage->GetGeometry());
   if(result != EXIT_SUCCESS)
@@ -132,7 +139,12 @@ int testImageToItkAndBack(mitk::Image* imgMem)
   toItkFilter->Update();
   typename ImageType::Pointer itkImage = toItkFilter->GetOutput();
 
-  result = testBackCasting<ImageType>(imgMem, itkImage);
+  result = testBackCasting<ImageType>(imgMem, itkImage, false);
+  if(result != EXIT_SUCCESS)
+    return result;
+
+  std::cout << "Testing mitk::ImageToItk (with subsequent DisconnectPipeline, see below): " << std::flush;
+  result = testBackCasting<ImageType>(imgMem, itkImage, true);
   if(result != EXIT_SUCCESS)
     return result;
 
@@ -183,7 +195,11 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   ImageType::Pointer itkImage;
   mitk::CastToItkImage( imgMem, itkImage );
 
-  result = testBackCasting<ImageType>(imgMem, itkImage);
+  result = testBackCasting<ImageType>(imgMem, itkImage, false);
+  if(result != EXIT_SUCCESS)
+    return result;
+
+  result = testBackCasting<ImageType>(imgMem, itkImage, true);
   if(result != EXIT_SUCCESS)
     return result;
 

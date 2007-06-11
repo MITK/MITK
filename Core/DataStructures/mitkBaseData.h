@@ -205,7 +205,14 @@ public:
   //## 
   //## @warning This method will normally be called internally by the sub-class of BaseData 
   //## during initialization.
+  //## \sa SetClonedGeometry
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+
+  //##Documentation
+  //## @brief Set a clone of the provided parameter as Geometry3D of the data. 
+  //## 
+  //## \sa SetGeometry
+  virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
 
   //##Documentation
   //## @brief Get the PropertyList 

@@ -59,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 \verbatim
 
-\/**
+/**
 \page QmitkFUNCTIONALITY_CLASS_NAMEUserManual The functionality to solve all problems
 
 Available sections:
@@ -79,7 +79,7 @@ Blaa
 
 Tadaa
 
-*\/
+*\
 \endverbatim
 
   However, it is nice to actually replace the nonsense :-)

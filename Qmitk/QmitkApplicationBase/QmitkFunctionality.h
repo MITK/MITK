@@ -55,6 +55,32 @@ Each functionality has a mitk::PropertyList, where it can store application opti
 using this list you can recreate your application's status after the user closed and restarted
 the application.
 
+\subsection Usage
+
+\subsubsection SetParameter Setting an option parameter
+
+Use m_Options->SetProperty() to store an option. Example:
+\verbatim
+// Try to access the template file //
+mitk::StringProperty* p = dynamic_cast<mitk::StringProperty*>(m_Options->GetProperty("ReportTemplateDirectory").GetPointer());
+if (p != NULL)
+{
+  QDir dir(p->GetValue());
+  ...
+}
+...
+\endverbatim
+\subsubsection GetParameter retrieving an option parameter
+
+Use m_Options->GetProperty() to retrieve an option. Example:
+\verbatim
+mitk::StringProperty* p = dynamic_cast<mitk::StringProperty*>(m_Options->GetProperty("TagPattern").GetPointer());
+if (p != NULL)
+  m_ReportWriter->SetTagPattern(p->GetValue());   // if a pattern is defined in the options, use it
+else
+  m_Options->SetProperty("TagPattern", new mitk::StringProperty("StandardPattern"));  // if not define it
+\endverbatim
+
 QmitkMainTemplate (and QmitkSampleApp) will read a list of options from file on startup and 
 tell the functionalities about it. This base class of all functionalities will store away
 your functionality's options in the m_Options variable. 
@@ -63,22 +89,22 @@ You should react on changes to this list in Activated(). OR, if you want to over
 SetFunctionalityOptionsList() method, make sure you know what you are doing and call
 QmitkFunctionality::SetFunctionalityOptionsList().
 
-\section QmitkFunctionalityOptionsDialog Application options dialog
+\section QmitkFunctionalityOptionsDialog Functionality options dialog
 
-QmitkMainTemplate could ask your functionality to provide an options dialog. In that case, CreateOptionWidget()
-will be called. The default behaviour is to return NULL. Otherwise please create a QWidget with some option 
-fields.
+QmitkMainTemplate will ask your functionality to provide an options dialog. In that case, CreateOptionWidget()
+will be called. The default behaviour is to return return a simple QmitkPropertyListView widget. This widget will 
+display the content of the functionalities m_Options propertylist, but it really does not look that nice.
+A better option would be to create your own option dialog and let your functionality's CreateOptionWidget() return it.
+
 After the user closes the option dialog, the application will call OptionsChanged(QWidget*) on your functionality,
 with the parameter being your widget from CreateOptionWidget().
 OptionsChanged() is your chance to read the changed checkboxes, textedits, whatever from your QWidget*.
-
-\warning There is no automatic way yet to create an option dialog from the m_Options list or automatically
-         change the m_Options list from your widget. This should be solved some time in the future.
-         A small collection of classes derived from mitk::PropertyObserver could be part of the solution. 
-         They are able to display properties, react to changes in properties, and also change properties.
+If you did not provide an option widget, the m_Option list will already be updated by the QmitkPropertyListView widget. 
+(There is no undoing changes by pressing Cancel with QmitkPropertyListView - it changes elements in m_Options as the user 
+edits the corresponding textfields/checkboxes...)
 
 \section QmitkFunctionalityUserManual User manual
-
+There is a more extensive documentation at QmitkMainTemplate
 \warning This is work in progress. Not tested with DKFZ external functionalities.
 
  1. In your functionalities directory, create a subdirectory UserManual. (this is optional but useful)

@@ -362,7 +362,6 @@ void QcMITKSamplePlugin::lightBoxImportButtonClicked(int row)
       mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();                                         // create a new empty node
       node->SetData( image );
       mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
-      node->SetProperty( "name", new mitk::StringProperty( reader->GetSeriesDescription() ) );
       mitk::ChiliPlugin::GetInstance()->SetPropertyToNode( reader->GetPropertyList(), node.GetPointer() );
       mitk::DataStorage::GetInstance()->Add( node );
 

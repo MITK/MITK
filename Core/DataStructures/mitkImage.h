@@ -343,9 +343,39 @@ public:
     mitk::Matrix3D matrix;
     matrix.SetIdentity();
     unsigned int j, itkDimMax3 = (m_Dimension >= 3? 3 : m_Dimension);
-    for ( i=0; i < itkDimMax3; ++i)
-      for( j=0; j < itkDimMax3; ++j )
-        matrix[i][j] = itkdirection[i][j]*spacing[j];
+    // check if spacing has no zero entry and itkdirection has no zero columns
+    bool itkdirectionOk = true;
+    mitk::Scalartype columnSum;
+    for( j=0; j < itkDimMax3; ++j )
+    {
+      columnSum = 0.0;
+      for ( i=0; i < itkDimMax3; ++i)
+      {
+        columnSum += fabs(itkdirection[i][j]);
+      }
+      if(columnSum < mitk::eps)
+      {
+        itkdirectionOk = false;
+      }
+      if(spacing[j] < mitk::eps)
+      {
+        itkWarningMacro(<< "Illegal value of itk::Image::GetSpacing()[" << j <<"]=" << spacing[j] << ". Using 1.0 instead.");
+        spacing[j] = 1.0;
+      }
+    }
+    if(itkdirectionOk == false)
+    {
+      itkWarningMacro(<< "Illegal matrix returned by itk::Image::GetDirection():" << itkdirection << " Using identity instead.");
+      for ( i=0; i < itkDimMax3; ++i)
+        for( j=0; j < itkDimMax3; ++j )
+          matrix[i][j] = spacing[j];
+    }
+    else
+    {
+      for ( i=0; i < itkDimMax3; ++i)
+        for( j=0; j < itkDimMax3; ++j )
+          matrix[i][j] = itkdirection[i][j]*spacing[j];
+    }
 
     // re-initialize PlaneGeometry with origin and direction
     PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetGeometry2D(0));

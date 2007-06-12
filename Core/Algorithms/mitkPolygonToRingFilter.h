@@ -32,9 +32,10 @@ class vtkCellArray;
 
 namespace mitk {
 
-//##Documentation
-//## @brief Create ring around polygons contained in a Mesh
-//## @ingroup Process
+/**
+ * \brief Create ring around polygons contained in a Mesh
+ * \ingroup Process
+ */
 class PolygonToRingFilter : public SurfaceSource
 {
 public:
@@ -49,32 +50,24 @@ public:
 
   virtual void SetInput(const mitk::Mesh *image);
 
-  //##Documentation
-  //## @brief Get ring radius
-  //##
+  /** \brief Get ring radius */
   itkGetMacro(RingRadius, float);
-  //##Documentation
-  //## @brief Set ring radius
-  //##
+
+  /* \brief Set ring radius */
   itkSetMacro(RingRadius, float);
 
-  //##Documentation
-  //## @brief Get ring resolution of created Surface
-  //##
+  /** \brief Get ring resolution of created Surface */
   itkGetMacro(RingResolution, unsigned int);
-  //##Documentation
-  //## @brief Set ring resolution of created Surface
-  //##
+   
+  /** \brief Set ring resolution of created Surface */
   itkSetMacro(RingResolution, unsigned int);
 
-  //##Documentation
-  //## @brief Get spline resolution
-  //##
+  /** \brief Get spline resolution */
   itkGetMacro(SplineResolution, unsigned int);
-  //##Documentation
-  //## @brief Set spline resolution
-  //##
+   
+  /** \brief Set spline resolution */
   itkSetMacro(SplineResolution, unsigned int);
+
 protected:
   typedef std::vector<Vector3D> VectorListType;
   typedef std::vector<Point3D>  PointListType;
@@ -83,23 +76,21 @@ protected:
 
   virtual ~PolygonToRingFilter();
 
-  void BuildVtkTube(vtkPoints *vPoints, vtkCellArray *polys, PointListType& ptList, VectorListType& vecList);
-  void BuildPointAndVectorList(mitk::Mesh::CellType& cell, PointListType& ptList, VectorListType& vecList);
-  void DrawCyl(vtkPoints *vPoints, vtkCellArray *polys, VectorListType &sl, VectorListType &sc, int idmax, Point3D & last_p, Point3D & cur_p);
+  void BuildVtkTube( vtkPoints *vPoints, vtkCellArray *polys, 
+    PointListType& ptList, VectorListType& vecList );
+  void BuildPointAndVectorList( mitk::Mesh::CellType& cell, 
+    PointListType& ptList, VectorListType& vecList, int timeStep = 0 );
+  void DrawCyl(vtkPoints *vPoints, vtkCellArray *polys, 
+    VectorListType &sl, VectorListType &sc, int idmax, 
+    Point3D & last_p, Point3D & cur_p);
 
-  //##Documentation
-  //## @brief Ring radius
-  //##
+  /** \brief Ring radius */
   float m_RingRadius;
 
-  //##Documentation
-  //## @brief Ring resolution of created Surface
-  //##
+  /** \brief Ring resolution of created Surface */
   unsigned int m_RingResolution;
 
-  //##Documentation
-  //## @brief Spline resolution of created Surface
-  //##
+  /** \brief Spline resolution of created Surface */
   unsigned int m_SplineResolution;
 
   vtkCardinalSpline *m_SplineX, *m_SplineY, *m_SplineZ;

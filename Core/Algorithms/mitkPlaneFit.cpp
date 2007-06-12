@@ -135,8 +135,8 @@ void mitk::PlaneFit::ProcessPointSet( int t )
 
   // calculate point distance to centroid and inserting it in the matrix
   mitk::PointSet::PointsContainer::Iterator pit, end;
-  pit = m_PointSet->GetPointSet()->GetPoints()->Begin();
-  end = m_PointSet->GetPointSet()->GetPoints()->End();
+  pit = m_PointSet->GetPointSet( t )->GetPoints()->Begin();
+  end = m_PointSet->GetPointSet( t )->GetPoints()->End();
   
   for (int p=0; pit!=end; pit++, p++)
   {

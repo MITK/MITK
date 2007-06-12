@@ -72,12 +72,10 @@ void mitk::PolygonToRingFilter::GenerateData()
     vtkPolyData *polyData = vtkPolyData::New();
     vtkPoints *vPoints = vtkPoints::New();
     vtkCellArray *polys = vtkCellArray::New();
-    //polys->Initialize();
-    //vPoints->Initialize();
 
     mitk::Mesh::PointType thisPoint;
 
-    //iterate through all cells and build tubes
+    // iterate through all cells and build tubes
     Mesh::CellIterator cellIt, cellEnd;
     cellEnd = input->GetMesh( t )->GetCells()->End();
     for ( cellIt = input->GetMesh( t )->GetCells()->Begin();
@@ -86,8 +84,10 @@ void mitk::PolygonToRingFilter::GenerateData()
     {
       m_PointList.clear();
       m_VectorList.clear();
-      BuildPointAndVectorList(*cellIt->Value(), m_PointList, m_VectorList);
-      BuildVtkTube(vPoints, polys, m_PointList, m_VectorList);
+
+      this->BuildPointAndVectorList(
+        *cellIt->Value(), m_PointList, m_VectorList, t );
+      this->BuildVtkTube( vPoints, polys, m_PointList, m_VectorList );
     }
 
     polyData->SetPoints( vPoints );
@@ -238,7 +238,10 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   DrawCyl(vPoints, polys, *sl, sfirst, idmax, last_p, cur_p);
 }
 
-void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& cell, PointListType& ptList, VectorListType& vecList)
+void 
+mitk::PolygonToRingFilter
+::BuildPointAndVectorList( mitk::Mesh::CellType& cell, 
+  PointListType& ptList, VectorListType& vecList, int timeStep )
 {
   // This method constructs a spline from the given point list and retrieves
   // a number of interpolated points from it to form a ring-like structure.
@@ -275,7 +278,7 @@ void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& ce
     if ( i == 0 ) { tStart = t; }
     if ( i == numberOfPoints ) { tEnd = t; }
 
-    inputPoint = this->GetInput()->GetPoint( *pit );
+    inputPoint = this->GetInput()->GetPoint( *pit, timeStep );
     m_SplineX->AddPoint( t, inputPoint[0] );
     m_SplineY->AddPoint( t, inputPoint[1] );
     m_SplineZ->AddPoint( t, inputPoint[2] );
@@ -286,7 +289,8 @@ void mitk::PolygonToRingFilter::BuildPointAndVectorList(mitk::Mesh::CellType& ce
       pit = cell.PointIdsBegin();
     }
 
-    t += inputPoint.EuclideanDistanceTo( this->GetInput()->GetPoint( *pit ) );
+    t += inputPoint.EuclideanDistanceTo( 
+      this->GetInput()->GetPoint( *pit, timeStep ) );
   }
 
   // Evaluate the spline for the desired number of points
@@ -333,151 +337,3 @@ void mitk::PolygonToRingFilter::SetInput(const mitk::Mesh *input)
   this->ProcessObject::SetNthInput(0, 
     const_cast< mitk::Mesh * >( input ) );
 }
-
-//void mitk::PolygonToRingFilter::BuildContourLines(/*mitk::VectorOfContourLines*/void* contours1)
-//{
-//  mitk::Mesh::ConstPointer input  = this->GetInput();
-//  mitk::Surface::Pointer output = this->GetOutput();
-//
-//  mitk::VectorOfContourLines & contours = *((mitk::VectorOfContourLines*)contours1);
-//
-//  mitk::Mesh::PointType thisPoint;
-//
-//  mitk::PlaneGeometry::Pointer oben, rechts;
-//  oben   = mitk::PlaneGeometry::New();
-//  rechts = mitk::PlaneGeometry::New();
-//
-//  //iterate through all cells and then iterate through all indexes of points in that cell
-//  Mesh::CellIterator cellIt, cellEnd;
-//  Mesh::PointIdIterator pointIdBegin, pointIdEnd;
-//  Mesh::PointIdIterator pointIdIt, stopPointIdIt, tempPointIdIt;
-//
-//  cellEnd = input->GetMesh()->GetCells()->End();
-//  for( cellIt = input->GetMesh()->GetCells()->Begin(); cellIt != cellEnd; ++cellIt )
-//  {
-//    unsigned int numOfPointsInCell = cellIt->Value()->GetNumberOfPoints();
-//    if (numOfPointsInCell>=3)
-//    {
-//      pointIdBegin = cellIt->Value()->PointIdsBegin();
-//      pointIdEnd   = cellIt->Value()->PointIdsEnd();
-//
-//      //Zur Bestimmung, ob Polygon links- oder rechtsdrehend (also auf welcher Seite innen ist), 
-//      //  wird erstmal ein echtes Linienstück gesucht
-//      int rl_end_id=1; //Nummer des Endpunkts des gefundenen echten Linienstücks
-//      pointIdIt=stopPointIdIt=pointIdBegin; ++pointIdIt;
-//      while((pointIdIt!=pointIdEnd) && (mitk::Equal(input->GetPoint(*pointIdIt),input->GetPoint(*stopPointIdIt))))
-//      {
-//        stopPointIdIt=pointIdIt;
-//        ++pointIdIt; ++rl_end_id;
-//      }
-//
-//      if(pointIdIt!=pointIdEnd) //andernfalls ist das gar kein richtiges Polygon, sondern nur ein Punkt
-//      {
-//        //Den nächsten Punkt der nicht kollinear auf dem ersten echten Linienstück liegt, suchen. 
-//        Vector3D direction;
-//        direction = input->GetPoint(*pointIdIt)-input->GetPoint(*stopPointIdIt);
-//        direction.Normalize();
-//        VnlVector stopVnl = input->GetPoint(*stopPointIdIt).Get_vnl_vector();
-//        VnlVector directionVnl=direction.Get_vnl_vector();
-//        VnlVector normalVnl;
-//        for(tempPointIdIt=pointIdBegin; tempPointIdIt!=pointIdEnd; ++tempPointIdIt)
-//        {
-//          normalVnl = vnl_cross_3d(directionVnl, stopVnl-input->GetPoint(*tempPointIdIt).Get_vnl_vector());
-//          if( mitk::Equal(normalVnl.squared_magnitude(),0.0f) == false )
-//            break;
-//        }
-//        if(tempPointIdIt!=pointIdEnd) //andernfalls ist das gar kein richtiges Polygon, sondern nur eine Linie
-//        {
-//          //Da wir z.Z. keine Normale in Zelle haben, aus ersten echten Linienstück und dem Punkt die Normale
-//          //  der Ebene berechnen
-//          normalVnl.normalize();
-//
-//          //Ebenen für Drehrichtungstest initialisieren
-//          Point3D p; Vector3D mid;
-//          VnlVector n_rechtsVnl;
-//          Vector3D n_rechts;
-//          vtk2itk(input->GetPoint(*pointIdIt), mid);
-//          mid += input->GetPoint(*stopPointIdIt);
-//          mid *= 0.5;
-//          vtk2itk(mid, p);
-//          oben->InitializePlane(p,direction);
-//          n_rechtsVnl=vnl_cross_3d(directionVnl, normalVnl); n_rechtsVnl.normalize();
-//          n_rechts.Set_vnl_vector(n_rechtsVnl);
-//          rechts->InitializePlane(p,n_rechts);
-//
-//          //Drehrichtungstest: wenn die Anzahl der echten Crossings der "oben"-Plane 
-//          //  (Vorzeichenwechsel des gerichteten Abstands von Polygonpunkt zu "oben"-Ebene)
-//          //  auf der rechten Seite (gerichteter Abstand des Polygonpunkt von "rechts"-Ebene echt positiv)
-//          //  ungerade ist, ist die Drehrichtung rechts, sonst links.
-//          int crossings=0;
-//          bool oberhalb;
-//          oberhalb=true;
-//
-//          ++pointIdIt;	if(pointIdIt==pointIdEnd) pointIdIt=pointIdBegin;
-//          while(pointIdIt!=stopPointIdIt)
-//          {
-//            thisPoint = input->GetPoint(*pointIdIt);
-//            if(rechts->SignedDistance(thisPoint)>0)
-//            {
-//              float dist=oben->SignedDistance(thisPoint);
-//              if(oberhalb)
-//              {
-//                if(dist<0)
-//                {
-//                  oberhalb=false;
-//                  ++crossings;
-//                }
-//              }
-//              else
-//              {
-//                if(dist>0)
-//                {
-//                  oberhalb=true;
-//                  ++crossings;
-//                }
-//              }
-//            }
-//            ++pointIdIt;	if(pointIdIt==pointIdEnd) pointIdIt=pointIdBegin;
-//          }
-//
-//          bool rechts_drehend=((crossings%2)==1);
-//
-//          //Zwischenpunkte (Punkte auf Polygon-Linienstück) in Einheitsabstand einfügen
-//          MBI_STD::auto_ptr<PointList> points3D(new PointList);
-//          Point3f first, last, point;
-//          Vector3f dir;
-//          int i, len;
-//          pointIdIt=pointIdBegin;
-//          itk2vm(input->GetPoint(*pointIdIt), last);
-//          first=last;
-//          ++pointIdIt;
-//          while(pointIdIt!=pointIdEnd)
-//          {
-//            itk2vm(input->GetPoint(*pointIdIt), point);
-//            dir=point-last; len=dir.length(); dir.normalize();
-//            for(i=0;i<len;++i,last+=dir)
-//              points3D->push_back(last);
-//            last=point;
-//            ++pointIdIt;
-//          }
-//          dir=first-last; len=dir.length(); dir.normalize();
-//          for(i=0;i<len;++i,last+=dir)
-//            points3D->push_back(last);
-//          //erster Punkt muss gleich letzter sein, sonst gilt die contour nicht als geschlossen (sh. ContourLine::contourIsClosed)
-//          points3D->push_back(first);
-//
-//          ContourLine* contour;
-//          Point3f originVm;
-//          Vector3f normalVm, directionVm;
-//          itk2vm(input->GetPoint(*stopPointIdIt), originVm);
-//          itk2vm(normalVnl, normalVm);
-//          itk2vm(direction, directionVm);
-//          View3f view(Plane3f(originVm, normalVm), directionVm);
-//          contour = new ContourLine( points3D, view, rechts_drehend );
-//
-//          contours.push_back(contour);
-//        }
-//      }
-//    }
-//  }
-//}

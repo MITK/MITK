@@ -167,7 +167,13 @@ public:
 
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
-protected:
+  const EnumIdsContainerType& GetEnumIds() const;
+  const EnumStringsContainerType& GetEnumStrings() const;
+  
+  EnumIdsContainerType& GetEnumIds();
+  EnumStringsContainerType& GetEnumStrings();
+
+private:
 
   IdType m_CurrentValue;
 
@@ -175,10 +181,16 @@ protected:
 
   EnumStringsContainerType m_EnumStrings;
 
+  typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
+  typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;
+
+  static IdMapForClassNameContainerType s_IdMapForClassName;
+  static StringMapForClassNameContainerType s_StringMapForClassName;
+
 };
 
 
-}
-
+} // namespace
 
 #endif
+

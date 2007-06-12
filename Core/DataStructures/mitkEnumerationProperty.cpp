@@ -3,21 +3,23 @@
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 
+// static map members of EnumerationProperty. These Maps point to per-classname-maps of ID <-> String. Accessed by GetEnumIds() and GetEnumString().
+mitk::EnumerationProperty::IdMapForClassNameContainerType     mitk::EnumerationProperty::s_IdMapForClassName;
+mitk::EnumerationProperty::StringMapForClassNameContainerType mitk::EnumerationProperty::s_StringMapForClassName;
+
+
 mitk::EnumerationProperty::EnumerationProperty()
 {
   m_CurrentValue = 0;
 }
 
 
-
-
-
 bool mitk::EnumerationProperty::AddEnum( const std::string& name, const IdType& id )
 {
   if ( ( ! IsValidEnumerationValue( name ) ) && ( ! IsValidEnumerationValue( id ) ) )
   {
-    m_EnumIds.insert( std::make_pair( id, name ) );
-    m_EnumStrings.insert( std::make_pair( name, id ) );
+    GetEnumIds().insert( std::make_pair( id, name ) );
+    GetEnumStrings().insert( std::make_pair( name, id ) );
     return true;
   }
   else
@@ -25,9 +27,6 @@ bool mitk::EnumerationProperty::AddEnum( const std::string& name, const IdType& 
     return false;
   }
 }
-
-
-
 
 
 bool mitk::EnumerationProperty::SetValue( const std::string& name )
@@ -43,10 +42,6 @@ bool mitk::EnumerationProperty::SetValue( const std::string& name )
   }
 }
 
-
-
-
-
 bool mitk::EnumerationProperty::SetValue( const IdType& id )
 {
   if ( IsValidEnumerationValue( id ) )
@@ -60,18 +55,10 @@ bool mitk::EnumerationProperty::SetValue( const IdType& id )
   }
 }
 
-
-
-
-
 mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetValueAsId() const
 {
   return m_CurrentValue;
 }
-
-
-
-
 
 std::string mitk::EnumerationProperty::GetValueAsString() const
 {
@@ -79,53 +66,38 @@ std::string mitk::EnumerationProperty::GetValueAsString() const
 }
 
 
-
-
-
 void mitk::EnumerationProperty::Clear()
 {
-  m_EnumIds.clear();
-  m_EnumStrings.clear();
+  GetEnumIds().clear();
+  GetEnumStrings().clear();
   m_CurrentValue = 0;
 }
 
 
-
-
-
 unsigned int mitk::EnumerationProperty::Size() const
 {
-  return m_EnumIds.size();
+  return GetEnumIds().size();
 }
-
-
-
 
 
 
 mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::Begin() const
 {
-  return m_EnumIds.begin();
+  return GetEnumIds().begin();
 }
-
-
-
 
 
 mitk::EnumerationProperty::EnumConstIterator mitk::EnumerationProperty::End() const
 {
-  return m_EnumIds.end();
+  return GetEnumIds().end();
 }
-
-
-
 
 
 std::string mitk::EnumerationProperty::GetEnumString( const IdType& id ) const
 {
   if ( IsValidEnumerationValue( id ) )
   {
-    return m_EnumIds.find( id )->second;
+    return GetEnumIds().find( id )->second;
   }
   else
   {
@@ -134,23 +106,17 @@ std::string mitk::EnumerationProperty::GetEnumString( const IdType& id ) const
 }
 
 
-
-
-
 mitk::EnumerationProperty::IdType mitk::EnumerationProperty::GetEnumId( const std::string& name ) const
 {
   if ( IsValidEnumerationValue( name ) )
   {
-    return  m_EnumStrings.find( name )->second;
+    return  GetEnumStrings().find( name )->second;
   }
   else
   {
     return 0;
   }
 }
-
-
-
 
 
 bool mitk::EnumerationProperty::operator==( const BaseProperty& property ) const
@@ -170,21 +136,15 @@ bool mitk::EnumerationProperty::operator==( const BaseProperty& property ) const
 }
 
 
-
-
-
 bool mitk::EnumerationProperty::IsValidEnumerationValue( const IdType& val ) const
 {
-  return ( m_EnumIds.find( val ) != m_EnumIds.end() );
+  return ( GetEnumIds().find( val ) != GetEnumIds().end() );
 }
-
-
-
 
 
 bool mitk::EnumerationProperty::IsValidEnumerationValue( const std::string& val ) const
 {
-  return ( m_EnumStrings.find( val ) != m_EnumStrings.end() );
+  return ( GetEnumStrings().find( val ) != GetEnumStrings().end() );
 }
 
 
@@ -203,3 +163,32 @@ bool mitk::EnumerationProperty::ReadXMLData( XMLReader& xmlReader )
   std::cout << "EnumerationProperty: " << GetValueAsString() << std::endl;
   return true;
 }
+  
+
+mitk::EnumerationProperty::EnumIdsContainerType& mitk::EnumerationProperty::GetEnumIds()
+{
+  std::string className = this->GetNameOfClass(); // virtual!
+  return s_IdMapForClassName[ className ];
+}
+
+
+const mitk::EnumerationProperty::EnumIdsContainerType& mitk::EnumerationProperty::GetEnumIds() const
+{
+  std::string className = this->GetNameOfClass(); // virtual!
+  return s_IdMapForClassName[ className ];
+}
+
+
+mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProperty::GetEnumStrings()
+{
+  std::string className = this->GetNameOfClass(); // virtual!
+  return s_StringMapForClassName[ className ];
+}
+
+
+const mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProperty::GetEnumStrings() const
+{
+  std::string className = this->GetNameOfClass(); // virtual!
+  return s_StringMapForClassName[ className ];
+}
+

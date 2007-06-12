@@ -64,8 +64,8 @@ void SampleApp::InitializeFunctionality()
   mitk::DataTreePreOrderIterator iterator(m_Tree);
 
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
-  for (std::list<QmitkFunctionalityFactory::CreateFunctionalityPtr>::const_iterator it = qff.GetCreateFunctionalityPtrList().begin() ; it != qff.GetCreateFunctionalityPtrList().end(); it++) {
-    QmitkFunctionality* functionalityInstance = (*it)(qfm,m_MultiWidget,&iterator);
+  for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) {
+    QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
     if (!m_TestingParameter) {
       qfm->AddFunctionality(functionalityInstance); 
     } else if (strcmp(m_TestingParameter,functionalityInstance->name()) == 0) {

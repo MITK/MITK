@@ -15,7 +15,7 @@ QmitkFunctionality* Create@FUNCTIONALITY_NAME@Instance(QObject *parent, QmitkStd
 
 bool Register@FUNCTIONALITY_NAME@()
 {
-  QmitkFunctionalityFactory::GetInstance().RegisterCreateFunctionalityCall(Create@FUNCTIONALITY_NAME@Instance);
+  QmitkFunctionalityFactory::GetInstance().RegisterCreateFunctionalityCall("@FUNCTIONALITY_NAME@",Create@FUNCTIONALITY_NAME@Instance);
   return true;
 }
 

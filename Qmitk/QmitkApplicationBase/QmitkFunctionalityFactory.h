@@ -29,15 +29,16 @@ class QmitkFunctionalityFactory {
 
 public:
   typedef QmitkFunctionality*(*CreateFunctionalityPtr)(QObject*, QmitkStdMultiWidget*, mitk::DataTreeIteratorBase*);
-  typedef std::list<CreateFunctionalityPtr> CreateFunctionalityPtrList; 
+  typedef std::map<std::string,CreateFunctionalityPtr> CreateFunctionalityPtrMap; 
   static QmitkFunctionalityFactory& GetInstance(); 
-  void RegisterCreateFunctionalityCall(CreateFunctionalityPtr p) {
-    m_RegisteredFunctionalities.push_back(p); 
+  void RegisterCreateFunctionalityCall(const std::string name,CreateFunctionalityPtr p) {
+    m_RegisteredFunctionalities.insert(std::make_pair(name,p)); 
   };  
-  const CreateFunctionalityPtrList& GetCreateFunctionalityPtrList() const { return m_RegisteredFunctionalities; };
+  const CreateFunctionalityPtrMap& GetCreateFunctionalityPtrMap() const { return m_RegisteredFunctionalities; };
+  CreateFunctionalityPtr GetCreateFunctionalityPtrByName(const std::string name) const;    
 protected: 
   QmitkFunctionalityFactory() {};   
-  CreateFunctionalityPtrList m_RegisteredFunctionalities;
+  CreateFunctionalityPtrMap m_RegisteredFunctionalities;
 };
 
 #endif

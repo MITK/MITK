@@ -124,6 +124,8 @@ void QmitkImageCropper::Deactivated()
   RemoveBoundingObjectFromNode();
 
   QmitkFunctionality::Deactivated(); // just call the inherited function
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 

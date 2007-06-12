@@ -50,7 +50,10 @@ void QmitkProgressBar::AddStepsToDo(unsigned int steps)
 {
   m_TotalSteps += steps;
   this->setProgress(m_Progress, m_TotalSteps);
-  this->show();
+  if (m_TotalSteps > 0)
+  {
+    this->show();
+  }
   qApp->processEvents();
 }
   

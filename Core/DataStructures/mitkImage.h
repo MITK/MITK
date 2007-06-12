@@ -345,7 +345,7 @@ public:
     unsigned int j, itkDimMax3 = (m_Dimension >= 3? 3 : m_Dimension);
     // check if spacing has no zero entry and itkdirection has no zero columns
     bool itkdirectionOk = true;
-    mitk::Scalartype columnSum;
+    mitk::ScalarType columnSum;
     for( j=0; j < itkDimMax3; ++j )
     {
       columnSum = 0.0;

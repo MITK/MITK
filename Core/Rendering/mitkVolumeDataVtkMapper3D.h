@@ -40,6 +40,7 @@ class vtkImageChangeInformation;
 class vtkLODProp3D;
 class vtkImageResample;
 
+
 namespace mitk {
 
 
@@ -85,10 +86,6 @@ protected:
   vtkVolumeTextureMapper2D* m_T2DMapper;
   vtkVolumeTextureMapper2D* m_T2DMapperHi;
   vtkVolumeRayCastMapper* m_HiResMapper;
-#if (VTK_MAJOR_VERSION >= 5)
-  vtkFixedPointVolumeRayCastMapper* m_FPRCMapper;
-  int m_FPRCID;
-#endif
   vtkImageResample* m_Resampler; 
   vtkLODProp3D* m_VolumeLOD;
 
@@ -103,6 +100,7 @@ protected:
   double m_PlaneNormalA;
   double m_PlaneNormalB;
   double m_PlaneNormalC;
+
 
 };
 

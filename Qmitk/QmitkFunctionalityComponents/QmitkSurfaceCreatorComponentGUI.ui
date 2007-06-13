@@ -35,6 +35,11 @@
             <property name="name">
                 <cstring>m_SurfaceCreatorGroupBox</cstring>
             </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
             <property name="lineWidth">
                 <number>1</number>
             </property>
@@ -60,6 +65,11 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_SurfaceDataGroupBox</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                     <property name="lineWidth">
                         <number>0</number>
@@ -162,6 +172,11 @@
                                     <property name="name">
                                         <cstring>textLabel1</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Threshold</string>
                                     </property>
@@ -187,6 +202,11 @@
                                     <property name="name">
                                         <cstring>m_ThresholdLineEdit</cstring>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>LineEditPanel</enum>
                                     </property>
@@ -202,6 +222,11 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowSurfaceParameterGroupBox</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -822,6 +847,11 @@
                             <property name="name">
                                 <cstring>m_CreateSurfaceButton</cstring>
                             </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
                             <property name="text">
                                 <string>Create Surface</string>
                             </property>
@@ -847,6 +877,11 @@
                                     <property name="enabled">
                                         <bool>false</bool>
                                     </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
+                                    </property>
                                     <property name="text">
                                         <string>Replace existing Surface</string>
                                     </property>
@@ -854,6 +889,11 @@
                                 <widget class="QCheckBox">
                                     <property name="name">
                                         <cstring>m_ShowContourChekckBox</cstring>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <bold>0</bold>
+                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>Show SurfaceContour</string>

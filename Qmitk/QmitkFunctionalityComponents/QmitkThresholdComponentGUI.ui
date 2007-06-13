@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>354</width>
-            <height>155</height>
+            <width>170</width>
+            <height>129</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -34,6 +34,11 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_ThresholdFinder</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
             <property name="frameShape">
                 <enum>GroupBoxPanel</enum>
@@ -83,6 +88,11 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ThresholdSelectDataGroupBox</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -502,6 +512,11 @@
                                                             </inactive>
                                                         </palette>
                                                     </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <bold>0</bold>
+                                                        </font>
+                                                    </property>
                                                     <property name="frameShape">
                                                         <enum>LineEditPanel</enum>
                                                     </property>
@@ -557,6 +572,11 @@
                                         <widget class="QCheckBox">
                                             <property name="name">
                                                 <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                             <property name="text">
                                                 <string>Delete Threshold Image 

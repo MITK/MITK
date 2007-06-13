@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>182</width>
+            <width>184</width>
             <height>120</height>
         </rect>
     </property>
@@ -160,109 +160,12 @@
                                 </widget>
                             </vbox>
                         </widget>
-                    </vbox>
-                </widget>
-                <widget class="QGroupBox">
-                    <property name="name">
-                        <cstring>m_ShowThresholdGroupBox</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="frameShape">
-                        <enum>NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>Plain</enum>
-                    </property>
-                    <property name="lineWidth">
-                        <number>0</number>
-                    </property>
-                    <property name="title">
-                        <string></string>
-                    </property>
-                    <property name="flat">
-                        <bool>true</bool>
-                    </property>
-                    <property name="checkable">
-                        <bool>false</bool>
-                    </property>
-                    <property name="checked">
-                        <bool>false</bool>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>0</number>
-                        </property>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>layout3</cstring>
-                            </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_CubeButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                    <property name="pixmap">
-                                        <pixmap>image0</pixmap>
-                                    </property>
-                                    <property name="toggleButton">
-                                        <bool>false</bool>
-                                    </property>
-                                    <property name="flat">
-                                        <bool>false</bool>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_EllipsoidButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                    <property name="pixmap">
-                                        <pixmap>image1</pixmap>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_CylinderButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                    <property name="pixmap">
-                                        <pixmap>image2</pixmap>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_ConeButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                    <property name="pixmap">
-                                        <pixmap>image3</pixmap>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
                         <widget class="QGroupBox">
                             <property name="name">
-                                <cstring>m_ThresholdValueContent</cstring>
+                                <cstring>m_ShowThresholdGroupBox</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -271,10 +174,19 @@
                                 <enum>Plain</enum>
                             </property>
                             <property name="lineWidth">
-                                <number>3</number>
+                                <number>0</number>
                             </property>
                             <property name="title">
                                 <string></string>
+                            </property>
+                            <property name="flat">
+                                <bool>true</bool>
+                            </property>
+                            <property name="checkable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
                             </property>
                             <vbox>
                                 <property name="name">
@@ -286,18 +198,106 @@
                                 <property name="spacing">
                                     <number>0</number>
                                 </property>
-                                <widget class="QPushButton">
+                                <widget class="QLayoutWidget">
                                     <property name="name">
-                                        <cstring>m_CropImageButton</cstring>
+                                        <cstring>layout3</cstring>
                                     </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
+                                    <hbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>m_CubeButton</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image0</pixmap>
+                                            </property>
+                                            <property name="toggleButton">
+                                                <bool>false</bool>
+                                            </property>
+                                            <property name="flat">
+                                                <bool>false</bool>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>m_EllipsoidButton</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image1</pixmap>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>m_CylinderButton</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image2</pixmap>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>m_ConeButton</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image3</pixmap>
+                                            </property>
+                                        </widget>
+                                    </hbox>
+                                </widget>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>m_ThresholdValueContent</cstring>
                                     </property>
-                                    <property name="text">
-                                        <string>Crop Image</string>
+                                    <property name="frameShape">
+                                        <enum>NoFrame</enum>
                                     </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>3</number>
+                                    </property>
+                                    <property name="title">
+                                        <string></string>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="margin">
+                                            <number>0</number>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <widget class="QPushButton">
+                                            <property name="name">
+                                                <cstring>m_CropImageButton</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
+                                            <property name="text">
+                                                <string>Crop Image</string>
+                                            </property>
+                                        </widget>
+                                    </vbox>
                                 </widget>
                             </vbox>
                         </widget>

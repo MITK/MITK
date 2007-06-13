@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>209</width>
+            <width>196</width>
             <height>93</height>
         </rect>
     </property>
@@ -35,6 +35,11 @@
             <property name="name">
                 <cstring>m_SingleTimeStepExporter</cstring>
             </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
             <property name="title">
                 <string>TimeStepExporter</string>
             </property>
@@ -57,6 +62,11 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                     <property name="frameShadow">
                         <enum>Plain</enum>
@@ -128,15 +138,19 @@
                                 <cstring>m_QmitkSliderNavigator</cstring>
                             </property>
                         </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_ExportTimeSliceButton</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Export Time Slice</string>
+                            </property>
+                        </widget>
                     </vbox>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_ExportTimeSliceButton</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Export Time Slice</string>
-                    </property>
                 </widget>
             </vbox>
         </widget>
@@ -205,8 +219,4 @@
     <function returnType="QPushButton *">GetExportButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-    <includehint>QmitkSliderNavigator.h</includehint>
-</includehints>
 </UI>

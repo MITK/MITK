@@ -47,8 +47,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, bool updateSelector, bool showSelector)
-: QmitkFunctionalityComponentContainer(parent, parentName),
+QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+: QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_MultiWidget(mitkStdMultiWidget),
 m_PixelGreyValueManipulatorComponentGUI(NULL),
 m_MitkImage(NULL),
@@ -154,12 +154,16 @@ void QmitkPixelGreyValueManipulatorComponent::Repaste(const QString& text)
 void QmitkPixelGreyValueManipulatorComponent::CheckModeForPointSet(int mode)
 {
 	if(mode == 2)
-	{
+	{ 
+		m_PointSet->GetContentContainer()->setShown(true);
 		m_PointSet->GetMainCheckBoxContainer()->setChecked(true);
 		m_PointSet->Activated();
+		
+		
 	}
 	else
 	{
+		m_PointSet->GetContentContainer()->setShown(false);
 		m_PointSet->Deactivated();
 	}
 }
@@ -310,6 +314,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreatePointSet()
 	m_PixelGreyValueManipulatorComponentGUI->layout()->add(m_PointSet->GetGUI());
 	m_PointSet->CreateConnections();
 	m_PixelGreyValueManipulatorComponentGUI->repaint();
+	m_PointSet->GetContentContainer()->setShown(false);
 	m_PointSet->Deactivated();
 }
 

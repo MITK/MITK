@@ -35,6 +35,11 @@
             <property name="name">
                 <cstring>m_PointSet</cstring>
             </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
             <property name="title">
                 <string>PointSet</string>
             </property>
@@ -61,6 +66,14 @@
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
                     </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
                     <property name="lineWidth">
                         <number>0</number>
                     </property>
@@ -80,6 +93,9 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowTreeNodeSelecotrGroupBox</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
                             </property>
                             <property name="lineWidth">
                                 <number>0</number>
@@ -136,8 +152,8 @@
 </widget>
 <customwidgets>
     <customwidget>
-        <class>QmitkPointListWidget</class>
-        <header location="local">QmitkPointListWidget.h</header>
+        <class>QmitkDataTreeComboBox</class>
+        <header location="global">QmitkDataTreeComboBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -152,8 +168,8 @@
         <pixmap>image0</pixmap>
     </customwidget>
     <customwidget>
-        <class>QmitkDataTreeComboBox</class>
-        <header location="global">QmitkDataTreeComboBox.h</header>
+        <class>QmitkPointListWidget</class>
+        <header location="local">QmitkPointListWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -192,5 +208,4 @@
     <function returnType="QGroupBox *">GetShowComponent()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

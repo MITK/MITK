@@ -64,7 +64,7 @@ public:
 	QCheckBox* m_CheckBox;
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL, bool updateSelector = false, bool showSelector = true);
+  QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */

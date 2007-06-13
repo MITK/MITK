@@ -205,6 +205,11 @@
                                             <property name="name">
                                                 <cstring>m_SliderNavigatorTransversal</cstring>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                         </widget>
                                     </hbox>
                                 </widget>
@@ -238,6 +243,11 @@
                                         <widget class="QmitkSliderNavigator">
                                             <property name="name">
                                                 <cstring>m_SliderNavigatorSagittal</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                         </widget>
                                     </hbox>
@@ -273,6 +283,11 @@
                                             <property name="name">
                                                 <cstring>m_SliderNavigatorCoronal</cstring>
                                             </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
+                                            </property>
                                         </widget>
                                     </hbox>
                                 </widget>
@@ -306,6 +321,11 @@
                                         <widget class="QmitkSliderNavigator">
                                             <property name="name">
                                                 <cstring>m_SliderNavigatorTemporal</cstring>
+                                            </property>
+                                            <property name="font">
+                                                <font>
+                                                    <bold>0</bold>
+                                                </font>
                                             </property>
                                         </widget>
                                     </hbox>

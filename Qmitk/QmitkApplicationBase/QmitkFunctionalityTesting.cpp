@@ -85,7 +85,7 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   std::cout<<"[PASSED]"<<std::endl;
 
 #ifdef BUILD_TESTING
-  std::cout << "Executing voluntary testing methods of functionality \"" << m_QmitkFctMediator->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+  std::cout << "GUI test for \"" << m_QmitkFctMediator->GetActiveFunctionality()->className() <<"\": "<< std::flush;
   QmitkFunctionality* activeFunctionality = m_QmitkFctMediator->GetActiveFunctionality();
   if (activeFunctionality)
   {
@@ -107,7 +107,7 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   QmitkFunctionality * nextFunctionality = m_QmitkFctMediator->GetFunctionalityById(nextId);
   if(nextFunctionality != NULL)
   {
-    std::cout << "Testing activation of functionality \"" << nextFunctionality->className() <<"\" "<< std::flush;
+    std::cout << "Activating \"" << nextFunctionality->className() <<"\" "<< std::flush;
     m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
     m_QmitkFctMediator->RaiseFunctionality(nextId);
     m_CloseMessagesTimer.stop();
@@ -129,7 +129,7 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
   if (qfm->GetActiveFunctionality()) {
-    std::cout << "Testing activation of functionality \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::endl;
+    std::cout << "Activating \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
   } 
   else
   { 

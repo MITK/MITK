@@ -61,3 +61,18 @@ MACRO(CHECK_AND_SET flag sourcelist )
   ENDIF(R)
 ENDMACRO(CHECK_AND_SET)
 
+# file should be named mitkMyAlgo-TYPE.cpp
+# in the file, every occurence of @TYPE@ is replaced by the
+# datatype. For each datatype, a new file mitkMyAlgo-datatype.cpp 
+# is generated and added to FILES_CPP
+
+MACRO(MITK_MULTIPLEX_PICTYPE file)
+  SET(TYPES "double;float;int;unsigned int;short;unsigned short;char;unsigned char")
+  FOREACH(TYPE ${TYPES})
+    # create filename for destination
+    STRING(REPLACE " " "_" quoted_type "${TYPE}")
+    STRING(REPLACE TYPE ${quoted_type} quoted_file ${file})
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${file} ${CMAKE_CURRENT_BINARY_DIR}/${quoted_file} @ONLY)
+    SET(CPP_FILES ${CPP_FILES} ${CMAKE_CURRENT_BINARY_DIR}/${quoted_file})
+  ENDFOREACH(TYPE)
+ENDMACRO(MITK_MULTIPLEX_PICTYPE)

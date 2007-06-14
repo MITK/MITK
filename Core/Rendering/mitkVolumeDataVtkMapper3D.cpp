@@ -50,7 +50,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
 
-
 #include <itkMultiThreader.h>
 
 
@@ -60,10 +59,12 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 }
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
-{
-
+{      
   m_Firstcall = true;
   m_PlaneSet = false;
+  
+  m_ClippingPlane = vtkPlane::New();  
+  m_PlaneWidget = vtkImplicitPlaneWidget::New();
   
   m_T2DMapper =  vtkVolumeTextureMapper2D::New();
   m_HiResMapper = vtkVolumeRayCastMapper::New();
@@ -123,16 +124,15 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_UnitSpacingImageFilter->Delete();
   m_ImageCast->Delete();
   m_T2DMapper->Delete();
-
   m_HiResMapper->Delete();
   m_Resampler->Delete();
   m_VolumePropertyLow->Delete();
   m_VolumePropertyMed->Delete();
   m_VolumePropertyHigh->Delete();
   m_VolumeLOD->Delete();
-  m_ImageCast->Delete();
   m_ClippingPlane->Delete(); 
   m_PlaneWidget->Delete();
+
 }
 
 void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
@@ -387,10 +387,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,1);
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
     
-    m_ClippingPlane = vtkPlane::New();  
-    m_PlaneWidget = vtkImplicitPlaneWidget::New();
     mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
-    
 
   } 
   else 
@@ -398,11 +395,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     //std::cout << "no vtk renderwindow" << std::endl;
   }
   SetClippingPlane(interactor);
-  
-  
 
- 
-  
 /*  std::cout<<"RenderTime LowRes (T2D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
 #if (VTK_MAJOR_VERSION >= 5)
   std::cout<<"RenderTime FPRC: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_FPRCID)<<std::endl;

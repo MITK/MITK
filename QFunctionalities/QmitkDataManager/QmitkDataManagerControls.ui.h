@@ -220,8 +220,11 @@ void QmitkDataManagerControls::ReInitButton_clicked()
     if (node != NULL )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
-      emit InitializeStandardViews( basedata->GetTimeSlicedGeometry() );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      if (basedata.IsNotNull())
+      {
+        emit InitializeStandardViews( basedata->GetTimeSlicedGeometry() );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
     }
   }
 }

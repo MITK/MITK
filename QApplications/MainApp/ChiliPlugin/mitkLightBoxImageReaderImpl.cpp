@@ -58,6 +58,17 @@ mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl()
 {
 }
 
+//helper class for sort a vectorlist
+class compare_Vector
+{
+  public:
+  bool operator() (const mitk::Vector3D &first, const mitk::Vector3D &second)
+  {
+    if( first[2] < second[2] )
+      return true;
+    return false;
+  }
+};
 
 void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
 {
@@ -475,32 +486,79 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
 {
   Vector3D spacing;
   spacing.Fill(1.0);
-  interSliceGeometry_t*  isg_t  = m_LightBox->fetchDicomGeometry(0);
+  interSliceGeometry_t* isg_t  = m_LightBox->fetchDicomGeometry(0);
   if( isg_t != NULL )
   {
     vtk2itk( isg_t->ps, spacing );
   }
 
-  if( imageNumbers.size() == 0 ) return spacing;
+  //if there only one image, there is no spacing
+  if( imageNumbers.size() == 1 )
+    return spacing;
 
   LocalImageInfoArray::iterator it = imageNumbers.begin(), infoEnd = imageNumbers.end();
-
   Vector3D& origin0 = it->origin;
+  Vector3D toNext;
+  std::list<Vector3D> spacingList;
 
+  //count all spacings
   while( it != infoEnd)
   {
     if( Equal( it->origin, origin0 ) == false)
-      break;
+    {
+      toNext = it->origin-origin0;
+      spacing[2] = toNext.GetNorm();
+      spacingList.push_back( spacing );
+      origin0 = it->origin;
+    }
     ++it;
   }
-  if( it != infoEnd )
-  {
-    Vector3D toNext = it->origin-origin0;
-    spacing[2] = toNext.GetNorm();
-  }
-  return spacing;
-}
 
+  //sort all spacings
+  compare_Vector cV;
+  spacingList.sort( cV );
+
+  //test if there are only one spacing
+  std::list<Vector3D> tempSpacingList = spacingList;
+  tempSpacingList.unique();
+  if( tempSpacingList.size() > 1 )
+  {
+    //find the most frequent spacing
+    std::cout << "WARNING: Found different spacings." << std::endl;
+    int currentCount = 0, maxCount = 0;
+    Vector3D currentSpacing = spacingList.front(), maxSpacing;
+    while( !spacingList.empty() )
+    {
+      if( currentSpacing == spacingList.front() )
+      {
+        currentCount++;
+        spacingList.pop_front();
+      }
+      else
+      {
+        if( currentCount > maxCount )
+        {
+          maxCount = currentCount;
+          maxSpacing = currentSpacing;
+        }
+        std::cout << "spacing: " << currentSpacing << ", count: " << currentCount << std::endl;
+        currentCount = 1;
+        currentSpacing = spacingList.front();
+        spacingList.pop_front();
+      }
+    }
+    //check the last counted spacing
+    if( currentCount > maxCount )
+    {
+      maxCount = currentCount;
+      maxSpacing = currentSpacing;
+    }
+    std::cout << "spacing: " << currentSpacing << ", count: " << currentCount << std::endl;
+    std::cout << "use: " << maxSpacing << std::endl;
+    return maxSpacing;
+  }
+  else return tempSpacingList.front();
+}
 bool mitk::LightBoxImageReaderImpl::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
 {
   if( Equal( elem1.origin, elem2.origin ) )

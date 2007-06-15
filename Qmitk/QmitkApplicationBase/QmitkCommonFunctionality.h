@@ -212,7 +212,7 @@ namespace CommonFunctionality
   mitk::DataTreeNode::Pointer FileOpen();
   mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack();
 
-  std::string SaveImage(mitk::Image* image, const char* fileName = NULL);
+  std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 
   std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
   

@@ -435,12 +435,14 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 #include "mitkImageWriter.h"
 #include <itksys/SystemTools.hxx>
 
-std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName)
+std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   std::string fileName;
-  if(aFileName == NULL)
+  if(aFileName == NULL || askForDifferentFilename)
   {
-    QString qfileName = QFileDialog::getSaveFileName(QString("NewImage.pic"),mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
+    QString initialFilename(aFileName);
+    if (initialFilename.isEmpty()) initialFilename = "NewImage.pic";
+    QString qfileName = QFileDialog::getSaveFileName( initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
     if (qfileName == NULL )
       return "";
     fileName = qfileName.ascii();

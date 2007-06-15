@@ -36,7 +36,10 @@ PURPOSE.  See the above copyright notices for more information.
 //##
 //## Use this macro once after the definition of your access function.
 //## Some compilers have memory problems without the explicit instantiation.
-//## You may need to move the access function to a separate file.
+//## You may need to move the access function to a separate file. The CMake macro
+//## MITK_MULTIPLEX_PICTYPE can help you with that. See \c mitk/CMake/CoreHelpers.cmake
+//## for documentation.
+//## 
 //## \note If you experience compiler errors, try to
 //## include mitkAltInstantiateAccessFunctions.h and
 //## add "Alt" (for alternate) before the call

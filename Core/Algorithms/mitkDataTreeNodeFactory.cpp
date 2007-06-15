@@ -769,7 +769,7 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
   node->SetProperty( "segmentation", new mitk::BoolProperty(true) );
   node->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   node->SetProperty( "color" , new mitk::ColorProperty( 1.0f, 0.0f, 0.0f ));
-  node->SetOpacity(0.5f);
+  node->SetOpacity(0.3f);
   node->SetVisibility(true);
 }
 

@@ -348,7 +348,6 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
     itkDebugMacro(<<"output->GetDimension(2): "<<output->GetDimension(2));
     slicedGeometry->InitializeEvenlySpaced(planegeometry, output->GetDimension(2));
-
     TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
     itkDebugMacro( <<"output->GetDimension(3): "<<output->GetDimension(3) );
     timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, output->GetDimension(3) );
@@ -500,9 +499,8 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
     vtk2itk( isg_t->ps, spacing );
   }
 
-  //if there only one image, there is no spacing
-  if( imageNumbers.size() == 1 )
-    return spacing;
+  //if there is only one image, there is no spacing
+  if( imageNumbers.size() == 1 ) return spacing;
 
   LocalImageInfoArray::iterator it = imageNumbers.begin(), infoEnd = imageNumbers.end();
   Vector3D& origin0 = it->origin;
@@ -565,6 +563,8 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
     std::cout << "use: " << maxSpacing << std::endl;
     return maxSpacing;
   }
+  else
+  if( tempSpacingList.size() == 0 ) return spacing;
   else return tempSpacingList.front();
 }
 bool mitk::LightBoxImageReaderImpl::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )

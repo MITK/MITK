@@ -59,6 +59,7 @@ SET(${KITNAME}_TESTIMAGES
   Pic2DplusT.pic.gz
   BallBinary30x30x30.pic.gz
   Png2D-bw.png
+  binary.stl
 )
 
 CREATE_TEST_SOURCELIST(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 

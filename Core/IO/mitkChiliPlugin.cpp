@@ -36,38 +36,34 @@ int mitk::ChiliPlugin::GetConferenceID()
   return 0;
 }
 
-QcPlugin* mitk::ChiliPlugin::GetPluginInstance()
-{
-  return 0;
-}
-
 unsigned int mitk::ChiliPlugin::GetLightBoxCount()
 {
   return 0;
 }
 
-mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetCurrentStudy()
+mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetCurrentSelectedStudy()
 {
   mitk::ChiliPlugin::StudyInformation emptyList;
   return emptyList;
 }
 
-mitk::ChiliPlugin::SeriesList mitk::ChiliPlugin::GetCurrentSeries()
+mitk::ChiliPlugin::SeriesList mitk::ChiliPlugin::GetCurrentSelectedSeries()
 {
   mitk::ChiliPlugin::SeriesList emptyList;
   return emptyList;
 }
 
-mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance()
+void mitk::ChiliPlugin::AddPropertyListToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* )
+{
+}
+
+mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
+  
+  if (destroyInstance)  // needed because of double inheritance of mitk::ChiliPluginImpl
+    s_Instance = NULL;
+
   return s_Instance;
 }
 
-void mitk::ChiliPlugin::SetPropertyToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* )
-{
-}
-
-void mitk::ChiliPlugin::SetPluginInstance( QcPlugin* instance )
-{
-}

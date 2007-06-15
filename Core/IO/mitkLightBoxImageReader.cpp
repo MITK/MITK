@@ -26,7 +26,7 @@ void mitk::LightBoxImageReader::SetLightBoxToCurrentLightBox()
 {
 }
 
-const mitk::PropertyList::Pointer mitk::LightBoxImageReader::GetPropertyList()
+const mitk::PropertyList::Pointer mitk::LightBoxImageReader::GetImageTagsAsPropertyList()
 {
   return NULL;
 }

@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 
 class QcPlugin;
-class QcMITKSamplePlugin;
 
 namespace mitk {
 
@@ -86,7 +85,7 @@ class ChiliPlugin : public itk::Object
     /** This struct contain all possible informations about the series. */
     struct SeriesInformation
     {
-      std::string IOD;
+      std::string OID;
       std::string InstanceUID;
       std::string Number;
       std::string Acquisition;
@@ -105,9 +104,9 @@ class ChiliPlugin : public itk::Object
     typedef std::list<SeriesInformation> SeriesList;
 
     /** return the StudyInformation of the current selected study */
-    virtual StudyInformation GetCurrentStudy();
+    virtual StudyInformation GetCurrentSelectedStudy();
     /** return the list of the series to the current selected study */
-    virtual SeriesList GetCurrentSeries();
+    virtual SeriesList GetCurrentSelectedSeries();
     /** return the number of Lightboxes in chili */
     virtual unsigned int GetLightBoxCount();
 
@@ -117,26 +116,17 @@ class ChiliPlugin : public itk::Object
     virtual int GetConferenceID();
 
     /** Set the properties from the list to the datatreenode. The description of the properties get the prefix "Chili: ". */
-    virtual void SetPropertyToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* );
+    virtual void AddPropertyListToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* );
 
-    /** return the PluginInstance */
-    virtual QcPlugin* GetPluginInstance();
     /** return the Plugin */
-    static ChiliPlugin* GetInstance();
+    static ChiliPlugin* GetInstance(bool destroyInstance = false);
 
     mitkClassMacro( ChiliPlugin,itk::Object );
     itkNewMacro( ChiliPlugin );
     virtual ~ChiliPlugin();
 
   protected:
-
-    /** someone have to set the study- and seriesinformation and the instance */
-    friend class QcMITKSamplePlugin;
-
-    virtual void SetPluginInstance( QcPlugin* instance );
-
     ChiliPlugin();
-
 };
 
 } // namespace mitk

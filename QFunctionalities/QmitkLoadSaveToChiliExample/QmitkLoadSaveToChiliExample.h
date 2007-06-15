@@ -105,11 +105,6 @@ protected:
   void chiliStudySelected(const itk::EventObject&);
 
   /*!
-  \brief if the lightboxcount changed, mitk::ChiliPlugin throws an event, this method listen to it
-  */
-  void chiliLightBoxCountChanged(const itk::EventObject&);
-
-  /*!
   * default main widget containing 4 windows showing 3
   * orthogonal slices of the volume and a 3d render window
   */

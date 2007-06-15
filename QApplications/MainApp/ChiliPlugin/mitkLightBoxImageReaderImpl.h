@@ -52,7 +52,7 @@ namespace mitk {
       This method reads the information from the pic-header or the dicom-header. 
       The property "name" is set and the same like the tag "Chili: SERIES DESCRIPTION".
       */
-      virtual const mitk::PropertyList::Pointer GetPropertyList();
+      virtual const mitk::PropertyList::Pointer GetImageTagsAsPropertyList();
 
       /** Get the lightbox to read from. */
       QcLightbox* GetLightBox() const;

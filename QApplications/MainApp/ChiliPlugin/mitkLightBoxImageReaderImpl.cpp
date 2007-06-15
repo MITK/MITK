@@ -18,22 +18,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLightBoxImageReaderImpl.h"
 
+#include "mitkChiliPluginImpl.h"
+
 #include <chili/qclightbox.h>
 #include <chili/qclightboxmanager.h>
-#include <chili/plugin.h>
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPic.h>
 #include <ipPic/ipPicTags.h>
 #include <ipFunc/ipFunc.h>
 
-#include <qmessagebox.h>
-
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include <itkImageFileReader.h>
 
 #include "mitkProperties.h"
+
+#include <list>
 
 // helper class for property import from pic/dicom-headers (see mitk::LightBoxImageReaderImpl::GetPropertyList())
 class HeaderTagInfo
@@ -53,11 +54,6 @@ class HeaderTagInfo
   DataType type;
 };
 
-mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl() 
-: m_LightBox(NULL)
-{
-}
-
 //helper class for sort a vectorlist
 class compare_Vector
 {
@@ -70,6 +66,15 @@ class compare_Vector
   }
 };
 
+mitk::LightBoxImageReaderImpl::LightBoxImageReaderImpl()
+: m_LightBox(NULL)
+{
+}
+
+mitk::LightBoxImageReaderImpl::~LightBoxImageReaderImpl()
+{
+}
+
 void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
 {
   if( lightbox != m_LightBox )
@@ -81,12 +86,14 @@ void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
 
 void mitk::LightBoxImageReaderImpl::SetLightBoxToCurrentLightBox()
 {
-  QcPlugin* plugin = ChiliPlugin::GetInstance()->GetPluginInstance();
-  if( plugin == NULL )
+  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
+  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+
+  if( !ChiliPlugin::GetInstance()->IsPlugin() )
   {
     itkExceptionMacro( <<"GetPluginInstance()==NULL: Plugin is not initialized correctly !" );
   }
-  SetLightBox( plugin->lightboxManager()->getActiveLightbox() );
+  SetLightBox( realPluginInstance->lightboxManager()->getActiveLightbox() );
 }
 
 QcLightbox* mitk::LightBoxImageReaderImpl::GetLightBox() const
@@ -284,6 +291,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
     PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
     spacing = GetSpacingFromLB( m_ImageNumbers );
+
     itkDebugMacro( <<"get spacing: "<<spacing );
     planegeometry->InitializeStandardPlane( output->GetDimension(0), output->GetDimension(1), rightVector, downVector, &spacing );
     //planegeometry->InitializeStandardPlane( rightVector,downVector,&GetSpacingFromLB());
@@ -674,7 +682,7 @@ int mitk::LightBoxImageReaderImpl::GetRealPosition( int position, LocalImageInfo
   return list[position].pos;
 }
 
-const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList()
+const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsPropertyList()
 {
   if( m_LightBox == NULL )
   {
@@ -797,7 +805,7 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
       ipUInt4_t len;
       if( dicomHeader )
       {
-        switch (tagsToImport[x].type)
+        switch ( tagsToImport[x].type )
         {
           case HeaderTagInfo::String:
           {
@@ -808,8 +816,7 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
           case HeaderTagInfo::UnsignedInt:
           {
             if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
-              //resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( (int)*((char*)data) ));
-              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
+              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( (int)*((char*)data) ));
             break;
           }
           case HeaderTagInfo::Int:
@@ -826,7 +833,6 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
       }
     }
   }
-
   BaseProperty::Pointer name = resultPropertyList->GetProperty( "Chili: SERIES DESCRIPTION" );
   if( name )
   {
@@ -835,8 +841,4 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetPropertyList
   else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "empty Name!" ) );
 
   return resultPropertyList;
-}
-
-mitk::LightBoxImageReaderImpl::~LightBoxImageReaderImpl()
-{
 }

@@ -12,13 +12,10 @@ SET(CPP_FILES
   mitkConference/TextLoggerConferenceKitFactory.cpp
   mitkLightBoxImageReaderImpl.cpp
   mitkLightBoxResultImageWriterImpl.cpp
-  QcMITKSamplePlugin.cpp
   QcMITKTask.cpp
   QmitkEventCollector.cpp
-  ToolBar.cpp
 )
 SET(MOC_H_FILES
-  QcMITKSamplePlugin.h
+  mitkChiliPluginImpl.h
   QmitkEventCollector.h
-  ToolBar.h
 )

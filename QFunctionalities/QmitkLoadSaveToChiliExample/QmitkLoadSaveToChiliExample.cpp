@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2007-04-19 15:02:32 +0200 (Do, 19 Apr 2007) $
 Version:   $Revision: 10185 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkLoadSaveToChiliExample.h"
@@ -53,11 +53,6 @@ QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
     command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliStudySelected );
     plugin->AddObserver( mitk::PluginStudySelected(), command );
-
-    //itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer 
-    command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
-    command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliLightBoxCountChanged );
-    plugin->AddObserver( mitk::PluginLightBoxCountChanged(), command );
   }
 }
 
@@ -134,7 +129,7 @@ void QmitkLoadSaveToChiliExample::LoadFromLightbox()
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
     node->SetData( image );
     mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
-    mitk::ChiliPlugin::GetInstance()->SetPropertyToNode( reader->GetPropertyList(), node.GetPointer() );
+    mitk::ChiliPlugin::GetInstance()->AddPropertyListToNode( reader->GetImageTagsAsPropertyList(), node.GetPointer() );
     mitk::DataStorage::GetInstance()->Add( node /* , parent */ );
     //initialize the multiwidget (input changed)
     m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
@@ -202,11 +197,13 @@ void QmitkLoadSaveToChiliExample::ImageSelected( mitk::DataTreeIteratorClone ima
 void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
 {
   //show the studydescription
-  m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentStudy().Description.c_str() );
+  if( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description != "" )
+    m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description );
+  else m_Controls->StudyDescription->setText( "no description" );
   //clear the listview
   m_Controls->ListView->clear();
   //get the current serieslist and iterate
-  mitk::ChiliPlugin::SeriesList temp = mitk::ChiliPlugin::GetInstance()->GetCurrentSeries();
+  mitk::ChiliPlugin::SeriesList temp = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries();
   for( mitk::ChiliPlugin::SeriesList::iterator iter = temp.begin(); iter != temp.end(); iter++)
   {
     //if there are no description show "no description" else show the saved one
@@ -215,12 +212,6 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
     else new QListViewItem( m_Controls->ListView, iter->Description.c_str() );
   }
 }
-
-void QmitkLoadSaveToChiliExample::chiliLightBoxCountChanged( const itk::EventObject& )
-{
-  //std::cout<< "active lightbox(es): " << mitk::ChiliPlugin::GetInstance()->GetLightBoxCount() <<std::endl;
-}
-
 
 void QmitkLoadSaveToChiliExample::TreeChanged()
 {

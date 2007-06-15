@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLightBoxResultImageWriterImpl.h"
+#include "mitkChiliPluginImpl.h"
 
 //ChiliIncludes
-#include <chili/plugin.h>
 #include <chili/qclightbox.h>
 #include <chili/qclightboxmanager.h>
 //Chili-Tags
@@ -31,8 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFrameOfReferenceUIDManager.h>
 
 #include <mitkPropertyList.h>
+#include "mitkProperties.h"
 #include <mitkGenericProperty.h>
 #include <mitkLevelWindowProperty.h>
+
+#include <qmessagebox.h>
 
 mitk::LightBoxResultImageWriterImpl::LightBoxResultImageWriterImpl()
 {
@@ -94,26 +97,30 @@ void mitk::LightBoxResultImageWriterImpl::SetSeriesDescription( const std::strin
 
 void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
-  if( plugin == NULL )
+  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
+  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+
+  if( !mitk::ChiliPlugin::GetInstance()->IsPlugin() )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
-  SetLightBox( plugin->lightboxManager()->getActiveLightbox() );
+  SetLightBox( realPluginInstance->lightboxManager()->getActiveLightbox() );
 }
 
 bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToNewLightBox()
 {
-  QcPlugin* plugin = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
-  if( plugin == NULL )
+  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
+  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+
+  if( !mitk::ChiliPlugin::GetInstance()->IsPlugin() )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
-  int lightboxCount = plugin->lightboxManager()->getLightboxes().count();
+  int lightboxCount = realPluginInstance->lightboxManager()->getLightboxes().count();
   QcLightbox * newLightbox;
   for( int i = 0; i < lightboxCount; i++ )
   {
-    newLightbox = plugin->lightboxManager()->getLightboxes().at(i);
+    newLightbox = realPluginInstance->lightboxManager()->getLightboxes().at(i);
     if( newLightbox->getFrames() == 0 )
     {
       newLightbox->activate();
@@ -213,11 +220,31 @@ void mitk::LightBoxResultImageWriterImpl::Write()
     std::cout<< "No input set." <<std::endl;
     return;
   }
-  mitk::ChiliPlugin::StudyInformation CurrentStudy = mitk::ChiliPlugin::GetInstance()->GetCurrentStudy();
+  mitk::ChiliPlugin::StudyInformation CurrentStudy = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy();
   if( CurrentStudy.InstanceUID == "" )
   {
     std::cout<< "There is no Study (no StudyInstanceUID) selected." <<std::endl;
     return;
+  }
+
+  if( m_PropertyList.IsNotNull() )
+  {
+    std::string temp = "Chili: " + (std::string)tagSTUDY_INSTANCE_UID;
+    BaseProperty* tempprop = m_PropertyList->GetProperty( temp.c_str() );
+    if( tempprop != NULL )
+    {
+      temp = tempprop->GetValueAsString();
+      if( CurrentStudy.InstanceUID != temp )
+      {
+        switch(QMessageBox::question( 0, "Save To Lightbox", "This data was not loaded from this study. Do you want to save?",
+          QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel))
+        {
+          case QMessageBox::Yes: break;
+          case QMessageBox::No: return;
+          case QMessageBox::Cancel: return;
+        }
+      }
+    }
   }
 
   if( m_LevelWindow == -1 )
@@ -242,8 +269,8 @@ void mitk::LightBoxResultImageWriterImpl::Write()
   Vector3D v;
   interSliceGeometry_t isg;
 
-  //captions and content for the tags which are needed to create a new series; DONT CHANGE!!!
-  std::string MyTags[6][2]=
+  //captions and content for the tags which are needed to create a new series; DONT CHANGE THEM!!!
+  std::string CurrentSelectedStudyAttributeToSave[6][2]=
   {
     { tagMODALITY, CurrentStudy.Modality },
     { tagSTUDY_DESCRIPTION, CurrentStudy.Description },
@@ -251,18 +278,23 @@ void mitk::LightBoxResultImageWriterImpl::Write()
     { tagSTUDY_TIME, CurrentStudy.Time },
     { tagSTUDY_INSTANCE_UID, CurrentStudy.InstanceUID },
     { tagSERIES_DESCRIPTION, m_SeriesDescription.c_str() }
-    // tagSERIES_NUMBER --> is int
   };
 
-  typedef std::list<ipPicTSV_t*> TagList;
-  //this is the list with all needed chilitags; m_PropertyList is the list of additional chilitags which are important for the patient and dataset
-  TagList tagList;
-
+  //while walking through the "CurrentSelectedStudyAttributeToSave" we delete the same tags from the propertyList
+  //the lightboximagereader read them
+  //in the propertylist stay the old study association, we dont want to save to the "old" study
+  //we want to save to a new study, so we have to use the "CurrentSelectedStudyAttributeToSave"
+  //later the propertylist get write to the PIC-Header, then stands there the right attribute to save
   for(int x = 0; x < 6; x++)
   {
-    tagList.push_back( CreateASCIITag( MyTags[x][0], MyTags[x][1] ) );  //add ASCII-Tags to list
+    std::string temp = "Chili: " + CurrentSelectedStudyAttributeToSave[x][0];
+    m_PropertyList->DeleteProperty( temp.c_str() );
+    m_PropertyList->SetProperty( temp.c_str(), new StringProperty( CurrentSelectedStudyAttributeToSave[x][1] ) );
   }
-  tagList.push_back( CreateIntTag( tagSERIES_NUMBER, ( mitk::ChiliPlugin::GetInstance()->GetCurrentSeries().size()+1 ) ) );  //SERIES NUMBER is an INT-tag
+
+  std::string temp = "Chili: " + (std::string)tagSERIES_NUMBER;
+  m_PropertyList->DeleteProperty( temp.c_str() );
+  m_PropertyList->SetProperty( temp.c_str(), new IntProperty( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries().size()+1 ) );
 
   resultslice->SetInput( m_Image );
   smax = m_Image->GetDimension(2);
@@ -285,26 +317,13 @@ void mitk::LightBoxResultImageWriterImpl::Write()
 
       if( firstTime )  //the first slice got a new pic-header, the other become a copy of the first one
       {
-        //to create a new series use addTags( ..., ..., true)
-        //we want to create one new series, so we use this for the first slice only (for the other slices look at --> else ... )
-        QcPlugin::addTags( cur, cur, true );
-        while( !tagList.empty() )  //thats the needed tags to save
-        {
-          std::string temp = "Chili: " + (std::string)tagList.front()->tag;
-          //if we dont delete the "old" property, we override our new studyassociation
-          m_PropertyList->DeleteProperty( temp.c_str() );
-          //delete tag (if exist)
-          DeleteTag( cur, tagList.front()->tag );
-          //add the new studyassociation
-          ipPicAddTag( cur, tagList.front() );
-          tagList.pop_front();
-        }
+        QcPlugin::addTags( cur, cur, true );  //create a new SeriesInstanceUID and delete the old one
         firstSlice = cur;  //save the first slice
         firstTime = false;
       }
       else QcPlugin::addTags ( cur, firstSlice , false );
 
-      //add the properties from the list; thats the additianal tags
+      //add the properties to the pic-header
       if( m_PropertyList.IsNotNull() )
       {
         std::string Description;
@@ -313,7 +332,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
           if( !iter->first.find("Chili: ", 0) )
           {
             Description = iter->first;
-            Description = Description.erase( 0, 7 );  //delete "Chili: " from Description
+            Description = Description.erase( 0, 7 );  //delete "Chili: "
             DeleteTag( cur, Description );  //delete the tag if exist
             mitk::BaseProperty* unknownProperty = NULL;
             unknownProperty = iter->second.first;

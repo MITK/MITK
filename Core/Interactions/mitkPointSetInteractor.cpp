@@ -950,8 +950,9 @@ void mitk::PointSetInteractor::Clear( int timeStep, ScalarType timeInMS )
       m_UndoController->SetOperationEvent( operationEvent );
     }
     //execute the Operation
-    pointSet->ExecuteOperation( doOp );
+    
     ++it;
+    pointSet->ExecuteOperation( doOp );
   }
 
   //reset the statemachine

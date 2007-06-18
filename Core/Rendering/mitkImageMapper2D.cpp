@@ -308,7 +308,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   int timestep = 0;
   ScalarType time = worldGeometry->GetTimeBounds()[0];
-  if ( time > -ScalarTypeNumericTraits::max() )
+  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
   {
     timestep = inputTimeGeometry->MSToTimeStep( time );
   }
@@ -317,6 +317,9 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   {
     return;
   }
+
+  // check if there is something to display.
+  if ( ! input->IsVolumeSet( timestep ) ) return;
 
   Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
   requestedRegion.SetIndex( 3, timestep );

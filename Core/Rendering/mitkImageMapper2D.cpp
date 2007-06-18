@@ -634,7 +634,6 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
 
   // 2. Store the result in a VTK image
-  rendererInfo.m_Image->Delete();
   rendererInfo.m_Image = vtkImageData::New();
   rendererInfo.m_Image->DeepCopy( rendererInfo.m_Reslicer->GetOutput() );
   rendererInfo.m_Image->Update();
@@ -934,7 +933,8 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()
 : m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
-  m_ObserverId(0), m_Pic(NULL), m_IilInterpolation(true)
+  m_ObserverId(0), m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
+  m_IilInterpolation(true)
 {
   m_PixelsPerMM.Fill(0);
 };
@@ -962,8 +962,7 @@ void
 mitk::ImageMapper2D::RendererInfo::RendererDeleted()
 {
   //delete texture due to its dependency on the renderer
-  delete m_iil4mitkImage;
-  m_iil4mitkImage = NULL;
+  Squeeze();
   m_Renderer = NULL;
 }
 
@@ -986,6 +985,11 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
   {
     ipPicFree(m_Pic);
     m_Pic = NULL;
+  }
+  if(m_Image != NULL)
+  {
+    m_Image->Delete();
+    m_Image = NULL;
   }
 }
 

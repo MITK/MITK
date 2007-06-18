@@ -198,7 +198,7 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
 {
   //show the studydescription
   if( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description != "" )
-    m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description );
+    m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description.c_str() );
   else m_Controls->StudyDescription->setText( "no description" );
   //clear the listview
   m_Controls->ListView->clear();

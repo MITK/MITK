@@ -31,7 +31,7 @@ void mitk::TimeSlicedGeometry::UpdateInformation()
   unsigned long maxModifiedTime = 0, curModifiedTime;
 
   mitk::ScalarType stmin, stmax;
-  stmin=-ScalarTypeNumericTraits::max();
+  stmin= ScalarTypeNumericTraits::NonpositiveMin();
   stmax= ScalarTypeNumericTraits::max();
 
   TimeBounds timeBounds;
@@ -156,7 +156,7 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
       return m_TimeSteps;
     if(m_TimeBounds[0]==m_TimeBounds[1])
       return 0;
-    if((m_TimeBounds[0]>-ScalarTypeNumericTraits::max()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))
+    if((m_TimeBounds[0]>ScalarTypeNumericTraits::NonpositiveMin()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))
       return (int) ((time_in_ms - m_TimeBounds[0])/(m_TimeBounds[1]-m_TimeBounds[0])*m_TimeSteps);
     return 0;
   }

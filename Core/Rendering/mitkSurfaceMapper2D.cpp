@@ -149,7 +149,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   // convert the world time to time steps of the input object
   //
   int timestep=0;
-  if( time > -ScalarTypeNumericTraits::max() )
+  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
     return;

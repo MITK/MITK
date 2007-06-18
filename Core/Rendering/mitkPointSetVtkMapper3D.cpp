@@ -132,7 +132,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   // convert the world time in time steps of the input object
   //
   int timeStep=0;
-  if( time > -ScalarTypeNumericTraits::max() )
+  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
     timeStep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timeStep ) == false )
   {

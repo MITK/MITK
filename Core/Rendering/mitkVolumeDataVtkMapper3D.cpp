@@ -225,7 +225,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   int timestep=0;
   ScalarType time = worldgeometry->GetTimeBounds()[0];
-  if(time>-ScalarTypeNumericTraits::max())
+  if(time> ScalarTypeNumericTraits::NonpositiveMin())
     timestep = inputtimegeometry->MSToTimeStep(time);
 
   if(inputtimegeometry->IsValidTime(timestep)==false)

@@ -94,7 +94,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   // convert the world time in time steps of the input object
   //
   int timestep=0;
-  if( time > -ScalarTypeNumericTraits::max() )
+  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
   {

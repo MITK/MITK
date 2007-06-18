@@ -97,7 +97,7 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
 
   TimeBounds timeBounds;
   ScalarType stmin, stmax, cur;
-  stmin=-ScalarTypeNumericTraits::max();
+  stmin= ScalarTypeNumericTraits::NonpositiveMin();
   stmax= ScalarTypeNumericTraits::max();
 
   timeBounds[0]=stmax; timeBounds[1]=stmin;
@@ -252,7 +252,7 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 
   mitk::ScalarType stmin, stmax, cur;
 
-  stmin=-ScalarTypeNumericTraits::max();
+  stmin= ScalarTypeNumericTraits::NonpositiveMin();
   stmax= ScalarTypeNumericTraits::max();
 
   timeBounds[0]=stmax; timeBounds[1]=stmin;

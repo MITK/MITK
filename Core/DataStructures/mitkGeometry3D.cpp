@@ -90,7 +90,7 @@ void mitk::Geometry3D::Initialize()
 
   m_ParametricTransform = m_IndexToWorldTransform;
 
-  m_TimeBounds[0]=-ScalarTypeNumericTraits::max(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
+  m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
 

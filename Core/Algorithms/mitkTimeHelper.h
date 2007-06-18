@@ -34,14 +34,14 @@ void ITK_EXPORT GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *output
   // convert the start-index-time of output in start-index-time of input via millisecond-time
   ScalarType timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
   int timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( inputTimeGeometry->IsValidTime( timestep ) ) )
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTime( timestep ) ) )
     inputRegion.SetIndex( 3, timestep );
   else
     inputRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of input via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
   timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > -ScalarTypeNumericTraits::max() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
     inputRegion.SetSize( 3, timestep - inputRegion.GetIndex(3) + 1 );
   else
     inputRegion.SetSize( 3, 1 );

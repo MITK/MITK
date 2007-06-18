@@ -85,7 +85,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       return false;
 
     ScalarType time = worldgeometry->GetTimeBounds()[0];
-    if(time>-ScalarTypeNumericTraits::max())
+    if(time> ScalarTypeNumericTraits::NonpositiveMin())
       timestep = inputtimegeometry->MSToTimeStep(time);
 
     if(inputtimegeometry->IsValidTime(timestep)==false)

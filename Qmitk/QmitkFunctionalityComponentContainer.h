@@ -128,6 +128,9 @@ virtual mitk::Image* GetParentMitkImage();
   /** \brief method to add components into this component. */
   virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer);
 
+    /** \brief method to add components into this component. */
+  virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer, int stackPage);
+
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);
 
@@ -161,6 +164,9 @@ public slots:
   /***************      OHTER METHODS     ***************/
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
+
+  void NextButtonPressed();
+  void BackButtonPressed();
 
 protected:
 

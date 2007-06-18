@@ -50,7 +50,10 @@
                 <number>0</number>
             </property>
             <property name="title">
-                <string>ComponentContainer</string>
+                <string></string>
+            </property>
+            <property name="alignment">
+                <set>AlignTop</set>
             </property>
             <property name="checkable">
                 <bool>true</bool>
@@ -60,7 +63,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>0</number>
+                    <number>2</number>
                 </property>
                 <property name="spacing">
                     <number>0</number>
@@ -69,8 +72,11 @@
                     <property name="name">
                         <cstring>m_ImageContent</cstring>
                     </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
                     <property name="title">
-                        <string>Select Data</string>
+                        <string></string>
                     </property>
                     <vbox>
                         <property name="name">
@@ -92,6 +98,56 @@
                                     <height>20</height>
                                 </size>
                             </property>
+                        </widget>
+                        <widget class="QWidgetStack">
+                            <property name="name">
+                                <cstring>m_WidgetStack</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <widget class="QWidget">
+                                <property name="name">
+                                    <cstring>WStackPage</cstring>
+                                </property>
+                                <attribute name="id">
+                                    <number>0</number>
+                                </attribute>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                </vbox>
+                            </widget>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout1</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_backButton</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>&lt;&lt;</string>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_forwardButton</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>&gt;&gt;</string>
+                                    </property>
+                                </widget>
+                            </hbox>
                         </widget>
                     </vbox>
                 </widget>
@@ -137,7 +193,7 @@
     <function returnType="QLayout *">GetContainerLayout()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
+    <function returnType="QWidgetStack *">GetWidgetStack()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

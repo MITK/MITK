@@ -38,3 +38,9 @@ QGroupBox * QmitkFunctionalityComponentContainerGUI::GetImageContent()
 {
   return m_ImageContent;
 }
+
+
+QWidgetStack* QmitkFunctionalityComponentContainerGUI::GetWidgetStack()
+{
+  return m_WidgetStack;
+}

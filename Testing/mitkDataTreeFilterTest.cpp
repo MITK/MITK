@@ -27,6 +27,12 @@
 
 #ifndef DOXYGEN_SKIP
 
+#define TEST_ASSERT(x) \
+if (!(x)) \
+{\
+  std::cerr << "Test condition '" #x "' failed." << std::endl; exit(EXIT_FAILURE);\
+}
+
 int verbose;
 
 class EinsZwoFilterDing : public mitk::DataTreeFilterFunction
@@ -301,10 +307,10 @@ soll <<
 "+- Ruut" << std::endl <<
 "    +- Eins" << std::endl <<
 "    +- Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
       
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
-          assert (selectedItems->empty());
+          TEST_ASSERT (selectedItems->empty());
           break;
         }
         case 1: {
@@ -318,10 +324,10 @@ soll <<
 "    +- Zwo" << std::endl <<
 "    |    visible: 1" << std::endl <<
 "    |    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
-          assert (selectedItems->empty());
+          TEST_ASSERT (selectedItems->empty());
           break;
         }
         case 2: {
@@ -335,10 +341,10 @@ soll <<
 "    +- Zwo" << std::endl <<
 "    |    visible: 1" << std::endl <<
 "    |    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
-          assert (selectedItems->empty());
+          TEST_ASSERT (selectedItems->empty());
           break;
         }
         case 3: {
@@ -352,10 +358,10 @@ soll <<
 "+- Zwo" << std::endl <<
 "|    visible: 1" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
-          assert (selectedItems->empty());
+          TEST_ASSERT (selectedItems->empty());
           break;
         }
         case 4: {
@@ -363,7 +369,7 @@ soll <<
 "+- Ruut" << std::endl <<
 "    +- Eins" << std::endl <<
 "    +- Zwo*" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
           int goodSelectedItems(0);
@@ -371,7 +377,7 @@ soll <<
           {
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Zwo")) ++goodSelectedItems;
           }
-          assert( goodSelectedItems == 1 );
+          TEST_ASSERT( goodSelectedItems == 1 );
           break;
         }
         case 5: {
@@ -382,7 +388,7 @@ soll <<
 "    |    name: Eins" << std::endl <<
 "    +- Zwo*" << std::endl <<
 "    |    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
           int goodSelectedItems(0);
@@ -391,7 +397,7 @@ soll <<
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Ruut")) ++goodSelectedItems;
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Zwo")) ++goodSelectedItems;
           }
-          assert( goodSelectedItems == 2 );
+          TEST_ASSERT( goodSelectedItems == 2 );
           break;
         }
         case 6: {
@@ -402,7 +408,7 @@ soll <<
 "|    name: Eins" << std::endl <<
 "+- Zwo*" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
           int goodSelectedItems(0);
@@ -411,7 +417,7 @@ soll <<
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Ruut")) ++goodSelectedItems;
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Zwo")) ++goodSelectedItems;
           }
-          assert( goodSelectedItems == 2 );
+          TEST_ASSERT( goodSelectedItems == 2 );
           break;
         }
         case 7: {
@@ -422,7 +428,7 @@ soll <<
 "|    name: Eins" << std::endl <<
 "+- Zwo*" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
           int goodSelectedItems(0);
@@ -430,7 +436,7 @@ soll <<
           {
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Zwo")) ++goodSelectedItems;
           }
-          assert( goodSelectedItems == 1 );
+          TEST_ASSERT( goodSelectedItems == 1 );
           break;
         }
         case 8: {
@@ -441,7 +447,7 @@ soll <<
 "|    name: Eins" << std::endl <<
 "+- Zwo*" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
           
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
           int goodSelectedItems(0);
@@ -450,7 +456,7 @@ soll <<
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Eins")) ++goodSelectedItems;
             if (static_cast<const std::string>((*iter)->GetProperty("name")) == std::string("Zwo")) ++goodSelectedItems;
           }
-          assert( goodSelectedItems == 2 );
+          TEST_ASSERT( goodSelectedItems == 2 );
           break;
         }
         case 9: {
@@ -459,14 +465,14 @@ soll <<
 "|    name: Eins" << std::endl <<
 "+- Zwo*" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
 
           break;
         }
         case 10: {
           const mitk::DataTreeFilter::ItemSet* selectedItems = tree_filter->GetSelectedItems();
-          assert( selectedItems->empty() );
-          assert( tree_filter->GetItems()->empty() );
+          TEST_ASSERT( selectedItems->empty() );
+          TEST_ASSERT( tree_filter->GetItems()->empty() );
           break;
         }
         case 11: {
@@ -475,7 +481,7 @@ soll <<
 "|    name: Eins" << std::endl <<
 "+- Zwo" << std::endl <<
 "|    name: Zwo" << std::endl;
-          assert ( ost.str() == soll.str() || verbose > 1 );
+          TEST_ASSERT ( ost.str() == soll.str() || verbose > 1 );
 
           break;
         }
@@ -500,69 +506,69 @@ void smart_pointer_vector_container_test()
 
   {
   ContainerPointer nix;
-  assert ( nix.IsNull() );
+  TEST_ASSERT ( nix.IsNull() );
   }
 
   // test simple construction/destruction
   ContainerPointer vec = Container::New(); 
-  assert ( vec.IsNotNull() );
+  TEST_ASSERT ( vec.IsNotNull() );
   
   vec = NULL;
-  assert ( vec.IsNull() );
+  TEST_ASSERT ( vec.IsNull() );
  
   // test sizing
   vec = Container::New(); 
-  assert ( vec.IsNotNull() );
+  TEST_ASSERT ( vec.IsNotNull() );
  
 #define NUM_ELEMENTS 500
   vec->Reserve(NUM_ELEMENTS);
-  assert ( vec->Size() == NUM_ELEMENTS );
+  TEST_ASSERT ( vec->Size() == NUM_ELEMENTS );
   vec = NULL;
-  assert ( vec.IsNull() );
+  TEST_ASSERT ( vec.IsNull() );
   vec = Container::New(); 
-  assert ( vec.IsNotNull() );
+  TEST_ASSERT ( vec.IsNotNull() );
   vec->Reserve(2);
 
   {
   // test iterator to empty elements (copy constructor)
   Container::Iterator iter(vec->Begin());
-  assert ( iter.Index() == 0 );
-  assert ( iter != vec->End() );
+  TEST_ASSERT ( iter.Index() == 0 );
+  TEST_ASSERT ( iter != vec->End() );
   
   // test iterator to empty elements assignment
-  iter = vec->Begin(); assert ( iter.Index() == 0 );
-  assert ( iter != vec->End() );
+  iter = vec->Begin(); TEST_ASSERT ( iter.Index() == 0 );
+  TEST_ASSERT ( iter != vec->End() );
  
   // test element access via iterator
-  assert ( iter.Value() == *iter );
-  assert ( *iter == iter.Value() );
-  assert ( *iter == vec->ElementAt(0) );
-  assert ( *iter == (void*)0 );
+  TEST_ASSERT ( iter.Value() == *iter );
+  TEST_ASSERT ( *iter == iter.Value() );
+  TEST_ASSERT ( *iter == vec->ElementAt(0) );
+  TEST_ASSERT ( *iter == (void*)0 );
 
   // same tests for const iterator
   Container::ConstIterator citer(vec->Begin());
-  assert ( citer.Index() == 0 );
-  assert ( citer != vec->End() );
+  TEST_ASSERT ( citer.Index() == 0 );
+  TEST_ASSERT ( citer != vec->End() );
   
   // test citerator to empty elements assignment
   citer = vec->Begin();
-  assert ( citer.Index() == 0 );
-  assert ( citer != vec->End() );
+  TEST_ASSERT ( citer.Index() == 0 );
+  TEST_ASSERT ( citer != vec->End() );
  
   // test element access via citerator
-  assert ( citer.Value() == *citer );
-  assert ( *citer == citer.Value() );
-  assert ( *citer == vec->GetElement(0) );
-  assert ( *citer == vec->ElementAt(0) );
-  assert ( *citer == (void*)0 );
+  TEST_ASSERT ( citer.Value() == *citer );
+  TEST_ASSERT ( *citer == citer.Value() );
+  TEST_ASSERT ( *citer == vec->GetElement(0) );
+  TEST_ASSERT ( *citer == vec->ElementAt(0) );
+  TEST_ASSERT ( *citer == (void*)0 );
 
   // compare between const and non-const iterators
-  assert ( citer.Value() == *iter );
-  assert ( *citer == iter.Value() );
-  assert ( iter.Value() == *citer );
-  assert ( *iter == citer.Value() );
+  TEST_ASSERT ( citer.Value() == *iter );
+  TEST_ASSERT ( *citer == iter.Value() );
+  TEST_ASSERT ( iter.Value() == *citer );
+  TEST_ASSERT ( *iter == citer.Value() );
 
-  assert ( citer.operator->() == iter.operator->() );
+  TEST_ASSERT ( citer.operator->() == iter.operator->() );
 
   } // end scope iterators
   
@@ -589,14 +595,14 @@ void smart_pointer_vector_container_test()
   mitk::FillVector3D( dp, 5, 81, 12 );
   vec->ElementAt(4)->SetPoint3D( dp );
 
-  assert( vec->Size() == 5 );
+  TEST_ASSERT( vec->Size() == 5 );
  
   // test operator++ and operator--
   Container::ConstIterator lastiter(vec->Begin());
   for ( Container::ConstIterator citer(vec->Begin()); citer != vec->End(); )
   {
     ++citer;
-    assert( lastiter != citer );
+    TEST_ASSERT( lastiter != citer );
     ++lastiter;
   }
   
@@ -604,7 +610,7 @@ void smart_pointer_vector_container_test()
   for ( Container::ConstIterator citer(vec->Begin()); citer != vec->End(); )
   {
     citer++;
-    assert( lastiter != citer );
+    TEST_ASSERT( lastiter != citer );
     lastiter++;
   }
   
@@ -612,7 +618,7 @@ void smart_pointer_vector_container_test()
   for ( Container::ConstIterator citer(vec->End()); citer != vec->Begin(); )
   {
     citer--;
-    assert( lastiter != citer );
+    TEST_ASSERT( lastiter != citer );
     lastiter--;
   }
   
@@ -620,7 +626,7 @@ void smart_pointer_vector_container_test()
   for ( Container::ConstIterator citer(vec->End()); citer != vec->Begin(); )
   {
     --citer;
-    assert( lastiter != citer );
+    TEST_ASSERT( lastiter != citer );
     --lastiter;
   }
   
@@ -640,14 +646,14 @@ void smart_pointer_vector_container_test()
   mitk::FillVector3D( dp, 77, 40, 20 );
   iter->SetPoint3D(dp);
   
-  assert ( iter->GetPoint3D() == dp );
+  TEST_ASSERT ( iter->GetPoint3D() == dp );
   iter++ = *iter; // copy from next element
  
-  assert ( iter->GetPoint3D() != dp ); // should have changed
+  TEST_ASSERT ( iter->GetPoint3D() != dp ); // should have changed
   
   // end testing
   vec = NULL;
-  assert ( vec.IsNull() );
+  TEST_ASSERT ( vec.IsNull() );
 
 }
 

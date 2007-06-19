@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>284</width>
-            <height>1130</height>
+            <width>1087</width>
+            <height>1163</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -17,6 +17,11 @@
             <width>0</width>
             <height>0</height>
         </size>
+    </property>
+    <property name="font">
+        <font>
+            <bold>1</bold>
+        </font>
     </property>
     <property name="caption">
         <string>ComponentContainer</string>
@@ -88,6 +93,22 @@
                         <property name="spacing">
                             <number>3</number>
                         </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_WizardTextLabel</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>textLabel1</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignTop|AlignLeft</set>
+                            </property>
+                        </widget>
                         <widget class="QmitkDataTreeComboBox">
                             <property name="name">
                                 <cstring>m_TreeNodeSelector</cstring>
@@ -97,6 +118,11 @@
                                     <width>0</width>
                                     <height>20</height>
                                 </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                         </widget>
                         <widget class="QWidgetStack">
@@ -116,39 +142,25 @@
                                 <attribute name="id">
                                     <number>0</number>
                                 </attribute>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                </vbox>
                             </widget>
                         </widget>
-                        <widget class="QLayoutWidget">
+                        <spacer>
                             <property name="name">
-                                <cstring>layout1</cstring>
+                                <cstring>spacer1</cstring>
                             </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_backButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&lt;&lt;</string>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>m_forwardButton</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&gt;&gt;</string>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
+                            <property name="orientation">
+                                <enum>Vertical</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Minimum</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>20</width>
+                                    <height>5</height>
+                                </size>
+                            </property>
+                        </spacer>
                     </vbox>
                 </widget>
             </vbox>
@@ -194,6 +206,7 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
     <function returnType="QWidgetStack *">GetWidgetStack()</function>
+    <function returnType="QLabel *">GetWizardTextLabel()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

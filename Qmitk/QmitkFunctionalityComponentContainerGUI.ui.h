@@ -44,3 +44,9 @@ QWidgetStack* QmitkFunctionalityComponentContainerGUI::GetWidgetStack()
 {
   return m_WidgetStack;
 }
+
+
+QLabel* QmitkFunctionalityComponentContainerGUI::GetWizardTextLabel()
+{
+  return m_WizardTextLabel;
+}

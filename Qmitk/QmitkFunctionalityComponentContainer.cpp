@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include <qobjectlist.h>
 #include <qcombobox.h>
-
+#include <qlabel.h>
 //#include <qlayout.h>
 
 #include <vector>
@@ -52,7 +52,10 @@ m_Parent(parent),
 m_ComponentName("ComponentContainer"),
 //m_MultiWidget(mitkStdMultiWidget),
 m_Spacer(NULL),
-m_MulitWidget(mitkStdMultiWidget)
+m_MulitWidget(mitkStdMultiWidget),
+m_BackButton(NULL),
+m_NextButton(NULL),
+m_MaximumWidgedStackSize(-1)
 {
 	SetDataTreeIterator(it);
 	SetAvailability(true);
@@ -173,11 +176,6 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 	{
 		connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
 		connect( (QObject*)(m_FunctionalityComponentContainerGUI->GetContainerBorder()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));    
-	
-		connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_forwardButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
-		connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_backButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
-	
-	
 	}
 }
 
@@ -359,25 +357,23 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 {  
 	if(component!=NULL)
 	{
-		/*   QWidget* componentWidget = component->CreateControlWidget(m_GUI);
-		AddComponentListener(component);*/
-		//m_FunctionalityComponentContainerGUI->GetWidgetStack()->addWidget(componentWidget, stackPage);
-		int stackSize = 0;
 		QWidget* visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
 		int idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
-		if(idVisibleWidget < stackPage)
+		if(idVisibleWidget > m_MaximumWidgedStackSize)
 		{
-			stackSize = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
-			//if(stackSize < 0) stackSize = 0;
-			//stackSize++;
+			m_MaximumWidgedStackSize = idVisibleWidget;
+		}
+		if(m_MaximumWidgedStackSize < stackPage)
+		{
 			QWidget* w = new QWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack());
 			m_FunctionalityComponentContainerGUI->GetWidgetStack()->addWidget(w, stackPage);
+			m_MaximumWidgedStackSize++;
 			m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(w);
 			visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
 			idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
-			//QWidget ( QWidget * parent = 0, const char * name = 0, WFlags f = 0 )
 			QLayout* visibleWidgetLayout = new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
 		}
+
 		QLayout* layout;
 		if(m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout() == 0)
 		{
@@ -392,23 +388,84 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 		QWidget* componentWidget = component->CreateControlWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
 		AddComponentListener(component);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->widget(stackPage)->layout()->add(componentWidget);
-		//m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget()->layout()->add(componentWidget);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->setShown(true);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->updateGeometry();
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout()->activate();
-		//m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout()->AlignTop;
 		componentWidget->setShown(true);
-		//m_GUI->layout()->add(componentWidget);
 		component->CreateConnections();
-		if(m_Spacer != NULL)
-		{
-			m_GUI->layout()->removeItem(m_Spacer);
-		}
-		QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
-		m_Spacer = spacer;
-		m_GUI->layout()->addItem( m_Spacer ); 
+
 		m_GUI->repaint();
 	}
+}
+
+void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
+{
+	QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
+	if(m_BackButton==NULL)
+	{
+		m_BackButton = new QPushButton("<<", GetImageContent());
+	}
+	if(m_NextButton==NULL)
+	{
+		m_NextButton = new QPushButton(">>", GetImageContent());
+	}
+
+	buttonLayout->addWidget(m_BackButton);
+	buttonLayout->addWidget(m_NextButton);
+	//m_GUI->layout()->addChildLayout(buttonLayout);
+	m_BackButton->setShown(true);
+	m_NextButton->setShown(true);
+	m_GUI->layout()->AlignTop;
+	m_GUI->layout()->activate();
+	m_GUI->repaint();
+
+	connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
+	connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
+
+	m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+	SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+	GetImageContent()->updateGeometry();
+	if(m_Spacer != NULL)
+	{
+		m_GUI->layout()->removeItem(m_Spacer);
+	}
+	QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
+	m_Spacer = spacer;
+	m_GUI->layout()->addItem( m_Spacer );
+	m_GUI->updateGeometry();
+	m_GUI->repaint();
+}
+
+void QmitkFunctionalityComponentContainer::SetWizardText(const QString & text)
+{
+	m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setText(text);
+	m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setAlignment(Qt::WordBreak);
+	GetImageContent()->updateGeometry();
+	GetImageContent()->repaint();
+	m_GUI->updateGeometry();
+	m_GUI->layout()->AlignTop;
+	m_GUI->layout()->activate();
+	m_GUI->repaint();
+
+}
+
+void QmitkFunctionalityComponentContainer::ChooseWizardText(int page)
+{
+	switch(page)
+	{
+	case 1:
+		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+		break;
+	case 2:
+		SetWizardText("<b>Step 2   Create an STL-Model:</b><br><b>a)</b> Choose a threshold with the Threshold Finder where all areas that shall be used for the model are marked (green).<br><b>b)</b> If there are special areas that have to be manipulated use the PixelGreyValueManipulator and do not forget to select the new created image.><br><b>c)</b> Create a Surface with the SurfaceCreator.");
+		break;
+	case 3:
+		SetWizardText("<b>Step 3 Surface Finish:</b><br><b>a)</b> If you have your surface you can use the connectivity filter where you can mark all connected areas in different colours or delete alle areas instead of the biggest.");
+		break;
+	default:
+		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+		break;
+	};
 }
 
 void QmitkFunctionalityComponentContainer::NextButtonPressed()
@@ -418,15 +475,19 @@ void QmitkFunctionalityComponentContainer::NextButtonPressed()
 	{
 	case 1:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
+		ChooseWizardText(2);
 		break;
 	case 2:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
+		ChooseWizardText(3);
 		break;
 	case 3:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+		ChooseWizardText(1);
 		break;
 	default:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+		ChooseWizardText(1);
 		break;
 	};
 
@@ -438,15 +499,19 @@ void QmitkFunctionalityComponentContainer::BackButtonPressed()
 	{
 	case 1:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
+		ChooseWizardText(3);
 		break;
 	case 2:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+		ChooseWizardText(1);
 		break;
 	case 3:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
+		ChooseWizardText(2);
 		break;
 	default:
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+		ChooseWizardText(1);
 		break;
 	};
 }

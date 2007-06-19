@@ -25,11 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qaction.h>
 #include <qwidget.h>
 #include <qwidgetstack.h>
+#include <qpushbutton.h>
 #include "mitkDataTree.h"
 #include <qstring.h>
 #include <qobject.h>
 #include <mitkDataTreeFilter.h>
 #include <qlayout.h>
+#include <qlabel.h>
 #include "QmitkFunctionalityComponentContainerGUI.h"
 
 class QmitkStdMultiWidget;
@@ -59,6 +61,7 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
 
 public:
 
+
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
   QmitkFunctionalityComponentContainer(QObject *parent=0, const char * parentName = 0,  bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
@@ -78,7 +81,17 @@ public:
   */
   virtual QWidget* CreateControlWidget(QWidget* parent);
 
-  
+  /** \brief Method to create the forward and backward -buttons to navigate through the wizard */
+void CreateNavigationButtons();
+
+///** \brief Method to change the wizardText */
+//void CreateWizardTextLabel();
+
+/** \brief Method to create a textLabel at the Top of the wizard where a description can be created */
+void SetWizardText(const QString & text);
+
+/** \brief Method to choose the  right wizard text, depending on the wizardpage*/
+void ChooseWizardText(int page);
 
   /***************        SET AND GET     ***************/
 
@@ -121,7 +134,6 @@ virtual QGroupBox* GetImageContent();
 
 /** \brief Method to return the Image Selected in the Container Combo Box */
 virtual mitk::Image* GetParentMitkImage();
-
 
 /***************     ADD COMPONENTS     ***************/
 
@@ -170,7 +182,8 @@ public slots:
 
 protected:
 
-  //QmitkStdMultiWidget *GetMultiWidget();
+  /** \brief Vector with all added components */
+	//std::vector<std::list<QmitkBaseFunctionalityComponent*>> m_WidgetStackAddedChildList;  
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
   virtual void UpdateDataTreeComboBoxes();
@@ -219,6 +232,10 @@ private:
   QSpacerItem* m_Spacer;
 
   QmitkStdMultiWidget *m_MulitWidget;
+
+  QPushButton* m_BackButton;
+  QPushButton* m_NextButton;
+  int m_MaximumWidgedStackSize;
 };
 
 #endif

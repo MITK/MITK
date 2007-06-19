@@ -129,13 +129,19 @@ public:
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
+
+  virtual void Initialize( const mitk::Geometry3D *geometry );
+  
+  virtual void Initialize( int timeSteps );
+
+  virtual void AdaptPointSetSeriesSize( int timeSteps );
+
+
   /** \brief executes the given Operation */
   virtual void ExecuteOperation(Operation* operation);
 
   /** \brief returns the current size of the point-list */
   virtual int GetSize( int t = 0 ) const;
-
-  virtual void AdaptPointSetSeriesSize( int timeSteps );
 
   virtual int GetPointSetSeriesSize() const;
 
@@ -209,8 +215,6 @@ protected:
   PointSet();
 
   virtual ~PointSet();
-
-  virtual void Initialize( int timeSteps );
 
   typedef std::vector< DataType::Pointer > PointSetSeries;
 

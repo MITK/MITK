@@ -47,6 +47,20 @@ mitk::PointSet::~PointSet()
 {
 }
 
+void mitk::PointSet::Initialize( const mitk::Geometry3D *geometry )
+{
+  const mitk::TimeSlicedGeometry *timeGeometry = 
+    dynamic_cast< const mitk::TimeSlicedGeometry * >( geometry );
+
+  if ( timeGeometry )
+  {
+    this->Initialize( timeGeometry->GetTimeSteps() );
+  }
+
+  this->SetGeometry( static_cast< Geometry3D * >( 
+    geometry->Clone().GetPointer() ) );
+
+}
 
 void mitk::PointSet::Initialize( int timeSteps )
 {
@@ -54,8 +68,12 @@ void mitk::PointSet::Initialize( int timeSteps )
 
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->Initialize();
-  mitk::ScalarType timeBounds[] = {0.0, 1.0};
-  g3d->SetTimeBounds( timeBounds );
+
+  if ( timeSteps > 1 )
+  {
+    mitk::ScalarType timeBounds[] = {0.0, 1.0};
+    g3d->SetTimeBounds( timeBounds );
+  }
 
   //
   // The geometry is propagated automatically to the other items,
@@ -319,20 +337,29 @@ int mitk::PointSet::SearchSelectedPoint( int t )
 
 void mitk::PointSet::ExecuteOperation( Operation* operation )
 {
+  int timeStep = -1;
 
-  int timeStep = 0;
+  mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
+
+  if ( pointOp )
+  {
+    timeStep = this->GetTimeSlicedGeometry()
+      ->MSToTimeStep( pointOp->GetTimeInMS() );
+  }
+
+  if ( timeStep == -1 )
+  {
+    // Time outside of PointSet time bounds
+    return;
+  }
 
   switch (operation->GetOperationType())
   {
   case OpNOTHING:
     break;
+
   case OpINSERT://inserts the point at the given position and selects it. 
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-      
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       int position = pointOp->GetIndex();
 
       PointType pt;
@@ -358,13 +385,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
     }
     break;
+
   case OpMOVE://moves the point given by index
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
       
@@ -378,13 +401,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->Modified();
     }
     break;
+
   case OpREMOVE://removes the point at given by position 
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       m_PointSetSeries[timeStep]->GetPoints()
         ->DeleteIndex((unsigned)pointOp->GetIndex());
       m_PointSetSeries[timeStep]->GetPointData()
@@ -396,13 +415,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
      ((const itk::Object*)this)->InvokeEvent( RemovedPointEvent() );
     }
     break;
+
   case OpSELECTPOINT://select the given point
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.selected = true;
@@ -410,13 +425,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->Modified();
     }
     break;
+
   case OpDESELECTPOINT://unselect the given point
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.selected = false;
@@ -424,13 +435,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->Modified();
     }
     break;
+
   case OpSETPOINTTYPE:
     {
-      mitkCheckOperationTypeMacro(PointOperation, operation, pointOp);
-
-      timeStep = this->GetTimeSlicedGeometry()
-        ->MSToTimeStep( pointOp->GetTimeInMS() );
-
       PointDataType pointData = {0, false, PTUNDEFINED};
       m_PointSetSeries[timeStep]->GetPointData(pointOp->GetIndex(), &pointData);
       pointData.pointSpec = pointOp->GetPointType();
@@ -438,6 +445,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->Modified();
     }
     break;
+
   default:
     itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
     break;

@@ -52,6 +52,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
+  skinExtractor->ComputeScalarsOff();
   skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);

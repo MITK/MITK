@@ -30,8 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <algorithm>
 
-//##Documentation
-//##@brief color to mark a selected point
 const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
 mitk::MeshMapper2D::MeshMapper2D()
@@ -58,18 +56,52 @@ static bool point3DSmaller( const mitk::Point3D& elem1, const mitk::Point3D& ele
   return elem1[2] < elem2[2];
 }
 
-void mitk::MeshMapper2D::Paint(mitk::BaseRenderer * renderer)
+void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  if(IsVisible(renderer)==false) return;
+  if ( !this->IsVisible(renderer) ) return;
 
   //	@FIXME: Logik fuer update
-  bool updateNeccesary=true;
+  bool updateNeccesary = true;
 
   if (updateNeccesary) 
   {
   //aus GenerateData    
-    mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
-    mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh();
+    mitk::Mesh::Pointer input = const_cast<mitk::Mesh*>(this->GetInput());
+
+    // Get the TimeSlicedGeometry of the input object
+    const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
+    if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    {
+      return;
+    }
+
+    //
+    // get the world time
+    //
+    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    assert( worldGeometry != NULL );
+    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+
+    //
+    // convert the world time in time steps of the input object
+    //
+    int timeStep=0;
+    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+      timeStep = inputTimeGeometry->MSToTimeStep( time );
+    if ( inputTimeGeometry->IsValidTime( timeStep ) == false )
+    {
+      return;
+    }
+
+
+    mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh( timeStep );
+
+    if ( itkMesh.GetPointer() == NULL) 
+    {
+      return;
+    }
+
+
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 

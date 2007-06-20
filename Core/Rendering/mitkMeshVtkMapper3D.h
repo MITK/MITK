@@ -47,42 +47,44 @@ class vtkPropAssembly;
 
 namespace mitk {
 
-//##Documentation
-//## @brief Vtk-based mapper for PointList
-//##
-//## @ingroup Mapper
+/**
+ * \brief Vtk-based mapper for PointList
+ * \ingroup Mapper
+ */
 class MeshVtkMapper3D : public BaseVtkMapper3D
 {
-  public:
+public:
 
-    mitkClassMacro(MeshVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(MeshVtkMapper3D, BaseVtkMapper3D);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    virtual const mitk::Mesh* GetInput();
+  virtual const mitk::Mesh* GetInput();
 
-    virtual vtkProp* GetProp();
+  virtual vtkProp* GetProp();
 
-  protected:
-    MeshVtkMapper3D();
+protected:
+  MeshVtkMapper3D();
 
-    virtual ~MeshVtkMapper3D();
+  virtual ~MeshVtkMapper3D();
 
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-    vtkPropAssembly* m_PropAssemply;
+  vtkPropAssembly* m_PropAssembly;
 
-    vtkActor *m_SpheresActor;
-    vtkActor *m_ContourActor;
-    vtkPolyDataMapper* m_ContourMapper;
-    vtkPolyDataMapper* m_SpheresMapper;
+  vtkActor *m_SpheresActor;
+  vtkActor *m_ContourActor;
+  vtkPolyDataMapper* m_ContourMapper;
+  vtkPolyDataMapper* m_SpheresMapper;
 
-    vtkPolyDataMapper* m_TextVtkPolyDataMapper;
+  vtkPolyDataMapper* m_TextVtkPolyDataMapper;
 
-		vtkAppendPolyData *m_Spheres;
-		vtkPolyData *m_Contour;
+  vtkAppendPolyData *m_Spheres;
+  vtkPolyData *m_Contour;
+
+  int m_TimeStep;
 };
 
 } // namespace mitk

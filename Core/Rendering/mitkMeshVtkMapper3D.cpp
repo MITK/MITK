@@ -19,9 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
-//#include "mitkStringProperty.h"
-//#include "mitkColorProperty.h"
 #include "mitkOpenGLRenderer.h"
+
 #ifndef VCL_VC60
 #include "mitkMeshUtil.h"
 #endif
@@ -45,13 +44,15 @@ const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
 
 vtkProp* mitk::MeshVtkMapper3D::GetProp()
 {
-  return m_PropAssemply;
+  return m_PropAssembly;
 }
 
-mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
+mitk::MeshVtkMapper3D::MeshVtkMapper3D()
+: m_PropAssembly(NULL),
+  m_TimeStep( 0 )
 {
-	m_Spheres = vtkAppendPolyData::New();
-	m_Contour = vtkPolyData::New();
+  m_Spheres = vtkAppendPolyData::New();
+  m_Contour = vtkPolyData::New();
 
   m_SpheresActor = vtkActor::New();
   m_SpheresMapper = vtkPolyDataMapper::New();
@@ -62,7 +63,7 @@ mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssemply(NULL)
   m_ContourActor->SetMapper(m_ContourMapper);
   m_ContourActor->GetProperty()->SetAmbient(1.0);
 
-  m_PropAssemply = vtkPropAssembly::New();
+  m_PropAssembly = vtkPropAssembly::New();
 
   // a vtkPropAssembly is not a sub-class of vtkProp3D, so
   // we cannot use m_Prop3D.
@@ -75,29 +76,38 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
   m_SpheresActor->Delete();
   m_ContourMapper->Delete();
   m_SpheresMapper->Delete();
-  m_PropAssemply->Delete();
+  m_PropAssembly->Delete();
   m_Spheres->Delete();
-	m_Contour->Delete();
+  m_Contour->Delete();
 }
 
 void mitk::MeshVtkMapper3D::GenerateData()
 {
-  if(m_PropAssemply->GetParts()->IsItemPresent(m_SpheresActor))
-    m_PropAssemply->RemovePart(m_SpheresActor);
-  if(m_PropAssemply->GetParts()->IsItemPresent(m_ContourActor))
-    m_PropAssemply->RemovePart(m_ContourActor);
+  m_PropAssembly->VisibilityOn();
 
-	m_Spheres->RemoveAllInputs();
+  if(m_PropAssembly->GetParts()->IsItemPresent(m_SpheresActor))
+    m_PropAssembly->RemovePart(m_SpheresActor);
+  if(m_PropAssembly->GetParts()->IsItemPresent(m_ContourActor))
+    m_PropAssembly->RemovePart(m_ContourActor);
+
+  m_Spheres->RemoveAllInputs();
   m_Contour->Initialize();
 
   mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
-  mitk::Mesh::DataType::Pointer mesh;
+  input->Update();
 
-	mesh = input->GetMesh();
+  mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( m_TimeStep );
 
+  if ( itkMesh.GetPointer() == NULL) 
+  {
+    m_PropAssembly->VisibilityOff();
+    return;
+  }
+
+  
   mitk::Mesh::PointsContainer::Iterator i;
 
-	int j;
+  int j;
 
   vtkFloatingPointType rgba[4]={1.0f,1.0f,1.0f,1.0f};
   mitk::Color tmpColor;
@@ -114,7 +124,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
     rgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
   }
 
-  if(mesh->GetNumberOfPoints()>0)
+  if(itkMesh->GetNumberOfPoints()>0)
   {
     // build m_Spheres->GetOutput() vtkPolyData
     int pointSize = 2;
@@ -122,30 +132,30 @@ void mitk::MeshVtkMapper3D::GenerateData()
     if (pointSizeProp.IsNotNull())
       pointSize = pointSizeProp->GetValue();
 
-    for (j=0, i=mesh->GetPoints()->Begin(); i!=mesh->GetPoints()->End() ; i++,j++)
-	  {
-	    vtkSphereSource *sphere = vtkSphereSource::New();
+    for (j=0, i=itkMesh->GetPoints()->Begin(); i!=itkMesh->GetPoints()->End() ; i++,j++)
+    {
+      vtkSphereSource *sphere = vtkSphereSource::New();
 
-		  sphere->SetRadius(pointSize);
+      sphere->SetRadius(pointSize);
       sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-		  m_Spheres->AddInput(sphere->GetOutput());
+      m_Spheres->AddInput(sphere->GetOutput());
       sphere->Delete();
-	  }
+    }
 
     // setup mapper, actor and add to assembly
     m_SpheresMapper->SetInput(m_Spheres->GetOutput());
     m_SpheresActor->GetProperty()->SetColor(rgba);
-    m_PropAssemply->AddPart(m_SpheresActor);
+    m_PropAssembly->AddPart(m_SpheresActor);
   }
 
-  if(mesh->GetNumberOfCells()>0)
+  if(itkMesh->GetNumberOfCells()>0)
   {
     // build m_Contour vtkPolyData
 #ifdef VCL_VC60
     itkExceptionMacro(<<"MeshVtkMapper3D currently not working for MS Visual C++ 6.0, because MeshUtils are currently not supported.");
 #else
-    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(mesh.GetPointer(), false, false, 0, NULL, m_Contour);
+    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(itkMesh.GetPointer(), false, false, 0, NULL, m_Contour);
 #endif
 
     if(m_Contour->GetNumberOfCells()>0)
@@ -159,13 +169,13 @@ void mitk::MeshVtkMapper3D::GenerateData()
       else
         m_ContourActor->GetProperty()->SetRepresentationToSurface();
       m_ContourActor->GetProperty()->SetColor(rgba);
-      m_PropAssemply->AddPart(m_ContourActor);
+      m_PropAssembly->AddPart(m_ContourActor);
     }
   }
 }
 
 
-void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
   if(IsVisible(renderer)==false)
   {
@@ -195,5 +205,37 @@ void mitk::MeshVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   else
   {
     m_SpheresActor->VisibilityOff();
+  }
+
+
+  // Get the TimeSlicedGeometry of the input object
+  mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
+  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ))
+  {
+    m_PropAssembly->VisibilityOff();
+    return;
+  }
+
+  //
+  // get the world time
+  //
+  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  assert( worldGeometry != NULL );
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+
+  //
+  // convert the world time in time steps of the input object
+  //
+  int m_TimeStep=0;
+  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  {
+    m_TimeStep = inputTimeGeometry->MSToTimeStep( time );
+  }
+
+  if( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
+  {
+    m_PropAssembly->VisibilityOff();
+    return;
   }
 }

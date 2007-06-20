@@ -28,28 +28,28 @@ namespace mitk {
 class BaseRenderer;
 class Mesh;
 
-//##Documentation
-//## @brief OpenGL-based mapper to display a mesh in a 2D window
-//##
-//## @todo implement for AbstractTransformGeometry.
-//## @ingroup Mapper
+/**
+ * \brief OpenGL-based mapper to display a mesh in a 2D window
+ * 
+ * \todo implement for AbstractTransformGeometry.
+ * \ingroup Mapper
+ */
 class MeshMapper2D : public GLMapper2D
 {
 public:
-    mitkClassMacro(MeshMapper2D, Mapper2D);
+  mitkClassMacro(MeshMapper2D, Mapper2D);
 
-    itkNewMacro(Self);
+  itkNewMacro(Self);
 
-    //##Documentation
-    //## @brief Get the Mesh to map
-    const mitk::Mesh* GetInput(void);
+  /** @brief Get the Mesh to map */
+  const mitk::Mesh *GetInput(void);
 
-    virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint( mitk::BaseRenderer *renderer );
 
 protected:
-    MeshMapper2D();
+  MeshMapper2D();
 
-    virtual ~MeshMapper2D();
+  virtual ~MeshMapper2D();
 };
 
 } // namespace mitk

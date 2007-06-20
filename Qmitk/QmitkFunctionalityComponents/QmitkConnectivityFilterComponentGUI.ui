@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>264</width>
-            <height>182</height>
+            <width>565</width>
+            <height>198</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -34,11 +34,6 @@
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>m_ConnectivityFilter</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
             </property>
             <property name="title">
                 <string>Connectivity Filter</string>
@@ -85,11 +80,6 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowTreeNodeSelecotrGroupBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="lineWidth">
                                 <number>0</number>
@@ -159,11 +149,6 @@
                                             <property name="name">
                                                 <cstring>m_ParameterModeTextLabel</cstring>
                                             </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
                                             <property name="text">
                                                 <string>Filter mode</string>
                                             </property>
@@ -212,11 +197,6 @@
                                             <property name="name">
                                                 <cstring>m_ParameterModeComboBox</cstring>
                                             </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
                                         </widget>
                                     </vbox>
                                 </widget>
@@ -249,11 +229,6 @@
                                                     <property name="name">
                                                         <cstring>m_ParameterTextLabel</cstring>
                                                     </property>
-                                                    <property name="font">
-                                                        <font>
-                                                            <bold>0</bold>
-                                                        </font>
-                                                    </property>
                                                     <property name="text">
                                                         <string>Parameter</string>
                                                     </property>
@@ -261,11 +236,6 @@
                                                 <widget class="QLineEdit">
                                                     <property name="name">
                                                         <cstring>m_ParamterLineEdit</cstring>
-                                                    </property>
-                                                    <property name="font">
-                                                        <font>
-                                                            <bold>0</bold>
-                                                        </font>
                                                     </property>
                                                     <property name="frameShape">
                                                         <enum>LineEditPanel</enum>
@@ -287,11 +257,6 @@
                             <property name="name">
                                 <cstring>m_StartFilterPushButton</cstring>
                             </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
                             <property name="text">
                                 <string>Start Filter</string>
                             </property>
@@ -299,11 +264,6 @@
                         <widget class="QCheckBox">
                             <property name="name">
                                 <cstring>m_ReplaceSurfaceCheckBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="text">
                                 <string>replace Surface?</string>
@@ -313,19 +273,6 @@
                             </property>
                         </widget>
                     </vbox>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_SurfaceToImageButton</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>SurfaceTo Image</string>
-                    </property>
                 </widget>
             </vbox>
         </widget>
@@ -376,7 +323,7 @@
     <function returnType="QLineEdit *">GetParameterLabel()</function>
     <function returnType="QGroupBox *">GetParameterPart()</function>
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
-    <function returnType="QPushButton *">GetSurfaceToImageButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+
 </UI>

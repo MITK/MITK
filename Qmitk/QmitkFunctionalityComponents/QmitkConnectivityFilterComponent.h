@@ -116,7 +116,7 @@ public slots:
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
 
-  void SurfaceToImage();
+  //void SurfaceToImage();
 
 protected:
 

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <map>
 #include <istream>
+#include <cstdlib>
 
 
 // VTK-related includes
@@ -773,6 +774,86 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
   node->SetVisibility(true);
 }
 
+mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( const std::string& organ )
+{
+  static bool initialized = false;
+  static std::map< std::string, std::string > s_ColorMap;
+
+  if (!initialized)
+  {
+    // all lowercase here, please!
+    s_ColorMap.insert( std::make_pair( "ankle",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "appendix",            "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "bone",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "brain",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "coccyx",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "colon",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "elbow",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "eye",                 "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "fallopian tube",      "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "hand",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "heart",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "hip",                 "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "kidney",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "knee",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "larynx",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "liver",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "lung",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "muscle",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "nerve",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "nose",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "oesophagus",          "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "ovaries",             "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "pancreas",            "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "pelvis",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "penis",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "pharynx",             "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "rectum",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "sacrum",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "shoulder",            "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "spinal cord",         "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "spleen",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "stomach",             "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "teeth",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "testicles",           "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "thyroid",             "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "tongue",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "urinary bladder",     "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "uterus",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "vagina",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "vertebra",            "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "wrist",               "0xe38686") );
+    initialized = true;
+  }
+
+  std::string lowercaseOrgan(organ);
+  for(unsigned int i = 0; i < organ.length(); i++)
+  {
+    lowercaseOrgan[i] = tolower(lowercaseOrgan[i]);
+  }
+
+  std::map< std::string, std::string >::iterator iter = s_ColorMap.find( lowercaseOrgan );
+  if ( iter != s_ColorMap.end() )
+  {
+    std::string hexColor = iter->second;
+    std::string hexRed   = std::string("0x") + hexColor.substr( 2, 2 );
+    std::string hexGreen = std::string("0x") + hexColor.substr( 4, 2 );
+    std::string hexBlue  = std::string("0x") + hexColor.substr( 6, 2 );
+
+    long int red   = strtol( hexRed.c_str(), NULL, 16 );
+    long int green = strtol( hexGreen.c_str(), NULL, 16 );
+    long int blue  = strtol( hexBlue.c_str(), NULL, 16 );
+
+    return new ColorProperty( (float)red/ 255.0, (float)green/ 255.0, (float)blue/ 255.0 );
+  }
+  else
+  {
+    // a default color (green)
+    return new ColorProperty( 0.0, 1.0, 0.0 );
+  }
+
+}
+
 void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
 {
   node->SetProperty( "lineWidth", new mitk::IntProperty(2) );
@@ -911,4 +992,5 @@ void mitk::DataTreeNodeFactory::SetDefaultTusProperties(int count, mitk::DataTre
   quaternionProp = new mitk::Point4dProperty(QuaternionData);    
   node->SetProperty( "QuaternionData", quaternionProp );
 }
+  
 #endif // MBI_INTERNAL

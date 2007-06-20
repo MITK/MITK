@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNodeSource.h"
 #include "mitkFileSeriesReader.h"
+#include "mitkColorProperty.h"
 
 #include <vtkConfigure.h>
 #include <string>
@@ -100,6 +101,12 @@ public:
    */
   static void SetDefaultPointSetProperties(DataTreeNode::Pointer &node);
   
+
+  /**
+    * Nice default colors for segmentations of some "normal" organs.
+    */
+  static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );
+
   /**
    * Sets default common properites
    */

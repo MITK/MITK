@@ -184,6 +184,8 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
   if(m_TimeStep!=timeStep)
   {
     m_TimeStep = timeStep;
+    m_TimeStepUpdateTime.Modified();
+
     if(m_TimeSlicedWorldGeometry.IsNotNull())
     {
       if(m_TimeStep >= m_TimeSlicedWorldGeometry->GetTimeSteps())

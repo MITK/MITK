@@ -254,10 +254,13 @@ public:
 
   //##Documentation
   //## @brief Get timestamp of last call of SetCurrentWorldGeometry2D
-  unsigned long  GetCurrentWorldGeometry2DUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
+  unsigned long GetCurrentWorldGeometry2DUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
   //##Documentation
   //## @brief Get timestamp of last call of SetDisplayGeometry
-  unsigned long  GetDisplayGeometryUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
+  unsigned long GetDisplayGeometryUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
+  //##Documentation
+  //## @brief Get timestamp of last change of current TimeStep
+  unsigned long GetTimeStepUpdateTime() { return m_TimeStepUpdateTime; };
 
   //##Documentation
   //## @brief Perform a picking: find the x,y,z world coordinate of a
@@ -461,9 +464,15 @@ private:
   //##Documentation
   //## @brief timestamp of last call of SetWorldGeometry
   itk::TimeStamp m_CurrentWorldGeometry2DUpdateTime;
+  
   //##Documentation
   //## @brief timestamp of last call of SetDisplayGeometry
   itk::TimeStamp m_DisplayGeometryUpdateTime;
+
+  //##Documentation
+  //## @brief timestamp of last change of the current time step
+  itk::TimeStamp m_TimeStepUpdateTime;
+
 protected:
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

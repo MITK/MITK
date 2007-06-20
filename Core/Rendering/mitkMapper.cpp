@@ -19,22 +19,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkMapper.h"
 #include "mitkDataTreeNode.h"
+#include "mitkBaseRenderer.h"
 
 const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
 
-//##ModelId=3E3C337E0162
 mitk::Mapper::Mapper()
 {
 
 }
 
 
-//##ModelId=3E3C337E019E
 mitk::Mapper::~Mapper()
 {
 }
 
-//##ModelId=3E860B9A0378
 mitk::BaseData* mitk::Mapper::GetData() const
 {
   return m_DataTreeNode->GetData();
@@ -47,7 +45,6 @@ mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
 } 
 
 
-//##ModelId=3EF17276014B
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataTreeNode* node=GetDataTreeNode();
@@ -57,7 +54,6 @@ bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const ch
     return node->GetColor(rgb, renderer, name);
 }
 
-//##ModelId=3EF17795006A
 bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataTreeNode* node=GetDataTreeNode();
@@ -67,7 +63,6 @@ bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, co
     return node->GetVisibility(visible, renderer, name);
 }
 
-//##ModelId=3EF1781F0285
 bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataTreeNode* node=GetDataTreeNode();
@@ -77,7 +72,6 @@ bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, cons
     return node->GetOpacity(opacity, renderer, name);
 }
 
-//##ModelId=3EF179660018
 bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataTreeNode* node=GetDataTreeNode();
@@ -87,7 +81,6 @@ bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRend
     return node->GetLevelWindow(levelWindow, renderer, name);
 }
 
-//##ModelId=3EF18B340008
 bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
 {
     bool visible=true;
@@ -105,8 +98,7 @@ void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 
 }
 
-//##ModelId=3EF1A43C01D9
-void mitk::Mapper::Update(mitk::BaseRenderer* renderer)
+void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
   const DataTreeNode* node = GetDataTreeNode();
   assert(node!=NULL);
@@ -122,7 +114,8 @@ void mitk::Mapper::Update(mitk::BaseRenderer* renderer)
   if(
       (m_LastUpdateTime < GetMTime()) ||
       (m_LastUpdateTime < node->GetDataReferenceChangedTime()) ||
-      (m_LastUpdateTime < dataMTime)
+      (m_LastUpdateTime < dataMTime) ||
+      (m_LastUpdateTime < renderer->GetTimeStepUpdateTime())
     )
   {
     GenerateData();

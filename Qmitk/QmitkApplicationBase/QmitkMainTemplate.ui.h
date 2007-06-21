@@ -674,8 +674,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
   m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
-  
-
+  m_Options->SetProperty( "Default value for iilInterpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_IilInterpolationActive) );
 }
 
 /*!
@@ -703,9 +702,9 @@ void QmitkMainTemplate::Initialize()
   //could the behavior file be found?
   if ( smLoadOK )
   {
-      posOutputType* posOutput = new posOutputType(&it);
+    posOutputType* posOutput = new posOutputType(&it);
 
-      mitk::GlobalInteraction::GetInstance()->AddListener(mitk::CoordinateSupplier::New("navigation", posOutput)); //sends PointOperations
+    mitk::GlobalInteraction::GetInstance()->AddListener(mitk::CoordinateSupplier::New("navigation", posOutput)); //sends PointOperations
   }
   else
   {
@@ -733,11 +732,11 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->AddDisplayPlaneSubTree(&it);
     m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
-  
+
     // show/hide plane widgets when the corresponding buttons/menu items are checked
     connect(toolbarShowPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
     connect(viewShowPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
-    
+
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), toolbarShowPlanes, SLOT(setOn(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), viewShowPlanesAction, SLOT(setOn(bool)));
   }
@@ -745,7 +744,7 @@ void QmitkMainTemplate::Initialize()
   InitializeFunctionality();
 
   std::string optionsFile(mitk::StandardFileLocations::FindFile("MITKOptions.xml"));
-  
+
   if (!optionsFile.empty())
   {
     LoadOptionsFromFile(optionsFile.c_str());
@@ -756,7 +755,7 @@ void QmitkMainTemplate::Initialize()
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
-  
+
   mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1").GetPointer() );
   mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2").GetPointer() );
   if  ( upperColProp && lowerColProp )
@@ -765,22 +764,26 @@ void QmitkMainTemplate::Initialize()
   }
 
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-
   if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
     this->enableDarkPalette(true);
   else
     if (darkProperty != NULL)
       this->enableDarkPalette(darkProperty->GetValue());
-  
-    mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
-    mitk::Color c = colProperty->GetColor();
-    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+  mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
+  mitk::Color c = colProperty->GetColor();
+  m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+  // Initialize other global options
+  mitk::BoolProperty* iilProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for iilInterpolation").GetPointer() );          
+  if (iilProperty != NULL)
+    mitk::DataTreeNodeFactory::m_IilInterpolationActive = iilProperty->GetValue();
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_MultiWidget->GetMoveAndZoomInteractor()
-  );
+    );
 
   m_MultiWidget->EnableNavigationControllerEventListening();
 }
@@ -1066,17 +1069,21 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     }
 
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-  if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
-    this->enableDarkPalette(true);
-  else
-    if (darkProperty != NULL)
-      this->enableDarkPalette(darkProperty->GetValue());
+    if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
+      this->enableDarkPalette(true);
+    else
+      if (darkProperty != NULL)
+        this->enableDarkPalette(darkProperty->GetValue());
 
     bp =  m_Options->GetProperty("Background color");
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
     mitk::Color c = colProperty->GetColor();
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+    mitk::BoolProperty* iilProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for iilInterpolation").GetPointer() );          
+    if (iilProperty != NULL)
+      mitk::DataTreeNodeFactory::m_IilInterpolationActive = iilProperty->GetValue();
 
     // next, notify the functionalities of changes in their options
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)

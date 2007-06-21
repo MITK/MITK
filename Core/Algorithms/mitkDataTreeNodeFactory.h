@@ -126,6 +126,8 @@ public:
    * if true -> loaded image is part of a serie
    */
   void SetImageSerie(bool serie);
+
+  static bool m_IilInterpolationActive;
   
 protected:
 

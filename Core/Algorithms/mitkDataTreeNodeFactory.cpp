@@ -92,6 +92,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkShapeModelFileReader.h"
 #endif // MBI_INTERNAL
 
+
+ bool mitk::DataTreeNodeFactory::m_IilInterpolationActive = true;		// default value for iilInterpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {
   m_Serie = false;
@@ -705,7 +708,8 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
   node->SetProperty( "use color", new mitk::BoolProperty( true ) );
-  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
+  //node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
+  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_IilInterpolationActive ) );	// set to user configurable default value (see global options)
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(0));

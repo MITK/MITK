@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
 
 mitk::Mapper::Mapper()
+: m_TimeStep( 0 )
 {
 
 }
@@ -90,18 +91,40 @@ bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) con
 
 void mitk::Mapper::GenerateData()
 {
-
 }
 
 void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 {
+}
 
+void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
+{
+  m_TimeStep = renderer->GetTimeStep();
+  /*
+  //
+  // get the world time
+  //
+  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  assert( worldGeometry != NULL );
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+
+  //
+  // convert the world time in time steps of the input object
+  //
+  int m_TimeStep=0;
+  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  {
+    m_TimeStep = inputTimeGeometry->MSToTimeStep( time );
+  }
+  */
 }
 
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
   const DataTreeNode* node = GetDataTreeNode();
   assert(node!=NULL);
+
+  this->CalculateTimeStep( renderer );
   
   //safty cause there are datatreenodes, that have no defined data (video-nodes and root)
   unsigned int dataMTime = 0;
@@ -118,11 +141,11 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
       (m_LastUpdateTime < renderer->GetTimeStepUpdateTime())
     )
   {
-    GenerateData();
+    this->GenerateData();
     m_LastUpdateTime.Modified();
   }
 
-  GenerateData(renderer);
+  this->GenerateData(renderer);
 }
 
 const std::string& mitk::Mapper::GetXMLNodeName() const

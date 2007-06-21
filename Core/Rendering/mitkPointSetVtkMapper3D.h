@@ -108,8 +108,6 @@ protected:
   //variables to be able to log, how many inputs have been added to PolyDatas
   unsigned int m_NumberOfSelectedAdded;
   unsigned int m_NumberOfUnselectedAdded;
-
-  int m_TimeStep;
 };
 
 

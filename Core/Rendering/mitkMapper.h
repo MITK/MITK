@@ -114,12 +114,18 @@ public:
     //##ModelId=3E3C337E019E
     virtual ~Mapper();
 
-  //##Documentation
-  //## @brief Generate the data needed for rendering (independent of a specific renderer)
-  virtual void GenerateData();
-  //##Documentation
-  //## @brief Generate the data needed for rendering into @a renderer
-  virtual void GenerateData(mitk::BaseRenderer *renderer);
+    //##Documentation
+    //## @brief Generate the data needed for rendering (independent of a specific renderer)
+    virtual void GenerateData();
+    //##Documentation
+    //## @brief Generate the data needed for rendering into @a renderer
+    virtual void GenerateData(mitk::BaseRenderer *renderer);
+
+    //## Update time step, for use in subclasses
+    virtual void CalculateTimeStep( mitk::BaseRenderer *renderer );
+
+    //## The current time step of the dataset to be rendered, for use in subclasses
+    int m_TimeStep;
 
     itk::WeakPointer<mitk::DataTreeNode> m_DataTreeNode;
 

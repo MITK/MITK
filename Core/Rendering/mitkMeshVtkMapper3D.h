@@ -83,8 +83,6 @@ protected:
 
   vtkAppendPolyData *m_Spheres;
   vtkPolyData *m_Contour;
-
-  int m_TimeStep;
 };
 
 } // namespace mitk

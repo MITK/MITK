@@ -66,8 +66,7 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
   m_contour(NULL), 
   m_tubefilter(NULL),
   m_NumberOfSelectedAdded(0), 
-  m_NumberOfUnselectedAdded(0),
-  m_TimeStep( 0 )
+  m_NumberOfUnselectedAdded(0)
 {
   //propassembly
   m_PointsAssembly = vtkPropAssembly::New();
@@ -518,22 +517,6 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
     m_PointsAssembly->VisibilityOff();
     return;
-  }
-
-  //
-  // get the world time
-  //
-  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-
-  //
-  // convert the world time in time steps of the input object
-  //
-  int m_TimeStep=0;
-  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-  {
-    m_TimeStep = inputTimeGeometry->MSToTimeStep( time );
   }
 
   if ( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )

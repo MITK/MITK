@@ -48,8 +48,7 @@ vtkProp* mitk::MeshVtkMapper3D::GetProp()
 }
 
 mitk::MeshVtkMapper3D::MeshVtkMapper3D()
-: m_PropAssembly(NULL),
-  m_TimeStep( 0 )
+: m_PropAssembly(NULL)
 {
   m_Spheres = vtkAppendPolyData::New();
   m_Contour = vtkPolyData::New();
@@ -215,22 +214,6 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
     m_PropAssembly->VisibilityOff();
     return;
-  }
-
-  //
-  // get the world time
-  //
-  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-
-  //
-  // convert the world time in time steps of the input object
-  //
-  int m_TimeStep=0;
-  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
-  {
-    m_TimeStep = inputTimeGeometry->MSToTimeStep( time );
   }
 
   if( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )

@@ -87,6 +87,9 @@ protected slots:
   */
   void SetDescription();
 
+  void FileDownload();
+  void FileUpload();
+
   /*!
   \brief fill a textfield with the seriesdescription
   */

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ImageWriter::ImageWriter()
 {
   this->SetNumberOfRequiredInputs( 1 );
-  
+  m_MimeType = "";
   SetDefaultExtension();
 }
 
@@ -125,14 +125,58 @@ void mitk::ImageWriter::GenerateData()
   }
   else
   {
-    ::itk::OStringStream filename;
-    filename <<  m_FileName.c_str() << m_Extension;
-
     PicFileWriter::Pointer picWriter = PicFileWriter::New();
-    picWriter->SetInput(input);
-    picWriter->SetFileName(filename.str().c_str());
+    //case: filename got always an extension
+    size_t found;
+    found = m_FileName.find( m_Extension );
+    if( found == std::string::npos )
+    {
+      //if Extension not in Filename
+      ::itk::OStringStream filename;
+      filename <<  m_FileName.c_str() << m_Extension;
+      picWriter->SetFileName( filename.str().c_str() );
+    }
+    else
+      picWriter->SetFileName( m_FileName.c_str() );
+    picWriter->SetInput( input );
     picWriter->Write();
   }
+  m_MimeType = "image/pict";
+}
+
+bool mitk::ImageWriter::CanWrite( DataTreeNode* input )
+{
+  if ( input )
+  {
+    mitk::BaseData* data = input->GetData();
+    if ( data )
+    {
+       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( data );
+       if( image.IsNotNull() )
+       {
+         //"SetDefaultExtension()" set m_Extension to ".mhd" ?????
+         m_Extension = ".pic";
+         return true;
+       }
+    }
+  }
+  return false;
+}
+
+void mitk::ImageWriter::SetInput( DataTreeNode* input )
+{
+  if( input && CanWrite( input ) )
+    this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::Image*>( input->GetData() ) );
+}
+
+std::string mitk::ImageWriter::GetWritenMIMEType()
+{
+  return m_MimeType;
+}
+
+std::string mitk::ImageWriter::GetFileExtension()
+{
+  return m_Extension;
 }
 
 void mitk::ImageWriter::SetInput( mitk::Image* image )

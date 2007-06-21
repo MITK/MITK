@@ -126,6 +126,26 @@ public:
      */
     const mitk::Surface* GetInput();
 
+    /**
+    * @brief Return the extension to be added to the filename.
+    */
+    virtual std::string GetFileExtension();
+
+    /**
+    * @brief Check if the Writer can write the Content of the DataTreenode.
+    */
+    virtual bool CanWrite( DataTreeNode* );
+
+    /**
+    * @brief Return the MimeType of the saved File.
+    */
+    virtual std::string GetWritenMIMEType();
+
+    /**
+    * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
+    */
+    virtual void SetInput( DataTreeNode* );
+
     VtkWriterType* GetVtkWriter()
     {
       return m_VtkWriter;
@@ -154,6 +174,8 @@ protected:
     std::string m_FilePattern;
 
     std::string m_Extension;
+
+    std::string m_MimeType;
 
     VtkWriterType* m_VtkWriter;
   

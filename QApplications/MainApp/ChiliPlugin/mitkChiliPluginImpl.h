@@ -54,13 +54,16 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
 
     virtual void handleMessage( ipInt4_t type, ipMsgParaList_t *list );
 
-    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
-
     /** return the StudyInformation of the current selected study */
     virtual StudyInformation GetCurrentSelectedStudy();
     /** return the list of the series to the current selected study */
     virtual SeriesList GetCurrentSelectedSeries();
+
+    #if ( CHILI_VERSION >= 38 )
     /** return the PatientInformation of the current selected study */
+    virtual PatientInformation GetCurrentSelectedPatient();
+    #endif
+
     virtual unsigned int GetLightBoxCount();
 
     /** return if the application run as standalone or as chiliplugin */
@@ -77,6 +80,18 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
     itkNewMacro(ChiliPluginImpl);
     virtual ~ChiliPluginImpl();
+
+    #if ( CHILI_VERSION >= 38 )
+    /** with this function you can save a file to the chilidatabase
+    * If you want to save the file to the current selected study and series, then set the datatreenode only.
+    * If you want to save the file to a specific study and series, then you have to set all parameter. */
+    virtual void UploadViaFile( DataTreeNode* node, std::string studyInstanceUID = "", std::string patientOID = "", std::string studyOID = "", std::string seriesOID = "" );
+
+    //UnderConstruction
+    virtual void UploadViaBuffer( DataTreeNode* );
+    virtual DataTreeNode* DownloadViaFile();
+    virtual DataTreeNode* DownloadViaBuffer();
+    #endif
 
   public slots:
 
@@ -106,23 +121,34 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     /** if the Lightbox count changed */
     void SendLightBoxCountChangedEvent();
 
+    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
+    static ipBool_t GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data );
+
     /** teleconference methods */
     virtual void connectPartner();
     virtual void disconnectPartner();
 
-    StudyInformation m_CurrentStudy;
+    #if ( CHILI_VERSION >= 38 )
+    /** if the study changed, we have to iterate over the series for a new current-selected-study-list */
+    bool m_currentStudyChanged;
+    /** a list of all series to the current selected Study */
     SeriesList m_CurrentSeries;
+    /** the count of the shown Lightboxes in chili */
     unsigned int m_LightBoxCount;
-
-//    bool m_currentStudyChanged;
-//    /** a list of all series to the current selected Study */
-//    SeriesList m_CurrentSeries;
-//    /** the count of the shown Lightboxes in chili */
-//    unsigned int m_LightBoxCount;
+    #else
+    /** the current selected study */
+    StudyInformation m_CurrentStudy;
+    /** a list of all series to the current selected Study */
+    SeriesList m_CurrentSeries;
+    /** the count of the shown Lightboxes in chili */
+    unsigned int m_LightBoxCount;
+    #endif
 
   private:
 
     static QWidget* s_Parent;
+
+    bool m_InImporting;
 
     SampleApp* app;
 

@@ -23,13 +23,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QcMITKTask.h>
 //Chili
 #include <chili/plugin.xpm>
-#include <chili/qclightboxmanager.h> //needed for iterateseries, ... // TODO I think iterateSeries is defined in plugin.h, right?
+#include <chili/qclightboxmanager.h> //needed for iterateseries, ... //
 //MITKPlugin
 #include "mitkChiliPluginImpl.h"
 #include <mitkChiliPluginFactory.h>
 #include <mitkLightBoxImageReader.h>
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkDataStorage.h>
+//Reader- and Writer-Factory´s
+#include "mitkSurfaceVtkWriterFactory.h"
+#include "mitkImageWriterFactory.h"
+#include "mitkPointSetWriterFactory.h"
 //teleconference
 #include <mitkConferenceToken.h>
 #include <mitkConferenceEventMapper.h>
@@ -65,10 +69,14 @@ QcEXPORT QObject* create( QWidget *parent )
   // overwrite implementation of mitk::ChiliPlugin with mitk::ChiliPluginImpl
   mitk::ChiliPluginFactory::RegisterOneFactory();
 
+  mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
+  mitk::PointSetWriterFactory::RegisterOneFactory();
+  mitk::ImageWriterFactory::RegisterOneFactory();
+
   // give Chili the single instance of mitk::ChiliPluginImpl
   mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
   mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
-  
+
   return realPluginInstance.GetPointer();
 }
 
@@ -99,13 +107,75 @@ mitk::ChiliPluginImpl::~ChiliPluginImpl()
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0; // set count to 0, so itk::LightObject won't trigger another delete...
   m_ReferenceCountLock.Unlock();
-
 }
 
 bool mitk::ChiliPluginImpl::IsPlugin()
 {
   return true;
 }
+
+#if ( CHILI_VERSION >= 38 )
+
+mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetCurrentSelectedStudy()
+{
+  study_t* tempStudy = pCurrentStudy();
+  mitk::ChiliPlugin::StudyInformation resultStudy;
+  if( tempStudy != NULL )
+  {
+    resultStudy.OID = tempStudy->oid;
+    resultStudy.InstanceUID = tempStudy->instanceUID;
+    resultStudy.ID = tempStudy->id;
+    resultStudy.Date = tempStudy->date;
+    resultStudy.Time = tempStudy->time;
+    resultStudy.Modality = tempStudy->modality;
+    resultStudy.Manufacturer = tempStudy->manufacturer;
+    resultStudy.ReferingPhysician = tempStudy->referingPhysician;
+    resultStudy.Description = tempStudy->description;
+    resultStudy.ManufacturersModelName = tempStudy->manufacturersModelName;
+    resultStudy.ImportTime = tempStudy->importTime;
+    resultStudy.ChiliSenderID = tempStudy->chiliSenderID;
+    resultStudy.AccessionNumber = tempStudy->accessionNumber;
+    resultStudy.InstitutionName = tempStudy->institutionName;
+    resultStudy.WorkflowState = tempStudy->workflow_state;
+    resultStudy.Flags = tempStudy->flags;
+    resultStudy.PerformingPhysician = tempStudy->performingPhysician;
+    resultStudy.ReportingPhysician = tempStudy->reportingPhysician;
+    resultStudy.LastAccess = tempStudy->last_access;
+  }
+  return resultStudy;
+}
+
+mitk::ChiliPlugin::SeriesList mitk::ChiliPluginImpl::GetCurrentSelectedSeries()
+{
+  if( m_currentStudyChanged )
+  {
+    m_CurrentSeries.clear();
+    m_currentStudyChanged = false;
+    char* currentStudyOID_c = (char*)GetCurrentSelectedStudy().OID.c_str();
+    iterateSeries( currentStudyOID_c, NULL, &mitk::ChiliPluginImpl::GlobalIterateSeriesCallback, this );
+  }
+  return m_CurrentSeries;
+}
+
+mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetCurrentSelectedPatient()
+{
+  patient_t* tempPatient = pCurrentPatient();
+  mitk::ChiliPlugin::PatientInformation resultPatient;
+  if( tempPatient != NULL )
+  {
+    resultPatient.OID = tempPatient->oid;
+    resultPatient.Name = tempPatient->name;
+    resultPatient.ID = tempPatient->id;
+    resultPatient.BirthDate = tempPatient->birthDate;
+    resultPatient.BirthTime = tempPatient->birthTime;
+    resultPatient.Sex = tempPatient->sex;
+    resultPatient.MedicalRecordLocator = tempPatient->medicalRecordLocator;
+    resultPatient.Comment = tempPatient->comment;
+  }
+  return resultPatient;
+}
+
+#else
 
 mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetCurrentSelectedStudy()
 {
@@ -117,6 +187,7 @@ mitk::ChiliPlugin::SeriesList mitk::ChiliPluginImpl::GetCurrentSelectedSeries()
   return m_CurrentSeries;
 }
 
+#endif
 
 ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data )
 {
@@ -380,6 +451,10 @@ void mitk::ChiliPluginImpl::studySelected( study_t* study )
     done = true;
   }
 
+#if ( CHILI_VERSION >= 38 )
+  m_currentStudyChanged = true;
+  SendStudySelectedEvent();
+#else
   if (study)
   {
     //set StudyInformation
@@ -423,20 +498,24 @@ void mitk::ChiliPluginImpl::studySelected( study_t* study )
     mitk::ChiliPlugin::StudyInformation emptyList;
     m_CurrentStudy = emptyList;
   }
+#endif
 }
 
 void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
 {
+  if ( m_InImporting ) return;
   QPtrList<QcLightbox>& lightboxes = QcPlugin::lightboxManager()->getLightboxes();
   QcLightbox* selectedLightbox = lightboxes.at(row);
   if (selectedLightbox)
   {
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    m_InImporting = true;
+    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     mitk::LightBoxImageReader::Pointer reader = mitk::LightBoxImageReader::New();
     reader->SetLightBox( selectedLightbox );
     mitk::Image::Pointer image = reader->GetOutput();
     image->Update();
-  QApplication::restoreOverrideCursor();
+    qApp->processEvents();
+    m_InImporting = false;
 
     if( image->IsInitialized() )
     {
@@ -459,9 +538,135 @@ void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
     {
       QMessageBox::information(NULL, "MITK", "Couldn't read this image. \n\nIf you feel this should be possible, report a bug to mitk-users@lists.sourceforge.net", QMessageBox::Ok);
     }
+    QApplication::restoreOverrideCursor();
   }
   else
   {
     std::cerr << "Lightbox import selected for lightbox #" << row << ", but lightbox manager doesn't know this lightbox." << std::endl;
   }
 }
+
+#if ( CHILI_VERSION >= 38 )
+void mitk::ChiliPluginImpl::UploadViaFile( DataTreeNode* node, std::string studyInstanceUID, std::string patientOID, std::string studyOID, std::string seriesOID)
+{
+  if( node )
+  {
+    //Searching for possible Writer
+    std::list<FileWriter::Pointer> possibleWriter;
+    std::list<LightObject::Pointer> allObjects = itk::ObjectFactoryBase::CreateAllInstance( "IOWriter" );
+    for( std::list<LightObject::Pointer>::iterator iter = allObjects.begin(); iter != allObjects.end(); iter++ )
+    {
+      FileWriter* writer = dynamic_cast<FileWriter*>( iter->GetPointer() );
+      if( writer )
+        possibleWriter.push_back( writer );
+      else std::cout << "ERROR: no FileWriter returned" << std::endl;
+    }
+
+    //checking the parameter and setting the input for "pStoreDataFromFile"
+    std::string tempStudyInstanceUID, tempPatientOID, tempStudyOID, tempSeriesOID;
+
+    //there is no input beside the datatreenode -> save to current selected study and series
+    if( studyInstanceUID == "" && patientOID == "" && studyOID == "" && seriesOID == "" )
+    {
+      patient_t* currentPatient = pCurrentPatient();
+      study_t* currentStudy = pCurrentStudy();
+      series_t* currentSeries = pCurrentSeries();
+      if( !currentStudy || !currentPatient || !currentSeries )
+      {
+        std::cout << "ERROR: no Series selected!" << std::endl;
+        return;
+      }
+      tempStudyInstanceUID = currentStudy->instanceUID;
+      tempPatientOID = currentPatient->oid;
+      tempStudyOID = currentStudy->oid;
+      tempSeriesOID = currentSeries->oid;
+    }
+    //save to specific study and series
+    else
+      if( studyInstanceUID == "" || patientOID == "" || studyOID == "" || seriesOID == "" )
+        std::cout << "ERROR: one parameter is NULL." <<std::endl;
+      else
+      {
+        tempStudyInstanceUID = studyInstanceUID;
+        tempPatientOID = patientOID;
+        tempStudyOID = studyOID;
+        tempSeriesOID = seriesOID;
+      }
+
+    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+
+    for( std::list<FileWriter::Pointer>::iterator it = possibleWriter.begin(); it != possibleWriter.end(); it++ )
+    {
+      if( it->GetPointer()->CanWrite( node ) )
+      {
+        std::string filename = "/tmp/FileUpload" + it->GetPointer()->GetFileExtension();
+        it->GetPointer()->SetFileName( filename.c_str() );
+        it->GetPointer()->SetInput( node );
+        it->GetPointer()->Write();
+
+        if( !pStoreDataFromFile( filename.c_str(), "AutoUpload", it->GetPointer()->GetWritenMIMEType().c_str(), tempStudyInstanceUID.c_str(), tempPatientOID.c_str(), tempStudyOID.c_str(), tempSeriesOID.c_str() ) )
+        std::cout << "ERROR: while saving File (" << filename << ") to Database." << std::endl;
+
+        if( remove(  filename.c_str() ) != 0 )
+          std::cout << "ERROR: while deleting file: " << it->GetPointer()->GetFileName() << std::endl;
+      }
+    }
+    QApplication::restoreOverrideCursor();
+  }
+}
+
+mitk::DataTreeNode* mitk::ChiliPluginImpl::DownloadViaFile()
+{
+//UNDER CONSTRUCTION
+/*
+  ipInt4_t error;
+
+  //surface
+  pFetchDataToFile( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_surf_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", "SurfaceFileDownload.vtp", &error );
+  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
+
+  //pointset
+  pFetchDataToFile( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_pointSet_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", "PointSetFileDownload.mps", &error );
+  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
+*/
+  return NULL;
+}
+
+void mitk::ChiliPluginImpl::UploadViaBuffer( DataTreeNode* node )
+{
+//UNDER CONSTRUCTION
+}
+
+mitk::DataTreeNode* mitk::ChiliPluginImpl::DownloadViaBuffer()
+{
+//UNDER CONSTRUCTION
+/*
+  ipInt4_t error;
+  void* buffer;
+  ipUInt4_t length;
+
+  pFetchDataToBuffer( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_pointSet_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", &buffer, &length , &error );
+  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
+*/
+  return NULL;
+}
+
+ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data )
+{
+//UNDER CONSTRUCTION
+/*
+  //image->path den filedownload starten, als file speichern, das file einlesen, in die lightbox packen, lightbox dem reader geben
+
+  ipInt4_t error;
+
+  pFetchDataToFile( image->path, "test.pic", &error );
+  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
+  ipPicDescriptor *pic;
+  pic = ipPicGet( "test.pic", NULL );
+  //mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
+  //callingObject->myLightbox.addImage( pic );
+*/
+  return ipTrue; // enum from ipTypes.h
+}
+#endif
+

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
 
+#include "mitkChiliPlugin.h"
 //reader and writer
 #include "mitkLightBoxImageReader.h"
 #include "mitkLightBoxResultImageWriter.h"
@@ -30,8 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 //need it for the writer
 #include <mitkLevelWindowProperty.h>
-//the MITK-Chili-Plugin
-#include "mitkChiliPlugin.h"
 //for the GUI
 #include <qcursor.h>
 #include <qapplication.h>
@@ -87,6 +86,8 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
     connect( ( QObject* )( m_Controls->LoadFromLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromLightbox() ) );
     connect( ( QObject* )( m_Controls->SaveToLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToLightbox() ) );
     connect( ( QObject* )( m_Controls->SetDescription ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SetDescription() ) );
+    connect( ( QObject* )( m_Controls->FileDownload ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( FileDownload() ) );
+    connect( ( QObject* )( m_Controls->FileUpload ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( FileUpload() ) );
   }
 }
 
@@ -103,14 +104,22 @@ void QmitkLoadSaveToChiliExample::SetDescription()
   std::string temp = m_Controls->DescriptionInput->text();
   //check description and selected node
   if( temp != "" )
+  {
     if( m_Controls->m_TreeNodeSelector->GetSelectedNode() )
     {
       //set the nodeproperty "name" and update the treenodeselector
       m_Controls->m_TreeNodeSelector->GetSelectedNode()->SetProperty( "name", new mitk::StringProperty( temp ) );
       m_Controls->m_TreeNodeSelector->UpdateContent();
     }
-    else QMessageBox::information( 0, "ChiliExample", "No node selected!" );
-  else QMessageBox::information( 0, "ChiliExample", "We want no empty SeriesDescription!" );
+    else 
+    {
+      QMessageBox::information( 0, "ChiliExample", "No node selected!" );
+    }
+  }
+  else 
+  {
+    QMessageBox::information( 0, "ChiliExample", "Please enter a non-empty series description!" );
+  }
 }
 
 void QmitkLoadSaveToChiliExample::LoadFromLightbox()
@@ -183,9 +192,32 @@ void QmitkLoadSaveToChiliExample::SaveToLightbox()
       }
       else QMessageBox::information( 0, "ChiliExample", "No image selected!" );
     }
-    else QMessageBox::information( 0, "ChiliExample", "There are no data in the node!" );
+    else QMessageBox::information( 0, "ChiliExample", "There is no data in the node!" );
   }
   else QMessageBox::information( 0, "ChiliExample", "No node selected!" );
+}
+
+void QmitkLoadSaveToChiliExample::FileUpload()
+{
+  if( mitk::ChiliPlugin::GetInstance()->GetChiliVersion() >= 38 )
+  {
+    mitk::DataStorage::SetOfObjects::ConstPointer m_Result = mitk::DataStorage::GetInstance()->GetAll();
+    if ( m_Result->Size() > 0 )
+    {
+      for( mitk::DataStorage::SetOfObjects::const_iterator go = m_Result->begin(); go != m_Result->end(); go++ )
+        mitk::ChiliPlugin::GetInstance()->UploadViaFile( (*go) );
+    }
+  }
+  else QMessageBox::information( 0, "LoadSaveToChiliExample", "Your current Chili version does not support this function." );
+}
+
+void QmitkLoadSaveToChiliExample::FileDownload()
+{
+  if( mitk::ChiliPlugin::GetInstance()->GetChiliVersion() >= 38 )
+  {
+    mitk::ChiliPlugin::GetInstance()->DownloadViaFile();
+  }
+  else QMessageBox::information( 0, "LoadSaveToChiliExample", "Your current Chili version does not support this function." );
 }
 
 void QmitkLoadSaveToChiliExample::ImageSelected( mitk::DataTreeIteratorClone imageIt )

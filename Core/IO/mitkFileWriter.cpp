@@ -16,12 +16,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkFileWriter.h"
+
+bool mitk::FileWriter::CanWrite( DataTreeNode* )
+{
+  return false;
+}
+
+std::string mitk::FileWriter::GetWritenMIMEType()
+{
+  return "";
+}
+
+void mitk::FileWriter::SetInput( DataTreeNode* )
+{
+}
+
+std::string mitk::FileWriter::GetFileExtension()
+{
+  return "";
+}
 
 mitk::FileWriter::FileWriter()
 {
-
 }
 
 mitk::FileWriter::~FileWriter()

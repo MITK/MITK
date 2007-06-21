@@ -126,6 +126,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     ExecuteWrite( m_VtkWriter, transformPolyData );
   }
   transformPolyData->Delete();
+  m_MimeType = "image/surf";
 }
 
 template <class VTKWRITER>
@@ -145,4 +146,42 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
   {
     return static_cast< const mitk::Surface * >( this->ProcessObject::GetInput( 0 ) );
   }
+}
+
+template <class VTKWRITER>
+bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWrite( DataTreeNode* input )
+{
+  if ( input )
+  {
+    mitk::BaseData* data = input->GetData();
+    if ( data )
+    {
+       mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( data );
+       if( surface.IsNotNull() )
+       {
+         SetDefaultExtension();
+         return true;
+       }
+    }
+  }
+  return false;
+}
+
+template <class VTKWRITER>
+void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( DataTreeNode* input )
+{
+  if( input && CanWrite( input ) )
+   SetInput( dynamic_cast<mitk::Surface*>( input->GetData() ) );
+}
+
+template <class VTKWRITER>
+std::string mitk::SurfaceVtkWriter<VTKWRITER>::GetWritenMIMEType()
+{
+  return m_MimeType;
+}
+
+template <class VTKWRITER>
+std::string mitk::SurfaceVtkWriter<VTKWRITER>::GetFileExtension()
+{
+  return m_Extension;
 }

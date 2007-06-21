@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include <itkProcessObject.h>
+#include <mitkDataTreeNode.h>
 
 namespace mitk {
 
@@ -74,8 +75,28 @@ class FileWriter : public itk::ProcessObject
     //## the data is stored in multiple files.
     virtual void SetFilePattern(const char* aFilePattern) = 0;
 
+    //##Documentation
+    //## @brief Return the extension to be added to the filename.
+    virtual std::string GetFileExtension();
+
+    //##Documentation
+    //## @brief Check if the Writer can write the Content of the 
+    //## DataTreenode.
+    virtual bool CanWrite( DataTreeNode* );
+
+    //##Documentation
+    //## @brief Return the MimeType of the saved File.
+    virtual std::string GetWritenMIMEType();
+
+    //##Documentation
+    //## @brief Set the DataTreenode as Input. Important: The Writer
+    //## always have a SetInput-Function.
+    virtual void SetInput( DataTreeNode* );
+
     virtual void Write() = 0;
+
 protected:
+
     FileWriter();
 
     virtual ~FileWriter();
@@ -102,4 +123,3 @@ virtual void Update()                                                       \
 
 } // namespace mitk
 #endif /* FILEWRITER_H_HEADER_INCLUDED */
-

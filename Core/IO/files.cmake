@@ -7,6 +7,7 @@ SET(CPP_FILES
   mitkFileSeriesReader.cpp
   mitkFileWriter.cpp
   mitkImageWriter.cpp
+  mitkImageWriterFactory.cpp
   mitkItkImageFileIOFactory.cpp
   mitkItkImageFileReader.cpp
   mitkItkImageWrite.cpp
@@ -25,6 +26,7 @@ SET(CPP_FILES
   mitkPointSetIOFactory.cpp
   mitkPointSetReader.cpp
   mitkPointSetWriter.cpp
+  mitkPointSetWriterFactory.cpp
   mitkRawImageFileReader.cpp
   mitkStandardFileLocations.cpp
   mitkSTLFileIOFactory.cpp
@@ -33,6 +35,7 @@ SET(CPP_FILES
   mitkStlVolumeTimeSeriesReader.cpp
   mitkSurfaceVtkWriter.cpp
   mitkSurfaceVtkWriter.txx
+  mitkSurfaceVtkWriterFactory.cpp
   mitkVtiFileIOFactory.cpp
   mitkVtiFileReader.cpp
   mitkVtkImageIOFactory.cpp

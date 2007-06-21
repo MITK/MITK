@@ -118,6 +118,7 @@ void mitk::PointSetWriter::GenerateData()
  
     out.close();
     m_Success = true;
+    m_MimeType = "image/pointSet";
 }
 
 
@@ -304,3 +305,39 @@ bool mitk::PointSetWriter::GetSuccess() const
     return m_Success;  
 }
 
+
+
+bool mitk::PointSetWriter::CanWrite( DataTreeNode* input )
+{
+  if ( input )
+  {
+    mitk::BaseData* data = input->GetData();
+    if ( data )
+    {
+       mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>( data );
+       if( pointSet.IsNotNull() )
+       {
+         //this writer has no "SetDefaultExtension()" - function 
+         m_Extension = ".mps";
+         return true;
+       }
+    }
+  }
+  return false;
+}
+
+void mitk::PointSetWriter::SetInput( DataTreeNode* input )
+{
+  if( input && CanWrite( input ) )
+    this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::PointSet*>( input->GetData() ) );
+}
+
+std::string mitk::PointSetWriter::GetWritenMIMEType()
+{
+  return m_MimeType;
+}
+
+std::string mitk::PointSetWriter::GetFileExtension()
+{
+  return m_Extension;
+}

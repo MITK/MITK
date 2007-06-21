@@ -60,10 +60,38 @@ void mitk::ChiliPlugin::AddPropertyListToNode( const mitk::PropertyList::Pointer
 mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
-  
+
   if (destroyInstance)  // needed because of double inheritance of mitk::ChiliPluginImpl
     s_Instance = NULL;
 
   return s_Instance;
 }
 
+unsigned int mitk::ChiliPlugin::GetChiliVersion()
+{
+  return CHILI_VERSION;
+}
+
+void mitk::ChiliPlugin::UploadViaFile( DataTreeNode*, std::string studyInstanceUID, std::string patientOID, std::string studyOID, std::string seriesOID )
+{
+}
+
+void mitk::ChiliPlugin::UploadViaBuffer( DataTreeNode* )
+{
+}
+
+mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaFile()
+{
+  return NULL;
+}
+
+mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaBuffer()
+{
+  return NULL;
+}
+
+mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetCurrentSelectedPatient()
+{
+  mitk::ChiliPlugin::PatientInformation emptyList;
+  return emptyList;
+}

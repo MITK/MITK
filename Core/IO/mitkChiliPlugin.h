@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPluginEvents.h"
 #include <mitkDataTreeNode.h>
 
+#define CHILI_VERSION 36
+
 class QcPlugin;
 
 namespace mitk {
@@ -103,12 +105,31 @@ class ChiliPlugin : public itk::Object
     /** there can be lots of series to one study, so we need a list */
     typedef std::list<SeriesInformation> SeriesList;
 
+    /** This struct contain all possible informations about the patient. */
+    struct PatientInformation
+    {
+      std::string OID;
+      std::string Name;
+      std::string ID;
+      std::string BirthDate;
+      std::string BirthTime;
+      std::string Sex;
+      std::string MedicalRecordLocator;
+      std::string Comment;
+    };
+
     /** return the StudyInformation of the current selected study */
     virtual StudyInformation GetCurrentSelectedStudy();
     /** return the list of the series to the current selected study */
     virtual SeriesList GetCurrentSelectedSeries();
+    /** return the PatientInformation of the current selected study */
+    virtual PatientInformation GetCurrentSelectedPatient();
+
     /** return the number of Lightboxes in chili */
     virtual unsigned int GetLightBoxCount();
+
+    /** return the number of the current ChiliVersion */
+    virtual unsigned int GetChiliVersion();
 
     /** return if the application run as standalone or as chiliplugin*/
     virtual bool IsPlugin();
@@ -119,11 +140,21 @@ class ChiliPlugin : public itk::Object
     virtual void AddPropertyListToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* );
 
     /** return the Plugin */
-    static ChiliPlugin* GetInstance(bool destroyInstance = false);
+    static ChiliPlugin* GetInstance( bool destroyInstance = false );
 
     mitkClassMacro( ChiliPlugin,itk::Object );
     itkNewMacro( ChiliPlugin );
     virtual ~ChiliPlugin();
+
+    /** with this function you can save a file to the chilidatabase
+    * If you want to save the file to the current selected study and series, then set the datatreenode only.
+    * If you want to save the file to a specific study and series, then you have to set all parameter. */
+    virtual void UploadViaFile( DataTreeNode*, std::string studyInstanceUID = "", std::string patientOID = "", std::string studyOID = "", std::string seriesOID = "" );
+
+    //UnderConstruction
+    virtual void UploadViaBuffer( DataTreeNode* );
+    virtual DataTreeNode* DownloadViaFile();
+    virtual DataTreeNode* DownloadViaBuffer();
 
   protected:
     ChiliPlugin();

@@ -55,16 +55,14 @@ void mitk::PlaneFit::GenerateData()
   for ( t = 0; t < m_PointSet->GetPointSetSeriesSize(); ++t )
   {
     // check number of data points - less then 3points isn't enough
-    if ( m_PointSet->GetSize( t ) < 3 )
+    if ( m_PointSet->GetSize( t ) >= 3 )
     {
-      break;
+      this->CalculateCentroid( t );
+
+      this->ProcessPointSet( t );
+
+      this->InitializePlane( t );
     }
-
-    this->CalculateCentroid( t );
-
-    this->ProcessPointSet( t );
-
-    this->InitializePlane( t );
   }
 }
 

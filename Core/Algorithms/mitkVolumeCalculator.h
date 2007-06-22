@@ -32,7 +32,7 @@ namespace mitk
 
   //##Documentation
   //## @brief Provides an easy way to calculate the volume of a mitk::Image
-  //##
+  //## The given volume is in milliliters. There is also a method to get the raw voxel count.
   class VolumeCalculator : public itk::Object
   {
   public:
@@ -44,6 +44,7 @@ namespace mitk
     // TODO: calculate if needed in GetHistogram()
     void ComputeVolume();
     itkGetMacro(Volume,float);
+    itkGetMacro(VoxelCount,unsigned long int);
     std::vector<float> GetVolumes() {
       return m_Volumes;
     }
@@ -53,11 +54,12 @@ namespace mitk
     virtual ~VolumeCalculator();
 
     template < typename TPixel, unsigned int VImageDimension >
-    friend void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, mitk::VolumeCalculator* volumeCalculator);
+    void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage);
 
     mitk::Image::ConstPointer m_Image;
     int m_Threshold;
     float m_Volume;
+    unsigned long int m_VoxelCount;
     std::vector<float> m_Volumes;
     mitk::ImageTimeSelector::Pointer m_TimeSelector;
   };
@@ -65,3 +67,4 @@ namespace mitk
 } // namespace mitk
 
 #endif /* VOLUME_CALCULATOR_H_HEADER_INCLUDED */
+

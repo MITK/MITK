@@ -405,6 +405,26 @@ public:
   {
     return m_DataReferenceChangedTime.GetMTime();
   }
+  
+  //##Documentation
+  //## @brief Adds or removes the associated interactor to mitk::GLobalInteraction.
+  //## 
+  virtual void SetInteractorEnabled( const bool& enabled );
+  
+  //##Documentation
+  //## @brief Adds the interactor to mitk::GlobalInteraction
+  //## 
+  virtual void EnableInteractor();
+  
+  //##Documentation
+  //## @brief Removes the Interactor from mitk::GlobalInteraction
+  //## 
+  virtual void DisableInteractor();
+  
+  //##Documentation
+  //## @brief Tests, if the interactor is already added to mitk::GlobalInteraction
+  //## 
+  virtual bool IsInteractorEnabled() const;
 
   //##
   virtual bool WriteXMLData( XMLWriter& xmlWriter );

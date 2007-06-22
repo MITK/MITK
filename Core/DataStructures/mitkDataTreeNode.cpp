@@ -643,6 +643,35 @@ bool mitk::DataTreeNode::IsSelected(mitk::BaseRenderer* renderer)
   return selected;
 }
 
+void mitk::DataTreeNode::SetInteractorEnabled( const bool& enabled )
+{
+  if ( m_Interactor.IsNull() )
+  {
+    itkWarningMacro("Interactor is NULL. Couldn't enable or disable interaction.");  
+    return;
+  }
+  if ( enabled )
+    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor.GetPointer() );
+  else
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor.GetPointer() );
+}
+
+void mitk::DataTreeNode::EnableInteractor()
+{
+  SetInteractorEnabled( true );
+}
+
+void mitk::DataTreeNode::DisableInteractor()
+{
+  SetInteractorEnabled( false );
+}
+
+bool mitk::DataTreeNode::IsInteractorEnabled() const
+{
+  return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
+}
+
+
 #ifndef _MSC_VER
 template <typename T>
 bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const

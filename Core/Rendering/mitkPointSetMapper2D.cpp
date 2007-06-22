@@ -96,7 +96,7 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 
 void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  const int text2dDistance = 5;
+  const int text2dDistance = 10;
 
   if(IsVisible(renderer)==false) return;
 
@@ -323,9 +323,9 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
             // decimal point)
             buffer << static_cast<int>(distance); // cut of decimal digits
             buffer << '.';
-            buffer <<     (int)(distance - static_cast<float>(static_cast<int>(distance))) // decimal digits
-                       * pow( 10.0f, m_DistancesDecimalDigits ); 
-            // TODO limit to 1 or 0 decimal places (by default)
+            buffer <<     (int)((distance - static_cast<float>(static_cast<int>(distance))) // decimal digits
+                       * pow( 10.0f, m_DistancesDecimalDigits )); 
+            buffer << "mm"; // always give a scale!
 
             Vector2D vec2d = pt2d-lastPt2d;
             makePerpendicularVector2D(vec2d, vec2d);

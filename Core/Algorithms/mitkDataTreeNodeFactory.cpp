@@ -803,6 +803,7 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "larynx",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "liver",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "lung",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "lymph node",          "0xff0000") );
     s_ColorMap.insert( std::make_pair( "muscle",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "nerve",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "nose",                "0xe38686") );

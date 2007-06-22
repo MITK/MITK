@@ -172,18 +172,23 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* /*node*/)
 
 mitk::CoreObjectFactory::CoreObjectFactory() 
 {
-  itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+  static bool alreadyDone = false;
+  if (!alreadyDone)
+  {
+    itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+    alreadyDone = true;
+  }
 }
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)

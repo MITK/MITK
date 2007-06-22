@@ -279,3 +279,9 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_CurrentPolygonInteraction);
   ItemsOfListUpdate();
 }
+
+
+mitk::DataTreeNode* QmitkPointListWidget::GetDataTreeNode()
+{
+  return m_DatatreeNode.GetPointer();
+}

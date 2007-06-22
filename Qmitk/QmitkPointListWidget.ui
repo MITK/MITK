@@ -129,11 +129,12 @@
     <slot>PointSelect( int ItemIndex )</slot>
     <slot>ItemsOfListUpdate()</slot>
     <slot>RemoveInteraction()</slot>
-    <slot>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
+    <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
+    <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

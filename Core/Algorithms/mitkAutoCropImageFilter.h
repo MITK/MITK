@@ -18,6 +18,8 @@ namespace mitk {
  * from the background, crops the input image and returns it.
  *
  * @ingroup Process
+ *
+ * @todo clean up, this is messy. bug #524
  * 
  */
 class AutoCropImageFilter : public SubImageSelector
@@ -35,6 +37,8 @@ public:
 
   itkGetConstMacro(MarginFactor,float);
   itkSetMacro(MarginFactor,float);
+  
+  void SetCroppingRegion(RegionType overrideRegion);
 
   virtual const std::type_info& GetOutputPixelType();
 
@@ -79,6 +83,8 @@ protected:
 
   mitk::SlicedData::RegionType m_InputRequestedRegion;
   itk::TimeStamp m_TimeOfHeaderInitialization;
+
+  bool m_OverrideCroppingRegion;
 
 };
 

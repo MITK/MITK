@@ -85,18 +85,16 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   }
 
   // *************************
-
-
-////  this->GraftNthOutput(0,output);  
-//  this->SetNthOutput(0,output);  
 }
 
 
-mitk::AutoCropImageFilter::AutoCropImageFilter() : m_BackgroundValue(0), m_MarginFactor(1.0)
+mitk::AutoCropImageFilter::AutoCropImageFilter() 
+: m_BackgroundValue(0), 
+  m_MarginFactor(1.0),
+  m_OverrideCroppingRegion(false)
 {
   m_InputTimeSelector  = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();
-
 }
 
 
@@ -151,6 +149,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     boRegion.SetSize(size);
     return;
   }
+
   // set input-requested-region, because we access it later in
   // GenerateInputRequestedRegion (there we just set the time)
   input->SetRequestedRegion(&m_InputRequestedRegion);
@@ -226,14 +225,6 @@ void mitk::AutoCropImageFilter::GenerateData()
     AccessFixedDimensionByItk( m_InputTimeSelector->GetOutput(), ITKCrop3DImage, 3);
   }
 
-  //float origin[3];
-  //origin[0] = m_RegionIndex[0];
-  //origin[1] = m_RegionIndex[1];
-  //origin[2] = m_RegionIndex[2];
-  //Vector3D originVector;
-  //mitk::Point3D origin();
-  //vtk2itk(origin, originVector);
-  //this->GetOutput()->GetGeometry()->Translate(originVector);
   m_TimeOfHeaderInitialization.Modified();
 }
 
@@ -253,67 +244,72 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     img =  this->GetInput();
   }
 
-  ImagePointer inputItk = ImageType::New();
-  mitk::CastToItkImage( img , inputItk );
-  typedef itk::ImageRegionConstIterator< ImageType > ConstIteratorType;
-  ConstIteratorType inIt( inputItk,  inputItk->GetLargestPossibleRegion() );
-  ImageType::IndexType minima,maxima;
-  maxima = inputItk->GetLargestPossibleRegion().GetIndex();
-  minima[0] = inputItk->GetLargestPossibleRegion().GetSize()[0];
-  minima[1] = inputItk->GetLargestPossibleRegion().GetSize()[1];
-  minima[2] = inputItk->GetLargestPossibleRegion().GetSize()[2];
-
-  for ( inIt.GoToBegin(); !inIt.IsAtEnd(); ++inIt)
+  if (m_OverrideCroppingRegion)
   {
-    float pix_val = inIt.Get();
-    if ( fabs(pix_val - m_BackgroundValue) > mitk::eps )
+    for (unsigned int i=0; i<3; ++i)
     {
-      for (int i=0; i < 3; i++)
-      {
-        minima[i] = vnl_math_min((int)minima[i],(int)(inIt.GetIndex()[i]));
-        maxima[i] = vnl_math_max((int)maxima[i],(int)(inIt.GetIndex()[i]));
-      }
+      m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
+      m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
+
+      m_LowerBounds[i] = m_CroppingRegion.GetIndex()[i];
+      m_UpperBounds[i] = img->GetDimension(i)-m_CroppingRegion.GetSize()[i]-m_LowerBounds[i];
     }
   }
+  else
+  {
 
+    ImagePointer inputItk = ImageType::New();
+    mitk::CastToItkImage( img , inputItk );
+    typedef itk::ImageRegionConstIterator< ImageType > ConstIteratorType;
+    ConstIteratorType inIt( inputItk,  inputItk->GetLargestPossibleRegion() );
+    ImageType::IndexType minima,maxima;
+    maxima = inputItk->GetLargestPossibleRegion().GetIndex();
+    minima[0] = inputItk->GetLargestPossibleRegion().GetSize()[0];
+    minima[1] = inputItk->GetLargestPossibleRegion().GetSize()[1];
+    minima[2] = inputItk->GetLargestPossibleRegion().GetSize()[2];
 
-  m_RegionSize[0] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
-  m_RegionSize[1] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
-  m_RegionSize[2] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
-  m_RegionIndex = minima;
+    for ( inIt.GoToBegin(); !inIt.IsAtEnd(); ++inIt)
+    {
+      float pix_val = inIt.Get();
+      if ( fabs(pix_val - m_BackgroundValue) > mitk::eps )
+      {
+        for (int i=0; i < 3; i++)
+        {
+          minima[i] = vnl_math_min((int)minima[i],(int)(inIt.GetIndex()[i]));
+          maxima[i] = vnl_math_max((int)maxima[i],(int)(inIt.GetIndex()[i]));
+        }
+      }
+    }
 
-  m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2;
-  m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2;
-  m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2;
+    m_RegionSize[0] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
+    m_RegionSize[1] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
+    m_RegionSize[2] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
+    m_RegionIndex = minima;
 
-  ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
-  ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);
-  origRegion.Crop(cropRegion);
-  
-  m_RegionSize[0] = origRegion.GetSize()[0];
-  m_RegionSize[1] = origRegion.GetSize()[1];
-  m_RegionSize[2] = origRegion.GetSize()[2];
+    m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2;
+    m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2;
+    m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2;
 
-  m_RegionIndex[0] = origRegion.GetIndex()[0];
-  m_RegionIndex[1] = origRegion.GetIndex()[1];
-  m_RegionIndex[2] = origRegion.GetIndex()[2];
+    ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
+    ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);
+    origRegion.Crop(cropRegion);
+    
+    m_RegionSize[0] = origRegion.GetSize()[0];
+    m_RegionSize[1] = origRegion.GetSize()[1];
+    m_RegionSize[2] = origRegion.GetSize()[2];
 
-  //for (int i = 0; i < 3; i++)
-  //{
-  //  if (m_RegionIndex[i] < 0) m_RegionIndex[i] = 0;
-  //  if (m_RegionIndex[i] + m_RegionSize[i] > inputItk->GetLargestPossibleRegion().GetSize()[i]-1) m_RegionSize[i] = inputItk->GetLargestPossibleRegion().GetSize()[i] - m_RegionIndex[i] - 1;
+    m_RegionIndex[0] = origRegion.GetIndex()[0];
+    m_RegionIndex[1] = origRegion.GetIndex()[1];
+    m_RegionIndex[2] = origRegion.GetIndex()[2];
 
-  //  if (m_RegionSize[i] < 1) return;
-  //}
+    m_LowerBounds[0] = m_RegionIndex[0];
+    m_LowerBounds[1] = m_RegionIndex[1];
+    m_LowerBounds[2] = m_RegionIndex[2];
 
-  m_LowerBounds[0] = m_RegionIndex[0];
-  m_LowerBounds[1] = m_RegionIndex[1];
-  m_LowerBounds[2] = m_RegionIndex[2];
-
-  m_UpperBounds[0] = inputItk->GetLargestPossibleRegion().GetSize()[0]-m_RegionSize[0]-m_RegionIndex[0];
-  m_UpperBounds[1] = inputItk->GetLargestPossibleRegion().GetSize()[1]-m_RegionSize[1]-m_RegionIndex[1];
-  m_UpperBounds[2] = inputItk->GetLargestPossibleRegion().GetSize()[2]-m_RegionSize[2]-m_RegionIndex[2];
-
+    m_UpperBounds[0] = inputItk->GetLargestPossibleRegion().GetSize()[0]-m_RegionSize[0]-m_RegionIndex[0];
+    m_UpperBounds[1] = inputItk->GetLargestPossibleRegion().GetSize()[1]-m_RegionSize[1]-m_RegionIndex[1];
+    m_UpperBounds[2] = inputItk->GetLargestPossibleRegion().GetSize()[2]-m_RegionSize[2]-m_RegionIndex[2];
+  }
 }
 
 
@@ -325,4 +321,10 @@ void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType() 
 {
   return *this->GetInput()->GetPixelType().GetTypeId();
+}
+  
+void mitk::AutoCropImageFilter::SetCroppingRegion(RegionType overrideRegion)
+{
+  m_CroppingRegion = overrideRegion;
+  m_OverrideCroppingRegion = true;
 }

@@ -84,6 +84,7 @@ typedef enum EEventIds
   EIDSHIFTANDMIDDLEMOUSEMOVE = 2004,
   EIDSHIFTANDMIDDLEMOUSERELEASE = 2005,
   EIDTDMOUSEINPUT = 4001, // 3d Mouse, SpaceNavigator input
+  EIDTDMOUSEKEYDOWN = 4002, // 3d Mouse, KeyDown
   EIDSTRGANDN = 10,
   EIDSTRGANDE = 11,
   EIDDELETE = 12,
@@ -346,8 +347,8 @@ typedef enum EActions
   AcDISPLAYOPTIONS = 49009,
   AcCYCLE = 49010,
   AcACCEPT = 49011,
-  AcONTDMOUSEINPUT = 4002 // On input of 3D Mouse
-
+  AcONTDMOUSEINPUT = 4001, // On input of 3D Mouse
+  AcONTDMOUSEKEYDOWN = 4002 // On input of 3D Mouse
 };
 
 
@@ -432,6 +433,7 @@ typedef enum EEventType
   Type_TabletPress = 92,			// tablet press
   Type_TabletRelease = 93,			// tablet release
   Type_TDMouseInput = 94,	// 3D mouse input occured
+  Type_TDMouseKeyDown = 95,	// 3D mouse input occured
   Type_User = 1000,				// first user event id
   Type_MaxUser = 65535
 };

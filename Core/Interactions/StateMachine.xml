@@ -2921,8 +2921,12 @@
   <stateMachine NAME="TDMouseInteraction">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4001">
-        <action ID="4002" />
+        <action ID="4001" />
         <!--AcONTDMOUSEINPUT-->
+      </transition>
+      <transition NAME="stay with button down" NEXT_STATE_ID="1" EVENT_ID="4002">
+	    <action ID="4002" />
+	    <!--AcONTDMOUSEKEYDOWN-->
       </transition>
     </state>
   </stateMachine>

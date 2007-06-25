@@ -77,13 +77,15 @@ void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
 
 bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 {
+  // Defers removal to a time after the current event handling is finished. Otherwise the implementation of InformListeners would crash sometimes.
   m_ListenersFlaggedForRemoval.push_back(listener);
+
+  StateMachineListIter position = std::find(m_ListenerList.begin(), m_ListenerList.end(),listener);
+  bool removePossible = (position != m_ListenerList.end());
 
   RemoveFlaggedListeners();
 
-  // Try find
-  StateMachineListIter position = std::find(m_ListenerList.begin(), m_ListenerList.end(),listener);
-  return position != m_ListenerList.end();
+  return removePossible;
 }
 
 void mitk::GlobalInteraction::RemoveFlaggedListeners()

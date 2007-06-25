@@ -186,6 +186,10 @@ namespace mitk {
     //## @ params swell: if the calculated jurisdictionvalue is above swell, then add it to the map
     void FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
 
+    void RemoveFlaggedListeners();
+
+    StateMachineList m_ListenersFlaggedForRemoval;
+
     //##Documentation
     //## @brief list of all listening statemachines, that want to recieve all events
     StateMachineList m_ListenerList;
@@ -211,6 +215,9 @@ namespace mitk {
     //##Documentation
     //## @brief holds a list of BaseRenderer and one focused
     FocusManager* m_FocusManager;
+
+    bool m_CurrentlyInInformListenersLoop;
+    bool m_CurrentlyInInformInteractorsLoop;
 
     InteractionDebugger::Pointer m_InteractionDebugger;
 

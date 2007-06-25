@@ -31,7 +31,8 @@ mitk::GlobalInteraction::Pointer mitk::GlobalInteraction::s_GlobalInteraction(NU
 
 
 mitk::GlobalInteraction::GlobalInteraction(const char * type)
-: StateMachine(type)
+: StateMachine(type),
+  m_CurrentlyInInformListenersLoop(false)
 {
   //build up the FocusManager
   m_FocusManager = new mitk::FocusManager();
@@ -66,6 +67,7 @@ void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
       << listener->GetNameOfClass() << ") as a listener. "
       << "This will probably cause problems");
   }
+
   if ( std::find(m_ListenerList.begin(), m_ListenerList.end(),listener) == m_ListenerList.end() )
   {
     m_ListenerList.push_back(listener);
@@ -75,12 +77,32 @@ void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
 
 bool mitk::GlobalInteraction::RemoveListener(mitk::StateMachine* listener)
 {
+  m_ListenersFlaggedForRemoval.push_back(listener);
+
+  RemoveFlaggedListeners();
+
   // Try find
   StateMachineListIter position = std::find(m_ListenerList.begin(), m_ListenerList.end(),listener);
-  if (position == m_ListenerList.end())
-    return false;
-  position = m_ListenerList.erase(position);
-  return true;
+  return position != m_ListenerList.end();
+}
+
+void mitk::GlobalInteraction::RemoveFlaggedListeners()
+{
+  if (m_CurrentlyInInformListenersLoop) return;
+
+  // iterate flagged listeners, remove them if possibleA
+  if (m_ListenersFlaggedForRemoval.empty()) return;
+
+  for (StateMachineListIter it = m_ListenersFlaggedForRemoval.begin(); it != m_ListenersFlaggedForRemoval.end(); ++it)
+  {
+    StateMachineListIter foundPosition = std::find( m_ListenerList.begin(), m_ListenerList.end(), it->GetPointer());
+    if (foundPosition != m_ListenerList.end())
+    {
+      m_ListenerList.erase( foundPosition );
+    }
+  }
+ 
+  m_ListenersFlaggedForRemoval.clear();
 }
 
 void mitk::GlobalInteraction::AddInteractor(mitk::Interactor* interactor)
@@ -139,11 +161,16 @@ bool mitk::GlobalInteraction::RemoveInteractor(mitk::Interactor* interactor)
 
 void mitk::GlobalInteraction::InformListeners(mitk::StateEvent const* stateEvent)
 {
+  m_CurrentlyInInformListenersLoop = true;
+
   for (StateMachineListIter it = m_ListenerList.begin(); it != m_ListenerList.end(); it++)
   {
     if((*it).IsNotNull())
       (*it)->HandleEvent(stateEvent);
   }
+
+  m_CurrentlyInInformListenersLoop = false;
+  RemoveFlaggedListeners();
 }
 
 bool mitk::GlobalInteraction::AskSelected(mitk::StateEvent const* stateEvent)

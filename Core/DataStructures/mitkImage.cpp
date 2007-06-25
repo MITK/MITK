@@ -41,11 +41,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Image::Image() : 
   m_Dimension(0), m_Dimensions(NULL), m_OffsetTable(NULL),
-  m_CompleteData(NULL), m_PixelType(NULL), m_Initialized(false),
+  m_CompleteData(NULL), m_PixelType(NULL),
   m_TimeSelectorForExtremaObject(NULL),
   m_CountOfMinValuedVoxels(0), m_CountOfMaxValuedVoxels(0), 
   m_ScalarMin(0), m_ScalarMax(0), m_Scalar2ndMin(0), m_Scalar2ndMax(0)
 {
+  m_Initialized = false;
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
   generator->SetImage(this);
@@ -949,12 +950,6 @@ bool mitk::Image::IsValidChannel(int n) const
     return false;
 }
 
-//##ModelId=3E19EA110396
-bool mitk::Image::IsInitialized() const
-{
-  return m_Initialized;
-}
-
 //##ModelId=3E155E7A0374
 void mitk::Image::ComputeOffsetTable()
 {
@@ -1084,15 +1079,9 @@ unsigned int* mitk::Image::GetDimensions() const
 
 void mitk::Image::Clear()
 {
-  if(m_Initialized)
-  {
-    m_Initialized = false;
-
-    delete [] m_Dimensions;
-    m_Dimensions = NULL;
-    
-    ReleaseData();
-  }
+  Superclass::Clear();
+  delete [] m_Dimensions;
+  m_Dimensions = NULL;
 }
 
 void mitk::Image::ReleaseData()

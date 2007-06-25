@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSet::PointSet()
 {
+  m_Initialized = false;
   m_PointSetSeries.resize( 1 );
 
   m_PointSetSeries[0] = DataType::New();
@@ -80,8 +81,14 @@ void mitk::PointSet::Initialize( int timeSteps )
   // if EvenlyTimed is true...
   //
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+
+  m_Initialized = true;
 }
 
+bool mitk::PointSet::IsEmpty(int t) const
+{
+  return IsInitialized() && (GetSize(t) <= 0);
+}
 
 void mitk::PointSet::AdaptPointSetSeriesSize( int timeSteps )
 {

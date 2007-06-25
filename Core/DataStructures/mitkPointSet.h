@@ -199,6 +199,8 @@ public:
    */
   int SearchPoint( Point3D point, float distance, int t = 0 );
 
+  virtual bool IsEmpty(int t) const;
+
   //virtual methods, that need to be implemented
   virtual void UpdateOutputInformation();
   virtual void SetRequestedRegionToLargestPossibleRegion();

@@ -32,7 +32,6 @@ namespace mitk {
 
 class BaseProcess;
 
-//##ModelId=3D6A0D7D00EC
 //##Documentation
 //## @brief Base of all data objects
 //##
@@ -78,7 +77,6 @@ public:
   //## calling UpdateOutputInformation).
   const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
 
-  //##ModelId=3DCBE2BA0139
   //##Documentation
   //## @brief Return the Geometry3D of the data at time \a t.
   //## 
@@ -106,18 +104,15 @@ public:
     return m_TimeSlicedGeometry->GetGeometry3D(t);
   }
 
-  //##ModelId=3E8600DB0188
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   virtual void UnRegister() const;
 
-  //##ModelId=3E8600DB02DC
   //##Documentation
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
   virtual int GetExternalReferenceCount() const;
 
-  //##ModelId=3EDD06DC017A
   //##Documentation 
   //## @brief Update the information for this BaseData (the geometry in particular) 
   //## so that it can be used as an output of a BaseProcess. 
@@ -135,7 +130,6 @@ public:
   //## \em after calling its source's BaseProcess::UpdateOutputInformation().
   void UpdateOutputInformation();
 
-  //##ModelId=3EDD06DC035E
   //##Documentation 
   //## @brief Set the RequestedRegion to the LargestPossibleRegion.
   //## 
@@ -143,7 +137,6 @@ public:
   //## (i.e. not streaming) on the next call to Update(). 
   void SetRequestedRegionToLargestPossibleRegion()=0;
 
-  //##ModelId=3EDD06DD017A
   //##Documentation 
   //## @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
   //## 
@@ -157,7 +150,6 @@ public:
   //## to re-execute 
   bool RequestedRegionIsOutsideOfTheBufferedRegion()=0;
 
-  //##ModelId=3EDD09370191
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
   //## 
@@ -171,7 +163,6 @@ public:
   //## not within the LargestPossibleRegion. 
   virtual bool VerifyRequestedRegion() = 0;
 
-  //##ModelId=3EDD06DE0274
   //##Documentation 
   //## @brief Copy information from the specified data set.
   //## 
@@ -185,7 +176,38 @@ public:
   //## version. 
   void CopyInformation(const itk::DataObject*) {};
 
-  //##ModelId=3EDD06DF017A
+  //##Documentation
+  //## @brief Check whether the data has been initialized, i.e., 
+  //## at least the Geometry and other header data has been set
+  //##
+  //## \warning Set to \a true by default for compatibility reasons.
+  //## Set m_Initialized=false in constructors of sub-classes that
+  //## support distinction between initialized and uninitialized state.
+  virtual bool IsInitialized() const;
+
+  //##Documentation
+  //## @brief reset to non-initialized state, release memory
+  virtual void Clear();
+
+  //##Documentation
+  //## @brief Check whether object contains data (at
+  //## a specified time), e.g., a set of points may be empty
+  //##
+  //## \warning Returns IsInitialized()==false by default for 
+  //## compatibility reasons. Override in sub-classes that
+  //## support distinction between empty/non-empty state.
+  virtual bool IsEmpty(int t) const;
+
+  //##Documentation
+  //## @brief Check whether object contains data (at
+  //## least at one point in time), e.g., a set of points 
+  //## may be empty
+  //##
+  //## \warning Returns IsInitialized()==false by default for 
+  //## compatibility reasons. Override in sub-classes that
+  //## support distinction between empty/non-empty state.
+  virtual bool IsEmpty() const;
+
   //##Documentation
   //## @brief Set the requested region from this data object to match the requested
   //## region of the data object passed in as a parameter.
@@ -226,7 +248,6 @@ public:
   //## @sa m_PropertyList
   void SetPropertyList(PropertyList* propertyList);
   
-  //##ModelId=3EF189DB0111
   //##Documentation
   //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
   //## @sa GetPropertyList
@@ -266,9 +287,7 @@ public:
   static const std::string XML_NODE_NAME;
 
 protected:
-  //##ModelId=3E3FE04202B9
   BaseData();
-  //##ModelId=3E3FE042031D
   ~BaseData();
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
@@ -278,11 +297,8 @@ protected:
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 #endif
 
-  //##ModelId=3E8600D9006D
   mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;
-  //##ModelId=3E8600D9021B
   mutable unsigned int m_SourceOutputIndexDuplicate;
-  //##ModelId=3E8600DC0053
   //##Documentation
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
@@ -291,16 +307,15 @@ protected:
   //## XML
   virtual const std::string& GetXMLNodeName() const;
 
+  bool m_Initialized;
+
 private:
-  //##ModelId=3E8600D90384
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   mutable bool m_Unregistering;
-  //##ModelId=3E8600DA0118
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   mutable bool m_CalculatingExternalReferenceCount;
-  //##ModelId=3E8600DA02B3
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   mutable int m_ExternalReferenceCount;
@@ -310,7 +325,6 @@ private:
   //##
   PropertyList::Pointer m_PropertyList;  
 
-  //##ModelId=3E15551A03CE
   TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
   //##Documentation

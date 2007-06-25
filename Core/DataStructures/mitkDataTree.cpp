@@ -105,7 +105,11 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
   while (!_it->IsAtEnd())
   {
     DataTreeNode::Pointer node = _it->Get();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+       (node->GetData()->IsEmpty()==false) && 
+       node->IsOn(boolPropertyKey, renderer) && 
+       node->IsOn(boolPropertyKey2, renderer)
+      )
     {
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
@@ -211,7 +215,11 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   while (!_it->IsAtEnd())
   {
     mitk::DataTreeNode::Pointer node = _it->Get();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer))
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+       (node->GetData()->IsEmpty()==false) && 
+       node->IsOn(boolPropertyKey, renderer) && 
+       node->IsOn(boolPropertyKey2, renderer)
+      )
     {
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
@@ -260,7 +268,11 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
   while (!_it->IsAtEnd())
   {
     mitk::DataTreeNode::Pointer node = _it->Get();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && node->IsOn(boolPropertyKey, renderer) && node->IsOn(boolPropertyKey2, renderer) && node->IsOn(boolPropertyKey2, renderer))
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+       (node->GetData()->IsEmpty()==false) && 
+       node->IsOn(boolPropertyKey, renderer) && 
+       node->IsOn(boolPropertyKey2, renderer)
+      )
     {
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 

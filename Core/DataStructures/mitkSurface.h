@@ -67,6 +67,8 @@ public:
 
   virtual void CopyInformation(const itk::DataObject *data);
   
+  virtual bool IsEmpty(int t) const;
+
   virtual void Update();
   
   virtual void Resize( unsigned int timeSteps = 1 );

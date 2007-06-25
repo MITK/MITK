@@ -419,17 +419,11 @@ public:
   virtual bool IsValidChannel(int n = 0) const;
 
   //##Documentation
-  //## @brief Check whether the image has been initialize, i.e., at least the header has to be set
-  virtual bool IsInitialized() const;
-
-  //##Documentation
   //## @brief Get the sizes of all dimensions as an integer-array.
   //##
   //## @sa GetDimension(int i);
   unsigned int* GetDimensions() const;
 
-  //##Documentation
-  //## @brief reset image to non-initialized state, release memory
   virtual void Clear();
 
   virtual void ReleaseData();
@@ -549,8 +543,6 @@ protected:
   size_t *m_OffsetTable;
   ImageDataItemPointer m_CompleteData;
   PixelType m_PixelType;
-
-  bool m_Initialized;
 
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
 

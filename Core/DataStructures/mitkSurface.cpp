@@ -67,6 +67,22 @@ void mitk::Surface::Initialize(unsigned int timeSteps)
   // if EvenlyTimed is true...
   //
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+  m_Initialized = true;
+}
+
+bool mitk::Surface::IsEmpty(int t) const
+{
+  if(!IsInitialized())
+    return false;
+  vtkPolyData* polydata = const_cast<Surface*>(this)->GetVtkPolyData(t);
+  return 
+    (polydata == NULL) || 
+    (
+      (polydata->GetNumberOfVerts()  <= 0) &&
+      (polydata->GetNumberOfPolys()  <= 0) &&
+      (polydata->GetNumberOfStrips() <= 0) &&
+      (polydata->GetNumberOfLines()  <= 0)
+    );
 }
 
 vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
@@ -93,6 +109,7 @@ vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
 //##ModelId=3E70F66100C4
 mitk::Surface::Surface() : m_CalculateBoundingBox( false )
 {
+  m_Initialized = false;
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.resize( 1, pdnull );
   Initialize(1);

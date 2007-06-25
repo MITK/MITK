@@ -31,7 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::BaseData::XML_NODE_NAME = "data";
 
 //##ModelId=3E3FE04202B9
-mitk::BaseData::BaseData() : m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL), m_SourceOutputIndexDuplicate(0), m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
+mitk::BaseData::BaseData() : 
+  m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL), 
+  m_SourceOutputIndexDuplicate(0), m_Initialized(true), 
+  m_Unregistering(false), m_CalculatingExternalReferenceCount(false), 
+  m_ExternalReferenceCount(-1)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
   m_PropertyList = PropertyList::New(); 
@@ -104,6 +108,27 @@ void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 {
   SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
+}
+
+bool mitk::BaseData::IsEmpty(int t) const
+{
+  return IsInitialized() == false;
+}
+
+bool mitk::BaseData::IsEmpty() const
+{
+  if(IsInitialized() == false)
+    return true;
+  const TimeSlicedGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeSlicedGeometry();
+  if(timeGeometry == NULL)
+    return true;
+  unsigned int timeSteps = timeGeometry->GetTimeSteps();
+  for ( unsigned int t = 0 ; t < timeSteps ; ++t )
+  {
+    if(IsEmpty(t) == false)
+      return false;
+  }
+  return true;
 }
 
 itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource() const
@@ -230,6 +255,21 @@ unsigned long mitk::BaseData::GetMTime() const
     //}
   }
   return time;
+}
+
+bool mitk::BaseData::IsInitialized() const
+{
+  return m_Initialized;
+}
+
+void mitk::BaseData::Clear()
+{
+  if(m_Initialized)
+  {
+    m_Initialized = false;
+
+    ReleaseData();
+  }
 }
 
 void mitk::BaseData::ExecuteOperation(mitk::Operation* /*operation*/)

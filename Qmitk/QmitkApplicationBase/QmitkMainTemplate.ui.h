@@ -736,10 +736,31 @@ void QmitkMainTemplate::Initialize()
     // show/hide plane widgets when the corresponding buttons/menu items are checked
     connect(toolbarShowPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
     connect(viewShowPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesVisibility(bool)));
-
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), toolbarShowPlanes, SLOT(setOn(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), viewShowPlanesAction, SLOT(setOn(bool)));
-  }
+
+    // lock/unlock plane widgets when the corresponding buttons/menu items are checked... 
+    connect(toolbarLockPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
+    connect(viewLockPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesLockedChanged(bool)), toolbarLockPlanes, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesLockedChanged(bool)), viewLockPlanesAction, SLOT(setOn(bool)));
+
+    // lock/unlock rotations of plane widgets when the corresponding buttons/menu items are checked...  (menu only)
+    connect(viewLockSliceRotationAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesRotationLocked(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLockedChanged(bool)), viewLockSliceRotationAction, SLOT(setOn(bool)));
+
+    // linking of slices during rotation
+    connect(viewLinkSliceRotationAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesRotationLinked(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLinked(bool)), viewLinkSliceRotationAction, SLOT(setOn(bool)));
+
+    
+    // enabling/disabling of slices rotation in general
+    connect(viewSlicesRotationAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesRotationEnabled(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewSlicesRotationAction, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewLockSliceRotationAction, SLOT(setEnabled(bool)));
+
+   }
 
   InitializeFunctionality();
 
@@ -979,14 +1000,6 @@ void QmitkMainTemplate::editRedo()
     redoButton->doUndoRedoLast(1);
 }
 
-void QmitkMainTemplate::viewSlicesRotation(bool on)
-{
-  m_MultiWidget->EnableSliceRotation(on);
-  // enable posibilty to lock rotation in a desired position
-  viewLockSliceRotationAction->setEnabled ( on );
-  viewLinkSlices->setEnabled ( on );
-}
-
 void QmitkMainTemplate::viewReinitMultiWidget()
 {
   mitk::DataTreePreOrderIterator it(m_Tree);
@@ -1189,47 +1202,6 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
   }
 }
 
-void QmitkMainTemplate::viewPlaneSliceRotationLocked_toggled( bool on)
-{ 
-    
-  m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(on);
-  m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(on);
-  m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(on);
-}
-
-
-void QmitkMainTemplate::viewPlanesLocked_toggled( bool on)
-{
-  if( on)
-  {
-    // enable the slice rotion locking in view menu
-    if( viewSlicesRotationAction->isOn() )
-    {
-      // add possiblity to lock slice rotation separatly
-      viewLockSliceRotationAction->setEnabled ( on );
-    }
-  }
-  else
-  {
-    //unset slice roation
-    viewLockSliceRotationAction->setOn( on );
-    viewLockSliceRotationAction->setEnabled ( on );
-  }  
-
-  // sign significant places in menu->view and the toolbar
-  viewLockPlanesAction->setOn( on );
-  toolbarPlanesLocked->setOn( on );
-
-  
-  //do your job and lock or unlock slices.
-  m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(on);
-  m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(on);
-  m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(on);
-
-  viewLockSliceRotationAction->setOn(on);
-}
-
-
 void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
 {
   if( on )
@@ -1262,14 +1234,6 @@ void QmitkMainTemplate::toolbarPositionOrientation_toggled( bool on )
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
-
-
-void QmitkMainTemplate::viewLinkSlices_toggled( bool link )
-{
-  m_MultiWidget->GetSlicesRotator()->SetLinkPlanes( link );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
 
 void QmitkMainTemplate::changeToRowWidgetSmall3nBig4Layout()
 {

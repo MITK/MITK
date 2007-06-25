@@ -1162,17 +1162,39 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
   SetWidgetPlaneVisibility("widget3Plane", visible);
 
   emit WidgetPlanesVisibilityChanged(visible);
-
-  if (visible)
-  {
-    EnableNavigationControllerEventListening();
-  }
-  else
-  {
-    DisableNavigationControllerEventListening();
-  }
 }
 
+void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
+{
+  //do your job and lock or unlock slices.
+  GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(locked);
+  GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(locked);
+  GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(locked);
+  
+  emit WidgetPlanesLockedChanged(locked);
+}
+
+void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
+{
+  //do your job and lock or unlock slices.
+  GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
+  GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
+  GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
+
+  emit WidgetPlanesRotationLockedChanged(locked);
+}
+
+void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
+{
+  m_SlicesRotator->SetLinkPlanes( link );
+  emit WidgetPlanesRotationLinked( link );
+}
+
+void QmitkStdMultiWidget::SetWidgetPlanesRotationEnabled( bool on )
+{
+  EnableSliceRotation( on );
+  emit WidgetPlanesRotationEnabled(on);
+}
 
 
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
@@ -1182,3 +1204,4 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
   m_GradientBackground3->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
   m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
 }
+

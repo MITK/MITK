@@ -186,6 +186,10 @@
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
     <signal>WidgetPlanesVisibilityChanged(bool)</signal>
+    <signal>WidgetPlanesLockedChanged(bool)</signal>
+    <signal>WidgetPlanesRotationLockedChanged(bool)</signal>
+    <signal>WidgetPlanesRotationLinked(bool)</signal>
+    <signal>WidgetPlanesRotationEnabled(bool)</signal>
 </signals>
 <slots>
     <slot>changeLayoutTo2DImagesUp()</slot>
@@ -219,6 +223,10 @@
     <slot>changeLayoutToSmallUpperWidget2Big3and4()</slot>
     <slot>SetWidgetPlaneVisibility( const char* name, bool visible )</slot>
     <slot>SetWidgetPlanesVisibility( bool visible )</slot>
+    <slot>SetWidgetPlanesLocked( bool locked )</slot>
+    <slot>SetWidgetPlanesRotationLocked( bool locked )</slot>
+    <slot>SetWidgetPlanesRotationLinked( bool link )</slot>
+    <slot>SetWidgetPlanesRotationEnabled( bool on )</slot>
     <slot>SetGradientBackgroundColors(const mitk::Color&amp; upper, const mitk::Color&amp; lower)</slot>
 </slots>
 <functions>

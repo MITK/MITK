@@ -51,7 +51,7 @@
         <action name="viewLockSliceRotationAction"/>
         <separator/>
         <action name="viewSlicesRotationAction"/>
-        <action name="viewLinkSlices"/>
+        <action name="viewLinkSliceRotationAction"/>
     </item>
     <item text="&amp;Options" name="Options">
         <action name="HideToolbarAction"/>
@@ -89,7 +89,7 @@
         </widget>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
-        <action name="toolbarPlanesLocked"/>
+        <action name="toolbarLockPlanes"/>
         <action name="toolbarPositionOrientation"/>
         <separator/>
         <action name="layoutGroup"/>
@@ -419,7 +419,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>toolbarPlanesLocked</cstring>
+            <cstring>toolbarLockPlanes</cstring>
         </property>
         <property name="toggleAction">
             <bool>true</bool>
@@ -675,7 +675,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>viewLinkSlices</cstring>
+            <cstring>viewLinkSliceRotationAction</cstring>
         </property>
         <property name="toggleAction">
             <bool>true</bool>
@@ -895,12 +895,6 @@
         <slot>editRedo()</slot>
     </connection>
     <connection>
-        <sender>viewSlicesRotationAction</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>viewSlicesRotation(bool)</slot>
-    </connection>
-    <connection>
         <sender>viewReinitMultiWidgetAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -919,18 +913,6 @@
         <slot>optionsShow_OptionsAction_activated()</slot>
     </connection>
     <connection>
-        <sender>viewLockPlanesAction</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>viewPlanesLocked_toggled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>viewLockSliceRotationAction</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>viewPlaneSliceRotationLocked_toggled(bool)</slot>
-    </connection>
-    <connection>
         <sender>viewShowPlanesAction</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -943,7 +925,7 @@
         <slot>viewShowPlanesAction_toggled(bool)</slot>
     </connection>
     <connection>
-        <sender>toolbarPlanesLocked</sender>
+        <sender>toolbarLockPlanes</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>viewPlanesLocked_toggled(bool)</slot>
@@ -953,12 +935,6 @@
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>toolbarPositionOrientation_toggled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>viewLinkSlices</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>viewLinkSlices_toggled(bool)</slot>
     </connection>
     <connection>
         <sender>RowWidgetSmall3nBig4</sender>
@@ -1066,15 +1042,11 @@
     <slot>optionsSystem_InformationAction_activated()</slot>
     <slot>editUndo()</slot>
     <slot>editRedo()</slot>
-    <slot>viewSlicesRotation( bool on )</slot>
     <slot>viewReinitMultiWidget()</slot>
     <slot>helpContents()</slot>
     <slot>optionsShow_OptionsAction_activated()</slot>
-    <slot>viewPlaneSliceRotationLocked_toggled( bool on )</slot>
-    <slot>viewPlanesLocked_toggled( bool on )</slot>
     <slot>viewShowPlanesAction_toggled( bool on )</slot>
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
-    <slot>viewLinkSlices_toggled( bool link )</slot>
     <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
     <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
     <slot>fileOpenRawImage()</slot>

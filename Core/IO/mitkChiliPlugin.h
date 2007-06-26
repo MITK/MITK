@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPluginEvents.h"
 #include <mitkDataTreeNode.h>
 
+#include <mitkDataTree.h>
+
 #define CHILI_VERSION 36
 
 class QcPlugin;
@@ -118,12 +120,30 @@ class ChiliPlugin : public itk::Object
       std::string Comment;
     };
 
+    /** This struct contain all possible informations about the TextFile (all other then PIC-Files). */
+    struct TextFileInformation
+    {
+      std::string OID;
+      std::string MimeType;
+      std::string ChiliText;
+      std::string Status;
+      std::string FrameOfReferenceUID;
+      std::string TextDate;
+      std::string Description;
+    };
+    /** there can be lots of series to one study, so we need a list */
+    typedef std::list<TextFileInformation> TextFileList;
+
     /** return the StudyInformation of the current selected study */
     virtual StudyInformation GetCurrentSelectedStudy();
     /** return the list of the series to the current selected study */
     virtual SeriesList GetCurrentSelectedSeries();
     /** return the PatientInformation of the current selected study */
     virtual PatientInformation GetCurrentSelectedPatient();
+    /** return a list of all TextFiles
+    * - of the current selected series (if the user specify no series_OID)
+      - of a specified series (if the user set the parameter) */
+    virtual TextFileList GetTextFileInformation( std::string seriesOID = "" );
 
     /** return the number of Lightboxes in chili */
     virtual unsigned int GetLightBoxCount();
@@ -146,14 +166,17 @@ class ChiliPlugin : public itk::Object
     itkNewMacro( ChiliPlugin );
     virtual ~ChiliPlugin();
 
-    /** with this function you can save a file to the chilidatabase
+    /** With this function you can save a file to the chilidatabase.
     * If you want to save the file to the current selected study and series, then set the datatreenode only.
     * If you want to save the file to a specific study and series, then you have to set all parameter. */
     virtual void UploadViaFile( DataTreeNode*, std::string studyInstanceUID = "", std::string patientOID = "", std::string studyOID = "", std::string seriesOID = "" );
 
+    /** with this function you can load a file from the chilidatabase
+    * For the chiliText and MimeType use GetTextFileInformation(). */
+    virtual void DownloadViaFile( std::string chiliText, std::string MimeType, DataTreeIteratorBase* parentIterator );
+
     //UnderConstruction
     virtual void UploadViaBuffer( DataTreeNode* );
-    virtual DataTreeNode* DownloadViaFile();
     virtual DataTreeNode* DownloadViaBuffer();
 
   protected:

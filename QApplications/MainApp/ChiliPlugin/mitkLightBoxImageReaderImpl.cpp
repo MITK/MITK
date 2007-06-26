@@ -18,7 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLightBoxImageReaderImpl.h"
 
+#include "QmitkLightBoxReaderDialog.h"
+
 #include "mitkChiliPluginImpl.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkFrameOfReferenceUIDManager.h"
+#include "mitkProperties.h"
+
+#include <itkImageFileReader.h>
+
+#include <qapplication.h>
 
 #include <chili/qclightbox.h>
 #include <chili/qclightboxmanager.h>
@@ -27,12 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPic.h>
 #include <ipPic/ipPicTags.h>
 #include <ipFunc/ipFunc.h>
-
-#include "mitkPlaneGeometry.h"
-#include "mitkFrameOfReferenceUIDManager.h"
-#include <itkImageFileReader.h>
-
-#include "mitkProperties.h"
 
 #include <list>
 
@@ -273,7 +276,6 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     }
   }
   itkDebugMacro( <<"initialize output" );
-  output->Initialize( header );
 
   //build geometry
   interSliceGeometry_t *interSliceGeometry;
@@ -290,7 +292,12 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     itkDebugMacro( <<"spacing: "<<spacing );
 
     PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+
+    abortLoadingTheLightbox = false;
     spacing = GetSpacingFromLB( m_ImageNumbers );
+    if( abortLoadingTheLightbox ) return;
+
+    output->Initialize( header );
 
     itkDebugMacro( <<"get spacing: "<<spacing );
     planegeometry->InitializeStandardPlane( output->GetDimension(0), output->GetDimension(1), rightVector, downVector, &spacing );
@@ -362,6 +369,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   }
   else
   {
+    output->Initialize( header );
     itkWarningMacro( <<"interSliceGeometry is NULL" );
     itkDebugMacro( <<"spacing from pic: "<<output->GetSlicedGeometry()->GetSpacing() );
   }
@@ -372,6 +380,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
 void mitk::LightBoxImageReaderImpl::GenerateData()
 {
+  if( abortLoadingTheLightbox ) return;  //userabort
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
@@ -524,15 +533,21 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
   compare_Vector cV;
   spacingList.sort( cV );
 
-  //test if there are only one spacing
+  //copy the spacinglist and delete twice entries
   std::list<Vector3D> tempSpacingList = spacingList;
   tempSpacingList.unique();
+
+  //no spacing found -> return defaultspacing
+  if( tempSpacingList.size() == 0 ) return spacing;
+  //one spacing found -> return it as result
+  if( tempSpacingList.size() == 1 ) return tempSpacingList.front();
+  //found different spacings -> count them and let the user decide
+  //create a diolog for the user
+  QmitkLightBoxReaderDialog myDialog( 0 );
   if( tempSpacingList.size() > 1 )
   {
-    //find the most frequent spacing
-    std::cout << "WARNING: Found different spacings." << std::endl;
-    int currentCount = 0, maxCount = 0;
-    Vector3D currentSpacing = spacingList.front(), maxSpacing;
+    int currentCount = 0;
+    Vector3D currentSpacing = spacingList.front();
     while( !spacingList.empty() )
     {
       if( currentSpacing == spacingList.front() )
@@ -542,31 +557,28 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
       }
       else
       {
-        if( currentCount > maxCount )
-        {
-          maxCount = currentCount;
-          maxSpacing = currentSpacing;
-        }
-        std::cout << "spacing: " << currentSpacing << ", count: " << currentCount << std::endl;
+        //add the found spacing to the dialog
+        myDialog.addSpacings( currentSpacing, currentCount );
         currentCount = 1;
         currentSpacing = spacingList.front();
         spacingList.pop_front();
       }
     }
-    //check the last counted spacing
-    if( currentCount > maxCount )
-    {
-      maxCount = currentCount;
-      maxSpacing = currentSpacing;
-    }
-    std::cout << "spacing: " << currentSpacing << ", count: " << currentCount << std::endl;
-    std::cout << "use: " << maxSpacing << std::endl;
-    return maxSpacing;
+    //add the last counted spacing
+    myDialog.addSpacings( currentSpacing, currentCount );
   }
-  else
-  if( tempSpacingList.size() == 0 ) return spacing;
-  else return tempSpacingList.front();
+  int dialogReturnValue = myDialog.exec();
+  qApp->processEvents();
+
+  if ( dialogReturnValue == QDialog::Rejected )
+  {
+    //we have to abort the whole loadprocess
+    abortLoadingTheLightbox = true;
+    return spacing;
+  }
+  return myDialog.GetSpacing();
 }
+
 bool mitk::LightBoxImageReaderImpl::ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 )
 {
   if( Equal( elem1.origin, elem2.origin ) )
@@ -841,4 +853,9 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
   else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "empty Name!" ) );
 
   return resultPropertyList;
+}
+
+bool mitk::LightBoxImageReaderImpl::userAbort()
+{
+  return abortLoadingTheLightbox;
 }

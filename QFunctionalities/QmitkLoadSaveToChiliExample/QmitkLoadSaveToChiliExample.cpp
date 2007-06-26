@@ -215,7 +215,16 @@ void QmitkLoadSaveToChiliExample::FileDownload()
 {
   if( mitk::ChiliPlugin::GetInstance()->GetChiliVersion() >= 38 )
   {
-    mitk::ChiliPlugin::GetInstance()->DownloadViaFile();
+    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    mitk::ChiliPlugin::TextFileList tempTextList = mitk::ChiliPlugin::GetInstance()->GetTextFileInformation();
+    for( mitk::ChiliPlugin::TextFileList::iterator iter = tempTextList.begin(); iter != tempTextList.end(); iter++ )
+    {
+      mitk::ChiliPlugin::GetInstance()->DownloadViaFile( iter->ChiliText, iter->MimeType, m_DataTreeIterator.GetPointer() );
+    }
+    m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+    m_MultiWidget->Fit();
+    m_MultiWidget->ReInitializeStandardViews();
+    QApplication::restoreOverrideCursor();
   }
   else QMessageBox::information( 0, "LoadSaveToChiliExample", "Your current Chili version does not support this function." );
 }
@@ -235,8 +244,8 @@ void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
   //clear the listview
   m_Controls->ListView->clear();
   //get the current serieslist and iterate
-  mitk::ChiliPlugin::SeriesList temp = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries();
-  for( mitk::ChiliPlugin::SeriesList::iterator iter = temp.begin(); iter != temp.end(); iter++)
+  mitk::ChiliPlugin::SeriesList tempSeriesList = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries();
+  for( mitk::ChiliPlugin::SeriesList::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++)
   {
     //if there are no description show "no description" else show the saved one
     if( iter->Description == "" )

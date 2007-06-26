@@ -57,6 +57,12 @@ namespace mitk {
       */
       virtual const mitk::PropertyList::Pointer GetImageTagsAsPropertyList();
 
+      /**
+      Its possible that the user abort while Loading from Lightbox (GetSpacingFromLB).
+      To show no wrong ErrorMessage, you can use this function.
+      */
+      virtual bool userAbort();
+
       /** Get the lightbox to read from. */
       virtual QcLightbox* GetLightBox() const;
 

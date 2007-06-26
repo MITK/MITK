@@ -62,6 +62,10 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     #if ( CHILI_VERSION >= 38 )
     /** return the PatientInformation of the current selected study */
     virtual PatientInformation GetCurrentSelectedPatient();
+    /** return a list of all TextFiles
+    * - of the current selected series (if the user specify no series_OID)
+      - of a specified series (if the user set the parameter) */
+    virtual TextFileList GetTextFileInformation( std::string seriesOID = "" );
     #endif
 
     virtual unsigned int GetLightBoxCount();
@@ -87,16 +91,16 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     * If you want to save the file to a specific study and series, then you have to set all parameter. */
     virtual void UploadViaFile( DataTreeNode* node, std::string studyInstanceUID = "", std::string patientOID = "", std::string studyOID = "", std::string seriesOID = "" );
 
+    /** with this function you can load a file from the chilidatabase
+    * For the chiliText and MimeType use GetTextFileInformation(). */
+    virtual void DownloadViaFile( std::string chiliText, std::string MimeType, DataTreeIteratorBase* parentIterator );
+
     //UnderConstruction
     virtual void UploadViaBuffer( DataTreeNode* );
-    virtual DataTreeNode* DownloadViaFile();
     virtual DataTreeNode* DownloadViaBuffer();
     #endif
 
   public slots:
-
-    // image selection methods
-    //void selectSerie( QcLightbox* );
 
     /** called when a lightbox import button is clicked */
     void lightBoxImportButtonClicked(int row);
@@ -123,6 +127,9 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
 
     static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
     static ipBool_t GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data );
+    #if ( CHILI_VERSION >= 38 )
+    static ipBool_t GlobalIterateTextCallback( int rows, int row, text_t *text, void *user_data );
+    #endif
 
     /** teleconference methods */
     virtual void connectPartner();
@@ -133,6 +140,8 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     bool m_currentStudyChanged;
     /** a list of all series to the current selected Study */
     SeriesList m_CurrentSeries;
+    /** a list of all TextFiles from a series */
+    TextFileList m_TextFileList;
     /** the count of the shown Lightboxes in chili */
     unsigned int m_LightBoxCount;
     #else

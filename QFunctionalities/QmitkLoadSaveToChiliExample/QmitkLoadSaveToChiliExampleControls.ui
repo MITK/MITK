@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>251</width>
+            <width>328</width>
             <height>755</height>
         </rect>
     </property>
@@ -21,292 +21,254 @@
     <property name="caption">
         <string>QmitkLoadSaveToChiliExample</string>
     </property>
-    <widget class="QGroupBox">
+    <vbox>
         <property name="name">
-            <cstring>currentInformation</cstring>
+            <cstring>unnamed</cstring>
         </property>
-        <property name="geometry">
-            <rect>
-                <x>11</x>
-                <y>11</y>
-                <width>229</width>
-                <height>220</height>
-            </rect>
-        </property>
-        <property name="font">
-            <font>
-                <bold>1</bold>
-            </font>
-        </property>
-        <property name="title">
-            <string>Output</string>
-        </property>
-        <vbox>
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>unnamed</cstring>
+                <cstring>currentInformation</cstring>
             </property>
-            <widget class="QLabel">
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Chili-DB</string>
+            </property>
+            <vbox>
                 <property name="name">
-                    <cstring>textLabel1</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                        <underline>1</underline>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>current StudyDescription:</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string></string>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>StudyDescription</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-                <property name="text">
-                    <string></string>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>textLabel2</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                        <underline>1</underline>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>current SeriesDescription:</string>
-                </property>
-            </widget>
-            <widget class="QListView">
-                <column>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel1</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Current study</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string></string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>StudyDescription</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                            <italic>1</italic>
+                        </font>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
-                    <property name="clickable">
-                        <bool>false</bool>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel2</cstring>
                     </property>
-                    <property name="resizable">
-                        <bool>false</bool>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
-                </column>
-                <property name="name">
-                    <cstring>ListView</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-                <property name="rootIsDecorated">
-                    <bool>true</bool>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Its an example to show information about the studies or series</string>
-                </property>
-            </widget>
-        </vbox>
-    </widget>
-    <widget class="QGroupBox">
-        <property name="name">
-            <cstring>groupBox10</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>11</x>
-                <y>237</y>
-                <width>229</width>
-                <height>219</height>
-            </rect>
-        </property>
-        <property name="font">
-            <font>
-                <bold>1</bold>
-            </font>
-        </property>
-        <property name="title">
-            <string>Input</string>
-        </property>
-        <vbox>
+                    <property name="text">
+                        <string>Available series</string>
+                    </property>
+                </widget>
+                <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="clickable">
+                            <bool>false</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>false</bool>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>ListView</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                            <italic>1</italic>
+                        </font>
+                    </property>
+                    <property name="rootIsDecorated">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Its an example to show information about the studies or series</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>unnamed</cstring>
+                <cstring>groupBox10</cstring>
             </property>
-            <widget class="QLabel">
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>MITK data</string>
+            </property>
+            <grid>
                 <property name="name">
-                    <cstring>textLabel3</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                        <underline>1</underline>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>TreeNodeSelector:</string>
-                </property>
-            </widget>
-            <widget class="QmitkTreeNodeSelector">
-                <property name="name">
-                    <cstring>m_TreeNodeSelector</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>textLabel4</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                        <underline>1</underline>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>Description of current
-Selected TreeNode:</string>
-                </property>
-            </widget>
-            <widget class="QLineEdit">
-                <property name="name">
-                    <cstring>DescriptionInput</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>SetDescription</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>Se&amp;t current SeriesDescription</string>
-                </property>
-                <property name="accel">
-                    <string>Alt+T</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>SaveToLightBox</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>&amp;Save To LightBox</string>
-                </property>
-                <property name="accel">
-                    <string>Alt+S</string>
-                </property>
-                <property name="toolTip" stdset="0">
-                    <string>Save the current selected TreeNode to a new Lightbox</string>
-                </property>
-            </widget>
-            <widget class="QPushButton">
-                <property name="name">
-                    <cstring>LoadFromLightBox</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <bold>0</bold>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>Load &amp;From LightBox</string>
-                </property>
-                <property name="accel">
-                    <string>Alt+F</string>
-                </property>
-            </widget>
-        </vbox>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>FileUpload</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>11</x>
-                <y>462</y>
-                <width>229</width>
-                <height>25</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>FileUplo&amp;ad</string>
-        </property>
-        <property name="accel">
-            <string>Alt+A</string>
-        </property>
-    </widget>
-    <widget class="QPushButton">
-        <property name="name">
-            <cstring>FileDownload</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>11</x>
-                <y>493</y>
-                <width>229</width>
-                <height>25</height>
-            </rect>
-        </property>
-        <property name="text">
-            <string>File&amp;Download</string>
-        </property>
-        <property name="accel">
-            <string>Alt+D</string>
-        </property>
-    </widget>
-    <spacer>
-        <property name="name">
-            <cstring>spacer2</cstring>
-        </property>
-        <property name="orientation">
-            <enum>Vertical</enum>
-        </property>
-        <property name="sizeType">
-            <enum>Expanding</enum>
-        </property>
-        <property name="sizeHint">
-            <size>
-                <width>20</width>
-                <height>130</height>
-            </size>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>115</x>
-                <y>524</y>
-                <width>20</width>
-                <height>220</height>
-            </rect>
-        </property>
-    </spacer>
+                <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Image</string>
+                    </property>
+                </widget>
+                <widget class="QmitkTreeNodeSelector" row="1" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>m_TreeNodeSelector</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>textLabel4</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Image description</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="3" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>DescriptionInput</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="4" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>SetDescription</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Change image description</string>
+                    </property>
+                    <property name="accel">
+                        <string></string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="5" column="1">
+                    <property name="name">
+                        <cstring>SaveToLightBox</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Save To LightBox</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+S</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Save the current selected TreeNode to a new Lightbox</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="5" column="0">
+                    <property name="name">
+                        <cstring>LoadFromLightBox</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Load &amp;From LightBox</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+F</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>FileUpload</cstring>
+            </property>
+            <property name="text">
+                <string>FileUplo&amp;ad</string>
+            </property>
+            <property name="accel">
+                <string>Alt+A</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>FileDownload</cstring>
+            </property>
+            <property name="text">
+                <string>File&amp;Download</string>
+            </property>
+            <property name="accel">
+                <string>Alt+D</string>
+            </property>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>50</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
 </widget>
 <customwidgets>
     <customwidget>
@@ -333,7 +295,7 @@ Selected TreeNode:</string>
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
+        <data format="PNG" length="872">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000032f49444154789cb5953148254718c77f1e5b7c030ab3e0c12e5ce00927f88a14af7d87c5590ac29d6013b0497b844008a9120e1248938354a6b1482131cde5a510b4f03081f07c8d4421c2063cd85708bbe0831938613ec8c0a5588dd1dc33452e5f33bb33c36f7ffbed7fd889fe7e9fcb7ad07df09ab750fdfdfec4c425787b6bfb757bae8df79e6a54e1bcc36008845b47e71dc549c1e06000f10a9e5c9a3effee39690ef92cb4a25e2c3b4804709844807035cfd57d7122f0ad65f0c25f0703d4a39af41d28473fa0af4a42548c81f007f85aa86a4510cc34cccc8288420405640ad2bbcadfeb2fb01b39021e7d5513a2c74c59ca43d8db510e0f6a24018d8a2496ecbeb0b892d29d0f08cdbc9d149ac7dc0057bea2831262853196fd5d6573dd43046b85fcbe2002d55019be54bef9a2a45ecd585e059106fe46639318403153427908bd0be8e2a38c874b90e70692806acade4ea0b7eee96d0cc9b2360b8f0d92e835e33b97172106400801b6b73c1a95c54719cbef439a2b9a54f833c3f68f8ec59594f73eb090089b1b153afa67e4ae1b270e5fa7144725d636a6228d853fcf59fbca511e7bdc193cf92467b0eb297f578a2220721d7ccdd82442553b48206f417a1714c5fb94b5cf2b8a638f58a13b9fc2a4a3ddb16854aa53d03806dcf4180481a8d8c98b8f7296b3f6a5a33c6ee2652785fc1ea4d2bcaf248246901bca377a0c661a482cc5505135ecbd088de9a490ddb30c8735cf9e5614872955a96854665a066e4f85a33d0bad96500f95bd9dc0f26a8a3b53ba0f53f20c9e3d85e1cb9a4f3facd0734f9659da1da8ea5b7a0c02a22cae081a95deba676fc7f1e4a39cce7ca0d5097cfc594e9659fca88608dd25cbccdcbfe6384014baf3509f66f436866c7e0d835d4ffb5d0b0954a5c38fb4e92d4af18b521c19ac8c39796ee42ecebe22c0f2aa90656d7adf5714c74a71346c7647b0d39685c7965f7f52aa738fc6947a34c6b83829284a41d2c6441258580a74e7738a22509d36d0bc65687760660e8a25033187c451fec69bc1838301ac0b69de444ad53779c32317bb2481f2d437b9dd6adae13d14874a558f3126c2e0e7cbc59be3b81abf7e67ecca7fac3bd0fca3fe17f0db86f7f7fb137f0208c29bb28f971c5b0000000049454e44ae426082</data>
     </image>
 </images>
 <layoutdefaults spacing="6" margin="11"/>

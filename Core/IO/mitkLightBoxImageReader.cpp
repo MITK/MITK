@@ -36,3 +36,7 @@ QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
   return NULL;
 }
 
+bool mitk::LightBoxImageReader::userAbort()
+{
+  return false;
+}

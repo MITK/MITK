@@ -30,6 +30,7 @@ SET(CPP_FILES
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
+  QmitkLightBoxReaderDialog.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkPiecewiseFunctionCanvas.cpp
   QmitkProgressBar.cpp
@@ -128,6 +129,7 @@ SET(MOC_H_FILES
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
+  QmitkLightBoxReaderDialog.h
   QmitkLineEditLevelWindowWidget.h
   QmitkPiecewiseFunctionCanvas.h
   QmitkProgressBar.h

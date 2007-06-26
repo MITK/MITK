@@ -48,9 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtooltip.h>
 
 #include <mitkPropertyList.h>
-
 #include <mitkDataStorage.h>
-
+#include <mitkCoreObjectFactory.h>
 #include "chili_lightbox_import.xpm"
 
 #define NUMBER_OF_THINKABLE_LIGHTBOXES 4
@@ -83,7 +82,7 @@ QcEXPORT QObject* create( QWidget *parent )
 /** constructor with hidden parameter s_Parent */
 mitk::ChiliPluginImpl::ChiliPluginImpl()
 : QcPlugin( s_Parent ),
-  app(NULL)
+  app( NULL )
 {
   task = new QcMITKTask( xpm(), s_Parent, name() );
 
@@ -173,6 +172,46 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetCurrentSelectedP
     resultPatient.Comment = tempPatient->comment;
   }
   return resultPatient;
+}
+
+mitk::ChiliPlugin::TextFileList mitk::ChiliPluginImpl::GetTextFileInformation( std::string seriesOID )
+{
+  m_TextFileList.clear();
+
+  std::string tempSeriesOID;
+  if( seriesOID == "" )
+  {
+    series_t* currentSeries = pCurrentSeries();
+    if( !currentSeries )
+    {
+      std::cout << "ERROR: no Series selected!" << std::endl;
+      return m_TextFileList;
+    }
+    tempSeriesOID = currentSeries->oid;
+  }
+  else tempSeriesOID = seriesOID;
+
+  mitk::ChiliPluginImpl* realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( mitk::ChiliPlugin::GetInstance() );
+  pIterateTexts( realPluginInstance, (char*)tempSeriesOID.c_str(), NULL, &mitk::ChiliPluginImpl::GlobalIterateTextCallback, this );
+
+  return m_TextFileList;
+}
+
+ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextCallback( int rows, int row, text_t *text, void *user_data )
+{
+  mitk::ChiliPlugin::TextFileInformation resultText;
+  resultText.OID = text->oid;
+  resultText.MimeType = text->mime_type;
+  resultText.ChiliText = text->chiliText;
+  resultText.Status = text->status;
+  resultText.FrameOfReferenceUID = text->frameOfReferenceUID;
+  resultText.TextDate = text->text_date;
+  resultText.Description = text->description;
+
+  mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
+  callingObject->m_TextFileList.push_back( resultText );
+
+  return ipTrue; // enum from ipTypes.h
 }
 
 #else
@@ -483,11 +522,10 @@ void mitk::ChiliPluginImpl::studySelected( study_t* study )
     m_CurrentStudy = newStudy; //this is friend of ChiliPluginImpl
     m_CurrentSeries.clear();
 
-    //get new OID for iterate
+    //get OID for iterate
     std::string currentStudyOID = study->oid;
-    char* currentStudyOID_c = (char*)currentStudyOID.c_str();
     //iterate
-    iterateSeries( currentStudyOID_c, NULL, &ChiliPluginImpl::GlobalIterateSeriesCallback, this );
+    iterateSeries( (char*)currentStudyOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateSeriesCallback, this );
     //send event for all application listeners
     SendStudySelectedEvent();
   }
@@ -535,6 +573,7 @@ void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     else
+    if( !reader->userAbort() )
     {
       QMessageBox::information(NULL, "MITK", "Couldn't read this image. \n\nIf you feel this should be possible, report a bug to mitk-users@lists.sourceforge.net", QMessageBox::Ok);
     }
@@ -573,7 +612,7 @@ void mitk::ChiliPluginImpl::UploadViaFile( DataTreeNode* node, std::string study
       series_t* currentSeries = pCurrentSeries();
       if( !currentStudy || !currentPatient || !currentSeries )
       {
-        std::cout << "ERROR: no Series selected!" << std::endl;
+        QMessageBox::information(NULL, "MITK", "ERROR: no Series selected!", QMessageBox::Ok);
         return;
       }
       tempStudyInstanceUID = currentStudy->instanceUID;
@@ -599,15 +638,23 @@ void mitk::ChiliPluginImpl::UploadViaFile( DataTreeNode* node, std::string study
     {
       if( it->GetPointer()->CanWrite( node ) )
       {
-        std::string filename = "/tmp/FileUpload" + it->GetPointer()->GetFileExtension();
-        it->GetPointer()->SetFileName( filename.c_str() );
+        std::string fileName;
+        if( node->GetProperty( "name" )->GetValueAsString() != "" )
+          fileName = node->GetProperty( "name" )->GetValueAsString();
+        else fileName = "FileUpload";
+
+        fileName = fileName + it->GetPointer()->GetFileExtension();
+        std::string pathAndFile = "/tmp/" + fileName;
+        it->GetPointer()->SetFileName( pathAndFile.c_str() );
         it->GetPointer()->SetInput( node );
         it->GetPointer()->Write();
+        //its very important, that the filename get used two times.
+        //the first parameter is the target to load from, this dont get saved.
+        //so if you want to know the filename to download from db, you have to set it as "name" too.
+        if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), tempStudyInstanceUID.c_str(), tempPatientOID.c_str(), tempStudyOID.c_str(), tempSeriesOID.c_str() ) )
+        std::cout << "ERROR: while saving File (" << fileName << ") to Database." << std::endl;
 
-        if( !pStoreDataFromFile( filename.c_str(), "AutoUpload", it->GetPointer()->GetWritenMIMEType().c_str(), tempStudyInstanceUID.c_str(), tempPatientOID.c_str(), tempStudyOID.c_str(), tempSeriesOID.c_str() ) )
-        std::cout << "ERROR: while saving File (" << filename << ") to Database." << std::endl;
-
-        if( remove(  filename.c_str() ) != 0 )
+        if( remove(  pathAndFile.c_str() ) != 0 )
           std::cout << "ERROR: while deleting file: " << it->GetPointer()->GetFileName() << std::endl;
       }
     }
@@ -615,21 +662,60 @@ void mitk::ChiliPluginImpl::UploadViaFile( DataTreeNode* node, std::string study
   }
 }
 
-mitk::DataTreeNode* mitk::ChiliPluginImpl::DownloadViaFile()
+void mitk::ChiliPluginImpl::DownloadViaFile( std::string chiliText, std::string MimeType, mitk::DataTreeIteratorBase* parentIterator )
 {
-//UNDER CONSTRUCTION
-/*
-  ipInt4_t error;
+  if( chiliText != "" && MimeType != "" )
+  {
+    //get the FileExtension from the file
+    char* fileExtension;
+    fileExtension = strrchr( chiliText.c_str(), '.' );
+    //check the FileExtension if MITK can read
+    char* check;
+    check = strstr( mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), fileExtension );
+    if( check == NULL )
+    {
+      std::cout << "ERROR: no readable Fileextension found. " << std::endl;
+      return;
+    }
+    //get Filename and path to save
+    char* fileName;
+    fileName = strrchr( chiliText.c_str(), '-' );
+    //we want no "-" in front of the filename
+    fileName++;
 
-  //surface
-  pFetchDataToFile( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_surf_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", "SurfaceFileDownload.vtp", &error );
-  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
+    std::string pathAndFile = "/tmp/";
+    strcat ( (char*)pathAndFile.c_str(), fileName );
 
-  //pointset
-  pFetchDataToFile( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_pointSet_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", "PointSetFileDownload.mps", &error );
-  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
-*/
-  return NULL;
+    ipInt4_t error;
+    pFetchDataToFile( chiliText.c_str(), pathAndFile.c_str(), &error );
+    if( error != 0 )
+    {
+      std::cout << "ERROR: " << error << ", while reading file (" << fileName << ") from Database." << std::endl;
+      return;
+    }
+
+    mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+    try
+    {
+      factory->SetFileName( pathAndFile );
+      factory->Update();
+      for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
+      {
+        mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
+        if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
+        {
+          parentIterator->Add( node );
+        }
+      }
+    }
+    catch ( itk::ExceptionObject & ex )
+    {
+      itkGenericOutputMacro( << "Exception during file open: " << ex );
+    }
+    if( remove(  pathAndFile.c_str() ) != 0 )
+      std::cout << "ERROR: while deleting file: " << pathAndFile << std::endl;
+  }
+  else std::cout<<"ERROR: no MimeType or ChiliText set."<<std::endl;
 }
 
 void mitk::ChiliPluginImpl::UploadViaBuffer( DataTreeNode* node )
@@ -640,33 +726,8 @@ void mitk::ChiliPluginImpl::UploadViaBuffer( DataTreeNode* node )
 mitk::DataTreeNode* mitk::ChiliPluginImpl::DownloadViaBuffer()
 {
 //UNDER CONSTRUCTION
-/*
-  ipInt4_t error;
-  void* buffer;
-  ipUInt4_t length;
-
-  pFetchDataToBuffer( "1993-05/MR/1.2.840.113619.2.1.1.318792063.474.737146178.965/-1/MIME_image_pointSet_1.2.840.113619.2.1.1.318792063.474.737146178.965-AutoUpload", &buffer, &length , &error );
-  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
-*/
   return NULL;
 }
 
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data )
-{
-//UNDER CONSTRUCTION
-/*
-  //image->path den filedownload starten, als file speichern, das file einlesen, in die lightbox packen, lightbox dem reader geben
-
-  ipInt4_t error;
-
-  pFetchDataToFile( image->path, "test.pic", &error );
-  if( error != 0 ) std::cout << "ERROR: " << error << std::endl;
-  ipPicDescriptor *pic;
-  pic = ipPicGet( "test.pic", NULL );
-  //mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
-  //callingObject->myLightbox.addImage( pic );
-*/
-  return ipTrue; // enum from ipTypes.h
-}
 #endif
 

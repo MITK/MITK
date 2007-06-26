@@ -80,9 +80,8 @@ void mitk::ChiliPlugin::UploadViaBuffer( DataTreeNode* )
 {
 }
 
-mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaFile()
+void mitk::ChiliPlugin::DownloadViaFile( std::string chiliText, std::string MimeType, mitk::DataTreeIteratorBase* parentIterator )
 {
-  return NULL;
 }
 
 mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaBuffer()
@@ -93,5 +92,11 @@ mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaBuffer()
 mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetCurrentSelectedPatient()
 {
   mitk::ChiliPlugin::PatientInformation emptyList;
+  return emptyList;
+}
+
+mitk::ChiliPlugin::TextFileList mitk::ChiliPlugin::GetTextFileInformation( std::string seriesOID )
+{
+  mitk::ChiliPlugin::TextFileList emptyList;
   return emptyList;
 }

@@ -265,7 +265,7 @@ public:
           }
 
 
-          if ( image )
+          if ( ( image != NULL ) && ( image->IsInitialized() ) )
           {
             m_TimeSelector->SetInput(image);
             mitk::Image* image3D = m_TimeSelector->GetOutput();
@@ -275,7 +275,7 @@ public:
             int timestep=0;
             if(time>mitk::ScalarTypeNumericTraits::min())
               timestep = inputTimeGeometry->MSToTimeStep( time );
-            if( inputTimeGeometry->IsValidTime( timestep ) == false )
+            if ( ( inputTimeGeometry->IsValidTime( timestep ) == false ) || ( image->IsVolumeSet(timestep) == false ) )
             {
               if(image3D!=NULL)
               {

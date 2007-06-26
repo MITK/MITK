@@ -62,6 +62,7 @@ class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityCompon
 public:
 
 
+
   /***************       CONSTRUCTOR      ***************/
   /** \brief Standard-Constructor. */
   QmitkFunctionalityComponentContainer(QObject *parent=0, const char * parentName = 0,  bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
@@ -89,9 +90,14 @@ void CreateNavigationButtons();
 
 /** \brief Method to create a textLabel at the Top of the wizard where a description can be created */
 void SetWizardText(const QString & text);
+//
+///** \brief Method to choose the  right wizard text, depending on the wizardpage*/
+//void ChooseWizardText(int page);
 
-/** \brief Method to choose the  right wizard text, depending on the wizardpage*/
-void ChooseWizardText(int page);
+ /** \brief also the Graphical User Interface for the component, like m_GUI, but with its specific type */
+QmitkFunctionalityComponentContainerGUI * GetFunctionalityComponentContainerGUI();
+
+
 
   /***************        SET AND GET     ***************/
 
@@ -135,6 +141,12 @@ virtual QGroupBox* GetImageContent();
 /** \brief Method to return the Image Selected in the Container Combo Box */
 virtual mitk::Image* GetParentMitkImage();
 
+/** \brief Method to return the NextButton to switch to the next widgetStackPage*/
+QPushButton* GetNextButton();
+
+/** \brief Method to return the BackButton to switch to the last widgetStackPage*/
+QPushButton* GetBackButton();
+
 /***************     ADD COMPONENTS     ***************/
 
   /** \brief method to add components into this component. */
@@ -177,8 +189,8 @@ public slots:
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
 
-  void NextButtonPressed();
-  void BackButtonPressed();
+  //void NextButtonPressed();
+  //void BackButtonPressed();
 
 protected:
 
@@ -218,6 +230,7 @@ private:
   /***************        ATTRIBUTES      ***************/
   /** \brief also the Graphical User Interface for the component, like m_GUI, but with its specific type */
   QmitkFunctionalityComponentContainerGUI * m_FunctionalityComponentContainerGUI;
+
 
   /** \brief parent of the component */
   QObject *m_Parent;

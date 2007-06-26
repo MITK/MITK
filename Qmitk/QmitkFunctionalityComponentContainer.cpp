@@ -351,6 +351,18 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 		m_GUI->repaint();
 	}
 }
+/** \brief Method to return the NextButton to switch to the next widgetStackPage*/
+QPushButton* QmitkFunctionalityComponentContainer::GetNextButton()
+{
+	return m_NextButton;
+}
+
+/** \brief Method to return the BackButton to switch to the last widgetStackPage*/
+QPushButton* QmitkFunctionalityComponentContainer::GetBackButton()
+{
+	return m_BackButton;
+}
+
 
 /***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityComponent* component, int stackPage)
@@ -423,7 +435,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 	connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
 
 	m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
-	SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+	SetWizardText("");
 	GetImageContent()->updateGeometry();
 	if(m_Spacer != NULL)
 	{
@@ -449,70 +461,75 @@ void QmitkFunctionalityComponentContainer::SetWizardText(const QString & text)
 
 }
 
-void QmitkFunctionalityComponentContainer::ChooseWizardText(int page)
-{
-	switch(page)
-	{
-	case 1:
-		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
-		break;
-	case 2:
-		SetWizardText("<b>Step 2   Create an STL-Model:</b><br><b>a)</b> Choose a threshold with the Threshold Finder where all areas that shall be used for the model are marked (green).<br><b>b)</b> If there are special areas that have to be manipulated use the PixelGreyValueManipulator and do not forget to select the new created image.><br><b>c)</b> Create a Surface with the SurfaceCreator.");
-		break;
-	case 3:
-		SetWizardText("<b>Step 3 Surface Finish:</b><br><b>a)</b> If you have your surface you can use the connectivity filter where you can mark all connected areas in different colours or delete alle areas instead of the biggest.");
-		break;
-	default:
-		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
-		break;
-	};
-}
+//void QmitkFunctionalityComponentContainer::ChooseWizardText(int page)
+//{
+//	switch(page)
+//	{
+//	case 1:
+//		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+//		break;
+//	case 2:
+//		SetWizardText("<b>Step 2   Create an STL-Model:</b><br><b>a)</b> Choose a threshold with the Threshold Finder where all areas that shall be used for the model are marked (green).<br><b>b)</b> If there are special areas that have to be manipulated use the PixelGreyValueManipulator and do not forget to select the new created image.><br><b>c)</b> Create a Surface with the SurfaceCreator.");
+//		break;
+//	case 3:
+//		SetWizardText("<b>Step 3 Surface Finish:</b><br><b>a)</b> If you have your surface you can use the connectivity filter where you can mark all connected areas in different colours or delete alle areas instead of the biggest.");
+//		break;
+//	default:
+//		SetWizardText("<b>Step 1   Minimize the dataset:</b><br><b>a)</b> If you have a 4D-Dataset export one time step with the TimeStepExporter.<br><b>b)</b> Crop the image by selecting a shape and placing it (STRG + Mouse) around the relevant areas. Everything around the shape will be cut off.");
+//		break;
+//	};
+//}
 
-void QmitkFunctionalityComponentContainer::NextButtonPressed()
-{
-	int actualPage = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
-	switch(actualPage)
-	{
-	case 1:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
-		ChooseWizardText(2);
-		break;
-	case 2:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
-		ChooseWizardText(3);
-		break;
-	case 3:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
-		ChooseWizardText(1);
-		break;
-	default:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
-		ChooseWizardText(1);
-		break;
-	};
+//void QmitkFunctionalityComponentContainer::NextButtonPressed()
+//{
+//	int actualPage = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
+//	switch(actualPage)
+//	{
+//	case 1:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
+//		ChooseWizardText(2);
+//		break;
+//	case 2:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
+//		ChooseWizardText(3);
+//		break;
+//	case 3:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+//		ChooseWizardText(1);
+//		break;
+//	default:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+//		ChooseWizardText(1);
+//		break;
+//	};
+//
+//}
+//void QmitkFunctionalityComponentContainer::BackButtonPressed()
+//{
+//	int actualPage = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
+//	switch(actualPage)
+//	{
+//	case 1:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
+//		ChooseWizardText(3);
+//		break;
+//	case 2:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+//		ChooseWizardText(1);
+//		break;
+//	case 3:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
+//		ChooseWizardText(2);
+//		break;
+//	default:
+//		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+//		ChooseWizardText(1);
+//		break;
+//	};
+//}
 
-}
-void QmitkFunctionalityComponentContainer::BackButtonPressed()
-{
-	int actualPage = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
-	switch(actualPage)
-	{
-	case 1:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(3);
-		ChooseWizardText(3);
-		break;
-	case 2:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
-		ChooseWizardText(1);
-		break;
-	case 3:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(2);
-		ChooseWizardText(2);
-		break;
-	default:
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
-		ChooseWizardText(1);
-		break;
-	};
-}
 
+QmitkFunctionalityComponentContainerGUI * QmitkFunctionalityComponentContainer::GetFunctionalityComponentContainerGUI()
+{
+	return m_FunctionalityComponentContainerGUI;
+}

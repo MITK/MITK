@@ -452,14 +452,12 @@ mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateEmptySegmentationNode
             //// actually create a new empty segmentation
             //mitk::PixelType pixelType( typeid(short int) );
             //mitk::Image::Pointer segmentation = mitk::Image::New();
-            //segmentation->Initialize(  
-pixelType, image->GetDimension(), image->GetDimensions() );
+            //segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
             //memset( segmentation->GetData(), 0, sizeof(short int) * segmentation->GetDimension(0) * segmentation->GetDimension(1) * segmentation->GetDimension(2) );
 
             //if (image->GetGeometry() )
             //{
-            //            mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF =  
-image->GetGeometry()->Clone();
+            //            mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF =  image->GetGeometry()->Clone();
             //            mitk::Geometry3D::Pointer originalGeometry = dynamic_cast<mitk::Geometry3D*>( originalGeometryAGF.GetPointer() );
             //            segmentation->SetGeometry( originalGeometry );
             //}

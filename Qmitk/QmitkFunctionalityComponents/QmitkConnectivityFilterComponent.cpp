@@ -61,8 +61,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * parent, const char * parentName, bool /*updateSelector*/, bool /*showSelector*/, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-: QmitkFunctionalityComponentContainer(parent, parentName, mitkStdMultiWidget, it),
+QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+: QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector, mitkStdMultiWidget, it),
 m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),
 m_DataIt(it),
@@ -180,6 +180,15 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
+
+  	if(m_ShowSelector)
+	{
+		m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
+	}
+	else
+	{
+		m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
+	}
 
   //CreatePointSet();
 //  m_PointSet->Deactivated();
@@ -535,3 +544,4 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 //  multiWidget->RequestUpdate();
 }//end of if itemSelector is not empty
 }//end of showConnected()
+

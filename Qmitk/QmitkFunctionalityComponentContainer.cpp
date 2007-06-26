@@ -251,7 +251,7 @@ QWidget* QmitkFunctionalityComponentContainer::CreateControlWidget(QWidget* pare
 		m_GUI = m_FunctionalityComponentContainerGUI;
 
 		m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-		m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("Container");
+		m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("Select Image");
 		m_FunctionalityComponentContainerGUI->GetContainerBorder()->setLineWidth(0);
 	}
 	CreateConnections();
@@ -431,8 +431,8 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 	m_GUI->layout()->activate();
 	m_GUI->repaint();
 
-	connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
-	connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
+//	connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
+//	connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
 
 	m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
 	SetWizardText("");

@@ -466,7 +466,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
   ((const itk::Object*)this)->InvokeEvent(endevent);
 
   //*todo has to be done here, cause of update-pipeline not working yet
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  // As discussed lately, don't mess with the rendering from inside data structures
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 

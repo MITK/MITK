@@ -805,8 +805,9 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
   mitk::OperationEndEvent endevent(operation);
   ((const itk::Object*)this)->InvokeEvent(endevent);
 
+  // As discussed lately, don't mess with rendering from inside data structures
   //*todo has to be done here, cause of update-pipeline not working yet
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
 }
 

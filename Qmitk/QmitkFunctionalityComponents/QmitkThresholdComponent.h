@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_THRESHOLDCOMPONENT_H
 
 #include "QmitkFunctionalityComponentContainer.h"
+#include <itkImage.h>
 class QmitkThresholdComponentGUI;
 class QmitkStdMultiWidget;
 
@@ -115,9 +116,21 @@ public slots:
   /** \brief Slot method that will be called if the ThresholdLineEdit was changed to update the shown image and the ThresholdSlider. */
   void ThresholdValueChanged( );
 
+  /** \brief Slot method that will be called if the "Create Segmentation"-Button was pressed to create a new segmentation image. Everything over the threshold will have the value 1, all other 0. */
+  void CreateThresholdSegmentation();
+
 
 protected:
 
+  /*!
+  Method to create a new Segmentation
+  */
+  mitk::DataTreeNode::Pointer CreateEmptySegmentationNode( mitk::Image* image);
+
+  /*!
+  Method to create the node for the thresholdbased segmentation
+  */
+  mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image);
 
   /** \brief Method that controls everything what happend after an image was selected */
   void DataObjectSelected();
@@ -139,6 +152,7 @@ protected:
   */
   mitk::DataTreeNode::Pointer m_ThresholdImageNode;
 
+
 private:
 
   /** \brief Method to create an Node that will hold the ThresholdImage and to set that preferences*/
@@ -150,6 +164,11 @@ private:
   /** \brief Method to to delete ThresholdNode if Component is deactivated*/
   void DeleteThresholdNode();
 
+  /*!
+  \brief template to create thresholdSegmentation
+  */
+ template < typename TPixel, unsigned int VImageDimension >
+ void ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * thresholdComponent);
 
   /***************        ATTRIBUTES      ***************/
 
@@ -159,6 +178,10 @@ private:
   /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/
   bool m_ThresholdNodeExisting;
 
+    /*!
+  * Segmentation made with thresholdSegmentation 
+  */
+  mitk::Image::Pointer m_ThresholdSegmentationImage;
 
 };
 

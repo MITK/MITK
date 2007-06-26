@@ -88,3 +88,9 @@ QGroupBox* QmitkThresholdComponentGUI::GetContainerContent()
 {
   return m_ContainerContent;
 }
+
+
+QPushButton* QmitkThresholdComponentGUI::GetCreateSegmentationButton()
+{
+  return m_CreateSegmentationButton;
+}

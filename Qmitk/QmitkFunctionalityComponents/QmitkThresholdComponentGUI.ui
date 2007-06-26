@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>170</width>
-            <height>129</height>
+            <width>282</width>
+            <height>115</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -44,7 +44,7 @@
                 <enum>GroupBoxPanel</enum>
             </property>
             <property name="title">
-                <string>ThresholdFinder</string>
+                <string>Find Threshold</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -156,23 +156,6 @@
                                                 <cstring>m_TreeNodeSelector</cstring>
                                             </property>
                                         </widget>
-                                        <spacer>
-                                            <property name="name">
-                                                <cstring>spacer2</cstring>
-                                            </property>
-                                            <property name="orientation">
-                                                <enum>Vertical</enum>
-                                            </property>
-                                            <property name="sizeType">
-                                                <enum>Fixed</enum>
-                                            </property>
-                                            <property name="sizeHint">
-                                                <size>
-                                                    <width>20</width>
-                                                    <height>16</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
                                     </vbox>
                                 </widget>
                             </vbox>
@@ -569,22 +552,45 @@
                                                 </widget>
                                             </hbox>
                                         </widget>
-                                        <widget class="QCheckBox">
+                                        <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
+                                                <cstring>layout2</cstring>
                                             </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="text">
-                                                <string>Delete Threshold Image 
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QCheckBox">
+                                                    <property name="name">
+                                                        <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
+                                                    </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <bold>0</bold>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Delete Threshold Image 
 if Component is deactivated</string>
-                                            </property>
-                                            <property name="checked">
-                                                <bool>true</bool>
-                                            </property>
+                                                    </property>
+                                                    <property name="checked">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QPushButton">
+                                                    <property name="name">
+                                                        <cstring>m_CreateSegmentationButton</cstring>
+                                                    </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <bold>0</bold>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>create segmentation</string>
+                                                    </property>
+                                                </widget>
+                                            </hbox>
                                         </widget>
                                     </vbox>
                                 </widget>
@@ -642,6 +648,7 @@ if Component is deactivated</string>
     <function returnType="QGroupBox *">GetImageContent()</function>
     <function returnType="QCheckBox *">GetDeleteImageIfDeactivatedCheckBox()</function>
     <function returnType="QGroupBox *">GetContainerContent()</function>
+    <function returnType="QPushButton *">GetCreateSegmentationButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

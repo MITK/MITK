@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>198</height>
+            <width>171</width>
+            <height>143</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -35,8 +35,13 @@
             <property name="name">
                 <cstring>m_ConnectivityFilter</cstring>
             </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
             <property name="title">
-                <string>Connectivity Filter</string>
+                <string>Surface Manipulation</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -57,6 +62,9 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
                     </property>
                     <property name="frameShadow">
                         <enum>Plain</enum>
@@ -81,11 +89,19 @@
                             <property name="name">
                                 <cstring>m_ShowTreeNodeSelecotrGroupBox</cstring>
                             </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
                             <property name="lineWidth">
                                 <number>0</number>
                             </property>
                             <property name="title">
-                                <string>Show TreeNodeSelector</string>
+                                <string>Select Data</string>
                             </property>
                             <property name="checkable">
                                 <bool>true</bool>
@@ -123,153 +139,66 @@
                                 </widget>
                             </vbox>
                         </widget>
-                        <widget class="QLayoutWidget">
+                        <widget class="QLabel">
                             <property name="name">
-                                <cstring>layout4</cstring>
+                                <cstring>m_ParameterModeTextLabel</cstring>
                             </property>
-                            <hbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>3</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>3</number>
-                                </property>
-                                <widget class="QLayoutWidget">
-                                    <property name="name">
-                                        <cstring>layout2</cstring>
-                                    </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <widget class="QLabel">
-                                            <property name="name">
-                                                <cstring>m_ParameterModeTextLabel</cstring>
-                                            </property>
-                                            <property name="text">
-                                                <string>Filter mode</string>
-                                            </property>
-                                        </widget>
-                                        <widget class="QComboBox">
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show largest Region</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show all Regions</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show Specified Regions</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Delete Spezified Region</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show PointSeededRegions</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Delete Seed</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show CellSeededRegions</string>
-                                                </property>
-                                            </item>
-                                            <item>
-                                                <property name="text">
-                                                    <string>Show ClosestPointRegion</string>
-                                                </property>
-                                            </item>
-                                            <property name="name">
-                                                <cstring>m_ParameterModeComboBox</cstring>
-                                            </property>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                                <widget class="QButtonGroup">
-                                    <property name="name">
-                                        <cstring>m_ExtraParameterGroupBox</cstring>
-                                    </property>
-                                    <property name="title">
-                                        <string></string>
-                                    </property>
-                                    <vbox>
-                                        <property name="name">
-                                            <cstring>unnamed</cstring>
-                                        </property>
-                                        <property name="margin">
-                                            <number>0</number>
-                                        </property>
-                                        <property name="spacing">
-                                            <number>0</number>
-                                        </property>
-                                        <widget class="QLayoutWidget">
-                                            <property name="name">
-                                                <cstring>layout1</cstring>
-                                            </property>
-                                            <vbox>
-                                                <property name="name">
-                                                    <cstring>unnamed</cstring>
-                                                </property>
-                                                <widget class="QLabel">
-                                                    <property name="name">
-                                                        <cstring>m_ParameterTextLabel</cstring>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>Parameter</string>
-                                                    </property>
-                                                </widget>
-                                                <widget class="QLineEdit">
-                                                    <property name="name">
-                                                        <cstring>m_ParamterLineEdit</cstring>
-                                                    </property>
-                                                    <property name="frameShape">
-                                                        <enum>LineEditPanel</enum>
-                                                    </property>
-                                                    <property name="frameShadow">
-                                                        <enum>Sunken</enum>
-                                                    </property>
-                                                    <property name="text">
-                                                        <string>0</string>
-                                                    </property>
-                                                </widget>
-                                            </vbox>
-                                        </widget>
-                                    </vbox>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>m_StartFilterPushButton</cstring>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                             <property name="text">
-                                <string>Start Filter</string>
+                                <string>Manipulation mode</string>
+                            </property>
+                        </widget>
+                        <widget class="QComboBox">
+                            <item>
+                                <property name="text">
+                                    <string>Show largest Surface</string>
+                                </property>
+                            </item>
+                            <item>
+                                <property name="text">
+                                    <string>Color all Surfaces</string>
+                                </property>
+                            </item>
+                            <property name="name">
+                                <cstring>m_ParameterModeComboBox</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
                             </property>
                         </widget>
                         <widget class="QCheckBox">
                             <property name="name">
                                 <cstring>m_ReplaceSurfaceCheckBox</cstring>
                             </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
                             <property name="text">
                                 <string>replace Surface?</string>
                             </property>
                             <property name="checked">
                                 <bool>true</bool>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_StartFilterPushButton</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Start Manipulation</string>
                             </property>
                         </widget>
                     </vbox>
@@ -318,12 +247,8 @@
     <function returnType="QGroupBox *">GetComponentContent()</function>
     <function returnType="QGroupBox *">GetShowComponent()</function>
     <function returnType="QComboBox *">GetFilterModeComboBox()</function>
-    <function returnType="QLineEdit *">GetParameterLineEdit()</function>
     <function returnType="QPushButton *">GetStartFilterPushButton()</function>
-    <function returnType="QLineEdit *">GetParameterLabel()</function>
-    <function returnType="QGroupBox *">GetParameterPart()</function>
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-
 </UI>

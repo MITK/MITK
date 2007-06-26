@@ -138,7 +138,7 @@ protected:
 private:
 
   /** \brief Method to create the pointset-object that is necessary for some connectivity-options. See also  - \ref QmitkSeedPointSetComponent*/
-  void CreatePointSet();
+  //void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
 
@@ -154,7 +154,7 @@ private:
   /*!
   * Node for the seed-points 
   */
-  mitk::DataTreeNode::Pointer m_PointSetNode;
+  //mitk::DataTreeNode::Pointer m_PointSetNode;
 
 
   /*!
@@ -169,7 +169,7 @@ private:
 
   mitk::DataTreeIteratorBase* m_DataIt;
 
-  QmitkSeedPointSetComponent* m_PointSet;
+ // QmitkSeedPointSetComponent* m_PointSet;
   int m_ConnectivityCounter;
 
 

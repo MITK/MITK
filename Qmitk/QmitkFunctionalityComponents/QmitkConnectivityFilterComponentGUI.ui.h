@@ -30,13 +30,6 @@ void QmitkConnectivityFilterComponentGUI::SetDataTreeIterator( mitk::DataTreeIte
   m_DataTreeIterator = it;
 }
 
-
-//QmitkDataTreeComboBox * QmitkThresholdComponentGUI::GetTreeNodeSelector()
-//{
-// return m_TreeNodeSelector;
-//}
-
-
 QmitkDataTreeComboBox * QmitkConnectivityFilterComponentGUI::GetTreeNodeSelector()
 {
   return m_TreeNodeSelector;
@@ -61,27 +54,9 @@ QComboBox*  QmitkConnectivityFilterComponentGUI::GetFilterModeComboBox()
 }
 
 
-QLineEdit* QmitkConnectivityFilterComponentGUI::GetParameterLineEdit()
-{
-  return m_ParamterLineEdit;
-}
-
-
 QPushButton* QmitkConnectivityFilterComponentGUI::GetStartFilterPushButton()
 {
   return m_StartFilterPushButton;
-}
-
-
-QLineEdit* QmitkConnectivityFilterComponentGUI::GetParameterLabel()
-{
-  return m_ParamterLineEdit;
-}
-
-
-QGroupBox* QmitkConnectivityFilterComponentGUI::GetParameterPart()
-{
-  return m_ExtraParameterGroupBox;
 }
 
 

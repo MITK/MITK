@@ -44,7 +44,7 @@
                 <number>1</number>
             </property>
             <property name="title">
-                <string>SurfaceCreator</string>
+                <string>Create Surface</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -78,7 +78,7 @@
                         <number>0</number>
                     </property>
                     <property name="title">
-                        <string>Show ImageSelector</string>
+                        <string>Select Image</string>
                     </property>
                     <property name="flat">
                         <bool>true</bool>
@@ -288,6 +288,9 @@
                                             </property>
                                             <property name="text">
                                                 <string>Median 3D</string>
+                                            </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
                                             </property>
                                         </widget>
                                         <widget class="QGroupBox">
@@ -548,6 +551,9 @@
                                             <property name="text">
                                                 <string>Smooth</string>
                                             </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
+                                            </property>
                                         </widget>
                                         <widget class="QGroupBox">
                                             <property name="name">
@@ -675,6 +681,9 @@
                                             </property>
                                             <property name="text">
                                                 <string>Gauss</string>
+                                            </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
                                             </property>
                                         </widget>
                                         <widget class="QGroupBox">

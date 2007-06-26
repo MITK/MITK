@@ -219,13 +219,16 @@ void
 mitk::RenderingManager
 ::CheckUpdatePending()
 { // Check if there are pending requests for any other windows
-  m_UpdatePending = false;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     if ( it->second > 0 )
     {
       m_UpdatePending = true;
+    }
+    else
+    {
+      m_UpdatePending = false;
     }
   }
 
@@ -263,7 +266,7 @@ mitk::RenderingManager
 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
-
+  
 }
 
 void
@@ -493,7 +496,7 @@ mitk::RenderingManager
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)
   { 
-    //std::cout<<"S ";
+    //std::cout<<"S "<<std::endl;
     m_IsRendering[renderer->GetRenderWindow()] = true;
   }
 }
@@ -513,7 +516,7 @@ mitk::RenderingManager
   mitk::BaseRenderer* renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if (renderer)
   {
-    //std::cout<<"E ";
+    //std::cout<<"E "<<std::endl;
     m_IsRendering[renderer->GetRenderWindow()] = false;
   }
   this->DoFinishAbortRendering();
@@ -575,6 +578,7 @@ int mitk::RenderingManager::GetCurrentLOD() //returns the LOD requested for the 
 
 void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for the next rendering
 { 
+  //std::cout<<"SetCurrentLOD("<<lod<<")"<<std::endl;
   if(m_CurrentLOD != lod)
   {
     m_CurrentLOD=lod;

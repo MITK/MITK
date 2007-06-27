@@ -42,6 +42,34 @@ public:
 
   void SetMask( const mitk::Image* mask );
   const mitk::Image* GetMask() const;
+  
+  /**
+   * This value is used as outside value. This only works
+   * if OverrideOutsideValue is set to true. Default is 0.
+   */
+  itkSetMacro( OutsideValue, mitk::ScalarType );
+  
+  /**
+   * This value is used as outside value. This only works
+   * if OverrideOutsideValue is set to true. Default is 0.
+   */
+  itkGetMacro( OutsideValue, mitk::ScalarType );
+  
+  /**
+   * If OverrideOutsideValue is set to false, this minimum
+   * of the pixel type of the output image is taken as outside
+   * value. If set to true, the value set via SetOutsideValue is
+   * used as background.
+   */
+  itkSetMacro( OverrideOutsideValue, bool );
+  /**
+   * If OverrideOutsideValue is set to false, this minimum
+   * of the pixel type of the output image is taken as outside
+   * value. If set to true, the value set via SetOutsideValue is
+   * used as background.
+   */
+  itkGetMacro( OverrideOutsideValue, bool );
+  itkBooleanMacro( OverrideOutsideValue );
 
 protected:
   MaskImageFilter();
@@ -65,6 +93,9 @@ protected:
   //##Description 
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
+  
+  mitk::ScalarType m_OutsideValue;
+  bool m_OverrideOutsideValue;
 };
 
 } // namespace mitk

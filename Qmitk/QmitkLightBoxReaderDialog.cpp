@@ -10,6 +10,8 @@
 QmitkLightBoxReaderDialog::QmitkLightBoxReaderDialog( QWidget* parent, const char* name )
 :QDialog( parent, name, true )
 {
+  QDialog::setCaption("Image import");
+
   QDialog::setMinimumSize(250, 300);
 
   QBoxLayout * verticalLayout = new QVBoxLayout( this );

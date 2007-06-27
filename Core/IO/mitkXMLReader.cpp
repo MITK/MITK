@@ -549,30 +549,34 @@ namespace mitk {
 
   const char* XMLReader::XMLNode::ConvertString( const char* string )
   {
-    static std::char_traits<char>::char_type buffer[255];
-    int length = std::char_traits<char>::length( string );
-    std::char_traits<char>::copy ( buffer, string, length + 1 );
-    const char* pos = buffer;
-    
-    while ( pos != NULL ) 
-    {
-      pos = std::char_traits<char>::find ( buffer, length , '{');
+    std::string buffer( string );
 
-      if( pos != NULL )
-        *(const_cast<char*>(pos)) = '<';
+    std::string::size_type pos(0);
+
+    while ( pos != std::string::npos )
+    {
+      pos = buffer.find( '{', pos );
+
+      if ( pos != std::string::npos )
+      {
+        buffer[pos] = '<';
+      }
     }
 
-    pos = buffer;
-    
-    while ( pos != NULL ) 
-    {
-      pos = std::char_traits<char>::find ( buffer, length , '}');
+    pos = 0;
 
-      if( pos != NULL )
-        *(const_cast<char*>(pos)) = '>';
+    while ( pos != std::string::npos )
+    {
+      pos = buffer.find( '}', pos );
+
+      if ( pos != std::string::npos )
+      {
+        buffer[pos] = '>';
+      }
     }
 
-    return buffer;
+
+    return buffer.c_str();
   }
 
 

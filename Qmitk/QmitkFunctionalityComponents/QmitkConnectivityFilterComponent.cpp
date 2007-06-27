@@ -440,6 +440,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
         connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
         connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
+		connectivityNode->SetProperty( "deprecated usePointDataForColouring", new mitk::BoolProperty(false) );
 
         mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 

@@ -39,6 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 
+#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
+
 // helper class for property import from pic/dicom-headers (see mitk::LightBoxImageReaderImpl::GetPropertyList())
 class HeaderTagInfo
 {
@@ -523,6 +525,14 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
     {
       toNext = it->origin-origin0;
       spacing[2] = toNext.GetNorm();
+      // round after 2. decimal digit
+      for (unsigned int i = 0; i < 3; ++i)
+      {
+        spacing[i] *= 100.0;
+        spacing[i] = ROUND(spacing[i]);
+        spacing[i] /= 100.0;
+      }
+
       spacingList.push_back( spacing );
       origin0 = it->origin;
     }

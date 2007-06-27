@@ -65,18 +65,27 @@ void SampleApp::InitializeFunctionality()
 
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
   if (!m_TestingParameter) {
+    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName("QmitkSimpleExampleFunctionality");
+   if (createFunction) {
+     QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+     qfm->AddFunctionality(functionalityInstance);
+   } 
+     
     // add all known functionalities
     for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) 
     {
-    QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
-      qfm->AddFunctionality(functionalityInstance); 
+      if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL ) {
+        QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
+        qfm->AddFunctionality(functionalityInstance);
+      } 
     }
   } 
   else {
     //
     QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(m_TestingParameter);
    if (createFunction) {
-     createFunction(qfm,m_MultiWidget,&iterator);
+     QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+     qfm->AddFunctionality(functionalityInstance);
    } 
   }
 

@@ -925,12 +925,6 @@
         <slot>viewShowPlanesAction_toggled(bool)</slot>
     </connection>
     <connection>
-        <sender>toolbarLockPlanes</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>viewPlanesLocked_toggled(bool)</slot>
-    </connection>
-    <connection>
         <sender>toolbarPositionOrientation</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>

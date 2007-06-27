@@ -115,6 +115,10 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
     /** still undocumented */
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
+  protected slots:
+
+    void OnApproachReinitializationOfWholeApplication();
+  
   protected:
 
     ChiliPluginImpl::ChiliPluginImpl();
@@ -201,3 +205,4 @@ class QIDToolButton : public QToolButton
 };
 
 #endif /* MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD */
+

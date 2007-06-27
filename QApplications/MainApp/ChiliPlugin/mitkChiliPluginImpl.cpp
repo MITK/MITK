@@ -113,6 +113,28 @@ bool mitk::ChiliPluginImpl::IsPlugin()
   return true;
 }
 
+void mitk::ChiliPluginImpl::OnApproachReinitializationOfWholeApplication()
+{
+  static int clickCount = 0;
+
+  clickCount++;
+
+  if (clickCount > 10)
+  {
+    if ( QMessageBox::question( NULL, tr("MITK"), 
+                                  QString("Desparate clicking suggests a strong wish to restart the whole MITK plugin.\n\nDo you want to restart MITK?"),
+                                  QMessageBox::Yes | QMessageBox::Default, 
+                                  QMessageBox::No  | QMessageBox::Escape
+                                ) == QMessageBox::Yes )
+    {
+      QMessageBox::information(NULL, "MITK", QString("Still unimplemented..."), QMessageBox::Ok);
+    }
+
+    clickCount = 0;
+  }
+}
+
+
 #if ( CHILI_VERSION >= 38 )
 
 mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetCurrentSelectedStudy()
@@ -477,7 +499,8 @@ void mitk::ChiliPluginImpl::studySelected( study_t* study )
     //m_LightBoxImportToggleButton->setToggleButton(true);
     //m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_lightbox_import) );
     m_LightBoxImportToggleButton->setAutoRaise(true);
-    m_LightBoxImportToggleButton->setEnabled(false);
+    m_LightBoxImportToggleButton->setEnabled(true); //!! secret button to reinit application
+    connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
     QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
     policy.setVerStretch( 1 );
     m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());

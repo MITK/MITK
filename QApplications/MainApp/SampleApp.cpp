@@ -64,16 +64,20 @@ void SampleApp::InitializeFunctionality()
   mitk::DataTreePreOrderIterator iterator(m_Tree);
 
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
-  for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) {
+  if (!m_TestingParameter) {
+    // add all known functionalities
+    for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) 
+    {
     QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
-    if (!m_TestingParameter) {
       qfm->AddFunctionality(functionalityInstance); 
-    } else if (strcmp(m_TestingParameter,functionalityInstance->name()) == 0) {
-      std::cout << "adding selected " << functionalityInstance->name() << std::endl;
-      qfm->AddFunctionality(functionalityInstance); 
-    } else {
-      std::cout << "rejecting functionality " << functionalityInstance->name() << std::endl;
     }
+  } 
+  else {
+    //
+    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(m_TestingParameter);
+   if (createFunction) {
+     createFunction(qfm,m_MultiWidget,&iterator);
+   } 
   }
 
   mitk::StatusBar::GetInstance()->DisplayText("Functionalities added",3000);

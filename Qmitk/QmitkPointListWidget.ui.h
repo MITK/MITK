@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 #include <qstring.h>
+#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
+#include <mitkRenderWindow.h>
 
 const int QmitkPointListWidget::UNLIMITED = 999;
 
@@ -52,7 +55,8 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
     mitk::Point2D p2d;
     mitk::Point3D p3d;
     mitk::FillVector3D(p3d, (ppt)[0],(ppt)[1],(ppt)[2]);
-    mitk::PositionEvent event(NULL, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
+    mitk::BaseRenderer::Pointer anyRenderer = (*(mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().begin()))->GetRenderer();
+    mitk::PositionEvent event(anyRenderer, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
     mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
 
     mitk::GlobalInteraction::GetInstance()->HandleEvent( stateEvent );

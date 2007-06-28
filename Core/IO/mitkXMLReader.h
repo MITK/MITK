@@ -72,7 +72,7 @@ namespace mitk{
       XMLNode* GetParent() { return m_Parent; };
 
       /// replaces characters "{" and "}" with "<" and ">"
-      static const char* ConvertString( const char* string );
+      static std::string ConvertString( const char* string );
 
       static XMLNode* FindNext( const std::string& name, XMLNode* node );
     };

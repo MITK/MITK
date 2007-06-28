@@ -103,7 +103,7 @@ protected:
 
   // Initialize should not be called manually;
   // The poly data vector is initialized automatically when enlarged;
-  virtual void Initialize( unsigned int timeSteps = 1 );
+  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
  
   //##ModelId=3E70F66100C4
   Surface();

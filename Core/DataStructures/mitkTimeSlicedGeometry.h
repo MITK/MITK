@@ -103,6 +103,8 @@ public:
 
   virtual void InitializeEmpty(unsigned int timeSteps);
 
+  virtual void ResizeToNumberOfTimeSteps( unsigned int timeSteps);
+
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 
   //##Documentation

@@ -29,6 +29,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 #include <itkSmartPointerForwardReference.txx>
 
+mitk::Surface::Surface() : m_CalculateBoundingBox( false )
+{
+  m_Initialized = false;
+  vtkPolyData* pdnull = NULL;
+  m_PolyDataSeries.resize( 1, pdnull );
+  InitializeTimeSlicedGeometry(1);
+
+  m_Initialized = true;
+}
+
+mitk::Surface::~Surface()
+{
+  for ( VTKPolyDataSeries::iterator it = m_PolyDataSeries.begin(); it != m_PolyDataSeries.end(); ++it )
+  {
+    if ( ( *it ) != NULL )
+      ( *it )->Delete();
+  }
+  m_PolyDataSeries.clear();
+}
+
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
   // check if the vector is long enouth to contain the new element
@@ -37,7 +57,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   {
     vtkPolyData* pdnull = NULL;
     m_PolyDataSeries.resize( t + 1, pdnull );
-    Initialize( t + 1 );
+    this->GetTimeSlicedGeometry()->ResizeToNumberOfTimeSteps( t+1 );
   }
 
   if(m_PolyDataSeries[ t ] != NULL)
@@ -54,7 +74,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   m_CalculateBoundingBox = true;
 }
 
-void mitk::Surface::Initialize(unsigned int timeSteps)
+void mitk::Surface::InitializeTimeSlicedGeometry(unsigned int timeSteps)
 {
   mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
 
@@ -67,7 +87,6 @@ void mitk::Surface::Initialize(unsigned int timeSteps)
   // if EvenlyTimed is true...
   //
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
-  m_Initialized = true;
 }
 
 bool mitk::Surface::IsEmpty(int t) const
@@ -104,26 +123,6 @@ vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
   }
   else
     return NULL;
-}
-
-//##ModelId=3E70F66100C4
-mitk::Surface::Surface() : m_CalculateBoundingBox( false )
-{
-  m_Initialized = false;
-  vtkPolyData* pdnull = NULL;
-  m_PolyDataSeries.resize( 1, pdnull );
-  Initialize(1);
-}
-
-//##ModelId=3E70F66100CA
-mitk::Surface::~Surface()
-{
-  for ( VTKPolyDataSeries::iterator it = m_PolyDataSeries.begin(); it != m_PolyDataSeries.end(); ++it )
-  {
-    if ( ( *it ) != NULL )
-      ( *it )->Delete();
-  }
-  m_PolyDataSeries.clear();
 }
 
 //##ModelId=3E70F66100AE
@@ -261,8 +260,7 @@ void mitk::Surface::Update()
 // Caution: If Resize is used explicitely, the vector is emptied.
 void mitk::Surface::Resize( unsigned int timeSteps )
 {
-  m_PolyDataSeries.resize( timeSteps, NULL );
-  Initialize( timeSteps );
+  InitializeTimeSlicedGeometry( timeSteps );
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.assign( timeSteps, pdnull );
   this->Modified();

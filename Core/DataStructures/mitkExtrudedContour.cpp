@@ -230,7 +230,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   if(m_Contour.IsNull())
     return;
 
-  Initialize(1);
+//  Initialize(1);
 
   Vector3D nullvector; nullvector.Fill(0.0);
   float xProj[3];

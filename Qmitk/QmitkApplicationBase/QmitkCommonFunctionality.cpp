@@ -473,7 +473,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     }
     dir += "/";
-    lastDirectory = dir; // remember path for next save dialog
+    lastDirectory = dir.c_str(); // remember path for next save dialog
     dir += baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();

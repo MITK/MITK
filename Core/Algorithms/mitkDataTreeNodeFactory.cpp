@@ -786,12 +786,14 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
   if (!initialized)
   {
     // all lowercase here, please!
+
     s_ColorMap.insert( std::make_pair( "ankle",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "appendix",            "0xe38686") );
     s_ColorMap.insert( std::make_pair( "bone",                "0xe38686") );
     s_ColorMap.insert( std::make_pair( "brain",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "coccyx",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "colon",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "cyst",                "0xe38686") );
     s_ColorMap.insert( std::make_pair( "elbow",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "eye",                 "0xe38686") );
     s_ColorMap.insert( std::make_pair( "fallopian tube",      "0xe38686") );
@@ -813,8 +815,10 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "pelvis",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "penis",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "pharynx",             "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "prostate",            "0xe38686") );
     s_ColorMap.insert( std::make_pair( "rectum",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "sacrum",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "seminal vesicle",     "0xe38686") );
     s_ColorMap.insert( std::make_pair( "shoulder",            "0xe38686") );
     s_ColorMap.insert( std::make_pair( "spinal cord",         "0xe38686") );
     s_ColorMap.insert( std::make_pair( "spleen",              "0xe38686") );
@@ -823,6 +827,8 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "testicles",           "0xe38686") );
     s_ColorMap.insert( std::make_pair( "thyroid",             "0xe38686") );
     s_ColorMap.insert( std::make_pair( "tongue",              "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "tumor",               "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "urethra",             "0xe38686") );
     s_ColorMap.insert( std::make_pair( "urinary bladder",     "0xe38686") );
     s_ColorMap.insert( std::make_pair( "uterus",              "0xe38686") );
     s_ColorMap.insert( std::make_pair( "vagina",              "0xe38686") );

@@ -50,7 +50,28 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 {  
   assert(m_PointSet.IsNotNull());
   mitk::PointSet::PointType ppt;
-  if ( m_PointSet->GetPointIfExists( (mitk::PointSet::PointIdentifier) ItemIndex, &ppt))
+  
+  // convert item index given from the list box into
+  // a point id referring to the Nth point in the point list.
+  // This is necessary, because the mitk::PointSet uses an itk::MapContainer
+  // as points container and thus indexes must not necessarily be strictly 
+  // increasing. This is the case if points have been deleted from the list.
+  // Unfortunately, there is no such fnction in the mitk::PointSet.
+  mitk::PointSet::PointIdentifier pointId;
+  unsigned int pointIndex;
+  mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet()->GetPoints()->Begin();  
+  for ( unsigned int currentIndex = 0 ; currentIndex <= ItemIndex ; ++currentIndex, ++it )
+  {
+    if ( it == m_PointSet->GetPointSet()->GetPoints()->End())
+    {
+      itkGenericOutputMacro("couldn't determine point id from index");
+      return;  
+    }    
+    if ( currentIndex == ItemIndex )
+      pointId = it->Index();
+  }   
+  
+  if ( m_PointSet->GetPointIfExists( pointId, &ppt))
   {
     mitk::Point2D p2d;
     mitk::Point3D p3d;

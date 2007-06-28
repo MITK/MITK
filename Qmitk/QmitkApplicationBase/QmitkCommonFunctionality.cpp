@@ -437,11 +437,16 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
+  static QString lastDirectory = "";
+
   std::string fileName;
   if(aFileName == NULL || askForDifferentFilename)
   {
     QString initialFilename(aFileName);
     if (initialFilename.isEmpty()) initialFilename = "NewImage.pic";
+
+    // prepend the last directory
+    initialFilename = lastDirectory + initialFilename;
     QString qfileName = QFileDialog::getSaveFileName( initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
     if (qfileName == NULL )
       return "";
@@ -468,6 +473,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     }
     dir += "/";
+    lastDirectory = dir; // remember path for next save dialog
     dir += baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();

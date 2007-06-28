@@ -35,6 +35,7 @@ QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent, const
 {
   setEnabled(false);
   setFocusPolicy(QWidget::ClickFocus);
+  m_TFWidgetAvailable = false;
 }
 
 void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)

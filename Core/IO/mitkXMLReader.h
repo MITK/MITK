@@ -172,7 +172,7 @@ namespace mitk{
     XMLNode* m_CurrentNode;
 
     struct Connector{ 
-      DataTreeNode* m_TreeNode;
+      DataTreeNode::Pointer m_TreeNode;
       XMLNode* m_XMLNode;
     };
 

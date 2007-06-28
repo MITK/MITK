@@ -380,7 +380,7 @@ namespace mitk {
       int count = m_CurrentPosition->CountChildren();
       m_CurrentPosition->GoToChild( count -1 );
       Connector connector;
-      connector.m_TreeNode = dataTreeNode.GetPointer();
+      connector.m_TreeNode = dataTreeNode;
       connector.m_XMLNode = node;
       m_ConnectorList.push_back( connector );
     }

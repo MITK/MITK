@@ -32,21 +32,29 @@ void mitk::PlaneFit::GenerateOutputInformation()
     return;
   }
 
-  mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
-
-  m_TimeSlicedGeometry->InitializeEvenlyTimed( 
-    planeGeometry, m_PointSet->GetPointSetSeriesSize() );
-
-  int t;
-  for ( t = 0;
-        (t < m_PointSet->GetPointSetSeriesSize())
-        && (t < m_Planes.size());
-        ++t )
+  bool update = false;
+  if ( output->GetGeometry() == NULL || output->GetTimeSlicedGeometry() == NULL )
+    update = true;
+  if ( ( ! update ) && ( output->GetTimeSlicedGeometry()->GetTimeSteps() != input->GetTimeSlicedGeometry()->GetTimeSteps() ) )
+    update = true;
+  if ( update )
   {
-    m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], t );
+    mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
+  
+    m_TimeSlicedGeometry->InitializeEvenlyTimed( 
+      planeGeometry, m_PointSet->GetPointSetSeriesSize() );
+  
+    int t;
+    for ( t = 0;
+          (t < m_PointSet->GetPointSetSeriesSize())
+          && (t < m_Planes.size());
+          ++t )
+    {
+      m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], t );
+    }
+  
+    output->SetGeometry( m_TimeSlicedGeometry );
   }
-
-  output->SetGeometry( m_TimeSlicedGeometry );
 }
 
 void mitk::PlaneFit::GenerateData()

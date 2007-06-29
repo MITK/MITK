@@ -38,6 +38,16 @@ public:
   
 protected:
   
+  /**
+   * Protected constructor. Use ::New instead()
+   */
+  PointSetToGeometryDataFilter();
+  
+  /**
+   * Protected destructor. Instances are destroyed when reference count is zero
+   */
+  virtual ~PointSetToGeometryDataFilter();
+  
   
 };  
     

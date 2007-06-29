@@ -36,4 +36,9 @@ mitk::PointSetToGeometryDataFilter::InputType* mitk::PointSetToGeometryDataFilte
 }
 
 
+mitk::PointSetToGeometryDataFilter::PointSetToGeometryDataFilter()
+{}
+  
+mitk::PointSetToGeometryDataFilter::~PointSetToGeometryDataFilter()
+{}
 

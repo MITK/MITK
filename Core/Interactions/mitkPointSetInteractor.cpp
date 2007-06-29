@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachineFactory.h"
 #include "mitkStateTransitionOperation.h"
 #include "mitkBaseRenderer.h"
+#include "mitkRenderingManager.h"
 
 
 //how precise must the user pick the point
@@ -267,9 +268,10 @@ bool mitk::PointSetInteractor
           new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
       }
+      ok = true;
+      break;
     }
-    ok = true;
-    break;
+
   case AcADDPOINT:
     // Declare two operations: one for the selected state: deselect the last 
     // one selected and select the new one the other operation is the add 
@@ -351,6 +353,9 @@ bool mitk::PointSetInteractor
       //pointSet->ExecuteOperation(doSelOp);
 
       ok = true;
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
   case AcINITMOVEMENT:
@@ -420,6 +425,9 @@ bool mitk::PointSetInteractor
       }
       m_LastPoint = newPoint;//for calculation of the direction vector
       ok = true;
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
   
@@ -567,6 +575,9 @@ bool mitk::PointSetInteractor
         ok = true;
       }//else
     }
+
+    // Update the display
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     break;
 
   // Remove all Points that have been set at once. 
@@ -594,6 +605,10 @@ bool mitk::PointSetInteractor
           else it++;
         }
       }
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
 
   //Checking if the Point transmitted is close enough to one point. Then 
@@ -646,8 +661,10 @@ bool mitk::PointSetInteractor
           ok = true;
         }
       }
+
       break;
     }
+
   case AcCHECKSELECTED:
     /*check, if the given point is selected:
     if no, then send EIDNO
@@ -704,8 +721,9 @@ bool mitk::PointSetInteractor
           10000);
         ok = false;
       }
+  
+      break;
     }
-    break;
   
   //generate Events if the set will be full after the addition of the 
   // point or not.
@@ -741,6 +759,7 @@ bool mitk::PointSetInteractor
       }//else
     }
     break;
+
   case AcCHECKEQUALS1:
     {
       //the number of points in the list is 1 (or smaler)
@@ -760,6 +779,7 @@ bool mitk::PointSetInteractor
       }
     }
     break;
+
   case AcSELECTPICKEDOBJECT://and deselect others
     {
       mitk::PositionEvent const  *posEvent = 
@@ -796,8 +816,12 @@ bool mitk::PointSetInteractor
         pointSet->ExecuteOperation(doOp);
         ok = true;
       }
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
-    break;
+
   case AcDESELECTOBJECT:
     {
       mitk::PositionEvent const  *posEvent = 
@@ -829,15 +853,23 @@ bool mitk::PointSetInteractor
         pointSet->ExecuteOperation(doOp);
         ok = true;
       }
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
-    break;
+
   case AcDESELECTALL:
     {
       //undo-supported able deselect of all points in the DataList
       this->UnselectAll( timeStep, timeInMS );
       ok = true;
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
-    break;
+
   case AcFINISHMOVEMENT:
     {
       mitk::PositionEvent const *posEvent = 
@@ -895,12 +927,21 @@ bool mitk::PointSetInteractor
       //increase the GroupEventId, so that the Undo goes to here
       this->IncCurrGroupEventId();
       ok = true;
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
-    break;
+  
   case AcCLEAR:
     {
       this->Clear( timeStep, timeInMS );
+
+      // Update the display
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
     }
+
   default:
     return Superclass::ExecuteAction( action, stateEvent );
   }

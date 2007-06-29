@@ -120,12 +120,21 @@ void QmitkRenderWindow::resizeGL( int w, int h )
   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
     return;
   m_InResize = true;
+
   if(QGLWidget::isVisible())
   {
     if(m_Renderer.IsNotNull())
+    {
       m_Renderer->Resize(w, h);
+    }
+
     updateGL();
   }
+  else
+  {
+    m_ResizeNeeded = true;
+  }
+
   m_InResize = false;
 }
 

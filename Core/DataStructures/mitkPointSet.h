@@ -130,8 +130,6 @@ public:
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
 
-  virtual void Initialize( const mitk::Geometry3D *geometry );
-  
   virtual void Initialize( int timeSteps );
 
   virtual void AdaptPointSetSeriesSize( int timeSteps );

@@ -48,24 +48,6 @@ mitk::PointSet::~PointSet()
 {
 }
 
-void mitk::PointSet::Initialize( const mitk::Geometry3D *geometry )
-{
-  this->SetGeometry( static_cast< Geometry3D * >( 
-    geometry->Clone().GetPointer() ) );
-
-  const mitk::TimeSlicedGeometry *timeGeometry = 
-    dynamic_cast< const mitk::TimeSlicedGeometry * >( geometry );
-
-  if ( timeGeometry )
-  {
-    this->Initialize( timeGeometry->GetTimeSteps() );
-  }
-  else
-  {
-    this->Initialize( 1 );
-  }
-}
-
 void mitk::PointSet::Initialize( int timeSteps )
 {
   mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();

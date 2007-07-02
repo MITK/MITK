@@ -35,11 +35,6 @@
             <property name="name">
                 <cstring>m_SliceSliderNavigator</cstring>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
             <property name="title">
                 <string>SliceSliderNavigater</string>
             </property>
@@ -85,11 +80,6 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_SelectDataGroupBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="lineWidth">
                                 <number>1</number>
@@ -192,23 +182,13 @@
                                                     <height>32767</height>
                                                 </size>
                                             </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
-                                            </property>
-                                            <property name="text">
+                                              <property name="text">
                                                 <string>Transversal:</string>
                                             </property>
                                         </widget>
                                         <widget class="QmitkSliderNavigator">
                                             <property name="name">
                                                 <cstring>m_SliderNavigatorTransversal</cstring>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
                                             </property>
                                         </widget>
                                     </hbox>
@@ -230,11 +210,6 @@
                                                     <width>70</width>
                                                     <height>32767</height>
                                                 </size>
-                                            </property>
-                                            <property name="font">
-                                                <font>
-                                                    <bold>0</bold>
-                                                </font>
                                             </property>
                                             <property name="text">
                                                 <string>Sagittal:</string>

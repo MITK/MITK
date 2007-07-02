@@ -35,11 +35,6 @@
             <property name="name">
                 <cstring>m_SingleTimeStepExporter</cstring>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
             <property name="title">
                 <string>TimeStepExporter</string>
             </property>
@@ -62,11 +57,6 @@
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
                     </property>
                     <property name="frameShadow">
                         <enum>Plain</enum>
@@ -141,10 +131,6 @@
                         <widget class="QPushButton">
                             <property name="name">
                                 <cstring>m_ExportTimeSliceButton</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                </font>
                             </property>
                             <property name="text">
                                 <string>Export Time Slice</string>

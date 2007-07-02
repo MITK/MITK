@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>1087</width>
-            <height>1163</height>
+            <width>135</width>
+            <height>102</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -17,11 +17,6 @@
             <width>0</width>
             <height>0</height>
         </size>
-    </property>
-    <property name="font">
-        <font>
-            <bold>1</bold>
-        </font>
     </property>
     <property name="caption">
         <string>ComponentContainer</string>
@@ -48,6 +43,11 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
             <property name="lineWidth">
                 <number>1</number>
             </property>
@@ -55,7 +55,7 @@
                 <number>0</number>
             </property>
             <property name="title">
-                <string></string>
+                <string>Select Image</string>
             </property>
             <property name="alignment">
                 <set>AlignTop</set>
@@ -77,6 +77,11 @@
                     <property name="name">
                         <cstring>m_ImageContent</cstring>
                     </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
                     <property name="frameShape">
                         <enum>NoFrame</enum>
                     </property>
@@ -93,30 +98,6 @@
                         <property name="spacing">
                             <number>3</number>
                         </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>m_WizardTextLabel</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>1</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string></string>
-                            </property>
-                            <property name="alignment">
-                                <set>AlignTop|AlignLeft</set>
-                            </property>
-                        </widget>
                         <widget class="QmitkDataTreeComboBox">
                             <property name="name">
                                 <cstring>m_TreeNodeSelector</cstring>
@@ -129,49 +110,35 @@
                             </property>
                             <property name="font">
                                 <font>
-                                    <bold>0</bold>
                                 </font>
                             </property>
                         </widget>
-                        <widget class="QWidgetStack">
-                            <property name="name">
-                                <cstring>m_WidgetStack</cstring>
-                            </property>
-                            <property name="frameShape">
-                                <enum>NoFrame</enum>
-                            </property>
-                            <property name="lineWidth">
-                                <number>0</number>
-                            </property>
-                            <widget class="QWidget">
-                                <property name="name">
-                                    <cstring>WStackPage</cstring>
-                                </property>
-                                <attribute name="id">
-                                    <number>0</number>
-                                </attribute>
-                            </widget>
-                        </widget>
-                        <spacer>
-                            <property name="name">
-                                <cstring>spacer1</cstring>
-                            </property>
-                            <property name="orientation">
-                                <enum>Vertical</enum>
-                            </property>
-                            <property name="sizeType">
-                                <enum>Minimum</enum>
-                            </property>
-                            <property name="sizeHint">
-                                <size>
-                                    <width>20</width>
-                                    <height>5</height>
-                                </size>
-                            </property>
-                        </spacer>
                     </vbox>
                 </widget>
             </vbox>
+        </widget>
+        <widget class="QWidgetStack">
+            <property name="name">
+                <cstring>m_WidgetStack</cstring>
+            </property>
+            <property name="font">
+                <font>
+                </font>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="lineWidth">
+                <number>0</number>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>WStackPage</cstring>
+                </property>
+                <attribute name="id">
+                    <number>0</number>
+                </attribute>
+            </widget>
         </widget>
     </vbox>
 </widget>
@@ -214,7 +181,9 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
     <function returnType="QWidgetStack *">GetWidgetStack()</function>
-    <function returnType="QLabel *">GetWizardTextLabel()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>171</width>
-            <height>143</height>
+            <width>156</width>
+            <height>149</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -41,7 +41,7 @@
                 </font>
             </property>
             <property name="title">
-                <string>Surface Manipulation</string>
+                <string>4. Edit Surface</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -53,15 +53,14 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="margin">
-                    <number>3</number>
-                </property>
-                <property name="spacing">
-                    <number>0</number>
-                </property>
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                     <property name="frameShape">
                         <enum>NoFrame</enum>
@@ -83,16 +82,11 @@
                             <number>0</number>
                         </property>
                         <property name="spacing">
-                            <number>0</number>
+                            <number>2</number>
                         </property>
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowTreeNodeSelecotrGroupBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -112,6 +106,12 @@
                             <vbox>
                                 <property name="name">
                                     <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
                                 </property>
                                 <widget class="QGroupBox">
                                     <property name="name">
@@ -143,11 +143,6 @@
                             <property name="name">
                                 <cstring>m_ParameterModeTextLabel</cstring>
                             </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
                             <property name="text">
                                 <string>Manipulation mode</string>
                             </property>
@@ -166,20 +161,10 @@
                             <property name="name">
                                 <cstring>m_ParameterModeComboBox</cstring>
                             </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
                         </widget>
                         <widget class="QCheckBox">
                             <property name="name">
                                 <cstring>m_ReplaceSurfaceCheckBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="text">
                                 <string>replace Surface?</string>
@@ -191,11 +176,6 @@
                         <widget class="QPushButton">
                             <property name="name">
                                 <cstring>m_StartFilterPushButton</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="text">
                                 <string>Start Manipulation</string>
@@ -251,4 +231,7 @@
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

@@ -251,8 +251,8 @@ QWidget* QmitkFunctionalityComponentContainer::CreateControlWidget(QWidget* pare
 		m_GUI = m_FunctionalityComponentContainerGUI;
 
 		m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-		m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("Select Image");
-		m_FunctionalityComponentContainerGUI->GetContainerBorder()->setLineWidth(0);
+		//m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("<bold>Select Image<\bold>");
+		//m_FunctionalityComponentContainerGUI->GetContainerBorder()->setLineWidth(0);
 	}
 	CreateConnections();
 	m_FunctionalityComponentContainerGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
@@ -412,16 +412,24 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 
 void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 {
-	QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
+	//QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
+	QBoxLayout * buttonLayout = new QHBoxLayout(m_FunctionalityComponentContainerGUI->layout());
+	//if(m_BackButton==NULL)
+	//{
+	//	m_BackButton = new QPushButton("<<", GetImageContent());
+	//}
+	//if(m_NextButton==NULL)
+	//{
+	//	m_NextButton = new QPushButton(">>", GetImageContent());
+	//}
 	if(m_BackButton==NULL)
 	{
-		m_BackButton = new QPushButton("<<", GetImageContent());
+		m_BackButton = new QPushButton("<<", m_FunctionalityComponentContainerGUI);
 	}
 	if(m_NextButton==NULL)
 	{
-		m_NextButton = new QPushButton(">>", GetImageContent());
+		m_NextButton = new QPushButton(">>", m_FunctionalityComponentContainerGUI);
 	}
-
 	buttonLayout->addWidget(m_BackButton);
 	buttonLayout->addWidget(m_NextButton);
 	//m_GUI->layout()->addChildLayout(buttonLayout);
@@ -450,8 +458,8 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 
 void QmitkFunctionalityComponentContainer::SetWizardText(const QString & text)
 {
-	m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setText(text);
-	m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setAlignment(Qt::WordBreak);
+	//m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setText(text);
+	//m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setAlignment(Qt::WordBreak);
 	GetImageContent()->updateGeometry();
 	GetImageContent()->repaint();
 	m_GUI->updateGeometry();

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>231</width>
-            <height>508</height>
+            <width>245</width>
+            <height>502</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -44,7 +44,7 @@
                 <number>1</number>
             </property>
             <property name="title">
-                <string>Create Surface</string>
+                <string>3. Create Surface</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -57,7 +57,7 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>2</number>
+                    <number>7</number>
                 </property>
                 <property name="spacing">
                     <number>0</number>
@@ -138,6 +138,11 @@
                     <property name="name">
                         <cstring>m_CreateSurfaceGroupBox</cstring>
                     </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
                     <property name="frameShape">
                         <enum>NoFrame</enum>
                     </property>
@@ -152,7 +157,10 @@
                             <cstring>unnamed</cstring>
                         </property>
                         <property name="margin">
-                            <number>0</number>
+                            <number>3</number>
+                        </property>
+                        <property name="spacing">
+                            <number>1</number>
                         </property>
                         <widget class="QLayoutWidget">
                             <property name="name">
@@ -171,11 +179,6 @@
                                 <widget class="QLabel">
                                     <property name="name">
                                         <cstring>textLabel1</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>Threshold</string>
@@ -202,11 +205,6 @@
                                     <property name="name">
                                         <cstring>m_ThresholdLineEdit</cstring>
                                     </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
                                     <property name="frameShape">
                                         <enum>LineEditPanel</enum>
                                     </property>
@@ -222,11 +220,6 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_ShowSurfaceParameterGroupBox</cstring>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -856,11 +849,6 @@
                             <property name="name">
                                 <cstring>m_CreateSurfaceButton</cstring>
                             </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
                             <property name="text">
                                 <string>Create Surface</string>
                             </property>
@@ -886,11 +874,6 @@
                                     <property name="enabled">
                                         <bool>false</bool>
                                     </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
-                                    </property>
                                     <property name="text">
                                         <string>Replace existing Surface</string>
                                     </property>
@@ -898,11 +881,6 @@
                                 <widget class="QCheckBox">
                                     <property name="name">
                                         <cstring>m_ShowContourChekckBox</cstring>
-                                    </property>
-                                    <property name="font">
-                                        <font>
-                                            <bold>0</bold>
-                                        </font>
                                     </property>
                                     <property name="text">
                                         <string>Show SurfaceContour</string>
@@ -988,4 +966,7 @@
     <function returnType="QCheckBox *">GetShowSurfaceContourCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

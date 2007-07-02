@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>282</width>
-            <height>115</height>
+            <width>288</width>
+            <height>120</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -44,7 +44,7 @@
                 <enum>GroupBoxPanel</enum>
             </property>
             <property name="title">
-                <string>Find Threshold</string>
+                <string>2. Find Threshold</string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -57,17 +57,25 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>3</number>
+                    <number>6</number>
                 </property>
                 <property name="spacing">
-                    <number>0</number>
+                    <number>2</number>
                 </property>
                 <widget class="QGroupBox">
                     <property name="name">
                         <cstring>m_ContainerContent</cstring>
                     </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
                     <property name="frameShape">
                         <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Plain</enum>
                     </property>
                     <property name="lineWidth">
                         <number>0</number>
@@ -89,13 +97,11 @@
                             <property name="name">
                                 <cstring>m_ThresholdSelectDataGroupBox</cstring>
                             </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
                             </property>
                             <property name="lineWidth">
                                 <number>0</number>
@@ -245,261 +251,6 @@
                                                             <height>32767</height>
                                                         </size>
                                                     </property>
-                                                    <property name="palette">
-                                                        <palette>
-                                                            <active>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>212</red>
-                                                                    <green>208</green>
-                                                                    <blue>200</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>233</red>
-                                                                    <green>231</green>
-                                                                    <blue>227</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>106</red>
-                                                                    <green>104</green>
-                                                                    <blue>100</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>141</red>
-                                                                    <green>138</green>
-                                                                    <blue>133</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                            </active>
-                                                            <disabled>
-                                                                <color>
-                                                                    <red>128</red>
-                                                                    <green>128</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>212</red>
-                                                                    <green>208</green>
-                                                                    <blue>200</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>243</red>
-                                                                    <green>239</green>
-                                                                    <blue>230</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>106</red>
-                                                                    <green>104</green>
-                                                                    <blue>100</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>141</red>
-                                                                    <green>138</green>
-                                                                    <blue>133</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>128</red>
-                                                                    <green>128</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>128</red>
-                                                                    <green>128</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>0</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                            </disabled>
-                                                            <inactive>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>212</red>
-                                                                    <green>208</green>
-                                                                    <blue>200</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>243</red>
-                                                                    <green>239</green>
-                                                                    <blue>230</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>106</red>
-                                                                    <green>104</green>
-                                                                    <blue>100</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>141</red>
-                                                                    <green>138</green>
-                                                                    <blue>133</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>0</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>128</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>255</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>0</red>
-                                                                    <green>0</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                                <color>
-                                                                    <red>255</red>
-                                                                    <green>0</green>
-                                                                    <blue>255</blue>
-                                                                </color>
-                                                            </inactive>
-                                                        </palette>
-                                                    </property>
-                                                    <property name="font">
-                                                        <font>
-                                                            <bold>0</bold>
-                                                        </font>
-                                                    </property>
                                                     <property name="frameShape">
                                                         <enum>LineEditPanel</enum>
                                                     </property>
@@ -564,11 +315,6 @@
                                                     <property name="name">
                                                         <cstring>m_DeleateImageIfDeactivatedCheckBox</cstring>
                                                     </property>
-                                                    <property name="font">
-                                                        <font>
-                                                            <bold>0</bold>
-                                                        </font>
-                                                    </property>
                                                     <property name="text">
                                                         <string>Delete Threshold Image 
 if Component is deactivated</string>
@@ -580,11 +326,6 @@ if Component is deactivated</string>
                                                 <widget class="QPushButton">
                                                     <property name="name">
                                                         <cstring>m_CreateSegmentationButton</cstring>
-                                                    </property>
-                                                    <property name="font">
-                                                        <font>
-                                                            <bold>0</bold>
-                                                        </font>
                                                     </property>
                                                     <property name="text">
                                                         <string>create segmentation</string>
@@ -651,4 +392,7 @@ if Component is deactivated</string>
     <function returnType="QPushButton *">GetCreateSegmentationButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

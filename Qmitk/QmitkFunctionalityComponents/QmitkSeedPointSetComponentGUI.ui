@@ -35,11 +35,7 @@
             <property name="name">
                 <cstring>m_PointSet</cstring>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
+    
             <property name="title">
                 <string>PointSet</string>
             </property>
@@ -66,11 +62,7 @@
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
+     
                     <property name="frameShape">
                         <enum>NoFrame</enum>
                     </property>

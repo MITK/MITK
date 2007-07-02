@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindowManager.h"
 #include <itkCommand.h>
-#include <mitkRenderingManager.h>
 
 // constructor
 mitk::LevelWindowManager::LevelWindowManager()
@@ -169,7 +168,6 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
   if (m_LevelWindowProperty.IsNotNull())
   {
     m_LevelWindowProperty->SetLevelWindow(levelWindow);
-    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -273,5 +271,4 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
   {
     SetAutoTopMostImage(true);
   }
-  RenderingManager::GetInstance()->RequestUpdateAll();
 }

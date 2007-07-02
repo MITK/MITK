@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtooltip.h>
 #include <itkCommand.h>
 #include <QmitkLevelWindowWidgetContextMenu.h>
+#include <mitkRenderingManager.h>
 
 /**
 * Constructor
@@ -453,6 +454,7 @@ void QmitkSliderLevelWindowWidget::update() {
     m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetMax() - m_LevelWindow.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
   
   QWidget::repaint();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )

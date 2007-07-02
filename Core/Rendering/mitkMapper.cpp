@@ -99,7 +99,14 @@ void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
-  m_TimeStep = renderer->GetTimeStep();
+  if ( renderer != NULL )
+  {
+    m_TimeStep = renderer->GetTimeStep();
+  }
+  else
+  {
+    m_TimeStep = 0;
+  }
   /*
   //
   // get the world time

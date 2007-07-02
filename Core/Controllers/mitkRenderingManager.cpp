@@ -200,13 +200,20 @@ void
 mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )
 {
-  s_RenderWindowList[renderWindow] = 2;
+  if ( s_RenderWindowList[renderWindow] < 2 )
+  {
+    s_RenderWindowList[renderWindow] = 2;
+  }
    
   if (m_IsRendering[renderWindow])
   {
     this->AbortRendering( renderWindow );
   }
-  m_RenderWindowList[renderWindow] = 2;
+
+  if ( m_RenderWindowList[renderWindow] < 2 )
+  {
+    m_RenderWindowList[renderWindow] = 2;
+  }
   
   if ( !m_UpdatePending )
   {
@@ -278,9 +285,21 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    it->second = magicUpdateFlag;
-    s_RenderWindowList[it->first] = magicUpdateFlag;
+    if ( it->second < magicUpdateFlag )
+    {
+      it->second = magicUpdateFlag;
+    }
+
     this->RequestUpdate( it->first);
+
+    if ( s_RenderWindowList[it->first] < magicUpdateFlag )
+    {
+      s_RenderWindowList[it->first] = magicUpdateFlag;
+    }
+    if ( m_RenderWindowList[it->first] < magicUpdateFlag )
+    {
+      m_RenderWindowList[it->first] = magicUpdateFlag;
+    }
   }
 
   // Restart the timer if there are no requests already
@@ -388,8 +407,8 @@ mitk::RenderingManager
     {
       if ( it->second )
       {
-        it->second = 0;
         this->ForceImmediateUpdate( it->first );
+        it->second = 0;
       }
     }
   }
@@ -400,8 +419,8 @@ mitk::RenderingManager
     {
       if ( it->second )
       {
-        it->second = 0;
         this->ForceImmediateUpdate( it->first );
+        it->second = 0;
       }
     }
   }

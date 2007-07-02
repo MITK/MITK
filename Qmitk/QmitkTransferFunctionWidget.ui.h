@@ -77,11 +77,11 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
       }
     }
     m_ScalarOpacityFunctionCanvas->setEnabled(true);
-    m_ScalarOpacityFunctionCanvas->SetTFWidget(this);
+    m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEdit, m_YEdit);
     m_GradientOpacityCanvas->setEnabled(true);
-    m_GradientOpacityCanvas->SetTFWidget(this);
+    m_GradientOpacityCanvas->SetQLineEdits(m_XEdit, m_YEdit);
     m_ColorTransferFunctionCanvas->setEnabled(true);
-    m_ColorTransferFunctionCanvas->SetTFWidget(this);
+    m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEdit, m_YEdit);
     m_ScalarOpacityFunctionCanvas->update();
     m_GradientOpacityCanvas->update();
     m_ColorTransferFunctionCanvas->update();
@@ -710,16 +710,6 @@ void QmitkTransferFunctionWidget::ImmediateUpdate(bool state)
     m_ScalarOpacityFunctionCanvas->SetImmediateUpdate(state);
     m_ColorTransferFunctionCanvas->SetImmediateUpdate(state);
     m_GradientOpacityCanvas->SetImmediateUpdate(state);	    
-}
-
-QLineEdit* QmitkTransferFunctionWidget::GetEditX()
-{
-  return m_XEdit;
-}
-
-QLineEdit* QmitkTransferFunctionWidget::GetEditY( )
-{
-  return m_YEdit;
 }
 
 void QmitkTransferFunctionWidget::SetXValue()

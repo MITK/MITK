@@ -28,8 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 #include <vector>
 #include <math.h>
+#include <qlineedit.h>
 
-#include "QmitkTransferFunctionWidget.h"
 
 #include <vtkPiecewiseFunction.h>
 
@@ -114,13 +114,7 @@ class QmitkTransferFunctionCanvas : public QWidget
     void keyPressEvent ( QKeyEvent * e ); 
     
     void SetImmediateUpdate(bool state);
-    
-    void SetTFWidget(QmitkTransferFunctionWidget* widget)
-    {
-      m_TFWidget = widget;
-      m_TFWidgetAvailable = true;
-    }
-    
+      
     void SetX(float x)
     {
       if (m_GrabbedHandle != -1 && GetFunctionX(m_GrabbedHandle) != m_Min && GetFunctionX(m_GrabbedHandle) != m_Max)
@@ -141,11 +135,20 @@ class QmitkTransferFunctionCanvas : public QWidget
       }   
     }
     
+    void SetQLineEdits(QLineEdit* xEdit, QLineEdit* yEdit)
+    {
+      m_XEdit = xEdit;
+      m_YEdit = yEdit;
+      m_LineEditAvailable = true;
+    }
+    
   protected: 
     bool m_ImmediateUpdate;
     float m_Range;
-    bool m_TFWidgetAvailable;
-    QmitkTransferFunctionWidget* m_TFWidget;
+    
+    bool m_LineEditAvailable;
+    QLineEdit* m_XEdit;
+    QLineEdit* m_YEdit;
 };
 #endif
 

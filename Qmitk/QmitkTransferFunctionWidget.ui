@@ -384,8 +384,6 @@
     <function>ChooseCS( int cstyle )</function>
     <function>ResetCS()</function>
     <function>AddCS()</function>
-    <function returnType="QLineEdit *">GetEditX()</function>
-    <function returnType="QLineEdit *">GetEditY()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

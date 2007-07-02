@@ -28,8 +28,7 @@ QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent, con
 
 void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* ) 
 {
-  
-  QPainter painter(this );
+  QPainter painter( this );
   
   if (m_IsGradientOpacityFunction)
   {
@@ -58,11 +57,12 @@ void QmitkPiecewiseFunctionCanvas::paintEvent( QPaintEvent* )
       if(i == m_GrabbedHandle)
       {
         painter.setBrush(QBrush(Qt::red));
-        if(m_TFWidgetAvailable)
-        { 
+        
+        if(m_LineEditAvailable)
+        {
           //inserts X/Y values of the grabbed function point into QLineEdit 
-          m_TFWidget->GetEditX()->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
-          m_TFWidget->GetEditY()->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
+          m_XEdit->setText( QString::number( GetFunctionX(m_GrabbedHandle)) );
+          m_YEdit->setText( QString::number( GetFunctionY(m_GrabbedHandle)) );
         }
       }
       else

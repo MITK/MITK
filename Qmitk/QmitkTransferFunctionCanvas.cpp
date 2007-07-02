@@ -35,7 +35,7 @@ QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent, const
 {
   setEnabled(false);
   setFocusPolicy(QWidget::ClickFocus);
-  m_TFWidgetAvailable = false;
+  m_LineEditAvailable = false;
 }
 
 void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)
@@ -70,10 +70,11 @@ int QmitkTransferFunctionCanvas::GetNearHandle(int /*x*/,int /*y*/,unsigned int 
 
 void QmitkTransferFunctionCanvas::mousePressEvent( QMouseEvent* mouseEvent )
 {   
-  if(m_TFWidgetAvailable)
+
+  if(m_LineEditAvailable)
   {
-    m_TFWidget->GetEditX()->clear();
-    m_TFWidget->GetEditY()->clear();
+    m_XEdit->clear();
+    m_YEdit->clear();
   }
   
   m_GrabbedHandle = GetNearHandle(mouseEvent->x(),mouseEvent->y());

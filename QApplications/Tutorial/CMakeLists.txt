@@ -1,3 +1,6 @@
+INCLUDE_DIRECTORIES(${Q${KITNAME}_INCLUDE_DIRS})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
 INCLUDE_DIRECTORIES(.)
 
 # initialize only the source lists which need additional files

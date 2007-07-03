@@ -416,8 +416,8 @@ iil4mitkPicImage::display (iil4mitkWidget* widget)
 	else {
 		glMatrixMode (GL_MODELVIEW);
         glPushMatrix ();
-        //glColor4f ( red(), green(), blue(), alpha() );
-		glColor4f( 1.0, 0.0, 0.0, 1.0 );
+        glColor4f ( red(), green(), blue(), alpha() );
+        //glColor4f( 1.0, 0.0, 0.0, 1.0 );
         glTranslatef( x(), y(), 0.0 );
         glBegin( GL_LINES );
 		

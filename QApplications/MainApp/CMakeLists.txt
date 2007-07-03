@@ -13,7 +13,12 @@ FOREACH(entry ${CACHE_VARS})
 STRING(REGEX MATCH "^${kit}_KNOWN_FUNCTIONALITY_[A-Za-z]+$" match ${entry})
 IF(match)
   STRING(REGEX REPLACE "^${kit}_KNOWN_FUNCTIONALITY_" "" potential_func_name ${match})
-  SET(${kit}_FUNCTIONALITY_NAMES_KNOWN "${${kit}_FUNCTIONALITY_NAMES_KNOWN};${potential_func_name}")
+  # now check whether a functionality dir is set and exists
+  IF(${match})
+    IF(IS_DIRECTORY ${${match}})
+      SET(${kit}_FUNCTIONALITY_NAMES_KNOWN "${${kit}_FUNCTIONALITY_NAMES_KNOWN};${potential_func_name}")
+    ENDIF(IS_DIRECTORY ${${match}})
+  ENDIF(${match})
 ENDIF(match)
 ENDFOREACH(entry)
 # MESSAGE("${kit}_FUNCTIONALITY_NAMES_KNOWN: ${${kit}_FUNCTIONALITY_NAMES_KNOWN}")
@@ -21,9 +26,6 @@ ENDFOREACH(kit)
 
 SET(ALL_KNOWN_FUNCTIONALITY_NAMES ${MITK_FUNCTIONALITY_NAMES_KNOWN} ${MBIQM_FUNCTIONALITY_NAMES_KNOWN} ${MBISB_FUNCTIONALITY_NAMES_KNOWN})
 FOREACH(FUNC_NAME ${ALL_KNOWN_FUNCTIONALITY_NAMES})
-  # first check if name is known, otherwise the name is maybe left from before and
-  # the functionality doesn't exist anymore, e.g. because the build system was 
-  # modified.
   IF(BUILD_${FUNC_NAME} OR BUILD_ALL_FUNCTIONALITIES)
     MESSAGE(STATUS "Adding ${FUNC_NAME} to MainApp")
     SET(FUNC_LIBRARIES ${FUNC_LIBRARIES} ${FUNC_NAME})

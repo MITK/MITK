@@ -840,16 +840,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         const mitk::Vector3D &currentNormal = planeGeometry->GetNormal();
         const mitk::Vector3D &newNormal = planeOp->GetNormal();
 
-        std::cout << "currentNormal: " << currentNormal << std::endl;
-        std::cout << "newNormal: " << newNormal << std::endl;
-
         Vector3D rotationAxis = itk::CrossProduct( newNormal, currentNormal );
 
         vtkFloatingPointType rotationAngle = - atan2( 
           (double) rotationAxis.GetNorm(),
           (double) (newNormal * currentNormal) );
-
-        std::cout << "rotationAngle: " << rotationAngle << std::endl;
 
         rotationAngle *= 180.0 / vnl_math::pi;
 

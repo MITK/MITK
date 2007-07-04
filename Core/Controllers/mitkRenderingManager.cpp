@@ -121,7 +121,6 @@ mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
   m_RenderWindowList[renderWindow] = 0;
-  s_RenderWindowList[renderWindow] = 0;
   
   m_AllRenderWindows.push_back( renderWindow );
 
@@ -160,10 +159,6 @@ mitk::RenderingManager
 ::RemoveRenderWindow( RenderWindow *renderWindow )
 {
   m_RenderWindowList.erase( renderWindow );
-  if(s_Instance == this)
-  {
-    s_RenderWindowList.erase( renderWindow );
-  }
 
   RenderWindowVector::iterator thisRenderWindowsPosition = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
   if ( thisRenderWindowsPosition != m_AllRenderWindows.end() )
@@ -200,11 +195,6 @@ void
 mitk::RenderingManager
 ::RequestUpdate( RenderWindow *renderWindow )
 {
-  if ( s_RenderWindowList[renderWindow] < 2 )
-  {
-    s_RenderWindowList[renderWindow] = 2;
-  }
-   
   if (m_IsRendering[renderWindow])
   {
     this->AbortRendering( renderWindow );
@@ -214,7 +204,7 @@ mitk::RenderingManager
   {
     m_RenderWindowList[renderWindow] = 2;
   }
-  
+
   if ( !m_UpdatePending )
   {
     m_UpdatePending = true;
@@ -225,28 +215,25 @@ mitk::RenderingManager
 void
 mitk::RenderingManager
 ::CheckUpdatePending()
-{ // Check if there are pending requests for any other windows
+{
+  // Check if there are pending requests for any other windows
+  m_UpdatePending = false;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-  {
+  { 
     if ( it->second > 0 )
     {
       m_UpdatePending = true;
     }
-    else
-    {
-      m_UpdatePending = false;
-    }
   }
-
 }
 
 void
 mitk::RenderingManager
 ::ForceImmediateUpdate( RenderWindow *renderWindow )
-{ 
-  bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 ) && ( s_RenderWindowList[renderWindow] == 1 )) ?true:false;
-  bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 ) && ( s_RenderWindowList[renderWindow] == 3 )) ?true:false;
+{
+  bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 )) ? true:false;
+  bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 )) ? true:false;
 
   if ( includingVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
   {
@@ -259,11 +246,8 @@ mitk::RenderingManager
 
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = 0;
-  s_RenderWindowList[renderWindow] = 0;
 
-  CheckUpdatePending();
-  if(s_Instance != this)
-    GetInstance()->CheckUpdatePending();
+  this->CheckUpdatePending();
 
   // Stop the timer if no more requests are pending
   if ( !m_UpdatePending )
@@ -273,15 +257,14 @@ mitk::RenderingManager
 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
-  
 }
 
 void
 mitk::RenderingManager
 ::RequestUpdateAll( bool includeVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
 {
+  
   int magicUpdateFlag = includeVtkActors?3:2;
-  //std::cout<<"RMUA \n";
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -292,10 +275,6 @@ mitk::RenderingManager
 
     this->RequestUpdate( it->first);
 
-    if ( s_RenderWindowList[it->first] < magicUpdateFlag )
-    {
-      s_RenderWindowList[it->first] = magicUpdateFlag;
-    }
     if ( m_RenderWindowList[it->first] < magicUpdateFlag )
     {
       m_RenderWindowList[it->first] = magicUpdateFlag;
@@ -317,12 +296,10 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    int& globalRequest = s_RenderWindowList[it->first];
-    bool onlyOverlay = (( it->second == 1 ) && ( globalRequest == 1 )) ?true:false;
+    bool onlyOverlay = ( it->second == 1 ) ?true:false;
 
     // Erase potentially pending requests
     it->second = 0;
-    globalRequest = 0;
 
     // Immediately repaint this window (implementation platform specific)
     it->first->Repaint(onlyOverlay);
@@ -334,8 +311,7 @@ mitk::RenderingManager
     m_UpdatePending = false;
   }
 
-  if(s_Instance != this)
-    GetInstance()->CheckUpdatePending();
+  this->CheckUpdatePending();
 }
 
 void 
@@ -345,12 +321,10 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    int& globalRequest = s_RenderWindowList[it->first];
-    bool onlyOverlay = (( it->second == 1 ) && ( globalRequest == 1 )) ?true:false;
+    bool onlyOverlay = ( it->second == 1 ) ? true:false;
 
     // Erase potentially pending requests
     it->second = 0;
-    globalRequest = 0;
     
     // if the render window is rendered via an mitk::OpenGLRenderer
     // call UpdateIncludingVtkActors. 
@@ -366,8 +340,7 @@ mitk::RenderingManager
     m_UpdatePending = false;
   }
 
-  if(s_Instance != this)
-    GetInstance()->CheckUpdatePending();
+  this->CheckUpdatePending();
 }
 
 void
@@ -400,28 +373,12 @@ mitk::RenderingManager
  m_UpdatePending = false;
 
   // Satisfy all pending update requests
-  if(s_Instance == this)
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    RenderWindowList::iterator it;
-    for ( it = s_RenderWindowList.begin(); it != s_RenderWindowList.end(); ++it )
+    if ( it->second )
     {
-      if ( it->second )
-      {
-        this->ForceImmediateUpdate( it->first );
-        it->second = 0;
-      }
-    }
-  }
-  else
-  {
-    RenderWindowList::iterator it;
-    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-    {
-      if ( it->second )
-      {
-        this->ForceImmediateUpdate( it->first );
-        it->second = 0;
-      }
+      this->ForceImmediateUpdate( it->first );
     }
   }
 }
@@ -432,9 +389,8 @@ mitk::RenderingManager
 {
 
   // don't distroy rendering request
-  if( s_RenderWindowList[renderWindow] < 1 && m_RenderWindowList[renderWindow] < 1 )
+  if ( m_RenderWindowList[renderWindow] < 1 )
   {
-    s_RenderWindowList[renderWindow] = 1;
     m_RenderWindowList[renderWindow] = 1;
   }
   
@@ -455,7 +411,6 @@ mitk::RenderingManager
     if( it->second < 1 )
     {
       it->second = 1;
-      s_RenderWindowList[it->first] = 1;
     }
   }
 
@@ -541,11 +496,13 @@ mitk::RenderingManager
   this->DoFinishAbortRendering();
 
   /** Level-Of-Detail **/
-  if(GetCurrentLOD() < m_MaxLOD)
+  if(m_CurrentLOD < m_MaxLOD)
   {
-    int nextLOD = GetCurrentLOD()+1;
+    int nextLOD = m_CurrentLOD+1;
     SetCurrentLOD(nextLOD);
+    //std::cout<<"request update..."<<std::endl;
     RequestUpdateAll();
+    //std::cout<<"update requested"<<std::endl;
   }
 }
 

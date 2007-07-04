@@ -501,6 +501,7 @@ mitk::RenderingManager
     int nextLOD = m_CurrentLOD+1;
     SetCurrentLOD(nextLOD);
     //std::cout<<"request update..."<<std::endl;
+    m_UpdatePending = false;
     RequestUpdateAll();
     //std::cout<<"update requested"<<std::endl;
   }

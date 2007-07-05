@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
+#include "mitkGeometryData.h"
 #include "mitkGeometry2D.h"
 
 namespace mitk {
@@ -31,10 +32,10 @@ namespace mitk {
 //## @brief Data class containing Geometry2D objects
 //## @ingroup Geometry
 //##
-class Geometry2DData : public BaseData
+class Geometry2DData : public GeometryData
 {
 public:
-  mitkClassMacro(Geometry2DData, BaseData);
+  mitkClassMacro(Geometry2DData, GeometryData);
 
   itkNewMacro(Self);
 
@@ -43,7 +44,7 @@ public:
   //## by the object
   //##
   //## @warning Accepts only instances of Geometry2D or sub-classes.
-  void SetGeometry(mitk::Geometry3D *geometry);
+  virtual void SetGeometry(mitk::Geometry3D *geometry);
 
   //##ModelId=3E6423D2030E
   //##Documentation
@@ -54,7 +55,7 @@ public:
   //##Documentation
   //## @brief Get the reference to the Geometry2D that is stored
   //## by the object
-  mitk::Geometry2D * GetGeometry2D() const
+  virtual mitk::Geometry2D * GetGeometry2D() const
   {
     return static_cast<mitk::Geometry2D *>(GetGeometry());
   };

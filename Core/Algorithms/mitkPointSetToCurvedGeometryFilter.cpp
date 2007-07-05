@@ -32,8 +32,6 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
   mitk::PointSet::ConstPointer input  = this->GetInput();
   mitk::Geometry2DData::Pointer output  = dynamic_cast<mitk::Geometry2DData*> ( this->GetOutput() );
 
-  std::cout <<   "GenerateOutputInformation()" << std::endl;
-
   if ( input.IsNull() )
     itkGenericExceptionMacro ( "Input point set is NULL!" );
 
@@ -75,7 +73,6 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
 
 void mitk::PointSetToCurvedGeometryFilter::GenerateData()
 {
-  std::cout << "Generate Data" << std::endl;
   mitk::PointSet::ConstPointer input  = this->GetInput();
   mitk::GeometryData::Pointer output  = this->GetOutput();
 

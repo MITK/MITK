@@ -172,7 +172,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     //threshold->Delete();
     gaussian->SetDimensionality( 3  );
     gaussian->SetRadiusFactor( 0.49 );
-    gaussian->SetStandardDeviation( 1.5 );
+    gaussian->SetStandardDeviation( GetGaussianStandardDeviation() );
     gaussian->ReleaseDataFlagOn();
     gaussian->UpdateInformation();
     gaussian->Update();

@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>245</width>
+            <width>247</width>
             <height>502</height>
         </rect>
     </property>
@@ -19,7 +19,7 @@
         </size>
     </property>
     <property name="caption">
-        <string>ThresholdComponent</string>
+        <string>SurfaceCreatorComponent</string>
     </property>
     <vbox>
         <property name="name">
@@ -205,6 +205,14 @@
                                     <property name="name">
                                         <cstring>m_ThresholdLineEdit</cstring>
                                     </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
                                     <property name="frameShape">
                                         <enum>LineEditPanel</enum>
                                     </property>
@@ -224,11 +232,14 @@
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
                             </property>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
                             <property name="lineWidth">
                                 <number>0</number>
                             </property>
                             <property name="title">
-                                <string> -- Parameter --</string>
+                                <string>  -- Parameter --</string>
                             </property>
                             <property name="checkable">
                                 <bool>true</bool>
@@ -257,7 +268,7 @@
                                         <number>1</number>
                                     </property>
                                     <property name="title">
-                                        <string> -- ExpertMode --</string>
+                                        <string> -- Expert Mode --</string>
                                     </property>
                                     <property name="checkable">
                                         <bool>true</bool>
@@ -278,6 +289,14 @@
                                             </property>
                                             <property name="enabled">
                                                 <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
                                             </property>
                                             <property name="text">
                                                 <string>Median 3D</string>
@@ -340,6 +359,14 @@
                                                                     <property name="name">
                                                                         <cstring>m_Median3DXValueLineEdit</cstring>
                                                                     </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
+                                                                    </property>
                                                                     <property name="text">
                                                                         <string>3</string>
                                                                     </property>
@@ -368,6 +395,14 @@
                                                                     <property name="name">
                                                                         <cstring>m_Median3DYValueLineEdit</cstring>
                                                                     </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
+                                                                    </property>
                                                                     <property name="text">
                                                                         <string>3</string>
                                                                     </property>
@@ -393,6 +428,14 @@
                                                                     <property name="name">
                                                                         <cstring>m_Median3DZValueLineEdit</cstring>
                                                                     </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
+                                                                    </property>
                                                                     <property name="text">
                                                                         <string>3</string>
                                                                     </property>
@@ -409,6 +452,14 @@
                                             </property>
                                             <property name="enabled">
                                                 <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
                                             </property>
                                             <property name="text">
                                                 <string>Interpolate</string>
@@ -453,7 +504,7 @@
                                                                 <cstring>textLabel1_2_2</cstring>
                                                             </property>
                                                             <property name="text">
-                                                                <string>X, Y, Z spacing in mm</string>
+                                                                <string>X, Y, Z Spacing in mm</string>
                                                             </property>
                                                         </widget>
                                                         <widget class="QLayoutWidget">
@@ -467,6 +518,14 @@
                                                                 <widget class="QLineEdit">
                                                                     <property name="name">
                                                                         <cstring>m_InterpolateXValueLineEdit</cstring>
+                                                                    </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
                                                                     </property>
                                                                     <property name="text">
                                                                         <string>1</string>
@@ -496,6 +555,14 @@
                                                                     <property name="name">
                                                                         <cstring>m_InterpolateYValueLineEdit</cstring>
                                                                     </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
+                                                                    </property>
                                                                     <property name="text">
                                                                         <string>1</string>
                                                                     </property>
@@ -524,6 +591,14 @@
                                                                     <property name="name">
                                                                         <cstring>m_InterpolateZValueLineEdit</cstring>
                                                                     </property>
+                                                                    <property name="sizePolicy">
+                                                                        <sizepolicy>
+                                                                            <hsizetype>5</hsizetype>
+                                                                            <vsizetype>5</vsizetype>
+                                                                            <horstretch>0</horstretch>
+                                                                            <verstretch>0</verstretch>
+                                                                        </sizepolicy>
+                                                                    </property>
                                                                     <property name="text">
                                                                         <string>1</string>
                                                                     </property>
@@ -540,6 +615,14 @@
                                             </property>
                                             <property name="enabled">
                                                 <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
                                             </property>
                                             <property name="text">
                                                 <string>Smooth</string>
@@ -611,6 +694,14 @@
                                                             <property name="name">
                                                                 <cstring>m_SmoothIterationValueLineEdit</cstring>
                                                             </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>5</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
                                                             <property name="text">
                                                                 <string>50</string>
                                                             </property>
@@ -657,6 +748,14 @@
                                                             <property name="name">
                                                                 <cstring>m_SmoothIRelaxationValueLineEdit</cstring>
                                                             </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>5</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
                                                             <property name="text">
                                                                 <string>0.1</string>
                                                             </property>
@@ -671,6 +770,14 @@
                                             </property>
                                             <property name="enabled">
                                                 <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
                                             </property>
                                             <property name="text">
                                                 <string>Gauss</string>
@@ -742,6 +849,14 @@
                                                             <property name="name">
                                                                 <cstring>m_GausValueLineEdit</cstring>
                                                             </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>5</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
                                                             <property name="text">
                                                                 <string>1.5</string>
                                                             </property>
@@ -759,6 +874,14 @@
                                             </property>
                                             <property name="enabled">
                                                 <bool>false</bool>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>5</hsizetype>
+                                                    <vsizetype>5</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
                                             </property>
                                             <property name="text">
                                                 <string>Decimate</string>
@@ -830,6 +953,14 @@
                                                             <property name="name">
                                                                 <cstring>m_DecimateValueLineEdit</cstring>
                                                             </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>5</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
                                                             <property name="text">
                                                                 <string>0.5</string>
                                                             </property>
@@ -848,6 +979,14 @@
                         <widget class="QPushButton">
                             <property name="name">
                                 <cstring>m_CreateSurfaceButton</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
                             <property name="text">
                                 <string>Create Surface</string>
@@ -874,16 +1013,32 @@
                                     <property name="enabled">
                                         <bool>false</bool>
                                     </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
                                     <property name="text">
-                                        <string>Replace existing Surface</string>
+                                        <string>Replace Existing Surface</string>
                                     </property>
                                 </widget>
                                 <widget class="QCheckBox">
                                     <property name="name">
                                         <cstring>m_ShowContourChekckBox</cstring>
                                     </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>5</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
                                     <property name="text">
-                                        <string>Show SurfaceContour</string>
+                                        <string>Show Surface Contour</string>
                                     </property>
                                 </widget>
                             </vbox>
@@ -966,7 +1121,4 @@
     <function returnType="QCheckBox *">GetShowSurfaceContourCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-</includehints>
 </UI>

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>288</width>
-            <height>120</height>
+            <width>340</width>
+            <height>193</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -305,9 +305,9 @@
                                         </widget>
                                         <widget class="QLayoutWidget">
                                             <property name="name">
-                                                <cstring>layout2</cstring>
+                                                <cstring>layout3</cstring>
                                             </property>
-                                            <hbox>
+                                            <vbox>
                                                 <property name="name">
                                                     <cstring>unnamed</cstring>
                                                 </property>
@@ -328,10 +328,10 @@ if Component is deactivated</string>
                                                         <cstring>m_CreateSegmentationButton</cstring>
                                                     </property>
                                                     <property name="text">
-                                                        <string>create segmentation</string>
+                                                        <string>Create Segmentation</string>
                                                     </property>
                                                 </widget>
-                                            </hbox>
+                                            </vbox>
                                         </widget>
                                     </vbox>
                                 </widget>
@@ -392,7 +392,4 @@ if Component is deactivated</string>
     <function returnType="QPushButton *">GetCreateSegmentationButton()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-</includehints>
 </UI>

@@ -144,7 +144,7 @@
                                 <cstring>m_ParameterModeTextLabel</cstring>
                             </property>
                             <property name="text">
-                                <string>Manipulation mode</string>
+                                <string>Manipulation Mode</string>
                             </property>
                         </widget>
                         <widget class="QComboBox">
@@ -161,13 +161,29 @@
                             <property name="name">
                                 <cstring>m_ParameterModeComboBox</cstring>
                             </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
                         </widget>
                         <widget class="QCheckBox">
                             <property name="name">
                                 <cstring>m_ReplaceSurfaceCheckBox</cstring>
                             </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
                             <property name="text">
-                                <string>replace Surface?</string>
+                                <string>Replace Surface</string>
                             </property>
                             <property name="checked">
                                 <bool>true</bool>
@@ -176,6 +192,14 @@
                         <widget class="QPushButton">
                             <property name="name">
                                 <cstring>m_StartFilterPushButton</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
                             </property>
                             <property name="text">
                                 <string>Start Manipulation</string>
@@ -231,7 +255,4 @@
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-</includehints>
 </UI>

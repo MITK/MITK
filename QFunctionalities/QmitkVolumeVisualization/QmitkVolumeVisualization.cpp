@@ -93,18 +93,32 @@ void QmitkVolumeVisualization::TreeChanged()
 void QmitkVolumeVisualization::Activated()
 {
   QmitkFunctionality::Activated();
+  
+  const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
+  if (item)
+  {
+    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
+    bool enabled = false; 
+    if (node) 
+    {
+      node->GetBoolProperty("volumerendering",enabled);
+    }
+    m_Controls->m_EnableRenderingCB->setChecked(enabled);
+  }
 }
 void QmitkVolumeVisualization::ImageSelected(const mitk::DataTreeFilter::Item* item)
 {
   mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
   bool enabled = false; 
-  if (node) {
+  if (node) 
+  {
     node->GetBoolProperty("volumerendering",enabled);
   }
   m_Controls->m_EnableRenderingCB->setChecked(enabled);
-  if (enabled) {
-m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
-m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
+  if (enabled) 
+  {
+    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+    m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
 }
 }
 void QmitkVolumeVisualization::EnableRendering(bool state) 
@@ -187,3 +201,4 @@ void QmitkVolumeVisualization::EnableClippingPlane(bool state)
   mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(state);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+

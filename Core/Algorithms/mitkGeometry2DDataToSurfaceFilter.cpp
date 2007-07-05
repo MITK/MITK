@@ -92,7 +92,32 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 {
   mitk::Geometry2DData::ConstPointer input = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
-
+  
+  if ( input.IsNull() )
+  {
+    itkWarningMacro("input is null");
+  }
+  else if ( input->GetGeometry2D() == NULL) 
+  {
+    itkWarningMacro("geometry2D is NULL");
+  }
+  else if ( input->GetGeometry2D()->IsValid() == false)
+  {
+    itkWarningMacro("geometry2D is invalid");
+  }
+  else if (m_UseBoundingBox && (m_BoundingBox.IsNull() || (m_BoundingBox->GetDiagonalLength2() < mitk::eps)))
+  {
+    itkWarningMacro("Bounding box problem");
+    if ( m_BoundingBox.IsNull() )
+    {
+      itkWarningMacro("m_BoundingBox is NULL!");
+    }
+    else if (m_BoundingBox->GetDiagonalLength2() < mitk::eps) 
+    {
+      itkWarningMacro("Diagonal Length < mitk::eps");
+    }
+  }
+  
   if ( input.IsNull() || (input->GetGeometry2D() == NULL)
     || (input->GetGeometry2D()->IsValid() == false)
     || (m_UseBoundingBox && (m_BoundingBox.IsNull() || (m_BoundingBox->GetDiagonalLength2() < mitk::eps))) )
@@ -102,13 +127,14 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
   Point3D origin;
   Point3D right, bottom;
-
+ 
   vtkPolyData *planeSurface = NULL;
   
-    
+  itkWarningMacro("1");
   // Does the Geometry2DData contain a PlaneGeometry?
   if ( dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() ) != NULL )
   {
+    itkWarningMacro("wrong way")
     mitk::PlaneGeometry *planeGeometry = 
       dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
 
@@ -268,6 +294,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   else if ( mitk::AbstractTransformGeometry *abstractGeometry =
     dynamic_cast< AbstractTransformGeometry * >( input->GetGeometry2D() ) )
   {
+    itkWarningMacro("2");
     // In the case of an AbstractTransformGeometry (which holds a possibly
     // non-rigid transform), we proceed slightly differently: since the
     // plane can be arbitrarily deformed, we need to transform it by the
@@ -332,10 +359,14 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     m_PlaneClipper->GenerateClippedOutputOn();
     m_PlaneClipper->InsideOutOn();
     m_PlaneClipper->SetValue( 0.0 );
+    itkWarningMacro("3");
 
     planeSurface = m_PlaneClipper->GetOutput();
   }
-
+  else
+  {
+    itkWarningMacro("Unsupported geometry");
+  }
   output->SetVtkPolyData( planeSurface );
   output->CalculateBoundingBox();
 }

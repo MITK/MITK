@@ -12,7 +12,7 @@
 
 mitk::PointSetToCurvedGeometryFilter::PointSetToCurvedGeometryFilter()
 {
-  m_ProjectionMode = XZPlane;
+  m_ProjectionMode = YZPlane;
   m_PCAPlaneCalculator = mitk::PlaneFit::New();
   m_ImageToBeMapped = NULL;
   m_Sigma = 1000;

@@ -59,7 +59,7 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 }
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
-{      
+{        
   m_Firstcall = true;
   m_PlaneSet = false;
   
@@ -132,7 +132,6 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_VolumeLOD->Delete();
   m_ClippingPlane->Delete(); 
   m_PlaneWidget->Delete();
-
 }
 
 void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
@@ -170,26 +169,26 @@ void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long
 
 
 void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
-{ 
+{
   SetPreferences();
 
   if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 0)
   {
     m_VolumeLOD->SetSelectedLODID(m_LowResID);
-    //std::cout<<" Low ";
+    //std::cout<<" Low "<<std::endl;
   }
   else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 1)
   {
     m_VolumeLOD->SetSelectedLODID(m_MedResID);
-    //std::cout<<" Med ";
+    //std::cout<<" Med "<<std::endl;
   }
   else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 2)
   {
     m_VolumeLOD->SetSelectedLODID(m_HiResID);
-    //std::cout<<" Hi ";
+    //std::cout<<" Hi "<<std::endl;
   }
   else{
-    //std::cout<<"Could not get current LOD ";
+    //std::cout<<"Could not get current LOD "<<std::endl;
   }
 
 
@@ -221,6 +220,12 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
 
+  if(worldgeometry==NULL)
+  {
+    GetDataTreeNode()->SetProperty("volumerendering",new mitk::BoolProperty(false));
+    return;
+  }
+  
   assert(worldgeometry!=NULL);
 
   int timestep=0;
@@ -388,7 +393,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
     
     mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
-
   } 
   else 
   {
@@ -403,7 +407,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   std::cout<<"RenderTime MedRes (T2DHi): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_MedResID)<<std::endl;
 #endif
   std::cout<<"RenderTime HiRes(T3D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_HiResID)<<std::endl;  */
-
 }
 
 /* Shading enabled / disabled */
@@ -459,7 +462,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
 #endif
     m_PlaneWidget->DrawPlaneOff(); //clipping plane is transparent
     mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
-    
+   
     /*places the widget within the specified bounds*/
     m_PlaneWidget->PlaceWidget(
         input->GetGeometry()->GetOrigin()[0],(input->GetGeometry()->GetOrigin()[0])+(input->GetDimension(0))*(input->GetVtkImageData()->GetSpacing()[0]),                               input->GetGeometry()->GetOrigin()[1],(input->GetGeometry()->GetOrigin()[1])+(input->GetDimension(1))*(input->GetVtkImageData()->GetSpacing()[1]),                               input->GetGeometry()->GetOrigin()[2],(input->GetGeometry()->GetOrigin()[2])+(input->GetDimension(2))*(input->GetVtkImageData()->GetSpacing()[2]));
@@ -469,9 +472,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     }
     
     m_PlaneWidget->GetPlane(m_ClippingPlane);
-    
     m_PlaneSet = true;
-    
   }
   else //if clippingplane is disabled
   { 
@@ -483,15 +484,14 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
 
 }    
 
-/* Removes the clipping plane */
-void mitk::VolumeDataVtkMapper3D::DelClippingPlane(){
 
+/* Removes the clipping plane */
+void mitk::VolumeDataVtkMapper3D::DelClippingPlane()
+{
   m_T2DMapper->RemoveAllClippingPlanes();
   m_HiResMapper->RemoveAllClippingPlanes();
   m_PlaneSet = false;
-
 }
-
 
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
 {

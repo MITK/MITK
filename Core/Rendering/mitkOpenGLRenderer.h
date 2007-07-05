@@ -37,6 +37,7 @@ class VtkRenderWindow;
 class vtkLight;
 class vtkLightKit;
 class vtkWorldPointPicker;
+class vtkPointPicker;
 
 namespace mitk {
 //##ModelId=3C6E9AD90215
@@ -102,7 +103,18 @@ public:
   {
     return m_LightKit;
   }
-
+  
+  //##Documentation
+  //## @brief defines if a vtkWordPointPicker or vtkPointPicker is used for picking in 3D
+  //## by default WorldPointPicking is used
+  enum PickingMode{ WorldPointPicking, PointPicking };
+  
+  //##Documentation
+  //## Set/Get wether a vtkWorldPointPicker or vtkPointPicker is used for
+  //## picking a point in the 3D window.
+  itkSetMacro( PickingMode, PickingMode );
+  itkGetMacro( PickingMode, PickingMode );
+  
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
 
   //##Documentation
@@ -178,6 +190,7 @@ private:
   unsigned long m_LastUpdateVtkActorsTime;
 
   vtkWorldPointPicker *m_WorldPointPicker;
+  vtkPointPicker *m_PointPicker;
 
   mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
   
@@ -187,6 +200,9 @@ private:
   //##Documentation
   //## @brief Keep track whether m_PixelMapGL contains valid data
   bool m_PixelMapGLValid;
+  
+  // describes wether world point picking or point picking is used.
+  PickingMode m_PickingMode;
 };
 
 } // namespace mitk

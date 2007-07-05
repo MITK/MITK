@@ -44,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkCamera.h>
 #include <vtkWorldPointPicker.h>
+#include <vtkPointPicker.h>
 
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
@@ -66,6 +67,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_CameraController = VtkInteractorCameraController::New();
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
+  m_PointPicker = vtkPointPicker::New();
 
   m_DataChangedCommand = itk::MemberCommand<mitk::OpenGLRenderer>::New();
   m_DataChangedCommand->SetCallbackFunction(this, &mitk::OpenGLRenderer::DataChangedEvent);
@@ -78,6 +80,7 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   m_DrawOverlayPosition.Fill(0);
+  m_PickingMode = WorldPointPicking;
 }
 
 void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
@@ -585,8 +588,21 @@ void mitk::OpenGLRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mit
   if(m_VtkMapperPresent)
   {
     //m_WorldPointPicker->SetTolerance (0.0001);
-    m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-    vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+    switch ( m_PickingMode )
+    {
+     case (WorldPointPicking) :
+     {
+       m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+       vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+       break;
+     }
+     case (PointPicking) :
+     {
+       m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+       vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
+       break;
+     }
+    }
   }
   else
     Superclass::PickWorldPoint(displayPoint, worldPoint);

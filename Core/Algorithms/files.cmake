@@ -36,6 +36,7 @@ SET(CPP_FILES
   mitkPlaneFit.cpp
   mitkPlanesPerpendicularToLinesFilter.cpp
   mitkPointSetSource.cpp
+  mitkPointSetToCurvedGeometryFilter.cpp
   mitkPointSetToGeometryDataFilter.cpp
   mitkPolygonToRingFilter.cpp
   mitkProbeFilter.cpp

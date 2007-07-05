@@ -6,6 +6,8 @@
 #include <mitkSphereLandmarkProjector.h>
 #include <mitkPlaneLandmarkProjector.h>
 #include <mitkPlaneFit.h>
+#include <mitkDataTreeNode.h>
+#include <mitkImage.h>
 
 namespace mitk
 {
@@ -33,7 +35,7 @@ public:
    * Fills a data tree node with appropriate properties
    * for mapping the output geometry surface 
    */
-  static void SetDefaultCurvedGeometryProperties();
+  static void SetDefaultCurvedGeometryProperties( mitk::DataTreeNode* node );
 
   /**
    * Sets / Gets whether the input land marks are projected onto a plane
@@ -47,9 +49,11 @@ public:
    */
   itkGetMacro ( ProjectionMode, ProjectionMode );
   
-  
   itkSetObjectMacro( ImageToBeMapped, mitk::Image );
   itkGetObjectMacro( ImageToBeMapped, mitk::Image );
+  
+  itkSetMacro( Sigma, float);
+  itkGetMacro( Sigma, float);
 
 protected:
 
@@ -66,6 +70,8 @@ protected:
   virtual void GenerateOutputInformation();
 
   virtual void GenerateData();
+  
+  virtual GeometryDataSource::DataObjectPointer MakeOutput(unsigned int idx);
 
   ProjectionMode m_ProjectionMode;
   
@@ -78,6 +84,13 @@ protected:
   mitk::PlaneFit::Pointer m_PCAPlaneCalculator;
   
   mitk::Image::Pointer m_ImageToBeMapped;
+  
+  mitk::PlaneLandmarkProjector::Pointer m_PlaneLandmarkProjector;
+  
+  mitk::SphereLandmarkProjector::Pointer m_SphereLandmarkProjector;
+  
+  float m_Sigma;
+  
 };
 
 }

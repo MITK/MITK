@@ -220,7 +220,7 @@ mitk::RenderingManager
   m_UpdatePending = false;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-  { 
+  {
     if ( it->second > 0 )
     {
       m_UpdatePending = true;
@@ -253,6 +253,19 @@ mitk::RenderingManager
   if ( !m_UpdatePending )
   {
     this->StopTimer();
+    
+    /** Level-Of-Detail **/
+    if(m_CurrentLOD < m_MaxLOD)
+    {
+      int nextLOD = m_CurrentLOD+1;
+      SetCurrentLOD(nextLOD);
+      RenderWindowList::iterator it;
+      for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+      {
+        if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
+          RequestUpdate(it->first);
+      }
+    }
   }
 
   // Immediately repaint this window (implementation platform specific)
@@ -494,17 +507,6 @@ mitk::RenderingManager
     m_IsRendering[renderer->GetRenderWindow()] = false;
   }
   this->DoFinishAbortRendering();
-
-  /** Level-Of-Detail **/
-  if(m_CurrentLOD < m_MaxLOD)
-  {
-    int nextLOD = m_CurrentLOD+1;
-    SetCurrentLOD(nextLOD);
-    //std::cout<<"request update..."<<std::endl;
-    m_UpdatePending = false;
-    RequestUpdateAll();
-    //std::cout<<"update requested"<<std::endl;
-  }
 }
 
 bool

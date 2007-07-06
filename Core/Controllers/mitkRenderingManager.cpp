@@ -259,12 +259,7 @@ mitk::RenderingManager
     {
       int nextLOD = m_CurrentLOD+1;
       SetCurrentLOD(nextLOD);
-      RenderWindowList::iterator it;
-      for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-      {
-        if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
-          RequestUpdate(it->first);
-      }
+      this->RequestUpdateAll3D();
     }
   }
 
@@ -299,6 +294,18 @@ mitk::RenderingManager
   {
     m_UpdatePending = true;
     this->RestartTimer();
+  }
+}
+
+void mitk::RenderingManager::RequestUpdateAll3D()
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
+    {
+      RequestUpdate(it->first);
+    }
   }
 }
 

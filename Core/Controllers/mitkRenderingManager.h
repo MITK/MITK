@@ -115,6 +115,9 @@ public:
 
   /** Requests all currently registered RenderWindows to be updated. */
   void RequestUpdateAll( bool includeVtkActors = false ); // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done
+  
+  /** Requests all currently registered RenderWindows which use 3DMappers to be updated. */
+  void RequestUpdateAll3D();
 
   /** Immediately executes an update of all registered RenderWindows. */
   void ForceImmediateUpdateAll();
@@ -162,7 +165,7 @@ public:
   
   void SetClippingPlaneStatus(bool status);
   bool GetClippingPlaneStatus();
-
+  
 protected:
   RenderingManager();
 

@@ -36,7 +36,7 @@ class vtkLookupTable;
 class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
-
+class vtkTransformPolyDataFilter;
 
 namespace mitk {
 
@@ -55,6 +55,13 @@ public:
   mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
 
   itkNewMacro(Geometry2DDataVtkMapper3D);
+
+  /**
+   * Overloaded since the displayed color-frame of the image mustn't be
+   * transformed after generation of poly data, but before (vertex coordinates
+   * only)
+   */
+  virtual vtkProp *GetProp();
 
   /**
    *  \brief Get the Geometry2DData to map
@@ -102,12 +109,17 @@ protected:
 
   int FindPowerOfTwo( int i );
 
-
-  /** \brief PropAssembly to hold the plane and its tubal frame */
+  /** \brief general PropAssembly to hold the entire scene */
   vtkAssembly *m_Prop3DAssembly;
+
+  /** \brief PropAssembly to hold the planes */
+  vtkAssembly *m_ImageAssembly;
 
   /** \brief Edge extractor for tube-shaped frame */
   vtkFeatureEdges *m_Edges;
+
+  /** \brief Filter to apply object transform to the extracted edges */
+  vtkTransformPolyDataFilter *m_EdgeTransformer;
 
   /** \brief Source to create the tube-shaped frame  */
   vtkTubeFilter *m_EdgeTuber;

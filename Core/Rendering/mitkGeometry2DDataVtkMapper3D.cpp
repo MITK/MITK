@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageShrink3D.h>
 #include <vtkImageConstantPad.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkTransformPolyDataFilter.h>
 
 #include "pic2vtk.h"
 
@@ -61,12 +62,16 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
   m_Edges = vtkFeatureEdges::New();
+  m_EdgeTransformer = vtkTransformPolyDataFilter::New();
   m_EdgeActor = vtkActor::New();
   m_BackgroundMapper = vtkDataSetMapper::New();
   m_BackgroundActor = vtkActor::New();
   m_Prop3DAssembly = vtkAssembly::New();
+  m_ImageAssembly = vtkAssembly::New();
 
-  m_EdgeTuber->SetInput( m_Edges->GetOutput() );
+  m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
+  
+  m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
   m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
   m_EdgeTuber->SetNumberOfSides( 12 );
   m_EdgeTuber->CappingOn();
@@ -84,7 +89,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
   m_BackgroundActor->SetMapper( m_BackgroundMapper );
 
-
+  m_Prop3DAssembly->AddPart( m_EdgeActor );
+  m_Prop3DAssembly->AddPart( m_ImageAssembly );
   
   m_Prop3D = m_Prop3DAssembly;
   m_Prop3D->Register(NULL);
@@ -101,9 +107,11 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
 Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
+  m_ImageAssembly->Delete();
   m_Prop3DAssembly->Delete();
   m_EdgeTuber->Delete();
   m_EdgeMapper->Delete();
+  m_EdgeTransformer->Delete();
   m_Edges->Delete();
   m_EdgeActor->Delete();
   m_BackgroundMapper->Delete();
@@ -116,6 +124,24 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   {
     it->second->Delete();
   }
+}
+
+
+vtkProp *
+Geometry2DDataVtkMapper3D::GetProp()
+{
+  if ( (this->GetDataTreeNode() != NULL )
+       && (m_Prop3D != NULL) 
+       && (m_ImageAssembly != NULL) ) 
+  {
+    // Do not transform the entire Prop3D assembly, but only the image part
+    // here. The colored frame is transformed elsewhere (via m_EdgeTransformer),
+    // since only vertices should be transformed there, not the poly data
+    // itself, to avoid distortion for anisotropic datasets.
+    m_ImageAssembly->SetUserTransform( this->GetDataTreeNode()->GetVtkTransform() );
+  }
+ 
+  return m_Prop3D;
 }
 
 
@@ -207,8 +233,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   // Remove all actors from the assembly, and re-initialize it with the 
   // edge actor
-  m_Prop3DAssembly->GetParts()->RemoveAllItems();
-  m_Prop3DAssembly->AddPart( m_EdgeActor );
+  m_ImageAssembly->GetParts()->RemoveAllItems();
 
   if ( !this->IsVisible(renderer) )
   {
@@ -218,7 +243,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     // references to the assemblies parts. During picking the
     // visibility of each part is checked, and not only for the
     // whole assembly.
-    m_Prop3DAssembly->VisibilityOff();
+    m_ImageAssembly->VisibilityOff();
     m_EdgeActor->VisibilityOff(); 
     return;
   }
@@ -229,7 +254,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   // references to the assemblies parts. During picking the
   // visibility of each part is checked, and not only for the
   // whole assembly.
-  m_Prop3DAssembly->VisibilityOn();
+  m_ImageAssembly->VisibilityOn();
   m_EdgeActor->VisibilityOn();
 
   mitk::Geometry2DData::Pointer input =
@@ -295,14 +320,14 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     if ( (surface->GetVtkPolyData() == 0 )
       || (surface->GetVtkPolyData()->GetNumberOfCells() == 0) )
     {
-      m_Prop3DAssembly->VisibilityOff();
+      m_ImageAssembly->VisibilityOff();
       return;
     }
 
 
     // Add black background for all images (which may be transparent)
     m_BackgroundMapper->SetInput( surfaceCreator->GetOutput()->GetVtkPolyData() );
-    m_Prop3DAssembly->AddPart( m_BackgroundActor );
+    m_ImageAssembly->AddPart( m_BackgroundActor );
 
 
     LayerSortedActorList layerSortedActors;
@@ -526,7 +551,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
           actorIt != layerSortedActors.end();
           ++actorIt )
     {
-      m_Prop3DAssembly->AddPart( actorIt->second );
+      m_ImageAssembly->AddPart( actorIt->second );
     }
 
 
@@ -535,6 +560,10 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     vtkPolyData *surfacePolyData = surface->GetVtkPolyData();
 
     m_Edges->SetInput( surfacePolyData );
+
+    m_EdgeTransformer->SetTransform( 
+      this->GetDataTreeNode()->GetVtkTransform(
+        renderer->GetTimeStep( this->GetDataTreeNode()->GetData())) );
 
     // Determine maximum extent
     vtkFloatingPointType* surfaceBounds = surfacePolyData->GetBounds();
@@ -546,7 +575,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     if ( extent < extentZ ) extent = extentZ;
 
     // Adjust the radius according to extent
-    m_EdgeTuber->SetRadius( extent / 330.0 );
+    m_EdgeTuber->SetRadius( extent / 450.0 );
 
     // Get the plane's color and set the tube properties accordingly
     mitk::ColorProperty::Pointer colorProperty;
@@ -566,7 +595,9 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       m_EdgeActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
     }
 
-    m_Prop3D->SetUserTransform( GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(GetDataTreeNode()->GetData())) );
+    m_ImageAssembly->SetUserTransform( 
+      this->GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(
+        this->GetDataTreeNode()->GetData())) );
   }
 }
 

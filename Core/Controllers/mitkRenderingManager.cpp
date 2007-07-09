@@ -297,14 +297,25 @@ mitk::RenderingManager
   }
 }
 
-void mitk::RenderingManager::RequestUpdateAll3D()
+void mitk::RenderingManager::RequestUpdateAll3D(bool includeVtkActors)
 {
+  int magicUpdateFlag = includeVtkActors?3:2;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
     {
-      RequestUpdate(it->first);
+      if ( it->second < magicUpdateFlag )
+      {
+        it->second = magicUpdateFlag;
+      }
+
+      this->RequestUpdate( it->first);
+
+      if ( m_RenderWindowList[it->first] < magicUpdateFlag )
+      {
+        m_RenderWindowList[it->first] = magicUpdateFlag;
+      }
     }
   }
 }

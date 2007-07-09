@@ -58,7 +58,7 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   // increasing. This is the case if points have been deleted from the list.
   // Unfortunately, there is no such fnction in the mitk::PointSet.
   mitk::PointSet::PointIdentifier pointId;
-  unsigned int pointIndex;
+  //unsigned int pointIndex; // Momentary not used.
   mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet()->GetPoints()->Begin();  
   for ( unsigned int currentIndex = 0 ; currentIndex <= ItemIndex ; ++currentIndex, ++it )
   {

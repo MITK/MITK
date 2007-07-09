@@ -7,7 +7,8 @@
 
 class vtkRenderer;
 class vtkMapper;
-class vtkActor2D;
+class vtkCamera;
+class vtkImageActor;
 class vtkImageMapper;
 class vtkLookupTable;
 class vtkPolyData;
@@ -30,6 +31,8 @@ public:
   itkNewMacro( Self );
 
   enum LogoPosition{ UpperLeft, UpperRight, LowerLeft, LowerRight, Middle };
+
+  virtual void SetupCamera();
   
   /**
    * Sets the renderwindow, in which the logo
@@ -54,7 +57,7 @@ public:
   /**
    * Returns the actor associated with the logo
    */
-  virtual vtkActor2D* GetActor();
+  virtual vtkImageActor* GetActor();
 
   /**
    * Returns the mapper associated with the logo
@@ -127,11 +130,12 @@ protected:
 
   mitk::RenderWindow* m_RenderWindow;
   vtkRenderer*        m_Renderer;
-  vtkActor2D*         m_Actor;
+  vtkImageActor*      m_Actor;
   vtkImageMapper*     m_Mapper;
   vtkPNGReader*       m_PngReader;
+  vtkCamera*          m_Camera;
 
-  std::string        m_FileName;
+  std::string         m_FileName;
 
   bool                m_IsEnabled;
 

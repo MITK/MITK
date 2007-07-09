@@ -12,7 +12,7 @@
 
 #include <vtkRenderer.h>
 #include <vtkMapper.h>
-#include <vtkActor2D.h>
+#include <vtkImageActor.h>
 #include <vtkImageMapper.h>
 #include <vtkPolyData.h>
 #include <vtkCamera.h>
@@ -26,7 +26,7 @@ mitk::LogoRendering::LogoRendering()
 {
   m_RenderWindow  = NULL;
   m_Renderer      = vtkRenderer::New();
-  m_Actor         = vtkActor2D::New();
+  m_Actor         = vtkImageActor::New();
   m_Mapper        = vtkImageMapper::New();
   m_PngReader     = vtkPNGReader::New();
   
@@ -94,7 +94,7 @@ vtkRenderer* mitk::LogoRendering::GetVtkRenderer()
 /**
  * Returns the actor associated with the  logo
  */
-vtkActor2D* mitk::LogoRendering::GetActor()
+vtkImageActor* mitk::LogoRendering::GetActor()
 {
   return m_Actor;
 }
@@ -120,35 +120,93 @@ void mitk::LogoRendering::SetLogoSource(std::string filename)
  */
 void mitk::LogoRendering::Enable()
 {
-  if(itksys::SystemTools::FileExists(m_FileName.c_str()))
+  if(itksys::SystemTools::FileExists(m_FileName.c_str()) && m_RenderWindow != NULL)
   {
     m_PngReader->Update();
-    m_Mapper->SetInput(m_PngReader->GetOutput());
+   
     
     double range[2];
     m_PngReader->GetOutput()->GetScalarRange(range);
-    m_Mapper->SetColorWindow(range[1] - range[0] );
-    m_Mapper->SetColorLevel((range[0]+range[1])/2);
+    
     
     // calculate position
-    m_Actor->SetPosition(0,0);
-    
-    
-    m_Actor->SetHeight(200);
-    m_Actor->SetMapper(m_Mapper);
-    m_Actor->SetLayerNumber(99);
-
+    m_Actor->SetInput(m_PngReader->GetOutput());
+    //m_Actor->SetPosition(10,10,0);
+   
+  
     m_Renderer->AddActor( m_Actor );
+    
     m_Renderer->InteractiveOff();
-    m_Renderer->GetActiveCamera()->ParallelProjectionOn();
-    m_Renderer->ResetCamera();
-    m_Renderer->GetActiveCamera()->SetParallelScale(0.5);
+  
+    SetupCamera();
 
-    m_RenderWindow->GetVtkLayerController()->GetSceneRenderer()->AddActor2D(m_Actor);
 
+    m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_Renderer,true);
+    
     m_IsEnabled = true;
   }
 }
+
+
+void mitk::LogoRendering::SetupCamera()
+{
+
+  vtkImageData * image = m_Actor->GetInput();
+  m_Camera = m_Renderer->GetActiveCamera();
+  m_Camera->SetClippingRange(1,100000);
+
+  if ( !image )
+    {
+    return;
+    }
+
+  vtkFloatingPointType spacing[3];
+  vtkFloatingPointType origin[3];
+  int   dimensions[3];
+
+  image->GetSpacing(spacing);
+  image->GetOrigin(origin);
+  image->GetDimensions(dimensions);
+
+  double focalPoint[3];
+  double position[3];
+
+  for ( unsigned int cc = 0; cc < 3; cc++)
+    {
+    focalPoint[cc] = origin[cc] + ( spacing[cc] * dimensions[cc] ) / 2.0;
+    position[cc]   = focalPoint[cc];
+    }
+
+
+   m_Camera->SetViewUp (     0,  1,  0 );
+
+  const double distanceToFocalPoint = 10000;
+  position[2] += distanceToFocalPoint;
+
+  m_Camera->SetPosition (   position );
+  m_Camera->SetFocalPoint ( focalPoint );
+
+#define myMAX(x,y) (((x)>(y))?(x):(y))  
+
+   int d1 = (2 + 1) % 3;
+   int d2 = (2 + 2) % 3;
+ 
+  double max = myMAX( 
+    spacing[d1] * dimensions[d1],
+    spacing[d2] * dimensions[d2]);
+
+
+  m_Camera->SetParallelScale( max / 2  * 0.1);//m_ZoomFactor ); http://www.itk.org/cgi-bin/viewcvs.cgi/LiverTumorSegmentation/ImageSliceViewer.cxx?rev=1.3&root=InsightApplications&view=markup
+
+}
+
+
+//void mitk::LogoRendering::SetZoomFactor( double factor )
+//{
+//  m_ZoomFactor = factor;
+//}
+
+
 
 /**
  * Disables drawing of the logo.
@@ -158,7 +216,7 @@ void mitk::LogoRendering::Disable()
 {
   if ( this->IsEnabled() )
   {
-    m_RenderWindow->GetVtkLayerController()->GetSceneRenderer()->RemoveActor2D(m_Actor);
+    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_Renderer);
     m_IsEnabled = false;
   }
 }

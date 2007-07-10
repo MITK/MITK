@@ -189,6 +189,7 @@ protected:
   int m_Interval;
   int m_CurrentLOD;
   int m_MaxLOD;
+  int m_Numberof3DRW;
   std::vector<bool> m_ShadingEnabled;
   bool m_ClippingPlaneStatus;
 

@@ -219,13 +219,20 @@ mitk::RenderingManager
   // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
+  m_Numberof3DRW = 0;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
+    //std::cout<<"it->second: "<<it->second<<std::endl;
     if ( it->second > 0 )
     {
       m_UpdatePending = true;
     }
+    if(it->first->GetRenderer()->GetMapperID() == 2)
+    {
+      m_Numberof3DRW++;
+    }
   }
+  //std::cout<<std::endl;
 }
 
 void
@@ -255,11 +262,14 @@ mitk::RenderingManager
     this->StopTimer();
     
     /** Level-Of-Detail **/
-    if(m_CurrentLOD < m_MaxLOD)
+    if(m_Numberof3DRW > 1)
     {
-      int nextLOD = m_CurrentLOD+1;
-      SetCurrentLOD(nextLOD);
-      this->RequestUpdateAll3D();
+      if(m_CurrentLOD < m_MaxLOD)
+      {
+        int nextLOD = m_CurrentLOD+1;
+        SetCurrentLOD(nextLOD);
+        this->RequestUpdateAll3D();
+      }
     }
   }
 
@@ -523,8 +533,19 @@ mitk::RenderingManager
   {
     //std::cout<<"E "<<std::endl;
     m_IsRendering[renderer->GetRenderWindow()] = false;
+    this->DoFinishAbortRendering();
+    
+    /** Level-Of-Detail **/
+    if(m_Numberof3DRW == 1)
+    {
+      if(m_CurrentLOD < m_MaxLOD)
+      {
+        int nextLOD = m_CurrentLOD+1;
+        SetCurrentLOD(nextLOD);
+        this->RequestUpdateAll3D();
+      }
+    }
   }
-  this->DoFinishAbortRendering();
 }
 
 bool
@@ -549,11 +570,12 @@ void
 mitk::RenderingManager
 ::AbortRendering( mitk::RenderWindow* renderWindow )
 { 
-  //std::cout<<" abort ";
+  //std::cout<<" abort "<<std::endl;
 
   if ( renderWindow && m_IsRendering[renderWindow] )
   { 
     renderWindow->GetVtkRenderWindow()->SetAbortRender( true );
+    m_UpdatePending = true;
   }
   else
   {

@@ -142,6 +142,8 @@ protected:
 
     virtual void GenerateData();
 
+    virtual void WriteByITK(mitk::Image* image, const std::string& filename);
+
     std::string m_FileName;
 
     std::string m_FilePrefix;

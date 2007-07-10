@@ -67,4 +67,44 @@ template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUS3>
 template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSC3>&);
 template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUC3>&);
 
+#ifndef DOXYGEN_SKIP
+//// Extension for RGB (and maybe also for vector types)
+//// Does not work yet, see comment below and bug 320
+//template <typename ItkOutputImageType> void RGBCastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+//{
+//  assert(mitkImage->GetDimension()==::itk::GetImageDimension<ItkOutputImageType>::ImageDimension);
+//
+//  assert(mitkImage->GetPixelType().GetNumberOfComponents() == 3);
+//
+//  const std::type_info& typeId=*mitkImage->GetPixelType().GetTypeId();
+//
+//  // Currently, the following line always fails, see bug 320
+//  assert( typeId == typeid(ItkOutputImageType::PixelType) );
+//
+//  const mitk::Image* constImage = mitkImage;
+//  const_cast<mitk::Image*>(constImage)->Update();
+//
+//  typedef mitk::ImageToItk<ItkOutputImageType> ImageToItkType;
+//  itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();
+//  imagetoitk->SetInput(mitkImage);
+//  imagetoitk->Update();
+//  itkOutputImage = imagetoitk->GetOutput();
+//}
+//
+//typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
+//typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
+//
+//template <> void CastToItkImage<itkImageRGBUC2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC2>& itkOutputImage)
+//{
+//  typedef itkImageRGBUC2 ItkOutputImageType;
+//  RGBCastToItkImage<ItkOutputImageType>(mitkImage, itkOutputImage);
+//}
+//
+//template <> void CastToItkImage<itkImageRGBUC3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC3>& itkOutputImage)
+//{
+//  typedef itkImageRGBUC3 ItkOutputImageType;
+//  RGBCastToItkImage<ItkOutputImageType>(mitkImage, itkOutputImage);
+//}
+#endif //DOXYGEN_SKIP
+
 }

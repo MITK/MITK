@@ -61,3 +61,25 @@ void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const s
 }
 
 InstantiateAccessFunction_1(_mitkItkImageWrite, const std::string&);
+
+typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
+template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)
+{
+  typedef itkImageRGBUC2 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};
+
+typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
+template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 3>(itkImageRGBUC3* itkImage, const std::string& fileName)
+{
+  typedef itkImageRGBUC3 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};

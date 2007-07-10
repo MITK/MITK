@@ -57,6 +57,49 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 }
 #endif
 
+void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& filename)
+{
+  if(image->GetPixelType().GetNumberOfComponents()==1)
+  {
+    AccessByItk_1( image, _mitkItkImageWrite, filename );
+  }
+  //// Extension for RGB (and maybe also for vector types)
+  //// Does not work yet, see bug 320 and mitkImageCastPart2.cpp
+  //else
+  //if(image->GetPixelType().GetNumberOfComponents()==3)
+  //{
+  //  const std::type_info& typeId=*(image)->GetPixelType().GetTypeId();
+  //  if ( typeId == typeid(unsigned char) )
+  //  {
+  //    if(image->GetDimension()==2)
+  //    {
+  //      typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
+  //      itkImageRGBUC2::Pointer itkRGBimage;
+  //      mitk::CastToItkImage(image, itkRGBimage);
+  //      _mitkItkImageWrite(itkRGBimage.GetPointer(), filename);
+  //    }
+  //    else
+  //    if(image->GetDimension()==3)
+  //    {
+  //      typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
+  //      itkImageRGBUC3::Pointer itkRGBimage;
+  //      mitk::CastToItkImage(image, itkRGBimage);
+  //      _mitkItkImageWrite(itkRGBimage.GetPointer(), filename);
+  //    }
+  //  }
+  //  else
+  //  {
+  //    itkWarningMacro(<<"Sorry, cannot write images with GetNumberOfComponents()==3 that " 
+  //      << "have pixeltype " << typeId.name() << " using ITK writers .");
+  //  }
+  //}
+  else
+  {
+    itkWarningMacro(<<"Sorry, cannot write images with GetNumberOfComponents()==" 
+      << image->GetPixelType().GetNumberOfComponents() << " using ITK writers .");
+  }
+}
+
 void mitk::ImageWriter::GenerateData()
 {
   if ( m_FileName == "" )
@@ -104,7 +147,7 @@ void mitk::ImageWriter::GenerateData()
         else
 #endif
         {        
-          AccessByItk_1( image, _mitkItkImageWrite, filename.str() );
+          WriteByITK(input, filename.str());
         }
       }
     }
@@ -120,7 +163,7 @@ void mitk::ImageWriter::GenerateData()
     {
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
-      AccessByItk_1( input, _mitkItkImageWrite, filename.str() );
+      WriteByITK(input, filename.str());
     }
   }
   else

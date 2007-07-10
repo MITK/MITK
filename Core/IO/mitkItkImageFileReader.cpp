@@ -129,7 +129,7 @@ void mitk::ItkImageFileReader::GenerateData()
   mitk::PixelType pixelType( imageIO->GetPixelType() );
   image->Initialize( pixelType, ndim, dimensions );
 #endif 
-  image->SetImportVolume( buffer, 0, 0, Image::ManageMemory );
+  image->SetImportChannel( buffer, 0, Image::ManageMemory );
 
 #if ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 4
   image->GetSlicedGeometry()->SetOrigin( origin );

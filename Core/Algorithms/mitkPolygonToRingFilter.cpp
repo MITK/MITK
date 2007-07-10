@@ -58,6 +58,8 @@ void mitk::PolygonToRingFilter::GenerateOutputInformation()
   if(input.IsNull()) return;
 
   output->SetGeometry(static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
+
+  output->Resize( input->GetPointSetSeriesSize() );
 }
 
 void mitk::PolygonToRingFilter::GenerateData()

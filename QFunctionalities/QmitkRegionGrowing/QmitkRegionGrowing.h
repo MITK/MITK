@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
-Date:      $Date: 2006-06-23 15:16:01 +0200 (Fri, 23 Jun 2006) $
-Version:   $Revision: 7202 $
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
-Date:      $Date: 1980/02/28 04:37:25 $
-Version:   $Revision: 1.0 $
+Date:      $Date$
+Version:   $Revision$
  
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

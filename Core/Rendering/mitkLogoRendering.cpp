@@ -30,14 +30,11 @@ mitk::LogoRendering::LogoRendering()
   m_Mapper        = vtkImageMapper::New();
   m_PngReader     = vtkPNGReader::New();
   
-  m_SizeX         = 200;
-  m_SizeY         = 200;
-  m_PositionX     = 0;
-  m_PositionY     = 0;  
-
-  m_LogoPosition  = mitk::LogoRendering::LogoPosition::LowerRight;
-  
+  m_LogoPosition  = mitk::LogoRendering::LowerRight;
+ 
   m_IsEnabled = false;
+
+  m_ZoomFactor = 1.0;
 
   m_FileName  = mitk::StandardFileLocations::FindFile("mbilogo.png","./mbi-sb/Core/Rendering");
   m_PngReader->SetFileName(m_FileName.c_str());
@@ -123,24 +120,14 @@ void mitk::LogoRendering::Enable()
   if(itksys::SystemTools::FileExists(m_FileName.c_str()) && m_RenderWindow != NULL)
   {
     m_PngReader->Update();
-   
-    
-    double range[2];
-    m_PngReader->GetOutput()->GetScalarRange(range);
-    
-    
-    // calculate position
     m_Actor->SetInput(m_PngReader->GetOutput());
-    //m_Actor->SetPosition(10,10,0);
-   
   
     m_Renderer->AddActor( m_Actor );
     
-    m_Renderer->InteractiveOff();
-  
     SetupCamera();
+    //SetupPosition();
 
-
+    m_Renderer->InteractiveOff();
     m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_Renderer,true);
     
     m_IsEnabled = true;
@@ -150,16 +137,15 @@ void mitk::LogoRendering::Enable()
 
 void mitk::LogoRendering::SetupCamera()
 {
+  // set the vtk camera in way that stretches the logo all over the renderwindow
 
   vtkImageData * image = m_Actor->GetInput();
   m_Camera = m_Renderer->GetActiveCamera();
   m_Camera->SetClippingRange(1,100000);
 
   if ( !image )
-    {
     return;
-    }
-
+  
   vtkFloatingPointType spacing[3];
   vtkFloatingPointType origin[3];
   int   dimensions[3];
@@ -172,34 +158,86 @@ void mitk::LogoRendering::SetupCamera()
   double position[3];
 
   for ( unsigned int cc = 0; cc < 3; cc++)
-    {
+  {
     focalPoint[cc] = origin[cc] + ( spacing[cc] * dimensions[cc] ) / 2.0;
     position[cc]   = focalPoint[cc];
-    }
+  }
 
 
-   m_Camera->SetViewUp (     0,  1,  0 );
+  m_Camera->SetViewUp (0,1,0);
+  int idx = 2;
+  const double distanceToFocalPoint = 1000;
+  position[idx] = distanceToFocalPoint;
 
-  const double distanceToFocalPoint = 10000;
-  position[2] += distanceToFocalPoint;
+  m_Camera->ParallelProjectionOn();
+  m_Camera->SetPosition (position);
+  m_Camera->SetFocalPoint (focalPoint);
 
-  m_Camera->SetPosition (   position );
-  m_Camera->SetFocalPoint ( focalPoint );
+  #define myMAX(x,y) (((x)>(y))?(x):(y))  
 
-#define myMAX(x,y) (((x)>(y))?(x):(y))  
+  int d1 = (idx + 1) % 3;
+  int d2 = (idx + 2) % 3;
 
-   int d1 = (2 + 1) % 3;
-   int d2 = (2 + 2) % 3;
- 
   double max = myMAX( 
     spacing[d1] * dimensions[d1],
     spacing[d2] * dimensions[d2]);
 
-
-  m_Camera->SetParallelScale( max / 2  * 0.1);//m_ZoomFactor ); http://www.itk.org/cgi-bin/viewcvs.cgi/LiverTumorSegmentation/ImageSliceViewer.cxx?rev=1.3&root=InsightApplications&view=markup
-
+  m_Camera->SetParallelScale( max );
 }
 
+void mitk::LogoRendering::SetupPosition()
+{
+  // Position and Scale of the logo
+  vtkFloatingPointType newPos[4];
+  int dimensions[3];
+  vtkImageData * image = m_Actor->GetInput();
+  image->GetDimensions(dimensions);
+  
+  #define myMAX(x,y) (((x)>(y))?(x):(y)) 
+  double max = myMAX(dimensions[0],dimensions[1]);
+  double normX = dimensions[0] / max;
+  double normY = dimensions[1] / max;
+
+
+  switch(m_LogoPosition)
+  {
+    case mitk::LogoRendering::LowerLeft:
+    {
+      newPos[0] = 0.0;
+      newPos[1] = 0.0;
+      newPos[2] = 0.2 * normX * m_ZoomFactor;
+      newPos[3] = 0.2 * normY * m_ZoomFactor;
+      break;
+    }
+    case mitk::LogoRendering::LowerRight:
+    {
+      newPos[0] = 1.0 - 0.2 * normX * m_ZoomFactor;
+      newPos[1] = 0.0;
+      newPos[2] = 1.0;
+      newPos[3] = 0.2 * normY * m_ZoomFactor;
+      break;
+    }
+    case mitk::LogoRendering::UpperLeft:
+    {
+      newPos[0] = 0.0;
+      newPos[1] = 1.0 - 0.2 * normY * m_ZoomFactor;
+      newPos[2] = 0.2 * normX * m_ZoomFactor;
+      newPos[3] = 1.0;
+      break;
+    }
+    case mitk::LogoRendering::UpperRight:
+    {
+      newPos[0] = 1.0 - 0.2 * normX * m_ZoomFactor;
+      newPos[1] = 1.0 - 0.2 * normY * m_ZoomFactor;
+      newPos[2] = 1.0;
+      newPos[3] = 1.0;
+      break;
+    }
+  }
+  
+  
+  m_Renderer->SetViewport(newPos);
+}
 
 //void mitk::LogoRendering::SetZoomFactor( double factor )
 //{

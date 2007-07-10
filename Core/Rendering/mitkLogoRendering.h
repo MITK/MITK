@@ -33,6 +33,7 @@ public:
   enum LogoPosition{ UpperLeft, UpperRight, LowerLeft, LowerRight, Middle };
 
   virtual void SetupCamera();
+  virtual void SetupPosition();
   
   /**
    * Sets the renderwindow, in which the logo
@@ -139,10 +140,8 @@ protected:
 
   bool                m_IsEnabled;
 
-  int                 m_SizeX, m_SizeY;
-  int                 m_PositionX, m_PositionY;
-
   LogoPosition        m_LogoPosition;
+  double              m_ZoomFactor;
 
 };
 

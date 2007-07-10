@@ -112,7 +112,10 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
 
         if ( volume3d == NULL )
         {
-            throw itk::ImageFileReaderException( __FILE__, __LINE__, "File could not be read!" );
+          ::itk::OStringStream message;
+          message << "mitk::ERROR: " << this->GetNameOfClass() << "(" << this << "): "
+                  << "File (" << filename << ") of time frame " << t << " could not be read!";
+          throw itk::ImageFileReaderException( __FILE__, __LINE__, message.str().c_str() );
         }
 
         //
@@ -125,7 +128,15 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
 
         // \todo use memory of Image as in PicFileReader (or integrate everything into the PicFileReader!)
         PicFileReader::ConvertHandedness(volume3d);
-        output->SetPicVolume( volume3d, t );
+        bool result;
+        result = output->SetPicVolume( volume3d, t );
+        if(result==false)
+        {
+          ::itk::OStringStream message;
+          message << "mitk::ERROR: " << this->GetNameOfClass() << "(" << this << "): "
+                  << "Volume of time frame " << t << " did not match size of other time frames.";
+          throw itk::ImageFileReaderException( __FILE__, __LINE__, message.str().c_str() );
+        }
         ipPicFree ( volume3d );
     }
 }

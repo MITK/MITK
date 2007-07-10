@@ -118,7 +118,7 @@ void VtkQRenderWindowInteractor::Render()
   if (this->RenderWindow && this->Enabled)
   {
     //this->RenderWindow->Render();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
 
   }
   // outside the above test so that third-party code can redirect

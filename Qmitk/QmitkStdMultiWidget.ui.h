@@ -840,10 +840,12 @@ QmitkStdMultiWidget::GetCrossPosition() const
     mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
   mitk::Line3D line;
-  if ( plane1->IntersectionLine( plane2, line ) )
+  if ( (plane1 != NULL) && (plane2 != NULL)
+    && (plane1->IntersectionLine( plane2, line )) )
   {
     mitk::Point3D point;
-    if ( plane3->IntersectionPoint( line, point ) )
+    if ( (plane3 != NULL) 
+      && (plane3->IntersectionPoint( line, point )) )
     {
       return point;
     }

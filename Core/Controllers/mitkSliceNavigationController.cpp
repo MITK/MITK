@@ -433,7 +433,14 @@ SliceNavigationController::GetCreatedWorldGeometry()
 const mitk::Geometry3D *
 SliceNavigationController::GetCurrentGeometry3D()
 {
-  return m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos() );
+  if ( m_CreatedWorldGeometry.IsNotNull() )
+  {
+    return m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos() );
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 

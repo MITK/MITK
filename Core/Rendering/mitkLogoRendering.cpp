@@ -20,6 +20,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkPNGReader.h>
 #include <vtkImageData.h>
+#include <vtkConfigure.h>
 
 
 mitk::LogoRendering::LogoRendering()
@@ -34,8 +35,8 @@ mitk::LogoRendering::LogoRendering()
  
   m_IsEnabled = false;
 
-  m_ZoomFactor = 1.0;
-  m_Opacity    = 1.0;
+  m_ZoomFactor = 1.15;
+  m_Opacity    = 0.5;
 
   m_FileName  = mitk::StandardFileLocations::FindFile("mbilogo.png","./mbi-sb/Core/Rendering");
   m_PngReader->SetFileName(m_FileName.c_str());
@@ -125,15 +126,19 @@ void mitk::LogoRendering::Enable()
   if(itksys::SystemTools::FileExists(m_FileName.c_str()) && m_RenderWindow != NULL)
   {
     m_PngReader->Update();
+    
     m_Actor->SetInput(m_PngReader->GetOutput());
-  
-    m_Actor->SetOpacity(0.85);//m_Opacity);
+    
+    #if ( VTK_MAJOR_VERSION >= 5 )
+      m_Actor->SetOpacity(m_Opacity);
+    #endif
+    
     m_Renderer->AddActor( m_Actor );
+    m_Renderer->InteractiveOff();
     
     SetupCamera();
     SetupPosition();
-
-    m_Renderer->InteractiveOff();
+    
     m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_Renderer,true);
     
     m_IsEnabled = true;
@@ -184,11 +189,9 @@ void mitk::LogoRendering::SetupCamera()
   int d1 = (idx + 1) % 3;
   int d2 = (idx + 2) % 3;
 
-  double max = myMAX( 
-    spacing[d1] * dimensions[d1],
-    spacing[d2] * dimensions[d2]);
+  double max = myMAX(dimensions[d1],dimensions[d2]);
 
-  m_Camera->SetParallelScale( max );
+  m_Camera->SetParallelScale( max / 2 );
 }
 
 void mitk::LogoRendering::SetupPosition()
@@ -204,7 +207,7 @@ void mitk::LogoRendering::SetupPosition()
   double normX = dimensions[0] / max;
   double normY = dimensions[1] / max;
 
-  double buffer = 0.02; // buffer to the boarder of the renderwindow
+  double buffer = 0; // buffer to the boarder of the renderwindow
  
   switch(m_LogoPosition)
   {

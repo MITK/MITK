@@ -1359,4 +1359,5 @@ void QmitkMainTemplate::fileCloseProject()
   mitk::NodePredicateNOT notpred(orpred);
   mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(notpred);
   mitk::DataStorage::GetInstance()->Remove(all);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -95,9 +95,9 @@ void mitk::GlobalInteraction::RemoveFlaggedListeners()
   // iterate flagged listeners, remove them if possibleA
   if (m_ListenersFlaggedForRemoval.empty()) return;
 
-  for (StateMachineListIter it = m_ListenersFlaggedForRemoval.begin(); it != m_ListenersFlaggedForRemoval.end(); ++it)
+  for (StateMachineCPointerListIter it = m_ListenersFlaggedForRemoval.begin(); it != m_ListenersFlaggedForRemoval.end(); ++it)
   {
-    StateMachineListIter foundPosition = std::find( m_ListenerList.begin(), m_ListenerList.end(), it->GetPointer());
+    StateMachineListIter foundPosition = std::find( m_ListenerList.begin(), m_ListenerList.end(), *it );
     if (foundPosition != m_ListenerList.end())
     {
       m_ListenerList.erase( foundPosition );

@@ -66,7 +66,9 @@ namespace mitk {
     mitkNewMacro1Param(Self, const char*);
 
     typedef std::vector<StateMachine::Pointer>  StateMachineList;
+    typedef std::vector<StateMachine*>  StateMachineCPointerList;
     typedef StateMachineList::iterator          StateMachineListIter;
+    typedef StateMachineCPointerList::iterator          StateMachineCPointerListIter;
     typedef std::vector<Interactor::Pointer>    InteractorList;
     typedef InteractorList::iterator            InteractorListIter;
     typedef std::multimap<float, Interactor::Pointer, std::greater<double> > InteractorMap;
@@ -188,7 +190,7 @@ namespace mitk {
 
     void RemoveFlaggedListeners();
 
-    StateMachineList m_ListenersFlaggedForRemoval;
+    StateMachineCPointerList m_ListenersFlaggedForRemoval;
 
     //##Documentation
     //## @brief list of all listening statemachines, that want to recieve all events

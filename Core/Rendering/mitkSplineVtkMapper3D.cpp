@@ -149,7 +149,6 @@ bool mitk::SplineVtkMapper3D::SplinesAreAvailable()
 
 vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 {
-  Mapper::Update(NULL);
   if ( m_SplinesAvailable )
     return ( dynamic_cast<vtkPolyDataMapper*>( m_SplinesActor->GetMapper() ) )->GetInput();
   else
@@ -158,7 +157,6 @@ vtkPolyData* mitk::SplineVtkMapper3D::GetSplinesPolyData()
 
 vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
 {
-  Mapper::Update(NULL);
   if ( m_SplinesAvailable )
     return m_SplinesActor;
   else

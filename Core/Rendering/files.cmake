@@ -36,5 +36,6 @@ SET(CPP_FILES
   mitkVtkARRenderWindow.cpp
   mitkVtkRenderWindow.cpp
   mitkVtkStencilRenderWindow.cpp
+  mitkLogoRendering.cpp
 )
 

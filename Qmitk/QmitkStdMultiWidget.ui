@@ -132,7 +132,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image1</pixmap>
+        <pixmap>image0</pixmap>
         <signal>levelWindow(mitk::LevelWindow*)</signal>
         <signal>levelWindow( const LevelWindow&amp; )</signal>
         <slot access="public" specifier="">slot()</slot>
@@ -140,9 +140,6 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
-    </image>
-    <image name="image1">
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
@@ -164,24 +161,29 @@
     <include location="global" impldecl="in declaration">mitkGradientBackground.h</include>
     <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
     <include location="global" impldecl="in declaration">mitkColorProperty.h</include>
+    <include location="global" impldecl="in declaration">mitkLogoRendering.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
-    <variable>bool m_SlicesRotation;</variable>
-    <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
-    <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
-    <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
-    <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
-    <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
-    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
-    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
-    <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
-    <variable>int m_Layout;</variable>
-    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4};</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering4;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground4;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>
+    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4};</variable>
+    <variable>int m_Layout;</variable>
+    <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
+    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
+    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
+    <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
+    <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
+    <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
+    <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
+    <variable>bool m_SlicesRotation;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering1;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering2;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering3;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -219,15 +221,18 @@
     <slot>EnableSliceRotation( bool on )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
+    <slot>EnableDepartmentLogo()</slot>
+    <slot>DisableDepartmentLogo()</slot>
     <slot>changeLayoutToRowWidgetSmall3andBig4()</slot>
     <slot>changeLayoutToSmallUpperWidget2Big3and4()</slot>
-    <slot>SetWidgetPlaneVisibility( const char* name, bool visible )</slot>
+    <slot>SetWidgetPlaneVisibility( const char * widgetName, bool visible )</slot>
     <slot>SetWidgetPlanesVisibility( bool visible )</slot>
     <slot>SetWidgetPlanesLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLinked( bool link )</slot>
     <slot>SetWidgetPlanesRotationEnabled( bool on )</slot>
-    <slot>SetGradientBackgroundColors(const mitk::Color&amp; upper, const mitk::Color&amp; lower)</slot>
+    <slot>SetGradientBackgroundColors( const mitk::Color &amp; upper, const mitk::Color &amp; lower )</slot>
+    <slot>SetDepartmentLogoPath( const char * path )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
@@ -247,4 +252,11 @@
     <function specifier="non virtual" returnType="mitk::SlicesRotator *">GetSlicesRotator() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkSelectableGLWidget.h</includehint>
+    <includehint>QmitkSelectableGLWidget.h</includehint>
+    <includehint>QmitkSelectableGLWidget.h</includehint>
+    <includehint>QmitkSelectableGLWidget.h</includehint>
+    <includehint>QmitkLevelWindowWidget.h</includehint>
+</includehints>
 </UI>

@@ -32,8 +32,7 @@ public:
 
   enum LogoPosition{ UpperLeft, UpperRight, LowerLeft, LowerRight, Middle };
 
-  virtual void SetupCamera();
-  virtual void SetupPosition();
+  
   
   /**
    * Sets the renderwindow, in which the logo
@@ -43,32 +42,18 @@ public:
   virtual void SetRenderWindow( mitk::RenderWindow* renderWindow );
 
   /**
-   * Returns the vtkRenderWindow, which is used
-   * for displaying the logo
-   */
-  virtual mitk::RenderWindow* GetRenderWindow();
-
-  /**
-   * Returns the renderer responsible for
-   * rendering the logo into the
-   * vtkRenderWindow
-   */
-  virtual vtkRenderer* GetVtkRenderer();
-
-  /**
-   * Returns the actor associated with the logo
-   */
-  virtual vtkImageActor* GetActor();
-
-  /**
-   * Returns the mapper associated with the logo
-   */
-  virtual vtkImageMapper* GetMapper();
-
-  /**
    * Sets the source file for the logo. 
    */
-  virtual void SetLogoSource(std::string filename);
+  virtual void SetLogoSource(const char* filename);
+  /**
+   * Sets the opacity level of the logo.
+   */
+  virtual void SetOpacity(double opacity);
+  /**
+   * Specifies the logo size, values from 0...10,
+   * where 1 is a nice little logo
+   */
+  virtual void SetZoomFactor( double factor );
   
   /**
    * Enables drawing of the logo.
@@ -87,12 +72,7 @@ public:
    * enabled (visible)
    */
   virtual bool IsEnabled();
-  
-  
-  
-  
-  
-  
+   
   /**
    * Empty implementation, since the LogoRendering doesn't
    * support the requested region concept
@@ -116,8 +96,33 @@ public:
    * support the requested region concept
    */
   virtual void SetRequestedRegion(itk::DataObject*);
+
+  /**
+   * Returns the vtkRenderWindow, which is used
+   * for displaying the logo
+   */
+  virtual mitk::RenderWindow* GetRenderWindow();
+
+  /**
+   * Returns the renderer responsible for
+   * rendering the logo into the
+   * vtkRenderWindow
+   */
+  virtual vtkRenderer* GetVtkRenderer();
+
+  /**
+   * Returns the actor associated with the logo
+   */
+  virtual vtkImageActor* GetActor();
+
+  /**
+   * Returns the mapper associated with the logo
+   */
+  virtual vtkImageMapper* GetMapper();
   
 protected:
+  void SetupCamera();
+  void SetupPosition();
 
   /**
    * Constructor
@@ -142,9 +147,9 @@ protected:
 
   LogoPosition        m_LogoPosition;
   double              m_ZoomFactor;
+  double              m_Opacity;
 
 };
 
 } //end of namespace mitk
 #endif
-

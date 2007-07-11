@@ -674,6 +674,8 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
   m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
+  m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(true) );
+  m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
   m_Options->SetProperty( "Default value for iilInterpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_IilInterpolationActive) );
 }
 
@@ -773,6 +775,7 @@ void QmitkMainTemplate::Initialize()
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
   // initialize multiwidget with options
+  // gradient background
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
@@ -783,6 +786,16 @@ void QmitkMainTemplate::Initialize()
   {
     m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
   }
+  // department logo
+  mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Department logo visible").GetPointer() );          
+  if (logoProperty != NULL)
+    this->enableDepartmentLogo(logoProperty->GetValue());
+  mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path").GetPointer() );
+  if (logoPath)
+  {
+    m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
+  }
+
 
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
   if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
@@ -1070,6 +1083,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   if (optionDialog->exec() == QDialog::Accepted)
   {
     // first process global options
+    // gradient background
     mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
     mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
     this->enableGradientBackground(gradProperty->GetValue());
@@ -1080,7 +1094,16 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     {
       m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
     }
-
+    // department logo
+    mitk::BaseProperty::Pointer logop =  m_Options->GetProperty("Department logo visible");
+    mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( logop.GetPointer() );
+    mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path").GetPointer() );
+    if (logoPath)
+    {
+      m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
+    }
+    this->enableDepartmentLogo(logoProperty->GetValue());
+    // dark palette
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
     if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
       this->enableDarkPalette(true);
@@ -1360,4 +1383,18 @@ void QmitkMainTemplate::fileCloseProject()
   mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(notpred);
   mitk::DataStorage::GetInstance()->Remove(all);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+
+void QmitkMainTemplate::enableDepartmentLogo(bool enable)
+{
+  if(enable)
+  {
+    m_MultiWidget->EnableDepartmentLogo();
+  }
+  else
+  {
+    m_MultiWidget->DisableDepartmentLogo();
+  }
+
 }

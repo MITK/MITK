@@ -149,7 +149,7 @@ void QmitkStdMultiWidget::init()
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
   );
-  
+  // setup gradient background
   m_GradientBackground1 = mitk::GradientBackground::New();
   m_GradientBackground1->SetRenderWindow(
     mitkWidget1->GetRenderer()->GetRenderWindow() );
@@ -170,6 +170,26 @@ void QmitkStdMultiWidget::init()
     mitkWidget4->GetRenderer()->GetRenderWindow() );
   m_GradientBackground4->SetGradientColors(0.0,0.1,0.3,0.7,0.7,0.8);
   m_GradientBackground4->Enable();
+  // setup the department logo rendering
+  m_LogoRendering1 = mitk::LogoRendering::New();
+  m_LogoRendering1->SetRenderWindow(
+    mitkWidget1->GetRenderer()->GetRenderWindow() );
+  m_LogoRendering1->Disable();
+
+  m_LogoRendering2 = mitk::LogoRendering::New();
+  m_LogoRendering2->SetRenderWindow(
+    mitkWidget2->GetRenderer()->GetRenderWindow() );
+  m_LogoRendering2->Disable();
+
+  m_LogoRendering3 = mitk::LogoRendering::New();
+  m_LogoRendering3->SetRenderWindow(
+    mitkWidget3->GetRenderer()->GetRenderWindow() );
+  m_LogoRendering3->Disable();
+  
+  m_LogoRendering4 = mitk::LogoRendering::New();
+  m_LogoRendering4->SetRenderWindow(
+    mitkWidget4->GetRenderer()->GetRenderWindow() );
+  m_LogoRendering4->Enable();
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -1072,6 +1092,16 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   m_GradientBackground4->Disable();
 }
 
+void QmitkStdMultiWidget::EnableDepartmentLogo()
+{
+  m_LogoRendering4->Enable();
+}
+
+void QmitkStdMultiWidget::DisableDepartmentLogo()
+{
+  m_LogoRendering4->Disable();
+}
+
 mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
 {
   return m_SlicesRotator;
@@ -1207,3 +1237,12 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
   m_GradientBackground4->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
 }
 
+
+
+void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
+{
+  m_LogoRendering1->SetLogoSource(path);
+  m_LogoRendering2->SetLogoSource(path);
+  m_LogoRendering3->SetLogoSource(path);
+  m_LogoRendering4->SetLogoSource(path);
+}

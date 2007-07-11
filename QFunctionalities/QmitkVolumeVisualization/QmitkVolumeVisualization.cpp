@@ -93,18 +93,6 @@ void QmitkVolumeVisualization::TreeChanged()
 void QmitkVolumeVisualization::Activated()
 {
   QmitkFunctionality::Activated();
-  
-  const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
-  if (item)
-  {
-    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
-    bool enabled = false; 
-    if (node) 
-    {
-      node->GetBoolProperty("volumerendering",enabled);
-    }
-    m_Controls->m_EnableRenderingCB->setChecked(enabled);
-  }
 }
 void QmitkVolumeVisualization::ImageSelected(const mitk::DataTreeFilter::Item* item)
 {

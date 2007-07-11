@@ -8,7 +8,8 @@
 #include <qapplication.h>
 
 QmitkLightBoxReaderDialog::QmitkLightBoxReaderDialog( QWidget* parent, const char* name )
-:QDialog( parent, name, true )
+:QDialog( parent, name, true ),
+ m_MaxCount(0)
 {
   QDialog::setCaption("Image import");
 
@@ -62,6 +63,10 @@ void QmitkLightBoxReaderDialog::addSpacings( mitk::Vector3D spacing, int count )
   m_Spacings->insertItem( resultString.c_str() );
   m_SpacingVector.push_back( spacing );
 
-  m_Spacings->setCurrentItem(0);
+  if( count > m_MaxCount )
+  {
+    m_MaxCount = count;
+    m_Spacings->setCurrentItem( m_Spacings->count()-1 );
+  }
 }
 

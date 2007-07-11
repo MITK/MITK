@@ -47,6 +47,7 @@ class QmitkLightBoxReaderDialog : public QDialog
     QPushButton* m_Ok;
     QPushButton* m_Abourt;
 
+    int m_MaxCount;
     int m_Selection;
     std::vector<mitk::Vector3D> m_SpacingVector;
 

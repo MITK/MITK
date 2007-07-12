@@ -110,7 +110,7 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
   SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
 }
 
-bool mitk::BaseData::IsEmpty(int t) const
+bool mitk::BaseData::IsEmpty(int) const
 {
   return IsInitialized() == false;
 }

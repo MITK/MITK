@@ -52,7 +52,7 @@ int mitkDataStorageTest(int argc, char* argv[])
 
 //##Documentation
 //## @brief Test for the DataStorage class and its associated classes (e.g. the predicate classes)
-int CheckDataStorage(int, char*, bool manageCompleteTree)
+int CheckDataStorage(int, char*[], bool manageCompleteTree)
 {
   int returnValue = EXIT_SUCCESS;
 

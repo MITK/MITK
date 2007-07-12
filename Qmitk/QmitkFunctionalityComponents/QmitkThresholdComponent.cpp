@@ -320,13 +320,13 @@ void QmitkThresholdComponent::SetSliderRange()
 			mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_ThresholdImageNode->GetData());
 			if(currentImage)
 			{
-				int min = currentImage->GetScalarValueMin();
-				int max = currentImage->GetScalarValueMaxNoRecompute();
+				int min = (int) currentImage->GetScalarValueMin();
+				int max = (int) currentImage->GetScalarValueMaxNoRecompute();
 				//int realMax = currentImage->GetScalarValueMax();
 				if(min < -32000)
 				{
-					min = currentImage->GetScalarValue2ndMin();
-					max = currentImage->GetScalarValue2ndMaxNoRecompute();
+					min = (int) currentImage->GetScalarValue2ndMin();
+					max = (int) currentImage->GetScalarValue2ndMaxNoRecompute();
 				}
 				m_ThresholdComponentGUI->GetThresholdInputSlider()->setMinValue(min);
 				m_ThresholdComponentGUI->GetThresholdInputSlider()->setMaxValue(max);

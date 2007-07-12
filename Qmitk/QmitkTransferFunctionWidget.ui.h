@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
  */ 
 void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
 {
-  if (node) {
+  if (node && node->GetProperty("TransferFunction")) {
     if (mitk::TransferFunctionProperty::Pointer tfp = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction").GetPointer()))
     {
       if (tfp)

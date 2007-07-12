@@ -51,7 +51,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
 }
 
 template<class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* transformPolyData )
+void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* )
 {
   m_VtkWriter->Write(); // without any return type. see .cpp for an alternative
 }

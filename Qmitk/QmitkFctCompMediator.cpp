@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 
 
-QmitkFctCompMediator::QmitkFctCompMediator(QWidget *aLayoutTemplate): m_FunctionalityComponentActionGroup(NULL)
+QmitkFctCompMediator::QmitkFctCompMediator(QWidget *): m_FunctionalityComponentActionGroup(NULL)
 {
 
 }

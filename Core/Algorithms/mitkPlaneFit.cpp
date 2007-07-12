@@ -44,13 +44,13 @@ void mitk::PlaneFit::GenerateOutputInformation()
     m_TimeSlicedGeometry->InitializeEvenlyTimed( 
       planeGeometry, m_PointSet->GetPointSetSeriesSize() );
   
-    int t;
+    unsigned int t;
     for ( t = 0;
           (t < m_PointSet->GetPointSetSeriesSize())
           && (t < m_Planes.size());
           ++t )
     {
-      m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], t );
+      m_TimeSlicedGeometry->SetGeometry3D( m_Planes[t], (int) t );
     }
   
     output->SetGeometry( m_TimeSlicedGeometry );

@@ -43,7 +43,7 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
   int dim=(input->GetDimension()<3?input->GetDimension():3);
 	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
-  if(m_TimeNr >= input->GetDimension(3))
+  if( (unsigned int) m_TimeNr >= input->GetDimension(3) )
   {
     m_TimeNr = input->GetDimension(3)-1;
   }

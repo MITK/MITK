@@ -52,7 +52,7 @@ int mitkDataStorageTest(int argc, char* argv[])
 
 //##Documentation
 //## @brief Test for the DataStorage class and its associated classes (e.g. the predicate classes)
-int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
+int CheckDataStorage(int, char*, bool manageCompleteTree)
 {
   int returnValue = EXIT_SUCCESS;
 
@@ -234,7 +234,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     if (ds->GetManageCompleteTree() == true)
-      if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
+      if (   (stlAll.size() == (unsigned int) tree->Count())  // check if all tree nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
@@ -279,7 +279,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     if (ds->GetManageCompleteTree() == true)
-      if (   (stlAll.size() == tree->Count())  // check if all tree nodes are in resultset
+      if (   (stlAll.size() == (unsigned int) tree->Count())  // check if all tree nodes are in resultset
           && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
           && (std::find(stlAll.begin(), stlAll.end(), treeNode) != stlAll.end()))
@@ -387,7 +387,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     if (manageCompleteTree)   // more than n1-n5 is returned and the extra nodes do not have a dataobject
     {
-      if ((all->Size() == tree->Count() - 2)  // we want to get all but n1 and n2
+      if ((all->Size() == (unsigned int) tree->Count() - 2)  // we want to get all but n1 and n2
           && (std::find(all->begin(), all->end(), n3) != all->end()) // and especially n3-n5
           && (std::find(all->begin(), all->end(), n4) != all->end())
           && (std::find(all->begin(), all->end(), n5) != all->end()))
@@ -495,7 +495,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     else
       expectedCount = 3;  // n1, n3, n5
 
-    if (   (all->Size() == expectedCount) // check if correct objects are in resultset
+    if (   (all->Size() == (unsigned int) expectedCount) // check if correct objects are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) 
         && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()))
@@ -1236,7 +1236,7 @@ int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree)
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
     int refCountbeforeDS = watcher->GetReferenceCount();
-    int n1refCountbeforeDS = n1watcher->GetReferenceCount();
+    // int n1refCountbeforeDS = n1watcher->GetReferenceCount();
 
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);

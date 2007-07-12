@@ -85,7 +85,7 @@ void PointSetCompare( mitk::PointSet* pointSet2, mitk::PointSet* pointSet1, bool
 
 }
 
-int mitkPointSetFileIOTest(int argc, char* argv[])
+int mitkPointSetFileIOTest(int, char*)
 {
   unsigned int numberFailed(0);
 

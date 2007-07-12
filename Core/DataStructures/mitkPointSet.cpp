@@ -195,7 +195,7 @@ mitk::PointSet::GetPoint( int position, int t ) const
   PointType out;
   out.Fill(0);
 
-  if ( t >= m_PointSetSeries.size() )
+  if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
     return out;
   }
@@ -219,7 +219,7 @@ bool
 mitk::PointSet
 ::GetPointIfExists( PointIdentifier id, PointType* point, int t )
 {
-  if ( t >= m_PointSetSeries.size() )
+  if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
     return false;
   }
@@ -248,7 +248,7 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
 
 void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
 {
-  if ( t < m_PointSetSeries.size() )
+  if ( (unsigned int) t < m_PointSetSeries.size() )
   {
     mitk::Point3D indexPoint;
     this->GetGeometry( t )->WorldToIndex( point, indexPoint );
@@ -259,7 +259,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
 
 bool mitk::PointSet::IndexExists( int position, int t )
 {
-  if ( t < m_PointSetSeries.size() )
+  if ( (unsigned int) t < m_PointSetSeries.size() )
   {
     return m_PointSetSeries[t]->GetPoints()->IndexExists( position );
   }
@@ -286,7 +286,7 @@ bool mitk::PointSet::GetSelectInfo( int position, int t )
 
 const int mitk::PointSet::GetNumberOfSelected( int t )
 {
-  if ( t >= m_PointSetSeries.size() )
+  if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
     return 0;
   }
@@ -309,7 +309,7 @@ const int mitk::PointSet::GetNumberOfSelected( int t )
 
 int mitk::PointSet::SearchSelectedPoint( int t )
 {
-  if ( t >= m_PointSetSeries.size() )
+  if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
     return -1;
   }

@@ -26,9 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name, mitk::DataTreeIteratorBase* dataIt )
 : QObject(parent, name),
 m_FuncName(name),
-m_Parent(parent),
 m_ParentMitkImage(NULL),
-m_MitkImageIterator(NULL)
+m_MitkImageIterator(NULL),
+m_Parent(parent)
 {
   SetDataTreeIterator(dataIt);
   

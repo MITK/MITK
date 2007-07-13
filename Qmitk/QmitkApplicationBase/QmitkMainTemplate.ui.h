@@ -633,6 +633,7 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::init()
 {
+  redoButton->setMode(QUndoRedoButton::Redo);
   m_Instance = this;
   m_MultiWidget=NULL;
   m_StandardViewsInitialized = false;

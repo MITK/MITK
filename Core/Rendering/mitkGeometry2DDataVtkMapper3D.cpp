@@ -61,6 +61,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 {
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
+
+  m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
   m_Edges = vtkFeatureEdges::New();
   m_EdgeTransformer = vtkTransformPolyDataFilter::New();
   m_EdgeActor = vtkActor::New();
@@ -69,8 +71,14 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_Prop3DAssembly = vtkAssembly::New();
   m_ImageAssembly = vtkAssembly::New();
 
+  // Make sure that the FeatureEdge algorithm is initialized with a "valid"
+  // (though empty) input
+  vtkPolyData *emptyPolyData = vtkPolyData::New();
+  m_Edges->SetInput( emptyPolyData );
+  emptyPolyData->Delete(); // decrease reference count
+
   m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
-  
+
   m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
   m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
   m_EdgeTuber->SetNumberOfSides( 12 );
@@ -262,8 +270,6 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if (input.IsNotNull() && (input->GetGeometry2D() != NULL))
   {
-    mitk::Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
-    
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(
       GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer()
@@ -271,32 +277,32 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     if ( (surfacecreatorprop.IsNull())
       || (surfacecreatorprop->GetSmartPointer().IsNull())
-      || ((surfaceCreator = dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(
+      || ((m_SurfaceCreator = dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(
              surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() )
       )
     {
-      surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
-      surfaceCreator->PlaceByGeometryOn();
-      surfacecreatorprop = new mitk::SmartPointerProperty(surfaceCreator);
+      m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
+      m_SurfaceCreator->PlaceByGeometryOn();
+      surfacecreatorprop = new mitk::SmartPointerProperty( m_SurfaceCreator );
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }
 
-    surfaceCreator->SetInput(input);
+    m_SurfaceCreator->SetInput(input);
 
     int res;
     if (GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
     {
-      surfaceCreator->SetXResolution(res);
+      m_SurfaceCreator->SetXResolution(res);
     }
     if (GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
     {
-      surfaceCreator->SetYResolution(res);
+      m_SurfaceCreator->SetYResolution(res);
     }
     
     // Clip the Geometry2D with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
     {
-      surfaceCreator->SetBoundingBox(
+      m_SurfaceCreator->SetBoundingBox(
         input->GetGeometry2D()->GetReferenceGeometry()->GetBoundingBox()
       );
     }
@@ -304,7 +310,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     {
       // If no reference geometry is available, clip with the current global
       // bounds
-      surfaceCreator->SetBoundingBox(
+      m_SurfaceCreator->SetBoundingBox(
         mitk::DataTree::ComputeVisibleBoundingBox(
           m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"
         )
@@ -312,9 +318,9 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
 
     // Calculate the surface of the Geometry2D
-    surfaceCreator->Update();
+    m_SurfaceCreator->Update();
 
-    mitk::Surface *surface = surfaceCreator->GetOutput();
+    mitk::Surface *surface = m_SurfaceCreator->GetOutput();
 
     // Check if there's something to display, otherwise return
     if ( (surface->GetVtkPolyData() == 0 )
@@ -326,7 +332,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 
     // Add black background for all images (which may be transparent)
-    m_BackgroundMapper->SetInput( surfaceCreator->GetOutput()->GetVtkPolyData() );
+    m_BackgroundMapper->SetInput( m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
     m_ImageAssembly->AddPart( m_BackgroundActor );
 
 
@@ -377,7 +383,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   vtkDataSetMapper *dataSetMapper = vtkDataSetMapper::New();
                   dataSetMapper->ImmediateModeRenderingOn();
                   dataSetMapper->SetInput( 
-                    surfaceCreator->GetOutput()->GetVtkPolyData() );
+                    m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
 
                   lookupTable = vtkLookupTable::New();
                   lookupTable->DeepCopy( m_DefaultLookupTable );

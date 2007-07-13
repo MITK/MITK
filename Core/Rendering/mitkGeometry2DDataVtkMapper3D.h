@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataTree.h"
+#include "mitkGeometry2DDataToSurfaceFilter.h"
 
 #include <vtkSystemIncludes.h>
 
@@ -114,6 +115,8 @@ protected:
 
   /** \brief PropAssembly to hold the planes */
   vtkAssembly *m_ImageAssembly;
+
+  mitk::Geometry2DDataToSurfaceFilter::Pointer m_SurfaceCreator;
 
   /** \brief Edge extractor for tube-shaped frame */
   vtkFeatureEdges *m_Edges;

@@ -19,6 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindowManager.h"
 #include <itkCommand.h>
+#include "mitkDataStorage.h"
+#include "mitkNodePredicateBase.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateNOT.h"
+#include "mitkProperties.h"
 
 // constructor
 mitk::LevelWindowManager::LevelWindowManager()
@@ -86,42 +93,40 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
 
     if (m_DataTree.IsNotNull())
     {
-      DataTreeIteratorClone iter = m_DataTree->GetIteratorToNode( m_DataTree, NULL );
-      iter->GoToBegin();
-
       int maxLayer = itk::NumericTraits<int>::min();
       m_LevelWindowProperty = NULL;
-      while ( !iter->IsAtEnd() )
+      std::vector<mitk::DataTreeNode::Pointer> allObjects = GetAllNodes();
+      for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
       {
-        if ( (iter->Get().IsNotNull()) && (iter->Get()->IsVisible(NULL)) )
+        mitk::DataTreeNode* node = (*objectIter).GetPointer();
+        if (node)
         {
-          int layer = 0;
-          iter->Get()->GetIntProperty("layer", layer);
-          if ( layer >= maxLayer )
+          if (node->IsVisible(NULL))
           {
-            bool binary = false;
-            iter->Get()->GetBoolProperty("binary", binary);
-            if( binary == false)
+            int layer = 0;
+            node->GetIntProperty("layer", layer);
+            if ( layer >= maxLayer )
             {
-              mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(iter->Get()->GetProperty("levelwindow").GetPointer());
+              mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
               if (levelWindowProperty.IsNotNull())
-              { 
+              {  
                 m_LevelWindowProperty = levelWindowProperty;
                 maxLayer = layer;
               }
             }
           }
         }
-        ++iter;
+        if (m_LevelWindowProperty.IsNotNull())
+        {
+          itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+          command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
+          m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
+          m_IsPropertyModifiedTagSet = true;
+        }
+        Modified();
       }
-      if (m_LevelWindowProperty.IsNotNull())
-      {
-        itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-        command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
-        m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
-        m_IsPropertyModifiedTagSet = true;
-      }
-      Modified();
     }
   }
 }
@@ -186,30 +191,31 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
 
   if (m_DataTree.IsNotNull())
   {
-    DataTreeIteratorClone iter = m_DataTree->GetIteratorToNode( m_DataTree, NULL );
-    iter->GoToBegin();
-    while ( !iter->IsAtEnd() )
+    std::vector<mitk::DataTreeNode::Pointer> allObjects = GetAllNodes();
+    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
     {
-      if ( (iter->Get().IsNotNull()) && (iter->Get()->GetProperty("visible")) )
+      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      if (node)
       {
         itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
         command->SetCallbackFunction(this, &LevelWindowManager::Update);
-        m_PropObserverToNode[iter->Get()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command )] = iter->Get()->GetProperty("visible");
+        m_PropObserverToNode[node->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command )] = node->GetProperty("visible");
       }
-      ++iter;
     }
-    iter->GoToBegin();
     if (m_LevelWindowProperty.IsNotNull() && !m_AutoTopMost && m_DataTree.IsNotNull())
     {
-      while ( !iter->IsAtEnd() )
+      for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
       {
-        if ( (iter->Get().IsNotNull()) && (iter->Get()->IsVisible(NULL)) )
+        mitk::DataTreeNode* node = (*objectIter).GetPointer();
+        if (node)
         {
-          bool binary = false;
-          iter->Get()->GetBoolProperty("binary", binary);
-          if( binary == false)
-          { 
-            mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(iter->Get()->GetProperty("levelwindow").GetPointer());
+          if (node->IsVisible(NULL))
+          {
+            mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
             if (levelWindowProperty)
             {
               if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)
@@ -217,7 +223,6 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
             }
           }
         }
-        ++iter;
       }
     }
   }
@@ -245,26 +250,21 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
 
   if (m_LevelWindowProperty.IsNotNull() && !m_AutoTopMost && m_DataTree.IsNotNull())
   {
-    DataTreeIteratorClone iter = m_DataTree->GetIteratorToNode( m_DataTree, NULL );
-    iter->GoToBegin();
-
-    while ( !iter->IsAtEnd() )
+    std::vector<mitk::DataTreeNode::Pointer> allObjects = GetAllNodes();
+    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
     {
-      if ( (iter->Get().IsNotNull()) && (iter->Get()->IsVisible(NULL)) )
+      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      if (node)
       {
-        bool binary = false;
-        iter->Get()->GetBoolProperty("binary", binary);
-        if( binary == false)
-        { 
-          mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(iter->Get()->GetProperty("levelwindow").GetPointer());
-          if (levelWindowProperty)
-          {
-            if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)
-              stillExists = true;
-          }
+        mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        if (levelWindowProperty)
+        {
+          if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)
+            stillExists = true;
         }
       }
-      ++iter;
     }
   }
   if (stillExists == false && m_DataTree.IsNotNull())
@@ -272,3 +272,32 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
     SetAutoTopMostImage(true);
   }
 }
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
+{
+  mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
+
+  mitk::NodePredicateProperty isVisible("visible", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty isBinary("binary", new mitk::BoolProperty(true));
+  mitk::NodePredicateNOT notBinary(isBinary);
+  mitk::NodePredicateProperty hasLevelWindow("levelwindow", NULL);
+  mitk::NodePredicateDataType isImage("Image");
+  mitk::NodePredicateAND predicate( isVisible, isImage );
+  mitk::NodePredicateAND predicateNotBinary( predicate, notBinary );
+  mitk::NodePredicateAND predicateLevelWindow( predicateNotBinary, hasLevelWindow );
+
+  mitk::DataStorage::SetOfObjects::ConstPointer allObjects = dataStorage->GetSubset( predicateLevelWindow );
+
+  std::vector<DataTreeNode::Pointer> resultVector;
+
+  for ( mitk::DataStorage::SetOfObjects::const_iterator objectIter = allObjects->begin();
+        objectIter != allObjects->end();
+        ++objectIter )
+  {
+    mitk::DataTreeNode* node = (*objectIter).GetPointer();
+    resultVector.push_back( node );
+  }
+
+  return resultVector; 
+}
+

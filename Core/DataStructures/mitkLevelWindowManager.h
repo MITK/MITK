@@ -92,6 +92,8 @@ namespace mitk
     /// destructor
     ~LevelWindowManager();
 
+    std::vector<DataTreeNode::Pointer> GetAllNodes();
+
   private:
 
     /// the DataTree with all image-nodes

@@ -5,6 +5,88 @@
 #include <itkMacro.h>
 #include <itksys/SystemTools.hxx>
 
+#include <algorithm>
+
+mitk::StandardFileLocations* mitk::StandardFileLocations::m_Instance = 0;
+
+mitk::StandardFileLocations::StandardFileLocations()
+{
+}
+
+mitk::StandardFileLocations::~StandardFileLocations()
+{
+}
+
+
+const void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
+{
+  std::string directory = dir;
+  if(directory.length() == 0)
+    return;
+  
+  // Do nothing if directory is already included into search list
+  FileSearchVectorType::iterator iter;
+  if(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.size() > 0)
+  {
+    iter = std::find(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin(),
+      mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end(),std::string(dir));
+    if ( iter != mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end() )
+      return;
+  }
+  // insert dir into queue
+  if(insertInFrontOfSearchList)
+  {
+    FileSearchVectorType::iterator it = mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin();
+    mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.insert(it,std::string(dir));
+  }
+  else
+    mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.push_back(std::string(dir));
+}
+
+const void mitk::StandardFileLocations::RemoveDirectoryForSearch(const char * dir)
+{
+  FileSearchVectorType::iterator it;
+  // background layers
+  if(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.size() > 0)
+  {
+    it = std::find(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin(),
+                   mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end(),std::string(dir));
+    if(it != mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end())
+    {
+      mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.erase(it);
+      return;
+    }
+  }
+}
+
+const std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char * filename)
+{
+  FileSearchVectorType::iterator it;
+ 
+  for(it = m_SearchDirectories.begin(); it != m_SearchDirectories.end(); it++)
+  {
+    std::string currDir = (*it);
+    
+    // Perhaps append "/" before appending filename
+    if(currDir.find_last_of("\\")+1 != currDir.size() || currDir.find_last_of("/")+1 != currDir.size())
+     currDir += "/";
+    
+    // Append filename
+    currDir += filename;
+    
+    // Perhaps remove "/" after filename
+    if(currDir.find_last_of("\\")+1 == currDir.size() || currDir.find_last_of("/")+1 == currDir.size())
+     currDir.erase(currDir.size()-1,currDir.size());
+
+    // convert to OS dependent path schema
+    currDir = itksys::SystemTools::ConvertToOutputPath(currDir.c_str());
+
+    // Return first found path   
+    if(itksys::SystemTools::FileExists(currDir.c_str())) 
+      return currDir;
+  }
+  return std::string(""); 
+}
 
 const std::string mitk::StandardFileLocations::FindFile(const char* filename, const char* pathInSourceDir)
 {
@@ -16,11 +98,7 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
     // 1. look for MITKCONF environment variable
     xmlFileName = mitkConf;
 
-    xmlFileName += "/";
-    xmlFileName = itksys::SystemTools::ConvertToOutputPath(xmlFileName.c_str());
-    xmlFileName += filename;
-
-    if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(mitkConf);
   }
 
   // 2. use .mitk-subdirectory in home directory of the user
@@ -67,16 +145,12 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
   }
 #endif // defined(_WIN32) && !defined(__CYGWIN__)
   
-  xmlFileName = homeDirectory;
-  xmlFileName += "/.mitk/";
-  xmlFileName += filename;
-
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
+  homeDirectory += "/.mitk/";
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(homeDirectory.c_str());
 
   // 3. look in the current working directory
   xmlFileName = filename;
-
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(xmlFileName.c_str());
 
   // 4. use a source tree location from compile time
   xmlFileName = MITK_ROOT;
@@ -85,11 +159,9 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
     xmlFileName += pathInSourceDir;
   }
   xmlFileName += '/';
-  xmlFileName += filename;
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(xmlFileName.c_str());
   
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str())) return xmlFileName;
-
-  return std::string("");
+  return mitk::StandardFileLocations::GetInstance()->SearchDirectoriesForFile(filename);
 }
 
 const std::string mitk::StandardFileLocations::GetOptionDirectory()

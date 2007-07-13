@@ -116,10 +116,6 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
   {
     homeDirectory = homeDrive;
     homeDirectory +=homePath;
-
-    // homeDirectory must not have a slash at the end, otherwise a path like "C:\/.mitk/" might occur.
-    if(homeDirectory.find_last_of("\\")+1 == homeDirectory.size() || homeDirectory.find_last_of("/")+1 == homeDirectory.size())
-     homeDirectory.erase(homeDirectory.size()-1,homeDirectory.size());
   }
   if(itksys::SystemTools::FileExists(homeDirectory.c_str())==false)
   {

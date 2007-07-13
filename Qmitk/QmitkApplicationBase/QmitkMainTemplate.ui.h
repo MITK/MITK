@@ -675,7 +675,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
   m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
-  m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(true) );
+  m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(false) );
   m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
   m_Options->SetProperty( "Default value for iilInterpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_IilInterpolationActive) );
 }

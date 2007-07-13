@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medickal and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/ for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef _vtk_Logo_Rendering_h_
 #define _vtk_Logo_Rendering_h_
 
@@ -13,6 +31,7 @@ class vtkImageMapper;
 class vtkLookupTable;
 class vtkPolyData;
 class vtkPNGReader;
+class vtkImageImport;
 
 namespace mitk {
 
@@ -119,6 +138,12 @@ public:
    * Returns the mapper associated with the logo
    */
   virtual vtkImageMapper* GetMapper();
+
+  /**
+   * If set true, this method forces the logo rendering mechanism that it always 
+   * renders the MBI department logo, independent from mainapp option settings.
+   */
+  virtual void ForceMBILogoVisible(bool visible);
   
 protected:
   void SetupCamera();
@@ -140,14 +165,18 @@ protected:
   vtkImageMapper*     m_Mapper;
   vtkPNGReader*       m_PngReader;
   vtkCamera*          m_Camera;
+  vtkImageImport*     m_VtkImageImport;
 
   std::string         m_FileName;
 
   bool                m_IsEnabled;
+  bool                m_ForceShowMBIDepartmentLogo;
 
   LogoPosition        m_LogoPosition;
   double              m_ZoomFactor;
   double              m_Opacity;
+
+  char *              m_ImageData;
 
 };
 

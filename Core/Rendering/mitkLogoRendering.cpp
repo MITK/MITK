@@ -10,6 +10,7 @@
 #include <itkMacro.h>
 #include <itksys/SystemTools.hxx>
 
+#include <vtkImageImport.h>
 #include <vtkRenderer.h>
 #include <vtkMapper.h>
 #include <vtkImageActor.h>
@@ -21,19 +22,24 @@
 #include <vtkPNGReader.h>
 #include <vtkImageData.h>
 #include <vtkConfigure.h>
+#include <vtkImageFlip.h>
+
+#include <mbilogo.h>
 
 
 mitk::LogoRendering::LogoRendering()
 {
-  m_RenderWindow  = NULL;
-  m_Renderer      = vtkRenderer::New();
-  m_Actor         = vtkImageActor::New();
-  m_Mapper        = vtkImageMapper::New();
-  m_PngReader     = vtkPNGReader::New();
+  m_RenderWindow      = NULL;
+  m_Renderer          = vtkRenderer::New();
+  m_Actor             = vtkImageActor::New();
+  m_Mapper            = vtkImageMapper::New();
+  m_PngReader         = vtkPNGReader::New();
+  m_VtkImageImport    = vtkImageImport::New();
   
   m_LogoPosition  = mitk::LogoRendering::LowerRight;
  
-  m_IsEnabled = false;
+  m_IsEnabled                  = false;
+  m_ForceShowMBIDepartmentLogo = false;
 
   m_ZoomFactor = 1.15;
   m_Opacity    = 0.5;
@@ -59,6 +65,9 @@ mitk::LogoRendering::~LogoRendering()
 
   if ( m_PngReader != NULL )
     m_PngReader->Delete();
+
+  if ( m_VtkImageImport != NULL )
+    m_VtkImageImport->Delete();
 }
 
 /**
@@ -123,12 +132,51 @@ void mitk::LogoRendering::SetLogoSource(const char* filename)
  */
 void mitk::LogoRendering::Enable()
 {
-  if(itksys::SystemTools::FileExists(m_FileName.c_str()) && m_RenderWindow != NULL)
+  if(m_IsEnabled)
+    return;
+
+  if(m_RenderWindow != NULL)
   {
-    m_PngReader->Update();
-    
-    m_Actor->SetInput(m_PngReader->GetOutput());
-    
+    if(itksys::SystemTools::FileExists(m_FileName.c_str()) && !m_ForceShowMBIDepartmentLogo)
+    {
+      m_PngReader->Update();
+      m_Actor->SetInput(m_PngReader->GetOutput());
+    }
+    else // either logo file not found or logo renderer is forced to show the MBI logo
+    {
+      m_VtkImageImport->SetDataScalarTypeToUnsignedChar();
+      m_VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
+      m_VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
+      m_VtkImageImport->SetDataExtentToWholeExtent();
+
+      // flip mbi logo around y axis and change color order
+      m_ImageData = new char[mbiLogo_Height*mbiLogo_Width*mbiLogo_NumberOfScalars];
+      
+      int column, row;
+      char * dest   = m_ImageData;
+      char * source = (char*) &mbiLogo_Data[0];;
+      char r, g, b, a;
+      for (column = 0; column < mbiLogo_Height; column++)
+        for (row = 0; row < mbiLogo_Width; row++)
+        {   //change r with b
+            b = *source++;
+            g = *source++;
+            r = *source++;
+            a = *source++;
+
+            *dest++ = r;
+            *dest++ = g;
+            *dest++ = b;
+            *dest++ = a;
+          }        
+
+      m_VtkImageImport->SetImportVoidPointer(m_ImageData);
+      m_VtkImageImport->Modified();
+      m_VtkImageImport->Update();
+      
+      m_Actor->SetInput(m_VtkImageImport->GetOutput());
+    }
+
     #if ( VTK_MAJOR_VERSION >= 5 )
       m_Actor->SetOpacity(m_Opacity);
     #endif
@@ -248,6 +296,11 @@ void mitk::LogoRendering::SetupPosition()
   m_Renderer->SetViewport(newPos);
 }
 
+void mitk::LogoRendering::ForceMBILogoVisible(bool visible)
+{
+  m_ForceShowMBIDepartmentLogo = visible;
+}
+
 void mitk::LogoRendering::SetZoomFactor( double factor )
 {
   m_ZoomFactor = factor;
@@ -263,7 +316,7 @@ void mitk::LogoRendering::SetOpacity(double opacity)
  */
 void mitk::LogoRendering::Disable()
 {
-  if ( this->IsEnabled() )
+  if ( this->IsEnabled() && !m_ForceShowMBIDepartmentLogo )
   {
     m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_Renderer);
     m_IsEnabled = false;

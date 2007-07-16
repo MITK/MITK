@@ -98,12 +98,12 @@ void BaseXMLWriter::EndNode( )
   {
     std::ostream& stream = m_Stack.top()->GetChildrenStream();
     current->Write( stream, steps );      
-    delete current;
   }
   else
   {
     current->Write( *m_Out, steps );
   }
+  delete current;
 }
 
 /**

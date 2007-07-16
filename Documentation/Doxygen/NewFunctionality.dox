@@ -28,14 +28,11 @@ to put the source code. The generator uses the CMake GUI for configuration.
 \li After successfull generation CMake shows a message where you can find your new functionality.
 
 \par Integrating your new functionality
-Copy your new functionality from the temporary directory to a place you like, inside or outside of your MITK source tree.
-(Hint for members of MBI: put it in \c mbi-sb/QFunctionalitites !)
+Copy your new functionality from the temporary directory to the QFunctionalities directory in your MITK source tree.
+(Hint for members of MBI: put it in \c mbi-sb/QFunctionalities !)
 
 Switch back to the configuration of your MITK build. On Windows you can just switch the "Where to build the binaries" combobox back 
-to your MITK binary directory. In the CMake GUI you can find a variable EXTERNAL_FUNCTIONALITIES_DIR. Set it to your newly created functionality source directory.
-
-\par Integrating multiple functionalities
-If you want to add multiple external functionalities to your MITK build, you have to put them all in one directory and point the EXTERNAL_FUNCTIONALITIES_DIR variable (see above) to this directory. In this directory you have to put a file named \c CMakeLists.txt which contains a line \c ADD_SUBDIRECTORY(<functionality_name>) for each of your functionalities. 
+to your MITK binary directory. After pressing "Configure" a new build ption for your functionality should appear.
 
 \section BuildSystem Build system for functionalities
 

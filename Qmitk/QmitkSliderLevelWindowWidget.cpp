@@ -279,7 +279,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
     }
   }
 
-  if ( m_MouseDown ) {
+  else {
 
     float fact = (float) m_MoveHeight / m_LevelWindow.GetRange();
 
@@ -368,6 +368,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
           m_LevelWindow.SetLevelWindow( value, m_LevelWindow.GetWindow() );
       }
       m_Manager->SetLevelWindow(m_LevelWindow);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -454,7 +455,6 @@ void QmitkSliderLevelWindowWidget::update() {
     m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetMax() - m_LevelWindow.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
   
   QWidget::repaint();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )

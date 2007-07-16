@@ -84,6 +84,8 @@ namespace mitk
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);
 
+    std::vector<DataTreeNode::Pointer> GetAllNodes();
+
   protected:
 
     /// constructor
@@ -91,8 +93,6 @@ namespace mitk
 
     /// destructor
     ~LevelWindowManager();
-
-    std::vector<DataTreeNode::Pointer> GetAllNodes();
 
   private:
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkLevelWindowPresetDefinition.h>
 #include <QmitkLevelWindowRangeChange.h>
 #include <qcursor.h>
+#include <mitkRenderingManager.h>
 
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f )
@@ -70,6 +71,7 @@ void QmitkLevelWindowWidgetContextMenu::setPreset(int presetID)
     }
     m_LevelWindow.SetLevelWindow(dlevel, dwindow);
     m_Manager->SetLevelWindow(m_LevelWindow);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -92,12 +94,14 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
 {
   m_LevelWindow.ResetDefaultLevelWindow();
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setMaximumWindow()
 {
   m_LevelWindow.SetToMaxWindowSize();
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
@@ -105,6 +109,7 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
   m_LevelWindow.ResetDefaultRangeMinMax();
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
@@ -117,6 +122,7 @@ void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
     m_LevelWindow.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());
     m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), m_LevelWindow.GetWindow());
     m_Manager->SetLevelWindow(m_LevelWindow);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -136,9 +142,6 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
   try
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
-
-    mitk::DataTree* dataTree = m_Manager->GetDataTree();
-    mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
 
     QPopupMenu* contextMenu = contextmenu;
     Q_CHECK_PTR( contextMenu );
@@ -169,31 +172,28 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
       m_ImageSubmenu->setItemChecked(m_ImageID, true);
     m_ImageSubmenu->insertSeparator();
     Q_CHECK_PTR( m_ImageSubmenu );
-    dataTreeIteratorClone->GoToBegin();
-    while ( !dataTreeIteratorClone->IsAtEnd() )
+    std::vector<mitk::DataTreeNode::Pointer> allObjects = m_Manager->GetAllNodes();
+    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
     {
-      if ( (dataTreeIteratorClone->Get().IsNotNull()) && (dataTreeIteratorClone->Get()->IsVisible(NULL)) )
+      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      if (node)
       {
-        bool binary = false;
-        dataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
-        if( binary == false)
-        { 
-          mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-          if (levelWindowProperty.IsNotNull())
+        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        if (levelWindowProperty.IsNotNull())
+        {
+          std::string name;
+          node->GetName(name);
+          QString item = name.c_str();
+          int id = m_ImageSubmenu->insertItem(item);
+          m_Images[id] = levelWindowProperty;
+          if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
           {
-            std::string name;
-            dataTreeIteratorClone->Get()->GetName(name);
-            QString item = name.c_str();
-            int id = m_ImageSubmenu->insertItem(item);
-            m_Images[id] = levelWindowProperty;
-            if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
-            {
-              m_ImageSubmenu->setItemChecked(id, true);
-            }
+            m_ImageSubmenu->setItemChecked(id, true);
           }
         }
       }
-      ++dataTreeIteratorClone;
     }
     connect(m_ImageSubmenu, SIGNAL(activated(int)), this, SLOT(setImage(int)));
     contextMenu->insertItem( "Images",  m_ImageSubmenu );
@@ -211,8 +211,6 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
   try
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
-    mitk::DataTree* dataTree = m_Manager->GetDataTree();
-    mitk::DataTreeIteratorClone dataTreeIteratorClone = dataTree->GetIteratorToNode( dataTree, NULL );
 
     QPopupMenu* contextMenu = new QPopupMenu( this );
     Q_CHECK_PTR( contextMenu );
@@ -243,31 +241,28 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
       m_ImageSubmenu->setItemChecked(m_ImageID, true);
     m_ImageSubmenu->insertSeparator();
     Q_CHECK_PTR( m_ImageSubmenu );
-    dataTreeIteratorClone->GoToBegin();
-    while ( !dataTreeIteratorClone->IsAtEnd() )
+    std::vector<mitk::DataTreeNode::Pointer> allObjects = m_Manager->GetAllNodes();
+    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
     {
-      if ( (dataTreeIteratorClone->Get().IsNotNull()) && (dataTreeIteratorClone->Get()->IsVisible(NULL)) )
+      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      if (node)
       {
-        bool binary = false;
-        dataTreeIteratorClone->Get()->GetBoolProperty("binary", binary);
-        if( binary == false)
-        { 
-          mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(dataTreeIteratorClone->Get()->GetProperty("levelwindow").GetPointer());
-          if (levelWindowProperty.IsNotNull())
+        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        if (levelWindowProperty.IsNotNull())
+        {
+          std::string name;
+          node->GetName(name);
+          QString item = name.c_str();
+          int id = m_ImageSubmenu->insertItem(item);
+          m_Images[id] = levelWindowProperty;
+          if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
           {
-            std::string name;
-            dataTreeIteratorClone->Get()->GetName(name);
-            QString item = name.c_str();
-            int id = m_ImageSubmenu->insertItem(item);
-            m_Images[id] = levelWindowProperty;
-            if (levelWindowProperty == m_Manager->GetLevelWindowProperty())
-            {
-              m_ImageSubmenu->setItemChecked(id, true);
-            }
+            m_ImageSubmenu->setItemChecked(id, true);
           }
         }
       }
-      ++dataTreeIteratorClone;
     }
     connect(m_ImageSubmenu, SIGNAL(activated(int)), this, SLOT(setImage(int)));
     contextMenu->insertItem( "Images",  m_ImageSubmenu );

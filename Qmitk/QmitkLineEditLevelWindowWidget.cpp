@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qlineedit.h>
 #include <QmitkLevelWindowWidgetContextMenu.h>
+#include <mitkRenderingManager.h>
 
 /**
 * Constructor
@@ -145,28 +146,6 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
   validWindow();
 }
 
-/*void QmitkLineEditLevelWindowWidget::setValidator()
-{
-  int diffLevelToUpperBound = (int)(m_LevelWindow.GetRangeMax() - m_LevelWindow.GetLevel()); 
-  int diffLevelToLowerBound = (int)(m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin());
-
-  // TODO delete noetig?
-  //Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  if (diffLevelToUpperBound < diffLevelToLowerBound)
-  {
-    QValidator* validatorWindowInput = new QIntValidator(1, diffLevelToUpperBound*2, this);
-    m_WindowInput->setValidator(validatorWindowInput);
-  }
-  else
-  {
-    QValidator* validatorWindowInput = new QIntValidator(1, diffLevelToLowerBound*2, this);
-    m_WindowInput->setValidator(validatorWindowInput);
-  }
-
-  QValidator* validatorLevelInput = new QIntValidator((int)(m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2), (int)(m_LevelWindow.GetRangeMax() - m_LevelWindow.GetWindow()/2), this);
-  m_LevelInput->setValidator(validatorLevelInput);
-}*/
-
 void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 { 
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
@@ -189,6 +168,7 @@ void QmitkLineEditLevelWindowWidget::validLevel()
   m_LevelInput->setText(qLevel);
   m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLineEditLevelWindowWidget::validWindow()
@@ -207,6 +187,7 @@ void QmitkLineEditLevelWindowWidget::validWindow()
   m_WindowInput->setText(qWindow);
   m_LevelWindow.SetLevelWindow(m_LevelWindow.GetLevel(), window);
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()

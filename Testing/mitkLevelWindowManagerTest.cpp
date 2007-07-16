@@ -1,4 +1,5 @@
 #include "mitkLevelWindowManager.h"
+#include "mitkDataStorage.h"
 
 int mitkLevelWindowManagerTest(int, char* [])
 {
@@ -13,6 +14,7 @@ int mitkLevelWindowManagerTest(int, char* [])
   std::cout<<"[PASSED]"<<std::endl;
    
   mitk::DataTree::Pointer datatree = mitk::DataTree::New();
+  mitk::DataStorage::CreateInstance(datatree);
 
   std::cout << "Testing mitk::LevelWindowManager SetDataTree ";
   manager->SetDataTree(datatree);

@@ -118,15 +118,15 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
             }
           }
         }
-        if (m_LevelWindowProperty.IsNotNull())
-        {
-          itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-          command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
-          m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
-          m_IsPropertyModifiedTagSet = true;
-        }
-        Modified();
       }
+      if (m_LevelWindowProperty.IsNotNull())
+      {
+        itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+        command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
+        m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
+        m_IsPropertyModifiedTagSet = true;
+      }
+      Modified();
     }
   }
 }
@@ -276,7 +276,9 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
 std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
-
+  std::vector<DataTreeNode::Pointer> resultVector;
+  if (dataStorage != NULL)
+  {
   mitk::NodePredicateProperty isVisible("visible", new mitk::BoolProperty(true));
   mitk::NodePredicateProperty isBinary("binary", new mitk::BoolProperty(true));
   mitk::NodePredicateNOT notBinary(isBinary);
@@ -297,7 +299,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
     mitk::DataTreeNode* node = (*objectIter).GetPointer();
     resultVector.push_back( node );
   }
-
+  }
   return resultVector; 
 }
 

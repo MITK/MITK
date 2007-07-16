@@ -709,14 +709,28 @@ mitk::ImageMapper2D
   mitk::BoundingBox::PointType bbCenter = boundingBox->GetCenter();
 
   vtkPoints *points = vtkPoints::New();
-  points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
-  points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
-  points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
-  points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
-  points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
-  points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
-  points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
-  points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
+  if(boundingGeometry->GetImageGeometry())
+  {
+    points->InsertPoint( 0, bbMin[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 1, bbMin[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 2, bbMin[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 3, bbMin[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 4, bbMax[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
+    points->InsertPoint( 5, bbMax[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 6, bbMax[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
+    points->InsertPoint( 7, bbMax[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
+  }
+  else
+  {
+    points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
+    points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
+    points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
+    points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
+    points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
+    points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
+    points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
+    points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
+  }
 
   vtkPoints *newPoints = vtkPoints::New();
 

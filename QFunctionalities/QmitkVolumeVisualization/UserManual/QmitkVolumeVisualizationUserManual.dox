@@ -1,5 +1,5 @@
-\/**
-\page QmitkVolumeVisualizationUserManual
+/**
+\page QmitkVolumeVisualizationUserManual The Volume Visualization Functionality
 
 Available sections:
   - \ref QmitkVolumeVisualizationUserManualOverview 
@@ -10,4 +10,4 @@ Available sections:
 A functionality to create and edit piecewise linear transfer functions for direct volume rendering,
 including color, scalar and gradient opacity functions.
 
-*\/
+*/

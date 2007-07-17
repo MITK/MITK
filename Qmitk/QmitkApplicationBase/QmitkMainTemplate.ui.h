@@ -79,12 +79,14 @@ Blaa
 
 Tadaa
 
-*\
+*&#47;
 \endverbatim
 
   However, it is nice to actually replace the nonsense :-)
-
 */
+
+// PLEASE: do not remove this strange 47 character up ther in the doxygen documentation. Putting a normal slash there produced errors on
+// at least one system.
 
 // these files have to be included at this location
 // because otherwise microsoft visual c++ generates

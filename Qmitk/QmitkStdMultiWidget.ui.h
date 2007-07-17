@@ -1191,6 +1191,8 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
   SetWidgetPlaneVisibility("widget2Plane", visible);
   SetWidgetPlaneVisibility("widget3Plane", visible);
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   emit WidgetPlanesVisibilityChanged(visible);
 }
 

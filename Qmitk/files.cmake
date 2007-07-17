@@ -12,6 +12,7 @@ SET(CPP_FILES
   QmitkApplicationBase/QmitkFunctionalityFactory.cpp
   QmitkApplicationBase/QmitkFunctionalityTesting.cpp
   QmitkApplicationBase/QmitkSaveProjectWidget.cpp
+  QmitkBaseComponent.cpp
   QmitkBaseAlgorithmComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
   QmitkCallbackFromGUIThread.cpp
@@ -112,6 +113,7 @@ SET(MOC_H_FILES
   QmitkApplicationBase/QmitkFunctionality.h
   QmitkApplicationBase/QmitkFunctionalityTesting.h
   QmitkApplicationBase/QmitkSaveProjectWidget.h
+  QmitkBaseComponent.h
   QmitkBaseFunctionalityComponent.h
   QmitkCallbackFromGUIThread.h
   QmitkColorTransferFunctionCanvas.h

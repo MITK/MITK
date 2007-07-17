@@ -146,10 +146,11 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
   }
   if(m_SurfaceCreatorComponentGUI != NULL)
   {
-
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
-      m_AddedChildList[i]->ImageSelected(m_SelectedItem);
+      QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->ImageSelected(m_SelectedItem);
     }
   }
   TreeChanged();

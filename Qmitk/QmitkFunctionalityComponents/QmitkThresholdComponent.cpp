@@ -130,7 +130,9 @@ void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeFilter::Item * i
 	{
 		for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
 		{
-			m_AddedChildList[i]->ImageSelected(m_SelectedItem);
+			QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->ImageSelected(m_SelectedItem);
 		}
 	}
 	m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());

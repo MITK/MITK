@@ -197,12 +197,14 @@ void QmitkFunctionalityComponentContainer::SetTreeIterator(mitk::DataTreeIterato
 			{
 				for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
 				{
-					//m_AddedChildList[i]->m_MitkImage = static_cast<mitk::Image*> (m_ParentMitkImageIterator->Get()->GetData());
-					m_AddedChildList[i]->m_DataTreeIterator = m_MitkImageIterator;
-					m_AddedChildList[i]->TreeChanged();
-
-				}   
-			}
+          QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+          if (functionalityComponent != NULL)
+          {
+            functionalityComponent->m_DataTreeIterator = m_MitkImageIterator;
+            functionalityComponent->TreeChanged();
+          }
+        }   
+      }
 		}
 	}
 }
@@ -215,7 +217,9 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFil
 	{
 		for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
 		{
-			m_AddedChildList[i]->ImageSelected(m_SelectedItem);
+			QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->ImageSelected(m_SelectedItem);
 		}   
 	}
 
@@ -233,9 +237,12 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeFil
 		{
 			for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
 			{
-				m_AddedChildList[i]->m_ParentMitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
-				m_AddedChildList[i]->m_MitkImageIterator = m_MitkImageIterator;
-
+        QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+        if (functionalityComponent != NULL)
+        {
+          functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+				  functionalityComponent->m_MitkImageIterator = m_MitkImageIterator;
+        }
 			}   
 		}
 	}

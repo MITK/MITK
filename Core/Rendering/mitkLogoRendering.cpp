@@ -44,7 +44,7 @@ mitk::LogoRendering::LogoRendering()
   m_ZoomFactor = 1.15;
   m_Opacity    = 0.5;
 
-  m_FileName  = mitk::StandardFileLocations::FindFile("mbilogo.png","./mbi-sb/Core/Rendering");
+  m_FileName  = "";
   m_PngReader->SetFileName(m_FileName.c_str());
 }
 

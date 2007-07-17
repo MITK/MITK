@@ -7,8 +7,6 @@
 
 #include <algorithm>
 
-mitk::StandardFileLocations* mitk::StandardFileLocations::m_Instance = 0;
-
 mitk::StandardFileLocations::StandardFileLocations()
 {
 }
@@ -18,7 +16,7 @@ mitk::StandardFileLocations::~StandardFileLocations()
 }
 
 
-const void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
+void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
 {
   std::string directory = dir;
   if(directory.length() == 0)
@@ -43,7 +41,7 @@ const void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, 
     mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.push_back(std::string(dir));
 }
 
-const void mitk::StandardFileLocations::RemoveDirectoryForSearch(const char * dir)
+void mitk::StandardFileLocations::RemoveDirectoryForSearch(const char * dir)
 {
   FileSearchVectorType::iterator it;
   // background layers
@@ -59,7 +57,7 @@ const void mitk::StandardFileLocations::RemoveDirectoryForSearch(const char * di
   }
 }
 
-const std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char * filename)
+std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char * filename)
 {
   FileSearchVectorType::iterator it;
  
@@ -88,7 +86,7 @@ const std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const ch
   return std::string(""); 
 }
 
-const std::string mitk::StandardFileLocations::FindFile(const char* filename, const char* pathInSourceDir)
+std::string mitk::StandardFileLocations::FindFile(const char* filename, const char* pathInSourceDir)
 {
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
   std::string xmlFileName;
@@ -160,7 +158,7 @@ const std::string mitk::StandardFileLocations::FindFile(const char* filename, co
   return mitk::StandardFileLocations::GetInstance()->SearchDirectoriesForFile(filename);
 }
 
-const std::string mitk::StandardFileLocations::GetOptionDirectory()
+std::string mitk::StandardFileLocations::GetOptionDirectory()
 {
   const char* mitkoptions = itksys::SystemTools::GetEnv("MITKOPTIONS");
   std::string optionsDirectory;

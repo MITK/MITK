@@ -769,7 +769,7 @@ void QmitkMainTemplate::Initialize()
 
   InitializeFunctionality();
 
-  std::string optionsFile(mitk::StandardFileLocations::FindFile("MITKOptions.xml"));
+  std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
 
   if (!optionsFile.empty())
   {
@@ -942,7 +942,7 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 
 void QmitkMainTemplate::destroy()
 {
-  std::string filename( mitk::StandardFileLocations::GetOptionDirectory() );
+  std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
   filename += "/MITKOptions.xml";
   SaveOptionsToFile( filename.c_str() );
   

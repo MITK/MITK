@@ -48,7 +48,7 @@ namespace mitk
     \param insertInFrontOfSearchList  wheather this search request shall be processed first
     \return void
     */
-    static const void AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList = true);
+    void AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList = true);
     
     /*!
     \brief Remove a directory from the search queue:
@@ -57,7 +57,7 @@ namespace mitk
     \param dir         directory you want to be searched in
     \return void
     */
-    static const void RemoveDirectoryForSearch(const char * dir);
+    void RemoveDirectoryForSearch(const char * dir);
 
     /*!
     \brief looks for a file in several standard locations
@@ -71,7 +71,7 @@ namespace mitk
     2. Look in the current working directory.
     3. Use pathInSourceDir to look in a source code directory hierarchy (which is determined at compile time)
     */
-    static const std::string FindFile(const char* filename, const char* pathInSourceDir = NULL );
+    std::string FindFile(const char* filename, const char* pathInSourceDir = NULL );
 
     /*!
     \brief Return directory of/for option files
@@ -84,7 +84,7 @@ namespace mitk
 
     The directory will be created if it does not exist.
     */
-    static const std::string GetOptionDirectory();
+    std::string GetOptionDirectory();
 
 
     void Execute(itk::Object *object, const itk::EventObject & event)
@@ -97,8 +97,10 @@ namespace mitk
 
     static StandardFileLocations* GetInstance()
     {
-      if( m_Instance == 0 )
-        m_Instance = new StandardFileLocations();
+      static StandardFileLocations::Pointer m_Instance = 0;
+
+      if(m_Instance.IsNull())
+        m_Instance = StandardFileLocations::New();
       return m_Instance;
     }
 
@@ -108,18 +110,11 @@ namespace mitk
   protected:
     StandardFileLocations();
 
-    const std::string SearchDirectoriesForFile(const char * filename);
-
+    std::string SearchDirectoriesForFile(const char * filename);
 
   private:
-    // SINGLETON
-    static StandardFileLocations * m_Instance;
     // Private Copy Constructor
     StandardFileLocations( const StandardFileLocations& );
-
-    
-
-
   };
 
 } // namespace

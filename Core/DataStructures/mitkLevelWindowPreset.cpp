@@ -33,7 +33,7 @@ LevelWindowPreset::~LevelWindowPreset()
 
 bool LevelWindowPreset::LoadPreset()
 {
-  m_XmlFileName = StandardFileLocations::FindFile("mitkLevelWindowPresets.xml", "Config");
+  m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml", "Config");
 
   if (!m_XmlFileName.empty()) 
     return LoadPreset(m_XmlFileName);

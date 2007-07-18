@@ -251,6 +251,7 @@ public:
   //##ModelId=3E3B987503A3
   void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
+  /// In contrast to WorldToIndex(Point3D) this method rounds to integer indices!
   template <unsigned int VIndexDimension>
      void WorldToIndex(const mitk::Point3D &pt_mm, itk::Index<VIndexDimension> &index) const
   {
@@ -328,6 +329,21 @@ public:
     }
     return inside;
   }
+
+  /// Convenience method for working with ITK indices
+  template <unsigned int VIndexDimension>
+    bool IsIndexInside(const itk::Index<VIndexDimension> &index) const
+  {
+    int i, dim=index.GetIndexDimension();
+    Point3D pt_index;
+    pt_index.Fill(0);
+    for ( i = 0; i < dim; ++i )
+    {
+      pt_index[i] = index[i];
+    }
+    return IsIndexInside(pt_index);
+  }
+
 
   //##Documentation
   //## @brief Get the spacing (size of a pixel).

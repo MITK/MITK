@@ -880,11 +880,11 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   if ( binary )
   {
     image->setExtrema(0, 1);
+    image->setBinary(true);
 
     bool binaryOutline = false;
     if (this->GetDataTreeNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
     {
-      image->setBinary(true);
       image->setOutline(binaryOutline);
     }
   }

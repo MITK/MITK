@@ -37,7 +37,7 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
     throw std::invalid_argument("To few digits requested");
   }
 
-  srand(time( (time_t *)0 ));
+  srand((unsigned int) time( (time_t *)0 ));
 }
 
 std::string UIDGenerator::GetUID()

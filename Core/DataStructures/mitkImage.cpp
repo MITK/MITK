@@ -1207,9 +1207,9 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
     mitkImage->m_CountOfMaxValuedVoxels = 0;
 
   mitkImage->m_Scalar2ndMin=
-    mitkImage->m_ScalarMin = itk::NumericTraits<TPixel>::max();
+    mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<TPixel>::max();
   mitkImage->m_Scalar2ndMax=
-    mitkImage->m_ScalarMax = itk::NumericTraits<TPixel>::NonpositiveMin();
+    mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<TPixel>::NonpositiveMin();
 
   while( !it.IsAtEnd() )
   {

@@ -33,6 +33,8 @@ void QmitkMemoryUsageIndicator::init()
   m_LEDYellow.convertFromImage( qembed_findImage("led-yellow") );
   m_LEDOrange.convertFromImage( qembed_findImage("led-orange") );
   m_LEDRed.convertFromImage( qembed_findImage("led-red") );
+  m_LED->setPixmap(m_LEDGreen);
+  m_PreviousState = 0;
 }
 
 void QmitkMemoryUsageIndicator::UpdateMemoryUsage()
@@ -42,15 +44,41 @@ void QmitkMemoryUsageIndicator::UpdateMemoryUsage()
   float percentage = ( (float) processSize / (float) totalSize ) * 100.0;
   m_Label->setText( GetMemoryDescription( processSize, percentage ).c_str() );
   if ( percentage < 50.0 )
-    m_LED->setPixmap(m_LEDGreen);
+  {
+    if(m_PreviousState != 0)
+    {
+      m_LED->setPixmap(m_LEDGreen);
+      m_PreviousState = 0;
+      m_LED->update();
+    }
+  }
   else if ( percentage < 65.0 )
-    m_LED->setPixmap(m_LEDYellow);
+  {
+    if(m_PreviousState != 1)
+    {
+      m_LED->setPixmap(m_LEDYellow);
+      m_PreviousState = 1;
+      m_LED->update();
+    }
+  }
   else if ( percentage < 80.0 )
-    m_LED->setPixmap(m_LEDOrange);
+  {
+    if(m_PreviousState != 2)
+    {
+      m_LED->setPixmap(m_LEDOrange);
+      m_PreviousState = 2;
+      m_LED->update();
+    }
+  }
   else
-    m_LED->setPixmap(m_LEDRed);
-  
-  m_LED->update();
+  {
+    if(m_PreviousState != 3)
+    {
+      m_LED->setPixmap(m_LEDRed);
+      m_PreviousState = 3;
+      m_LED->update();
+    }
+  }
 }
 
 

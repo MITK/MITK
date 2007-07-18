@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 {
   try
   {
-    // Add current working directory as search directory
+    // Add directory in which the application executable resides as search directory
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(itksys::SystemTools::GetFilenamePath(argv[0]).c_str()); 
     //
     // determine application name without path and extension

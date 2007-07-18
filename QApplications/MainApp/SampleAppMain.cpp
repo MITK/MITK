@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 #include <stdexcept>
 
+#include <mitkStandardFileLocations.h>
+
 /*
 * BUG: ATI-grafics-cards are slow in building up display lists in case of displaying transparent surfaces.
 * Activating GlobalImmediateModeRendering in vtk solves this problem.
@@ -35,6 +37,8 @@ int main(int argc, char* argv[])
 {
   try
   {
+    // Add current working directory as search directory
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(itksys::SystemTools::GetFilenamePath(argv[0]).c_str()); 
     //
     // determine application name without path and extension
     //

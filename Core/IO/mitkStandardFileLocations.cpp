@@ -19,9 +19,7 @@ mitk::StandardFileLocations::~StandardFileLocations()
 void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
 {
   std::string directory = dir;
-  if(directory.length() == 0)
-    return;
-  
+    
   // Do nothing if directory is already included into search list
   FileSearchVectorType::iterator iter;
   if(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.size() > 0)
@@ -88,72 +86,52 @@ std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char * f
 
 std::string mitk::StandardFileLocations::FindFile(const char* filename, const char* pathInSourceDir)
 {
-  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
-  std::string xmlFileName;
+  std::string directoryPath;
 
+  // 1. look for MITKCONF environment variable
+  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");  
   if (mitkConf!=NULL)
-  {
-    // 1. look for MITKCONF environment variable
-    xmlFileName = mitkConf;
-
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(mitkConf);
-  }
 
   // 2. use .mitk-subdirectory in home directory of the user
-  std::string homeDirectory;
 #if defined(_WIN32) && !defined(__CYGWIN__)
   const char* homeDrive = itksys::SystemTools::GetEnv("HOMEDRIVE");
   const char* homePath = itksys::SystemTools::GetEnv("HOMEPATH");
-  if((homeDrive==NULL) || (homePath==NULL))
-  {
-    itkGenericOutputMacro( << "Environment variables HOMEDRIVE and/or HOMEPATH not set" <<
-      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
-    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
-  }
-  else
-  {
-    homeDirectory = homeDrive;
-    homeDirectory +=homePath;
-  }
-  if(itksys::SystemTools::FileExists(homeDirectory.c_str())==false)
-  {
-    itkGenericOutputMacro( << "Could not find home directory at " << homeDirectory << 
-      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
-    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
-  }
-#else
-  const char* home = itksys::SystemTools::GetEnv("HOME");
-  if(home==NULL)
-  {
-    itkGenericOutputMacro( << "Environment variable HOME not set" <<
-      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
-    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
-  }
-  else
-    homeDirectory = home;
-  if(itksys::SystemTools::FileExists(homeDirectory.c_str())==false)
-  {
-    itkGenericOutputMacro( << "Could not find home directory at " << homeDirectory << 
-      ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());
-    homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
-  }
-#endif // defined(_WIN32) && !defined(__CYGWIN__)
   
-  homeDirectory += "/.mitk/";
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(homeDirectory.c_str());
+  if((homeDrive!=NULL) || (homePath!=NULL))
+  {
+    directoryPath = homeDrive;
+    directoryPath += homePath;
+    directoryPath += "/.mitk/";
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  }
+ 
+#else
+  const char* homeDirectory = itksys::SystemTools::GetEnv("HOME");
+  if(homeDirectory != NULL)
+  {
+    directoryPath = homeDirectory;
+    directoryPath += "/.mitk/";
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  }
 
+#endif // defined(_WIN32) && !defined(__CYGWIN__)
+ 
   // 3. look in the current working directory
-  xmlFileName = filename;
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(xmlFileName.c_str());
+  directoryPath = "";
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  
+  directoryPath = itksys::SystemTools::GetCurrentWorkingDirectory();
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
 
   // 4. use a source tree location from compile time
-  xmlFileName = MITK_ROOT;
+  directoryPath = MITK_ROOT;
   if (pathInSourceDir)
   {
-    xmlFileName += pathInSourceDir;
+    directoryPath += pathInSourceDir;
   }
-  xmlFileName += '/';
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(xmlFileName.c_str());
+  directoryPath += '/';
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
   
   return mitk::StandardFileLocations::GetInstance()->SearchDirectoriesForFile(filename);
 }

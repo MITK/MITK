@@ -49,7 +49,8 @@ void QmitkMemoryUsageIndicator::UpdateMemoryUsage()
     m_LED->setPixmap(m_LEDOrange);
   else
     m_LED->setPixmap(m_LEDRed);
-  QApplication::eventLoop()->processEvents( QEventLoop::ExcludeUserInput );
+  
+  m_LED->update();
 }
 
 

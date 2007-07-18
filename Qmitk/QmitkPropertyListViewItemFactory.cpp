@@ -22,12 +22,18 @@
 #include <iostream>
 
 QmitkPropertyListViewItemFactory* QmitkPropertyListViewItemFactory::GetInstance() {
-   static QmitkPropertyListViewItemFactory* instance = new QmitkPropertyListViewItemFactory();
-   return instance;
+  static QmitkPropertyListViewItemFactory* instance = new QmitkPropertyListViewItemFactory();
+  return instance;
 }
 QmitkPropertyListViewItem* QmitkPropertyListViewItemFactory::CreateQmitkPropertyListViewItem(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl) const {
 
   QmitkPropertyListViewItem* newItem = NULL;
+  QLabel* itemLabel = NULL;
+  if ( !createOnlyControl )
+  {
+    itemLabel = new QLabel ( name.c_str(),parent );
+    itemLabel->show();
+  }
   if (m_Extension) {
     // try the registered extension
     newItem = m_Extension->CreateQmitkPropertyListViewItem(propList,name,parent,createOnlyControl);
@@ -51,7 +57,7 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItemFactory::CreateQmitkProperty
     {
       newItem = new QmitkPropertyListViewItem(name,propList,parent,createOnlyControl);
       newItem->m_Control = new QLineEdit(QString(stringProp->GetValue()),parent);
-      QObject::connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(StringControlActivated(const QString &)));
+      QObject::connect((QObject*)(newItem->m_Control),SIGNAL(textChanged(const QString &)),(QObject*)(newItem),SLOT(StringControlActivated(const QString &))); 
     }
     else if (mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(baseProp))
     {
@@ -159,7 +165,12 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItemFactory::CreateQmitkProperty
         newItem->m_Control = new QLabel("n/a",parent);
       }
     }
-  } 
+  }
+  if (!createOnlyControl) {
+    newItem->m_Label = itemLabel;
+    newItem->CreateEnabledButton(parent);
+  }
+
   if (newItem && newItem->m_Control) {
     newItem->m_Control->setName((name + "_" + "QmitkPropertyListViewItem_control").c_str());
     newItem->m_Control->show();

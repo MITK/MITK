@@ -51,24 +51,17 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) 
   : m_Name(name), m_PropertyList(propertyList), m_Label(NULL), m_Control(NULL)
 {
-  if (!createOnlyControl)
-  {
-    CreateEnabledButton(parent);
-    m_Label = new QLabel(name.c_str(),parent);
-    m_Label->show();
-  }
-};
-
+}
 
 void QmitkPropertyListViewItem::CreateEnabledButton(QWidget* parent)
 {
   m_EnabledButton = new QPushButton(parent);
   connect(
-    (QObject*)(m_EnabledButton),
-    SIGNAL(clicked()),
-    (QObject*)(this),
-    SLOT(EnabledButtonClicked())
-  );
+      (QObject*)(m_EnabledButton),
+      SIGNAL(clicked()),
+      (QObject*)(this),
+      SLOT(EnabledButtonClicked())
+      );
   m_EnabledButton->show();
   UpdateEnabledView();
 }
@@ -158,19 +151,19 @@ void QmitkPropertyListViewItem::UpdateView()
   mitk::BaseProperty* baseProp = m_PropertyList->GetProperty(m_Name.c_str());
   if (mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
   {
-     if (QCheckBox* cb = dynamic_cast<QCheckBox*>(m_Control)) {
+    if (QCheckBox* cb = dynamic_cast<QCheckBox*>(m_Control)) {
       cb ->setChecked(boolProp->GetValue());
-     } else {
-       //std::cout << "warning: non-checkbox control for bool property " << m_Name << std::endl;
-     }
+    } else {
+      //std::cout << "warning: non-checkbox control for bool property " << m_Name << std::endl;
+    }
   }
   else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
   {
     if (QLineEdit* qle = dynamic_cast<QLineEdit*>(m_Control)) {
-    qle->setText(QString(stringProp->GetValue()));
-} else {
-       //std::cout << "warning: non-lineedit control for string property " << m_Name << std::endl;
-}
+      qle->setText(QString(stringProp->GetValue()));
+    } else {
+      //std::cout << "warning: non-lineedit control for string property " << m_Name << std::endl;
+    }
 
   }
   else if (mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(baseProp))
@@ -186,7 +179,7 @@ void QmitkPropertyListViewItem::UpdateView()
     QColor qcol((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255),(int)( col.GetBlue() * 255));
     ((QPushButton*)(m_Control))->setPaletteBackgroundColor(qcol);
   }
-  
+
   else if (mitk::EnumerationProperty* enumerationProp = dynamic_cast<mitk::EnumerationProperty*>(baseProp))
   {
     QComboBox* combo = ( ( QComboBox* ) m_Control );
@@ -195,8 +188,8 @@ void QmitkPropertyListViewItem::UpdateView()
     {
       if ( enumerationValue == combo->text( item ).latin1() )
       {
-         combo->setCurrentItem( item );
-         break;
+        combo->setCurrentItem( item );
+        break;
       }
     }
   }
@@ -242,9 +235,9 @@ void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
     {
       if ( enumProp->IsValidEnumerationValue( activatedItem ) )
       {
-         enumProp->SetValue( activatedItem );
-         m_PropertyList->InvokeEvent( itk::ModifiedEvent() );
-         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        enumProp->SetValue( activatedItem );
+        m_PropertyList->InvokeEvent( itk::ModifiedEvent() );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }

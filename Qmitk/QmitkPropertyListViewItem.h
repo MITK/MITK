@@ -59,6 +59,7 @@ public slots:
 protected:
   QmitkPropertyListViewItem() {}
   void CreateEnabledButton(QWidget* parent);
+  friend class QmitkPropertyListViewItemFactory;
 protected slots:
   void EnabledButtonClicked();
 };

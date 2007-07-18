@@ -737,6 +737,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
   mitkLutProp->SetLookupTable(mitkLut);
   node->SetProperty( "LookupTable", mitkLutProp );
+  node->SetProperty( "binary", new mitk::BoolProperty( false ) );
 } 
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)

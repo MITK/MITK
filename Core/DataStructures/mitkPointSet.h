@@ -130,9 +130,8 @@ public:
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
 
-  virtual void Initialize( int timeSteps );
 
-  virtual void AdaptPointSetSeriesSize( int timeSteps );
+  virtual void AdaptPointSetSeriesSize( unsigned int timeSteps );
 
 
   /** \brief executes the given Operation */
@@ -215,6 +214,8 @@ protected:
   PointSet();
 
   virtual ~PointSet();
+  
+  virtual void InitializeTimeSlicedGeometry( int timeSteps );
 
   typedef std::vector< DataType::Pointer > PointSetSeries;
 

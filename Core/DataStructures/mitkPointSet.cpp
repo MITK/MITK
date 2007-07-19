@@ -40,7 +40,7 @@ mitk::PointSet::PointSet()
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_PointSetSeries[0]->SetPointData( pointData );
 
-  this->Initialize( 1 );
+  this->InitializeTimeSlicedGeometry( 1 );
 }
 
 
@@ -48,7 +48,7 @@ mitk::PointSet::~PointSet()
 {
 }
 
-void mitk::PointSet::Initialize( int timeSteps )
+void mitk::PointSet::InitializeTimeSlicedGeometry( int timeSteps )
 {
   mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
 
@@ -67,7 +67,7 @@ void mitk::PointSet::Initialize( int timeSteps )
   //
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
 
-  m_Initialized = true;
+  m_Initialized = (timeSteps>0);
 }
 
 bool mitk::PointSet::IsEmpty(int t) const
@@ -75,26 +75,24 @@ bool mitk::PointSet::IsEmpty(int t) const
   return IsInitialized() && (GetSize(t) <= 0);
 }
 
-void mitk::PointSet::AdaptPointSetSeriesSize( int timeSteps )
+void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
 {
   // Check if the vector is long enouth to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
   // elements.
-  if ( timeSteps > m_PointSetSeries.size() )
+  unsigned int oldSize = m_PointSetSeries.size();
+  m_PointSetSeries.resize( timeSteps );
+  
+  if ( timeSteps > oldSize )
   {
-    int oldSize = m_PointSetSeries.size();
-    m_PointSetSeries.resize( timeSteps );
-
-    int i;
-    for ( i = oldSize; i < timeSteps; ++i )
+    for ( unsigned int i = oldSize; i < timeSteps; ++i )
     {
       m_PointSetSeries[i] = DataType::New();
       PointDataContainer::Pointer pointData = PointDataContainer::New();
       m_PointSetSeries[i]->SetPointData( pointData );
     }
-
-    this->Initialize( timeSteps );
   }
+  this->InitializeTimeSlicedGeometry( timeSteps );
 }
 
 
@@ -106,7 +104,7 @@ int mitk::PointSet::GetPointSetSeriesSize() const
 
 int mitk::PointSet::GetSize( int t ) const
 {
-  if ( t < m_PointSetSeries.size() )
+  if ( t < (int)m_PointSetSeries.size() )
   {
     return m_PointSetSeries[t]->GetNumberOfPoints();
   }
@@ -118,7 +116,7 @@ int mitk::PointSet::GetSize( int t ) const
 
 mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
 {
-  if ( t < m_PointSetSeries.size() )
+  if ( t < (int)m_PointSetSeries.size() )
   {
     return m_PointSetSeries[t];
   }
@@ -130,7 +128,7 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
 
 int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  )
 {
-  if ( t >= m_PointSetSeries.size() )
+  if ( t >= (int)m_PointSetSeries.size() )
   {
     return -1;
   }
@@ -462,19 +460,28 @@ void mitk::PointSet::UpdateOutputInformation()
   {
       this->GetSource( )->UpdateOutputInformation( );
   }
-  const DataType::BoundingBoxType *bb = m_PointSetSeries[0]->GetBoundingBox();
-  BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
-  float mitkBounds[6];
 
-  //for assignment see Geometry3d::SetBounds(const float bounds)
-  mitkBounds[0] = itkBounds[0];
-  mitkBounds[1] = itkBounds[1];
-  mitkBounds[2] = itkBounds[2];
-  mitkBounds[3] = itkBounds[3];
-  mitkBounds[4] = itkBounds[4];
-  mitkBounds[5] = itkBounds[5];
+  //
+  // first make sure, that the associated time sliced geometry has
+  // the same number of geometry 3d's as PointSets are present
+  //
+  mitk::TimeSlicedGeometry* timeGeometry = GetTimeSlicedGeometry();
+  if ( timeGeometry->GetTimeSteps() != m_PointSetSeries.size() )
+  {
+    itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+  }
 
-  GetGeometry()->SetBounds(itkBounds);
+  //
+  // Iterate over the PointSets and update the Geometry
+  // information of each of the items.
+  //
+  for ( unsigned int i = 0 ; i < m_PointSetSeries.size() ; ++i )
+  {
+    const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
+    BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
+    GetGeometry(i)->SetBounds(itkBounds);
+  }
+  GetTimeSlicedGeometry()->UpdateInformation();
 }
 
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()

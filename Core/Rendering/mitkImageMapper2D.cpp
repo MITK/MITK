@@ -591,7 +591,10 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
-  rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax, yMin, yMax, 0, 1 );
+  // xMax and yMax are ment exclusive until now, whereas 
+  // SetOutputExtent wants an inclusive bound. Thus, we need 
+  // to substract 1.
+  rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 1 );
 
 
   // Do the reslicing. Modified() is called to make sure that the reslicer is

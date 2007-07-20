@@ -70,6 +70,7 @@ void mitk::LevelWindowManager::SetDataTree(DataTree* tree)
     command->SetCallbackFunction(this, &LevelWindowManager::TreeChanged);
     m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
     m_IsObserverTagSet = true;
+    LevelWindowManager::TreeChanged(itk::TreeChangeEvent<mitk::DataTreeBase>());
   }
 }
 

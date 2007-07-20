@@ -1199,17 +1199,26 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   if(region != itkImage->GetRequestedRegion()) return;
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
-  //typedef itk::Image<TPixel, VImageDimension> ItkImageType;
   typedef typename ItkImageType::PixelType TPixel;
   TPixel value;
 
-    mitkImage->m_CountOfMinValuedVoxels = 0;
-    mitkImage->m_CountOfMaxValuedVoxels = 0;
+  mitkImage->m_CountOfMinValuedVoxels = 0;
+  mitkImage->m_CountOfMaxValuedVoxels = 0;
 
-  mitkImage->m_Scalar2ndMin=
-    mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<TPixel>::max();
-  mitkImage->m_Scalar2ndMax=
-    mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<TPixel>::NonpositiveMin();
+  if(itk::NumericTraits<TPixel>::max() <= itk::NumericTraits<ScalarType>::max())
+  {
+    mitkImage->m_Scalar2ndMin=
+      mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<TPixel>::max();
+    mitkImage->m_Scalar2ndMax=
+      mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<TPixel>::NonpositiveMin();
+  }
+  else
+  {
+    mitkImage->m_Scalar2ndMin=
+      mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<ScalarType>::max();
+    mitkImage->m_Scalar2ndMax=
+      mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<ScalarType>::NonpositiveMin();
+  }
 
   while( !it.IsAtEnd() )
   {

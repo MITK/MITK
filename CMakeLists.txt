@@ -25,6 +25,9 @@ INCLUDE(CMakeImportBuildSettings)
 IF(ITK_BUILD_SETTINGS_FILE)
 CMAKE_IMPORT_BUILD_SETTINGS(${ITK_BUILD_SETTINGS_FILE})
 ENDIF(ITK_BUILD_SETTINGS_FILE)
+
+# see bug #347: problems occur when mixing release/debug. So maybe a more specific check
+# could be implemented to allow static ITK again.
 IF(WIN32 AND ITK_BUILD_SHARED)
 MESSAGE(SEND_ERROR "Using ITK shared libs on windows causes trouble. Please recompile ITK with BUILD_SHARED_LIBS OFF")
 ENDIF(WIN32 AND ITK_BUILD_SHARED)

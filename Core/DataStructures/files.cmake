@@ -34,6 +34,8 @@ SET(CPP_FILES
   mitkGeometry2DData.cpp
   mitkGeometry3D.cpp
   mitkGeometryData.cpp
+  mitkGridRepresentationProperty.cpp
+  mitkGridVolumeMapperProperty.cpp
   mitkGroupTagProperty.cpp
   mitkImage.cpp
   mitkImageDataItem.cpp
@@ -82,6 +84,7 @@ SET(CPP_FILES
   mitkTimeSlicedGeometry.cpp
   mitkTransferFunction.cpp
   # mitkUSLookupTableSource.cpp
+  mitkUnstructuredGrid.cpp
   mitkVector.cpp
   mitkVideoSource.cpp
   # mitkVesselGraphOperation.cpp

@@ -241,7 +241,7 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
       case mitk::GridVolumeMapperProperty::RAYCAST:
         if (m_VtkVolumeRayCastMapper == 0) {
           m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
-          m_VtkVolumeRayCastMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
+          m_VtkVolumeRayCastMapper->SetInput(m_VtkTriangleFilter->GetOutput());
         }
         m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
         break;

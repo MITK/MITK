@@ -31,10 +31,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkDataSetTriangleFilter.h>
 
 #include <vtkDataSetMapper.h>
-#include <vtkProjectedTetrahedraMapper.h>
 #include <vtkUnstructuredGridVolumeRayCastMapper.h>
-#include <vtkUnstructuredGridVolumeZSweepMapper.h>
-//class vtkPolyDataNormals;
+
+#if (VTK_MAJOR_VERSION >= 5)
+  #include <vtkProjectedTetrahedraMapper.h>
+  #include <vtkUnstructuredGridVolumeZSweepMapper.h>
+#endif
+
 
 namespace mitk {
 
@@ -71,11 +74,12 @@ protected:
 
   vtkDataSetMapper* m_VtkDataSetMapper;
 
+  vtkUnstructuredGridVolumeRayCastMapper* m_VtkVolumeRayCastMapper;
+  
+  #if (VTK_MAJOR_VERSION >= 5)
   vtkProjectedTetrahedraMapper* m_VtkPTMapper;
   vtkUnstructuredGridVolumeZSweepMapper* m_VtkVolumeZSweepMapper;
-  vtkUnstructuredGridVolumeRayCastMapper* m_VtkVolumeRayCastMapper;
-
-  //vtkPolyDataNormals* m_VtkPolyDataNormals;
+  #endif
 };
 
 } // namespace mitk

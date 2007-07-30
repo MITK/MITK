@@ -73,11 +73,13 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
   if (m_VtkVolumeRayCastMapper != 0)
     m_VtkVolumeRayCastMapper->Delete();
   
+  #if (VTK_MAJOR_VERSION >= 5)
   if (m_VtkVolumeZSweepMapper != 0)
     m_VtkVolumeZSweepMapper->Delete();
     
   if (m_VtkPTMapper != 0)
     m_VtkPTMapper->Delete();
+  #endif
     
   if (m_VtkDataSetMapper != 0)
     m_VtkDataSetMapper->Delete();
@@ -236,6 +238,14 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
   {
     mitk::GridVolumeMapperProperty::IdType type = mapperProp->GetValueAsId();
     switch (type) {
+      case mitk::GridVolumeMapperProperty::RAYCAST:
+        if (m_VtkVolumeRayCastMapper == 0) {
+          m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
+          m_VtkVolumeRayCastMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
+        }
+        m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
+        break;
+      #if (VTK_MAJOR_VERSION >= 5)
       case mitk::GridVolumeMapperProperty::PT:
         if (m_VtkPTMapper == 0) {
           m_VtkPTMapper = vtkProjectedTetrahedraMapper::New();
@@ -250,13 +260,7 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
         }
         m_Volume->SetMapper(m_VtkVolumeZSweepMapper);
         break;
-      case mitk::GridVolumeMapperProperty::RAYCAST:
-        if (m_VtkVolumeRayCastMapper == 0) {
-          m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
-          m_VtkVolumeRayCastMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
-        }
-        m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
-        break;
+      #endif
     }
   }
     

@@ -36,12 +36,17 @@ SET(CPP_FILES
   mitkSurfaceVtkWriter.cpp
   mitkSurfaceVtkWriter.txx
   mitkSurfaceVtkWriterFactory.cpp
+  mitkUnstructuredGridVtkWriter.cpp
+  mitkUnstructuredGridVtkWriter.txx
+  mitkUnstructuredGridVtkWriterFactory.cpp
   mitkVtiFileIOFactory.cpp
   mitkVtiFileReader.cpp
   mitkVtkImageIOFactory.cpp
   mitkVtkImageReader.cpp
   mitkVtkSurfaceIOFactory.cpp
   mitkVtkSurfaceReader.cpp
+  mitkVtkUnstructuredGridIOFactory.cpp
+  mitkVtkUnstructuredGridReader.cpp
   mitkVtkVolumeTimeSeriesIOFactory.cpp
   mitkVtkVolumeTimeSeriesReader.cpp
   mitkXMLReader.cpp

@@ -74,11 +74,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSTLFileIOFactory.h"
 #include "mitkObjFileIOFactory.h"
 #include "mitkVtkSurfaceIOFactory.h"
+#include "mitkVtkUnstructuredGridIOFactory.h"
 #include "mitkVtkImageIOFactory.h"
 #include "mitkVtiFileIOFactory.h"
 #include "mitkPicVolumeTimeSeriesIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
+
+#include "mitkUnstructuredGrid.h"
+#include "mitkUnstructuredGridVtkMapper3D.h"
 
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
@@ -121,6 +125,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( Geometry3D, "Geometry3D" )
     CREATE_ITK( TimeSlicedGeometry, "TimeSlicedGeometry" )
     CREATE_ITK( Surface, "Surface" )
+    CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
     CREATE_ITK( PointSet, "PointSet" )
     CREATE_ITK( SlicedGeometry3D, "SlicedGeometry3D" )
     CREATE_ITK( PlaneGeometry, "PlaneGeometry" )
@@ -129,6 +134,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( SurfaceVtkMapper3D, "SurfaceVtkMapper3D" )
     CREATE_ITK( ImageMapper2D, "ImageMapper2D" )
     CREATE_ITK( VolumeDataVtkMapper3D, "VolumeDataVtkMapper3D" )
+    CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
     CREATE_ITK( LookupTable, "LookupTable" )
     CREATE_ITK( PointSetMapper2D, "PointSetMapper2D" )
     CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
@@ -181,6 +187,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
@@ -305,12 +312,18 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
             newMapper = mitk::ContourSetVtkMapper3D::New();
             newMapper->SetDataTreeNode(node);
           }
+          else
+            if((dynamic_cast<UnstructuredGrid*>(node->GetData())!=NULL))
+            {
+              newMapper = mitk::UnstructuredGridVtkMapper3D::New();
+              newMapper->SetDataTreeNode(node);
+            }
     }
   return newMapper;
 }
 
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.hdr);;" \
+    "All known formats(*.dcm *.DCM *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
     "DICOM files(*.dcm *.DCM *.gdcm);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \
@@ -318,7 +331,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     "Surface files (*.stl *.vtk *.vtp *.obj)"
 
 #define INTERNAL_FILE_EXTENSIONS \
-    "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.obj *.vti *.ves " \
+    "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves " \
          "*.uvg *.dvg *.par *.dcm *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \

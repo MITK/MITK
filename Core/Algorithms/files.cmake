@@ -44,5 +44,7 @@ SET(CPP_FILES
   mitkSurfaceSource.cpp
   mitkSurfaceToImageFilter.cpp
   mitkUIDGenerator.cpp
+  mitkUnstructuredGridHistogram.cpp
+  mitkUnstructuredGridSource.cpp
   mitkVolumeCalculator.cpp
 )

@@ -32,6 +32,7 @@ SET(CPP_FILES
   mitkSurfaceVtkMapper3D.cpp
   # mitkVectorImageMapper2D.cpp
   # mitkVectorImageVtkGlyphMapper3D.cpp
+  mitkUnstructuredGridVtkMapper3D.cpp
   mitkVolumeDataVtkMapper3D.cpp
   mitkVtkARRenderWindow.cpp
   mitkVtkRenderWindow.cpp

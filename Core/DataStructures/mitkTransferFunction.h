@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <mitkImage.h>
+#include <itkHistogram.h>
+
 namespace mitk
 {
 
@@ -51,6 +53,7 @@ namespace mitk
       itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
       itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
       void InitializeByMitkImage(const mitk::Image* image);
+      void InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram);
       static Pointer CreateForMitkImage(const mitk::Image* image);
       ~TransferFunction() {
         m_ColorTransferFunction->Delete();

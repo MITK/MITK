@@ -29,7 +29,11 @@ const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::ZSW
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( )
 {
   AddRepresentationTypes();
+  #if (VTK_MAJOR_VERSION >= 5)
   SetValue( PT );
+  #else
+  SetValue( RAYCAST );
+  #endif
 }
 
 

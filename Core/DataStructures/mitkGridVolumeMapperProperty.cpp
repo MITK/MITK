@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProperty.h>
 #include "mitkGridVolumeMapperProperty.h"
 
+const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::RAYCAST;
+#if (VTK_MAJOR_VERSION >= 5)
 const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::PT;
 const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::ZSWEEP;
-const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::RAYCAST;
+#endif
 
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( )
 {
@@ -40,7 +42,11 @@ mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const IdType& value )
   }
   else
   {
+    #if (VTK_MAJOR_VERSION >= 5)
     SetValue( PT );
+    #else
+    SetValue( RAYCAST );
+    #endif
   }
 }
 
@@ -54,21 +60,27 @@ mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const std::string& val
   }
   else
   {
+    #if (VTK_MAJOR_VERSION >= 5)
     SetValue( PT );
+    #else
+    SetValue( RAYCAST );
+    #endif
   }
 }
 
-
+#if (VTK_MAJOR_VERSION >= 5)
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToPT()
 {
   SetValue( PT );
 }
+#endif
 
-
+#if (VTK_MAJOR_VERSION >= 5)
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToZSweep()
 {
   SetValue( ZSWEEP );
 }
+#endif
 
 
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToRayCast()
@@ -79,9 +91,13 @@ void mitk::GridVolumeMapperProperty::SetVolumeMapperToRayCast()
 
 void mitk::GridVolumeMapperProperty::AddRepresentationTypes()
 {
+  AddEnum( "Ray Cast", RAYCAST );
+  
+  #if (VTK_MAJOR_VERSION >= 5)
   AddEnum( "Projected Tetrahedra", PT );
   AddEnum( "ZSweep", ZSWEEP );
-  AddEnum( "Ray Cast", RAYCAST );
+  #endif
+  
 }
 
 

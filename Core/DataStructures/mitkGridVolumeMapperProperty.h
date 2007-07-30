@@ -55,6 +55,7 @@ public:
    */
   GridVolumeMapperProperty( const std::string& value );
   
+  #if (VTK_MAJOR_VERSION >= 5)
   /**
    * Sets the mapper to projected tetrahedra.
    */
@@ -64,16 +65,19 @@ public:
    * Sets the mapper to zsweep.
    */
   virtual void SetVolumeMapperToZSweep();
+  #endif
   
   /**
    * Sets the mapper to ray casting.
    */
   virtual void SetVolumeMapperToRayCast();
     
+  static const IdType RAYCAST = 0;
   
-  static const IdType PT = 0;
-  static const IdType ZSWEEP = 1;
-  static const IdType RAYCAST = 2;
+  #if (VTK_MAJOR_VERSION >= 5)
+  static const IdType PT = 1;
+  static const IdType ZSWEEP = 2;
+  #endif
   
   
 protected:

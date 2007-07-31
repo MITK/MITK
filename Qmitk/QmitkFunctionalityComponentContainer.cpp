@@ -390,7 +390,9 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 			m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(w);
 			visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
 			idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
-			QLayout* visibleWidgetLayout = new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+			
+      //removed because it is unused!
+      //QLayout* visibleWidgetLayout = new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
 		}
 
 		QLayout* layout;
@@ -442,7 +444,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 	//m_GUI->layout()->addChildLayout(buttonLayout);
 	m_BackButton->setShown(true);
 	m_NextButton->setShown(true);
-	m_GUI->layout()->AlignTop;
+  m_GUI->layout()->AlignTop;
 	m_GUI->layout()->activate();
 	m_GUI->repaint();
 
@@ -463,7 +465,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 	m_GUI->repaint();
 }
 
-void QmitkFunctionalityComponentContainer::SetWizardText(const QString & text)
+void QmitkFunctionalityComponentContainer::SetWizardText(const QString &)
 {
 	//m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setText(text);
 	//m_FunctionalityComponentContainerGUI->GetWizardTextLabel()->setAlignment(Qt::WordBreak);

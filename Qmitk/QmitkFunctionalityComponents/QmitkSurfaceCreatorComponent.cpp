@@ -219,7 +219,7 @@ QWidget* QmitkSurfaceCreatorComponent::CreateControlWidget(QWidget* parent)
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
-void QmitkSurfaceCreatorComponent::SetSelectorVisibility(bool visibility)
+void QmitkSurfaceCreatorComponent::SetSelectorVisibility(bool /*visibility*/)
 {
   if(m_SurfaceCreatorComponentGUI)
   {

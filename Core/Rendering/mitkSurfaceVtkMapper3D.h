@@ -31,11 +31,31 @@ class vtkPolyDataNormals;
 
 namespace mitk {
 
-//##ModelId=3E70F60202EA
+
 //##Documentation
 //## @brief Vtk-based mapper for Surface
 //##
 //## @ingroup Mapper
+
+
+
+  /**
+  * @brief Vtk-based mapper for Surface
+  * 
+  * Properties to look for are:
+  *
+  *   - \b "scalar visibility": if set to on, scalars assigned to the data are shown
+  *        Turn this on if using a lookup table.
+  *   - \b "ScalarsRangeMinimum": Optional. Can be used to store the scalar min, e.g.
+  *         for the level window settings.
+  *   - \b "ScalarsRangeMaximum": Optional. See above.
+  *
+  * There are still some other, deprecated properties. These will not be documented anymore.
+  * Please check the source if you really need them.
+  *
+  * @ingroup Mapper
+  */
+
 class SurfaceVtkMapper3D : public BaseVtkMapper3D
 {
 public:

@@ -612,17 +612,17 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // 1. Convert the resampling result to PIC image format
   ipPicDescriptor *pic = Pic2vtk::convert( rendererInfo.m_Reslicer->GetOutput() );
 
+  if (pic == NULL)
+  {
+    return;
+  }
+
   if ( pic->dim == 1 )
   {
     pic->dim = 2;
     pic->n[1] = 1;
   }
   assert( pic->dim == 2 );
-
-  if ( rendererInfo.m_Pic != NULL )
-  {
-    ipPicFree( rendererInfo.m_Pic );
-  }
 
   rendererInfo.m_Pic = pic;
 
@@ -1007,6 +1007,8 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
   m_iil4mitkImage = NULL;
   if ( m_Pic != NULL )
   {
+    delete [] m_Pic->data;
+    m_Pic->data = NULL;
     ipPicFree(m_Pic);
     m_Pic = NULL;
   }

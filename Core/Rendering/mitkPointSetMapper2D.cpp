@@ -318,14 +318,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           {
             std::stringstream buffer;
             float distance = vec.GetNorm();
-            // std::stringstream::setprecision not used because this would set
-            // the length of the whole string (including digits before the 
-            // decimal point)
-            buffer << static_cast<int>(distance); // cut of decimal digits
-            buffer << '.';
-            buffer <<     (int)((distance - static_cast<float>(static_cast<int>(distance))) // decimal digits
-                       * pow( 10.0f, m_DistancesDecimalDigits )); 
-            buffer << "mm"; // always give a scale!
+            buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distance<<" mm";
 
             Vector2D vec2d = pt2d-lastPt2d;
             makePerpendicularVector2D(vec2d, vec2d);

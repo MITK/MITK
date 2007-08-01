@@ -444,8 +444,8 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
         mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 
-        //bool isSurface = false;
-        //bool isConnectivity = false;
+        bool isSurface = false;
+        bool isConnectivity = false;
 
         //while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
         //{

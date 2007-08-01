@@ -19,7 +19,7 @@ FOREACH(kit MITK MBIQM MBISB)
   SET(${kit}_FUNCTIONALITY_NAMES_KNOWN "")
 
 FOREACH(entry ${CACHE_VARS})
-STRING(REGEX MATCH "^${kit}_KNOWN_FUNCTIONALITY_[A-Za-z]+$" match ${entry})
+STRING(REGEX MATCH "^${kit}_KNOWN_FUNCTIONALITY_[A-Za-z0-9]+$" match ${entry})
 IF(match)
   STRING(REGEX REPLACE "^${kit}_KNOWN_FUNCTIONALITY_" "" potential_func_name ${match})
   # now check whether a functionality dir is set and exists

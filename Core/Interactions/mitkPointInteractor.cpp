@@ -75,7 +75,7 @@ void mitk::PointInteractor::DeselectAllPoints()
   for (it = itkPointSet->GetPoints()->Begin(); it != end; it++)
   {
     int position = it->Index();
-    PointSet::PointDataType pointData;
+    PointSet::PointDataType pointData = {0, false, PTUNDEFINED};
     itkPointSet->GetPointData(position, &pointData);
     if ( pointData.selected )//then declare an operation which unselects this point; UndoOperation as well!
     {

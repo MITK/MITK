@@ -147,7 +147,7 @@ void mitk::PointSetInteractor
   for (it = itkPointSet->GetPoints()->Begin(); it != end; it++)
   {
     int position = it->Index();
-    PointSet::PointDataType pointData;
+    PointSet::PointDataType pointData = {0, false, PTUNDEFINED};
     itkPointSet->GetPointData( position, &pointData );
     
     //then declare an operation which unselects this point; 

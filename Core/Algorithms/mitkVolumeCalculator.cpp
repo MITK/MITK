@@ -35,9 +35,14 @@ void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension
       count++;
     }
   }
-
-  mitk::Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
-  m_Volume = count / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+  if (m_Image->GetDimension() == 3) {
+    mitk::Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
+    m_Volume = count / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+  } 
+  else if (m_Image->GetDimension() == 2) {
+    mitk::Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
+    m_Volume = count / 100.0 * spacing[0] * spacing[1];
+  }
   m_VoxelCount = count;
 }
 
@@ -61,11 +66,14 @@ void mitk::VolumeCalculator::ComputeVolume()
       AccessFixedDimensionByItk(m_TimeSelector->GetOutput(),InternalCompute,3);
       m_Volumes[timeStep] = m_Volume;
     }
-  } else if (m_Image->GetDimension() == 3) {
+  }
+  else if (m_Image->GetDimension() == 3) {
     const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
     AccessFixedDimensionByItk(m_Image,InternalCompute,3);
-  } else {
-    m_Volume = 0;
+  } 
+  else if (m_Image->GetDimension() == 2) {
+    const_cast<mitk::Image*>(m_Image.GetPointer())->Update();
+    AccessFixedDimensionByItk(m_Image,InternalCompute,2);
   }
 }
 

@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>388</width>
+            <width>476</width>
             <height>732</height>
         </rect>
     </property>
@@ -73,7 +73,7 @@
                     <cstring>tab</cstring>
                 </property>
                 <attribute name="title">
-                    <string>CT</string>
+                    <string>Edit</string>
                 </attribute>
                 <vbox>
                     <property name="name">
@@ -124,10 +124,18 @@
                         <property name="name">
                             <cstring>m_TransferFunctionWidget</cstring>
                         </property>
+                        <property name="font">
+                            <font>
+                            </font>
+                        </property>
                     </widget>
                     <widget class="QLabel">
                         <property name="name">
                             <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="font">
+                            <font>
+                            </font>
                         </property>
                         <property name="frameShape">
                             <enum>Box</enum>
@@ -141,189 +149,257 @@ Press delete to remove selected handle.</string>
                             <set>WordBreak|AlignVCenter</set>
                         </property>
                     </widget>
-                    <spacer>
+                    <widget class="QButtonGroup">
                         <property name="name">
-                            <cstring>spacer61</cstring>
+                            <cstring>buttonGroup1</cstring>
                         </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
+                        <property name="font">
+                            <font>
+                                <bold>1</bold>
+                            </font>
                         </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
+                        <property name="title">
+                            <string>Presets</string>
                         </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout19</cstring>
-                        </property>
-                        <hbox>
+                        <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLabel">
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>textLabelTF</cstring>
+                                    <cstring>layout28</cstring>
                                 </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Transfer function</string>
-                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabelTF</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Transfer function</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QComboBox">
+                                        <item>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>bone + soft-tissue</string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>soft-tissue</string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>bones</string>
+                                            </property>
+                                        </item>
+                                        <property name="name">
+                                            <cstring>comboBox1</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pushButton1</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="minimumSize">
+                                            <size>
+                                                <width>0</width>
+                                                <height>0</height>
+                                            </size>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Set</string>
+                                        </property>
+                                    </widget>
+                                </hbox>
                             </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string></string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>bone + soft-tissue</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>soft-tissue</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>bones</string>
-                                    </property>
-                                </item>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>comboBox1</cstring>
+                                    <cstring>layout20</cstring>
                                 </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabelCS</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="frameShape">
+                                            <enum>NoFrame</enum>
+                                        </property>
+                                        <property name="text">
+                                            <string>Color style</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QComboBox">
+                                        <item>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>bone - natural</string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>bone - high contrast</string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>soft tissue - natural</string>
+                                            </property>
+                                        </item>
+                                        <property name="name">
+                                            <cstring>comboBoxCS</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pushButtonCS</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Set</string>
+                                        </property>
+                                    </widget>
+                                </hbox>
                             </widget>
-                            <widget class="QPushButton">
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>pushButton1</cstring>
+                                    <cstring>layout18</cstring>
                                 </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>0</width>
-                                        <height>0</height>
-                                    </size>
-                                </property>
-                                <property name="text">
-                                    <string>Set transfer function</string>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout20</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabelCS</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="frameShape">
-                                    <enum>NoFrame</enum>
-                                </property>
-                                <property name="text">
-                                    <string>&lt;font size="+1"&gt;&lt;font size="+1"&gt;Color style&lt;/font&gt;&lt;/font&gt;</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string></string>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>bone - natural</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>bone - high contrast</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>soft tissue - natural</string>
-                                    </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>comboBoxCS</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>resetButton</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Reset</string>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer47</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>250</width>
+                                                <height>21</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </hbox>
                             </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pushButtonCS</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Set color style</string>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout18</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>resetButton</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Reset</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer47</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>250</width>
-                                        <height>21</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
+                        </vbox>
                     </widget>
                     <spacer>
                         <property name="name">
@@ -349,7 +425,7 @@ Press delete to remove selected handle.</string>
                     <cstring>tab</cstring>
                 </property>
                 <attribute name="title">
-                    <string>Presets</string>
+                    <string>TF Styles</string>
                 </attribute>
                 <vbox>
                     <property name="name">
@@ -360,442 +436,466 @@ Press delete to remove selected handle.</string>
                             <cstring>m_TransferFunctionWidget_2</cstring>
                         </property>
                     </widget>
-                    <widget class="QLabel">
+                    <widget class="QGroupBox">
                         <property name="name">
-                            <cstring>textLabelPS</cstring>
+                            <cstring>groupBox8</cstring>
                         </property>
-                        <property name="enabled">
-                            <bool>false</bool>
+                        <property name="font">
+                            <font>
+                                <bold>1</bold>
+                            </font>
                         </property>
-                        <property name="frameShape">
-                            <enum>Box</enum>
+                        <property name="title">
+                            <string>Presets</string>
                         </property>
-                        <property name="text">
-                            <string>&lt;p align="center"&gt;&lt;font size="+1"&gt;TF presets&lt;/font&gt;&lt;/p&gt;</string>
-                        </property>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout5</cstring>
-                        </property>
-                        <hbox>
+                        <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QPushButton">
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>tf1_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image0</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_6</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf2_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image1</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_2_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf3_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image2</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_3_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf4_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image3</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_4_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf5_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image4</pixmap>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout6</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf6_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image5</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_5_5</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf7_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image6</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_5_2_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf8_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image7</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_5_3_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf9_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image8</pixmap>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer62_5_4_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>16</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>tf10_button</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image9</pixmap>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout16_2</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabelCS_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>&lt;font size="+1"&gt;&lt;font size="+1"&gt;Color style&lt;/font&gt;&lt;/font&gt;</string>
-                                </property>
-                            </widget>
-                            <widget class="QComboBox">
-                                <item>
-                                    <property name="text">
-                                        <string></string>
+                                    <cstring>layout5</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>bone - natural</string>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf1_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image0</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_6</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf2_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image1</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_2_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf3_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image2</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_3_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf4_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image3</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_4_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf5_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image4</pixmap>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout6</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                </item>
-                                <item>
-                                    <property name="text">
-                                        <string>muscles - bones</string>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf6_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image5</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_5_5</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf7_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image6</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_5_2_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf8_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image7</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_5_3_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf9_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image8</pixmap>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer62_5_4_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>16</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>tf10_button</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string></string>
+                                        </property>
+                                        <property name="pixmap">
+                                            <pixmap>image9</pixmap>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout16_2</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                </item>
-                                <property name="name">
-                                    <cstring>comboBoxCS_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>textLabelCS_2</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>&lt;font size="+1"&gt;&lt;font size="+1"&gt;Color style&lt;/font&gt;&lt;/font&gt;</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QComboBox">
+                                        <item>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>bone - natural</string>
+                                            </property>
+                                        </item>
+                                        <item>
+                                            <property name="text">
+                                                <string>muscles - bones</string>
+                                            </property>
+                                        </item>
+                                        <property name="name">
+                                            <cstring>comboBoxCS_2</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer51_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>21</width>
+                                                <height>21</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pushButtonCS_2</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Set</string>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer11_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>100</width>
+                                                <height>21</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </hbox>
                             </widget>
-                            <spacer>
+                            <widget class="QLayoutWidget">
                                 <property name="name">
-                                    <cstring>spacer51_2</cstring>
+                                    <cstring>layout18_2</cstring>
                                 </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>21</width>
-                                        <height>21</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pushButtonCS_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Set color style</string>
-                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>resetButton_2</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Reset</string>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>spacer47_2</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>281</width>
+                                                <height>21</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </hbox>
                             </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer11_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>100</width>
-                                        <height>21</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
-                    </widget>
-                    <widget class="QLayoutWidget">
-                        <property name="name">
-                            <cstring>layout18_2</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>resetButton_2</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Reset</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer47_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>281</width>
-                                        <height>21</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
+                        </vbox>
                     </widget>
                     <spacer>
                         <property name="name">
@@ -810,7 +910,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>300</height>
+                                <height>150</height>
                             </size>
                         </property>
                     </spacer>
@@ -839,52 +939,41 @@ Press delete to remove selected handle.</string>
                         <property name="title">
                             <string>Interaction</string>
                         </property>
-                        <widget class="QCheckBox">
+                        <vbox>
                             <property name="name">
-                                <cstring>m_ClippingPlaneCB</cstring>
+                                <cstring>unnamed</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>false</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>10</x>
-                                    <y>30</y>
-                                    <width>280</width>
-                                    <height>21</height>
-                                </rect>
-                            </property>
-                            <property name="text">
-                                <string>enable clipping plane</string>
-                            </property>
-                            <property name="checked">
-                                <bool>false</bool>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>textLabel1_4</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>false</bool>
-                            </property>
-                            <property name="geometry">
-                                <rect>
-                                    <x>10</x>
-                                    <y>70</y>
-                                    <width>283</width>
-                                    <height>20</height>
-                                </rect>
-                            </property>
-                            <property name="font">
-                                <font>
-                                    <bold>0</bold>
-                                </font>
-                            </property>
-                            <property name="text">
-                                <string>(press "i" to switch to interaction mode)</string>
-                            </property>
-                        </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>m_ClippingPlaneCB</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>enable clipping plane</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel1_4</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="font">
+                                    <font>
+                                        <bold>0</bold>
+                                    </font>
+                                </property>
+                                <property name="text">
+                                    <string>(press "i" to switch to interaction mode)</string>
+                                </property>
+                            </widget>
+                        </vbox>
                     </widget>
                     <widget class="QGroupBox">
                         <property name="name">
@@ -902,101 +991,17 @@ Press delete to remove selected handle.</string>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QFrame">
+                            <widget class="QGroupBox">
                                 <property name="name">
-                                    <cstring>frame7</cstring>
+                                    <cstring>groupBox9</cstring>
                                 </property>
-                                <property name="frameShape">
-                                    <enum>StyledPanel</enum>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Raised</enum>
+                                <property name="title">
+                                    <string>LOD 0 (low)</string>
                                 </property>
                                 <vbox>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QLayoutWidget">
-                                        <property name="name">
-                                            <cstring>layout31_4</cstring>
-                                        </property>
-                                        <vbox>
-                                            <property name="name">
-                                                <cstring>unnamed</cstring>
-                                            </property>
-                                            <widget class="QLayoutWidget">
-                                                <property name="name">
-                                                    <cstring>layout30_4</cstring>
-                                                </property>
-                                                <hbox>
-                                                    <property name="name">
-                                                        <cstring>unnamed</cstring>
-                                                    </property>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_5</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>90</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                    <widget class="QLabel">
-                                                        <property name="name">
-                                                            <cstring>textLabel1_5</cstring>
-                                                        </property>
-                                                        <property name="font">
-                                                            <font>
-                                                                <bold>0</bold>
-                                                            </font>
-                                                        </property>
-                                                        <property name="text">
-                                                            <string>LOD 0 (low)</string>
-                                                        </property>
-                                                    </widget>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_2_4</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>80</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                </hbox>
-                                            </widget>
-                                            <widget class="Line">
-                                                <property name="name">
-                                                    <cstring>line1_4</cstring>
-                                                </property>
-                                                <property name="frameShape">
-                                                    <enum>HLine</enum>
-                                                </property>
-                                                <property name="frameShadow">
-                                                    <enum>Sunken</enum>
-                                                </property>
-                                                <property name="orientation">
-                                                    <enum>Horizontal</enum>
-                                                </property>
-                                            </widget>
-                                        </vbox>
-                                    </widget>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
                                             <cstring>layout9</cstring>
@@ -1019,6 +1024,11 @@ Press delete to remove selected handle.</string>
                                                         </property>
                                                         <property name="enabled">
                                                             <bool>false</bool>
+                                                        </property>
+                                                        <property name="font">
+                                                            <font>
+                                                                <bold>0</bold>
+                                                            </font>
                                                         </property>
                                                         <property name="text">
                                                             <string>Shading</string>
@@ -1050,101 +1060,17 @@ Press delete to remove selected handle.</string>
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QFrame">
+                            <widget class="QGroupBox">
                                 <property name="name">
-                                    <cstring>frame8</cstring>
+                                    <cstring>groupBox10</cstring>
                                 </property>
-                                <property name="frameShape">
-                                    <enum>StyledPanel</enum>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Raised</enum>
+                                <property name="title">
+                                    <string>LOD1 (medium)</string>
                                 </property>
                                 <vbox>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QLayoutWidget">
-                                        <property name="name">
-                                            <cstring>layout31_2</cstring>
-                                        </property>
-                                        <vbox>
-                                            <property name="name">
-                                                <cstring>unnamed</cstring>
-                                            </property>
-                                            <widget class="QLayoutWidget">
-                                                <property name="name">
-                                                    <cstring>layout30_2</cstring>
-                                                </property>
-                                                <hbox>
-                                                    <property name="name">
-                                                        <cstring>unnamed</cstring>
-                                                    </property>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_3</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>90</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                    <widget class="QLabel">
-                                                        <property name="name">
-                                                            <cstring>textLabel1_2</cstring>
-                                                        </property>
-                                                        <property name="font">
-                                                            <font>
-                                                                <bold>0</bold>
-                                                            </font>
-                                                        </property>
-                                                        <property name="text">
-                                                            <string>LOD 1 (medium)</string>
-                                                        </property>
-                                                    </widget>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_2_2</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>80</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                </hbox>
-                                            </widget>
-                                            <widget class="Line">
-                                                <property name="name">
-                                                    <cstring>line1_2</cstring>
-                                                </property>
-                                                <property name="frameShape">
-                                                    <enum>HLine</enum>
-                                                </property>
-                                                <property name="frameShadow">
-                                                    <enum>Sunken</enum>
-                                                </property>
-                                                <property name="orientation">
-                                                    <enum>Horizontal</enum>
-                                                </property>
-                                            </widget>
-                                        </vbox>
-                                    </widget>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
                                             <cstring>layout9_2</cstring>
@@ -1167,6 +1093,11 @@ Press delete to remove selected handle.</string>
                                                         </property>
                                                         <property name="enabled">
                                                             <bool>false</bool>
+                                                        </property>
+                                                        <property name="font">
+                                                            <font>
+                                                                <bold>0</bold>
+                                                            </font>
                                                         </property>
                                                         <property name="text">
                                                             <string>Shading</string>
@@ -1198,101 +1129,17 @@ Press delete to remove selected handle.</string>
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QFrame">
+                            <widget class="QGroupBox">
                                 <property name="name">
-                                    <cstring>frame9</cstring>
+                                    <cstring>groupBox11</cstring>
                                 </property>
-                                <property name="frameShape">
-                                    <enum>StyledPanel</enum>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Raised</enum>
+                                <property name="title">
+                                    <string>LOD 2 (high)</string>
                                 </property>
                                 <vbox>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QLayoutWidget">
-                                        <property name="name">
-                                            <cstring>layout31_3</cstring>
-                                        </property>
-                                        <vbox>
-                                            <property name="name">
-                                                <cstring>unnamed</cstring>
-                                            </property>
-                                            <widget class="QLayoutWidget">
-                                                <property name="name">
-                                                    <cstring>layout30_3</cstring>
-                                                </property>
-                                                <hbox>
-                                                    <property name="name">
-                                                        <cstring>unnamed</cstring>
-                                                    </property>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_4</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>90</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                    <widget class="QLabel">
-                                                        <property name="name">
-                                                            <cstring>textLabel1_3</cstring>
-                                                        </property>
-                                                        <property name="font">
-                                                            <font>
-                                                                <bold>0</bold>
-                                                            </font>
-                                                        </property>
-                                                        <property name="text">
-                                                            <string>LOD 2 (high)</string>
-                                                        </property>
-                                                    </widget>
-                                                    <spacer>
-                                                        <property name="name">
-                                                            <cstring>spacer21_2_3</cstring>
-                                                        </property>
-                                                        <property name="orientation">
-                                                            <enum>Horizontal</enum>
-                                                        </property>
-                                                        <property name="sizeType">
-                                                            <enum>Expanding</enum>
-                                                        </property>
-                                                        <property name="sizeHint">
-                                                            <size>
-                                                                <width>80</width>
-                                                                <height>20</height>
-                                                            </size>
-                                                        </property>
-                                                    </spacer>
-                                                </hbox>
-                                            </widget>
-                                            <widget class="Line">
-                                                <property name="name">
-                                                    <cstring>line1_3</cstring>
-                                                </property>
-                                                <property name="frameShape">
-                                                    <enum>HLine</enum>
-                                                </property>
-                                                <property name="frameShadow">
-                                                    <enum>Sunken</enum>
-                                                </property>
-                                                <property name="orientation">
-                                                    <enum>Horizontal</enum>
-                                                </property>
-                                            </widget>
-                                        </vbox>
-                                    </widget>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
                                             <cstring>layout9_2_2</cstring>
@@ -1315,6 +1162,11 @@ Press delete to remove selected handle.</string>
                                                         </property>
                                                         <property name="enabled">
                                                             <bool>false</bool>
+                                                        </property>
+                                                        <property name="font">
+                                                            <font>
+                                                                <bold>0</bold>
+                                                            </font>
                                                         </property>
                                                         <property name="text">
                                                             <string>Shading</string>
@@ -1361,7 +1213,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>140</height>
+                                <height>259</height>
                             </size>
                         </property>
                     </spacer>
@@ -1605,12 +1457,6 @@ Press delete to remove selected handle.</string>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>tf10_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>textLabelPS</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
     <connection>

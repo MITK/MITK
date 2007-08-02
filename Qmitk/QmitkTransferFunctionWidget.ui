@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>345</width>
-            <height>544</height>
+            <width>399</width>
+            <height>611</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -33,279 +33,400 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QLabel">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>textLabel2</cstring>
+                <cstring>groupBox4</cstring>
             </property>
-            <property name="maximumSize">
-                <size>
-                    <width>32767</width>
-                    <height>30</height>
-                </size>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
-            <property name="frameShape">
-                <enum>Box</enum>
+            <property name="title">
+                <string>Scalar Opacity</string>
             </property>
-            <property name="text">
-                <string>&lt;font size="+1"&gt;&lt;p align="center"&gt;scalar opacity&lt;/p&gt;&lt;/font&gt;</string>
-            </property>
-        </widget>
-        <widget class="QmitkPiecewiseFunctionCanvas">
-            <property name="name">
-                <cstring>m_ScalarOpacityFunctionCanvas</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>0</width>
-                    <height>200</height>
-                </size>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout25</cstring>
-            </property>
-            <hbox>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel">
+                <widget class="QmitkPiecewiseFunctionCanvas">
                     <property name="name">
-                        <cstring>m_textLabelX</cstring>
+                        <cstring>m_ScalarOpacityFunctionCanvas</cstring>
                     </property>
-                    <property name="text">
-                        <string>X</string>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                </widget>
-                <widget class="QLineEdit">
-                    <property name="name">
-                        <cstring>m_XEdit</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer34</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
+                    <property name="minimumSize">
                         <size>
-                            <width>30</width>
-                            <height>21</height>
+                            <width>0</width>
+                            <height>200</height>
                         </size>
                     </property>
-                </spacer>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>m_textLabelY</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Y</string>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
                     </property>
                 </widget>
-                <widget class="QLineEdit">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_YEdit</cstring>
+                        <cstring>layout2_3</cstring>
                     </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MinLabel_2</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>min</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignLeft</set>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer2_3</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>430</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MaxLabel_2</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>max</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                        </widget>
+                    </hbox>
                 </widget>
-            </hbox>
+            </vbox>
         </widget>
-        <widget class="QLabel">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>textLabel3</cstring>
+                <cstring>groupBox5</cstring>
             </property>
-            <property name="maximumSize">
-                <size>
-                    <width>32767</width>
-                    <height>30</height>
-                </size>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
-            <property name="frameShape">
-                <enum>Box</enum>
+            <property name="title">
+                <string>Selected Point</string>
             </property>
-            <property name="text">
-                <string>&lt;font size="+1"&gt;&lt;p align="center"&gt;color&lt;/p&gt;&lt;/font&gt;</string>
-            </property>
-        </widget>
-        <widget class="QmitkColorTransferFunctionCanvas">
-            <property name="name">
-                <cstring>m_ColorTransferFunctionCanvas</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>0</width>
-                    <height>30</height>
-                </size>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout2</cstring>
-            </property>
-            <hbox>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_MinLabel</cstring>
+                        <cstring>layout25</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <pointsize>7</pointsize>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>min</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignLeft</set>
-                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_textLabelX</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>X</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>m_XEdit</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer34</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>30</width>
+                                    <height>21</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_textLabelY</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Y</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>m_YEdit</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                        </widget>
+                    </hbox>
                 </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer2</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
-                        <size>
-                            <width>430</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>m_MaxLabel</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <pointsize>7</pointsize>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>max</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                </widget>
-            </hbox>
+            </vbox>
         </widget>
-        <widget class="QLabel">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>textLabel1</cstring>
+                <cstring>groupBox6</cstring>
             </property>
-            <property name="maximumSize">
-                <size>
-                    <width>32767</width>
-                    <height>30</height>
-                </size>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
             </property>
-            <property name="frameShape">
-                <enum>Box</enum>
+            <property name="title">
+                <string>Color</string>
             </property>
-            <property name="text">
-                <string>&lt;p align="center"&gt;&lt;font size="+1"&gt;gradient opacity&lt;/font&gt;&lt;/p&gt;</string>
-            </property>
-        </widget>
-        <widget class="QmitkPiecewiseFunctionCanvas">
-            <property name="name">
-                <cstring>m_GradientOpacityCanvas</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>0</width>
-                    <height>100</height>
-                </size>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout2_2</cstring>
-            </property>
-            <hbox>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel">
+                <widget class="QmitkColorTransferFunctionCanvas">
                     <property name="name">
-                        <cstring>m_MinLabelGO</cstring>
+                        <cstring>m_ColorTransferFunctionCanvas</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <pointsize>7</pointsize>
-                        </font>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                    <property name="text">
-                        <string>min</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignLeft</set>
-                    </property>
-                </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer2_2</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
+                    <property name="minimumSize">
                         <size>
-                            <width>430</width>
-                            <height>20</height>
+                            <width>0</width>
+                            <height>30</height>
                         </size>
                     </property>
-                </spacer>
-                <widget class="QLabel">
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_MaxLabelGO</cstring>
+                        <cstring>layout2</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MinLabel</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>min</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignLeft</set>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>430</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MaxLabel</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>max</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox7</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Gradient Opacity</string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QmitkPiecewiseFunctionCanvas">
+                    <property name="name">
+                        <cstring>m_GradientOpacityCanvas</cstring>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>100</height>
+                        </size>
                     </property>
                     <property name="font">
                         <font>
-                            <pointsize>7</pointsize>
+                            <bold>0</bold>
                         </font>
                     </property>
-                    <property name="text">
-                        <string>max</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
                 </widget>
-            </hbox>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout2_2</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MinLabelGO</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>min</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignLeft</set>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer2_2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>430</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_MaxLabelGO</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <pointsize>7</pointsize>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>max</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
         </widget>
     </vbox>
 </widget>

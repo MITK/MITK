@@ -102,7 +102,9 @@ void QmitkTransferFunctionWidget::UpdateMinMaxLabels()
   if (m_ScalarOpacityFunctionCanvas)
   {
     m_MinLabel->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMin()));
+    m_MinLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMin()));
     m_MaxLabel->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
+    m_MaxLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
   }
     if (m_GradientOpacityCanvas)
   {

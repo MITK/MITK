@@ -23,9 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "pic2vtk.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkBaseRenderer.h"
 #include "mitkDataTreeNode.h"
-#include "mitkGLUT.h"
+#include "mitkOpenGLRenderer.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
@@ -234,7 +233,10 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       volumeString << segmentationVolume << " ml";
 
       // draw text
-      WriteTextXY(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str());
+
+      mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+      OpenGLrenderer->WriteSimpleText(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str());
+      //WriteTextXY(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str(),renderer);
     }
   }
 

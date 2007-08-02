@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkLine.h"
-#include "mitkGLUT.h"
+#include "mitkGL.h"
 
 #include <vtkLinearTransform.h>
 

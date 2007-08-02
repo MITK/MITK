@@ -19,14 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointSetMapper2D.h"
 #include "mitkPointSet.h"
-#include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "vtkLinearTransform.h"
 #include "mitkStringProperty.h"
 #include "mitkPointSet.h"
-#include "mitkGLUT.h"
+#include "mitkOpenGLRenderer.h"
 
 const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
@@ -254,8 +253,10 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
             sprintf(buffer,"%d",j+1);
             l.append(buffer);
           }
-          this->WriteTextXY(pt2d[0] + text2dDistance, 
-            pt2d[1] + text2dDistance, l);
+          mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+          OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+       /*   this->WriteTextXY(pt2d[0] + text2dDistance, 
+            pt2d[1] + text2dDistance, l,renderer);*/
         }
         
         if((m_ShowPoints) && (scalardiff<4.0))
@@ -325,7 +326,9 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
             Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
 
-            this->WriteTextXY(pos2d[0], pos2d[1], buffer.str());
+            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(pos2d[0], pos2d[1], buffer.str());
+            //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
           }
 
           if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
@@ -342,7 +345,9 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
             Vector2D pos2d = lastPt2d.GetVectorFromOrigin()+vec2d*text2dDistance*text2dDistance;
 
-            this->WriteTextXY(pos2d[0], pos2d[1], buffer.str());
+            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(pos2d[0], pos2d[1], buffer.str());
+            //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
           }
       }
         counter++;

@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTree.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkRenderingManager.h"
+#include "mitkSimpleTextRendering.h"
 #include <mitkGL.h>
 
 #include <itkCommand.h>
@@ -62,6 +63,8 @@ public:
   \param cameraController instance of the active camera controller
   */
   void SetCameraController(CameraController* cameraController);
+
+  int WriteSimpleText(int posX, int posY, std::string text);
 
   virtual void Update(mitk::DataTreeNode* datatreenode);
 
@@ -193,7 +196,9 @@ private:
   vtkPointPicker *m_PointPicker;
 
   mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
-  
+
+  mitk::SimpleTextRendering::Pointer m_SimpleTextRenderer;
+
   // save a copy of the rendered window.
   GLbyte *m_PixelMapGL;
 

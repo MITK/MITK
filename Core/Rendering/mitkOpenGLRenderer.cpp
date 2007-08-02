@@ -81,6 +81,9 @@ mitk::OpenGLRenderer::OpenGLRenderer( const char* name )
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   m_DrawOverlayPosition.Fill(0);
   m_PickingMode = WorldPointPicking;
+
+  m_SimpleTextRenderer = mitk::SimpleTextRendering::New();
+  
 }
 
 void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
@@ -300,6 +303,8 @@ void mitk::OpenGLRenderer::Update()
 void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
 //first render vtkActors, then render mitkMappers
 {
+  m_SimpleTextRenderer->ClearTextLabelCollection();
+
   //if we do not have any data, we do nothing else but clearing our window
   
   if(GetData() == NULL)
@@ -406,12 +411,21 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
     }
     //------------------
     //rendering VTK-Mappers if present
-    if((m_VtkMapperPresent && m_MapperID != 1) || m_RenderWindow->GetVtkLayerController()->GetNumberOfRenderers() > 1)
+    if((m_VtkMapperPresent && m_MapperID != 1) || m_RenderWindow->GetVtkLayerController()->GetNumberOfRenderers() > 1
+       || m_SimpleTextRenderer->GetNumberOfTextLabels() > 0)
     {
       mitk::VtkARRenderWindow *arRenderWindow = dynamic_cast<mitk::VtkARRenderWindow *>(m_RenderWindow->GetVtkRenderWindow());
       if (arRenderWindow)
         arRenderWindow->SetFinishRendering(false);
 
+      if(m_SimpleTextRenderer->GetRenderWindow() == NULL)
+        m_SimpleTextRenderer->SetRenderWindow(m_RenderWindow);
+      
+      if(m_SimpleTextRenderer->GetNumberOfTextLabels() > 0)
+        m_SimpleTextRenderer->Enable();
+      else
+        m_SimpleTextRenderer->Disable();
+      
       //start vtk render process with the updated scenegraph
       m_RenderWindow->GetVtkRenderWindow()->MitkRender();
     }
@@ -658,5 +672,13 @@ void mitk::OpenGLRenderer::SetCameraController(CameraController* cameraControlle
   m_CameraController = NULL;
   m_CameraController = cameraController;
   m_CameraController->SetRenderer(this);
+}
+
+int mitk::OpenGLRenderer::WriteSimpleText(int posX, int posY, std::string text)
+{
+  if(m_SimpleTextRenderer.IsNull())
+    m_SimpleTextRenderer = mitk::SimpleTextRendering::New();
+
+  return m_SimpleTextRenderer->AddTextLabel(posX,posY,text);
 }
 

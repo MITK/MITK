@@ -79,6 +79,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageChannelSelector.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkCoreObjectFactory.h"
+#include "mitkTransferFunctionProperty.h"
 
 #ifdef MBI_INTERNAL
 #ifdef HAVE_IPDICOM
@@ -738,6 +739,15 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   mitkLutProp->SetLookupTable(mitkLut);
   node->SetProperty( "LookupTable", mitkLutProp );
   node->SetProperty( "binary", new mitk::BoolProperty( false ) );
+  
+  
+  // add a default transfer function
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+  if(image.IsNotNull())
+  {
+    tf->InitializeByMitkImage ( image );
+    node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
+  }
 } 
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)

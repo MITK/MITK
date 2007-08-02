@@ -1,0 +1,125 @@
+/**
+\page StatemachineEditor How to install and use the Statemachine-Editor
+
+Available sections:
+  - \ref StatemachineEditorOverview
+  - \ref Installation 
+  - \ref Manual 
+
+\section StatemachineEditorOverview Overview
+
+This plug-in for Eclipse allows you to create new statemachines and change existing statemachines in an graphical editor. You can open existing
+statemachines from a xml file or create a new statemachine in a new xml file.
+
+This document will tell you how to install the plug-in for eclipse and how to use it.
+
+\section StatemachineEditorInstallation How to Install the Statemachine-Editor
+
+First of all you have to install Eclipse (Eclipse Classic) and the plug-in Graphical Editing Framework (GEF). Furthermore we need the packages JDOM
+(jdom.jar) and Java3D (vecmath.jar).
+
+Now you have to unzip the file StateMachines.zip into your eclipse folder. The file is located in your SVN checkout mitk/core/interactions.
+
+Start Eclipse and select "File" -> "Import...".
+
+\image html Import.PNG "\b Fig.1: Import"
+
+In the popup window (\b Fig.1: Import) select the folder "Plug-in Development" and "Plug-ins and Fragments".
+
+\image html Import2.PNG "\b Fig.2: Selection"
+
+On the page "Selection" (\b Fig.2: Selection) select the "StateMachines (1.0.0) Plug-in.
+
+\image html Import3.PNG "\b Fig.3: Selection 2"
+
+Click the "Add ->" button (\b Fig.3: Selection 2).
+
+\image html Import4.PNG "\b Fig.4: Selection 3"
+
+Click "Finish" (\b Fig.4: Selection 3).
+
+Now you have to make sure that the path to vecmath.jar and jdom.jar is set correctly.
+
+\image html BuildPath.PNG "\b Fig.5: Set Build Path"
+
+You can find the build path by selecting the project in the package view and the go to "Project" -> "Properties" -> "Java Build Path" in the tab
+"Libraries" (as you can see in \b Fig.5: Set Build Path).
+
+Now you should be able to start a Run-time Workbench.
+
+\image html Eclipse1.png "\b Fig.6: Start Run-time Workbench"
+
+Therefore you have to press the "Run" button and select "Eclipse Application", Click "OK" (\b Fig.6: Start Run-time Workbench).
+
+A new Eclipse workbench opens where we can use the Statemachine-Editor.
+
+
+\section StatemachineEditorManual How to use the Statemachine-Editor
+
+In the Eclipse Run-time Workbench we have to create a new Java project first (\b Fig.7: Create a new Java project).
+
+\image html CreateJavaProject.PNG "\b Fig.7: Create a new Java project"
+
+Then you can select one of the two buttons:
+
+\li "New statemachine"
+\li "Statemachines from *.xml"
+
+
+\subsection StatemachineEditorManual1 New Statemachines
+
+When you press the button "New Statemachine" the following window will pop up:
+
+\image html NewStatemachine.PNG "\b Fig.8: New Statemachine"
+
+Here, you have to "Browse..." for your Java-Project as your file container (\b Fig.8: New Statemachine).
+
+\image html NewStatemachine1.PNG "\b Fig.9: New Statemachine 1"
+
+Select your Project and click "OK" (Fig.9: New Statemachine 1).
+
+\image html NewStatemachine2.PNG "\b Fig.10: New Statemachine 2"
+
+As soon as you have selected a container and a File name, the "Finish" button will become enabled (\b Fig.10: New Statemachine 2).
+
+\b Attention: If the filename has already been used, you have to set another filename to enable the "Finish" button.
+
+\image html NewStatemachine3.PNG "\b Fig.11: New Statemachine 3"
+
+As a last step you have to enter the location and name for the xml file to be generated (\b Fig.11: New Statemachine 3).
+
+Read on in Section Work with the Editor.
+
+
+\subsection StatemachineEditorManual2 Statemachines from *.xml
+
+... comming soon ...
+
+
+\subsection StatemachineEditorManual3 Work with the Editor
+
+Now your workspace looks something like this:
+
+\image html application.PNG "\b Fig.12: Workspace"
+
+You can open a statemachine from the "Statemachines List" view (\b Fig.12: Workspace) by performing a double click on the statemachine.
+The an editor opens and on its palette you can find all tools, such as create state or create transition.
+
+\image html openPropertiesView.PNG "\b Fig.13: Open the properties view"
+
+\image html application1.PNG "\b Fig.14: Change statename in the properties view"
+
+To edit the statename or state ID you have to open the "Properties" view (\b Fig.14: Change statename in the properties view). You will get it by
+"Window"->"Show View" -> "Other..." -> "General" -> "Properties" (\b Fig.13: Open the properties view).
+
+\image html changeEvent.PNG "\b Fig.15: Change Event"
+
+\image html addAction.PNG "\b Fig.16: Add Action"
+
+To change a transitions event or action you have to select the transition and open its context menu (\b Fig.15: Change Event, \b Fig.16: Add Action).
+You can connect a transition to another state by drag one end of it and drop it to another state. All these changes are connected with an undo/redo 
+controller.
+
+When you save your statemachine it will be saved as an xml file which you either have created with your new statemachine or have opened before.
+
+*/

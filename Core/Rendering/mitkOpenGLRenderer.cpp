@@ -682,3 +682,8 @@ int mitk::OpenGLRenderer::WriteSimpleText(int posX, int posY, std::string text)
   return m_SimpleTextRenderer->AddTextLabel(posX,posY,text);
 }
 
+vtkTextProperty* mitk::OpenGLRenderer::GetTextLabelProperty(int text_id)
+{
+	return m_SimpleTextRenderer->GetVtkTextProperty(text_id);
+}
+

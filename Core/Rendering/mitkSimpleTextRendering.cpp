@@ -109,7 +109,7 @@ void mitk::SimpleTextRendering::Enable()
   m_TextRenderer->SetInteractive(0);
 
   m_RenderWindow->GetVtkRenderWindow()->SetErase(0);  
-  m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_TextRenderer,true);
+  m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_TextRenderer,false);
   
   m_IsEnabled = true;
 }

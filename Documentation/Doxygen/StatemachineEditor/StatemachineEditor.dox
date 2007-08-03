@@ -3,8 +3,10 @@
 
 Available sections:
   - \ref StatemachineEditorOverview
-  - \ref Installation 
-  - \ref Manual 
+  - \ref StatemachineEditorInstallation 
+  - \ref StatemachineEditorManual
+  - \ref StatemachineEditorManual1 
+  - \ref StatemachineEditorManual2 
 
 \section StatemachineEditorOverview Overview
 

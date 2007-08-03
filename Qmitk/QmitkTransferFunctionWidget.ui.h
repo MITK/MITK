@@ -47,7 +47,8 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
         mitk::TransferFunction* tf = dynamic_cast<mitk::TransferFunction*>(tfp->GetValue().GetPointer());
         if (tf)
         {
-          std::cout << "TF access" << std::endl;
+          tf->InitializeByMitkImage(dynamic_cast<mitk::Image*>(node->GetData()));
+          //std::cout << "TF access" << std::endl;
           m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction(tf->GetScalarOpacityFunction());
           m_ScalarOpacityFunctionCanvas->SetHistogram(tf->GetHistogram());
           m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());

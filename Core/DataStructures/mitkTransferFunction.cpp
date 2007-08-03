@@ -53,7 +53,7 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
   m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
   m_ColorTransferFunction->SetColorSpaceToHSV();
-  std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+  //std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
 }
 
 mitk::TransferFunction::Pointer mitk::TransferFunction::CreateForMitkImage(const mitk::Image* image) {

@@ -745,7 +745,18 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
   if(image.IsNotNull())
   {
-    tf->InitializeByMitkImage ( image );
+    int m_Min = image->GetScalarValueMin();
+    int m_Max = image->GetScalarValueMax();
+    tf->GetScalarOpacityFunction()->Initialize();
+    tf->GetScalarOpacityFunction()->AddPoint ( m_Min, 0 );
+    tf->GetScalarOpacityFunction()->AddPoint ( m_Max, 1 );
+    tf->GetColorTransferFunction()->AddRGBPoint(m_Min,1,0,0);
+    tf->GetColorTransferFunction()->AddRGBPoint(m_Max,1,1,0);
+    tf->GetGradientOpacityFunction()->Initialize();
+    tf->GetGradientOpacityFunction()->AddPoint(m_Min,0.0);
+    tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
+    tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
+    tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);  
     node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
   }
 } 

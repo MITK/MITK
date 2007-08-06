@@ -27,46 +27,46 @@ Start Eclipse and select "File" -> "Import...".
 
 \image html Import.PNG "\b Fig.1: Import"
 
-In the popup window (\b Fig.1: Import) select the folder "Plug-in Development" and "Plug-ins and Fragments". Click "Next >".
+In the popup window (<B>Fig.1: Import</B>) select the folder "Plug-in Development" and "Plug-ins and Fragments". Click "Next >".
 
 \image html Import2.PNG "\b Fig.2: Import Plug-ins and Fragments"
 
-On the page "Import Plug-ins and Fragments" (\b Fig.2: Import Plug-ins and Fragments) just click "Next >".
+On the page "Import Plug-ins and Fragments" (\b Fig.2: Import Plug-ins and Fragments</B>) just click "Next >".
 
 \image html Import3.PNG "\b Fig.3: Selection"
 
-On the page "Selection" (\b Fig.3: Selection) select the "StateMachines (1.0.0) Plug-in and click the "Add ->" button.
+On the page "Selection" (\b Fig.3: Selection</B>) select the "StateMachines (1.0.0)" Plug-in and click the "Add ->" button.
 
 \image html Import4.PNG "\b Fig.4: Selection 2"
 
-Click "Finish" (\b Fig.4: Selection 2).
+Click "Finish" (\b Fig.4: Selection 2</B>).
 
 Now you have to make sure that the path to vecmath.jar and jdom.jar is set correctly.
 
 \image html BuildPath.PNG "\b Fig.5: Set build path"
 
 You can find the build path by selecting the project in the "Package Explorer" view. Then go to "Project" -> "Properties" -> "Java Build Path" in the tab
-"Libraries" (as you can see in \b Fig.5: Set build path).
+"Libraries" (as you can see in <B>Fig.5: Set build path</B>).
 
 Now you should be able to start a Run-time Workbench.
 
 \image html Runas.png "\b Fig.6: Start Run-time Workbench"
 
-Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (\b Fig.6: Start Run-time Workbench).
+Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (<B>Fig.6: Start Run-time Workbench</B>).
 
 A new Eclipse workbench opens where we can use the Statemachine-Editor.
 
 
 \section StatemachineEditorManual How to use the Statemachine-Editor
 
-In the Eclipse Run-time Workbench we have to create a new Java project first (\b Fig.7: Create a new Java project).
+In the Eclipse Run-time Workbench we have to create a new Java project first (<B>Fig.7: Create a new Java project</B>).
 
 \image html CreateJavaProject.PNG "\b Fig.7: Create a new Java project"
 
 Then you can select one of the two buttons:
 
-\li "New statemachine"
-\li "Statemachines from *.xml"
+\li \ref StatemachineEditorManual1
+\li \ref StatemachineEditorManual2
 
 
 \subsection StatemachineEditorManual1 New Statemachines
@@ -75,21 +75,21 @@ When you press the button "New Statemachine" the following window will pop up:
 
 \image html NewStatemachine.PNG "\b Fig.8: New Statemachine"
 
-Here, you have to "Browse..." for your Java-Project as your file container (\b Fig.8: New Statemachine).
+Here, you have to "Browse..." for your Java-Project as your file container (<B>Fig.8: New Statemachine</B>).
 
 \image html NewStatemachine1.PNG "\b Fig.9: New Statemachine 1"
 
-Select your Project and click "OK" (Fig.9: New Statemachine 1).
+Select your Project and click "OK" (<B>Fig.9: New Statemachine 1</B>).
 
 \image html NewStatemachine2.PNG "\b Fig.10: New Statemachine 2"
 
-As soon as you have selected a container and a File name, the "Finish" button will become enabled (\b Fig.10: New Statemachine 2).
+As soon as you have selected a container and a File name, the "Finish" button will become enabled (<B>Fig.10: New Statemachine 2</B>).
 
-\b Attention: If the filename has already been used, you have to set another filename to enable the "Finish" button.
+<B>Attention:</B> If the filename has already been used, you have to set another filename to enable the "Finish" button.
 
 \image html NewStatemachine3.PNG "\b Fig.11: New Statemachine 3"
 
-As a last step you have to enter the location and name for the xml file to be generated (\b Fig.11: New Statemachine 3).
+As a last step you have to enter the location and name for the xml file to be generated (<B>Fig.11: New Statemachine 3</B>).
 
 Read on in Section Work with the Editor.
 
@@ -105,21 +105,21 @@ Now your workspace looks something like this:
 
 \image html application.PNG "\b Fig.12: Workspace"
 
-You can open a statemachine from the "Statemachines List" view (\b Fig.12: Workspace) by performing a double click on the statemachine.
-The an editor opens and on its palette you can find all tools, such as create state or create transition.
+You can open a statemachine from the "Statemachines List" view (<B>Fig.12: Workspace</B>) by performing a double click on the statemachine.
+An editor opens and on its palette you can find different tools, such as create state or create transition.
 
 \image html openPropertiesView.PNG "\b Fig.13: Open the properties view"
 
 \image html application1.PNG "\b Fig.14: Change statename in the properties view"
 
-To edit the statename or state ID you have to open the "Properties" view (\b Fig.14: Change statename in the properties view). You will get it by
-"Window"->"Show View" -> "Other..." -> "General" -> "Properties" (\b Fig.13: Open the properties view).
+To edit the statename or state ID you have to open the "Properties" view (<B>Fig.14: Change statename in the properties view</B>). You will get it by
+"Window"->"Show View" -> "Other..." -> "General" -> "Properties" (<B>Fig.13: Open the properties view</B>).
 
 \image html changeEvent.PNG "\b Fig.15: Change Event"
 
 \image html addAction.PNG "\b Fig.16: Add Action"
 
-To change a transitions event or action you have to select the transition and open its context menu (\b Fig.15: Change Event, \b Fig.16: Add Action).
+To change a transitions event or action you have to select the transition and open its context menu (<B>Fig.15: Change Event</B>, <B>Fig.16: Add Action</B>).
 You can connect a transition to another state by drag one end of it and drop it to another state. All these changes are connected with an undo/redo 
 controller.
 

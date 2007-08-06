@@ -418,6 +418,10 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   if(mitk::RenderingManager::GetInstance()->GetShading(0))
   {
     m_VolumePropertyLow->ShadeOn();
+    m_VolumePropertyLow->SetAmbient(mitk::RenderingManager::GetInstance()->GetShadingValues()[0]);
+    m_VolumePropertyLow->SetDiffuse(mitk::RenderingManager::GetInstance()->GetShadingValues()[1]);
+    m_VolumePropertyLow->SetSpecular(mitk::RenderingManager::GetInstance()->GetShadingValues()[2]);
+    m_VolumePropertyLow->SetSpecularPower(mitk::RenderingManager::GetInstance()->GetShadingValues()[3]);
   }
   else
   {
@@ -428,6 +432,10 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   if(mitk::RenderingManager::GetInstance()->GetShading(1))
   {
     m_VolumePropertyMed->ShadeOn();
+    m_VolumePropertyMed->SetAmbient(mitk::RenderingManager::GetInstance()->GetShadingValues()[0]);
+    m_VolumePropertyMed->SetDiffuse(mitk::RenderingManager::GetInstance()->GetShadingValues()[1]);
+    m_VolumePropertyMed->SetSpecular(mitk::RenderingManager::GetInstance()->GetShadingValues()[2]);
+    m_VolumePropertyMed->SetSpecularPower(mitk::RenderingManager::GetInstance()->GetShadingValues()[3]);
   }
   else
   {

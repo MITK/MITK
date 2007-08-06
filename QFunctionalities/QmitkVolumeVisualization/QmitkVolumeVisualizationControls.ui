@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>312</width>
-            <height>732</height>
+            <width>353</width>
+            <height>889</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -1202,6 +1202,19 @@ Press delete to remove selected handle.</string>
                                             </spacer>
                                         </hbox>
                                     </widget>
+                                </vbox>
+                            </widget>
+                            <widget class="QGroupBox">
+                                <property name="name">
+                                    <cstring>groupBox8_2</cstring>
+                                </property>
+                                <property name="title">
+                                    <string>Shading Properties</string>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
                                             <cstring>layout15</cstring>
@@ -1496,7 +1509,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>60</height>
+                                <height>100</height>
                             </size>
                         </property>
                     </spacer>
@@ -1581,8 +1594,8 @@ Press delete to remove selected handle.</string>
 </images>
 <connections>
     <connection>
-        <sender>m_EnableShading1</sender>
-        <signal>toggled(bool)</signal>
+        <sender>m_ImmediateUpdate</sender>
+        <signal>&lt;No Signal&gt;</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
         <slot>EnableShadingMed(bool)</slot>
     </connection>
@@ -1857,18 +1870,6 @@ Press delete to remove selected handle.</string>
         <slot>EnableRenderingCB_toggled(bool)</slot>
     </connection>
     <connection>
-        <sender>m_SetValuesButton</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetShadingValues()</slot>
-    </connection>
-    <connection>
-        <sender>m_DefaultValuesButton</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetDefaultShadingValues()</slot>
-    </connection>
-    <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>groupBox5</receiver>
@@ -1908,6 +1909,24 @@ Press delete to remove selected handle.</string>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>m_ClippingPlaneCB</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_DefaultValuesButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetDefaultShadingValues()</slot>
+    </connection>
+    <connection>
+        <sender>m_SetValuesButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetShadingValues()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>groupBox8_2</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
 </connections>

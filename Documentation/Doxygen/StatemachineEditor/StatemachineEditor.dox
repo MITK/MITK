@@ -7,6 +7,7 @@ Available sections:
   - \ref StatemachineEditorManual
   - \ref StatemachineEditorManual1 
   - \ref StatemachineEditorManual2 
+  - \ref StatemachineEditorManual3
 
 \section StatemachineEditorOverview Overview
 
@@ -26,32 +27,32 @@ Start Eclipse and select "File" -> "Import...".
 
 \image html Import.PNG "\b Fig.1: Import"
 
-In the popup window (\b Fig.1: Import) select the folder "Plug-in Development" and "Plug-ins and Fragments".
+In the popup window (\b Fig.1: Import) select the folder "Plug-in Development" and "Plug-ins and Fragments". Click "Next >".
 
-\image html Import2.PNG "\b Fig.2: Selection"
+\image html Import2.PNG "\b Fig.2: Import Plug-ins and Fragments"
 
-On the page "Selection" (\b Fig.2: Selection) select the "StateMachines (1.0.0) Plug-in.
+On the page "Import Plug-ins and Fragments" (\b Fig.2: Import Plug-ins and Fragments) just click "Next >".
 
-\image html Import3.PNG "\b Fig.3: Selection 2"
+\image html Import3.PNG "\b Fig.3: Selection"
 
-Click the "Add ->" button (\b Fig.3: Selection 2).
+On the page "Selection" (\b Fig.3: Selection) select the "StateMachines (1.0.0) Plug-in and click the "Add ->" button.
 
-\image html Import4.PNG "\b Fig.4: Selection 3"
+\image html Import4.PNG "\b Fig.4: Selection 2"
 
-Click "Finish" (\b Fig.4: Selection 3).
+Click "Finish" (\b Fig.4: Selection 2).
 
 Now you have to make sure that the path to vecmath.jar and jdom.jar is set correctly.
 
-\image html BuildPath.PNG "\b Fig.5: Set Build Path"
+\image html BuildPath.PNG "\b Fig.5: Set build path"
 
-You can find the build path by selecting the project in the package view and the go to "Project" -> "Properties" -> "Java Build Path" in the tab
-"Libraries" (as you can see in \b Fig.5: Set Build Path).
+You can find the build path by selecting the project in the "Package Explorer" view. Then go to "Project" -> "Properties" -> "Java Build Path" in the tab
+"Libraries" (as you can see in \b Fig.5: Set build path).
 
 Now you should be able to start a Run-time Workbench.
 
-\image html Eclipse1.png "\b Fig.6: Start Run-time Workbench"
+\image html Runas.png "\b Fig.6: Start Run-time Workbench"
 
-Therefore you have to press the "Run" button and select "Eclipse Application", Click "OK" (\b Fig.6: Start Run-time Workbench).
+Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (\b Fig.6: Start Run-time Workbench).
 
 A new Eclipse workbench opens where we can use the Statemachine-Editor.
 

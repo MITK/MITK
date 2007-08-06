@@ -165,3 +165,17 @@ void QmitkVolumeVisualizationControls::EnableClippingPlane( bool state )
 {
   emit EnableCPToggled(state);
 }
+
+void QmitkVolumeVisualizationControls::SetShadingValues()
+{
+  emit ShadingValues(m_AmbientEdit->text().toFloat(), m_DiffuseEdit->text().toFloat(), m_SpecularEdit->text().toFloat(), m_SpecPowerEdit->text().toFloat());
+}
+
+
+void QmitkVolumeVisualizationControls::SetDefaultShadingValues()
+{
+  m_AmbientEdit->setText(QString::number(0.1));
+  m_DiffuseEdit->setText(QString::number(0.7));
+  m_SpecularEdit->setText(QString::number(0.2));
+  m_SpecPowerEdit->setText(QString::number(10));
+}

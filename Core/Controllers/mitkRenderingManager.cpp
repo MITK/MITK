@@ -108,6 +108,7 @@ mitk::RenderingManager::RenderingManager()
 : m_UpdatePending( false ), m_Interval( 10 )
 {
   m_ShadingEnabled.resize(3);
+  m_ShadingValues.resize(4);
   // The default (minimum) interval is 10 msec, theoretically enabling a
   // maximum frame rate of 100 Hz.
 }
@@ -631,6 +632,20 @@ bool mitk::RenderingManager::GetClippingPlaneStatus()
 {
   return m_ClippingPlaneStatus;
 }
+
+void mitk::RenderingManager::SetShadingValues(float ambient, float diffuse, float specular, float specpower)
+{
+  m_ShadingValues[0] = ambient;
+  m_ShadingValues[1] = diffuse;
+  m_ShadingValues[2] = specular;
+  m_ShadingValues[3] = specpower;
+}
+
+std::vector<float> mitk::RenderingManager::GetShadingValues()
+{
+  return m_ShadingValues;
+}
+
 
 // Create and register generic RenderingManagerFactory.
 mitk::GenericRenderingManagerFactory renderingManagerFactory;

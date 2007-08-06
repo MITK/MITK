@@ -72,6 +72,8 @@ void QmitkVolumeVisualization::CreateConnections()
     connect( (QObject*)(m_Controls), SIGNAL(EnableShadingToggled(bool, int)),(QObject*) this, SLOT(SetShading(bool, int)));
     //Clipping plane
     connect( (QObject*)(m_Controls), SIGNAL(EnableCPToggled(bool)),(QObject*) this, SLOT(EnableClippingPlane(bool)));
+    //ShadingOptions
+    connect( (QObject*)(m_Controls), SIGNAL(ShadingValues(float, float, float, float)),(QObject*) this, SLOT(SetShadingValues(float, float, float, float)));
     
     //Immediate Update
     connect( (QObject*)(m_Controls), SIGNAL(ImmUpdate(bool)),(QObject*) this, SLOT(ImmediateUpdate(bool)));
@@ -187,6 +189,13 @@ void QmitkVolumeVisualization::ImmediateUpdate(bool state)
 void QmitkVolumeVisualization::EnableClippingPlane(bool state)
 {
   mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(state);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
 }
+
+void QmitkVolumeVisualization::SetShadingValues(float ambient, float diffuse, float specular, float specpower)
+{
+  mitk::RenderingManager::GetInstance()->SetShadingValues(ambient, diffuse, specular, specpower);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
+}
+
 

@@ -166,6 +166,9 @@ public:
   void SetClippingPlaneStatus(bool status);
   bool GetClippingPlaneStatus();
   
+  void SetShadingValues(float ambient, float diffuse, float specular, float specpower);
+  std::vector<float> GetShadingValues();
+  
 protected:
   RenderingManager();
 
@@ -192,6 +195,7 @@ protected:
   int m_Numberof3DRW;
   std::vector<bool> m_ShadingEnabled;
   bool m_ClippingPlaneStatus;
+  std::vector<float> m_ShadingValues;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );

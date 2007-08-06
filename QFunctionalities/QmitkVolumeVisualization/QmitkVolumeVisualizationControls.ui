@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>476</width>
+            <width>312</width>
             <height>732</height>
         </rect>
     </property>
@@ -931,6 +931,9 @@ Press delete to remove selected handle.</string>
                         <property name="name">
                             <cstring>groupBox3</cstring>
                         </property>
+                        <property name="enabled">
+                            <bool>false</bool>
+                        </property>
                         <property name="font">
                             <font>
                                 <bold>1</bold>
@@ -979,13 +982,16 @@ Press delete to remove selected handle.</string>
                         <property name="name">
                             <cstring>groupBox5</cstring>
                         </property>
+                        <property name="enabled">
+                            <bool>false</bool>
+                        </property>
                         <property name="font">
                             <font>
                                 <bold>1</bold>
                             </font>
                         </property>
                         <property name="title">
-                            <string>Level of detail</string>
+                            <string>Shading</string>
                         </property>
                         <vbox>
                             <property name="name">
@@ -1196,6 +1202,283 @@ Press delete to remove selected handle.</string>
                                             </spacer>
                                         </hbox>
                                     </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout15</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QLabel">
+                                                <property name="name">
+                                                    <cstring>textLabel1</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Ambient Coefficent</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLineEdit">
+                                                <property name="name">
+                                                    <cstring>m_AmbientEdit</cstring>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>50</width>
+                                                        <height>0</height>
+                                                    </size>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                            </widget>
+                                            <spacer>
+                                                <property name="name">
+                                                    <cstring>spacer18_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>86</width>
+                                                        <height>21</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </hbox>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout16</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QLabel">
+                                                <property name="name">
+                                                    <cstring>textLabel1_2</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Diffuse Coefficent</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLineEdit">
+                                                <property name="name">
+                                                    <cstring>m_DiffuseEdit</cstring>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>50</width>
+                                                        <height>0</height>
+                                                    </size>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                            </widget>
+                                            <spacer>
+                                                <property name="name">
+                                                    <cstring>spacer18_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>89</width>
+                                                        <height>21</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </hbox>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout17</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QLabel">
+                                                <property name="name">
+                                                    <cstring>textLabel1_2_2</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Specular Coefficent</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLineEdit">
+                                                <property name="name">
+                                                    <cstring>m_SpecularEdit</cstring>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>50</width>
+                                                        <height>0</height>
+                                                    </size>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                            </widget>
+                                            <spacer>
+                                                <property name="name">
+                                                    <cstring>spacer18_2_3</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>83</width>
+                                                        <height>21</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </hbox>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout18</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QLabel">
+                                                <property name="name">
+                                                    <cstring>textLabel1_2_2_2</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Specular Power</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLineEdit">
+                                                <property name="name">
+                                                    <cstring>m_SpecPowerEdit</cstring>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>50</width>
+                                                        <height>0</height>
+                                                    </size>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                            </widget>
+                                            <spacer>
+                                                <property name="name">
+                                                    <cstring>spacer18_2_4</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>96</width>
+                                                        <height>21</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </hbox>
+                                    </widget>
+                                    <widget class="QLayoutWidget">
+                                        <property name="name">
+                                            <cstring>layout27</cstring>
+                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>m_SetValuesButton</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Set values</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>m_DefaultValuesButton</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>0</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Default</string>
+                                                </property>
+                                            </widget>
+                                            <spacer>
+                                                <property name="name">
+                                                    <cstring>spacer18_2_4_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>155</width>
+                                                        <height>21</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </hbox>
+                                    </widget>
                                 </vbox>
                             </widget>
                         </vbox>
@@ -1213,7 +1496,7 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>259</height>
+                                <height>60</height>
                             </size>
                         </property>
                     </spacer>
@@ -1298,231 +1581,45 @@ Press delete to remove selected handle.</string>
 </images>
 <connections>
     <connection>
-        <sender>m_EnableRenderingCB</sender>
+        <sender>m_EnableShading1</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableRenderingCB_toggled(bool)</slot>
+        <slot>EnableShadingMed(bool)</slot>
     </connection>
     <connection>
-        <sender>comboBox1</sender>
-        <signal>activated(const QString&amp;)</signal>
+        <sender>m_ClippingPlaneCB</sender>
+        <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ComboBox(const QString&amp;)</slot>
+        <slot>EnableClippingPlane(bool)</slot>
     </connection>
     <connection>
-        <sender>pushButton1</sender>
-        <signal>clicked()</signal>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>m_ImmediateUpdate</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_ImmediateUpdate</sender>
+        <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SendChoice()</slot>
+        <slot>ImmediateUpdate(bool)</slot>
     </connection>
     <connection>
-        <sender>resetButton</sender>
-        <signal>clicked()</signal>
+        <sender>m_EnableShading2</sender>
+        <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>resetTF()</slot>
+        <slot>EnableShadingHigh(bool)</slot>
     </connection>
     <connection>
-        <sender>m_EnableRenderingCB</sender>
+        <sender>m_EnableShading0</sender>
         <signal>toggled(bool)</signal>
-        <receiver>comboBox1</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>pushButton1</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>resetButton</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>textLabelTF</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>textLabelCS</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>comboBoxCS</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>comboBoxCS</sender>
-        <signal>activated(const QString&amp;)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ColorStyle(const QString&amp;)</slot>
+        <slot>EnableShadingLow(bool)</slot>
     </connection>
     <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
-        <receiver>pushButtonCS</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>pushButtonCS</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SendCS()</slot>
-    </connection>
-    <connection>
-        <sender>comboBoxCS_2</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ColorStyle(const QString&amp;)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>pushButtonCS_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>pushButtonCS_2</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SendCS()</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>comboBoxCS_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf1_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf2_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf3_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf4_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf5_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf6_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf7_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf8_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf9_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf10_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>tf1_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset1()</slot>
-    </connection>
-    <connection>
-        <sender>tf2_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset2()</slot>
-    </connection>
-    <connection>
-        <sender>tf3_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset3()</slot>
-    </connection>
-    <connection>
-        <sender>tf4_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset4()</slot>
-    </connection>
-    <connection>
-        <sender>tf5_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset5()</slot>
-    </connection>
-    <connection>
-        <sender>tf6_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset6()</slot>
-    </connection>
-    <connection>
-        <sender>tf7_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset7()</slot>
-    </connection>
-    <connection>
-        <sender>tf8_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset8()</slot>
-    </connection>
-    <connection>
-        <sender>tf9_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset9()</slot>
-    </connection>
-    <connection>
-        <sender>tf10_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset10()</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>textLabelCS_2</receiver>
+        <receiver>resetButton_2</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
     <connection>
@@ -1534,20 +1631,254 @@ Press delete to remove selected handle.</string>
     <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
-        <receiver>resetButton_2</receiver>
+        <receiver>textLabelCS_2</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
     <connection>
-        <sender>m_EnableShading0</sender>
-        <signal>toggled(bool)</signal>
+        <sender>tf10_button</sender>
+        <signal>clicked()</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableShadingLow(bool)</slot>
+        <slot>SetPreset10()</slot>
     </connection>
     <connection>
-        <sender>m_EnableShading2</sender>
+        <sender>tf9_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset9()</slot>
+    </connection>
+    <connection>
+        <sender>tf8_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset8()</slot>
+    </connection>
+    <connection>
+        <sender>tf7_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset7()</slot>
+    </connection>
+    <connection>
+        <sender>tf6_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset6()</slot>
+    </connection>
+    <connection>
+        <sender>tf5_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset5()</slot>
+    </connection>
+    <connection>
+        <sender>tf4_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset4()</slot>
+    </connection>
+    <connection>
+        <sender>tf3_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset3()</slot>
+    </connection>
+    <connection>
+        <sender>tf2_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset2()</slot>
+    </connection>
+    <connection>
+        <sender>tf1_button</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetPreset1()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf10_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf9_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf8_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf7_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf6_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf5_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf4_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf3_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf2_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf1_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>comboBoxCS_2</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>pushButtonCS_2</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SendCS()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>pushButtonCS_2</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>comboBoxCS_2</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>ColorStyle(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>pushButtonCS</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SendCS()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>pushButtonCS</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>comboBoxCS</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>ColorStyle(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>comboBoxCS</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>textLabelCS</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>textLabelTF</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>resetButton</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>pushButton1</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>comboBox1</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>resetButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>resetTF()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton1</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SendChoice()</slot>
+    </connection>
+    <connection>
+        <sender>comboBox1</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>ComboBox(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableShadingHigh(bool)</slot>
+        <slot>EnableRenderingCB_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_SetValuesButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetShadingValues()</slot>
+    </connection>
+    <connection>
+        <sender>m_DefaultValuesButton</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SetDefaultShadingValues()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>groupBox5</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>groupBox3</receiver>
+        <slot>setEnabled(bool)</slot>
     </connection>
     <connection>
         <sender>m_EnableRenderingCB</sender>
@@ -1558,32 +1889,14 @@ Press delete to remove selected handle.</string>
     <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
+        <receiver>m_EnableShading1</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
         <receiver>m_EnableShading2</receiver>
         <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_ImmediateUpdate</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ImmediateUpdate(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>m_ImmediateUpdate</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>m_ClippingPlaneCB</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_ClippingPlaneCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableClippingPlane(bool)</slot>
     </connection>
     <connection>
         <sender>m_EnableRenderingCB</sender>
@@ -1594,14 +1907,8 @@ Press delete to remove selected handle.</string>
     <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
-        <receiver>m_EnableShading1</receiver>
+        <receiver>m_ClippingPlaneCB</receiver>
         <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableShading1</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableShadingMed(bool)</slot>
     </connection>
 </connections>
 <includes>
@@ -1615,6 +1922,7 @@ Press delete to remove selected handle.</string>
     <signal>EnableShadingToggled(bool, int)</signal>
     <signal>ImmUpdate(bool)</signal>
     <signal>EnableCPToggled(bool)</signal>
+    <signal>ShadingValues(float, float, float, float)</signal>
 </signals>
 <slots>
     <slot>EnableRenderingCB_toggled( bool state )</slot>
@@ -1638,6 +1946,8 @@ Press delete to remove selected handle.</string>
     <slot>EnableShadingMed( bool state )</slot>
     <slot>EnableShadingHigh( bool state )</slot>
     <slot>EnableClippingPlane( bool state )</slot>
+    <slot>SetShadingValues()</slot>
+    <slot>SetDefaultShadingValues()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

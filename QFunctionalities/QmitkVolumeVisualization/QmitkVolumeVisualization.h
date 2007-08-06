@@ -85,7 +85,7 @@ class QmitkVolumeVisualization : public QmitkFunctionality
     void SetShading(bool state, int lod);
     void ImmediateUpdate(bool state);
     void EnableClippingPlane(bool state);
-
+    void SetShadingValues(float ambient, float diffuse, float specular, float specpower);
   protected:  
     /*!  
      * default main widget containing 4 windows showing 3   

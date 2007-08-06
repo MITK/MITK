@@ -87,12 +87,12 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_VolumeLOD = vtkLODProp3D::New();
 
-  m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0);
+  m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0); // RayCast
 
   m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumePropertyLow,0.0); // TextureMapper2D
 
   
-  m_MedResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyMed,0.0); // TextureMapper2D_high
+  m_MedResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyMed,0.0); // RayCast
 
 
   m_Resampler = vtkImageResample::New();
@@ -392,6 +392,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShading(true,1);
     mitk::RenderingManager::GetInstance()->SetShading(true,2);
     
+    mitk::RenderingManager::GetInstance()->SetShadingValues(m_VolumePropertyHigh->GetAmbient(),m_VolumePropertyHigh->GetDiffuse(),m_VolumePropertyHigh->GetSpecular(),m_VolumePropertyHigh->GetSpecularPower());
+
     mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
   } 
   else 
@@ -436,6 +438,11 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   if(mitk::RenderingManager::GetInstance()->GetShading(2))
   {
     m_VolumePropertyHigh->ShadeOn();
+    //Shading Properties
+    m_VolumePropertyHigh->SetAmbient(mitk::RenderingManager::GetInstance()->GetShadingValues()[0]);
+    m_VolumePropertyHigh->SetDiffuse(mitk::RenderingManager::GetInstance()->GetShadingValues()[1]);
+    m_VolumePropertyHigh->SetSpecular(mitk::RenderingManager::GetInstance()->GetShadingValues()[2]);
+    m_VolumePropertyHigh->SetSpecularPower(mitk::RenderingManager::GetInstance()->GetShadingValues()[3]);
   }
   else
   {

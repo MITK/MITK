@@ -84,7 +84,6 @@ protected:
   vtkVolumeProperty* m_VolumePropertyMed;
   vtkVolumeProperty* m_VolumePropertyHigh;
   vtkVolumeTextureMapper2D* m_T2DMapper;
-  vtkVolumeTextureMapper2D* m_T2DMapperHi;
   vtkVolumeRayCastMapper* m_HiResMapper;
   vtkImageResample* m_Resampler; 
   vtkLODProp3D* m_VolumeLOD;

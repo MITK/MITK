@@ -89,37 +89,59 @@ As soon as you have selected a container and a File name, the "Finish" button wi
 
 \image html NewStatemachine3.PNG "\b Fig.11: New Statemachine 3"
 
-As a last step you have to enter the location and name for the xml file to be generated (<B>Fig.11: New Statemachine 3</B>).
+As a last step you have to enter the location and name for the xml file to be generated (<B>Fig.11: New Statemachine 3</B>). If you want to have predefined
+events and actions, make sure the "mitkEventAndActionConstants.xml" file is in the same folder.
 
-Read on in Section Work with the Editor.
+
+Read on in Section \ref StatemachineEditorManual3.
 
 
 \subsection StatemachineEditorManual2 Statemachines from *.xml
 
-... comming soon ...
+When you press the button "Statemachines from *.xml" the following window will pop up:
+
+\image html openstatemachinexml.png "\b Fig.12: Open Statemachine from *.xml"
+
+Here you have to select the xml file, which contains the statemachines (<B>Fig.12: Open Statemachine from *.xml</B>). If you want to have predefined events
+and actions, make sure the "mitkEventAndActionConstants.xml" file is in the same folder.
+
+\image html specifycontainer.png "\b Fig.13: Select container"
+
+Here, you have to "Browse..." for your Java-Project as your file container (<B>Fig.13: Select container</B>).
+
+\image html specifycontainer2.png "\b Fig.14: Select container 1"
+
+Select your Project and click "OK" (<B>Fig.14: Select container 1</B>).
+
+\image html specifycontainer3.png "\b Fig.15: Select container 2"
+
+As soon as you have selected a container, the "Finish" button will become enabled (<B>Fig.15: Select container 2</B>).
+
+
+Read on in Section \ref StatemachineEditorManual3.
 
 
 \subsection StatemachineEditorManual3 Work with the Editor
 
 Now your workspace looks something like this:
 
-\image html application.PNG "\b Fig.12: Workspace"
+\image html application.PNG "\b Fig.16: Workspace"
 
-You can open a statemachine from the "Statemachines List" view (<B>Fig.12: Workspace</B>) by performing a double click on the statemachine.
+You can open a statemachine from the "Statemachines List" view (<B>Fig.16: Workspace</B>) by performing a double click on the statemachine.
 An editor opens and on its palette you can find different tools, such as create state or create transition.
 
-\image html openPropertiesView.PNG "\b Fig.13: Open the properties view"
+\image html openPropertiesView.PNG "\b Fig.17: Open the properties view"
 
-\image html application1.PNG "\b Fig.14: Change statename in the properties view"
+\image html application1.PNG "\b Fig.18: Change statename in the properties view"
 
-To edit the statename or state ID you have to open the "Properties" view (<B>Fig.14: Change statename in the properties view</B>). You will get it by
-"Window"->"Show View" -> "Other..." -> "General" -> "Properties" (<B>Fig.13: Open the properties view</B>).
+To edit the statename or state ID you have to open the "Properties" view (<B>Fig.18: Change statename in the properties view</B>). You will get it by
+"Window"->"Show View" -> "Other..." -> "General" -> "Properties" (<B>Fig.17: Open the properties view</B>).
 
-\image html changeEvent.PNG "\b Fig.15: Change Event"
+\image html changeEvent.PNG "\b Fig.19: Change Event"
 
-\image html addAction.PNG "\b Fig.16: Add Action"
+\image html addAction.PNG "\b Fig.20: Add Action"
 
-To change a transitions event or action you have to select the transition and open its context menu (<B>Fig.15: Change Event</B>, <B>Fig.16: Add Action</B>).
+To change a transitions event or action you have to select the transition and open its context menu (<B>Fig.19: Change Event</B>, <B>Fig.20: Add Action</B>).
 You can connect a transition to another state by drag one end of it and drop it to another state. All these changes are connected with an undo/redo 
 controller.
 

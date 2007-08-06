@@ -17,6 +17,10 @@
 void QmitkVolumeVisualizationControls::EnableRenderingCB_toggled( bool state)
 {
   emit EnableRenderingToggled(state);
+  if(state)
+  {
+    this->SetDefaultShadingValues();
+  }
 }
 
 void QmitkVolumeVisualizationControls::SendChoice()

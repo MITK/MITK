@@ -66,8 +66,13 @@ void mitk::VtkLayerController::InsertForegroundRenderer(vtkRenderer* renderer, b
  */
 vtkRenderer* mitk::VtkLayerController::GetSceneRenderer()
 {
-   RendererVectorType::iterator it = m_SceneRenderers.begin();
-   return (*it);
+  if(m_SceneRenderers.size() > 0)
+  {
+    RendererVectorType::iterator it = m_SceneRenderers.begin();
+    return (*it);
+  }
+  else
+    return NULL;
 }
 /**
  * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered between background renderers and

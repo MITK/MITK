@@ -426,7 +426,13 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
       else
         m_SimpleTextRenderer->Disable();
       
-      //start vtk render process with the updated scenegraph
+      
+      // avoid rendering of scene layer
+      if(m_MapperID != 2)
+        m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_RenderWindow->GetVtkLayerController()->GetSceneRenderer());
+     
+      
+        //start vtk render process with the updated scenegraph
       m_RenderWindow->GetVtkRenderWindow()->MitkRender();
     }
 

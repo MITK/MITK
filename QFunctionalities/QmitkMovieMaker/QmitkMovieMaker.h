@@ -159,6 +159,8 @@ public:
   virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
+  
+  virtual void Deactivated();
 
   /** \brief Called when another window receives the focus. */
   void FocusChange();
@@ -244,5 +246,8 @@ private:
 
   mitk::MovieGenerator::Pointer m_movieGenerator;
 
+  unsigned long m_FocusManagerObserverTag;
+
 };
 #endif // !defined(QMITK_MOVIEMAKER_H__INCLUDED)
+

@@ -45,7 +45,7 @@ QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
 
 : QmitkFunctionality(parent, name, it),
   m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget), m_StepperAdapter(NULL), 
-  m_Looping(true), m_Direction(0), m_Aspect(0)
+  m_Looping(true), m_Direction(0), m_Aspect(0), m_FocusManagerCallback(0)
 {
   this->SetAvailability(true);
   m_Timer = new QTimer(this);
@@ -53,9 +53,6 @@ QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
 
   m_FocusManagerCallback = MemberCommand::New();
   m_FocusManagerCallback->SetCallbackFunction( this, &QmitkMovieMaker::FocusChange );
-  mitk::GlobalInteraction::GetInstance()->GetFocusManager()->AddObserver(
-    mitk::FocusEvent(), m_FocusManagerCallback
-  );
 
   m_movieGenerator = mitk::MovieGenerator::New();
 
@@ -209,8 +206,17 @@ void QmitkMovieMaker::Activated()
 {
   QmitkFunctionality::Activated();
   
+  m_FocusManagerObserverTag = mitk::GlobalInteraction::GetInstance()->GetFocusManager()->AddObserver( mitk::FocusEvent(), m_FocusManagerCallback);
+
   // Initialize steppers etc.
   this->FocusChange();
+}
+
+void QmitkMovieMaker::Deactivated()
+{
+  QmitkFunctionality::Deactivated();
+
+  mitk::GlobalInteraction::GetInstance()->GetFocusManager()->RemoveObserver( m_FocusManagerObserverTag ); // remove (if tag is invalid, nothing is removed)
 }
 
 void QmitkMovieMaker::FocusChange()

@@ -24,9 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifdef WIN32
 #ifndef __GNUC__
-#if ! (_MSC_VER >= 1400)
+//#if ! (_MSC_VER >= 1400)
 #include "mitkMovieGeneratorWin32.h"
-#endif
+//#endif
 #endif
 #endif
 #ifndef GL_BGR
@@ -42,10 +42,10 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 
 #ifdef WIN32
 #ifndef __GNUC__
-#if ! (_MSC_VER >= 1400)
+//#if ! (_MSC_VER >= 1400)
     mitk::MovieGenerator::Pointer wp = static_cast<mitk::MovieGenerator*>(mitk::MovieGeneratorWin32::New());
     return wp;
-#endif
+//#endif
 #endif
 #endif
   }

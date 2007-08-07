@@ -125,11 +125,23 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 
   // Step 4: Get codec and infos about codec
   memset(&opts, 0, sizeof(opts));
+  
+  // predefine MS-CRAM as standard codec
+  opts.fccType = streamtypeVIDEO;
+  opts.fccHandler = mmioFOURCC('M','S','V','C'); 
+  
+  
   // Poping codec dialog
+  // GUI Codec selection does not work in a vs 2005 compiled mitk, since we do not pass a hwnd as first parameter
+  // of AVISaveOptions
+  #if ! (_MSC_VER >= 1400)
+
   if (!AVISaveOptions(NULL, 0, 1, &m_pStream, (LPAVICOMPRESSOPTIONS FAR *) &aopts))  {
     AVISaveOptionsFree(1,(LPAVICOMPRESSOPTIONS FAR *) &aopts);
     return false;
   }
+
+  #endif
 
   // Step 5:  Create a compressed stream using codec options.
   hr = AVIMakeCompressedStream(&m_pStreamCompressed, 

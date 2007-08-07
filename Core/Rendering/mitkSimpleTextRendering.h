@@ -36,24 +36,53 @@ namespace mitk {
 
 class RenderWindow;  
 /**
- * Renders a company text in the foreground
- * of a vtkRenderWindow.
- 
+ * This is a simple approach for rendering text with the help
+ * of the vtkTextActor class.
+ * It replaces the old GLUT text rendering interface of mitk.
+ * This class is instanciated as a member of the mitk::OpenGLRenderer
+ * and should be only accounted via the Renderer.
  */
 class SimpleTextRendering : public BaseData
 {
 public:
 
   mitkClassMacro( SimpleTextRendering, BaseData );
-  
   itkNewMacro( Self );
 
+  /**
+  * Adds a text label to a label collection, which will be rendered .
+  * This method is invoked by the mitkOpenGLRenderer.
+  * Any mapper may use the WriteSimpleText() function of the
+  * the OpenGLRenderer.
+  *
+  * As return value, a text label id is returned, which may
+  * be used for further setting of text appereance.
+  */
   int  AddTextLabel(int posX, int posY, std::string text);
+  
+  /**
+  * Removes a text label from the label collection.
+  */
   void RemoveTextLabel(int text_id);
+  
+  /**
+  * Returns the vtkTextProperty of a specific text label
+  * in the label collection.
+  * This method is used by mitk::OpenGLRenderer::GetTextLabelProperty().
+  * 
+  * It facilitates a simple way for setting up text properties like 
+  * font, size, color etc.
+  */
   vtkTextProperty* GetVtkTextProperty(int text_id);
 
+  /**
+  * Clears the list of text labels.
+  */
   void ClearTextLabelCollection();
 
+  /**
+  * Returns the number of text labels, which are added to the label collection.
+  */
   int GetNumberOfTextLabels();
   
   /**

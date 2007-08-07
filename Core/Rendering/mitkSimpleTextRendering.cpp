@@ -76,7 +76,7 @@ vtkTextProperty* mitk::SimpleTextRendering::GetVtkTextProperty(int text_id)
 }
 
 /**
- * Disables drawing of the text.
+ * Disables drawing of the text label collection.
  * If you want to enable it, call the Enable() function.
  */
 void mitk::SimpleTextRendering::Disable()
@@ -92,6 +92,10 @@ void mitk::SimpleTextRendering::Disable()
   }
 }
 
+/**
+ * Enables drawing of the text label collection.
+ * If you want to disable it, call the Disable() function.
+ */
 void mitk::SimpleTextRendering::Enable()
 {
   if(this->IsEnabled())

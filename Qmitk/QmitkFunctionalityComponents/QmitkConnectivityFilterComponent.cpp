@@ -15,23 +15,26 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
 #include "QmitkConnectivityFilterComponent.h"
 #include "QmitkConnectivityFilterComponentGUI.h"
 
-#include <QmitkDataTreeComboBox.h>
-
-
-#include "mitkSurface.h"
-#include "mitkRenderWindow.h"
-#include "mitkRenderingManager.h"
-#include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"
-#include <QmitkPointListWidget.h>
+#include "mitkProperties.h"
+#include "mitkRenderingManager.h"
+#include "mitkRenderWindow.h"
+#include "mitkSurface.h"
+
+#include <mitkDataTreeNodeFactory.h>
 #include "mitkProperties.h"
 
-#include <vtkPolyData.h>
+#include <QmitkDataTreeComboBox.h>
+#include "QmitkSeedPointSetComponent.h"
+#include <QmitkPointListWidget.h>
+
 #include <vtkPointData.h>
-#include <mitkDataTreeNodeFactory.h>
+#include <vtkPolyData.h>
+
 
 //#include "QmitkSeedPointSetComponent.h"
 
@@ -66,7 +69,7 @@ QmitkConnectivityFilterComponent::QmitkConnectivityFilterComponent(QObject * par
 m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),
 m_DataIt(it),
-//m_PointSet(NULL),
+m_PointSet(NULL),
 m_ConnectivityCounter(0)
 {
   SetDataTreeIterator(it);
@@ -191,7 +194,7 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 	}
 
   //CreatePointSet();
-//  m_PointSet->Deactivated();
+  //m_PointSet->Deactivated();
   return m_ConnectivityFilterComponentGUI;
 }
 
@@ -205,7 +208,6 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 //  m_PointSet->CreateConnections();
 //  m_PointSet->SetDataTreeName("SeedPointsForConnectivity");
 //  m_ConnectivityFilterComponentGUI->repaint();
-//  
 //}
 
 /*************** GET CONTENT CONTAINER  ***************/
@@ -248,6 +250,13 @@ void QmitkConnectivityFilterComponent::SetContentContainerVisibility(bool)
   } 
 }
 
+
+/***************      SET POINTSET      ***************/
+void QmitkConnectivityFilterComponent::SetPointSet(QmitkSeedPointSetComponent* pointSet)
+{
+  m_PointSet = pointSet;
+}
+
 /***************        ACTIVATED       ***************/
 void QmitkConnectivityFilterComponent::Activated()
 {
@@ -280,12 +289,8 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
   //Get the FilterMode
   // 0 show largest Region
   // 1 show all Regions
-  // 2 show specified Region
-  // 3 delete specified Region
-  // 4 Show PointSeededRegions
-  // 5 Delete Seed
-  // 6 ShowCellSeededRegions
-  // 7 ShowClosestPointRegion
+  // 2 showClosestPointRegion
+
 
   int filterMode = m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem();
   
@@ -313,75 +318,58 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
       }
       break; 
 
-    //case 2: /*show specified Region*/
-    //  {
-    //  //  pdConnectivity->SetExtractionModeToAllRegions();
-    //  //  pdConnectivity->Update();
-    //  //  numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
-    //  //  int specifiedRegion = atoi(m_ConnectivityFilterComponentGUI->GetParameterLineEdit()->text());
-    //  //  
-    //  //  for(int i = 0; i <= numberOfExtractedRegions; i++)
-    //  //  {
-    //  //    if(i != specifiedRegion)
-    //  //    {
-    //  //      pdConnectivity->SetColorRegions(i);
-    //  //    }
-    //  //  }
+    case 2: /*Point Marked Surface*/
+      {
+		  if(m_PointSet!=NULL)
+		  {
+			if(m_PointSet->GetPointSetNode().IsNotNull())
+			{
+				//std::cout<<"Punkte sind da:"<<std::endl;
+				mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
+				int numberOfPoints = pointSet->GetSize();
+				if(numberOfPoints > 0)
+				{
+					mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
+					
+					double x1 = pointOne[0];
+					double y1 = pointOne[1];
+					double z1 = pointOne[2];
 
-    //  //  //pdConnectivity->AddSpecifiedRegion(specifiedRegion);
-    //  //  //pdConnectivity->SetExtractionModeToSpecifiedRegions(); 
-    //  //}
-    //  break; 
+					pdConnectivity->SetClosestPoint(x1, y1, z1);
+					pdConnectivity->SetExtractionModeToClosestPointRegion();
+				}
+			}
+		  }
+	  }
+	  break;
 
-    //case 3: /*delete specified Region*/
-    //  //{
-    //  //  int specifiedRegion = atoi(m_ConnectivityFilterComponentGUI->GetParameterLineEdit()->text());
+	  //case 3: /*Delete Point Marked Surface*/
+   //   {
+		 // if(m_PointSet!=NULL)
+		 // {
+			//if(m_PointSet->GetPointSetNode().IsNotNull())
+			//{
+			//	//std::cout<<"Punkte sind da:"<<std::endl;
+			//	mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
+			//	int numberOfPoints = pointSet->GetSize();
+			//	if(numberOfPoints > 0)
+			//	{
+			//		mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
+			//		
+			//		double x1 = pointOne[0];
+			//		double y1 = pointOne[1];
+			//		double z1 = pointOne[2];
 
-    //  //  pdConnectivity->DeleteSpecifiedRegion(specifiedRegion);
-    //  //  pdConnectivity->SetExtractionModeToAllRegions();  
-    //  //}
-    //  break;
+			//		pdConnectivity->SetClosestPoint(x1, y1, z1);
+			//		pdConnectivity->SetExtractionModeToClosestPointRegion();
+			//		int id = pdConnectivity->GetNumberOfExtractedRegions();
+			//		pdConnectivity->DeleteSpecifiedRegion(id);
 
-    //case 4: /*Show PointSeededRegions*/
-    //  //{
-    //  //   int specifiedRegion = atoi(m_ConnectivityFilterComponentGUI->GetParameterLineEdit()->text());
-
-    //  //  pdConnectivity->AddSeed(specifiedRegion);
-    //  //   pdConnectivity->SetExtractionModeToPointSeededRegions();
-    //  //}
-    //  break;
-
-    //case 5: /*Delete Seed*/
-    //  {
-    //    vtkIdType specifiedSeed = atoi(m_ConnectivityFilterComponentGUI->GetParameterLineEdit()->text());
-    //    pdConnectivity->DeleteSeed(specifiedSeed);
-    //    pdConnectivity->SetExtractionModeToAllRegions();  
-    //  }
-    //  break;
-
-    //case 6: /*ShowCellSeededRegions*/
-    //  {
-    //    pdConnectivity->SetExtractionModeToCellSeededRegions();
-    //  }
-    //  break;
-
-    //case 7: /*ShowClosestPointRegion*/
-    //  {
-    //    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
-    //    int numberOfPoints = pointSet->GetSize();
-
-    //    if(numberOfPoints > 0)
-    //    {
-    //    mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
-    //      float x1 = pointOne[0];
-    //      float y1 = pointOne[1];
-    //      float z1 = pointOne[2];
-    //     
-    //     pdConnectivity->SetClosestPoint(x1, y1, z1);
-    //     pdConnectivity->SetExtractionModeToClosestPointRegion();
-    //    }
-    //  }
-    //  break;
+			//	}
+			//}
+		 // }
+	  //}
+	  //break;
 
     default: ; break; 
     }
@@ -439,7 +427,14 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         connectivityNode->SetProperty("name", new mitk::StringProperty(connectivityNodeName) );
         connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
         connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
-        connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
+		if(filterMode ==1)
+		{
+            connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( true ));
+		}
+		else
+		{
+			connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
+		}
 		connectivityNode->SetProperty( "deprecated usePointDataForColouring", new mitk::BoolProperty(false) );
 
         mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;

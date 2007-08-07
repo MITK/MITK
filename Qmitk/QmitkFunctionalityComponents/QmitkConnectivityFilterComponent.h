@@ -94,6 +94,8 @@ virtual QGroupBox* GetImageContent();
   /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
+  void SetPointSet(QmitkSeedPointSetComponent* pointSet);
+
   /***************      (DE)ACTIVATED     ***************/
 
   ///** \brief Method to set m_Activated to true */
@@ -169,7 +171,8 @@ private:
 
   mitk::DataTreeIteratorBase* m_DataIt;
 
- // QmitkSeedPointSetComponent* m_PointSet;
+  QmitkSeedPointSetComponent* m_PointSet;
+  
   int m_ConnectivityCounter;
 
 

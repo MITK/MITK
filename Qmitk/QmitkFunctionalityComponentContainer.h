@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_FUNCTIONALITYCOMPONENTCONTAINER_H
 
 #include "QmitkBaseFunctionalityComponent.h"
-
+ 
 #include "mitkDataTree.h"
 #include <qaction.h>
 #include <qwidget.h>

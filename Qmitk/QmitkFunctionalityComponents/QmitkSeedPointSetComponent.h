@@ -96,6 +96,8 @@ virtual QGroupBox* GetImageContent();
   /** \brief Method to that the name of the PointSetNode in the dataTree */
   void SetDataTreeName(std::string pointSetNodeName);
 
+  QmitkSeedPointSetComponentGUI* GetSeedPointSetComponentGUI();
+
   /***************      (DE)ACTIVATED     ***************/
 
   ///** \brief Method to set m_Activated to true */
@@ -109,6 +111,9 @@ public slots:
 
   void ShowTreeNodeSelector();
   void ShowComponentContent();
+
+  ///** \brief Slot method to export the PointSet */
+  //void PointsExported();
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);

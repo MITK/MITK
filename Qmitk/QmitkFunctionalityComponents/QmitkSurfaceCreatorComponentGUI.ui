@@ -44,7 +44,7 @@
                 <number>1</number>
             </property>
             <property name="title">
-                <string>3. Create Surface</string>
+                <string>3. Create Surface </string>
             </property>
             <property name="flat">
                 <bool>false</bool>

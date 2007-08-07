@@ -79,6 +79,12 @@ QmitkDataTreeComboBox* QmitkSeedPointSetComponent::GetTreeNodeSelector()
   return  m_PointSetNode;
  }
 
+  /************GET SEED POINT SET COMPONENT GUI**********/
+ QmitkSeedPointSetComponentGUI* QmitkSeedPointSetComponent::GetSeedPointSetComponentGUI()
+ {
+   return m_PointSetComponentGUI;
+ }
+
  /************ Update DATATREECOMBOBOX(ES) *************/
 void QmitkSeedPointSetComponent::UpdateDataTreeComboBoxes()
 {
@@ -102,6 +108,7 @@ void QmitkSeedPointSetComponent::CreateConnections()
 
   }
 }
+
 
 /*************** SHOW COMPONENT CONTENT ***************/
 void QmitkSeedPointSetComponent::ShowComponentContent()

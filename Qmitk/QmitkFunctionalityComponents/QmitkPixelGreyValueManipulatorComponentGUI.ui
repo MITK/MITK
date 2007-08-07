@@ -18,6 +18,11 @@
             <height>0</height>
         </size>
     </property>
+    <property name="font">
+        <font>
+            <bold>1</bold>
+        </font>
+    </property>
     <property name="caption">
         <string>ThresholdComponent</string>
     </property>
@@ -37,7 +42,6 @@
             </property>
             <property name="font">
                 <font>
-                    <bold>1</bold>
                 </font>
             </property>
             <property name="frameShape">
@@ -75,6 +79,11 @@
                     <property name="name">
                         <cstring>m_PixelManipulatorContentGroupBox</cstring>
                     </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
                     <property name="frameShape">
                         <enum>NoFrame</enum>
                     </property>
@@ -103,6 +112,10 @@
                         <widget class="QGroupBox">
                             <property name="name">
                                 <cstring>m_PixelManipulatorDataGroupBox</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                </font>
                             </property>
                             <property name="frameShape">
                                 <enum>NoFrame</enum>
@@ -239,7 +252,11 @@
                                             <property name="name">
                                                 <cstring>m_ManipulationModeComboBox</cstring>
                                             </property>
-                                            </widget>
+                                            <property name="font">
+                                                <font>
+                                                </font>
+                                            </property>
+                                        </widget>
                                         <widget class="QComboBox">
                                             <item>
                                                 <property name="text">
@@ -264,14 +281,17 @@
                                             <property name="name">
                                                 <cstring>m_ManipulationAreaComboBox</cstring>
                                             </property>
-                                           </widget>
+                                            <property name="font">
+                                                <font>
+                                                </font>
+                                            </property>
+                                        </widget>
                                     </hbox>
                                 </widget>
                                 <widget class="QGroupBox">
                                     <property name="name">
                                         <cstring>m_ShowBaseThresholdGroupBox</cstring>
                                     </property>
-                                
                                     <property name="frameShape">
                                         <enum>NoFrame</enum>
                                     </property>
@@ -396,7 +416,6 @@
                                                         <property name="name">
                                                             <cstring>textLabel6</cstring>
                                                         </property>
-                                               
                                                         <property name="text">
                                                             <string>Manipulation Mode</string>
                                                         </property>
@@ -427,7 +446,6 @@
                                                                 <height>16</height>
                                                             </size>
                                                         </property>
-                                                  
                                                         <property name="text">
                                                             <string>Linear</string>
                                                         </property>
@@ -470,7 +488,6 @@
                                                                 <property name="name">
                                                                     <cstring>textLabel1</cstring>
                                                                 </property>
-                                                             
                                                                 <property name="text">
                                                                     <string>Value 1</string>
                                                                 </property>
@@ -496,7 +513,6 @@
                                                                         <height>0</height>
                                                                     </size>
                                                                 </property>
-                                                         
                                                                 <property name="frameShape">
                                                                     <enum>LineEditPanel</enum>
                                                                 </property>
@@ -528,7 +544,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -573,7 +588,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="text">
@@ -600,7 +614,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="frameShape">
@@ -652,7 +665,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="text">
@@ -679,7 +691,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="text">
@@ -713,7 +724,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -764,7 +774,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="text">
@@ -791,7 +800,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="frameShape">
@@ -845,7 +853,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -896,7 +903,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="text">
@@ -923,7 +929,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="frameShape">
@@ -970,7 +975,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -1000,7 +1004,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -1036,7 +1039,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -1053,7 +1055,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                             </font>
                                                         </property>
                                                         <property name="frameShadow">
@@ -1147,7 +1148,6 @@
                                                         </property>
                                                         <property name="font">
                                                             <font>
-                                                                <bold>0</bold>
                                                                 <italic>1</italic>
                                                             </font>
                                                         </property>
@@ -1218,7 +1218,6 @@
                                                                 </property>
                                                                 <property name="font">
                                                                     <font>
-                                                                        <bold>0</bold>
                                                                     </font>
                                                                 </property>
                                                                 <property name="insertionPolicy">
@@ -1236,7 +1235,6 @@
                                             </property>
                                             <property name="font">
                                                 <font>
-                                                    <bold>0</bold>
                                                 </font>
                                             </property>
                                             <property name="text">
@@ -1251,7 +1249,6 @@
                                     </property>
                                     <property name="font">
                                         <font>
-                                            <bold>0</bold>
                                         </font>
                                     </property>
                                     <property name="text">

@@ -58,3 +58,9 @@ QGroupBox* QmitkSeedPointSetComponentGUI::GetShowComponent()
 {
 return m_PointSet;
 }
+
+
+QPushButton* QmitkSeedPointSetComponentGUI::GetPoints()
+{
+ return m_ExportPointsButton;
+}

@@ -41,7 +41,7 @@
                 </font>
             </property>
             <property name="title">
-                <string>4. Edit Surface</string>
+                <string>4. Edit Surface </string>
             </property>
             <property name="flat">
                 <bool>false</bool>
@@ -158,6 +158,11 @@
                                     <string>Color all Surfaces</string>
                                 </property>
                             </item>
+                            <item>
+                                <property name="text">
+                                    <string>Point Marked Surface</string>
+                                </property>
+                            </item>
                             <property name="name">
                                 <cstring>m_ParameterModeComboBox</cstring>
                             </property>
@@ -255,4 +260,7 @@
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

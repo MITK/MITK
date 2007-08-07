@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>223</width>
-            <height>77</height>
+            <width>327</width>
+            <height>220</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -35,7 +35,6 @@
             <property name="name">
                 <cstring>m_PointSet</cstring>
             </property>
-    
             <property name="title">
                 <string>PointSet</string>
             </property>
@@ -62,7 +61,6 @@
                     <property name="name">
                         <cstring>m_ComponentContent</cstring>
                     </property>
-     
                     <property name="frameShape">
                         <enum>NoFrame</enum>
                     </property>
@@ -128,6 +126,14 @@
                                             </property>
                                         </widget>
                                     </vbox>
+                                </widget>
+                                <widget class="QPushButton">
+                                    <property name="name">
+                                        <cstring>m_ExportPointsButton</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Export Points</string>
+                                    </property>
                                 </widget>
                             </vbox>
                         </widget>
@@ -198,6 +204,11 @@
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetComponentContent()</function>
     <function returnType="QGroupBox *">GetShowComponent()</function>
+    <function returnType="QPushButton *">GetPoints()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+    <includehint>QmitkPointListWidget.h</includehint>
+</includehints>
 </UI>

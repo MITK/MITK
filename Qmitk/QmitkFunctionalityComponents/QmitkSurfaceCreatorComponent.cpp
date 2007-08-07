@@ -108,7 +108,7 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSurfaceCreatorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowCreateSurface(bool)));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool)));
 
-    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetCreateSurfaceButton()), SIGNAL(pressed()), (QObject*) this, SLOT(CreateSurface()));
+    connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetCreateSurfaceButton()), SIGNAL(released()), (QObject*) this, SLOT(CreateSurface()));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetThresholdLineEdit()), SIGNAL(returnPressed()), (QObject*) this, SLOT(CreateSurface()));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetShowExpertModeGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowExpertMode(bool)));
     connect( (QObject*)(m_SurfaceCreatorComponentGUI->GetShowSurfaceParameterGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceParameter(bool)));

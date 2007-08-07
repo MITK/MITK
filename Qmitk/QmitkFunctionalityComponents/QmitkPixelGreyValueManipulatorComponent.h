@@ -99,6 +99,11 @@ virtual QGroupBox* GetImageContent();
     /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
+   /** \brief Return the PointSet */
+  QmitkSeedPointSetComponent* GetPointSet();
+
+
+
 
   /***************      (DE)ACTIVATED     ***************/
 

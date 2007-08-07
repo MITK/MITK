@@ -88,6 +88,11 @@ void QmitkPixelGreyValueManipulatorComponent::SetDataTreeIterator(mitk::DataTree
 	m_DataTreeIterator = it;
 }
 
+ QmitkSeedPointSetComponent* QmitkPixelGreyValueManipulatorComponent::GetPointSet()
+ {
+   return m_PointSet;
+ }
+
 /***************   GET IMAGE CONTENT   ***************/
 QGroupBox*  QmitkPixelGreyValueManipulatorComponent::GetImageContent()
 {

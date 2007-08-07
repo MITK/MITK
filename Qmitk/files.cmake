@@ -28,7 +28,6 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
   QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
   QmitkFunctionalityComponents/QmitkEmptyComponent.cpp
-  QmitkFunctionalityComponents/QmitkSTLConvertComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
@@ -88,7 +87,6 @@ SET(UI_FILES
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
   QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
   QmitkFunctionalityComponents/QmitkEmptyComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkSTLConvertComponentGUI.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui
@@ -130,7 +128,6 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
   QmitkFunctionalityComponents/QmitkImageCropperComponent.h
   QmitkFunctionalityComponents/QmitkEmptyComponent.h
-  QmitkFunctionalityComponents/QmitkSTLConvertComponent.h
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h

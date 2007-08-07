@@ -356,7 +356,7 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
         Update();
       }
       else
-        if(m_MapperID>=2)
+        if(m_MapperID>=2 && m_MapperID < 6)
         { //@todo in 3D mode wird sonst nix geupdated, da z.Z. weder camera noch �derung des Baums beachtet wird!!!
           Update();
         }
@@ -425,12 +425,18 @@ void mitk::OpenGLRenderer::Repaint( bool onlyOverlay )
         m_SimpleTextRenderer->Enable();
       else
         m_SimpleTextRenderer->Disable();
-      
-      
-      // avoid rendering of scene layer
+     
+      //// avoid rendering of scene layer if MapperID is set to 3D
       if(m_MapperID != 2)
         m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_RenderWindow->GetVtkLayerController()->GetSceneRenderer());
-     
+      else
+      {
+        if(!m_RenderWindow->GetVtkLayerController()->IsRendererInserted(m_VtkRenderer))
+        {  
+          m_RenderWindow->GetVtkLayerController()->InsertSceneRenderer(m_VtkRenderer);       
+          this->UpdateIncludingVtkActors();
+        }
+      }
       
         //start vtk render process with the updated scenegraph
       m_RenderWindow->GetVtkRenderWindow()->MitkRender();

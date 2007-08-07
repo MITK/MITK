@@ -83,6 +83,10 @@ void mitk::SimpleTextRendering::Disable()
 {
   if ( this->IsEnabled())
   {
+    #if ( VTK_MAJOR_VERSION >= 5 )
+      m_TextRenderer->SetErase(1);
+    #endif
+    m_RenderWindow->GetVtkRenderWindow()->SetErase(1);
     m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_TextRenderer);
     m_IsEnabled = false;
   }

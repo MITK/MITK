@@ -20,10 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKGLUT_H_HEADER_INCLUDED
 #define MITKGLUT_H_HEADER_INCLUDED
 
+// Since 7.8.07 MITK is not using/requiring GLUT anymore.
+
 #ifdef __APPLE__
-#include <glut.h>
+//#include <glut.h>
 #else
-#include <GL/glut.h>
+//#include <GL/glut.h>
 #endif
 
 #endif /* MITKGLUT_H_HEADER_INCLUDED */

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkProperties.h"
+#include "mitkPicHeaderProperty.h"
 
 #include <itkImageFileReader.h>
 
@@ -724,143 +725,35 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
 
   PropertyList::Pointer resultPropertyList = PropertyList::New();
 
-  #define NUMBER_OF_CHILI_PIC_TAGS 24
-  HeaderTagInfo tagsToImport[NUMBER_OF_CHILI_PIC_TAGS] =
+  ipPicDescriptor* imageToExtractTagsFrom = m_LightBox->fetchHeader(0); // TODO set this to the right descriptor
+  if (!imageToExtractTagsFrom || !imageToExtractTagsFrom->info || !imageToExtractTagsFrom->info->tags_head) return NULL;
+
+  // Extract ALL tags from the PIC header
+  _ipPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
+
+  while (currentTagNode)
   {
-    //this information are important to save the series
-    //we use it to control, if all nodes are loaded from the same study
-    HeaderTagInfo( tagMODALITY,                      0x0008, 0x0060, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_DESCRIPTION,            0x0008, 0x103e, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSTUDY_INSTANCE_UID,            0x0020, 0x000d, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSTUDY_DATE,                    0x0008, 0x0020, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSTUDY_TIME,                    0x0008, 0x0030, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSTUDY_DESCRIPTION,             0x0008, 0x1030, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_NUMBER,                 0x0020, 0x0011, HeaderTagInfo::Int ),
-    //additional information ( define as "ChiliTag" ( ipPic/ipPicTags.h) )
-    HeaderTagInfo( tagPATIENT_NAME,                  0x0010, 0x0010, HeaderTagInfo::String ),
-    HeaderTagInfo( tagPATIENT_ID,                    0x0010, 0x0020, HeaderTagInfo::String ),
-    HeaderTagInfo( tagPATIENT_BIRTHDATE,             0x0010, 0x0030, HeaderTagInfo::String ),
-    HeaderTagInfo( tagPATIENT_BIRTHTIME,             0x0010, 0x0032, HeaderTagInfo::String ),
-    HeaderTagInfo( tagMEDICAL_RECORD_LOCATOR,        0x0010, 0x1090, HeaderTagInfo::String ),
-    HeaderTagInfo( tagREFERING_PHYSICIAN_NAME,       0x0008, 0x0090, HeaderTagInfo::String ),
-    HeaderTagInfo( tagINSTITUTION_NAME,              0x0008, 0x0080, HeaderTagInfo::String ),
-    HeaderTagInfo( tagMANUFACTURER,                  0x0008, 0x0070, HeaderTagInfo::String ),
-    HeaderTagInfo( tagMODEL_NAME,                    0x0008, 0x1090, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_CONTRAST,               0x0018, 0x0010, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_BODY_PART_EXAMINED,     0x0018, 0x0015, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_FRAME_OF_REFERENCE_UID, 0x0020, 0x0052, HeaderTagInfo::String ),
-    HeaderTagInfo( tagSERIES_SCANNING_SEQUENCE,      0x0018, 0x0020, HeaderTagInfo::String ),
-    HeaderTagInfo( tagIMAGE_TYPE,                    0x0008, 0x0008, HeaderTagInfo::String ),
-    HeaderTagInfo( tagPATIENT_SEX,                   0x0010, 0x0040, HeaderTagInfo::UnsignedInt ),
-    HeaderTagInfo( tagSERIES_ECHO_NUMBER,            0x0018, 0x0086, HeaderTagInfo::Int ),
-    HeaderTagInfo( tagSERIES_ACQUISITION,            0x0020, 0x1001, HeaderTagInfo::Int )
-  };
+    ipPicTSV_t* currentTag = currentTagNode->tsv;
 
-    /*
-    if you want additional information self define
-    -define MITK-TAGS ( for example in MITKTags.h )
-    #define tagMITK_INSTITUTION_ADDRESS "MITK INSTITUTION ADDRESS"
-    #define tagMITK_STATION_NAME "MITK STATION NAME"
-    #define tagMITK_PATIENT_POSTION "MITK PATIENT POSITION"
-    ...
+    // process this tag
+    BaseProperty::Pointer newProperty = new PicHeaderProperty( currentTag );
+    std::string propertyName = "CHILI: ";
+    propertyName += currentTag->tag;
+    resultPropertyList->SetProperty( propertyName.c_str(), newProperty );
 
-    -#include <MITKTags.h>
-
-    -change #define NUMBER_OF_CHILI_PIC_TAGS
-
-    -add to list (the Dicom-Address is right):
-    HeaderTagInfo( tagMITK_INSTITUTION_ADDRESS,     0x0008, 0x0081, HeaderTagInfo::String ),
-    HeaderTagInfo( tagMITK_STATION_NAME,     0x0008, 0x0010, HeaderTagInfo::String ),
-    HeaderTagInfo( tagMITK_PATIENT_POSTION,     0x0018, 0x5100, HeaderTagInfo::String ),
-
-    ->that´s all;
-    the reader read first from the Pic-Header, then from the Dicom-Header an add it as "Chili: " + HeaderTagInfo.picTagKey to the propertylist
-    the writer take all "Chili: " + * Tags and wrote them as * Tags to the Pic-Header
-    */
-
-  ipPicTSV_t* picHeader;
-  std::string PropertyName;
-
-  for( int x = 0; x < NUMBER_OF_CHILI_PIC_TAGS; ++x )
-  {
-    //first try to read from the pic-header
-    PropertyName = "Chili: " + tagsToImport[x].picTagKey;
-    picHeader = ipPicQueryTag( m_LightBox->fetchHeader(0), (char*)tagsToImport[x].picTagKey.c_str() );
-    if( picHeader )
-    {
-      BaseProperty::Pointer tagProperty;
-
-      switch( picHeader->type )
-      {
-        case ipPicASCII:
-        {
-          tagProperty = new StringProperty( static_cast<char*>(picHeader->value) );
-          break;
-        }
-        case ipPicInt:
-        {
-          tagProperty = new IntProperty( *static_cast<int*>(picHeader->value) );
-          break;
-        }
-        case ipPicUInt:
-        {
-          tagProperty = new IntProperty( (int)*((char*)(picHeader->value)) );
-          break;
-        }
-        default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
-        {
-          std::cout << "WARNING: Type of PIC-Tag '" << tagsToImport[x].picTagKey << "' not handled in LightBoxImageReader." << std::endl;
-          break;
-        }
-      }
-
-      if (tagProperty.IsNotNull())
-      {
-        resultPropertyList->SetProperty( PropertyName.c_str() , tagProperty );
-      }
-    }
-    else // unable to find/read PIC-Tag from header
-    {
-      //read from Dicom-Header
-      ipPicTSV_t *dicomHeader = ipPicQueryTag( m_LightBox->fetchHeader(0), "SOURCE HEADER" );
-      void* data; // dicomfindelement point it to a dicomaddress, dont delete it or free if you want to work with the dicomheader
-      ipUInt4_t len;
-      if( dicomHeader )
-      {
-        switch ( tagsToImport[x].type )
-        {
-          case HeaderTagInfo::String:
-          {
-            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
-              resultPropertyList->SetProperty ( PropertyName.c_str(), new StringProperty( (char*)data ) );
-            break;
-          }
-          case HeaderTagInfo::UnsignedInt:
-          {
-            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
-              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( (int)*((char*)data) ));
-            break;
-          }
-          case HeaderTagInfo::Int:
-          {
-            if ( dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
-              resultPropertyList->SetProperty ( PropertyName.c_str() , new IntProperty( atoi((char*)data) ));
-            break;
-          }
-          case HeaderTagInfo::MissingInDicom:
-          {
-            break;
-          }
-        }
-      }
-    }
+    // proceed to the next tag
+    currentTagNode = currentTagNode->next;
   }
+
+  // all tags are stored as properties now
+  // TODO do we need any DICOM headers/tags?
+
   BaseProperty::Pointer name = resultPropertyList->GetProperty( "Chili: SERIES DESCRIPTION" );
   if( name )
   {
     resultPropertyList->SetProperty( "name", new mitk::StringProperty( name->GetValueAsString() ) );
   }
-  else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "empty Name!" ) );
+  else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "unnamed" ) );
 
   return resultPropertyList;
 }

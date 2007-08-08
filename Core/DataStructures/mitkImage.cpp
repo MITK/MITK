@@ -65,6 +65,7 @@ mitk::Image::~Image()
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
+  delete [] m_OffsetTable;
 }
 
 //##ModelId=3DCBC2B50345

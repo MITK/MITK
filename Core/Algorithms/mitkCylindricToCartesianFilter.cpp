@@ -314,7 +314,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  unsigned int i, *tmpDimensions=new unsigned int[input->GetDimension()];
+  unsigned int i, *tmpDimensions=new unsigned int[std::max(3u,input->GetDimension())];
 
   tmpDimensions[0]=m_TargetXSize;
   if(tmpDimensions[0]==0)

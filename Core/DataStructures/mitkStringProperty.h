@@ -38,7 +38,7 @@ protected:
 
 public:
     mitkClassMacro(StringProperty, BaseProperty);
-
+    typedef std::string ValueType;
     //##ModelId=3E3FF04F005F
     StringProperty( const char* string = NULL );
     StringProperty( std::string  s );

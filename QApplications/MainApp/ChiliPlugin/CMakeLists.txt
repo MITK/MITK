@@ -11,7 +11,11 @@ QT_WRAP_CPP(${MITK_CHILI_PLUGIN_NAME} CPP_FILES ${MOC_H_FILES} ../SampleApp.h)
 # QT_WRAP_CPP(${MITK_CHILI_PLUGIN_NAME} CPP_FILES ${MOC_H_FILES} ../SampleApp.h ${MITK_CHILI_PLUGIN_SDK}/include/chili/plugin.h)
 ADD_LIBRARY(${MITK_CHILI_PLUGIN_NAME} SHARED ${CPP_FILES} ${REGISTER_FUNCTIONALITY_CALLS_CPP} ../SampleApp.cpp)
 
-OPTION(CHILI_SDK_34_WORKAROUND "Enable workaround for incomplete dicom lib in the chili 3.4 windows sdk" ON)
+# chili 3.4 needs a workaround for incomplete dicom lib in the chili windows sdk
+IF(EXISTS ${MITK_CHILI_PLUGIN_SDK}/../bin)
+  MESSAGE(STATUS "Using CHILI 3.4 SDK, enabling workaround")
+  SET(CHILI_SDK_34_WORKAROUND TRUE)
+ENDIF(EXISTS ${MITK_CHILI_PLUGIN_SDK}/../bin)
 IF(CHILI_SDK_34_WORKAROUND AND WIN32)
   FIND_LIBRARY(IPDICOM_LIB libipDicom c:/opt/windows/mbi/lib)
 ELSE(CHILI_SDK_34_WORKAROUND AND WIN32)

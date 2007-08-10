@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSTRINGPROPERTY_H_HEADER_INCLUDED_C1C02491
 #define MITKSTRINGPROPERTY_H_HEADER_INCLUDED_C1C02491
 
+#include <itkConfigure.h>
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
 #include <string>
@@ -45,6 +46,10 @@ public:
     
     itkGetStringMacro(Value);
     itkSetStringMacro(Value);
+/// @todo: remove after ITK 2.8 compatibility has been dropped 
+#if ITK_VERSION_MAJOR < 3 
+    itkSetMacro(Value);
+#endif
 
     //##ModelId=3E3FF04F00E1
     virtual bool operator==(const BaseProperty& property ) const;

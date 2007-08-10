@@ -46,9 +46,15 @@ public:
     
     itkGetStringMacro(Value);
     itkSetStringMacro(Value);
-/// @todo: remove after ITK 2.8 compatibility has been dropped 
-#if ITK_VERSION_MAJOR < 3 
-    itkSetMacro(Value);
+
+    /// @todo: remove after ITK 2.8 compatibility has been dropped 
+#if ITK_VERSION_MAJOR < 3     
+    virtual void SetValue (const std::string & _arg) 
+    { 
+      this->SetValue( _arg.c_str() ); 
+    } 
+
+
 #endif
 
     //##ModelId=3E3FF04F00E1

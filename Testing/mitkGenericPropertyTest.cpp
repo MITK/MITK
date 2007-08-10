@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkGenericProperty.h"
+#include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkVector.h"
 

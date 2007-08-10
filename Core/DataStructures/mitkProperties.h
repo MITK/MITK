@@ -25,21 +25,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-   mitkSpecializeGenericProperty(BoolProperty,bool);
+   mitkSpecializeGenericProperty(BoolProperty,bool,false);
    
-   mitkSpecializeGenericProperty(IntProperty,int);
+   mitkSpecializeGenericProperty(IntProperty,int,0);
    
-   mitkSpecializeGenericProperty(FloatProperty,float);
+   mitkSpecializeGenericProperty(FloatProperty,float,0.0f);
    
-   mitkSpecializeGenericProperty(DoubleProperty,double);
+   mitkSpecializeGenericProperty(DoubleProperty,double,0.0);
    
-   mitkSpecializeGenericProperty(Vector3DProperty,Vector3D);
+   mitkSpecializeGenericProperty(Vector3DProperty,Vector3D,Vector3D(0.0f));
    
-   mitkSpecializeGenericProperty(Point3dProperty,Point3D);
+   mitkSpecializeGenericProperty(Point3dProperty,Point3D,Point3D::BaseArray::Filled(0.0f).GetDataPointer() );
    
-   mitkSpecializeGenericProperty(Point4dProperty,Point4D);
+   mitkSpecializeGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
    
-   mitkSpecializeGenericProperty(Point3iProperty,Point3I);
+   mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
    
 } // namespace mitk  
 

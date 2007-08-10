@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 #include <stdlib.h>
 
-
+#include "mitkVector.h"
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
 #include <mitkXMLWriter.h>
@@ -52,10 +52,7 @@ class GenericProperty : public BaseProperty
 
     mitkClassMacro(GenericProperty, BaseProperty);
     
-    GenericProperty() 
-    {
-    }
-
+    typedef T ValueType;
 
     GenericProperty(T x) 
     : m_Value(x) 
@@ -131,8 +128,8 @@ class GenericProperty : public BaseProperty
     virtual bool ReadXMLData( XMLReader& xmlReader );
 
   protected:
+    GenericProperty() {} 
     T m_Value;
-
 };
 
 template <class T>
@@ -160,12 +157,12 @@ bool GenericProperty<T>::ReadXMLData( XMLReader& xmlReader )
  * @param PropertyName the name of the instantiation of GenericProperty
  * @param Type the value type of the GenericProperty
  */
-#define mitkSpecializeGenericProperty(PropertyName,Type)  \
+#define mitkSpecializeGenericProperty(PropertyName,Type,DefaultValue)  \
 class PropertyName: public GenericProperty< Type >        \
 {                                                         \
 public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \
-  PropertyName() {}                                       \
+  PropertyName() { m_Value = DefaultValue; }                                       \
   PropertyName(Type x) : GenericProperty<Type>(x) {}      \
   virtual ~PropertyName() {}                              \
 };

@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkGenericProperty.h"
+#include "mitkProperties.h"
 #include "mitkVector.h"
 
 #include <iostream>
@@ -24,13 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 // call with testValue1 != testValue2 
 template <typename T>
-int TestGenericPropertyForDataType(T testValue1, T testValue2, std::string testValue1AsString, std::string testValue2AsString, std::string type)
+int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T::ValueType testValue2, std::string testValue1AsString, std::string testValue2AsString, std::string type)
 {
   std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1AsString << ", " << testValue2AsString << ") ";
   
-  typename mitk::GenericProperty<T>::Pointer prop = new mitk::GenericProperty<T>();
-  typename mitk::GenericProperty<T>::Pointer prop2 = new mitk::GenericProperty<T>(testValue1);
-  typename mitk::GenericProperty<T>::Pointer prop3 = new mitk::GenericProperty<T>(testValue2);
+  typename T::Pointer prop = new T();
+  typename T::Pointer prop2 = new T(testValue1);
+  typename T::Pointer prop3 = new T(testValue2);
   
   unsigned long tBefore = prop->GetMTime();
   prop->SetValue(testValue1);
@@ -81,23 +82,23 @@ int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
   int retVal(EXIT_SUCCESS);
 
   // testing for some different data types
-  TestGenericPropertyForDataType<int>(1, 2, "1", "2", "int");
-  TestGenericPropertyForDataType<bool>(true, false, "1", "0", "bool");
-  TestGenericPropertyForDataType<float>(1.0, -1.0, "1", "-1", "float");
-  TestGenericPropertyForDataType<double>(1.0, -1.0, "1", "-1", "double");
+  TestGenericPropertyForDataType<mitk::IntProperty>(1, 2, "1", "2", "int");
+  TestGenericPropertyForDataType<mitk::BoolProperty>(true, false, "1", "0", "bool");
+  TestGenericPropertyForDataType<mitk::FloatProperty>(1.0, -1.0, "1", "-1", "float");
+  TestGenericPropertyForDataType<mitk::DoubleProperty>(1.0, -1.0, "1", "-1", "double");
   
-  TestGenericPropertyForDataType<std::string>("eins", "zwei", "eins", "zwei", "std::string");
+  TestGenericPropertyForDataType<mitk::StringProperty>(std::string("eins"), std::string("zwei"), std::string("eins"), std::string("zwei"), "std::string");
 
   {
   mitk::Point3D p1; p1[0] = 2.0; p1[1] = 3.0; p1[2] = 4.0;
   mitk::Point3D p2; p2[0] =-1.0; p2[1] = 2.0; p2[2] = 3.0;
-  TestGenericPropertyForDataType<mitk::Point3D>( p1, p2, "[2, 3, 4]", "[-1, 2, 3]", "mitk::Point3D");
+  TestGenericPropertyForDataType<mitk::Point3dProperty>( p1, p2, "[2, 3, 4]", "[-1, 2, 3]", "mitk::Point3D");
   }
  
   {
   mitk::Point4D p1; p1[0] = 2.0; p1[1] = 3.0; p1[2] = 4.0; p1[3] =-2.0;
   mitk::Point4D p2; p2[0] =-1.0; p2[1] = 2.0; p2[2] = 3.0; p2[3] = 5.0;
-  TestGenericPropertyForDataType<mitk::Point4D>( p1, p2, "[2, 3, 4, -2]", "[-1, 2, 3, 5]", "mitk::Point4D");
+  TestGenericPropertyForDataType<mitk::Point4dProperty>( p1, p2, "[2, 3, 4, -2]", "[-1, 2, 3, 5]", "mitk::Point4D");
   }
  
   /*  THIS won't compile because of the interface of XMLWriter... that should be reworked perhaps
@@ -111,7 +112,7 @@ int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
   {
   mitk::Vector3D p1; p1[0] = 2.0; p1[1] = 3.0; p1[2] = 4.0;
   mitk::Vector3D p2; p2[0] =-1.0; p2[1] = 2.0; p2[2] = 3.0;
-  TestGenericPropertyForDataType<mitk::Vector3D>( p1, p2, "[2, 3, 4]", "[-1, 2, 3]", "mitk::Vector3D");
+  TestGenericPropertyForDataType<mitk::Vector3DProperty>( p1, p2, "[2, 3, 4]", "[-1, 2, 3]", "mitk::Vector3D");
   }
  
   std::cout << "[TEST DONE]"<<std::endl;

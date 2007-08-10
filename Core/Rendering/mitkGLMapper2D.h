@@ -57,3 +57,4 @@ class GLMapper2D : public Mapper2D
 
 
 #endif /* MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872 */
+

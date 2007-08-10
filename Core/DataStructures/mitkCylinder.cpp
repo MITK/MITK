@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include "vtkCylinderSource.h"
 
+
 mitk::Cylinder::Cylinder()
+: BoundingObject()
 {
   vtkCylinderSource* cylinder = vtkCylinderSource::New();
   cylinder->SetRadius(1.0);
@@ -30,14 +32,16 @@ mitk::Cylinder::Cylinder()
   cylinder->SetCenter(0.0, 0.0, 0.0);
   cylinder->SetResolution(20);
   cylinder->CappingOn();
+  cylinder->Update();
   SetVtkPolyData(cylinder->GetOutput());
   cylinder->Delete();
 }
 
+
 mitk::Cylinder::~Cylinder()
 {
-
 }
+
 
 bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 {
@@ -49,6 +53,7 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);
   return retval; 
 }
+
 
 mitk::ScalarType mitk::Cylinder::GetVolume()
 {

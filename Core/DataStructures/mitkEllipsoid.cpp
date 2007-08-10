@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include "vtkSphereSource.h"
 
-mitk::Ellipsoid::Ellipsoid():BoundingObject()
+
+mitk::Ellipsoid::Ellipsoid()
+: BoundingObject()
 {
   vtkSphereSource* sphere = vtkSphereSource::New();
   sphere->SetRadius(1.0);
@@ -30,13 +32,15 @@ mitk::Ellipsoid::Ellipsoid():BoundingObject()
   sphere->SetPhiResolution(20);
   sphere->Update();
   SetVtkPolyData(sphere->GetOutput());
-  itkDebugMacro( << GetVtkPolyData()<< ", " << sphere->GetOutput());
   sphere->Delete();
 }
+
+
 
 mitk::Ellipsoid::~Ellipsoid()
 {
 }
+
 
 bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
 {

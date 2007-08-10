@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkConeSource.h"
 
 mitk::Cone::Cone()
+: BoundingObject()
 {
   // Set up Cone Surface. Radius 1.0, height 2.0, , centered around the origin
   vtkConeSource* cone = vtkConeSource::New();

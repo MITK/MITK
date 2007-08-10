@@ -24,7 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSTLReader.h>
 
-mitk::Cuboid::Cuboid()
+mitk::Cuboid::Cuboid() 
+: BoundingObject()
 {
   vtkCubeSource* cube = vtkCubeSource::New();
   cube->SetXLength(2.0);

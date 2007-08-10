@@ -6,7 +6,7 @@ Language:  C++
 Date:      $Date$
 Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medickal and
+Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/ for details.
 

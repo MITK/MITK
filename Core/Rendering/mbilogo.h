@@ -6,7 +6,7 @@ Language:  C++
 Date:      $Date: 2007-06-27 12:01:21 +0200 (Mi, 27 Jun 2007) $
 Version:   $Revision: 10984 $
 
-Copyright (c) German Cancer Research Center, Division of Medickal and
+Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/ for details.
 

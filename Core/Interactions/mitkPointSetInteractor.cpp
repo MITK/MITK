@@ -219,15 +219,18 @@ bool mitk::PointSetInteractor
     return false;
   }
 
-  const mitk::Event *event = stateEvent->GetEvent();
-
+  //get the timestep to also support 3D+T
+  const mitk::Event *theEvent = stateEvent->GetEvent();
   int timeStep = 0;
   mitk::ScalarType timeInMS = 0.0;
 
-  if ( event )
+  if ( theEvent )
   {
-    timeStep = event->GetSender()->GetTimeStep();
-    timeInMS = event->GetSender()->GetTime();
+    if (theEvent->GetSender() != NULL)
+    {
+      timeStep = theEvent->GetSender()->GetTimeStep();
+      timeInMS = theEvent->GetSender()->GetTime();
+    }
   }
 
   // Make sure that the point set (if time-resolved) has enough entries;

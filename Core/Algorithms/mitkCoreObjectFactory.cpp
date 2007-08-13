@@ -81,6 +81,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
+#include "mitkImageWriterFactory.h"
+#include "mitkPointSetWriterFactory.h"
+#include "mitkSurfaceVtkWriterFactory.h"
+
 #include "mitkUnstructuredGrid.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
 
@@ -194,6 +198,11 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+
+    mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
+    mitk::PointSetWriterFactory::RegisterOneFactory();
+    mitk::ImageWriterFactory::RegisterOneFactory();
+
     alreadyDone = true;
   }
 }

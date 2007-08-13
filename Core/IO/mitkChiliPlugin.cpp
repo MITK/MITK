@@ -18,45 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkChiliPlugin.h"
 
-mitk::ChiliPlugin::ChiliPlugin()
-{
-}
-
-mitk::ChiliPlugin::~ChiliPlugin()
-{
-}
-
-bool mitk::ChiliPlugin::IsPlugin()
-{
-  return false;
-}
-
-int mitk::ChiliPlugin::GetConferenceID()
-{
-  return 0;
-}
-
-unsigned int mitk::ChiliPlugin::GetLightBoxCount()
-{
-  return 0;
-}
-
-mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetCurrentSelectedStudy()
-{
-  mitk::ChiliPlugin::StudyInformation emptyList;
-  return emptyList;
-}
-
-mitk::ChiliPlugin::SeriesList mitk::ChiliPlugin::GetCurrentSelectedSeries()
-{
-  mitk::ChiliPlugin::SeriesList emptyList;
-  return emptyList;
-}
-
-void mitk::ChiliPlugin::AddPropertyListToNode( const mitk::PropertyList::Pointer, mitk::DataTreeNode* )
-{
-}
-
+/** return a singleton from the current ChiliPlugin */
 mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
@@ -67,36 +29,116 @@ mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
   return s_Instance;
 }
 
-unsigned int mitk::ChiliPlugin::GetChiliVersion()
-{
-  return CHILI_VERSION;
-}
+/** DefaultImplementation */
 
-void mitk::ChiliPlugin::UploadViaFile( DataTreeNode*, std::string studyInstanceUID, std::string patientOID, std::string studyOID, std::string seriesOID )
+mitk::ChiliPlugin::ChiliPlugin()
 {
 }
 
-void mitk::ChiliPlugin::UploadViaBuffer( DataTreeNode* )
+mitk::ChiliPlugin::~ChiliPlugin()
 {
 }
 
-void mitk::ChiliPlugin::DownloadViaFile( std::string chiliText, std::string MimeType, mitk::DataTreeIteratorBase* parentIterator )
+int mitk::ChiliPlugin::GetConferenceID()
 {
+  return 0;
 }
 
-mitk::DataTreeNode* mitk::ChiliPlugin::DownloadViaBuffer()
+bool mitk::ChiliPlugin::IsPlugin()
+{
+  return false;
+}
+
+mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesOID )
+{
+  StudyInformation emptyResult;
+  return emptyResult;
+}
+
+mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesOID )
+{
+  PatientInformation emptyResult;
+  return emptyResult;
+}
+
+mitk::ChiliPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesOID )
+{
+  SeriesInformation emptyResult;
+  return emptyResult;
+}
+
+mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& studyOID )
+{
+  SeriesInformationList emptyResult;
+  emptyResult.clear();
+  return emptyResult;
+}
+
+mitk::ChiliPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& textOID )
+{
+  TextInformation emptyResult;
+  return emptyResult;
+}
+
+mitk::ChiliPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& seriesOID )
+{
+  TextInformationList emptyResult;
+  emptyResult.clear();
+  return emptyResult;
+}
+
+unsigned int mitk::ChiliPlugin::GetLightboxCount()
+{
+  return 0;
+}
+
+QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
 {
   return NULL;
 }
 
-mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetCurrentSelectedPatient()
+QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
 {
-  mitk::ChiliPlugin::PatientInformation emptyList;
-  return emptyList;
+  return NULL;
 }
 
-mitk::ChiliPlugin::TextFileList mitk::ChiliPlugin::GetTextFileInformation( std::string seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* inputLightbox )
 {
-  mitk::ChiliPlugin::TextFileList emptyList;
-  return emptyList;
+  std::vector<DataTreeNode::Pointer> emptyVector;
+  emptyVector.clear();
+  return emptyVector;
+}
+
+void mitk::ChiliPlugin::SaveImageToLightbox( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, QcLightbox* lightbox )
+{
+}
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& seriesOID )
+{
+  std::vector<DataTreeNode::Pointer> emptyVector;
+  emptyVector.clear();
+  return emptyVector;
+}
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& seriesOID )
+{
+  std::vector<DataTreeNode::Pointer> emptyVector;
+  emptyVector.clear();
+  return emptyVector;
+}
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& seriesOID )
+{
+  std::vector<DataTreeNode::Pointer> emptyVector;
+  emptyVector.clear();
+  return emptyVector;
+}
+
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneTextFromSeries( const std::string& seriesOID, const std::string& textOID )
+{
+  return NULL;
+}
+
+void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
+{
 }

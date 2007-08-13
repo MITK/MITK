@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define LIGHTBOXIMAGEREADER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkImageSource.h"
-#include "mitkChiliPlugin.h"
-#include <mitkPropertyList.h>
 
 class QcLightbox;
 
@@ -46,25 +44,14 @@ namespace mitk {
       /** Set the lightbox to read from. */
       virtual void SetLightBox( QcLightbox* lightbox );
 
-      /**Set the lightbox to read from to the current lightbox. */
-      virtual void SetLightBoxToCurrentLightBox();
-
-      /**
-      Return a propertylist from the current selected lightBox.
-      For the tags look at mitkLightBoxImageReaderImpl.cpp.
-      This method reads the information from the pic-header or the dicom-header. 
-      The property "name" is set and the same like the tag "Chili: SERIES DESCRIPTION".
-      */
-      virtual const mitk::PropertyList::Pointer GetImageTagsAsPropertyList();
+      /** Get the lightbox to read from. */
+      virtual QcLightbox* GetLightBox() const;
 
       /**
       Its possible that the user abort while Loading from Lightbox (GetSpacingFromLB).
       To show no wrong ErrorMessage, you can use this function.
       */
       virtual bool userAbort();
-
-      /** Get the lightbox to read from. */
-      virtual QcLightbox* GetLightBox() const;
 
       virtual ~LightBoxImageReader() {}
     protected:

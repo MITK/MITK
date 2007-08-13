@@ -22,15 +22,6 @@ void mitk::LightBoxImageReader::SetLightBox( QcLightbox* )
 {
 }
 
-void mitk::LightBoxImageReader::SetLightBoxToCurrentLightBox()
-{
-}
-
-const mitk::PropertyList::Pointer mitk::LightBoxImageReader::GetImageTagsAsPropertyList()
-{
-  return NULL;
-}
-
 QcLightbox* mitk::LightBoxImageReader::GetLightBox() const
 {
   return NULL;

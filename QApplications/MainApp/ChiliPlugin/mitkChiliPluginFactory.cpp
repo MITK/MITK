@@ -22,10 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkChiliPlugin.h"
 #include "mitkChiliPluginImpl.h"
+//TODO entfernen wenn das neue Chili-Release installiert ist
 #include "mitkLightBoxImageReader.h"
 #include "mitkLightBoxImageReaderImpl.h"
-#include "mitkLightBoxResultImageWriter.h"
-#include "mitkLightBoxResultImageWriterImpl.h"
+
 
 namespace mitk
 {
@@ -37,7 +37,7 @@ public:
   /** Standard class typedefs. */
   typedef CreateChiliObjectFunction  Self;
   typedef itk::SmartPointer<Self>    Pointer;
-    
+
   /** Methods from itk:LightObject. */
   itkFactorylessNewMacro(Self);
   LightObject::Pointer CreateObject() { typename T::Pointer p = T::New(); 
@@ -48,7 +48,7 @@ public:
 protected:
   CreateChiliObjectFunction() {}
   ~CreateChiliObjectFunction() {}
-  
+
 private:
   CreateChiliObjectFunction(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
@@ -58,23 +58,21 @@ private:
 ChiliPluginFactory::ChiliPluginFactory()
 {
   std::cout << "registering ChiliPluginFactory" << std::endl;
-   this->RegisterOverride(typeid(mitk::ChiliPlugin).name(),
+
+  this->RegisterOverride(typeid(mitk::ChiliPlugin).name(),
                          typeid(mitk::ChiliPluginImpl).name(),
                          "MITK Chili Plugin",
                          1,
                          mitk::CreateChiliObjectFunction<mitk::ChiliPluginImpl>::New());
+
+//TODO entfernen wenn das neue Chili-Release installiert ist
   this->RegisterOverride(typeid(mitk::LightBoxImageReader).name(),
                          typeid(mitk::LightBoxImageReaderImpl).name(),
                          "MITK Chili Plugin Lightbox Reader",
                          1,
                          mitk::CreateChiliObjectFunction<mitk::LightBoxImageReaderImpl>::New());
-  this->RegisterOverride(typeid(mitk::LightBoxResultImageWriter).name(),
-                         typeid(mitk::LightBoxResultImageWriterImpl).name(),
-                         "MITK Chili Plugin Lightbox Writer",
-                         1,
-                         mitk::CreateChiliObjectFunction<mitk::LightBoxResultImageWriterImpl>::New());
 }
-  
+
 ChiliPluginFactory::~ChiliPluginFactory()
 {
 }

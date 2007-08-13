@@ -11,8 +11,6 @@ SET(CPP_FILES
   mitkItkImageFileIOFactory.cpp
   mitkItkImageFileReader.cpp
   mitkItkImageWrite.cpp
-  mitkLightBoxImageReader.cpp
-  mitkLightBoxResultImageWriter.cpp
   mitkMeshReader.cpp
   mitkObjFileIOFactory.cpp
   mitkObjFileReader.cpp
@@ -53,4 +51,6 @@ SET(CPP_FILES
   mitkXMLWriter.cpp
   vtkPointSetXMLParser.cpp
   # XMLPointIO.cpp
+
+  mitkLightBoxImageReader.cpp
 )

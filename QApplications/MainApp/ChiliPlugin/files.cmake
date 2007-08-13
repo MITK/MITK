@@ -10,10 +10,12 @@ SET(CPP_FILES
   # mitkConference/QmitkQChili3Conference.cpp
   mitkConference/TextLoggerConferenceKit.cpp
   mitkConference/TextLoggerConferenceKitFactory.cpp
-  mitkLightBoxImageReaderImpl.cpp
-  mitkLightBoxResultImageWriterImpl.cpp
+  mitkImageToPicDescriptor.cpp
+  mitkPicDescriptorToNode.cpp
   QcMITKTask.cpp
   QmitkEventCollector.cpp
+
+  mitkLightBoxImageReaderImpl.cpp
 )
 SET(MOC_H_FILES
   mitkChiliPluginImpl.h

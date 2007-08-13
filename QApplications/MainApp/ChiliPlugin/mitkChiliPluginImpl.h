@@ -19,17 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
 #define MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
 
+// class mitkChiliPluginImpl inherit from
 #include <mitkChiliPlugin.h>
-
 #include <chili/plugin.h>
-#include <chili/ipUtil.h>
-#include <ipMsg/ipMsg.h>
-#include <ipMsg/ipMsgTypes.h>
-#include <ipPic/ipTypes.h>
-
+// class QIDToolButton inherit from
 #include <qtoolbutton.h>
 
-#include <vector>
+#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
 
 class QcMITKTask;
 class SampleApp;
@@ -43,7 +39,7 @@ namespace mitk {
   @ingroup Chili
   */
 
-class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
+class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 {
   Q_OBJECT
 
@@ -54,121 +50,249 @@ class ChiliPluginImpl : public ::QcPlugin, public ChiliPlugin
 
     virtual void handleMessage( ipInt4_t type, ipMsgParaList_t *list );
 
-    /** return the StudyInformation of the current selected study */
-    virtual StudyInformation GetCurrentSelectedStudy();
-    /** return the list of the series to the current selected study */
-    virtual SeriesList GetCurrentSelectedSeries();
-
-    #if ( CHILI_VERSION >= 38 )
-    /** return the PatientInformation of the current selected study */
-    virtual PatientInformation GetCurrentSelectedPatient();
-    /** return a list of all TextFiles
-    * - of the current selected series (if the user specify no series_OID)
-      - of a specified series (if the user set the parameter) */
-    virtual TextFileList GetTextFileInformation( std::string seriesOID = "" );
-    #endif
-
-    virtual unsigned int GetLightBoxCount();
-
-    /** return if the application run as standalone or as chiliplugin */
-    virtual bool IsPlugin();
-    /** return the conferenceid */
+    /*!
+    \brief return the ConferenceID
+    @returns m_QmitkChiliPluginConferenceID
+    */
     virtual int GetConferenceID();
 
-    /** Set the properties from the list to the datatreenode. The description of the properties get the prefix "Chili: ". */
-    virtual void AddPropertyListToNode( const mitk::PropertyList::Pointer property, mitk::DataTreeNode* );
+    /*!
+    \brief Return true if the application run as plugin and false if its standalone.
+    @returns True for ChiliPlugin, false for Standalone.
+    */
+    virtual bool IsPlugin();
 
-    /** Set the QtParent, which is needed to instantiate QcPlugin */
-    static void SetQtParent( QWidget* parent );
+    /*!
+    \brief Return the studyinformation.
+    @param studyOID   If you dont set the input, you get the current selected study. If you want a specific study, set the input.
+    @returns The current or specific studyinformation.
+    If no study could found, this function return StudyInformation.OID == "".
+    */
+    virtual StudyInformation GetStudyInformation( const std::string& seriesOID = "" );
+
+    /*!
+    \brief Return the patientinformation.
+    @param patientOID   If you dont set the input, you get the current selected patient. If you want a specific patient, set the input.
+    @returns The current or specific patientinformation.
+    If no patient could found, this function return PatientInformation.OID == "".
+    */
+    virtual PatientInformation GetPatientInformation( const std::string& seriesOID = "" );
+
+    /*!
+    \brief Return the seriesinformation.
+    @param seriesOID   If you dont set the input, you get the current selected series. If you want a specific series, set the input.
+    @returns The current or specific seriesinformation.
+    If no series could found, this function return SeriesInformation.OID == "".
+    */
+    virtual SeriesInformation GetSeriesInformation( const std::string& seriesOID = "" );
+
+    /*!
+    \brief Return a list of all seriesinformation from one study.
+    @param studyOID   Set the study from wich one you want to know all series.
+    @returns The current or specific seriesinformation.
+    If no series could found, this function returns an empty list.
+    */
+    virtual SeriesInformationList GetSeriesInformationList( const std::string& studyOID = "" );
+
+    /*!
+    \brief Return the textinformation.
+    @param textOID   Set the text from which one you want the information?
+    @returns The textinformation.
+    If no text could found, this function return TextInformation.OID == "".
+    */
+    virtual TextInformation GetTextInformation( const std::string& textOID );
+
+    /*!
+    \brief Return a list of all textinformation from one series.
+    @param seriesOID   Set the series from which one you want to know all texts.
+    @returns A list of textinformation from one series.
+    If no texts could found, this function returns an empty list.
+    */
+    virtual TextInformationList GetTextInformationList( const std::string& seriesOID );
+
+    /*!
+    \brief Return the number of current shown lightboxes in chili.
+    @returns The visible lightboxcount.
+    */
+    virtual unsigned int GetLightboxCount();
+
+    /*!
+    \brief Return the first empty Lightbox.
+    @returns An empty lightbox.
+    There are only four available lightboxes in chili, if all of them not empty the function return NULL and show a message.
+    */
+    virtual QcLightbox* GetNewLightbox();
+
+    /*!
+    \brief Return the current active Lightbox.
+    @returns The current lightbox.
+    If there is no current lightbox the function return NULL and show a message.
+    */
+    virtual QcLightbox* GetCurrentLightbox();
+
+    /*!
+    \brief Load all images from the given lightbox.
+    @param inputLightbox   The lightbox to read. If no lightbox set, the current lightbox get used.
+    @returns Multiple mitk::DataTreeNodes as vector.
+    */
+    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
+
+    /*!
+    \brief Save image into the given Lightbox.
+    @param sourceImage   The image to save.
+    @param levelWindow   The levelWindow for the image.
+    @param seriesOID   The seriesOID from the series where the image should saved. For example use "GetCurrentSelectedSeries()" to get the information. If the image was loaded from chili, the mitk::DataTreeNode have a Property named "SeriesOID", use them here!
+    @param nameProperty   The "name"-Property needed if different studies selected. So you can see which Node came from which study.
+    @param lightbox   This function use the lightbox to save the single slices. Therefore you have to set a lightbox to show and save the slices. Use "GetCurrentLightbox()" or "GetNewLightbox()".
+    */
+    virtual void SaveImageToLightbox( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, QcLightbox* lightbox );
+
+    /*!
+    \brief Load all Image- and Text-Files from the series.
+    @param seriesOID   Set the series to load from.
+    @returns Multiple mitk::DataTreeNodes as vector.
+    */
+    virtual std::vector<DataTreeNode::Pointer> LoadCompleteSeries( const std::string& seriesOID );
+
+    /*!
+    \brief Load all Images from the series.
+    @param seriesOID   Set the series to load from.
+    @returns Multiple mitk::DataTreeNodes as vector.
+    This function save all image-files ( current known: *.pic, *.dcm, *.jpg ) from database to harddisk.
+    The *dcm-files get converted to ipPicDescriptor. These and the *pic-files get readed via mitk::PicDescriptorsToNode ( this class returns multiple mitk::images).
+    The other files ( current *.jpg ) get readed via mitk::DataTreeNodeFactory (this class return one mitk::image). */
+    virtual std::vector<DataTreeNode::Pointer> LoadAllImagesFromSeries( const std::string& seriesOID );
+
+    /*!
+    \brief Load all Text-files from the series.
+    @param seriesOID   Set the series to load from.
+    @returns Multiple mitk::DataTreeNodes as vector.
+    This function works sequently: it save one text-file to harddisk, read them via factories ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and delete the saved file.
+    Important: This function use the filename from database to save the files. In the database it is possible, that a filename is twice in a series ( thats realy two different entries ). So we have to work sequently, otherwise we override the files ( twice filenames ).
+    */
+    virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
+
+    /*!
+    \brief Load one Text-files.
+    @param seriesOID   Set the series to load from.
+    @param textOID   Set the single text.
+    @returns one mitk::DataTreeNode
+    */
+    virtual DataTreeNode::Pointer LoadOneTextFromSeries( const std::string& seriesOID, const std::string& textOID );
+
+    /*!
+    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    @param inputNodes   Thats the nodes to save.
+    */
+    virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
 
     mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
     itkNewMacro(ChiliPluginImpl);
     virtual ~ChiliPluginImpl();
 
-    #if ( CHILI_VERSION >= 38 )
-    /** with this function you can save a file to the chilidatabase
-    * If you want to save the file to the current selected study and series, then set the datatreenode only.
-    * If you want to save the file to a specific study and series, then you have to set all parameter. */
-    virtual void UploadViaFile( DataTreeNode* node, std::string studyInstanceUID = "", std::string patientOID = "", std::string studyOID = "", std::string seriesOID = "" );
-
-    /** with this function you can load a file from the chilidatabase
-    * For the chiliText and MimeType use GetTextFileInformation(). */
-    virtual void DownloadViaFile( std::string chiliText, std::string MimeType, DataTreeIteratorBase* parentIterator );
-
-    //UnderConstruction
-    virtual void UploadViaBuffer( DataTreeNode* );
-    virtual DataTreeNode* DownloadViaBuffer();
-    #endif
-
   public slots:
 
     /** called when a lightbox import button is clicked */
     void lightBoxImportButtonClicked(int row);
-
-    /** Slot from QcPlugin: */
-    /** When Study is selected */
+    /** called when Study is selected */
     virtual void studySelected( study_t* );
-
-    /**  still undocumented */
-    virtual void lightboxFilled( QcLightbox* lightbox );
-
-    /** still undocumented */
+    /** called when a new lightbox get visible in chili */
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
   protected slots:
 
+    /** Slot to reinitialize the ChiliPlugin */
     void OnApproachReinitializationOfWholeApplication();
-  
+
   protected:
 
-    ChiliPluginImpl::ChiliPluginImpl();
+    /** REMEMBER: QcPlugin inheritanced protected */
 
-    /** Invoke events: */
-    /** if a new study selected */
-    void SendStudySelectedEvent();
-    /** if the Lightbox count changed */
-    void SendLightBoxCountChangedEvent();
+    /** This Class use the QcPlugin-Function "void sendMessage( ipMsgType_t type, ipMsgParaList_t *list )". Its protected because not everybody should send Messages. */
+    friend class Chili3Conference;
+
+    /** need a QcPluginInstance for "create" */
+    friend QObject* QcEXPORT::create( QWidget *parent );
+
+    /** needed to instantiate QcPlugin */
+    static QWidget* s_Parent;
+
+    /** set s_Parent; set by QcEXPORT QObject* create( QWidget *parent ) */
+    static void SetQtParent( QWidget* parent );
+
+    /** return the QcPluginInstance; used by QcEXPORT QObject* create( QWidget *parent ) */
+    static QcPlugin* GetQcPluginInstance();
+
+  private:
+
+    /** the application */
+    SampleApp* app;
+    /** the task */
+    QcMITKTask* task;
+
+    SeriesInformationList m_SeriesInformationList;
 
     static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
+
+    TextInformationList m_TextInformationList;
+
+#ifdef CHILI_PLUGIN_VERSION_CODE
+    static ipBool_t GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data );
+
+    /** function to iterate over all textfiles from a series;
+    the db-path and the text-oid get saved;
+    dont download the files here, because of double entries;
+    its possible to save different text-files under the same filename, if you save here, you override the files on harddisk
+    IMPORTANT: works for chili 3.9 or higher only */
+    static ipBool_t GlobalIterateTextTwoCallback( int rows, int row, text_t *text, void *user_data );
+#endif
+
+    TagInformationList GetAllAvailableStudyAndPatientPicTags( const std::string& seriesOID );
+
+    /** the count of the shown Lightboxes in chili */
+    unsigned int m_LightBoxCount;
+
+    /** while importing the lightbox to MITK, it should not be possible to click the importbutton several times (FIX BUG 483) */
+    bool m_InImporting;
+
+    /** the current tempDirectory which get used to load and save files for the down - and up - load */
+    std::string m_tempDirectory;
+
+    /** its a list of all Filenames, needed to download picdescriptors --> need to know which to load */
+    std::list<std::string> m_FileList;
+
+    struct TextFilePathAndOIDStruct
+    {
+      std::string TextFilePath;
+      std::string TextFileOID;
+    };
+    /** its a list of all TextFiles with Path and OID */
+    std::list<TextFilePathAndOIDStruct> m_TextFileList;
+
+    /** a vector of all Tool-/LightboximportButtons */
+    std::vector<QIDToolButton*> m_LightBoxImportButtons;
+
+    /** secret button to reinit application */
+    QToolButton* m_LightBoxImportToggleButton;
+
+    /** Constuctor */
+    ChiliPluginImpl::ChiliPluginImpl();
+
+    /** return the temporary directory, it is a new directory in the system-specific temp-Directory */
+    std::string GetTempDirectory();
+
+    /** function to iterate over all images from a series
+    works for chili 3.9 or higher only */
     static ipBool_t GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data );
-    #if ( CHILI_VERSION >= 38 )
-    static ipBool_t GlobalIterateTextCallback( int rows, int row, text_t *text, void *user_data );
-    #endif
 
     /** teleconference methods */
     virtual void connectPartner();
     virtual void disconnectPartner();
 
-    #if ( CHILI_VERSION >= 38 )
-    /** if the study changed, we have to iterate over the series for a new current-selected-study-list */
-    bool m_currentStudyChanged;
-    /** a list of all series to the current selected Study */
-    SeriesList m_CurrentSeries;
-    /** a list of all TextFiles from a series */
-    TextFileList m_TextFileList;
-    /** the count of the shown Lightboxes in chili */
-    unsigned int m_LightBoxCount;
-    #else
-    /** the current selected study */
-    StudyInformation m_CurrentStudy;
-    /** a list of all series to the current selected Study */
-    SeriesList m_CurrentSeries;
-    /** the count of the shown Lightboxes in chili */
-    unsigned int m_LightBoxCount;
-    #endif
-
-  private:
-
-    static QWidget* s_Parent;
-
-    bool m_InImporting;
-
-    SampleApp* app;
-
-    QcMITKTask* task;
-
-    std::vector<QIDToolButton*> m_LightBoxImportButtons;
-    QToolButton* m_LightBoxImportToggleButton;
+    /** Invoke event: if a new study selected */
+    //void SendStudySelectedEvent();
+    /** Invoke event: if the Lightbox count changed */
+    void SendLightBoxCountChangedEvent();
 };
 
 } // namespace mitk
@@ -204,5 +328,4 @@ class QIDToolButton : public QToolButton
     int m_ID;
 };
 
-#endif /* MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD */
-
+#endif

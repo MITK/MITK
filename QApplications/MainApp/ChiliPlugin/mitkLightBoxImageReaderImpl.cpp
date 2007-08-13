@@ -17,28 +17,24 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLightBoxImageReaderImpl.h"
-
 #include "QmitkLightBoxReaderDialog.h"
 
-#include "mitkChiliPluginImpl.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
-#include "mitkProperties.h"
 #include "mitkPicHeaderProperty.h"
 
 #include <itkImageFileReader.h>
 
-#include <qapplication.h>
-
 #include <chili/qclightbox.h>
-#include <chili/qclightboxmanager.h>
+//#include <chili/qclightboxmanager.h>
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
-#include <ipPic/ipPic.h>
 #include <ipPic/ipPicTags.h>
-#include <ipFunc/ipFunc.h>
 
-#include <list>
+#include <ipPic/ipPic.h>
+//#include <ipFunc/ipFunc.h>
+
+//#include <list>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -90,18 +86,6 @@ void mitk::LightBoxImageReaderImpl::SetLightBox( QcLightbox* lightbox )
   }
 }
 
-void mitk::LightBoxImageReaderImpl::SetLightBoxToCurrentLightBox()
-{
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
-
-  if( !ChiliPlugin::GetInstance()->IsPlugin() )
-  {
-    itkExceptionMacro( <<"GetPluginInstance()==NULL: Plugin is not initialized correctly !" );
-  }
-  SetLightBox( realPluginInstance->lightboxManager()->getActiveLightbox() );
-}
-
 QcLightbox* mitk::LightBoxImageReaderImpl::GetLightBox() const
 {
   return m_LightBox;
@@ -112,7 +96,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    SetLightBoxToCurrentLightBox();
+    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {
@@ -168,7 +152,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   // iterate through the virutally sorted lightbox:
   //  position= sorted position
   //  realPosition= original position in the (real) lightbox
-  for( position = 0; position < m_LightBox->getFrames (); ++position )
+  for( position = 0; position < m_LightBox->getFrames(); ++position )
   {
     //get original position of the image slice in the (real) lightbox
     RealPosition = GetRealPosition( position,m_ImageNumbers );
@@ -283,6 +267,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   //build geometry
   interSliceGeometry_t *interSliceGeometry;
   interSliceGeometry = m_LightBox->fetchDicomGeometry( RealPosition );
+
   if( interSliceGeometry != NULL )
   {
     Vector3D rightVector;
@@ -291,6 +276,13 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
     vtk2itk( interSliceGeometry->u, rightVector );
     vtk2itk( interSliceGeometry->v, downVector );
+
+    //its possible that a 2D-picture have no right- or down-vector, but you can not initialize [0,0,0]
+    if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
+      rightVector[0] = 1;
+    if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
+      downVector[2] = -1;
+
     vtk2itk( interSliceGeometry->ps, spacing );
     itkDebugMacro( <<"spacing: "<<spacing );
 
@@ -305,7 +297,6 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     itkDebugMacro( <<"get spacing: "<<spacing );
     planegeometry->InitializeStandardPlane( output->GetDimension(0), output->GetDimension(1), rightVector, downVector, &spacing );
     //planegeometry->InitializeStandardPlane( rightVector,downVector,&GetSpacingFromLB());
-
     Point3D origin;
     vtk2itk( interSliceGeometry->o, origin );
     itkDebugMacro( <<"origin: "<<origin );
@@ -387,7 +378,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    SetLightBoxToCurrentLightBox();
+    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {
@@ -436,7 +427,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   }
 
   output->SetPicSlice( pic0, numberOfImages,time );
-  for( position = 1; position < m_LightBox->getFrames (); ++position ) 
+  for( position = 1; position < m_LightBox->getFrames(); ++position ) 
   {
     //GetRealPosition of image
     RealPosition = GetRealPosition( position, m_ImageNumbers );
@@ -579,7 +570,6 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
     myDialog.addSpacings( currentSpacing, currentCount );
   }
   int dialogReturnValue = myDialog.exec();
-  qApp->processEvents();
 
   if ( dialogReturnValue == QDialog::Rejected )
   {
@@ -618,7 +608,7 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
   info.direction = &direction;
   bool directionInitialized = false;
 
-  for (unsigned int position = 0; position < m_LightBox->getFrames (); ++position)
+  for (unsigned int position = 0; position < m_LightBox->getFrames(); ++position)
   {
     info.pos = position;
 
@@ -710,7 +700,7 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    SetLightBoxToCurrentLightBox();
+    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {

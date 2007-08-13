@@ -43,15 +43,9 @@ namespace mitk {
       /** Set the lightbox to read from. */
       void SetLightBox( QcLightbox* lightbox );
 
-      /**Set the lightbox to read from to the current lightbox. */
-      void SetLightBoxToCurrentLightBox();
+      /** Get the lightbox to read from. */
+      QcLightbox* GetLightBox() const;
 
-      /**
-      Return a propertylist from the current selected lightBox.
-      For the tags look at mitkLightBoxImageReaderImpl.cpp.
-      This method reads the information from the pic-header or the dicom-header. 
-      The property "name" is set and the same like the tag "Chili: SERIES DESCRIPTION".
-      */
       virtual const mitk::PropertyList::Pointer GetImageTagsAsPropertyList();
 
       /**
@@ -59,9 +53,6 @@ namespace mitk {
       To show no wrong ErrorMessage, you can use this function.
       */
       virtual bool userAbort();
-
-      /** Get the lightbox to read from. */
-      QcLightbox* GetLightBox() const;
 
     protected:
 
@@ -104,7 +95,7 @@ namespace mitk {
       static bool ImageOriginLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
       static bool ImageNumberLesser ( const LocalImageInfo& elem1, const LocalImageInfo& elem2 );
 
-      /** Generate outpu */
+      /** Generate output */
       virtual void GenerateData();
       virtual void GenerateOutputInformation();
 

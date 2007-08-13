@@ -88,7 +88,7 @@ bool mitk::PicHeaderProperty::operator==(const BaseProperty& property) const
       );
 }
 
-ipPicTSV_t const* mitk::PicHeaderProperty::GetValue() const
+ipPicTSV_t* mitk::PicHeaderProperty::GetValue() const
 {
   return m_StoredTag;
 }

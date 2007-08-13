@@ -44,7 +44,7 @@ class PicHeaderProperty : public BaseProperty
    
     virtual bool operator==(const BaseProperty& property) const;
     
-    ipPicTSV_t const* GetValue() const;
+    ipPicTSV_t* GetValue() const;
     std::string GetValueAsString() const;
 
   protected:

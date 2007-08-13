@@ -24,13 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 
 #include "mitkChiliPlugin.h"
-//reader and writer
-#include "mitkLightBoxImageReader.h"
-#include "mitkLightBoxResultImageWriter.h"
+//PluginEvents
+#include "mitkChiliPluginEvents.h"
 //to add a new node
 #include "mitkDataTreeNodeFactory.h"
-//need it for the writer
-#include <mitkLevelWindowProperty.h>
 //for the GUI
 #include <qcursor.h>
 #include <qapplication.h>
@@ -39,20 +36,28 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlineedit.h>
 #include <qmessagebox.h>
 
+#include <mitkNodePredicateOR.h>
+#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateProperty.h>
+
 QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 : QmitkFunctionality( parent, name, it ),
   m_MultiWidget( mitkStdMultiWidget ),
   m_Controls( NULL )
 {
   SetAvailability( true );
+/*
   // register to chili plugin as observer
   mitk::ChiliPlugin* plugin = mitk::ChiliPlugin::GetInstance();
+
   if( plugin )
   {
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
     command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliStudySelected );
     plugin->AddObserver( mitk::PluginStudySelected(), command );
   }
+*/
 }
 
 QmitkLoadSaveToChiliExample::~QmitkLoadSaveToChiliExample()
@@ -81,13 +86,15 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
 {
   if( m_Controls )
   {
-    connect( ( QObject* )( m_Controls->m_TreeNodeSelector ), SIGNAL( Activated( mitk::DataTreeIteratorClone ) ), ( QObject* ) this, SLOT( ImageSelected ( mitk::DataTreeIteratorClone ) ) );
-    //connect the buttons to the implementation
-    connect( ( QObject* )( m_Controls->LoadFromLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromLightbox() ) );
-    connect( ( QObject* )( m_Controls->SaveToLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToLightbox() ) );
-    connect( ( QObject* )( m_Controls->SetDescription ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SetDescription() ) );
-    connect( ( QObject* )( m_Controls->FileDownload ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( FileDownload() ) );
-    connect( ( QObject* )( m_Controls->FileUpload ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( FileUpload() ) );
+    connect( ( QObject* )( m_Controls->LoadImageFromLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadImageFromLightBox() ) );
+    connect( ( QObject* )( m_Controls->SaveImageToLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveImageToLightBox() ) );
+
+    connect( ( QObject* )( m_Controls->LoadCompleteSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadCompleteSeries() ) );
+    connect( ( QObject* )( m_Controls->LoadAllImages ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllImages() ) );
+    connect( ( QObject* )( m_Controls->LoadAllTexts ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllTexts() ) );
+    connect( ( QObject* )( m_Controls->LoadOneText ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadOneText() ) );
+
+    connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
   }
 }
 
@@ -98,160 +105,111 @@ QAction * QmitkLoadSaveToChiliExample::CreateAction( QActionGroup *parent )
   return action;
 }
 
-void QmitkLoadSaveToChiliExample::SetDescription()
+void QmitkLoadSaveToChiliExample::LoadImageFromLightBox()
 {
-  //get description
-  std::string temp = m_Controls->DescriptionInput->text();
-  //check description and selected node
-  if( temp != "" )
-  {
-    if( m_Controls->m_TreeNodeSelector->GetSelectedNode() )
-    {
-      //set the nodeproperty "name" and update the treenodeselector
-      m_Controls->m_TreeNodeSelector->GetSelectedNode()->SetProperty( "name", new mitk::StringProperty( temp ) );
-      m_Controls->m_TreeNodeSelector->UpdateContent();
-    }
-    else 
-    {
-      QMessageBox::information( 0, "ChiliExample", "No node selected!" );
-    }
-  }
-  else 
-  {
-    QMessageBox::information( 0, "ChiliExample", "Please enter a non-empty series description!" );
-  }
+  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadImagesFromLightbox( mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox() ) );
 }
 
-void QmitkLoadSaveToChiliExample::LoadFromLightbox()
+void QmitkLoadSaveToChiliExample::SaveImageToLightBox()
 {
-  //make the cursor to a clock
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-  //read the current lightbox
-  mitk::LightBoxImageReader::Pointer reader = mitk::LightBoxImageReader::New();
-  reader->SetLightBoxToCurrentLightBox();
-  mitk::Image::Pointer image = reader->GetOutput();
-  image->Update();
-  //the image is not initialized if the lightbox is empty
-  if( image->IsInitialized() )
-  {
-    //create a new datatreenode, setdate, set the nodeproperty "name", add
-    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-    node->SetData( image );
-    mitk::DataTreeNodeFactory::SetDefaultImageProperties( node );
-    mitk::ChiliPlugin::GetInstance()->AddPropertyListToNode( reader->GetImageTagsAsPropertyList(), node.GetPointer() );
-    mitk::DataStorage::GetInstance()->Add( node /* , parent */ );
-    //initialize the multiwidget (input changed)
-    m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
-    m_MultiWidget->Fit();
-    m_MultiWidget->ReInitializeStandardViews();
-    //update the treenodeselector and make the cursor normal
-    m_Controls->m_TreeNodeSelector->UpdateContent();
-    QApplication::restoreOverrideCursor();
-  }
-  else
-  {
-    QApplication::restoreOverrideCursor();
-    QMessageBox::information( 0, "ChiliExample", "The selected Lightbox is empty!" );
-  }
-}
 
-void QmitkLoadSaveToChiliExample::SaveToLightbox()
-{
-  //check the current node, we can only save real images
   mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
-  if ( node )
+  if( node )
   {
     mitk::BaseData* data = node->GetData();
-    if ( data )
+    if( data )
     {
       mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-      if ( image )
+      if( image )
       {
-        //we got a real image -> make the cursor to a clock, create a writer
-        QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-        mitk::LightBoxResultImageWriter::Pointer writer = mitk::LightBoxResultImageWriter::New();
-        //SET INPUT (detailed variant)
-        //->the image
-        writer->SetInput( image );
-        //->the level-window-property
-        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>( node->GetProperty("levelwindow").GetPointer() );
-        if( levelWindowProperty.IsNotNull() )
-          writer->SetLevelWindow( levelWindowProperty->GetLevelWindow() );
-        //->the seriesdescription
-        writer->SetSeriesDescription( node->GetPropertyList()->GetProperty( "name" )->GetValueAsString() );
-        //->set the propertylist
-        writer->SetPropertyList( node->GetPropertyList() );
-        //->the lightbox to write
-        writer->SetLightBoxToNewLightBox();
-        //->you have to set the image, the other inputs get set automatically if there are empty
-        //SET INPUT (short variant)
-        //writer->SetInputByDataTreeNode( node );
-        writer->Write();//write the image to the lightbox
-        //make the cursor normal
-        QApplication::restoreOverrideCursor();
+        mitk::ChiliPlugin::GetInstance()->SaveImageToLightbox( image, node->GetPropertyList(), mitk::ChiliPlugin::GetInstance()->GetNewLightbox() );
       }
-      else QMessageBox::information( 0, "ChiliExample", "No image selected!" );
     }
-    else QMessageBox::information( 0, "ChiliExample", "There is no data in the node!" );
   }
-  else QMessageBox::information( 0, "ChiliExample", "No node selected!" );
 }
 
-void QmitkLoadSaveToChiliExample::FileUpload()
+void QmitkLoadSaveToChiliExample::LoadCompleteSeries()
 {
-  if( mitk::ChiliPlugin::GetInstance()->GetChiliVersion() >= 38 )
+  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadCompleteSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+}
+
+void QmitkLoadSaveToChiliExample::LoadAllImages()
+{
+  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadAllImagesFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+}
+
+void QmitkLoadSaveToChiliExample::LoadAllTexts()
+{
+  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadAllTextsFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+}
+
+void QmitkLoadSaveToChiliExample::LoadOneText()
+{
+  //AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadOneTextFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+}
+
+void QmitkLoadSaveToChiliExample::SaveToChili()
+{
+  mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
+  mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
+  mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
+  mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
+  mitk::NodePredicateData w5( NULL );
+  mitk::NodePredicateOR orpred;
+  orpred.AddPredicate( w1 );
+  orpred.AddPredicate( w2 );
+  orpred.AddPredicate( w3 );
+  orpred.AddPredicate( w4 );
+  orpred.AddPredicate( w5 );
+  mitk::NodePredicateNOT notpred( orpred );
+
+  mitk::ChiliPlugin::GetInstance()->SaveToChili( mitk::DataStorage::GetInstance()->GetSubset( notpred ) );
+}
+
+void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes)
+{
+
+  bool showAll = true;
+  bool askQuestion = false;
+
+  mitk::BaseProperty::Pointer propertyImageNumber;
+  mitk::BaseProperty::Pointer propertyTimeSlice;
+
+  for( unsigned int n = 0; n < resultNodes.size(); n++ )
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer m_Result = mitk::DataStorage::GetInstance()->GetAll();
-    if ( m_Result->Size() > 0 )
+    propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
+    propertyTimeSlice = resultNodes[n]->GetProperty( "NumberOfTimeSlices" );
+
+    if( propertyImageNumber.IsNotNull() && propertyTimeSlice.IsNotNull() )
     {
-      for( mitk::DataStorage::SetOfObjects::const_iterator go = m_Result->begin(); go != m_Result->end(); go++ )
-        mitk::ChiliPlugin::GetInstance()->UploadViaFile( (*go) );
+      if( propertyImageNumber->GetValueAsString() == "1" && propertyTimeSlice->GetValueAsString() == "1" )
+      {
+        if(askQuestion == false )
+          if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected 2D-ResultImages.\nYou can choose if you want to add them to the mitk::DataTree or not.\nMore Images makes the Application slower, so if you want to see the volume only, dont add them.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+          {
+            showAll = true;
+            askQuestion = true;
+            mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+          }
+          else
+          {
+            showAll = false;
+            askQuestion = true;
+          }
+        else
+          if( showAll == true ) mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+      }
+      else  mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
     }
+    else mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
   }
-  else QMessageBox::information( 0, "LoadSaveToChiliExample", "Your current Chili version does not support this function." );
-}
 
-void QmitkLoadSaveToChiliExample::FileDownload()
-{
-  if( mitk::ChiliPlugin::GetInstance()->GetChiliVersion() >= 38 )
-  {
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-    mitk::ChiliPlugin::TextFileList tempTextList = mitk::ChiliPlugin::GetInstance()->GetTextFileInformation();
-    for( mitk::ChiliPlugin::TextFileList::iterator iter = tempTextList.begin(); iter != tempTextList.end(); iter++ )
-    {
-      mitk::ChiliPlugin::GetInstance()->DownloadViaFile( iter->ChiliText, iter->MimeType, m_DataTreeIterator.GetPointer() );
-    }
-    m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
-    m_MultiWidget->Fit();
-    m_MultiWidget->ReInitializeStandardViews();
-    QApplication::restoreOverrideCursor();
-  }
-  else QMessageBox::information( 0, "LoadSaveToChiliExample", "Your current Chili version does not support this function." );
-}
-
-void QmitkLoadSaveToChiliExample::ImageSelected( mitk::DataTreeIteratorClone imageIt )
-{
-  //fill the textfield with the new seriesdescription if another node get selected
-  m_Controls->DescriptionInput->setText( m_Controls->m_TreeNodeSelector->GetSelectedNode()->GetPropertyList()->GetProperty( "name" )->GetValueAsString().c_str() );
-}
-
-void QmitkLoadSaveToChiliExample::chiliStudySelected( const itk::EventObject& )
-{
-  //show the studydescription
-  if( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description != "" )
-    m_Controls->StudyDescription->setText( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy().Description.c_str() );
-  else m_Controls->StudyDescription->setText( "no description" );
-  //clear the listview
-  m_Controls->ListView->clear();
-  //get the current serieslist and iterate
-  mitk::ChiliPlugin::SeriesList tempSeriesList = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries();
-  for( mitk::ChiliPlugin::SeriesList::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++)
-  {
-    //if there are no description show "no description" else show the saved one
-    if( iter->Description == "" )
-      new QListViewItem( m_Controls->ListView, "no description" );
-    else new QListViewItem( m_Controls->ListView, iter->Description.c_str() );
-  }
+  //initialize the multiwidget (input changed)
+  m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+  m_MultiWidget->Fit();
+  m_MultiWidget->ReInitializeStandardViews();
+  //update the treenodeselector
+  m_Controls->m_TreeNodeSelector->UpdateContent();
 }
 
 void QmitkLoadSaveToChiliExample::TreeChanged()

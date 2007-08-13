@@ -72,28 +72,13 @@ class QmitkLoadSaveToChiliExample : public QmitkFunctionality
 
 protected slots:
 
-  /*!
-  \brief load an image from the current selected lightbox and add it to the MITK-DataTree
-  */
-  void LoadFromLightbox();
-
-  /*!
-  \brief add the current selected DataTreeNode (only images) to a new lightbox
-  */
-  void SaveToLightbox();
-
-  /*!
-  \brief change the description of the current selected DataTreeNode
-  */
-  void SetDescription();
-
-  void FileDownload();
-  void FileUpload();
-
-  /*!
-  \brief fill a textfield with the seriesdescription
-  */
-  void ImageSelected(mitk::DataTreeIteratorClone imageIt);
+  void LoadImageFromLightBox();
+  void SaveImageToLightBox();
+  void LoadCompleteSeries();
+  void LoadAllImages();
+  void LoadAllTexts();
+  void LoadOneText();
+  void SaveToChili();
 
   /*!
   \brief method if the tree changed
@@ -102,10 +87,7 @@ protected slots:
 
 protected:
 
-  /*!
-  \brief if the user change the study in chili, mitk::ChiliPlugin throws an event, this method listen to it and change the listview (show the description of all series to the selected study)
-  */
-  void chiliStudySelected(const itk::EventObject&);
+  void AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes);
 
   /*!
   * default main widget containing 4 windows showing 3

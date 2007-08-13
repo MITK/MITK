@@ -7,6 +7,7 @@
 #include <qcursor.h>
 #include <qapplication.h>
 
+// the constructor create the widget
 QmitkLightBoxReaderDialog::QmitkLightBoxReaderDialog( QWidget* parent, const char* name )
 :QDialog( parent, name, true ),
  m_MaxCount(0)
@@ -29,30 +30,34 @@ QmitkLightBoxReaderDialog::QmitkLightBoxReaderDialog( QWidget* parent, const cha
   m_Ok->setFocus();
   connect( m_Ok, SIGNAL( clicked() ), this, SLOT( accept() ) );
 
-  m_Abourt = new QPushButton( tr("Cancel"), this );
-  connect( m_Abourt, SIGNAL( clicked() ), this, SLOT( reject() ) );
+  m_Abort = new QPushButton( tr("Cancel"), this );
+  connect( m_Abort, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
   QBoxLayout * horizontalLayout = new QHBoxLayout( verticalLayout );
   horizontalLayout->setSpacing(5);
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( m_Ok );
-  horizontalLayout->addWidget( m_Abourt );
+  horizontalLayout->addWidget( m_Abort );
 
   QApplication::restoreOverrideCursor();
 }
 
+// destructor
 QmitkLightBoxReaderDialog::~QmitkLightBoxReaderDialog()
 {
 }
 
+// return the selected spacing
 mitk::Vector3D QmitkLightBoxReaderDialog::GetSpacing()
 {
   QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
   return m_SpacingVector[ m_Spacings->currentItem() ];
 }
 
+// add a spacing to the listbox
 void QmitkLightBoxReaderDialog::addSpacings( mitk::Vector3D spacing, int count )
 {
+  // convert a Vector3D and int to string
   std::ostringstream stringHelper;
   stringHelper << "Spacing: ";
   stringHelper << spacing[2];
@@ -60,13 +65,16 @@ void QmitkLightBoxReaderDialog::addSpacings( mitk::Vector3D spacing, int count )
   stringHelper << count;
   std::string resultString = stringHelper.str();
 
+  // put the string into the listbox
   m_Spacings->insertItem( resultString.c_str() );
+  // save the spacing
   m_SpacingVector.push_back( spacing );
 
+  // count the maximum
   if( count > m_MaxCount )
   {
     m_MaxCount = count;
+    // select the item with the current highest count
     m_Spacings->setCurrentItem( m_Spacings->count()-1 );
   }
 }
-

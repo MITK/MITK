@@ -16,6 +16,7 @@ SET(CPP_FILES
   QmitkBaseAlgorithmComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
   QmitkCallbackFromGUIThread.cpp
+  QmitkChiliPluginDifferentStudiesDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
@@ -116,6 +117,7 @@ SET(MOC_H_FILES
   QmitkBaseComponent.h
   QmitkBaseFunctionalityComponent.h
   QmitkCallbackFromGUIThread.h
+  QmitkChiliPluginDifferentStudiesDialog.h
   QmitkColorTransferFunctionCanvas.h
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h

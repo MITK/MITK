@@ -1,0 +1,325 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkSurfaceTransformerComponentGUI</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkSurfaceTransformerComponentGUI</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>156</width>
+            <height>114</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>SurfaceTransformerComponent</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>0</number>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>m_SurfaceTransformer</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>GroupBoxPanel</enum>
+            </property>
+            <property name="title">
+                <string>SurfaceTransformer</string>
+            </property>
+            <property name="flat">
+                <bool>false</bool>
+            </property>
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>3</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>m_ContainerContent</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="lineWidth">
+                        <number>0</number>
+                    </property>
+                    <property name="title">
+                        <string></string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QGroupBox">
+                            <property name="name">
+                                <cstring>m_SurfaceTransformerSelectDataGroupBox</cstring>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="midLineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="title">
+                                <string>Show Image Selector</string>
+                            </property>
+                            <property name="flat">
+                                <bool>true</bool>
+                            </property>
+                            <property name="checkable">
+                                <bool>true</bool>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>m_ImageContent</cstring>
+                                    </property>
+                                    <property name="frameShape">
+                                        <enum>NoFrame</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="midLineWidth">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="title">
+                                        <string></string>
+                                    </property>
+                                    <property name="flat">
+                                        <bool>true</bool>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <property name="margin">
+                                            <number>0</number>
+                                        </property>
+                                        <property name="spacing">
+                                            <number>0</number>
+                                        </property>
+                                        <widget class="QmitkDataTreeComboBox">
+                                            <property name="name">
+                                                <cstring>m_TreeNodeSelector</cstring>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QGroupBox">
+                            <property name="name">
+                                <cstring>m_ShowSurfaceTransformerGroupBox</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="frameShape">
+                                <enum>NoFrame</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Plain</enum>
+                            </property>
+                            <property name="lineWidth">
+                                <number>0</number>
+                            </property>
+                            <property name="title">
+                                <string></string>
+                            </property>
+                            <property name="flat">
+                                <bool>true</bool>
+                            </property>
+                            <property name="checkable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                            <vbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QGroupBox">
+                                    <property name="name">
+                                        <cstring>m_SurfaceTransformerValueContent</cstring>
+                                    </property>
+                                    <property name="frameShape">
+                                        <enum>NoFrame</enum>
+                                    </property>
+                                    <property name="frameShadow">
+                                        <enum>Plain</enum>
+                                    </property>
+                                    <property name="lineWidth">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="title">
+                                        <string></string>
+                                    </property>
+                                    <grid>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QPushButton" row="0" column="0">
+                                            <property name="name">
+                                                <cstring>m_MoveButton</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>0</hsizetype>
+                                                    <vsizetype>0</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image0</pixmap>
+                                            </property>
+                                            <property name="toggleButton">
+                                                <bool>true</bool>
+                                            </property>
+                                            <property name="toolTip" stdset="0">
+                                                <string>Move : use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to move the surface</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QPushButton" row="0" column="1">
+                                            <property name="name">
+                                                <cstring>m_RotateButton</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>0</hsizetype>
+                                                    <vsizetype>0</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="pixmap">
+                                                <pixmap>image1</pixmap>
+                                            </property>
+                                            <property name="toggleButton">
+                                                <bool>true</bool>
+                                            </property>
+                                            <property name="toolTip" stdset="0">
+                                                <string>Rotate: use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to rotate the surface</string>
+                                            </property>
+                                        </widget>
+                                    </grid>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+    </vbox>
+</widget>
+<customwidgets>
+    <customwidget>
+        <class>QmitkDataTreeComboBox</class>
+        <header location="global">QmitkDataTreeComboBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image2</pixmap>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc44531004735180322a174381b2b232650a9495d15490ee8661ad4019ab0265980294c0436602c5c1718d0f106502613750c39bc34c01e1544d71c6c17443ad3517007ac5b397</data>
+    </image>
+    <image name="image1">
+        <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc4453100473f1013405ca60804b813212c0a240190da02b40d186a402a600dd6a381faa005d1e26a20c5580290ff710580136799843600a30e55115e0928728c06e801ec29bf8e40928805b31700a087a9308057af8821a224c9c02ec2a208278d3839e1ec114457c9a4449c828d90729e360cd16a8590f4bc6d253aab5e6020017f2ae7a</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="1002">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003b149444154789cad94514c5b5518c77fe7dc4b7b4b6150bb96324418ca32358bee6192609c51d883892ce083f1718b3ebb185f8dc91e972cf39d2d6a78d0b027b3cd07d9e68c81c625a6c139408a4384f416100aed6d4b7bdb7b8e0fc0921a70c6ed7b3ae7e43bbff3fffedfc927e2f138bbd1dbdbab7902118fc785d8058f8d8de9aeae2e72b91cb66de338ce7f82e47239666767492412b8aefbf0dcdc553a323242f4501d918e2d3a8f15a9784584100809a609526eafd1a0f54e6142e029c5c21f3ef41583bb77a805efbe1ce9d86279e32619678eaab7853fa0f02a16abb64166ad0cdac75307eb3874b84cb0a14aa5a24108cc0688c48c9a4a1e826ddbe6f0b12219678e8ace610502ccdfafe3f68d3c33bf6c01c59dcc209d472c4e0d35d2f3ba81d205d06005e4de60c77170bd2255af80150870f70e8c0eaf009260a349577714e913a4175d16925b5cbe50607931cc3b677c68ca28a5f7066f5b26f00760febec9e8f032a0e81b68a17fc0201415989647a9d8c4c498cbe8f05f5cff3a4d4bac8bfe210b290b35e01afd428257b1b875cd01aaf4bd1de5dd0fea688e1530ad1c1bab16b7af17393558cf997311c0e49bafd670d6258621f6576c9ab09a3248fe5ae6c08103f49f36517213d33070369bf8e2529ee9c90ceb2b2eef7f14617c2c48722a4b7226845143fa87622905ebeb6514253a9eb5084504a66950c88618bee0303d99217cb09e9ed71a09369538fa523d00e9a50a42eed3bc6d8f41281fa0903e8561796cac86f8f2b33c33930ea0f0fb4d5adbeb30ad22866ffbbad226d2a805d7ee0484220208925aaa50deaa67e27b97e9c90ccdcdf5c462cdd8a94d2e7e62f3603244ea410989a4ed191f52a8fd156b056d9d553a9e0bf0e7ef45c6bf7339fd5e90ec7a88575e6d20d6e6e7e2a755ec854dce7fb8885b2cd014f6f3c2714d3a550bae55ac35c1068fb7061b00b87a7995899b25ce9e0b73e24d8fae97b37c7cbe9370b499fce6066eb54adf6098f6ee2a9a7ff9c70841a5023d270deca510d746537c7e29cdf8ad20475fb4307c82d4fc324ec6859d66fdfc6381e44014b36e9fe6e572393ca54068aa22cfd0598b686b3737aeae90bc9725796f0350802414b6e81b7c9a9f7e70708a2e6e5991cfeee3f1ecec2c0b0b3e8c068142a2a8d23728397132c6dc6f2e2b8b0a8da4b5ddc7f3c735ed47146f0cb4502983693a4c25ca7b83138904fa8a412466e00f48b4271086c2901263676c4a6990b615b6ade15b85694af239984a94585bf6f606bbae5b334f1f37e4a3531e031c8fc7c5a312ff17f849c3e3f1b8f81b8be6900aca9b61c90000000049454e44ae426082</data>
+    </image>
+</images>
+<includes>
+    <include location="local" impldecl="in declaration">mitkDataTree.h</include>
+    <include location="local" impldecl="in implementation">QmitkSurfaceTransformerComponentGUI.ui.h</include>
+</includes>
+<variables>
+    <variable>mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
+</variables>
+<slots>
+    <slot specifier="non virtual">SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
+</slots>
+<functions>
+    <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
+    <function returnType="QGroupBox *">GetShowSurfaceTransformerGroupBox()</function>
+    <function returnType="QGroupBox *">GetSurfaceTransformerFinderGroupBox()</function>
+    <function returnType="QGroupBox *">GetSelectDataGroupBox()</function>
+    <function returnType="QGroupBox *">GetSurfaceTransformerValueContent()</function>
+    <function returnType="QGroupBox *">GetImageContent()</function>
+    <function returnType="QGroupBox *">GetContainerContent()</function>
+    <function returnType="QPushButton *">GetMoveButton()</function>
+    <function returnType="QPushButton *">GetRotateButton()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
+</UI>

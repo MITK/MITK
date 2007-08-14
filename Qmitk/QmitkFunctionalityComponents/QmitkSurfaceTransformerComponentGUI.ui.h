@@ -72,3 +72,9 @@ QPushButton* QmitkSurfaceTransformerComponentGUI::GetRotateButton()
 {
   return m_RotateButton;
 }
+
+
+QPushButton* QmitkSurfaceTransformerComponentGUI::GetScaleButton()
+{
+  return m_ScaleButton;
+}

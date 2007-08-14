@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionalityComponentContainer.h"
 class QmitkSurfaceTransformerComponentGUI;
 class QmitkStdMultiWidget;
+
+//class vtkTransform;
+//class qaccel;
+#include <vtkTransform.h>
+
 #include <qaccel.h>
 
 /**
@@ -91,6 +96,18 @@ public:
 	/** \brief Method to set the reference to the node that shall be transformed */
 	void SetSurfaceNode(mitk::DataTreeNode::Pointer node);
 
+	/** \brief Method to set the the distance that is used to move the object */
+	void SetDistance(double distance);
+
+    /** \brief Method to get the distance that is used to move the object */
+	double GetDistance();
+
+	/** \brief Method to set the the angle that is used to rotate the object */
+	void SetAngle(double angle);
+
+	/** \brief Method to get the angle that is used to rotate the object */
+	double GetAngle();
+
 	/***************      (DE)ACTIVATED     ***************/
 
 	///** \brief Method to set m_Activated to true */
@@ -111,11 +128,14 @@ public slots:
 	/** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
 	void ShowImageContent(bool show = true);
 
-	/** \brief Slot method that will be called if the move-operation is avtivated or deactivated by the move button. */ 
+	/** \brief Slot method that will be called if the move-operation is activated or deactivated by the move button. */ 
 	void TransformationModeMove(bool toggleflag);
 
-	/** \brief Slot method that will be called if the rotate-operation is avtivated or deactivated by the rotate button. */ 
+	/** \brief Slot method that will be called if the rotate-operation is activated or deactivated by the rotate button. */ 
 	void TransformationModeRotate(bool toggleflag);
+
+	/** \brief Slot method that will be called if the scale-operation is activated or deactivated by the rotate button. */ 
+	void TransformationModeScale(bool toggleflag);
 
 
 	/***************************** SLOTS TO TRANSFORM *************************************/
@@ -137,18 +157,25 @@ public slots:
 
 	/* ROTATION */  
 
-	/** \brief Slot method to rotate the surface around the x-Axis rotate button is activated and (Qt::Key_Left) is pressed*/
+	/** \brief Slot method to rotate the surface around the x-Axis if the rotate button is activated and (Qt::Key_Left) is pressed*/
 	void RotX();  
-	/** \brief Slot method to rotate the surface negative around the x-Axis rotate button is activated and (Qt::Key_Right) is pressed*/
+	/** \brief Slot method to rotate the surface negative around the x-Axis if the rotate button is activated and (Qt::Key_Right) is pressed*/
 	void RotInvX();
-	/** \brief Slot method to rotate the surface around the y-Axis rotate button is activated and (Qt::Key_Up) is pressed*/
+	/** \brief Slot method to rotate the surface around the y-Axis if the rotate button is activated and (Qt::Key_Up) is pressed*/
 	void RotY(); 
-	/** \brief Slot method to rotate the surface negative around the y-Axis rotate button is activated and (Qt::Key_Down) is pressed*/
+	/** \brief Slot method to rotate the surface negative around the y-Axis if the rotate button is activated and (Qt::Key_Down) is pressed*/
 	void RotInvY(); 
-	/** \brief Slot method to rotate the surface around the z-Axis rotate button is activated and (Qt::Key_A) is pressed*/
+	/** \brief Slot method to rotate the surface around the z-Axis if the rotate button is activated and (Qt::Key_A) is pressed*/
 	void RotZ();
-	/** \brief Slot method to rotate the surface negative around the z-Axis rotate button is activated and (Qt::Key_S) is pressed*/
+	/** \brief Slot method to rotate the surface negative around the z-Axis if the rotate button is activated and (Qt::Key_S) is pressed*/
 	void RotInvZ();   
+
+	/* Scale */ 
+
+	/** \brief Slot method to scale the surface up if the scale button is activated and (Qt::Key_Up) is pressed*/
+	void ScaleUp();
+	/** \brief Slot method to scale the surface down if the scale button is activated and (Qt::Key_Down) is pressed*/
+	void ScaleDown();  
 
 protected:
 
@@ -184,6 +211,8 @@ private:
 	/** \brief Method to to delete SurfaceTransformerNode if Component is deactivated*/
 	void DeleteSurfaceTransformerNode();
 
+	/** \brief Method to adopt the transformation on the surface and put it into the datatree*/
+	void Transform(vtkTransform* transform);
 
 	/***************        ATTRIBUTES      ***************/
 
@@ -215,6 +244,13 @@ private:
 	/** \brief  Member for the connection between the "S"-key and the RotInvZ slot*/
 	QAccel* m_RotInvZ;
 
+	/* MEMBER ACCELS FOR SCALE */
+	/** \brief  Member for the connection between the up-arrow-key and the ScaleUp slot*/
+	QAccel* m_ScaleUp;
+	/** \brief  Member for the connection between the down-arrow-keyand the ScaleDown slot*/
+	QAccel* m_ScaleDown;
+
+
 
 
 	/** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
@@ -240,6 +276,36 @@ private:
 	a reference to the visible multiwidget
 	*/
 	QmitkStdMultiWidget* m_MultiWidget;
+
+	/*!
+	Member for the standard angle that is used to rotate the object
+	*/
+	double m_Angle;
+
+    /*!
+	Member for the standard distance that is used to move the object
+	*/
+    double m_Distance;
+
+	/*!
+	Member for the standard scale-factor that is used to scale the object
+	*/
+    double m_Scale;
+
+	/*!
+	Member for the scale-factors x, y, z that are used to scale the object
+	*/
+	double m_ScaleX;
+
+	/*!
+	Member for the scale-factors x, y, z that are used to scale the object
+	*/
+	double m_ScaleY;
+
+	/*!
+	Member for the scale-factors x, y, z that are used to scale the object
+	*/
+	double m_ScaleZ;
 
 
 };

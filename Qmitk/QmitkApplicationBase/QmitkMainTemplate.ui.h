@@ -213,10 +213,18 @@ public:
   {
     m_DataTreeIterator = iterator;
     m_TimeSelector = mitk::ImageTimeSelector::New();
+		if(m_DataTreeIterator.IsNotNull())
+		{
+			itk::ReceptorMemberCommand<posOutputType>::Pointer command = itk::ReceptorMemberCommand<posOutputType>::New();
+			command->SetCallbackFunction(this, &posOutputType::TreeChanged);
+			m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+		}
   }
 
   ~posOutputType()
-  {}
+  {
+		m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+	}
 
   typedef mitk::Operation Operation;
   void ExecuteOperation(Operation* operation) //writing mitk::Operation causes QT-Designer to create a Slot calles Operation*operation) and thus causes errors. Thats why we here have a typedef. //TODO: FIX it!
@@ -229,31 +237,8 @@ public:
       {
       case mitk::OpMOVE:
         {
-          int maxLayer = itk::NumericTraits<int>::min();
           mitk::Image* image = NULL;
-          mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-          while ( !it->IsAtEnd() )
-          {
-            bool include = true;
-            if(it->Get()->GetBoolProperty("include for pixel inspection", include) == false)
-              include = it->Get()->IsVisible(NULL);
-            if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && include )
-            {
-              int layer = 0;
-              it->Get()->GetIntProperty("layer", layer);
-              if ( layer >= maxLayer )
-              {
-
-                if(strcmp(it->Get()->GetData()->GetNameOfClass(),"Image")==0)
-                {
-                  image = static_cast<mitk::Image*>(it->Get()->GetData());
-                  maxLayer = layer;
-                }
-              }
-            }
-            ++it;
-          }
-
+					image = GetImageFromDataTree();
           QString s;
           mitk::Point3D p = pointoperation->GetPoint();
           mitk::ScalarType time = pointoperation->GetTimeInMS();
@@ -267,7 +252,11 @@ public:
           }
 
 
-          if ( ( image != NULL ) && ( image->IsInitialized() ) )
+					if (image==NULL)
+					{
+						m_TimeSelector->SetInput(NULL);
+					}
+					else if ( image->IsInitialized() ) 
           {
             m_TimeSelector->SetInput(image);
             mitk::Image* image3D = m_TimeSelector->GetOutput();
@@ -283,7 +272,7 @@ public:
               {
                 image3D->ReleaseData();
               }
-              m_TimeSelector->SetInput(NULL);
+              //m_TimeSelector->SetInput(NULL);
               return;
             }
 
@@ -321,7 +310,7 @@ public:
             {
               image3D->ReleaseData();
             }
-            m_TimeSelector->SetInput(NULL);
+            //m_TimeSelector->SetInput(NULL);
           }
           mitk::StatusBar::GetInstance()->DisplayText(s.ascii(), 10000);
           break;
@@ -333,6 +322,51 @@ public:
       }
     }
   }
+			
+	virtual void TreeChanged(const itk::EventObject & treeChangedEvent)
+	{
+		mitk::Image* image = NULL;
+		image = this->GetImageFromDataTree();
+		if (image==NULL)
+		{
+			m_TimeSelector->SetInput(NULL);
+		}
+		else if ( image->IsInitialized() )
+		{
+			m_TimeSelector->SetInput(image);
+		}
+	}
+
+	mitk::Image* GetImageFromDataTree()
+	{
+		int maxLayer = itk::NumericTraits<int>::min();
+		mitk::Image* image = NULL;
+		mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+		while ( !it->IsAtEnd() )
+		{
+			bool include = true;
+			if(it->Get()->GetBoolProperty("include for pixel inspection", include) == false)
+				include = it->Get()->IsVisible(NULL);
+			if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && include )
+			{
+				int layer = 0;
+				it->Get()->GetIntProperty("layer", layer);
+				if ( layer >= maxLayer )
+				{
+
+					if(strcmp(it->Get()->GetData()->GetNameOfClass(),"Image")==0)
+					{
+						image = static_cast<mitk::Image*>(it->Get()->GetData());
+						maxLayer = layer;
+					}
+				}
+			}
+			++it;
+		}
+		return image;
+	}
+
+	int m_ObserverTag;
 };
 
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;

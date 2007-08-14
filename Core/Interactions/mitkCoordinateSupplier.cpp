@@ -149,8 +149,10 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
         default:
           ok = false;
           break;
-        }
-        return ok;
+      }
+			if(doOp!=NULL)
+				delete doOp;
+      return ok;
     }
 
     if(doOp!=NULL)

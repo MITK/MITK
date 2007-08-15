@@ -121,7 +121,7 @@ void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
   Point3D a_first,b_first;
   int a_firstID = 0, b_firstID = 0;
 
-  int front[4];
+  vtkIdType front[4];
   for(i=0;i<m_RingResolution;++i)
   {
     VnlVector v0,v1,v2,v3,normal;
@@ -136,7 +136,7 @@ void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
       front[2]=vPoints->InsertNextPoint(v1[0],v1[1],v1[2]);
       front[1]=vPoints->InsertNextPoint(v2[0],v2[1],v2[2]);
       front[0]=vPoints->InsertNextPoint(v3[0],v3[1],v3[2]);
-      polys->InsertNextCell( 4, front );
+      polys->InsertNextCell( (vtkIdType) 4, front );
       if(i==1)
       {
         a_firstID=front[3]; b_firstID=front[2]; //continue;

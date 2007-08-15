@@ -334,6 +334,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
   m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
   TransferVtkToItkTransform();
   Modified();
+	vtktransform->Delete();
 }
 
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const

@@ -599,10 +599,7 @@ int mitk::RenderingManager::GetCurrentLOD() //returns the LOD requested for the 
 void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for the next rendering
 { 
   //std::cout<<"SetCurrentLOD("<<lod<<")"<<std::endl;
-  if(m_CurrentLOD != lod)
-  {
-    m_CurrentLOD=lod;
-  }
+  m_CurrentLOD=lod;
 }
 
 void mitk::RenderingManager::SetNumberOfLOD(int number)

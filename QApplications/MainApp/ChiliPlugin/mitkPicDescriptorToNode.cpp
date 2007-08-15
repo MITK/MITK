@@ -152,7 +152,7 @@ class compare_Vector
 // helper class to round
 double mitk::PicDescriptorToNode::Round(double number, unsigned int decimalPlaces)
 {
-  double d = pow( 10.0, decimalPlaces );
+  double d = pow( (long double)10.0, (int)decimalPlaces );
   double x;
   if( number > 0 )
     x = floor( number * d + 0.5 ) / d;

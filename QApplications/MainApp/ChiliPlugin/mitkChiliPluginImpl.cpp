@@ -85,7 +85,7 @@ mitk::ChiliPluginImpl::ChiliPluginImpl()
   m_FileList.clear();
 
   m_tempDirectory = GetTempDirectory();
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
+  if( m_tempDirectory.empty() )
     QMessageBox::information( 0, "MITK", "MITK was not able to create a Temp-Directory.\nYou can only Load and Save via Lightbox.\nMore should not be possible." );
   else
     std::cout << "ChiliPlugin: Create and use directory "<< m_tempDirectory << std::endl;
@@ -1772,8 +1772,8 @@ void mitk::ChiliPluginImpl::handleMessage( ipInt4_t type, ipMsgParaList_t *list 
 #ifdef WIN32
 
 #include <windows.h>
-#using <mscorlib.dll>
-#using <System.dll>
+//#using <mscorlib.dll>
+//#using <System.dll>
 
 
 // ist das ein c-sharp beispiel?? der namespace ist nicht c++

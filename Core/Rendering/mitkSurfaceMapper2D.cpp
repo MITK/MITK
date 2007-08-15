@@ -165,11 +165,11 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     Point3D point;
     Vector3D normal;
 
-    // Check if Lookup-Table is already given, else use standard one. 
+    //Check if Lookup-Table is already given, else use standard one. 
     vtkFloatingPointType* scalarLimits = m_LUT->GetTableRange();
     vtkFloatingPointType scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1]; 
 
-    vtkLookupTable *lut = vtkLookupTable::New();
+    vtkLookupTable *lut;// = vtkLookupTable::New();
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
@@ -239,7 +239,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     m_Plane->SetOrigin(vp);
     m_Plane->SetNormal(vnormal);
 
-    // set data into cutter
+    //set data into cutter
     m_Cutter->SetInput(vtkpolydata);
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
@@ -252,6 +252,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     // travers the cut contour
     PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);
+
   }
 }
 

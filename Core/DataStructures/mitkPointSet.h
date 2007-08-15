@@ -63,11 +63,26 @@ namespace mitk {
  * which is also derived from itk::PointSet. Thus several typedefs which seem
  * to be in wrong place, are declared here (for example SelectedLinesType).
  *
- * \subsection mitkPointSetDisplayOptions
+ * \section mitkPointSetDisplayOptions
  * 
  * The default mappers for this data structure are mitk::PointSetMapper2D and
  * mitk::PointSetVtkMapper3D. See these classes for display options which can
  * can be set via properties.
+ *
+ * \section Events
+ *
+ * PointSet issues the following events, for which observers can register
+ * (the below events are grouped into a class hierarchy as indicated by 
+ * identation level; e.g. PointSetSizeChangeEvent comprises PointSetAddEvent 
+ * and PointSetRemoveEvent):
+ * 
+ * <tt>
+ * PointSetEvent <i>subsumes all PointSet events</i>
+ *   PointSetMoveEvent <i>issued when a point of the PointSet is moved</i>
+ *   PointSetSizeChangeEvent <i>subsumes add and remove events<i>
+ *     PointSetAddEvent <i>issued when a point is added to the PointSet</i>
+ *     PointSetRemoveEvent <i>issued when a point is removed from the PointSet</i>
+ * </tt>
  *
  * \ingroup Data
  */
@@ -223,99 +238,13 @@ protected:
 
 };
 
-  itkEventMacro( NewPointEvent, itk::AnyEvent );
-  itkEventMacro( RemovedPointEvent, itk::AnyEvent );
 
+itkEventMacro( PointSetEvent, itk::AnyEvent );
+itkEventMacro( PointSetMoveEvent, PointSetEvent );
+itkEventMacro( PointSetSizeChangeEvent, PointSetEvent );
+itkEventMacro( PointSetAddEvent, PointSetSizeChangeEvent );
+itkEventMacro( PointSetRemoveEvent, PointSetSizeChangeEvent );
 
-
-/**
-* \brief Class to realize an observer, that listens to an event called by
-* mitk::PointSet.
-*
-* A pointer to a method of an other object, not derived from itk can be 
-* connected and called 
-**/
-template <class T> 
-class TPointSetObserver : public itk::Command 
-  {
-  public:
-    typedef  TPointSetObserver        Self;
-    typedef  itk::Command             Superclass;
-    typedef  itk::SmartPointer<Self>  Pointer;
-
-    itkNewMacro( Self );
-
-  protected:
-    TPointSetObserver(){}
-    ~TPointSetObserver(){}
-
-  public:
-    /**
-    * \brief Set the object and its methods, that have to be called if an
-    * event is recieved
-    **/
-    void Set( T* object, void (T::*memberFunctionPointerNewPointEvent)(), 
-              void (T::*memberFunctionPointerRemovedPointEvent)() ) 
-    {
-      m_Object = object; 
-      m_MemberFunctionPointerNewPointEvent = 
-        memberFunctionPointerNewPointEvent;
-      m_MemberFunctionPointerRemovedPointEvent = 
-        memberFunctionPointerRemovedPointEvent;
-    }
-    
-    /**
-     * \brief Set the parent, which methods are called
-     **/
-    void SetParent( T* object)
-    {
-      m_Object = object;
-    }
-    
-    /**
-     * \brief Set the method to be called if the pointset throughs a
-     * NewPointEvent()
-     */
-    void SetNewPointEventMethod( 
-      void (T::*memberFunctionPointerNewPointEvent)() )
-    {
-      m_MemberFunctionPointerNewPointEvent = 
-        memberFunctionPointerNewPointEvent;
-    }
-
-    /**
-     * \brief Set the method to be called if the pointset throughs a
-     * RemovedPointEvent()
-     */
-    void SetRemovedPointEventMethod( 
-      void (T::*memberFunctionPointerRemovedPointEvent)() ) 
-    {
-      m_MemberFunctionPointerRemovedPointEvent = 
-        memberFunctionPointerRemovedPointEvent;
-    }
-    
-    /**
-     * \brief Derive methods to call the registered method if an event is 
-     * revieved
-     */
-    void Execute(itk::Object *object, const itk::EventObject & event)
-    {
-      this->Execute( (const itk::Object*) object, event );
-    }
-
-    void Execute(const itk::Object * object, const itk::EventObject & event)
-    {
-      if ( typeid(event) == typeid(mitk::NewPointEvent) )
-        (*m_Object.*m_MemberFunctionPointerNewPointEvent)();
-      if ( typeid(event) == typeid(mitk::RemovedPointEvent) )
-        (*m_Object.*m_MemberFunctionPointerRemovedPointEvent)();
-    }
-
-  private: 
-    T* m_Object;
-    void (T::*m_MemberFunctionPointerNewPointEvent)();
-    void (T::*m_MemberFunctionPointerRemovedPointEvent)();
-  };
 
 } // namespace mitk
 

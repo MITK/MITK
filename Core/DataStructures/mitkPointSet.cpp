@@ -77,22 +77,26 @@ bool mitk::PointSet::IsEmpty(int t) const
 
 void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
 {
-  // Check if the vector is long enouth to contain the new element
+  // Check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
   // elements.
+  //
+  // NOTE: This method will never REDUCE the vector size; it should only
+  // be used to make sure that the vector has enough elements to include the
+  // specified time step.
   unsigned int oldSize = m_PointSetSeries.size();
-  m_PointSetSeries.resize( timeSteps );
   
   if ( timeSteps > oldSize )
   {
+    m_PointSetSeries.resize( timeSteps );
     for ( unsigned int i = oldSize; i < timeSteps; ++i )
     {
       m_PointSetSeries[i] = DataType::New();
       PointDataContainer::Pointer pointData = PointDataContainer::New();
       m_PointSetSeries[i]->SetPointData( pointData );
     }
+    this->InitializeTimeSlicedGeometry( timeSteps );
   }
-  this->InitializeTimeSlicedGeometry( timeSteps );
 }
 
 
@@ -371,7 +375,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
         ->InsertElement(position, pointData);
 
       this->Modified();
-      ((const itk::Object*)this)->InvokeEvent( NewPointEvent() );
+      this->InvokeEvent( PointSetAddEvent() );
       this->OnPointSetChange();
     }
     break;
@@ -389,6 +393,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
 
       this->Modified();
+      this->InvokeEvent( PointSetMoveEvent() );
     }
     break;
 
@@ -402,7 +407,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
 
       this->Modified();
-     ((const itk::Object*)this)->InvokeEvent( RemovedPointEvent() );
+      this->InvokeEvent( PointSetRemoveEvent() );
     }
     break;
 
@@ -479,9 +484,9 @@ void mitk::PointSet::UpdateOutputInformation()
   {
     const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
     BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
-    GetGeometry(i)->SetBounds(itkBounds);
+    this->GetGeometry(i)->SetBounds(itkBounds);
   }
-  GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeSlicedGeometry()->UpdateInformation();
 }
 
 void mitk::PointSet::SetRequestedRegionToLargestPossibleRegion()

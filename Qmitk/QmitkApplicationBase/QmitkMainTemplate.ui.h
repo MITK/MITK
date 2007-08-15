@@ -379,10 +379,27 @@ void QmitkMainTemplate::fileOpen()
 {
   try
   {
-    QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
-    for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
+    QString defaultPath;
+    if ( m_FirstFileOpen )
     {
-      fileOpen((*it).ascii());
+      defaultPath = m_DefaultDatasetPath->GetValue();
+    }
+    else
+    {
+      defaultPath = QString::null;
+    }
+    
+    QStringList fileNames = QFileDialog::getOpenFileNames(
+      mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), defaultPath);
+
+    if ( !fileNames.isEmpty() )
+    {
+      QStringList::Iterator it;
+      for ( it = fileNames.begin(); it != fileNames.end(); ++it )
+      {
+        fileOpen((*it).ascii());
+      }
+      m_FirstFileOpen = false;
     }
   }
   catch ( std::exception& e )
@@ -442,9 +459,19 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
 
 void QmitkMainTemplate::fileOpenImageSequence()
 {
- try
- {
-    QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
+  try
+  {
+    QString defaultPath;
+    if ( m_FirstFileOpen )
+    {
+      defaultPath = m_DefaultDatasetPath->GetValue();
+    }
+    else
+    {
+      defaultPath = QString::null;
+    }
+    
+    QString fileName = QFileDialog::getOpenFileName(defaultPath,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
 
     if ( !fileName.isNull() )
     {
@@ -490,6 +517,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
         factory->Update();
         factory->SetImageSerie(false);
         fileOpenGetFactoryOutput(*factory.GetPointer());
+        m_FirstFileOpen = false;
       }
       catch ( itk::ExceptionObject & ex )
       {
@@ -675,6 +703,7 @@ void QmitkMainTemplate::init()
   m_StandardViewsInitialized = false;
   m_FineUndoEnabled = true;
   m_StandardPalette = QApplication::palette();
+  m_FirstFileOpen = true;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -714,6 +743,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(false) );
   m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
   m_Options->SetProperty( "Default value for iilInterpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_IilInterpolationActive) );
+  m_Options->SetProperty( "Default dataset path", new mitk::StringProperty("") );
 }
 
 /*!
@@ -833,7 +863,11 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
   }
 
+  // default dataset path
+  m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( 
+    m_Options->GetProperty("Default dataset path").GetPointer() );
 
+  // use dark palette on/off
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
   if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
     this->enableDarkPalette(true);
@@ -1120,6 +1154,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   if (optionDialog->exec() == QDialog::Accepted)
   {
     // first process global options
+    
     // gradient background
     mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
     mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
@@ -1131,6 +1166,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     {
       m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
     }
+    
     // department logo
     mitk::BaseProperty::Pointer logop =  m_Options->GetProperty("Department logo visible");
     mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( logop.GetPointer() );
@@ -1140,6 +1176,11 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
       m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
     }
     this->enableDepartmentLogo(logoProperty->GetValue());
+    
+    // default dataset path
+    m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( 
+    m_Options->GetProperty("Default dataset path").GetPointer() );
+
     // dark palette
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
     if(mitk::ChiliPlugin::GetInstance()->IsPlugin())

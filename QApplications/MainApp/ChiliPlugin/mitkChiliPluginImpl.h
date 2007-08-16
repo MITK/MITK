@@ -212,7 +212,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     friend class Chili3Conference;
 
     /** need a QcPluginInstance for "create" */
-    friend QObject* QcEXPORT::create( QWidget *parent );
+    friend QObject* ::create( QWidget *parent );
 
     /** needed to instantiate QcPlugin */
     static QWidget* s_Parent;

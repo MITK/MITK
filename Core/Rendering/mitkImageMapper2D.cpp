@@ -99,7 +99,6 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
   glMatrixMode( GL_MODELVIEW );
 
-
   // Define clipping planes to clip the image according to the bounds
   // correlating to the current world geometry. The "extent" of the bounds
   // needs to be enlarged by an "overlap" factor, in order to make the
@@ -128,8 +127,10 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   // Render the image
   image->setInterpolation( rendererInfo.m_IilInterpolation );
-  image->display( renderer->GetRenderWindow() );
   
+
+  image->display( renderer->GetRenderWindow() );
+
 
   // Disable the utilized clipping planes
   glDisable( GL_CLIP_PLANE0 );
@@ -235,8 +236,14 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       // draw text
 
       mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-      OpenGLrenderer->WriteSimpleText(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str());
-      //WriteTextXY(x + (size / 9.0 ), y - (size / 20.0 ), volumeString.str(),renderer);
+
+      Point2D pt2D;
+      pt2D[0] = x + (size / 9.0);
+      pt2D[1] = y - (size / 19.0);
+      displayGeometry->IndexToWorld( pt2D, pt2D );
+      displayGeometry->WorldToDisplay( pt2D, pt2D );
+
+      OpenGLrenderer->WriteSimpleText( pt2D[0], pt2D[1], volumeString.str() );
     }
   }
 
@@ -604,6 +611,8 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // is necessary when the input /em data, but not the /em geometry changes.
   rendererInfo.m_Reslicer->Modified();
   rendererInfo.m_Reslicer->ReleaseDataFlagOn();
+  
+
   rendererInfo.m_Reslicer->Update();
 
 

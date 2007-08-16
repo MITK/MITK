@@ -40,11 +40,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itksys/SystemTools.hxx>
 
-#include <ipPic/ipPic.h>
-#include <ipFunc/ipFunc.h>
+//#include <ipPic/ipPic.h>
+//#include <ipFunc/ipFunc.h>
 
 #include <mitkChiliPlugin.h>
-#include <mitkLightBoxResultImageWriter.h>
 
 #include <qfiledialog.h>
 #include <qmessagebox.h>

@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QcMITKTask;
 class SampleApp;
 class QIDToolButton;
+class Chili3Conference;
 
 namespace mitk {
 
@@ -145,7 +146,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param nameProperty   The "name"-Property needed if different studies selected. So you can see which Node came from which study.
     @param lightbox   This function use the lightbox to save the single slices. Therefore you have to set a lightbox to show and save the slices. Use "GetCurrentLightbox()" or "GetNewLightbox()".
     */
-    virtual void SaveImageToLightbox( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, QcLightbox* lightbox );
+    virtual void SaveImageToLightbox( Image* sourceImage, const PropertyList::Pointer propertyList, QcLightbox* lightbox );
 
     /*!
     \brief Load all Image- and Text-Files from the series.
@@ -209,7 +210,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** REMEMBER: QcPlugin inheritanced protected */
 
     /** This Class use the QcPlugin-Function "void sendMessage( ipMsgType_t type, ipMsgParaList_t *list )". Its protected because not everybody should send Messages. */
-    friend class Chili3Conference;
+    friend class ::Chili3Conference;
 
     /** need a QcPluginInstance for "create" */
     friend QObject* ::create( QWidget *parent );
@@ -276,7 +277,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     QToolButton* m_LightBoxImportToggleButton;
 
     /** Constuctor */
-    ChiliPluginImpl::ChiliPluginImpl();
+    ChiliPluginImpl();
 
     /** return the temporary directory, it is a new directory in the system-specific temp-Directory */
     std::string GetTempDirectory();

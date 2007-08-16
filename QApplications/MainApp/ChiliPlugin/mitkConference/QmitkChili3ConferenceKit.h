@@ -3,7 +3,7 @@
 
 #include <mitkConferenceKit.h>
 
-class Chili3Conference:public mitk::ConferenceKit
+class Chili3Conference : public mitk::ConferenceKit
 {
 
   public:

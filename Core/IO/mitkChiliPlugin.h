@@ -69,12 +69,8 @@ class ChiliPlugin : public itk::Object
       std::string ReferingPhysician;
       std::string Description;
       std::string ManufacturersModelName;
-      std::string ImportTime;
-      std::string ChiliSenderID;
       std::string AccessionNumber;
       std::string InstitutionName;
-      std::string WorkflowState;
-      std::string Flags;
       std::string PerformingPhysician;
       std::string ReportingPhysician;
       std::string LastAccess;
@@ -111,7 +107,7 @@ class ChiliPlugin : public itk::Object
       std::string FrameOfReferenceUID;
     };
 
-    /** there can be lots of series to one study, so we need a list */
+    /** There can be lots of series to one study, so we need a list. */
     typedef std::list<SeriesInformation> SeriesInformationList;
 
     /** This struct contain all possible informations about the TextFile (all other then PIC-Files). */
@@ -126,17 +122,17 @@ class ChiliPlugin : public itk::Object
       std::string Description;
     };
 
-    /** there can be lots of series to one study, so we need a list */
+    /** There can be lots of texts to one series, so we need a list. */
     typedef std::list<TextInformation> TextInformationList;
 
-    /** struct to transport the PicTags (with Description and Content ) */
+    /** Struct to transport the PicTags (with Description and Content ). */
     struct TagInformationStruct
     {
       std::string PicTagDescription;
       std::string PicTagContent;
     };
 
-    /** we need more than one PicTag */
+    /** We need more than one PicTag. */
     typedef std::list<TagInformationStruct> TagInformationList;
 
     /*!

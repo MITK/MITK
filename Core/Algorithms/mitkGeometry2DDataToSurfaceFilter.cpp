@@ -81,8 +81,8 @@ mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
   m_PlaneTriangler->Delete();
   m_TextureMapToPlane->Delete();
 
-  m_Box = vtkBox::New();
-  m_PlaneClipper = vtkClipPolyData::New();
+  m_Box->Delete();
+  m_PlaneClipper->Delete();
 
   m_VtkTransformPlaneFilter->Delete();
 }

@@ -412,7 +412,7 @@ void
 mitk::RenderingManager
 ::UpdateCallback()
 {
- m_UpdatePending = false;
+
 
   // Satisfy all pending update requests
   RenderWindowList::iterator it;
@@ -423,6 +423,7 @@ mitk::RenderingManager
       this->ForceImmediateUpdate( it->first );
     }
   }
+  m_UpdatePending = false;
 }
 
 void
@@ -576,7 +577,7 @@ mitk::RenderingManager
   if ( renderWindow && m_IsRendering[renderWindow] )
   { 
     renderWindow->GetVtkRenderWindow()->SetAbortRender( true );
-    m_UpdatePending = true;
+    //m_UpdatePending = true;
   }
   else
   {

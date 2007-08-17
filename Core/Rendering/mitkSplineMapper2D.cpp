@@ -116,8 +116,8 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   {
     bool previousPointOnPlane = false;
     bool currentPointOnPlane = false;
-    int* cell ( NULL );
-    int cellSize ( 0 ); 
+    vtkIdType* cell ( NULL );
+    vtkIdType cellSize ( 0 ); 
     vlines->GetNextCell ( cellSize, cell );
     for ( int j = 0 ; j < cellSize; ++j )
     {

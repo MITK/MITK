@@ -305,8 +305,8 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   vlines->InitTraversal();
   for(i=0;i<numberOfLines;++i)
   {
-    int *cell(NULL);
-    int cellSize(0);
+    vtkIdType *cell(NULL);
+    vtkIdType cellSize(0);
     vtkFloatingPointType vp[3];
 
     vlines->GetNextCell(cellSize, cell);

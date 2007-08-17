@@ -149,8 +149,8 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
         for ( i = 0;i < numberOfCells;++i )
         {
-            int *cell(NULL);
-            int cellSize(0);
+            vtkIdType *cell(NULL);
+            vtkIdType cellSize(0);
 
             vpolys->GetNextCell( cellSize, cell );
 

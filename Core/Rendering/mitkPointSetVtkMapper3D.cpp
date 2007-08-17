@@ -202,7 +202,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
     for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
     {
-      int cell[2] = {j-1,j};
+      vtkIdType cell[2] = {j-1,j};
       points->InsertPoint(j,pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
       if (j>0)
         polys->InsertNextCell(2,cell);
@@ -215,7 +215,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
     if (close) 
     {
-      int cell[2] = {j-1,0};
+      vtkIdType cell[2] = {j-1,0};
       polys->InsertNextCell(2,cell);
     }
 

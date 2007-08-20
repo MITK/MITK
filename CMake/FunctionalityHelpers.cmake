@@ -54,6 +54,7 @@ ENDMACRO( createFunctionalityLib )
 #   ADD_FUNC_HEADER: Name of a file which contains the AddFuncName() declaration
 #   ADD_FUNC_CALL: File which contains just the call to the above function 
 MACRO(CREATE_QFUNCTIONALITY FUNC_NAME)
+  SUPPRESS_VC8_DEPRECATED_WARNINGS()
   IF(NOT FUNC_NAME)
     GET_FILENAME_COMPONENT(FUNC_NAME ${PROJECT_SOURCE_DIR} NAME)
     MESSAGE(STATUS "Warning. No FUNC_NAME set. Setting it to directory name: ${FUNC_NAME}")

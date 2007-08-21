@@ -156,7 +156,7 @@ void mitk::OperationEvent::ReverseOperations()
 void mitk::OperationEvent::ReverseAndExecute()
 {
   ReverseOperations();
-  if (m_Destination && m_Operation)
+  if (m_Destination && m_Operation && !m_Invalid)
     m_Destination->ExecuteOperation( m_Operation );
 }
 

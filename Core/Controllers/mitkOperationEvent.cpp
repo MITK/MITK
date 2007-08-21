@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkOperationEvent.h"
+#include <itkCommand.h>
 
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;
 int mitk::UndoStackItem::m_CurrGroupEventId = 0;
@@ -111,13 +112,29 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
                                      std::string description)
 : UndoStackItem(description), 
   m_Destination(destination),
-  m_Operation(operation), m_UndoOperation(undoOperation) 
+  m_Operation(operation), 
+  m_UndoOperation(undoOperation),
+  m_Invalid(false)
 {
   // nothing to do
+  if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
+  {
+    itk::SimpleMemberCommand< OperationEvent >::Pointer command = itk::SimpleMemberCommand< OperationEvent >::New();
+    command->SetCallbackFunction( this, &OperationEvent::OnObjectDeleted );
+    m_DeleteTag = object->AddObserver( itk::DeleteEvent(), command );
+  }
 }
 
 mitk::OperationEvent::~OperationEvent()
 {
+  if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
+  {
+    if (!m_Invalid)
+    {
+      object->RemoveObserver( m_DeleteTag );
+    }
+  }
+
   delete m_Operation;
   delete m_UndoOperation;
 }
@@ -148,4 +165,12 @@ mitk::OperationActor* mitk::OperationEvent::GetDestination()
   return m_Destination;
 }
 
+void mitk::OperationEvent::OnObjectDeleted()
+{
+  m_Invalid = true;
+}
 
+bool mitk::OperationEvent::IsValid()
+{
+  return !m_Invalid;
+}

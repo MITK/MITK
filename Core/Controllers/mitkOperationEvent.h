@@ -138,6 +138,12 @@ class UndoStackItem
 //## OperationActor. The operations may be swapped, which is done by the
 //## LimitedLinearUndo models, when an OperationEvent is moved from the undo to the redo
 //## stack or vice versa.
+//##
+//## \attention New, but highly needed method for this object: IsValid() tells you if the destination is still valid.
+//## If the destination happens to be an itk::Object (often the case), OperationEvent is informed as soon
+//## as the object is deleted - from this moment on the OperationEvent gets invalid. You should definitly
+//## check this flag before you call anything on destination
+//##
 //## @ingroup Undo
 class OperationEvent : public UndoStackItem
 {
@@ -158,9 +164,17 @@ public:
   //## that it has been swapped and do is undo and undo is do
   virtual void ReverseOperations();
   virtual void ReverseAndExecute();           /// reverses and executes both operations (used, when moved from undo to redo stack)
+
+  virtual bool IsValid();
+
 protected:
 
+  void OnObjectDeleted();
+
 private:
+
+  // Has to be observed for itk::DeleteEvents.
+  // When destination is deleted, this stack item is invalid!
   OperationActor* m_Destination;
 
   Operation* m_Operation;
@@ -169,6 +183,10 @@ private:
 
   OperationEvent(OperationEvent&);             // hide copy constructor
   void operator=(const OperationEvent&);       // hide operator=
+
+  unsigned long m_DeleteTag;
+
+  bool m_Invalid;
 };
 
 } //namespace mitk

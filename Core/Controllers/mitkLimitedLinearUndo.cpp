@@ -181,6 +181,7 @@ mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* des
     if (!opEvent) continue;
 
     if (   opEvent->GetOperation()->GetOperationType() == opType
+        && opEvent->IsValid()
         && opEvent->GetDestination() == destination ) 
       return opEvent;
   }

@@ -174,7 +174,7 @@ int mitk::LimitedLinearUndo::GetLastGroupEventIdInList()
 
 mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* destination, OperationType opType)
 {
-  // TODO when/where is this function needed?
+  // When/where is this function needed? In CoordinateSupplier...
   for ( UndoContainerRevIter iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
   {
     OperationEvent* opEvent = dynamic_cast<OperationEvent*>(*iter);

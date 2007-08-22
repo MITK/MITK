@@ -41,6 +41,7 @@ mitk::PointSet::PointSet()
   m_PointSetSeries[0]->SetPointData( pointData );
 
   this->InitializeTimeSlicedGeometry( 1 );
+  m_CalculateBoundingBox = false;
 }
 
 
@@ -96,6 +97,9 @@ void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
       m_PointSetSeries[i]->SetPointData( pointData );
     }
     this->InitializeTimeSlicedGeometry( timeSteps );
+    
+    //if the size changes, then compute the boundingbox
+    m_CalculateBoundingBox = true;
   }
 }
 
@@ -245,6 +249,9 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
   mitk::Point3D indexPoint;
   this->GetGeometry( t )->WorldToIndex( point, indexPoint );
   m_PointSetSeries[t]->SetPoint( id, indexPoint );
+
+  //boundingbox has to be computed anyway
+  m_CalculateBoundingBox = true;
 }
 
 
@@ -255,6 +262,9 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
     mitk::Point3D indexPoint;
     this->GetGeometry( t )->WorldToIndex( point, indexPoint );
     m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
+    
+    //boundingbox has to be computed anyway
+    m_CalculateBoundingBox = true;
   }
 }
 
@@ -375,6 +385,10 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
         ->InsertElement(position, pointData);
 
       this->Modified();
+      
+      //boundingbox has to be computed
+      m_CalculateBoundingBox = true;
+
       this->InvokeEvent( PointSetAddEvent() );
       this->OnPointSetChange();
     }
@@ -393,6 +407,10 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
 
       this->Modified();
+
+      //boundingbox has to be computed anyway
+      m_CalculateBoundingBox = true;
+
       this->InvokeEvent( PointSetMoveEvent() );
     }
     break;
@@ -407,6 +425,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       this->OnPointSetChange();
 
       this->Modified();
+      //boundingbox has to be computed anyway
+      m_CalculateBoundingBox = true;
+
       this->InvokeEvent( PointSetRemoveEvent() );
     }
     break;
@@ -480,11 +501,15 @@ void mitk::PointSet::UpdateOutputInformation()
   // Iterate over the PointSets and update the Geometry
   // information of each of the items.
   //
-  for ( unsigned int i = 0 ; i < m_PointSetSeries.size() ; ++i )
+  if (m_CalculateBoundingBox)
   {
-    const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
-    BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
-    this->GetGeometry(i)->SetBounds(itkBounds);
+    for ( unsigned int i = 0 ; i < m_PointSetSeries.size() ; ++i )
+    {
+      const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
+      BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
+      this->GetGeometry(i)->SetBounds(itkBounds);
+    }
+    m_CalculateBoundingBox = false;
   }
   this->GetTimeSlicedGeometry()->UpdateInformation();
 }

@@ -236,6 +236,11 @@ protected:
 
   PointSetSeries m_PointSetSeries;
 
+  /**
+  * @brief flag to indicate the right time to call SetBounds
+  **/
+  bool m_CalculateBoundingBox;
+
 };
 
 

@@ -69,10 +69,10 @@ mitk::SplineVtkMapper3D::GenerateData()
   Superclass::GenerateData();
 
   // only update spline if UpdateSpline has not been called from
-  // external, e.g. by the SplineMapper2D.
-  if ( m_SplineUpdateTime < m_LastUpdateTime ) 
+  // external, e.g. by the SplineMapper2D. But call it the first time when m_SplineUpdateTime = 0 and m_LastUpdateTime = 0.
+  if ( m_SplineUpdateTime < m_LastUpdateTime || m_SplineUpdateTime == 0) 
   {
-    UpdateSpline();
+    this->UpdateSpline();
     this->ApplyProperties();
   }
 
@@ -107,11 +107,9 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
     m_SplinesActor->VisibilityOn();
     m_SplineAssembly->VisibilityOn();
 
-    //remove the PointsAssembly if it was added insuperclass. No need to display points and spline!
+    //remove the PointsAssembly if it was added in superclass. No need to display points and spline!
     if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
       m_SplineAssembly->RemovePart(m_PointsAssembly);
-    this->ApplyProperties();
-   
   }
 }
 

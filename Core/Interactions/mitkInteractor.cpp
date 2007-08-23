@@ -99,14 +99,20 @@ bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* /*s
   {
   case AcMODEDESELECT:
     {
-      this->CreateModeOperation(SMDESELECTED);
-      global->RemoveFromSelectedInteractors(this);
+      if( this->GetMode() !=  SMDESELECTED)
+      {
+        this->CreateModeOperation(SMDESELECTED);
+        global->RemoveFromSelectedInteractors(this);
+      }
       return true;
     }
   case AcMODESELECT:
-    {      
-      this->CreateModeOperation(SMSELECTED);
-      global->AddToSelectedInteractors(this);
+    { 
+      if( this->GetMode() !=  SMSELECTED)
+      {
+        this->CreateModeOperation(SMSELECTED);
+        global->AddToSelectedInteractors(this);
+      }
       return true;
     }
   case AcMODESUBSELECT:

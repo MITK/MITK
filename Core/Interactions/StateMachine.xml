@@ -16,8 +16,14 @@
     <event NAME="left MouseBN + Shift" ID="3" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0100" KEY="Key_none" />
     <!-- middle MouseButton -->
     <event NAME="middle MouseBN" ID="4" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!-- Ctrl + left MouseButton -->
+    <event NAME="CTRL+leftBN" ID="5" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+    <!-- Ctrl + middle MouseButton -->
+    <event NAME="CTRL+middleBN" ID="6" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+    <!-- Ctrl + right MouseButton -->
+    <event NAME="CTRL+rightBN" ID="7" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- left MouseButton DoubleClick-->
-    <event NAME="left MouseBN DC" ID="5" TYPE="Type_MouseButtonDblClick" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <event NAME="left MouseBN DC" ID="8" TYPE="Type_MouseButtonDblClick" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- Strg + N -->
     <event NAME="Strg + N" ID="10" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_N" />
     <!-- Strg + E -->
@@ -82,12 +88,6 @@
     <event NAME="CTRL+rightBN+MouseMove" ID="535" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0202" KEY="Key_none" />
     <!-- CTRL + middle MouseButton and MouseMove -->
     <event NAME="CTRL+middleBN+MouseMove" ID="536" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0204" KEY="Key_none" />
-    <!-- Ctrl + left MouseButton -->
-    <event NAME="CTRL+leftBN" ID="5" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0200" KEY="Key_none" />
-    <!-- Ctrl + middle MouseButton -->
-    <event NAME="CTRL+middleBN" ID="6" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0200" KEY="Key_none" />
-    <!-- Ctrl + right MouseButton -->
-    <event NAME="CTRL+rightBN" ID="7" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- CTRL + left MouseButtonRelease -->
     <event NAME="CTRL+leftBNRelease" ID="537" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0201" KEY="Key_none" />
     <!-- CTRL + right MouseButtonRelease -->
@@ -796,12 +796,20 @@
       <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="5">
         <action ID="1600" />
       </transition>
+      <transition NAME="do picking" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="1600" />
+      </transition>
     </state>
   </stateMachine>
   <stateMachine NAME="YetAnotherVesselTreeInteractor">
     <!-- state machine for vessel TREE interaction -->
     <state NAME="no-vessel-picked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
       <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="8">
         <action ID="30">
           <!--AcCHECKELEMENT-->
         </action>
@@ -821,6 +829,11 @@
     </state>
     <state NAME="vessel-picked" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
       <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="8">
         <action ID="30">
           <!--AcCHECKELEMENT-->
         </action>
@@ -2495,6 +2508,11 @@
           <!--AcCHECKOBJECT-->
         </action>
       </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="2" EVENT_ID="8">
+        <action ID="31">
+          <!--AcCHECKOBJECT-->
+        </action>
+      </transition>
     </state>
     <state NAME="CheckPicking" ID="2" X_POS="515" Y_POS="263" WIDTH="100" HEIGHT="50">
       <transition NAME="noPicked" NEXT_STATE_ID="4" EVENT_ID="1003">
@@ -2514,6 +2532,11 @@
           <!-- AcCHECKOBJECT  -->
         </action>
       </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="5" EVENT_ID="8">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>      
       <transition NAME="delete" NEXT_STATE_ID="1" EVENT_ID="12">
         <action ID="104">
           <!-- AcREMOVESELECTEDSUBOBJECT -->
@@ -2582,6 +2605,11 @@
           <!-- AcCHECKOBJECT  -->
         </action>
       </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="6" EVENT_ID="8">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>      
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
         <action ID="72">
           <!-- AcDESELECTALL -->
@@ -2690,6 +2718,11 @@
           <!-- AcCHECKOBJECT  -->
         </action>
       </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="8">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+      </transition>
       <transition NAME="searchShortestPathBetween2Edges" NEXT_STATE_ID="11" EVENT_ID="18">
         <action ID="3003">
           <!-- AcSHORTESTPATHSEARCH -->
@@ -2790,6 +2823,11 @@
           <!-- AcCHECKOBJECT  -->
         </action>
       </transition>
+      <transition NAME="goToCheckPicking" NEXT_STATE_ID="10" EVENT_ID="8">
+        <action ID="31">
+          <!-- AcCHECKOBJECT  -->
+        </action>
+        </transition>
       <transition NAME="deselectAll" NEXT_STATE_ID="1" EVENT_ID="14">
         <action ID="72">
           <!-- AcDESELECTALL -->

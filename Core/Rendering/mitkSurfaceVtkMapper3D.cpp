@@ -139,29 +139,44 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::MaterialProperty* materialProperty;
-  this->GetDataTreeNode()->GetProperty(materialProperty, "material");
-  if ( materialProperty != NULL )
+  //first check render specific property, then the regulat one
+  bool setMaterial = false;
+  
+  this->GetDataTreeNode()->GetProperty(materialProperty, "material", renderer);
+  if ( materialProperty != NULL && this->GetDataTreeNode()->GetPropertyList(renderer)->IsEnabled("material"))
+    setMaterial = true;
+  else 
   {
-    if ( materialProperty->GetRenderer() == NULL || materialProperty->GetRenderer() == renderer )
-    {
-      vtkProperty* property = m_Actor->GetProperty();
-      //property->SetColor( materialProperty->GetColor().GetDataPointer() );
-      property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
-      property->SetAmbient( materialProperty->GetColorCoefficient() );    
-      property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );    
-      property->SetDiffuse( materialProperty->GetColorCoefficient() );
-      property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
-      property->SetSpecular( materialProperty->GetSpecularCoefficient() );
-      property->SetSpecularPower( materialProperty->GetSpecularPower() );
-      property->SetOpacity( materialProperty->GetOpacity() );
-      property->SetInterpolation( materialProperty->GetVtkInterpolation() );
-      property->SetRepresentation( materialProperty->GetVtkRepresentation() );
-    }
+    this->GetDataTreeNode()->GetProperty(materialProperty, "material");//without renderer?
+    if (materialProperty != NULL && this->GetDataTreeNode()->GetPropertyList()->IsEnabled("material"))
+      setMaterial = true;
+  }
+    
+  if (setMaterial)
+  {
+    vtkProperty* property = m_Actor->GetProperty();
+    //property->SetColor( materialProperty->GetColor().GetDataPointer() );
+    property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
+    property->SetAmbient( materialProperty->GetColorCoefficient() );    
+    property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );    
+    property->SetDiffuse( materialProperty->GetColorCoefficient() );
+    property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
+    property->SetSpecular( materialProperty->GetSpecularCoefficient() );
+    property->SetSpecularPower( materialProperty->GetSpecularPower() );
+    property->SetOpacity( materialProperty->GetOpacity() );
+    property->SetInterpolation( materialProperty->GetVtkInterpolation() );
+    property->SetRepresentation( materialProperty->GetVtkRepresentation() );
   }
   else
   {
     Superclass::ApplyProperties( m_Actor, renderer ) ;
-    m_VtkPolyDataMapper->ScalarVisibilityOff();
+    //reset the default values in case no material is used
+    vtkProperty* property = m_Actor->GetProperty();
+
+    property->SetAmbient( 0.0f );    
+    property->SetDiffuse( 1.0f );
+    property->SetSpecular( 0.0f );
+    property->SetSpecularPower( 1.0f );
   }
 
   mitk::LookupTableProperty::Pointer lookupTableProp;

@@ -111,14 +111,15 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
     if(m_SplineAssembly->GetParts()->IsItemPresent(m_PointsAssembly))
       m_SplineAssembly->RemovePart(m_PointsAssembly);
   }
+  //if the properties have been changed, then refresh the properties
+  if ( (m_SplineUpdateTime < this->m_DataTreeNode->GetPropertyList()->GetMTime() ) || 
+       (m_SplineUpdateTime < this->m_DataTreeNode->GetPropertyList(renderer)->GetMTime() ) )
+    this->ApplyProperties();
 }
 
 
 void mitk::SplineVtkMapper3D::ApplyProperties()
 {
-//todo: only call if needed and properties have been changed!!!
-
-
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
   vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 
@@ -136,6 +137,8 @@ void mitk::SplineVtkMapper3D::ApplyProperties()
   else
     lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
   m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
+  
+  m_SplineUpdateTime.Modified();
 }
 
 

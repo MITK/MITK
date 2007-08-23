@@ -133,10 +133,10 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
     return;
 
-  if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("lineWidth").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer()) == NULL)
     m_LineWidth = 1;
   else
-    m_LineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("lineWidth").GetPointer())->GetValue();
+    m_LineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
 
   //
   // get the world time

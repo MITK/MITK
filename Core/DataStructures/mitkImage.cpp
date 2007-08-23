@@ -1275,22 +1275,27 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   {
       mitkImage->m_Scalar2ndMax = mitkImage->m_Scalar2ndMin = mitkImage->m_ScalarMax;
   }
+  mitkImage->m_LastRecomputeTimeStamp.Modified();
   //itkGenericOutputMacro(<<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max());
 }
 
 const void mitk::Image::ComputeExtrema(int t) const
 {
-  mitk::ImageTimeSelector* timeSelector;
-  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
-  if(timeSelector!=NULL)
+  if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
   {
-    timeSelector->SetTimeNr(t);
-    timeSelector->UpdateLargestPossibleRegion();
-    mitk::Image* image = timeSelector->GetOutput();
-    mitk::Image* thisImage = const_cast<Image*>(this);
-    AccessByItk_1( image, _ComputeExtremaInItkImage, thisImage );
+    mitk::ImageTimeSelector* timeSelector;
+    timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+    if(timeSelector!=NULL)
+    {
+      timeSelector->SetTimeNr(t);
+      timeSelector->UpdateLargestPossibleRegion();
+      mitk::Image* image = timeSelector->GetOutput();
+      mitk::Image* thisImage = const_cast<Image*>(this);
+      AccessByItk_1( image, _ComputeExtremaInItkImage, thisImage );
+    }
   }
 }
+
 
 mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
 {

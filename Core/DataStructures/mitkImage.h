@@ -445,14 +445,14 @@ public:
   virtual ScalarType GetScalarValue2ndMin(int t=0) const;
 
   //##Documentation
-  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  //## \brief Get the smallest value for scalar images, but do not recompute it first
   virtual mitk::ScalarType GetScalarValueMinNoRecompute() const
   {
       return m_ScalarMin;
   }
 
   //##Documentation
-  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  //## \brief Get the second smallest value for scalar images, but do not recompute it first
   virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute() const
   {
       return m_Scalar2ndMin;
@@ -463,7 +463,7 @@ public:
   virtual ScalarType GetScalarValue2ndMax(int t=0) const;
 
   //##Documentation
-  //## \brief Get the second largest value for scalar images, but do not recompute it first
+  //## \brief Get the largest value for scalar images, but do not recompute it first
   virtual mitk::ScalarType GetScalarValueMaxNoRecompute() const
   {
       return m_ScalarMax;
@@ -553,6 +553,8 @@ protected:
   mutable ScalarType m_ScalarMax;
   mutable ScalarType m_Scalar2ndMin;
   mutable ScalarType m_Scalar2ndMax;
+
+  itk::TimeStamp m_LastRecomputeTimeStamp;
 
 };
 

@@ -225,6 +225,8 @@ void mitk::TimeSlicedGeometry::ResizeToNumberOfTimeSteps( unsigned int timeSteps
   m_Geometry3Ds.resize(timeSteps, gnull);
 
   m_TimeSteps = timeSteps;
+
+  UpdateInformation();
 }
 
 mitk::TimeSlicedGeometry::TimeSlicedGeometry() : m_TimeSteps(0), m_EvenlyTimed(false)

@@ -56,7 +56,7 @@ protected:
 
   virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
-  bool CheckSelected(const mitk::Point3D& worldPoint);
+  bool CheckSelected(const mitk::Point3D& worldPoint, int timestep);
   bool ConvertDisplayEventToWorldPosition(mitk::DisplayPositionEvent const* displayEvent, mitk::Point3D& worldPoint);
 
   mitk::Point3D m_LastMousePosition;

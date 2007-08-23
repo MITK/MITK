@@ -119,7 +119,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
       }
 
-      if (this->CheckSelected(worldPoint))
+      if (this->CheckSelected(worldPoint, timestep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         selected->SetValue(true);
@@ -149,7 +149,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     {
       mitk::Point3D worldPoint = event->GetWorldPosition();
       mitk::StateEvent* newStateEvent = NULL;
-      if (this->CheckSelected(worldPoint))
+      if (this->CheckSelected(worldPoint, timestep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, event);
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
@@ -306,11 +306,8 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   return ok;
 }
 
-bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
+bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint, int timestep )
 {
-  // \todo consider time! Replace GetTimeSlicedGeometry by GetGeometry(time of stateEvent)
-  const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry();
-
   bool selected = false;
   if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
     m_DataTreeNode->SetProperty("selected", new mitk::BoolProperty(false));  // create it
@@ -323,6 +320,7 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint)
   }
   else    // use the data objects bounding box to determine if hit
   {
+    const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( timestep );
     selected = geometry->IsInside(worldPoint);
   }
   return selected;

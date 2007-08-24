@@ -72,7 +72,8 @@ QcEXPORT QObject* create( QWidget *parent )
 mitk::ChiliPluginImpl::ChiliPluginImpl()
 : QcPlugin( s_Parent ),
   app( NULL ),
-  m_LightBoxCount( 0 )
+  m_LightBoxCount( 0 ),
+  m_InImporting (false)
 {
   task = new QcMITKTask( xpm(), s_Parent, name() );
 
@@ -1769,7 +1770,7 @@ std::string mitk::ChiliPluginImpl::GetTempDirectory()
   if( CreateDirectory( resultTempPath, NULL ) )
     return newTmpDirectory;
   else*/
- return "C:\Temp";
+ return "C:\\Temp";
 }
 
 /*

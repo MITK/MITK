@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>
 
-#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
+#include "mitkImageToPicDescriptor.h"
 
 class QcMITKTask;
 class SampleApp;
@@ -139,16 +139,6 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
 
     /*!
-    \brief Save image into the given Lightbox.
-    @param sourceImage   The image to save.
-    @param levelWindow   The levelWindow for the image.
-    @param seriesOID   The seriesOID from the series where the image should saved. For example use "GetCurrentSelectedSeries()" to get the information. If the image was loaded from chili, the mitk::DataTreeNode have a Property named "SeriesOID", use them here!
-    @param nameProperty   The "name"-Property needed if different studies selected. So you can see which Node came from which study.
-    @param lightbox   This function use the lightbox to save the single slices. Therefore you have to set a lightbox to show and save the slices. Use "GetCurrentLightbox()" or "GetNewLightbox()".
-    */
-    virtual void SaveImageToLightbox( Image* sourceImage, const PropertyList::Pointer propertyList, QcLightbox* lightbox );
-
-    /*!
     \brief Load all Image- and Text-Files from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
@@ -184,8 +174,27 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /*!
     \brief Save Images- and Texts-Files to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
+    This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... .
     */
     virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
+
+    /*!
+    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    @param inputNodes   Thats the nodes to save.
+    @param study   In which study the new series should created?
+    This function create a new series in the given study. All inputNodes get saved to this series. No dialog is used.
+    */
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription );
+
+    /*!
+    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    @param inputNodes   Thats the nodes to save.
+    @param StudyOID   In which study should saved?
+    @param SeriesOID   In which series should saved?
+    @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not?
+    This function add the inputNodes to the given Study and Series.
+    */
+    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 
     mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
     itkNewMacro(ChiliPluginImpl);
@@ -231,67 +240,71 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** the task */
     QcMITKTask* task;
 
-    SeriesInformationList m_SeriesInformationList;
-
-    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
-
-    TextInformationList m_TextInformationList;
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
-    static ipBool_t GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data );
-
-    /** function to iterate over all textfiles from a series;
-    the db-path and the text-oid get saved;
-    dont download the files here, because of double entries;
-    its possible to save different text-files under the same filename, if you save here, you override the files on harddisk
-    IMPORTANT: works for chili 3.9 or higher only */
-    static ipBool_t GlobalIterateTextTwoCallback( int rows, int row, text_t *text, void *user_data );
-#endif
-
-    TagInformationList GetAllAvailableStudyAndPatientPicTags( const std::string& seriesOID );
-
-    /** the count of the shown Lightboxes in chili */
+    /** The count of the shown Lightboxes in Chili. */
     unsigned int m_LightBoxCount;
 
-    /** while importing the lightbox to MITK, it should not be possible to click the importbutton several times (FIX BUG 483) */
+    /** While importing the lightbox to MITK, it should not be possible to click the importbutton several times (FIX BUG 483). */
     bool m_InImporting;
 
-    /** the current tempDirectory which get used to load and save files for the down - and up - load */
+    /** The current tempDirectory which get used to load and save files for the Down - and Upload. */
     std::string m_tempDirectory;
 
-    /** its a list of all Filenames, needed to download picdescriptors --> need to know which to load */
-    std::list<std::string> m_FileList;
+    /** A vector of all Tool-/LightboximportButtons. */
+    std::vector<QIDToolButton*> m_LightBoxImportButtons;
+
+    /** Secret button to reinit application. */
+    QToolButton* m_LightBoxImportToggleButton;
+
+    /** Constuctor */
+    ChiliPluginImpl();
+
+#ifdef CHILI_PLUGIN_VERSION_CODE
+    /** Get used to load all text to one series ( GetTextInformationList() ). This function save all found series into m_TextInformationList.*/
+    static ipBool_t GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data );
+    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text from one series. */
+    TextInformationList m_TextInformationList;
+
+    /** This function save the text-path and text-oid to the m_TextFileList. This list get used to load textFiles. */
+    static ipBool_t GlobalIterateTextTwoCallback( int rows, int row, text_t *text, void *user_data );
 
     struct TextFilePathAndOIDStruct
     {
       std::string TextFilePath;
       std::string TextFileOID;
     };
-    /** its a list of all TextFiles with Path and OID */
+    /** Thats a list of text-file-path and oid. This list used to load text-Files. Its not possible to save all text-files to harddisk and load them. The text-description can be the same, then the file on harddisk get override. So we create a list and load one after another. */
     std::list<TextFilePathAndOIDStruct> m_TextFileList;
+#endif
 
-    /** a vector of all Tool-/LightboximportButtons */
-    std::vector<QIDToolButton*> m_LightBoxImportButtons;
+    /** Get used to load all series to one study ( GetSeriesInformationList() ). This function save all found series into m_SeriesInformationList.*/
+    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
+    /** This is a list of SeriesInformation. This list get filled from GlobalIterateSeriesCallback() and provide all series from one study. */
+    SeriesInformationList m_SeriesInformationList;
 
-    /** secret button to reinit application */
-    QToolButton* m_LightBoxImportToggleButton;
+    /** This function get used from LoadAllImagesFromSeries() and save Image-Files to harddisk and save the filenames to m_FileList. */
+    static ipBool_t GlobalIterateImagesCallbackOne( int rows, int row, image_t* image, void* user_data );
+    /** Thats a list of all filenames. This list get filled from GlobalIterateImagesCallback(). */
+    std::list<std::string> m_FileList;
 
-    /** Constuctor */
-    ChiliPluginImpl();
-
-    /** return the temporary directory, it is a new directory in the system-specific temp-Directory */
+    /** This function return a temporary directory. It is a new directory in the system-specific temp-Directory. */
     std::string GetTempDirectory();
 
-    /** function to iterate over all images from a series
-    works for chili 3.9 or higher only */
-    static ipBool_t GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data );
+    /** This function search all images ( using GlobalIterateImagesCallbackTwo() ) from one series and search the maximum imagenumber. */
+    int GetMaximumImageNumber( std::string seriesOID );
+    /** This function compare the imageNumber and m_MaximumImageNumber and set the higher one to m_MaximumImageNumber. */
+    static ipBool_t GlobalIterateImagesCallbackTwo( int rows, int row, image_t* image, void* user_data );
+    /** The maximum imageNumber from a series. It's needed for saving image-files. */
+    int m_MaximumImageNumber;
+
+    /** Generate the TagList from the given study, series and patient. Therefore only specific tags get used. This taglist used as input for class mitk::ImageToPicDescriptor. */
+    ImageToPicDescriptor::TagInformationList GetNeededTagList( study_t* study, patient_t* patient, series_t* series );
 
     /** teleconference methods */
     virtual void connectPartner();
     virtual void disconnectPartner();
 
     /** Invoke event: if a new study selected */
-    //void SendStudySelectedEvent();
+    void SendStudySelectedEvent();
     /** Invoke event: if the Lightbox count changed */
     void SendLightBoxCountChangedEvent();
 };

@@ -257,12 +257,13 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 
     /** Constuctor */
     ChiliPluginImpl();
+    
+    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text from one series. */
+    TextInformationList m_TextInformationList;
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
     /** Get used to load all text to one series ( GetTextInformationList() ). This function save all found series into m_TextInformationList.*/
     static ipBool_t GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data );
-    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text from one series. */
-    TextInformationList m_TextInformationList;
 
     /** This function save the text-path and text-oid to the m_TextFileList. This list get used to load textFiles. */
     static ipBool_t GlobalIterateTextTwoCallback( int rows, int row, text_t *text, void *user_data );

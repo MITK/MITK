@@ -44,6 +44,16 @@ namespace mitk {
       /** Set the lightbox to read from. */
       virtual void SetLightBox( QcLightbox* lightbox );
 
+#ifndef CHILI_PLUGIN_VERSION_CODE
+      /** 
+       * Return a propertylist from the current selected lightBox. lightBox 
+       * For the tags look at mitkLightBoxImageReaderImpl.cpp. cpp 
+       * This method reads the information from the pic-header or the dicom-header. header 
+       * The property "name" is set and the same like the tag "Chili: SERIES DESCRIPTION". DESCRIPTION 
+       */
+      virtual const mitk::PropertyList::Pointer GetImageTagsAsPropertyList() { return NULL; }
+#endif
+
       /** Get the lightbox to read from. */
       virtual QcLightbox* GetLightBox() const;
 

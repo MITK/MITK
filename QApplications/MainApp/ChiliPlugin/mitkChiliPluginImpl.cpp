@@ -418,8 +418,12 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, 
   newSeries.BodyPartExamined = series->bodyPartExamined;
   newSeries.ScanningSequence = series->scanningSequence;
   newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
+#ifdef CHILI_PLUGIN_VERSION_CODE
   stringHelper << series->image_count;
   newSeries.ImageCount = stringHelper.str();
+#else
+  newSeries.ImageCount = "undefined";
+#endif
   stringHelper.clear();
 
   //add to list
@@ -479,14 +483,14 @@ mitk::ChiliPlugin::TextInformation mitk::ChiliPluginImpl::GetTextInformation( co
 /** return the textinformationlist */
 mitk::ChiliPlugin::TextInformationList mitk::ChiliPluginImpl::GetTextInformationList( const std::string& seriesOID )
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   //get used to save all found text
   m_TextInformationList.clear();
+#ifdef CHILI_PLUGIN_VERSION_CODE
   //iterate over all text from series
   pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextOneCallback, this );
   //the function filled the TextInformationList
-  return m_TextInformationList;
 #endif
+  return m_TextInformationList;
 }
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -1176,6 +1180,13 @@ std::cout<<"vorbei"<<std::endl;
 
 void mitk::ChiliPluginImpl::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription )
 {
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
   if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
     return;
 
@@ -1210,6 +1221,7 @@ void mitk::ChiliPluginImpl::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPoi
 
   clearStudyStruct( &study );
   QApplication::restoreOverrideCursor();
+#endif
 }
 
 void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries )

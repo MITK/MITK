@@ -312,7 +312,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 8;
 
 		register char *s = (char*) vtkImage->GetScalarPointer();
-		register char *a = new char[size];
+		register char *a = (char*) malloc(sizeof(char)* size);;
 		pic->data = a;
 
 #define COPYVECTORDATAVTK2PIC	\
@@ -336,7 +336,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 8;
 
 		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();
-		register unsigned char *a = new unsigned char[size];
+		register unsigned char *a = (unsigned char*) malloc(sizeof(unsigned char)* size);;
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -349,7 +349,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 16;
 
 		register short *s = (short*) vtkImage->GetScalarPointer();
-		register short *a = new short[size];
+		register short *a = (short*) malloc(sizeof(short)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -362,7 +362,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 16;
 
 		register unsigned short *s = (unsigned short*) vtkImage->GetScalarPointer();
-		register unsigned short *a = new unsigned short[size];
+		register unsigned short *a = (unsigned short*) malloc(sizeof(unsigned short)* size);
 		pic->data = a;
 
 
@@ -376,7 +376,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 32;
 
 		register int *s = (int*) vtkImage->GetScalarPointer();
-		register int *a = new int[size];
+		register int *a = (int*) malloc(sizeof(int)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -389,7 +389,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 32;
 
 		register unsigned int *s = (unsigned int*) vtkImage->GetScalarPointer();
-		register unsigned int *a = new unsigned int[size];
+		register unsigned int *a = (unsigned int*) malloc(sizeof(unsigned int)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -402,7 +402,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 64;
 
 		register long *s = (long*) vtkImage->GetScalarPointer();
-		register long *a = new long[size];
+		register long *a = (long*) malloc(sizeof(long)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -415,7 +415,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 64;
 
 		register unsigned long *s = (unsigned long*) vtkImage->GetScalarPointer();
-		register unsigned long *a = new unsigned long[size];
+		register unsigned long *a = (unsigned long*) malloc(sizeof(unsigned long)* size);
 		pic->data = a;
 		
 		COPYVECTORDATAVTK2PIC
@@ -428,7 +428,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 32;
 
 		register float *s = (float*) vtkImage->GetScalarPointer();
-		register float *a = new float[size];
+		register float *a = (float*) malloc(sizeof(float)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC
@@ -441,7 +441,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		pic->bpe = 64;
 
 		register double *s = (double*) vtkImage->GetScalarPointer();
-		register double *a = new double[size];
+		register double *a = (double*) malloc(sizeof(double)* size);
 		pic->data = a;
 
 		COPYVECTORDATAVTK2PIC

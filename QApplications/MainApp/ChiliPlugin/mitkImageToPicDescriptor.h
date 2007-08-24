@@ -19,72 +19,114 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 #define IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 
-#include "mitkChiliPlugin.h"
+#include <ipPic/ipPic.h>
+#include <iostream.h>
+#include <list>
+
+#include <mitkLevelWindow.h>
+#include <mitkImage.h>
+#include "mitkCommon.h"
 
 namespace mitk {
-
-class Image;
-class LevelWindow;
 
   /**
   This class separate a mitk::Image into a list of ipPicDescriptor.
 
   WARNING:
-  This class arranged as helper-class and dont check the input.
-  Probably you dont should use this class. Use mitk::ChiliPlugin::SaveImageToLightBox(...) or mitk::ChiliPlugin::SaveToChili(...). If you do yet, use it carefully.
+  This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
+  If you use them, be carefull with the parameter.
   */
 
-class ImageToPicDescriptor
+class ImageToPicDescriptor : public itk::Object
 {
   public:
+
+    /** Struct to transport the PicTags (with Description and Content ). */
+    struct TagInformationStruct
+    {
+      std::string PicTagDescription;
+      std::string PicTagContent;
+    };
+
+    /** We need more than one PicTag. */
+    typedef std::list< TagInformationStruct > TagInformationList;
+
+   mitkClassMacro( ImageToPicDescriptor, itk::Object );
+   itkNewMacro( ImageToPicDescriptor );
+
+    /*!
+    \brief This function set a mitk::Image as input.
+    @param sourceImage   The mitk::Image.
+    This function have to be use, otherwise update dont work.
+    */
+    void SetImage( Image* sourceImage);
+
+    /*!
+    \brief This function set a TagInformaitionList and a bool variable.
+    @param inputTags   This list provides information about the study, patient and series. This tags are the minimun which is needed to save.
+    @param useSavedPicTags   This bool attribute decided, if the tags to save get created and used from the TagInformationList or if no tag get changed. If no tag get changed, it is possible to override the series. Otherwise the data get added to series.
+    This function have to be use, otherwise update dont work.
+    */
+    void SetTagList( TagInformationList inputTags, bool useSavedPicTags );
+
+    /*!
+    \brief This function set a mitk::Levelwindow.
+    @param levelWindow   The mitk::Levelwindow.
+    This function can be use. If the levelwindow dont get set, it will be created with SetAuto().
+    */
+    void SetLevelWindow( LevelWindow levelWindow );
+
+    /*!
+    \brief This function set the imageNumber.
+    @param imageNumber   This is the image number for the tags. If the picdescriptors added to an existing series, the image number sould not be twice. Then the PicDescriptorToNode can splitt the results better. Therefor you can set the start-number.
+    This function can be use. If the imageNumber dont set, the number set to one.
+    */
+    void SetImageNumber( int imageNumber );
+
+    /*!
+    \brief This function separate a mitk::image into a list of ipPicDescriptor.
+    If no input set before, the function create an empty output.
+    */
+    void Update();
+
+    /*!
+    \brief Return the generated Output.
+    @returns The list of ipPicDescriptors.
+    */
+    std::list< ipPicDescriptor* > GetOutput();
+
+  protected:
 
     /** constuctor and desctructor */
     ImageToPicDescriptor();
     ~ImageToPicDescriptor();
 
-   /*!
-   \brief set the mitk::Image, mitk::LevelWindow as Input
-   @param sourceImage   the image which get seperated
-   @param levelWindow   the levelwindow from the image;
-   @param studyPatientAndSeriesTags   if this list are empty, no picTags get override, so we have the original and can override them
-   if its not empty, all current picTags get delete and the new one used, this happens if you want to save a new series
-   */
-    void SetInput( Image* sourceImage, ChiliPlugin::TagInformationList studyPatientAndSeriesTags, LevelWindow levelWindow );
-
-    //void SetInput( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, LevelWindow levelWindow );
-
-   /*!
-   \brief this function separate a mitk::image into a list of ipPicDescriptor
-   */
-    void Write();
-
-   /*!
-   \brief return the generated Output
-   @returns the list of ipPicDescriptors
-   */
-    std::list< ipPicDescriptor* > GetOutput();
-
-  protected:
-
     /** the list for the output */
     std::list< ipPicDescriptor* > m_Output;
     /** the image to seperate */
-    Image* m_SourceImage;
+    Image::Pointer m_SourceImage;
     /** the levelwindow of the image */
-    LevelWindow m_levelWindow;
-    /** this tags contained the study-, patient- and series-information from the new series */
-    ChiliPlugin::TagInformationList m_StudyPatientAndSeriesTags;
+    LevelWindow m_LevelWindow;
+    bool m_LevelWindowInitialized;
+    /** the taginformationlist */
+    TagInformationList m_TagList;
+    bool m_UseSavedPicTags;
+    bool m_TagListInitialized;
+    /** the imageNumber */
+    int m_ImageNumber;
+    bool m_ImageNumberInitialized;
 
-    //mitk::PropertyList::Pointer m_PropertyList;
-
-    /** create a String-Pic-Tag */
+    /** The Dicom-Header have to deleted, because the function QcPlugin::addDicomHeader() dont change the existing, it create a new one.
+    If we dont want to loose to much information, we copy them from the Dicom- to Pic-Header. */
+    void CopyDicomHeaderInformationToPicHeader( ipPicDescriptor* );
+    /** Create a String-Pic-Tag. */
     ipPicTSV_t* CreateASCIITag( std::string Description = "", std::string Content = "" );
-    /** create a Int-Pic-Tag */
+    /** Create a Int-Pic-Tag. */
     ipPicTSV_t* CreateIntTag( std::string Description = "", int Content = 0 );
-    /** create a Unsinged-Int-Pic-Tag */
+    /** Create a Unsinged-Int-Pic-Tag. */
     ipPicTSV_t* CreateUIntTag( std::string Description = "", int Content = 0 );
-    /** delete a Pic-Tag if exist */
-    void DeleteTag( ipPicDescriptor* cur = NULL, std::string Description = "" );
+    /** Function to delete a pic-tag. Only existing tags can be deleted. */
+    void DeleteTag( ipPicDescriptor* cur, std::string description );
 };
 
 } // namespace mitk

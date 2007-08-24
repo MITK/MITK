@@ -28,8 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
-
-//#include "mitkPicHeaderProperty.h"
+#include "mitkPicHeaderProperty.h"
 
 #include "math.h"
 
@@ -39,13 +38,12 @@ class compare_PicDescriptor_ImageNumber
   public:
   bool operator() ( ipPicDescriptor* &first, ipPicDescriptor* &second)
   {
-    //try to seperate them by imageNumber
-    int imageNumberISG1 = 0, imageNumberISG2 = 0;
+    int imageNumberPic1 = 0, imageNumberPic2 = 0;
 
     ipPicTSV_t* imagenumberTag1 = ipPicQueryTag( first, tagIMAGE_NUMBER );
     if( imagenumberTag1 && imagenumberTag1->type == ipPicInt )
     {
-      imageNumberISG1 = *( (int*)(imagenumberTag1->value) );
+      imageNumberPic1 = *( (int*)(imagenumberTag1->value) );
     }
     else
     {
@@ -57,7 +55,7 @@ class compare_PicDescriptor_ImageNumber
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
         {
-          sscanf( (char *) data, "%d", &imageNumberISG1 );
+          sscanf( (char *) data, "%d", &imageNumberPic1 );
         }
       }
     }
@@ -65,7 +63,7 @@ class compare_PicDescriptor_ImageNumber
     ipPicTSV_t* imagenumberTag2 = ipPicQueryTag( second, tagIMAGE_NUMBER );
     if( imagenumberTag2 && imagenumberTag2->type == ipPicInt )
     {
-      imageNumberISG2 = *( (int*)(imagenumberTag2->value) );
+      imageNumberPic2 = *( (int*)(imagenumberTag2->value) );
     }
     else
     {
@@ -77,12 +75,12 @@ class compare_PicDescriptor_ImageNumber
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
         {
-          sscanf( (char *) data, "%d", &imageNumberISG2 );
+          sscanf( (char *) data, "%d", &imageNumberPic2 );
         }
       }
     }
 #ifdef CHILI_PLUGIN_VERSION_CODE
-    if( imageNumberISG1 == imageNumberISG2 )
+    if( imageNumberPic1 == imageNumberPic2 )
     {
       bool returnValue = false;
       interSliceGeometry_t* isg1 = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
@@ -101,7 +99,7 @@ class compare_PicDescriptor_ImageNumber
     else
 #endif
     {
-      if( imageNumberISG1 < imageNumberISG2 )
+      if( imageNumberPic1 < imageNumberPic2 )
       {
         return true;
       }
@@ -137,18 +135,6 @@ class compare_PicDescriptor_SliceLocation
   }
 };
 
-// helper class to sort Vectors
-class compare_Vector
-{
-  public:
-  bool operator() (const mitk::Vector3D &first, const mitk::Vector3D &second)
-  {
-    if( first[2] < second[2] )
-      return true;
-    return false;
-  }
-};
-
 // helper class to round
 double mitk::PicDescriptorToNode::Round(double number, unsigned int decimalPlaces)
 {
@@ -171,21 +157,21 @@ mitk::PicDescriptorToNode::~PicDescriptorToNode()
 {
 }
 
-// the set-function
+// set-function
 void mitk::PicDescriptorToNode::SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
 {
   m_SeriesOID = inputSeriesOID;
   m_PicDescriptorList = inputPicDescriptorList;
 }
 
-// the get-function
+// get-function
 std::vector< mitk::DataTreeNode::Pointer > mitk::PicDescriptorToNode::GetOutput()
 {
   return m_Output;
 }
 
 // the "main"-function
-void mitk::PicDescriptorToNode::GenerateNodes()
+void mitk::PicDescriptorToNode::Update()
 {
   m_Output.clear();
   m_PossibleOutputs.clear();
@@ -212,10 +198,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
   // sort by "NormalenVektor" --> if they are parallel, the slices located one above the other
   // sort by pixelSpacing --> separation of extent
   // sort by SeriesDescription
-  std::list< ipPicDescriptor* >::iterator picDescriptorCur = m_PicDescriptorList.begin();
-  std::list< ipPicDescriptor* >::iterator picDescriptorEnd = m_PicDescriptorList.end();
-
-  while( picDescriptorCur != picDescriptorEnd )
+  for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
     Vector3D rightVector, downVector, pixelSpacing, normale;
     std::string currentSeriesDescription = "";
@@ -224,11 +207,10 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
 
     //check intersliceGeomtry
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-    if( !pFetchSliceGeometryFromPic( (*picDescriptorCur), isg ) )
+    if( !pFetchSliceGeometryFromPic( (*currentPic), isg ) )
     {
       //PicDescriptor without a geometry not able to sort in a volume
       std::cout<<"PicDescriptorToNode-WARNING: Found image without SliceGeometry. Image ignored."<<std::endl;
-      picDescriptorCur++;
       delete isg;
       continue;
     }
@@ -240,11 +222,11 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     normale[1] = ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) );
     normale[2] = ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) );
 
-    //PixelSpacing
+    //TODO PixelSize
     vtk2itk( isg->ps, pixelSpacing );
 
     //SeriesDescription
-    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*picDescriptorCur), tagSERIES_DESCRIPTION );
+    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), tagSERIES_DESCRIPTION );
     if( seriesDescriptionTag )
     {
       currentSeriesDescription = static_cast<char*>( seriesDescriptionTag->value );
@@ -254,7 +236,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       ipPicTSV_t *tsv;
       void* data;
       ipUInt4_t len;
-      tsv = ipPicQueryTag( (*picDescriptorCur), "SOURCE HEADER" );
+      tsv = ipPicQueryTag( (*currentPic), "SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
@@ -278,42 +260,33 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
         //check if vectors are parallel (only if they have a lowest common multiple)
         foundMatch = true; // --> found the right output
         float referenceForParallelism = 0;
+        //create reference
         if( normale[0] != m_PossibleOutputs[ curCount ].normale[0] )
-        {
           referenceForParallelism = normale[0]/m_PossibleOutputs[ curCount ].normale[0];
-        }
+        //check the second
         if( normale[1] != m_PossibleOutputs[ curCount ].normale[1] )
         {
           if( referenceForParallelism == 0 )
-          {
             referenceForParallelism = normale[1]/m_PossibleOutputs[ curCount ].normale[1];
-          }
           else
           {
             if( referenceForParallelism != normale[1]/m_PossibleOutputs[ curCount ].normale[1] )
-            {
-              foundMatch = false;
-            }
+              foundMatch = false;  // --> not parallel, wrong output
           }
         }
+        //check the third
         if( normale[2] != m_PossibleOutputs[ curCount ].normale[2] )
         {
           if( referenceForParallelism == 0 )
-          {
             referenceForParallelism = normale[2]/m_PossibleOutputs[ curCount ].normale[2];
-          }
           else
           {
             if( referenceForParallelism != normale[2]/m_PossibleOutputs[ curCount ].normale[2] )
-            {
-              foundMatch = false;
-            }
+              foundMatch = false;  // --> not parallel, wrong output
           }
         }
         if( !foundMatch )
-        {
           curCount ++;
-        }
       }
       else curCount ++; // the next output
     }
@@ -322,7 +295,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     if( foundMatch )
     {
       // add to an existing Output
-      m_PossibleOutputs[curCount].descriptors.push_back( (*picDescriptorCur) );
+      m_PossibleOutputs[curCount].descriptors.push_back( (*currentPic) );
     }
     else
     // create a new Output
@@ -332,20 +305,19 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       newOutput.seriesDescription = currentSeriesDescription;
       newOutput.normale = normale;
       newOutput.pixelSpacing = pixelSpacing;
-      newOutput.numberOfSlices = 0;
-      newOutput.numberOfTimeSlices = 0;
+      newOutput.numberOfSlices = -1;  //from here on only defaults. True values will be calculated later
+      newOutput.numberOfTimeSlices = -1;
       newOutput.differentTimeSlices = false;
       newOutput.descriptors.clear();
-      newOutput.descriptors.push_back( (*picDescriptorCur) );
+      newOutput.descriptors.push_back( (*currentPic) );
       m_PossibleOutputs.push_back( newOutput );
     }
-    picDescriptorCur ++;
     delete isg;
   }
 #endif
 }
 
-//sort the descriptors of the PossibleOutputs
+//sort all possible outputs by imagenumber
 void mitk::PicDescriptorToNode::SortByImageNumber()
 {
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
@@ -355,6 +327,7 @@ void mitk::PicDescriptorToNode::SortByImageNumber()
   }
 }
 
+//sort all possible outputs by slicelocation
 void mitk::PicDescriptorToNode::SortBySliceLocation()
 {
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
@@ -364,7 +337,7 @@ void mitk::PicDescriptorToNode::SortBySliceLocation()
   }
 }
 
-// separation on spacing and set minimum timslices and minimum slices
+// separation on spacing and set minimum of timslices and slices
 void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -464,7 +437,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
               iterend --;
               m_PossibleOutputs[n].descriptors.resize( currentCount );
               m_PossibleOutputs.push_back( newOutput );
-              iterend = iter;
+              iterend = iter;  // --> end searching the current output
             }
           }
         }
@@ -577,10 +550,10 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
           //set slice and timeslice
           {
             timeOutput->numberOfSlices ++;
+            //if the numberOfTimeSlices not initialiced and the possibleOutputs contain only one picDescriptor
             if( timeOutput->numberOfTimeSlices == -1 )
-            {
+              //intialice the numberOfTimeSlices
               timeOutput->numberOfTimeSlices = ( curTime - m_PossibleOutputs[n].numberOfTimeSlices - 1 );
-            }
             else
             {
               if( curTime < timeOutput->numberOfTimeSlices )
@@ -590,7 +563,8 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
               }
               else
               {
-                timeOutput->differentTimeSlices = true;
+                if( curTime > timeOutput->numberOfTimeSlices )
+                  timeOutput->differentTimeSlices = true;
               }
             }
           }
@@ -615,7 +589,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
 
       //dont forget to check the last slice
       if( deleteIterator )
-      //delete the slice
+        //delete the slice
         iter = m_PossibleOutputs[n].descriptors.erase( iter );
 
       if( curTime > m_PossibleOutputs[n].numberOfTimeSlices )
@@ -631,7 +605,10 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
             timeOutput->differentTimeSlices = true;
           }
           else
-            timeOutput->differentTimeSlices = true;
+          {
+            if( curTime > timeOutput->numberOfTimeSlices )
+              timeOutput->differentTimeSlices = true;
+          }
       }
 
       if( timeOutput != NULL )
@@ -643,6 +620,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
 
       delete isg;
     }
+    //we cleaned the current possibleOutput
     m_PossibleOutputs[n].differentTimeSlices = false;
   }
 #endif
@@ -723,16 +701,10 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
     {
       //create mitk::Image
       int slice = 0, time = 0;
-      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
       Point3D origin;
       Vector3D rightVector, downVector, origincur, originb4;
       ipPicDescriptor* header;
       Image::Pointer resultImage;
-      DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-
       header = ipPicCopyHeader( m_PossibleOutputs[n].descriptors.front(), NULL );
 
       //2D
@@ -749,7 +721,7 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
         {
           header->dim = 4;
           header->n[2] = 1;
-          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices+1;
+          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
         }
       }
       //3D
@@ -758,18 +730,19 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
         if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
         {
           header->dim = 3;
-          header->n[2] = m_PossibleOutputs[n].numberOfSlices+1;
+          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
           header->n[3] = 0;
         }
         // +t
         else
         {
           header->dim = 4;
-          header->n[2] = m_PossibleOutputs[n].numberOfSlices+1;
-          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices+1;
+          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
+          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
         }
       }
       resultImage = Image::New();
+      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
       resultImage->Initialize( header );
       if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
       {
@@ -780,35 +753,36 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
       vtk2itk( isg->v, downVector );
       vtk2itk( isg->o, origin );
 
-      //its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
+      // its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
       if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
         rightVector[0] = 1;
       if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
         downVector[2] = -1;
 
-      //set the timeBounds
+      // set the timeBounds
       ScalarType timeBounds[] = {0.0, 1.0};
+      // set the planeGeomtry
+      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
       planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &m_PossibleOutputs[n].sliceSpacing );
       planegeometry->SetOrigin( origin );
       planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
       planegeometry->SetTimeBounds( timeBounds );
+      // slicedGeometry
+      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
       slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-
+      // timeSlicedGeometry
+      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
       timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
       timeSliceGeometry->TransferItkToVtkTransform();
+      // Image->SetGeometry
       resultImage->SetGeometry( timeSliceGeometry );
-      std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin();
-      std::list< ipPicDescriptor* >::iterator iterend = m_PossibleOutputs[n].descriptors.end();
 
-      //add the slices to the created mitk::Image
-      while( iter != iterend )
+      // add the slices to the created mitk::Image
+      for( std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin(); iter != m_PossibleOutputs[n].descriptors.end(); iter++)
       {
         resultImage->SetPicSlice( (*iter), slice, time );
-        iter ++;
         if( time < m_PossibleOutputs[n].numberOfTimeSlices )
-        {
           time ++;
-        }
         else
         {
           time = 0;
@@ -816,9 +790,10 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
         }
       }
 
-      //if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name and data
+      // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties
       if( resultImage->IsInitialized() && resultImage.IsNotNull() )
       {
+        DataTreeNode::Pointer node = mitk::DataTreeNode::New();
         node->SetData( resultImage );
         DataTreeNodeFactory::SetDefaultImageProperties( node );
 
@@ -829,13 +804,13 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
         node->SetProperty( "NumberOfTimeSlices", new IntProperty( m_PossibleOutputs[n].numberOfTimeSlices+1 ) );
         if( m_SeriesOID != "" )
           node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
-/*
+
         mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( m_PossibleOutputs[n].descriptors.front() );
         for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
         {
           node->SetProperty( iter->first.c_str(), iter->second.first );
         }
-*/
+
         m_Output.push_back( node );
       }
       delete isg;
@@ -844,7 +819,6 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
 #endif
 }
 
-/*
 const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListFromPicTags( ipPicDescriptor* imageToExtractTagsFrom )
 {
   if( !imageToExtractTagsFrom || !imageToExtractTagsFrom->info || !imageToExtractTagsFrom->info->tags_head )
@@ -868,7 +842,6 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
 
   return resultPropertyList;
 }
-*/
 
 // show all PossibleOutputs and the descriptors
 void mitk::PicDescriptorToNode::DebugOutput()

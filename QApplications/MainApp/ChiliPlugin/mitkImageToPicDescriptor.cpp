@@ -18,32 +18,46 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToPicDescriptor.h"
 
-//Pic-Tags
-#include <ipPic/ipPicTags.h>
-//Chili-Inlcudes
 #include <chili/isg.h>
 #include <chili/plugin.h>
-//Mitk
+#include <ipDicom/ipDicom.h>
+#include <ipPic/ipPicTags.h>
+
 #include "mitkFrameOfReferenceUIDManager.h"
-#include "mitkLevelWindowProperty.h"
 #include "mitkImageSliceSelector.h"
 
-//#include "mitkPicHeaderProperty.h"
+// helper class for property import from pic/dicom-headers (see mitk::LightBoxImageReaderImpl::GetPropertyList())
+class HeaderTagInfo
+{
+  public:
 
-//constructor
+    typedef enum { MissingInDicom, String, Int, UnsignedInt } DataType;
+
+    HeaderTagInfo( const char* ppicTagKey, ipUInt2_t pdicomGroup, ipUInt2_t pdicomElement, DataType ptype )
+    : picTagKey( ppicTagKey ), dicomGroup( pdicomGroup ), dicomElement( pdicomElement ), type( ptype )
+    {
+    }
+
+  std::string picTagKey;
+  ipUInt2_t dicomGroup;
+  ipUInt2_t dicomElement;
+  DataType type;
+};
+
+// constructor
 mitk::ImageToPicDescriptor::ImageToPicDescriptor()
 {
-  m_SourceImage = NULL;
-  m_StudyPatientAndSeriesTags.clear();
-  m_Output.clear();
+  m_LevelWindowInitialized = false;
+  m_TagListInitialized = false;
+  m_ImageNumberInitialized = false;
 }
 
-//destructor
+// destructor
 mitk::ImageToPicDescriptor::~ImageToPicDescriptor()
 {
 }
 
-//create a string-pic-tag
+// create a string-pic-tag
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateASCIITag( std::string description, std::string content )
 {
   if( description != "" )
@@ -68,7 +82,7 @@ ipPicTSV_t* mitk::ImageToPicDescriptor::CreateASCIITag( std::string description,
   else return 0;
 }
 
-//create an int-pic-tag
+// create an int-pic-tag
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateIntTag( std::string description, int content )
 {
   if( description != "" )
@@ -86,7 +100,7 @@ ipPicTSV_t* mitk::ImageToPicDescriptor::CreateIntTag( std::string description, i
   else return 0;
 }
 
-//create a unsigned-int-pic-tag (tagPATIENT_SEX is the only one)
+// create a unsigned-int-pic-tag (tagPATIENT_SEX is the only one)
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateUIntTag( std::string description, int content )
 {
   if( description != "" )
@@ -121,215 +135,229 @@ void mitk::ImageToPicDescriptor::DeleteTag( ipPicDescriptor* cur, std::string de
   }
 }
 
-// set the input
-void mitk::ImageToPicDescriptor::SetInput( Image* sourceImage, ChiliPlugin::TagInformationList studyPatientAndSeriesTags, LevelWindow levelWindow )
+void mitk::ImageToPicDescriptor::SetImage( Image* sourceImage)
 {
   m_SourceImage = sourceImage;
-  m_levelWindow = levelWindow;
-  m_StudyPatientAndSeriesTags = studyPatientAndSeriesTags;
-  //m_PropertyList = NULL;
 }
 
-/*
-void mitk::ImageToPicDescriptor::SetInput( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, LevelWindow levelWindow )
+void mitk::ImageToPicDescriptor::SetLevelWindow( LevelWindow levelWindow )
 {
-  m_SourceImage = sourceImage;
-  m_levelWindow = levelWindow;
-  m_StudyPatientAndSeriesTags.clear();
-  m_PropertyList = propertyList;
+  m_LevelWindow = levelWindow;
+  m_LevelWindowInitialized = true;
 }
-*/
 
-//this function separate a mitk::image into a list of ipPicDescriptor
-void mitk::ImageToPicDescriptor::Write()
+void mitk::ImageToPicDescriptor::SetTagList( TagInformationList inputTags, bool useSavedPicTags )
+{
+  m_TagList = inputTags;
+  m_UseSavedPicTags = useSavedPicTags;
+  m_TagListInitialized = true;
+}
+
+void mitk::ImageToPicDescriptor::SetImageNumber( int imageNumber )
+{
+  m_ImageNumber = imageNumber;
+  m_ImageNumberInitialized = true;
+}
+
+// this function separate a mitk::image into a list of ipPicDescriptor
+void mitk::ImageToPicDescriptor::Update()
 {
   m_Output.clear();
 
-  if( m_SourceImage == NULL ) return;
+  if( m_SourceImage.IsNull() || !m_TagListInitialized ) return;
 
-  //used var
-  ipPicDescriptor* cur;
-  int s, t;
-  int smax, tmax;
-  int number = 1;
-  bool firstTime = true;
-  std::string newSeriesInstanceUID, newSeriesDate, newSeriesTime;
-  ImageSliceSelector::Pointer resultslice = ImageSliceSelector::New();
-  mitk::SlicedGeometry3D* SlicedGeometry;
+  if( !m_LevelWindowInitialized )
+    m_LevelWindow.SetAuto( m_SourceImage );
+
+  if( !m_ImageNumberInitialized )
+    m_ImageNumber = 1;
+
+  // used var
+  ipPicDescriptor* currentPicDescriptor;
+  int slice, time;
+  int maxSlice, maxTime;
+  ImageSliceSelector::Pointer resultSlice = ImageSliceSelector::New();
+  mitk::SlicedGeometry3D* slicedGeometry;
   mitk::Geometry3D* geometry3DofSlice;
   Point3D origin;
   Vector3D v;
   interSliceGeometry_t isg;
 
-  if( !m_StudyPatientAndSeriesTags.empty() )
-  //get the information you needed for a new series (only one time)
-  {
-    ipPicDescriptor* getNeededSeriesInformations = ipPicNew();
-    QcPlugin::addTags( getNeededSeriesInformations, getNeededSeriesInformations, true );
-    //SERIES_INSTANCE_UID
-    ipPicTSV_t* seriesInstanceUIDQuery = ipPicQueryTag( getNeededSeriesInformations, tagSERIES_INSTANCE_UID );
-    if( seriesInstanceUIDQuery )
-      newSeriesInstanceUID = static_cast<char*>( seriesInstanceUIDQuery->value );
-    else
-      newSeriesInstanceUID = "";
-    //SERIES_DATE
-    ipPicTSV_t* seriesDateQuery = ipPicQueryTag( getNeededSeriesInformations, tagSERIES_DATE );
-    if( seriesDateQuery )
-      newSeriesDate = static_cast<char*>( seriesDateQuery->value );
-    else
-      newSeriesDate = "";
-    //SERIES_TIME
-    ipPicTSV_t* seriesTimeQuery = ipPicQueryTag( getNeededSeriesInformations, tagSERIES_TIME );
-    if( seriesTimeQuery )
-      newSeriesTime = static_cast<char*>( seriesTimeQuery->value );
-    else
-      newSeriesTime = "";
-  }
+  resultSlice->SetInput( m_SourceImage );
+  maxSlice = m_SourceImage->GetDimension(2);
+  maxTime = m_SourceImage->GetDimension(3);
 
-  resultslice->SetInput( m_SourceImage );
-  smax = m_SourceImage->GetDimension(2);
-  tmax = m_SourceImage->GetDimension(3);
-
-  //GeomtryInformation
-  SlicedGeometry = m_SourceImage->GetSlicedGeometry();
-  origin = SlicedGeometry->GetCornerPoint();
-  memcpy( isg.forUID, mitk::FrameOfReferenceUIDManager::GetFrameOfReferenceUID(SlicedGeometry->GetFrameOfReferenceID()), 128 );
+  // GeomtryInformation
+  slicedGeometry = m_SourceImage->GetSlicedGeometry();
+  origin = slicedGeometry->GetCornerPoint();
+  memcpy( isg.forUID, FrameOfReferenceUIDManager::GetFrameOfReferenceUID( slicedGeometry->GetFrameOfReferenceID() ), 128 );
   isg.psu = ipPicUtilMillimeter;
 
-  for( s = smax-1; s >= 0; --s )  //Slices
+  for( slice = maxSlice - 1; slice >= 0; --slice )  // Slices
   {
-    resultslice->SetSliceNr(s);
-    for( t = 0; t < tmax; ++t )  //Time
+    resultSlice->SetSliceNr( slice );
+    for( time = 0; time < maxTime; ++time )  // Time
     {
-      resultslice->SetTimeNr(t);
-      resultslice->Update();
-      //get current slice
-      cur = ipPicClone( resultslice->GetOutput()->GetPic() );  //if you dont do, you change the mitk::image
+      resultSlice->SetTimeNr( time );
+      resultSlice->Update();
+      // get current slice
+      currentPicDescriptor = ipPicClone( resultSlice->GetOutput()->GetPic() );  // if you dont do, you change the mitk::image
 
-      //create a new series
-      if( !m_StudyPatientAndSeriesTags.empty() )
+      if( !m_UseSavedPicTags )
       {
-        //delete the complete Pic-Header
-        while( cur->info->tags_head != NULL )
-        {
-          _ipPicTagsElement_t* currentTagNode = cur->info->tags_head;
-          cur->info->tags_head = cur->info->tags_head->next;
-          ipPicFreeTag( currentTagNode->tsv );
-          free( currentTagNode );
-        }
-
-        //add the elemental SeriesInformation
-        ipPicAddTag( cur, CreateASCIITag( tagSERIES_INSTANCE_UID, newSeriesInstanceUID ) );
-        ipPicAddTag( cur, CreateASCIITag( tagSERIES_DATE, newSeriesDate ) );
-        ipPicAddTag( cur, CreateASCIITag( tagSERIES_TIME, newSeriesTime ) );
-
-        //create the needed ImageTags
-        ipPicDescriptor* getMissingImageTags = ipPicNew();
-        QcPlugin::addTags( getMissingImageTags, getMissingImageTags, false );
+        // create the needed ImageTags
+        ipPicDescriptor* missingImageTags = ipPicNew();
+        QcPlugin::addTags( missingImageTags, missingImageTags, false );
 
         // put the generated Image-tags to the slice
-        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( getMissingImageTags, tagIMAGE_INSTANCE_UID );
+        // IMAGE_INSTANCE_UID
+        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_INSTANCE_UID );
         if( missingImageTagQuery )
         {
-          ipPicAddTag( cur, CreateASCIITag( tagIMAGE_INSTANCE_UID, static_cast<char*>( missingImageTagQuery->value ) ) );
+          DeleteTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
+          ipPicAddTag( currentPicDescriptor, CreateASCIITag( tagIMAGE_INSTANCE_UID, static_cast<char*>( missingImageTagQuery->value ) ) );
         }
-        missingImageTagQuery = ipPicQueryTag( getMissingImageTags, tagIMAGE_DATE );
+        // IMAGE_DATE
+        missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_DATE );
         if( missingImageTagQuery )
         {
-          ipPicAddTag( cur, CreateASCIITag( tagIMAGE_DATE, static_cast<char*>( missingImageTagQuery->value ) ) );
+          DeleteTag( currentPicDescriptor, tagIMAGE_DATE );
+          ipPicAddTag( currentPicDescriptor, CreateASCIITag( tagIMAGE_DATE, static_cast<char*>( missingImageTagQuery->value ) ) );
         }
-        missingImageTagQuery = ipPicQueryTag( getMissingImageTags, tagIMAGE_TIME );
+        // IMAGE_TIME
+        missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_TIME );
         if( missingImageTagQuery )
         {
-          ipPicAddTag( cur, CreateASCIITag( tagIMAGE_TIME, static_cast<char*>( missingImageTagQuery->value ) ) );
+          DeleteTag( currentPicDescriptor, tagIMAGE_TIME );
+          ipPicAddTag( currentPicDescriptor, CreateASCIITag( tagIMAGE_TIME, static_cast<char*>( missingImageTagQuery->value ) ) );
         }
-        ipPicAddTag( cur, CreateIntTag( tagIMAGE_NUMBER, number ) );
-        number++;
+        ipPicFree( missingImageTags );
+        // IMAGE_NUMBER
+        DeleteTag( currentPicDescriptor, tagIMAGE_NUMBER );
+        ipPicAddTag( currentPicDescriptor, CreateIntTag( tagIMAGE_NUMBER, m_ImageNumber ) );
+        m_ImageNumber++;
 
-        //add the Study-, Patient- and Series-Tags
-        for( mitk::ChiliPlugin::TagInformationList::iterator iter = m_StudyPatientAndSeriesTags.begin(); iter != m_StudyPatientAndSeriesTags.end(); iter ++ )
+        // add the Study-, Patient- and Series-Tags
+        for( TagInformationList::iterator iter = m_TagList.begin(); iter != m_TagList.end(); iter ++ )
         {
           // some tags are not string
-          if( (*iter).PicTagDescription == tagSERIES_ACQUISITION || (*iter).PicTagDescription == tagSERIES_NUMBER || (*iter).PicTagDescription == tagSERIES_ECHO_NUMBER || (*iter).PicTagDescription == tagSERIES_TEMPORAL_POSITION )
+          if( (*iter).PicTagDescription == tagSERIES_NUMBER )
           {
+            // add as INT-Tag
             std::stringstream ssStream( (*iter).PicTagContent.c_str() );
             int tempTag;
             ssStream >> tempTag;
-            ipPicAddTag( cur, CreateIntTag( (*iter).PicTagDescription , tempTag ) );
+            DeleteTag( currentPicDescriptor, (*iter).PicTagDescription );
+            ipPicAddTag( currentPicDescriptor, CreateIntTag( (*iter).PicTagDescription , tempTag ) );
           }
           else
           {
             if( (*iter).PicTagDescription == tagPATIENT_SEX )
             {
-              ipPicAddTag( cur, CreateUIntTag( (*iter).PicTagDescription , (int)*(*iter).PicTagContent.c_str() ) );
+              // add as UINT-Tag
+              DeleteTag( currentPicDescriptor, (*iter).PicTagDescription );
+              ipPicAddTag( currentPicDescriptor, CreateUIntTag( (*iter).PicTagDescription , (int)*(*iter).PicTagContent.c_str() ) );
             }
             else
             {
-              ipPicAddTag( cur, CreateASCIITag( (*iter).PicTagDescription , (*iter).PicTagContent ) );
+              // add as ASCII-Tag
+              DeleteTag( currentPicDescriptor, (*iter).PicTagDescription );
+              ipPicAddTag( currentPicDescriptor, CreateASCIITag( (*iter).PicTagDescription , (*iter).PicTagContent ) );
             }
           }
         }
 
-        QcPlugin::addIcon( cur, true );  //create an icon for the lightbox
-        QcPlugin::addLevelWindow( cur, (int)(m_levelWindow.GetLevel()), (int)(m_levelWindow.GetWindow()) );  //add the Level/Window
+        QcPlugin::addIcon( currentPicDescriptor, true );  // create an icon for the lightbox
+        QcPlugin::addLevelWindow( currentPicDescriptor, (int)( m_LevelWindow.GetLevel() ), (int)( m_LevelWindow.GetWindow() ) );  // add the Level/Window
       }
+      // the following passage have to be used, if a new series create or not
+      // dont put it in the passage "if( !m_StudyPatientAndSeriesTags.empty() ) ...", then it is not possible to load override images
 
-/*
-      else
-      //add all Chili-Properties from the propertyList
-      {
-        for( mitk::PropertyList::PropertyMap::const_iterator iter = m_PropertyList->GetMap()->begin(); iter != m_PropertyList->GetMap()->end(); iter++ )
-        {
-          if( !iter->first.find("CHILI: ", 0) )
-          {
-            mitk::BaseProperty* unknownProperty = iter->second.first;
-            if( mitk::PicHeaderProperty* picHeader = dynamic_cast<mitk::PicHeaderProperty*>( unknownProperty ) )
-            {
-              ipPicTSV_t* picClone = _ipPicCloneTag( picHeader->GetValue() );
-              ipPicAddTag( cur, picClone );
-            }
-            else
-            {
-              std::cout << "mitkImageToPicDescriptor (Write): Found Chili-Property which is no PicHeaderProperty." << std::endl;
-            }
-          }
-        }
-      }
-*/
-
-      //the following passage have to be used, if a new series create or not
-      //dont put it in the passage "if( !m_StudyPatientAndSeriesTags.empty() ) ...", then it is not possible to load override images
-
-      //create the GeometryInformation
-      geometry3DofSlice = SlicedGeometry->GetGeometry2D(s);
+      // create the GeometryInformation
+      geometry3DofSlice = slicedGeometry->GetGeometry2D( slice );
       v=geometry3DofSlice->GetOrigin().GetVectorFromOrigin();
       itk2vtk(v, isg.o);
 
       v-=origin;
       isg.sl = v.GetNorm();
 
-      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(0));
-      isg.ps[0]=v.GetNorm();
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn( 0 ));
+      isg.ps[0] = v.GetNorm();
       v/=isg.ps[0];
       itk2vtk(v, isg.u);
-      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(1));
-      isg.ps[1]=v.GetNorm();
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn( 1 ));
+      isg.ps[1] = v.GetNorm();
       v/=isg.ps[1];
       itk2vtk(v, isg.v);
-      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn(2));
-      isg.ps[2]=v.GetNorm();
+      v.Set_vnl_vector(geometry3DofSlice->GetMatrixColumn( 2 ));
+      isg.ps[2] = v.GetNorm();
       v/=isg.ps[2];
       itk2vtk(v, isg.w);
 
-      cur->dim = 2;
+      currentPicDescriptor->dim = 2;
 
-      if( !m_StudyPatientAndSeriesTags.empty() )
+      if( !m_UseSavedPicTags )
       {
-        QcPlugin::addDicomHeader( cur, &isg );  //create the Dicom-Header with the new GeomtryInformation
+        CopyDicomHeaderInformationToPicHeader( currentPicDescriptor );
+        DeleteTag( currentPicDescriptor, "SOURCE HEADER" );
+        QcPlugin::addDicomHeader( currentPicDescriptor, &isg );
       }
 
-      //add slice to output
-      m_Output.push_back( cur );
+      // add slice to output
+      m_Output.push_back( currentPicDescriptor );
+    }
+  }
+}
+
+void mitk::ImageToPicDescriptor::CopyDicomHeaderInformationToPicHeader( ipPicDescriptor* pic )
+{
+  #define NUMBER_OF_CHILI_PIC_TAGS 15
+  HeaderTagInfo tagsToImport[NUMBER_OF_CHILI_PIC_TAGS] =
+  {
+    HeaderTagInfo( tagPATIENT_NAME,                  0x0010, 0x0010, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_SEX,                   0x0010, 0x0040, HeaderTagInfo::UnsignedInt ),
+    HeaderTagInfo( tagPATIENT_ID,                    0x0010, 0x0020, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_BIRTHDATE,             0x0010, 0x0030, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPATIENT_BIRTHTIME,             0x0010, 0x0032, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMEDICAL_RECORD_LOCATOR,        0x0010, 0x1090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagREFERING_PHYSICIAN_NAME,       0x0008, 0x0090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagPERFORMING_PHYSICIAN_NAME,       0x0008, 0x1050, HeaderTagInfo::String ),
+    HeaderTagInfo( tagMODEL_NAME,                    0x0008, 0x1090, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_ECHO_NUMBER,            0x0018, 0x0086, HeaderTagInfo::Int ),
+    HeaderTagInfo( tagSERIES_ACQUISITION,            0x0020, 0x1001, HeaderTagInfo::Int ),
+    HeaderTagInfo( tagSERIES_CONTRAST,               0x0018, 0x0010, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_BODY_PART_EXAMINED,     0x0018, 0x0015, HeaderTagInfo::String ),
+    HeaderTagInfo( tagSERIES_SCANNING_SEQUENCE,      0x0018, 0x0020, HeaderTagInfo::String ),
+    HeaderTagInfo( tagIMAGE_TYPE,                    0x0008, 0x0008, HeaderTagInfo::String )
+  };
+  ipPicTSV_t* picHeader;
+
+  for( int x = 0; x < NUMBER_OF_CHILI_PIC_TAGS; ++x )
+  {
+    //check if the tag exist in pic-header
+    picHeader = ipPicQueryTag( pic, (char*)tagsToImport[x].picTagKey.c_str() );
+    if( !picHeader )
+    {
+      //try to read from dicom-header
+      ipPicTSV_t *dicomHeader = ipPicQueryTag( pic, "SOURCE HEADER" );
+      void* data;
+      ipUInt4_t len;
+      if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
+      {
+        //found, create a pic-tag
+        if( tagsToImport[x].type == HeaderTagInfo::String )
+          ipPicAddTag( pic, CreateASCIITag( (char*)tagsToImport[x].picTagKey.c_str(), static_cast<char*>(data) ) );
+        else
+        {
+          if( tagsToImport[x].type == HeaderTagInfo::UnsignedInt )
+            ipPicAddTag( pic, CreateUIntTag( (char*)tagsToImport[x].picTagKey.c_str(), (int)*((char*)data) ) );
+          else
+          {
+            if( tagsToImport[x].type == HeaderTagInfo::Int )
+              ipPicAddTag( pic, CreateIntTag( (char*)tagsToImport[x].picTagKey.c_str(), atoi((char*)data) ) );
+          }
+        }
+      }
     }
   }
 }

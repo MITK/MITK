@@ -1018,8 +1018,6 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
   m_iil4mitkImage = NULL;
   if ( m_Pic != NULL )
   {
-    delete [] m_Pic->data;
-    m_Pic->data = NULL;
     ipPicFree(m_Pic);
     m_Pic = NULL;
   }

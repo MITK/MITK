@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTree.h>
 #include <mitkDataStorage.h>
 
+#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
+
 class QcPlugin;
 class QcLightbox;
 class interSliceGeometry_t;
@@ -74,6 +76,7 @@ class ChiliPlugin : public itk::Object
       std::string PerformingPhysician;
       std::string ReportingPhysician;
       std::string LastAccess;
+      std::string ImageCount;
     };
 
     /** This struct contain all possible informations about the patient. */
@@ -105,6 +108,7 @@ class ChiliPlugin : public itk::Object
       std::string BodyPartExamined;
       std::string ScanningSequence;
       std::string FrameOfReferenceUID;
+      std::string ImageCount;
     };
 
     /** There can be lots of series to one study, so we need a list. */
@@ -124,16 +128,6 @@ class ChiliPlugin : public itk::Object
 
     /** There can be lots of texts to one series, so we need a list. */
     typedef std::list<TextInformation> TextInformationList;
-
-    /** Struct to transport the PicTags (with Description and Content ). */
-    struct TagInformationStruct
-    {
-      std::string PicTagDescription;
-      std::string PicTagContent;
-    };
-
-    /** We need more than one PicTag. */
-    typedef std::list<TagInformationStruct> TagInformationList;
 
     /*!
     \brief Return a mitk::ChiliPlugin-Instance as singleton.
@@ -230,16 +224,6 @@ class ChiliPlugin : public itk::Object
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
 
     /*!
-    \brief Save image into the given Lightbox.
-    @param sourceImage   The image to save.
-    @param levelWindow   The levelWindow for the image.
-    @param seriesOID   The seriesOID from the series where the image should saved. For example use "GetCurrentSelectedSeries()" to get the information. If the image was loaded from chili, the mitk::DataTreeNode have a Property named "SeriesOID", use them here!
-    @param nameProperty   The "name"-Property needed if different studies selected. So you can see which Node came from which study.
-    @param lightbox   This function use the lightbox to save the single slices. Therefore you have to set a lightbox to show and save the slices. Use "GetCurrentLightbox()" or "GetNewLightbox()".
-    */
-    virtual void SaveImageToLightbox( Image* sourceImage, const mitk::PropertyList::Pointer propertyList, QcLightbox* lightbox );
-
-    /*!
     \brief Load all Image- and Text-Files from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
@@ -271,8 +255,27 @@ class ChiliPlugin : public itk::Object
     /*!
     \brief Save Images- and Texts-Files to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
+    This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... .
     */
     virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
+
+    /*!
+    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    @param inputNodes   Thats the nodes to save.
+    @param study   In which study the new series should created?
+    This function create a new series in the given study. All inputNodes get saved to this series. No dialog is used.
+    */
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription );
+
+    /*!
+    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    @param inputNodes   Thats the nodes to save.
+    @param StudyOID   In which study should saved?
+    @param SeriesOID   In which series should saved?
+    @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not?
+    This function add the inputNodes to the given Study and Series.
+    */
+    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 
     mitkClassMacro( ChiliPlugin,itk::Object );
     itkNewMacro( ChiliPlugin );

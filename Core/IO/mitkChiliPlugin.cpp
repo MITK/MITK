@@ -111,10 +111,6 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
   return emptyVector;
 }
 
-void mitk::ChiliPlugin::SaveImageToLightbox( Image*, const mitk::PropertyList::Pointer, QcLightbox* )
-{
-}
-
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
@@ -144,3 +140,12 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneTextFromSeries( const std:
 void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 {
 }
+
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string )
+{
+}
+
+void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer , std::string , std::string , bool )
+{
+}
+

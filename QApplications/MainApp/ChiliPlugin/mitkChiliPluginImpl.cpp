@@ -16,27 +16,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//Chili
+//#include <ipDicom/ipDicom.h>  //read DICOM-Files
+#include <chili/plugin.xpm>
+#include <chili/cdbTypes.h>  //series_t*, study_t*, ...
+#include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
+#include <ipPic/ipPic.h>  //ipPicDescriptor
+#include <ipPic/ipPicTags.h>  //Tags
+//MITK-Plugin
+#include "mitkChiliPluginImpl.h"
+#include "mitkChiliPluginEvents.h"
+#include "mitkChiliPluginFactory.h"
+#include "mitkPicDescriptorToNode.h"
+#include "QmitkChiliPluginSaveDialog.h"
+#include "mitkLightBoxImageReader.h"  //TODO entfernen wenn das neue Chili-Release installiert ist
+//MITK
+#include <mitkCoreObjectFactory.h>
 #include <QmitkStdMultiWidget.h>
 #include <QmitkEventCollector.h>
 #include <QcMITKTask.h>
 #include <SampleApp.h>
-//Chili
-#include <chili/isg.h>
-#include <chili/cdbTypes.h>
-#include <chili/plugin.xpm>
-#include <chili/qclightboxmanager.h>
-#include <ipPic/ipPicTags.h>
-#include <ipPic/ipPic.h>
-#include <ipDicom/ipDicom.h>
-//MITKPlugin
-#include "mitkChiliPluginImpl.h"
-#include "mitkChiliPluginEvents.h"
-#include "mitkChiliPluginFactory.h"
-#include "mitkImageToPicDescriptor.h"
-#include "mitkPicDescriptorToNode.h"
-#include "QmitkChiliPluginDifferentStudiesDialog.h"
-//TODO entfernen wenn das neue Chili-Release installiert ist
-  #include "mitkLightBoxImageReader.h"
 //teleconference
 #include <mitkConferenceToken.h>
 #include <mitkConferenceEventMapper.h>
@@ -49,8 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpixmap.h>
 #include <qmessagebox.h>
 #include <qtooltip.h>
-
-#include <mitkCoreObjectFactory.h>
 
 #include "chili_lightbox_import.xpm"
 
@@ -180,9 +177,10 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
 
   if( seriesOID == "" )
   {
-    //use current selected patient
+    //use current selected study
     if( pCurrentStudy() != NULL )
     {
+      //copy the StudyStruct
       study = (*dupStudyStruct( pCurrentStudy() ) );
     }
     else
@@ -197,7 +195,6 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
   {
     //let chili search for study
     series.oid = strdup( seriesOID.c_str() );
-
     if( !pQuerySeries( this, &series, &study, NULL ) )
     {
       clearStudyStruct( &study );
@@ -207,28 +204,25 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
     }
   }
 
-  if( &study != NULL )
-  {
-    resultInformation.OID = study.oid;
-    resultInformation.InstanceUID = study.instanceUID;
-    resultInformation.ID = study.id;
-    resultInformation.Date = study.date;
-    resultInformation.Time = study.time;
-    resultInformation.Modality = study.modality;
-    resultInformation.Manufacturer = study.manufacturer;
-    resultInformation.ReferingPhysician = study.referingPhysician;
-    resultInformation.Description = study.description;
-    resultInformation.ManufacturersModelName = study.manufacturersModelName;
-    resultInformation.ImportTime = study.importTime;
-    resultInformation.ChiliSenderID = study.chiliSenderID;
-    resultInformation.AccessionNumber = study.accessionNumber;
-    resultInformation.InstitutionName = study.institutionName;
-    resultInformation.WorkflowState = study.workflow_state;
-    resultInformation.Flags = study.flags;
-    resultInformation.PerformingPhysician = study.performingPhysician;
-    resultInformation.ReportingPhysician = study.reportingPhysician;
-    resultInformation.LastAccess = study.last_access;
-  }
+  resultInformation.OID = study.oid;
+  resultInformation.InstanceUID = study.instanceUID;
+  resultInformation.ID = study.id;
+  resultInformation.Date = study.date;
+  resultInformation.Time = study.time;
+  resultInformation.Modality = study.modality;
+  resultInformation.Manufacturer = study.manufacturer;
+  resultInformation.ReferingPhysician = study.referingPhysician;
+  resultInformation.Description = study.description;
+  resultInformation.ManufacturersModelName = study.manufacturersModelName;
+  resultInformation.AccessionNumber = study.accessionNumber;
+  resultInformation.InstitutionName = study.institutionName;
+  resultInformation.PerformingPhysician = study.performingPhysician;
+  resultInformation.ReportingPhysician = study.reportingPhysician;
+  resultInformation.LastAccess = study.last_access;
+  //convert in to string
+  std::ostringstream stringHelper;
+  stringHelper << study.image_count;
+  resultInformation.ImageCount = stringHelper.str();
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
@@ -261,6 +255,7 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformati
     //use current selected patient
     if( pCurrentPatient() != NULL )
     {
+      //copy patientstruct
       patient = (*dupPatientStruct( pCurrentPatient() ) );
     }
     else
@@ -326,6 +321,7 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
     //use current selected series
     if( pCurrentSeries() != NULL )
     {
+      //copy seriesstruct
       series = (*dupSeriesStruct( pCurrentSeries() ) );
     }
     else
@@ -348,12 +344,21 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
 
   if( &series != NULL )
   {
+    std::ostringstream stringHelper;
+
     resultInformation.OID = series.oid;
     resultInformation.InstanceUID = series.instanceUID;
-    resultInformation.Number = series.number;
-    resultInformation.Acquisition = series.acquisition;
-    resultInformation.EchoNumber = series.echoNumber;
-    resultInformation.TemporalPosition = series.temporalPosition;
+    stringHelper << series.number;
+    resultInformation.Number = stringHelper.str();
+    stringHelper.clear();
+    stringHelper << series.acquisition;
+    resultInformation.Acquisition = stringHelper.str();
+    stringHelper.clear();
+    stringHelper << series.echoNumber;
+    resultInformation.EchoNumber = stringHelper.str();
+    stringHelper.clear();
+    stringHelper << series.temporalPosition;
+    resultInformation.TemporalPosition = stringHelper.str();
     resultInformation.Date = series.date;
     resultInformation.Time = series.time;
     resultInformation.Description = series.description;
@@ -361,6 +366,8 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
     resultInformation.BodyPartExamined = series.bodyPartExamined;
     resultInformation.ScanningSequence = series.scanningSequence;
     resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
+    stringHelper << series.image_count;
+    resultInformation.ImageCount = stringHelper.str();
   }
 
   clearSeriesStruct( &series );
@@ -371,10 +378,11 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
 /** return the seriesinformationlist */
 mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPluginImpl::GetSeriesInformationList( const std::string& studyOID )
 {
+  //get used to save all found series
   m_SeriesInformationList.clear();
-
+  //iterate over all series from study
   iterateSeries( (char*)studyOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateSeriesCallback, this );
-
+  //the function filled the SeriesInformationList
   return m_SeriesInformationList;
 }
 
@@ -383,14 +391,25 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, 
 {
   mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
 
+  std::ostringstream stringHelper;
+  //create new element
   mitk::ChiliPlugin::SeriesInformation newSeries;
 
+  //fill element
   newSeries.OID = series->oid;
   newSeries.InstanceUID = series->instanceUID;
-  newSeries.Number = series->number;
-  newSeries.Acquisition = series->acquisition;
-  newSeries.EchoNumber = series->echoNumber;
-  newSeries.TemporalPosition = series->temporalPosition;
+  stringHelper << series->number;
+  newSeries.Number = stringHelper.str();
+  stringHelper.clear();
+  stringHelper << series->acquisition;
+  newSeries.Acquisition = stringHelper.str();
+  stringHelper.clear();
+  stringHelper << series->echoNumber;
+  newSeries.EchoNumber = stringHelper.str();
+  stringHelper.clear();
+  stringHelper << series->temporalPosition;
+  newSeries.TemporalPosition = stringHelper.str();
+  stringHelper.clear();
   newSeries.Date = series->date;
   newSeries.Time = series->time;
   newSeries.Description = series->description;
@@ -398,7 +417,11 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, 
   newSeries.BodyPartExamined = series->bodyPartExamined;
   newSeries.ScanningSequence = series->scanningSequence;
   newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
+  stringHelper << series->image_count;
+  newSeries.ImageCount = stringHelper.str();
+  stringHelper.clear();
 
+  //add to list
   callingObject->m_SeriesInformationList.push_back( newSeries );
 
   return ipTrue; // enum from ipTypes.h
@@ -455,15 +478,14 @@ mitk::ChiliPlugin::TextInformation mitk::ChiliPluginImpl::GetTextInformation( co
 /** return the textinformationlist */
 mitk::ChiliPlugin::TextInformationList mitk::ChiliPluginImpl::GetTextInformationList( const std::string& seriesOID )
 {
-  m_TextInformationList.clear();
-
 #ifdef CHILI_PLUGIN_VERSION_CODE
-
+  //get used to save all found text
+  m_TextInformationList.clear();
+  //iterate over all text from series
   pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextOneCallback, this );
-
-#endif
-
+  //the function filled the TextInformationList
   return m_TextInformationList;
+#endif
 }
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -471,9 +493,9 @@ mitk::ChiliPlugin::TextInformationList mitk::ChiliPluginImpl::GetTextInformation
 ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data )
 {
   mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
-
+  //create new element
   mitk::ChiliPlugin::TextInformation resultText;
-
+  //fill element
   resultText.OID = text->oid;
   resultText.MimeType = text->mime_type;
   resultText.ChiliText = text->chiliText;
@@ -482,6 +504,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextOneCallback( int rows, int row,
   resultText.TextDate = text->text_date;
   resultText.Description = text->description;
 
+  //add to list
   callingObject->m_TextInformationList.push_back( resultText );
 
   return ipTrue; // enum from ipTypes.h
@@ -549,6 +572,12 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
     DataTreeNode::Pointer node = DataTreeNode::New();
     node->SetData( image );
     DataTreeNodeFactory::SetDefaultImageProperties( node );
+    mitk::PropertyList::Pointer tempPropertyList = reader->GetImageTagsAsPropertyList();
+    //add properties to node
+    for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
+    {
+      node->SetProperty( iter->first.c_str(), iter->second.first );
+    }
     resultVector.push_back( node );
   }
   QApplication::restoreOverrideCursor();
@@ -579,125 +608,16 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
     }
 
     //use class PicDescriptorToNode
-    PicDescriptorToNode* converterToNode = new PicDescriptorToNode();
+    PicDescriptorToNode::Pointer converterToNode = PicDescriptorToNode::New();
     //input - processing - output - delete
     converterToNode->SetInput( lightboxPicDescriptorList, lightbox->currentSeries()->oid );
-    converterToNode->GenerateNodes();
+    converterToNode->Update();
     resultVector = converterToNode->GetOutput();
-    delete converterToNode;
 
     QApplication::restoreOverrideCursor();
   }
 
   return resultVector;
-#endif
-}
-
-/** save images to lightbox */
-void mitk::ChiliPluginImpl::SaveImageToLightbox( Image* sourceImage, const mitk::PropertyList::Pointer propertyList , QcLightbox* lightbox )
-{
-#ifndef CHILI_PLUGIN_VERSION_CODE
-
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
-  return;
-
-#else
-
-  if( sourceImage == NULL )
-  {
-    std::cout << "ChiliPlugin (SaveImageToLightbox): The sourceImage is empty. Abort." << std::endl;
-    return;
-  }
-
-  if( lightbox == NULL)
-  {
-    std::cout << "ChiliPlugin (SaveImageToLightbox): No lightbox set. Abort." << std::endl;
-    return;
-  }
-
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-  TagInformationList picTagList;
-  picTagList.clear();
-
-  //get the seriesOID
-  mitk::BaseProperty::Pointer seriesOIDProperty = propertyList->GetProperty( "SeriesOID" );
-  if( !seriesOIDProperty )
-  {
-    //the image have no seriesOID -> it was not loaded from chili -> add to current selected series
-    picTagList = GetAllAvailableStudyAndPatientPicTags( GetStudyInformation().OID );
-  }
-  else
-  {
-    //if the current study different to the study from the given series
-    if( strcmp( GetStudyInformation( seriesOIDProperty->GetValueAsString() ).OID.c_str(), pCurrentStudy()->oid ) != 0 )
-    {
-      //ask the user which study he want to use
-      QmitkChiliPluginDifferentStudiesDialog myDialog( 0 );
-
-      //add current selected study
-      myDialog.addStudy( GetStudyInformation(), GetPatientInformation(), "current seleted Series" );
-
-      //add the series where the image from
-      //get the nameProperty
-      mitk::BaseProperty::Pointer nameProperty = propertyList->GetProperty( "name" );
-      if( nameProperty )
-      {
-        myDialog.addStudy( GetStudyInformation( seriesOIDProperty->GetValueAsString() ), GetPatientInformation( seriesOIDProperty->GetValueAsString() ), nameProperty->GetValueAsString() );
-      }
-      else
-      {
-        myDialog.addStudy( GetStudyInformation( seriesOIDProperty->GetValueAsString() ), GetPatientInformation( seriesOIDProperty->GetValueAsString() ), "no name" );
-      }
-
-      QApplication::restoreOverrideCursor();
-      int dialogReturnValue = myDialog.exec();
-      QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-      if( dialogReturnValue == QDialog::Rejected || myDialog.GetSelectedStudy() == "" )
-      {
-        QApplication::restoreOverrideCursor();
-        return; //user abort
-      }
-      else
-      {
-        // TODO test ob überschreiben ( + überschreibendialog )
-      }
-    }
-    else
-    {
-      //TODO überschreibendialog
-      //picTagList = GetAllAvailableStudyAndPatientPicTags( GetStudyInformation( seriesOIDProperty->GetValueAsString() ).OID );
-      //picTagList.clear();
-    }
-  }
-
-  //get the levelWindow
-  mitk::LevelWindow levelWindow;
-  mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>( propertyList->GetProperty("levelwindow").GetPointer() );
-  if( levelWindowProperty.IsNotNull() )
-  {
-    levelWindow = levelWindowProperty->GetLevelWindow();
-  }
-  else
-  {
-    levelWindow.SetAuto( sourceImage );
-  }
-
-  //seperate the image into PicDescriptors
-  ImageToPicDescriptor* converterToPicDescriptor = new ImageToPicDescriptor();
-  //input - processing - output
-  converterToPicDescriptor->SetInput( sourceImage, picTagList, levelWindow );
-  converterToPicDescriptor->Write();
-  std::list< ipPicDescriptor* > resultPicDescriptorList = converterToPicDescriptor->GetOutput();
-  //delete
-  delete converterToPicDescriptor;
-  //add the single slices to the lightbox, they dont get saved, only if the user press the Chili-save-button
-  while( !resultPicDescriptorList.empty() )
-  {
-    lightbox->addImage( resultPicDescriptorList.front() );
-    resultPicDescriptorList.pop_front();
-  }
-  QApplication::restoreOverrideCursor();
 #endif
 }
 
@@ -714,10 +634,8 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadCompleteSeri
 
 #else
 
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
-  {
+  if( m_tempDirectory.empty() )
     return resultNodes;
-  }
 
   if( seriesOID == "" )
   {
@@ -757,10 +675,8 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
   return resultNodes;
 
 #else
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
-  {
+  if( m_tempDirectory.empty() )
     return resultNodes;
-  }
 
   if( seriesOID == "" )
   {
@@ -774,7 +690,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
   m_FileList.clear();
 
   //iterate over all images from this series, save them to harddisk and set all filenames to m_FileList
-  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateImagesCallback, this );
+  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateImagesCallbackOne, this );
 
   //read the actually saved files
   if( !m_FileList.empty() )
@@ -871,12 +787,11 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
     //make the readed picDescriptors to multiple Nodes
     if( !picDescriptorToNodeInput.empty() )
     {
-      PicDescriptorToNode* converterToNode = new PicDescriptorToNode();
+      PicDescriptorToNode::Pointer converterToNode = PicDescriptorToNode::New();
       //input - processing - output
       converterToNode->SetInput( picDescriptorToNodeInput, seriesOID );
-      converterToNode->GenerateNodes();
+      converterToNode->Update();
       resultNodes = converterToNode->GetOutput();
-      delete converterToNode;
     }
 
     //read the rest via DataTreeNodeFactory
@@ -938,7 +853,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
 }
 
 /** function to iterate over all images from a series */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallback( int rows, int row, image_t* image, void* user_data )
+ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallbackOne( int rows, int row, image_t* image, void* user_data )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>( user_data );
@@ -957,7 +872,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallback( int rows, int row, 
   pFetchDataToFile( image->path, pathAndFile.c_str(), &error );
   //all right?
   if( error != 0 )
-    std::cout << "ChiliPlugin (GlobalIterateImagesCallback): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
+    std::cout << "ChiliPlugin (GlobalIterateImagesCallbackOne): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
   else
     //then add the filename to the list
     callingObject->m_FileList.push_back( pathAndFile );
@@ -968,6 +883,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallback( int rows, int row, 
 /** this function load all text-files from the series */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFromSeries( const std::string& seriesOID )
 {
+//TODO use LoadOneTextFile
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
 
@@ -978,7 +894,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
 
 #else
 
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
+  if( m_tempDirectory.empty() )
   {
     return resultNodes;
   }
@@ -1048,7 +964,10 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
               fileName.erase( size );
               node->SetProperty( "name", new StringProperty( fileName ) );
               node->SetProperty( "TextOID", new StringProperty( m_TextFileList.front().TextFileOID ) );
-               node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+              node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+              //it should be possible to override all non-image-entries
+              node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
+              node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
               resultNodes.push_back( node );
               if( remove(  pathAndFile.c_str() ) != 0 )
               {
@@ -1095,7 +1014,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneTextFromSeries( const 
 
 #else
 
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
+  if( m_tempDirectory.empty() )
   {
     return NULL;
   }
@@ -1148,6 +1067,9 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneTextFromSeries( const 
             node->SetProperty( "name", new StringProperty( fileName ) );
             node->SetProperty( "TextOID", new StringProperty( m_TextFileList.front().TextFileOID ) );
             node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+            //it should be possible to override all non-image-entries
+            node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
+            node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
 
             if( remove(  pathAndFile.c_str() ) != 0 )
             {
@@ -1174,163 +1096,220 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
   return;
 
 #else
-/*
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
 
-  if( m_tempDirectory == NULL || m_tempDirectory == "" )
-  {
-    QApplication::restoreOverrideCursor();
+  if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
     return;
-  }
 
-  //get the destination-study
-  std::list<std::string> studyOIDList;
-  studyOIDList.clear();
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+  QmitkChiliPluginSaveDialog chiliPluginDialog( 0 );
 
+  //add all nodes to the dialog
   for( DataStorage::SetOfObjects::const_iterator nodeIter = inputNodes->begin(); nodeIter != inputNodes->end(); nodeIter++ )
   {
-    if ( (*nodeIter) )
+    if( (*nodeIter) )
     {
-      mitk::BaseProperty::Pointer propertySeriesOID = (*nodeIter)->GetProperty( "SeriesOID" );
-      if( propertySeriesOID && propertySeriesOID->GetValueAsString() != "" )
-      {
-        series_t series;
-        study_t study;
-        initSeriesStruct( &series );
-        initStudyStruct( &study );
+      mitk::BaseProperty::Pointer seriesOIDProperty = (*nodeIter)->GetProperty( "SeriesOID" );
 
-        series.oid = strdup( propertySeriesOID->GetValueAsString().c_str() );
-        if( pQuerySeries( this, &series, &study, NULL ) )
-          studyOIDList.push_back( study.oid );
+      mitk::BaseProperty::Pointer manufacturerProperty = (*nodeIter)->GetProperty( "CHILI: MANUFACTURER" );
+      mitk::BaseProperty::Pointer institutionNameProperty = (*nodeIter)->GetProperty( "CHILI: INSTITUTION NAME" );
+      if( manufacturerProperty )
+        std::cout<<manufacturerProperty->GetValueAsString();
+      if( institutionNameProperty )
+        std::cout<<institutionNameProperty->GetValueAsString();
+std::cout<<"vorbei"<<std::endl;
+
+      if( seriesOIDProperty.IsNotNull() )
+      {
+        //this nodes are loaded from chili
+        PatientInformation tempPatient = GetPatientInformation( seriesOIDProperty->GetValueAsString() );
+        StudyInformation tempStudy = GetStudyInformation( seriesOIDProperty->GetValueAsString() );
+        SeriesInformation tempSeries = GetSeriesInformation( seriesOIDProperty->GetValueAsString() );
+
+        chiliPluginDialog.AddStudySeriesAndNode( tempStudy.OID, tempPatient.Name, tempPatient.ID, tempStudy.Description, tempSeries.OID, tempSeries.Number, tempSeries.Description, (*nodeIter) );
+      }
+      else
+      {
+        //this nodes saved the first time to chili
+        chiliPluginDialog.AddNode( (*nodeIter) );
       }
     }
   }
-  //dont forget the currentOID
-  studyOIDList.push_back( pCurrentStudy()->oid );
-
-  studyOIDList.sort();  //unique needed
-  studyOIDList.unique();  //eleminate all double entries
-
-  std::string destinationStudyOID = "";
-
-  if( studyOIDList.size() > 1 )
+/*
+  //add the current selected study/patient/series
+  PatientInformation currentselectedPatient = GetPatientInformation();
+  StudyInformation currentselectedStudy = GetStudyInformation();
+  SeriesInformation currentselectedSeries = GetSeriesInformation();
+  if( currentselectedSeries.OID == "" )
   {
-    QmitkChiliPluginDifferentStudiesDialog myDialog( 0 );
-
-    for( std::list<std::string>::iterator iter = studyOIDList.begin(); iter != studyOIDList.end(); iter++)
-    {
-      study_t study;
-      patient_t patient;
-      initStudyStruct( &study );
-      initPatientStruct( &patient );
-
-      study.oid = strdup( (*iter).c_str() );
-      if( pQueryStudy( this, &study, &patient ) )
-        myDialog.addStudy( study.oid, patient.name, patient.id, study.description, study.date, study.modality );
-
-      clearStudyStruct( &study );
-      clearPatientStruct( &patient );
-    }
-
-    QApplication::restoreOverrideCursor();
-    int dialogReturnValue = myDialog.exec();
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-    if( dialogReturnValue == QDialog::Rejected || myDialog.GetSelectedStudy() == "" )
-    {
-      QApplication::restoreOverrideCursor();
-      return; //user abort
-    }
-    else destinationStudyOID = myDialog.GetSelectedStudy();
+    chiliPluginDialog.AddStudy( currentselectedStudy.OID, currentselectedPatient.Name, currentselectedPatient.ID, currentselectedStudy.Description );
   }
-  else destinationStudyOID = studyOIDList.front();
+  else
+    chiliPluginDialog.AddStudyAndSeries( currentselectedStudy.OID, currentselectedPatient.Name, currentselectedPatient.ID, currentselectedStudy.Description, currentselectedSeries.OID, currentselectedSeries.Number, currentselectedSeries.Description );
 
-  study_t resultStudy;
-  patient_t resultPatient;
-  initStudyStruct( &resultStudy );
-  initPatientStruct( &resultPatient );
-  resultStudy.oid = strdup( destinationStudyOID.c_str() );
-  if( !pQueryStudy( this, &resultStudy, &resultPatient ) )
-  {
-    QApplication::restoreOverrideCursor();
-    std::cout << "ChiliPlugin-Warning: pQueryStudy() failed." << std::endl;
+  //let the user decide
+  chiliPluginDialog.UpdateView();
+  QApplication::restoreOverrideCursor();
+  int dialogReturnValue = chiliPluginDialog.exec();
+
+  if( dialogReturnValue == QDialog::Rejected )
     return; //user abort
+
+  if( chiliPluginDialog.GetSelection().UserDecision == QmitkChiliPluginSaveDialog::CreateNew )
+  {
+    SaveAsNewSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSeriesInformation().SeriesNumber, chiliPluginDialog.GetSeriesInformation().SeriesDescription );
+  }
+  else
+  {
+    if( chiliPluginDialog.GetSelection().UserDecision == QmitkChiliPluginSaveDialog::OverrideAll )
+    {
+      SaveToSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSelection().SeriesOID, true );
+    }
+    else
+    {
+      SaveToSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSelection().SeriesOID, false );
+    }
+  }
+*/
+#endif
+}
+
+void mitk::ChiliPluginImpl::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription )
+{
+  if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
+    return;
+
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+
+  study_t study;
+  initStudyStruct( &study );
+
+  if( studyOID != "" )
+  {
+    study.oid = strdup( studyOID.c_str() );
+    if( pQueryStudy( this, &study, NULL ) )
+    {
+      //create new series
+      series_t* newSeries = ( series_t* )malloc( sizeof( series_t ) );
+      initSeriesStruct( newSeries );
+      newSeries->description = (char*)seriesDescription.c_str();
+      newSeries->number = seriesNumber;
+      if( pCreateSeries( this, &study, newSeries ) )
+      {
+        SaveToSeries( inputNodes, study.oid, newSeries->oid, false );
+      }
+      else
+        std::cout << "ChiliPlugin (SaveToChili): Can not create a new Series." << std::endl;
+      delete newSeries;
+    }
+    else
+      std::cout << "ChiliPlugin (SaveAsNewSeries): pQueryStudy failed. Abort." << std::endl;
+  }
+  else
+    std::cout << "ChiliPlugin (SaveAsNewSeries): studyOID is empty. Abort." << std::endl;
+
+  clearStudyStruct( &study );
+  QApplication::restoreOverrideCursor();
+}
+
+void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries )
+{
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  return;
+
+#else
+
+  if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
+    return;
+
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+
+  study_t study;
+  patient_t patient;
+  series_t series;
+  initStudyStruct( &study );
+  initPatientStruct( &patient );
+  initSeriesStruct( &series );
+
+  bool abort = false;
+  if( seriesOID == "" )
+  {
+    std::cout << "ChiliPlugin (SaveToSeries): seriesOID is empty. Abort." << std::endl;
+    abort = true;
+  }
+  else
+  {
+    series.oid = strdup( seriesOID.c_str() );
+    if( !pQuerySeries( this, &series, &study, &patient ) )
+    {
+      std::cout << "ChiliPlugin (SaveToSeries): pQuerySeries failed. Abort." << std::endl;
+      abort = true;
+    }
+    else
+      if( study.oid != studyOID )
+      {
+        std::cout << "ChiliPlugin (SaveToSeries): The given StudyOID is different to the StudyOID of the found Series. Abort." << std::endl;
+        abort = true;
+      }
   }
 
-  //now we can save the single nodes
+  if( abort )
+  {
+    clearStudyStruct( &study );
+    clearPatientStruct( &patient );
+    clearSeriesStruct( &series );
+    return;
+  }
+
+  int imageNumberCount = GetMaximumImageNumber( seriesOID ) + 1;
+
+  mitk::ImageToPicDescriptor::TagInformationList picTagList = GetNeededTagList( &study, &patient, &series );
+
   for( DataStorage::SetOfObjects::const_iterator nodeIter = inputNodes->begin(); nodeIter != inputNodes->end(); nodeIter++ )
   {
-    if ( (*nodeIter) )
+    if( (*nodeIter) )
     {
       BaseData* data = (*nodeIter)->GetData();
       if ( data )
       {
-        std::string destinationSeriesOID = "";
-
-        //check if the current node already exist in the destination-study
-        mitk::BaseProperty::Pointer propertySeriesOID = (*nodeIter)->GetProperty( "SeriesOID" );
-        if( propertySeriesOID && propertySeriesOID->GetValueAsString() != "" )
-        {
-          series_t series;
-          study_t study;
-          initSeriesStruct( &series );
-          initStudyStruct( &study );
-
-          series.oid = strdup( propertySeriesOID->GetValueAsString().c_str() );
-          if( pQuerySeries( this, &series, &study, NULL ) )
-          {
-            if( study.oid == destinationStudyOID )
-            {
-              //TODO ask what to do
-            }
-            else
-            {
-              //create a new series in the study
-              destinationSeriesOID = CreateNewSeries( &resultStudy );
-              if( destinationSeriesOID == "" )
-              {
-                QApplication::restoreOverrideCursor();
-                return;
-              }
-            }
-          }
-          else
-          {
-            QApplication::restoreOverrideCursor();
-            std::cout << "ChiliPlugin-Warning: pQuerySeries() failed." << std::endl;
-            return;
-          }
-          clearStudyStruct( &study );
-          clearSeriesStruct( &series );
-        }
-        else
-        {
-          //create a new series in the study
-          destinationSeriesOID = CreateNewSeries( &resultStudy );
-          if( destinationSeriesOID == "" )
-          {
-            QApplication::restoreOverrideCursor();
-            return;
-          }
-        }
-
         Image* image = dynamic_cast<Image*>( data );
         if( image )
         //save Image
         {
-          //levelWindow
-          LevelWindow levelWindow;
-          LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<LevelWindowProperty*>( (*nodeIter)->GetProperty("levelwindow").GetPointer() );
-          if( levelWindowProperty.IsNotNull() )
-            levelWindow = levelWindowProperty->GetLevelWindow();
-          else levelWindow.SetAuto( image );
+          mitk::BaseProperty::Pointer seriesOIDProperty = (*nodeIter)->GetProperty( "SeriesOID" );
+          if( seriesOIDProperty && seriesOIDProperty->GetValueAsString() == seriesOID && !overrideExistingSeries )
+            continue;
 
           //ImageToPicDescriptor
-          ImageToPicDescriptor* converterToDescriptor = new ImageToPicDescriptor();
-          //input - processing - output
-          //TODO converterToDescriptor->SetInput( image, NULL, levelWindow );
-          converterToDescriptor->Write();
+          ImageToPicDescriptor::Pointer converterToDescriptor = ImageToPicDescriptor::New();
+          LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<LevelWindowProperty*>( (*nodeIter)->GetProperty("levelwindow").GetPointer() );
+          if( levelWindowProperty.IsNotNull() )
+          {
+            converterToDescriptor->SetLevelWindow( levelWindowProperty->GetLevelWindow() );
+          }
+          converterToDescriptor->SetImage( image );
+          converterToDescriptor->SetImageNumber( imageNumberCount );
+
+          //add the node-name as SeriesDescription to the Taglist
+          mitk::BaseProperty::Pointer nameProperty = (*nodeIter)->GetProperty( "name" );
+          mitk::ImageToPicDescriptor::TagInformationStruct temp;
+          temp.PicTagDescription = tagSERIES_DESCRIPTION;
+          temp.PicTagContent = nameProperty->GetValueAsString();
+          picTagList.push_back( temp );
+
+          if( overrideExistingSeries && seriesOIDProperty && seriesOIDProperty->GetValueAsString() == seriesOID )
+            converterToDescriptor->SetTagList( picTagList, true );
+          else
+            converterToDescriptor->SetTagList( picTagList, false );
+          //create the picdescriptorlist
+          converterToDescriptor->Update();
           std::list< ipPicDescriptor* > myPicDescriptorList = converterToDescriptor->GetOutput();
+
+          //increase the imageNumber
+          imageNumberCount = imageNumberCount + myPicDescriptorList.size();
+          //delete the current node-name (SeriesnDescription) from the picTagList
+          picTagList.pop_back();
 
           int count = 0;
           while( !myPicDescriptorList.empty() )
@@ -1343,16 +1322,23 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
             std::string fileName = helpFileName.str();
 
             std::string pathAndFile = m_tempDirectory + fileName;
-
+            //get PicDescriptor
             ipPicDescriptor *pic = myPicDescriptorList.front();
-
+            //save to harddisk
             ipPicPut( (char*)pathAndFile.c_str(), pic );
-
-            if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), NULL, resultStudy.instanceUID, resultPatient.oid, resultStudy.oid, destinationSeriesOID.c_str(), NULL ) )
-              std::cout << "ChiliPlugin-Warning: Error while saving File (" << fileName << ") to Database." << std::endl;
-            else
-              if( remove( pathAndFile.c_str() ) != 0 ) std::cout << "ChiliPlugin-Warning: Not able to  delete file: " << pathAndFile << std::endl;
+            //delete Descriptor
+            ipPicFree( pic );
             myPicDescriptorList.pop_front();
+            //save saved file to chili
+            if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), NULL, study.instanceUID, patient.oid, study.oid, series.oid, NULL ) )
+            {
+              std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
+            }
+            else
+            {
+              if( remove( pathAndFile.c_str() ) != 0 )
+                std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << pathAndFile << std::endl;
+            }
             count++;
           }
         }
@@ -1367,9 +1353,10 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
             FileWriter* writer = dynamic_cast<FileWriter*>( iter->GetPointer() );
             if( writer )
               possibleWriter.push_back( writer );
-            else std::cout << "ChiliPlugin-Warning: no FileWriter returned" << std::endl;
+            else std::cout << "ChiliPlugin (SaveToChili): no FileWriter returned" << std::endl;
           }
 
+          //write/save
           for( std::list<FileWriter::Pointer>::iterator it = possibleWriter.begin(); it != possibleWriter.end(); it++ )
           {
             if( it->GetPointer()->CanWrite( (*nodeIter) ) )
@@ -1381,8 +1368,8 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
 
               std::string textOID;
               BaseProperty::Pointer propertyTextOID = (*nodeIter)->GetProperty( "TextOID" );
-              if( propertyTextOID )
-                textOID = propertyTextOID->GetValueAsString();
+              if( overrideExistingSeries && propertyTextOID )
+                  textOID = propertyTextOID->GetValueAsString();
               else
                 textOID = "";
 
@@ -1394,110 +1381,100 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
               it->GetPointer()->SetInput( (*nodeIter) );
               it->GetPointer()->Write();
 
-              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), resultStudy.instanceUID, resultPatient.oid, resultStudy.oid, destinationSeriesOID.c_str(), textOID.c_str() ) )
-                std::cout << "ChiliPlugin-Warning: Error while saving File (" << fileName << ") to Database." << std::endl;
-              else if( remove(  pathAndFile.c_str() ) != 0 ) std::cout << "ChiliPlugin-Warning: Not able to  delete file: " << it->GetPointer()->GetFileName() << std::endl;
+              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
+              {
+                std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
+              }
+              else
+                 if( remove(  pathAndFile.c_str() ) != 0 )
+                   std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << it->GetPointer()->GetFileName() << std::endl;
             }
           }
         }
       }
     }
   }
-  clearStudyStruct( &resultStudy );
-  clearPatientStruct( &resultPatient );
+  clearStudyStruct( &study );
+  clearPatientStruct( &patient );
+  clearSeriesStruct( &series );
   QApplication::restoreOverrideCursor();
-*/
 #endif
 }
 
-mitk::ChiliPlugin::TagInformationList mitk::ChiliPluginImpl::GetAllAvailableStudyAndPatientPicTags( const std::string& studyOID )
+int mitk::ChiliPluginImpl::GetMaximumImageNumber( std::string seriesOID )
 {
-  TagInformationList resultList;
+  m_MaximumImageNumber = 0;
+  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateImagesCallbackTwo, this );
+  return m_MaximumImageNumber;
+}
+
+/** function to iterate over all images from a series */
+ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallbackTwo( int rows, int row, image_t* image, void* user_data )
+{
+  ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>( user_data );
+  if( image->number > callingObject->m_MaximumImageNumber )
+    callingObject->m_MaximumImageNumber = image->number;
+  return ipTrue; // enum from ipTypes.h
+}
+
+mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPluginImpl::GetNeededTagList( study_t* study, patient_t* patient, series_t* series )
+{
+  mitk::ImageToPicDescriptor::TagInformationList resultList;
   resultList.clear();
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
-  study_t study;
-  patient_t patient;
-
-  initStudyStruct( &study );
-  initPatientStruct( &patient );
-
-  study.oid = strdup( studyOID.c_str() );
-  if( !pQueryStudy( this, &study, &patient ) )
-  {
-    clearStudyStruct( &study );
-    clearPatientStruct( &patient );
-  }
-
   //get all study- and patient-information
-  if( &study != NULL && &patient != NULL )
+  if( study != NULL && patient != NULL && series != NULL )
   {
-    TagInformationStruct temp;
-
+    mitk::ImageToPicDescriptor::TagInformationStruct temp;
     //study
-    temp.PicTagDescription = tagPERFORMING_PHYSICIAN_NAME;
-    temp.PicTagContent = study.performingPhysician;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagREFERING_PHYSICIAN_NAME;
-    temp.PicTagContent = study.referingPhysician;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagINSTITUTION_NAME;
-    temp.PicTagContent = study.institutionName;
-    resultList.push_back( temp );
     temp.PicTagDescription = tagSTUDY_INSTANCE_UID;
-    temp.PicTagContent = study.instanceUID;
+    temp.PicTagContent = study->instanceUID;
     resultList.push_back( temp );
     temp.PicTagDescription = tagSTUDY_DESCRIPTION;
-    temp.PicTagContent = study.description;
+    temp.PicTagContent = study->description;
     resultList.push_back( temp );
     temp.PicTagDescription = tagSTUDY_DATE;
-    temp.PicTagContent = study.date;
+    temp.PicTagContent = study->date;
     resultList.push_back( temp );
     temp.PicTagDescription = tagSTUDY_TIME;
-    temp.PicTagContent = study.time;
+    temp.PicTagContent = study->time;
     resultList.push_back( temp );
     temp.PicTagDescription = tagSTUDY_ID;
-    temp.PicTagContent = study.id;
+    temp.PicTagContent = study->id;
+    resultList.push_back( temp );
+    //self created
+    temp.PicTagDescription = tagMANUFACTURER;
+    temp.PicTagContent = "MITK";
+    resultList.push_back( temp );
+    temp.PicTagDescription = tagINSTITUTION_NAME;
+    temp.PicTagContent = "DKFZ.MBI";
     resultList.push_back( temp );
     temp.PicTagDescription = tagMODALITY;
-    temp.PicTagContent = study.modality;
+    std::string tempString = study->modality;
+    tempString = tempString + " processed";
+    temp.PicTagContent = tempString;
     resultList.push_back( temp );
-    temp.PicTagDescription = tagMANUFACTURER;
-    temp.PicTagContent = "DKFZ.MBI";  //TODO subversion-number, chili-number???
+    //series
+    temp.PicTagDescription = tagSERIES_INSTANCE_UID;
+    temp.PicTagContent = series->instanceUID;
     resultList.push_back( temp );
-    temp.PicTagDescription = tagMODEL_NAME;
-    temp.PicTagContent = study.manufacturersModelName;
+    temp.PicTagDescription = tagSERIES_DATE;
+    temp.PicTagContent = series->date;
     resultList.push_back( temp );
-    //patient
-    temp.PicTagDescription = tagPATIENT_NAME;
-    temp.PicTagContent = patient.name;
+    temp.PicTagDescription = tagSERIES_TIME;
+    temp.PicTagContent = series->time;
     resultList.push_back( temp );
-    temp.PicTagDescription = tagPATIENT_SEX;
-    temp.PicTagContent = patient.sex;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagPATIENT_ID;
-    temp.PicTagContent = patient.id;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagPATIENT_BIRTHDATE;
-    temp.PicTagContent = patient.birthDate;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagPATIENT_BIRTHTIME;
-    temp.PicTagContent = patient.birthTime;
-    resultList.push_back( temp );
-    temp.PicTagDescription = tagMEDICAL_RECORD_LOCATOR;
-    temp.PicTagContent = patient.medicalRecordLocator;
+    temp.PicTagDescription = tagSERIES_NUMBER;
+    temp.PicTagContent = series->number;
     resultList.push_back( temp );
   }
   else
   {
-    std::cout << "ChiliPlugin(GetAllAvailableStudyAndPatientPicTags): The Study- and/or Patient-Information are empty." << std::endl;
+    std::cout << "ChiliPlugin(GetAllAvailablePicTags): One input was empty." << std::endl;
     resultList.clear();
   }
-
-  clearStudyStruct( &study );
-  clearPatientStruct( &patient );
-
 #endif
 
   return resultList;
@@ -1627,13 +1604,11 @@ void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
 }
 
 /** if you want to show the current selected study, you have to know when they changed */
-/*
 void mitk::ChiliPluginImpl::SendStudySelectedEvent()
 {
   //throw ITK event (defined in mitkChiliPluginEvents.h)
   InvokeEvent( PluginStudySelected() );
 }
-*/
 
 /** throw an event, if the lightboxcount changed */
 void mitk::ChiliPluginImpl::SendLightBoxCountChangedEvent()

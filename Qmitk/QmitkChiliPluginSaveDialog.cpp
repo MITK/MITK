@@ -148,7 +148,8 @@ QmitkChiliPluginSaveDialog::NewSeriesInformation QmitkChiliPluginSaveDialog::Get
     newSeriesInformation.SeriesNumber = 0;
   else
   {
-    std::stringstream ssStream( m_SeriesNumber->text() );
+    std::stringstream ssStream;
+    ssStream << m_SeriesNumber->text();
     ssStream >> newSeriesInformation.SeriesNumber;
   }
   return newSeriesInformation;
@@ -162,7 +163,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
     bool exist = false;
     for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
     {
-      if( (*iter).StudyOID == studyOID )
+      if( iter->StudyOID == studyOID )
       {
         exist = true;
         break;
@@ -183,7 +184,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
       newInput.NodeDescriptionField = NULL;
       m_Inputs.push_back( newInput );
       //add study to dialog
-      new QListViewItem( m_StudyListView, patientName, patientID, studyDescription, studyOID );
+      new QListViewItem( m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str(), studyOID.c_str() );
     }
   }
 }
@@ -197,10 +198,10 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
     bool studyExist = false;
     for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
     {
-      if( (*iter).StudyOID == studyOID )
+      if( iter->StudyOID == studyOID )
       {
         studyExist = true;
-        if( (*iter).SeriesOID == seriesOID )
+        if( iter->SeriesOID == seriesOID )
         {
           studyAndSeriesExist = true;
          break;
@@ -227,7 +228,7 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
 
       //add study only if they not exist
       if( studyExist == false )
-        new QListViewItem( m_StudyListView, patientName, patientID, studyDescription, studyOID );
+        new QListViewItem( m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str(), studyOID.c_str() );
 
       m_Inputs.push_back( newInput );
     }
@@ -264,7 +265,7 @@ void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, st
     bool exist = false;
     for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
     {
-      if( (*iter).StudyOID == studyOID )
+      if( iter->StudyOID == studyOID )
       {
         exist = true;
         break;
@@ -272,7 +273,7 @@ void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, st
     }
     //only if they not exist
     if( exist == false )
-      new QListViewItem( m_StudyListView, patientName, patientID, studyDescription, studyOID );
+      new QListViewItem( m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str(), studyOID.c_str() );
 
     m_Inputs.push_back( newInput );
   }
@@ -315,12 +316,12 @@ void QmitkChiliPluginSaveDialog::UpdateView()
   //search and show all series with the selected studyOID
   for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
   {
-    if( (*iter).StudyOID == showSeriesWithStudyOID )
+    if( iter->StudyOID == showSeriesWithStudyOID )
     {
       //insert them only, if the series didnt show yet
-      if( m_SeriesListView->findItem( (*iter).SeriesOID.c_str(), 2, Qt::ExactMatch ) == 0 )
+      if( m_SeriesListView->findItem( iter->SeriesOID.c_str(), 2, Qt::ExactMatch ) == 0 )
       {
-        new QListViewItem( m_SeriesListView, (*iter).SeriesNumber, (*iter).SeriesDescription, (*iter).SeriesOID );
+        new QListViewItem( m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str(), iter->SeriesOID.c_str() );
       }
     }
   }
@@ -356,22 +357,22 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
   std::string selectedSeriesOID = m_SeriesListView->selectedItem()->text( 2 );
   for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
   {
-    if( (*iter).NodeDescriptionField != NULL )
+    if( iter->NodeDescriptionField != NULL )
     {
-      mitk::BaseProperty::Pointer manufacturerProperty = (*iter).Node.GetPointer()->GetProperty( "CHILI: MANUFACTURER" );
-      mitk::BaseProperty::Pointer institutionNameProperty = (*iter).Node.GetPointer()->GetProperty( "CHILI: INSTITUTION NAME" );
+      mitk::BaseProperty::Pointer manufacturerProperty = iter->Node.GetPointer()->GetProperty( "CHILI: MANUFACTURER" );
+      mitk::BaseProperty::Pointer institutionNameProperty = iter->Node.GetPointer()->GetProperty( "CHILI: INSTITUTION NAME" );
       //set enable
-      if( ( m_Add->isChecked() ||  m_Override->isChecked() ) && (*iter).SeriesOID == selectedSeriesOID )
+      if( ( m_Add->isChecked() ||  m_Override->isChecked() ) && iter->SeriesOID == selectedSeriesOID )
       {
-        (*iter).NodeDescriptionField->setEnabled( false );
+        iter->NodeDescriptionField->setEnabled( false );
       }
       else
       {
-        (*iter).NodeDescriptionField->setEnabled( true );
+        iter->NodeDescriptionField->setEnabled( true );
       }
       //set strikeout
-      QFont temp = (*iter).NodeDescriptionField->font();
-      if( (*iter).SeriesOID == selectedSeriesOID && ( ( m_Override->isChecked() && ( manufacturerProperty.IsNull() || manufacturerProperty->GetValueAsString() != "MITK" || institutionNameProperty.IsNull() || institutionNameProperty->GetValueAsString() != "DKFZ.MBI" ) ) || m_Add->isChecked() ) )
+      QFont temp = iter->NodeDescriptionField->font();
+      if( iter->SeriesOID == selectedSeriesOID && ( ( m_Override->isChecked() && ( manufacturerProperty.IsNull() || manufacturerProperty->GetValueAsString() != "MITK" || institutionNameProperty.IsNull() || institutionNameProperty->GetValueAsString() != "DKFZ.MBI" ) ) || m_Add->isChecked() ) )
       {
         temp.setStrikeOut( true );
       }
@@ -379,7 +380,7 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
       {
         temp.setStrikeOut( false );
       }
-      (*iter).NodeDescriptionField->setFont( temp );
+      iter->NodeDescriptionField->setFont( temp );
       //set seriesDescription and seriesNumber
       if( m_New->isChecked() )
       {
@@ -409,15 +410,15 @@ void QmitkChiliPluginSaveDialog::CheckOutputs()
   for( std::list< DifferentInputs >::iterator iter = m_Inputs.begin(); iter != m_Inputs.end(); iter ++ )
   {
     //its possible that only the current selected series and study added, this entry have no nodelineedit
-    if( (*iter).NodeDescriptionField != NULL )
+    if( iter->NodeDescriptionField != NULL )
     {
-      std::string nodeDescription = (*iter).NodeDescriptionField->text();
+      std::string nodeDescription = iter->NodeDescriptionField->text();
       if( nodeDescription != "" )
-        (*iter).Node->SetProperty( "name", new mitk::StringProperty( nodeDescription ) );
+        iter->Node->SetProperty( "name", new mitk::StringProperty( nodeDescription ) );
       else
       {
         QMessageBox::information( 0, "MITK", "Found a node without Description.\nPlease fill all Node-Descriptions." );
-        (*iter).NodeDescriptionField->setFocus();
+        iter->NodeDescriptionField->setFocus();
        return;
       }
     }

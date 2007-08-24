@@ -165,7 +165,7 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultInformation;
 
 #else
@@ -238,7 +238,7 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformati
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultInformation;
 
 #else
@@ -308,7 +308,7 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultInformation;
 
 #else
@@ -557,7 +557,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  //QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  //QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   //return resultVector;
 
   //TODO entfernen wenn das neue Chili-Release installiert ist
@@ -629,7 +629,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadCompleteSeri
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultNodes;
 
 #else
@@ -671,7 +671,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultNodes;
 
 #else
@@ -889,7 +889,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return resultNodes;
 
 #else
@@ -1009,7 +1009,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneTextFromSeries( const 
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return NULL;
 
 #else
@@ -1092,7 +1092,7 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return;
 
 #else
@@ -1215,7 +1215,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Youre current ChiliVersion dont support that function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return;
 
 #else

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 
 #include <ipPic/ipPic.h>
-#include <iostream.h>
+#include <iostream>
 #include <list>
 
 #include <mitkLevelWindow.h>

@@ -197,7 +197,6 @@ void QmitkDataManagerControls::SaveLightBox_clicked()
           mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
           if(image.IsNotNull())
           {
-            mitk::ChiliPlugin::GetInstance()->SaveImageToLightbox( image, node->GetPropertyList(), mitk::ChiliPlugin::GetInstance()->GetNewLightbox() );
           }
         }
       }

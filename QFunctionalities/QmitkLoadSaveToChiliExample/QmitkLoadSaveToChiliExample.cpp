@@ -86,15 +86,15 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
 {
   if( m_Controls )
   {
-    connect( ( QObject* )( m_Controls->LoadImageFromLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadImageFromLightBox() ) );
-    connect( ( QObject* )( m_Controls->SaveImageToLightBox ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveImageToLightBox() ) );
-
     connect( ( QObject* )( m_Controls->LoadCompleteSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadCompleteSeries() ) );
     connect( ( QObject* )( m_Controls->LoadAllImages ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllImages() ) );
     connect( ( QObject* )( m_Controls->LoadAllTexts ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllTexts() ) );
     connect( ( QObject* )( m_Controls->LoadOneText ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadOneText() ) );
 
     connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
+    connect( ( QObject* )( m_Controls->SaveNew ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveNew() ) );
+    connect( ( QObject* )( m_Controls->SaveToSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToSeries() ) );
+    connect( ( QObject* )( m_Controls->SaveToSeriesOverride ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToSeriesOverride() ) );
   }
 }
 
@@ -103,29 +103,6 @@ QAction * QmitkLoadSaveToChiliExample::CreateAction( QActionGroup *parent )
   QAction* action;
   action = new QAction( tr( "Example for Save and Load to Chili" ), QPixmap( (const char**) icon_xpm ), tr( "&Example for Save and Load to Chili" ), 0, parent, "QmitkLoadSaveToChiliExample" );
   return action;
-}
-
-void QmitkLoadSaveToChiliExample::LoadImageFromLightBox()
-{
-  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadImagesFromLightbox( mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox() ) );
-}
-
-void QmitkLoadSaveToChiliExample::SaveImageToLightBox()
-{
-
-  mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
-  if( node )
-  {
-    mitk::BaseData* data = node->GetData();
-    if( data )
-    {
-      mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-      if( image )
-      {
-        mitk::ChiliPlugin::GetInstance()->SaveImageToLightbox( image, node->GetPropertyList(), mitk::ChiliPlugin::GetInstance()->GetNewLightbox() );
-      }
-    }
-  }
 }
 
 void QmitkLoadSaveToChiliExample::LoadCompleteSeries()
@@ -164,6 +141,83 @@ void QmitkLoadSaveToChiliExample::SaveToChili()
   mitk::NodePredicateNOT notpred( orpred );
 
   mitk::ChiliPlugin::GetInstance()->SaveToChili( mitk::DataStorage::GetInstance()->GetSubset( notpred ) );
+}
+
+void QmitkLoadSaveToChiliExample::SaveNew()
+{
+  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
+
+  if( study.OID != "" )
+  {
+    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
+    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
+    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
+    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
+    mitk::NodePredicateData w5( NULL );
+    mitk::NodePredicateOR orpred;
+    orpred.AddPredicate( w1 );
+    orpred.AddPredicate( w2 );
+    orpred.AddPredicate( w3 );
+    orpred.AddPredicate( w4 );
+    orpred.AddPredicate( w5 );
+    mitk::NodePredicateNOT notpred( orpred );
+
+    mitk::ChiliPlugin::GetInstance()->SaveAsNewSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, 99, "ExampleEntry" );
+  }
+  else
+    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID is empty. Do you select a study?" );
+}
+
+void QmitkLoadSaveToChiliExample::SaveToSeries()
+{
+  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
+  mitk::ChiliPlugin::SeriesInformation series = mitk::ChiliPlugin::GetInstance()->GetSeriesInformation();
+
+  if( study.OID != "" && series.OID != "" )
+  {
+    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
+    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
+    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
+    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
+    mitk::NodePredicateData w5( NULL );
+    mitk::NodePredicateOR orpred;
+    orpred.AddPredicate( w1 );
+    orpred.AddPredicate( w2 );
+    orpred.AddPredicate( w3 );
+    orpred.AddPredicate( w4 );
+    orpred.AddPredicate( w5 );
+    mitk::NodePredicateNOT notpred( orpred );
+
+    mitk::ChiliPlugin::GetInstance()->SaveToSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, series.OID, false );
+  }
+  else
+    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID or seriesOID is empty. Do you select a study and series?" );
+}
+
+void QmitkLoadSaveToChiliExample::SaveToSeriesOverride()
+{
+  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
+  mitk::ChiliPlugin::SeriesInformation series = mitk::ChiliPlugin::GetInstance()->GetSeriesInformation();
+
+  if( study.OID != "" && series.OID != "" )
+  {
+    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
+    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
+    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
+    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
+    mitk::NodePredicateData w5( NULL );
+    mitk::NodePredicateOR orpred;
+    orpred.AddPredicate( w1 );
+    orpred.AddPredicate( w2 );
+    orpred.AddPredicate( w3 );
+    orpred.AddPredicate( w4 );
+    orpred.AddPredicate( w5 );
+    mitk::NodePredicateNOT notpred( orpred );
+
+    mitk::ChiliPlugin::GetInstance()->SaveToSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, series.OID, true );
+  }
+  else
+    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID or seriesOID is empty. Do you select a study and series?" );
 }
 
 void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes)
@@ -208,13 +262,6 @@ void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTree
   m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
   m_MultiWidget->Fit();
   m_MultiWidget->ReInitializeStandardViews();
-  //update the treenodeselector
-  m_Controls->m_TreeNodeSelector->UpdateContent();
-}
-
-void QmitkLoadSaveToChiliExample::TreeChanged()
-{
-  m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator( this->GetDataTreeIterator() );
 }
 
 void QmitkLoadSaveToChiliExample::Activated()

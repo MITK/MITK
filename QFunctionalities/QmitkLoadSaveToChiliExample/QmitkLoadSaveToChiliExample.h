@@ -72,18 +72,14 @@ class QmitkLoadSaveToChiliExample : public QmitkFunctionality
 
 protected slots:
 
-  void LoadImageFromLightBox();
-  void SaveImageToLightBox();
   void LoadCompleteSeries();
   void LoadAllImages();
   void LoadAllTexts();
   void LoadOneText();
   void SaveToChili();
-
-  /*!
-  \brief method if the tree changed
-  */
-  void TreeChanged();
+  void SaveNew();
+  void SaveToSeries();
+  void SaveToSeriesOverride();
 
 protected:
 

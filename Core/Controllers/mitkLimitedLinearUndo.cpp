@@ -44,7 +44,7 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
     m_RedoList.clear();
     InvokeEvent( RedoEmptyEvent() );
   }
-
+    
   m_UndoList.push_back(operationEvent);
   
   InvokeEvent( UndoNotEmptyEvent() );
@@ -180,7 +180,8 @@ mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* des
     OperationEvent* opEvent = dynamic_cast<OperationEvent*>(*iter);
     if (!opEvent) continue;
 
-    if (   opEvent->GetOperation()->GetOperationType() == opType
+    if (   opEvent->GetOperation() != NULL
+        && opEvent->GetOperation()->GetOperationType() == opType
         && opEvent->IsValid()
         && opEvent->GetDestination() == destination ) 
       return opEvent;

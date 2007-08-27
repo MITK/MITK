@@ -195,7 +195,7 @@ void QmitkMovieMaker::CreateConnections()
 QAction* QmitkMovieMaker::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "MovieMaker" ), QPixmap((const char**)icon_xpm),
+  action = new QAction( tr( "Movie Maker" ), QPixmap((const char**)icon_xpm),
     tr( "Camera Path" ), 0, parent, "MovieMaker"
   );
 

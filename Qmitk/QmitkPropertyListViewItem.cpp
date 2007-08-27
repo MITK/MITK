@@ -92,7 +92,7 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
 {
   if (((QLineEdit*)m_Control)->hasAcceptableInput())
   {
-    m_Control->setPaletteForegroundColor(QApplication::palette()->active()->foreground());
+    m_Control->setPaletteForegroundColor(QApplication::palette().active().foreground());
     float value = text.toFloat();
     mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
     if (value != floatProp->GetValue())
@@ -112,7 +112,7 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
 {
   if (((QLineEdit*)m_Control)->hasAcceptableInput())
   {
-    m_Control->setPaletteForegroundColor(QApplication::palette()->active()->foreground());
+    m_Control->setPaletteForegroundColor(QApplication::palette().active().foreground());
     int value = text.toInt();
     mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
     if (value != intProp->GetValue())

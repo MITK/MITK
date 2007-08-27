@@ -76,7 +76,6 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             PointOperation* undoOp = new PointOperation(OpDELETE, m_OldPoint, 0);
             OperationEvent *operationEvent = new OperationEvent( m_Destination, doOp, undoOp );
             m_UndoController->SetOperationEvent(operationEvent);
-            delete undoOp;
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
@@ -136,7 +135,6 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
             PointOperation* undoOp = new PointOperation(OpMOVE, timeInMS, oldMovePoint, 0);
             OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
             m_UndoController->SetOperationEvent(operationEvent);
-            delete undoOp;
           }
           //execute the Operation
           m_Destination->ExecuteOperation(doOp);
@@ -150,14 +148,9 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
           ok = false;
           break;
       }
-			if(doOp!=NULL)
-				delete doOp;
       return ok;
     }
 
-    if(doOp!=NULL)
-      delete doOp;
- 
     const mitk::DisplayPositionEvent* displPosEvent = dynamic_cast<const mitk::DisplayPositionEvent *>(stateEvent->GetEvent());
     if(displPosEvent!=NULL)
     {

@@ -735,10 +735,17 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
     currentTagNode = currentTagNode->next;
   }
 
+  if (m_LightBox->currentSeries())
+  {
+    series_t* series = m_LightBox->currentSeries();
+    if (series->description) resultPropertyList->SetProperty( "CHILI: " tagSERIES_DESCRIPTION, new StringProperty( std::string(series->description) ) );
+    // could be extended, but will be replaced soon
+  }
+
   // all tags are stored as properties now
   // TODO do we need any DICOM headers/tags?
 
-  BaseProperty::Pointer name = resultPropertyList->GetProperty( "Chili: SERIES DESCRIPTION" );
+  BaseProperty::Pointer name = resultPropertyList->GetProperty( "CHILI: SERIES DESCRIPTION" );
   if( name )
   {
     resultPropertyList->SetProperty( "name", new mitk::StringProperty( name->GetValueAsString() ) );

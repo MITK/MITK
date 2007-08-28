@@ -20,36 +20,34 @@ void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool i
 {
   std::string directory = dir;
     
-  // Do nothing if directory is already included into search list
+  // Do nothing if directory is already included into search list (TODO more clever: search only once!)
   FileSearchVectorType::iterator iter;
-  if(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.size() > 0)
+  if(m_SearchDirectories.size() > 0)
   {
-    iter = std::find(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin(),
-      mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end(),std::string(dir));
-    if ( iter != mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end() )
+    iter = std::find(m_SearchDirectories.begin(), m_SearchDirectories.end(),std::string(dir));
+    if ( iter != m_SearchDirectories.end() )
       return;
   }
   // insert dir into queue
   if(insertInFrontOfSearchList)
   {
-    FileSearchVectorType::iterator it = mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin();
-    mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.insert(it,std::string(dir));
+    FileSearchVectorType::iterator it = m_SearchDirectories.begin();
+    m_SearchDirectories.insert(it,std::string(dir));
   }
   else
-    mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.push_back(std::string(dir));
+    m_SearchDirectories.push_back(std::string(dir));
 }
 
 void mitk::StandardFileLocations::RemoveDirectoryForSearch(const char * dir)
 {
   FileSearchVectorType::iterator it;
   // background layers
-  if(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.size() > 0)
+  if(m_SearchDirectories.size() > 0)
   {
-    it = std::find(mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.begin(),
-                   mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end(),std::string(dir));
-    if(it != mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.end())
+    it = std::find(m_SearchDirectories.begin(), m_SearchDirectories.end(),std::string(dir));
+    if(it != m_SearchDirectories.end())
     {
-      mitk::StandardFileLocations::GetInstance()->m_SearchDirectories.erase(it);
+      m_SearchDirectories.erase(it);
       return;
     }
   }
@@ -98,7 +96,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   // 1. look for MITKCONF environment variable
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");  
   if (mitkConf!=NULL)
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(mitkConf);
+    AddDirectoryForSearch(mitkConf);
 
   // 2. use .mitk-subdirectory in home directory of the user
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -110,7 +108,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
     directoryPath = homeDrive;
     directoryPath += homePath;
     directoryPath += "/.mitk/";
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+    AddDirectoryForSearch(directoryPath.c_str());
   }
  
 #else
@@ -119,17 +117,17 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   {
     directoryPath = homeDirectory;
     directoryPath += "/.mitk/";
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+    AddDirectoryForSearch(directoryPath.c_str());
   }
 
 #endif // defined(_WIN32) && !defined(__CYGWIN__)
  
   // 3. look in the current working directory
   directoryPath = "";
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  AddDirectoryForSearch(directoryPath.c_str());
   
   directoryPath = itksys::SystemTools::GetCurrentWorkingDirectory();
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  AddDirectoryForSearch(directoryPath.c_str());
 
   // 4. use a source tree location from compile time
   directoryPath = MITK_ROOT;
@@ -138,9 +136,9 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
     directoryPath += pathInSourceDir;
   }
   directoryPath += '/';
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(directoryPath.c_str());
+  AddDirectoryForSearch(directoryPath.c_str());
   
-  return mitk::StandardFileLocations::GetInstance()->SearchDirectoriesForFile(filename);
+  return SearchDirectoriesForFile(filename);
 }
 
 std::string mitk::StandardFileLocations::GetOptionDirectory()

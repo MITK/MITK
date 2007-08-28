@@ -172,17 +172,20 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
 
 void QmitkSurfaceCreatorComponent::TreeChanged()
 {
-    UpdateDataTreeComboBoxes();
+	UpdateDataTreeComboBoxes();
 
-    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-    {
-      m_AddedChildList[i]->TreeChanged();
-    } 
+	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+	{
+		m_AddedChildList[i]->TreeChanged();
+	} 
 
-	   if(m_MitkImageIterator.GetPointer())
-    {
-      m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
-    }
+	if(m_MitkImageIterator.GetPointer())
+	{
+		if(m_MitkImageIterator->Get())
+		{
+			m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+		}
+	}
 }
 
 /***************  CREATE CONTROL WIDGET  **************/

@@ -33,7 +33,7 @@ QmitkChiliPluginSaveDialog::QmitkChiliPluginSaveDialog( QWidget* parent, const c
   //Study-Listview
   m_StudyListView = new QListView( this );
   m_StudyListView->setMargin( 3 );
-  for( unsigned int x = 0; x < m_StudyListView->columns(); x++ )
+  for( int x = 0; x < m_StudyListView->columns(); x++ )
   {
     m_StudyListView->removeColumn( x );
   }
@@ -48,7 +48,7 @@ QmitkChiliPluginSaveDialog::QmitkChiliPluginSaveDialog( QWidget* parent, const c
   //Series-Listview
   m_SeriesListView = new QListView( this );
   m_SeriesListView->setMargin( 3 );
-  for( unsigned int x = 0; x < m_SeriesListView->columns(); x++ )
+  for( int x = 0; x < m_SeriesListView->columns(); x++ )
   {
     m_SeriesListView->removeColumn( x );
   }

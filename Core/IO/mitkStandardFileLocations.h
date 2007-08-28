@@ -20,7 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_STANDARD_FILE_LOCATIONS_H_INCLUDED_SWDG
 
 #include <string>
-#include <itkCommand.h>
+
+#include <itkObject.h>
+#include <itkObjectFactory.h>
 
 namespace mitk
 {
@@ -29,7 +31,7 @@ namespace mitk
   Call mitk::StandardFileLocations::FindFile(filename) to look for configuration files.
   Call mitk::StandardFileLocations::GetOptionDirectory() to look for/save option files.
   */
-  class StandardFileLocations : public itk::Command 
+  class StandardFileLocations : public itk::Object 
   {
   public:
     typedef  StandardFileLocations   Self;
@@ -37,8 +39,6 @@ namespace mitk
     typedef  itk::SmartPointer<Self>  Pointer;
 
     itkNewMacro( Self );
-    ~StandardFileLocations();
-
     
     /*!
     \brief Adds a directory into the search queue:
@@ -84,15 +84,6 @@ namespace mitk
     */
     std::string GetOptionDirectory();
 
-
-    void Execute(itk::Object *object, const itk::EventObject & event)
-    {
-      Execute( (const itk::Object*) object, event );
-    }
-    void Execute(const itk::Object * object, const itk::EventObject & event)
-    {   
-    }
-
     static StandardFileLocations* GetInstance()
     {
       static StandardFileLocations::Pointer m_Instance = 0;
@@ -108,6 +99,7 @@ namespace mitk
     FileSearchVectorType  m_SearchDirectories;
 
     StandardFileLocations();
+    virtual ~StandardFileLocations();
 
     std::string SearchDirectoriesForFile(const char * filename);
 

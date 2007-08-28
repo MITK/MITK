@@ -26,6 +26,8 @@
 
 #include <mbilogo.h>
 
+#include <algorithm>
+
 
 mitk::LogoRendering::LogoRendering()
 {
@@ -152,7 +154,7 @@ void mitk::LogoRendering::Enable()
       // flip mbi logo around y axis and change color order
       m_ImageData = new char[mbiLogo_Height*mbiLogo_Width*mbiLogo_NumberOfScalars];
       
-      int column, row;
+      unsigned int column, row;
       char * dest   = m_ImageData;
       char * source = (char*) &mbiLogo_Data[0];;
       char r, g, b, a;
@@ -232,12 +234,10 @@ void mitk::LogoRendering::SetupCamera()
   m_Camera->SetPosition (position);
   m_Camera->SetFocalPoint (focalPoint);
 
-  #define myMAX(x,y) (((x)>(y))?(x):(y))  
-
   int d1 = (idx + 1) % 3;
   int d2 = (idx + 2) % 3;
 
-  double max = myMAX(dimensions[d1],dimensions[d2]);
+  double max = std::max(dimensions[d1],dimensions[d2]);
 
   m_Camera->SetParallelScale( max / 2 );
 }
@@ -250,8 +250,7 @@ void mitk::LogoRendering::SetupPosition()
   vtkImageData * image = m_Actor->GetInput();
   image->GetDimensions(dimensions);
   // normalize image dimensions
-  #define myMAX(x,y) (((x)>(y))?(x):(y)) 
-  double max = myMAX(dimensions[0],dimensions[1]);
+  double max = std::max(dimensions[0],dimensions[1]);
   double normX = dimensions[0] / max;
   double normY = dimensions[1] / max;
 
@@ -289,6 +288,15 @@ void mitk::LogoRendering::SetupPosition()
       newPos[1] = (1 - buffer) - 0.2 * normY * m_ZoomFactor;
       newPos[2] = (1 - buffer);
       newPos[3] = (1 - buffer);
+      break;
+    }
+    case mitk::LogoRendering::Middle:
+    default:
+    {
+      newPos[0] = 0.5 - 0.2 * normX * m_ZoomFactor;
+      newPos[1] = 0.5 + 0.2 * normY * m_ZoomFactor;
+      newPos[2] = 0.5 - 0.2 * normX * m_ZoomFactor;
+      newPos[3] = 0.5 + 0.2 * normY * m_ZoomFactor;
       break;
     }
   }

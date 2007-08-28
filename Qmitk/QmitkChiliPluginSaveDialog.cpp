@@ -189,7 +189,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
   }
 }
 
-void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, std::string seriesNumber, std::string seriesDescription )
+void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription )
 {
   if( studyOID != "" && seriesOID != "" )
   {
@@ -217,10 +217,14 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
       newInput.PatientID = patientID;
       newInput.StudyDescription = studyDescription;
       newInput.SeriesOID = seriesOID;
-      if( seriesNumber == "-1" || seriesNumber == "0" )
+      if( seriesNumber == -1 )
         newInput.SeriesNumber = "";
       else
-        newInput.SeriesNumber = seriesNumber;
+      {
+        std::ostringstream stringHelper;
+        stringHelper << seriesNumber;
+        newInput.SeriesNumber = stringHelper.str();
+      }
       newInput.SeriesNumber = seriesNumber;
       newInput.SeriesDescription = seriesDescription;
       newInput.Node = NULL;
@@ -235,7 +239,7 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
   }
 }
 
-void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, std::string seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node )
+void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node )
 {
   if( studyOID != "" && seriesOID != "" )
   //add new input
@@ -246,10 +250,14 @@ void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, st
     newInput.PatientID = patientID;
     newInput.StudyDescription = studyDescription;
     newInput.SeriesOID = seriesOID;
-    if( seriesNumber == "-1" )
+    if( seriesNumber == -1 )
       newInput.SeriesNumber = "";
     else
-      newInput.SeriesNumber = seriesNumber;
+    {
+      std::ostringstream stringHelper;
+      stringHelper << seriesNumber;
+      newInput.SeriesNumber = stringHelper.str();
+    }
     newInput.SeriesDescription = seriesDescription;
     if( node.IsNotNull() )
     {
@@ -359,8 +367,8 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
   {
     if( iter->NodeDescriptionField != NULL )
     {
-      mitk::BaseProperty::Pointer manufacturerProperty = iter->Node.GetPointer()->GetProperty( "CHILI: MANUFACTURER" );
-      mitk::BaseProperty::Pointer institutionNameProperty = iter->Node.GetPointer()->GetProperty( "CHILI: INSTITUTION NAME" );
+      mitk::BaseProperty::Pointer manufacturerProperty = iter->Node->GetProperty( "CHILI: MANUFACTURER" );
+      mitk::BaseProperty::Pointer institutionNameProperty = iter->Node->GetProperty( "CHILI: INSTITUTION NAME" );
       //set enable
       if( ( m_Add->isChecked() ||  m_Override->isChecked() ) && iter->SeriesOID == selectedSeriesOID )
       {

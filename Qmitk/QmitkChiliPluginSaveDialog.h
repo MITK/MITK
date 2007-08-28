@@ -59,11 +59,11 @@ class QmitkChiliPluginSaveDialog : public QDialog
     void AddStudy( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription );
 
     /** This function adds a study and series. Use this function if the user select a study and series. */
-    void AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, std::string seriesNumber, std::string seriesDescription );
+    void AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription );
 
     /** This function adds a mitk::DataTreeNode which was loaded from chili. We have to know from which study and series the node
     was loaded. Therefore you have to set all. Use this function for a mitk::DataTreeNode with SeriesOID-Property. */
-    void AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, std::string seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node );
+    void AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node );
 
     /** This function add the node only. This node wasnt saved in chili bevor. So there are no series- and study-relationships.
     Use this function for a mitk::DataTreeNode without SeriesOID-Property. */

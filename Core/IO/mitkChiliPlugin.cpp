@@ -132,7 +132,12 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeri
   return emptyVector;
 }
 
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneTextFromSeries( const std::string&, const std::string& )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& )
+{
+  return NULL;
+}
+
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& , const std::string& , const std::string& )
 {
   return NULL;
 }

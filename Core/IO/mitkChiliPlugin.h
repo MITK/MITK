@@ -76,7 +76,7 @@ class ChiliPlugin : public itk::Object
       std::string PerformingPhysician;
       std::string ReportingPhysician;
       std::string LastAccess;
-      std::string ImageCount;
+      int ImageCount;
     };
 
     /** This struct contain all possible informations about the patient. */
@@ -97,10 +97,10 @@ class ChiliPlugin : public itk::Object
     {
       std::string OID;
       std::string InstanceUID;
-      std::string Number;
-      std::string Acquisition;
-      std::string EchoNumber;
-      std::string TemporalPosition;
+      int Number;
+      int Acquisition;
+      int EchoNumber;
+      int TemporalPosition;
       std::string Date;
       std::string Time;
       std::string Description;
@@ -108,7 +108,7 @@ class ChiliPlugin : public itk::Object
       std::string BodyPartExamined;
       std::string ScanningSequence;
       std::string FrameOfReferenceUID;
-      std::string ImageCount;
+      int ImageCount;
     };
 
     /** There can be lots of series to one study, so we need a list. */
@@ -241,16 +241,30 @@ class ChiliPlugin : public itk::Object
     \brief Load all Text-files from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
+    Important: The filename from database is used to save the files. Its possible that one filename ( not the databasedirectory ) is twice in a series ( thats realy two different entries ). So we have to work sequently, otherwise we override the files ( twice filenames ).
+    The function iterateText(...) return a list of all textOID's and textPath's from all included text-files in this series.
+    With this information LoadOneText( seriesOID, textOID, textPath ) is used.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
 
     /*!
     \brief Load one Text-files.
-    @param seriesOID   Set the series to load from.
     @param textOID   Set the single text.
     @returns one mitk::DataTreeNode
+    This function use qTextQuery(...) to find the databasedirectory and seriesOID.
+    Then LoadOneText( seriesOID, textOID, textPath ) get used.
     */
-    virtual DataTreeNode::Pointer LoadOneTextFromSeries( const std::string& seriesOID, const std::string& textOID );
+    virtual DataTreeNode::Pointer LoadOneText( const std::string& textOID );
+
+    /*!
+    \brief Load one Text-files.
+    @param seriesOID   Set the series to load from.
+    @param textOID   Set the single text.
+    @param textPath   The chili-database-path from the file which should read.
+    @returns one mitk::DataTreeNode
+    This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factorie ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted.
+    */
+    virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
     /*!
     \brief Save Images- and Texts-Files to Chili via Fileupload.

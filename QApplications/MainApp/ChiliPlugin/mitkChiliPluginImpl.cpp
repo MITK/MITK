@@ -89,13 +89,14 @@ mitk::ChiliPluginImpl::ChiliPluginImpl()
     std::cout << "ChiliPlugin: Create and use directory "<< m_tempDirectory << std::endl;
 }
 
+/** destructor */
 mitk::ChiliPluginImpl::~ChiliPluginImpl()
 {
-  // delete the created TempDirectory
   static bool deleteOnlyOneTime = false; // the destructor get called two times
   if( !deleteOnlyOneTime )
   {
     deleteOnlyOneTime = true;
+    // delete the created TempDirectory
     #ifdef WIN32
       std::string removeDirectory = "rm /s " + m_tempDirectory;
       std::cout << "ChiliPlugin: Delete directory "<< m_tempDirectory << std::endl;
@@ -180,10 +181,7 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
   {
     //use current selected study
     if( pCurrentStudy() != NULL )
-    {
-      //copy the StudyStruct
-      study = (*dupStudyStruct( pCurrentStudy() ) );
-    }
+      study = (*dupStudyStruct( pCurrentStudy() ) );  //copy the StudyStruct
     else
     {
       std::cout << "ChiliPlugin (GetStudyInformation): pCurrentStudy() failed. Abort." << std::endl;
@@ -220,10 +218,7 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
   resultInformation.PerformingPhysician = study.performingPhysician;
   resultInformation.ReportingPhysician = study.reportingPhysician;
   resultInformation.LastAccess = study.last_access;
-  //convert in to string
-  std::ostringstream stringHelper;
-  stringHelper << study.image_count;
-  resultInformation.ImageCount = stringHelper.str();
+  resultInformation.ImageCount = study.image_count;
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
@@ -255,10 +250,7 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformati
   {
     //use current selected patient
     if( pCurrentPatient() != NULL )
-    {
-      //copy patientstruct
-      patient = (*dupPatientStruct( pCurrentPatient() ) );
-    }
+      patient = (*dupPatientStruct( pCurrentPatient() ) );  //copy patientstruct
     else
     {
       std::cout << "ChiliPlugin (GetPatientInformation): pCurrentPatient() failed. Abort." << std::endl;
@@ -282,17 +274,14 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformati
     }
   }
 
-  if( &patient != NULL )
-  {
-    resultInformation.OID = patient.oid;
-    resultInformation.Name = patient.name;
-    resultInformation.ID = patient.id;
-    resultInformation.BirthDate = patient.birthDate;
-    resultInformation.BirthTime = patient.birthTime;
-    resultInformation.Sex = patient.sex;
-    resultInformation.MedicalRecordLocator = patient.medicalRecordLocator;
-    resultInformation.Comment = patient.comment;
-  }
+  resultInformation.OID = patient.oid;
+  resultInformation.Name = patient.name;
+  resultInformation.ID = patient.id;
+  resultInformation.BirthDate = patient.birthDate;
+  resultInformation.BirthTime = patient.birthTime;
+  resultInformation.Sex = patient.sex;
+  resultInformation.MedicalRecordLocator = patient.medicalRecordLocator;
+  resultInformation.Comment = patient.comment;
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
@@ -321,10 +310,7 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
   {
     //use current selected series
     if( pCurrentSeries() != NULL )
-    {
-      //copy seriesstruct
-      series = (*dupSeriesStruct( pCurrentSeries() ) );
-    }
+      series = (*dupSeriesStruct( pCurrentSeries() ) );  //copy seriesstruct
     else
     {
       std::cout << "ChiliPlugin (GetSeriesInformation): pCurrentSeries() failed. Abort." << std::endl;
@@ -343,33 +329,20 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
     }
   }
 
-  if( &series != NULL )
-  {
-    std::ostringstream stringHelper;
-
-    resultInformation.OID = series.oid;
-    resultInformation.InstanceUID = series.instanceUID;
-    stringHelper << series.number;
-    resultInformation.Number = stringHelper.str();
-    stringHelper.clear();
-    stringHelper << series.acquisition;
-    resultInformation.Acquisition = stringHelper.str();
-    stringHelper.clear();
-    stringHelper << series.echoNumber;
-    resultInformation.EchoNumber = stringHelper.str();
-    stringHelper.clear();
-    stringHelper << series.temporalPosition;
-    resultInformation.TemporalPosition = stringHelper.str();
-    resultInformation.Date = series.date;
-    resultInformation.Time = series.time;
-    resultInformation.Description = series.description;
-    resultInformation.Contrast = series.contrast;
-    resultInformation.BodyPartExamined = series.bodyPartExamined;
-    resultInformation.ScanningSequence = series.scanningSequence;
-    resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
-    stringHelper << series.image_count;
-    resultInformation.ImageCount = stringHelper.str();
-  }
+  resultInformation.OID = series.oid;
+  resultInformation.InstanceUID = series.instanceUID;
+  resultInformation.Number = series.number;
+  resultInformation.Acquisition = series.acquisition;
+  resultInformation.EchoNumber = series.echoNumber;
+  resultInformation.TemporalPosition = series.temporalPosition;
+  resultInformation.Date = series.date;
+  resultInformation.Time = series.time;
+  resultInformation.Description = series.description;
+  resultInformation.Contrast = series.contrast;
+  resultInformation.BodyPartExamined = series.bodyPartExamined;
+  resultInformation.ScanningSequence = series.scanningSequence;
+  resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
+  resultInformation.ImageCount = series.image_count;
 
   clearSeriesStruct( &series );
   return resultInformation;
@@ -391,26 +364,15 @@ mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPluginImpl::GetSeriesInforma
 ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data )
 {
   mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
-
-  std::ostringstream stringHelper;
   //create new element
   mitk::ChiliPlugin::SeriesInformation newSeries;
-
   //fill element
   newSeries.OID = series->oid;
   newSeries.InstanceUID = series->instanceUID;
-  stringHelper << series->number;
-  newSeries.Number = stringHelper.str();
-  stringHelper.clear();
-  stringHelper << series->acquisition;
-  newSeries.Acquisition = stringHelper.str();
-  stringHelper.clear();
-  stringHelper << series->echoNumber;
-  newSeries.EchoNumber = stringHelper.str();
-  stringHelper.clear();
-  stringHelper << series->temporalPosition;
-  newSeries.TemporalPosition = stringHelper.str();
-  stringHelper.clear();
+  newSeries.Number = series->number;
+  newSeries.Acquisition = series->acquisition;
+  newSeries.EchoNumber = series->echoNumber;
+  newSeries.TemporalPosition = series->temporalPosition;
   newSeries.Date = series->date;
   newSeries.Time = series->time;
   newSeries.Description = series->description;
@@ -419,13 +381,10 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, 
   newSeries.ScanningSequence = series->scanningSequence;
   newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
 #ifdef CHILI_PLUGIN_VERSION_CODE
-  stringHelper << series->image_count;
-  newSeries.ImageCount = stringHelper.str();
+  newSeries.ImageCount = series->image_count;
 #else
-  newSeries.ImageCount = "undefined";
+  newSeries.ImageCount = 0;
 #endif
-  stringHelper.clear();
-
   //add to list
   callingObject->m_SeriesInformationList.push_back( newSeries );
 
@@ -435,49 +394,42 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesCallback( int rows, int row, 
 /** return the seriesinformation */
 mitk::ChiliPlugin::TextInformation mitk::ChiliPluginImpl::GetTextInformation( const std::string& textOID )
 {
-//TODO
-// diese funktion wird aktuell noch nicht von Chili bereit gestellt
-// soll in kürze erfolgen
-// wenn Funktion geliefert wird auf CHILI_PLUGIN_VERSION achten
-// es sollten nur noch minimale änderungen am code notwendig sein
-
   TextInformation resultInformation;
   resultInformation.OID = "";
-/*
-#ifdef CHILI_PLUGIN_VERSION_CODE
+
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return resultInformation;
+
+#else
 
   if( textOID == "" )
-  {
     return resultInformation;
-  }
 
   text_t text;
   initTextStruct( &text );
 
   //let chili search for series
   text.oid = strdup( textOID.c_str() );
-  if( !pQueryText( this, &text ) )
+  if( !pQueryText( this, &text, NULL, NULL, NULL ) )
   {
-    clearSeriesStruct( &text );
+    clearTextStruct( &text );
     std::cout << "ChiliPlugin (GetTextInformation): pQueryText() failed. Abort." << std::endl;
     return resultInformation;
   }
 
-  if( &text != NULL )
-  {
-    resultInformation.OID = text.oid;
-    resultInformation.MimeType = text.mime_type;
-    resultInformation.ChiliText = text.chiliText;
-    resultInformation.Status = text.status;
-    resultInformation.FrameOfReferenceUID = text.frameOfReferenceUID;
-    resultInformation.TextDate = text.text_date;
-    resultInformation.Description = text.description;
-  }
+  resultInformation.OID = text.oid;
+  resultInformation.MimeType = text.mime_type;
+  resultInformation.ChiliText = text.chiliText;
+  resultInformation.Status = text.status;
+  resultInformation.FrameOfReferenceUID = text.frameOfReferenceUID;
+  resultInformation.TextDate = text.text_date;
+  resultInformation.Description = text.description;
 
-  clearStudyStruct( &text );
-#endif
-*/
+  clearTextStruct( &text );
   return resultInformation;
+#endif
 }
 
 /** return the textinformationlist */
@@ -508,7 +460,6 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextOneCallback( int rows, int row,
   resultText.FrameOfReferenceUID = text->frameOfReferenceUID;
   resultText.TextDate = text->text_date;
   resultText.Description = text->description;
-
   //add to list
   callingObject->m_TextInformationList.push_back( resultText );
 
@@ -548,9 +499,7 @@ QcLightbox* mitk::ChiliPluginImpl::GetCurrentLightbox()
 {
   QcLightbox* currentLightbox = lightboxManager()->getActiveLightbox();
   if( currentLightbox == NULL)
-  {
     QMessageBox::information( 0, "MITK", "There is no selected Lightbox in Chili." );
-  }
   return currentLightbox;
 }
 
@@ -560,7 +509,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
   std::vector<DataTreeNode::Pointer> resultVector;
   resultVector.clear();
 
-#ifndef CHILI_PLUGIN_VERSION_CODE
+//#ifndef CHILI_PLUGIN_VERSION_CODE
 
   //QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   //return resultVector;
@@ -587,16 +536,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
   }
   QApplication::restoreOverrideCursor();
   return resultVector;
-
+/*
 #else
 
   if( lightbox == NULL )
   {
     lightbox = GetCurrentLightbox();
     if( lightbox == NULL )
-    {
       return resultVector;  //abort
-    }
   }
 
   if( lightbox->getFrames() > 0 )
@@ -621,9 +568,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
 
     QApplication::restoreOverrideCursor();
   }
-
   return resultVector;
 #endif
+*/
 }
 
 /** load images- and text-files from series */
@@ -714,9 +661,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
       char* fileExtension;
       fileExtension = strrchr( m_FileList.front().c_str(), '.' );
       if( strcmp( fileExtension, ".pic" ) == 0 )
-      {
         picFileList.push_back( m_FileList.front() );
-      }
       else
       {
 //      if( strcmp( fileExtension, ".dcm" ) == 0 )
@@ -749,9 +694,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
         picDescriptorToNodeInput.push_back( pic );
         //after loading and adding we dont need them as file
         if( remove( picFileList.front().c_str() ) != 0 )
-        {
           std::cout << "ChiliPlugin (LoadAllImagesFromSeries): Not able to  delete file: " << picFileList.front().c_str() << std::endl;
-        }
       }
       picFileList.pop_front();
     }
@@ -767,13 +710,10 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
       dicomGetHeaderAndImage( (char*)dicomFileList.front().c_str(), &header, &header_size, &image, &image_size );
 
       if( !header )
-      {
         std::cout<< "ChiliPlugin (LoadAllImagesFromSeries): Could not get header." <<std::endl;
-      }
+
       if( !image )
-      {
         std::cout<< "ChiliPlugin (LoadAllImagesFromSeries): Could not get image." <<std::endl;
-      }
 
       ipPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );  //this PicDescriptor is right, but dont work
 
@@ -822,13 +762,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
             if( pQuerySeries( this, &series, NULL, NULL ) )
             {
               if( series.description == "" )
-              {
                 node->SetProperty( "name", new StringProperty( "no description" ) );
-              }
               else
-              {
                 node->SetProperty( "name", new StringProperty( series.description ) );
-              }
             }
             clearSeriesStruct( &series );
             node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
@@ -841,9 +777,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
           while( !otherFileList.empty() )
           {
             if( remove(  otherFileList.front().c_str() ) != 0 )
-            {
               std::cout << "ChiliPlugin (LoadAllImagesFromSeries): Not able to  delete file: " << otherFileList.front().c_str() << std::endl;
-            }
             otherFileList.pop_front();
           }
         }
@@ -888,7 +822,6 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallbackOne( int rows, int ro
 /** this function load all text-files from the series */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFromSeries( const std::string& seriesOID )
 {
-//TODO use LoadOneTextFile
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
 
@@ -900,9 +833,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
 #else
 
   if( m_tempDirectory.empty() )
-  {
     return resultNodes;
-  }
 
   if( seriesOID == "" )
   {
@@ -918,75 +849,13 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
   //now we iterate over all text-files from the series, save the db-path and text-oid to m_TextFileList
   //dont save here to harddisk; double filedescriptions override themselve
   pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextTwoCallback, this );
-
-  DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-
-  //load the files from harddisk to mitk
+  //use the found oid's and path's to load
   while( !m_TextFileList.empty() )
   {
-    //get Filename and path to save to harddisk
-    char* tempFileName;
-    tempFileName = strrchr( m_TextFileList.front().TextFilePath.c_str(), '-' );
-    //we want no "-" in front of the filename
-    tempFileName++;
-    std::string fileName = tempFileName;
-
-    std::string pathAndFile = m_tempDirectory + fileName;
-
-    //Load File from DB
-    ipInt4_t error;
-    pFetchDataToFile( m_TextFileList.front().TextFilePath.c_str(), pathAndFile.c_str(), &error );
-    if( error != 0 )
-    {
-      std::cout << "ChiliPlugin (LoadAllTextsFromSeries): ChiliError: " << error << ", while reading file (" << fileName << ") from Database." << std::endl;
-    }
-    else
-    {
-      //if there are no fileextension in the filename, the reader not able to load the file and the plugin crashed
-      //dont use DataTreeNodeFactory::GetFilePattern(): if someone create a new reader and dont add the extension to "GetFilePattern()", his reader doesnt work
-      char* fileExtension;
-      fileExtension = strrchr( tempFileName, '.' );
-      if( fileExtension == NULL )
-      {
-        std::cout << "ChiliPlugin (LoadAllTextsFromSeries): Reader not able to read file without extension. ("<< pathAndFile << ")" << std::endl;
-      }
-      else
-      {
-        //try to Read the File
-        try
-        {
-          factory->SetFileName( pathAndFile );
-          factory->Update();
-          for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
-          {
-            DataTreeNode::Pointer node = factory->GetOutput( i );
-            if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
-            {
-              //get the FileExtension and cut them from the filename
-              char* fileExtension;
-              fileExtension = strrchr( m_TextFileList.front().TextFilePath.c_str(), '.' );
-              int size = fileName.size() - sizeof( fileExtension );
-              fileName.erase( size );
-              node->SetProperty( "name", new StringProperty( fileName ) );
-              node->SetProperty( "TextOID", new StringProperty( m_TextFileList.front().TextFileOID ) );
-              node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
-              //it should be possible to override all non-image-entries
-              node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
-              node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
-              resultNodes.push_back( node );
-              if( remove(  pathAndFile.c_str() ) != 0 )
-              {
-                std::cout << "ChiliPlugin (LoadAllTextsFromSeries): Not able to  delete file: " << pathAndFile << std::endl;
-              }
-            }
-          }
-        }
-        catch ( itk::ExceptionObject & ex )
-          itkGenericOutputMacro( << "Exception during file open: " << ex );
-      }
-    }
-  m_TextFileList.pop_front();
+    resultNodes.push_back( LoadOneText( seriesOID, m_TextFileList.front().TextFileOID, m_TextFileList.front().TextFilePath ) );
+    m_TextFileList.pop_front();
   }
+
   QApplication::restoreOverrideCursor();
   return resultNodes;
 #endif
@@ -1010,7 +879,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextTwoCallback( int rows, int row,
 }
 #endif
 
-mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneTextFromSeries( const std::string& seriesOID, const std::string& textOID )
+mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::string& textOID )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1020,75 +889,113 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneTextFromSeries( const 
 #else
 
   if( m_tempDirectory.empty() )
-  {
     return NULL;
-  }
 
-  if( textOID == "" || seriesOID == "" )
+  if( textOID == "" )
   {
     std::cout << "ChiliPlugin (LoadOneTextFromSeries): No Text-OID set. Abort." << std::endl;
     return NULL;
   }
 
-  TextInformation textToLoad = GetTextInformation( textOID );
-  if( textToLoad.OID != "" )
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+
+  text_t text;
+  series_t series;
+  initTextStruct( &text );
+  initSeriesStruct( &series );
+
+  text.oid = strdup( textOID.c_str() );
+  if( !pQueryText( this, &text, &series, NULL, NULL ) )
   {
-    //get Filename and path to save to harddisk
-    char* tempFileName;
-    tempFileName = strrchr( textToLoad.ChiliText.c_str(), '-' );
-    //we want no "-" in front of the filename
-    tempFileName++;
+    clearTextStruct( &text );
+    clearSeriesStruct( &series );
+    std::cout << "ChiliPlugin (GetTextInformation): pQueryText() failed. Abort." << std::endl;
+    QApplication::restoreOverrideCursor();
+    return NULL;
+  }
 
-    std::string fileName = tempFileName;
-    std::string pathAndFile = m_tempDirectory + fileName;
+  mitk::DataTreeNode::Pointer result = LoadOneText( series.oid, text.oid, text.chiliText );
+  clearTextStruct( &text );
+  clearSeriesStruct( &series );
+  QApplication::restoreOverrideCursor();
+  return result;
+#endif
+}
 
-    //Load File from DB
-    ipInt4_t error;
-    pFetchDataToFile( textToLoad.ChiliText.c_str(), pathAndFile.c_str(), &error );
-    if( error != 0 )
+mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath )
+{
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return NULL;
+
+#else
+
+  if( m_tempDirectory.empty() )
+    return NULL;
+
+  if( seriesOID == "" || textOID == "" ||textPath == "" )
+  {
+    std::cout << "ChiliPlugin (LoadOneText): Wrong textOID, seriesOID or textPath. Abort." << std::endl;
+    return NULL;
+  }
+
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+
+  //get Filename and path to save to harddisk
+  char* tempFileName;
+  tempFileName = strrchr( textPath.c_str(), '-' );
+  //we want no "-" in front of the filename
+  tempFileName++;
+
+  std::string fileName = tempFileName;
+  std::string pathAndFile = m_tempDirectory + fileName;
+
+  //Load File from DB
+  ipInt4_t error;
+  pFetchDataToFile( textPath.c_str(), pathAndFile.c_str(), &error );
+  if( error != 0 )
+  {
+    std::cout << "ChiliPlugin (LoadOneText): ChiliError: " << error << ", while reading file (" << fileName << ") from Database." << std::endl;
+    QApplication::restoreOverrideCursor();
+    return NULL;
+  }
+
+  //try to Read the File
+  DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
+  try
+  {
+    factory->SetFileName( pathAndFile );
+    factory->Update();
+    for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
     {
-      std::cout << "ChiliPlugin (LoadOneTextFromSeries): ChiliError: " << error << ", while reading file (" << fileName << ") from Database." << std::endl;
-    }
-    else
-    {
-      //try to Read the File
-      DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-      try
+      DataTreeNode::Pointer node = factory->GetOutput( i );
+      if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
       {
-        factory->SetFileName( pathAndFile );
-        factory->Update();
-        for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
-        {
-          DataTreeNode::Pointer node = factory->GetOutput( i );
-          if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
-          {
-            //get the FileExtension and cut them from the filename
-            char* fileExtension;
-            fileExtension = strrchr( textToLoad.ChiliText.c_str(), '.' );
-            //cut the fileExtension from the filename
-            int size = fileName.size() - sizeof( fileExtension );
-            fileName.erase( size );
-            //set the filename without extension as name-property
-            node->SetProperty( "name", new StringProperty( fileName ) );
-            node->SetProperty( "TextOID", new StringProperty( m_TextFileList.front().TextFileOID ) );
-            node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
-            //it should be possible to override all non-image-entries
-            node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
-            node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
+        //get the FileExtension and cut them from the filename
+        char* fileExtension;
+        fileExtension = strrchr( textPath.c_str(), '.' );
+        //cut the fileExtension from the filename
+        int size = fileName.size() - sizeof( fileExtension );
+        fileName.erase( size );
+        //set the filename without extension as name-property
+        node->SetProperty( "name", new StringProperty( fileName ) );
+        node->SetProperty( "TextOID", new StringProperty( textOID ) );
+        node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+        //it should be possible to override all non-image-entries
+        node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
+        node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
 
-            if( remove(  pathAndFile.c_str() ) != 0 )
-            {
-              std::cout << "ChiliPlugin (LoadOneTextFromSeries): Not able to  delete file: " << pathAndFile << std::endl;
-            }
-            return node;
-          }
-        }
+        if( remove(  pathAndFile.c_str() ) != 0 )
+          std::cout << "ChiliPlugin (LoadOneTextFromSeries): Not able to  delete file: " << pathAndFile << std::endl;
+
+        QApplication::restoreOverrideCursor();
+        return node;
       }
-      catch ( itk::ExceptionObject & ex )
-          itkGenericOutputMacro( << "Exception during file open: " << ex );
     }
   }
-  else return NULL;
+  catch ( itk::ExceptionObject & ex )
+      itkGenericOutputMacro( << "Exception during file open: " << ex );
 #endif
 }
 
@@ -1115,14 +1022,6 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
     {
       mitk::BaseProperty::Pointer seriesOIDProperty = (*nodeIter)->GetProperty( "SeriesOID" );
 
-      mitk::BaseProperty::Pointer manufacturerProperty = (*nodeIter)->GetProperty( "CHILI: MANUFACTURER" );
-      mitk::BaseProperty::Pointer institutionNameProperty = (*nodeIter)->GetProperty( "CHILI: INSTITUTION NAME" );
-      if( manufacturerProperty )
-        std::cout<<manufacturerProperty->GetValueAsString();
-      if( institutionNameProperty )
-        std::cout<<institutionNameProperty->GetValueAsString();
-std::cout<<"vorbei"<<std::endl;
-
       if( seriesOIDProperty.IsNotNull() )
       {
         //this nodes are loaded from chili
@@ -1139,7 +1038,7 @@ std::cout<<"vorbei"<<std::endl;
       }
     }
   }
-/*
+
   //add the current selected study/patient/series
   PatientInformation currentselectedPatient = GetPatientInformation();
   StudyInformation currentselectedStudy = GetStudyInformation();
@@ -1159,6 +1058,7 @@ std::cout<<"vorbei"<<std::endl;
   if( dialogReturnValue == QDialog::Rejected )
     return; //user abort
 
+  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
   if( chiliPluginDialog.GetSelection().UserDecision == QmitkChiliPluginSaveDialog::CreateNew )
   {
     SaveAsNewSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSeriesInformation().SeriesNumber, chiliPluginDialog.GetSeriesInformation().SeriesDescription );
@@ -1166,15 +1066,11 @@ std::cout<<"vorbei"<<std::endl;
   else
   {
     if( chiliPluginDialog.GetSelection().UserDecision == QmitkChiliPluginSaveDialog::OverrideAll )
-    {
       SaveToSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSelection().SeriesOID, true );
-    }
     else
-    {
       SaveToSeries( inputNodes, chiliPluginDialog.GetSelection().StudyOID, chiliPluginDialog.GetSelection().SeriesOID, false );
-    }
   }
-*/
+  QApplication::restoreOverrideCursor();
 #endif
 }
 
@@ -1272,6 +1168,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
     clearStudyStruct( &study );
     clearPatientStruct( &patient );
     clearSeriesStruct( &series );
+    QApplication::restoreOverrideCursor();
     return;
   }
 
@@ -1343,7 +1240,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
             ipPicFree( pic );
             myPicDescriptorList.pop_front();
             //save saved file to chili
-            if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), NULL, study.instanceUID, patient.oid, study.oid, series.oid, NULL ) )
+            if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), NULL, NULL, study.instanceUID, patient.oid, study.oid, series.oid, NULL ) )
             {
               std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
             }
@@ -1394,7 +1291,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
               it->GetPointer()->SetInput( (*nodeIter) );
               it->GetPointer()->Write();
 
-              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
+              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), "TEST", study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
               {
                 std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
               }

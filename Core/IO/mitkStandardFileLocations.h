@@ -46,7 +46,6 @@ namespace mitk
     \      directories, they will also be searched for the requested file
     \param dir         directory you want to be searched in
     \param insertInFrontOfSearchList  wheather this search request shall be processed first
-    \return void
     */
     void AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList = true);
     
@@ -55,7 +54,6 @@ namespace mitk
     \      Use this function in combination with FindFile().
     \      
     \param dir         directory you want to be searched in
-    \return void
     */
     void RemoveDirectoryForSearch(const char * dir);
 
@@ -104,10 +102,11 @@ namespace mitk
       return m_Instance;
     }
 
+  protected:
+
     typedef std::vector<std::string> FileSearchVectorType;
     FileSearchVectorType  m_SearchDirectories;
 
-  protected:
     StandardFileLocations();
 
     std::string SearchDirectoriesForFile(const char * filename);

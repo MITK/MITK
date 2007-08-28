@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkDataTreeComboBox.h>
 #include "QmitkSeedPointSetComponent.h"
+#include "QmitkStdMultiWidget.h"
 #include <QmitkPointListWidget.h>
 
 #include <vtkPointData.h>
@@ -38,22 +39,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include "QmitkSeedPointSetComponent.h"
 
-      //#include <vtkImageGaussianSmooth.h>
+//#include <vtkImageGaussianSmooth.h>
 #include <vtkPolyDataConnectivityFilter.h>
-      //#include <vtkRenderer.h>
-      //#include <vtkRenderWindow.h>
-      //#include <vtkRenderWindowInteractor.h>
-      //#include <vtkImageShrink3D.h>
+//#include <vtkRenderer.h>
+//#include <vtkRenderWindow.h>
+//#include <vtkRenderWindowInteractor.h>
+//#include <vtkImageShrink3D.h>
 #include <vtkPolyDataMapper.h>
-      //#include <vtkActor.h>
-      //#include <vtkMarchingCubes.h>
-      //#include <vtkSmoothPolyDataFilter.h>
+//#include <vtkActor.h>
+//#include <vtkMarchingCubes.h>
+//#include <vtkSmoothPolyDataFilter.h>
 #include <vtkPolyDataNormals.h>
-      //#include <vtkImageGaussianSmooth.h>
-      //#include <vtkImageThreshold.h>
-      //#include <mitkOpenGLRenderer.h>
-      //#include <mitkVtkRenderWindow.h>
-      //#include <vtkRenderWindow.h>
+//#include <vtkImageGaussianSmooth.h>
+//#include <vtkImageThreshold.h>
+//#include <mitkOpenGLRenderer.h>
+//#include <mitkVtkRenderWindow.h>
+//#include <vtkRenderWindow.h>
 #include <vtkSTLWriter.h>
 
 #include <qlayout.h>
@@ -70,12 +71,13 @@ m_ConnectivityFilterComponentGUI(NULL),
 m_ConnectivityNode(NULL),
 m_DataIt(it),
 m_PointSet(NULL),
-m_ConnectivityCounter(0)
+m_ConnectivityCounter(0),
+m_MultiWidget(mitkStdMultiWidget)
 {
-  SetDataTreeIterator(it);
-  SetAvailability(true);
+	SetDataTreeIterator(it);
+	SetAvailability(true);
 
-  SetComponentName("ConnectivityFilterComponent");
+	SetComponentName("ConnectivityFilterComponent");
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -93,98 +95,98 @@ QmitkConnectivityFilterComponent::~QmitkConnectivityFilterComponent()
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkConnectivityFilterComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-  m_DataTreeIterator = it;
+	m_DataTreeIterator = it;
 }
 
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkConnectivityFilterComponent::GetTreeNodeSelector()
 {
-  return m_ConnectivityFilterComponentGUI->GetTreeNodeSelector();
+	return m_ConnectivityFilterComponentGUI->GetTreeNodeSelector();
 }
 
 /***************   GET POINT SET NODE   ***************/
- //mitk::DataTreeNode::Pointer QmitkConnectivityFilterComponent::GetPointSetNode()
- //{
- // return  m_ConnectivityNode;
- //}
+//mitk::DataTreeNode::Pointer QmitkConnectivityFilterComponent::GetPointSetNode()
+//{
+// return  m_ConnectivityNode;
+//}
 
- /***************   GET IMAGE CONTENT   ***************/
+/***************   GET IMAGE CONTENT   ***************/
 QGroupBox*  QmitkConnectivityFilterComponent::GetImageContent()
 {
-  return (QGroupBox*) m_ConnectivityFilterComponentGUI->GetImageContent();
+	return (QGroupBox*) m_ConnectivityFilterComponentGUI->GetImageContent();
 }
 
- /************ Update DATATREECOMBOBOX(ES) *************/
+/************ Update DATATREECOMBOBOX(ES) *************/
 void QmitkConnectivityFilterComponent::UpdateDataTreeComboBoxes()
 {
-  if(GetTreeNodeSelector() != NULL)
-  {
-   GetTreeNodeSelector()->Update();
-  }
+	if(GetTreeNodeSelector() != NULL)
+	{
+		GetTreeNodeSelector()->Update();
+	}
 }
 
 /***************       CONNECTIONS      ***************/
 void QmitkConnectivityFilterComponent::CreateConnections()
 {
-  if ( m_ConnectivityFilterComponentGUI )
-  {
-    connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
-    connect((QObject*)(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowTreeNodeSelector()));
-    connect((QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowComponentContent()));
-    //Button to start the connectFilter pressed:
-    connect((QObject*)(m_ConnectivityFilterComponentGUI->GetStartFilterPushButton()), SIGNAL(clicked()), (QObject*) this, SLOT(StartConnectivityFilter()));
+	if ( m_ConnectivityFilterComponentGUI )
+	{
+		connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+		connect((QObject*)(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowTreeNodeSelector()));
+		connect((QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowComponentContent()));
+		//Button to start the connectFilter pressed:
+		connect((QObject*)(m_ConnectivityFilterComponentGUI->GetStartFilterPushButton()), SIGNAL(clicked()), (QObject*) this, SLOT(StartConnectivityFilter()));
 
-    //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
-    connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
+		//to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
+		connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
 
-  }
+	}
 }
 
 /*************** SHOW COMPONENT CONTENT ***************/
 void QmitkConnectivityFilterComponent::ShowComponentContent()
 {
- m_ConnectivityFilterComponentGUI->GetComponentContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowComponent()->isChecked());
+	m_ConnectivityFilterComponentGUI->GetComponentContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowComponent()->isChecked());
 }
 
 /*************** SHOW TREE NODE SELECTOR **************/
 void QmitkConnectivityFilterComponent::ShowTreeNodeSelector()
 {
- m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
+	m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
 }
 
 /***************     IMAGE SELECTED     ***************/
 void QmitkConnectivityFilterComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-  m_SelectedItem = imageIt;
-  mitk::DataTreeFilter::Item* currentItem(NULL);
-  if(m_ConnectivityFilterComponentGUI)
-  {
-    if(mitk::DataTreeFilter* filter = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter())
-    {
-      if(imageIt)
-      {
-        currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
-      }
-    }
-  }
-  if(currentItem)
-  {
-    currentItem->SetSelected(true);
-  }
+	m_SelectedItem = imageIt;
+	mitk::DataTreeFilter::Item* currentItem(NULL);
+	if(m_ConnectivityFilterComponentGUI)
+	{
+		if(mitk::DataTreeFilter* filter = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter())
+		{
+			if(imageIt)
+			{
+				currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+			}
+		}
+	}
+	if(currentItem)
+	{
+		currentItem->SetSelected(true);
+	}
 
-  TreeChanged();
+	TreeChanged();
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 {
-  m_ConnectivityFilterComponentGUI = new QmitkConnectivityFilterComponentGUI(parent);
-  m_GUI = m_ConnectivityFilterComponentGUI;
+	m_ConnectivityFilterComponentGUI = new QmitkConnectivityFilterComponentGUI(parent);
+	m_GUI = m_ConnectivityFilterComponentGUI;
 
-  m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-  m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
+	m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+	m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
 
-  	if(m_ShowSelector)
+	if(m_ShowSelector)
 	{
 		m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
 	}
@@ -193,9 +195,9 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 		m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
 	}
 
-  //CreatePointSet();
-  //m_PointSet->Deactivated();
-  return m_ConnectivityFilterComponentGUI;
+	//CreatePointSet();
+	//m_PointSet->Deactivated();
+	return m_ConnectivityFilterComponentGUI;
 }
 
 /*************** CREATE SEEDPOINT WIDGET **************/
@@ -213,71 +215,71 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 /*************** GET CONTENT CONTAINER  ***************/
 QGroupBox * QmitkConnectivityFilterComponent::GetContentContainer()
 {
- return m_ConnectivityFilterComponentGUI->GetComponentContent();
+	return m_ConnectivityFilterComponentGUI->GetComponentContent();
 }
 
 /************ GET MAIN CHECK BOX CONTAINER ************/
 QGroupBox * QmitkConnectivityFilterComponent::GetMainCheckBoxContainer()
 {
- return m_ConnectivityFilterComponentGUI->GetShowComponent();
+	return m_ConnectivityFilterComponentGUI->GetShowComponent();
 }
 
 /*********** SET CONTENT CONTAINER VISIBLE ************/
 void QmitkConnectivityFilterComponent::SetContentContainerVisibility(bool)
 {
-  if(GetMainCheckBoxContainer() != NULL)
-  {
-    if(GetMainCheckBoxContainer()->isChecked())
-    {
-      Activated();
-    }
-    else
-    {
-      Deactivated();
-    }
-  }
-  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-  {
-    if(m_AddedChildList[i]->GetContentContainer() != NULL)
-    {
-      m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
-    }
-    if(m_AddedChildList[i]->GetMainCheckBoxContainer() != NULL)
-    {
-      m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
-    }
-    m_AddedChildList[i]->SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
-  } 
+	if(GetMainCheckBoxContainer() != NULL)
+	{
+		if(GetMainCheckBoxContainer()->isChecked())
+		{
+			Activated();
+		}
+		else
+		{
+			Deactivated();
+		}
+	}
+	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+	{
+		if(m_AddedChildList[i]->GetContentContainer() != NULL)
+		{
+			m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
+		}
+		if(m_AddedChildList[i]->GetMainCheckBoxContainer() != NULL)
+		{
+			m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
+		}
+		m_AddedChildList[i]->SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
+	} 
 }
 
 
 /***************      SET POINTSET      ***************/
 void QmitkConnectivityFilterComponent::SetPointSet(QmitkSeedPointSetComponent* pointSet)
 {
-  m_PointSet = pointSet;
+	m_PointSet = pointSet;
 }
 
 /***************        ACTIVATED       ***************/
 void QmitkConnectivityFilterComponent::Activated()
 {
-  QmitkBaseFunctionalityComponent::Activated();
-  m_Active = true;
-  TreeChanged();
-  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-  {
-    m_AddedChildList[i]->Activated();
-  } 
+	QmitkBaseFunctionalityComponent::Activated();
+	m_Active = true;
+	TreeChanged();
+	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+	{
+		m_AddedChildList[i]->Activated();
+	} 
 }
 
 /***************       DEACTIVATED      ***************/
 void QmitkConnectivityFilterComponent::Deactivated()
 {
-  QmitkBaseFunctionalityComponent::Deactivated();
-  m_Active = false;
-   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-  {
-    m_AddedChildList[i]->Deactivated();
-  } 
+	QmitkBaseFunctionalityComponent::Deactivated();
+	m_Active = false;
+	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+	{
+		m_AddedChildList[i]->Deactivated();
+	} 
 }
 
 
@@ -286,67 +288,68 @@ void QmitkConnectivityFilterComponent::Deactivated()
 //shows the largest connected surface and removes all disconnected areas
 void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 {
-  //Get the FilterMode
-  // 0 show largest Region
-  // 1 show all Regions
-  // 2 showClosestPointRegion
+	//Get the FilterMode
+	// 0 show largest Region
+	// 1 show all Regions
+	// 2 showClosestPointRegion
 
 
-  int filterMode = m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem();
-  
-  vtkPolyDataConnectivityFilter* pdConnectivity = vtkPolyDataConnectivityFilter::New();
-  m_SelectedItem = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem();
-  if(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetItems()->Size() > 0)//if itemSelector is not empty
-  {
-    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SelectedItem->GetNode()->GetData());
-    pdConnectivity->SetInput(surface->GetVtkPolyData());
+	int filterMode = m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem();
 
-    int numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
-    pdConnectivity->InitializeSpecifiedRegionList();
+	vtkPolyDataConnectivityFilter* pdConnectivity = vtkPolyDataConnectivityFilter::New();
+	m_SelectedItem = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem();
+	if(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetItems()->Size() > 0)//if itemSelector is not empty
+	{
+		mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SelectedItem->GetNode()->GetData());
+		pdConnectivity->SetInput(surface->GetVtkPolyData());
 
-    switch(filterMode) 
-    { 
-    case 0: /*show largest Region*/
-      {
-        ; 
-      }
-      break; 
+		int numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
+		pdConnectivity->InitializeSpecifiedRegionList();
 
-    case 1: /*show all Regions*/
-      {
-        pdConnectivity->SetExtractionModeToAllRegions();               
-      }
-      break; 
-
-    case 2: /*Point Marked Surface*/
-      {
-		  if(m_PointSet!=NULL)
-		  {
-			if(m_PointSet->GetPointSetNode().IsNotNull())
+		switch(filterMode) 
+		{ 
+		case 0: /*show largest Region*/
 			{
-				//std::cout<<"Punkte sind da:"<<std::endl;
-				mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
-				int numberOfPoints = pointSet->GetSize();
-				if(numberOfPoints > 0)
-				{
-					mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
-					
-					double x1 = pointOne[0];
-					double y1 = pointOne[1];
-					double z1 = pointOne[2];
+				; 
+			}
+			break; 
 
-					pdConnectivity->SetClosestPoint(x1, y1, z1);
-					pdConnectivity->SetExtractionModeToClosestPointRegion();
+		case 1: /*show all Regions*/
+			{
+				pdConnectivity->SetExtractionModeToAllRegions();               
+			}
+			break; 
+
+		case 2: /*Point Marked Surface*/
+			{
+				if(m_PointSet!=NULL)
+				{
+					if(m_PointSet->GetPointSetNode().IsNotNull())
+					{
+						//std::cout<<"Punkte sind da:"<<std::endl;
+						mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
+						int numberOfPoints = pointSet->GetSize();
+						if(numberOfPoints > 0)
+						{
+							mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
+
+							double x1 = pointOne[0];
+							double y1 = pointOne[1];
+							double z1 = pointOne[2];
+
+							pdConnectivity->SetClosestPoint(x1, y1, z1);
+							pdConnectivity->SetExtractionModeToClosestPointRegion();
+							//pdConnectivity->
+						}
+					}
 				}
 			}
-		  }
-	  }
-	  break;
+			break;
 
-	  //case 3: /*Delete Point Marked Surface*/
-   //   {
-		 // if(m_PointSet!=NULL)
-		 // {
+			//case 3: /*Delete Point Marked Surface*/
+			//   {
+			// if(m_PointSet!=NULL)
+			// {
 			//if(m_PointSet->GetPointSetNode().IsNotNull())
 			//{
 			//	//std::cout<<"Punkte sind da:"<<std::endl;
@@ -367,177 +370,190 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
 			//	}
 			//}
-		 // }
-	  //}
-	  //break;
+			// }
+			//}
+			//break;
 
-    default: ; break; 
-    }
-
-  pdConnectivity->ColorRegionsOn();
-  pdConnectivity->Update();
-
-  numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
-//
-  //to set different colors 
-  vtkFloatingPointType* range = pdConnectivity->GetOutput()->GetPointData()->GetScalars()->GetRange();
-
-  float scalarsMin = range[0];
-  float scalarsMax = range[1];
-
-  mitk::DataTreeIteratorClone itConnectivity = GetDataTreeIterator();
-//  std::cout<<"while:"<<std::endl;
-  int i = 0;
-  while ( !itConnectivity->IsAtEnd() )
-  {
-    i++;
-//    std::cout<<i<<std::endl;
-    mitk::DataTreeNode::Pointer aNode = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
-    if ( aNode->GetData() != NULL )
-    {
-      mitk::Surface::Pointer sf = dynamic_cast<mitk::Surface*>( aNode->GetData() );
-      if (sf.IsNotNull())
-      {
-        mitk::DataTreeNode::Pointer connectivityNode = mitk::DataTreeNode::New();
-        vtkPolyData* connected = pdConnectivity->GetOutput();
-        sf->SetVtkPolyData(connected, 0);
-        connectivityNode->SetData(sf);
-
-        int layer = 0;
-
-        ++m_ConnectivityCounter;
-
-
-        std::ostringstream buffer;
-        QString connectivityDataName = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->currentText();
-        buffer << connectivityDataName.ascii();
-        buffer << "_";
-        buffer << m_ConnectivityCounter;
-
-        std::string connectivityNodeName = "Connectivity_" + buffer.str();
-
-
-
-
-        mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
-        iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
-        connectivityNode->SetIntProperty("layer", layer+1);
-        mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
-        connectivityNode->SetProperty("deprecated usePointDataForColouring", new mitk::BoolProperty(true));
-        connectivityNode->SetProperty("name", new mitk::StringProperty(connectivityNodeName) );
-        connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
-        connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
-		if(filterMode ==1)
-		{
-            connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( true ));
+		default: ; break; 
 		}
-		else
+
+		pdConnectivity->ColorRegionsOn();
+		pdConnectivity->Update();
+
+		numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
+		//
+		//to set different colors 
+		vtkFloatingPointType* range = pdConnectivity->GetOutput()->GetPointData()->GetScalars()->GetRange();
+
+		float scalarsMin = range[0];
+		float scalarsMax = range[1];
+
+		mitk::DataTreeIteratorClone itConnectivity = GetDataTreeIterator();
+		//  std::cout<<"while:"<<std::endl;
+		int i = 0;
+		while ( !itConnectivity->IsAtEnd() )
 		{
-			connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
-		}
-		connectivityNode->SetProperty( "deprecated usePointDataForColouring", new mitk::BoolProperty(false) );
+			i++;
+			//    std::cout<<i<<std::endl;
+			mitk::DataTreeNode::Pointer aNode = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
+			if ( aNode->GetData() != NULL )
+			{
+				mitk::Surface::Pointer sf = dynamic_cast<mitk::Surface*>( aNode->GetData() );
+				if (sf.IsNotNull())
+				{
+					mitk::DataTreeNode::Pointer connectivityNode = mitk::DataTreeNode::New();
+					vtkPolyData* connected = pdConnectivity->GetOutput();
+					sf->SetVtkPolyData(connected, 0);
+					connectivityNode->SetData(sf);
 
-        mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
+					int layer = 0;
 
-        bool isSurface = false;
-        bool isConnectivity = false;
+					++m_ConnectivityCounter;
 
-        //while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
-        //{
-        //  iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface);
-        //  if(isSurface == false)
-        //  {
-        //    ++iteratorConnectivity;
-        //  }
-        //  std::cout <<iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface)<<std::endl;
-        //}//end of while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
-        //while(!(iteratorConnectivity->IsAtEnd())&&(iteratorConnectivity->Get() != m_SelectedItem->GetNode()))
-          while(!(iteratorConnectivity->IsAtEnd()))
-        {
-          if(iteratorConnectivity->Get() != m_SelectedItem->GetNode())
-          {
-            std::cout <<"Ungleicher Knoten"<<std::endl;
-          }
-          else if(iteratorConnectivity->Get() == m_SelectedItem->GetNode())
-          {
 
-            std::cout <<"Gleicher Knoten"<<std::endl;
-            iteratorConnectivity->Set(connectivityNode);
-            //mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
-            iteratorConnectivity->GetTree()->Modified();
-            std::cout <<"SET"<<std::endl;
-            break;
-          }
-          else
-          {
-            iteratorConnectivity->Add(connectivityNode);
-            std::cout <<"ADD"<<std::endl;
-          }
+					std::ostringstream buffer;
+					QString connectivityDataName = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->currentText();
+					buffer << connectivityDataName.ascii();
+					buffer << "_";
+					buffer << m_ConnectivityCounter;
 
-          ++iteratorConnectivity;
+					std::string connectivityNodeName = "Connectivity_" + buffer.str();
 
-        }
 
-        //if(isSurface == false)
-        //{
-        //  while(!(iteratorConnectivity->IsAtEnd())&&(isConnectivity == false))
-        //  {
-        //    iteratorConnectivity->Get()->GetBoolProperty("connectivity", isConnectivity);
-        //    if(isConnectivity == false)
-        //    {
-        //      ++iteratorConnectivity;
-        //    }
-        //  }
-        //}//end of if(isSurface == false)
 
-        ////if(isSurface == true)
-        ////{
-        ////  itConnectivity->Set(connectivityNode);
-        ////  itConnectivity->GetTree()->Modified();
-        ////}//end of if(isSurface == true)
 
-        ////if(isSurface == false)
-        ////{
-        ////  if(isConnectivity == true)
-        ////  {
+					mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
+					iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
+					connectivityNode->SetIntProperty("layer", layer+1);
+					mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
+					connectivityNode->SetProperty("deprecated usePointDataForColouring", new mitk::BoolProperty(true));
+					connectivityNode->SetProperty("name", new mitk::StringProperty(connectivityNodeName) );
+					connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
+					connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
+					if(filterMode ==1)
+					{
+						connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( true ));
+					}
+					else
+					{
+						connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
+					}
+					connectivityNode->SetProperty( "deprecated usePointDataForColouring", new mitk::BoolProperty(false) );
 
-        ////    itConnectivity->Set(connectivityNode);
-        ////    itConnectivity->GetTree()->Modified();
-        ////  }
+					mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 
-        ////  if(isConnectivity == false)
-        ////  {
-        ////    itConnectivity->Add(connectivityNode);
-        ////  }
-        ////}//end of if(isSurface == false)
+					bool isSurface = false;
+					bool isConnectivity = false;
 
-        //if(isSurface == true)
-        //{
-        //  iteratorConnectivity->Set(connectivityNode);
-        //  iteratorConnectivity->GetTree()->Modified();
-        //}//end of if(isSurface == true)
+					//while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
+					//{
+					//  iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface);
+					//  if(isSurface == false)
+					//  {
+					//    ++iteratorConnectivity;
+					//  }
+					//  std::cout <<iteratorConnectivity->Get()->GetBoolProperty("SurfaceCreatorSurface", isSurface)<<std::endl;
+					//}//end of while(!(iteratorConnectivity->IsAtEnd())&&(isSurface == false))
+					//while(!(iteratorConnectivity->IsAtEnd())&&(iteratorConnectivity->Get() != m_SelectedItem->GetNode()))
+					while(!(iteratorConnectivity->IsAtEnd()))
+					{
+						if(iteratorConnectivity->Get() != m_SelectedItem->GetNode())
+						{
+							//std::cout <<"Ungleicher Knoten"<<std::endl;
+						}
+						else 
+							if(iteratorConnectivity->Get() == m_SelectedItem->GetNode())
+							{
 
-        //if(isSurface == false)
-        //{
-        //  if(isConnectivity == true)
-        //  {
+								//std::cout <<"Gleicher Knoten"<<std::endl;
+								if(filterMode==2)
+								{
+									iteratorConnectivity->Add(connectivityNode);
+									emit nodeExported( connectivityNode );
+								}
+								else
+								{
+									iteratorConnectivity->Set(connectivityNode);
+								}
+								//mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
+								iteratorConnectivity->GetTree()->Modified();
+								//std::cout <<"SET"<<std::endl;
+								break;
+							}
+							else
+							{
+								iteratorConnectivity->Add(connectivityNode);
+								std::cout <<"ADD"<<std::endl;
+								break;
+							}
 
-        //    iteratorConnectivity->Set(connectivityNode);
-        //    iteratorConnectivity->GetTree()->Modified();
-        //  }
+							++iteratorConnectivity;
+					}
 
-        //  if(isConnectivity == false)
-        //  {
-        //    iteratorConnectivity->Add(connectivityNode);
-        //  }
-        //}//end of if(isSurface == false)
+					//if(isSurface == false)
+					//{
+					//  while(!(iteratorConnectivity->IsAtEnd())&&(isConnectivity == false))
+					//  {
+					//    iteratorConnectivity->Get()->GetBoolProperty("connectivity", isConnectivity);
+					//    if(isConnectivity == false)
+					//    {
+					//      ++iteratorConnectivity;
+					//    }
+					//  }
+					//}//end of if(isSurface == false)
 
-        break;
-      }//end of if (sf.IsNotNull())
-    }//end of if ( aNode->GetData() != NULL )
-    ++itConnectivity;
-  }//end of while ( !itConnectivity->IsAtEnd() )
-//  multiWidget->RequestUpdate();
-}//end of if itemSelector is not empty
+					////if(isSurface == true)
+					////{
+					////  itConnectivity->Set(connectivityNode);
+					////  itConnectivity->GetTree()->Modified();
+					////}//end of if(isSurface == true)
+
+					////if(isSurface == false)
+					////{
+					////  if(isConnectivity == true)
+					////  {
+
+					////    itConnectivity->Set(connectivityNode);
+					////    itConnectivity->GetTree()->Modified();
+					////  }
+
+					////  if(isConnectivity == false)
+					////  {
+					////    itConnectivity->Add(connectivityNode);
+					////  }
+					////}//end of if(isSurface == false)
+
+					//if(isSurface == true)
+					//{
+					//  iteratorConnectivity->Set(connectivityNode);
+					//  iteratorConnectivity->GetTree()->Modified();
+					//}//end of if(isSurface == true)
+
+					//if(isSurface == false)
+					//{
+					//  if(isConnectivity == true)
+					//  {
+
+					//    iteratorConnectivity->Set(connectivityNode);
+					//    iteratorConnectivity->GetTree()->Modified();
+					//  }
+
+					//  if(isConnectivity == false)
+					//  {
+					//    iteratorConnectivity->Add(connectivityNode);
+					//  }
+					//}//end of if(isSurface == false)
+
+					break;
+				}//end of if (sf.IsNotNull())
+			}//end of if ( aNode->GetData() != NULL )
+			++itConnectivity;
+		}//end of while ( !itConnectivity->IsAtEnd() )
+		//multiWidget->RequestUpdate();
+		m_MultiWidget->GetRenderWindow1()->repaint();
+		m_MultiWidget->GetRenderWindow2()->repaint();
+		m_MultiWidget->GetRenderWindow3()->repaint();
+		m_MultiWidget->GetRenderWindow4()->repaint();
+	}//end of if itemSelector is not empty
 }//end of showConnected()
 

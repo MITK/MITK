@@ -118,7 +118,11 @@ public slots:
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
 
-  //void SurfaceToImage();
+   signals:
+
+    // Emitted when the property changes. The parameter gives you the new value of the property.
+    void nodeExported(mitk::DataTreeNode::Pointer);
+
 
 protected:
 
@@ -169,11 +173,19 @@ private:
   */
   //mitk::PointSet::Pointer m_Seeds;
 
+   /** \brief Member iterator on the Dataset*/
   mitk::DataTreeIteratorBase* m_DataIt;
 
+   /** \brief Member of a point Set that can be used to set Points in the visualisation widgets*/
   QmitkSeedPointSetComponent* m_PointSet;
   
+   /** \brief Member how many connectivities were created yet*/
   int m_ConnectivityCounter;
+
+  /*!
+  a reference to the visible multiwidget
+  */
+  QmitkStdMultiWidget* m_MultiWidget;
 
 
 

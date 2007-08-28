@@ -19,22 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLightBoxImageReaderImpl.h"
 #include "QmitkLightBoxReaderDialog.h"
 
+#include <mitkProperties.h>
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
-#include "mitkPicHeaderProperty.h"
 
 #include <itkImageFileReader.h>
 
 #include <chili/qclightbox.h>
-//#include <chili/qclightboxmanager.h>
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPicTags.h>
-
 #include <ipPic/ipPic.h>
-//#include <ipFunc/ipFunc.h>
-
-//#include <list>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -721,37 +716,57 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
   // Extract ALL tags from the PIC header
   _ipPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
 
-  while (currentTagNode)
+  while( currentTagNode )
   {
     ipPicTSV_t* currentTag = currentTagNode->tsv;
 
-    // process this tag
-    BaseProperty::Pointer newProperty = new PicHeaderProperty( currentTag );
     std::string propertyName = "CHILI: ";
     propertyName += currentTag->tag;
-    resultPropertyList->SetProperty( propertyName.c_str(), newProperty );
 
+    switch( currentTag->type )
+    {
+      case ipPicASCII:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::StringProperty( static_cast<char*>( currentTag->value ) ) );
+        break;
+      }
+      case ipPicInt:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( *static_cast<int*>( currentTag->value ) ) );
+        break;
+      }
+      case ipPicUInt:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( (int)*( (char*)( currentTag->value ) ) ) );
+        break;
+      }
+      default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
+      {
+        std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "' not handled in LightBoxImageReader." << std::endl;
+        break;
+      }
+    }
     // proceed to the next tag
     currentTagNode = currentTagNode->next;
   }
-
-  if (m_LightBox->currentSeries())
-  {
-    series_t* series = m_LightBox->currentSeries();
-    if (series->description) resultPropertyList->SetProperty( "CHILI: " tagSERIES_DESCRIPTION, new StringProperty( std::string(series->description) ) );
-    // could be extended, but will be replaced soon
-  }
-
-  // all tags are stored as properties now
-  // TODO do we need any DICOM headers/tags?
 
   BaseProperty::Pointer name = resultPropertyList->GetProperty( "CHILI: SERIES DESCRIPTION" );
   if( name )
   {
     resultPropertyList->SetProperty( "name", new mitk::StringProperty( name->GetValueAsString() ) );
   }
-  else resultPropertyList->SetProperty( "name", new mitk::StringProperty( "unnamed" ) );
-
+  else
+  {
+    if (m_LightBox->currentSeries())
+    {
+      if( m_LightBox->currentSeries()->description )
+      {
+        resultPropertyList->SetProperty( "name", new StringProperty( std::string( m_LightBox->currentSeries()->description ) ) );
+      }
+      else
+        resultPropertyList->SetProperty( "name", new mitk::StringProperty( "unnamed" ) );
+    }
+  }
   return resultPropertyList;
 }
 

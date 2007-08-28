@@ -31,3 +31,8 @@ bool mitk::LightBoxImageReader::userAbort()
 {
   return false;
 }
+
+const mitk::PropertyList::Pointer mitk::LightBoxImageReader::GetImageTagsAsPropertyList()
+{
+  return NULL;
+}

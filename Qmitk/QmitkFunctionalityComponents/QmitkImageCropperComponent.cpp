@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEllipsoid.h>
 #include <mitkCylinder.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkUndoController.h>
+//#include <mitkUndoController.h>
 #include <mitkBoundingObjectCutter.h>
 #include <mitkDataTreeHelper.h>
 
@@ -347,13 +347,13 @@ void QmitkImageCropperComponent::CropImage()
 		opExchangeNodes*  doOp   = new opExchangeNodes(OP_EXCHANGE, m_MitkImageIterator->Get().GetPointer(), 
 			m_MitkImageIterator->Get()->GetData(), 
 			resultImage); 
-		opExchangeNodes* undoOp  = new opExchangeNodes(OP_EXCHANGE, m_MitkImageIterator->Get().GetPointer(), 
-			resultImage, 
-			m_MitkImageIterator->Get()->GetData());
+	//	opExchangeNodes* undoOp  = new opExchangeNodes(OP_EXCHANGE, m_MitkImageIterator->Get().GetPointer(), 
+	//		resultImage, 
+	//		m_MitkImageIterator->Get()->GetData());
 
-		//if(m_ParentObject){m_ParentObject->TreeChanged();}
-		mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( 
-			new mitk::OperationEvent(this, doOp, undoOp, "Crop image") ); // tell the undo controller about the action
+	//	//if(m_ParentObject){m_ParentObject->TreeChanged();}
+	//	mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( 
+	//		new mitk::OperationEvent(this, doOp, undoOp, "Crop image") ); // tell the undo controller about the action
 		ExecuteOperation(doOp); // execute action
 
 		m_MitkImage = resultImage;

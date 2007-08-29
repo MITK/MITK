@@ -397,6 +397,12 @@ class SliceNavigationController : public BaseController
     itkGetMacro(SliceRotationLocked, bool);
     itkBooleanMacro(SliceRotationLocked);
 
+    /** 
+     * \brief Adjusts the numerical range of the slice stepper according to
+     * the current geometry orientation of this SNC's SlicedGeometry.
+     */
+    void AdjustSliceStepperRange();
+
 
   protected:
     SliceNavigationController(const char * type = NULL);

@@ -26,20 +26,56 @@ PURPOSE.  See the above copyright notices for more information.
 ** place of a destructor.
 *****************************************************************************/
 
-
+/**
+ * \brief Updates the slider with the recent changes applied to the navigator.
+ *
+ * Intended to be called via event mechanism, e.g. if the connected
+ * mitk::Stepper is modified.
+ */
 void QmitkSliderNavigator::Refetch()
 {
   if(!m_InRefetch)
   {
     m_InRefetch=true;
     
-    slider->setMinValue(0);
-    slider->setMaxValue(m_Stepper->GetSteps()-1);
-    slider->setValue(m_Stepper->GetPos());
+    m_Slider->setMinValue(0);
+    m_Slider->setMaxValue(m_Stepper->GetSteps()-1);
+    m_Slider->setValue(m_Stepper->GetPos());
     
-    spinBox->setMinValue( 0 );
-    spinBox->setMaxValue( m_Stepper->GetSteps()-1 );
-    spinBox->setValue( m_Stepper->GetPos() );
+    m_SpinBox->setMinValue( 0 );
+    m_SpinBox->setMaxValue( m_Stepper->GetSteps()-1 );
+    m_SpinBox->setValue( m_Stepper->GetPos() );
+
+    if ( m_Stepper->HasRange() )
+    {
+      // Show slider with labels according to below settings
+      this->ShowLabels( true );
+
+      if ( m_Stepper->HasValidRange() )
+      {
+        this->SetLabelValuesValid( true, true );
+        this->SetLabelValues( 
+          m_Stepper->GetRangeMin(),
+          m_Stepper->GetRangeMax() );
+      }
+      else
+      {
+        this->SetLabelValuesValid( false, false );
+      }
+
+      if ( m_Stepper->HasUnitName() )
+      {
+        this->SetLabelUnit( m_Stepper->GetUnitName() );
+      }
+    }
+    else
+    {
+      // Show slider without any labels
+      this->ShowLabels( false );
+    }
+  
+    // Update GUI according to above settings
+    this->SetLabels();
     
     m_InRefetch=false;
   }
@@ -48,8 +84,11 @@ void QmitkSliderNavigator::Refetch()
 
 void QmitkSliderNavigator::SetStepper( mitk::Stepper * stepper)
 {
-    m_Stepper = stepper;
-    m_InRefetch = (stepper==NULL); // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+  m_Stepper = stepper;
+  
+  // this avoids trying to use m_Stepper until it is set to something != NULL 
+  // (additionally to the avoiding recursions during refetching)
+  m_InRefetch = (stepper==NULL);
 }
 
 
@@ -57,32 +96,164 @@ void QmitkSliderNavigator::slider_valueChanged( int )
 {
   if (!m_InRefetch)
   {
-    m_Stepper->SetPos(slider->value());
+    m_Stepper->SetPos(m_Slider->value());
     this->Refetch();
   }
 }
 
 void QmitkSliderNavigator::init()
 {
-  m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
+  // this avoids trying to use m_Stepper until it is set to something != NULL 
+  // (additionally to the avoiding recursions during refetching)
+  m_InRefetch = true;
+
+  // Hide slider labeling -- until it is explicitly activated
+  this->ShowLabels( false );
+
+  // Set label values as invalid (N/A)
+  this->SetLabelValuesValid( false, false );
+
+  m_HasLabelUnit = false;
 }
 
+void QmitkSliderNavigator::ShowLabels( bool show )
+{
+  m_SliderLabelLeft->setHidden( !show );
+  m_SliderLabelRight->setHidden( !show );
+  m_HasLabels = show;
+}
+
+/**
+ * \brief Converts the passed value to a QString representation.
+ *
+ * If the value exceeds a certain maximum, "INF" (for "infinity") is displayed 
+ * instead.
+ */
+QString QmitkSliderNavigator::ClippedValueToString( float value )
+{
+  if ( value < -10000000.0 )
+  {
+    return "-INF";
+  }
+  else if ( value > 10000000.0 )
+  {
+    return "+INF";
+  }
+  else
+  {
+    return QString::number( value, 'f', 3 );
+  }
+}
+
+/**
+ * \brief Returns range-minimum (displayed as label left of slider if enabled)
+ */
+QString QmitkSliderNavigator::GetMinValueLabel()
+{
+  if ( m_MinValueValid )
+  {
+    return this->ClippedValueToString( m_MinValue );
+  }
+  else
+  {
+    return "N/A";
+  }
+}
+
+QString QmitkSliderNavigator::GetMaxValueLabel()
+{
+  if ( m_MaxValueValid )
+  {
+    return this->ClippedValueToString( m_MaxValue );
+  }
+  else
+  {
+    return "N/A";
+  }
+}
+
+/**
+ * \brief Set range minimum and maximum (displayed as labels left and right
+ * of slider if enabled)
+ */
+void QmitkSliderNavigator::SetLabelValues( float min, float max )
+{
+  m_MinValue = min;
+  m_MaxValue = max;
+}
+
+void QmitkSliderNavigator::SetLabelValuesValid( bool minValid, bool maxValid )
+{
+  m_MinValueValid = minValid;
+  m_MaxValueValid = maxValid;
+}
+
+/**
+ * \brief Set range unit (e.g. mm or ms) which will be displayed below range
+ * labels if enabled.
+ */
+void QmitkSliderNavigator::SetLabelUnit( const char *unit )
+{
+  m_LabelUnit = unit;
+  m_HasLabelUnit = true;
+}
+
+QString QmitkSliderNavigator::GetLabelUnit()
+{
+  return m_LabelUnit;
+}
+
+/** 
+ * \brief Disables displaying of the unit label (range will be displayed
+ * without unit if enabled).
+ */
+void QmitkSliderNavigator::RemoveLabelUnit()
+{
+  m_HasLabelUnit = false;
+}
+
+/**
+ * \brief Configure slider with labels according to range and unit settings
+ */
+void QmitkSliderNavigator::SetLabels()
+{
+  QString minText = "<p align='center'><font size='2'>" 
+    + this->GetMinValueLabel();
+
+  QString maxText = "<p align='center'><font size='2'>" 
+    + this->GetMaxValueLabel();
+  
+  if ( m_HasLabelUnit )
+  {
+    minText += "<br>[" + this->GetLabelUnit() + "]";
+    maxText += "<br>[" + this->GetLabelUnit() + "]";
+  }
+
+  minText += "</font></p>";
+  maxText += "</font></p>";
+
+  m_SliderLabelLeft->setText( minText );
+  m_SliderLabelRight->setText( maxText );
+}
 
 void QmitkSliderNavigator::spinBox_valueChanged( int )
 {
   if(!m_InRefetch)
   {
-    m_Stepper->SetPos( spinBox->value() );
+    m_Stepper->SetPos( m_SpinBox->value() );
     this->Refetch();
   }
 }
 
 int QmitkSliderNavigator::GetPos()
 {
-    return m_Stepper->GetPos();
+  return m_Stepper->GetPos();
 }
 
 void QmitkSliderNavigator::SetPos(int val)
 {
-    if(!m_InRefetch)    m_Stepper->SetPos( val );
+  if (!m_InRefetch)    
+  {
+    m_Stepper->SetPos( val );
+  }
 }

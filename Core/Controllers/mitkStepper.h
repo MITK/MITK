@@ -22,19 +22,34 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkVector.h"
+
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
+#include <string>
+
 namespace mitk {
 
-//##ModelId=3DF8BF9A005D
-//##Documentation
-//## @brief Helper class to step through a list
-//##
-//## A helper class to step through a list. Does not contain the list, just the
-//## position in the list (between 0 and GetSteps()). Provides methods like
-//## First (go to the first element), Next (go to the next one), etc.
-//## @ingroup NavigationControl
+/**
+ * \brief Helper class to step through a list
+ *
+ * A helper class to step through a list. Does not contain the list, just the
+ * position in the list (between 0 and GetSteps()). Provides methods like
+ * First (go to the first element), Next (go to the next one), etc.
+ *
+ * Besides the actual number of steps, the stepper can also hold a stepping
+ * range, indicating the scalar values corresponding to the covered steps.
+ * For example, steppers are generally used to slice a dataset with a plane;
+ * Hereby, Steps indicates the total number of steps (positions) available for
+ * the plane, Pos indicates the current step, and Range indicates the physical
+ * minimum and maximum values for the plane, in this case a value in mm.
+ *
+ * The range can also be supplied with a unit name (a string) which can be
+ * used by classes providing information about the stepping (e.g. graphical
+ * sliders).
+ *
+ * \ingroup NavigationControl
+ */
 class Stepper : public itk::Object
 {
 public:
@@ -42,8 +57,12 @@ public:
   itkNewMacro(Self);
 
   itkGetMacro(Pos, unsigned int);
-  virtual void SetPos(unsigned int pos) { // copied from itkMacro.h, itkSetClampMacro(...)
-    if (this->m_Pos != (pos > m_Steps-1 ? m_Steps-1 : pos)) {
+  
+  virtual void SetPos(unsigned int pos) 
+  { 
+    // copied from itkMacro.h, itkSetClampMacro(...)
+    if (this->m_Pos != (pos > m_Steps-1 ? m_Steps-1 : pos)) 
+    {
       this->m_Pos = pos > m_Steps-1 ? m_Steps-1 : pos ;
       this->Modified();
     }
@@ -56,27 +75,37 @@ public:
   itkSetMacro(AutoRepeat, bool);
   itkBooleanMacro(AutoRepeat);
 
-  //## Causes the stepper to shift direction when the boundary is reached
+  /** Causes the stepper to shift direction when the boundary is reached */
   itkSetMacro(PingPong, bool);
   itkGetMacro(PingPong, bool);
   itkBooleanMacro(PingPong);
 
-  //## If set to true, the Next() decreases the stepper and Previous()
-  //## decreases it
+  /** If set to true, the Next() decreases the stepper and Previous()
+   * decreases it */
   itkSetMacro(InverseDirection, bool);
   itkGetMacro(InverseDirection, bool);
   itkBooleanMacro(InverseDirection);
 
-  //##ModelId=3DF8B92703A4
+  void SetRange( ScalarType min, ScalarType max );
+  void InvalidateRange();
+  ScalarType GetRangeMin() const;
+  ScalarType GetRangeMax() const;
+  bool HasValidRange() const;
+  void RemoveRange();
+  bool HasRange() const;
+
+  void SetUnitName( const char *unitName );
+  const char *GetUnitName() const;
+  void RemoveUnitName();
+  bool HasUnitName() const;
+
+
   virtual void Next();
 
-  //##ModelId=3DF8B9410142
   virtual void Previous();
 
-  //##ModelId=3DF8B91502F8
   virtual void First();
 
-  //##ModelId=3DF8B92F01DF
   virtual void Last();
 
 protected:
@@ -87,16 +116,22 @@ protected:
 
   void Decrease();
 
-  //##ModelId=3DD524BD00DC
   unsigned int m_Pos;
 
-  //##ModelId=3DF8F73C0076
   unsigned int m_Steps;
 
   bool m_AutoRepeat;
   
   bool m_PingPong;
   bool m_InverseDirection;
+
+  ScalarType m_RangeMin;
+  ScalarType m_RangeMax;
+  bool m_RangeValid;
+  bool m_HasRange;
+
+  std::string m_UnitName;
+  bool m_HasUnitName;
 
 };
 

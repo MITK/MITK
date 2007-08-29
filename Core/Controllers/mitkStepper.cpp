@@ -19,16 +19,116 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStepper.h"
 
-mitk::Stepper::Stepper() : m_Pos(0), m_Steps(0), m_AutoRepeat(false), 
-                           m_PingPong(false), m_InverseDirection(false)
+mitk::Stepper
+::Stepper()
+: m_Pos( 0 ), 
+  m_Steps( 0 ),
+  m_AutoRepeat( false ), 
+  m_PingPong( false ), 
+  m_InverseDirection( false ),
+  m_RangeMin( 0.0 ),
+  m_RangeMax( -1.0 ),
+  m_HasUnitName( false ),
+  m_HasRange( false ),
+  m_RangeValid( false )
 {
 }
 
-mitk::Stepper::~Stepper()
+mitk::Stepper
+::~Stepper()
 {
 }
 
-void mitk::Stepper::Increase()
+void 
+mitk::Stepper
+::SetRange( ScalarType min, ScalarType max )
+{
+  m_RangeMin = min;
+  m_RangeMax = max;
+  m_HasRange = true;
+  m_RangeValid = true;
+  this->Modified();
+}
+
+void
+mitk::Stepper
+::InvalidateRange()
+{
+  m_HasRange = true;
+  m_RangeValid = false;
+  this->Modified();
+}
+
+mitk::ScalarType
+mitk::Stepper
+::GetRangeMin() const
+{
+  return m_RangeMin;
+}
+
+mitk::ScalarType
+mitk::Stepper
+::GetRangeMax() const
+{
+  return m_RangeMax;
+}
+
+void
+mitk::Stepper
+::RemoveRange()
+{
+  m_HasRange = false;
+  this->Modified();
+}
+
+bool
+mitk::Stepper
+::HasValidRange() const
+{
+  return (m_HasRange && m_RangeValid);
+}
+
+bool
+mitk::Stepper
+::HasRange() const
+{
+  return m_HasRange;
+}
+
+void 
+mitk::Stepper
+::SetUnitName( const char *unitName )
+{
+  m_UnitName = std::string( unitName );
+  m_HasUnitName = true;
+  this->Modified();
+}
+
+const char *
+mitk::Stepper
+::GetUnitName() const
+{
+  return m_UnitName.c_str();
+}
+
+void
+mitk::Stepper
+::RemoveUnitName()
+{
+  m_HasUnitName = false;
+  this->Modified();
+}
+
+bool
+mitk::Stepper
+::HasUnitName() const
+{
+  return m_HasUnitName;
+}
+
+void 
+mitk::Stepper
+::Increase()
 {
   if (this->GetPos() < this->GetSteps() - 1)
   {
@@ -51,7 +151,9 @@ void mitk::Stepper::Increase()
   }
 }
 
-void mitk::Stepper::Decrease()
+void 
+mitk::Stepper
+::Decrease()
 {
   if (this->GetPos() > 0)
   {
@@ -74,8 +176,9 @@ void mitk::Stepper::Decrease()
   }
 }
 
-//##ModelId=3DF8B92703A4
-void mitk::Stepper::Next()
+void 
+mitk::Stepper
+::Next()
 {
   if (!m_InverseDirection)
   {
@@ -87,8 +190,9 @@ void mitk::Stepper::Next()
   }
 }
 
-//##ModelId=3DF8B9410142
-void mitk::Stepper::Previous()
+void 
+mitk::Stepper
+::Previous()
 {
   if (!m_InverseDirection)
   {
@@ -100,14 +204,16 @@ void mitk::Stepper::Previous()
   }
 }
 
-//##ModelId=3DF8B91502F8
-void mitk::Stepper::First()
+void 
+mitk::Stepper
+::First()
 {
-    this->SetPos(0);
+  this->SetPos(0);
 }
 
-//##ModelId=3DF8B92F01DF
-void mitk::Stepper::Last()
+void 
+mitk::Stepper
+::Last()
 {
   this->SetPos(this->GetSteps() - 1);
 }

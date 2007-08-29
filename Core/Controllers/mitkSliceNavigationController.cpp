@@ -69,6 +69,9 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_Slice->AddObserver( itk::ModifiedEvent(), sliceStepperChangedCommand );
   m_Time->AddObserver( itk::ModifiedEvent(), timeStepperChangedCommand );
   
+  m_Slice->SetUnitName( "mm" );
+  m_Time->SetUnitName( "ms" );
+
   m_Top = false;
   m_FrontSide = false;
   m_Rotated = false;
@@ -227,14 +230,19 @@ SliceNavigationController::Update(
     if ( worldTimeSlicedGeometry == NULL )
     {
       m_CreatedWorldGeometry->InitializeEvenlyTimed( slicedWorldGeometry, 1 );
-      m_Time->SetSteps(0);
-      m_Time->SetPos(0);
+      m_Time->SetSteps( 0 );
+      m_Time->SetPos( 0 );
+      m_Time->InvalidateRange();
     }
     else
     {
       m_BlockUpdate = true;
       m_Time->SetSteps( worldTimeSlicedGeometry->GetTimeSteps() );
       m_Time->SetPos( 0 );
+
+      const TimeBounds &timeBounds = worldTimeSlicedGeometry->GetTimeBounds();
+      m_Time->SetRange( timeBounds[0], timeBounds[1] );
+
       m_BlockUpdate = false;
 
       assert( worldTimeSlicedGeometry->GetGeometry3D( this->GetTime()->GetPos() ) != NULL );
@@ -257,6 +265,9 @@ SliceNavigationController::Update(
   this->SendCreatedWorldGeometry();
   this->SendSlice();
   this->SendTime();
+
+  // Adjust the stepper range of slice stepper according to geometry
+  this->AdjustSliceStepperRange();
 }
 
 void
@@ -447,19 +458,55 @@ SliceNavigationController::GetCurrentGeometry3D()
 const mitk::PlaneGeometry *
 SliceNavigationController::GetCurrentPlaneGeometry()
 {
-  const mitk::SlicedGeometry3D *slicedGeometry = dynamic_cast< const mitk::SlicedGeometry3D * >
-    ( this->GetCurrentGeometry3D() );
+  const mitk::SlicedGeometry3D *slicedGeometry = 
+    dynamic_cast< const mitk::SlicedGeometry3D * >
+      ( this->GetCurrentGeometry3D() );
 
   if ( slicedGeometry )
   {
-    const mitk::PlaneGeometry *planeGeometry = dynamic_cast< mitk::PlaneGeometry * >
-      ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
+    const mitk::PlaneGeometry *planeGeometry = 
+      dynamic_cast< mitk::PlaneGeometry * >
+        ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
     return planeGeometry;
   }
   else
   {
     return NULL;
   }
+}
+
+void
+SliceNavigationController::AdjustSliceStepperRange()
+{
+  const mitk::SlicedGeometry3D *slicedGeometry = 
+    dynamic_cast< const mitk::SlicedGeometry3D * >
+      ( this->GetCurrentGeometry3D() );
+
+  const Vector3D &direction = slicedGeometry->GetDirectionVector();
+
+  int c = 0;
+  int i, k;
+  for ( i = 0; i < 3; ++i )
+  {
+    if ( abs( direction[i] ) < 0.000000001 ) { ++c; }
+    else { k = i; }
+  }
+
+  if ( c == 2 )
+  {
+    const BoundingBox::BoundsArrayType &bounds = 
+      m_InputWorldGeometry->GetBounds();
+
+    ScalarType min = m_InputWorldGeometry->GetOrigin()[k];
+    ScalarType max = min + m_InputWorldGeometry->GetExtentInMM( k );
+
+    m_Slice->SetRange( min, max );
+  }
+  else
+  {
+    m_Slice->InvalidateRange();
+  }
+
 }
 
 

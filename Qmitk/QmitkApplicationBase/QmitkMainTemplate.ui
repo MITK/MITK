@@ -84,12 +84,13 @@
                 <cstring>redoButton</cstring>
             </property>
         </widget>
+        <separator/>
+        <action name="layoutGroup"/>
+        <separator/>
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
         <action name="toolbarLockPlanes"/>
         <action name="toolbarPositionOrientation"/>
-        <separator/>
-        <action name="layoutGroup"/>
     </toolbar>
 </toolbars>
 <customwidgets>
@@ -405,7 +406,10 @@
             <bool>true</bool>
         </property>
         <property name="on">
-            <bool>false</bool>
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Hide Planes</string>
@@ -422,7 +426,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image4</iconset>
+            <iconset>image5</iconset>
         </property>
         <property name="text">
             <string>Lock Planes</string>
@@ -439,7 +443,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image5</iconset>
+            <iconset>image6</iconset>
         </property>
         <property name="text">
             <string>Position Tracking</string>
@@ -758,9 +762,12 @@
         <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="PNG" length="267">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d249444154789ce553410ac230109c547d8436087e2304fa893ed34f88651fe1a55aaa7d45494f69624d248bc68b038192ddce4e26134144c881220b2b87588fb5d1636dbe4ecc4536e235f707b955b31dfd4022d6c7527c958f97214aa9a0efc9c496747f700b00ba1608918b941cdbe35b322267815ff3f7678fcb4ac7a374719fb74d01f8bd5eadacb4b99f1a01fc221576520812cec3655facc68a5bd7024038054bb0736c2fd00d0ae30f9ef4bbe3b389fb8144ece97e440c00c57907006856c7682c9ffa392a3848569caad4229be209cd86435a74b3bc410000000049454e44ae426082</data>
+        <data format="PNG" length="152">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005f49444154789c633c76ec18032d00134d4c25c5609b5fe1ff6d7e85ffa7bac1a482518387b0c12c308690bd2ddea474e4e0614662d4bd83aaa3998b1989cdd2b0cc71846d252331ea875ee48d1a3c6a30266021ac040288cd18304033170300154f1735e931148d0000000049454e44ae426082</data>
     </image>
     <image name="image5">
+        <data format="PNG" length="267">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d249444154789ce553410ac230109c547d8436087e2304fa893ed34f88651fe1a55aaa7d45494f69624d248bc68b038192ddce4e26134144c881220b2b87588fb5d1636dbe4ecc4536e235f707b955b31dfd4022d6c7527c958f97214aa9a0efc9c496747f700b00ba1608918b941cdbe35b322267815ff3f7678fcb4ac7a374719fb74d01f8bd5eadacb4b99f1a01fc221576520812cec3655facc68a5bd7024038054bb0736c2fd00d0ae30f9ef4bbe3b389fb8144ece97e440c00c57907006856c7682c9ffa392a3848569caad4229be209cd86435a74b3bc410000000049454e44ae426082</data>
+    </image>
+    <image name="image6">
         <data format="PNG" length="372">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000013b49444154789ccd94416a83401486ff29a1db60054f93d295d014047739800b6b0bee8ae809b2938834c58d2b910aae5de82624e40c71e9057a00174e3775c0a4916814f2af86378f6fdefcf3de90fd7e8f3174370ab50b78562ee8ac5cd0c1c15d755be0d56a457ddf6fb5a517581004789e87300ccfc27b5b5155151cc7411445ffc2aff6d8b66d044170029fd48b87a7c756cf769b2d6179af6f8d3dd775a1eb3a7dfffac4cf5fde605de1380e3e9e5f4e2bae4f3aa77a38769b2d4118524a299224c17c3e87a669e0791ea6693246af8aabaa429aa688e31800b05eafc1715c23a717b8280a4ca753a2280a592e9700803ccfaf075b96c5ae2c8a2200c0f33c1c0e07d600573f5e5996c4b22c004096652c3e48574892440cc380aaaa2c3669c9ef2459961b5d755bbfdb25bad88addfd77eb001d6bb48a7f01fe6f6740e7331c200000000049454e44ae426082</data>
     </image>
 </images>

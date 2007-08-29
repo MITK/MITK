@@ -173,9 +173,6 @@ Tadaa
 #include <mitkCoordinateSupplier.h>
 #include <mitkStatusBar.h>
 
-#include <PlaneCrossPoints.xpm>
-#include <PlaneCross.xpm>
-
 #include <stdexcept>
 #include "mitkChiliPlugin.h"
 
@@ -322,51 +319,51 @@ public:
       }
     }
   }
-			
-	virtual void TreeChanged(const itk::EventObject & treeChangedEvent)
-	{
-		mitk::Image* image = NULL;
-		image = this->GetImageFromDataTree();
-		if (image==NULL)
-		{
-			m_TimeSelector->SetInput(NULL);
-		}
-		else if ( image->IsInitialized() )
-		{
-			m_TimeSelector->SetInput(image);
-		}
-	}
 
-	mitk::Image* GetImageFromDataTree()
-	{
-		int maxLayer = itk::NumericTraits<int>::min();
-		mitk::Image* image = NULL;
-		mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-		while ( !it->IsAtEnd() )
-		{
-			bool include = true;
-			if(it->Get()->GetBoolProperty("include for pixel inspection", include) == false)
-				include = it->Get()->IsVisible(NULL);
-			if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && include )
-			{
-				int layer = 0;
-				it->Get()->GetIntProperty("layer", layer);
-				if ( layer >= maxLayer )
-				{
+  virtual void TreeChanged(const itk::EventObject & treeChangedEvent)
+  {
+    mitk::Image* image = NULL;
+    image = this->GetImageFromDataTree();
+    if (image==NULL)
+    {
+      m_TimeSelector->SetInput(NULL);
+    }
+    else if ( image->IsInitialized() )
+    {
+      m_TimeSelector->SetInput(image);
+    }
+  }
 
-					if(strcmp(it->Get()->GetData()->GetNameOfClass(),"Image")==0)
-					{
-						image = static_cast<mitk::Image*>(it->Get()->GetData());
-						maxLayer = layer;
-					}
-				}
-			}
-			++it;
-		}
-		return image;
-	}
+  mitk::Image* GetImageFromDataTree()
+  {
+    int maxLayer = itk::NumericTraits<int>::min();
+    mitk::Image* image = NULL;
+    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+    while ( !it->IsAtEnd() )
+    {
+      bool include = true;
+      if(it->Get()->GetBoolProperty("include for pixel inspection", include) == false)
+        include = it->Get()->IsVisible(NULL);
+      if ( (it->Get().GetPointer() != NULL) && (it->Get()->GetData() != NULL) && include )
+      {
+        int layer = 0;
+        it->Get()->GetIntProperty("layer", layer);
+        if ( layer >= maxLayer )
+        {
 
-	int m_ObserverTag;
+          if(strcmp(it->Get()->GetData()->GetNameOfClass(),"Image")==0)
+          {
+            image = static_cast<mitk::Image*>(it->Get()->GetData());
+            maxLayer = layer;
+          }
+        }
+      }
+      ++it;
+    }
+    return image;
+  }
+
+  int m_ObserverTag;
 };
 
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
@@ -720,13 +717,6 @@ void QmitkMainTemplate::init()
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
 
-  //set icons for show planes
-  QIconSet showPlanes;
-  showPlanes.setPixmap(QPixmap( planecross_xpm ) ,QIconSet::Automatic, QIconSet::Normal, QIconSet::On) ;
-  showPlanes.setPixmap(QPixmap( planecrosspoints_xpm ) ,QIconSet::Automatic, QIconSet::Active, QIconSet::On) ;
-  toolbarShowPlanes->setIconSet(showPlanes);
-  toolbarShowPlanes->setOn(true);
-  
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
 

@@ -848,10 +848,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
   //now we iterate over all text-files from the series, save the db-path and text-oid to m_TextFileList
   //dont save here to harddisk; double filedescriptions override themselve
   pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextTwoCallback, this );
+
+  DataTreeNode::Pointer tempNode;
   //use the found oid's and path's to load
   while( !m_TextFileList.empty() )
   {
-    resultNodes.push_back( LoadOneText( seriesOID, m_TextFileList.front().TextFileOID, m_TextFileList.front().TextFilePath ) );
+    tempNode = LoadOneText( seriesOID, m_TextFileList.front().TextFileOID, m_TextFileList.front().TextFilePath );
+    if( tempNode.IsNotNull() )
+      resultNodes.push_back( tempNode );
     m_TextFileList.pop_front();
   }
 
@@ -960,41 +964,53 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
     return NULL;
   }
 
-  //try to Read the File
-  DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-  try
+  //if there are no fileextension in the filename, the reader not able to load the file and the plugin crashed
+  char* fileExtension;
+  fileExtension = strrchr( tempFileName, '.' );
+  if( fileExtension == NULL )
   {
-    factory->SetFileName( pathAndFile );
-    factory->Update();
-    for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
+    //if the user dont close chili, he can look at the file in the tempdirectory, therefore the file downloaded first and checked afterwards
+    std::cout << "ChiliPlugin (LoadOneText): Reader not able to read file without extension.\nIf you dont close Chili you can find the file here: "<< pathAndFile <<"." << std::endl;
+  }
+  else
+  {
+    //try to Read the File
+    DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
+    try
     {
-      DataTreeNode::Pointer node = factory->GetOutput( i );
-      if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
+      factory->SetFileName( pathAndFile );
+      factory->Update();
+      for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
       {
-        //get the FileExtension and cut them from the filename
-        char* fileExtension;
-        fileExtension = strrchr( textPath.c_str(), '.' );
-        //cut the fileExtension from the filename
-        int size = fileName.size() - sizeof( fileExtension );
-        fileName.erase( size );
-        //set the filename without extension as name-property
-        node->SetProperty( "name", new StringProperty( fileName ) );
-        node->SetProperty( "TextOID", new StringProperty( textOID ) );
-        node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
-        //it should be possible to override all non-image-entries
-        node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
-        node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
+        DataTreeNode::Pointer node = factory->GetOutput( i );
+        if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
+        {
+          //get the FileExtension and cut them from the filename
+          char* fileExtension;
+          fileExtension = strrchr( textPath.c_str(), '.' );
+          //cut the fileExtension from the filename
+          int size = fileName.size() - sizeof( fileExtension );
+          fileName.erase( size );
+          //set the filename without extension as name-property
+          node->SetProperty( "name", new StringProperty( fileName ) );
+          node->SetProperty( "TextOID", new StringProperty( textOID ) );
+          node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+          //it should be possible to override all non-image-entries
+          node->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
+          node->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
 
-        if( remove(  pathAndFile.c_str() ) != 0 )
-          std::cout << "ChiliPlugin (LoadOneTextFromSeries): Not able to  delete file: " << pathAndFile << std::endl;
+          if( remove(  pathAndFile.c_str() ) != 0 )
+            std::cout << "ChiliPlugin (LoadOneTextFromSeries): Not able to  delete file: " << pathAndFile << std::endl;
 
-        QApplication::restoreOverrideCursor();
-        return node;
+          QApplication::restoreOverrideCursor();
+          return node;
+        }
       }
     }
-  }
-  catch ( itk::ExceptionObject & ex )
+    catch ( itk::ExceptionObject & ex )
       itkGenericOutputMacro( << "Exception during file open: " << ex );
+  }
+  QApplication::restoreOverrideCursor();
   return NULL;
 #endif
 }
@@ -1667,7 +1683,7 @@ void mitk::ChiliPluginImpl::handleMessage( ipInt4_t type, ipMsgParaList_t *list 
 /** create a temporary directory for windows */
 std::string mitk::ChiliPluginImpl::GetTempDirectory()
 {
-/* TODO not tested yet
+/* TODO not tested and implemented yet
 
   std::string tempPath, resultTempPath;
 

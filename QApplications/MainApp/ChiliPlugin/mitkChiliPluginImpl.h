@@ -167,7 +167,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /*!
     \brief Load one Text-files.
     @param textOID   Set the single text.
-    @returns one mitk::DataTreeNode
+    @returns One mitk::DataTreeNode, can be NULL too.
     This function use qTextQuery(...) to find the databasedirectory and seriesOID.
     Then LoadOneText( seriesOID, textOID, textPath ) get used.
     */
@@ -178,7 +178,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param seriesOID   Set the series to load from.
     @param textOID   Set the single text.
     @param textPath   The chili-database-path from the file which should read.
-    @returns one mitk::DataTreeNode
+    @returns One mitk::DataTreeNode, can be NULL too.
     This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factorie ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );

@@ -89,7 +89,6 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
     connect( ( QObject* )( m_Controls->LoadCompleteSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadCompleteSeries() ) );
     connect( ( QObject* )( m_Controls->LoadAllImages ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllImages() ) );
     connect( ( QObject* )( m_Controls->LoadAllTexts ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllTexts() ) );
-    connect( ( QObject* )( m_Controls->LoadOneText ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadOneText() ) );
 
     connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
     connect( ( QObject* )( m_Controls->SaveNew ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveNew() ) );
@@ -118,11 +117,6 @@ void QmitkLoadSaveToChiliExample::LoadAllImages()
 void QmitkLoadSaveToChiliExample::LoadAllTexts()
 {
   AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadAllTextsFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
-}
-
-void QmitkLoadSaveToChiliExample::LoadOneText()
-{
-  //AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadOneTextFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
 }
 
 void QmitkLoadSaveToChiliExample::SaveToChili()
@@ -222,7 +216,6 @@ void QmitkLoadSaveToChiliExample::SaveToSeriesOverride()
 
 void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes)
 {
-
   bool showAll = true;
   bool askQuestion = false;
 
@@ -231,31 +224,34 @@ void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTree
 
   for( unsigned int n = 0; n < resultNodes.size(); n++ )
   {
-    propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
-    propertyTimeSlice = resultNodes[n]->GetProperty( "NumberOfTimeSlices" );
-
-    if( propertyImageNumber.IsNotNull() && propertyTimeSlice.IsNotNull() )
+    if( resultNodes[n].IsNotNull() )
     {
-      if( propertyImageNumber->GetValueAsString() == "1" && propertyTimeSlice->GetValueAsString() == "1" )
+      propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
+      propertyTimeSlice = resultNodes[n]->GetProperty( "NumberOfTimeSlices" );
+
+      if( propertyImageNumber.IsNotNull() && propertyTimeSlice.IsNotNull() )
       {
-        if(askQuestion == false )
-          if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected 2D-ResultImages.\nYou can choose if you want to add them to the mitk::DataTree or not.\nMore Images makes the Application slower, so if you want to see the volume only, dont add them.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
-          {
-            showAll = true;
-            askQuestion = true;
-            mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
-          }
+        if( propertyImageNumber->GetValueAsString() == "1" && propertyTimeSlice->GetValueAsString() == "1" )
+        {
+          if(askQuestion == false )
+            if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected 2D-ResultImages.\nYou can choose if you want to add them to the mitk::DataTree or not.\nMore Images makes the Application slower, so if you want to see the volume only, dont add them.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+            {
+              showAll = true;
+              askQuestion = true;
+              mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+            }
+            else
+            {
+              showAll = false;
+              askQuestion = true;
+            }
           else
-          {
-            showAll = false;
-            askQuestion = true;
-          }
-        else
-          if( showAll == true ) mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+            if( showAll == true ) mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+        }
+        else  mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
       }
-      else  mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
+      else mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
     }
-    else mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
   }
 
   //initialize the multiwidget (input changed)

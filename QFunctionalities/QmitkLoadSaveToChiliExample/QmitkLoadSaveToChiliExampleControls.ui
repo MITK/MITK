@@ -83,20 +83,6 @@
                                 <string>Load all Text-Files from the current selected Series.</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>LoadOneText</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Load &amp;One Text</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+O</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Load only one Text-File from the current selected Series.</string>
-                            </property>
-                        </widget>
                     </vbox>
                 </widget>
                 <widget class="QGroupBox">
@@ -154,10 +140,10 @@ and dont override existing Entries</string>
                             </property>
                             <property name="text">
                                 <string>Save to current selected Series
-and override existing Entries</string>
+and &amp;override existing Entries</string>
                             </property>
                             <property name="accel">
-                                <string></string>
+                                <string>Alt+O</string>
                             </property>
                         </widget>
                     </vbox>

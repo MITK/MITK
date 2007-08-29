@@ -340,9 +340,9 @@ void mitk::ImageToPicDescriptor::CopyDicomHeaderInformationToPicHeader( ipPicDes
     {
       //try to read from dicom-header
       ipPicTSV_t *dicomHeader = ipPicQueryTag( pic, "SOURCE HEADER" );
-      void* data;
-      ipUInt4_t len;
-      if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) )
+      void* data = NULL;
+      ipUInt4_t len = 0;
+      if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) && data != NULL )
       {
         //found, create a pic-tag
         if( tagsToImport[x].type == HeaderTagInfo::String )

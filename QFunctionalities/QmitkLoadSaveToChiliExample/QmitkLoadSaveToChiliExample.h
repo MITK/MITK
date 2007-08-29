@@ -75,7 +75,6 @@ protected slots:
   void LoadCompleteSeries();
   void LoadAllImages();
   void LoadAllTexts();
-  void LoadOneText();
   void SaveToChili();
   void SaveNew();
   void SaveToSeries();

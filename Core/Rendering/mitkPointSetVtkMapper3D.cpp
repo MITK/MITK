@@ -63,8 +63,8 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
   m_VtkUnselectedPolyDataMapper(NULL),
   m_vtkContourPolyDataMapper(NULL),
   m_vtkTextList(NULL), 
-  m_contour(NULL), 
-  m_tubefilter(NULL),
+  m_Contour(NULL), 
+  m_TubeFilter(NULL),
   m_NumberOfSelectedAdded(0), 
   m_NumberOfUnselectedAdded(0)
 {
@@ -219,33 +219,40 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       polys->InsertNextCell(2,cell);
     }
 
-    m_contour = vtkPolyData::New();
-    m_contour->SetPoints(points);
+    m_Contour = vtkPolyData::New();
+    m_Contour->SetPoints(points);
     points->Delete();
-    m_contour->SetLines(polys);
+    m_Contour->SetLines(polys);
     polys->Delete();
-    m_contour->Update();
+    m_Contour->Update();
 
-    m_tubefilter = vtkTubeFilter::New();
-    m_tubefilter->SetInput(m_contour);
-    m_contour->Delete();
+    m_TubeFilter = vtkTubeFilter::New();
+    m_TubeFilter->SetNumberOfSides( 12 );
+    m_TubeFilter->SetInput(m_Contour);
+    m_Contour->Delete();
 
     //check for property contoursize. If not present, then take pointsize
-    int radius = 1;
-    mitk::IntProperty::Pointer contourSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("contoursize").GetPointer());
-    if (contourSizeProp.IsNull())
-      contourSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
-    if (contourSizeProp.IsNotNull())
-      radius = contourSizeProp->GetValue();
-    m_tubefilter->SetRadius(radius);
+    ScalarType radius = 0.5;
+    mitk::FloatProperty::Pointer contourSizeProp = 
+      dynamic_cast<mitk::FloatProperty *>(
+        this->GetDataTreeNode()->GetProperty("contoursize").GetPointer());
 
-    //	  m_tubefilter->SetRadiusFactor(7);
-    //	  m_tubefilter->SetNumberOfSides(6);
-    m_tubefilter->Update();
+    if (contourSizeProp.IsNull())
+    {
+      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(
+        this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+    }
+    if (contourSizeProp.IsNotNull())
+    {
+      radius = contourSizeProp->GetValue();
+    }
+
+    m_TubeFilter->SetRadius( radius );
+    m_TubeFilter->Update();
 
     //add to pipeline
-    m_vtkContourPolyData->AddInput(m_tubefilter->GetOutput());
-    m_tubefilter->Delete();
+    m_vtkContourPolyData->AddInput(m_TubeFilter->GetOutput());
+    m_TubeFilter->Delete();
     m_vtkContourPolyDataMapper->SetInput(m_vtkContourPolyData->GetOutput());
     m_vtkContourPolyData->Delete();
 
@@ -262,8 +269,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
   //now fill selected and unselected pointList
   //get size of Points in Property
-  int pointSize = 2;
-  mitk::IntProperty::Pointer pointSizeProp = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+  ScalarType pointSize = 2;
+  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
   if ( pointSizeProp.IsNotNull() )
     pointSize = pointSizeProp->GetValue();
 

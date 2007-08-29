@@ -893,7 +893,7 @@ void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode:
 {
   node->SetProperty( "linewidth", new mitk::IntProperty(2) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
-  node->SetProperty( "pointsize", new mitk::IntProperty(1));
+  node->SetProperty( "pointsize", new mitk::FloatProperty(1.0));
   node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));
   node->SetProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
   //node->SetProperty( "contour", new mitk::BoolProperty(false) );

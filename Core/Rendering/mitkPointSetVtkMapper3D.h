@@ -102,8 +102,8 @@ protected:
 
   //help for contour between points
   vtkAppendPolyData *m_vtkTextList;
-  vtkPolyData *m_contour;
-  vtkTubeFilter *m_tubefilter;
+  vtkPolyData *m_Contour;
+  vtkTubeFilter *m_TubeFilter;
 
   //variables to be able to log, how many inputs have been added to PolyDatas
   unsigned int m_NumberOfSelectedAdded;

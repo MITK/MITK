@@ -17,14 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-// QmitkFctMediator.h: interface for the QmitkFctMediator class.
-//
-//////////////////////////////////////////////////////////////////////
+#ifndef QMITK_FCTMEDIATOR_H
+#define QMITK_FCTMEDIATOR_H
 
-#if !defined(AFX_QUSFUNCTIONALITYMANAGER_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)
-#define AFX_QUSFUNCTIONALITYMANAGER_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_
-
-#include <QmitkFunctionality.h>
+#include "QmitkFunctionality.h"
+#include "QmitkDialogBar.h"
 
 #include <qptrlist.h>
 
@@ -32,71 +29,104 @@ class QWidgetStack;
 class QButtonGroup;
 class QToolBar;
 class QActionGroup;
+class QVBox;
 
-/*!
-\brief Mediator between functionalities
-
-A QmitkFctMediator object gets passed a reference of a functionality and positions 
-the widgets in the application window controlled by a layout template.
-
-\ingroup Functionalities
-*/
+/**
+ * \brief Coordinates management of functionalities' control widgets.
+ *
+ * During startup, QmitkFctMediator creates a widget stack of all available
+ * functionalities, for both their control and main widgets (if available),
+ * and for each functionality adds its icon to the toolbar.
+ *
+ * Besides managing functionalities (QmitkFunctionality), QmitkFctMediator
+ * also holds a list of all available dialog bars (QmitkDialogBar). Dialog
+ * bars are small control widgets displayed below the functionalities'
+ * control panel and can be toggled on/off via their toolbar icons.
+ *
+ * The class interface provides methods for querying and selecting specific
+ * functionalities and tool bars.
+ *
+ * \ingroup Functionalities
+ */
 class QmitkFctMediator : public QObject
 {
   Q_OBJECT
-protected:
-  QWidget*      m_LayoutTemplate;
-  QWidgetStack* m_MainStack;
-  QWidgetStack* m_ControlStack;
-  QButtonGroup* m_ButtonMenu;
-  QWidget*      m_ToolBar;
 
-  QWidget* m_DefaultMain;
-
-  int m_NumOfFuncs;
-  QActionGroup* m_FunctionalityActionGroup;
-  int m_CurrentFunctionality;
-
-
-  QPtrList<QmitkFunctionality> qfl;
-  QPtrList<QAction> qal;
-
-protected slots:
-  void Slot_dummy_protected() {};
-  virtual void Selecting(int id);
-  virtual void FunctionalitySelected(int id);
-  virtual void RaiseFunctionality(QAction* action);
-public slots:
-  void Slot_dummy() {};
-
-  virtual void HideControls(bool hide);
-  virtual void HideMenu(bool hide);
-
-  virtual void CheckAvailability();
-
-  virtual void RaiseFunctionality(int id);
-  virtual void RaiseFunctionality(QmitkFunctionality* aFunctionality);
 public:
-  virtual void Initialize(QWidget *aLayoutTemplate);
-
-  virtual bool AddFunctionality(QmitkFunctionality * functionality);
-
-  virtual QmitkFunctionality* GetFunctionalityByName(const char * name);
-  virtual int GetFunctionalityIdByName( const char * name );
-  virtual QWidget * GetMainParent();
-  virtual QWidget * GetControlParent();
-  virtual QButtonGroup * GetButtonMenu();
-  virtual QWidget * GetToolBar();
-  virtual QWidget * GetDefaultMain();
-
-  virtual int GetActiveFunctionalityId() const;
-  virtual QmitkFunctionality* GetActiveFunctionality();
-  virtual QmitkFunctionality* GetFunctionalityById(int id);
-  virtual unsigned int GetFunctionalityCount();
-  
-  QmitkFctMediator(QObject *parent=0, const char *name=0);
+  QmitkFctMediator( QObject *parent=0, const char *name=0 );
   virtual ~QmitkFctMediator();
 
+  virtual void Initialize( QWidget *aLayoutTemplate );
+
+  /** \brief Adds the specified functionality; both its control widget and
+   * main widget (if available) are added to the respective widget stacks,
+   * and the functionality icon is added to the toolbar.
+   */
+  virtual bool AddFunctionality( QmitkFunctionality *functionality );
+
+  /** \brief Adds the specified dialog bar; its control widget is added to the
+   * dialog bar panel (below the functionality panel), and the dialog bar icon
+   * is added to the toolbar.
+   */
+  virtual bool AddDialogBar( QmitkDialogBar *dialogBar );
+
+  /** \brief Adds a separator at the current position in the toolbar */
+  virtual void AddSeparator();
+
+  virtual QmitkFunctionality *GetFunctionalityByName( const char *name );
+  virtual QmitkFunctionality *GetFunctionalityById( int id );
+  virtual QmitkFunctionality *GetActiveFunctionality();
+  virtual int GetFunctionalityIdByName( const char *name );
+  virtual int GetActiveFunctionalityId() const;
+
+  virtual QmitkDialogBar *GetDialogBarByName( const char *name );
+  virtual QmitkDialogBar *GetDialogBarById( int id );
+  virtual int GetDialogBarIdByName( const char *name );
+
+  virtual QWidget *GetMainParent();
+  virtual QWidget *GetControlParent();
+  virtual QWidget *GetToolBar();
+  virtual QWidget *GetDefaultMain();
+
+  virtual unsigned int GetFunctionalityCount();
+  virtual unsigned int GetDialogBarCount();
+
+public slots:
+  virtual void HideControls( bool hide );
+
+  virtual void RaiseFunctionality( int id );
+  virtual void RaiseFunctionality( QmitkFunctionality *aFunctionality );
+
+  virtual void EnableDialogBar( int id, bool enable = true );
+  virtual void EnableDialogBar( QmitkDialogBar *dialogBar, bool enable = true );
+  
+
+protected slots:
+  virtual void RaiseFunctionality( QAction *action );
+  virtual void ToggleDialogBar( QAction *action );
+
+protected:
+  QWidget *m_LayoutTemplate;
+  QWidgetStack *m_MainStack;
+  QWidgetStack *m_ControlStack;
+  QVBox *m_DialogBarsFrame;
+  QToolBar *m_ToolBar;
+
+  QWidget *m_DefaultMain;
+
+  int m_NumberOfFunctionalities;
+  int m_NumberOfDialogBars;
+
+  QActionGroup *m_FunctionalityActionGroup;
+  int m_CurrentFunctionality;
+
+  QPtrList< QmitkFunctionality > m_Functionalities;
+  QPtrList< QmitkDialogBar > m_DialogBars;
+  
+  QPtrList< QWidget > m_DialogBarControls;
+  
+  QPtrList< QAction > m_FunctionalityActions;
+  QPtrList< QAction > m_DialogBarActions;
 };
 
-#endif // !defined(AFX_QUSFUNCTIONALITYMANAGER_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)
+#endif

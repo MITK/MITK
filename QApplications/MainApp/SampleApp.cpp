@@ -18,17 +18,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "SampleApp.h"
 
-#include <QmitkStdMultiWidget.h>
-#include <QmitkSelectableGLWidget.h>
-#include <QmitkCommonFunctionality.h>
+#include "mitkStatusBar.h"
 
-#include <mitkStatusBar.h>
+#include "QmitkStdMultiWidget.h"
+#include "QmitkSelectableGLWidget.h"
+#include "QmitkCommonFunctionality.h"
 
-#include <QmitkFunctionality.h>
-#include <QmitkFunctionalityFactory.h>
-#include <QmitkFctMediator.h>
-#include <QmitkControlsRightFctLayoutTemplate.h>
-#include <QmitkControlsLeftFctLayoutTemplate.h>
+#include "QmitkFunctionality.h"
+#include "QmitkFunctionalityFactory.h"
+#include "QmitkFctMediator.h"
+#include "QmitkControlsRightFctLayoutTemplate.h"
+#include "QmitkControlsLeftFctLayoutTemplate.h"
+
+#include "QmitkSliderDialogBar.h"
 
 #include <qlayout.h>
 
@@ -64,29 +66,41 @@ void SampleApp::InitializeFunctionality()
   mitk::DataTreePreOrderIterator iterator(m_Tree);
 
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
-  if (!m_TestingParameter) {
+  if (!m_TestingParameter) 
+  {
     QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName("QmitkSimpleExampleFunctionality");
-   if (createFunction) {
-     QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
-     qfm->AddFunctionality(functionalityInstance);
-   } 
+    if (createFunction) 
+    {
+      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+      qfm->AddFunctionality(functionalityInstance);
+    } 
      
+    // add dialog bars
+    QmitkSliderDialogBar *sliderDialogBar = new QmitkSliderDialogBar( m_MultiWidget, "test", m_MultiWidget );
+    qfm->AddDialogBar( sliderDialogBar );
+
+    // add separator
+    qfm->AddSeparator();
+
     // add all known functionalities
     for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) 
     {
-      if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL ) {
+      if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL ) 
+      {
         QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
         qfm->AddFunctionality(functionalityInstance);
       } 
     }
   } 
-  else {
+  else
+  {
     //
     QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(m_TestingParameter);
-   if (createFunction) {
+    if (createFunction) 
+    {
      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
      qfm->AddFunctionality(functionalityInstance);
-   } 
+    } 
   }
 
   mitk::StatusBar::GetInstance()->DisplayText("Functionalities added",3000);

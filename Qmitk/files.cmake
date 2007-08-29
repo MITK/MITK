@@ -18,6 +18,8 @@ SET(CPP_FILES
   QmitkCallbackFromGUIThread.cpp
   QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
+  QmitkDialogBar.cpp
+  QmitkDialogBars/QmitkSliderDialogBar.cpp
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
@@ -119,6 +121,8 @@ SET(MOC_H_FILES
   QmitkCallbackFromGUIThread.h
   QmitkChiliPluginSaveDialog.h
   QmitkColorTransferFunctionCanvas.h
+  QmitkDialogBar.h
+  QmitkDialogBars/QmitkSliderDialogBar.h
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h

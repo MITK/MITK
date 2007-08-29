@@ -82,7 +82,7 @@ class PicDescriptorToNode : public itk::Object
       std::string refferenceUID;
       std::string seriesDescription;
       Vector3D normale;
-      Vector3D pixelSpacing;
+      Vector3D pixelSize;
       Vector3D sliceSpacing;
       /** This parameter can be changing while creating the outputs. */
       int numberOfSlices;

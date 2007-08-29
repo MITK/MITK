@@ -48,8 +48,8 @@ class compare_PicDescriptor_ImageNumber
     else
     {
       ipPicTSV_t *tsv;
-      void* data;
-      ipUInt4_t len;
+      void* data = NULL;
+      ipUInt4_t len = 0;
       tsv = ipPicQueryTag( first, "SOURCE HEADER" );
       if( tsv )
       {
@@ -68,8 +68,8 @@ class compare_PicDescriptor_ImageNumber
     else
     {
       ipPicTSV_t *tsv;
-      void* data;
-      ipUInt4_t len;
+      void* data = NULL;
+      ipUInt4_t len = 0;
       tsv = ipPicQueryTag( second, "SOURCE HEADER" );
       if( tsv )
       {
@@ -180,11 +180,8 @@ void mitk::PicDescriptorToNode::Update()
   {
     CreatePossibleOutputs();
     SortByImageNumber();
-DebugOutput();
     SeperateOutputsBySpacing();
-DebugOutput();
     SeperateOutputsByTime();
-DebugOutput();
     SplitDummiVolumes();
     SortBySliceLocation();
     CreateNodesFromOutputs();
@@ -203,7 +200,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
   // sort by SeriesDescription
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
-    Vector3D rightVector, downVector, pixelSpacing, normale;
+    Vector3D rightVector, downVector, pixelSize, normale;
     std::string currentSeriesDescription = "";
     bool foundMatch; // true if the searched output exist
     int maxCount, curCount; // parameter to searching outputs
@@ -225,8 +222,8 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     normale[1] = ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) );
     normale[2] = ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) );
 
-    //TODO PixelSize
-    vtk2itk( isg->ps, pixelSpacing );
+    //PixelSize
+    vtk2itk( isg->ps, pixelSize );
 
     //SeriesDescription
     ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), tagSERIES_DESCRIPTION );
@@ -237,8 +234,8 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     if( currentSeriesDescription == "" )
     {
       ipPicTSV_t *tsv;
-      void* data;
-      ipUInt4_t len;
+      void* data = NULL;
+      ipUInt4_t len = 0;
       tsv = ipPicQueryTag( (*currentPic), "SOURCE HEADER" );
       if( tsv )
       {
@@ -258,7 +255,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     while( curCount < maxCount && !foundMatch )
     {
       //check RefferenceUID, Pixelspacing and SeriesDescription
-      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSpacing, m_PossibleOutputs[ curCount ].pixelSpacing) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription )
+      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSize, m_PossibleOutputs[ curCount ].pixelSize) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription )
       {
         //check if vectors are parallel (only if they have a lowest common multiple)
         foundMatch = true; // --> found the right output
@@ -307,7 +304,7 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       newOutput.refferenceUID = isg->forUID;
       newOutput.seriesDescription = currentSeriesDescription;
       newOutput.normale = normale;
-      newOutput.pixelSpacing = pixelSpacing;
+      newOutput.pixelSize = pixelSize;
       newOutput.numberOfSlices = -1;  //from here on only defaults. True values will be calculated later
       newOutput.numberOfTimeSlices = -1;
       newOutput.differentTimeSlices = false;
@@ -429,7 +426,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
               newOutput.refferenceUID = m_PossibleOutputs[n].refferenceUID;
               newOutput.seriesDescription = m_PossibleOutputs[n].seriesDescription;
               newOutput.normale = m_PossibleOutputs[n].normale;
-              newOutput.pixelSpacing = m_PossibleOutputs[n].pixelSpacing;
+              newOutput.pixelSize = m_PossibleOutputs[n].pixelSize;
               newOutput.numberOfSlices = - 1;
               newOutput.numberOfTimeSlices = - 1;
               newOutput.differentTimeSlices = false;
@@ -531,7 +528,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
               timeOutput->refferenceUID = m_PossibleOutputs[n].refferenceUID;
               timeOutput->seriesDescription = m_PossibleOutputs[n].seriesDescription;
               timeOutput->normale = m_PossibleOutputs[n].normale;
-              timeOutput->pixelSpacing = m_PossibleOutputs[n].pixelSpacing;
+              timeOutput->pixelSize = m_PossibleOutputs[n].pixelSize;
               timeOutput->sliceSpacing = m_PossibleOutputs[n].sliceSpacing;
               timeOutput->numberOfSlices = - 1;
               timeOutput->numberOfTimeSlices = - 1;
@@ -644,7 +641,7 @@ void mitk::PicDescriptorToNode::SplitDummiVolumes()
       new2DOutput.refferenceUID = m_PossibleOutputs[n].refferenceUID;
       new2DOutput.seriesDescription = m_PossibleOutputs[n].seriesDescription;
       new2DOutput.normale = m_PossibleOutputs[n].normale;
-      new2DOutput.pixelSpacing = m_PossibleOutputs[n].pixelSpacing;
+      new2DOutput.pixelSize = m_PossibleOutputs[n].pixelSize;
 
       //set the spacing for the new output
       if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
@@ -861,7 +858,11 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
       }
       default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
       {
-        std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "'( " << propertyName << " ) not handled in mitkPicDescriptorToNode." << std::endl;
+        //every PicDescriptor have the following tags wich not get imported, but they are not so important that we have to throw messages
+        if( propertyName != "CHILI: PIXEL SIZE" && propertyName != "CHILI: REAL PIXEL SIZE" && propertyName != "CHILI: ISG" && propertyName != "CHILI: SOURCE HEADER" && propertyName != "CHILI: PIXEL SPACING" )
+        {
+          std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "'( " << propertyName << " ) not handled in mitkPicDescriptorToNode." << std::endl;
+        }
         break;
       }
     }
@@ -882,7 +883,7 @@ void mitk::PicDescriptorToNode::DebugOutput()
     std::cout << "ReferenceUID:" << m_PossibleOutputs[n].refferenceUID << std::endl;
     std::cout << "SeriesDescription:" << m_PossibleOutputs[n].seriesDescription << std::endl;
     std::cout << "Normale:" << m_PossibleOutputs[n].normale << std::endl;
-    std::cout << "PixelSpacing:" << m_PossibleOutputs[n].pixelSpacing << std::endl;
+    std::cout << "PixelSize:" << m_PossibleOutputs[n].pixelSize << std::endl;
     std::cout << "SliceSpacing:" << m_PossibleOutputs[n].sliceSpacing << std::endl;
     std::cout << "NumberOfSlices:" << m_PossibleOutputs[n].numberOfSlices << std::endl;
     std::cout << "NumberOfTimeSlices:" << m_PossibleOutputs[n].numberOfTimeSlices << std::endl;
@@ -894,8 +895,8 @@ void mitk::PicDescriptorToNode::DebugOutput()
     {
       int imageNumber = 0;
       ipPicTSV_t *tsv;
-      void* data;
-      ipUInt4_t len;
+      void* data = NULL;
+      ipUInt4_t len = 0;
       tsv = ipPicQueryTag( (*it), "SOURCE HEADER" );
       if( tsv )
       {

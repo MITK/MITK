@@ -180,8 +180,11 @@ void mitk::PicDescriptorToNode::Update()
   {
     CreatePossibleOutputs();
     SortByImageNumber();
+DebugOutput();
     SeperateOutputsBySpacing();
+DebugOutput();
     SeperateOutputsByTime();
+DebugOutput();
     SplitDummiVolumes();
     SortBySliceLocation();
     CreateNodesFromOutputs();
@@ -831,15 +834,40 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
   while (currentTagNode)
   {
     ipPicTSV_t* currentTag = currentTagNode->tsv;
-    // process this tag
-    BaseProperty::Pointer newProperty = new PicHeaderProperty( currentTag );
+
     std::string propertyName = "CHILI: ";
     propertyName += currentTag->tag;
-    resultPropertyList->SetProperty( propertyName.c_str(), newProperty );
+
+    //The currentTag->tag ends with a lot of ' ', so you find nothing if you search for the properties.
+    while( propertyName[ propertyName.length() -1 ] == ' ' )
+      propertyName.erase( propertyName.length() -1 );
+
+    switch( currentTag->type )
+    {
+      case ipPicASCII:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::StringProperty( static_cast<char*>( currentTag->value ) ) );
+        break;
+      }
+      case ipPicInt:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( *static_cast<int*>( currentTag->value ) ) );
+        break;
+      }
+      case ipPicUInt:
+      {
+        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( (int)*( (char*)( currentTag->value ) ) ) );
+        break;
+      }
+      default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
+      {
+        std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "'( " << propertyName << " ) not handled in mitkPicDescriptorToNode." << std::endl;
+        break;
+      }
+    }
     // proceed to the next tag
     currentTagNode = currentTagNode->next;
   }
-
   return resultPropertyList;
 }
 

@@ -509,7 +509,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
   std::vector<DataTreeNode::Pointer> resultVector;
   resultVector.clear();
 
-//#ifndef CHILI_PLUGIN_VERSION_CODE
+#ifndef CHILI_PLUGIN_VERSION_CODE
 
   //QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   //return resultVector;
@@ -536,7 +536,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
   }
   QApplication::restoreOverrideCursor();
   return resultVector;
-/*
+
 #else
 
   if( lightbox == NULL )
@@ -570,7 +570,6 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
   }
   return resultVector;
 #endif
-*/
 }
 
 /** load images- and text-files from series */
@@ -996,6 +995,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
   }
   catch ( itk::ExceptionObject & ex )
       itkGenericOutputMacro( << "Exception during file open: " << ex );
+  return NULL;
 #endif
 }
 
@@ -1291,7 +1291,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
               it->GetPointer()->SetInput( (*nodeIter) );
               it->GetPointer()->Write();
 
-              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), "TEST", study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
+              if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), NULL, study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
               {
                 std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
               }

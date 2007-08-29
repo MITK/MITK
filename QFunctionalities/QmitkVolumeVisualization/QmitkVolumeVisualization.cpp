@@ -103,11 +103,6 @@ void QmitkVolumeVisualization::ImageSelected(const mitk::DataTreeFilter::Item* i
   if (node) 
   {
     node->GetBoolProperty("volumerendering",enabled);
-    if(node->GetProperty("TransferFunction"))
-    {
-      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
-      m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
-    }
   }
   m_Controls->m_EnableRenderingCB->setChecked(enabled);
 }

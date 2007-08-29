@@ -98,7 +98,7 @@
                                     <string>immediate update</string>
                                 </property>
                                 <property name="checked">
-                                    <bool>false</bool>
+                                    <bool>true</bool>
                                 </property>
                             </widget>
                             <spacer>
@@ -1594,12 +1594,6 @@ Press delete to remove selected handle.</string>
 </images>
 <connections>
     <connection>
-        <sender>m_ImmediateUpdate</sender>
-        <signal>&lt;No Signal&gt;</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>EnableShadingMed(bool)</slot>
-    </connection>
-    <connection>
         <sender>m_ClippingPlaneCB</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
@@ -1928,6 +1922,12 @@ Press delete to remove selected handle.</string>
         <signal>toggled(bool)</signal>
         <receiver>groupBox8_2</receiver>
         <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableShading1</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>EnableShadingMed(bool)</slot>
     </connection>
 </connections>
 <includes>

@@ -832,6 +832,12 @@ void QmitkMainTemplate::Initialize()
   }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
+  // Pass global options to all available dialog bars (other than
+  // functionalities, dialog bars currently store their options
+  // (enabled/disabled state and potentially other options in the
+  // global options list).
+  qfm->ApplyOptionsToDialogBars( m_Options );
+
   // initialize multiwidget with options
   // gradient background
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
@@ -1288,13 +1294,6 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
           {
             m_Options->SetProperty(it->first.c_str(), it->second.first);
           }
-
-          // Pass global options to all available dialog bars (other than
-          // functionalities, dialog bars currently store their options
-          // (enabled/disabled state and potentially other options in the
-          // global options list).
-          qfm->ApplyOptionsToDialogBars( m_Options );
-
         }
         else
         {

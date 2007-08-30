@@ -117,7 +117,13 @@ void VtkQRenderWindowInteractor::Render()
 {
   if (this->RenderWindow && this->Enabled)
   {
-    //this->RenderWindow->Render();
+    /*
+    currently this is faster (for navigation applications for instance but without volume rendering.
+    Then the rendering inside one window initially takes some milliseconds and then is fast.
+    */
+    //this->RenderWindow->Render(); 
+    
+    //only way for VolumeRendering
     mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
 
   }

@@ -798,6 +798,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         {
           m_SliceNavigationController->SelectSliceByPoint(
             rotOp->GetCenterOfRotation() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
         }
 
         Geometry3D::ExecuteOperation( &centeredRotation );
@@ -865,6 +866,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         if ( m_SliceNavigationController )
         {
           m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
         }
 
         Geometry3D::ExecuteOperation( &centeredRotation );

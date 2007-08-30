@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkBaseFunctionalityComponent.h"
-#include "mitkDataTreeFilter.h"
+#include "mitkPropertyList.h"
 
 #include <qstring.h>
 
@@ -71,7 +71,11 @@ public:
 
   virtual QAction *CreateAction( QObject *parent ) = 0;
 
+  virtual const QString &GetCaption() const;
+
   QmitkStdMultiWidget *GetMultiWidget() const;
+
+  void SetGlobalOptions( mitk::PropertyList::Pointer options );
 
 public slots:
   virtual void ToggleVisible( bool on );
@@ -84,6 +88,9 @@ protected:
   QmitkStdMultiWidget *m_MultiWidget;
 
   QString m_Caption;
+
+private:
+  mitk::PropertyList::Pointer m_GlobalOptions;
 
 };
 

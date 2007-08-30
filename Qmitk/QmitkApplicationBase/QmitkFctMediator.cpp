@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkControlsRightFctLayoutTemplate.h"
 #include "QmitkControlsLeftFctLayoutTemplate.h"
 
+#include "mitkProperties.h"
+
 #include <qwidgetstack.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
@@ -78,7 +80,7 @@ QmitkFctMediator::~QmitkFctMediator()
   m_DialogBars.clear();
 }
 
-void QmitkFctMediator::Initialize(QWidget *aLayoutTemplate)
+void QmitkFctMediator::Initialize( QWidget *aLayoutTemplate )
 {
   if (aLayoutTemplate==NULL)
   {
@@ -253,6 +255,8 @@ bool QmitkFctMediator::AddDialogBar( QmitkDialogBar *dialogBar )
     return true;
   }
 
+  // Add dialog bar to the control pane and its icon to the toolbar
+
   m_DialogBars.append( dialogBar );
 
   QAction *action = dialogBar->CreateAction( this );
@@ -272,12 +276,8 @@ bool QmitkFctMediator::AddDialogBar( QmitkDialogBar *dialogBar )
     QWidget *controlWidget = dialogBar->CreateControlWidget( m_DialogBarsFrame );
   }
 
-  if ( action != NULL )
-  {
-    action->setOn(true);
-  }
-
   dialogBar->CreateConnections();
+
 
   ++m_NumberOfDialogBars;
 
@@ -546,4 +546,53 @@ unsigned int QmitkFctMediator::GetFunctionalityCount()
 unsigned int QmitkFctMediator::GetDialogBarCount()
 {  
   return m_NumberOfDialogBars;
+}
+
+
+void 
+QmitkFctMediator
+::ApplyOptionsToDialogBars( mitk::PropertyList::Pointer options )
+{
+  m_Options = options;
+
+  if ( m_Options.IsNotNull() )
+  {
+
+    int i;
+    for ( i = 0; i < m_NumberOfDialogBars; ++i )
+    {
+      QmitkDialogBar *dialogBar = m_DialogBars.at( i );
+      QAction *action = m_DialogBarActions.at( i );
+      
+      // Pass global preferences to DialogBar so that it can manage the
+      // persistancy of its state
+      dialogBar->SetGlobalOptions( m_Options );
+
+      // Read (or create) application property for this dialog bar; enable or
+      // disable it accordingly; default is disabled
+      QString dialogBarStateName = 
+        "DialogBar " + dialogBar->GetCaption() + " active";
+
+      mitk::BoolProperty *dialogBarState = 
+        dynamic_cast< mitk::BoolProperty * >( 
+          m_Options->GetProperty( dialogBarStateName.ascii() ).GetPointer() );          
+
+      bool enableDialogBar;
+      if ( dialogBarState != NULL )
+      {
+        enableDialogBar = dialogBarState->GetValue();
+      }
+      else
+      {
+        m_Options->SetProperty( dialogBarStateName.ascii(), new mitk::BoolProperty( false ) );
+        enableDialogBar = false;
+      }
+
+      if ( action != NULL )
+      {
+        dialogBar->ToggleVisible( enableDialogBar );
+        action->setOn( enableDialogBar );
+      }
+    }
+  }
 }

@@ -17,8 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "QmitkDialogBar.h"
 
+#include "mitkProperties.h"
+
 #include <qgroupbox.h>
 #include <qlayout.h>
+
 
 QmitkDialogBar
 ::QmitkDialogBar( 
@@ -63,6 +66,22 @@ QmitkDialogBar
   {
     m_GroupBox->setHidden( !visible );
   }
+
+  // Reflect new visible state in global preferences
+  if ( m_GlobalOptions )
+  {
+    QString dialogBarStateName = "DialogBar " + m_Caption + " active";
+
+    m_GlobalOptions->SetProperty( 
+      dialogBarStateName, new mitk::BoolProperty( visible ) );
+  }
+}
+
+const QString &
+QmitkDialogBar
+::GetCaption() const
+{
+  return m_Caption;
 }
 
 QmitkStdMultiWidget *
@@ -70,4 +89,11 @@ QmitkDialogBar
 ::GetMultiWidget() const
 {
   return m_MultiWidget;
+}
+
+void
+QmitkDialogBar
+::SetGlobalOptions( mitk::PropertyList::Pointer options )
+{
+  m_GlobalOptions = options;
 }

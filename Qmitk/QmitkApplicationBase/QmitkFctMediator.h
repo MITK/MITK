@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "QmitkDialogBar.h"
 
+#include "mitkPropertyList.h"
+
 #include <qptrlist.h>
 
 class QWidgetStack;
@@ -56,6 +58,11 @@ public:
   QmitkFctMediator( QObject *parent=0, const char *name=0 );
   virtual ~QmitkFctMediator();
 
+  /**
+   * \brief Initializes the mediator with the main window template's QWidget
+   * and the list of default application properties (used for
+   * activating/deactivating dialog bars by default).
+   */
   virtual void Initialize( QWidget *aLayoutTemplate );
 
   /** \brief Adds the specified functionality; both its control widget and
@@ -91,6 +98,8 @@ public:
   virtual unsigned int GetFunctionalityCount();
   virtual unsigned int GetDialogBarCount();
 
+  virtual void ApplyOptionsToDialogBars( mitk::PropertyList::Pointer options );
+
 public slots:
   virtual void HideControls( bool hide );
 
@@ -113,6 +122,8 @@ protected:
   QToolBar *m_ToolBar;
 
   QWidget *m_DefaultMain;
+
+  mitk::PropertyList::Pointer m_Options;
 
   int m_NumberOfFunctionalities;
   int m_NumberOfDialogBars;

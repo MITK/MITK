@@ -821,7 +821,8 @@ void QmitkMainTemplate::Initialize()
 
    }
 
-  InitializeFunctionality();
+  this->InitializeFunctionality();
+
 
   std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
 
@@ -905,7 +906,7 @@ void QmitkMainTemplate::InitializeQfm()
   setCentralWidget(layoutTemplate);
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
-  qfm->Initialize(this);
+  qfm->Initialize( this );
   
 }
 
@@ -1189,13 +1190,19 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     if (iilProperty != NULL)
       mitk::DataTreeNodeFactory::m_IilInterpolationActive = iilProperty->GetValue();
 
+    // Pass global options to all available dialog bars (other than
+    // functionalities, dialog bars currently store their options
+    // (enabled/disabled state and potentially other options in the global
+    // options list).
+    qfm->ApplyOptionsToDialogBars( m_Options );
+    
     // next, notify the functionalities of changes in their options
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
     {
       QmitkFunctionality* f = qfm->GetFunctionalityById(i);
       if (f != NULL)
         f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i + 2));
-    }  
+    } 
   }
   delete optionDialog;
 }
@@ -1276,15 +1283,27 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
         if (idstring == "MITKSampleApp")
         {
           // set all global options read from the config file
-          for (mitk::PropertyList::PropertyMap::const_iterator it = pl->GetMap()->begin(); it != pl->GetMap()->end(); it++)
-            m_Options->SetProperty(it->first.c_str(), it->second.first);          
+          mitk::PropertyList::PropertyMap::const_iterator it;
+          for ( it = pl->GetMap()->begin(); it != pl->GetMap()->end(); it++ )
+          {
+            m_Options->SetProperty(it->first.c_str(), it->second.first);
+          }
+
+          // Pass global options to all available dialog bars (other than
+          // functionalities, dialog bars currently store their options
+          // (enabled/disabled state and potentially other options in the
+          // global options list).
+          qfm->ApplyOptionsToDialogBars( m_Options );
+
         }
         else
         {
           // give it to the appropriate functionality
           QmitkFunctionality* f = qfm->GetFunctionalityByName( idstring.c_str() );
-          if (f)
+          if ( f != NULL )
+          {
             f->SetFunctionalityOptionsList( pl );
+          }
         }
       }
     } 

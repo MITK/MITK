@@ -33,6 +33,14 @@ class QmitkRenderingManagerFactory;
  * This implementation uses a QTimer object to realize the RenderWindow
  * update timing. The execution of pending updates is controlled by the
  * timer.
+ *
+ * Generally, rendering execution is controlled by the timer. To make sure
+ * that the execution is done regularly even if the timer is blocked for
+ * some reason (e.g., timer events have lower priority than other events
+ * which are blocking the event queue), rendering is also executed when
+ * the mouse is moved with pressed left button over the render windows.
+ * See Qmitk::RenderWindow::mouseMoveEvent(...)
+ *
  * \ingroup Renderer
  */
 class QmitkRenderingManager : public QObject, public mitk::RenderingManager

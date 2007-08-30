@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDisplayPositionEvent.h"
 #include "QmitkRenderingManagerFactory.h"
 
-//##ModelId=3E1EB4410304
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name)
   : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), 
     m_InResize(false), m_DrawOverlayOnly(false)
@@ -43,7 +42,6 @@ QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char 
   setMouseTracking(true);
 }
 
-//##ModelId=3E1EB4410318
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
 : QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false), m_DrawOverlayOnly(false)
 
@@ -62,7 +60,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
   setMouseTracking(true);
 }
 
-//##ModelId=3E1EB441032C
 QmitkRenderWindow::~QmitkRenderWindow()
 {
 
@@ -104,7 +101,6 @@ bool QmitkRenderWindow::PrepareRendering()
 /*!
 \brief Initialize the OpenGL Window
 */
-//##ModelId=3E33145903C8
 void QmitkRenderWindow::initializeGL() 
 {
   if(m_Renderer.IsNotNull())
@@ -114,7 +110,6 @@ void QmitkRenderWindow::initializeGL()
 /*!
 \brief Resize the OpenGL Window
 */
-//##ModelId=3E33145A001C
 void QmitkRenderWindow::resizeGL( int w, int h ) 
 {
   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
@@ -141,7 +136,6 @@ void QmitkRenderWindow::resizeGL( int w, int h )
 /*!
 \brief Render the scene
 */
-//##ModelId=3E3314590396
 void QmitkRenderWindow::paintGL( )
 {
   // Calls back to PrepareRendering()
@@ -160,7 +154,6 @@ void QmitkRenderWindow::showEvent ( QShowEvent * )
 }
 
 
-//##ModelId=3E3D1D4A00A5
 void QmitkRenderWindow::MakeCurrent()
 {
   makeCurrent();
@@ -176,7 +169,6 @@ bool QmitkRenderWindow::IsSharing () const
   return isSharing();
 }
 
-//##ModelId=3E6D5DD40306
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
 {
   QGLWidget::mousePressEvent(me);
@@ -188,7 +180,6 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   }
 }
 
-//##ModelId=3E6D5DD4032E
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseReleaseEvent(me);
@@ -200,7 +191,6 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   }
 }
 
-//##ModelId=3E6D5DD40356
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
 {
   QGLWidget::mouseMoveEvent(me);
@@ -208,6 +198,18 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
     mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MouseMoveEvent(&event);
+  }
+
+  // Request additional rendering if left mouse button had been pressed.
+  // This is required to make sure that the rendering is executed regularly;
+  // since the rendering mechanism is generally controlled and executed via a 
+  // timer, the timer might be blocked for longer periods if other Qt events
+  // with higher priorities are in the pipeline.
+  //
+  // See also QmitkRenderingManager
+  if ( me->state() & Qt::LeftButton )
+  {
+    mitk::RenderingManager::GetInstance()->UpdateCallback();
   }
 }
 
@@ -219,7 +221,6 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
     m_Renderer->WheelEvent(we); */
 }
 
-//##ModelId=3E6D5DD40388
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
 {
   if (m_Renderer.IsNotNull())
@@ -253,9 +254,7 @@ QSize QmitkRenderWindow::sizeHint () const
   return QSize(100, 100);
 }
 
-//##ModelId=3E6D5DD403B0
 void QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
-//##ModelId=3E6D5DD403E2
 void QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
 
 // Create and register RenderingManagerFactory for this platform.

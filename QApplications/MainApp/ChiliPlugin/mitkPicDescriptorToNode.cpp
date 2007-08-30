@@ -215,12 +215,16 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       continue;
     }
 
-    //"NormalenVektor"
+    //"Normal-Vektor with image size"
     vtk2itk( isg->u, rightVector );
     vtk2itk( isg->v, downVector );
     normale[0] = ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) );
     normale[1] = ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) );
     normale[2] = ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) );
+
+    //expansion
+    int xExpansion = (*currentPic)->n[0];
+    int yExpansion = (*currentPic)->n[1];
 
     //PixelSize
     vtk2itk( isg->ps, pixelSize );
@@ -254,8 +258,8 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
     // searching for equal output
     while( curCount < maxCount && !foundMatch )
     {
-      //check RefferenceUID, Pixelspacing and SeriesDescription
-      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSize, m_PossibleOutputs[ curCount ].pixelSize) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription )
+      //check RefferenceUID, PixelSize, Expansion and SeriesDescription
+      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSize, m_PossibleOutputs[ curCount ].pixelSize) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription && yExpansion == m_PossibleOutputs[ curCount ].yExpansion && xExpansion == m_PossibleOutputs[ curCount ].xExpansion )
       {
         //check if vectors are parallel (only if they have a lowest common multiple)
         foundMatch = true; // --> found the right output
@@ -305,6 +309,8 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       newOutput.seriesDescription = currentSeriesDescription;
       newOutput.normale = normale;
       newOutput.pixelSize = pixelSize;
+      newOutput.yExpansion = yExpansion;
+      newOutput.xExpansion = xExpansion;
       newOutput.numberOfSlices = -1;  //from here on only defaults. True values will be calculated later
       newOutput.numberOfTimeSlices = -1;
       newOutput.differentTimeSlices = false;
@@ -427,6 +433,8 @@ void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
               newOutput.seriesDescription = m_PossibleOutputs[n].seriesDescription;
               newOutput.normale = m_PossibleOutputs[n].normale;
               newOutput.pixelSize = m_PossibleOutputs[n].pixelSize;
+              newOutput.yExpansion = m_PossibleOutputs[n].yExpansion;
+              newOutput.xExpansion = m_PossibleOutputs[n].xExpansion;
               newOutput.numberOfSlices = - 1;
               newOutput.numberOfTimeSlices = - 1;
               newOutput.differentTimeSlices = false;
@@ -530,6 +538,8 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
               timeOutput->normale = m_PossibleOutputs[n].normale;
               timeOutput->pixelSize = m_PossibleOutputs[n].pixelSize;
               timeOutput->sliceSpacing = m_PossibleOutputs[n].sliceSpacing;
+              timeOutput->yExpansion = m_PossibleOutputs[n].yExpansion;
+              timeOutput->xExpansion = m_PossibleOutputs[n].xExpansion;
               timeOutput->numberOfSlices = - 1;
               timeOutput->numberOfTimeSlices = - 1;
               timeOutput->differentTimeSlices = false;
@@ -885,6 +895,8 @@ void mitk::PicDescriptorToNode::DebugOutput()
     std::cout << "Normale:" << m_PossibleOutputs[n].normale << std::endl;
     std::cout << "PixelSize:" << m_PossibleOutputs[n].pixelSize << std::endl;
     std::cout << "SliceSpacing:" << m_PossibleOutputs[n].sliceSpacing << std::endl;
+    std::cout << "X-Expansion:" << m_PossibleOutputs[n].xExpansion << std::endl;
+    std::cout << "Y-Expansion:" << m_PossibleOutputs[n].yExpansion << std::endl;
     std::cout << "NumberOfSlices:" << m_PossibleOutputs[n].numberOfSlices << std::endl;
     std::cout << "NumberOfTimeSlices:" << m_PossibleOutputs[n].numberOfTimeSlices << std::endl;
     std::cout << "DifferentTimeSlices (bool):" << m_PossibleOutputs[n].differentTimeSlices << std::endl;

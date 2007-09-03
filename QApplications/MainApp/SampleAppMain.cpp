@@ -81,10 +81,19 @@ int main(int argc, char* argv[])
       return a.exec();
     }
   }
-  catch ( const std::exception & e )
+  catch (const std::bad_alloc& e)
+  {
+    std::cout << "bad_alloc caught. Could not aquire enough memory: " << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const std::exception& e)
   {
     std::cout << "Exception caught: " << e.what() << std::endl;
     return EXIT_FAILURE;
   }
+  catch (...)
+  {
+    std::cout << "Unknown exception caught." << std::endl;
+    return EXIT_FAILURE;
+  }  
 } 
-

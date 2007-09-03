@@ -81,6 +81,10 @@ QmitkSliderDialogBar
   QLabel *label4 = new QLabel( "Time", grid );
   QmitkSliderNavigator *sliderNavigatorTime = new QmitkSliderNavigator( grid );
 
+  sliderNavigator1->ShowLabels( true );
+  sliderNavigator2->ShowLabels( true );
+  sliderNavigator3->ShowLabels( true );
+  sliderNavigatorTime->ShowLabels( true );
 
   QmitkStepperAdapter *stepperAdapter1 = new QmitkStepperAdapter(
     sliderNavigator1, 

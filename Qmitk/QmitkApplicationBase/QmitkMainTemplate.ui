@@ -4,6 +4,9 @@
     <property name="name">
         <cstring>QmitkMainTemplate</cstring>
     </property>
+    <property name="enabled">
+        <bool>true</bool>
+    </property>
     <property name="geometry">
         <rect>
             <x>0</x>
@@ -378,6 +381,28 @@
             </property>
             <property name="text">
                 <string>SmallUpperWidget2Big3n4</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Two2DOne3D</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Two 2D left, 3D right</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>Left2DAnd3DRight2D</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>2D and 3D left, 2D right</string>
             </property>
         </action>
     </actiongroup>
@@ -827,6 +852,18 @@
         <slot>changeToBig3DLayout()</slot>
     </connection>
     <connection>
+        <sender>Two2DOne3D</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeTo2x2Dand3DLayout()</slot>
+    </connection>
+    <connection>
+        <sender>Left2DAnd3DRight2D</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>changeToLeft2DAnd3DRight2DLayout()</slot>
+    </connection>
+    <connection>
         <sender>Widget1</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -1035,9 +1072,11 @@
     <slot>changeToWidget1Layout()</slot>
     <slot>changeToWidget2Layout()</slot>
     <slot>changeToWidget3Layout()</slot>
-    <slot>FullScreenMode( bool fullscreen )</slot>
     <slot>changeToColumnWidget3n4Layout()</slot>
     <slot>changeToRowWidget3n4Layout()</slot>
+    <slot>changeTo2x2Dand3DLayout()</slot>
+    <slot>changeToLeft2DAnd3DRight2DLayout()</slot>
+    <slot>FullScreenMode( bool fullscreen )</slot>
     <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>

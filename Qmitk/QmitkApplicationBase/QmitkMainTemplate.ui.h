@@ -997,6 +997,27 @@ void QmitkMainTemplate::changeToWidget3Layout()
   m_MultiWidget->changeLayoutToWidget3();
 }
 
+void QmitkMainTemplate::changeToColumnWidget3n4Layout()
+{
+  m_MultiWidget->changeLayoutToColumnWidget3And4();
+}
+
+void QmitkMainTemplate::changeToRowWidget3n4Layout()
+{
+  m_MultiWidget->changeLayoutToRowWidget3And4();
+}
+
+void QmitkMainTemplate::changeTo2x2Dand3DLayout()
+{
+  m_MultiWidget->changeLayoutTo2x2Dand3DWidget();
+}
+
+void QmitkMainTemplate::changeToLeft2DAnd3DRight2DLayout()
+{
+  m_MultiWidget->changeLayoutToLeft2Dand3DRight2D();
+}
+
+
 void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 {
   if ( fullscreen )
@@ -1025,16 +1046,6 @@ QmitkMainTemplate* QmitkMainTemplate::GetInstance()
 QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 {
   return qfm;
-}
-
-void QmitkMainTemplate::changeToColumnWidget3n4Layout()
-{
-  m_MultiWidget->changeLayoutToColumnWidget3And4();
-}
-
-void QmitkMainTemplate::changeToRowWidget3n4Layout()
-{
-  m_MultiWidget->changeLayoutToRowWidget3And4();
 }
 
 void QmitkMainTemplate::hideToolbar(bool on)

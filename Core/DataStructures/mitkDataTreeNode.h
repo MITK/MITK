@@ -304,6 +304,33 @@ public:
     }
   }
 
+  //##Documentation
+  //## @brief Extra convenience access method for accessing the name of an object (instance of
+  //## StringProperty with property-key "name"). 
+  //##
+  //## This method does not take the renderer specific 
+  //## propertylists into account, because the name of an object should never be renderer specific.
+  //## @returns a std::string with the name of the object (content of "name" Property). 
+  //## If there is no "name" Property, an empty string will be returned.
+  virtual std::string GetName() const
+  {
+    mitk::StringProperty* sp = dynamic_cast<mitk::StringProperty*>(this->GetProperty("name").GetPointer());
+    if (sp == NULL)
+      return "";
+    return sp->GetValue();
+  }
+
+  //##Documentation
+  //## @brief Extra convenience access method to set the name of an object.
+  //##
+  //## The name will be stored in the non-renderer-specific PropertyList in a StringProperty named "name".
+  virtual void SetName( const char* name)
+  {
+    if (name == NULL)
+      return;
+    this->SetProperty("name", new StringProperty(name));
+  }
+
   //##ModelId=3EF1941E01D6
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances

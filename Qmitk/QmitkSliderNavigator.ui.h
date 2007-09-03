@@ -34,23 +34,24 @@ PURPOSE.  See the above copyright notices for more information.
  */
 void QmitkSliderNavigator::Refetch()
 {
-  if(!m_InRefetch)
+  if ( !m_InRefetch )
   {
-    m_InRefetch=true;
+    m_InRefetch = true;
     
-    m_Slider->setMinValue(0);
-    m_Slider->setMaxValue(m_Stepper->GetSteps()-1);
-    m_Slider->setValue(m_Stepper->GetPos());
+    m_Slider->setMinValue( 0 );
+    m_Slider->setMaxValue( m_Stepper->GetSteps() - 1 );
+    m_Slider->setValue( m_Stepper->GetPos() );
     
     m_SpinBox->setMinValue( 0 );
-    m_SpinBox->setMaxValue( m_Stepper->GetSteps()-1 );
+    m_SpinBox->setMaxValue( m_Stepper->GetSteps() - 1 );
     m_SpinBox->setValue( m_Stepper->GetPos() );
 
-    if ( m_Stepper->HasRange() )
+    if ( m_Stepper->HasRange() && m_HasLabels )
     {
       // Show slider with labels according to below settings
-      this->ShowLabels( true );
-
+      m_SliderLabelLeft->setHidden( false );
+      m_SliderLabelRight->setHidden( false );
+    
       if ( m_Stepper->HasValidRange() )
       {
         this->SetLabelValuesValid( true, true );
@@ -71,7 +72,8 @@ void QmitkSliderNavigator::Refetch()
     else
     {
       // Show slider without any labels
-      this->ShowLabels( false );
+      m_SliderLabelLeft->setHidden( true );
+      m_SliderLabelRight->setHidden( true );
     }
   
     // Update GUI according to above settings
@@ -113,14 +115,52 @@ void QmitkSliderNavigator::init()
   // Set label values as invalid (N/A)
   this->SetLabelValuesValid( false, false );
 
-  m_HasLabelUnit = false;
+  m_HasLabels = false;
+  m_HasLabelUnit = true;
 }
 
 void QmitkSliderNavigator::ShowLabels( bool show )
 {
-  m_SliderLabelLeft->setHidden( !show );
-  m_SliderLabelRight->setHidden( !show );
   m_HasLabels = show;
+}
+
+/** 
+ * \brief En-/disables displaying of the unit label (range will be displayed
+ * without unit if enabled).
+ */
+void QmitkSliderNavigator::ShowLabelUnit( bool show )
+{
+  m_HasLabelUnit = show;
+}
+
+/**
+ * \brief Set range minimum and maximum (displayed as labels left and right
+ * of slider if enabled)
+ */
+void QmitkSliderNavigator::SetLabelValues( float min, float max )
+{
+  m_MinValue = min;
+  m_MaxValue = max;
+}
+
+void QmitkSliderNavigator::SetLabelValuesValid( bool minValid, bool maxValid )
+{
+  m_MinValueValid = minValid;
+  m_MaxValueValid = maxValid;
+}
+
+/**
+ * \brief Set range unit (e.g. mm or ms) which will be displayed below range
+ * labels if enabled.
+ */
+void QmitkSliderNavigator::SetLabelUnit( const char *unit )
+{
+  m_LabelUnit = unit;
+}
+
+QString QmitkSliderNavigator::GetLabelUnit()
+{
+  return m_LabelUnit;
 }
 
 /**
@@ -170,46 +210,6 @@ QString QmitkSliderNavigator::GetMaxValueLabel()
   {
     return "N/A";
   }
-}
-
-/**
- * \brief Set range minimum and maximum (displayed as labels left and right
- * of slider if enabled)
- */
-void QmitkSliderNavigator::SetLabelValues( float min, float max )
-{
-  m_MinValue = min;
-  m_MaxValue = max;
-}
-
-void QmitkSliderNavigator::SetLabelValuesValid( bool minValid, bool maxValid )
-{
-  m_MinValueValid = minValid;
-  m_MaxValueValid = maxValid;
-}
-
-/**
- * \brief Set range unit (e.g. mm or ms) which will be displayed below range
- * labels if enabled.
- */
-void QmitkSliderNavigator::SetLabelUnit( const char *unit )
-{
-  m_LabelUnit = unit;
-  m_HasLabelUnit = true;
-}
-
-QString QmitkSliderNavigator::GetLabelUnit()
-{
-  return m_LabelUnit;
-}
-
-/** 
- * \brief Disables displaying of the unit label (range will be displayed
- * without unit if enabled).
- */
-void QmitkSliderNavigator::RemoveLabelUnit()
-{
-  m_HasLabelUnit = false;
 }
 
 /**

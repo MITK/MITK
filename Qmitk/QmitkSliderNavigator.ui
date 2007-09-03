@@ -185,22 +185,22 @@
 <slots>
     <slot>Refetch()</slot>
     <slot>SetStepper( mitk::Stepper * stepper )</slot>
-    <slot>slider_valueChanged( int )</slot>
+    <slot access="protected">slider_valueChanged( int )</slot>
     <slot>ShowLabels( bool show )</slot>
-    <slot>SetLabelValues( float min, float max )</slot>
-    <slot>SetLabelValuesValid( bool minValid, bool maxValid )</slot>
-    <slot>SetLabelUnit( const char * unit )</slot>
-    <slot>RemoveLabelUnit()</slot>
-    <slot>SetLabels()</slot>
-    <slot>spinBox_valueChanged( int )</slot>
+    <slot>ShowLabelUnit( bool show )</slot>
+    <slot access="protected">SetLabelValues( float min, float max )</slot>
+    <slot access="protected">SetLabelValuesValid( bool minValid, bool maxValid )</slot>
+    <slot access="protected">SetLabelUnit( const char * unit )</slot>
+    <slot access="protected">SetLabels()</slot>
+    <slot access="protected">spinBox_valueChanged( int )</slot>
     <slot>SetPos( int val )</slot>
 </slots>
 <functions>
     <function>init()</function>
+    <function returnType="QString">GetLabelUnit()</function>
     <function returnType="QString">ClippedValueToString( float value )</function>
     <function returnType="QString">GetMinValueLabel()</function>
     <function returnType="QString">GetMaxValueLabel()</function>
-    <function returnType="QString">GetLabelUnit()</function>
     <function returnType="int">GetPos()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>

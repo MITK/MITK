@@ -1209,16 +1209,16 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   if(itk::NumericTraits<TPixel>::max() <= itk::NumericTraits<ScalarType>::max())
   {
     mitkImage->m_Scalar2ndMin=
-      mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<TPixel>::max();
+      mitkImage->m_ScalarMin = static_cast<ScalarType>(itk::NumericTraits<TPixel>::max());
     mitkImage->m_Scalar2ndMax=
-      mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<TPixel>::NonpositiveMin();
+      mitkImage->m_ScalarMax = static_cast<ScalarType>(itk::NumericTraits<TPixel>::NonpositiveMin());
   }
   else
   {
     mitkImage->m_Scalar2ndMin=
-      mitkImage->m_ScalarMin = (ScalarType) itk::NumericTraits<ScalarType>::max();
+      mitkImage->m_ScalarMin = static_cast<ScalarType>(itk::NumericTraits<ScalarType>::max());
     mitkImage->m_Scalar2ndMax=
-      mitkImage->m_ScalarMax = (ScalarType) itk::NumericTraits<ScalarType>::NonpositiveMin();
+      mitkImage->m_ScalarMax = static_cast<ScalarType>(itk::NumericTraits<ScalarType>::NonpositiveMin());
   }
 
   while( !it.IsAtEnd() )

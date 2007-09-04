@@ -53,12 +53,12 @@ QmitkSliderDialogBar
 {
   QAction* action;
   action = new QAction( 
-    tr( "Mitralyzer" ), 
+    tr( "Slider" ), 
     QPixmap((const char**)QmitkSliderDialogBar_xpm), 
     tr( "MenueEintrag" ), 
     0, 
     parent, 
-    "QmitkMitralyzer" );
+    "QmitkSliderDialogBar" );
 
   return action;
 }

@@ -68,19 +68,20 @@ void SampleApp::InitializeFunctionality()
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
   if (!m_TestingParameter) 
   {
-    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName("QmitkSimpleExampleFunctionality");
-    if (createFunction) 
-    {
-      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
-      qfm->AddFunctionality(functionalityInstance);
-    } 
-     
     // add dialog bars
     QmitkSliderDialogBar *sliderDialogBar = new QmitkSliderDialogBar( m_MultiWidget, "test", m_MultiWidget );
     qfm->AddDialogBar( sliderDialogBar );
 
     // add separator
     qfm->AddSeparator();
+
+    // add "SimpleExampleFunctionality" if requested
+    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName("QmitkSimpleExampleFunctionality");
+    if (createFunction) 
+    {
+      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+      qfm->AddFunctionality(functionalityInstance);
+    }      
 
     // add all known functionalities
     for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) 

@@ -128,7 +128,9 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   
   // predefine MS-CRAM as standard codec
   opts.fccType = streamtypeVIDEO;
+  //creates a video with minor quality! Use different codec (must be installed on local machine) to generate movies with higher quality
   opts.fccHandler = mmioFOURCC('M','S','V','C'); 
+  
   
   
   // Poping codec dialog

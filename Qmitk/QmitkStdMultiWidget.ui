@@ -198,6 +198,7 @@
     <signal>WidgetPlanesRotationLockedChanged(bool)</signal>
     <signal>WidgetPlanesRotationLinked(bool)</signal>
     <signal>WidgetPlanesRotationEnabled(bool)</signal>
+    <signal>ViewsInitialized()</signal>
 </signals>
 <slots>
     <slot>changeLayoutTo2DImagesUp()</slot>
@@ -207,11 +208,11 @@
     <slot>changeLayoutToWidget1()</slot>
     <slot>changeLayoutToWidget2()</slot>
     <slot>changeLayoutToWidget3()</slot>
-    <slot>changeLayoutTo2x2Dand3DWidget()</slot>
     <slot>changeLayoutToRowWidget3And4()</slot>
     <slot>changeLayoutToColumnWidget3And4()</slot>
     <slot>changeLayoutToRowWidgetSmall3andBig4()</slot>
     <slot>changeLayoutToSmallUpperWidget2Big3and4()</slot>
+    <slot>changeLayoutTo2x2Dand3DWidget()</slot>
     <slot>changeLayoutToLeft2Dand3DRight2D()</slot>
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
     <slot>Fit()</slot>

@@ -789,6 +789,9 @@ bool QmitkStdMultiWidget::InitializeStandardViews(
         timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());
         timeNavigationController->Update();
 
+        // Tell observers that views are initialized now
+        emit ViewsInitialized();
+
         // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
         // that Fit() resets the camera according to the new geometry.
         //mitk::RenderingManager::GetInstance()->RequestUpdateAll();

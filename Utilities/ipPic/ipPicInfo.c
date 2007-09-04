@@ -68,7 +68,7 @@
  */
 
 
-#define INT_MAX 5
+#define INT_MAXIMUM 5
 #define ASCII_MAX 60
 
 /*
@@ -158,7 +158,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                                    (char *)current->tsv->value );
                 break;
               case ipPicUInt:
-                for( i = 0; i < Min( INT_MAX, current->tsv->n[0] ); i++ )
+                for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {
                       case 8:
@@ -177,7 +177,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                         fprintf( stream, "???" );
                         break;
                     }
-                if( current->tsv->n[0] > INT_MAX )
+                if( current->tsv->n[0] > INT_MAXIMUM )
                   fprintf( stream, "..." );
                 fprintf( stream, "\n" );
                 if( current->tsv->dim > 1 )
@@ -188,7 +188,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                   }
                 break;
               case ipPicInt:
-                for( i = 0; i < Min( INT_MAX, current->tsv->n[0] ); i++ )
+                for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {
                       case 8:
@@ -207,7 +207,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                         fprintf( stream, "???" );
                         break;
                     }
-                if( current->tsv->n[0] > INT_MAX )
+                if( current->tsv->n[0] > INT_MAXIMUM )
                   fprintf( stream, "..." );
                 fprintf( stream, "\n" );
                 if( current->tsv->dim > 1 )
@@ -218,7 +218,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                   }
                 break;
               case ipPicFloat:
-                for( i = 0; i < Min( INT_MAX, current->tsv->n[0] ); i++ )
+                for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {
                       case 32:
@@ -233,7 +233,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                         fprintf( stream, "???" );
                         break;
                     }
-                if( current->tsv->n[0] > INT_MAX )
+                if( current->tsv->n[0] > INT_MAXIMUM )
                   fprintf( stream, "..." );
                 fprintf( stream, "\n" );
                 if( current->tsv->dim > 1 )

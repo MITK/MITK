@@ -277,6 +277,34 @@ namespace mitk
       std::string m_PropertyName;
   };
 
+    /*! \brief Tests if the node contains an image with a dimensionality greater or equal to the template parameter
+
+    To be used with mitk::DataTreeFilter, e.g.
+    \code
+     treeFilter->SetFilter( mitk::IsImageWithMinimumDimension<3>() );
+    \endcode
+  */
+  template <unsigned int DIM>
+  class IsImageWithMinimumDimension : public DataTreeFilterFunction
+  {
+    public:
+      
+      virtual bool NodeMatches(DataTreeNode* node) const
+      {
+        return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
+                 && dynamic_cast<mitk::Image*>(node->GetData() )                            // data is an image
+                 && (dynamic_cast<mitk::Image*>(node->GetData() )->GetDimension() >= DIM)
+                );
+      }
+
+      virtual DataTreeFilterFunction* Clone() const
+      {
+        return new IsImageWithMinimumDimension<DIM>();
+      }
+
+      virtual ~IsImageWithMinimumDimension() {}
+  };
+
 } // namespace mitk
 
 #endif

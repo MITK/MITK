@@ -179,7 +179,7 @@ namespace CommonFunctionality
     }
 
     mitk::Surface::Pointer surface = mitk::Surface::New();
-    //    vtkPolyData* polys = MeshUtil<TMeshType>::meshToPolyData( itkMesh );
+    //    vtkPolyData* polys = MeshUtil<TMeshType>::MeshToPolyData( itkMesh );
     /**
     * @todo include Algorithms/itkMeshDeformation into Framework module so the upper line can be used
     * and the conversion works correctly

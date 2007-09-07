@@ -509,9 +509,11 @@ public:
     int numcells = vtkcells->GetNumberOfCells();
     int* vtkCellTypes = new int[numcells];
     int cellId = 0;
+    // poly ids start after verts and lines!
+    int cellIdOfs = poly->GetNumberOfVerts() + poly->GetNumberOfLines();
       for(; cellId < numcells; cellId++)
       {
-        vtkCellTypes[cellId] = poly->GetCellType(cellId);
+        vtkCellTypes[cellId] = poly->GetCellType( cellId+cellIdOfs );
       }
 
       // cells->Reserve(numcells);
@@ -634,9 +636,11 @@ public:
         numcells = vtkcells->GetNumberOfCells();
         vtkCellTypes = new int[numcells];
         int stripId = 0;
+        // strip ids start after verts, lines and polys!
+        int stripIdOfs = poly->GetNumberOfVerts() + poly->GetNumberOfLines() + poly->GetNumberOfPolys(); 
           for(; stripId < numcells; stripId++)
           {
-            vtkCellTypes[stripId] = poly->GetCellType(stripId);
+            vtkCellTypes[stripId] = poly->GetCellType( stripId+stripIdOfs );
           }
           stripId = 0;
 
@@ -668,7 +672,7 @@ public:
               pointIds[2] = pts[t+3];
             }
           }
-      }
+      }   
       //output->Print(std::cout);
       output->BuildCellLinks();
       delete[] vtkCellTypes;

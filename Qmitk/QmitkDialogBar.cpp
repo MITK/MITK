@@ -21,15 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qgroupbox.h>
 #include <qlayout.h>
-
+#include <qfont.h>
+#include <qobjectlist.h>
 
 QmitkDialogBar
 ::QmitkDialogBar( 
   const char *caption, QObject *parent, const char *name, QmitkStdMultiWidget *multiWidget,
   mitk::DataTreeIteratorBase *dataIt )
 : QmitkBaseFunctionalityComponent( parent, name, dataIt ),
-  m_MultiWidget( multiWidget ),
   m_GroupBox( NULL ),
+  m_MultiWidget( multiWidget ),
   m_Caption( caption )
 {
 }
@@ -51,6 +52,29 @@ QmitkDialogBar
 
   QWidget *dialogBar = this->CreateDialogBar( m_GroupBox );
 
+  QFont captionFont = m_GroupBox->font();
+  captionFont.setBold( true );
+  m_GroupBox->setFont( captionFont );
+
+  QObjectList* childList = m_GroupBox->queryList( "QWidget" );
+  QObjectListIt childIter( *childList ); 
+  QObject* child;
+  QWidget* widget;
+  while ( (child = childIter.current()) )
+  {
+    widget = dynamic_cast<QWidget*>( child ); 
+
+    if (widget)
+    {
+      widget->unsetFont();
+      QFont normalFont = widget->font();
+      normalFont.setBold( false );
+      widget->setFont( normalFont );
+    }
+
+    ++childIter;
+  }
+ 
   QGridLayout *grid = new QGridLayout( m_GroupBox->layout(), 1, 1, 2 );
   grid->setAlignment( Qt::AlignTop );
   grid->addWidget( dialogBar, 0, 0 );

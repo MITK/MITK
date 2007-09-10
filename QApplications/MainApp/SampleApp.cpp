@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkControlsLeftFctLayoutTemplate.h"
 
 #include "QmitkSliderDialogBar.h"
+#include "QmitkStandardViewsDialogBar.h"
 
 #include <qlayout.h>
 
@@ -68,9 +69,14 @@ void SampleApp::InitializeFunctionality()
   QmitkFunctionalityFactory& qff = QmitkFunctionalityFactory::GetInstance();
   if (!m_TestingParameter) 
   {
+    // add separator
+    qfm->AddSeparator();
+
     // add dialog bars
-    QmitkSliderDialogBar *sliderDialogBar = new QmitkSliderDialogBar( m_MultiWidget, "test", m_MultiWidget );
+    QmitkSliderDialogBar *sliderDialogBar = new QmitkSliderDialogBar( m_MultiWidget, "slicerbar", m_MultiWidget );
     qfm->AddDialogBar( sliderDialogBar );
+    QmitkStandardViewsDialogBar *standardViewsDialogBar = new QmitkStandardViewsDialogBar( m_MultiWidget, "viewsbar", m_MultiWidget );
+    qfm->AddDialogBar( standardViewsDialogBar );
 
     // add separator
     qfm->AddSeparator();

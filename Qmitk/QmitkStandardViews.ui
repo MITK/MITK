@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>163</width>
+            <width>138</width>
             <height>141</height>
         </rect>
     </property>
@@ -22,63 +22,45 @@
         <property name="margin">
             <number>0</number>
         </property>
-        <widget class="QButtonGroup">
+        <spacer>
             <property name="name">
-                <cstring>m_StandardViews</cstring>
+                <cstring>spacer1</cstring>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
+            <property name="orientation">
+                <enum>Horizontal</enum>
             </property>
-            <property name="title">
-                <string>Standard views</string>
+            <property name="sizeType">
+                <enum>Expanding</enum>
             </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer3</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget class="QClickableLabel">
-                    <property name="name">
-                        <cstring>m_ClickablePicture</cstring>
-                    </property>
-                </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer4</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
-                        <size>
-                            <width>21</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-            </hbox>
+            <property name="sizeHint">
+                <size>
+                    <width>21</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QClickableLabel">
+            <property name="name">
+                <cstring>m_ClickablePicture</cstring>
+            </property>
         </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>21</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
     </hbox>
 </widget>
 <customwidgets>
@@ -101,7 +83,7 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="PNG" length="808">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ef49444154789ccd953168dc5618c77f2e1a3e81034f7005093ce8c0433c5ea1cb990ce7f168862b74483aa5812ea54b3a662aa4e99039743078b4874232049cc1902b85bb1b127a8694a8e0826e3890c006bd21a00f22b80e4f3efbee6c68a185be45e8e97bbfefaffffbeb696d301cf05f0c6f7962fc7a3ccbf28ce27df1b700d65ad29394d19b11835f076b578255d359dc2a8951b452e4bca2aef2eb6b595d5a5dc12405dd15b6dbdbb3c1d0c1e7e0f1ebf12c6e95e4f690a24801c5f795f283904f85e24c01216840b3a9c83a68dd406e4014c1f82a2bb23c23466ba8c5f785776f0dfd1796e4d8025a570af14d61a767687780cacd8b2c5a340717ef0bb4d23974d887fd9f72b7685d68de348807d95499fca1ecfd98934f0c77efc9a5a657809d16f07d78f7566aa8d2f92ca4db13828f01515423862f4bf677730e0f72c230a6fb4500d805f047cb6dca0f42ffb99d43bffc5a08220b62294e8557cf0bba3d9fafbe0d01e1d981c59e2d4b5cbef5209f0ac9ef16630cdd9e8067c103b586bd274a726c294ee1fe8380d191ab4d1267d3f58aa1de7d258aebd7afa14f1fbb4d340de1935b829892ad96dbb16ca2b591d7805d4e5d8188f3b4c80c4f1f2bc9b16b2802cd0ddf3df7ce61b262c58ae2a0e10ad3a9a21a30fa05a7d4086168c8a796470f3392714076e2d210c5fe3266b14f59b9f0c79bc2e44f65f8b2a47bc7a73835b46f09d186cfa387904f2c3f7c93a2aa9886d06a9564d3c5c8ad289675e8f60c00fbbb39c3a392fb0f025a1d885b05df7ddfc484066b2d5a293bbd90687345f0ea21a415b43b904f0dcf0e72f69ee48c8e84ad2d0181ec2443cf74bef2b7be25bd1d21dee28732075b7b117045f9fc9e60c298c39f5d1a92e38be6a621747b31c3bec5aaa20ad62e5a3107a727299314b87101eff684762722490cd9c4cd471b3ead4f4ba24dd8b91d39915e4132be063c7a3342778528aaa356313f32e53c861e64b9257be15a8b27580bc958c9f2454bd72eff41b6dbdbb365cfffc9383f8b57c0ffe65889dbff1efc174cac4fc530b953010000000049454e44ae426082</data>
+        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
     </image>
 </images>
 <includes>

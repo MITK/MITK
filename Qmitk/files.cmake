@@ -20,6 +20,7 @@ SET(CPP_FILES
   QmitkColorTransferFunctionCanvas.cpp
   QmitkDialogBar.cpp
   QmitkDialogBars/QmitkSliderDialogBar.cpp
+  QmitkDialogBars/QmitkStandardViewsDialogBar.cpp
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
@@ -123,6 +124,7 @@ SET(MOC_H_FILES
   QmitkColorTransferFunctionCanvas.h
   QmitkDialogBar.h
   QmitkDialogBars/QmitkSliderDialogBar.h
+  QmitkDialogBars/QmitkStandardViewsDialogBar.h
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h

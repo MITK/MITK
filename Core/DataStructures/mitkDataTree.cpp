@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
 #include <mitkSmartPointerProperty.h>
+#include <mitkProperties.h>
 
 const std::string mitk::DataTree::XML_NODE_NAME = "mitkDataTree";
 const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
@@ -29,7 +30,9 @@ const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
 mitk::DataTree::DataTree() : 
 DataTreeBase( )
 {
-  SetRoot(mitk::DataTreeNode::New());
+  DataTreeNode::Pointer emptyNode = DataTreeNode::New();
+  emptyNode->SetProperty( "do not save", new BoolProperty(true) );
+  SetRoot(emptyNode);
 }
 
 
@@ -52,12 +55,12 @@ mitk::DataTreeIteratorClone mitk::DataTree::GetNext( const char* propertyKey, co
   else
     pos = DataTreePreOrderIterator(this);
 
-  mitk::DataTreeNode::Pointer dtn;
+  DataTreeNode::Pointer dtn;
   while ( !pos->IsAtEnd() )
   {
     dtn = pos->Get();
-    mitk::PropertyList::Pointer propertyList = dtn->GetPropertyList();
-    mitk::BaseProperty::Pointer tmp = propertyList->GetProperty( propertyKey );
+    PropertyList::Pointer propertyList = dtn->GetPropertyList();
+    BaseProperty::Pointer tmp = propertyList->GetProperty( propertyKey );
     if ( (*property) == *(tmp) )
       return pos;
     ++pos;
@@ -206,15 +209,15 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
     return NULL;
   }
 
-  mitk::DataTreeIteratorClone _it=it;
-  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+  DataTreeIteratorClone _it=it;
+  BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
 
-  mitk::BoundingBox::PointIdentifier pointid=0;
-  mitk::Point3D point;
+  BoundingBox::PointIdentifier pointid=0;
+  Point3D point;
 
   while (!_it->IsAtEnd())
   {
-    mitk::DataTreeNode::Pointer node = _it->Get();
+    DataTreeNode::Pointer node = _it->Get();
     if((node.IsNotNull()) && (node->GetData() != NULL) && 
        (node->GetData()->IsEmpty()==false) && 
        node->IsOn(boolPropertyKey, renderer) && 
@@ -228,7 +231,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
         for(i=0; i<8; ++i)
         {
           point = geometry->GetCornerPoint(i);
-          if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
+          if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
             pointscontainer->InsertElement( pointid++, point);
           else
           {
@@ -240,7 +243,7 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
     ++_it;
   }
 
-  mitk::BoundingBox::Pointer result = mitk::BoundingBox::New();
+  BoundingBox::Pointer result = BoundingBox::New();
   result->SetPoints(pointscontainer);
   result->ComputeBoundingBox();
 
@@ -256,9 +259,9 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 
   TimeBounds timeBounds;
 
-  mitk::DataTreeIteratorClone _it=it;
+  DataTreeIteratorClone _it=it;
 
-  mitk::ScalarType stmin, stmax, cur;
+  ScalarType stmin, stmax, cur;
 
   stmin= ScalarTypeNumericTraits::NonpositiveMin();
   stmax= ScalarTypeNumericTraits::max();
@@ -267,7 +270,7 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 
   while (!_it->IsAtEnd())
   {
-    mitk::DataTreeNode::Pointer node = _it->Get();
+    DataTreeNode::Pointer node = _it->Get();
     if((node.IsNotNull()) && (node->GetData() != NULL) && 
        (node->GetData()->IsEmpty()==false) && 
        node->IsOn(boolPropertyKey, renderer) && 
@@ -303,8 +306,8 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
 
 bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )
 {
-  mitk::PropertyList::PrepareXML_IO(); // to get "shared" properties right  
-  bool result = mitk::XMLReader::Load( filename, it );
+  PropertyList::PrepareXML_IO(); // to get "shared" properties right  
+  bool result = XMLReader::Load( filename, it );
   SmartPointerProperty::PostProcessXMLReading(); // to get "shared" properties right  
 
   return result;
@@ -315,7 +318,7 @@ bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fil
   if ( fileName == NULL || it == NULL || it->IsAtEnd() )
     return false;
   
-  mitk::XMLWriter writer( fileName );
+  XMLWriter writer( fileName );
 
   if ( !Save( it, writer, writeRootNodeToo ) )
     writer.WriteComment( "Error" );
@@ -328,7 +331,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
   if ( it == NULL || it->IsAtEnd() )
     return false;
 
-  mitk::DataTreeNode* node = it->Get();
+  DataTreeNode* node = it->Get();
   xmlWriter.BeginNode(XML_TAG_TREE_NODE);
 
   if (node) 
@@ -336,7 +339,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
     if (writeRootNodeToo)
     {
-      mitk::StringProperty* sprop = dynamic_cast<mitk::StringProperty*>( node->GetProperty("FILENAME").GetPointer() );
+      StringProperty* sprop = dynamic_cast<StringProperty*>( node->GetProperty("FILENAME").GetPointer() );
       if (sprop) // if this property is set, then use it as a filename
       {
         xmlWriter.SetSourceFileName( sprop->GetValue() );      
@@ -364,7 +367,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
 bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo ) 
 {
-  mitk::PropertyList::PrepareXML_IO(); // to get "shared" properties right  
+  PropertyList::PrepareXML_IO(); // to get "shared" properties right  
   xmlWriter.BeginNode(XML_NODE_NAME);
   bool result = SaveNext( it, xmlWriter, writeRootNodeToo );
   xmlWriter.EndNode(); // mitkDataTree

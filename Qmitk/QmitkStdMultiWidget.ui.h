@@ -639,6 +639,7 @@ void QmitkStdMultiWidget
 
   mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
   node->SetProperty("name", new mitk::StringProperty("Widgets"));
+  node->SetProperty("do not save", new mitk::BoolProperty(true));
   mitk::DataTreeIteratorClone dit = it;
   dit->Add(node);
   dit->GoToChild(dit->ChildPosition(node));
@@ -653,6 +654,7 @@ void QmitkStdMultiWidget
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  planeNode->SetProperty("do not save", new mitk::BoolProperty(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
   planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
   dit->Add(planeNode);
@@ -665,6 +667,7 @@ void QmitkStdMultiWidget
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  planeNode->SetProperty("do not save", new mitk::BoolProperty(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
   mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
   planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
@@ -676,6 +679,7 @@ void QmitkStdMultiWidget
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
+  planeNode->SetProperty("do not save", new mitk::BoolProperty(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
   mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
   planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);

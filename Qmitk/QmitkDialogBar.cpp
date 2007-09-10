@@ -62,10 +62,9 @@ QmitkDialogBar
   QWidget* widget;
   while ( (child = childIter.current()) )
   {
-    widget = dynamic_cast<QWidget*>( child ); 
-
-    if (widget)
+    if (child->inherits("QWidget"))
     {
+      widget = static_cast<QWidget*>( child );
       widget->unsetFont();
       QFont normalFont = widget->font();
       normalFont.setBold( false );

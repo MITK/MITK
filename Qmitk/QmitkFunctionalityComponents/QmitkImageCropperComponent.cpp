@@ -452,6 +452,7 @@ void QmitkImageCropperComponent::RemoveBoundingObjectFromNode()
 {
 	if (m_CroppingObjectNode.IsNotNull())
 	{
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
 		mitk::DataTreeIteratorClone iteratorToCroppingObject = mitk::DataTreeHelper::FindIteratorToNode(m_DataTreeIterator.GetPointer(),  m_CroppingObjectNode);
 		if (iteratorToCroppingObject.IsNotNull())
 			iteratorToCroppingObject->Remove();

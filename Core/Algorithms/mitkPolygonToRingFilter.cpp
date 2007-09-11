@@ -67,7 +67,7 @@ void mitk::PolygonToRingFilter::GenerateData()
   mitk::Mesh::ConstPointer input  = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
 
-  int t;
+  unsigned int t;
   for ( t = 0; t < input->GetPointSetSeriesSize(); ++t )
   {
 

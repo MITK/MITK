@@ -59,7 +59,7 @@ void mitk::PlaneFit::GenerateOutputInformation()
 
 void mitk::PlaneFit::GenerateData()
 {
-  int t;
+  unsigned int t;
   for ( t = 0; t < m_PointSet->GetPointSetSeriesSize(); ++t )
   {
     // check number of data points - less then 3points isn't enough
@@ -81,13 +81,13 @@ void mitk::PlaneFit::SetInput( const mitk::PointSet* pointSet )
     const_cast< mitk::PointSet * >( pointSet ) );
 
   m_PointSet = pointSet;
-  int pointSetSize = pointSet->GetPointSetSeriesSize();
+  unsigned int pointSetSize = pointSet->GetPointSetSeriesSize();
 
   m_Planes.resize( pointSetSize );
   m_Centroids.resize( pointSetSize );
   m_PlaneVectors.resize( pointSetSize );
 
-  int t;
+  unsigned int t;
   for ( t = 0; t < pointSetSize; ++t )
   {
     m_Planes[t] = mitk::PlaneGeometry::New();

@@ -60,7 +60,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
 
     timeGeometry->InitializeEvenlyTimed ( curvedGeometry, input->GetPointSetSeriesSize() );
 
-    for ( int t = 1; t < input->GetPointSetSeriesSize(); ++t )
+    for ( unsigned int t = 1; t < input->GetPointSetSeriesSize(); ++t )
     {
       mitk::ThinPlateSplineCurvedGeometry::Pointer tmpCurvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
       timeGeometry->SetGeometry3D ( tmpCurvedGeometry.GetPointer(), t );

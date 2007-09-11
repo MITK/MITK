@@ -155,7 +155,7 @@ public:
   /** \brief returns the current size of the point-list */
   virtual int GetSize( int t = 0 ) const;
 
-  virtual int GetPointSetSeriesSize() const;
+  virtual unsigned int GetPointSetSeriesSize() const;
 
   /** \brief returns the pointset */
   virtual DataType::Pointer GetPointSet( int t = 0 ) const;

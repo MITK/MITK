@@ -545,3 +545,14 @@ vtkProp* mitk::PointSetVtkMapper3D::GetProp()
   return m_PointsAssembly;
 }
 
+void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+{
+  vtkLinearTransform * vtktransform = 
+    this->GetDataTreeNode()->GetVtkTransform(
+      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+
+  m_SelectedActor->SetUserTransform(vtktransform);
+  m_UnselectedActor->SetUserTransform(vtktransform);
+  m_ContourActor->SetUserTransform(vtktransform);
+}
+

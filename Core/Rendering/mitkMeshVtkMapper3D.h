@@ -62,6 +62,7 @@ public:
   virtual const mitk::Mesh* GetInput();
 
   virtual vtkProp* GetProp();
+  virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
 
 protected:
   MeshVtkMapper3D();

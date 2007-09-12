@@ -77,6 +77,7 @@ public:
   //overwritten from BaseVtkMapper3D to be able to return a 
   //m_PointsAssembly which is much faster than a vtkAssembly
   virtual vtkProp* GetProp();
+  virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
 
 protected:
   PointSetVtkMapper3D();

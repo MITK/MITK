@@ -62,6 +62,14 @@ mitk::SplineVtkMapper3D::GetProp()
   return m_SplineAssembly;
 }
 
+void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+{
+  vtkLinearTransform * vtktransform = 
+    this->GetDataTreeNode()->GetVtkTransform(
+      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+
+  m_SplinesActor->SetUserTransform(vtktransform);
+}
 
 void
 mitk::SplineVtkMapper3D::GenerateData()

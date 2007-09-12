@@ -204,7 +204,7 @@ void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
         {
           anVtkMapper3D->Update(this);
           vtkprop = anVtkMapper3D->GetProp();
-
+          anVtkMapper3D->UpdateVtkTransform(this);
         }
       }
       if(vtkprop!=NULL)
@@ -276,6 +276,7 @@ void mitk::OpenGLRenderer::Update(mitk::DataTreeNode* datatreenode)
         if(vtkmapper3d != NULL)
         {
           vtkmapper3d->Update(this);
+          vtkmapper3d->UpdateVtkTransform(this);
           m_VtkMapperPresent=true;
         }
       }

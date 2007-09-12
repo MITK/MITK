@@ -47,9 +47,6 @@ class ContourSetVtkMapper3D : public BaseVtkMapper3D
 
     virtual const mitk::ContourSet* GetInput();
 
-    virtual vtkProp* GetProp();
-
-
   protected:
    
     ContourSetVtkMapper3D();

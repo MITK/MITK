@@ -152,6 +152,12 @@ Geometry2DDataVtkMapper3D::GetProp()
   return m_Prop3D;
 }
 
+void mitk::Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+{
+  m_ImageAssembly->SetUserTransform( 
+    this->GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(
+      this->GetDataTreeNode()->GetData())) );
+}
 
 const Geometry2DData *
 Geometry2DDataVtkMapper3D::GetInput()

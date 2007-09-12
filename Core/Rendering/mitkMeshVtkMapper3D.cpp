@@ -47,6 +47,16 @@ vtkProp* mitk::MeshVtkMapper3D::GetProp()
   return m_PropAssembly;
 }
 
+void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+{
+  vtkLinearTransform * vtktransform = 
+    this->GetDataTreeNode()->GetVtkTransform(
+      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+
+  m_SpheresActor->SetUserTransform(vtktransform);
+  m_ContourActor->SetUserTransform(vtktransform);
+}
+
 mitk::MeshVtkMapper3D::MeshVtkMapper3D()
 : m_PropAssembly(NULL)
 {

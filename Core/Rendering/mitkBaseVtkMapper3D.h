@@ -31,32 +31,35 @@ class vtkActor;
 
 namespace mitk {
 
-//##ModelId=3E32C62B00BE
 //##Documentation
 //## @brief Base class of all vtk-based 3D-Mappers
 //##
-//## Those must implement the abstract
-//## method vtkProp* GetProp().
+//## GetProp() returns m_Prop3D, which should be
+//## initialized by sub-classes (e.g., by setting
+//## it to an vtkActor).
 //## @ingroup Mapper
 class BaseVtkMapper3D : public Mapper3D
 {
 public:
   mitkClassMacro(BaseVtkMapper3D, Mapper3D);
 
-  //##ModelId=3E32C93D0000
   virtual vtkProp* GetProp();
-  //##ModelId=3EF180C70065
+
+  //##Documentation
+  //## @brief Set the vtkTransform of the m_Prop3D for
+  //## the current time step of \a renderer
+  //##
+  //## Called by mitk::OpenGLRenderer::Update and
+  //## UpdateIncludingVtkActors
+  virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
+
   //##Documentation
   //## @brief Apply color and opacity read from the PropertyList
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
-
-
 protected:
-  //##ModelId=3E3424950213
   BaseVtkMapper3D();
 
-  //##ModelId=3E3424950231
   virtual ~BaseVtkMapper3D();
 
 public:
@@ -74,21 +77,15 @@ public:
   itkSetMacro(ChannelNr,int);
 
 protected:
-  //##ModelId=3EDD039F0117
   Geometry3D::Pointer m_Geometry;
-  //##ModelId=3ED91D050038
   LevelWindow m_LevelWindow;
 
-  //##ModelId=3E3AE0DC023D
   int m_SliceNr;
 
-  //##ModelId=3E33ECF203A1
   int m_TimeNr;
 
-  //##ModelId=3E33ECF203B5
   int m_ChannelNr;
 
-  //##ModelId=3ED91D050046
   vtkProp3D* m_Prop3D;
 };
 

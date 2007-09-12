@@ -5,11 +5,6 @@
 #include <vtkSphereSource.h>
 #include <vtkProperty.h>
 
-vtkProp* mitk::PointDataVtkMapper3D::GetProp()
-{
-    return m_PointActor;
-}
-
 mitk::PointDataVtkMapper3D::PointDataVtkMapper3D()
 {
 	int i;
@@ -31,6 +26,8 @@ mitk::PointDataVtkMapper3D::PointDataVtkMapper3D()
 	m_PointMapper->SetInput(m_PolyData);
 	m_PointActor->SetMapper( m_PointMapper );
 	m_PointActor->GetProperty()->SetColor(0.0,0.0,1.0);
+
+  m_Prop3D = m_PointActor;
 }
 
 mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
@@ -39,7 +36,6 @@ mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
 	m_CellArray->Delete();
 	m_PolyData->Delete();
 	m_PointMapper->Delete();
-	m_PointActor->Delete();
 }
 
 void mitk::PointDataVtkMapper3D::GenerateData()

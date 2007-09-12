@@ -36,8 +36,6 @@ public:
 
     itkGetMacro( Radius, float);
 
-    virtual vtkProp* GetProp();
-
 protected:
 
     PointDataVtkMapper3D();

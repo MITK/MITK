@@ -49,10 +49,13 @@ void mitk::PointSetReader::GenerateData()
     if ( ! in.good() )
     {
         itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
+        in.close();
         return ;
     }
+    in.close();
+
     mitk::vtkPointSetXMLParser* parser = new mitk::vtkPointSetXMLParser();
-    parser->SetStream( &in );
+   parser->SetFileName( m_FileName.c_str() );
     if ( parser->Parse() == 0 ) //Parse returns zero as error indicator
     {
         itkWarningMacro( << "Sorry, an error occurred during parsing!" );
@@ -66,7 +69,6 @@ void mitk::PointSetReader::GenerateData()
     {
         this->SetNthOutput( i, *it );
     }
-    in.close();
     parser->Delete();
     m_Success = true;
 }

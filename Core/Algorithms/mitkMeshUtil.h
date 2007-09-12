@@ -138,6 +138,8 @@ class MeshUtil
   void InsertTriangle(vtkIdType *pts);
   void InsertPolygon(vtkIdType npts, vtkIdType *pts);
   void InsertQuad(vtkIdType *pts);
+  void InsertTetra(vtkIdType *pts);
+  void InsertHexahedron(vtkIdType *pts);
   \endcode
 
   This class calls the appropriate insert-method of the 
@@ -159,6 +161,8 @@ class MeshUtil
     typedef itk::TriangleCell<CellInterfaceType>      floatTriangleCell;
     typedef itk::PolygonCell<CellInterfaceType>       floatPolygonCell;
     typedef itk::QuadrilateralCell<CellInterfaceType> floatQuadrilateralCell;
+    typedef itk::TetrahedronCell<CellInterfaceType>   floatTetrahedronCell;
+    typedef itk::HexahedronCell<CellInterfaceType>    floatHexahedronCell;
     typedef typename CellInterfaceType::PointIdConstIterator PointIdIterator;
 
   public:
@@ -177,7 +181,7 @@ class MeshUtil
     }
 
     /*!
-    Visit a line and create the VTK_POLYGON cell   
+    Visit a polygon and create the VTK_POLYGON cell   
     */
     void Visit(unsigned long , floatPolygonCell* t)
     {
@@ -220,7 +224,7 @@ class MeshUtil
     }
 
     /*! 
-    Visit a triangle and create the VTK_QUAD cell 
+    Visit a quad and create the VTK_QUAD cell 
     */
     void Visit(unsigned long , floatQuadrilateralCell* t)
     {
@@ -228,6 +232,61 @@ class MeshUtil
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
       if (num == 4) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) 
+        {
+          if (i == 2) pts[3] = *it;
+          else if (i == 3) pts[2] = *it;
+          else pts[i] = *it;
+          i++;
+          //pts[i++] = *it;
+        }
+        this->InsertQuad( (vtkIdType*)pts );
+      }
+      else if (num == 3) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTriangle( (vtkIdType*)pts );
+      }
+      else if (num==2) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
+    }
+    
+    /*! 
+    Visit a tetrahedra and create the VTK_TETRA cell 
+    */
+    void Visit(unsigned long , floatTetrahedronCell* t)
+    {
+      vtkIdType pts[4];
+      int i=0;
+      unsigned long num = t->GetNumberOfVertices();
+      if (num == 4) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTetra( (vtkIdType*)pts );
+      }
+      else if (num == 3) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertTriangle( (vtkIdType*)pts );
+      }
+      else if (num==2) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertLine( (vtkIdType*)pts );
+      }
+    }
+    
+    /*! 
+    Visit a hexahedron and create the VTK_HEXAHEDRON cell 
+    */
+    void Visit(unsigned long , floatHexahedronCell* t)
+    {
+      vtkIdType pts[8];
+      int i=0;
+      unsigned long num = t->GetNumberOfVertices();
+      if (num == 8) {
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
+        this->InsertHexahedron( (vtkIdType*)pts );
+      }
+      else if (num == 4) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         this->InsertQuad( (vtkIdType*)pts );
       }
@@ -264,6 +323,8 @@ class MeshUtil
     typedef itk::TriangleCell<CellInterfaceType>      floatTriangleCell;
     typedef itk::PolygonCell<CellInterfaceType>       floatPolygonCell;
     typedef itk::QuadrilateralCell<CellInterfaceType> floatQuadrilateralCell;
+    typedef itk::TetrahedronCell<CellInterfaceType>   floatTetrahedronCell;
+    typedef itk::HexahedronCell<CellInterfaceType>    floatHexahedronCell;
 
   public:
     /*!
@@ -278,7 +339,7 @@ class MeshUtil
     }
 
     /*!
-    Visit a line and create the VTK_POLYGON cell   
+    Visit a polygon and create the VTK_POLYGON cell   
     */
     void Visit(unsigned long , floatPolygonCell* t)
     {
@@ -300,14 +361,40 @@ class MeshUtil
     }
 
     /*! 
-    Visit a triangle and create the VTK_QUAD cell 
+    Visit a quadrilateral and create the VTK_QUAD cell 
     */
     void Visit(unsigned long , floatQuadrilateralCell* t)
     {
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
-      if (num == 4) 
+      if (num == 4) {
+        vtkIdType tmpId = pts[3];
+        pts[3] = pts[4];
+        pts[4] = tmpId;
         this->InsertQuad(pts);
+      }
+    }
+    
+    /*! 
+    Visit a tetrahedron and create the VTK_TETRA cell 
+    */
+    void Visit(unsigned long , floatTetrahedronCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 4) 
+        this->InsertTetra(pts);
+    }
+    
+    /*! 
+    Visit a hexahedron and create the VTK_HEXAHEDRON cell 
+    */
+    void Visit(unsigned long , floatHexahedronCell* t)
+    {
+      unsigned long num = t->GetNumberOfVertices();
+      vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
+      if (num == 8) 
+        this->InsertHexahedron(pts);
     }
   };
 
@@ -321,6 +408,7 @@ class MeshUtil
   {
     vtkCellArray* m_Cells;
     int* m_TypeArray;
+    vtkIdType cellId;
   public:
     /*! Set the vtkCellArray that will be constructed
     */
@@ -336,7 +424,7 @@ class MeshUtil
     {
       m_TypeArray = i;
     }
-
+    
     void InsertLine(vtkIdType *pts)
     {
       this->cellId = m_Cells->InsertNextCell(2, pts);
@@ -359,6 +447,18 @@ class MeshUtil
     {
       this->cellId = m_Cells->InsertNextCell(4, pts);
       m_TypeArray[this->cellId] = VTK_QUAD;
+    }
+    
+    void InsertTetra(vtkIdType *pts)
+    {
+      this->cellId = m_Cells->InsertNextCell(4, pts);
+      m_TypeArray[this->cellId] = VTK_TETRA;
+    }
+    
+    void InsertHexahedron(vtkIdType *pts)
+    {
+      this->cellId = m_Cells->InsertNextCell(8, pts);
+      m_TypeArray[this->cellId] = VTK_HEXAHEDRON;
     }
   };
 
@@ -403,6 +503,9 @@ class MeshUtil
     {
       m_QuadCells->InsertNextCell(4, pts);
     }
+    
+    void InsertTetra(vtkIdType *pts) {} // ignored
+    void InsertHexahedron(vtkIdType *pts) {} // ignored
   };
 
   //typedef typename MeshType::CellType                CellType;
@@ -703,7 +806,7 @@ public:
       SingleCellArrayUserVisitorType>			          SingleCellArrayLineVisitor;
 
     /*! 
-    default SingleCellArray line cell visitior definition 
+    default SingleCellArray polygon cell visitior definition 
     */
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
@@ -727,6 +830,20 @@ public:
       SingleCellArrayUserVisitorType>               SingleCellArrayQuadrilateralVisitor;
 
 
+    /*! 
+    default SingleCellArray tetra cell visitior definition
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
+      itk::TetrahedronCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      SingleCellArrayUserVisitorType>               SingleCellArrayTetrahedronVisitor;
+      
+      
+    /*! 
+    default SingleCellArray hex cell visitior definition
+    */
+    typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
+      itk::HexahedronCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
+      SingleCellArrayUserVisitorType>               SingleCellArrayHexahedronVisitor;
 
     // Get the number of points in the mesh
     int numPoints = mesh->GetNumberOfPoints();
@@ -750,7 +867,7 @@ public:
 
     // iterate over all the points in the itk mesh to find
     // the maximal index
-    int maxIndex = 0;
+    unsigned int maxIndex = 0;
     for(i = points->Begin(); i != points->End(); ++i)
     {
       if(maxIndex < i->Index())
@@ -759,45 +876,66 @@ public:
 
     // initialize vtk-classes for points and scalars
     vpoints->SetNumberOfPoints(maxIndex+1);
-
+    
+    vtkFloatingPointType vtkpoint[3];
+    typename MeshType::PointType itkPhysicalPoint;
+    
     for(i = points->Begin(); i != points->End(); ++i)
     {
       // Get the point index from the point container iterator
       int idx = i->Index();
 
-
+      itkPhysicalPoint = i->Value();
+      mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
       // Set the vtk point at the index with the the coord array from itk
       // itk returns a const pointer, but vtk is not const correct, so
       // we have to use a const cast to get rid of the const
       //      vpoints->SetPoint(idx, const_cast<DATATYPE*>(i->Value().GetDataPointer()));
-      vpoints->SetPoint(idx, (typename MeshType::PixelType*)(i->Value().GetDataPointer()));
+      //vpoints->SetPoint(idx, (typename MeshType::PixelType*)(i->Value().GetDataPointer()));
+      vpoints->SetPoint(idx, vtkpoint);
     }
     // Set the points on the vtk grid
     vgrid->SetPoints(vpoints);
     // Now create the cells using the MulitVisitor
     // 1. Create a MultiVisitor
     typename MeshType::CellType::MultiVisitor::Pointer mv =
-      typename MeshType::CellType::MultiVisitor::New();
-    // 2. Create a triangle and quadrilateral visitor
+      MeshType::CellType::MultiVisitor::New();
+    // 2. Create visitors
+    typename SingleCellArrayLineVisitor::Pointer      lv = SingleCellArrayLineVisitor::New();
+    typename SingleCellArrayPolygonVisitor::Pointer      pv = SingleCellArrayPolygonVisitor::New();
     typename SingleCellArrayTriangleVisitor::Pointer      tv = SingleCellArrayTriangleVisitor::New();
     typename SingleCellArrayQuadrilateralVisitor::Pointer qv = SingleCellArrayQuadrilateralVisitor::New();
+    typename SingleCellArrayTetrahedronVisitor::Pointer tetv = SingleCellArrayTetrahedronVisitor::New();
+    typename SingleCellArrayHexahedronVisitor::Pointer hv = SingleCellArrayHexahedronVisitor::New();
     // 3. Set up the visitors
-    int vtkCellCount = 0; // running counter for current cell being inserted into vtk
+    //int vtkCellCount = 0; // running counter for current cell being inserted into vtk
     int numCells = mesh->GetNumberOfCells();
     int *types = new int[numCells]; // type array for vtk 
     // create vtk cells and estimate the size
     vtkCellArray* cells = vtkCellArray::New();
     cells->Allocate(numCells);
-    // Set the TypeArray CellCount and CellArray for both visitors
+    // Set the TypeArray CellCount and CellArray for the visitors
+    lv->SetTypeArray(types);
+    lv->SetCellArray(cells);
+    pv->SetTypeArray(types);
+    pv->SetCellArray(cells);
     tv->SetTypeArray(types);
-    tv->SetCellCounter(&vtkCellCount);
+    //tv->SetCellCounter(&vtkCellCount);
     tv->SetCellArray(cells);
     qv->SetTypeArray(types);
-    qv->SetCellCounter(&vtkCellCount);
+    //qv->SetCellCounter(&vtkCellCount);
     qv->SetCellArray(cells);
+    tetv->SetTypeArray(types);
+    tetv->SetCellArray(cells);
+    hv->SetTypeArray(types);
+    hv->SetCellArray(cells);
     // add the visitors to the multivisitor
+    mv->AddVisitor(lv);
+    mv->AddVisitor(pv);
     mv->AddVisitor(tv);
     mv->AddVisitor(qv);
+    mv->AddVisitor(tetv);
+    mv->AddVisitor(hv);
     // Now ask the mesh to accept the multivisitor which
     // will Call Visit for each cell in the mesh that matches the
     // cell types of the visitors added to the MultiVisitor
@@ -815,7 +953,7 @@ public:
 
 
   /*!
-  create an vtkUnstructuredGrid object from an itkMesh
+  create a vtkPolyData object from an itkMesh
   */
   static vtkPolyData* MeshToPolyData(MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
   {
@@ -828,7 +966,7 @@ public:
       DistributeUserVisitorType>			          DistributeLineVisitor;
 
     /*! 
-    default Distribute line cell visitior definition 
+    default Distribute polygon cell visitior definition 
     */
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
@@ -868,7 +1006,7 @@ public:
       mesh->Print(std::cerr);
       std::cerr << "no points in Grid " << std::endl;
     }
-    // Create a vtkUnstructuredGrid
+    // Create a vtkPolyData
     if(polydata == NULL)
       polydata = vtkPolyData::New();
     else
@@ -1022,7 +1160,7 @@ public:
       if(trianglecells->GetNumberOfCells()>0)
         polydata->SetStrips(trianglecells); 
       if(polygoncells->GetNumberOfCells()>0)
-        polydata->SetPolys(polygoncells);  
+        polydata->SetPolys(polygoncells);
 
       // 5. Clean up vtk objects (no vtkSmartPointer ... )
       linecells->Delete();
@@ -1032,7 +1170,7 @@ public:
     vpoints->Delete();
     scalars->Delete();
 
-    //std::cout << "meshToUnstructuredGrid end" << std::endl;
+    //std::cout << "meshToPolyData end" << std::endl;
     return polydata;
   }
 

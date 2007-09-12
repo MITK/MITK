@@ -162,6 +162,7 @@ void mitk::MaterialProperty::SetColor( mitk::MaterialProperty::Color color )
     m_DataTreeNode->SetColor( color.GetRed(), color.GetGreen(), color.GetBlue(), m_Renderer );
   }
   m_Color = color;
+  Modified();
 }
 
 
@@ -172,6 +173,7 @@ void mitk::MaterialProperty::SetColor( vtkFloatingPointType red, vtkFloatingPoin
     m_DataTreeNode->SetColor( red, green, blue, m_Renderer );
   }
   m_Color.Set( red, green, blue );
+  Modified();
 }
 
 
@@ -182,6 +184,7 @@ void mitk::MaterialProperty::SetColorCoefficient( vtkFloatingPointType coefficie
     m_DataTreeNode->SetProperty( COLOR_COEFFICIENT_KEY, new mitk::FloatProperty( coefficient ), m_Renderer );
   }
   m_ColorCoefficient = coefficient;
+  Modified();
 }
 
 void mitk::MaterialProperty::SetSpecularColor( mitk::MaterialProperty::Color specularColor )
@@ -191,6 +194,7 @@ void mitk::MaterialProperty::SetSpecularColor( mitk::MaterialProperty::Color spe
     m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( specularColor.GetRed(), specularColor.GetGreen(), specularColor.GetBlue() ), m_Renderer );
   }
   m_SpecularColor = specularColor;
+  Modified();
 }
 
 
@@ -201,6 +205,7 @@ void mitk::MaterialProperty::SetSpecularColor( vtkFloatingPointType red, vtkFloa
     m_DataTreeNode->SetProperty( SPECULAR_COLOR_KEY, new mitk::ColorProperty( red, green, blue ), m_Renderer );
   }
   m_SpecularColor.Set( red, green, blue );
+  Modified();
 }
 
 void mitk::MaterialProperty::SetSpecularCoefficient( vtkFloatingPointType specularCoefficient )
@@ -210,6 +215,7 @@ void mitk::MaterialProperty::SetSpecularCoefficient( vtkFloatingPointType specul
     m_DataTreeNode->SetProperty( SPECULAR_COEFFICIENT_KEY, new mitk::FloatProperty( specularCoefficient ), m_Renderer );
   }
   m_SpecularCoefficient = specularCoefficient;
+  Modified();
 }
 
 
@@ -220,6 +226,7 @@ void mitk::MaterialProperty::SetSpecularPower( vtkFloatingPointType specularPowe
     m_DataTreeNode->SetProperty( SPECULAR_POWER_KEY, new mitk::FloatProperty( specularPower ), m_Renderer );
   }
   m_SpecularPower = specularPower;
+  Modified();
 }
 
 
@@ -230,6 +237,7 @@ void mitk::MaterialProperty::SetOpacity( vtkFloatingPointType opacity )
     m_DataTreeNode->SetOpacity( opacity, m_Renderer );
   }
   m_Opacity = opacity;
+  Modified();
 }
 
 
@@ -240,6 +248,7 @@ void mitk::MaterialProperty::SetInterpolation( InterpolationType interpolation )
     m_DataTreeNode->SetProperty( INTERPOLATION_KEY, new mitk::VtkInterpolationProperty( interpolation ), m_Renderer );
   }
   m_Interpolation = interpolation;
+  Modified();
 }
 
 
@@ -250,6 +259,7 @@ void mitk::MaterialProperty::SetRepresentation( RepresentationType representatio
     m_DataTreeNode->SetProperty( REPRESENTATION_KEY, new mitk::VtkRepresentationProperty( representation ), m_Renderer );
   }
   m_Representation = representation;
+  Modified();
 }
 
 

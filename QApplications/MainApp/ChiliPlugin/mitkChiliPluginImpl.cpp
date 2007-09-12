@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Chili
 //#include <ipDicom/ipDicom.h>  //read DICOM-Files
-#include <chili/plugin.xpm>
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 #include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
 #include <ipPic/ipPic.h>  //ipPicDescriptor
@@ -49,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qtooltip.h>
 
+#include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
 
 QWidget* mitk::ChiliPluginImpl::s_Parent = NULL;
@@ -128,7 +128,7 @@ QString mitk::ChiliPluginImpl::name()
 
 const char** mitk::ChiliPluginImpl::xpm()
 {
-  return (const char **)plugin_xpm;
+  return (const char **)mitk_chili_plugin_xpm;
 }
 
 /** set the qtparent, needed for QObject* create() */

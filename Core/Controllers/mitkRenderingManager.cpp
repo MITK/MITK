@@ -105,10 +105,15 @@ mitk::RenderingManager
 }
 
 mitk::RenderingManager::RenderingManager()
-: m_UpdatePending( false ), m_Interval( 10 )
+: m_UpdatePending( false ), 
+  m_Interval( 10 ),
+  m_CurrentLOD( 0 ),
+  m_MaxLOD( 0 ),
+  m_Numberof3DRW( 0 ),
+  m_ClippingPlaneEnabled( false )
 {
-  m_ShadingEnabled.resize(3);
-  m_ShadingValues.resize(4);
+  m_ShadingEnabled.assign(3, false);
+  m_ShadingValues.assign(4, 0.0);
   // The default (minimum) interval is 10 msec, theoretically enabling a
   // maximum frame rate of 100 Hz.
 }
@@ -623,12 +628,12 @@ bool mitk::RenderingManager::GetShading(int lod)
 //enable/disable the clipping plane
 void mitk::RenderingManager::SetClippingPlaneStatus(bool status)
 {
-  m_ClippingPlaneStatus = status;
+  m_ClippingPlaneEnabled = status;
 }
 
 bool mitk::RenderingManager::GetClippingPlaneStatus()
 {
-  return m_ClippingPlaneStatus;
+  return m_ClippingPlaneEnabled;
 }
 
 void mitk::RenderingManager::SetShadingValues(float ambient, float diffuse, float specular, float specpower)

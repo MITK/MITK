@@ -194,7 +194,7 @@ protected:
   int m_MaxLOD;
   int m_Numberof3DRW;
   std::vector<bool> m_ShadingEnabled;
-  bool m_ClippingPlaneStatus;
+  bool m_ClippingPlaneEnabled;
   std::vector<float> m_ShadingValues;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );

@@ -204,7 +204,7 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 
 int mitk::BaseRenderer::GetTimeStep(mitk::BaseData* data) const
 {
-  if(data==NULL)
+  if( (data==NULL) || (data->IsInitialized()==false) )
   {
     return -1;
   }

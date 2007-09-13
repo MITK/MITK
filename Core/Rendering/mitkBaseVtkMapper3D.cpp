@@ -25,13 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
 
-//##ModelId=3E3424950213
 mitk::BaseVtkMapper3D::BaseVtkMapper3D() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0), m_Prop3D(NULL)
 {
   //vtkMapper::GlobalImmediateModeRenderingOn();
 }
 
-//##ModelId=3E3424950231
 mitk::BaseVtkMapper3D::~BaseVtkMapper3D()
 {
   if(m_Prop3D)
@@ -54,7 +52,6 @@ void mitk::BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
   m_Prop3D->SetUserTransform(vtktransform);
 }
 
-//##ModelId=3EF180C70065
 void mitk::BaseVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
 {
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};

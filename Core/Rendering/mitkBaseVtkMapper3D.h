@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef BASEVTKMAPPER3D_H_HEADER_INCLUDED_C1CD0F0A
-#define BASEVTKMAPPER3D_H_HEADER_INCLUDED_C1CD0F0A
+#ifndef BASEVTKMAPPER3D_H_HEADER_INCLUDED
+#define BASEVTKMAPPER3D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
 #include "mitkMapper.h"
@@ -91,4 +91,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* BASEVTKMAPPER3D_H_HEADER_INCLUDED_C1CD0F0A */
+#endif /* BASEVTKMAPPER3D_H_HEADER_INCLUDED */

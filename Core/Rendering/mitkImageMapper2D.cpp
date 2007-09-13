@@ -108,12 +108,18 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   // rectangle for clipping, but using the side surfaces of the transformed
   // 3D bounds as clipping planes instead. This would clip even rotates
   // planes at their exact intersection lines with the 3D bounding box.
-  GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
-  GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
-    + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] };
-  GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
-  GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
-    + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] };
+  //GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
+  //GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
+  //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] };
+  //GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
+  //GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
+  //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] };
+  // IW commented out the previous lines and reverted to rev. 9358
+  // (version before rev. 9443) See bug #625
+  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
+  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
+  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
+  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
 
   glClipPlane( GL_CLIP_PLANE0, eqn0 );
   glEnable( GL_CLIP_PLANE0 );

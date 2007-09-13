@@ -576,10 +576,10 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
-    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] );
-    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] );
-    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] );
-    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] );
+    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] + 0.5 );
+    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] + 0.5 );
+    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] + 0.5 );
+    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] + 0.5 );
 
     // Calculate the extent by which the maximal plane (due to plane rotation)
     // overlaps the regular plane size.
@@ -594,9 +594,9 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
     xMin = yMin = 0;
     xMax = static_cast< int >( rendererInfo.m_Extent[0]
-      - rendererInfo.m_PixelsPerMM[0] );
+      - rendererInfo.m_PixelsPerMM[0] + 0.5 );
     yMax = static_cast< int >( rendererInfo.m_Extent[1] 
-      - rendererInfo.m_PixelsPerMM[1] );
+      - rendererInfo.m_PixelsPerMM[1] + 0.5 );
   }
 
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
@@ -620,8 +620,22 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // currently uses PIC data structures, while 3D mapping uses VTK data. Thus,
   // the reslicing result needs to be stored twice.
 
-  // 1. Convert the resampling result to PIC image format
-  ipPicDescriptor *pic = Pic2vtk::convert( rendererInfo.m_Reslicer->GetOutput() );
+  // 1. Check the result
+  vtkImageData* reslicedImage = rendererInfo.m_Reslicer->GetOutput();
+
+  if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
+  {
+    itkWarningMacro(<<"reslicer returned empty image");
+    return;
+  }
+
+  // 2. Store the result in a VTK image
+  rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
+  rendererInfo.m_Image->DeepCopy( reslicedImage );
+  rendererInfo.m_Image->Update();
+
+  // 3. Convert the resampling result to PIC image format
+  ipPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
 
   if (pic == NULL)
   {
@@ -646,11 +660,6 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   image->setInterpolation( false );
   image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 
-
-  // 2. Store the result in a VTK image
-  rendererInfo.m_Image = vtkImageData::New();
-  rendererInfo.m_Image->DeepCopy( rendererInfo.m_Reslicer->GetOutput() );
-  rendererInfo.m_Image->Update();
 
 
   // We have been modified

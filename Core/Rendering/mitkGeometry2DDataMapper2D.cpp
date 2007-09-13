@@ -136,16 +136,24 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     TransformType::Pointer inverseTransform = TransformType::New();
     transform->GetInverse( inverseTransform );
 
-    mitk::BoundingBox::PointType boundingBoxMin, boundingBoxMax;
-    boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
-    boundingBoxMax = referenceGeometry->GetBoundingBox()->GetMaximum();
-
     Line3D crossLine, otherCrossLine;
 
     // Calculate the intersection line of the input plane with the world plane
     if ( worldPlaneGeometry->IntersectionLine( 
           inputPlaneGeometry, crossLine ) )
     {
+      mitk::BoundingBox::PointType boundingBoxMin, boundingBoxMax;
+      boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
+      boundingBoxMax = referenceGeometry->GetBoundingBox()->GetMaximum();
+      if(referenceGeometry->GetImageGeometry())
+      {
+        for(unsigned int i = 0; i < 3; ++i)
+        {
+          boundingBoxMin[i]-=0.5;
+          boundingBoxMax[i]-=0.5;
+        }
+      }
+
       crossLine.Transform( *inverseTransform );
       mitk::Point3D point1, point2;
 

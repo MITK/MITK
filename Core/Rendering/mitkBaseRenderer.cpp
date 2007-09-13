@@ -219,7 +219,11 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   }
   else
   {
-    return m_TimeSlicedWorldGeometry->TimeStepToMS(GetTimeStep());
+    ScalarType timeInMS = m_TimeSlicedWorldGeometry->TimeStepToMS(GetTimeStep());
+    if(timeInMS == ScalarTypeNumericTraits::NonpositiveMin())
+      return 0;
+    else
+      return timeInMS;
   }
 }
 

@@ -88,6 +88,15 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   }
 }
 
+void QmitkPointListWidget::keyPressEvent(QKeyEvent* e)
+{
+  //pass the event to the mitk global interaction 
+  mitk::BaseRenderer::Pointer anyRenderer = (*(mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().begin()))->GetRenderer();
+  mitk::Event *tempEvent = new mitk::Event(anyRenderer, e->type(), mitk::BS_NoButton, mitk::BS_NoButton, e->key());
+  mitk::EventMapper::MapEvent(tempEvent);
+  delete tempEvent;
+}
+
 
 void QmitkPointListWidget::ItemsOfListUpdate()
 {

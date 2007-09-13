@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>738</width>
-            <height>892</height>
+            <width>688</width>
+            <height>369</height>
         </rect>
     </property>
     <property name="caption">
@@ -132,9 +132,10 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
+    <function access="protected">keyPressEvent( QKeyEvent * e )</function>
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
-    <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
+    <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

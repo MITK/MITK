@@ -194,7 +194,6 @@ mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
-  static_cast<mitk::ItkMatrixHack<AffineGeometryFrame3D::TransformType>*>(newGeometry->GetIndexToWorldTransform())->MatrixChanged();
 
   newGeometry->SetTimeBounds(m_TimeBounds);
 

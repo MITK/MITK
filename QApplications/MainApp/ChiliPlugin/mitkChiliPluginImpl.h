@@ -31,6 +31,7 @@ class QcMITKTask;
 class SampleApp;
 class QIDToolButton;
 class Chili3Conference;
+class QHBoxLayout;
 
 namespace mitk {
 
@@ -221,6 +222,8 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** called when a new lightbox get visible in chili */
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
+    void CreateSampleApp();
+
   protected slots:
 
     /** Slot to reinitialize the ChiliPlugin */
@@ -320,6 +323,8 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     void SendStudySelectedEvent();
     /** Invoke event: if the Lightbox count changed */
     void SendLightBoxCountChangedEvent();
+
+    QHBoxLayout* horzlayout;
 };
 
 } // namespace mitk

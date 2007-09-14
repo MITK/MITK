@@ -50,6 +50,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
+#include "chili_restart_mitk.xpm"
 
 QWidget* mitk::ChiliPluginImpl::s_Parent = NULL;
 /** create event-logging object (ConferenceKit) */
@@ -137,12 +138,83 @@ void mitk::ChiliPluginImpl::SetQtParent( QWidget* parent )
   s_Parent = parent;
 }
 
+void mitk::ChiliPluginImpl::CreateSampleApp()
+{
+  static bool done = false;
+  if( !done ) // this is done here, beause if it's done in the constructor, then many button labels get wrong... (qt names as labels)
+  {
+    // toplevel layout
+    horzlayout = new QHBoxLayout( task ); // member
+    QVBoxLayout* vertlayout = new QVBoxLayout( horzlayout );
+
+    // 4 lightbox import buttons
+    for (unsigned int row = 0; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row)
+    {
+      QIDToolButton* toolbutton = new QIDToolButton( row, task );
+      toolbutton->setUsesTextLabel( true );
+      QToolTip::add( toolbutton, "Import this lightbox to MITK");
+      toolbutton->setTextPosition( QToolButton::BelowIcon );
+      toolbutton->setPixmap( QPixmap(chili_lightbox_import_xpm) );
+
+      QSizePolicy policy = toolbutton->sizePolicy();
+      policy.setVerStretch( 2 );
+      toolbutton->setSizePolicy( policy );
+
+      connect( toolbutton, SIGNAL(clicked(int)), this, SLOT(lightBoxImportButtonClicked(int)));
+
+      m_LightBoxImportButtons.push_back( toolbutton ); // we need to know these for import of lightboxes
+      vertlayout->addWidget( toolbutton );
+
+      if (row < m_LightBoxCount)
+      {
+        toolbutton->show();
+      }
+      else
+      {
+        toolbutton->hide();
+      }
+    }
+
+    // button for application restart
+    m_LightBoxImportToggleButton = new QToolButton( task );
+    m_LightBoxImportToggleButton->setText(" "); // just some space that generates one short empty line of text
+    m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_restart_mitk_xpm) );
+    m_LightBoxImportToggleButton->setAutoRaise(true);
+    m_LightBoxImportToggleButton->setEnabled(true); //!! secret button to reinit application
+    connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
+    QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
+    policy.setVerStretch( 1 );
+    m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());
+    vertlayout->addWidget( m_LightBoxImportToggleButton );
+  }
+
+  if (app)
+  {
+    // delete old application
+    horzlayout->remove(app);
+    delete app;
+  }
+
+  // create one instance of SampleApp
+  app = new SampleApp( task, "sample", 0 );
+  horzlayout->addWidget( app ); 
+  horzlayout->activate();
+  app->show();
+
+  if (!done)
+  {
+    done = true;
+  }
+}
+
 /** return the plugininstance */
 QcPlugin* mitk::ChiliPluginImpl::GetQcPluginInstance()
 {
   // give Chili the single instance of mitk::ChiliPluginImpl
   ChiliPlugin::Pointer pluginInstance = ChiliPlugin::GetInstance();
   ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<ChiliPluginImpl*>( pluginInstance.GetPointer() );
+
+  realPluginInstance->CreateSampleApp();
 
   return realPluginInstance.GetPointer();
 }
@@ -1436,60 +1508,6 @@ void mitk::ChiliPluginImpl::lightboxTiles( QcLightboxManager *lbm, int tiles )
 /** event if a new study get selected */
 void mitk::ChiliPluginImpl::studySelected( study_t* study )
 {
-  static bool done = false;
-  if( !done ) // this is done here, beause if it's done in the constructor, then many button labels get wrong... (qt names as labels)
-  {
-    // toplevel layout
-    QHBoxLayout* horzlayout = new QHBoxLayout( task );
-    QVBoxLayout* vertlayout = new QVBoxLayout( horzlayout );
-
-    // 4 lightbox import buttons
-    for (unsigned int row = 0; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row)
-    {
-      QIDToolButton* toolbutton = new QIDToolButton( row, task );
-      toolbutton->setUsesTextLabel( true );
-      QToolTip::add( toolbutton, "Import this lightbox to MITK");
-      toolbutton->setTextPosition( QToolButton::BelowIcon );
-      toolbutton->setPixmap( QPixmap(chili_lightbox_import_xpm) );
-
-      QSizePolicy policy = toolbutton->sizePolicy();
-      policy.setVerStretch( 2 );
-      toolbutton->setSizePolicy( policy );
-
-      connect( toolbutton, SIGNAL(clicked(int)), this, SLOT(lightBoxImportButtonClicked(int)));
-
-      m_LightBoxImportButtons.push_back( toolbutton ); // we need to know these for import of lightboxes
-      vertlayout->addWidget( toolbutton );
-
-      if (row < m_LightBoxCount)
-      {
-        toolbutton->show();
-      }
-      else
-      {
-        toolbutton->hide();
-      }
-    }
-
-    // unused toggle button. How to hide without integrating the hide/show button into the actual application?
-    m_LightBoxImportToggleButton = new QToolButton( task );
-    m_LightBoxImportToggleButton->setText(" "); // just some space that generates one short empty line of text
-    //m_LightBoxImportToggleButton->setToggleButton(true);
-    //m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_lightbox_import) );
-    m_LightBoxImportToggleButton->setAutoRaise(true);
-    m_LightBoxImportToggleButton->setEnabled(true); //!! secret button to reinit application
-    connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
-    QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
-    policy.setVerStretch( 1 );
-    m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());
-    vertlayout->addWidget( m_LightBoxImportToggleButton );
-
-    // create one instance of SampleApp
-    app = new SampleApp( task, "sample", 0 );
-    horzlayout->addWidget( app ); // fromRow, toRow, fromCol, toCol
-
-    done = true;
-  }
 }
 
 /** button to import the lightbox */
@@ -1558,7 +1576,7 @@ void mitk::ChiliPluginImpl::OnApproachReinitializationOfWholeApplication()
                                   QMessageBox::No  | QMessageBox::Escape
                                 ) == QMessageBox::Yes )
     {
-      QMessageBox::information(NULL, "MITK", QString("Still unimplemented..."), QMessageBox::Ok);
+      CreateSampleApp();
     }
 
     clickCount = 0;

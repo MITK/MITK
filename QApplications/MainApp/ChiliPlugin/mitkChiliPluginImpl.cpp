@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpixmap.h>
 #include <qmessagebox.h>
 #include <qtooltip.h>
+#include <qtimer.h>
 
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
@@ -65,7 +66,7 @@ QcEXPORT QObject* create( QWidget *parent )
 
   // overwrite implementation of mitk::ChiliPlugin with mitk::ChiliPluginImpl
   mitk::ChiliPluginFactory::RegisterOneFactory();
-
+  
   return mitk::ChiliPluginImpl::GetQcPluginInstance();
 }
 
@@ -214,7 +215,16 @@ QcPlugin* mitk::ChiliPluginImpl::GetQcPluginInstance()
   ChiliPlugin::Pointer pluginInstance = ChiliPlugin::GetInstance();
   ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<ChiliPluginImpl*>( pluginInstance.GetPointer() );
 
-  realPluginInstance->CreateSampleApp();
+  static bool done = false;
+
+  if (!done)
+  {
+    QTimer* timer = new QTimer(realPluginInstance);
+    connect( timer, SIGNAL(timeout()), realPluginInstance, SLOT(CreateSampleApp()) );
+    timer->start(1000, true);
+
+    done = true;
+  }
 
   return realPluginInstance.GetPointer();
 }

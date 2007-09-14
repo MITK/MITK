@@ -222,12 +222,12 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** called when a new lightbox get visible in chili */
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
-    void CreateSampleApp();
-
   protected slots:
 
     /** Slot to reinitialize the ChiliPlugin */
     void OnApproachReinitializationOfWholeApplication();
+
+    void CreateSampleApp();
 
   protected:
 

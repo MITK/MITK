@@ -142,10 +142,10 @@ Tadaa
 #include <mitkImageTimeSelector.h>
 
 #include <mitkStateMachineFactory.h>
-#include <mitkUndoController.h>
 #include <mitkOperation.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkUndoController.h>
 
 #include <mitkParRecFileReader.h>
 #include <mitkInteractionConst.h>
@@ -1480,6 +1480,11 @@ void QmitkMainTemplate::fileCloseProject()
   mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(notpred);
   mitk::DataStorage::GetInstance()->Remove(all);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  if (m_UndoController)
+  {
+    m_UndoController->Clear(); // clear the undo/redo stacks
+  }
 }
 
 

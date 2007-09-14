@@ -29,7 +29,7 @@ mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
 : m_WriterWriteHasReturnValue( false )
 {
   this->SetNumberOfRequiredInputs( 1 );
-  
+
   m_VtkWriter = VtkWriterType::New();
 
   //enable to write ascii-formatted-file
@@ -66,21 +66,22 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   }
 
   mitk::Surface::Pointer input = const_cast<mitk::Surface*>(this->GetInput());
-  
+
   vtkTransformPolyDataFilter* transformPolyData = vtkTransformPolyDataFilter::New();
   vtkPolyData * polyData;
   Geometry3D* geometry;
 
-  if(input->GetTimeSlicedGeometry()->GetTimeSteps()>1)
-  {
-    
-    int t, timesteps;
+  unsigned int t, timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
 
-    timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
-    for(t = 0; t < timesteps; ++t)
+  for(t = 0; t < timesteps; ++t)
+  {
+    // surfaces do not have to exist in all timeteps; therefor, only write valid surfaces
+    if( input->GetVtkPolyData(t) == NULL ) continue;
+
+    ::itk::OStringStream filename;
+    geometry = input->GetGeometry(t);
+    if ( timesteps > 1 )
     {
-      ::itk::OStringStream filename;
-      geometry = input->GetGeometry(t);
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {
         const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
@@ -91,40 +92,26 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
         itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of surface " << filename << ".");
         filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
       }
-      geometry->TransferItkToVtkTransform();
-      transformPolyData->SetInput(input->GetVtkPolyData(t));
-      transformPolyData->SetTransform(geometry->GetVtkTransform());
-      transformPolyData->UpdateWholeExtent();
-      polyData = transformPolyData->GetOutput();
-      
       m_VtkWriter->SetFileName(filename.str().c_str());
-#if VTK_MAJOR_VERSION >= 5 
-      m_VtkWriter->SetInput((vtkDataObject*)polyData);
-#else
-      m_VtkWriter->SetInput(polyData);
-#endif
-     
-      ExecuteWrite( m_VtkWriter, transformPolyData );
     }
-  }
-  else
-  {
-    geometry = input->GetGeometry();
+    else 
+      m_VtkWriter->SetFileName(m_FileName.c_str());
+
     geometry->TransferItkToVtkTransform();
-    transformPolyData->SetInput(input->GetVtkPolyData());
+    transformPolyData->SetInput(input->GetVtkPolyData(t));
     transformPolyData->SetTransform(geometry->GetVtkTransform());
     transformPolyData->UpdateWholeExtent();
     polyData = transformPolyData->GetOutput();
-      
-    m_VtkWriter->SetFileName(m_FileName.c_str());
+
 #if VTK_MAJOR_VERSION >= 5 
     m_VtkWriter->SetInput((vtkDataObject*)polyData);
 #else
     m_VtkWriter->SetInput(polyData);
 #endif
-    
+
     ExecuteWrite( m_VtkWriter, transformPolyData );
   }
+
   transformPolyData->Delete();
   m_MimeType = "image/surf";
 }
@@ -156,12 +143,12 @@ bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWrite( DataTreeNode* input )
     mitk::BaseData* data = input->GetData();
     if ( data )
     {
-       mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( data );
-       if( surface.IsNotNull() )
-       {
-         SetDefaultExtension();
-         return true;
-       }
+      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( data );
+      if( surface.IsNotNull() )
+      {
+        SetDefaultExtension();
+        return true;
+      }
     }
   }
   return false;
@@ -171,7 +158,7 @@ template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( DataTreeNode* input )
 {
   if( input && CanWrite( input ) )
-   SetInput( dynamic_cast<mitk::Surface*>( input->GetData() ) );
+    SetInput( dynamic_cast<mitk::Surface*>( input->GetData() ) );
 }
 
 template <class VTKWRITER>

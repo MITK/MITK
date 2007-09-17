@@ -137,6 +137,9 @@ public slots:
 	/** \brief Slot method that will be called if the scale-operation is activated or deactivated by the rotate button. */ 
 	void TransformationModeScale(bool toggleflag);
 
+  /** \brief Slot method that will be called if the mirror-operation is activated or deactivated by the mirror button. */ 
+	void TransformationModeMirror(bool toggleflag);
+
 
 	/***************************** SLOTS TO TRANSFORM *************************************/
 
@@ -176,6 +179,15 @@ public slots:
 	void ScaleUp();
 	/** \brief Slot method to scale the surface down if the scale button is activated and (Qt::Key_Down) is pressed*/
 	void ScaleDown();  
+
+  /* Mirror */ 
+
+  /** \brief Slot method to mirror the surface around the X-plane if the mirror-button is activated and (Qt::Key_X) is pressed*/
+  void MirrorX();
+  /** \brief Slot method to mirror the surface around the Y-plane if the mirror-button is activated and (Qt::Key_Y) is pressed*/
+  void MirrorY(); 
+  /** \brief Slot method to mirror the surface around the Z-plane if the mirror-button is activated and (Qt::Key_Z) is pressed*/
+  void MirrorZ(); 
 
 protected:
 
@@ -250,6 +262,13 @@ private:
 	/** \brief  Member for the connection between the down-arrow-keyand the ScaleDown slot*/
 	QAccel* m_ScaleDown;
 
+  /* MEMBER ACCELS FOR SCALE */
+	/** \brief  Member for the connection between the X-key and the MirrorX slot*/
+	QAccel* m_MirrorX;
+	/** \brief  Member for the connection between the Y-key and the MirrorY slot*/
+	QAccel* m_MirrorY;
+  /** \brief  Member for the connection between the Z-key and the MirrorZ slot*/
+	QAccel* m_MirrorZ;
 
 
 

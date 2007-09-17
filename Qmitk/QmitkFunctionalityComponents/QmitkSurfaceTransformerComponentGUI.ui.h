@@ -78,3 +78,9 @@ QPushButton* QmitkSurfaceTransformerComponentGUI::GetScaleButton()
 {
   return m_ScaleButton;
 }
+
+
+QPushButton* QmitkSurfaceTransformerComponentGUI::GetMirrorButton()
+{
+ return m_MirrorButton;
+}

@@ -29,9 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <vtkLinearTransform.h>
 //#include <vtkMatrix4x4.h>
+#include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPolyData.h>
+#include <vtkReflectionFilter.h>
 #include <vtkTransformPolyDataFilter.h>
+#include "vtkTransform.h"
+#include "vtkReverseSense.h"
+
 #include <vtkTransform.h>
 
 
@@ -57,11 +62,11 @@ m_Angle(5.0),
 m_Distance(1.0),
 m_Scale(0.9)
 {
-	SetDataTreeIterator(it);
-	SetAvailability(true);
+  SetDataTreeIterator(it);
+  SetAvailability(true);
 
-	SetComponentName("SurfaceTransformer");
-	m_Node = it->Get();
+  SetComponentName("SurfaceTransformer");
+  m_Node = it->Get();
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -73,152 +78,208 @@ QmitkSurfaceTransformerComponent::~QmitkSurfaceTransformerComponent()
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkSurfaceTransformerComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
-	m_DataTreeIterator = it;
-	m_Node = m_DataTreeIterator->Get();
+  m_DataTreeIterator = it;
+  m_Node = m_DataTreeIterator->Get();
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
 void QmitkSurfaceTransformerComponent::SetSelectorVisibility(bool visibility)
 {
-	if(m_SurfaceTransformerComponentGUI)
-	{
-		m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
-	}
+  if(m_SurfaceTransformerComponentGUI)
+  {
+    m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(visibility);
+  }
 }
 
 /***************   GET IMAGE CONTENT   ***************/
 QGroupBox* QmitkSurfaceTransformerComponent::GetImageContent()
 {
-	return (QGroupBox*) m_SurfaceTransformerComponentGUI->GetImageContent();
+  return (QGroupBox*) m_SurfaceTransformerComponentGUI->GetImageContent();
 }
 
 
 /*************** GET TREE NODE SELECTOR ***************/
 QmitkDataTreeComboBox* QmitkSurfaceTransformerComponent::GetTreeNodeSelector()
 {
-	return m_SurfaceTransformerComponentGUI->GetTreeNodeSelector();
+  return m_SurfaceTransformerComponentGUI->GetTreeNodeSelector();
 }
 
 /****************** GET SURFACE NODE ******************/
 mitk::DataTreeNode::Pointer QmitkSurfaceTransformerComponent::GetSurfaceNode()
 {
-	return m_SurfaceNode;
+  return m_SurfaceNode;
 }
 
 /****************** SET SURFACE NODE ******************/
 void QmitkSurfaceTransformerComponent::SetSurfaceNode(mitk::DataTreeNode::Pointer node)
 {
-	m_SurfaceNode = node;
+  m_SurfaceNode = node;
 }
 
 /***************       CONNECTIONS      ***************/
 void QmitkSurfaceTransformerComponent::CreateConnections()
 {
-	if ( m_SurfaceTransformerComponentGUI )
-	{
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceTransformerContent(bool)));     
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetMoveButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeMove(bool))); 
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetRotateButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeRotate(bool)));
-		connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetScaleButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeScale(bool)));
-	}
+  if ( m_SurfaceTransformerComponentGUI )
+  {
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowSurfaceTransformerContent(bool)));     
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetMoveButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeMove(bool))); 
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetRotateButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeRotate(bool)));
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetScaleButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeScale(bool)));
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetMirrorButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeMirror(bool)));
+  }
 }
 
 
 /************** TRANSFORMATION MODE MOVE **************/
 void QmitkSurfaceTransformerComponent::TransformationModeMove(bool toggleflag)
 {
-	if(toggleflag == true)
-	{
-		m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
-		m_SurfaceTransformerComponentGUI->GetScaleButton()->setOn(false);
+  if(toggleflag == true)
+  {
+    m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetScaleButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetMirrorButton()->setOn(false);
 
 
-		if(m_SurfaceNode)
-		{
-			//activate the connection between the arrow-keys and the translation-mehtods.
-			m_Left->setEnabled(true);
-			m_Right->setEnabled(true);
-			m_Up->setEnabled(true);
-			m_Down->setEnabled(true);
-			m_Forward->setEnabled(true);
-			m_Backward->setEnabled(true);
+    if(m_SurfaceNode)
+    {
+      //activate the connection between the arrow-keys and the translation-mehtods.
+      m_Left->setEnabled(true);
+      m_Right->setEnabled(true);
+      m_Up->setEnabled(true);
+      m_Down->setEnabled(true);
+      m_Forward->setEnabled(true);
+      m_Backward->setEnabled(true);
 
-			//deactivate the connction between the keys and the rotation-methods
-			m_RotX->setEnabled(false);
-			m_RotInvX->setEnabled(false);
-			m_RotY->setEnabled(false);
-			m_RotInvY->setEnabled(false);
-			m_RotZ->setEnabled(false);
-			m_RotInvZ->setEnabled(false);
+      //deactivate the connction between the keys and the rotation-methods
+      m_RotX->setEnabled(false);
+      m_RotInvX->setEnabled(false);
+      m_RotY->setEnabled(false);
+      m_RotInvY->setEnabled(false);
+      m_RotZ->setEnabled(false);
+      m_RotInvZ->setEnabled(false);
 
-			//deactivate the connction between the keys and the scale-methods
-			m_ScaleUp->setEnabled(false);
-			m_ScaleDown->setEnabled(false);
-		}
-	}
+      //deactivate the connction between the keys and the scale-methods
+      m_ScaleUp->setEnabled(false);
+      m_ScaleDown->setEnabled(false);
+
+      //deactivate the connection between the XYZ-Keys and the mirror-methods
+      m_MirrorX->setEnabled(false);
+      m_MirrorY->setEnabled(false);
+      m_MirrorZ->setEnabled(false);
+    }
+  }
 }
 
 /************* TRANSFORMATION MODE ROTATE *************/
 void QmitkSurfaceTransformerComponent::TransformationModeRotate(bool toggleflag)
 {
-	if(toggleflag == true)
-	{
-		m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
-		m_SurfaceTransformerComponentGUI->GetScaleButton()->setOn(false);
+  if(toggleflag == true)
+  {
+    m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetScaleButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetMirrorButton()->setOn(false);
 
-		//activate the connection between the arrow-keys and the rotation-mehtods.
-		m_RotX->setEnabled(true);
-		m_RotInvX->setEnabled(true);
-		m_RotY->setEnabled(true);
-		m_RotInvY->setEnabled(true);
-		m_RotZ->setEnabled(true);
-		m_RotInvZ->setEnabled(true);
+    //activate the connection between the arrow-keys and the rotation-mehtods.
+    m_RotX->setEnabled(true);
+    m_RotInvX->setEnabled(true);
+    m_RotY->setEnabled(true);
+    m_RotInvY->setEnabled(true);
+    m_RotZ->setEnabled(true);
+    m_RotInvZ->setEnabled(true);
 
-		//deactivate the connction between the keys and the translation-methods
-		m_Left->setEnabled(false);
-		m_Right->setEnabled(false);
-		m_Up->setEnabled(false);
-		m_Down->setEnabled(false);
-		m_Forward->setEnabled(false);
-		m_Backward->setEnabled(false);
+    //deactivate the connction between the keys and the translation-methods
+    m_Left->setEnabled(false);
+    m_Right->setEnabled(false);
+    m_Up->setEnabled(false);
+    m_Down->setEnabled(false);
+    m_Forward->setEnabled(false);
+    m_Backward->setEnabled(false);
 
-		//deactivate the connction between the keys and the scale-methods
-		m_ScaleUp->setEnabled(false);
-		m_ScaleDown->setEnabled(false);
-	}
+    //deactivate the connction between the keys and the scale-methods
+    m_ScaleUp->setEnabled(false);
+    m_ScaleDown->setEnabled(false);
+
+    //deactivate the connection between the XYZ-Keys and the mirror-methods
+    m_MirrorX->setEnabled(false);
+    m_MirrorY->setEnabled(false);
+    m_MirrorZ->setEnabled(false);
+  }
 }
 
 /************* TRANSFORMATION MODE ROTATE *************/
 void QmitkSurfaceTransformerComponent::TransformationModeScale(bool toggleflag)
 {
-	if(toggleflag == true)
-	{
-		m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
-		m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
+  if(toggleflag == true)
+  {
+    m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetMirrorButton()->setOn(false);
 
-		//activate the connction between the keys and the scale-methods
-		m_ScaleUp->setEnabled(true);
-		m_ScaleDown->setEnabled(true);
+    //deactivate the connction between the keys and the scale-methods
+    m_ScaleUp->setEnabled(true);
+    m_ScaleDown->setEnabled(true);
 
-		//activate the connection between the arrow-keys and the rotation-mehtods.
-		m_RotX->setEnabled(false);
-		m_RotInvX->setEnabled(false);
-		m_RotY->setEnabled(false);
-		m_RotInvY->setEnabled(false);
-		m_RotZ->setEnabled(false);
-		m_RotInvZ->setEnabled(false);
+    //activate the connection between the arrow-keys and the rotation-mehtods.
+    m_RotX->setEnabled(false);
+    m_RotInvX->setEnabled(false);
+    m_RotY->setEnabled(false);
+    m_RotInvY->setEnabled(false);
+    m_RotZ->setEnabled(false);
+    m_RotInvZ->setEnabled(false);
 
-		//deactivate the connction between the keys and the translation-methods
-		m_Left->setEnabled(false);
-		m_Right->setEnabled(false);
-		m_Up->setEnabled(false);
-		m_Down->setEnabled(false);
-		m_Forward->setEnabled(false);
-		m_Backward->setEnabled(false);
-	}
+    //deactivate the connction between the keys and the translation-methods
+    m_Left->setEnabled(false);
+    m_Right->setEnabled(false);
+    m_Up->setEnabled(false);
+    m_Down->setEnabled(false);
+    m_Forward->setEnabled(false);
+    m_Backward->setEnabled(false);
+
+    //deactivate the connection between the XYZ-Keys and the mirror-methods
+    m_MirrorX->setEnabled(false);
+    m_MirrorY->setEnabled(false);
+    m_MirrorZ->setEnabled(false);
+  }
+}
+
+/************* TRANSFORMATION MODE ROTATE *************/
+void QmitkSurfaceTransformerComponent::TransformationModeMirror(bool toggleflag)
+{
+  if(toggleflag == true)
+  {
+    m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
+    m_SurfaceTransformerComponentGUI->GetScaleButton()->setOn(false);
+
+    //activate the connection between the XYZ-Keys and the mirror-methods
+    m_MirrorX->setEnabled(true);
+    m_MirrorY->setEnabled(true);
+    m_MirrorZ->setEnabled(true);
+
+
+    //deactivate the connction between the keys and the scale-methods
+    m_ScaleUp->setEnabled(false);
+    m_ScaleDown->setEnabled(false);
+
+    //deactivate the connection between the arrow-keys and the rotation-mehtods.
+    m_RotX->setEnabled(false);
+    m_RotInvX->setEnabled(false);
+    m_RotY->setEnabled(false);
+    m_RotInvY->setEnabled(false);
+    m_RotZ->setEnabled(false);
+    m_RotInvZ->setEnabled(false);
+
+    //deactivate the connction between the keys and the translation-methods
+    m_Left->setEnabled(false);
+    m_Right->setEnabled(false);
+    m_Up->setEnabled(false);
+    m_Down->setEnabled(false);
+    m_Forward->setEnabled(false);
+    m_Backward->setEnabled(false);
+  }
 }
 
 /*****************************************************************************************************************************/
@@ -228,68 +289,70 @@ void QmitkSurfaceTransformerComponent::TransformationModeScale(bool toggleflag)
 /*************          MOVE LEFT         *************/
 void QmitkSurfaceTransformerComponent::MoveLeft()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( m_Distance, 0.0, 0.0 );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( m_Distance, 0.0, 0.0 );
+    Transform(transform);
+  }
 }                     
 
 /*************         MOVE RIGHT         *************/
 void QmitkSurfaceTransformerComponent::MoveRight()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( -m_Distance, 0.0, 0.0 );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( -m_Distance, 0.0, 0.0 );
+    Transform(transform);
+  }
 }                    
 
 /*************          MOVE UP           *************/
 void QmitkSurfaceTransformerComponent::MoveUp()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( 0.0, m_Distance, 0.0 );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( 0.0, m_Distance, 0.0 );
+    Transform(transform);
+  }
 }                      
 
 /*************         MOVE DOWN          *************/
 void QmitkSurfaceTransformerComponent::MoveDown()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( 0.0, -m_Distance, 0.0 );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( 0.0, -m_Distance, 0.0 );
+    Transform(transform);
+  }
 }  
 
 /*************       MOVE FOREWARD        *************/
 void QmitkSurfaceTransformerComponent::MoveForward()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( 0.0, 0.0, m_Distance );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( 0.0, 0.0, m_Distance );
+    Transform(transform);
+  }
 }                      
 
 /*************        MOVE BACKWARD       *************/
 void QmitkSurfaceTransformerComponent::MoveBackward()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Translate( 0.0, 0.0, -m_Distance );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Translate( 0.0, 0.0, -m_Distance );
+    Transform(transform);
+  }
 } 
+
+
 /*****************************************************************************************************************************/
 /****************************************       ROTATION       ***************************************************************/
 /*****************************************************************************************************************************/
@@ -297,73 +360,73 @@ void QmitkSurfaceTransformerComponent::MoveBackward()
 ///*************    ROTATE ARROUND X-AXIS   *************/
 void QmitkSurfaceTransformerComponent::RotX()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateX( m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateX( m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*********** ROTATE INVERSE ARROUND X-AXIS ************/
 void QmitkSurfaceTransformerComponent::RotInvX()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateX( -m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateX( -m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*************    ROTATE ARROUND Y-AXIS   *************/
 void QmitkSurfaceTransformerComponent::RotY()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateY( m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateY( m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*********** ROTATE INVERSE ARROUND Y-AXIS ************/
 void QmitkSurfaceTransformerComponent::RotInvY()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateY( -m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateY( -m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*************    ROTATE ARROUND Z-AXIS   *************/
 void QmitkSurfaceTransformerComponent::RotZ()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateZ( m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateZ( m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*********** ROTATE INVERSE ARROUND Z-AXIS ************/
 void QmitkSurfaceTransformerComponent::RotInvZ()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->RotateZ( -m_Angle );
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->RotateZ( -m_Angle );
 
-		Transform(transform);
-	}
+    Transform(transform);
+  }
 }
 
 /*****************************************************************************************************************************/
@@ -373,191 +436,331 @@ void QmitkSurfaceTransformerComponent::RotInvZ()
 /*************           SCALE UP         *************/
 void QmitkSurfaceTransformerComponent::ScaleUp()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Scale(  1/m_Scale, 1/m_Scale, 1/m_Scale );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Scale(  1/m_Scale, 1/m_Scale, 1/m_Scale );
+    Transform(transform);
+  }
 }  
 
 /*************          SCALE DOWN        *************/
 void QmitkSurfaceTransformerComponent::ScaleDown()
 {
-	if(m_SurfaceNode)
-	{
-		vtkTransform* transform = vtkTransform::New();
-		transform->Scale( m_Scale, m_Scale, m_Scale );
-		Transform(transform);
-	}
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Scale( m_Scale, m_Scale, m_Scale );
+
+    Transform(transform);
+  }
 } 
 
 
+/*****************************************************************************************************************************/
+/****************************************        MIRROR        ***************************************************************/
+/*****************************************************************************************************************************/
 
+/*************           MIRROR X         *************/
+void QmitkSurfaceTransformerComponent::MirrorX()
+{
+  if(m_SurfaceNode)
+  {
+    vtkTransform* transform = vtkTransform::New();
+    transform->Scale(  1, 1, -1);
+
+    //vtkTransformPolyDataFilter *tf=vtkTransformPolyDataFilter::New();
+
+    //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    //tf->SetInput(surface->GetVtkPolyData());
+
+
+    ////tf->SetInput(transform->GetOutput()reader->GetOutput());
+    //tf->SetTransform(transform);
+
+    //vtkReverseSense *reverse=vtkReverseSense ::New();
+    //reverse->SetInput(tf->GetOutput());
+
+    vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+
+    
+  transformFilter->SetInput( surface->GetVtkPolyData() );  
+  transformFilter->SetTransform( transform );
+
+    mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+    vtkPolyData* transformed = transformFilter->GetOutput();
+
+    vtkReverseSense *reverse=vtkReverseSense ::New();
+    reverse->SetInput(transformed);
+
+    mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+    tf->SetVtkPolyData(reverse->GetOutput(), 0);
+
+
+
+
+  m_SurfaceNode->SetData(tf);
+
+  RepaintRenderWindows();
+
+
+
+  //vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
+  //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+
+  //transformFilter->SetInput( surface->GetVtkPolyData() );  
+  //transformFilter->SetTransform( transform );
+
+  //mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+  //vtkPolyData* transformed = transformFilter->GetOutput();
+  //mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+  //tf->SetVtkPolyData(transformed, 0);
+  //m_SurfaceNode->SetData(tf);
+
+  RepaintRenderWindows();
+
+
+  }
+}  
+
+/*************           MIRROR Y         *************/
+void QmitkSurfaceTransformerComponent::MirrorY()
+{
+  if(m_SurfaceNode)
+  {
+    //vtkTransform* transform = vtkTransform::New();
+    //transform->Scale(-1,-1,-1);
+    //Transform(transform);
+    vtkReflectionFilter* mirror = vtkReflectionFilter::New();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    mirror->SetInput(surface->GetVtkPolyData());
+    mirror->SetPlaneToY();
+    RepaintRenderWindows();
+
+    vtkGeometryFilter* geo = vtkGeometryFilter::New();
+    geo->SetInput((vtkDataObject*)(mirror->GetOutput()));
+    geo->Update();
+    //mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+    //vtkPolyData* transformed = mirror->GetOutput();
+    mitk::Surface::Pointer tf;// = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+    tf->SetVtkPolyData(geo->GetOutput(), 0);
+    m_SurfaceNode->SetData(tf);
+
+
+    RepaintRenderWindows();
+  }
+} 
+
+/*************           MIRROR Z         *************/
+void QmitkSurfaceTransformerComponent::MirrorZ()
+{
+  if(m_SurfaceNode)
+  {
+    //vtkTransform* transform = vtkTransform::New();
+    //transform->Scale(-1,-1,-1);
+    //Transform(transform);
+    vtkReflectionFilter* mirror = vtkReflectionFilter::New();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    mirror->SetInput(surface->GetVtkPolyData());
+    mirror->SetPlaneToZ();
+    RepaintRenderWindows();
+
+        vtkGeometryFilter* geo = vtkGeometryFilter::New();
+    geo->SetInput((vtkDataObject*)(mirror->GetOutput()));
+    geo->Update();
+    //mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+    //vtkPolyData* transformed = mirror->GetOutput();
+    mitk::Surface::Pointer tf;// = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+    tf->SetVtkPolyData(geo->GetOutput(), 0);
+    m_SurfaceNode->SetData(tf);
+
+
+    RepaintRenderWindows();
+  }
+} 
 
 /*************          TRANSFORM         *************/
 void QmitkSurfaceTransformerComponent::Transform(vtkTransform* transform)
 {
-	vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
-	mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
+  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
 
-	transformFilter->SetInput( surface->GetVtkPolyData() );  
-	transformFilter->SetTransform( transform );
+  transformFilter->SetInput( surface->GetVtkPolyData() );  
+  transformFilter->SetTransform( transform );
 
-	mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
-	vtkPolyData* transformed = transformFilter->GetOutput();
-	mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
-	tf->SetVtkPolyData(transformed, 0);
-	m_SurfaceNode->SetData(tf);
+  mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+  vtkPolyData* transformed = transformFilter->GetOutput();
+  mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+  tf->SetVtkPolyData(transformed, 0);
+  m_SurfaceNode->SetData(tf);
 
-	RepaintRenderWindows();
+  RepaintRenderWindows();
 }
 
 /*************    REPAINT RENDERWINDOWS   *************/
 void QmitkSurfaceTransformerComponent::RepaintRenderWindows()
 {
-	m_MultiWidget->GetRenderWindow1()->repaint();
-	m_MultiWidget->GetRenderWindow2()->repaint();
-	m_MultiWidget->GetRenderWindow3()->repaint();
-	m_MultiWidget->GetRenderWindow4()->repaint();
+  m_MultiWidget->GetRenderWindow1()->repaint();
+  m_MultiWidget->GetRenderWindow2()->repaint();
+  m_MultiWidget->GetRenderWindow3()->repaint();
+  m_MultiWidget->GetRenderWindow4()->repaint();
 }
 
 
 /***************     IMAGE SELECTED     ***************/
 void QmitkSurfaceTransformerComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
-	m_SelectedItem = imageIt;
-	mitk::DataTreeFilter::Item* currentItem(NULL);
-	if(m_SurfaceTransformerComponentGUI)
-	{
-		if(mitk::DataTreeFilter* filter = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->GetFilter())
-		{
-			if(imageIt)
-			{
-				currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
-			}
-		}
-	}
-	if(currentItem)
-	{
-		currentItem->SetSelected(true);
-	}
-	if(m_SurfaceTransformerComponentGUI != NULL)
-	{
-		for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
-		{
-			QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
-			if (functionalityComponent != NULL)
-				functionalityComponent->ImageSelected(m_SelectedItem);
-		}
-	}
-	m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
-	m_SurfaceNode = m_Node;
+  m_SelectedItem = imageIt;
+  mitk::DataTreeFilter::Item* currentItem(NULL);
+  if(m_SurfaceTransformerComponentGUI)
+  {
+    if(mitk::DataTreeFilter* filter = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->GetFilter())
+    {
+      if(imageIt)
+      {
+        currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+      }
+    }
+  }
+  if(currentItem)
+  {
+    currentItem->SetSelected(true);
+  }
+  if(m_SurfaceTransformerComponentGUI != NULL)
+  {
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
+    {
+      QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->ImageSelected(m_SelectedItem);
+    }
+  }
+  m_Node = const_cast<mitk::DataTreeNode*>(m_SelectedItem->GetNode());
+  m_SurfaceNode = m_Node;
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkSurfaceTransformerComponent::CreateControlWidget(QWidget* parent)
 {
-	m_SurfaceTransformerComponentGUI = new QmitkSurfaceTransformerComponentGUI(parent);
-	m_GUI = m_SurfaceTransformerComponentGUI;
+  m_SurfaceTransformerComponentGUI = new QmitkSurfaceTransformerComponentGUI(parent);
+  m_GUI = m_SurfaceTransformerComponentGUI;
 
-	m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+  m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
 
-	m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
-	m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
+  m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
+  m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
 
-	if(m_ShowSelector)
-	{
-		m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
-	}
-
-
-	//create connection between keys and translation methods
-
-	m_Left = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Left->connectItem( m_Left->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveLeft()));                     // MoveLeft() slot
-
-	m_Right = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Right->connectItem( m_Right->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveRight()));                     // MoveRight() slot
-
-	m_Up = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Up->connectItem( m_Up->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveForward()));                     // MoveUp() slot
-
-	m_Down = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Down->connectItem( m_Down->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveBackward()));                     // MoveDown() slot
-
-	m_Forward = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Forward->connectItem( m_Forward->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveUp()));                     // MoveForward() slot
-
-	m_Backward = new QAccel(m_GUI);        // create accels for multiWidget
-	m_Backward->connectItem( m_Backward->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(MoveDown()));                     // MoveBackward() slot
+  if(m_ShowSelector)
+  {
+    m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  }
 
 
+  //create connection between keys and translation methods
 
-	//create connection between keys and rotation methods
+  m_Left = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Left->connectItem( m_Left->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveLeft()));                     // MoveLeft() slot
 
-	m_RotX = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotX->connectItem( m_RotX->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotX()));                     // RotY() slot
+  m_Right = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Right->connectItem( m_Right->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveRight()));                     // MoveRight() slot
 
-	m_RotInvX = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotInvX->connectItem( m_RotInvX->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotInvX()));                     // RotInvX() slot
+  m_Up = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Up->connectItem( m_Up->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveForward()));                     // MoveUp() slot
 
-	m_RotY = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotY->connectItem( m_RotY->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotY()));                     // RotY() slot
+  m_Down = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Down->connectItem( m_Down->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveBackward()));                     // MoveDown() slot
 
-	m_RotInvY = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotInvY->connectItem( m_RotInvY->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotInvY()));                     // RotInvY() slot
+  m_Forward = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Forward->connectItem( m_Forward->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveUp()));                     // MoveForward() slot
 
-	m_RotZ = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotZ->connectItem( m_RotZ->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotZ()));                     // RotZ() slot
-
-	m_RotInvZ = new QAccel(m_GUI);        // create accels for multiWidget
-	m_RotInvZ->connectItem( m_RotInvZ->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(RotInvZ()));                     // RotInvZ() slot
+  m_Backward = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Backward->connectItem( m_Backward->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MoveDown()));                     // MoveBackward() slot
 
 
-	//create connection between keys and scale methods
 
-	m_ScaleUp = new QAccel(m_GUI);        // create accels for multiWidget
-	m_ScaleUp->connectItem( m_ScaleUp->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(ScaleUp()));                     // RotY() slot
+  //create connection between keys and rotation methods
 
-	m_ScaleDown = new QAccel(m_GUI);        // create accels for multiWidget
-	m_ScaleDown->connectItem( m_ScaleDown->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-		this,                                       // connected to SurfaceCreator
-		SLOT(ScaleDown()));                     // RotY() slot
+  m_RotX = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotX->connectItem( m_RotX->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotX()));                     // RotY() slot
 
-	/*  see list of Keys at http://doc.trolltech.com/3.3/qt.html#Key-enum */
+  m_RotInvX = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvX->connectItem( m_RotInvX->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotInvX()));                     // RotInvX() slot
 
-	return m_SurfaceTransformerComponentGUI;
+  m_RotY = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotY->connectItem( m_RotY->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotY()));                     // RotY() slot
+
+  m_RotInvY = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvY->connectItem( m_RotInvY->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotInvY()));                     // RotInvY() slot
+
+  m_RotZ = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotZ->connectItem( m_RotZ->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotZ()));                     // RotZ() slot
+
+  m_RotInvZ = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvZ->connectItem( m_RotInvZ->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(RotInvZ()));                     // RotInvZ() slot
+
+
+  //create connection between keys and scale methods
+
+  m_ScaleUp = new QAccel(m_GUI);        // create accels for multiWidget
+  m_ScaleUp->connectItem( m_ScaleUp->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(ScaleUp()));                     // RotY() slot
+
+  m_ScaleDown = new QAccel(m_GUI);        // create accels for multiWidget
+  m_ScaleDown->connectItem( m_ScaleDown->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(ScaleDown()));                     // RotY() slot
+
+
+  //create connection between keys and mirror methods
+
+  m_MirrorX = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorX->connectItem( m_MirrorX->insertItem(Qt::Key_X), // adds Key_X accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MirrorX()));                     // MirrorX() slot
+
+  m_MirrorY = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorY->connectItem( m_MirrorY->insertItem(Qt::Key_Y), // adds Key_Y accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MirrorY()));                     // MirrorY() slot
+
+  m_MirrorZ = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorZ->connectItem( m_MirrorZ->insertItem(Qt::Key_Z), // adds Key_Y accelerator
+    this,                                       // connected to SurfaceCreator
+    SLOT(MirrorZ()));                     // MirrorZ() slot
+
+  /*  see list of Keys at http://doc.trolltech.com/3.3/qt.html#Key-enum */
+
+  return m_SurfaceTransformerComponentGUI;
 }
 
 
@@ -567,141 +770,155 @@ QWidget* QmitkSurfaceTransformerComponent::CreateControlWidget(QWidget* parent)
 /***************      SET DISTANCE      ***************/
 void QmitkSurfaceTransformerComponent::SetDistance(double distance)
 {
-	m_Distance = distance;
+  m_Distance = distance;
 }
 
 /***************      GET DISTANCE      ***************/
 double QmitkSurfaceTransformerComponent::GetDistance()
 {
-	return m_Distance;
+  return m_Distance;
 }
 
 /***************       SET ANGLE        ***************/
 void QmitkSurfaceTransformerComponent::SetAngle(double angle)
 {
-	m_Angle = angle;
+  m_Angle = angle;
 }
 
 /***************       GET ANGLE        ***************/
 double QmitkSurfaceTransformerComponent::GetAngle()
 {
-	return m_Angle;
+  return m_Angle;
 }
 
 
 /*************** GET CONTENT CONTAINER  ***************/
 QGroupBox * QmitkSurfaceTransformerComponent::GetContentContainer()
 {
-	return m_SurfaceTransformerComponentGUI->GetContainerContent();
+  return m_SurfaceTransformerComponentGUI->GetContainerContent();
 }
 
 /************ GET MAIN CHECK BOX CONTAINER ************/
 QGroupBox * QmitkSurfaceTransformerComponent::GetMainCheckBoxContainer()
 {
-	return m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox();
+  return m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox();
 }
 
 /***************        ACTIVATED       ***************/
 void QmitkSurfaceTransformerComponent::Activated()
 {
-	QmitkBaseFunctionalityComponent::Activated();
-	m_Active = true;
-	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-	{
-		m_AddedChildList[i]->Activated();
-	} 
+  QmitkBaseFunctionalityComponent::Activated();
+  m_Active = true;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Activated();
+  } 
 
-	m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
-	m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
+  m_SurfaceTransformerComponentGUI->GetMoveButton()->setOn(false);
+  m_SurfaceTransformerComponentGUI->GetRotateButton()->setOn(false);
 
-	m_Left->setEnabled(false);
-	m_Right->setEnabled(false);
-	m_Up->setEnabled(false);
-	m_Down->setEnabled(false);
-	m_Forward->setEnabled(false);
-	m_Backward->setEnabled(false);
+  m_Left->setEnabled(false);
+  m_Right->setEnabled(false);
+  m_Up->setEnabled(false);
+  m_Down->setEnabled(false);
+  m_Forward->setEnabled(false);
+  m_Backward->setEnabled(false);
 
-	m_RotX->setEnabled(false);
-	m_RotInvX->setEnabled(false);
-	m_RotY->setEnabled(false);
-	m_RotInvY->setEnabled(false);
-	m_RotZ->setEnabled(false);
-	m_RotInvZ->setEnabled(false);
+  m_RotX->setEnabled(false);
+  m_RotInvX->setEnabled(false);
+  m_RotY->setEnabled(false);
+  m_RotInvY->setEnabled(false);
+  m_RotZ->setEnabled(false);
+  m_RotInvZ->setEnabled(false);
+
+  m_ScaleUp->setEnabled(false);
+  m_ScaleDown->setEnabled(false);
+
+  m_MirrorX->setEnabled(false);
+  m_MirrorY->setEnabled(false);
+  m_MirrorZ->setEnabled(false);
 
 }
 
 /***************       DEACTIVATED      ***************/
 void QmitkSurfaceTransformerComponent::Deactivated()
 {
-	QmitkBaseFunctionalityComponent::Deactivated();
-	m_Active = false;
-	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-	{
-		m_AddedChildList[i]->Deactivated();
-	} 
+  QmitkBaseFunctionalityComponent::Deactivated();
+  m_Active = false;
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->Deactivated();
+  } 
 
-	m_Left->setEnabled(false);
-	m_Right->setEnabled(false);
-	m_Up->setEnabled(false);
-	m_Down->setEnabled(false);
-	m_Forward->setEnabled(false);
-	m_Backward->setEnabled(false);
+  m_Left->setEnabled(false);
+  m_Right->setEnabled(false);
+  m_Up->setEnabled(false);
+  m_Down->setEnabled(false);
+  m_Forward->setEnabled(false);
+  m_Backward->setEnabled(false);
 
-	m_RotX->setEnabled(false);
-	m_RotInvX->setEnabled(false);
-	m_RotY->setEnabled(false);
-	m_RotInvY->setEnabled(false);
-	m_RotZ->setEnabled(false);
-	m_RotInvZ->setEnabled(false);
+  m_RotX->setEnabled(false);
+  m_RotInvX->setEnabled(false);
+  m_RotY->setEnabled(false);
+  m_RotInvY->setEnabled(false);
+  m_RotZ->setEnabled(false);
+  m_RotInvZ->setEnabled(false);
+
+  m_ScaleUp->setEnabled(false);
+  m_ScaleDown->setEnabled(false);
+
+  m_MirrorX->setEnabled(false);
+  m_MirrorY->setEnabled(false);
+  m_MirrorZ->setEnabled(false);
 }
 
 
 ///************ SHOW SurfaceTransformer CONTENT ***********/
 void QmitkSurfaceTransformerComponent::ShowSurfaceTransformerContent(bool)
 {
-	m_SurfaceTransformerComponentGUI->GetContainerContent()->setShown(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()->isChecked());
+  m_SurfaceTransformerComponentGUI->GetContainerContent()->setShown(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()->isChecked());
 
-	if(m_ShowSelector)
-	{
-		m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()->isChecked());
-	}
+  if(m_ShowSelector)
+  {
+    m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_SurfaceTransformerComponentGUI->GetSurfaceTransformerFinderGroupBox()->isChecked());
+  }
 }
 
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkSurfaceTransformerComponent::ShowImageContent(bool)
 {
-	m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
+  m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
 
-	if(m_ShowSelector)
-	{
-		m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
-	}
+  if(m_ShowSelector)
+  {
+    m_SurfaceTransformerComponentGUI->GetImageContent()->setShown(m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_SurfaceTransformerComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  }
 }
 
 
 ///***************  DELETE SurfaceTransformerD NODE  **************/
 void QmitkSurfaceTransformerComponent::DeleteSurfaceTransformerNode()
 {
-	if(m_SurfaceTransformerImageNode)
-	{
-		mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
-		while ( !iteratorClone->IsAtEnd() )
-		{
-			mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+  if(m_SurfaceTransformerImageNode)
+  {
+    mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
+    while ( !iteratorClone->IsAtEnd() )
+    {
+      mitk::DataTreeNode::Pointer node = iteratorClone->Get();
 
-			std::string name;
-			node->GetName(name);
+      std::string name;
+      node->GetName(name);
 
-			if(name == "SurfaceTransformer image")
-			{
-				iteratorClone->Disconnect();
-				m_SurfaceTransformerNodeExisting = false;
-			}
-			++iteratorClone;
-		}
-	}
+      if(name == "SurfaceTransformer image")
+      {
+        iteratorClone->Disconnect();
+        m_SurfaceTransformerNodeExisting = false;
+      }
+      ++iteratorClone;
+    }
+  }
 }

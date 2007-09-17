@@ -113,9 +113,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput());
   m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
-    
-  mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
-  
+ 
 }
 
 
@@ -276,6 +274,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   mitk::LookupTableProperty::Pointer lookupTableProp;
   lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer());
   mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction").GetPointer());
+  
   if ( transferFunctionProp.IsNotNull() )   {
 
     opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
@@ -372,6 +371,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   
   if (vtkRendWin && m_Firstcall) 
   {
+    mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
 
     vtkCallbackCommand* cbc = vtkCallbackCommand::New();
     cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback); 

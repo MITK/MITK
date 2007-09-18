@@ -111,7 +111,7 @@ QmitkChiliPluginSaveDialog::QmitkChiliPluginSaveDialog( QWidget* parent, const c
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( okButton );
   horizontalLayout->addWidget( abortButton );
-  gridLayout->addWidget( new QLabel( "If the node enabled, they get saved to the selected study and series and you can change the node-name.\nIf the node diabled, they get saved to the selected study and series but the node-name can not be changed, because the data get override.\nIf the node is strikeout, they dont get saved to the selected study and series.", this ), 4, 0 );
+  gridLayout->addWidget( new QLabel( "The node-name can be enabled or disabled and the disabled ones can be stikeout or not.\nA enabled node means, that the node dont exist in the current selected series and you can change the name.\nA disable node means, that the node always exist in the current selected series.\nNo strikeout means, that the existing entry get overridden and therefore the original node-name get used.\nA strikeout node-name means, that you have no rights to override the existing entry.\nIn this case the node dont get saved. Only MBI-saved-Data can be overridden.", this ), 4, 0 );
   gridLayout->addLayout( horizontalLayout, 4, 1 );
 }
 
@@ -225,7 +225,6 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
         stringHelper << seriesNumber;
         newInput.SeriesNumber = stringHelper.str();
       }
-      newInput.SeriesNumber = seriesNumber;
       newInput.SeriesDescription = seriesDescription;
       newInput.Node = NULL;
       newInput.NodeDescriptionField = NULL;
@@ -313,10 +312,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
 {
   //ensure that a study is selected
   if( m_StudyListView->selectedItem() == 0 )
-  {
-    //select the first one
     m_StudyListView->setSelected( m_StudyListView->firstChild(), true );
-  }
 
   //get the studyOID from the selected study
   std::string showSeriesWithStudyOID = m_StudyListView->selectedItem()->text( 3 );
@@ -326,11 +322,9 @@ void QmitkChiliPluginSaveDialog::UpdateView()
   {
     if( iter->StudyOID == showSeriesWithStudyOID )
     {
-      //insert them only, if the series didnt show yet
+      //insert them only, if the series dont show
       if( m_SeriesListView->findItem( iter->SeriesOID.c_str(), 2, Qt::ExactMatch ) == 0 )
-      {
         new QListViewItem( m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str(), iter->SeriesOID.c_str() );
-      }
     }
   }
 

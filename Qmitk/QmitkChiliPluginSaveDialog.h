@@ -91,6 +91,8 @@ class QmitkChiliPluginSaveDialog : public QDialog
     /** This slot check the ouput. Thats include all node-names. They get set via the lineedits whereas they should not be empty. If the user want to create a new series, the seriesDescription get checked too. */
     void CheckOutputs();
 
+    void ShowHelp();
+
   protected:
 
   /** Internal struct to handle the input. */

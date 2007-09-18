@@ -106,12 +106,17 @@ QmitkChiliPluginSaveDialog::QmitkChiliPluginSaveDialog( QWidget* parent, const c
 
   QPushButton* abortButton = new QPushButton( tr("Cancel"), this );
   connect( abortButton, SIGNAL( clicked() ), this, SLOT( reject() ) );
+
+  QPushButton* helpButton = new QPushButton( tr("Help"), this );
+  connect( helpButton, SIGNAL( clicked() ), this, SLOT( ShowHelp() ) );
+
   QBoxLayout * horizontalLayout = new QHBoxLayout( 0 );
   horizontalLayout->setSpacing(5);
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( okButton );
   horizontalLayout->addWidget( abortButton );
-  gridLayout->addWidget( new QLabel( "The node-name can be enabled or disabled and the disabled ones can be stikeout or not.\nA enabled node means, that the node dont exist in the current selected series and you can change the name.\nA disable node means, that the node always exist in the current selected series.\nNo strikeout means, that the existing entry get overridden and therefore the original node-name get used.\nA strikeout node-name means, that you have no rights to override the existing entry.\nIn this case the node dont get saved. Only MBI-saved-Data can be overridden.", this ), 4, 0 );
+  horizontalLayout->addWidget( helpButton );
+
   gridLayout->addLayout( horizontalLayout, 4, 1 );
 }
 
@@ -427,4 +432,9 @@ void QmitkChiliPluginSaveDialog::CheckOutputs()
   }
   //quit the dialog
   accept();
+}
+
+void QmitkChiliPluginSaveDialog::ShowHelp()
+{
+  QMessageBox::information( 0, "MITK", "The node-name can be enabled or disabled and the disabled ones can be stikeout or not.\nA enabled node means, that the node dont exist in the current selected series and you can change the name.\nA disable node means, that the node always exist in the current selected series.\nNo strikeout means, that the existing entry get overridden and therefore the original node-name get used.\nA strikeout node-name means, that you have no rights to override the existing entry.\nIn this case the node dont get saved. Only MBI-saved-Data can be overridden." );
 }

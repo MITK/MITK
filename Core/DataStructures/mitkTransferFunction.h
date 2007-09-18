@@ -16,69 +16,133 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
-#include <mitkHistogramGenerator.h>
-#include "mitkCommon.h"
-#include <itkObject.h>
-#include <itkObjectFactory.h>
-#include <algorithm>
-#include <set>
+#include "mitkBaseData.h"
+
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
-#include <mitkImage.h>
+
+#include <itkRGBPixel.h>
+
+#include <vector>
+
+#include "mitkHistogramGenerator.h"
+#include "mitkCommon.h"
+#include "mitkImage.h"
+
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+
+#include <algorithm>
+#include <set>
+
 #include <itkHistogram.h>
 
-namespace mitk
+
+namespace mitk {
+  
+class TransferFunction : public mitk::BaseData
 {
+public:
+  
+  itkSetMacro(Min,int);
+  itkSetMacro(Max,int);
+  itkGetMacro(Min,int);
+  itkGetMacro(Max,int);
+  itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
+  itkGetMacro(GradientOpacityFunction,vtkPiecewiseFunction*); 
+  itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
+  itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
+  void InitializeByMitkImage(const mitk::Image* image);
+  void InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram);
+  
+  mitkClassMacro(TransferFunction, BaseData);
+  itkNewMacro(Self);
+  
+  TransferFunction();
+  ~TransferFunction();
+  
+  typedef std::vector<std::pair<double, double> > ControlPoints;
+  typedef std::vector<std::pair<double, itk::RGBPixel<double> > > RGBControlPoints;
+  
+  /*!  
+  \brief Insert controlpoints and values into the piecewise transfer function of a channel  (scalar / gradient)
+  */  
+  void SetPoints(int channel, TransferFunction::ControlPoints points);
+  
+  /*!  
+  \brief Insert RGB controlpoints and values 
+  */  
+  void SetRGBPoints(TransferFunction::RGBControlPoints rgbpoints);
+      
+  /*!  
+  \brief Add a single controlpoint to the transfer function of a channel  (scalar / gradient)
+  */  
+  void AddPoint(int channel, double x, double value);
+  
+  /*!  
+  \brief Add a single RGB controlpoint
+  */  
+  void AddRGBPoint(double x, double r, double g, double b);
+  
+  /*!
+  \brief Get all controlpoints of a channel
+  */
+  TransferFunction::ControlPoints GetPoints(int channel);
+  
+  /*!
+  \brief Get all RGB controlpoints
+  */
+  TransferFunction::RGBControlPoints GetRGBPoints();
+  
+  /*!
+  \brief Removes all controlpoints of a channel
+  */
+  void ClearPoints(int channel);
+  
+  /*!
+  \brief Removes all rgb controlpoints
+  */
+  void ClearRGBPoints();
+    
+  
+  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool VerifyRequestedRegion();
+  virtual void SetRequestedRegion(itk::DataObject *data);
+  
+protected:
+  
+  /*!
+  * controlpoints of the piecewise linear opacity functions (scalar and gradient)
+  */
+  TransferFunction::ControlPoints m_ScalarOpacityPoints;
+  
+  TransferFunction::ControlPoints m_GradientOpacityPoints;
+  
+  TransferFunction::RGBControlPoints m_RGBPoints;
+  
+  
+  
+  /*!
+  * the RGB color function controlpoints
+  */
+  TransferFunction::RGBControlPoints m_RGBControlPoints;
+  
+  vtkPiecewiseFunction* m_ScalarOpacityFunction;
+  vtkColorTransferFunction* m_ColorTransferFunction;
+  vtkPiecewiseFunction* m_GradientOpacityFunction;
+  
+  
+  int m_Min;
+  int m_Max;
+  
+  mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram; 
 
-  //##
-  //##Documentation
-  //## @brief
-  //##
-  //##
-  class TransferFunction : public itk::Object 
-  {
-    public:
-     
-      mitkClassMacro(TransferFunction, itk::DataObject);
-      itkSetMacro(Min,int);
-      itkSetMacro(Max,int);
-      itkGetMacro(Min,int);
-      itkGetMacro(Max,int);
-      itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
-      itkGetMacro(GradientOpacityFunction,vtkPiecewiseFunction*); 
-      itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
-      itkGetConstObjectMacro(Histogram,HistogramGenerator::HistogramType);
-      void InitializeByMitkImage(const mitk::Image* image);
-      void InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram);
-      static Pointer CreateForMitkImage(const mitk::Image* image);
-      ~TransferFunction() {
-        m_ColorTransferFunction->Delete();
-        m_ScalarOpacityFunction->Delete();
-        m_GradientOpacityFunction->Delete();
-      }
-      itkNewMacro(Self);
-    protected:
-      TransferFunction(int min, int max) : m_Min(min), m_Max(max) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()), m_GradientOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL)  {
-        this->m_ScalarOpacityFunction->Initialize();
-        this->m_GradientOpacityFunction->Initialize();
-      }
-      TransferFunction() : m_Min(0), m_Max(255) , m_ColorTransferFunction(vtkColorTransferFunction::New()), m_ScalarOpacityFunction(vtkPiecewiseFunction::New()),m_GradientOpacityFunction(vtkPiecewiseFunction::New()), m_Histogram(NULL) {
-        this->m_ScalarOpacityFunction->Initialize();
-        this->m_GradientOpacityFunction->Initialize();
-      }
-       int m_Min;
-      int m_Max;
+};
 
-      vtkColorTransferFunction* m_ColorTransferFunction;
-      vtkPiecewiseFunction* m_ScalarOpacityFunction;
-      vtkPiecewiseFunction* m_GradientOpacityFunction;
-      mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram; 
-
-  };
 }
-#endif 
-// MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
+
+#endif /* MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED */

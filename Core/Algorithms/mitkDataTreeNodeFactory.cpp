@@ -755,7 +755,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     tf->GetColorTransferFunction()->AddRGBPoint(m_Min,1,0,0);
     tf->GetColorTransferFunction()->AddRGBPoint(m_Max,1,1,0);
     tf->GetGradientOpacityFunction()->Initialize();
-    tf->GetGradientOpacityFunction()->AddPoint(m_Min,0.0);
+    tf->GetGradientOpacityFunction()->AddPoint(m_Min,1.0);
     tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
     tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
     tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);  

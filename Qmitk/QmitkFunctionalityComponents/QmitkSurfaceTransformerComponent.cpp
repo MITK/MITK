@@ -467,26 +467,14 @@ void QmitkSurfaceTransformerComponent::MirrorX()
   if(m_SurfaceNode)
   {
     vtkTransform* transform = vtkTransform::New();
-    transform->Scale(  1, 1, -1);
-
-    //vtkTransformPolyDataFilter *tf=vtkTransformPolyDataFilter::New();
-
-    //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-    //tf->SetInput(surface->GetVtkPolyData());
-
-
-    ////tf->SetInput(transform->GetOutput()reader->GetOutput());
-    //tf->SetTransform(transform);
-
-    //vtkReverseSense *reverse=vtkReverseSense ::New();
-    //reverse->SetInput(tf->GetOutput());
+    transform->Scale(  -1, 1, 1);
 
     vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
     mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
 
-    
-  transformFilter->SetInput( surface->GetVtkPolyData() );  
-  transformFilter->SetTransform( transform );
+
+    transformFilter->SetInput( surface->GetVtkPolyData() );  
+    transformFilter->SetTransform( transform );
 
     mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
     vtkPolyData* transformed = transformFilter->GetOutput();
@@ -497,30 +485,15 @@ void QmitkSurfaceTransformerComponent::MirrorX()
     mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
     tf->SetVtkPolyData(reverse->GetOutput(), 0);
 
+    m_SurfaceNode->SetData(tf);
 
+    RepaintRenderWindows();
 
-
-  m_SurfaceNode->SetData(tf);
-
-  RepaintRenderWindows();
-
-
-
-  //vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
-  //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-
-  //transformFilter->SetInput( surface->GetVtkPolyData() );  
-  //transformFilter->SetTransform( transform );
-
-  //mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
-  //vtkPolyData* transformed = transformFilter->GetOutput();
-  //mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
-  //tf->SetVtkPolyData(transformed, 0);
-  //m_SurfaceNode->SetData(tf);
-
-  RepaintRenderWindows();
-
-
+    std::ostringstream buffer;
+    QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
+    buffer << surfaceDataName.ascii();
+    std::string surfaceNodeName = "Mirror_" + buffer.str();
+    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
   }
 }  
 
@@ -529,26 +502,34 @@ void QmitkSurfaceTransformerComponent::MirrorY()
 {
   if(m_SurfaceNode)
   {
-    ////vtkTransform* transform = vtkTransform::New();
-    ////transform->Scale(-1,-1,-1);
-    ////Transform(transform);
-    //vtkReflectionFilter* mirror = vtkReflectionFilter::New();
-    //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-    //mirror->SetInput(surface->GetVtkPolyData());
-    //mirror->SetPlaneToY();
-    //RepaintRenderWindows();
+    vtkTransform* transform = vtkTransform::New();
+    transform->Scale(  1, -1, 1);
 
-    //vtkGeometryFilter* geo = vtkGeometryFilter::New();
-    //geo->SetInput((vtkDataObject*)(mirror->GetOutput()));
-    //geo->Update();
-    ////mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
-    ////vtkPolyData* transformed = mirror->GetOutput();
-    //mitk::Surface::Pointer tf;// = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
-    //tf->SetVtkPolyData(geo->GetOutput(), 0);
-    //m_SurfaceNode->SetData(tf);
+    vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
 
 
-    //RepaintRenderWindows();
+    transformFilter->SetInput( surface->GetVtkPolyData() );  
+    transformFilter->SetTransform( transform );
+
+    mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+    vtkPolyData* transformed = transformFilter->GetOutput();
+
+    vtkReverseSense *reverse=vtkReverseSense ::New();
+    reverse->SetInput(transformed);
+
+    mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+    tf->SetVtkPolyData(reverse->GetOutput(), 0);
+
+    m_SurfaceNode->SetData(tf);
+
+    RepaintRenderWindows();
+
+    std::ostringstream buffer;
+    QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
+    buffer << surfaceDataName.ascii();
+    std::string surfaceNodeName = "Mirror_" + buffer.str();
+    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
   }
 } 
 
@@ -557,26 +538,34 @@ void QmitkSurfaceTransformerComponent::MirrorZ()
 {
   if(m_SurfaceNode)
   {
-    ////vtkTransform* transform = vtkTransform::New();
-    ////transform->Scale(-1,-1,-1);
-    ////Transform(transform);
-    //vtkReflectionFilter* mirror = vtkReflectionFilter::New();
-    //mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-    //mirror->SetInput(surface->GetVtkPolyData());
-    //mirror->SetPlaneToZ();
-    //RepaintRenderWindows();
+    vtkTransform* transform = vtkTransform::New();
+    transform->Scale(  1, 1, -1);
 
-    //    vtkGeometryFilter* geo = vtkGeometryFilter::New();
-    //geo->SetInput((vtkDataObject*)(mirror->GetOutput()));
-    //geo->Update();
-    ////mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
-    ////vtkPolyData* transformed = mirror->GetOutput();
-    //mitk::Surface::Pointer tf;// = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
-    //tf->SetVtkPolyData(geo->GetOutput(), 0);
-    //m_SurfaceNode->SetData(tf);
+    vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
 
 
-    //RepaintRenderWindows();
+    transformFilter->SetInput( surface->GetVtkPolyData() );  
+    transformFilter->SetTransform( transform );
+
+    mitk::DataTreeNode::Pointer transformNode = mitk::DataTreeNode::New();
+    vtkPolyData* transformed = transformFilter->GetOutput();
+
+    vtkReverseSense *reverse=vtkReverseSense ::New();
+    reverse->SetInput(transformed);
+
+    mitk::Surface::Pointer tf = dynamic_cast<mitk::Surface*>( m_SurfaceNode->GetData() );
+    tf->SetVtkPolyData(reverse->GetOutput(), 0);
+
+    m_SurfaceNode->SetData(tf);
+
+    RepaintRenderWindows();
+
+    std::ostringstream buffer;
+    QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
+    buffer << surfaceDataName.ascii();
+    std::string surfaceNodeName = "Mirror_" + buffer.str();
+    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
   }
 } 
 

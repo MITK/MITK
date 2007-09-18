@@ -118,7 +118,7 @@ void mitk::PointSetWriter::GenerateData()
  
     out.close();
     m_Success = true;
-    m_MimeType = "image/pointSet";
+    m_MimeType = "application/MITK.PointSet";
 }
 
 

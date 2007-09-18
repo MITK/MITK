@@ -113,7 +113,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   }
 
   transformPolyData->Delete();
-  m_MimeType = "image/surf";
+  m_MimeType = "application/MITK.Surface";
 }
 
 template <class VTKWRITER>

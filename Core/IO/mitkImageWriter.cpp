@@ -184,7 +184,7 @@ void mitk::ImageWriter::GenerateData()
     picWriter->SetInput( input );
     picWriter->Write();
   }
-  m_MimeType = "image/pict";
+  m_MimeType = "application/MITK.Pic";
 }
 
 bool mitk::ImageWriter::CanWrite( DataTreeNode* input )

@@ -87,20 +87,24 @@ public:
   static void SetDefaultImageProperties(DataTreeNode::Pointer &node);
   
   /**
-   * Sets default properites common to all data types representing a surface
+   * Sets default properties common to all data types representing a surface
    */
   static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
 
   /**
-   * Sets default properites common to all data types representing a binary segmentation
+   * Sets default properties common to all data types representing a binary segmentation
    */
   static void SetDefaultSegmentationProperties(DataTreeNode::Pointer &node);
   
   /**
-   * Sets default properites common to all data types representing a PointSet
+   * Sets default properties common to all data types representing a PointSet
    */
   static void SetDefaultPointSetProperties(DataTreeNode::Pointer &node);
   
+  /**
+    * Sets default properties common to all data types representing an unstructured grid
+    */
+  static void SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node);
 
   /**
     * Nice default colors for segmentations of some "normal" organs.
@@ -108,17 +112,17 @@ public:
   static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );
 
   /**
-   * Sets default common properites
+   * Sets default common properties
    */
   void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
 
   /**
-   * Sets default properites common to ultrasound content
+   * Sets default properties common to ultrasound content
    */
   void SetDefaultUltraSoundProperties(DataTreeNode::Pointer &node);
 
   /**
-   * Sets default properites common to tus files
+   * Sets default properties common to tus files
    */
   void SetDefaultTusProperties(int count, DataTreeNode::Pointer &node);
 

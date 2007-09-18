@@ -80,6 +80,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSliceSelector.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkTransferFunctionProperty.h"
+#include "mitkGridRepresentationProperty.h"
+#include "mitkGridVolumeMapperProperty.h"
 
 #ifdef MBI_INTERNAL
 #ifdef HAVE_IPDICOM
@@ -797,6 +799,16 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
   node->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   node->SetProperty( "color" , new mitk::ColorProperty( 1.0f, 0.0f, 0.0f ));
   node->SetOpacity(0.3f);
+  node->SetVisibility(true);
+}
+
+void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node)
+{
+  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "grid representation", new mitk::GridRepresentationProperty);
+  node->SetProperty( "grid volume mapper", new mitk::GridVolumeMapperProperty);
+  node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
+  node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
   node->SetVisibility(true);
 }
 

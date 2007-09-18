@@ -59,6 +59,12 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
   m_Assembly->AddPart(m_Actor);
   m_Assembly->AddPart(m_Volume);
   m_Prop3D = m_Assembly;
+  
+  m_VtkVolumeRayCastMapper = 0;
+  #if (VTK_MAJOR_VERSION >= 5)
+  m_VtkPTMapper = 0;
+  m_VtkVolumeZSweepMapper = 0;
+  #endif
 
   //m_GenerateNormals = false;
 }

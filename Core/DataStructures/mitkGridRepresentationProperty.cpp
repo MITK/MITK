@@ -20,10 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProperty.h>
 #include "mitkGridRepresentationProperty.h"
 
-const mitk::GridRepresentationProperty::IdType mitk::GridRepresentationProperty::POINTS;
-const mitk::GridRepresentationProperty::IdType mitk::GridRepresentationProperty::WIREFRAME;
-const mitk::GridRepresentationProperty::IdType mitk::GridRepresentationProperty::SURFACE;
-const mitk::GridRepresentationProperty::IdType mitk::GridRepresentationProperty::VOLUME;
 
 mitk::GridRepresentationProperty::GridRepresentationProperty( )
 {

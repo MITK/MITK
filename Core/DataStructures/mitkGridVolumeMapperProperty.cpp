@@ -20,12 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProperty.h>
 #include "mitkGridVolumeMapperProperty.h"
 
-const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::RAYCAST;
-#if (VTK_MAJOR_VERSION >= 5)
-const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::PT;
-const mitk::GridVolumeMapperProperty::IdType mitk::GridVolumeMapperProperty::ZSWEEP;
-#endif
-
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( )
 {
   AddRepresentationTypes();

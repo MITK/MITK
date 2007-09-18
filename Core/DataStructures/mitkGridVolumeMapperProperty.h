@@ -34,6 +34,13 @@ class GridVolumeMapperProperty : public EnumerationProperty
 {
 public:
 
+  enum MapperType { RAYCAST = 0
+  #if (VTK_MAJOR_VERSION >= 5)
+	  , PT = 1, ZSWEEP = 2 
+  #endif
+  };
+  
+
   mitkClassMacro( GridVolumeMapperProperty, EnumerationProperty );
   
   /**
@@ -72,13 +79,6 @@ public:
    */
   virtual void SetVolumeMapperToRayCast();
     
-  static const IdType RAYCAST = 0;
-  
-  #if (VTK_MAJOR_VERSION >= 5)
-  static const IdType PT = 1;
-  static const IdType ZSWEEP = 2;
-  #endif
-  
   
 protected:
 

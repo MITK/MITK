@@ -34,6 +34,8 @@ class GridRepresentationProperty : public EnumerationProperty
 {
 public:
 
+  enum RepresentationType {POINTS = 0, WIREFRAME = 1, SURFACE = 2, VOLUME = 3};
+
   mitkClassMacro( GridRepresentationProperty, EnumerationProperty );
   
   /**
@@ -74,12 +76,6 @@ public:
    * Sets the representation type to VOLUME.
    */
   virtual void SetRepresentationToVolume();
-  
-  
-  static const IdType POINTS = 0;
-  static const IdType WIREFRAME = 1;
-  static const IdType SURFACE = 2;
-  static const IdType VOLUME = 3;
   
 protected:
 

@@ -31,7 +31,7 @@ mitk::DataTree::DataTree() :
 DataTreeBase( )
 {
   DataTreeNode::Pointer emptyNode = DataTreeNode::New();
-  emptyNode->SetProperty( "do not save", new BoolProperty(true) );
+  emptyNode->SetProperty( "helper object", new BoolProperty(true) );
   SetRoot(emptyNode);
 }
 

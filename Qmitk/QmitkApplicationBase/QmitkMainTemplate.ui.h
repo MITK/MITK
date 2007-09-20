@@ -1469,7 +1469,7 @@ void QmitkMainTemplate::fileCloseProject()
   mitk::NodePredicateProperty w2("name", new mitk::StringProperty("widget1Plane"));
   mitk::NodePredicateProperty w3("name", new mitk::StringProperty("widget2Plane"));
   mitk::NodePredicateProperty w4("name", new mitk::StringProperty("widget3Plane"));
-  mitk::NodePredicateProperty dontsaveorclose("do not save", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty dontsaveorclose("helper object", new mitk::BoolProperty(true));
   mitk::NodePredicateData w5(NULL);   // keep objects without data (e.g. root node of the tree!)
   mitk::NodePredicateOR orpred;
   orpred.AddPredicate(w1);

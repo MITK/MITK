@@ -118,31 +118,6 @@
                             </widget>
                             <widget class="QPushButton">
                                 <property name="name">
-                                    <cstring>m_SaveToLightBox</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>Save to Light&amp;Box</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+B</string>
-                                </property>
-                                <property name="toolTip" stdset="0">
-                                    <string>Save selected node to Chili lightbox.</string>
-                                </property>
-                                <property name="whatsThis" stdset="0">
-                                    <string>Save selected node to Chili lightbox.</string>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
                                     <cstring>m_RemoveButton</cstring>
                                 </property>
                                 <property name="sizePolicy">
@@ -468,12 +443,6 @@
         <slot>SaveButton_clicked()</slot>
     </connection>
     <connection>
-        <sender>m_SaveToLightBox</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkDataManagerControls</receiver>
-        <slot>SaveLightBox_clicked()</slot>
-    </connection>
-    <connection>
         <sender>m_ReInitButton</sender>
         <signal>clicked()</signal>
         <receiver>QmitkDataManagerControls</receiver>
@@ -564,7 +533,6 @@
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
     <slot>RemoveButtonClicked()</slot>
     <slot>SaveButton_clicked()</slot>
-    <slot>SaveLightBox_clicked()</slot>
     <slot>ReInitButton_clicked()</slot>
     <slot access="protected">TreeSelectionChanged( QListViewItem * item )</slot>
     <slot>RenderWindowSelected( int id )</slot>
@@ -588,4 +556,8 @@
     <function>init()</function>
 </functions>
 <layoutdefaults spacing="0" margin="0"/>
+<includehints>
+    <includehint>QmitkPropertyListView.h</includehint>
+    <includehint>QmitkPropertyListView.h</includehint>
+</includehints>
 </UI>

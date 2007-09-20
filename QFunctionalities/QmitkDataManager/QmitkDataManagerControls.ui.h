@@ -168,42 +168,6 @@ void QmitkDataManagerControls::SaveButton_clicked()
   }
 }
 
-void QmitkDataManagerControls::SaveLightBox_clicked()
-{
-  if(mitk::ChiliPlugin::GetInstance()->IsPlugin()==false)
-  {
-    QMessageBox::critical( this, "Save Selected to LightBox",
-        "Saving to LightBox not possible:\n"
-        "This is not a plugin!! ... or the plugin is not correctly initialized!",
-        QMessageBox::Cancel|QMessageBox::Default|QMessageBox::Escape,QMessageBox::NoButton );
-    return;
-  }
-
-  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
-  if (selected != NULL)
-  {
-    std::string selectedItemsName = std::string(selected->text(0).ascii());
-
-    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
-    if (selectedIterator != NULL)
-    {
-      mitk::DataTreeNode* node = selectedIterator->Get();
-      if (node != NULL )
-      {
-        mitk::BaseData::Pointer data=node->GetData();
-
-        if (data.IsNotNull())
-        {
-          mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data.GetPointer());
-          if(image.IsNotNull())
-          {
-          }
-        }
-      }
-    }
-  }
-}
-
 void QmitkDataManagerControls::ReInitButton_clicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
@@ -485,8 +449,4 @@ void QmitkDataManagerControls::init()
 #ifndef MBI_INTERNAL
   m_AffineInteraction->hide();
 #endif
-  if(mitk::ChiliPlugin::GetInstance()->IsPlugin()==false)
-  {
-    m_SaveToLightBox->hide();
-  }
 }

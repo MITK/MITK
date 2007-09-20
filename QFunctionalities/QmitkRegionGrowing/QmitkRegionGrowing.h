@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 
 #include "mitkPointSet.h"
+#include "mitkPointSetInteractor.h"
 
 #include <itkImage.h>
 
@@ -67,6 +68,9 @@ class QmitkRegionGrowing : public QmitkFunctionality
   /// \brief Called when the functionality is activated
   virtual void Activated();
 
+  /// \brief Called when the functionality is deactivated
+  virtual void Deactivated();
+
 protected slots:  
   
   /// \brief Called by the application whenever the data tree changes
@@ -101,6 +105,8 @@ protected:
 
   /// \brief This is the actual seed point data object
   mitk::PointSet::Pointer m_PointSet;
+
+  mitk::PointSetInteractor::Pointer m_Interactor;
 
 };
 

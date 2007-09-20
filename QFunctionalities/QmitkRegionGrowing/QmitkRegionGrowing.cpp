@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
-#include "mitkPointSetInteractor.h"
 #include "mitkProperties.h"
 
 #include <itkConnectedThresholdImageFilter.h>
@@ -105,14 +104,18 @@ void QmitkRegionGrowing::Activated()
     m_PointSetNode->SetData( m_PointSet );
 
     // new behaviour/interaction for the pointset node
-    mitk::PointSetInteractor::Pointer interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+    m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
 
     // add the pointset to the data tree (for rendering)
     GetDataTreeIterator()->Add( m_PointSetNode );
   }
 }
 
+void QmitkRegionGrowing::Deactivated()
+{
+  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);
+}
 void QmitkRegionGrowing::DoRegionGrowing()
 {
   const mitk::DataTreeIteratorClone* iterator = m_Controls->m_TreeNodeSelector->GetSelectedIterator(); // should never fail, the selection widget cares for that

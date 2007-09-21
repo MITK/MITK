@@ -237,7 +237,8 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       // create text
       std::stringstream volumeString; 
-      volumeString << segmentationVolume << " ml";
+      volumeString.precision(1);
+      volumeString << std::fixed << segmentationVolume << " ml";
 
       // draw text
 

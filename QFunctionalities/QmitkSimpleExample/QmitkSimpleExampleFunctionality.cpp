@@ -137,10 +137,10 @@ void QmitkSimpleExampleFunctionality::Activated()
   // init widget 4 as a 3D widget
   multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
 
-  if(m_NavigatorsInitialized)
-  {
-    multiWidget->ReInitializeStandardViews();
-  }
+  //if(m_NavigatorsInitialized)
+  //{
+  //  multiWidget->ReInitializeStandardViews();
+  //}
 }
 
 void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )

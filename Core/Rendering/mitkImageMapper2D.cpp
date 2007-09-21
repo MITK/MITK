@@ -250,7 +250,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       displayGeometry->IndexToWorld( pt2D, pt2D );
       displayGeometry->WorldToDisplay( pt2D, pt2D );
 
-      OpenGLrenderer->WriteSimpleText( pt2D[0], pt2D[1], volumeString.str() );
+      OpenGLrenderer->WriteSimpleText( (int)pt2D[0], (int)pt2D[1], volumeString.str() );
     }
   }
 

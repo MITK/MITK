@@ -49,7 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "disabled.xpm"
 
 
-QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* parent, bool createOnlyControl) 
+QmitkPropertyListViewItem::QmitkPropertyListViewItem(std::string name, mitk::PropertyList* propertyList, QWidget* /*parent*/, bool /*createOnlyControl*/) 
   : m_Name(name), m_PropertyList(propertyList), m_Label(NULL), m_Control(NULL)
 {
 }

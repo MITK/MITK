@@ -34,7 +34,7 @@ mitk::Surface::Surface() : m_CalculateBoundingBox( false )
   m_Initialized = false;
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.resize( 1, pdnull );
-  InitializeTimeSlicedGeometry(1);
+  //InitializeTimeSlicedGeometry(1);
 
   m_Initialized = true;
 }
@@ -72,21 +72,6 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   }
   this->Modified();
   m_CalculateBoundingBox = true;
-}
-
-void mitk::Surface::InitializeTimeSlicedGeometry(unsigned int timeSteps)
-{
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  g3d->Initialize();
-  mitk::ScalarType timeBounds[] = {0.0, 1.0};
-  g3d->SetTimeBounds( timeBounds );
-  //
-  // The geometry is propagated automatically to the other items,
-  // if EvenlyTimed is true...
-  //
-  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
 }
 
 bool mitk::Surface::IsEmpty(int t) const
@@ -260,7 +245,7 @@ void mitk::Surface::Update()
 // Caution: If Resize is used explicitely, the vector is emptied.
 void mitk::Surface::Resize( unsigned int timeSteps )
 {
-  InitializeTimeSlicedGeometry( timeSteps );
+  Superclass::InitializeTimeSlicedGeometry( timeSteps );
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.assign( timeSteps, pdnull );
   this->Modified();

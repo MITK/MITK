@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string mitk::BaseData::XML_NODE_NAME = "data";
 
-//##ModelId=3E3FE04202B9
 mitk::BaseData::BaseData() : 
   m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL), 
   m_SourceOutputIndexDuplicate(0), m_Initialized(true), 
@@ -38,13 +37,32 @@ mitk::BaseData::BaseData() :
   m_ExternalReferenceCount(-1)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
+  this->InitializeTimeSlicedGeometry(1);
   m_PropertyList = PropertyList::New(); 
 }
 
-//##ModelId=3E3FE042031D
 mitk::BaseData::~BaseData() 
 {
   m_SmartSourcePointer = NULL;
+}
+
+void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
+{
+  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
+
+  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
+  g3d->Initialize();
+
+  if ( timeSteps > 1 )
+  {
+    mitk::ScalarType timeBounds[] = {0.0, 1.0};
+    g3d->SetTimeBounds( timeBounds );
+  }
+
+  // The geometry is propagated automatically to the other items,
+  // if EvenlyTimed is true...
+  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+  m_Initialized = (timeSteps>0);
 }
 
 void mitk::BaseData::UpdateOutputInformation()
@@ -66,7 +84,6 @@ const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
   return GetTimeSlicedGeometry();
 }
 
-//##ModelId=3DCBE2BA0139
 const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
@@ -83,7 +100,7 @@ void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
     TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
     if(timeSlicedGeometry.IsNull())
     {
-      if((m_TimeSlicedGeometry.IsNotNull()) && (m_TimeSlicedGeometry->GetGeometry3D(0)==aGeometry3D) && m_TimeSlicedGeometry->GetTimeSteps()==1)
+      if((m_TimeSlicedGeometry.IsNotNull()) && (m_TimeSlicedGeometry->GetGeometry3D(0)==aGeometry3D) && (m_TimeSlicedGeometry->GetTimeSteps()==1))
         return;
       timeSlicedGeometry = TimeSlicedGeometry::New();
       m_TimeSlicedGeometry = timeSlicedGeometry;   
@@ -136,7 +153,6 @@ itk::SmartPointerForwardReference<mitk::BaseProcess> mitk::BaseData::GetSource()
   return static_cast<mitk::BaseProcess*>(Superclass::GetSource().GetPointer());
 }
 
-//##ModelId=3E8600DB02DC
 int mitk::BaseData::GetExternalReferenceCount() const
 {
   if(m_CalculatingExternalReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
@@ -173,7 +189,6 @@ int mitk::BaseData::GetExternalReferenceCount() const
   return m_ExternalReferenceCount;
 }
 
-//##ModelId=3E8600DB0188
 void mitk::BaseData::UnRegister() const
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
@@ -200,7 +215,6 @@ void mitk::BaseData::UnRegister() const
     Superclass::UnRegister(); // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
 }
 
-//##ModelId=3E8600DC0053
 void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) const
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED

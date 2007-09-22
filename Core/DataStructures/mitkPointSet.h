@@ -230,8 +230,6 @@ protected:
 
   virtual ~PointSet();
   
-  virtual void InitializeTimeSlicedGeometry( int timeSteps );
-
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;

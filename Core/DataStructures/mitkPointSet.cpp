@@ -40,35 +40,11 @@ mitk::PointSet::PointSet()
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_PointSetSeries[0]->SetPointData( pointData );
 
-  this->InitializeTimeSlicedGeometry( 1 );
   m_CalculateBoundingBox = false;
 }
 
-
 mitk::PointSet::~PointSet()
 {
-}
-
-void mitk::PointSet::InitializeTimeSlicedGeometry( int timeSteps )
-{
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  g3d->Initialize();
-
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
-  }
-
-  //
-  // The geometry is propagated automatically to the other items,
-  // if EvenlyTimed is true...
-  //
-  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
-
-  m_Initialized = (timeSteps>0);
 }
 
 bool mitk::PointSet::IsEmpty(int t) const
@@ -96,7 +72,7 @@ void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
       PointDataContainer::Pointer pointData = PointDataContainer::New();
       m_PointSetSeries[i]->SetPointData( pointData );
     }
-    this->InitializeTimeSlicedGeometry( timeSteps );
+    Superclass::InitializeTimeSlicedGeometry( timeSteps );
     
     //if the size changes, then compute the boundingbox
     m_CalculateBoundingBox = true;

@@ -57,7 +57,7 @@ public:
   }
 
   //##Documentation
-  //## @brief Return the TimeSlicedGeometry of the data as const pointer. 
+  //## @brief Return the TimeSlicedGeometry of the data as pointer. 
   //## 
   //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
   //## be sure that the geometry is up-to-date.
@@ -289,6 +289,12 @@ public:
 protected:
   BaseData();
   ~BaseData();
+
+  //##Documentation
+  //## @brief Initialize the TimeSlicedGeometry for a number of timesteps. 
+  //## The TimeSlicedGeometry is initialized empty and evenly timed.
+  //## In many cases it will be necessary to overwrite this in sub-classes.
+  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

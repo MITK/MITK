@@ -101,17 +101,10 @@ protected:
 
   typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
 
-  // Initialize should not be called manually;
-  // The poly data vector is initialized automatically when enlarged;
-  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
- 
-  //##ModelId=3E70F66100C4
   Surface();
   
-  //##ModelId=3E70F66100CA
   virtual ~Surface();
 
-  //##ModelId=3E70F6610099
   VTKPolyDataSeries m_PolyDataSeries;
 
   mutable RegionType m_LargestPossibleRegion;

@@ -37,7 +37,6 @@ mitk::BaseData::BaseData() :
   m_ExternalReferenceCount(-1)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
-  this->InitializeTimeSlicedGeometry(1);
   m_PropertyList = PropertyList::New(); 
 }
 
@@ -53,16 +52,12 @@ void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->Initialize();
 
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
-  }
+  mitk::ScalarType timeBounds[] = {0.0, 1.0};
+  g3d->SetTimeBounds( timeBounds );
 
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
   timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
-  m_Initialized = (timeSteps>0);
 }
 
 void mitk::BaseData::UpdateOutputInformation()
@@ -95,31 +90,25 @@ const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
 
 void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D)
 {
-  if(aGeometry3D!=NULL)
+if(aGeometry3D!=NULL)
   {
     TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
-    if(timeSlicedGeometry.IsNull())
+    if ( timeSlicedGeometry.IsNotNull() )
+      m_TimeSlicedGeometry = timeSlicedGeometry;
+    else
     {
-      if((m_TimeSlicedGeometry.IsNotNull()) && (m_TimeSlicedGeometry->GetGeometry3D(0)==aGeometry3D) && (m_TimeSlicedGeometry->GetTimeSteps()==1))
-        return;
       timeSlicedGeometry = TimeSlicedGeometry::New();
       m_TimeSlicedGeometry = timeSlicedGeometry;   
       timeSlicedGeometry->InitializeEvenlyTimed(aGeometry3D, 1);
     }
-    else
-    {
-      if(aGeometry3D == m_TimeSlicedGeometry)
-        return;
-    }
-    m_TimeSlicedGeometry = timeSlicedGeometry;
+    Modified();
   }
-  else
+  else if( m_TimeSlicedGeometry.IsNotNull() ) 
   {
-    if(m_TimeSlicedGeometry.IsNull())
-      return;
     m_TimeSlicedGeometry = NULL;
+    Modified();
   }
-  Modified();
+  return;
 }
 
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)

@@ -39,6 +39,7 @@ mitk::PointSet::PointSet()
   m_PointSetSeries[0] = DataType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_PointSetSeries[0]->SetPointData( pointData );
+  Superclass::InitializeTimeSlicedGeometry(1);
 
   m_CalculateBoundingBox = false;
 }

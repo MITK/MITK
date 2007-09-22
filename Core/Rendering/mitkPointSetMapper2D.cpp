@@ -63,7 +63,7 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetBoolProperty("contour",            m_Polygon);
   node->GetBoolProperty("show points",        m_ShowPoints);
   node->GetBoolProperty("show distances",     m_ShowDistances);
-  node->GetFloatProperty("distance decimal digits",     m_DistancesDecimalDigits);
+  node->GetIntProperty("distance decimal digits",     m_DistancesDecimalDigits);
   node->GetBoolProperty("show angles",        m_ShowAngles);
   node->GetBoolProperty("show distant lines", m_ShowDistantLines);
   node->GetIntProperty("line width",          m_LineWidth);

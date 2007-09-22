@@ -687,7 +687,7 @@ void mitk::OpenGLRenderer::SetCameraController(CameraController* cameraControlle
   m_CameraController->SetRenderer(this);
 }
 
-int mitk::OpenGLRenderer::WriteSimpleText(int posX, int posY, std::string text)
+int mitk::OpenGLRenderer::WriteSimpleText(double posX, double posY, std::string text)
 {
   if(m_SimpleTextRenderer.IsNull())
     m_SimpleTextRenderer = mitk::SimpleTextRendering::New();

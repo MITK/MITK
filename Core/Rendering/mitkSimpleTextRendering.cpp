@@ -140,7 +140,7 @@ void mitk::SimpleTextRendering::ClearTextLabelCollection()
   m_TextCollection.clear();
 }
 
-int mitk::SimpleTextRendering::AddTextLabel(int posX, int posY, std::string text)
+int mitk::SimpleTextRendering::AddTextLabel(double posX, double posY, std::string text)
 {
   if(text.size() > 0)
   {

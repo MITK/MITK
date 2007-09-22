@@ -58,7 +58,7 @@ public:
   * As return value, a text label id is returned, which may
   * be used for further setting of text appereance.
   */
-  int  AddTextLabel(int posX, int posY, std::string text);
+  int  AddTextLabel(double posX, double posY, std::string text);
   
   /**
   * Removes a text label from the label collection.

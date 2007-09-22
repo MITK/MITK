@@ -64,7 +64,7 @@ public:
   */
   void SetCameraController(CameraController* cameraController);
 
-  int WriteSimpleText(int posX, int posY, std::string text);
+  int WriteSimpleText(double posX, double posY, std::string text);
 	vtkTextProperty* GetTextLabelProperty(int text_id);
 
   virtual void Update(mitk::DataTreeNode* datatreenode);

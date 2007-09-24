@@ -28,9 +28,9 @@ mitk::Stepper
   m_InverseDirection( false ),
   m_RangeMin( 0.0 ),
   m_RangeMax( -1.0 ),
-  m_HasUnitName( false ),
+  m_RangeValid( false ),
   m_HasRange( false ),
-  m_RangeValid( false )
+  m_HasUnitName( false )
 {
 }
 

@@ -65,7 +65,7 @@ void PointSetCompare( mitk::PointSet* pointSet2, mitk::PointSet* pointSet1, bool
     return;
   }
 
-  for (unsigned int i = 0; i < pointSet1->GetSize(); ++i)
+  for (unsigned int i = 0; i < (unsigned int)pointSet1->GetSize(); ++i)
   {
     mitk::Point3D p1 = pointSet1->GetPoint(i);
     mitk::Point3D p2 = pointSet2->GetPoint(i);

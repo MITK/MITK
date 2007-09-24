@@ -198,7 +198,7 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality *functionality)
         "QmitkFctMediator::dummyMain"), m_NumberOfFunctionalities+1);
     }
   }
-  QWidget *controlWidget;
+  QWidget *controlWidget(NULL);
   if (m_ControlStack!=NULL)
   {
     controlWidget = functionality->CreateControlWidget(m_ControlStack);
@@ -270,7 +270,7 @@ bool QmitkFctMediator::AddDialogBar( QmitkDialogBar *dialogBar )
 
   if ( m_DialogBarsFrame != NULL )
   {
-    QWidget *controlWidget = dialogBar->CreateControlWidget( m_DialogBarsFrame );
+    /*QWidget *controlWidget = */dialogBar->CreateControlWidget( m_DialogBarsFrame );
   }
 
   dialogBar->CreateConnections();

@@ -15,6 +15,7 @@ class QmitkPropertyListViewItemFactory {
     }
   protected:
     QmitkPropertyListViewItemFactory() : m_Extension(NULL) {}
+    virtual ~QmitkPropertyListViewItemFactory() {}
     QmitkPropertyListViewItemFactory* m_Extension;
 };
 

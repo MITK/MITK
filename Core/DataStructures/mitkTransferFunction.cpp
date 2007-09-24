@@ -130,6 +130,12 @@ mitk::TransferFunction::ControlPoints mitk::TransferFunction::GetPoints(int chan
     { 
       return m_GradientOpacityPoints;
     }
+    
+    default:
+    {
+      std::cout<<"channel not found, returning scalar opacity control points!";
+      return m_ScalarOpacityPoints;
+    }
   }
 }
 

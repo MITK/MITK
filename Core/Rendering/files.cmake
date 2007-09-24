@@ -21,7 +21,6 @@ SET(CPP_FILES
   mitkMeshVtkMapper3D.cpp
   mitkNativeRenderWindowInteractor.cpp
   mitkOpenGLRenderer.cpp
-  mitkParametricCurveVtkMapper3D.cpp
   mitkPointDataVtkMapper3D.cpp
   mitkPointSetMapper2D.cpp
   mitkPointSetVtkMapper3D.cpp

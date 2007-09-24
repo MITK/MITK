@@ -45,8 +45,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMaterialProperty.h"
 #include "mitkMeshMapper2D.h"
 #include "mitkMeshVtkMapper3D.h"
-#include "mitkParametricCurve.h"
-#include "mitkParametricCurveVtkMapper3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPointDataVtkMapper3D.h"
 #include "mitkPointSet.h"
@@ -144,7 +142,6 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( LookupTable, "LookupTable" )
     CREATE_ITK( PointSetMapper2D, "PointSetMapper2D" )
     CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
-    CREATE_ITK( ParametricCurveVtkMapper3D, "ParametricCurveVtkMapper3D" )
 
   else
     std::cout << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
@@ -297,12 +294,6 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       newMapper = mitk::PointSetVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
-    else if((dynamic_cast<ParametricCurve*>(data)!=NULL))
-    {
-      newMapper = mitk::ParametricCurveVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
-    }
-
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PointDataVtkMapper3D::New();

@@ -130,11 +130,6 @@ mitk::TransferFunction::ControlPoints mitk::TransferFunction::GetPoints(int chan
     { 
       return m_GradientOpacityPoints;
     }
-    
-    default:
-    {
-      std::cerr<<"cannot access channel "<<channel<<std::endl;
-    }
   }
 }
 

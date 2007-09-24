@@ -37,6 +37,7 @@ mitk::BaseData::BaseData() :
   m_ExternalReferenceCount(-1)
 {
   m_TimeSlicedGeometry = TimeSlicedGeometry::New();
+  this->InitializeTimeSlicedGeometry(1);
   m_PropertyList = PropertyList::New(); 
 }
 

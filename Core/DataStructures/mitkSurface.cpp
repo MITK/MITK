@@ -34,7 +34,6 @@ mitk::Surface::Surface() : m_CalculateBoundingBox( false )
   m_Initialized = false;
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.resize( 1, pdnull );
-  Superclass::InitializeTimeSlicedGeometry(1);
 
   m_Initialized = true;
 }

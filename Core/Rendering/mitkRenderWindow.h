@@ -139,7 +139,7 @@ public:
 
   //##Documentation
   //## @brief Set the size of the window
-  void SetSize(int w, int h);
+  virtual void SetSize(int w, int h);
     
   inline BaseRenderer* GetRenderer() const 
   {

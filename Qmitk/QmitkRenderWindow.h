@@ -48,6 +48,8 @@ public:
 
   virtual bool IsSharing () const;
 
+  virtual void SetSize(int w, int h);
+
   virtual QSize minimumSizeHint () const;
 
   virtual QSizePolicy sizePolicy() const;

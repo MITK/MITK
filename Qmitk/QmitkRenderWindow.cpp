@@ -74,7 +74,6 @@ void QmitkRenderWindow::InitRenderer()
 
   this->setAutoBufferSwap( false );
 }
-
 bool QmitkRenderWindow::PrepareRendering()
 {
   // Get the native window ID and pass it
@@ -167,6 +166,15 @@ void QmitkRenderWindow::SwapBuffers()
 bool QmitkRenderWindow::IsSharing () const
 {
   return isSharing();
+}
+
+void QmitkRenderWindow::SetSize(int w, int h)
+{
+  if((w != width()) || (h != height()))
+  {
+    this->resize(w,h);
+  }
+  mitk::RenderWindow::SetSize(w,h);
 }
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 

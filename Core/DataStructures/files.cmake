@@ -57,6 +57,8 @@ SET(CPP_FILES
   mitkModeOperation.cpp
   mitkOperationActor.cpp
   mitkOperation.cpp
+  mitkParametricCurve.cpp
+  mitkParametricSpline.cpp
   mitkPicHelper.cpp
   mitkPicHeaderProperty.cpp
   mitkPixelType.cpp

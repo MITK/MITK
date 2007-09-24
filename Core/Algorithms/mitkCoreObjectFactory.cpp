@@ -45,6 +45,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMaterialProperty.h"
 #include "mitkMeshMapper2D.h"
 #include "mitkMeshVtkMapper3D.h"
+#include "mitkParametricCurve.h"
+#include "mitkParametricCurveVtkMapper3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPointDataVtkMapper3D.h"
 #include "mitkPointSet.h"
@@ -142,6 +144,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( LookupTable, "LookupTable" )
     CREATE_ITK( PointSetMapper2D, "PointSetMapper2D" )
     CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
+    CREATE_ITK( ParametricCurveVtkMapper3D, "ParametricCurveVtkMapper3D" )
 
   else
     std::cout << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
@@ -209,125 +212,118 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper=NULL;
+  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::BaseData *data = node->GetData();
 
-  if(id==mitk::BaseRenderer::Standard2D)
+  if ( id == mitk::BaseRenderer::Standard2D )
   {
-    if((dynamic_cast<Image*>(node->GetData()) != NULL))
+    if((dynamic_cast<Image*>(data)!=NULL))
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
       newMapper = mitk::ImageMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
-    else
-      if((dynamic_cast<Geometry2DData*>(node->GetData())!=NULL))
-      {
-        newMapper = mitk::Geometry2DDataMapper2D::New();
-        newMapper->SetDataTreeNode(node);
-      }
-      else
-        if((dynamic_cast<Surface*>(node->GetData())!=NULL))
-        {
-          newMapper = mitk::SurfaceMapper2D::New();
-          // cast because SetDataTreeNode is not virtual
-          mitk::SurfaceMapper2D *castedMapper = (mitk::SurfaceMapper2D*)newMapper.GetPointer();
-          castedMapper->SetDataTreeNode(node);
-        }
-        else
-          if((dynamic_cast<Mesh*>(node->GetData())!=NULL))
-          {
-            newMapper = mitk::MeshMapper2D::New();
-            newMapper->SetDataTreeNode(node);
-          }
-          else
-            if((dynamic_cast<PointSet*>(node->GetData())!=NULL))
-            {
-              newMapper = mitk::PointSetMapper2D::New();
-              newMapper->SetDataTreeNode(node);
-            }
-    if((dynamic_cast<PointData*>(node->GetData())!=NULL))
+    else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+    {
+      newMapper = mitk::Geometry2DDataMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<Surface*>(data)!=NULL))
+    {
+      newMapper = mitk::SurfaceMapper2D::New();
+      // cast because SetDataTreeNode is not virtual
+      mitk::SurfaceMapper2D *castedMapper = (mitk::SurfaceMapper2D*)newMapper.GetPointer();
+      castedMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<Mesh*>(data)!=NULL))
+    {
+      newMapper = mitk::MeshMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<PointSet*>(data)!=NULL))
+    {
+      newMapper = mitk::PointSetMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PolyDataGLMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
-    else
-      if((dynamic_cast<Contour*>(node->GetData())!=NULL))
-      {
-        newMapper = mitk::ContourMapper2D::New();
-        newMapper->SetDataTreeNode(node);
-      }
-      else
-        if((dynamic_cast<ContourSet*>(node->GetData())!=NULL))
-        {
-          newMapper = mitk::ContourSetMapper2D::New();
-          newMapper->SetDataTreeNode(node);
-        }
-  }
-  else
-    if(id==mitk::BaseRenderer::Standard3D)
+    else if((dynamic_cast<Contour*>(data)!=NULL))
     {
-      if((dynamic_cast<Image*>(node->GetData()) != NULL))
+      newMapper = mitk::ContourMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<ContourSet*>(data)!=NULL))
+    {
+      newMapper = mitk::ContourSetMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+  }
+  else if ( id == mitk::BaseRenderer::Standard3D )
+  {
+    if((dynamic_cast<Image*>(data) != NULL))
+    {
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
+      if (image->GetPixelType().GetNumberOfComponents() <= 1)
       {
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-        if (image->GetPixelType().GetNumberOfComponents() <= 1)
-        {
-          newMapper = mitk::VolumeDataVtkMapper3D::New();
-          newMapper->SetDataTreeNode(node);
-        }
-        else
-        {
-          //newMapper = mitk::VectorImageVtkGlyphMapper3D::New();
-          //newMapper->SetDataTreeNode(node);
-        }
-      }
-      else
-        if((dynamic_cast<Geometry2DData*>(node->GetData())!=NULL))
-        {
-          newMapper = mitk::Geometry2DDataVtkMapper3D::New();
-          newMapper->SetDataTreeNode(node);
-        }
-        else
-          if((dynamic_cast<Surface*>(node->GetData())!=NULL))
-          {
-            newMapper = mitk::SurfaceVtkMapper3D::New();
-            newMapper->SetDataTreeNode(node);
-          }
-          else
-            if((dynamic_cast<Mesh*>(node->GetData())!=NULL))
-            {
-              newMapper = mitk::MeshVtkMapper3D::New();
-              newMapper->SetDataTreeNode(node);
-            }
-            else
-              if((dynamic_cast<PointSet*>(node->GetData())!=NULL))
-              {
-                newMapper = mitk::PointSetVtkMapper3D::New();
-                newMapper->SetDataTreeNode(node);
-              }
-      if((dynamic_cast<PointData*>(node->GetData())!=NULL))
-      {
-        newMapper = mitk::PointDataVtkMapper3D::New();
+        newMapper = mitk::VolumeDataVtkMapper3D::New();
         newMapper->SetDataTreeNode(node);
       }
       else
-        if((dynamic_cast<Contour*>(node->GetData())!=NULL))
-        {
-          newMapper = mitk::ContourVtkMapper3D::New();
-          newMapper->SetDataTreeNode(node);
-        }
-        else
-          if((dynamic_cast<ContourSet*>(node->GetData())!=NULL))
-          {
-            newMapper = mitk::ContourSetVtkMapper3D::New();
-            newMapper->SetDataTreeNode(node);
-          }
-          else
-            if((dynamic_cast<UnstructuredGrid*>(node->GetData())!=NULL))
-            {
-              newMapper = mitk::UnstructuredGridVtkMapper3D::New();
-              newMapper->SetDataTreeNode(node);
-            }
+      {
+        //newMapper = mitk::VectorImageVtkGlyphMapper3D::New();
+        //newMapper->SetDataTreeNode(node);
+      }
     }
+    else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+    {
+      newMapper = mitk::Geometry2DDataVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<Surface*>(data)!=NULL))
+    {
+      newMapper = mitk::SurfaceVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<Mesh*>(data)!=NULL))
+    {
+      newMapper = mitk::MeshVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<PointSet*>(data)!=NULL))
+    {
+      newMapper = mitk::PointSetVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<ParametricCurve*>(data)!=NULL))
+    {
+      newMapper = mitk::ParametricCurveVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+
+    else if((dynamic_cast<PointData*>(data)!=NULL))
+    {
+      newMapper = mitk::PointDataVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<Contour*>(data)!=NULL))
+    {
+      newMapper = mitk::ContourVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<ContourSet*>(data)!=NULL))
+    {
+      newMapper = mitk::ContourSetVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
+    {
+      newMapper = mitk::UnstructuredGridVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+  }
   return newMapper;
 }
 

@@ -107,6 +107,11 @@ public:
   static void SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node);
 
   /**
+    * Sets default properties common to all data types representing a parametric curve
+    */
+  static void SetDefaultParametricCurveProperties(DataTreeNode::Pointer &node);
+
+  /**
     * Nice default colors for segmentations of some "normal" organs.
     */
   static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );

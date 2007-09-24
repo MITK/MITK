@@ -812,6 +812,17 @@ void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNod
   node->SetVisibility(true);
 }
 
+void mitk::DataTreeNodeFactory::SetDefaultParametricCurveProperties(mitk::DataTreeNode::Pointer &node)
+{
+  node->SetProperty( "linewidth", new mitk::IntProperty(2) );
+  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  node->SetProperty( "scalar visibility", new mitk::BoolProperty(false) );
+  node->SetProperty( "representation", new mitk::VtkRepresentationProperty );
+  node->SetVisibility(true);
+}
+
+
 mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( const std::string& organ )
 {
   static bool initialized = false;

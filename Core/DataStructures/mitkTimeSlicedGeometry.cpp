@@ -148,27 +148,46 @@ bool mitk::TimeSlicedGeometry::SetGeometry3D(mitk::Geometry3D* geometry3D, int t
 
 int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
 {
-  assert(m_EvenlyTimed);
+  if(time_in_ms < m_TimeBounds[0])
+    return -1;
+  if(time_in_ms >= m_TimeBounds[1])
+    return m_TimeSteps;
+  if(m_EvenlyTimed)
   {
-    if(time_in_ms < m_TimeBounds[0])
-      return -1;
-    if(time_in_ms >= m_TimeBounds[1])
-      return m_TimeSteps;
-    if(m_TimeBounds[0]==m_TimeBounds[1])
+    if(m_TimeBounds[0] == m_TimeBounds[1])
       return 0;
     if((m_TimeBounds[0]>ScalarTypeNumericTraits::NonpositiveMin()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))
       return (int) ((time_in_ms - m_TimeBounds[0])/(m_TimeBounds[1]-m_TimeBounds[0])*m_TimeSteps);
     return 0;
+  }
+  else
+  {
+    Point3D projectedPoint;
+    unsigned int t;
+    for ( t = 0; t < m_TimeSteps; ++t )
+    {
+      const TimeBounds& timeBounds = GetGeometry3D( t )->GetTimeBounds();
+      if( (timeBounds[0] <= time_in_ms) && (time_in_ms <= timeBounds[1]) )
+      {
+        return t;
+      }
+    }
   }
   return 0;
 }
 
 mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
 {
-  assert(m_EvenlyTimed);
   if(IsValidTime(timestep)==false)
     return ScalarTypeNumericTraits::max();
-  return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+  if(m_EvenlyTimed)
+  {
+    return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+  }
+  else
+  {
+    return GetGeometry3D(timestep)->GetTimeBounds()[0];
+  }
 }
 
 void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)

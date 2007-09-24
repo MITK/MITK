@@ -38,6 +38,7 @@ SET(${KITNAME}_TESTS
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToImageFilterTest.cpp
+  mitkTimeSlicedGeometryTest.cpp
   mitkTransitionTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkITKThreadingTest.cpp

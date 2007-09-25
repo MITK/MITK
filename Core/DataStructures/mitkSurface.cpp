@@ -51,14 +51,8 @@ mitk::Surface::~Surface()
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
-  // check if the vector is long enouth to contain the new element
-  // at the given position. If not, expand it with sufficient zero-filled elements.
-  if ( t >= m_PolyDataSeries.size() )
-  {
-    vtkPolyData* pdnull = NULL;
-    m_PolyDataSeries.resize( t + 1, pdnull );
-    this->GetTimeSlicedGeometry()->ResizeToNumberOfTimeSteps( t+1 );
-  }
+  // Adapt the size of the data vector if necessary
+  this->Resize( t+1 );
 
   if(m_PolyDataSeries[ t ] != NULL)
   {
@@ -74,7 +68,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
     m_PolyDataSeries[ t ]->Register( NULL );
   }
   this->Modified();
-  m_CalculateBoundingBox = true;
+  //m_CalculateBoundingBox = true;
 }
 
 bool mitk::Surface::IsEmpty(int t) const
@@ -237,14 +231,17 @@ void mitk::Surface::Update()
   Superclass::Update();
 }
 
-// Caution: If Resize is used explicitely, the vector is emptied.
 void mitk::Surface::Resize( unsigned int timeSteps )
-{
-  Superclass::InitializeTimeSlicedGeometry( timeSteps );
-  vtkPolyData* pdnull = NULL;
-  m_PolyDataSeries.assign( timeSteps, pdnull );
-  this->Modified();
-  m_CalculateBoundingBox = true;
+{  
+  // check if the vector is long enouth to contain the new element
+  // at the given position. If not, expand it with sufficient zero-filled elements.
+  if ( timeSteps > m_PolyDataSeries.size() )
+  {
+    Superclass::Resize( timeSteps );
+    vtkPolyData* pdnull = NULL;
+    m_PolyDataSeries.resize( timeSteps, pdnull );
+    m_CalculateBoundingBox = true;
+  }
 }
 
 bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )

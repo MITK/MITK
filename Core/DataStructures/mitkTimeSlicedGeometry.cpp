@@ -235,7 +235,7 @@ void mitk::TimeSlicedGeometry::InitializeEmpty(unsigned int timeSteps)
   m_Geometry3Ds.assign(m_TimeSteps, gnull);
 }
 
-void mitk::TimeSlicedGeometry::ResizeToNumberOfTimeSteps( unsigned int timeSteps)
+void mitk::TimeSlicedGeometry::ResizeToNumberOfTimeSteps( unsigned int timeSteps )
 {
   if( timeSteps <= m_TimeSteps ) return;
 

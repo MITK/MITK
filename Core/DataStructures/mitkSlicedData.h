@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef SLICEDDATA_H_HEADER_INCLUDED_C1EBD53D
-#define SLICEDDATA_H_HEADER_INCLUDED_C1EBD53D
+#ifndef SLICEDDATA_H_HEADER_INCLUDED
+#define SLICEDDATA_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
@@ -33,7 +33,6 @@ namespace mitk {
 
 class SlicedGeometry3D;
 
-//##ModelId=3E14379B00E8
 //##Documentation
 //## @brief Super class of data objects consisting of slices
 //##
@@ -54,25 +53,18 @@ public:
   typedef itk::ImageRegion<RegionDimension>  RegionType;
 
   /** Index typedef support. An index is used to access pixel values. */
-  //##ModelId=3E144ED10331
   typedef itk::Index<RegionDimension>  IndexType;
-  //##ModelId=3E144ED10346
   typedef IndexType::IndexValueType  IndexValueType;
 
   /** Offset typedef support. An offset represent relative position
   * between indices. */
-  //##ModelId=3E144ED1035A
   typedef itk::Offset<RegionDimension>  OffsetType;
-  //##ModelId=3E144ED1036D
   typedef OffsetType::OffsetValueType OffsetValueType;
 
   /** Size typedef support. A size is used to define region bounds. */
-  //##ModelId=3E144ED10377
   typedef itk::Size<RegionDimension>  SizeType;
-  //##ModelId=3E144ED10382
   typedef SizeType::SizeValueType SizeValueType;
 
-  //##ModelId=3E141028018A
   //##Documentation
   //## Update the information for this DataObject so that it can be used as
   //## an output of a ProcessObject.  This method is used in the pipeline
@@ -86,14 +78,12 @@ public:
 
   virtual void PrepareForNewData();
 
-  //##ModelId=3E14102C029E
   //##Documentation
   //## Set the RequestedRegion to the LargestPossibleRegion.  This forces a
   //## filter to produce all of the output in one execution (i.e. not
   //## streaming) on the next call to Update().
   virtual void SetRequestedRegionToLargestPossibleRegion();
 
-  //##ModelId=3E14104300AC
   //##Documentation
   //## Determine whether the RequestedRegion is outside of the
   //## BufferedRegion. This method returns true if the RequestedRegion is
@@ -105,7 +95,6 @@ public:
   //## given filter does not need to re-execute
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-  //##ModelId=3E14105B00F7
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the
   //## LargestPossibleRegion.  
@@ -121,7 +110,6 @@ public:
   //## not within the LargestPossibleRegion.
   virtual bool VerifyRequestedRegion();
 
-  //##ModelId=3E1410760114
   //##Documentation
   //## Set the requested region from this data object to match the requested
   //## region of the data object passed in as a parameter.  This method is
@@ -139,7 +127,6 @@ public:
     return m_LargestPossibleRegion;
   }
 
-  //##ModelId=3E144ED20089
   //##Documentation
   //## Get the region object that defines the size and starting index
   //## for the region of the image requested (i.e., the region of the
@@ -149,13 +136,9 @@ public:
     return m_RequestedRegion;
   }
 
-  //##ModelId=3E14713503B7
   virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
-  //##ModelId=3E147163027C
   virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
-  //##ModelId=3E1550BD0272
   virtual bool IsChannelSet(int n = 0) const = 0;
-  //##ModelId=3E34513B016D
   virtual void CopyInformation(const itk::DataObject *data);
 
   //##Documentation
@@ -204,26 +187,18 @@ public:
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
-  //##Documentation
-  //## @brief release memory
-  virtual void ReleaseData();
-
 protected:
-  //##ModelId=3E19EA3300BA
+
   SlicedData();
-  //##ModelId=3E19EA3300CE
   virtual ~SlicedData();
 
   RegionType m_LargestPossibleRegion;
 
-  //##ModelId=3E143BF10135
   RegionType          m_RequestedRegion;
-  //##ModelId=3E143BF10149
   RegionType          m_BufferedRegion;
-  //##ModelId=3E144ED20075
   bool                m_UseLargestPossibleRegion;
 };
 
 } // namespace mitk
 
-#endif /* SLICEDDATA_H_HEADER_INCLUDED_C1EBD53D */
+#endif /* SLICEDDATA_H_HEADER_INCLUDED */

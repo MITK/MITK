@@ -269,9 +269,9 @@ void mitk::BaseData::Clear()
 {
   if(m_Initialized)
   {
-    m_Initialized = false;
-
     ReleaseData();
+
+    m_Initialized = false;
   }
 }
 

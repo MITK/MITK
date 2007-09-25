@@ -426,8 +426,6 @@ public:
 
   virtual void Clear();
 
-  virtual void ReleaseData();
-
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   virtual const HistogramType* GetScalarHistogram(int t=0) const;

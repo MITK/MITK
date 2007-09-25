@@ -273,6 +273,14 @@ public:
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
   //##Documentation
+  //## @brief Get the number of timesteps from the Timeslicedgeometry
+  //## As the base data has not a data vector given by itself, the number
+  //## of timesteps is defined over the time sliced geometry. In sub classes,
+  //## a better implementation could be over the length of the data vector.
+  const unsigned int GetTimeSteps(){ return m_TimeSlicedGeometry->GetTimeSteps(); };
+
+
+  //##Documentation
   //## @brief Get the modified time of the last change of the contents 
   //## this data object or its geometry.
   virtual unsigned long GetMTime() const;

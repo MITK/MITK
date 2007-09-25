@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKSURFACEDATA_H_HEADER_INCLUDED_C19085D7
-#define MITKSURFACEDATA_H_HEADER_INCLUDED_C19085D7
+#ifndef MITKSURFACEDATA_H_HEADER_INCLUDED
+#define MITKSURFACEDATA_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
@@ -30,90 +30,86 @@ class vtkPolyData;
 
 namespace mitk {
 
-//##ModelId=3E70F66001B9
-//##Documentation
-//## @brief Class for storing surfaces (vtkPolyData)
-//## @ingroup Data
-class Surface : public BaseData
-{
-protected:
-
-public:
-  // not yet the best chioce of a region-type for surfaces, but it works for the time being
-  typedef itk::ImageRegion< 5 >  RegionType;  
-	
-  mitkClassMacro(Surface, BaseData);
-  
-  itkNewMacro(Self);
-  
-  //##ModelId=3E70F661009A
-  virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);
-  
-  //##ModelId=3E70F66100A5
-  virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
-  
-  //##ModelId=3E70F66100AE
-  virtual void UpdateOutputInformation();
-  
-  virtual void SetRequestedRegionToLargestPossibleRegion();
-  
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  
-  virtual bool VerifyRequestedRegion();
- 
-  virtual void SetRequestedRegion(itk::DataObject *data);
-
-  virtual void SetRequestedRegion(Surface::RegionType *region);
-
-  virtual void CopyInformation(const itk::DataObject *data);
-  
-  virtual bool IsEmpty(int t) const;
-
-  virtual void Update();
-  
-  virtual void Resize( unsigned int timeSteps = 1 );
-
-  const RegionType& GetLargestPossibleRegion() const
-  {
-	  m_LargestPossibleRegion.SetIndex(3, 0);
-	  m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
-	  return m_LargestPossibleRegion;
-  }
-
   //##Documentation
-  //## Get the region object that defines the size and starting index
-  //## for the region of the image requested (i.e., the region of the
-  //## image to be operated on by a filter).
-  virtual const RegionType& GetRequestedRegion() const
+  //## @brief Class for storing surfaces (vtkPolyData)
+  //## @ingroup Data
+  class Surface : public BaseData
   {
-    return m_RequestedRegion;
-  }
+  protected:
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
+  public:
+    // not yet the best chioce of a region-type for surfaces, but it works for the time being
+    typedef itk::ImageRegion< 5 >  RegionType;  
 
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
+    mitkClassMacro(Surface, BaseData);
 
-  void CalculateBoundingBox();
+    itkNewMacro(Self);
 
-protected:
+    virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);
 
-  typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
+    virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
 
-  Surface();
-  
-  virtual ~Surface();
+    virtual void UpdateOutputInformation();
 
-  VTKPolyDataSeries m_PolyDataSeries;
+    virtual void SetRequestedRegionToLargestPossibleRegion();
 
-  mutable RegionType m_LargestPossibleRegion;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-  RegionType m_RequestedRegion;
-  
-  bool m_CalculateBoundingBox;
-};
+    virtual bool VerifyRequestedRegion();
+
+    virtual void SetRequestedRegion(itk::DataObject *data);
+
+    virtual void SetRequestedRegion(Surface::RegionType *region);
+
+    virtual void CopyInformation(const itk::DataObject *data);
+
+    virtual bool IsEmpty(int t) const;
+
+    virtual void Update();
+
+    virtual void Resize( unsigned int timeSteps = 1 );
+
+    const RegionType& GetLargestPossibleRegion() const
+    {
+      m_LargestPossibleRegion.SetIndex(3, 0);
+      m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
+      return m_LargestPossibleRegion;
+    }
+
+    //##Documentation
+    //## Get the region object that defines the size and starting index
+    //## for the region of the image requested (i.e., the region of the
+    //## image to be operated on by a filter).
+    virtual const RegionType& GetRequestedRegion() const
+    {
+      return m_RequestedRegion;
+    }
+
+    //## 
+    virtual bool WriteXMLData( XMLWriter& xmlWriter );
+
+    //##
+    virtual bool ReadXMLData( XMLReader& xmlReader );
+
+    void CalculateBoundingBox();
+
+  protected:
+
+    typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
+
+    Surface();
+
+    virtual ~Surface();
+
+    VTKPolyDataSeries m_PolyDataSeries;
+
+    mutable RegionType m_LargestPossibleRegion;
+
+    RegionType m_RequestedRegion;
+
+    bool m_CalculateBoundingBox;
+  };
 
 } // namespace mitk
 
-#endif /* MITKSURFACEDATA_H_HEADER_INCLUDED_C19085D7 */
+#endif /* MITKSURFACEDATA_H_HEADER_INCLUDED */

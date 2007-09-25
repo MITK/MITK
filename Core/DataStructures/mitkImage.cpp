@@ -611,6 +611,21 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryM
 
 void mitk::Image::Initialize()
 {
+  ImageDataItemPointerArray::iterator it, end;
+  for( it=m_Slices.begin(), end=m_Slices.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
+  }
+  for( it=m_Volumes.begin(), end=m_Volumes.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
+  }
+  for( it=m_Channels.begin(), end=m_Channels.end(); it!=end; ++it )
+  {
+    (*it)=NULL;
+  }
+  m_CompleteData = NULL;
+
   if(m_TimeSelectorForExtremaObject.IsNull())
   {
     m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
@@ -1083,25 +1098,6 @@ void mitk::Image::Clear()
   Superclass::Clear();
   delete [] m_Dimensions;
   m_Dimensions = NULL;
-}
-
-void mitk::Image::ReleaseData()
-{
-  ImageDataItemPointerArray::iterator it, end;
-  for( it=m_Slices.begin(), end=m_Slices.end(); it!=end; ++it )
-  {
-    (*it)=NULL;
-  }
-  for( it=m_Volumes.begin(), end=m_Volumes.end(); it!=end; ++it )
-  {
-    (*it)=NULL;
-  }
-  for( it=m_Channels.begin(), end=m_Channels.end(); it!=end; ++it )
-  {
-    (*it)=NULL;
-  }
-  m_CompleteData = NULL;
-  Superclass::ReleaseData();
 }
 
 bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 

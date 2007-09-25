@@ -22,7 +22,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 
 
-//##ModelId=3E141028018A
+mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
+{
+  unsigned int i;
+  for(i=0;i<4;++i)
+  {
+    m_LargestPossibleRegion.SetIndex(i, 0);
+    m_LargestPossibleRegion.SetSize (i, 1);
+  }
+}
+
+mitk::SlicedData::~SlicedData()
+{
+}
+
 void mitk::SlicedData::UpdateOutputInformation()
 {
   Superclass::UpdateOutputInformation();
@@ -47,10 +60,6 @@ void mitk::SlicedData::UpdateOutputInformation()
   m_LastRequestedRegionWasOutsideOfTheBufferedRegion = 0;
 }
 
-void mitk::SlicedData::ReleaseData()
-{
-}
-
 void mitk::SlicedData::PrepareForNewData()
 {
   if ( GetUpdateMTime() < GetPipelineMTime() || GetDataReleased() )
@@ -59,7 +68,6 @@ void mitk::SlicedData::PrepareForNewData()
   }
 }
 
-//##ModelId=3E14102C029E
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
@@ -75,7 +83,6 @@ void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
   }
 }
 
-//##ModelId=3E14104300AC
 bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   // Is the requested region within the currently buffered data?
@@ -124,7 +131,6 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   return false;
 }
 
-//##ModelId=3E14105B00F7
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
   if(GetTimeSlicedGeometry() == NULL) return false;
@@ -155,7 +161,6 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   return true;
 }
 
-//##ModelId=3E1410760114
 void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
 {
   m_UseLargestPossibleRegion=false;
@@ -192,25 +197,6 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
   }
 }
 
-
-//##ModelId=3E19EA3300BA
-mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
-{
-  unsigned int i;
-  for(i=0;i<4;++i)
-  {
-    m_LargestPossibleRegion.SetIndex(i, 0);
-    m_LargestPossibleRegion.SetSize (i, 1);
-  }
-}
-
-
-//##ModelId=3E19EA3300CE
-mitk::SlicedData::~SlicedData()
-{
-}
-
-//##ModelId=3E34513B016D
 void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 {
   // Standard call to the superclass' method

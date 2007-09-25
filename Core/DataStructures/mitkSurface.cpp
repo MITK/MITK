@@ -34,6 +34,7 @@ mitk::Surface::Surface() : m_CalculateBoundingBox( false )
   m_Initialized = false;
   vtkPolyData* pdnull = NULL;
   m_PolyDataSeries.resize( 1, pdnull );
+  Superclass::InitializeTimeSlicedGeometry(1);
 
   m_Initialized = true;
 }
@@ -81,10 +82,10 @@ bool mitk::Surface::IsEmpty(int t) const
   return 
     (polydata == NULL) || 
     (
-      (polydata->GetNumberOfVerts()  <= 0) &&
-      (polydata->GetNumberOfPolys()  <= 0) &&
-      (polydata->GetNumberOfStrips() <= 0) &&
-      (polydata->GetNumberOfLines()  <= 0)
+    (polydata->GetNumberOfVerts()  <= 0) &&
+    (polydata->GetNumberOfPolys()  <= 0) &&
+    (polydata->GetNumberOfStrips() <= 0) &&
+    (polydata->GetNumberOfLines()  <= 0)
     );
 }
 
@@ -109,7 +110,6 @@ vtkPolyData* mitk::Surface::GetVtkPolyData( unsigned int t )
     return NULL;
 }
 
-//##ModelId=3E70F66100AE
 void mitk::Surface::UpdateOutputInformation()
 {
   if ( this->GetSource() )
@@ -160,13 +160,10 @@ void mitk::Surface::CalculateBoundingBox()
   m_CalculateBoundingBox = false;
 }
 
-//##ModelId=3E70F66100B0
 void mitk::Surface::SetRequestedRegionToLargestPossibleRegion()
 {
   m_RequestedRegion = GetLargestPossibleRegion();
 }
-
-//##ModelId=3E70F66100B6
 
 bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
@@ -182,17 +179,15 @@ bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
   return false;
 }
 
-//##ModelId=3E70F66100B8
 bool mitk::Surface::VerifyRequestedRegion()
 {
   if( (m_RequestedRegion.GetIndex(3)>=0) && 
-      (m_RequestedRegion.GetIndex(3)+m_RequestedRegion.GetSize(3)<=m_PolyDataSeries.size()) )
+    (m_RequestedRegion.GetIndex(3)+m_RequestedRegion.GetSize(3)<=m_PolyDataSeries.size()) )
     return true;
 
   return false;
 }
 
-//##ModelId=3E70F66100BA
 void mitk::Surface::SetRequestedRegion( itk::DataObject *data )
 {
   mitk::Surface *surfaceData;
@@ -222,8 +217,6 @@ void mitk::Surface::SetRequestedRegion(Surface::RegionType *region)  //by arin
     itkExceptionMacro( << "mitk::Surface::SetRequestedRegion(Surface::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(Surface*).name() );
   }
 }
-
-//##ModelId=3E70F66100C1
 
 void mitk::Surface::CopyInformation( const itk::DataObject * )
 {}
@@ -289,7 +282,6 @@ bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
   return true;
 }
 
-
 bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
 {
   BaseData::ReadXMLData( xmlReader );
@@ -321,6 +313,5 @@ bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
     return false;
   }
 
-  
   return true;
 }

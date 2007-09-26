@@ -268,7 +268,7 @@ void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, st
     QLabel* newOne;
     mitk::BaseProperty::Pointer descriptionProperty = node->GetProperty( "name" );
     if( descriptionProperty )
-      newOne = new QLabel( descriptionProperty->GetValueAsString(), this );
+      newOne = new QLabel( descriptionProperty->GetValueAsString().c_str(), this );
     else
       newOne = new QLabel( "no Description", this );
 
@@ -287,7 +287,7 @@ void QmitkChiliPluginSaveDialog::AddNode( mitk::DataTreeNode::Pointer node )
   QLabel* newOne;
   mitk::BaseProperty::Pointer descriptionProperty = node->GetProperty( "name" );
   if( descriptionProperty )
-    newOne = new QLabel( descriptionProperty->GetValueAsString(), this );
+    newOne = new QLabel( descriptionProperty->GetValueAsString().c_str(), this );
   else
     newOne = new QLabel( "no Description", this );
 
@@ -310,18 +310,26 @@ void QmitkChiliPluginSaveDialog::UpdateView()
   //search and show all series with the selected studyOID
   for( std::list< SeriesInputs >::iterator iter = m_SeriesInputs.begin(); iter != m_SeriesInputs.end(); iter ++ )
   {
-    if( entry && entry->GetChiliOID() == iter->StudyOID )
+    if( entry )
     {
-      //search if the series always shown
-      QListViewItem* walkThroughSeries = m_SeriesListView->firstChild();
-      QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughSeries );
-      while( walkThroughSeries != 0 && entry && entry->GetChiliOID() != iter->SeriesOID )
+      std::string savedOID = entry->GetChiliOID();
+      if( savedOID == iter->StudyOID )
       {
-        walkThroughSeries = walkThroughSeries->itemBelow();
+        //search if the series always shown
+        QListViewItem* walkThroughSeries = m_SeriesListView->firstChild();
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughSeries );
+        if( entry )
+        {
+          std::string secondOID = entry->GetChiliOID();
+          while( walkThroughSeries != 0 && secondOID != iter->SeriesOID )
+          {
+            walkThroughSeries = walkThroughSeries->itemBelow();
+            QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughSeries );
+          }
+          if( walkThroughSeries == 0 )
+            new QmitkPluginListViewItem( iter->SeriesOID.c_str(), m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str() );
+        }
       }
-      if( walkThroughSeries == 0 )
-        new QmitkPluginListViewItem( iter->SeriesOID.c_str(), m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str() );
     }
   }
 

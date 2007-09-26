@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkChiliPlugin.h"
 
-/** return a singleton from the current ChiliPlugin */
+/** Return a singleton from the current ChiliPlugin. */
 mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
@@ -32,43 +32,49 @@ mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 }
 
 /** DefaultImplementation */
-
 mitk::ChiliPlugin::ChiliPlugin()
 {
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::~ChiliPlugin()
 {
 }
 
+/** DefaultImplementation */
 int mitk::ChiliPlugin::GetConferenceID()
 {
   return 0;
 }
 
+/** DefaultImplementation */
 bool mitk::ChiliPlugin::IsPlugin()
 {
   return false;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& )
 {
   StudyInformation emptyResult;
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& )
 {
   PatientInformation emptyResult;
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& )
 {
   SeriesInformation emptyResult;
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& )
 {
   SeriesInformationList emptyResult;
@@ -76,12 +82,14 @@ mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformation
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& )
 {
   TextInformation emptyResult;
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::ChiliPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& )
 {
   TextInformationList emptyResult;
@@ -89,25 +97,30 @@ mitk::ChiliPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList
   return emptyResult;
 }
 
+/** DefaultImplementation */
 unsigned int mitk::ChiliPlugin::GetLightboxCount()
 {
   return 0;
 }
 
+/** DefaultImplementation */
 QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
 {
   return NULL;
 }
 
+/** DefaultImplementation */
 QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
 {
   return NULL;
 }
 
+/** DefaultImplementation */
 void mitk::ChiliPlugin::SetReaderType( unsigned int )
 {
 }
 
+/** DefaultImplementation */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
@@ -115,6 +128,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
   return emptyVector;
 }
 
+/** DefaultImplementation */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
@@ -122,6 +136,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( 
   return emptyVector;
 }
 
+/** DefaultImplementation */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
@@ -129,6 +144,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSer
   return emptyVector;
 }
 
+/** DefaultImplementation */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
@@ -136,24 +152,29 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeri
   return emptyVector;
 }
 
+/** DefaultImplementation */
 mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& )
 {
   return NULL;
 }
 
+/** DefaultImplementation */
 mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& , const std::string& , const std::string& )
 {
   return NULL;
 }
 
+/** DefaultImplementation */
 void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 {
 }
 
-void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string )
+/** DefaultImplementation */
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string, bool )
 {
 }
 
+/** DefaultImplementation */
 void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer , std::string , std::string , bool )
 {
 }

@@ -34,7 +34,6 @@ namespace mitk {
 
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
-  If you use them, be carefull with the parameter.
   */
 
 class ImageToPicDescriptor : public itk::Object
@@ -63,8 +62,8 @@ class ImageToPicDescriptor : public itk::Object
 
     /*!
     \brief This function set a TagInformaitionList and a bool variable.
-    @param inputTags   This list provides information about the study, patient and series. This tags are the minimun which is needed to save.
-    @param useSavedPicTags   This bool attribute decided, if the tags to save get created and used from the TagInformationList (false) or if no tag get changed (true). If no tag get changed, it is possible to override the series. Otherwise the data get added to series.
+    @param inputTags   This list provides information about the study, patient and series. This tags are the minimun which needed to save.
+    @param useSavedPicTags   This bool attribute decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the ipPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one.
     This function have to be use, otherwise update dont work.
     */
     void SetTagList( TagInformationList inputTags, bool useSavedPicTags );
@@ -78,8 +77,9 @@ class ImageToPicDescriptor : public itk::Object
 
     /*!
     \brief This function set the imageNumber.
-    @param imageNumber   This is the image number for the tags. If the picdescriptors added to an existing series, the image number sould not be twice. Then the PicDescriptorToNode can splitt the results better. Therefor you can set the start-number.
+    @param imageNumber   This is the image number for the tags. If the picdescriptors added to an existing series, the image number sould not be twice. Then the slice-stack-reader can splitt the results better. Therefor you can set the start-number.
     This function can be use. If the imageNumber dont set, the number set to one.
+    IMPORTANT: Its recommend to set the ImageNumber!
     */
     void SetImageNumber( int imageNumber );
 
@@ -98,29 +98,31 @@ class ImageToPicDescriptor : public itk::Object
     /*!
     \brief Return the saved ImageInstanceUIDs.
     @returns A list of strings.
+    The imageInstanceUIDs get used to identify the single slices. The single slices addicted a volume. Volumes have parent-child-relations. Therefore they needed.
     */
     std::list< std::string > GetSaveImageInstanceUIDs();
 
   protected:
 
-    /** constuctor and desctructor */
+    /** Constuctor */
     ImageToPicDescriptor();
+    /** Destructor */
     ~ImageToPicDescriptor();
 
-    /** the list for the output */
+    /** The list for the output. */
     std::list< ipPicDescriptor* > m_Output;
-    /** we need the created imageInstanceUIDs to save the parent-child-realtionship */
+    /** We need the created imageInstanceUIDs to save the parent-child-realtionship. */
     std::list< std::string > m_imageInstanceUIDs;
-    /** the image to seperate */
+    /** The image to seperate. */
     Image::Pointer m_SourceImage;
-    /** the levelwindow of the image */
+    /** The levelwindow of the image. */
     LevelWindow m_LevelWindow;
     bool m_LevelWindowInitialized;
-    /** the taginformationlist */
+    /** The taginformationlist. */
     TagInformationList m_TagList;
     bool m_UseSavedPicTags;
     bool m_TagListInitialized;
-    /** the imageNumber */
+    /** The imageNumber. */
     int m_ImageNumber;
     bool m_ImageNumberInitialized;
 

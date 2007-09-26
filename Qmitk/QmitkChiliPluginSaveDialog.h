@@ -36,7 +36,7 @@ class QmitkChiliPluginSaveDialog : public QDialog
 
     typedef enum { OverrideAll, AddOnlyNew, CreateNew } DataType;
 
-    /** This struct is the basic ReturnValue. Which Series- and StudyOID select the user and what should happen with the nodes.  */
+    /** This struct is the basic ReturnValue. Where ( Series- and StudyOID ) should all nodes save and how ( new, add, override ). */
     struct ReturnValue
     {
       std::string StudyOID;
@@ -44,53 +44,102 @@ class QmitkChiliPluginSaveDialog : public QDialog
       DataType UserDecision;
     };
 
-    /** This struct contains the information if a new series should created. */
+    /** This struct contains the information to create a new series. */
     struct NewSeriesInformation
     {
       std::string SeriesDescription;
       int SeriesNumber;
     };
 
-    /** Constructor and destructor. */
+    /*!
+    \brief Constructor.
+    The MainWidget get created via the constuctor.
+    */
     QmitkChiliPluginSaveDialog( QWidget* parent = 0, const char* name = 0 );
+
+    /*! \brief Destructor. */
     virtual ~QmitkChiliPluginSaveDialog();
 
-    /** This function adds a study to the dialog. Use this function if the user selected a study only. */
+    /*!
+    \brief This function add a study to the dialog.
+    @param studyOID   The studyOID.
+    @param patientName   The patientName.
+    @param patientID   The patientID.
+    @param studyDescription   The studyDesription.
+    If you want to add the current selected study as target to save, then use this function.
+    */
     void AddStudy( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription );
 
-    /** This function adds a study and series. Use this function if the user select a study and series. */
+    /*!
+    \brief This function add a study and series to the dialog.
+    @param studyOID   The studyOID.
+    @param patientName   The patientName.
+    @param patientID   The patientID.
+    @param studyDescription   The studyDesription.
+    @param seriesOID   The seriesOID.
+    @param seriesNumber   The seriesNumber.
+    @param seriesDescription   The seriesDesription.
+    If you want to add the current selected study and series as target to save, then use this function.
+    */
     void AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription );
 
-    /** This function adds a mitk::DataTreeNode which was loaded from chili. We have to know from which study and series the node
-    was loaded. Therefore you have to set all. Use this function for a mitk::DataTreeNode with SeriesOID-Property. */
+    /*!
+    \brief This function add a study, series and node to the dialog.
+    @param studyOID   The studyOID.
+    @param patientName   The patientName.
+    @param patientID   The patientID.
+    @param studyDescription   The studyDesription.
+    @param seriesOID   The seriesOID.
+    @param seriesNumber   The seriesNumber.
+    @param seriesDescription   The seriesDesription.
+    @param node   The mitk::DataTreeNode.
+    A node which was loaded from chili have a seriesOID as property. With this property you can get the series and study where the node load from. You can set this attributes to the dialog. Then the user can save to this series and study.
+    */
     void AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node );
 
-    /** This function add the node only. This node wasnt saved in chili bevor. So there are no series- and study-relationships.
-    Use this function for a mitk::DataTreeNode without SeriesOID-Property. */
+    /*!
+    \brief This function add a node to the dialog.
+    @param node   The mitk::DataTreeNode.
+    There are nodes which was not loaded from chili. This one have no seriesOID property. But we want to save them too. So we add only the node.
+    If you add only nodes without a series or study, its not possible to save them. Because the user have no study and series to select. Therefore add the current selected study or series!
+    */
     void AddNode( mitk::DataTreeNode::Pointer node );
 
-    /** This function return the user-selction. */
+    /*!
+    \brief This function return the user-selection.
+    @returns The struct ReturnValue.
+    */
     ReturnValue GetSelection();
-    /** If the user want to create a new series, this function return the SeriesNumber and -Description. */
+
+    /*!
+    \brief This function return the seriesNumber and -Description.
+    @returns The struct NewSeriesInformation.
+    If the user want to create a new series, he can enter a SeriesNumber and -Description. This function return them.
+    */
     NewSeriesInformation GetSeriesInformation();
 
   public slots:
 
-    /** This slot ensure that a study is selected, show all series to the selected study and call SetSeries().
-    IMPORTANT: This slot have to call one time bevor exec the dialog. */
+    /*!
+    \brief This function refresh the dialog.
+    This slot ensure that a study is selected, show all series to the selected study and call SetSeries().
+    IMPORTANT: This slot have to call one time bevor exec the dialog.
+    */
     void UpdateView();
-    /** This slot ensure that a series is selected. If no series exist, the option to create a new series is set to the one and only. Call SetNodesByButtonGroup(). */
-    void SetSeries();
 
   protected slots:
 
+    /** This slot ensure that a series is selected. If no series exist, the option to create a new series is set to the one and only. Call SetNodesByButtonGroup(). */
+    void SetSeries();
+
     /** This slot enable and strikeout the nodes in subject to the selected radiobutton. The lineedit for the SeriesDescription and -Number 
-    get hide and show. */
+    get hide or show. */
     void SetNodesByButtonGroup();
 
-    /** This slot check the ouput. Thats include all node-names. They get set via the lineedits whereas they should not be empty. If the user want to create a new series, the seriesDescription get checked too. */
+    /** If the user want to create a new series, this slot check if the seriesDescription is not empty. */
     void CheckOutputs();
 
+    /** This slot show a messagebox with helpinformation. */
     void ShowHelp();
 
   protected:
@@ -106,19 +155,21 @@ class QmitkChiliPluginSaveDialog : public QDialog
   /** All inputs. */
   std::list< SeriesInputs > m_SeriesInputs;
 
+  /** Internal struct to handle the nodes. */
   struct NodeInputs
   {
     std::string SeriesOID;
     bool canBeOverride;
     QLabel* usedLabel;
   };
+  /** All nodes. */
   std::list< NodeInputs > m_NodeInputs;
 
   /** Show the different Studies. */
   QListView* m_StudyListView;
   /** Show the different Series. */
   QListView* m_SeriesListView;
-  /** Show the nodes to save. */
+  /** The layoout for the nodes to save. */
   QVBoxLayout* m_NodeLayout;
   /** The RadioButton to select whats happens with the nodes. */
   QRadioButton* m_Override;

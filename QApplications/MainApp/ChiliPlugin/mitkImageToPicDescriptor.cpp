@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkImageSliceSelector.h"
 
-// helper class for property import from pic/dicom-headers (see mitk::LightBoxImageReaderImpl::GetPropertyList())
+/** Helper class for property import from pic/dicom-headers. */
 class HeaderTagInfo
 {
   public:
@@ -44,7 +44,7 @@ class HeaderTagInfo
   DataType type;
 };
 
-// constructor
+/** Constructor */
 mitk::ImageToPicDescriptor::ImageToPicDescriptor()
 {
   m_LevelWindowInitialized = false;
@@ -52,12 +52,12 @@ mitk::ImageToPicDescriptor::ImageToPicDescriptor()
   m_ImageNumberInitialized = false;
 }
 
-// destructor
+/** Destructor */
 mitk::ImageToPicDescriptor::~ImageToPicDescriptor()
 {
 }
 
-// create a string-pic-tag
+/** Create a string-pic-tag. */
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateASCIITag( std::string description, std::string content )
 {
   if( description != "" )
@@ -82,7 +82,7 @@ ipPicTSV_t* mitk::ImageToPicDescriptor::CreateASCIITag( std::string description,
   else return 0;
 }
 
-// create an int-pic-tag
+/** Create an int-pic-tag. */
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateIntTag( std::string description, int content )
 {
   if( description != "" )
@@ -100,7 +100,7 @@ ipPicTSV_t* mitk::ImageToPicDescriptor::CreateIntTag( std::string description, i
   else return 0;
 }
 
-// create a unsigned-int-pic-tag (tagPATIENT_SEX is the only one)
+/** Create a unsigned-int-pic-tag (tagPATIENT_SEX current the only one). */
 ipPicTSV_t* mitk::ImageToPicDescriptor::CreateUIntTag( std::string description, int content )
 {
   if( description != "" )
@@ -118,7 +118,7 @@ ipPicTSV_t* mitk::ImageToPicDescriptor::CreateUIntTag( std::string description, 
   else return 0;
 }
 
-//delete a pic-tag from the given Picdescriptor
+/** Delete a pic-tag from the given Picdescriptor. */
 void mitk::ImageToPicDescriptor::DeleteTag( ipPicDescriptor* cur, std::string description )
 {
   if( description != "" && cur != NULL )
@@ -135,17 +135,20 @@ void mitk::ImageToPicDescriptor::DeleteTag( ipPicDescriptor* cur, std::string de
   }
 }
 
+/** Set the image. The Image have to be set, otherwise update dont work. */
 void mitk::ImageToPicDescriptor::SetImage( Image* sourceImage)
 {
   m_SourceImage = sourceImage;
 }
 
+/** Set the levelwindow. This function can be use. If the levelwindow dont get set, it will be created with SetAuto(). */
 void mitk::ImageToPicDescriptor::SetLevelWindow( LevelWindow levelWindow )
 {
   m_LevelWindow = levelWindow;
   m_LevelWindowInitialized = true;
 }
 
+/** Set the tagList. "useSavedPicTags" decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the ipPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one. This function have to be use, otherwise update dont work.*/
 void mitk::ImageToPicDescriptor::SetTagList( TagInformationList inputTags, bool useSavedPicTags )
 {
   m_TagList = inputTags;
@@ -153,13 +156,14 @@ void mitk::ImageToPicDescriptor::SetTagList( TagInformationList inputTags, bool 
   m_TagListInitialized = true;
 }
 
+/** This function set the imageNumber. If the picdescriptors added to an existing series, the image number sould not be twice. Then the slice-stack-reader can splitt the results better. Therefor you can set the start-number. This function can be use. If the imageNumber dont set, the number set to one. Bu its recommend to set the ImageNumber! */
 void mitk::ImageToPicDescriptor::SetImageNumber( int imageNumber )
 {
   m_ImageNumber = imageNumber;
   m_ImageNumberInitialized = true;
 }
 
-// this function separate a mitk::image into a list of ipPicDescriptor
+/** This function separate a mitk::image into a list of ipPicDescriptor. If no input set before, the function create an empty output. */
 void mitk::ImageToPicDescriptor::Update()
 {
   m_Output.clear();
@@ -319,6 +323,7 @@ void mitk::ImageToPicDescriptor::Update()
   }
 }
 
+/** The Dicom-Header have to deleted, because the function QcPlugin::addDicomHeader() dont change the existing, it create a new one. If we dont want to loose to much information, we copy them from the Dicom- to Pic-Header. */
 void mitk::ImageToPicDescriptor::CopyDicomHeaderInformationToPicHeader( ipPicDescriptor* pic )
 {
   #define NUMBER_OF_CHILI_PIC_TAGS 15
@@ -372,14 +377,15 @@ void mitk::ImageToPicDescriptor::CopyDicomHeaderInformationToPicHeader( ipPicDes
   }
 }
 
-// return the generated output
+/** Return the generated Output. */
 std::list<ipPicDescriptor*> mitk::ImageToPicDescriptor::GetOutput()
 {
   return m_Output;
 }
 
-
+/** Return the saved ImageInstanceUIDs. The imageInstanceUIDs get used to identify the single slices. The single slices addicted a volume. Volumes have parent-child-relations. Therefore they needed. */
 std::list< std::string > mitk::ImageToPicDescriptor::GetSaveImageInstanceUIDs()
 {
   return m_imageInstanceUIDs;
 }
+

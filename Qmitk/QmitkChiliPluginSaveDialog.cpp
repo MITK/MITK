@@ -110,11 +110,13 @@ QmitkChiliPluginSaveDialog::QmitkChiliPluginSaveDialog( QWidget* parent, const c
   m_NodeInputs.clear();
 }
 
-// destructor
+/** Destructor */
 QmitkChiliPluginSaveDialog::~QmitkChiliPluginSaveDialog()
 {
 }
 
+
+/** This function return the user-selection. */
 QmitkChiliPluginSaveDialog::ReturnValue QmitkChiliPluginSaveDialog::GetSelection()
 {
   ReturnValue newReturnValue;
@@ -145,6 +147,7 @@ QmitkChiliPluginSaveDialog::ReturnValue QmitkChiliPluginSaveDialog::GetSelection
   return newReturnValue;
 }
 
+/** If the user want to create a new series, he can enter a SeriesNumber and -Description. This function return them. */
 QmitkChiliPluginSaveDialog::NewSeriesInformation QmitkChiliPluginSaveDialog::GetSeriesInformation()
 {
   NewSeriesInformation newSeriesInformation;
@@ -161,6 +164,7 @@ QmitkChiliPluginSaveDialog::NewSeriesInformation QmitkChiliPluginSaveDialog::Get
   return newSeriesInformation;
 }
 
+/** This function add a study to the dialog. If you want to add the current selected study as target to save, then use this function. */
 void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription )
 {
   if( studyOID != "" )
@@ -179,6 +183,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
   }
 }
 
+/** This function add a study and series to the dialog. If you want to add the current selected study and series as target to save, then use this function. */
 void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription )
 {
   if( studyOID != "" && seriesOID != "" )
@@ -214,6 +219,7 @@ void QmitkChiliPluginSaveDialog::AddStudyAndSeries( std::string studyOID, std::s
   }
 }
 
+/** This function add a study, series and node to the dialog. A node which was loaded from chili have a seriesOID as property. With this property you can get the series and study where the node load from. You can set this attributes to the dialog. Then the user can save to this series and study. */
 void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, std::string patientName, std::string patientID, std::string studyDescription, std::string seriesOID, int seriesNumber, std::string seriesDescription, mitk::DataTreeNode::Pointer node )
 {
   if( studyOID != "" && seriesOID != "" )
@@ -268,6 +274,7 @@ void QmitkChiliPluginSaveDialog::AddStudySeriesAndNode( std::string studyOID, st
   }
 }
 
+/** This function add a node to the dialog. There are nodes which was not loaded from chili. This one have no seriesOID property. But we want to save them too. So we add only the node. If you add only nodes without a series or study, its not possible to save them. Because the user have no study and series to select. Therefore add the current selected study or series! */
 void QmitkChiliPluginSaveDialog::AddNode( mitk::DataTreeNode::Pointer node )
 {
   NodeInputs newInput;
@@ -285,6 +292,7 @@ void QmitkChiliPluginSaveDialog::AddNode( mitk::DataTreeNode::Pointer node )
   m_NodeInputs.push_back( newInput );
 }
 
+/** This function refresh the dialog. This slot ensure that a study is selected, show all series to the selected study and call SetSeries(). IMPORTANT: This slot have to call one time bevor exec the dialog.*/
 void QmitkChiliPluginSaveDialog::UpdateView()
 {
   //ensure that a study is selected
@@ -316,6 +324,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
   SetSeries();
 }
 
+/** This slot ensure that a series is selected. If no series exist, the option to create a new series is set to the one and only. Call SetNodesByButtonGroup(). */
 void QmitkChiliPluginSaveDialog::SetSeries()
 {
   //ensure that a series is selected
@@ -339,6 +348,7 @@ void QmitkChiliPluginSaveDialog::SetSeries()
   SetNodesByButtonGroup();
 }
 
+/** This slot enable and strikeout the nodes in subject to the selected radiobutton. The lineedit for the SeriesDescription and -Number get hide or show. */
 void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
 {
   if( m_SeriesListView->childCount() == 0 )
@@ -386,6 +396,7 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
   }
 }
 
+/** If the user want to create a new series, this slot check if the seriesDescription is not empty. */
 void QmitkChiliPluginSaveDialog::CheckOutputs()
 {
   if( m_New->isChecked() && m_SeriesDescription->text() == "" )
@@ -399,6 +410,7 @@ void QmitkChiliPluginSaveDialog::CheckOutputs()
   accept();
 }
 
+/** This slot show a messagebox with helpinformation. */
 void QmitkChiliPluginSaveDialog::ShowHelp()
 {
   QMessageBox::information( 0, "MITK", "The node-name can be enabled or disabled\nA enabled node means, that the node dont exist in the current selected series and you can change the name.\nA disable node means, that the node always exist in the current selected series.\nDisabled ones can be stikeout or not.\nNo strikeout means, that the existing entry get overridden and therefore the original node-name get used.\nA strikeout node-name means, that you have no rights to override the existing entry.\nIn this case the node dont get saved. Only MBI-saved-Data can be overridden." );

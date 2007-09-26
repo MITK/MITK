@@ -39,36 +39,13 @@ mitk::PointSet::PointSet()
   m_PointSetSeries[0] = DataType::New();
   PointDataContainer::Pointer pointData = PointDataContainer::New();
   m_PointSetSeries[0]->SetPointData( pointData );
-
-  this->InitializeTimeSlicedGeometry( 1 );
   m_CalculateBoundingBox = false;
-}
 
+  Superclass::InitializeTimeSlicedGeometry(1);
+}
 
 mitk::PointSet::~PointSet()
 {
-}
-
-void mitk::PointSet::InitializeTimeSlicedGeometry( int timeSteps )
-{
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  g3d->Initialize();
-
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
-  }
-
-  //
-  // The geometry is propagated automatically to the other items,
-  // if EvenlyTimed is true...
-  //
-  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
-
-  m_Initialized = (timeSteps>0);
 }
 
 bool mitk::PointSet::IsEmpty(int t) const
@@ -76,7 +53,7 @@ bool mitk::PointSet::IsEmpty(int t) const
   return IsInitialized() && (GetSize(t) <= 0);
 }
 
-void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
+void mitk::PointSet::Resize( unsigned int timeSteps )
 {
   // Check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
@@ -85,10 +62,13 @@ void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
   // NOTE: This method will never REDUCE the vector size; it should only
   // be used to make sure that the vector has enough elements to include the
   // specified time step.
+
   unsigned int oldSize = m_PointSetSeries.size();
-  
+
   if ( timeSteps > oldSize )
   {
+    Superclass::Resize( timeSteps );
+
     m_PointSetSeries.resize( timeSteps );
     for ( unsigned int i = oldSize; i < timeSteps; ++i )
     {
@@ -96,10 +76,14 @@ void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
       PointDataContainer::Pointer pointData = PointDataContainer::New();
       m_PointSetSeries[i]->SetPointData( pointData );
     }
-    this->InitializeTimeSlicedGeometry( timeSteps );
-    
+
     //if the size changes, then compute the boundingbox
     m_CalculateBoundingBox = true;
+  }
+
+  if ( timeSteps != oldSize )
+  {
+    this->InvokeEvent( PointSetTimeStepsChangeEvent() );
   }
 }
 
@@ -244,7 +228,8 @@ mitk::PointSet
 
 void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
 {
-  this->AdaptPointSetSeriesSize( t+1 );
+  // Adapt the size of the data vector if necessary
+  this->Resize( t+1 );
 
   mitk::Point3D indexPoint;
   this->GetGeometry( t )->WorldToIndex( point, indexPoint );
@@ -252,6 +237,7 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
 
   //boundingbox has to be computed anyway
   m_CalculateBoundingBox = true;
+  this->Modified();
 }
 
 

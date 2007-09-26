@@ -215,16 +215,14 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       continue;
     }
 
-    //"Normal-Vektor with image size"
+    //"Normal-Vektor"
     vtk2itk( isg->u, rightVector );
     vtk2itk( isg->v, downVector );
-    normale[0] = ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) );
-    normale[1] = ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) );
-    normale[2] = ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) );
-
-    //expansion
-    int xExpansion = (*currentPic)->n[0];
-    int yExpansion = (*currentPic)->n[1];
+    rightVector = rightVector * (*currentPic)->n[0];
+    downVector = downVector * (*currentPic)->n[1];
+    normale[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2 );
+    normale[1] = Round( ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) ), 2);
+    normale[2] = Round( ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) ), 2);
 
     //PixelSize
     vtk2itk( isg->ps, pixelSize );
@@ -250,16 +248,39 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       }
     }
 
-    //initialize searching
-    foundMatch = false;
-    curCount = 0;
-    maxCount = m_PossibleOutputs.size();
+    //dimension
+    int currentDimension = (*currentPic)->dim;
+    if( currentDimension < 2 || currentDimension > 4 )
+    {
+      std::cout<<"PicDescriptorToNode-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
+      delete isg;
+      continue;
+    }
+
+    //origin
+    Vector3D currentOrigin;
+    vtk2itk( isg->o, currentOrigin );
+
+    if( currentDimension == 4 )
+    {
+      //with this combination, no search initialize and a new group created
+      foundMatch = false;
+      curCount = 0;
+      maxCount = 0;
+    }
+    else
+    {
+      //initialize searching
+      foundMatch = false;
+      curCount = 0;
+      maxCount = m_PossibleOutputs.size();
+    }
 
     // searching for equal output
     while( curCount < maxCount && !foundMatch )
     {
       //check RefferenceUID, PixelSize, Expansion and SeriesDescription
-      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSize, m_PossibleOutputs[ curCount ].pixelSize) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription && yExpansion == m_PossibleOutputs[ curCount ].yExpansion && xExpansion == m_PossibleOutputs[ curCount ].xExpansion )
+      if( isg->forUID == m_PossibleOutputs[ curCount ].refferenceUID && Equal(pixelSize, m_PossibleOutputs[ curCount ].pixelSize) && currentSeriesDescription == m_PossibleOutputs[ curCount ].seriesDescription && currentDimension == m_PossibleOutputs[ curCount ].dimension )
       {
         //check if vectors are parallel (only if they have a lowest common multiple)
         foundMatch = true; // --> found the right output
@@ -289,10 +310,24 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
               foundMatch = false;  // --> not parallel, wrong output
           }
         }
-        if( !foundMatch )
-          curCount ++;
+        //now we know about the dimension, normale, referenceUID, pixelSize and description
+        //but there are dimension specific cases
+        if( m_PossibleOutputs[ curCount ].dimension == 2 )
+        {
+          if( !foundMatch )
+            curCount ++;
+        }
+        else
+        {
+          if( foundMatch && ( m_PossibleOutputs[ curCount ].origin != currentOrigin || m_PossibleOutputs[ curCount ].numberOfSlices != (*currentPic)->n[2] ) )
+          {
+            foundMatch = false;
+            curCount++;
+          }
+          else curCount++;
+        }
       }
-      else curCount ++; // the next output
+      else curCount++;
     }
 
     // match found?
@@ -309,10 +344,16 @@ void mitk::PicDescriptorToNode::CreatePossibleOutputs()
       newOutput.seriesDescription = currentSeriesDescription;
       newOutput.normale = normale;
       newOutput.pixelSize = pixelSize;
-      newOutput.yExpansion = yExpansion;
-      newOutput.xExpansion = xExpansion;
-      newOutput.numberOfSlices = -1;  //from here on only defaults. True values will be calculated later
-      newOutput.numberOfTimeSlices = -1;
+      newOutput.dimension = currentDimension;
+      newOutput.origin = currentOrigin;
+      if( currentDimension > 2 )
+        newOutput.numberOfSlices = (*currentPic)->n[2]-1;
+      else
+        newOutput.numberOfSlices = -1;  //from here on only defaults. True values will be calculated later
+      if( currentDimension == 4 )
+        newOutput.numberOfTimeSlices = (*currentPic)->n[3]-1;
+      else
+        newOutput.numberOfTimeSlices = -1;
       newOutput.differentTimeSlices = false;
       newOutput.descriptors.clear();
       newOutput.descriptors.push_back( (*currentPic) );
@@ -349,6 +390,12 @@ void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
 #ifdef CHILI_PLUGIN_VERSION_CODE
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
   {
+    if( m_PossibleOutputs[n].dimension == 3 )
+    {
+      m_PossibleOutputs[n].numberOfTimeSlices = m_PossibleOutputs[n].descriptors.size()-1;
+      continue;
+    }
+
     std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin();
     std::list< ipPicDescriptor* >::iterator iterend = m_PossibleOutputs[n].descriptors.end();
     bool InitializedSpacingAndTime = false;
@@ -433,8 +480,8 @@ void mitk::PicDescriptorToNode::SeperateOutputsBySpacing()
               newOutput.seriesDescription = m_PossibleOutputs[n].seriesDescription;
               newOutput.normale = m_PossibleOutputs[n].normale;
               newOutput.pixelSize = m_PossibleOutputs[n].pixelSize;
-              newOutput.yExpansion = m_PossibleOutputs[n].yExpansion;
-              newOutput.xExpansion = m_PossibleOutputs[n].xExpansion;
+              newOutput.dimension = m_PossibleOutputs[n].dimension;
+              newOutput.origin = m_PossibleOutputs[n].origin;
               newOutput.numberOfSlices = - 1;
               newOutput.numberOfTimeSlices = - 1;
               newOutput.differentTimeSlices = false;
@@ -478,7 +525,7 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
 #ifdef CHILI_PLUGIN_VERSION_CODE
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
   {
-    if( m_PossibleOutputs[n].differentTimeSlices )
+    if( m_PossibleOutputs[n].differentTimeSlices && m_PossibleOutputs[n].dimension == 2 )
     {
       int curTime = 0, lastTime = 0;
       bool deleteIterator = false;
@@ -538,8 +585,8 @@ void mitk::PicDescriptorToNode::SeperateOutputsByTime()
               timeOutput->normale = m_PossibleOutputs[n].normale;
               timeOutput->pixelSize = m_PossibleOutputs[n].pixelSize;
               timeOutput->sliceSpacing = m_PossibleOutputs[n].sliceSpacing;
-              timeOutput->yExpansion = m_PossibleOutputs[n].yExpansion;
-              timeOutput->xExpansion = m_PossibleOutputs[n].xExpansion;
+              timeOutput->dimension = m_PossibleOutputs[n].dimension;
+              timeOutput->origin = m_PossibleOutputs[n].origin;
               timeOutput->numberOfSlices = - 1;
               timeOutput->numberOfTimeSlices = - 1;
               timeOutput->differentTimeSlices = false;
@@ -644,49 +691,25 @@ void mitk::PicDescriptorToNode::SplitDummiVolumes()
 
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
   {
-    if( m_PossibleOutputs[n].numberOfSlices == 1 && m_PossibleOutputs[n].numberOfTimeSlices == 0 && m_PossibleOutputs[n].differentTimeSlices == false )
+    if( m_PossibleOutputs[n].numberOfSlices == 1 && m_PossibleOutputs[n].numberOfTimeSlices == 0 && m_PossibleOutputs[n].differentTimeSlices == false && m_PossibleOutputs[n].dimension == 2 )
     {
       //create a "new" Output
       DifferentOutputs new2DOutput;
+
       new2DOutput.refferenceUID = m_PossibleOutputs[n].refferenceUID;
       new2DOutput.seriesDescription = m_PossibleOutputs[n].seriesDescription;
       new2DOutput.normale = m_PossibleOutputs[n].normale;
       new2DOutput.pixelSize = m_PossibleOutputs[n].pixelSize;
-
-      //set the spacing for the new output
-      if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
-      {
-        delete isg;
-        return;
-      }
-
-      vtk2itk( isg->ps, spacing );
-      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-        spacing.Fill(1.0);
-      for (unsigned int i = 0; i < 3; ++i)
-        spacing[i] = Round( spacing[i], 2 );
-      new2DOutput.sliceSpacing = spacing;
-
+      new2DOutput.sliceSpacing = m_PossibleOutputs[n].sliceSpacing;
+      new2DOutput.dimension = m_PossibleOutputs[n].dimension;
+      new2DOutput.origin = m_PossibleOutputs[n].origin;
       new2DOutput.numberOfSlices = 0;
       new2DOutput.numberOfTimeSlices = 0;
       new2DOutput.differentTimeSlices = false;
       new2DOutput.descriptors.clear();
       new2DOutput.descriptors.push_back( m_PossibleOutputs[n].descriptors.front() );
+
       m_PossibleOutputs[n].descriptors.pop_front();
-
-      //set the spacing for the source output
-      if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
-      {
-        delete isg;
-        return;
-      }
-      vtk2itk( isg->ps, spacing );
-      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-        spacing.Fill(1.0);
-      for (unsigned int i = 0; i < 3; ++i)
-        spacing[i] = Round( spacing[i], 2 );
-      m_PossibleOutputs[n].sliceSpacing = spacing;
-
       m_PossibleOutputs[n].numberOfSlices = 0;
       m_PossibleOutputs.push_back( new2DOutput );
     }
@@ -702,128 +725,148 @@ void mitk::PicDescriptorToNode::CreateNodesFromOutputs()
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
   {
     //check the count of slices with the numberOfSlices and numberOfTimeSlices
-    if( (unsigned int)( ( m_PossibleOutputs[n].numberOfSlices+1 ) * ( m_PossibleOutputs[n].numberOfTimeSlices+1 ) ) != m_PossibleOutputs[n].descriptors.size() )
-      std::cout<<"PicDescriptorToNode-ERROR: For Output"<<n<<" ("<<m_PossibleOutputs[n].seriesDescription<<") calculated slicecount is not equal to the existing slices. Output closed."<<std::endl;
-    else
-      if(  m_PossibleOutputs[n].differentTimeSlices == true )
-        std::cout<<"PicDescriptorToNode-ERROR: Output"<<n<<" ("<<m_PossibleOutputs[n].seriesDescription<<") have different numbers of timeslices. Function SeperateOutputsByTime() dont work right. Output closed."<<std::endl;
-    else
+    if( m_PossibleOutputs[n].dimension == 2 && (unsigned int)( ( m_PossibleOutputs[n].numberOfSlices+1 ) * ( m_PossibleOutputs[n].numberOfTimeSlices+1 ) ) != m_PossibleOutputs[n].descriptors.size() )
     {
-      //create mitk::Image
-      int slice = 0, time = 0;
-      Point3D origin;
-      Vector3D rightVector, downVector, origincur, originb4;
-      ipPicDescriptor* header;
-      Image::Pointer resultImage;
-      header = ipPicCopyHeader( m_PossibleOutputs[n].descriptors.front(), NULL );
+      std::cout<<"PicDescriptorToNode-ERROR: For Output"<<n<<" ("<<m_PossibleOutputs[n].seriesDescription<<") calculated slicecount is not equal to the existing slices. Output closed."<<std::endl;
+      continue;
+    }
+    if(  m_PossibleOutputs[n].differentTimeSlices == true )
+    {
+      std::cout<<"PicDescriptorToNode-ERROR: Output"<<n<<" ("<<m_PossibleOutputs[n].seriesDescription<<") have different numbers of timeslices. Function SeperateOutputsByTime() dont work right. Output closed."<<std::endl;
+      continue;
+    }
 
-      //2D
-      if( m_PossibleOutputs[n].numberOfSlices == 0 )
+    //create mitk::Image
+    int slice = 0, time = 0;
+    Image::Pointer resultImage;
+    Point3D origin;
+    Vector3D rightVector, downVector, origincur, originb4;
+    ipPicDescriptor* header;
+    header = ipPicCopyHeader( m_PossibleOutputs[n].descriptors.front(), NULL );
+
+    //2D
+    if( m_PossibleOutputs[n].numberOfSlices == 0 )
+    {
+      if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
       {
-        if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
-        {
-          header->dim = 2;
-          header->n[2] = 0;
-          header->n[3] = 0;
-        }
-        // +t
-        else
-        {
-          header->dim = 4;
-          header->n[2] = 1;
-          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
-        }
+        header->dim = 2;
+        header->n[2] = 0;
+        header->n[3] = 0;
       }
-      //3D
+      // +t
       else
       {
-        if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
-        {
-          header->dim = 3;
-          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
-          header->n[3] = 0;
-        }
-        // +t
-        else
-        {
-          header->dim = 4;
-          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
-          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
-        }
+        header->dim = 4;
+        header->n[2] = 1;
+        header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
       }
-      resultImage = Image::New();
-      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-      resultImage->Initialize( header );
-      if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
+    }
+    //3D
+    else
+    {
+      if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
       {
-        delete isg;
-        return;
+        header->dim = 3;
+        header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
+        header->n[3] = 0;
       }
-      vtk2itk( isg->u, rightVector );
-      vtk2itk( isg->v, downVector );
-      vtk2itk( isg->o, origin );
-
-      // its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
-      if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
-        rightVector[0] = 1;
-      if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
-        downVector[2] = -1;
-
-      // set the timeBounds
-      ScalarType timeBounds[] = {0.0, 1.0};
-      // set the planeGeomtry
-      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &m_PossibleOutputs[n].sliceSpacing );
-      planegeometry->SetOrigin( origin );
-      planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
-      planegeometry->SetTimeBounds( timeBounds );
-      // slicedGeometry
-      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-      slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-      // timeSlicedGeometry
-      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-      timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
-      timeSliceGeometry->TransferItkToVtkTransform();
-      // Image->SetGeometry
-      resultImage->SetGeometry( timeSliceGeometry );
-
-      // add the slices to the created mitk::Image
-      for( std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin(); iter != m_PossibleOutputs[n].descriptors.end(); iter++)
+      // +t
+      else
       {
-        resultImage->SetPicSlice( (*iter), slice, time );
-        if( time < m_PossibleOutputs[n].numberOfTimeSlices )
-          time ++;
-        else
-        {
-          time = 0;
-          slice ++;
-        }
+        header->dim = 4;
+        header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
+        header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
       }
+    }
+    resultImage = Image::New();
+    interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+    resultImage->Initialize( header, 1, -1, m_PossibleOutputs[n].numberOfSlices+1 );
 
-      // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties
-      if( resultImage->IsInitialized() && resultImage.IsNotNull() )
-      {
-        DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-        node->SetData( resultImage );
-        DataTreeNodeFactory::SetDefaultImageProperties( node );
-
-        if( m_PossibleOutputs[n].seriesDescription == "" )
-          m_PossibleOutputs[n].seriesDescription = "no SeriesDescription";
-        node->SetProperty( "name", new StringProperty( m_PossibleOutputs[n].seriesDescription ) );
-        node->SetProperty( "NumberOfSlices", new IntProperty( m_PossibleOutputs[n].numberOfSlices+1 ) );
-        node->SetProperty( "NumberOfTimeSlices", new IntProperty( m_PossibleOutputs[n].numberOfTimeSlices+1 ) );
-        if( m_SeriesOID != "" )
-          node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
-
-        mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( m_PossibleOutputs[n].descriptors.front() );
-        for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
-        {
-          node->SetProperty( iter->first.c_str(), iter->second.first );
-        }
-
-        m_Output.push_back( node );
-      }
+    if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
+    {
       delete isg;
+      return;
+    }
+    vtk2itk( isg->u, rightVector );
+    vtk2itk( isg->v, downVector );
+    vtk2itk( isg->o, origin );
+
+    // its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
+    if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
+      rightVector[0] = 1;
+    if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
+      downVector[2] = -1;
+
+    // set the timeBounds
+    ScalarType timeBounds[] = {0.0, 1.0};
+    // set the planeGeomtry
+    PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+    if( m_PossibleOutputs[n].dimension == 3 )
+    {
+      Vector3D spacing;
+      vtk2itk( isg->ps, spacing );
+      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
+        spacing.Fill(1.0);
+      for (unsigned int i = 0; i < 3; ++i)
+        spacing[i] = Round( spacing[i], 2 );
+      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+    }
+    else
+    {
+      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &m_PossibleOutputs[n].sliceSpacing );
+    }
+    planegeometry->SetOrigin( origin );
+    planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
+    planegeometry->SetTimeBounds( timeBounds );
+    // slicedGeometry
+    SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+    slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
+    // timeSlicedGeometry
+    TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+    timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
+    timeSliceGeometry->TransferItkToVtkTransform();
+    // Image->SetGeometry
+    resultImage->SetGeometry( timeSliceGeometry );
+
+    // add the slices to the created mitk::Image
+    for( std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin(); iter != m_PossibleOutputs[n].descriptors.end(); iter++)
+    {
+      if( m_PossibleOutputs[n].dimension == 3 )
+        resultImage->SetPicVolume( (*iter), time );
+      else
+        resultImage->SetPicSlice( (*iter), slice, time );
+      if( time < m_PossibleOutputs[n].numberOfTimeSlices )
+        time ++;
+      else
+      {
+        time = 0;
+        slice ++;
+      }
+    }
+    delete isg;
+
+    // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties
+    if( resultImage->IsInitialized() && resultImage.IsNotNull() )
+    {
+      DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+      node->SetData( resultImage );
+      DataTreeNodeFactory::SetDefaultImageProperties( node );
+
+      if( m_PossibleOutputs[n].seriesDescription == "" )
+        m_PossibleOutputs[n].seriesDescription = "no SeriesDescription";
+      node->SetProperty( "name", new StringProperty( m_PossibleOutputs[n].seriesDescription ) );
+      node->SetProperty( "NumberOfSlices", new IntProperty( m_PossibleOutputs[n].numberOfSlices+1 ) );
+      node->SetProperty( "NumberOfTimeSlices", new IntProperty( m_PossibleOutputs[n].numberOfTimeSlices+1 ) );
+      if( m_SeriesOID != "" )
+        node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
+
+      mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( m_PossibleOutputs[n].descriptors.front() );
+      for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
+      {
+        node->SetProperty( iter->first.c_str(), iter->second.first );
+      }
+
+      m_Output.push_back( node );
     }
   }
 #endif
@@ -895,8 +938,8 @@ void mitk::PicDescriptorToNode::DebugOutput()
     std::cout << "Normale:" << m_PossibleOutputs[n].normale << std::endl;
     std::cout << "PixelSize:" << m_PossibleOutputs[n].pixelSize << std::endl;
     std::cout << "SliceSpacing:" << m_PossibleOutputs[n].sliceSpacing << std::endl;
-    std::cout << "X-Expansion:" << m_PossibleOutputs[n].xExpansion << std::endl;
-    std::cout << "Y-Expansion:" << m_PossibleOutputs[n].yExpansion << std::endl;
+    std::cout << "Dimension:" << m_PossibleOutputs[n].dimension << std::endl;
+    std::cout << "Origin:" << m_PossibleOutputs[n].origin << std::endl;
     std::cout << "NumberOfSlices:" << m_PossibleOutputs[n].numberOfSlices << std::endl;
     std::cout << "NumberOfTimeSlices:" << m_PossibleOutputs[n].numberOfTimeSlices << std::endl;
     std::cout << "DifferentTimeSlices (bool):" << m_PossibleOutputs[n].differentTimeSlices << std::endl;

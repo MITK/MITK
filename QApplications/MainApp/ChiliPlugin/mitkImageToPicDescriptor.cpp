@@ -163,6 +163,7 @@ void mitk::ImageToPicDescriptor::SetImageNumber( int imageNumber )
 void mitk::ImageToPicDescriptor::Update()
 {
   m_Output.clear();
+  m_imageInstanceUIDs.clear();
 
   if( m_SourceImage.IsNull() || !m_TagListInitialized ) return;
 
@@ -216,6 +217,7 @@ void mitk::ImageToPicDescriptor::Update()
         {
           DeleteTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
           ipPicAddTag( currentPicDescriptor, CreateASCIITag( tagIMAGE_INSTANCE_UID, static_cast<char*>( missingImageTagQuery->value ) ) );
+          m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );
         }
         // IMAGE_DATE
         missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_DATE );
@@ -270,8 +272,16 @@ void mitk::ImageToPicDescriptor::Update()
         QcPlugin::addIcon( currentPicDescriptor, true );  // create an icon for the lightbox
         QcPlugin::addLevelWindow( currentPicDescriptor, (int)( m_LevelWindow.GetLevel() ), (int)( m_LevelWindow.GetWindow() ) );  // add the Level/Window
       }
-      // the following passage have to be used, if a new series create or not
-      // dont put it in the passage "if( !m_StudyPatientAndSeriesTags.empty() ) ...", then it is not possible to load override images
+      else
+      //if the slices should override, no tags get changed, but we need the imageInstanceUID
+      {
+        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
+        if( missingImageTagQuery )
+          m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );
+      }
+
+      // the following passage have to be used, if a new series create or not, i dont know why
+      // dont put it in the passage "if( !m_UseSavedPicTags ) ...", then it is not possible to load override images
 
       // create the GeometryInformation
       geometry3DofSlice = slicedGeometry->GetGeometry2D( slice );
@@ -368,3 +378,8 @@ std::list<ipPicDescriptor*> mitk::ImageToPicDescriptor::GetOutput()
   return m_Output;
 }
 
+
+std::list< std::string > mitk::ImageToPicDescriptor::GetSaveImageInstanceUIDs()
+{
+  return m_imageInstanceUIDs;
+}

@@ -64,7 +64,7 @@ class ImageToPicDescriptor : public itk::Object
     /*!
     \brief This function set a TagInformaitionList and a bool variable.
     @param inputTags   This list provides information about the study, patient and series. This tags are the minimun which is needed to save.
-    @param useSavedPicTags   This bool attribute decided, if the tags to save get created and used from the TagInformationList or if no tag get changed. If no tag get changed, it is possible to override the series. Otherwise the data get added to series.
+    @param useSavedPicTags   This bool attribute decided, if the tags to save get created and used from the TagInformationList (false) or if no tag get changed (true). If no tag get changed, it is possible to override the series. Otherwise the data get added to series.
     This function have to be use, otherwise update dont work.
     */
     void SetTagList( TagInformationList inputTags, bool useSavedPicTags );
@@ -95,6 +95,12 @@ class ImageToPicDescriptor : public itk::Object
     */
     std::list< ipPicDescriptor* > GetOutput();
 
+    /*!
+    \brief Return the saved ImageInstanceUIDs.
+    @returns A list of strings.
+    */
+    std::list< std::string > GetSaveImageInstanceUIDs();
+
   protected:
 
     /** constuctor and desctructor */
@@ -103,6 +109,8 @@ class ImageToPicDescriptor : public itk::Object
 
     /** the list for the output */
     std::list< ipPicDescriptor* > m_Output;
+    /** we need the created imageInstanceUIDs to save the parent-child-realtionship */
+    std::list< std::string > m_imageInstanceUIDs;
     /** the image to seperate */
     Image::Pointer m_SourceImage;
     /** the levelwindow of the image */

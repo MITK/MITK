@@ -81,8 +81,8 @@ class PicDescriptorToNode : public itk::Object
       /** Criteria to seperate the different outputs, set by CreatePossibleOutputs(). */
       std::string refferenceUID;
       std::string seriesDescription;
-      int xExpansion;
-      int yExpansion;
+      int dimension;
+      Vector3D origin;
       Vector3D normale;
       Vector3D pixelSize;
       Vector3D sliceSpacing;

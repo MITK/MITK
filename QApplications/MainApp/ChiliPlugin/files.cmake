@@ -12,6 +12,8 @@ SET(CPP_FILES
   mitkConference/TextLoggerConferenceKitFactory.cpp
   mitkImageToPicDescriptor.cpp
   mitkPicDescriptorToNode.cpp
+  mitkPicDescriptorToNodeSecond.cpp
+  mitkPicDescriptorToNodeThird.cpp
   QcMITKTask.cpp
   QmitkEventCollector.cpp
 

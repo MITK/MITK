@@ -38,6 +38,7 @@ SET(CPP_FILES
   QmitkLightBoxReaderDialog.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkPiecewiseFunctionCanvas.cpp
+  QmitkPluginListViewItem.cpp
   QmitkProgressBar.cpp
   QmitkPropertyListViewItem.cpp
   QmitkPropertyListViewItemFactory.cpp

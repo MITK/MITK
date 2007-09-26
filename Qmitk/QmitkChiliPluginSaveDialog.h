@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 class QListView;
 class QLineEdit;
 class QRadioButton;
-class QGridLayout;
-class QBoxLayout;
+class QLabel;
+class QVBoxLayout;
 
 class QmitkChiliPluginSaveDialog : public QDialog
 {
@@ -51,7 +51,7 @@ class QmitkChiliPluginSaveDialog : public QDialog
       int SeriesNumber;
     };
 
-    /** constructor and destructor */
+    /** Constructor and destructor. */
     QmitkChiliPluginSaveDialog( QWidget* parent = 0, const char* name = 0 );
     virtual ~QmitkChiliPluginSaveDialog();
 
@@ -96,27 +96,30 @@ class QmitkChiliPluginSaveDialog : public QDialog
   protected:
 
   /** Internal struct to handle the input. */
-  struct DifferentInputs
+  struct SeriesInputs
   {
     std::string StudyOID;
     std::string SeriesOID;
-    std::string PatientName;
-    std::string PatientID;
-    std::string StudyDescription;
     std::string SeriesNumber;
     std::string SeriesDescription;
-    mitk::DataTreeNode::Pointer Node;
-    QLineEdit* NodeDescriptionField;
   };
   /** All inputs. */
-  std::list< DifferentInputs > m_Inputs;
+  std::list< SeriesInputs > m_SeriesInputs;
+
+  struct NodeInputs
+  {
+    std::string SeriesOID;
+    bool canBeOverride;
+    QLabel* usedLabel;
+  };
+  std::list< NodeInputs > m_NodeInputs;
 
   /** Show the different Studies. */
   QListView* m_StudyListView;
   /** Show the different Series. */
   QListView* m_SeriesListView;
-  /** Container to show the Nodes. */
-  QBoxLayout* m_NodeLayout;
+  /** Show the nodes to save. */
+  QVBoxLayout* m_NodeLayout;
   /** The RadioButton to select whats happens with the nodes. */
   QRadioButton* m_Override;
   QRadioButton* m_Add;

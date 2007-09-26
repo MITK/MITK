@@ -87,8 +87,6 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
     connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SimpleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
-
-connect( ( QObject* )( m_Controls->pushButton7), SIGNAL( clicked() ), ( QObject* ) this, SLOT( test() ) );
   }
 }
 

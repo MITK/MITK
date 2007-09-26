@@ -230,12 +230,30 @@ namespace mitk
   class IsInResultSet : public DataTreeFilterFunction
   {
     public:
-      IsInResultSet(const DataStorage::SetOfObjects* rs):m_ResultSet(rs){}
+      IsInResultSet( std::set<const DataTreeNode*> rs )
+        :m_ResultSet(rs)
+      {
+      }
+
+      IsInResultSet(const DataStorage::SetOfObjects* rs)
+      {
+        if (rs)
+        {
+          for (DataStorage::SetOfObjects::const_iterator iter = rs->begin();
+               iter != rs->end();
+               ++iter)
+          {
+            m_ResultSet.insert( iter->GetPointer() );
+          }
+        }
+      }
+
       virtual ~IsInResultSet() {}
       virtual bool NodeMatches(DataTreeNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
     protected:
-      DataStorage::SetOfObjects::ConstPointer m_ResultSet;
+      //DataStorage::SetOfObjects::ConstPointer m_ResultSet;
+      std::set<const DataTreeNode*> m_ResultSet;
   };
 
   /*! \brief Tests if the node contains an image with a specified dimensionality (template parameter)

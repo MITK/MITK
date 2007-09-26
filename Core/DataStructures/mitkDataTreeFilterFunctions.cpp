@@ -49,11 +49,10 @@ DataTreeFilterFunction* IsGoodDataTreeNode::Clone() const
 
 bool IsInResultSet::NodeMatches(DataTreeNode* node) const
 {
-  if ((node == NULL) || (m_ResultSet.IsNull()))
+  if ((node == NULL) || (m_ResultSet.empty()))
     return false;
 
-  DataStorage::SetOfObjects::STLContainerType rs = m_ResultSet->CastToSTLConstContainer();
-  return (std::find(rs.begin(), rs.end(), mitk::DataTreeNode::Pointer(node)) != rs.end()); // search for node in resultset
+  return (std::find(m_ResultSet.begin(), m_ResultSet.end(), node) != m_ResultSet.end()); // search for node in resultset
 }
 
 DataTreeFilterFunction* IsInResultSet::Clone() const

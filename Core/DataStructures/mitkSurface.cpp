@@ -68,7 +68,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
     m_PolyDataSeries[ t ]->Register( NULL );
   }
   this->Modified();
-  //m_CalculateBoundingBox = true;
+  m_CalculateBoundingBox = true;
 }
 
 bool mitk::Surface::IsEmpty(int t) const

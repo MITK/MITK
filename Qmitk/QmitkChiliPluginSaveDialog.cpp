@@ -172,14 +172,18 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
     //search if the study always exist
     QListViewItem* walkThroughStudies = m_StudyListView->firstChild();
     QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughStudies );
-    while( walkThroughStudies != 0 && entry && entry->GetChiliOID() != studyOID )
+    if( entry )
     {
-      walkThroughStudies = walkThroughStudies->itemBelow();
-      QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughStudies );
-    }
+      std::string savedOID = entry->GetChiliOID();
+      while( walkThroughStudies != 0 && savedOID != studyOID )
+      {
+        walkThroughStudies = walkThroughStudies->itemBelow();
+        QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughStudies );
+      }
 
-    if( walkThroughStudies == 0 )
-      new QmitkPluginListViewItem( studyOID.c_str(), m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str() );
+      if( walkThroughStudies == 0 )
+        new QmitkPluginListViewItem( studyOID.c_str(), m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str() );
+    }
   }
 }
 

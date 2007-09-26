@@ -110,7 +110,10 @@ void QmitkLoadSaveToChiliExample::LoadFromListView()
     {
       QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
       if( entry )
-        AddNodesToDataTree( m_Plugin->LoadCompleteSeries( entry->GetChiliOID() ) );
+      {
+        std::string savedOID = entry->GetChiliOID();
+        AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
+      }
     }
     else
       if( m_Controls->contentOfStudy->selectedItem()->depth() == 1 )
@@ -119,14 +122,20 @@ void QmitkLoadSaveToChiliExample::LoadFromListView()
         {
           QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
           if( entry )
-            AddNodesToDataTree( m_Plugin->LoadAllImagesFromSeries( entry->GetChiliOID() ) );
+          {
+            std::string savedOID = entry->GetChiliOID();
+            AddNodesToDataTree( m_Plugin->LoadAllImagesFromSeries( savedOID ) );
+          }
         }
         else
           if( m_Controls->contentOfStudy->selectedItem()->text( 0 ) == "Text" )  //load all text
           {
             QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
             if( entry )
-              AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( entry->GetChiliOID() ) );
+            {
+              std::string savedOID = entry->GetChiliOID();
+              AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( savedOID ) );
+            }
           }
       }
       else
@@ -134,7 +143,10 @@ void QmitkLoadSaveToChiliExample::LoadFromListView()
         {
           QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
           if( entry )
-            mitk::DataStorage::GetInstance()->Add( m_Plugin->LoadOneText( entry->GetChiliOID() ) );
+          {
+            std::string savedOID = entry->GetChiliOID();
+            mitk::DataStorage::GetInstance()->Add( m_Plugin->LoadOneText( savedOID ) );
+          }
 
           m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
           m_MultiWidget->Fit();

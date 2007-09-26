@@ -104,6 +104,10 @@ QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
   return NULL;
 }
 
+void mitk::ChiliPlugin::SetReaderType( unsigned int )
+{
+}
+
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;

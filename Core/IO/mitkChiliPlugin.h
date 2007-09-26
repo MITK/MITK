@@ -153,6 +153,7 @@ class ChiliPlugin : public itk::Object
     @param seriesOID   If you dont set the input, you get the current selected study. If you want a specific study, set the input.
     @returns The current or specific studyinformation.
     If no study could found, this function return StudyInformation.OID == "".
+    If no parameter set, the current selected study returned.
     */
     virtual StudyInformation GetStudyInformation( const std::string& seriesOID = "" );
 
@@ -161,6 +162,7 @@ class ChiliPlugin : public itk::Object
     @param seriesOID   If you dont set the input, you get the current selected patient. If you want a specific patient, set the input.
     @returns The current or specific patientinformation.
     If no patient could found, this function return PatientInformation.OID == "".
+    If no parameter set, the current selected patient returned.
     */
     virtual PatientInformation GetPatientInformation( const std::string& seriesOID = "" );
 
@@ -169,6 +171,7 @@ class ChiliPlugin : public itk::Object
     @param seriesOID   If you dont set the input, you get the current selected series. If you want a specific series, set the input.
     @returns The current or specific seriesinformation.
     If no series could found, this function return SeriesInformation.OID == "".
+    If no parameter set, the current selected series returned.
     */
     virtual SeriesInformation GetSeriesInformation( const std::string& seriesOID = "" );
 
@@ -177,6 +180,7 @@ class ChiliPlugin : public itk::Object
     @param studyOID   Set the study from wich one you want to know all series.
     @returns The current or specific seriesinformation.
     If no series could found, this function returns an empty list.
+    If no parameter set, the seriesList of the current selected study returned.
     */
     virtual SeriesInformationList GetSeriesInformationList( const std::string& studyOID = "" );
 
@@ -185,6 +189,7 @@ class ChiliPlugin : public itk::Object
     @param textOID   Set the text from which one you want the information?
     @returns The textinformation.
     If no text could found, this function return TextInformation.OID == "".
+    The parameter have to be set.
     */
     virtual TextInformation GetTextInformation( const std::string& textOID );
 
@@ -193,6 +198,7 @@ class ChiliPlugin : public itk::Object
     @param seriesOID   Set the series from which one you want to know all texts.
     @returns A list of textinformation from one series.
     If no texts could found, this function returns an empty list.
+    The parameter have to be set.
     */
     virtual TextInformationList GetTextInformationList( const std::string& seriesOID );
 
@@ -217,9 +223,17 @@ class ChiliPlugin : public itk::Object
     virtual QcLightbox* GetCurrentLightbox();
 
     /*!
+    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually two different readers available. The first one use the image number and the spacing between two slices. The second one use the slice location and all possible spacing between two slices ( this could take longer time ).
+    @param readerType   Actually 0 used for the PicDescriptorToNode, 1 for the PicDescriptorToNodeSecond and 2 used for PicDescriptorToNodeThird.
+    If no parameter set, the PicDescriptorToNode get used.
+    */
+    virtual void SetReaderType( unsigned int readerType = 0 );
+
+    /*!
     \brief Load all images from the given lightbox.
     @param inputLightbox   The lightbox to read. If no lightbox set, the current lightbox get used.
     @returns Multiple mitk::DataTreeNodes as vector.
+    If no parameter set, the current selected Lightbox get used.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
 
@@ -227,6 +241,7 @@ class ChiliPlugin : public itk::Object
     \brief Load all Image- and Text-Files from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
+    The parameter have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadCompleteSeries( const std::string& seriesOID );
 
@@ -234,6 +249,7 @@ class ChiliPlugin : public itk::Object
     \brief Load all Images from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
+    The parameter have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadAllImagesFromSeries( const std::string& seriesOID );
 
@@ -244,6 +260,7 @@ class ChiliPlugin : public itk::Object
     Important: The filename from database is used to save the files. Its possible that one filename ( not the databasedirectory ) is twice in a series ( thats realy two different entries ). So we have to work sequently, otherwise we override the files ( twice filenames ).
     The function iterateText(...) return a list of all textOID's and textPath's from all included text-files in this series.
     With this information LoadOneText( seriesOID, textOID, textPath ) is used.
+    The parameter have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
 
@@ -253,6 +270,7 @@ class ChiliPlugin : public itk::Object
     @returns one mitk::DataTreeNode
     This function use qTextQuery(...) to find the databasedirectory and seriesOID.
     Then LoadOneText( seriesOID, textOID, textPath ) get used.
+    The parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& textOID );
 
@@ -263,6 +281,7 @@ class ChiliPlugin : public itk::Object
     @param textPath   The chili-database-path from the file which should read.
     @returns one mitk::DataTreeNode
     This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factorie ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted.
+    The parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 

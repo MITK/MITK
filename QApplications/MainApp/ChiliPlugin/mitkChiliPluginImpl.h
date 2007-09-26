@@ -25,7 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>
 
-#include "mitkImageToPicDescriptor.h"
+#include <tinyxml.h>  // xml used to save the parent-child-relationship
+#include "mitkImageToPicDescriptor.h"  // define the "TagInformationList"
+
+extern "C" char *dbGetNewOID( void );  //TODO delete if its integrated into the plugin.h --> needed to get the textOID for the parentChildRelationship
 
 class QcMITKTask;
 class SampleApp;
@@ -66,17 +69,19 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 
     /*!
     \brief Return the studyinformation.
-    @param studyOID   If you dont set the input, you get the current selected study. If you want a specific study, set the input.
+    @param seriesOID   If you dont set the input, you get the current selected study. If you want a specific study, set the input.
     @returns The current or specific studyinformation.
     If no study could found, this function return StudyInformation.OID == "".
+    If no parameter set, the current selected study returned.
     */
     virtual StudyInformation GetStudyInformation( const std::string& seriesOID = "" );
 
     /*!
     \brief Return the patientinformation.
-    @param patientOID   If you dont set the input, you get the current selected patient. If you want a specific patient, set the input.
+    @param seriesOID   If you dont set the input, you get the current selected patient. If you want a specific patient, set the input.
     @returns The current or specific patientinformation.
     If no patient could found, this function return PatientInformation.OID == "".
+    If no parameter set, the current selected patient returned.
     */
     virtual PatientInformation GetPatientInformation( const std::string& seriesOID = "" );
 
@@ -85,6 +90,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param seriesOID   If you dont set the input, you get the current selected series. If you want a specific series, set the input.
     @returns The current or specific seriesinformation.
     If no series could found, this function return SeriesInformation.OID == "".
+    If no parameter set, the current selected series returned.
     */
     virtual SeriesInformation GetSeriesInformation( const std::string& seriesOID = "" );
 
@@ -93,6 +99,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param studyOID   Set the study from wich one you want to know all series.
     @returns The current or specific seriesinformation.
     If no series could found, this function returns an empty list.
+    If no parameter set, the seriesList of the current selected study returned.
     */
     virtual SeriesInformationList GetSeriesInformationList( const std::string& studyOID = "" );
 
@@ -101,6 +108,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param textOID   Set the text from which one you want the information?
     @returns The textinformation.
     If no text could found, this function return TextInformation.OID == "".
+    The parameter have to be set.
     */
     virtual TextInformation GetTextInformation( const std::string& textOID );
 
@@ -109,6 +117,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param seriesOID   Set the series from which one you want to know all texts.
     @returns A list of textinformation from one series.
     If no texts could found, this function returns an empty list.
+    The parameter have to be set.
     */
     virtual TextInformationList GetTextInformationList( const std::string& seriesOID );
 
@@ -133,9 +142,17 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     virtual QcLightbox* GetCurrentLightbox();
 
     /*!
+    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually two different readers available. The first one use the image number and the spacing between two slices. The second one use the slice location and all possible spacing between two slices ( this could take longer time ).
+    @param readerType   Actually 0 used for the PicDescriptorToNode, 1 for the PicDescriptorToNodeSecond and 2 used for PicDescriptorToNodeThird.
+    If no parameter set, the PicDescriptorToNode get used.
+    */
+    virtual void SetReaderType( unsigned int readerType = 0 );
+
+    /*!
     \brief Load all images from the given lightbox.
     @param inputLightbox   The lightbox to read. If no lightbox set, the current lightbox get used.
     @returns Multiple mitk::DataTreeNodes as vector.
+    If no parameter set, the current selected Lightbox get used.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
 
@@ -143,6 +160,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     \brief Load all Image- and Text-Files from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
+    The parameter have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadCompleteSeries( const std::string& seriesOID );
 
@@ -150,9 +168,8 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     \brief Load all Images from the series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
-    This function save all image-files ( current known: *.pic, *.dcm, *.jpg ) from database to harddisk.
-    The *dcm-files get converted to ipPicDescriptor. These and the *pic-files get readed via mitk::PicDescriptorsToNode ( this class returns multiple mitk::images).
-    The other files ( current *.jpg ) get readed via mitk::DataTreeNodeFactory (this class return one mitk::image). */
+    The parameter have to be set.
+    */
     virtual std::vector<DataTreeNode::Pointer> LoadAllImagesFromSeries( const std::string& seriesOID );
 
     /*!
@@ -162,15 +179,17 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     Important: The filename from database is used to save the files. Its possible that one filename ( not the databasedirectory ) is twice in a series ( thats realy two different entries ). So we have to work sequently, otherwise we override the files ( twice filenames ).
     The function iterateText(...) return a list of all textOID's and textPath's from all included text-files in this series.
     With this information LoadOneText( seriesOID, textOID, textPath ) is used.
+    The parameter have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
 
     /*!
     \brief Load one Text-files.
     @param textOID   Set the single text.
-    @returns One mitk::DataTreeNode, can be NULL too.
+    @returns one mitk::DataTreeNode
     This function use qTextQuery(...) to find the databasedirectory and seriesOID.
     Then LoadOneText( seriesOID, textOID, textPath ) get used.
+    The parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& textOID );
 
@@ -179,8 +198,9 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param seriesOID   Set the series to load from.
     @param textOID   Set the single text.
     @param textPath   The chili-database-path from the file which should read.
-    @returns One mitk::DataTreeNode, can be NULL too.
-    This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factorie ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted.
+    @returns one mitk::DataTreeNode
+    This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted.
+    The parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
@@ -215,16 +235,16 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 
   public slots:
 
-    /** called when a lightbox import button is clicked */
+    /** Called when a lightbox import button is clicked. */
     void lightBoxImportButtonClicked(int row);
-    /** called when Study is selected */
+    /** Called when Study is selected. */
     virtual void studySelected( study_t* );
-    /** called when a new lightbox get visible in chili */
+    /** Called when a new lightbox get visible in chili. */
     virtual void lightboxTiles (QcLightboxManager *lbm, int tiles);
 
   protected slots:
 
-    /** Slot to reinitialize the ChiliPlugin */
+    /** Slot to reinitialize the ChiliPlugin. */
     void OnApproachReinitializationOfWholeApplication();
 
     void CreateSampleApp();
@@ -236,16 +256,16 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** This Class use the QcPlugin-Function "void sendMessage( ipMsgType_t type, ipMsgParaList_t *list )". Its protected because not everybody should send Messages. */
     friend class ::Chili3Conference;
 
-    /** need a QcPluginInstance for "create" */
+    /** Need a QcPluginInstance for "create". */
     friend QObject* ::create( QWidget *parent );
 
-    /** needed to instantiate QcPlugin */
+    /** Needed to instantiate QcPlugin. */
     static QWidget* s_Parent;
 
-    /** set s_Parent; set by QcEXPORT QObject* create( QWidget *parent ) */
+    /** Set s_Parent; set by QcEXPORT QObject* create( QWidget *parent ). */
     static void SetQtParent( QWidget* parent );
 
-    /** return the QcPluginInstance; used by QcEXPORT QObject* create( QWidget *parent ) */
+    /** Return the QcPluginInstance; used by QcEXPORT QObject* create( QWidget *parent ). */
     static QcPlugin* GetQcPluginInstance();
 
   private:
@@ -254,6 +274,9 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     SampleApp* app;
     /** the task */
     QcMITKTask* task;
+
+    /** MITK provides different reader to combine slices to a volume. This variable use to set the reader and use the right one. */
+    int m_UseReader;
 
     /** The count of the shown Lightboxes in Chili. */
     unsigned int m_LightBoxCount;
@@ -273,7 +296,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** Constuctor */
     ChiliPluginImpl();
 
-    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text from one series. */
+    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text of one series. */
     TextInformationList m_TextInformationList;
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -304,6 +327,30 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 
     /** This function return a temporary directory. It is a new directory in the system-specific temp-Directory. */
     std::string GetTempDirectory();
+
+    /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
+    void CheckCurrentSeriesForRelation( const std::string& seriesOID );
+    /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
+    void AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node );
+    /** This function save the relations between the nodes. */
+    void SaveRelationShip( DataStorage::SetOfObjects::ConstPointer inputNodes );
+
+#ifdef CHILI_PLUGIN_VERSION_CODE
+static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows, int row, text_t *text, void *user_data );
+#endif
+
+    std::string m_ParentOID;
+    TiXmlDocument* m_currentXmlDoc;
+
+    struct NodeDescriptionStruct
+    {
+      DataTreeNode::Pointer Node;
+      std::string VolumeDescription;
+    };
+    std::list<NodeDescriptionStruct> m_RelationShipHelpList;
+
+//    TextInformationList m_TextList;
+//    std::string GetAddedTextOID( const std::string& seriesOID );
 
     /** This function search all images ( using GlobalIterateImagesCallbackTwo() ) from one series and search the maximum imagenumber. */
     int GetMaximumImageNumber( std::string seriesOID );

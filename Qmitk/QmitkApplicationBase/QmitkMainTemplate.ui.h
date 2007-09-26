@@ -59,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 \verbatim
 
-/**
+&#47;**
 \page QmitkFUNCTIONALITY_CLASS_NAMEUserManual The functionality to solve all problems
 
 Available sections:
@@ -320,7 +320,7 @@ public:
     }
   }
 
-  virtual void TreeChanged(const itk::EventObject & treeChangedEvent)
+  virtual void TreeChanged(const itk::EventObject &)
   {
     mitk::Image* image = NULL;
     image = this->GetImageFromDataTree();

@@ -485,18 +485,15 @@ SliceNavigationController::AdjustSliceStepperRange()
   const Vector3D &direction = slicedGeometry->GetDirectionVector();
 
   int c = 0;
-  int i, k;
+  int i, k = 0;
   for ( i = 0; i < 3; ++i )
   {
-    if ( abs( direction[i] ) < 0.000000001 ) { ++c; }
+    if ( abs( (float) direction[i] ) < 0.000000001 ) { ++c; }
     else { k = i; }
   }
 
   if ( c == 2 )
   {
-    const BoundingBox::BoundsArrayType &bounds = 
-      m_InputWorldGeometry->GetBounds();
-
     ScalarType min = m_InputWorldGeometry->GetOrigin()[k];
     ScalarType max = min + m_InputWorldGeometry->GetExtentInMM( k );
 

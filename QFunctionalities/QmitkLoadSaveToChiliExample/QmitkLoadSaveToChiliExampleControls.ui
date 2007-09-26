@@ -8,9 +8,17 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>300</width>
-            <height>675</height>
+            <width>210</width>
+            <height>739</height>
         </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
     </property>
     <property name="minimumSize">
         <size>
@@ -27,146 +35,181 @@
         </property>
         <widget class="QGroupBox">
             <property name="name">
-                <cstring>groupBox6</cstring>
+                <cstring>groupBox1</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>450</height>
+                </size>
             </property>
             <property name="title">
-                <string>Chili - DataBase</string>
+                <string>content of selected Study:</string>
             </property>
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QGroupBox">
-                    <property name="name">
-                        <cstring>groupBox4_2</cstring>
-                    </property>
-                    <property name="title">
-                        <string>Load</string>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
+                <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string>Description</string>
                         </property>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>LoadCompleteSeries</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Load &amp;Complete Series</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+C</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Load Image- and Text-Files from the current selected Series.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>LoadAllImages</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&amp;Load All Images</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Load the Image-File from the current selected Series.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>LoadAllTexts</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Load All Texts</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Load all Text-Files from the current selected Series.</string>
-                            </property>
-                        </widget>
-                    </vbox>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>contentOfStudy</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="hScrollBarMode">
+                        <enum>AlwaysOn</enum>
+                    </property>
+                    <property name="selectionMode">
+                        <enum>Single</enum>
+                    </property>
+                    <property name="rootIsDecorated">
+                        <bool>true</bool>
+                    </property>
+                    <property name="showToolTips">
+                        <bool>true</bool>
+                    </property>
                 </widget>
-                <widget class="QGroupBox">
+                <widget class="QPushButton">
                     <property name="name">
-                        <cstring>groupBox5</cstring>
+                        <cstring>LoadFromListView</cstring>
                     </property>
-                    <property name="title">
-                        <string>Save</string>
+                    <property name="text">
+                        <string>&amp;Load</string>
                     </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>SaveToChili</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Save &amp;To Chili</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+T</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>In this example the whole DataTree get saved.</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>SaveNew</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Sa&amp;ve as new Series to
-current selected Study</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+V</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>SaveToSeries</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Save to current selected Series
-and dont override existing Entries</string>
-                            </property>
-                            <property name="accel">
-                                <string></string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>SaveToSeriesOverride</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Save to current selected Series
-and &amp;override existing Entries</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+O</string>
-                            </property>
-                        </widget>
-                    </vbox>
+                    <property name="accel">
+                        <string>Alt+L</string>
+                    </property>
                 </widget>
             </vbox>
         </widget>
         <spacer>
             <property name="name">
-                <cstring>spacer2</cstring>
+                <cstring>spacer2_2_2</cstring>
             </property>
             <property name="orientation">
                 <enum>Vertical</enum>
             </property>
             <property name="sizeType">
-                <enum>Expanding</enum>
+                <enum>MinimumExpanding</enum>
             </property>
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>170</height>
+                    <height>20</height>
                 </size>
             </property>
         </spacer>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>SaveToChili</cstring>
+            </property>
+            <property name="text">
+                <string>Sa&amp;ve current DataTree</string>
+            </property>
+            <property name="accel">
+                <string>Alt+V</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>In this example the whole DataTree get saved.</string>
+            </property>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2_2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>MinimumExpanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>60</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QButtonGroup">
+            <property name="name">
+                <cstring>buttonGroup1</cstring>
+            </property>
+            <property name="title">
+                <string>Import-Filter:</string>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>ImageNumberFilter</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Image-N&amp;umber-Filter</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+U</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>SpacingFilter</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Spacing-Se&amp;t-Filter</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+T</string>
+                    </property>
+                </widget>
+                <widget class="QRadioButton">
+                    <property name="name">
+                        <cstring>SimpleSpacingFilter</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Simple-Spacing-Filter</string>
+                    </property>
+                    <property name="accel">
+                        <string></string>
+                    </property>
+                    <property name="checked">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
     </vbox>
 </widget>
 <layoutdefaults spacing="6" margin="11"/>

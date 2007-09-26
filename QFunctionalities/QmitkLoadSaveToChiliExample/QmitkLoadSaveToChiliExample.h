@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkLoadSaveToChiliExample_H__INCLUDED
 
 #include "QmitkFunctionality.h"
+#include "mitkChiliPlugin.h"
+
+#include "QmitkPluginListViewItem.h"
 
 class QmitkStdMultiWidget;
 class QmitkLoadSaveToChiliExampleControls;
@@ -72,17 +75,23 @@ class QmitkLoadSaveToChiliExample : public QmitkFunctionality
 
 protected slots:
 
-  void LoadCompleteSeries();
-  void LoadAllImages();
-  void LoadAllTexts();
   void SaveToChili();
-  void SaveNew();
-  void SaveToSeries();
-  void SaveToSeriesOverride();
+  void LoadFromListView();
+  void ChangeReaderType();
 
 protected:
 
+  mitk::ChiliPlugin* m_Plugin;
+
+  struct MimeTypeStruct
+  {
+    std::string mimeType;
+    QmitkPluginListViewItem* parentItem;
+  };
+
   void AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes);
+
+  void PluginEventNewStudySelected(const itk::EventObject&);
 
   /*!
   * default main widget containing 4 windows showing 3

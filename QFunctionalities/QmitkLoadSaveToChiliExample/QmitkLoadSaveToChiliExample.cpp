@@ -23,19 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
 
-#include "mitkChiliPlugin.h"
 //PluginEvents
 #include "mitkChiliPluginEvents.h"
 //to add a new node
 #include "mitkDataTreeNodeFactory.h"
 //for the GUI
-#include <qcursor.h>
-#include <qapplication.h>
-#include <qlabel.h>
 #include <qlistview.h>
-#include <qlineedit.h>
+#include <qradiobutton.h>
 #include <qmessagebox.h>
-
+//predicates
 #include <mitkNodePredicateOR.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateData.h>
@@ -44,20 +40,18 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 : QmitkFunctionality( parent, name, it ),
   m_MultiWidget( mitkStdMultiWidget ),
-  m_Controls( NULL )
+  m_Controls( NULL ),
+  m_Plugin( NULL )
 {
   SetAvailability( true );
-/*
   // register to chili plugin as observer
-  mitk::ChiliPlugin* plugin = mitk::ChiliPlugin::GetInstance();
-
-  if( plugin )
+  m_Plugin = mitk::ChiliPlugin::GetInstance();
+  if( m_Plugin )
   {
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
-    command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::chiliStudySelected );
-    plugin->AddObserver( mitk::PluginStudySelected(), command );
+    command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::PluginEventNewStudySelected );
+    m_Plugin->AddObserver( mitk::PluginStudySelected(), command );
   }
-*/
 }
 
 QmitkLoadSaveToChiliExample::~QmitkLoadSaveToChiliExample()
@@ -86,14 +80,15 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
 {
   if( m_Controls )
   {
-    connect( ( QObject* )( m_Controls->LoadCompleteSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadCompleteSeries() ) );
-    connect( ( QObject* )( m_Controls->LoadAllImages ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllImages() ) );
-    connect( ( QObject* )( m_Controls->LoadAllTexts ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadAllTexts() ) );
+    connect( ( QObject* )( m_Controls->LoadFromListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromListView() ) );
 
     connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
-    connect( ( QObject* )( m_Controls->SaveNew ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveNew() ) );
-    connect( ( QObject* )( m_Controls->SaveToSeries ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToSeries() ) );
-    connect( ( QObject* )( m_Controls->SaveToSeriesOverride ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToSeriesOverride() ) );
+
+    connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+    connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+    connect( ( QObject* )( m_Controls->SimpleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+
+connect( ( QObject* )( m_Controls->pushButton7), SIGNAL( clicked() ), ( QObject* ) this, SLOT( test() ) );
   }
 }
 
@@ -104,19 +99,50 @@ QAction * QmitkLoadSaveToChiliExample::CreateAction( QActionGroup *parent )
   return action;
 }
 
-void QmitkLoadSaveToChiliExample::LoadCompleteSeries()
+void QmitkLoadSaveToChiliExample::Activated()
 {
-  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadCompleteSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+  QmitkFunctionality::Activated();
 }
 
-void QmitkLoadSaveToChiliExample::LoadAllImages()
+void QmitkLoadSaveToChiliExample::LoadFromListView()
 {
-  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadAllImagesFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
-}
+  if( m_Controls->contentOfStudy->selectedItem() != 0 )
+  {
+    if( m_Controls->contentOfStudy->selectedItem()->depth() == 0 )  //load complete series
+    {
+      QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+      if( entry )
+        AddNodesToDataTree( m_Plugin->LoadCompleteSeries( entry->GetChiliOID() ) );
+    }
+    else
+      if( m_Controls->contentOfStudy->selectedItem()->depth() == 1 )
+      {
+        if( m_Controls->contentOfStudy->selectedItem()->text( 0 ) == "Image" )  //load all images
+        {
+          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+          if( entry )
+            AddNodesToDataTree( m_Plugin->LoadAllImagesFromSeries( entry->GetChiliOID() ) );
+        }
+        else
+          if( m_Controls->contentOfStudy->selectedItem()->text( 0 ) == "Text" )  //load all text
+          {
+            QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+            if( entry )
+              AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( entry->GetChiliOID() ) );
+          }
+      }
+      else
+        if( m_Controls->contentOfStudy->selectedItem()->depth() == 3 )  //load single text
+        {
+          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+          if( entry )
+            mitk::DataStorage::GetInstance()->Add( m_Plugin->LoadOneText( entry->GetChiliOID() ) );
 
-void QmitkLoadSaveToChiliExample::LoadAllTexts()
-{
-  AddNodesToDataTree( mitk::ChiliPlugin::GetInstance()->LoadAllTextsFromSeries( mitk::ChiliPlugin::GetInstance()->GetSeriesInformation().OID ) );
+          m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+          m_MultiWidget->Fit();
+          m_MultiWidget->ReInitializeStandardViews();
+        }
+  }
 }
 
 void QmitkLoadSaveToChiliExample::SaveToChili()
@@ -134,84 +160,19 @@ void QmitkLoadSaveToChiliExample::SaveToChili()
   orpred.AddPredicate( w5 );
   mitk::NodePredicateNOT notpred( orpred );
 
-  mitk::ChiliPlugin::GetInstance()->SaveToChili( mitk::DataStorage::GetInstance()->GetSubset( notpred ) );
+  m_Plugin->SaveToChili( mitk::DataStorage::GetInstance()->GetSubset( notpred ) );
 }
 
-void QmitkLoadSaveToChiliExample::SaveNew()
+void QmitkLoadSaveToChiliExample::ChangeReaderType()
 {
-  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
-
-  if( study.OID != "" )
-  {
-    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
-    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
-    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
-    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
-    mitk::NodePredicateData w5( NULL );
-    mitk::NodePredicateOR orpred;
-    orpred.AddPredicate( w1 );
-    orpred.AddPredicate( w2 );
-    orpred.AddPredicate( w3 );
-    orpred.AddPredicate( w4 );
-    orpred.AddPredicate( w5 );
-    mitk::NodePredicateNOT notpred( orpred );
-
-    mitk::ChiliPlugin::GetInstance()->SaveAsNewSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, 99, "ExampleEntry" );
-  }
+  if( m_Controls->ImageNumberFilter->isChecked() )
+    m_Plugin->SetReaderType( 0 );
   else
-    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID is empty. Do you select a study?" );
-}
-
-void QmitkLoadSaveToChiliExample::SaveToSeries()
-{
-  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
-  mitk::ChiliPlugin::SeriesInformation series = mitk::ChiliPlugin::GetInstance()->GetSeriesInformation();
-
-  if( study.OID != "" && series.OID != "" )
-  {
-    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
-    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
-    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
-    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
-    mitk::NodePredicateData w5( NULL );
-    mitk::NodePredicateOR orpred;
-    orpred.AddPredicate( w1 );
-    orpred.AddPredicate( w2 );
-    orpred.AddPredicate( w3 );
-    orpred.AddPredicate( w4 );
-    orpred.AddPredicate( w5 );
-    mitk::NodePredicateNOT notpred( orpred );
-
-    mitk::ChiliPlugin::GetInstance()->SaveToSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, series.OID, false );
-  }
-  else
-    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID or seriesOID is empty. Do you select a study and series?" );
-}
-
-void QmitkLoadSaveToChiliExample::SaveToSeriesOverride()
-{
-  mitk::ChiliPlugin::StudyInformation study = mitk::ChiliPlugin::GetInstance()->GetStudyInformation();
-  mitk::ChiliPlugin::SeriesInformation series = mitk::ChiliPlugin::GetInstance()->GetSeriesInformation();
-
-  if( study.OID != "" && series.OID != "" )
-  {
-    mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
-    mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
-    mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
-    mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
-    mitk::NodePredicateData w5( NULL );
-    mitk::NodePredicateOR orpred;
-    orpred.AddPredicate( w1 );
-    orpred.AddPredicate( w2 );
-    orpred.AddPredicate( w3 );
-    orpred.AddPredicate( w4 );
-    orpred.AddPredicate( w5 );
-    mitk::NodePredicateNOT notpred( orpred );
-
-    mitk::ChiliPlugin::GetInstance()->SaveToSeries( mitk::DataStorage::GetInstance()->GetSubset( notpred ), study.OID, series.OID, true );
-  }
-  else
-    QMessageBox::information( 0, "LoadSaveToChiliExample", "The studyOID or seriesOID is empty. Do you select a study and series?" );
+    if( m_Controls->SpacingFilter->isChecked() )
+      m_Plugin->SetReaderType( 1 );
+    else
+      if( m_Controls->SimpleSpacingFilter->isChecked() )
+        m_Plugin->SetReaderType( 2 );
 }
 
 void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes)
@@ -260,7 +221,89 @@ void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTree
   m_MultiWidget->ReInitializeStandardViews();
 }
 
-void QmitkLoadSaveToChiliExample::Activated()
+void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventObject& )
 {
-  QmitkFunctionality::Activated();
+  m_Controls->contentOfStudy->clear();
+  mitk::ChiliPlugin::SeriesInformationList tempSeriesList = m_Plugin->GetSeriesInformationList();
+  for( std::list<mitk::ChiliPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
+  {
+    QmitkPluginListViewItem* seriesParent;
+    //QListViewItem* seriesParent;
+
+    //seriesDescription
+    if( iter->Description == "" )
+      //seriesParent = new QListViewItem( m_Controls->contentOfStudy, "no description", iter->OID.c_str() );
+      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, "no description" );
+    else
+      //seriesParent = new QListViewItem( m_Controls->contentOfStudy, iter->Description.c_str(), iter->OID.c_str() );
+      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, iter->Description.c_str() );
+
+    //imageCount, seriesNumber
+    //QListViewItem* image = new QListViewItem( seriesParent, "Image", iter->OID.c_str() );
+    QmitkPluginListViewItem* image = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Image" );
+    std::ostringstream seriesNumber;
+    seriesNumber << "SeriesNumber: ";
+    if( iter->Number != -1 )
+      seriesNumber << iter->Number;
+    //new QListViewItem( image , seriesNumber.str() );
+    new QmitkPluginListViewItem( "", image , seriesNumber.str() );
+
+    std::ostringstream imageCount;
+    imageCount << "ImageCount: " << iter->ImageCount;
+    //new QListViewItem( image , imageCount.str() );
+    new QmitkPluginListViewItem( "", image , imageCount.str() );
+
+    //text
+    mitk::ChiliPlugin::TextInformationList tempTextList = m_Plugin->GetTextInformationList( iter->OID.c_str() );
+    std::vector< MimeTypeStruct > mimeTypeVector;
+
+    //QListViewItem* textItem = NULL;
+    QmitkPluginListViewItem* textItem = NULL;
+
+    for( std::list<mitk::ChiliPlugin::TextInformation>::iterator it = tempTextList.begin(); it != tempTextList.end(); it++)
+    {
+      //text-Name
+      char* textName;
+      textName = strrchr( it->ChiliText.c_str(), '-' );
+      textName++;
+      //search if MimeType always exist
+      std::vector< MimeTypeStruct >::iterator searchBegin = mimeTypeVector.begin();
+      std::vector< MimeTypeStruct >::iterator searchEnd = mimeTypeVector.end();
+      bool found = false;
+
+      while( searchBegin != searchEnd )
+      {
+        //if MimeType exist, add the current found
+        if( searchBegin->mimeType == it->MimeType )
+        {
+          //create singe "mime-type-item"
+          //new QListViewItem( searchBegin->parentItem, textName, it->OID.c_str() );
+          new QmitkPluginListViewItem( it->OID.c_str(), searchBegin->parentItem, textName );
+          //break up search
+          searchBegin = searchEnd;
+          found = true;
+        }
+        else searchBegin++;
+      }
+
+      //if this MimeType not shown yet
+      if( !found )
+      {
+        //create the "main-text-item"
+        if( textItem == NULL )
+          //textItem = new QListViewItem( seriesParent, "Text", iter->OID.c_str() );
+          textItem = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Text" );
+        //create new "mime-type-group"
+        MimeTypeStruct newMimeType;
+        newMimeType.mimeType = it->MimeType;
+        //newMimeType.parentItem = new QListViewItem( textItem, it->MimeType);
+        newMimeType.parentItem = new QmitkPluginListViewItem( "", textItem, it->MimeType);
+        //create single "mime-type-item"
+        //new QListViewItem( newMimeType.parentItem, textName, it->OID.c_str() );
+        new QmitkPluginListViewItem( it->OID.c_str(), newMimeType.parentItem, textName );
+        mimeTypeVector.push_back( newMimeType );
+      }
+    }
+  }
 }
+

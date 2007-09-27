@@ -238,43 +238,36 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
   for( std::list<mitk::ChiliPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
   {
     QmitkPluginListViewItem* seriesParent;
-    //QListViewItem* seriesParent;
 
     //seriesDescription
     if( iter->Description == "" )
-      //seriesParent = new QListViewItem( m_Controls->contentOfStudy, "no description", iter->OID.c_str() );
       seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, "no description" );
     else
-      //seriesParent = new QListViewItem( m_Controls->contentOfStudy, iter->Description.c_str(), iter->OID.c_str() );
       seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, iter->Description.c_str() );
 
     //imageCount, seriesNumber
-    //QListViewItem* image = new QListViewItem( seriesParent, "Image", iter->OID.c_str() );
     QmitkPluginListViewItem* image = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Image" );
     std::ostringstream seriesNumber;
     seriesNumber << "SeriesNumber: ";
     if( iter->Number != -1 )
       seriesNumber << iter->Number;
-    //new QListViewItem( image , seriesNumber.str() );
-    new QmitkPluginListViewItem( "", image , seriesNumber.str() );
+    new QmitkPluginListViewItem( "", image , seriesNumber.str().c_str() );
 
     std::ostringstream imageCount;
     imageCount << "ImageCount: " << iter->ImageCount;
-    //new QListViewItem( image , imageCount.str() );
-    new QmitkPluginListViewItem( "", image , imageCount.str() );
+    new QmitkPluginListViewItem( "", image , imageCount.str().c_str() );
 
     //text
     mitk::ChiliPlugin::TextInformationList tempTextList = m_Plugin->GetTextInformationList( iter->OID.c_str() );
     std::vector< MimeTypeStruct > mimeTypeVector;
 
-    //QListViewItem* textItem = NULL;
     QmitkPluginListViewItem* textItem = NULL;
 
     for( std::list<mitk::ChiliPlugin::TextInformation>::iterator it = tempTextList.begin(); it != tempTextList.end(); it++)
     {
       //text-Name
       char* textName;
-      textName = strrchr( it->ChiliText.c_str(), '-' );
+      textName = strrchr( (char*) it->ChiliText.c_str(), '-' );
       textName++;
       //search if MimeType always exist
       std::vector< MimeTypeStruct >::iterator searchBegin = mimeTypeVector.begin();
@@ -287,7 +280,6 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
         if( searchBegin->mimeType == it->MimeType )
         {
           //create singe "mime-type-item"
-          //new QListViewItem( searchBegin->parentItem, textName, it->OID.c_str() );
           new QmitkPluginListViewItem( it->OID.c_str(), searchBegin->parentItem, textName );
           //break up search
           searchBegin = searchEnd;
@@ -301,15 +293,12 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
       {
         //create the "main-text-item"
         if( textItem == NULL )
-          //textItem = new QListViewItem( seriesParent, "Text", iter->OID.c_str() );
           textItem = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Text" );
         //create new "mime-type-group"
         MimeTypeStruct newMimeType;
         newMimeType.mimeType = it->MimeType;
-        //newMimeType.parentItem = new QListViewItem( textItem, it->MimeType);
-        newMimeType.parentItem = new QmitkPluginListViewItem( "", textItem, it->MimeType);
+        newMimeType.parentItem = new QmitkPluginListViewItem( "", textItem, it->MimeType.c_str() );
         //create single "mime-type-item"
-        //new QListViewItem( newMimeType.parentItem, textName, it->OID.c_str() );
         new QmitkPluginListViewItem( it->OID.c_str(), newMimeType.parentItem, textName );
         mimeTypeVector.push_back( newMimeType );
       }

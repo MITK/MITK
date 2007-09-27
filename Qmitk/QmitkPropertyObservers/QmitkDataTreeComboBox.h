@@ -154,7 +154,7 @@ class QmitkDataTreeComboBox : public QComboBox
    
   signals:
     void activated(const mitk::DataTreeFilter::Item*);
-    //void selectionCleared();
+    void selectionCleared();
 
   protected:
 

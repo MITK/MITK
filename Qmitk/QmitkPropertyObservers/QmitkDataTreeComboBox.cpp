@@ -437,8 +437,12 @@ void QmitkDataTreeComboBox::generateItems()
 
   try
   {
-    if ( QComboBox::currentItem() < 0 ) return; // nothing selected (e.g. because there are no items)
-    if ( m_Items.size() == 0 ) return; // nothing selected (there are no items)
+    if ( (QComboBox::currentItem() < 0) || (m_Items.size() == 0) )
+    {
+      // nothing selected (e.g. because there are no items)
+      emit selectionCleared();
+      return;
+    }
    
     mitk::DataTreeFilter::Item* currentItem = const_cast<mitk::DataTreeFilter::Item*>(m_Items.at( QComboBox::currentItem() ));
     if ( currentItem->GetNode() != m_CurrentNode )
@@ -512,6 +516,7 @@ void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
   try
   {
     for (; row < QComboBox::count(); ++row)
+    {
       if ( m_Items.at(row) == item )
       {
         QComboBox::setCurrentItem(row);
@@ -519,6 +524,8 @@ void QmitkDataTreeComboBox::selectionChangedHandler( const itk::EventObject& e)
         emit activated(m_Items.at(row));
         break;
       }
+    }
+    emit selectionCleared();
   }
   catch (std::out_of_range)
   {

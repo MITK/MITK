@@ -181,7 +181,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
         if( savedOID != studyOID )
         {
           walkThroughStudies = walkThroughStudies->itemBelow();
-          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughStudies );
+          entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughStudies );
         }
         else break;
       }
@@ -333,7 +333,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
             if( secondOID != iter->SeriesOID )
             {
               walkThroughSeries = walkThroughSeries->itemBelow();
-              QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughSeries );
+              entry = dynamic_cast<QmitkPluginListViewItem*>( walkThroughSeries );
             }
           }
         }

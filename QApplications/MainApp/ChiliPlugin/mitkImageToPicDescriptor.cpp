@@ -282,6 +282,15 @@ void mitk::ImageToPicDescriptor::Update()
         ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
         if( missingImageTagQuery )
           m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );
+        else
+        {
+          //try to read from dicom-header
+          ipPicTSV_t *dicomHeader = ipPicQueryTag( currentPicDescriptor, "SOURCE HEADER" );
+          void* data = NULL;
+          ipUInt4_t len = 0;
+          if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
+            m_imageInstanceUIDs.push_back( static_cast<char*>( data ) );
+        }
       }
 
       // the following passage have to be used, if a new series create or not, i dont know why

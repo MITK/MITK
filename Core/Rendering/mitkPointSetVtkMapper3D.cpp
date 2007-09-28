@@ -58,13 +58,13 @@ const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D() 
 : m_vtkSelectedPointList(NULL),
   m_vtkUnselectedPointList(NULL), 
-  m_vtkContourPolyData(NULL),
+  //m_vtkContourPolyData(NULL),
   m_VtkSelectedPolyDataMapper(NULL), 
   m_VtkUnselectedPolyDataMapper(NULL),
-  m_vtkContourPolyDataMapper(NULL),
+  //m_vtkContourPolyDataMapper(NULL),
   m_vtkTextList(NULL), 
-  m_Contour(NULL), 
-  m_TubeFilter(NULL),
+  //m_Contour(NULL), 
+  //m_TubeFilter(NULL),
   m_NumberOfSelectedAdded(0), 
   m_NumberOfUnselectedAdded(0)
 {
@@ -104,12 +104,10 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   if( this->GetDataTreeNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice )
   {
     if( this->GetDataTreeNode()->GetIntProperty("BaseRendererMapperID",mapperID) && mapperID == 2)
-    {
       return; //The event for the PositionTracker came from the 3d widget and  not needs to be displayed
-    }
   }
 
-  // Get and update the PointSet
+  // get and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
   input->Update();
 
@@ -128,161 +126,29 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   m_NumberOfSelectedAdded = 0;
   m_NumberOfUnselectedAdded = 0;
 
-
-  //check for color props and use it for rendering of selected/unselected points and contour 
-  //due to different params in VTK (double/float) we have to convert!
-
-  //vars to convert to
-  vtkFloatingPointType unselectedColor[4]={1.0f,1.0f,1.0f,1.0f};
-  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,0.0f};//red
-
-  mitk::Color tmpColor;
-  double opacity = 1.0;
-
-  //get unselected from node
-  float unselectedColorTMP[4]={1.0f,1.0f,1.0f,1.0f};
-  m_DataTreeNode->GetColor(unselectedColorTMP, NULL);
-  //check if there is an unselected property
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer()) != NULL)
-  {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer())->GetValue();
-    unselectedColor[0] = tmpColor[0];
-    unselectedColor[1] = tmpColor[1];
-    unselectedColor[2] = tmpColor[2];
-    unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
-  }
-  else
-  {
-    unselectedColor[0] = unselectedColorTMP[0];
-    unselectedColor[1] = unselectedColorTMP[1];
-    unselectedColor[2] = unselectedColorTMP[2];
-    //unselectedColor[3] stays 1.0f
-  }
-
-  //get selected property
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("selectedcolor").GetPointer()) != NULL)
-  {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("selectedcolor").GetPointer())->GetValue();
-    selectedColor[0] = tmpColor[0];
-    selectedColor[1] = tmpColor[1];
-    selectedColor[2] = tmpColor[2];
-    selectedColor[3] = 1.0f;
-  }
-
-  //get contour property
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("contourcolor").GetPointer()) != NULL)
-  {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("contourcolor").GetPointer())->GetValue();
-    contourColor[0] = tmpColor[0];
-    contourColor[1] = tmpColor[1];
-    contourColor[2] = tmpColor[2];
-    contourColor[3] = 1.0f;
-  }
-
-  if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer()) != NULL)
-  {
-    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity").GetPointer());
-    opacity = pointOpacity->GetValue();
-  }
-  //finished color / opacity fishing!
-
-  //check if a contour shall be drawn
+  //create contour
   bool makeContour = false;
   this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
-
-  //create contour
   if (makeContour)
   {
-    m_vtkContourPolyData = vtkAppendPolyData::New();
-    m_vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 
-
-    vtkPoints *points = vtkPoints::New();
-    vtkCellArray *polys = vtkCellArray::New();
-
-    for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
-    {
-      vtkIdType cell[2] = {j-1,j};
-      points->InsertPoint(j,pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
-      if (j>0)
-        polys->InsertNextCell(2,cell);
-    }
-
-    bool close;
-    if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer()) == NULL)
-      close = false;
-    else
-      close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
-    if (close) 
-    {
-      vtkIdType cell[2] = {j-1,0};
-      polys->InsertNextCell(2,cell);
-    }
-
-    m_Contour = vtkPolyData::New();
-    m_Contour->SetPoints(points);
-    points->Delete();
-    m_Contour->SetLines(polys);
-    polys->Delete();
-    m_Contour->Update();
-
-    m_TubeFilter = vtkTubeFilter::New();
-    m_TubeFilter->SetNumberOfSides( 12 );
-    m_TubeFilter->SetInput(m_Contour);
-    m_Contour->Delete();
-
-    //check for property contoursize. If not present, then take pointsize
-    ScalarType radius = 0.5;
-    mitk::FloatProperty::Pointer contourSizeProp = 
-      dynamic_cast<mitk::FloatProperty *>(
-        this->GetDataTreeNode()->GetProperty("contoursize").GetPointer());
-
-    if (contourSizeProp.IsNull())
-    {
-      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(
-        this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
-    }
-    if (contourSizeProp.IsNotNull())
-    {
-      radius = contourSizeProp->GetValue();
-    }
-
-    m_TubeFilter->SetRadius( radius );
-    m_TubeFilter->Update();
-
-    //add to pipeline
-    m_vtkContourPolyData->AddInput(m_TubeFilter->GetOutput());
-    m_TubeFilter->Delete();
-    m_vtkContourPolyDataMapper->SetInput(m_vtkContourPolyData->GetOutput());
-    m_vtkContourPolyData->Delete();
-
-    //create a new instance of the actor
-    m_ContourActor->Delete();
-    m_ContourActor = vtkActor::New();
-
-    m_ContourActor->SetMapper(m_vtkContourPolyDataMapper);
-    m_vtkContourPolyDataMapper->Delete();
-    m_ContourActor->GetProperty()->SetColor(contourColor);
-    m_ContourActor->GetProperty()->SetOpacity(opacity);
-    m_PointsAssembly->AddPart(m_ContourActor);
+    this->CreateContour(NULL);
   }
 
   //now fill selected and unselected pointList
   //get size of Points in Property
   ScalarType pointSize = 2;
-  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("pointsize").GetPointer());
   if ( pointSizeProp.IsNotNull() )
     pointSize = pointSizeProp->GetValue();
 
+  //get the property for creating a lable onto every point only once
   bool showLabel = true;
   this->GetDataTreeNode()->GetBoolProperty("show label", showLabel);
   const char * pointLabel=NULL;
   if(showLabel)
   {
-    if(dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) != NULL)
-    {
-      pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
-    }
+    if(dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("label").GetPointer()) != NULL)
+      pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("label").GetPointer())->GetValue();
     else
       showLabel = false;
   }
@@ -298,7 +164,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType;
   
-    if(itkPointSet->GetPointData()->size() ==0)
+    if(itkPointSet->GetPointData()->size() == 0)
       pointType = mitk::PTUNDEFINED;
     else
       pointType = pointDataIter.Value().pointSpec;
@@ -449,8 +315,6 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
     m_SelectedActor->SetMapper(m_VtkSelectedPolyDataMapper);
     m_VtkSelectedPolyDataMapper->Delete();
-    m_SelectedActor->GetProperty()->SetColor(selectedColor);
-    m_SelectedActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_SelectedActor);
   }
 
@@ -466,18 +330,20 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
     m_UnselectedActor->SetMapper(m_VtkUnselectedPolyDataMapper);
     m_VtkUnselectedPolyDataMapper->Delete();
-    m_UnselectedActor->GetProperty()->SetColor(unselectedColor);
-    m_UnselectedActor->GetProperty()->SetOpacity(opacity);
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
+
+    //apply props
+  this->ApplyProperties(NULL);
+
 }
 
 
 void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  bool makeContour = false;
-  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
-
+  
+  this->ApplyProperties(renderer);
+  
   if(IsVisible(renderer)==false)
   {
     m_UnselectedActor->VisibilityOff();
@@ -507,6 +373,9 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     m_UnselectedActor->GetProperty()->SetOpacity(opacity);
     m_SelectedActor->GetProperty()->SetOpacity(opacity);
   }
+
+  bool makeContour = false;
+  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
   if (makeContour)
   {
     m_ContourActor->VisibilityOn();
@@ -556,3 +425,191 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
+void mitk::PointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+{
+//check for color props and use it for rendering of selected/unselected points and contour 
+  //due to different params in VTK (double/float) we have to convert!
+
+  //vars to convert to
+  vtkFloatingPointType unselectedColor[4]={1.0f,1.0f,0.0f,1.0f};//yellow
+  vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+  vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};//red
+
+  //different types for color!!!
+  mitk::Color tmpColor;
+  double opacity = 1.0;
+
+  //check if there is an unselected property
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+    unselectedColor[0] = tmpColor[0];
+    unselectedColor[1] = tmpColor[1];
+    unselectedColor[2] = tmpColor[2];
+    unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+  }
+  else if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+    unselectedColor[0] = tmpColor[0];
+    unselectedColor[1] = tmpColor[1];
+    unselectedColor[2] = tmpColor[2];
+    unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+  }
+  else
+  {
+    //check if the node has a color
+    float unselectedColorTMP[4]={1.0f,1.0f,0.0f,1.0f};//yellow
+    m_DataTreeNode->GetColor(unselectedColorTMP, NULL);
+    unselectedColor[0] = unselectedColorTMP[0];
+    unselectedColor[1] = unselectedColorTMP[1];
+    unselectedColor[2] = unselectedColorTMP[2];
+    //unselectedColor[3] stays 1.0f
+  }
+
+  //get selected property
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer())->GetValue();
+    selectedColor[0] = tmpColor[0];
+    selectedColor[1] = tmpColor[1];
+    selectedColor[2] = tmpColor[2];
+    selectedColor[3] = 1.0f;
+  }
+  else if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer())->GetValue();
+    selectedColor[0] = tmpColor[0];
+    selectedColor[1] = tmpColor[1];
+    selectedColor[2] = tmpColor[2];
+    selectedColor[3] = 1.0f;
+  }
+
+  //get contour property
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer())->GetValue();
+    contourColor[0] = tmpColor[0];
+    contourColor[1] = tmpColor[1];
+    contourColor[2] = tmpColor[2];
+    contourColor[3] = 1.0f;
+  }
+  else if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer()) != NULL)
+  {
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer())->GetValue();
+    contourColor[0] = tmpColor[0];
+    contourColor[1] = tmpColor[1];
+    contourColor[2] = tmpColor[2];
+    contourColor[3] = 1.0f;
+  }
+
+  if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("opacity").GetPointer()) != NULL)
+  {
+    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("opacity").GetPointer());
+    opacity = pointOpacity->GetValue();
+  }
+  else if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("opacity").GetPointer()) != NULL)
+  {
+    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("opacity").GetPointer());
+    opacity = pointOpacity->GetValue();
+  }
+  //finished color / opacity fishing!
+
+  //check if a contour shall be drawn
+  bool makeContour = false;
+  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour, renderer);
+  int visibleBefore = m_ContourActor->GetVisibility();
+  if(makeContour && (m_ContourActor != NULL) )
+  {
+    if ( visibleBefore == 0)//was not visible before, so create it.
+      this->CreateContour(renderer);
+    m_ContourActor->GetProperty()->SetColor(contourColor);
+    m_ContourActor->GetProperty()->SetOpacity(opacity);
+  }
+
+  m_SelectedActor->GetProperty()->SetColor(selectedColor);
+  m_SelectedActor->GetProperty()->SetOpacity(opacity);
+
+  m_UnselectedActor->GetProperty()->SetColor(unselectedColor);
+  m_UnselectedActor->GetProperty()->SetOpacity(opacity);
+
+}
+
+void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
+{
+    vtkAppendPolyData* vtkContourPolyData = vtkAppendPolyData::New();
+    vtkPolyDataMapper* vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 
+
+    vtkPoints *points = vtkPoints::New();
+    vtkCellArray *polys = vtkCellArray::New();
+    
+    mitk::PointSet::PointsContainer::Iterator pointsIter;
+    mitk::PointSet::PointDataContainer::Iterator pointDataIter;
+    int j;
+
+    // get and update the PointSet
+    mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
+    input->Update();
+
+    mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( m_TimeStep );
+    for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
+    {
+      vtkIdType cell[2] = {j-1,j};
+      points->InsertPoint(j,pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+      if (j>0)
+        polys->InsertNextCell(2,cell);
+    }
+
+    bool close;
+    if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close").GetPointer(), renderer) == NULL)
+      close = false;
+    else
+      close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close").GetPointer(), renderer)->GetValue();
+    if (close) 
+    {
+      vtkIdType cell[2] = {j-1,0};
+      polys->InsertNextCell(2,cell);
+    }
+
+    vtkPolyData* contour = vtkPolyData::New();
+    contour->SetPoints(points);
+    points->Delete();
+    contour->SetLines(polys);
+    polys->Delete();
+    contour->Update();
+
+    vtkTubeFilter* tubeFilter = vtkTubeFilter::New();
+    tubeFilter->SetNumberOfSides( 12 );
+    tubeFilter->SetInput(contour);
+    contour->Delete();
+
+    //check for property contoursize. If not present, then take pointsize
+    ScalarType radius = 0.5;
+    mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("contoursize").GetPointer(), renderer);
+
+    //if no property could be found, then use pointsize
+    if (contourSizeProp.IsNull())
+      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("pointsize").GetPointer(), renderer);
+
+    //take whatever was usefull
+    if (contourSizeProp.IsNotNull())
+      radius = contourSizeProp->GetValue();
+
+    tubeFilter->SetRadius( radius );
+    tubeFilter->Update();
+
+    //add to pipeline
+    vtkContourPolyData->AddInput(tubeFilter->GetOutput());
+    tubeFilter->Delete();
+    vtkContourPolyDataMapper->SetInput(vtkContourPolyData->GetOutput());
+    vtkContourPolyData->Delete();
+
+    //create a new instance of the actor
+    m_ContourActor->Delete();
+    m_ContourActor = vtkActor::New();
+
+    m_ContourActor->SetMapper(vtkContourPolyDataMapper);
+    vtkContourPolyDataMapper->Delete();
+    
+    m_PointsAssembly->AddPart(m_ContourActor);
+}

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSet.h"
 #include "mitkOpenGLRenderer.h"
 
-const float selectedColor[]={1.0,0.0,0.6}; //for selected!
+//const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
 
 mitk::PointSetMapper2D::PointSetMapper2D()
@@ -95,6 +95,11 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 
 void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
+
+  const mitk::DataTreeNode* node=GetDataTreeNode();
+  if( node == NULL )
+    return;
+
   const int text2dDistance = 10;
 
   if(IsVisible(renderer)==false) return;
@@ -166,10 +171,52 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
     int j = 0;
 
     //for switching back to old color after using selected color
-    float unselectedColor[4];
+    float recallColor[4];
+    glGetFloatv(GL_CURRENT_COLOR,recallColor);
+    
+    //get the properties for coloring the points
+    float unselectedColor[4] = {1.0, 1.0, 0.0, 1.0};//yellow
+    //check if there is an unselected property
+    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+    {
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+      unselectedColor[0] = tmpColor[0];
+      unselectedColor[1] = tmpColor[1];
+      unselectedColor[2] = tmpColor[2];
+      unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+    }
+    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+    {
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+      unselectedColor[0] = tmpColor[0];
+      unselectedColor[1] = tmpColor[1];
+      unselectedColor[2] = tmpColor[2];
+      unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+    }
+    else
+    {
+      //get the color from the dataTreeNode
+      node->GetColor(unselectedColor, NULL);
+    }
 
-    //get current color to recall colorchange after paint
-    glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
+    //get selected property
+    float selectedColor[4] = {1.0, 0.0, 0.6, 1.0};
+    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer()) != NULL)
+    {
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer())->GetValue();
+      selectedColor[0] = tmpColor[0];
+      selectedColor[1] = tmpColor[1];
+      selectedColor[2] = tmpColor[2];
+      selectedColor[3] = 1.0f;
+    }
+    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer()) != NULL)
+    {
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer())->GetValue();
+      selectedColor[0] = tmpColor[0];
+      selectedColor[1] = tmpColor[1];
+      selectedColor[2] = tmpColor[2];
+      selectedColor[3] = 1.0f;
+    }
 
     Point3D p;                      // currently visited point 
     Point3D lastP;                  // last visited point 
@@ -220,7 +267,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           p_size = 10.0;
 
         //draw Point
-        float opacity = (p_size<8)?0.3:1.0;
+        float opacity = (p_size<8)?0.3:1.0;//don't get the opacity from the node? Feature not a bug! Otehrwise the 2D cross is hardly seen.
         glColor4f(unselectedColor[0],unselectedColor[1],unselectedColor[2],opacity);
         glPointSize(p_size);
         //glShadeModel(GL_FLAT);
@@ -268,7 +315,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
             {
               horz[0]=8;
               vert[1]=8;
-              glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
+              glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);
 
               //a diamond around the point with the selected color
               glBegin (GL_LINE_LOOP);
@@ -309,6 +356,27 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
  
         if ( m_Polygon && counter > 0 && drawLinesEtc) // draw a line
         {
+          //get contour color property
+          float contourColor[4] = {unselectedColor[0], unselectedColor[1], unselectedColor[2], unselectedColor[3]};//so if no property set, then use unselected color
+          if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer()) != NULL)
+          {
+            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer())->GetValue();
+            contourColor[0] = tmpColor[0];
+            contourColor[1] = tmpColor[1];
+            contourColor[2] = tmpColor[2];
+            contourColor[3] = 1.0f;
+          }
+          else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer()) != NULL)
+          {
+            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer())->GetValue();
+            contourColor[0] = tmpColor[0];
+            contourColor[1] = tmpColor[1];
+            contourColor[2] = tmpColor[2];
+            contourColor[3] = 1.0f;
+          }
+          //set this color
+          glColor3f(contourColor[0],contourColor[1],contourColor[2]);
+
           glLineWidth( m_LineWidth );
           glBegin (GL_LINES);
           glVertex2fv(&pt2d[0]);
@@ -357,5 +425,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         ++selIt;
       j++;
     }
+
+    //recall the color to the same color before this drawing
+    glColor3f(recallColor[0],recallColor[1],recallColor[2]);
   }
 }

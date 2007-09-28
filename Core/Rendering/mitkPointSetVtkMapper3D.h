@@ -86,14 +86,16 @@ protected:
 
   virtual void GenerateData();
   virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+  virtual void CreateContour(mitk::BaseRenderer* renderer);
 
   vtkAppendPolyData *m_vtkSelectedPointList;
   vtkAppendPolyData *m_vtkUnselectedPointList;
-  vtkAppendPolyData *m_vtkContourPolyData;
+//  vtkAppendPolyData *m_vtkContourPolyData;
 
   vtkPolyDataMapper *m_VtkSelectedPolyDataMapper;
   vtkPolyDataMapper *m_VtkUnselectedPolyDataMapper;
-  vtkPolyDataMapper *m_vtkContourPolyDataMapper;
+//  vtkPolyDataMapper *m_vtkContourPolyDataMapper;
 
   vtkActor *m_SelectedActor;
   vtkActor *m_UnselectedActor;
@@ -103,8 +105,8 @@ protected:
 
   //help for contour between points
   vtkAppendPolyData *m_vtkTextList;
-  vtkPolyData *m_Contour;
-  vtkTubeFilter *m_TubeFilter;
+  //vtkPolyData *m_Contour;
+  //vtkTubeFilter *m_TubeFilter;
 
   //variables to be able to log, how many inputs have been added to PolyDatas
   unsigned int m_NumberOfSelectedAdded;

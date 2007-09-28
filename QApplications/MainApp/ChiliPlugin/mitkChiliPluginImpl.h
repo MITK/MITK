@@ -333,9 +333,11 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
     void CheckCurrentSeriesForRelation( const std::string& seriesOID );
     /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
-    void AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node );
+    void AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image );
+
     /** This function save the relations between the nodes. */
-    void SaveRelationShip( DataStorage::SetOfObjects::ConstPointer inputNodes );
+    void SaveRelationShip();
+    void DeleteExistingRelations();
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows, int row, text_t *text, void *user_data );
@@ -354,8 +356,14 @@ static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows,
     /** The different nodes get saved to the xml-file under automatic generate indices. For the relationship we need the generated indices. */
     std::list<NodeDescriptionStruct> m_RelationShipHelpList;
 
-//    TextInformationList m_TextList;
-//    std::string GetAddedTextOID( const std::string& seriesOID );
+    struct CircleTestStruct
+    {
+      std::string VolumeDescription;
+      int Count;
+      std::list<std::string> ParentList;
+    };
+    std::list<CircleTestStruct> m_CircleTestList;
+    void InitCircleTestStruct();
 
     /** This function search all images ( using GlobalIterateImagesCallbackTwo() ) of one series and search the maximum imagenumber. The maximal imagenumber is used to save. We want no double imageNumber. */
     int GetMaximumImageNumber( std::string seriesOID );

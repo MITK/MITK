@@ -547,11 +547,9 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextOneCallback( int rows, int row,
   mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
 
   //we dont want that the parent-child-relation-file can be load ;)
-  char* chiliDatabaseName;
-  chiliDatabaseName = strrchr( text->chiliText, '-' );
-  chiliDatabaseName++;
-  std::string filename = chiliDatabaseName;
-  if( filename != "ParentChild.xml" )
+  std::string chiliDatabaseName = text->chiliText;
+  std::string fileName = chiliDatabaseName.substr( chiliDatabaseName.find_last_of("-") + 1 );
+  if( fileName != "ParentChild.xml" )
   {
     //create new element
     mitk::ChiliPlugin::TextInformation resultText;
@@ -802,13 +800,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
     //seperate them
     while( !m_FileList.empty() )
     {
-      char* fileExtension;
-      fileExtension = strrchr( m_FileList.front().c_str(), '.' );
-      if( strcmp( fileExtension, ".pic" ) == 0 )
+      std::string filename = m_FileList.front();
+      std::string fileExtension = filename.substr( filename.find_last_of(".") + 1 );
+
+      if( fileExtension == "pic" )
         picFileList.push_back( m_FileList.front() );
       else
       {
-//        if( strcmp( fileExtension, ".dcm" ) == 0 )
+//        if( fileExtension == "dcm" )
 //          dicomFileList.push_back( m_FileList.front() );
 //        else
           otherFileList.push_back( m_FileList.front() );
@@ -971,12 +970,12 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesCallbackOne( int rows, int ro
   ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>( user_data );
 
   //get the FileExtension from the file ( the mitk-filereader need them )
-  char* fileExtension;
-  fileExtension = strrchr( image->path, '.' );
+  std::string imagePath = image->path;
+  std::string fileExtension = imagePath.substr( imagePath.find_last_of(".") + 1 );
 
   //create a new FileName (1.*, 2.*, 3.*, ...) with FileExtension from DB
   std::ostringstream stringHelper;
-  stringHelper << row << fileExtension;
+  stringHelper << row << "." << fileExtension;
   std::string pathAndFile = callingObject->m_tempDirectory + stringHelper.str();
 
   //save to harddisk
@@ -1122,12 +1121,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
   QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
 
   //get Filename and path to save to harddisk
-  char* tempFileName;
-  tempFileName = strrchr( textPath.c_str(), '-' );
-  //we want no "-" in front of the filename
-  tempFileName++;
-
-  std::string fileName = tempFileName;
+  std::string fileName = textPath.substr( textPath.find_last_of("-") + 1 );
   std::string pathAndFile = m_tempDirectory + fileName;
 
   //Load File from DB
@@ -1141,9 +1135,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
   }
 
   //if there are no fileextension in the filename, the reader not able to load the file and the plugin crashed
-  char* fileExtension;
-  fileExtension = strrchr( tempFileName, '.' );
-  if( fileExtension == NULL )
+  if( fileName.find_last_of(".") == -1 )
   {
     //if the user dont close chili, he can look at the file in the tempdirectory, therefore the file downloaded first and checked afterwards
     std::cout << "ChiliPlugin (LoadOneText): Reader not able to read file without extension.\nIf you dont close Chili you can find the file here: "<< pathAndFile <<"." << std::endl;
@@ -1162,13 +1154,9 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
         if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
         {
           //get the FileExtension and cut them from the filename
-          char* fileExtension;
-          fileExtension = strrchr( textPath.c_str(), '.' );
-          //cut the fileExtension from the filename
-          int size = fileName.size() - sizeof( fileExtension );
-          fileName.erase( size );
+          std::string fileNameWithoutExtension = fileName.substr( 0, fileName.find_last_of(".") );
           //set the filename without extension as name-property
-          node->SetProperty( "name", new StringProperty( fileName ) );
+          node->SetProperty( "name", new StringProperty( fileNameWithoutExtension ) );
           node->SetProperty( "TextOID", new StringProperty( textOID ) );
           node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
           //it should be possible to override all non-image-entries
@@ -1404,7 +1392,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
           converterToDescriptor->SetImage( image );
           converterToDescriptor->SetImageNumber( imageNumberCount );
 
-          //add the node-name as SeriesDescription to the Taglist
+          //add the node-name as SeriesDescription to the Taglist (get saved as SeriesDescription)
           mitk::BaseProperty::Pointer nameProperty = (*nodeIter)->GetProperty( "name" );
           mitk::ImageToPicDescriptor::TagInformationStruct temp;
           temp.PicTagDescription = tagSERIES_DESCRIPTION;
@@ -1421,15 +1409,24 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
           std::list< ipPicDescriptor* > myPicDescriptorList = converterToDescriptor->GetOutput();
           std::list< std::string > newVolume = converterToDescriptor->GetSaveImageInstanceUIDs();
           if( m_ParentOID != "stop" )
-            AddVolumeToParentChild( newVolume, (*nodeIter) );
+            AddVolumeToParentChild( newVolume, (*nodeIter), true );
 
           //if the user choosen "save the new nodes only", we add the volume now to the parent child relationship, but we must not save the image
           if( seriesOIDProperty && seriesOIDProperty->GetValueAsString() == seriesOID && !overrideExistingSeries )
             continue;
 
+          //check if we have the right to override the data
+          if( overrideExistingSeries )
+          {
+            mitk::BaseProperty::Pointer manufacturerProperty = (*nodeIter)->GetProperty( "CHILI: MANUFACTURER" );
+            mitk::BaseProperty::Pointer institutionNameProperty = (*nodeIter)->GetProperty( "CHILI: INSTITUTION NAME" );
+            if( !manufacturerProperty || !institutionNameProperty || manufacturerProperty->GetValueAsString() != "MITK" || institutionNameProperty->GetValueAsString() != "DKFZ.MBI" )
+              continue;
+          }
+
           //increase the imageNumber
           imageNumberCount = imageNumberCount + myPicDescriptorList.size();
-          //delete the current node-name (SeriesnDescription) from the picTagList
+          //delete the current node-name from the picTagList (added as SeriesDescription but the picTagList get used for the next image too, that get another SeriesDescription)
           picTagList.pop_back();
 
           int count = 0;
@@ -1466,41 +1463,58 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
         else
         //save text
         {
-          //test textOID
+          //DEFINE TEXTOID
           std::string textOID;
+          //first: check if the node have a TextOID-Property
           BaseProperty::Pointer propertyTextOID = (*nodeIter)->GetProperty( "TextOID" );
-          if( propertyTextOID ) textOID = propertyTextOID->GetValueAsString();
-          else textOID = "";
-
-          //if only the new nodes should save, test if the text-file exist in the series
-          if( !overrideExistingSeries && textOID != "" )
+          bool TextExistInCurrentSeries = false;
+          if( propertyTextOID )
           {
+            //now test if the TextOID existing in the series to save
             text_t text;
             series_t series;
             initTextStruct( &text );
             initSeriesStruct( &series );
 
-            text.oid = strdup( textOID.c_str() );
+            text.oid = strdup( propertyTextOID->GetValueAsString().c_str() );
+            //get the series to the given TextOID
             if( pQueryText( this, &text, &series, NULL, NULL ) )
             {
+              //the series are the same -> the text always exist in the current series
               if( strcmp( series.oid, seriesOID.c_str() ) == 0 )
               {
-                //yes the text which should save exist in the series to save and only the new one should save, so we abort
-                clearTextStruct( &text );
-                clearSeriesStruct( &series );
-                //but add the volume for the parent-child-relationship
-                std::list< std::string > newVolume;
-                newVolume.clear();
-                newVolume.push_back( textOID );
-                AddVolumeToParentChild( newVolume, (*nodeIter) );
-                continue;
+                TextExistInCurrentSeries = true;
               }
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
           }
 
-          //Searching for possible Writer
+          bool textShouldNotBeOverride = false;
+          //second: handle if text exist in series and text should override
+          if( !TextExistInCurrentSeries )
+            textOID = dbGetNewOID();  //they dont exist, so we need a new OID
+          else
+          {
+            textOID = propertyTextOID->GetValueAsString();  //to override the oid have to be the same
+            if( !overrideExistingSeries )
+              textShouldNotBeOverride = true;
+          }
+
+          //add volume to parent-child ( the function check if volume always exist )
+          if( m_ParentOID != "stop" )
+          {
+            //AddVolumeToParentChild want a std::list
+            std::list< std::string > newVolume;
+            newVolume.clear();
+            newVolume.push_back( textOID );
+            AddVolumeToParentChild( newVolume, (*nodeIter), false );
+          }
+
+          if( textShouldNotBeOverride ) continue;  //we dont want to override existing text, so we dont need to save!
+
+          //SAVE
+          //first: Searching for possible Writer
           std::list<FileWriter::Pointer> possibleWriter;
           std::list<LightObject::Pointer> allObjects = itk::ObjectFactoryBase::CreateAllInstance( "IOWriter" );
           for( std::list<LightObject::Pointer>::iterator iter = allObjects.begin(); iter != allObjects.end(); iter++ )
@@ -1511,12 +1525,12 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
             else std::cout << "ChiliPlugin (SaveToChili): no FileWriter returned" << std::endl;
           }
 
-          //write/save
+          //second: use Writer
           for( std::list<FileWriter::Pointer>::iterator it = possibleWriter.begin(); it != possibleWriter.end(); it++ )
           {
             if( it->GetPointer()->CanWrite( (*nodeIter) ) )
             {
-              //get filename
+              //create filename
               std::string fileName;
               if( (*nodeIter)->GetProperty( "name" )->GetValueAsString() != "" )
                 fileName = (*nodeIter)->GetProperty( "name" )->GetValueAsString();
@@ -1526,22 +1540,12 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
               //path and filename
               std::string pathAndFile = m_tempDirectory + fileName;
 
+              //save via Writer to harddisk
               it->GetPointer()->SetFileName( pathAndFile.c_str() );
               it->GetPointer()->SetInput( (*nodeIter) );
               it->GetPointer()->Write();
 
-              if( textOID == "" )
-                textOID = dbGetNewOID();
-
-              if( m_ParentOID != "stop" )
-              {
-                std::list< std::string > newVolume;
-                newVolume.clear();
-                newVolume.push_back( textOID );
-                AddVolumeToParentChild( newVolume, (*nodeIter) );
-              }
-
-              //save to chili
+              //save file from harddisk to chili
               if( !pStoreDataFromFile( pathAndFile.c_str(), fileName.c_str(), it->GetPointer()->GetWritenMIMEType().c_str(), NULL, study.instanceUID, patient.oid, study.oid, series.oid, textOID.c_str() ) )
               {
                 std::cout << "ChiliPlugin (SaveToChili): Error while saving File (" << fileName << ") to Database." << std::endl;
@@ -1561,7 +1565,8 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
   //save relationship
   if( m_ParentOID != "stop" )
   {
-    SaveRelationShip( inputNodes );
+    SaveRelationShip();
+    //add the saved file to the series
     std::string pathAndFile = m_tempDirectory + "ParentChild.xml";
     if( !pStoreDataFromFile( pathAndFile.c_str(), "ParentChild.xml", "application/MITK.xml", NULL, study.instanceUID, patient.oid, study.oid, series.oid, m_ParentOID.c_str() ) )
     {
@@ -1586,6 +1591,16 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
 /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
 void mitk::ChiliPluginImpl::CheckCurrentSeriesForRelation( const std::string& seriesOID )
 {
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
+  if( m_tempDirectory.empty() || seriesOID == "" )
+    return;
+
   m_ParentOID = "";
   pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextThirdCallback, this );
   if( m_ParentOID != "" )
@@ -1614,6 +1629,7 @@ void mitk::ChiliPluginImpl::CheckCurrentSeriesForRelation( const std::string& se
   }
 
   m_RelationShipHelpList.clear();
+#endif
 }
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -1625,11 +1641,9 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows, int ro
 
   if( text != NULL )
   {
-    char* chiliDatabaseName;
-    chiliDatabaseName = strrchr( text->chiliText, '-' );
-    chiliDatabaseName++;
-    std::string filename = chiliDatabaseName;
-    if( filename == "ParentChild.xml" )
+    std::string chiliDataBaseName = text->chiliText;
+    std::string fileName = chiliDataBaseName.substr( chiliDataBaseName.find_last_of("-") + 1 );
+    if( fileName == "ParentChild.xml" )
     {
       callingObject->m_ParentOID = text->oid;
     }
@@ -1639,42 +1653,61 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows, int ro
 #endif
 
 /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
-void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node )
+void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image )
 {
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
+  if( m_tempDirectory.empty() )
+    return;
+
+  //check
+  if( !m_currentXmlDoc ) return;
   TiXmlElement* volume = m_currentXmlDoc->FirstChildElement("volumes");
   if( !volume )
   {
     std::cout << "ChiliPlugin (AddVolumeToParentChild): Missing Entry. Abort." << std::endl;
     return;
   }
-  bool createNewVolume = true;
-  std::string volumeDescription;
-  int volumeCount = 0;
+
+  bool createNewVolume = true; //have we to create a new Volume?
+  std::string volumeDescription; //get the volumeDescription, if the uids or oids alway exist
+  int volumeCount = 0; //count the included volumes
+
   TiXmlElement* singleVolume = volume->FirstChildElement();
-  for( singleVolume; singleVolume; singleVolume = singleVolume->NextSiblingElement() )
+  while( singleVolume && createNewVolume )
   {
     volumeCount++;
-    //check if the newVolume alway exist in the file
-    TiXmlElement* singleUID = singleVolume->FirstChildElement();
+    //check if the ids from the newVolume alway exist in the saved volume
+    TiXmlElement* singleID = singleVolume->FirstChildElement();
+    int idCount = 0;
     bool match = true;
-    int uidCount = 0;
-    while( singleUID && match )
+    while( singleID && match )
     {
-      //if the imageinstanceuid always exist searching with the next one and count the accordances
-      if( find( newVolume.begin(), newVolume.end(), singleUID->GetText() ) != newVolume.end() )
+      //therefore check if the id of the current selected volume exist in the newVolume
+      if( find( newVolume.begin(), newVolume.end(), singleID->GetText() ) != newVolume.end() )
       {
-        singleUID = singleUID->NextSiblingElement();
-        uidCount++;
+        //if id exist, check the next id if they exist in the newVolume
+        singleID = singleID->NextSiblingElement();
+        idCount++;
       }
       else
         match = false;
     }
-    if( match && uidCount == newVolume.size() )
+    //do we found a match?
+    if( match && idCount == newVolume.size() )
     {
+      //set the volumeDescription and dont create a new volume
       createNewVolume = false;
       volumeDescription = singleVolume->Value();
     }
+    singleVolume = singleVolume->NextSiblingElement();
   }
+
   if( createNewVolume )
   //the volume dont exist, create it
   {
@@ -1690,7 +1723,9 @@ void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > new
 
     for( std::list< std::string >::iterator iter = newVolume.begin(); iter != newVolume.end(); iter++ )
     {
-      TiXmlElement * uid = new TiXmlElement( "ImageInstanceUID" );
+      TiXmlElement * uid;
+      if( image ) uid = new TiXmlElement( "ImageInstanceUID" );
+      else uid = new TiXmlElement( "TextOID" );
       TiXmlText * text = new TiXmlText( (*iter).c_str() );
       uid->LinkEndChild( text );
       element->LinkEndChild( uid );
@@ -1706,11 +1741,24 @@ void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > new
     newElement.VolumeDescription = volumeDescription;
     m_RelationShipHelpList.push_back( newElement );
   }
+#endif
 }
 
 /** This function save the relations between the nodes. */
-void mitk::ChiliPluginImpl::SaveRelationShip( DataStorage::SetOfObjects::ConstPointer inputNodes )
+void mitk::ChiliPluginImpl::SaveRelationShip()
 {
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
+  if( m_tempDirectory.empty() )
+    return;
+
+  //check
+  if( !m_currentXmlDoc ) return;
   TiXmlElement* relation = m_currentXmlDoc->FirstChildElement("relations");
   if( !relation )
   {
@@ -1718,10 +1766,33 @@ void mitk::ChiliPluginImpl::SaveRelationShip( DataStorage::SetOfObjects::ConstPo
     return;
   }
 
-  //searching in the created list m_RelationShipHelpList for the overgiven nodes
+  //first delete all existing relationships between the overgiven nodes, we create new one
+  DeleteExistingRelations();
+
+  //we need a structur to test if circles created
+  InitCircleTestStruct();
+
+/*
+  for( std::list<CircleTestStruct>::iterator iter = m_CircleTestList.begin(); iter != m_CircleTestList.end(); iter++ )
+  {
+    std::cout<<iter->VolumeDescription<<", "<<iter->Count<<std::endl;
+    for( std::list<std::string>::iterator it = iter->ParentList.begin(); it != iter->ParentList.end(); it++ )
+      std::cout<<(*it)<<std::endl;
+  }
+*/
+
+//TODO fehler durch überschreiben ist neuer datensatz dazu gekommen!!!
+
+  //add the new relations
+  for( std::list<NodeDescriptionStruct>::iterator listIter = m_RelationShipHelpList.begin(); listIter != m_RelationShipHelpList.end(); listIter++ )
+  {
+
+  }
+
+/*
   for( DataStorage::SetOfObjects::const_iterator nodeIter = inputNodes->begin(); nodeIter != inputNodes->end(); nodeIter++ )
   {
-    //get Child
+    //therefore searching for the volumenDescription of the node
     std::list<NodeDescriptionStruct>::iterator getChild = m_RelationShipHelpList.begin();
     for( getChild; getChild != m_RelationShipHelpList.end(); getChild++ )
     {
@@ -1729,65 +1800,184 @@ void mitk::ChiliPluginImpl::SaveRelationShip( DataStorage::SetOfObjects::ConstPo
         break;
     }
 
+    //node not stored
     if( getChild->Node != (*nodeIter) )
-    {
-      std::cout << "ChiliPlugin (SaveRelationShip): Node not saved to series. No relationship created." << std::endl;
       continue;
-    }
 
+    //node found, now get the relation
     DataStorage::SetOfObjects::ConstPointer relations = DataStorage::GetInstance()->GetSources( (*nodeIter) );
     for( DataStorage::SetOfObjects::const_iterator relationIter = relations->begin(); relationIter != relations->end(); relationIter++ )
     {
-      //get Parent
+      //searching the volumeDesription for the "parent"-node
       std::list<NodeDescriptionStruct>::iterator getParent = m_RelationShipHelpList.begin();
       for( getParent; getParent != m_RelationShipHelpList.end(); getParent++ )
       {
         if( getParent->Node == (*relationIter) )
+          break;
+      }
+
+      //parent not stored
+      if( getParent->Node != (*relationIter) )
+        continue;
+
+      //test if the new relation dont create "circles"
+      //therefore count the parents for every node
+*/
+
+/*
+    for( std::list<CircleTestStruct>::iterator iter = m_CircleTestList.begin(); iter != m_CircleTestList.end(); iter++ )
+    {
+      std::cout<<iter->VolumeDescription<<", "<<iter->Count<<std::endl;
+      for( std::list<std::string>::iterator it = iter->ParentList.begin(); it != iter->ParentList.end(); it++ )
+        std::cout<<(*it)<<std::endl;
+    }
+*/
+/*
+      for( TiXmlElement* singleRelation = relation->FirstChildElement(); singleRelation; singleRelation = singleRelation->NextSiblingElement() )
+      {
+        char* lastElement;
+        lastElement = strrchr( (char*) singleRelation->GetText(), ' ' );
+        lastElement++;
+
+        for( std::list<NodeDescriptionStruct>::iterator searchElement = m_RelationShipHelpList.begin(); searchElement != m_RelationShipHelpList.end(); searchElement++ )
         {
-          std::cout<<"found"<<std::endl;
+          if( strcmp( searchElement->VolumeDescription.c_str(), lastElement) == 0 )
+          {
+            (*searchElement).Count++;
+            newElement.ParentList.push_back();
+            break;
+          }
+        }
+      }
+      //now add the current relation to the count
+      for( std::list<NodeDescriptionStruct>::iterator searchElement = m_RelationShipHelpList.begin(); searchElement != m_RelationShipHelpList.end(); searchElement++ )
+      {
+        if( searchElement->VolumeDescription == getChild->VolumeDescription )
+        {
+          searchElement->Count++;
           break;
         }
       }
-
-      if( getParent->Node != (*relationIter) )
-      {
-        std::cout << "ChiliPlugin (SaveRelationShip): Node not saved to series. No relationship created." << std::endl;
-        continue;
-      }
-      //save relation
-      //TODO schon vorhandene beziehungen zwischen den knoten löschen
-      //TODO vor dem einfügen auf kreise testen
-      std::string relationship = getParent->VolumeDescription + " " + getChild->VolumeDescription;
-      TiXmlText * text = new TiXmlText( relationship.c_str() );
-      relation->LinkEndChild( text );
-    }
-  }
-}
-
+      //now check if circles created
+      */
 /*
-std::string mitk::ChiliPluginImpl::GetAddedTextOID( const std::string& seriesOID )
-{
-std::cout<<m_TextList.size()<<std::endl;
-  TextInformationList textListBevor = m_TextList;
-  m_TextList = GetTextInformationList( seriesOID );
-std::cout<<m_TextList.size()<<std::endl;
-  for( TextInformationList::iterator iter = m_TextList.begin(); iter != m_TextList.end(); iter++ )
-  {
-    bool match = false;
-    TextInformationList::iterator iterator = textListBevor.begin();
-    while( iterator != textListBevor.end() && !match )
-    {
-      if( iterator->OID == iter->OID ) match = true;
-      else iterator++;
-    }
-    if( !match )
-    {
-      std::cout<<"2"<<std::endl;
-      return iter->OID;
+      //if all fine, save relation
+      std::string relationship = getParent->VolumeDescription + " " + getChild->VolumeDescription;
+      TiXmlElement * relationElement = new TiXmlElement( "Relation" );
+      TiXmlText * text = new TiXmlText( relationship.c_str() );
+      relationElement->LinkEndChild( text );
+      relation->LinkEndChild( relationElement );
     }
   }
-}
 */
+
+  //all changes done, save the xml-file
+  std::string pathAndFile = m_tempDirectory + "ParentChild.xml";
+  m_currentXmlDoc->SaveFile( pathAndFile.c_str() );
+
+#endif
+}
+
+void mitk::ChiliPluginImpl::InitCircleTestStruct()
+{
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
+  //check
+  if( !m_currentXmlDoc ) return;
+  TiXmlElement* volume = m_currentXmlDoc->FirstChildElement("volumes");
+  TiXmlElement* relation = m_currentXmlDoc->FirstChildElement("relations");
+  if( !volume || !relation )
+  {
+    std::cout << "ChiliPlugin (InitCircleTestStruct): Missing Entry. Abort." << std::endl;
+    return;
+  }
+
+  //first add all known volume
+  for( TiXmlElement* singleVolume = volume->FirstChildElement(); singleVolume; singleVolume = singleVolume->NextSiblingElement() )
+  {
+    CircleTestStruct newElement;
+    newElement.VolumeDescription = singleVolume->Value();
+    newElement.Count = 0;
+    newElement.ParentList.clear();
+    m_CircleTestList.push_back( newElement );
+  }
+
+  //now set the count and parentList
+  for( TiXmlElement* singleRelation = relation->FirstChildElement(); singleRelation; singleRelation = singleRelation->NextSiblingElement() )
+  {
+    std::string relationString = singleRelation->GetText();
+    std::string parent = relationString.substr( 0, relationString.find(" ") );
+    std::string child = relationString.substr( relationString.find(" ") + 1 );
+
+    for( std::list<CircleTestStruct>::iterator iter = m_CircleTestList.begin(); iter != m_CircleTestList.end(); iter++ )
+    {
+      if( iter->VolumeDescription == child )
+      {
+        iter->Count++;
+        iter->ParentList.push_back( parent );
+        break;
+      }
+    }
+  }
+#endif
+}
+
+void mitk::ChiliPluginImpl::DeleteExistingRelations()
+{
+#ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  return;
+
+#else
+
+  //check
+  if( !m_currentXmlDoc ) return;
+  TiXmlElement* relation = m_currentXmlDoc->FirstChildElement("relations");
+  if( !relation )
+  {
+    std::cout << "ChiliPlugin (DeleteExistingRelations): Missing Entry. Abort." << std::endl;
+    return;
+  }
+
+  //therefore create a list with all possible combinations between the nodes to add
+  std::list<std::string> combinationList;
+  combinationList.clear();
+
+  std::list<NodeDescriptionStruct>::iterator listEnd = m_RelationShipHelpList.end();
+  listEnd--;
+  for( std::list<NodeDescriptionStruct>::iterator listIter = m_RelationShipHelpList.begin(); listIter != listEnd; listIter++ )
+  {
+    for( std::list<NodeDescriptionStruct>::iterator walkIter = listIter; walkIter != m_RelationShipHelpList.end(); walkIter++ )
+    {
+      //create combination and save them
+      std::string combination = listIter->VolumeDescription + " " + walkIter->VolumeDescription;
+      combinationList.push_back( combination );
+      combination = walkIter->VolumeDescription + " " + listIter->VolumeDescription;
+      combinationList.push_back( combination );
+    }
+  }
+
+  //now searching for the combination in the xml-file and delete them if they exist
+  while( !combinationList.empty() )
+  {
+    for( TiXmlElement* singleRelation = relation->FirstChildElement(); singleRelation; singleRelation = singleRelation->NextSiblingElement() )
+    {
+      if( singleRelation->GetText() == combinationList.front() )
+      {
+        relation->RemoveChild( singleRelation );
+        break;
+      }
+    }
+    combinationList.pop_front();
+  }
+#endif
+}
 
 /** This function found the highes imagenumber in a series, its needed because the slice-sort-reader use the imagenumber as criteria. */
 int mitk::ChiliPluginImpl::GetMaximumImageNumber( std::string seriesOID )
@@ -1918,20 +2108,14 @@ void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
     //for images
     std::vector<DataTreeNode::Pointer> resultNodes = LoadImagesFromLightbox( selectedLightbox );
     for( unsigned int n = 0; n < resultNodes.size(); n++ )
-    {
       DataStorage::GetInstance()->Add( resultNodes[n] );
-    }
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
+DataTreeNode::Pointer test = resultNodes[0];
+
     //for text
     resultNodes = LoadAllTextsFromSeries( selectedLightbox->currentSeries()->oid );
-DataTreeNode::Pointer test;
     for( unsigned int n = 0; n < resultNodes.size(); n++ )
-    {
-      if( n ==1 ) DataStorage::GetInstance()->Add( resultNodes[n], resultNodes[0] );
-      else DataStorage::GetInstance()->Add( resultNodes[n] );
-    }
-#endif
+      DataStorage::GetInstance()->Add( resultNodes[n], test );
 
     // stupid, that this is still necessary
     DataTreePreOrderIterator treeiter( app->GetTree() );

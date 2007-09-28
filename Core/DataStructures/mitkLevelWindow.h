@@ -145,9 +145,9 @@ public:
   void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
 
   /**!
-  * \brief sets level/window to the second min/max greyvalues of the given Image
+  * \brief sets level/window to the min/max greyvalues of the given Image
   */
-  void SetAuto(const mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+  void SetAuto(const mitk::Image* image, bool tryPicTags = true);
   
   /**
    * If a level window is set to fixed, the set and get methods won't accept

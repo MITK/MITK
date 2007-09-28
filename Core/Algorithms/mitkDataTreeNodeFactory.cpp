@@ -904,13 +904,13 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
 void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
 {
   node->SetProperty( "linewidth", new mitk::IntProperty(2) );
-  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "layer", new mitk::IntProperty(1));
   node->SetProperty( "pointsize", new mitk::FloatProperty(1.0));
-  node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));
-  node->SetProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
-  //node->SetProperty( "contour", new mitk::BoolProperty(false) );
-  //node->SetProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
-  //node->SetProperty( "close", new mitk::BoolProperty(false) );
+  node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));//yellow
+  node->SetProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));//red
+  node->SetProperty( "contour", new mitk::BoolProperty(false) );
+  node->SetProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
+  node->SetProperty( "close", new mitk::BoolProperty(false) );
 
   //node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetVisibility(true);

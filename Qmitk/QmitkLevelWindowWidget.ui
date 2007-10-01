@@ -6,16 +6,16 @@
     </property>
     <property name="geometry">
         <rect>
-            <x>425</x>
+            <x>35</x>
             <y>0</y>
             <width>50</width>
-            <height>1061</height>
+            <height>580</height>
         </rect>
     </property>
     <property name="sizePolicy">
         <sizepolicy>
-            <hsizetype>1</hsizetype>
-            <vsizetype>1</vsizetype>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
@@ -47,7 +47,7 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout1</cstring>
+                <cstring>layout2</cstring>
             </property>
             <vbox>
                 <property name="name">
@@ -59,8 +59,8 @@
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>7</vsizetype>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
@@ -84,22 +84,22 @@
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>1</vsizetype>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
                     <property name="minimumSize">
                         <size>
-                            <width>40</width>
-                            <height>30</height>
+                            <width>0</width>
+                            <height>0</height>
                         </size>
                     </property>
                     <property name="maximumSize">
                         <size>
-                            <width>40</width>
-                            <height>30</height>
+                            <width>50</width>
+                            <height>32767</height>
                         </size>
                     </property>
                 </widget>
@@ -131,7 +131,7 @@
     </customwidget>
     <customwidget>
         <class>QmitkLineEditLevelWindowWidget</class>
-        <header location="global">QmitkLineEditLevelWindowWidget.h</header>
+        <header location="global">C:/home/daniel/mitk/Qmitk/QmitkLineEditLevelWindowWidget.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>

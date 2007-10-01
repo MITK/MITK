@@ -31,7 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-	
+/**
+ * Create itk::ImageSource for mitk::Image
+ * \ingroup Adaptor
+ */
 template <class TOutputImage>
 class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >
 {

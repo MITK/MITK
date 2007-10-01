@@ -36,28 +36,22 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
-  setMinimumSize ( QSize( 40, 30 ) );
-  setMaximumSize ( QSize( 40, 30 ) );
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this, "contextMenu", true);
   
-  QGridLayout* grid = new QGridLayout( this, 2, 0, 0 );
+  QVBoxLayout* layout = new QVBoxLayout( this );
 
   m_LevelInput = new QLineEdit( this, "LevelInput" );
-  m_LevelInput->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)7, 0, 0, m_LevelInput->sizePolicy().hasHeightForWidth() ) );
-  m_LevelInput->setMinimumSize( QSize( 40, 15 ) );
-  m_LevelInput->setMaximumSize( QSize( 40, 15 ) );
+  m_LevelInput->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)5));
   m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
   m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
   m_WindowInput = new QLineEdit( this, "WindowInput" );
-  m_WindowInput->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)7, 0, 0, m_WindowInput->sizePolicy().hasHeightForWidth() ) );
-  m_WindowInput->setMinimumSize( QSize( 40, 15 ) );
-  m_WindowInput->setMaximumSize( QSize( 40, 15 ) );
+  m_WindowInput->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)5));
   m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
   m_WindowInput->setFrameShadow( QLineEdit::Sunken );
 
-  grid->addWidget(m_LevelInput, 0, 0);
-  grid->addWidget(m_WindowInput, 1, 0);
+  layout->addWidget(m_LevelInput);
+  layout->addWidget(m_WindowInput);
 
   // signals and slots connections
   connect( m_LevelInput, SIGNAL( returnPressed() ), this, SLOT( SetLevelValue() ) );

@@ -552,6 +552,11 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
     input->Update();
 
     mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( m_TimeStep );
+    if ( itkPointSet.GetPointer() == NULL) 
+    {
+      return;
+    }
+
     for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
     {
       vtkIdType cell[2] = {j-1,j};

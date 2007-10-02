@@ -590,11 +590,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #  define ipPicFWrite _ipPicFWrite
 #  define ipPicFEOF gzeof
 #  define ipPicFClose gzclose
-#  ifdef USE_ITK_3_ZLIB
-#    include "itk_zlib_mangle_itk3.h"
-#  else
-#    include "itk_zlib_mangle.h"
-#  endif 
+#  include "itk_zlib_mangle_itk3.h"
 #  include "itkzlib/zlib.h"
 #else
 #  include "itkzlib/zlib.h"

@@ -4,7 +4,6 @@
 */
 #define MITK_ROOT "${PROJECT_SOURCE_DIR}/"
 #cmakedefine USE_ITKZLIB
-#cmakedefine USE_ITK_3_ZLIB
 #cmakedefine MITK_CHILI_PLUGIN
 #cmakedefine BUILD_TESTING
 #define MITK_CHILI_PLUGIN_SDK_IPPIC_H "@MITK_CHILI_PLUGIN_SDK_IPPIC_H@"

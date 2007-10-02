@@ -1,2 +1,2 @@
-#include "@CHILI_ZLIB_H@"
+#include "@MITK_ZLIB_H@"
 

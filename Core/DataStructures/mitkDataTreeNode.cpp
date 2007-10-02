@@ -100,10 +100,6 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
-  std::string name ("no name");
-  this->GetName(name);
-  std::cout << "~DataTreeNode " << name << std::endl;
-
   Interactor* interactor = GetInteractor().GetPointer();
 
   if ( interactor )

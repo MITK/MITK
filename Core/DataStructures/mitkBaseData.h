@@ -285,7 +285,10 @@ public:
   //## As the base data has not a data vector given by itself, the number
   //## of timesteps is defined over the time sliced geometry. In sub classes,
   //## a better implementation could be over the length of the data vector.
-  const unsigned int GetTimeSteps(){ return m_TimeSlicedGeometry->GetTimeSteps(); };
+  const unsigned int GetTimeSteps() const 
+  { 
+    return m_TimeSlicedGeometry->GetTimeSteps(); 
+  };
 
 
   //##Documentation

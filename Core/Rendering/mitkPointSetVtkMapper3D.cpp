@@ -246,7 +246,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       }
       break;
     }
-    if (pointType)
+    if (pointDataIter.Value().selected)
     {
       m_vtkSelectedPointList->AddInput(source->GetOutput());
       ++m_NumberOfSelectedAdded;

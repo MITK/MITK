@@ -448,6 +448,7 @@ void mitk::Geometry3D::SetIdentity()
 void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other, bool pre )
 {
   m_IndexToWorldTransform->Compose(other, pre);
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
   Modified();
   TransferItkToVtkTransform();

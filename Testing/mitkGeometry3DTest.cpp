@@ -81,6 +81,45 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
   if(testGetAxisVectorExtent(geometry3d) == false)
     return EXIT_FAILURE;
 
+  std::cout << "Creating an AffineTransform3D transform: ";
+  mitk::AffineTransform3D::MatrixType matrix;
+  matrix.SetIdentity();
+  matrix(1,1) = 2;
+  mitk::AffineTransform3D::Pointer transform;
+  transform = mitk::AffineTransform3D::New();
+  transform->SetMatrix(matrix);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing a SetIndexToWorldTransform: ";
+  geometry3d->SetIndexToWorldTransform(transform);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of value returned by GetSpacing: ";
+  const mitk::Vector3D& spacing1 = geometry3d->GetSpacing();
+  mitk::Vector3D expectedSpacing;
+  expectedSpacing.Fill(1.0);
+  expectedSpacing[1] = 2;
+  if( mitk::Equal(spacing1, expectedSpacing) == false )
+  {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing a Compose(transform): ";
+  geometry3d->Compose(transform);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of value returned by GetSpacing: ";
+  const mitk::Vector3D& spacing2 = geometry3d->GetSpacing();
+  expectedSpacing[1] = 4;
+  if( mitk::Equal(spacing2, expectedSpacing) == false )
+  {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

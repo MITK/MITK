@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNOT.h"
 #include "mitkNodePredicateAND.h"
@@ -59,6 +60,9 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   // create some datatree nodes to fill the ds
   mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();   // node with image and name property
   mitk::Image::Pointer image = mitk::Image::New();
+  unsigned int imageDimensions[] = { 10, 10, 10 };
+  mitk::PixelType pt(typeid(int));
+  image->Initialize( pt, 3, imageDimensions );
   n1->SetData(image);
   n1->SetProperty("name", new mitk::StringProperty("Node 1 - Image Node"));
   mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();
@@ -340,6 +344,28 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try 
   {
     mitk::NodePredicateDataType predicate("Image");
+    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+    if ((all->Size() == 1) && (all->GetElement(0) == n1))  // check if correct object is in resultset
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  } 
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Requesting objects of specific dimension */
+  std::cout << "Requesting objects of specific dimension: " << std::flush;
+  try 
+  {
+    mitk::NodePredicateDimension predicate( 3 );
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     if ((all->Size() == 1) && (all->GetElement(0) == n1))  // check if correct object is in resultset
     {

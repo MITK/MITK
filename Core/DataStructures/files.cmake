@@ -103,6 +103,7 @@ SET(CPP_FILES
   mitkDataStorage/mitkNodePredicateCompositeBase.cpp
   mitkDataStorage/mitkNodePredicateData.cpp
   mitkDataStorage/mitkNodePredicateDataType.cpp
+  mitkDataStorage/mitkNodePredicateDimension.cpp
   mitkDataStorage/mitkNodePredicateNOT.cpp
   mitkDataStorage/mitkNodePredicateOR.cpp
   mitkDataStorage/mitkNodePredicateProperty.cpp

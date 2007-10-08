@@ -356,7 +356,13 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       pt.CastFrom(pointOp->GetPoint());
 
       //transfer from world to index coordinates 
-      this->GetGeometry( timeStep )->WorldToIndex(pt, pt);
+      mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
+      if (geometry == NULL)
+      {
+        std::cout<<"mitkPointSet.cpp::L362: GetGeometry returned NULL!\n";
+        return;
+      }
+      geometry->WorldToIndex(pt, pt);
 
       m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position, pt);
 

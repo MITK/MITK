@@ -11,7 +11,7 @@ dashboard</a> at Kitware before checking out. If the build tree is not clean, yo
 To checkout MITK's current subversion repository do:
 
 <tt>
-svn co svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk mitk
+svn co http://svn.mitk.org/trunk/mitk mitk
 </tt>
 
 If you prefer a graphical client (look <a href="http://subversion.tigris.org/links.html#clients">here [subversion.tigris.org]</a> for a list), use <tt>svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk</tt> as the repository URL for the trunk.

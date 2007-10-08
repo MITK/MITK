@@ -207,14 +207,20 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags)
   
   if ( image == NULL || !image->IsInitialized() ) return;
 
+  ScalarType minValue    = image->GetScalarValueMin();
+  ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
+
   if ( tryPicTags )
   {
     if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
+    {
+      SetRangeMinMax(minValue, maxValue);
+  SetDefaultRangeMinMax(minValue, maxValue);
       return;
+    }
   }
 
-  ScalarType minValue    = image->GetScalarValueMin();
-  ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
+  
   ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
@@ -268,9 +274,9 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
     if ((double)(GetRangeMax()) < (level + window/2))
     {
       max = level + window/2;
-    }
+    }/*
     SetRangeMinMax(min, max);
-    SetDefaultRangeMinMax(min, max);
+    SetDefaultRangeMinMax(min, max);*/
     SetLevelWindow( level, window );
     SetDefaultLevelWindow(level, window);
     return true;

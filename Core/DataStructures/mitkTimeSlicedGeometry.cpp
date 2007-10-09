@@ -162,7 +162,6 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
   }
   else
   {
-    Point3D projectedPoint;
     unsigned int t;
     for ( t = 0; t < m_TimeSteps; ++t )
     {
@@ -183,11 +182,12 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
   if(m_EvenlyTimed)
   {
     if ( timestep == 0 )
-      return 0;
-    if ( m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() )
-      return 0;
+      return m_TimeBounds[0];
     else 
+    {
+      assert( m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() );
       return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+    }
   }
   else
   {

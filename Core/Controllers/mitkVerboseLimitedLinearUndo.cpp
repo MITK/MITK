@@ -56,6 +56,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
   std::string currentDescription;                    // description of current group
   int currentDescriptionCount(0);                    // counter, how many items of the current group gave descriptions
   bool niceDescriptionFound(false);                  // have we yet seen a plain descriptive entry (not OperationEvent)?
+  std::string lastDescription;                       // stores the last description to inhibit entries like "name AND name AND name..." if name is always the same
 
   for ( std::vector<UndoStackItem*>::reverse_iterator iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
   {
@@ -83,12 +84,21 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       }
       else if (!niceDescriptionFound) // mere descriptive items override OperationEvents' descriptions
       {
-      if ( currentDescriptionCount )            // if we have already seen another description
-        //currentDescription += '\n';             // concatenate descriptions with newline
-        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
-        currentDescription += (*iter)->GetDescription();
+        if ( currentDescriptionCount )            // if we have already seen another description
+        {
+          if (lastDescription != (*iter)->GetDescription())
+          {
+            //currentDescription += '\n';           // concatenate descriptions with newline
+            currentDescription += " AND ";          // this has to wait until the popup can process multiline items
+            currentDescription += (*iter)->GetDescription();
+          }
+        }
+        else
+        {
+          currentDescription += (*iter)->GetDescription();
+        }
       }
-      
+      lastDescription = (*iter)->GetDescription();
       ++currentDescriptionCount;
     }
 
@@ -112,6 +122,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
   std::string currentDescription;                    // description of current group
   int currentDescriptionCount(0);                    // counter, how many items of the current group gave descriptions
   bool niceDescriptionFound(false);                  // have we yet seen a plain descriptive entry (not OperationEvent)?
+  std::string lastDescription;                       // stores the last description to inhibit entries like "name AND name AND name..." if name is always the same
 
   for ( std::vector<UndoStackItem*>::reverse_iterator iter = m_RedoList.rbegin(); iter != m_RedoList.rend(); ++iter )
   {
@@ -140,12 +151,21 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       }
       else if (!niceDescriptionFound) // mere descriptive items override OperationEvents' descriptions
       {
-      if ( currentDescriptionCount )            // if we have already seen another description
-        //currentDescription += '\n';             // concatenate descriptions with newline
-        currentDescription += " AND ";          // this has to wait until the popup can process multiline items
-        currentDescription += (*iter)->GetDescription();
+        if ( currentDescriptionCount )            // if we have already seen another description
+        {
+          if (lastDescription != (*iter)->GetDescription())
+          {
+            //currentDescription += '\n';           // concatenate descriptions with newline
+            currentDescription += " AND ";          // this has to wait until the popup can process multiline items
+            currentDescription += (*iter)->GetDescription();
+          }
+        }
+        else
+        {
+          currentDescription += (*iter)->GetDescription();
+        }
       }
-      
+      lastDescription = (*iter)->GetDescription();
       ++currentDescriptionCount;
     }
 

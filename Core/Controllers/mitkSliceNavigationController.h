@@ -437,6 +437,7 @@ class SliceNavigationController : public BaseController
 
     bool m_SliceLocked;
     bool m_SliceRotationLocked;
+    unsigned int m_OldPos;
 };
 
 } // namespace mitk

@@ -95,7 +95,7 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
   } 
   while ( m_UndoList.back()->GetObjectEventId() >= oeid );
 
-  //Update. This should belong into the ExecuteOperation() of OperationActors, but it seems not to be used everywhere
+  //Update. Check Rendering Mechanism where to request updates
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
 }

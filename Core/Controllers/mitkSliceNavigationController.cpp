@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkPlaneOperation.h"
+#include "mitkUndoController.h"
+#include "mitkOperationEvent.h"
 
 #include <itkCommand.h>
 
@@ -217,7 +219,6 @@ SliceNavigationController::Update(
     default:
       itkExceptionMacro("unknown ViewDirection");
     }
-
 
     m_Slice->SetPos( 0 );
     m_Slice->SetSteps( (int)slicedWorldGeometry->GetSlices() );
@@ -526,9 +527,13 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
       {
         // select a slice
         PointOperation *po = dynamic_cast< PointOperation * >( operation );
-        if ( po )
+        if ( po && po->GetIndex() == -1 )
         {
           this->SelectSliceByPoint( po->GetPoint() );
+        }
+        else if ( po && po->GetIndex() != -1 ) // undo case because index != -1, index holds the old position of this slice
+        {
+          this->GetSlice()->SetPos( po->GetIndex() );
         }
       }
       break;
@@ -571,8 +576,17 @@ SliceNavigationController
         if ( baseRenderer )
           if ( baseRenderer->GetMapperID() == 1 )
           {
-            PointOperation po( OpMOVE, posEvent->GetWorldPosition() );
-            ExecuteOperation( &po ); // select best slice
+            PointOperation* doOp = new mitk::PointOperation(OpMOVE, posEvent->GetWorldPosition());
+            if (m_UndoEnabled)
+            {
+              m_OldPos = this->GetSlice()->GetPos();
+              // m_OldPos holds the old slice position. For the undo controller this old position will be stored as index in mitk::PointOperation
+              PointOperation* undoOp = new mitk::PointOperation(OpMOVE, posEvent->GetWorldPosition(), m_OldPos);
+              OperationEvent *operationEvent = new mitk::OperationEvent(this, doOp, undoOp, "Move slices");
+              m_UndoController->SetOperationEvent(operationEvent);
+            }
+
+            this->ExecuteOperation( doOp ); 
           }
           ok = true;
           break;

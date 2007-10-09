@@ -132,8 +132,8 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
                 oldMovePoint = lastOp->GetPoint();
               }
             }
-            PointOperation* undoOp = new PointOperation(OpMOVE, timeInMS, oldMovePoint, 0);
-            OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp);
+            PointOperation* undoOp = new PointOperation(OpMOVE, timeInMS, oldMovePoint, 0, "Move slices");
+            OperationEvent *operationEvent = new OperationEvent(m_Destination, doOp, undoOp, "Move slices");
             m_UndoController->SetOperationEvent(operationEvent);
           }
           //execute the Operation

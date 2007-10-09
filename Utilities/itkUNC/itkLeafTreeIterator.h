@@ -33,31 +33,42 @@ public:
   typedef typename TreeType::ValueType ValueType;
   typedef TreeNode<ValueType>  TreeNodeType;
 
+  /** Constructor */
   LeafTreeIterator( const TreeType* tree );
+  
+  /** Constructor */
   LeafTreeIterator( TreeType* tree );
 
-  ~LeafTreeIterator();
+  /** Destructor */
+  virtual ~LeafTreeIterator();
 
+  /** Return the type of iterator */
   int GetType() const;
 
+  /** Clone function */
   TreeIteratorBase<TTreeType>* Clone();
 
 protected:
+  
+  /** Return the next value */
   const ValueType& Next();
+
+  /** Return true if the next value exists */
   bool HasNext() const;
 
 private:
+
+  /** Find the next node */
   const TreeNodeType* FindNextNode() const;
 
 };
-
 
 /** Constructor */
 template <class TTreeType>
 LeafTreeIterator<TTreeType>::LeafTreeIterator(  const TTreeType* tree ) 
   :TreeIteratorBase<TTreeType>(tree,NULL)
 {
-  m_Begin =  const_cast<TreeNodeType* >(this->FindNextNode()); // Position the iterator to the first leaf;
+  this->m_Begin = const_cast<TreeNodeType* >(this->FindNextNode()); // Position the iterator to the first leaf;
 }
 
 /** Constructor */
@@ -65,9 +76,8 @@ template <class TTreeType>
 LeafTreeIterator<TTreeType>::LeafTreeIterator( TTreeType* tree ) 
   :TreeIteratorBase<TTreeType>(tree,NULL)
 {
-  m_Begin =  const_cast<TreeNodeType* >(this->FindNextNode()); // Position the iterator to the first leaf;
+  this->m_Begin = const_cast<TreeNodeType* >(this->FindNextNode()); // Position the iterator to the first leaf;
 }
-
 
 /** Destructor */
 template <class TTreeType>
@@ -75,27 +85,18 @@ LeafTreeIterator<TTreeType>::~LeafTreeIterator()
 {
 }
 
-
-/**
- * Gibt den Iteratortyp zurück
- * @return Typ des Iterators
- */
+/** Return the type of iterator */
 template <class TTreeType>
 int LeafTreeIterator<TTreeType>::GetType() const 
 {
   return TreeIteratorBase<TTreeType>::LEAF;
 }
 
-
-/**
- * Überprüft, ob es ein weiteres Element gibt
- * @return true es gibt einen weiteren Knoten 
- *         false es gibt keinen weiteren Knoten
- */
+/** Return true if the next value exists */
 template <class TTreeType>
 bool LeafTreeIterator<TTreeType>::HasNext() const
 {
-  if(m_Position == NULL)
+  if(this->m_Position == NULL)
     {
     return false;
     }
@@ -106,17 +107,13 @@ bool LeafTreeIterator<TTreeType>::HasNext() const
   return false;
 }
 
-
-/**
- * Setzt den Iterator um eins weiter und gibt den Wert zurück
- * @return Wert des nächsten Knotens
- */
+/** Return the next node */
 template <class TTreeType>
 const typename LeafTreeIterator<TTreeType>::ValueType&
 LeafTreeIterator<TTreeType>::Next() 
 {
-  m_Position = const_cast<TreeNodeType* >(FindNextNode());
-  return m_Position->Get();
+  this->m_Position = const_cast<TreeNodeType* >(FindNextNode());
+  return this->m_Position->Get();
 }
 
 /** Const next */
@@ -135,7 +132,7 @@ template <class TTreeType>
 const typename LeafTreeIterator<TTreeType>::TreeNodeType* 
 LeafTreeIterator<TTreeType>::FindNextNode() const 
 {
-  PreOrderTreeIterator<TTreeType> it(m_Tree,m_Position); 
+  PreOrderTreeIterator<TTreeType> it(this->m_Tree,this->m_Position); 
   ++it; // go next
   if(it.IsAtEnd())
     {
@@ -159,11 +156,11 @@ LeafTreeIterator<TTreeType>::FindNextNode() const
   return NULL;
 }
 
-/** */
+/** Clone function */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* LeafTreeIterator<TTreeType>::Clone() 
 {
-  LeafTreeIterator<TTreeType>* clone = new LeafTreeIterator<TTreeType>( m_Tree );
+  LeafTreeIterator<TTreeType>* clone = new LeafTreeIterator<TTreeType>( this->m_Tree );
   *clone = *this;
   return clone;
 }
@@ -171,4 +168,3 @@ TreeIteratorBase<TTreeType>* LeafTreeIterator<TTreeType>::Clone()
 } // end namespace itk
 
 #endif
-

@@ -27,12 +27,16 @@ template <class TObjectType>
 class ITK_EXPORT TreeIteratorClone 
 {
 public:
+  
+  /** Typedefs */
   typedef TreeIteratorClone<TObjectType> Self;
   typedef TObjectType ObjectType;
   
   /** Constructor  */
   TreeIteratorClone () 
-    { m_Pointer = 0; }
+    { 
+    m_Pointer = 0; 
+    }
 
   /** Copy constructor  */
   TreeIteratorClone (const TreeIteratorClone<ObjectType> &p):
@@ -142,9 +146,9 @@ public:
   /** Function to print object pointed to  */
   ObjectType *Print (std::ostream& os) const 
     { 
-      // This prints the object pointed to by the pointer  
-      (*m_Pointer).Print(os);  
-      return m_Pointer;
+    // This prints the object pointed to by the pointer  
+    (*m_Pointer).Print(os);  
+    return m_Pointer;
     } 
 
 private:
@@ -152,7 +156,7 @@ private:
   ObjectType* m_Pointer;
 };  
 
-  
+
 template <typename T>
 std::ostream& operator<< (std::ostream& os, TreeIteratorClone<T> p) 
 {

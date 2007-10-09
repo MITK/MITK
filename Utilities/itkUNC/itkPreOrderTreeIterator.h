@@ -19,33 +19,35 @@
 
 #include <itkTreeIteratorBase.h>
 
-
 namespace itk{
-
-//template <class TTreeType> class TreeContainerBase;
 
 template <class TTreeType>
 class PreOrderTreeIterator : public TreeIteratorBase<TTreeType> 
 {
 public:
 
-  /** Constructor */
+  /** Typedefs */
   typedef typename TTreeType::ValueType  ValueType;
   typedef TreeIteratorBase<TTreeType> Superclass;
   typedef typename Superclass::TreeNodeType TreeNodeType;
  
-  PreOrderTreeIterator( const TTreeType* tree, TreeNodeType* start = NULL );
+  /** Constructor */
+  PreOrderTreeIterator( const TTreeType* tree,const TreeNodeType* start = NULL );
 
   /** Get the type of the iterator */
   int GetType() const;
+  /** Clone function */
   TreeIteratorBase<TTreeType>* Clone();
 
 protected:
+  /** Return the next node */
   const ValueType& Next();
+  /** Return true if the next node exists */
   bool HasNext() const;
   
 private:  
 
+  /** Find the next node */
   const TreeNodeType* FindNextNode() const;
 
 };
@@ -53,7 +55,7 @@ private:
 
 /** Constructor */
 template <class TTreeType>
-PreOrderTreeIterator<TTreeType>::PreOrderTreeIterator( const TTreeType* tree, TreeNodeType* start )
+PreOrderTreeIterator<TTreeType>::PreOrderTreeIterator( const TTreeType* tree, const TreeNodeType* start )
   :TreeIteratorBase<TTreeType>(tree,start) 
 {
 
@@ -67,8 +69,7 @@ PreOrderTreeIterator<TTreeType>::GetType() const
   return TreeIteratorBase<TTreeType>::PREORDER; 
 }
 
-
-/** Has next? */
+/** Return true if the next node exists */
 template <class TTreeType>
 bool 
 PreOrderTreeIterator<TTreeType>::HasNext() const
@@ -170,8 +171,7 @@ PreOrderTreeIterator<TTreeType>::FindNextNode() const
   return NULL;
 }
 
-
-/** */
+/** Clone function */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* PreOrderTreeIterator<TTreeType>::Clone() 
 {

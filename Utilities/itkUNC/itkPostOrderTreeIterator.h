@@ -26,7 +26,7 @@ class PostOrderTreeIterator : public TreeIteratorBase<TTreeType>
 {
 public:
    
-   /** Typedefs */
+  /** Typedefs */
   typedef TreeIteratorBase<TTreeType>  Superclass;
   typedef TTreeType TreeType;
   typedef typename TTreeType::ValueType ValueType;
@@ -37,10 +37,13 @@ public:
 
   /** Get the type of the iterator */
   int GetType() const;
+  /** Clone function */
   TreeIteratorBase<TTreeType>* Clone();
 
 protected:
+  /** Return the next node */
   const ValueType& Next();
+  /** Return true if the next node exists */
   bool HasNext() const;
  
 protected:
@@ -56,16 +59,16 @@ template <class TTreeType>
 PostOrderTreeIterator<TTreeType>::PostOrderTreeIterator( TTreeType* tree)
     :TreeIteratorBase<TTreeType>(tree,NULL) 
 {
-  m_Position = const_cast<TreeNode<ValueType>*>(tree->GetRoot());
+  this->m_Position = const_cast<TreeNode<ValueType>*>(tree->GetRoot());
 
-  if ( m_Position == NULL )
+  if ( this->m_Position == NULL )
   {
-    m_Begin = NULL;
+    this->m_Begin = NULL;
   }
   else
   {
-    m_Position =const_cast<TreeNodeType* >(FindMostRightLeaf(m_Position));
-    m_Begin = m_Position;
+    this->m_Position =const_cast<TreeNodeType* >(FindMostRightLeaf(this->m_Position));
+    this->m_Begin = this->m_Position;
   }  
 }
 
@@ -91,14 +94,13 @@ PostOrderTreeIterator<TTreeType>::HasNext() const
   return false;
 }
 
-
 /** Go to the next node */
 template <class TTreeType>
 const typename PostOrderTreeIterator<TTreeType>::ValueType&
 PostOrderTreeIterator<TTreeType>::Next()
 { 
-  m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return m_Position->Get();
+  this->m_Position = const_cast<TreeNodeType*>(FindNextNode());
+  return this->m_Position->Get();
 }
 
 /** Go to the next node  (const function) */
@@ -117,22 +119,22 @@ template <class TTreeType>
 const typename PostOrderTreeIterator<TTreeType>::TreeNodeType* 
 PostOrderTreeIterator<TTreeType>::FindNextNode() const
 {
-  if ( m_Position == NULL || m_Position == m_Root )
+  if ( this->m_Position == NULL || this->m_Position == this->m_Root )
     {
     return NULL;
     }
-  TreeNodeType* sister = const_cast<TreeNodeType*>(FindSister( m_Position ));
+  TreeNodeType* sister = const_cast<TreeNodeType*>(FindSister( this->m_Position ));
 
   if ( sister != NULL )
     {
     return FindMostRightLeaf( sister );
     }
 
-  return m_Position->GetParent();
+  return this->m_Position->GetParent();
 }
 
 
-/** */
+/** Find the sister node */
 template <class TTreeType>
 const typename PostOrderTreeIterator<TTreeType>::TreeNodeType* 
 PostOrderTreeIterator<TTreeType>::FindSister( TreeNodeType* node ) const
@@ -159,7 +161,7 @@ PostOrderTreeIterator<TTreeType>::FindSister( TreeNodeType* node ) const
   return NULL;
 }
 
-/** */
+/** Find the most right leaf */
 template <class TTreeType>
 const typename PostOrderTreeIterator<TTreeType>::TreeNodeType* 
 PostOrderTreeIterator<TTreeType>::FindMostRightLeaf(TreeNodeType* node) const
@@ -185,11 +187,11 @@ PostOrderTreeIterator<TTreeType>::FindMostRightLeaf(TreeNodeType* node) const
   return node;
 }
 
-/** */
+/** Clone function */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* PostOrderTreeIterator<TTreeType>::Clone() 
 {
-  PostOrderTreeIterator<TTreeType>* clone = new PostOrderTreeIterator<TTreeType>( const_cast<TTreeType*>(m_Tree) );
+  PostOrderTreeIterator<TTreeType>* clone = new PostOrderTreeIterator<TTreeType>( const_cast<TTreeType*>(this->m_Tree) );
   *clone = *this;
   return clone;
 }

@@ -337,9 +337,9 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       ->MSToTimeStep( pointOp->GetTimeInMS() );
   }
 
-  if ( timeStep == -1 )
+  if ( timeStep < 0 )
   {
-    // Time outside of PointSet time bounds
+    std::cerr << "Time step (" << timeStep << ") outside of PointSet time bounds" << std::endl;
     return;
   }
 

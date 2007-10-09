@@ -299,7 +299,7 @@ void DataTreeFilter::ConnectTreeEvents()
   command->SetCallbackFunction(this, &DataTreeFilter::TreeChange);
   m_TreeChangeConnection = m_DataTree->AddObserver(itk::TreeChangeEvent<DataTreeBase>(), command);
   }
-
+/*
   {
   itk::ReceptorMemberCommand<DataTreeFilter>::Pointer command = itk::ReceptorMemberCommand<DataTreeFilter>::New();
   command->SetCallbackFunction(this, &DataTreeFilter::TreeAdd);
@@ -317,15 +317,18 @@ void DataTreeFilter::ConnectTreeEvents()
   command->SetCallbackFunction(this, &DataTreeFilter::TreePrune);
   m_TreePruneConnection = m_DataTree->AddObserver(itk::TreePruneEvent<DataTreeBase>(), command);
   }
+*/
 }
 
 void DataTreeFilter::DisconnectTreeEvents()
 {
   // remove this as observer from the data tree
   m_DataTree->RemoveObserver( m_TreeChangeConnection );
+  /*
   m_DataTree->RemoveObserver( m_TreeAddConnection );
   m_DataTree->RemoveObserver( m_TreeRemoveConnection );
   m_DataTree->RemoveObserver( m_TreePruneConnection );
+  */
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -517,7 +520,7 @@ void DataTreeFilter::DeleteSelectedItemsAndSubItems()
 
 void DataTreeFilter::TreeChange(const itk::EventObject& e)
 {
-  if ( typeid(e) != typeid(itk::TreeChangeEvent<DataTreeBase>) ) return;
+  //if ( typeid(e) != typeid(itk::TreeChangeEvent<DataTreeBase>) ) return;
   DEBUG_MSG_STATE("Before TreeChangeEvent")
  
 
@@ -710,30 +713,35 @@ void DataTreeFilter::TreeRemove(const itk::EventObject& e)
   
   if ( (*m_Filter)(treePosition->Get()) )
   {
-    Item* item = m_Item[ treePosition->Get() ];
-          if (!item) 
-          {
-            std::cerr << "l. " << __LINE__ << ": Treefilter " << (void*)this << " looked for m_Item[...] but couldn't find anything." << std::endl;
-            return; // TODO is that possible? At least this happens sometimes, may be a bug
-          }
+    //Item* item = 
+    TreeNodeItemMap::iterator it = m_Item.find(treePosition->Get());
+    if (it == m_Item.end()) 
+    {
+      std::cerr << "l. " << __LINE__ << ": Treefilter " << (void*)this << " looked for m_Item[...] but couldn't find anything." << std::endl;
+      return; // TODO is that possible? At least this happens sometimes, may be a bug
+    }
+    Item* item = it->second;
     ItemList* list(0);
     
     if ( item->IsRoot() )
       list = m_Items;
     else
       list = item->m_Parent->m_Children;
-    
+
+    if (list == NULL)
+      return;
+
     ItemList::iterator listIter;
     for ( listIter = list->begin(); listIter != list->end(); ++listIter )
       if ( *listIter == item ) break;
 
     InvokeEvent( TreeFilterRemoveChildrenEvent( item->m_Parent ) );
-    
+
     if ( item->m_Children->size() > 0 )
     {
       list->insert(listIter, item->m_Children->begin(), item->m_Children->end());
     }
-  
+
     // because I'm not sure if the STL guarantees something about the position of an
     // iterator after insert, I once again look for the item to remove
 

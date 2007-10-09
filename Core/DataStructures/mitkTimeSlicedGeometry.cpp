@@ -38,7 +38,7 @@ void mitk::TimeSlicedGeometry::UpdateInformation()
   timeBounds[0]=stmax; timeBounds[1]=stmin;
 
   mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
- 
+
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
   mitk::ScalarType nullpoint[]={0,0,0};
   mitk::BoundingBox::PointType p(nullpoint);
@@ -182,7 +182,12 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
     return ScalarTypeNumericTraits::max();
   if(m_EvenlyTimed)
   {
-    return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+    if ( timestep == 0 )
+      return 0;
+    if ( m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() )
+      return 0;
+    else 
+      return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
   }
   else
   {
@@ -229,7 +234,7 @@ void mitk::TimeSlicedGeometry::InitializeEmpty(unsigned int timeSteps)
   Superclass::Initialize();
 
   m_TimeSteps = timeSteps;
-  
+
   // initialize with empty geometries
   Geometry3D::Pointer gnull=NULL;
   m_Geometry3Ds.assign(m_TimeSteps, gnull);
@@ -350,10 +355,10 @@ bool mitk::TimeSlicedGeometry::WriteXMLData( XMLWriter& xmlWriter )
   xmlWriter.WriteProperty( EVENLY_TIMED, m_EvenlyTimed );
 
   xmlWriter.WriteProperty( TIME_STEPS, (int) m_TimeSteps );
- 
+
   std::vector<Geometry3D::Pointer>::iterator i = m_Geometry3Ds.begin();
   const std::vector<Geometry3D::Pointer>::iterator end = m_Geometry3Ds.end();
-  
+
   while ( i != end )
   {
     (*i)->WriteXML( xmlWriter );
@@ -396,12 +401,12 @@ void mitk::TimeSlicedGeometry::ExecuteOperation(Operation* operation)
 {
   // reach through to all time steps
   for (std::vector<Geometry3D::Pointer>::iterator iter = m_Geometry3Ds.begin();
-       iter != m_Geometry3Ds.end();
-       ++iter)
+    iter != m_Geometry3Ds.end();
+    ++iter)
   {
     (*iter)->ExecuteOperation(operation);
   }
-    
+
   Geometry3D::ExecuteOperation(operation);
 
   this->Modified();

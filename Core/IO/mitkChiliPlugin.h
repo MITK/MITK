@@ -286,6 +286,13 @@ class ChiliPlugin : public itk::Object
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
     /*!
+    \brief This function load the saved nodes and the relation between.
+    @param seriesOID   Set the series to load from.
+    This function load the saved nodes and the relation between them. Therefore the seriesOID is needed and have to be set. The function return no nodes, the function add the nodes automatically to the datastorage.
+    */
+    virtual void LoadParentChildRelation( const std::string& seriesOID );
+
+    /*!
     \brief Save Images- and Texts-Files to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
     This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... .
@@ -310,7 +317,7 @@ class ChiliPlugin : public itk::Object
     @param StudyOID   In which study should saved?
     @param SeriesOID   In which series should saved?
     @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not ( only possible if the data saved by MBI )?
-    This function save the nodes to via FileUpload to chili.
+    This function save the nodes to via FileUpload to chili. The parent-child-relation saved automatically.
     */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 

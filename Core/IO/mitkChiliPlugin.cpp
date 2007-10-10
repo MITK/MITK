@@ -165,6 +165,12 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& ,
 }
 
 /** DefaultImplementation */
+void mitk::ChiliPlugin::LoadParentChildRelation( const std::string& seriesOID )
+{
+  return;
+}
+
+/** DefaultImplementation */
 void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 {
 }

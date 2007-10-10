@@ -178,7 +178,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
     Important: Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ).
-    The function GlobalIterateTextTwoCallback(...) return a list of all textOID's and textPath's from all included text-files in this series.
+    The function GlobalIterateToLoadAllText(...) return a list of all textOID's and textPath's from all included text-files in this series.
     With this information LoadOneText( seriesOID, textOID, textPath ) is used step by step.
     The parameter have to be set.
     */
@@ -203,6 +203,14 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     The parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
+
+
+    /*!
+    \brief This function load the saved nodes and the relation between.
+    @param seriesOID   Set the series to load from.
+    This function load the saved nodes and the relation between them. Therefore the seriesOID is needed and have to be set. The function return no nodes, the function add the nodes automatically to the datastorage.
+    */
+    virtual void LoadParentChildRelation( const std::string& seriesOID );
 
     /*!
     \brief Save Images- and Texts-Files to Chili via Fileupload.
@@ -229,7 +237,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     @param StudyOID   In which study should saved?
     @param SeriesOID   In which series should saved?
     @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not ( only possible if the data saved by MBI )?
-    This function save the nodes to via FileUpload to chili.
+    This function save the nodes to via FileUpload to chili.  The parent-child-relation saved automatically.
     */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 
@@ -302,12 +310,10 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** This function return a temporary directory. It is a new directory in the system-specific temp-Directory. Use m_tempDirectory. */
     std::string GetTempDirectory();
 
-    /** This is a list of TextInformation. This list get filled from GlobalIterateTextOneCallback() and provide all text of one series. */
+    /** This is a list of TextInformation. This list get filled from GlobalIterateTextForCompleteInformation() and provide all text of one series. */
     TextInformationList m_TextInformationList;
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
-    /** Get used to load all text to one series ( GetTextInformationList() ). This function save all found series into m_TextInformationList.*/
-    static ipBool_t GlobalIterateTextOneCallback( int rows, int row, text_t *text, void *user_data );
 
     struct TextFilePathAndOIDStruct
     {
@@ -316,19 +322,54 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     };
     /** Thats a list of text-file-path and oid. This list used to load text-Files. Its not possible to save all text-files to harddisk and load them. The filename can be the same, then the file on harddisk get override. So we create a list and load one after another. */
     std::list<TextFilePathAndOIDStruct> m_TextFileList;
+
     /** This function save the text-path and text-oid to the m_TextFileList. This list get used to load textFiles. */
-    static ipBool_t GlobalIterateTextTwoCallback( int rows, int row, text_t *text, void *user_data );
+    static ipBool_t GlobalIterateToLoadAllText( int rows, int row, text_t *text, void *user_data );
+
+    /** Get used to load all text to one series ( GetTextInformationList() ). This function save all found series into m_TextInformationList.*/
+    static ipBool_t GlobalIterateTextForCompleteInformation( int rows, int row, text_t *text, void *user_data );
+
+    /** Iterate over all text and search for "ParentChild.xml", the function GetTextInformationList() dont return this one. */
+    static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data );
 #endif
 
-    /** This is a list of SeriesInformation. This list get filled from GlobalIterateSeriesCallback() and provide all series from one study. */
+    /** This is a list of SeriesInformation. This list get filled from GlobalIterateSeriesForCompleteInformation() and provide all series from one study. */
     SeriesInformationList m_SeriesInformationList;
     /** Get used to load all series to one study ( GetSeriesInformationList() ). This function save all found series into m_SeriesInformationList.*/
-    static ipBool_t GlobalIterateSeriesCallback( int rows, int row, series_t* series, void* user_data );
+    static ipBool_t GlobalIterateSeriesForCompleteInformation( int rows, int row, series_t* series, void* user_data );
 
-    /** Thats a list of all filenames. This list get filled from GlobalIterateImagesCallback(). The list get used to load all image-files from harddisk. */
-    std::list<std::string> m_FileList;
     /** This function get used from LoadAllImagesFromSeries() and save Image-Files to harddisk and save the filenames to m_FileList. */
-    static ipBool_t GlobalIterateImagesCallbackOne( int rows, int row, image_t* image, void* user_data );
+    static ipBool_t GlobalIterateLoadImage( int rows, int row, image_t* image, void* user_data );
+
+    /** This function compare the imageNumbers and set the higher one to m_MaximumImageNumber. */
+    static ipBool_t GlobalIterateImagesForMaximalImageNumber( int rows, int row, image_t* image, void* user_data );
+
+    /** This list get used to load image-files. The Plugin handle *.pic and *.dcm. All other image-formats get saved to this list and try to load via DataTreeNodeFactory. */
+    std::list<std::string> unknownImageFormatPath;
+
+    struct ImageListStruct
+    {
+      ipPicDescriptor* Pic;
+      std::string ImageInstanceUID;
+    };
+    /** This list get used to load image-files. The Plugin handle *.pic and *.dcm. *.dcm get converted to *.pic and saved to this list, just like *.pic. */
+    std::list<ImageListStruct> m_ImageList;
+
+    /** This struct */
+    struct ParentChildStruct
+    {
+      DataTreeNode::Pointer Node;
+      std::string VolumeDescription;
+      int ParentCount;
+      std::list<std::string> ChildList;
+    };
+    /** This list get used to load and save the parent-child-relation. If you want to save the file, you have to check that a new relation dont create circles. If you want to load files, you have to load the parents first. */
+    std::list<ParentChildStruct> m_ParentChildList;
+
+    /** This variable save the OID of the parent-child-text. */
+    std::string m_ParentOID;
+    /** Thats the xml-file where the parent-child-realtionship saved. */
+    TiXmlDocument* m_currentXmlDoc;
 
     /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
     void CheckCurrentSeriesForRelation( const std::string& seriesOID );
@@ -337,38 +378,18 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
 
     /** This function save the relations between the nodes. */
     void SaveRelationShip();
+
+    /** This function use the m_ParentChildList and combine all nodes to check, if a relation between them always saved. If a relation between two nodes always exist, they get deleted. */
     void DeleteExistingRelations();
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
-static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextThirdCallback( int rows, int row, text_t *text, void *user_data );
-#endif
+    /** This function use the saved relations ( ParentChild.xml ) and set the attributes "ParentCount" and "ChildList" of m_ParentChildList. */
+    void AddRelationToParentChildList();
 
-    /** This variable save the OID of the parent-child-text. */
-    std::string m_ParentOID;
-    /** Thats the xml-file where the parent-child-realtionship saved. */
-    TiXmlDocument* m_currentXmlDoc;
+    /** This function return if the overgiven values creates circles or not. */
+    bool RelationCreateCircle( std::string parent, std::string child );
 
-    struct NodeDescriptionStruct
-    {
-      DataTreeNode::Pointer Node;
-      std::string VolumeDescription;
-    };
-    /** The different nodes get saved to the xml-file under automatic generate indices. For the relationship we need the generated indices. */
-    std::list<NodeDescriptionStruct> m_RelationShipHelpList;
-
-    struct CircleTestStruct
-    {
-      std::string VolumeDescription;
-      int Count;
-      std::list<std::string> ParentList;
-    };
-    std::list<CircleTestStruct> m_CircleTestList;
-    void InitCircleTestStruct();
-
-    /** This function search all images ( using GlobalIterateImagesCallbackTwo() ) of one series and search the maximum imagenumber. The maximal imagenumber is used to save. We want no double imageNumber. */
+    /** This function search all images ( using GlobalIterateImagesForMaximalImageNumber() ) of one series and search the maximum imagenumber. The maximal imagenumber is used to save. We want no double imageNumber. */
     int GetMaximumImageNumber( std::string seriesOID );
-    /** This function compare the imageNumbers and set the higher one to m_MaximumImageNumber. */
-    static ipBool_t GlobalIterateImagesCallbackTwo( int rows, int row, image_t* image, void* user_data );
     /** The maximum imageNumber from a series. */
     int m_MaximumImageNumber;
 

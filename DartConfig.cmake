@@ -1,5 +1,9 @@
 OPTION(USE_KITWARE_DARTBOARD "Use the Kitware Dartboard for Build Submissions." OFF)
 
+
+# never use kitware dashboard, since it doesn't work at the moment (10.10.2007)
+IF(FALSE)
+
 # configure dart for submission to kitware
 IF(USE_KITWARE_DARTBOARD)
 	#
@@ -18,6 +22,7 @@ IF(USE_KITWARE_DARTBOARD)
 	# SET (DOXYGEN_URL "http://mbi-srv.inet.dkfz-heidelberg.de/docs/image_processing/mitk/doxygen/" )
         
 ENDIF(USE_KITWARE_DARTBOARD)
+ENDIF(FALSE)
 
 IF(EXISTS ${MBI_DART_WORKDIR}/notes.txt)
   MAKE_DIRECTORY(${MBI_DART_WORKDIR}/bin/Testing/Notes)

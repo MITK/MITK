@@ -78,6 +78,7 @@ protected slots:
   void SaveToChili();
   void LoadFromListView();
   void ChangeReaderType();
+  void LoadParentChildRelation();
 
 protected:
 

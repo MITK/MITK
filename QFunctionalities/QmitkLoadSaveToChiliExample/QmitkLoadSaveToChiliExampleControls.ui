@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>210</width>
+            <width>216</width>
             <height>739</height>
         </rect>
     </property>
@@ -123,10 +123,21 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>20</height>
+                    <height>16</height>
                 </size>
             </property>
         </spacer>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>LoadParentChildRelation</cstring>
+            </property>
+            <property name="text">
+                <string>Load Parent-Child-Relation</string>
+            </property>
+            <property name="accel">
+                <string></string>
+            </property>
+        </widget>
         <widget class="QPushButton">
             <property name="name">
                 <cstring>SaveToChili</cstring>
@@ -154,7 +165,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>60</height>
+                    <height>30</height>
                 </size>
             </property>
         </spacer>
@@ -196,13 +207,13 @@
                 </widget>
                 <widget class="QRadioButton">
                     <property name="name">
-                        <cstring>SimpleSpacingFilter</cstring>
+                        <cstring>SingleSpacingFilter</cstring>
                     </property>
                     <property name="text">
-                        <string>Simple-Spacing-Filter</string>
+                        <string>Si&amp;ngle-Spacing-Filter</string>
                     </property>
                     <property name="accel">
-                        <string></string>
+                        <string>Alt+N</string>
                     </property>
                     <property name="checked">
                         <bool>false</bool>

@@ -86,7 +86,9 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
 
     connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
-    connect( ( QObject* )( m_Controls->SimpleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+    connect( ( QObject* )( m_Controls->SingleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+
+    connect( ( QObject* )( m_Controls->LoadParentChildRelation ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadParentChildRelation() ) );
   }
 }
 
@@ -100,6 +102,11 @@ QAction * QmitkLoadSaveToChiliExample::CreateAction( QActionGroup *parent )
 void QmitkLoadSaveToChiliExample::Activated()
 {
   QmitkFunctionality::Activated();
+}
+
+void QmitkLoadSaveToChiliExample::LoadParentChildRelation()
+{
+  m_Plugin->LoadParentChildRelation( m_Plugin->GetSeriesInformation().OID );
 }
 
 void QmitkLoadSaveToChiliExample::LoadFromListView()
@@ -181,7 +188,7 @@ void QmitkLoadSaveToChiliExample::ChangeReaderType()
     if( m_Controls->SpacingFilter->isChecked() )
       m_Plugin->SetReaderType( 1 );
     else
-      if( m_Controls->SimpleSpacingFilter->isChecked() )
+      if( m_Controls->SingleSpacingFilter->isChecked() )
         m_Plugin->SetReaderType( 2 );
 }
 

@@ -12,8 +12,9 @@ SET(CPP_FILES
   mitkConference/TextLoggerConferenceKitFactory.cpp
   mitkImageToPicDescriptor.cpp
   mitkPicDescriptorToNode.cpp
-  mitkPicDescriptorToNodeSecond.cpp
-  mitkPicDescriptorToNodeThird.cpp
+  mitkSingleSpacingFilter.cpp
+  mitkSpacingSetFilter.cpp
+  mitkImageNumberFilter.cpp
   QcMITKTask.cpp
   QmitkEventCollector.cpp
 

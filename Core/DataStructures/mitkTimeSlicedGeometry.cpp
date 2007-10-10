@@ -185,7 +185,7 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
       return m_TimeBounds[0];
     else 
     {
-      assert( m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() );
+      assert( ! (m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() ) );
       return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
     }
   }

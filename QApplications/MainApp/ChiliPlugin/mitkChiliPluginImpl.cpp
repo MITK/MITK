@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 //Chili
-//#include <ipDicom/ipDicom.h>  //read DICOM-Files
+#include <ipDicom/ipDicom.h>  //read DICOM-Files
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 #include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
 #include <ipPic/ipPic.h>  //ipPicDescriptor
@@ -741,8 +741,6 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadCompleteSeri
 /** This function load all images from the given series(OID). This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats saved, they get load from harddisk with the DataTreeNodeFactory. */
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFromSeries( const std::string& seriesOID )
 {
-//TODO read DicomFiles via PicDescriptorToNode
-
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
 
@@ -903,33 +901,32 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateLoadImage( int rows, int row, image
     {
       if( fileExtension == "dcm" )
       {
-/*
         // read dicom-files
         ipUInt1_t* header = NULL;
         ipUInt4_t  header_size;
-        ipUInt1_t* image = NULL;
+        ipUInt1_t* dcimage = NULL;
         ipUInt4_t  image_size;
 
-        dicomGetHeaderAndImage( (char*)dicomFileList.front().c_str(), &header, &header_size, &image, &image_size );
+        dicomGetHeaderAndImage( (char*)pathAndFile.c_str(), &header, &header_size, &dcimage, &image_size );
 
         if( !header )
           std::cout<< "ChiliPlugin (GlobalIterateLoadImage): Could not get header." <<std::endl;
 
-        if( !image )
+        if( !dcimage )
           std::cout<< "ChiliPlugin (GlobalIterateLoadImage): Could not get image." <<std::endl;
 
-        ipPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );  //this PicDescriptor is right, but dont work
+        //ipPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );
+        ipPicDescriptor *pic = _dicomToPic( header, header_size, dcimage, image_size, ipFalse, ipTrue, ipTrue);
 
         if( pic != NULL)
         {
-          //add them to the input
-          picDescriptorToNodeInput.push_back( pic );
-          if( remove( dicomFileList.front().c_str() ) != 0 )
-         {
-            std::cout << "ChiliPlugin (GlobalIterateLoadImage): Not able to  delete file: " << dicomFileList.front().c_str() << std::endl;
+          ImageListStruct newImage;
+          newImage.Pic = pic;
+          newImage.ImageInstanceUID = image->instanceUID;
+          callingObject->m_ImageList.push_back( newImage );
+          if( remove(  pathAndFile.c_str() ) != 0 )
+            std::cout << "ChiliPlugin (GlobalIterateLoadImage): Not able to  delete file: "<< pathAndFile << std::endl;
         }
-      }
-*/
       }
       else
       {
@@ -1135,8 +1132,6 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
 /** This function load the single saved volumes and the relationship between them. Therefore a list get used and filled step by step. */
 void mitk::ChiliPluginImpl::LoadParentChildRelation( const std::string& seriesOID )
 {
-//TODO DICOM-FILES
-
   if( seriesOID == "" ) return;
 
   std::vector<mitk::DataTreeNode::Pointer> resultVector;

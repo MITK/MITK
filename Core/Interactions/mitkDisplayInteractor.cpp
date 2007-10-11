@@ -59,8 +59,24 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
     case OpZOOM :
       {
         float distance = dcOperation->GetLastToCurrentDisplayVector()[1];
-        distance = (distance > 0 ? 1 : (distance < 0 ? -1 : 0));
-        float factor= 1.0 + distance * 0.05;
+
+        //float factor= 1.0 + distance * 0.05; // stupid because factors from +1 and -1 dont give results that represent inverse zooms
+
+        float factor = 1.0;
+
+        if (distance < 0.0)
+        {
+          factor = 1.0 / 1.05;
+        }
+        else if (distance > 0.0)
+        {
+          factor = 1.0 * 1.05; // 5%
+        }
+        else // distance == 0.0
+        {
+          // nothing to do, factor remains 1.0
+        }
+        
         //renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
         Point2D center;
         center[0] = renderer->GetDisplayGeometry()->GetDisplayWidth()/2;

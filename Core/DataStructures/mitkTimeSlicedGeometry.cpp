@@ -165,10 +165,22 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
 
 mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
 {
-  assert(m_EvenlyTimed);
   if(IsValidTime(timestep)==false)
     return ScalarTypeNumericTraits::max();
-  return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+  if(m_EvenlyTimed)
+  {
+    if ( timestep == 0 )
+      return m_TimeBounds[0];
+    else 
+    {
+      assert( ! (m_TimeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin() && m_TimeBounds[1] == ScalarTypeNumericTraits::max() ) );
+      return ((mitk::ScalarType)timestep)/m_TimeSteps*(m_TimeBounds[1]-m_TimeBounds[0])+m_TimeBounds[0];
+    }
+  }
+  else
+  {
+    return GetGeometry3D(timestep)->GetTimeBounds()[0];
+  }
 }
 
 void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)

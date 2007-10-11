@@ -194,7 +194,7 @@ void mitk::LevelWindow::ResetDefaultRangeMinMax()
 
 /*!
 This method initializes a mitk::LevelWindow from an mitk::Image. The algorithm is as follows:
-  
+
 Default to taking the central image slice for quick analysis.
 
 Compute the smallest (minValue), second smallest (min2ndValue), second largest (max2ndValue), and
@@ -236,6 +236,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   if ( image == NULL || !image->IsInitialized() ) return;
 
   const mitk::Image* wholeImage = image;
+  ScalarType minValue = 0.0;
+  ScalarType maxValue = 0.0;
+  ScalarType min2ndValue = 0.0; 
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   if ( guessByCentralSlice )
   {
@@ -244,53 +247,25 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     sliceSelector->SetTimeNr(image->GetDimension(3)/2);
     sliceSelector->SetChannelNr(image->GetDimension(4)/2);
     sliceSelector->Update();
-
     image = sliceSelector->GetOutput();
+    minValue    = image->GetScalarValueMin();
+    maxValue    = image->GetScalarValueMaxNoRecompute();
+    min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
+    if ( minValue == maxValue )
+    {
+      // guessByCentralSlice seems to have failed, lets look at all data
+      image       = wholeImage;
+      minValue    = image->GetScalarValueMin();                   
+      maxValue    = image->GetScalarValueMaxNoRecompute();
+      min2ndValue = image->GetScalarValue2ndMinNoRecompute();      
+    }
   }
   else
   {
     const_cast<Image*>(image)->Update();
-  }
-  
-  if ( !image->IsInitialized() ) return;
-
-  ScalarType minValue    = image->GetScalarValueMin();
-  ScalarType maxValue    = image->GetScalarValueMaxNoRecompute();
-  ScalarType min2ndValue = image->GetScalarValue2ndMinNoRecompute();
-  ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
-  unsigned int numPixelsInSlice = image->GetDimensions()[0];
-  for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInSlice *= image->GetDimensions()[k];
-  unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
-  unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
-  float minCountFraction = minCount/float(numPixelsInSlice);
-  float maxCountFraction = maxCount/float(numPixelsInSlice);
-
-  // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType().GetType() == ipPicInt && image->GetPixelType().GetBpe() >= 8)
-  {
-    if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
-    {
-      minValue = min2ndValue;
-    }
-  }
-  // End fix
-
-  if ( minValue == maxValue )
-  {
-    // guessByCentralSlice seems to have failed, lets look at all data
-    minValue    = wholeImage->GetScalarValueMin();                   
-    maxValue    = wholeImage->GetScalarValueMaxNoRecompute();
-    min2ndValue = wholeImage->GetScalarValue2ndMinNoRecompute();  
-    max2ndValue = wholeImage->GetScalarValue2ndMaxNoRecompute();  
-    unsigned int numPixelsInDataset = image->GetDimensions()[0];
-    for ( unsigned int k=0;  k<image->GetDimension();  ++k )
-    {
-      numPixelsInDataset *= image->GetDimensions()[k];
-    }
-    minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
-    maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
-    minCountFraction = minCount/float(numPixelsInDataset);
-    maxCountFraction = maxCount/float(numPixelsInDataset);
+    minValue    = image->GetScalarValueMin();
+    maxValue    = image->GetScalarValueMaxNoRecompute();
+    min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
@@ -307,19 +282,67 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   if ( minValue == maxValue )
   {
     minValue = maxValue-1;
-    SetRangeMinMax(minValue, maxValue);
-    SetDefaultRangeMinMax(minValue, maxValue);
   }
-
   SetRangeMinMax(minValue, maxValue);
   SetDefaultRangeMinMax(minValue, maxValue);
-  SetMinMax(minValue, maxValue);
-  SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
-  if ( tryPicTags )
+
+  if ( tryPicTags ) // level and window will be set by informations provided directly by the ipPicDescriptor
   {
     if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
+    {
       return;
+    }
   }
+   
+  ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();  
+  unsigned int numPixelsInDataset = image->GetDimensions()[0];
+  for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
+  unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();
+  unsigned int maxCount = image->GetCountOfMaxValuedVoxelsNoRecompute();
+  float minCountFraction = minCount/float(numPixelsInDataset);
+  float maxCountFraction = maxCount/float(numPixelsInDataset);
+
+  //// binary image
+  if ( min2ndValue == maxValue )
+  {
+    // noop; full range is fine
+  }
+
+  //// triple value image, put middle value in center of gray level ramp
+  else if ( min2ndValue == max2ndValue )
+  {
+    ScalarType minDelta = std::min(min2ndValue-minValue, maxValue-min2ndValue);
+    minValue = min2ndValue - minDelta;
+    maxValue = min2ndValue + minDelta;
+  }
+
+  // now we can assume more than three distict scalar values
+  else
+  {
+    ScalarType innerRange = max2ndValue - min2ndValue;
+    
+    if ( minCountFraction > 0.2 )  //// lots of min values -> make different from rest, but not miles away
+    {
+      ScalarType halfInnerRangeGapMinValue = min2ndValue - innerRange/2.0;
+      minValue = std::max(minValue, halfInnerRangeGapMinValue);
+    }
+    else  //// few min values -> focus on innerRange
+    {
+      minValue = min2ndValue;
+    }
+
+    if ( maxCountFraction > 0.2 )  //// lots of max values -> make different from rest
+    {
+      ScalarType halfInnerRangeGapMaxValue = max2ndValue + innerRange/2.0;
+      maxValue = std::min(maxValue, halfInnerRangeGapMaxValue);
+    }
+    else  //// few max values -> focus on innerRange
+    {
+      maxValue = max2ndValue;
+    }
+  }
+  SetMinMax(minValue, maxValue);
+  SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
 }
 
 bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
@@ -353,8 +376,6 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
     {
       max = level + window/2;
     }
-    SetRangeMinMax(min, max);
-    SetDefaultRangeMinMax(min, max);
     SetLevelWindow( level, window );
     SetDefaultLevelWindow(level, window);
     return true;
@@ -364,7 +385,7 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
 
 void mitk::LevelWindow::SetFixed( bool fixed )
 {
-  this->m_Fixed = fixed; 
+  m_Fixed = fixed; 
 }
   
 bool mitk::LevelWindow::GetFixed() const
@@ -376,8 +397,6 @@ bool mitk::LevelWindow::IsFixed() const
 {
   return m_Fixed;
 }
-
-
 
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {

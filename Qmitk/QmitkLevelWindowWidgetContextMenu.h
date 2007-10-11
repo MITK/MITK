@@ -92,6 +92,12 @@ protected slots:
   /// sets level and window value of the current image to the values defined for the selected preset
   void setPreset(int presetID);
 
+  /// calls the mitkLevelWindow SetAuto method with guessByCentralSlice false, so that the greyvalues from whole image will be considered
+  void useAllGreyvaluesFromImage();
+
+  /// sets the level window slider to be fixed
+  void setFixed();
+
   /// adds a new Preset for presets-contextmenu
   void addPreset();
 

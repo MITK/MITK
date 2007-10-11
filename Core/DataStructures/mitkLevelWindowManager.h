@@ -86,6 +86,8 @@ namespace mitk
 
     std::vector<DataTreeNode::Pointer> GetAllNodes();
 
+    mitk::Image* GetCurrentImage();
+
   protected:
 
     /// constructor
@@ -110,6 +112,7 @@ namespace mitk
     bool m_IsObserverTagSet;
     unsigned long m_PropertyModifiedTag;
     bool m_IsPropertyModifiedTagSet;
+    mitk::Image* m_CurrentImage;
   };
 }
 

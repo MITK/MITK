@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::LevelWindowManager::LevelWindowManager()
 {
   m_LevelWindowProperty = NULL;
+  m_CurrentImage = NULL;
   m_IsObserverTagSet = false;
   m_IsPropertyModifiedTagSet = false;
   m_DataTree = NULL;
@@ -114,6 +115,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
               if (levelWindowProperty.IsNotNull())
               {  
                 m_LevelWindowProperty = levelWindowProperty;
+                m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
                 maxLayer = layer;
               }
             }
@@ -149,6 +151,24 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
     m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver( itk::ModifiedEvent(), command );
     m_IsPropertyModifiedTagSet = true;
     m_AutoTopMost = false;
+    std::vector<mitk::DataTreeNode::Pointer> allObjects = GetAllNodes();
+    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
+        objectIter != allObjects.end();
+        ++objectIter)
+    {
+      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      if (node)
+      {
+        if (node->IsVisible(NULL))
+        {
+          mitk::LevelWindowProperty* levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+          if (levWinProp == levelWindowProperty)
+          {
+            m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
+          }
+        }
+      }
+    }
     Modified();
   }
 }
@@ -300,3 +320,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
   return resultVector; 
 }
 
+mitk::Image* mitk::LevelWindowManager::GetCurrentImage()
+{
+  return m_CurrentImage;
+}

@@ -1,6 +1,6 @@
 SET(CPP_FILES
   mitkChiliPluginFactory.cpp
-  mitkChiliPluginImpl.cpp
+  mitkChiliPlugin.cpp
   # mitkConference/mitkChiliConferenceKitFactory.cpp
   mitkConference/mitkConferenceKit.cpp
   mitkConference/mitkConferenceKitFactory.cpp
@@ -21,6 +21,6 @@ SET(CPP_FILES
   mitkLightBoxImageReaderImpl.cpp
 )
 SET(MOC_H_FILES
-  mitkChiliPluginImpl.h
+  mitkChiliPlugin.h
   QmitkEventCollector.h
 )

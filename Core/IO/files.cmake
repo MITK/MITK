@@ -2,7 +2,7 @@ SET(CPP_FILES
   mitkBaseDataIOFactory.cpp
   mitkBaseXMLWriter.cpp
   mitkChiliPluginIpPicStub.c
-  mitkChiliPlugin.cpp
+  mitkPACSPlugin.cpp
   mitkFileReader.cpp
   mitkFileSeriesReader.cpp
   mitkFileWriter.cpp

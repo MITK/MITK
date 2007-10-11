@@ -82,7 +82,7 @@ protected slots:
 
 protected:
 
-  mitk::ChiliPlugin* m_Plugin;
+  mitk::PACSPlugin* m_Plugin;
 
   struct MimeTypeStruct
   {

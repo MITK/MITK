@@ -19,11 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkChiliPlugin.h"
 
 /** Return a singleton from the current ChiliPlugin. */
-mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
+mitk::PACSPlugin* mitk::PACSPlugin::GetInstance(bool destroyInstance)
 {
-  static mitk::ChiliPlugin::Pointer s_Instance = mitk::ChiliPlugin::New();
+  static mitk::PACSPlugin::Pointer s_Instance = mitk::PACSPlugin::New();
 
-  if( destroyInstance )  // needed because of double inheritance of mitk::ChiliPluginImpl
+  if( destroyInstance )  // needed because of double inheritance of mitk::ChiliPlugin
   {
     s_Instance = NULL;
   }
@@ -32,50 +32,50 @@ mitk::ChiliPlugin* mitk::ChiliPlugin::GetInstance(bool destroyInstance)
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::ChiliPlugin()
+mitk::PACSPlugin::PACSPlugin()
 {
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::~ChiliPlugin()
+mitk::PACSPlugin::~PACSPlugin()
 {
 }
 
 /** DefaultImplementation */
-int mitk::ChiliPlugin::GetConferenceID()
+int mitk::PACSPlugin::GetConferenceID()
 {
   return 0;
 }
 
 /** DefaultImplementation */
-bool mitk::ChiliPlugin::IsPlugin()
+bool mitk::PACSPlugin::IsPlugin()
 {
   return false;
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& )
+mitk::PACSPlugin::StudyInformation mitk::PACSPlugin::GetStudyInformation( const std::string& )
 {
   StudyInformation emptyResult;
   return emptyResult;
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& )
+mitk::PACSPlugin::PatientInformation mitk::PACSPlugin::GetPatientInformation( const std::string& )
 {
   PatientInformation emptyResult;
   return emptyResult;
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& )
+mitk::PACSPlugin::SeriesInformation mitk::PACSPlugin::GetSeriesInformation( const std::string& )
 {
   SeriesInformation emptyResult;
   return emptyResult;
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& )
+mitk::PACSPlugin::SeriesInformationList mitk::PACSPlugin::GetSeriesInformationList( const std::string& )
 {
   SeriesInformationList emptyResult;
   emptyResult.clear();
@@ -83,14 +83,14 @@ mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformation
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& )
+mitk::PACSPlugin::TextInformation mitk::PACSPlugin::GetTextInformation( const std::string& )
 {
   TextInformation emptyResult;
   return emptyResult;
 }
 
 /** DefaultImplementation */
-mitk::ChiliPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& )
+mitk::PACSPlugin::TextInformationList mitk::PACSPlugin::GetTextInformationList( const std::string& )
 {
   TextInformationList emptyResult;
   emptyResult.clear();
@@ -98,30 +98,30 @@ mitk::ChiliPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList
 }
 
 /** DefaultImplementation */
-unsigned int mitk::ChiliPlugin::GetLightboxCount()
+unsigned int mitk::PACSPlugin::GetLightboxCount()
 {
   return 0;
 }
 
 /** DefaultImplementation */
-QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
+QcLightbox* mitk::PACSPlugin::GetNewLightbox()
 {
   return NULL;
 }
 
 /** DefaultImplementation */
-QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
+QcLightbox* mitk::PACSPlugin::GetCurrentLightbox()
 {
   return NULL;
 }
 
 /** DefaultImplementation */
-void mitk::ChiliPlugin::SetReaderType( unsigned int )
+void mitk::PACSPlugin::SetReaderType( unsigned int )
 {
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( QcLightbox* )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -129,7 +129,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadCompleteSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -137,7 +137,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( 
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllImagesFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -145,7 +145,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSer
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllTextsFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -153,35 +153,35 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeri
 }
 
 /** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& )
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& )
 {
   return NULL;
 }
 
 /** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& , const std::string& , const std::string& )
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& , const std::string& , const std::string& )
 {
   return NULL;
 }
 
 /** DefaultImplementation */
-void mitk::ChiliPlugin::LoadParentChildRelation( const std::string& seriesOID )
+void mitk::PACSPlugin::LoadParentChildRelation( const std::string& seriesOID )
 {
   return;
 }
 
 /** DefaultImplementation */
-void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
+void mitk::PACSPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 {
 }
 
 /** DefaultImplementation */
-void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string, bool )
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string, bool )
 {
 }
 
 /** DefaultImplementation */
-void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer , std::string , std::string , bool )
+void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer , std::string , std::string , bool )
 {
 }
 

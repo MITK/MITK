@@ -54,7 +54,7 @@ typedef enum
 
   This is the default-implementation, for the real implementation look at mitkChiliPluginImpl.
   */
-class ChiliPlugin : public itk::Object
+class PACSPlugin : public itk::Object
 {
   public:
 
@@ -130,11 +130,11 @@ class ChiliPlugin : public itk::Object
     typedef std::list<TextInformation> TextInformationList;
 
     /*!
-    \brief Return a mitk::ChiliPlugin-Instance as singleton.
-    @param destroyInstance   Needed because of double inheritance of mitk::ChiliPluginImpl, both want to destroy the instance.
-    @returns The singleton ChiliPlugin* - Instance.
+    \brief Return a mitk::PACSPlugin-Instance as singleton.
+    @param destroyInstance   Needed because of double inheritance of mitk::ChiliPlugin, both want to destroy the instance.
+    @returns The singleton PACSPlugin* - Instance.
     */
-    static ChiliPlugin* GetInstance( bool destroyInstance = false );
+    static PACSPlugin* GetInstance( bool destroyInstance = false );
 
     /*!
     \brief Return the ConferenceID.
@@ -321,13 +321,13 @@ class ChiliPlugin : public itk::Object
     */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 
-    mitkClassMacro( ChiliPlugin,itk::Object );
-    itkNewMacro( ChiliPlugin );
-    virtual ~ChiliPlugin();
+    mitkClassMacro( PACSPlugin,itk::Object );
+    itkNewMacro( PACSPlugin );
+    virtual ~PACSPlugin();
 
   protected:
 
-    ChiliPlugin();
+    PACSPlugin();
 };
 
 }

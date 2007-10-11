@@ -91,7 +91,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
+    m_LightBox = mitk::PACSPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {
@@ -373,7 +373,7 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
+    m_LightBox = mitk::PACSPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {
@@ -695,7 +695,7 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
   if( m_LightBox == NULL )
   {
     itkWarningMacro( <<"Lightbox not set, using current lightbox" );
-    m_LightBox = mitk::ChiliPlugin::GetInstance()->GetCurrentLightbox();
+    m_LightBox = mitk::PACSPlugin::GetInstance()->GetCurrentLightbox();
   }
   if ( m_LightBox == NULL )
   {

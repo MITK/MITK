@@ -97,10 +97,10 @@ void mitk::LightBoxResultImageWriterImpl::SetSeriesDescription( const std::strin
 
 void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
-  if( !mitk::ChiliPlugin::GetInstance()->IsPlugin() )
+  if( !mitk::PACSPlugin::GetInstance()->IsPlugin() )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
@@ -109,10 +109,10 @@ void mitk::LightBoxResultImageWriterImpl::SetLightBoxToCurrentLightBox()
 
 bool mitk::LightBoxResultImageWriterImpl::SetLightBoxToNewLightBox()
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
-  if( !mitk::ChiliPlugin::GetInstance()->IsPlugin() )
+  if( !mitk::PACSPlugin::GetInstance()->IsPlugin() )
   {
     itkExceptionMacro(<<"GetPluginInstance()==NULL: Plugin is not initialized correctly !");
   }
@@ -220,7 +220,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
     std::cout<< "No input set." <<std::endl;
     return;
   }
-  mitk::ChiliPlugin::StudyInformation CurrentStudy = mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedStudy();
+  mitk::PACSPlugin::StudyInformation CurrentStudy = mitk::PACSPlugin::GetInstance()->GetCurrentSelectedStudy();
   if( CurrentStudy.InstanceUID == "" )
   {
     std::cout<< "There is no Study (no StudyInstanceUID) selected." <<std::endl;
@@ -294,7 +294,7 @@ void mitk::LightBoxResultImageWriterImpl::Write()
 
   std::string temp = "Chili: " + (std::string)tagSERIES_NUMBER;
   m_PropertyList->DeleteProperty( temp.c_str() );
-  m_PropertyList->SetProperty( temp.c_str(), new IntProperty( mitk::ChiliPlugin::GetInstance()->GetCurrentSelectedSeries().size()+1 ) );
+  m_PropertyList->SetProperty( temp.c_str(), new IntProperty( mitk::PACSPlugin::GetInstance()->GetCurrentSelectedSeries().size()+1 ) );
 
   resultslice->SetInput( m_Image );
   smax = m_Image->GetDimension(2);

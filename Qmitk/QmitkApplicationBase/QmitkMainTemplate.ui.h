@@ -866,7 +866,7 @@ void QmitkMainTemplate::Initialize()
 
   // use dark palette on/off
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-  if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
+  if(mitk::PACSPlugin::GetInstance()->IsPlugin())
     this->enableDarkPalette(true);
   else
     if (darkProperty != NULL)
@@ -1191,7 +1191,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 
     // dark palette
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
-    if(mitk::ChiliPlugin::GetInstance()->IsPlugin())
+    if(mitk::PACSPlugin::GetInstance()->IsPlugin())
       this->enableDarkPalette(true);
     else
       if (darkProperty != NULL)

@@ -16,10 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
-#define MITKCHILIPLUGINIMPL_H_HEADER_INCLUDED
+#ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED
+#define MITKCHILIPLUGIN_H_HEADER_INCLUDED
 
-// class mitkChiliPluginImpl inherit from
+// class mitkChiliPlugin inherit from
 #include <mitkChiliPlugin.h>
 #include <chili/plugin.h>
 // class QIDToolButton inherit from
@@ -44,7 +44,7 @@ namespace mitk {
   @ingroup Chili
   */
 
-class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
+class ChiliPlugin : protected QcPlugin, public PACSPlugin
 {
   Q_OBJECT
 
@@ -241,9 +241,9 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 
-    mitkClassMacro(ChiliPluginImpl,ChiliPlugin);
-    itkNewMacro(ChiliPluginImpl);
-    virtual ~ChiliPluginImpl();
+    mitkClassMacro(ChiliPlugin,PACSPlugin);
+    itkNewMacro(ChiliPlugin);
+    virtual ~ChiliPlugin();
 
   public slots:
 
@@ -288,7 +288,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     QcMITKTask* task;
 
     /** Constuctor */
-    ChiliPluginImpl();
+    ChiliPlugin();
 
     /** MITK provides different reader to combine slices to a volume. This variable use to set the reader and use the right one. */
     int m_UseReader;
@@ -330,7 +330,7 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     static ipBool_t GlobalIterateTextForCompleteInformation( int rows, int row, text_t *text, void *user_data );
 
     /** Iterate over all text and search for "ParentChild.xml", the function GetTextInformationList() dont return this one. */
-    static ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data );
+    static ipBool_t GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data );
 #endif
 
     /** This is a list of SeriesInformation. This list get filled from GlobalIterateSeriesForCompleteInformation() and provide all series from one study. */

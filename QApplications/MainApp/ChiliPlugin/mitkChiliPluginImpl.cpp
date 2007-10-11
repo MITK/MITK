@@ -56,7 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "chili_lightbox_import.xpm"
 #include "chili_restart_mitk.xpm"
 
-QWidget* mitk::ChiliPluginImpl::s_Parent = NULL;
+QWidget* mitk::ChiliPlugin::s_Parent = NULL;
 /** Create event-logging object (ConferenceKit). */
 Chili3ConferenceKitFactory chiliconferencekitfactory;
 
@@ -65,16 +65,16 @@ extern "C"
 QcEXPORT QObject* create( QWidget *parent )
 {
   // save parent for parameter-less constructor
-  mitk::ChiliPluginImpl::SetQtParent( parent );
+  mitk::ChiliPlugin::SetQtParent( parent );
 
-  // overwrite implementation of mitk::ChiliPlugin with mitk::ChiliPluginImpl
+  // overwrite implementation of mitk::ChiliPlugin with mitk::ChiliPlugin
   mitk::ChiliPluginFactory::RegisterOneFactory();
 
-  return mitk::ChiliPluginImpl::GetQcPluginInstance();
+  return mitk::ChiliPlugin::GetQcPluginInstance();
 }
 
 /** Constructor with hidden parameter s_Parent. */
-mitk::ChiliPluginImpl::ChiliPluginImpl()
+mitk::ChiliPlugin::ChiliPlugin()
 : QcPlugin( s_Parent ),
   app( NULL ),
   m_LightBoxCount( 0 ),
@@ -94,7 +94,7 @@ mitk::ChiliPluginImpl::ChiliPluginImpl()
 }
 
 /** Destructor */
-mitk::ChiliPluginImpl::~ChiliPluginImpl()
+mitk::ChiliPlugin::~ChiliPlugin()
 {
   #ifdef WIN32
     std::string removeDirectory = "rm /s " + m_tempDirectory;
@@ -113,31 +113,31 @@ mitk::ChiliPluginImpl::~ChiliPluginImpl()
   ++m_ReferenceCount; // increase count, so the following notice to mitk::ChiliPlugin won't trigger another delete on "this"
   m_ReferenceCountLock.Unlock();
 
-  ChiliPlugin::GetInstance(true); // set internal s_Instance = NULL, so ITK won't have another SmartPointer to us (hopefully nobody else has)
+  PACSPlugin::GetInstance(true); // set internal s_Instance = NULL, so ITK won't have another SmartPointer to us (hopefully nobody else has)
 
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0; // set count to 0, so itk::LightObject won't trigger another delete...
   m_ReferenceCountLock.Unlock();
 }
 
-QString mitk::ChiliPluginImpl::name()
+QString mitk::ChiliPlugin::name()
 {
   return QString( "MITK" );
 }
 
-const char** mitk::ChiliPluginImpl::xpm()
+const char** mitk::ChiliPlugin::xpm()
 {
   return (const char **)mitk_chili_plugin_xpm;
 }
 
 /** Set the qtparent, needed for QObject* create(). */
-void mitk::ChiliPluginImpl::SetQtParent( QWidget* parent )
+void mitk::ChiliPlugin::SetQtParent( QWidget* parent )
 {
   s_Parent = parent;
 }
 
 /** Create a new SampleApp. */
-void mitk::ChiliPluginImpl::CreateSampleApp()
+void mitk::ChiliPlugin::CreateSampleApp()
 {
   static bool done = false;
   if( !done ) // this is done here, beause if it's done in the constructor, then many button labels get wrong... (qt names as labels)
@@ -209,11 +209,11 @@ void mitk::ChiliPluginImpl::CreateSampleApp()
 }
 
 /** Return the plugininstance. */
-QcPlugin* mitk::ChiliPluginImpl::GetQcPluginInstance()
+QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
 {
-  // give Chili the single instance of mitk::ChiliPluginImpl
-  ChiliPlugin::Pointer pluginInstance = ChiliPlugin::GetInstance();
-  ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  // give Chili the single instance of mitk::ChiliPlugin
+  PACSPlugin::Pointer pluginInstance = PACSPlugin::GetInstance();
+  ChiliPlugin::Pointer realPluginInstance = dynamic_cast<ChiliPlugin*>( pluginInstance.GetPointer() );
 
   static bool done = false;
 
@@ -230,13 +230,13 @@ QcPlugin* mitk::ChiliPluginImpl::GetQcPluginInstance()
 }
 
 /** Return the ConferenceID. */
-int mitk::ChiliPluginImpl::GetConferenceID()
+int mitk::ChiliPlugin::GetConferenceID()
 {
   return m_QmitkChiliPluginConferenceID;
 }
 
 /** Return true if the application run as plugin and false if its standalone. */
-bool mitk::ChiliPluginImpl::IsPlugin()
+bool mitk::ChiliPlugin::IsPlugin()
 {
   return true;
 }
@@ -244,7 +244,7 @@ bool mitk::ChiliPluginImpl::IsPlugin()
 /** STUDY-, PATIENT-, SERIES- AND TEXT-INFORMATIONS */
 
 /** Return the studyinformation. If you dont set the seriesOID, you get the current selected study. If you want a specific study, set the OID. If no study could found, this function return StudyInformation.OID == "". */
-mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( const std::string& seriesOID )
+mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesOID )
 {
   StudyInformation resultInformation;
   resultInformation.OID = "";
@@ -311,7 +311,7 @@ mitk::ChiliPlugin::StudyInformation mitk::ChiliPluginImpl::GetStudyInformation( 
 }
 
 /** Return the patientinformation. If you dont set the seriesOID, you get the current selected patient. If you want a specific patient, set the OID. If no patient could found, this function return PatientInformation.OID == "". */
-mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformation( const std::string& seriesOID )
+mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesOID )
 {
   PatientInformation resultInformation;
   resultInformation.OID = "";
@@ -375,7 +375,7 @@ mitk::ChiliPlugin::PatientInformation mitk::ChiliPluginImpl::GetPatientInformati
 }
 
 /** Return the seriesinformation. If you dont set the seriesOID, you get the current selected series. If you want a specific series, set the OID. If no series could found, this function return SeriesInformation.OID == "". */
-mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation( const std::string& seriesOID )
+mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesOID )
 {
   SeriesInformation resultInformation;
   resultInformation.OID = "";
@@ -434,25 +434,25 @@ mitk::ChiliPlugin::SeriesInformation mitk::ChiliPluginImpl::GetSeriesInformation
 }
 
 /** Return the seriesinformationlist. If you dont set the studyOID, you get the seriesList of the current selected study. If you want a list of a specific study, set the OID. If no series could found, this function returns an empty list. */
-mitk::ChiliPlugin::SeriesInformationList mitk::ChiliPluginImpl::GetSeriesInformationList( const std::string& studyOID )
+mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& studyOID )
 {
   //get used to save all found series
   m_SeriesInformationList.clear();
   //iterate over all series from study
   if( studyOID == "" )
-    iterateSeries( (char*)GetStudyInformation().OID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateSeriesForCompleteInformation, this );
+    iterateSeries( (char*)GetStudyInformation().OID.c_str(), NULL, &ChiliPlugin::GlobalIterateSeriesForCompleteInformation, this );
   else
-    iterateSeries( (char*)studyOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateSeriesForCompleteInformation, this );
+    iterateSeries( (char*)studyOID.c_str(), NULL, &ChiliPlugin::GlobalIterateSeriesForCompleteInformation, this );
   //the function filled the SeriesInformationList
   return m_SeriesInformationList;
 }
 
 /** This function Iterate over all series of one study and save the series-properties to m_SeriesInformationList. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesForCompleteInformation( int rows, int row, series_t* series, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateSeriesForCompleteInformation( int rows, int row, series_t* series, void* user_data )
 {
-  mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
+  mitk::ChiliPlugin* callingObject = static_cast<mitk::ChiliPlugin*>(user_data);
   //create new element
-  mitk::ChiliPlugin::SeriesInformation newSeries;
+  mitk::PACSPlugin::SeriesInformation newSeries;
   //fill element
   newSeries.OID = series->oid;
   newSeries.InstanceUID = series->instanceUID;
@@ -479,7 +479,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateSeriesForCompleteInformation( int r
 }
 
 /** Return the textinformation. You have to set the textOID to get the information. If no text could found, this function return TextInformation.OID == "". */
-mitk::ChiliPlugin::TextInformation mitk::ChiliPluginImpl::GetTextInformation( const std::string& textOID )
+mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& textOID )
 {
   TextInformation resultInformation;
   resultInformation.OID = "";
@@ -520,13 +520,13 @@ mitk::ChiliPlugin::TextInformation mitk::ChiliPluginImpl::GetTextInformation( co
 }
 
 /** Return a list of all textinformation. You have to set the seriesOID to get the textList. If no texts could found, this function returns an empty list. This function dont return the text which used to save and load the parent-child-relationship. */
-mitk::ChiliPlugin::TextInformationList mitk::ChiliPluginImpl::GetTextInformationList( const std::string& seriesOID )
+mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& seriesOID )
 {
   //get used to save all found text
   m_TextInformationList.clear();
 #ifdef CHILI_PLUGIN_VERSION_CODE
   //iterate over all text from series
-  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextForCompleteInformation, this );
+  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateTextForCompleteInformation, this );
   //the function filled the TextInformationList
 #endif
   return m_TextInformationList;
@@ -534,9 +534,9 @@ mitk::ChiliPlugin::TextInformationList mitk::ChiliPluginImpl::GetTextInformation
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** This function Iterate over all texts of one series and save the text-properties to m_TextInformationList. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForCompleteInformation( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateTextForCompleteInformation( int rows, int row, text_t *text, void *user_data )
 {
-  mitk::ChiliPluginImpl* callingObject = static_cast<mitk::ChiliPluginImpl*>(user_data);
+  mitk::ChiliPlugin* callingObject = static_cast<mitk::ChiliPlugin*>(user_data);
 
   //we dont want that the parent-child-relation-file can be load ;)
   std::string chiliDatabaseName = text->chiliText;
@@ -544,7 +544,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForCompleteInformation( int row
   if( fileName != "ParentChild.xml" )
   {
     //create new element
-    mitk::ChiliPlugin::TextInformation resultText;
+    mitk::PACSPlugin::TextInformation resultText;
     //fill element
     resultText.OID = text->oid;
     resultText.MimeType = text->mime_type;
@@ -561,13 +561,13 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForCompleteInformation( int row
 #endif
 
 /** Return the number of current shown lightboxes and set by lightboxTiles(). */
-unsigned int mitk::ChiliPluginImpl::GetLightboxCount()
+unsigned int mitk::ChiliPlugin::GetLightboxCount()
 {
   return m_LightBoxCount;
 }
 
 /** Return the first found empty chililightbox, using the lightboxmanager therefore. */
-QcLightbox* mitk::ChiliPluginImpl::GetNewLightbox()
+QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
 {
   QcLightbox* newLightbox;
   // chili can show maximal four lightboxes
@@ -588,7 +588,7 @@ QcLightbox* mitk::ChiliPluginImpl::GetNewLightbox()
 }
 
 /** Return the current selected chililightbox, using the lightboxmanager therefore. */
-QcLightbox* mitk::ChiliPluginImpl::GetCurrentLightbox()
+QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
 {
   QcLightbox* currentLightbox = lightboxManager()->getActiveLightbox();
   if( currentLightbox == NULL)
@@ -600,7 +600,7 @@ QcLightbox* mitk::ChiliPluginImpl::GetCurrentLightbox()
 0: PicDescriptorToNode(ImageNumber);
 1: PicDescriptorToNodeSecond(SpacingCombination);
 2: PicDescriptorToNodeThird(most common spacing) */
-void mitk::ChiliPluginImpl::SetReaderType( unsigned int readerType )
+void mitk::ChiliPlugin::SetReaderType( unsigned int readerType )
 {
   m_UseReader = readerType;
 }
@@ -608,7 +608,7 @@ void mitk::ChiliPluginImpl::SetReaderType( unsigned int readerType )
 /** LOAD-FUNCTIONS */
 
 /** Load all images from the given lightbox. If no lightbox set, the current lightbox get used. Chili dont support text-access via lightbox. If you want to load them, use LoadAllTextsFromSeries(...). The slices get combined with the internal set ReaderType. */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLightbox( QcLightbox* lightbox )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* lightbox )
 {
   std::vector<DataTreeNode::Pointer> resultVector;
   resultVector.clear();
@@ -699,7 +699,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadImagesFromLi
 }
 
 /** Load all image- and text-files from the series. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadCompleteSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -739,7 +739,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadCompleteSeri
 }
 
 /** This function load all images from the given series(OID). This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats saved, they get load from harddisk with the DataTreeNodeFactory. */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFromSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -766,18 +766,18 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
   unknownImageFormatPath.clear();
 
   //iterate over all images from this series, save them to harddisk, load them and add the picDescriptors to m_ImageList, unknown imagefiles get saved to unknownImageFormatPath
-  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateLoadImage, this );
+  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateLoadImage, this );
 
-  std::list<ipPicDescriptor*> readerInput;
-  readerInput.clear();
-  for( std::list<ImageListStruct>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+  if( !m_ImageList.empty() )
   {
-    readerInput.push_back( imageIter->Pic );
-  }
+    std::list<ipPicDescriptor*> readerInput;
+    readerInput.clear();
+    for( std::list<ImageListStruct>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+    {
+      readerInput.push_back( imageIter->Pic );
+    }
 
-  //make the readed picDescriptors to multiple Nodes
-  if( !readerInput.empty() )
-  {
+    //make the readed picDescriptors to multiple Nodes
     PicDescriptorToNode::Pointer converterToNode;
 
     switch ( m_UseReader )
@@ -806,6 +806,12 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
     converterToNode->SetInput( readerInput, seriesOID );
     converterToNode->Update();
     resultNodes = converterToNode->GetOutput();
+    //delete the loaded ipPicDescriptors and m_ImageList
+    for( std::list<ImageListStruct>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+    {
+      ipPicFree( imageIter->Pic );
+    }
+    m_ImageList.clear();
   }
 
   //read the rest via DataTreeNodeFactory
@@ -861,10 +867,10 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllImagesFro
 }
 
 /** This function iterate over all images of a series. The single images get saved to harddisk and the filenames to a internal filelist. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateLoadImage( int rows, int row, image_t* image, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateLoadImage( int rows, int row, image_t* image, void* user_data )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
-  ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>( user_data );
+  ChiliPlugin* callingObject = static_cast<ChiliPlugin*>( user_data );
 
   //get the FileExtension
   std::string imagePath = image->path;
@@ -939,7 +945,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateLoadImage( int rows, int row, image
 }
 
 /** This function load all text-files from the series. Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFromSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -967,7 +973,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
 
   //now we iterate over all text-files from the series, save the db-path and text-oid to m_TextFileList
   //dont save here to harddisk; double filedescriptions override themselve
-  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateToLoadAllText, this );
+  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateToLoadAllText, this );
 
   DataTreeNode::Pointer tempNode;
   //use the found oid's and path's to load
@@ -986,17 +992,17 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPluginImpl::LoadAllTextsFrom
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** This function iterate over all text-files from a series and save the text-path and text-oid to the m_TextFileList. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateToLoadAllText( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateToLoadAllText( int rows, int row, text_t *text, void *user_data )
 {
   //cast to chiliplugin to save the single textfileinformation
-  ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>(user_data);
+  ChiliPlugin* callingObject = static_cast<ChiliPlugin*>(user_data);
 
   //we dont want that to load the parent-child-relation-file
   std::string chiliDatabaseName = text->chiliText;
   std::string fileName = chiliDatabaseName.substr( chiliDatabaseName.find_last_of("-") + 1 );
   if( fileName != "ParentChild.xml" )
   {
-    ChiliPluginImpl::TextFilePathAndOIDStruct newTextFile;
+    ChiliPlugin::TextFilePathAndOIDStruct newTextFile;
     newTextFile.TextFilePath = text->chiliText;
     newTextFile.TextFileOID = text->oid;
     callingObject->m_TextFileList.push_back( newTextFile );
@@ -1006,7 +1012,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateToLoadAllText( int rows, int row, t
 #endif
 
 /** To load a single text-file, you need more than the textOID, this function search for the missing attributes and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ). */
-mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::string& textOID )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& textOID )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1050,7 +1056,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
 }
 
 /** This function load a single text-file. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk. */
-mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1130,7 +1136,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPluginImpl::LoadOneText( const std::strin
 }
 
 /** This function load the single saved volumes and the relationship between them. Therefore a list get used and filled step by step. */
-void mitk::ChiliPluginImpl::LoadParentChildRelation( const std::string& seriesOID )
+void mitk::ChiliPlugin::LoadParentChildRelation( const std::string& seriesOID )
 {
   if( seriesOID == "" ) return;
 
@@ -1149,7 +1155,7 @@ void mitk::ChiliPluginImpl::LoadParentChildRelation( const std::string& seriesOI
 
   //initialize imageList -> contain the imageinstanceuid and the picdescriptor
   m_ImageList.clear();
-  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateLoadImage, this );
+  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateLoadImage, this );
 
   //use the volumelist to combine
   for( TiXmlElement* singleVolume = volume->FirstChildElement(); singleVolume; singleVolume = singleVolume->NextSiblingElement() )
@@ -1211,6 +1217,13 @@ void mitk::ChiliPluginImpl::LoadParentChildRelation( const std::string& seriesOI
       m_ParentChildList.push_back( newElement );
     }
   }
+
+  //delete the loaded ipPicDescriptors and m_ImageList
+  for( std::list<ImageListStruct>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+  {
+    ipPicFree( imageIter->Pic );
+  }
+  m_ImageList.clear();
 
   //use the saved relations and set the ParentChildList
   AddRelationToParentChildList();
@@ -1274,7 +1287,7 @@ void mitk::ChiliPluginImpl::LoadParentChildRelation( const std::string& seriesOI
 /** SAVE-FUNCTIONS */
 
 /** This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... . Then SaveAsNewSeries(...) or SaveToSeries(...) get used. */
-void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
+void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1351,7 +1364,7 @@ void mitk::ChiliPluginImpl::SaveToChili( DataStorage::SetOfObjects::ConstPointer
 }
 
 /** This function create a new series and use the function SaveToSeries() . No dialog is used. */
-void mitk::ChiliPluginImpl::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries )
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1398,7 +1411,7 @@ void mitk::ChiliPluginImpl::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPoi
 }
 
 /** This function save the nodes to via FileUpload to chili. */
-void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries )
+void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1679,7 +1692,7 @@ void mitk::ChiliPluginImpl::SaveToSeries( DataStorage::SetOfObjects::ConstPointe
 /** RELATIONSHIP-FUNCTIONS */
 
 /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
-void mitk::ChiliPluginImpl::CheckCurrentSeriesForRelation( const std::string& seriesOID )
+void mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& seriesOID )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1692,7 +1705,7 @@ void mitk::ChiliPluginImpl::CheckCurrentSeriesForRelation( const std::string& se
     return;
 
   m_ParentOID = "";
-  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateTextForRelation, this );
+  pIterateTexts( this, (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateTextForRelation, this );
   if( m_ParentOID != "" )
   {
     //load file from chili
@@ -1725,10 +1738,10 @@ void mitk::ChiliPluginImpl::CheckCurrentSeriesForRelation( const std::string& se
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** Iterate over all text and search for "ParentChild.xml", the function GetTextInformationList() dont return this one. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data )
 {
   //cast to chiliplugin to save the single textfileinformation
-  ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>(user_data);
+  ChiliPlugin* callingObject = static_cast<ChiliPlugin*>(user_data);
 
   if( text != NULL )
   {
@@ -1745,7 +1758,7 @@ ipBool_t mitk::ChiliPluginImpl::GlobalIterateTextForRelation( int rows, int row,
 #endif
 
 /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
-void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image )
+void mitk::ChiliPlugin::AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1833,7 +1846,7 @@ void mitk::ChiliPluginImpl::AddVolumeToParentChild( std::list< std::string > new
 }
 
 /** This function save the relations between the nodes. */
-void mitk::ChiliPluginImpl::SaveRelationShip()
+void mitk::ChiliPlugin::SaveRelationShip()
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1895,7 +1908,7 @@ void mitk::ChiliPluginImpl::SaveRelationShip()
 }
 
 /** This function return if the overgiven values creates circles or not. */
-bool mitk::ChiliPluginImpl::RelationCreateCircle( std::string parent, std::string child )
+bool mitk::ChiliPlugin::RelationCreateCircle( std::string parent, std::string child )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1968,7 +1981,7 @@ bool mitk::ChiliPluginImpl::RelationCreateCircle( std::string parent, std::strin
 }
 
 /** This function use the saved relations ( ParentChild.xml ) and set the attributes "ParentCount" and "ChildList" of m_ParentChildList. */
-void mitk::ChiliPluginImpl::AddRelationToParentChildList()
+void mitk::ChiliPlugin::AddRelationToParentChildList()
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -2002,7 +2015,7 @@ void mitk::ChiliPluginImpl::AddRelationToParentChildList()
 }
 
 /** This function use the m_ParentChildList and combine all nodes to check, if a relation between them always saved. If a relation always exist, they get deleted. */
-void mitk::ChiliPluginImpl::DeleteExistingRelations()
+void mitk::ChiliPlugin::DeleteExistingRelations()
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -2051,24 +2064,24 @@ void mitk::ChiliPluginImpl::DeleteExistingRelations()
 }
 
 /** This function found the highes imagenumber in a series, its needed because the slice-sort-reader use the imagenumber as criteria. */
-int mitk::ChiliPluginImpl::GetMaximumImageNumber( std::string seriesOID )
+int mitk::ChiliPlugin::GetMaximumImageNumber( std::string seriesOID )
 {
   m_MaximumImageNumber = 0;
-  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPluginImpl::GlobalIterateImagesForMaximalImageNumber, this );
+  iterateImages( (char*)seriesOID.c_str(), NULL, &ChiliPlugin::GlobalIterateImagesForMaximalImageNumber, this );
   return m_MaximumImageNumber;
 }
 
 /** Function to iterate over all images from a series. */
-ipBool_t mitk::ChiliPluginImpl::GlobalIterateImagesForMaximalImageNumber( int rows, int row, image_t* image, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateImagesForMaximalImageNumber( int rows, int row, image_t* image, void* user_data )
 {
-  ChiliPluginImpl* callingObject = static_cast<ChiliPluginImpl*>( user_data );
+  ChiliPlugin* callingObject = static_cast<ChiliPlugin*>( user_data );
   if( image->number > callingObject->m_MaximumImageNumber )
     callingObject->m_MaximumImageNumber = image->number;
   return ipTrue; // enum from ipTypes.h
 }
 
 /** Create the needed tags to save a pic-file to chili. */
-mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPluginImpl::GetNeededTagList( study_t* study, patient_t* patient, series_t* series )
+mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPlugin::GetNeededTagList( study_t* study, patient_t* patient, series_t* series )
 {
   mitk::ImageToPicDescriptor::TagInformationList resultList;
   resultList.clear();
@@ -2132,13 +2145,13 @@ mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPluginImpl::GetNeededT
 }
 
 /** Event if a new study get selected (from QcPlugin). */
-void mitk::ChiliPluginImpl::studySelected( study_t* study )
+void mitk::ChiliPlugin::studySelected( study_t* study )
 {
   SendStudySelectedEvent();
 }
 
 /** Event if the lightbox get tiles (from QcPlugin). */
-void mitk::ChiliPluginImpl::lightboxTiles( QcLightboxManager *lbm, int tiles )
+void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager *lbm, int tiles )
 {
   m_LightBoxCount = tiles;
 
@@ -2165,7 +2178,7 @@ void mitk::ChiliPluginImpl::lightboxTiles( QcLightboxManager *lbm, int tiles )
 }
 
 /** Button to import the lightbox. */
-void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
+void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 {
   if( m_InImporting ) return;
   QPtrList<QcLightbox>& lightboxes = QcPlugin::lightboxManager()->getLightboxes();
@@ -2199,21 +2212,21 @@ void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
 }
 
 /** Throw an event, if the study changed. */
-void mitk::ChiliPluginImpl::SendStudySelectedEvent()
+void mitk::ChiliPlugin::SendStudySelectedEvent()
 {
   //throw ITK event (defined in mitkChiliPluginEvents.h)
   InvokeEvent( PluginStudySelected() );
 }
 
 /** Throw an event, if the lightboxcount changed. */
-void mitk::ChiliPluginImpl::SendLightBoxCountChangedEvent()
+void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
 {
   //throw ITK event (defined in mitkChiliPluginEvents.h)
   InvokeEvent( PluginLightBoxCountChanged() );
 }
 
 /** Reinitialize the application. */
-void mitk::ChiliPluginImpl::OnApproachReinitializationOfWholeApplication()
+void mitk::ChiliPlugin::OnApproachReinitializationOfWholeApplication()
 {
   static int clickCount = 0;
 
@@ -2236,19 +2249,19 @@ void mitk::ChiliPluginImpl::OnApproachReinitializationOfWholeApplication()
 
 /** TELECONFERENCE METHODS */
 
-void mitk::ChiliPluginImpl::connectPartner()
+void mitk::ChiliPlugin::connectPartner()
 {
   ConferenceToken* ct = ConferenceToken::GetInstance();
   ct->ArrangeToken();
 }
 
-void mitk::ChiliPluginImpl::disconnectPartner()
+void mitk::ChiliPlugin::disconnectPartner()
 {
   ConferenceToken* ct = ConferenceToken::GetInstance();
   ct->SetToken( 0 );
 }
 
-void mitk::ChiliPluginImpl::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
+void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 {
   //QString message;
   //QString arguments;
@@ -2329,7 +2342,7 @@ void mitk::ChiliPluginImpl::handleMessage( ipInt4_t type, ipMsgParaList_t *list 
           );
 
       if( !ConferenceEventMapper::MapEvent( str, w1, w2, w3 ) )
-        //std::cout<<"ChiliPluginImpl::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
+        //std::cout<<"ChiliPlugin::handleMessage() -> MouseMoveEvent couldn't pass through"<<std::endl;
 
     break;   
     default:
@@ -2345,7 +2358,7 @@ using namespace System.Security;
 using namespace System.IO;
 */
 /** Create a temporary directory for windows. */
-std::string mitk::ChiliPluginImpl::GetTempDirectory()
+std::string mitk::ChiliPlugin::GetTempDirectory()
 {
 /*
   std::string tempPath, resultTempPath;
@@ -2370,7 +2383,7 @@ std::string mitk::ChiliPluginImpl::GetTempDirectory()
 #include <stdlib.h>
 
 /** Create a temporary directory for linux. */
-std::string mitk::ChiliPluginImpl::GetTempDirectory()
+std::string mitk::ChiliPlugin::GetTempDirectory()
 {
   char *tmpDirectory = getenv( "TMPDIR" ); //return NULL if the TempDirectory is "/tmp/"
   std::string newTmpDirectory;

@@ -45,7 +45,7 @@ QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const
 {
   SetAvailability( true );
   // register to chili plugin as observer
-  m_Plugin = mitk::ChiliPlugin::GetInstance();
+  m_Plugin = mitk::PACSPlugin::GetInstance();
   if( m_Plugin )
   {
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
@@ -241,8 +241,8 @@ void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTree
 void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventObject& )
 {
   m_Controls->contentOfStudy->clear();
-  mitk::ChiliPlugin::SeriesInformationList tempSeriesList = m_Plugin->GetSeriesInformationList();
-  for( std::list<mitk::ChiliPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
+  mitk::PACSPlugin::SeriesInformationList tempSeriesList = m_Plugin->GetSeriesInformationList();
+  for( std::list<mitk::PACSPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
   {
     QmitkPluginListViewItem* seriesParent;
 
@@ -265,12 +265,12 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
     new QmitkPluginListViewItem( "", image , imageCount.str().c_str() );
 
     //text
-    mitk::ChiliPlugin::TextInformationList tempTextList = m_Plugin->GetTextInformationList( iter->OID.c_str() );
+    mitk::PACSPlugin::TextInformationList tempTextList = m_Plugin->GetTextInformationList( iter->OID.c_str() );
     std::vector< MimeTypeStruct > mimeTypeVector;
 
     QmitkPluginListViewItem* textItem = NULL;
 
-    for( std::list<mitk::ChiliPlugin::TextInformation>::iterator it = tempTextList.begin(); it != tempTextList.end(); it++)
+    for( std::list<mitk::PACSPlugin::TextInformation>::iterator it = tempTextList.begin(); it != tempTextList.end(); it++)
     {
       //text-Name
       char* textName;

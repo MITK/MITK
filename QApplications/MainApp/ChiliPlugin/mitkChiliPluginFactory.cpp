@@ -59,11 +59,11 @@ ChiliPluginFactory::ChiliPluginFactory()
 {
   std::cout << "registering ChiliPluginFactory" << std::endl;
 
-  this->RegisterOverride(typeid(mitk::ChiliPlugin).name(),
-                         typeid(mitk::ChiliPluginImpl).name(),
+  this->RegisterOverride(typeid(mitk::PACSPlugin).name(),
+                         typeid(mitk::ChiliPlugin).name(),
                          "MITK Chili Plugin",
                          1,
-                         mitk::CreateChiliObjectFunction<mitk::ChiliPluginImpl>::New());
+                         mitk::CreateChiliObjectFunction<mitk::ChiliPlugin>::New());
 
 //TODO entfernen wenn das neue Chili-Release installiert ist
   this->RegisterOverride(typeid(mitk::LightBoxImageReader).name(),

@@ -8,8 +8,8 @@ Chili3Conference::~Chili3Conference(){};
 void
 Chili3Conference::SendQt(const char* s)
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 
@@ -27,8 +27,8 @@ Chili3Conference::SendQt(const char* s)
 void
 Chili3Conference::SendMITK(signed int eventID, const char* sender, int etype, int estate, int ebuttonstate, int ekey, float w1, float w2, float w3, float p1, float p2)
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 
@@ -56,8 +56,8 @@ Chili3Conference::SendMITK(signed int eventID, const char* sender, int etype, in
 void
 Chili3Conference::MouseMove( const char* sender, float w1, float w2, float w3 )
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 
@@ -78,8 +78,8 @@ Chili3Conference::MouseMove( const char* sender, float w1, float w2, float w3 )
 void
 Chili3Conference::MyTokenPriority(long int tid)
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 
@@ -98,8 +98,8 @@ Chili3Conference::MyTokenPriority(long int tid)
 void
 Chili3Conference::AskForToken(long int tid)
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 
@@ -117,8 +117,8 @@ Chili3Conference::AskForToken(long int tid)
 void
 Chili3Conference::SetToken(long int sender, long int requester)
 {
-  mitk::ChiliPlugin::Pointer pluginInstance = mitk::ChiliPlugin::GetInstance();
-  mitk::ChiliPluginImpl::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPluginImpl*>( pluginInstance.GetPointer() );
+  mitk::PACSPlugin::Pointer pluginInstance = mitk::PACSPlugin::GetInstance();
+  mitk::ChiliPlugin::Pointer realPluginInstance = dynamic_cast<mitk::ChiliPlugin*>( pluginInstance.GetPointer() );
 
   ipMsgParaList_t *list = NULL;
 

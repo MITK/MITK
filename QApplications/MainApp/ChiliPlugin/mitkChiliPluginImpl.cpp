@@ -1578,10 +1578,11 @@ void mitk::ChiliPluginImpl::OnApproachReinitializationOfWholeApplication()
 
   clickCount++;
 
-  if (clickCount > 10)
+  if (clickCount > 0)
   {
     if ( QMessageBox::question( NULL, tr("MITK"), 
-                                  QString("Desparate clicking suggests a strong wish to restart the whole MITK plugin.\n\nDo you want to restart MITK?"),
+                                  /*QString("Desparate clicking suggests a strong wish to restart the whole MITK plugin.\n\nDo you want to restart MITK?"),*/
+                                  QString("Do you want to restart MITK and loose all work results?"),
                                   QMessageBox::Yes | QMessageBox::Default, 
                                   QMessageBox::No  | QMessageBox::Escape
                                 ) == QMessageBox::Yes )

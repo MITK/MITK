@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkHistogramGenerator.h"
 
 #include <itkRGBPixel.h>
-#include <itkScalarImageToHistogramGenerator.h>
 
 #include <vector>
 

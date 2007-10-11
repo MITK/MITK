@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkChiliPlugin.h"
+#include "mitkPACSPlugin.h"
 
 /** Return a singleton from the current ChiliPlugin. */
 mitk::PACSPlugin* mitk::PACSPlugin::GetInstance(bool destroyInstance)

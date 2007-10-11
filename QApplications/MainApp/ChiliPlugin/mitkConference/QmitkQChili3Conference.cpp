@@ -2,7 +2,7 @@
 #include "QmitkQChili3Conference.h"
 #include <iostream>
 #include <chili/plugin.h>
-#include <mitkChiliPlugin.h>
+#include <mitkPACSPlugin.h>
 
 
 QChili3Conference::QChili3Conference(){};
@@ -13,7 +13,7 @@ void QChili3Conference::SendQt(const char* s)
   std::cout<<"QChili3Conference__"<<s<<std::endl;
 
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
+  qp = mitk::PACSPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
   ipInt4_t arg0 = 999999;
@@ -35,7 +35,7 @@ void QChili3Conference::SendQt(const char* s)
 void QChili3Conference::SendMITK(signed int eventID, const char* sender, float w1, float w2, float w3, float p1, float p2)
 {
   QcPlugin* qp;
-  qp = mitk::ChiliPlugin::GetInstance()->GetPluginInstance();
+  qp = mitk::PACSPlugin::GetInstance()->GetPluginInstance();
 
   ipMsgParaList_t *list = NULL;
 

@@ -1,6 +1,6 @@
 #include <QmitkChili3ConferenceKit.h>
 #include <chili/plugin.h>
-#include <mitkChiliPluginImpl.h>
+#include <mitkChiliPlugin.h>
 
 Chili3Conference::Chili3Conference(){};
 Chili3Conference::~Chili3Conference(){};

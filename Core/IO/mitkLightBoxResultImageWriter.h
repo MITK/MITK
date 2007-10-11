@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseProcess.h"
 #include <mitkLevelWindow.h>
-#include "mitkChiliPlugin.h"
+#include "mitkPACSPlugin.h"
 
 class QcLightbox;
 

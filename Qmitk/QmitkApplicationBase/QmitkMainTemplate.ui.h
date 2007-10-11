@@ -174,7 +174,7 @@ Tadaa
 #include <mitkStatusBar.h>
 
 #include <stdexcept>
-#include "mitkChiliPlugin.h"
+#include "mitkPACSPlugin.h"
 
 template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)

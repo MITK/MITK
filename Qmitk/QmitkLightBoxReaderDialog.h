@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkLightBoxReaderDialog_h_Included
 
 #include <qdialog.h>
-#include "mitkChiliPlugin.h"  //using mitk::Vector3D
+#include "mitkPACSPlugin.h"  //using mitk::Vector3D
 
 class QLabel;
 class QListBox;

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPic.h>  //ipPicDescriptor
 #include <ipPic/ipPicTags.h>  //Tags
 //MITK-Plugin
-#include "mitkChiliPluginImpl.h"
+#include "mitkChiliPlugin.h"
 #include "mitkChiliPluginEvents.h"
 #include "mitkChiliPluginFactory.h"
 #include "mitkPicDescriptorToNode.h"

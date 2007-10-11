@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkLoadSaveToChiliExample_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include "mitkChiliPlugin.h"
+#include "mitkPACSPlugin.h"
 
 #include "QmitkPluginListViewItem.h"
 

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED
 
 // class mitkChiliPlugin inherit from
-#include <mitkChiliPlugin.h>
+#include <mitkPACSPlugin.h>
 #include <chili/plugin.h>
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>

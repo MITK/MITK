@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLightBoxResultImageWriterImpl.h"
-#include "mitkChiliPluginImpl.h"
+#include "mitkChiliPlugin.h"
 
 //ChiliIncludes
 #include <chili/qclightbox.h>

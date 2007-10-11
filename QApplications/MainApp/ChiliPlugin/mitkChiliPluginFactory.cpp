@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkCreateObjectFunction.h"
 #include "itkVersion.h"
 
+#include "mitkPACSPlugin.h"
 #include "mitkChiliPlugin.h"
-#include "mitkChiliPluginImpl.h"
 //TODO entfernen wenn das neue Chili-Release installiert ist
 #include "mitkLightBoxImageReader.h"
 #include "mitkLightBoxImageReaderImpl.h"

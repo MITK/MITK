@@ -90,6 +90,18 @@ void QmitkLevelWindowWidgetContextMenu::addPreset()
   }
 }
 
+void QmitkLevelWindowWidgetContextMenu::setFixed()
+{
+  m_LevelWindow.SetFixed(!m_LevelWindow.GetFixed());
+  m_Manager->SetLevelWindow(m_LevelWindow);
+}
+
+void QmitkLevelWindowWidgetContextMenu::useAllGreyvaluesFromImage()
+{
+  m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(), true, false);
+  m_Manager->SetLevelWindow(m_LevelWindow);
+}
+
 void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()
 {
   m_LevelWindow.ResetDefaultLevelWindow();
@@ -145,6 +157,12 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
 
     QPopupMenu* contextMenu = contextmenu;
     Q_CHECK_PTR( contextMenu );
+    contextMenu->setCheckable(true);
+    int sliderFixed = contextMenu->insertItem(tr("Set Slider Fixed"), this, SLOT(setFixed()));
+    contextMenu->setItemChecked(sliderFixed, m_LevelWindow.IsFixed());
+    contextMenu->insertSeparator();
+    contextMenu->insertItem(tr("Use Whole Image Greyvalues"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->insertSeparator();
     contextMenu->insertItem(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
     contextMenu->insertSeparator();
@@ -214,6 +232,12 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
 
     QPopupMenu* contextMenu = new QPopupMenu( this );
     Q_CHECK_PTR( contextMenu );
+    contextMenu->setCheckable(true);
+    int sliderFixed = contextMenu->insertItem(tr("Set Slider Fixed"), this, SLOT(setFixed()));
+    contextMenu->setItemChecked(sliderFixed, m_LevelWindow.IsFixed());
+    contextMenu->insertSeparator();
+    contextMenu->insertItem(tr("Use Whole Image Greyvalues"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->insertSeparator();
     contextMenu->insertItem(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->insertItem(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
     contextMenu->insertSeparator();

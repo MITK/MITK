@@ -405,6 +405,9 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     /** Invoke event: if the Lightbox count changed */
     void SendLightBoxCountChangedEvent();
 
+    QObject* findProgressBar(QObject* object);
+    bool ChiliIsFillingLightbox();
+
     QHBoxLayout* horzlayout;
 };
 

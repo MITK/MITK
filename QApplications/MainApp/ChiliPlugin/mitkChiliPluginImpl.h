@@ -324,6 +324,9 @@ class ChiliPluginImpl : protected QcPlugin, public ChiliPlugin
     /** Invoke event: if the Lightbox count changed */
     void SendLightBoxCountChangedEvent();
 
+    QObject* findProgressBar(QObject* object);
+    bool ChiliIsFillingLightbox();
+
     QHBoxLayout* horzlayout;
 };
 

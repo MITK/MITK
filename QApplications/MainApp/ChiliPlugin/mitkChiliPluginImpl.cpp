@@ -48,6 +48,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qtooltip.h>
 #include <qtimer.h>
+#include <qobjectlist.h>
+#include <qprogressbar.h>
 
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
@@ -1524,6 +1526,13 @@ void mitk::ChiliPluginImpl::studySelected( study_t* study )
 void mitk::ChiliPluginImpl::lightBoxImportButtonClicked(int row)
 {
   if( m_InImporting ) return;
+
+  if (ChiliIsFillingLightbox()) 
+  {  
+    QMessageBox::information( 0, "MITK", "Lightbox not ready. Try again when lightbox filling is completed!" ); 
+    return;
+  }  
+
   QPtrList<QcLightbox>& lightboxes = QcPlugin::lightboxManager()->getLightboxes();
   QcLightbox* selectedLightbox = lightboxes.at(row);
 
@@ -1769,3 +1778,82 @@ std::string mitk::ChiliPluginImpl::GetTempDirectory()
 }
 
 #endif
+
+QObject* mitk::ChiliPluginImpl::findProgressBar(QObject* object)
+{
+  const QObjectList* children = object->children();
+  if (children)
+  {
+    QObjectListIt it( *children );
+    QObject* child;
+    while ( (child = it.current()) != 0 )
+    {    
+      //std::cout << "Testing child '" << child->name() << "' (" << child->className() << ")" << std::endl;
+      if ( std::string(child->className()) == "QProgressBar" )
+        return child;
+
+      QObject* result = findProgressBar( child );
+      if (result) 
+        return result;
+
+      ++it;
+    }    
+  }
+
+  return NULL;
+}
+
+bool mitk::ChiliPluginImpl::ChiliIsFillingLightbox()
+{
+  // find lightBoxArea
+  QObject* current(this);
+  QObject* lightboxAreaObject(NULL);
+  while (current)
+  {
+    /*
+    std::cout << "============================================" << std::endl;
+    std::cout << "Current object: '" << current->name() << "' (" << current->className() << ")" << std::endl;
+    */
+
+    const QObjectList* children = current->children();
+    if (children)
+    {
+      QObjectListIt it( *children );
+      QObject* child;
+      while ( (child = it.current()) != 0 )
+      {
+        //std::cout << "  Child '" << child->name() << "' (" << child->className() << ")" << std::endl;
+
+        if ( std::string(child->name()) == "lightboxArea" )
+        {
+          lightboxAreaObject = child;
+          break;
+        }
+        ++it;
+      }
+    }
+
+    if (lightboxAreaObject) break;
+
+    current = current->parent();
+  }
+
+  if (lightboxAreaObject)
+  {
+    QProgressBar* progressBar = dynamic_cast<QProgressBar*>( findProgressBar( lightboxAreaObject ) );
+    if (progressBar)
+    {
+      //std::cout << "Found progressbar, progress " << progressBar->progress() << std::endl;
+      //return progressBar->progress() != 0;
+      return progressBar->isVisible();
+    }
+    else
+    {
+      //std::cout << "Couldn't find progressbar -- assuming CHILI is not filling lightbox." << std::endl;
+      return false;
+    }
+  } 
+
+  return false;
+} 
+

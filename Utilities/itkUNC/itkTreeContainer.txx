@@ -62,10 +62,6 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::SetRoot(const TValueType element)  
 {
-  if (m_Root)
-    {
-    return false;
-    }
   m_Root = TreeNodeType::New();
   m_Root->Set(element);
   m_Root->SetParent(NULL);
@@ -77,10 +73,6 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::SetRoot( TreeNode<TValueType>* node)
 {
-  if (m_Root)
-    {
-    return false;
-    }
   m_Root = node;
   return true;
 }

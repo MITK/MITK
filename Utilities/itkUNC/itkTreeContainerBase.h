@@ -82,6 +82,5 @@ protected:
 
 } // namespace itk
 
-
-
 #endif
+

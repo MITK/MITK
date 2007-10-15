@@ -426,27 +426,6 @@ int TreeIteratorBase<TTreeType>::Count()
   return size;
 }
 
-/**  Count the number of nodes */
-template <class TTreeType>
-int TreeIteratorBase<TTreeType>::Count(TreeNodeType* node ) 
-{
-  int size = 0;
-
-  if ( !node->hasChildren() )
-    {
-    return 0;
-    }
-
-  TreeIteratorBase<TTreeType> it(this,node);
-
-  while ( !it.IsAtEnd() )
-   {
-   ++it; 
-   size++;
-   }
-  return size;
-}
-
 /** Get the node pointed by the iterator */
 template <class TTreeType>
 typename TreeIteratorBase<TTreeType>::TreeNodeType* 

@@ -81,7 +81,6 @@ PreOrderTreeIterator<TTreeType>::HasNext() const
   return false;
 }
 
-
 /** Return the next node */
 template <class TTreeType>
 const typename PreOrderTreeIterator<TTreeType>::ValueType&

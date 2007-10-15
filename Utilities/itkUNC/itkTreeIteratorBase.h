@@ -156,7 +156,7 @@ public:
   };
 
   /** operator++ */
-  TreeIteratorBase<TTreeType> &
+  Self &
   operator++()
   {
     if ( !IsAtEnd() )
@@ -181,6 +181,7 @@ public:
     m_Tree = iterator.m_Tree;
     return *this;
     }
+
    virtual ~TreeIteratorBase() {}
 protected:
 
@@ -193,7 +194,6 @@ protected:
   mutable TreeNodeType* m_End;
   const TreeNodeType* m_Root;
   TTreeType* m_Tree;
-  int Count(TreeNodeType* node);
 
   virtual bool HasNext() const = 0;
   virtual const ValueType& Next() = 0;

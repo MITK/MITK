@@ -26,18 +26,18 @@ namespace itk
 template <class TValueType>
 TreeContainer<TValueType>::TreeContainer()
 {
-  this->m_Root = NULL;
-  this->m_SubTree = false;
-  this->m_DefaultChildrenCount = 2;
+  m_Root = NULL;
+  this->SetSubtree( false );
+  m_DefaultChildrenCount = 2;
 }
 
 /** Constructor with default children count */
 template <class TValueType>
 TreeContainer<TValueType>::TreeContainer(int dcc)
 {  
-  this->m_Root = NULL;
-  this->m_SubTree = false;
-  this->m_DefaultChildrenCount = dcc;
+  m_Root = NULL;
+  this->SetSubtree( false );
+  m_DefaultChildrenCount = dcc;
 }
 
 
@@ -45,9 +45,9 @@ TreeContainer<TValueType>::TreeContainer(int dcc)
 template <class TValueType>
 TreeContainer<TValueType>::TreeContainer(TreeContainer<TValueType>& tree)
 {
-  this->m_Root = NULL;
-  this->m_SubTree = false;
-  this->m_DefaultChildrenCount = 3;
+  m_Root = NULL;
+  this->SetSubtree( false );
+  m_DefaultChildrenCount = 3;
 }
 
 
@@ -62,13 +62,13 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::SetRoot(const TValueType element)  
 {
-  if (this->m_Root)
+  if (m_Root)
     {
     return false;
     }
-  this->m_Root = TreeNodeType::New();
-  this->m_Root->Set(element);
-  this->m_Root->SetParent(NULL);
+  m_Root = TreeNodeType::New();
+  m_Root->Set(element);
+  m_Root->SetParent(NULL);
   return true;
 }
 
@@ -77,11 +77,11 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::SetRoot( TreeNode<TValueType>* node)
 {
-  if (this->m_Root)
+  if (m_Root)
     {
     return false;
     }
-  this->m_Root = node;
+  m_Root = node;
   return true;
 }
 
@@ -90,7 +90,7 @@ template <class TValueType>
 int 
 TreeContainer<TValueType>::Count() const
 {
-  if(!this->m_Root)
+  if(!m_Root)
     {
     return 0;
     }
@@ -128,12 +128,12 @@ TreeContainer<TValueType>::Swap( IteratorType& v, IteratorType& w )
   else if ( pv == NULL )
     {
     pw->ReplaceChild(nw, nv);
-    this->m_Root = nw;
+    m_Root = nw;
     }
   else if( pw == NULL ) 
     {
     pv->ReplaceChild(nv, nw);
-    this->m_Root = nv;
+    m_Root = nv;
     }
   else 
     {
@@ -152,7 +152,7 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::Contains( const TValueType element ) 
 { 
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -170,7 +170,7 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::operator==( TreeContainer<TValueType>& tree ) 
 {
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   PreOrderTreeIterator<Self> it2(&tree,tree.GetRoot());
   it2.GoToBegin();
@@ -193,7 +193,7 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::IsLeaf( TValueType element ) 
 {
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -217,7 +217,7 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::IsRoot( TValueType element ) 
 {
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -241,7 +241,7 @@ TreeContainer<TValueType>::IsRoot( TValueType element )
 template <class TValueType>
 bool TreeContainer<TValueType>::Clear() 
 {
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -254,7 +254,7 @@ bool TreeContainer<TValueType>::Clear()
       return false;
       }
     }
-  this->m_Root = NULL;
+  m_Root = NULL;
   return true;
 }
 
@@ -263,7 +263,7 @@ template <class TValueType>
 const TreeNode<TValueType>* 
 TreeContainer<TValueType>::GetNode(TValueType val) const
 {
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -299,7 +299,7 @@ TreeContainer<TValueType>::SetRoot( IteratorType& pos )
     return false;
     }
   
-  this->m_Root = node;
+  m_Root = node;
   node->AddChild( parent );
   parent->Remove( node );
   node->SetParent( NULL );
@@ -324,13 +324,13 @@ template <class TValueType>
 bool 
 TreeContainer<TValueType>::Add(const TValueType child, const TValueType parent)
 {
-  if(!this->m_Root)
+  if(!m_Root)
     {
     std::cout << "TreeContainer<TValueType>::Add() : The tree is empty" << std::endl;
     return false;
     }
   // Find the first node in the tree that has the parent value
-  PreOrderTreeIterator<Self> it(this,this->m_Root);
+  PreOrderTreeIterator<Self> it(this,m_Root);
   it.GoToBegin();
   while(!it.IsAtEnd())
     {
@@ -357,7 +357,7 @@ PrintSelf(std::ostream &os, Indent indent) const
     {
     os << indent << "Tree:" << std::endl;
     // Now prints the tree
-    PreOrderTreeIterator<Self> it(this,this->m_Root);
+    PreOrderTreeIterator<Self> it(this,m_Root);
     it.GoToBegin();
     while(!it.IsAtEnd())
       {

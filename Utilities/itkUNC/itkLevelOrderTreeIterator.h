@@ -58,7 +58,6 @@ public:
   /** operator = */
   Self& operator=(Superclass& iterator) 
     {
-    /** Get the end level */
     Superclass::operator=(iterator);
     LevelOrderTreeIterator<TTreeType>& it = static_cast<LevelOrderTreeIterator<TTreeType>&>(iterator);
     m_StartLevel = it.m_StartLevel;

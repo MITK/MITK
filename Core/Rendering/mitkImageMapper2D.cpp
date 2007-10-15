@@ -110,10 +110,16 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   // planes at their exact intersection lines with the 3D bounding box.
   //GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
   //GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
-  //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] };
+  //  + 2.0 * rendererInfo.m_Overlap[0]/* - rendererInfo.m_PixelsPerMM[0]*/ };
+  //std::cout << "X: " << rendererInfo.m_Extent[0]
+  //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] << std::endl;
+
   //GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
   //GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
-  //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] };
+  //  + 2.0 * rendererInfo.m_Overlap[1]/* - rendererInfo.m_PixelsPerMM[1]*/ };
+  //std::cout << "Y:" << rendererInfo.m_Extent[1]
+  //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] << std::endl;
+
   // IW commented out the previous lines and reverted to rev. 9358
   // (version before rev. 9443) See bug #625
   GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
@@ -980,10 +986,22 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 }
 
 
+void
+mitk::ImageMapper2D
+::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
+{
+  mitk::BaseRenderer *renderer = dynamic_cast< mitk::BaseRenderer* >( object );
+  if ( renderer )
+  {
+    m_RendererInfo.erase( renderer );
+  }
+}
+
+
 mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()
 : m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
-  m_ObserverId(0), m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
+  m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
   m_IilInterpolation(true)
 {
   m_PixelsPerMM.Fill(0);
@@ -996,8 +1014,6 @@ mitk::ImageMapper2D::RendererInfo
   Squeeze();
   if (m_Renderer != NULL)
   {
-    m_Renderer->RemoveObserver(m_ObserverId);
-
     m_Reslicer->Delete();
 
     m_UnitSpacingImageFilter->Delete();
@@ -1007,14 +1023,6 @@ mitk::ImageMapper2D::RendererInfo
   //ImageMapper2D
 }
 
-
-void
-mitk::ImageMapper2D::RendererInfo::RendererDeleted()
-{
-  //delete texture due to its dependency on the renderer
-  Squeeze();
-  m_Renderer = NULL;
-}
 
 void
 mitk::ImageMapper2D::RendererInfo
@@ -1053,17 +1061,6 @@ mitk::ImageMapper2D::RendererInfo
 
   m_RendererId = rendererId;
   m_Renderer = renderer;
-
-  itk::SimpleMemberCommand<RendererInfo>::Pointer deleteRendererCommand;
-  deleteRendererCommand = itk::SimpleMemberCommand<RendererInfo>::New();
-  
-  deleteRendererCommand->SetCallbackFunction(
-    this, &RendererInfo::RendererDeleted
-  );
-
-  m_ObserverId = renderer->AddObserver(
-    mitk::BaseRenderer::RendererResetEvent(), deleteRendererCommand
-  );
 
   m_Image = vtkImageData::New();
 

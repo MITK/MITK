@@ -108,9 +108,7 @@ public:
      * 2D rendering (cf. m_Image) */
     iil4mitkPicImage* m_iil4mitkImage;
     mitk::BaseRenderer* m_Renderer;
-    unsigned long m_ObserverId;
 
-    void RendererDeleted();
   public:
     /** \brief timestamp of last update of stored data */
     itk::TimeStamp m_LastUpdateTime;
@@ -197,9 +195,31 @@ protected:
   {
     RendererInfo& rendererInfo = m_RendererInfo[renderer];
     if(rendererInfo.IsInitialized()==false)
+    {
+      // Initialize RendererInfo
       rendererInfo.Initialize(ImageMapper2D::numRenderer++, renderer);
+
+      // Add observer for renderer reset events (RendererInfo will 
+      // automatically be removed from list when a Renderer is deleted)
+      //
+      // Note: do not care about managing the observer ID, since the evoking 
+      // Renderer is about to be deleted anyway.
+      typedef itk::MemberCommand< ImageMapper2D > MemberCommandType;
+      MemberCommandType::Pointer deleteRendererCommand = 
+        MemberCommandType::New();
+
+      deleteRendererCommand->SetCallbackFunction(
+        this, &ImageMapper2D::DeleteRendererCallback );
+      
+      renderer->AddObserver( BaseRenderer::RendererResetEvent(), 
+        deleteRendererCommand );
+    }
+
     return rendererInfo;
   }
+
+  void DeleteRendererCallback( itk::Object *object, const itk::EventObject & );
+
 
   double CalculateSpacing( const mitk::Geometry3D *geometry, 
     const mitk::Vector3D &d ) const;

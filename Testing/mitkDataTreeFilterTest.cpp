@@ -224,6 +224,7 @@ class Test
         }
         case 10: { // delete tree, then selections and all items should be removed
           data_tree->Clear();
+          tree_filter->Update();
           break;
         }
         case 11: {  // should give the same as 9 (hierarchy is different here)

@@ -124,7 +124,7 @@ void VtkQRenderWindowInteractor::Render()
     //this->RenderWindow->Render(); 
     
     //only way for VolumeRendering
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
+    mitk::RenderingManager::GetInstance()->RequestUpdateVtkRenderWindow(this->RenderWindow);
 
   }
   // outside the above test so that third-party code can redirect

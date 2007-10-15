@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRenderWindow.h"
 #include "mitkOpenGLRenderer.h"
 
+#include <vtkRenderWindow.h>
+
 #include <itkCommand.h>
 #include <algorithm>
 
@@ -281,6 +283,20 @@ mitk::RenderingManager
 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
+}
+
+void mitk::RenderingManager::RequestUpdateVtkRenderWindow(vtkRenderWindow* renderwindow)
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    //std::cout<<"it->second: "<<it->second<<std::endl;
+    if ( it->first->GetVtkRenderWindow() == renderwindow )
+    {
+      this->RequestUpdate(it->first);
+      break;
+    }
+  } 
 }
 
 void

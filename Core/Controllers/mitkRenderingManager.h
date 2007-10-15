@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <itkObject.h>
 
+class vtkRenderWindow;
+
 namespace mitk
 {
 
@@ -109,6 +111,9 @@ public:
   /** Requests an update for the specified RenderWindow. The time of
    * execution usually depends on the specified minimum interval. */
   void RequestUpdate( RenderWindow *renderWindow );
+  
+  /** Requests an update for the specified VtkRenderWindow. */
+  void RequestUpdateVtkRenderWindow(vtkRenderWindow* renderwindow);
 
   /** Immediately executes an update of the specified RenderWindow. */
   void ForceImmediateUpdate( RenderWindow *renderWindow );

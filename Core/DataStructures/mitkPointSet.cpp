@@ -100,10 +100,6 @@ void mitk::PointSet::AdaptPointSetSeriesSize( unsigned int timeSteps )
     
     //if the size changes, then compute the boundingbox
     m_CalculateBoundingBox = true;
-  }
-
-  if ( timeSteps != oldSize )
-  {
     this->InvokeEvent( PointSetTimeStepsChangeEvent() );
   }
 }

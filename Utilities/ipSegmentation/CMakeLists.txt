@@ -1,0 +1,19 @@
+SET(IPSEGMENTATION_FILES
+    ipSegmentationError.c
+    ipSegmentationNew.c
+    ipSegmentationFree.c
+    ipSegmentationClear.c
+    ipSegmentationCombineRegion.c
+    ipSegmentationRegionGrower.cpp
+    ipSegmentationContourExtraction.cpp
+    ipSegmentationReplaceRegion.cpp
+    ipSegmentationRegionCutter.cpp
+    ipSegmentationGrowerHistory.cpp
+    ipSegmentationContourUtils.cpp
+    ipSegmentationInterpolate.c
+    ipSegmentationUndo.c
+)
+
+INCLUDE_DIRECTORIES(${UTILITIES_DIR} ${MITK_INCLUDE_DIRS} ${ANN_INCLUDE_DIR})
+ADD_LIBRARY(ipSegmentation${LIBPOSTFIX} ${IPSEGMENTATION_FILES})
+

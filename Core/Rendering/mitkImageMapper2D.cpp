@@ -285,7 +285,7 @@ mitk::ImageMapper2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 {
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
-  return rendererInfo.GetRendererId();
+  return rendererInfo.GetRendererID();
 }
 
 
@@ -838,6 +838,7 @@ mitk::ImageMapper2D::Clear()
   RendererInfoMap::iterator it, end = m_RendererInfo.end();
   for ( it = m_RendererInfo.begin(); it != end; ++it )
   {
+    it->second.RemoveObserver();
     it->second.Squeeze();
   }
   //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von
@@ -1000,9 +1001,10 @@ mitk::ImageMapper2D
 
 mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()
-: m_RendererId(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
+: m_RendererID(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
   m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
-  m_IilInterpolation(true)
+  m_IilInterpolation(true),
+  m_ObserverID( 0 )
 {
   m_PixelsPerMM.Fill(0);
 };
@@ -1018,6 +1020,7 @@ mitk::ImageMapper2D::RendererInfo
 
     m_UnitSpacingImageFilter->Delete();
   }
+
   //delete m_iil4mitkImage;
   //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von
   //ImageMapper2D
@@ -1051,15 +1054,27 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
   }
 }
 
+void
+mitk::ImageMapper2D::RendererInfo::RemoveObserver()
+{
+  if ( m_ObserverID != 0 )
+  {
+    m_Renderer->RemoveObserver( m_ObserverID );
+  }
+}
+
 
 void 
 mitk::ImageMapper2D::RendererInfo
-::Initialize( int rendererId, mitk::BaseRenderer *renderer )
+::Initialize( int rendererID, mitk::BaseRenderer *renderer, 
+  unsigned long observerID )
 {
-  assert(rendererId>=0);
-  assert(m_RendererId<0);
+  m_ObserverID = observerID;
 
-  m_RendererId = rendererId;
+  assert(rendererID>=0);
+  assert(m_RendererID<0);
+
+  m_RendererID = rendererID;
   m_Renderer = renderer;
 
   m_Image = vtkImageData::New();

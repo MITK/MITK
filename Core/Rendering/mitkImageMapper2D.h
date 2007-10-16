@@ -102,8 +102,8 @@ public:
   class RendererInfo
   {
     /** \brief internal id of the renderer the data is stored for */
-    int m_RendererId;
-    
+    int m_RendererID;
+
     /** \brief stored iil4mitkPicImage containing the texture to display for
      * 2D rendering (cf. m_Image) */
     iil4mitkPicImage* m_iil4mitkImage;
@@ -139,16 +139,20 @@ public:
    
     bool m_IilInterpolation;
 
+    /** \brief stores the id of the observer for delete event of renderer */
+    unsigned long m_ObserverID;
+
     RendererInfo();
 
     ~RendererInfo();
 
     inline bool IsInitialized() const
     {
-      return m_RendererId >= 0;
+      return m_RendererID >= 0;
     }
 
-    void Initialize( int rendererId, mitk::BaseRenderer *renderer );
+    void Initialize( int rendererID, mitk::BaseRenderer *renderer, 
+      unsigned long observerID );
 
     void Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage);
 
@@ -157,10 +161,12 @@ public:
       return m_iil4mitkImage;
     }
 
-    inline int GetRendererId() const
+    inline int GetRendererID() const
     {
-      return m_RendererId;
+      return m_RendererID;
     }
+
+    void RemoveObserver();
 
     void Squeeze();
   }; // RendererInfo
@@ -196,14 +202,11 @@ protected:
     RendererInfo& rendererInfo = m_RendererInfo[renderer];
     if(rendererInfo.IsInitialized()==false)
     {
-      // Initialize RendererInfo
-      rendererInfo.Initialize(ImageMapper2D::numRenderer++, renderer);
-
       // Add observer for renderer reset events (RendererInfo will 
       // automatically be removed from list when a Renderer is deleted)
       //
-      // Note: do not care about managing the observer ID, since the evoking 
-      // Renderer is about to be deleted anyway.
+      // Note: observer ID is passed to rendererInfo, which will take
+      // responsiblity to remove the observer upon its destruction
       typedef itk::MemberCommand< ImageMapper2D > MemberCommandType;
       MemberCommandType::Pointer deleteRendererCommand = 
         MemberCommandType::New();
@@ -211,8 +214,11 @@ protected:
       deleteRendererCommand->SetCallbackFunction(
         this, &ImageMapper2D::DeleteRendererCallback );
       
-      renderer->AddObserver( BaseRenderer::RendererResetEvent(), 
-        deleteRendererCommand );
+      unsigned long observerID = renderer->AddObserver( 
+        BaseRenderer::RendererResetEvent(), deleteRendererCommand );
+
+      // Initialize RendererInfo
+      rendererInfo.Initialize( ImageMapper2D::numRenderer++, renderer, observerID );
     }
 
     return rendererInfo;

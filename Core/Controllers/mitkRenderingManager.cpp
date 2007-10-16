@@ -270,6 +270,7 @@ mitk::RenderingManager
     this->StopTimer();
     
     /** Level-Of-Detail **/
+    /*
     if(m_Numberof3DRW > 1)
     {
       if(m_CurrentLOD < m_MaxLOD)
@@ -279,6 +280,7 @@ mitk::RenderingManager
         this->RequestUpdateAll3D();
       }
     }
+    */
   }
 
   // Immediately repaint this window (implementation platform specific)

@@ -245,7 +245,7 @@ itkEventMacro( PointSetMoveEvent, PointSetEvent );
 itkEventMacro( PointSetSizeChangeEvent, PointSetEvent );
 itkEventMacro( PointSetAddEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetRemoveEvent, PointSetSizeChangeEvent );
-itkEventMacro( PointSetTimeStepsChangeEvent, PointSetEvent );
+itkEventMacro( PointSetExtendTimeRangeEvent, PointSetEvent );
 
 
 } // namespace mitk

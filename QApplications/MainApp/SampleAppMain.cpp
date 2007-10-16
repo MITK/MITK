@@ -64,7 +64,6 @@ int main(int argc, char* argv[])
     std::cout << "changing palette ..." << std::endl;
     QPalette p( QColor( 64,64,64), QColor(64,64,64));
     a.setPalette(p,TRUE);
-    
 #endif
     /*
     * BUG: ATI-grafics-cards are slow in building up display lists in case of displaying transparent surfaces.
@@ -83,17 +82,17 @@ int main(int argc, char* argv[])
   }
   catch (const std::bad_alloc& e)
   {
-    std::cout << "bad_alloc caught. Could not aquire enough memory: " << e.what() << std::endl;
+    std::cout << "MITK MainApp caught bad_alloc: Could not acquire enough memory: " << e.what() << std::endl;
     return EXIT_FAILURE;
   }
   catch (const std::exception& e)
   {
-    std::cout << "Exception caught: " << e.what() << std::endl;
+    std::cout << "MITK MainApp caught an exception: " << e.what() << std::endl;
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    std::cout << "Unknown exception caught." << std::endl;
+    std::cout << "MITK MainApp caught something like an exception..." << std::endl;
     return EXIT_FAILURE;
   }  
 } 

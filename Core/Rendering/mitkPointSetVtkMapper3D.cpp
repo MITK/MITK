@@ -155,6 +155,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
   m_vtkSelectedPointList = vtkAppendPolyData::New();
   m_vtkUnselectedPointList = vtkAppendPolyData::New();
+  //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
+  bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
   //now add an object for each point in data
   pointDataIter = itkPointSet->GetPointData()->Begin();
   for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); 
@@ -164,7 +166,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType;
   
-    if(itkPointSet->GetPointData()->size() == 0)
+    if(itkPointSet->GetPointData()->size() == 0 || pointDataBroken)
       pointType = mitk::PTUNDEFINED;
     else
       pointType = pointDataIter.Value().pointSpec;
@@ -246,16 +248,25 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       }
       break;
     }
-    if (pointDataIter.Value().selected)
+    if (!pointDataBroken)
     {
-      m_vtkSelectedPointList->AddInput(source->GetOutput());
-      ++m_NumberOfSelectedAdded;
+      if (pointDataIter.Value().selected)
+      {
+        m_vtkSelectedPointList->AddInput(source->GetOutput());
+        ++m_NumberOfSelectedAdded;
+      }
+      else 
+      {
+        m_vtkUnselectedPointList->AddInput(source->GetOutput());
+        ++m_NumberOfUnselectedAdded;
+      }
     }
-    else 
+    else
     {
       m_vtkUnselectedPointList->AddInput(source->GetOutput());
       ++m_NumberOfUnselectedAdded;
     }
+
     source->Delete();
 
     if (showLabel)

@@ -162,6 +162,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     //iterator on the additional data of each point
     PointSet::DataType::PointDataContainerIterator selIt, selEnd;
+    bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
     selIt = itkPointSet->GetPointData()->Begin();
     selEnd = itkPointSet->GetPointData()->End();
 
@@ -309,9 +310,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         if((m_ShowPoints) && (scalardiff<4.0))
         {
           //check if the point is to be marked as selected 
-          if(selIt != selEnd)
+          if(selIt != selEnd || pointDataBroken)
           {
-            if (selIt->Value().selected)
+            bool addAsSelected = false;
+            if (pointDataBroken)
+              addAsSelected = false;
+            else if (selIt->Value().selected)
+              addAsSelected = true;
+            else 
+              addAsSelected = false;
+
+            if (addAsSelected)
             {
               horz[0]=8;
               vert[1]=8;
@@ -421,7 +430,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         counter++;
       }
       ++it;
-      if(selIt != selEnd)
+      if(selIt != selEnd && !pointDataBroken)
         ++selIt;
       j++;
     }

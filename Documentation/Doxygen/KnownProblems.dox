@@ -3,7 +3,6 @@
 \page KnownProblemsPage Known Problems
 
 \li "Installing" MITK via cmake (or using "make install") is not yet supported.
-\li Visual Studio 6 is currently not supported.
 \li Sometimes remote X sessions will display black rendering windows. It is not 
     known whether this is a problem within MITK or within the X implementation.
 \li VTK 4.4: In rare cases we experienced crashes in vtkImageReslice.

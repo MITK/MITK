@@ -35,8 +35,95 @@ extern float truncf (float x);
 static ipPicDescriptor* setup (ipPicDescriptor* pic_old);
 static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* mask_dist, const ipInt2_t* mask_offset, const ipUInt4_t mask_elements);
 
+// DON'T ever touch this code again - rather rewrite it! Then use ITK or some other library!
+
+// Works ONLY with 2D images.
 ipPicDescriptor*
-ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ipFloat4_t ratio, const ipFloat4_t threshold)
+ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
+{
+  //prepare the images
+  ipPicDescriptor* pic_out = ipPicCopyHeader(pic_in, NULL);
+  if (pic_out == NULL) {
+      ipMITKSegmentationError (ipMITKSegmentationPIC_NULL);
+  }
+
+  if ((pic_out->type != ipMITKSegmentationTYPE_ID) || (pic_out->bpe != ipMITKSegmentationBPE)) 
+  {
+    ipMITKSegmentationError (ipMITKSegmentationWRONG_TYPE);
+  }
+
+  // pad by 1 pixel
+  pic_out->n[0] += 4;
+  pic_out->n[1] += 4;
+    
+  // allocate image data
+  pic_out->data = malloc ( pic_out->n[0] * pic_out->n[1] * (pic_out->bpe/8) );
+
+  // copy pixel data
+  ipMITKSegmentationTYPE* out_pixel_pointer = pic_out->data;
+  ipMITKSegmentationTYPE* in_pixel_pointer = pic_in->data;
+  unsigned int x, y;
+  for (y = 0; y < pic_out->n[1]; ++y)
+    for (x = 0; x < pic_out->n[0]; ++x, ++out_pixel_pointer)
+    {
+      if ( x < 2  || y < 2 || (x > pic_in->n[0]-3) || (y > pic_in->n[1]-3) ) // set border pixels to 0
+      {
+        *out_pixel_pointer = 0;
+      }
+      else
+      {
+        *out_pixel_pointer = *in_pixel_pointer;
+        ++in_pixel_pointer;
+      }
+    }
+    
+  return pic_out;
+}
+
+// Works ONLY with 2D images.
+ipPicDescriptor*
+ipMITKSegmentationShrinkBy1Pixel (ipPicDescriptor* pic_in )
+{
+  //prepare the images
+  ipPicDescriptor* pic_out = ipPicCopyHeader(pic_in, NULL);
+  if (pic_out == NULL) {
+      ipMITKSegmentationError (ipMITKSegmentationPIC_NULL);
+  }
+
+  if ((pic_out->type != ipMITKSegmentationTYPE_ID) || (pic_out->bpe != ipMITKSegmentationBPE)) 
+  {
+    ipMITKSegmentationError (ipMITKSegmentationWRONG_TYPE);
+  }
+
+  // pad by 1 pixel
+  pic_out->n[0] -= 4;
+  pic_out->n[1] -= 4;
+    
+  // allocate image data
+  pic_out->data = malloc ( pic_out->n[0] * pic_out->n[1] * (pic_out->bpe/8) );
+
+  // copy pixel data
+  ipMITKSegmentationTYPE* out_pixel_pointer = pic_out->data;
+  ipMITKSegmentationTYPE* in_pixel_pointer = pic_in->data;
+  unsigned int x, y;
+  for (y = 0; y < pic_in->n[1]; ++y)
+    for (x = 0; x < pic_in->n[0]; ++x, ++in_pixel_pointer)
+    {
+      if ( x < 2  || y < 2 || (x > pic_in->n[0]-3) || (y > pic_in->n[1]-3) ) // ignore border pixels
+      {
+      }
+      else
+      {
+        *out_pixel_pointer = *in_pixel_pointer;
+        ++out_pixel_pointer;
+      }
+    }
+    
+  return pic_out;
+}
+
+ipPicDescriptor*
+ipMITKSegmentationInterpolate (ipPicDescriptor* pPic1, ipPicDescriptor* pPic2, const ipFloat4_t ratio)
 {
     ipPicDescriptor *pic_out, *pic[2];         /* pointer to image data */
     ipUInt4_t frame [_ipPicNDIM];              /* pointer for definition of frame-size */
@@ -46,7 +133,6 @@ ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, con
     ipInt2_t mask_width = 1;                   /* mask width from center to border       */
     ipInt2_t mask_x[] = {0, -1, +1,  0, -1};   /* relativ position in x-axis of mask */
     ipInt2_t mask_y[] = {0,  0, -1, -1, -1};   /* relativ position in y-axis of mask */
-    //ipInt2_t mask_dist[] = {0, 3, 4, 3, 4};  /* distance to central element */
     ipInt2_t mask_dist[] = {0, 10, 14, 10, 14};/* distance to central element */
     ipInt2_t mask_offset [5];                  /* relative start position in given image */
     ipUInt4_t mask_elements = 5;               /* elements in distance mask */
@@ -54,6 +140,9 @@ ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, con
     ipInt2_t last_x, last_y;                   /* last pixel for distance calculation in enlarged image version */
     ipInt2_t *pixel[2];                        /* pointer to the current pixels */
     ipMITKSegmentationTYPE* pixel_out;
+
+    ipPicDescriptor* pic1 = ipMITKSegmentationPadBy1Pixel( pPic1 );
+    ipPicDescriptor* pic2 = ipMITKSegmentationPadBy1Pixel( pPic2 );
 
     /* prepare the images */
     pic_out = ipPicCopyHeader(pic1, NULL);
@@ -105,7 +194,15 @@ ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, con
     }
     ipPicFree(pic [0]);
     ipPicFree(pic [1]);
-    return pic_out;
+    
+    ipPicFree(pic1);
+    ipPicFree(pic2);
+
+    ipPicDescriptor* returnImage = ipMITKSegmentationShrinkBy1Pixel( pic_out );
+
+    ipPicFree(pic_out);
+
+    return returnImage;
 }
 
 static ipPicDescriptor*

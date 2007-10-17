@@ -71,9 +71,8 @@ extern "C"
     @param pic1,pic2 the images of the segmentation
     @param ratio the ratio of the images, the ratios 0.0 and 1.0 will 
     produce pic1 and pic2, accordingly.
-    @param threshold the threshold which provides the interpolated shape  
     */
-  extern ipPicDescriptor* ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ipFloat4_t ratio, const ipFloat4_t threshold);
+  extern ipPicDescriptor* ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ipFloat4_t ratio);
 
   /*!
     \brief The type of logical operation.

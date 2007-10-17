@@ -376,6 +376,8 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
     {
       max = level + window/2;
     }
+    SetRangeMinMax(min, max);
+    SetDefaultRangeMinMax(min, max);
     SetLevelWindow( level, window );
     SetDefaultLevelWindow(level, window);
     return true;

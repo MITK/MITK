@@ -1,0 +1,6 @@
+/*
+  mitkTestingConfig.h
+  this file is generated. Do not change!
+*/
+#cmakedefine BUILD_TESTING
+

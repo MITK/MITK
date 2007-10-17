@@ -2198,16 +2198,20 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     m_InImporting = true;
     std::vector<DataTreeNode::Pointer> resultNodes;
     //dont use "LoadCompleteSeries( ... )", the Buttons called LightboxImportButtons, so use the LoadImagesFromLightbox-Function too
-
     //for images
     resultNodes = LoadImagesFromLightbox( selectedLightbox );
     for( unsigned int n = 0; n < resultNodes.size(); n++ )
         DataStorage::GetInstance()->Add( resultNodes[n] );
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
     //for text
-    resultNodes = LoadAllTextsFromSeries( selectedLightbox->currentSeries()->oid );
-    for( unsigned int n = 0; n < resultNodes.size(); n++ )
-      DataStorage::GetInstance()->Add( resultNodes[n] );
+    if( selectedLightbox->currentSeries() )
+    {
+      resultNodes = LoadAllTextsFromSeries( selectedLightbox->currentSeries()->oid );
+      for( unsigned int n = 0; n < resultNodes.size(); n++ )
+        DataStorage::GetInstance()->Add( resultNodes[n] );
+    }
+#endif
 
     // stupid, that this is still necessary
     DataTreePreOrderIterator treeiter( app->GetTree() );

@@ -69,9 +69,9 @@ ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
   in_pixel_pointer = (ipMITKSegmentationTYPE*) (pic_in->data);
   
   for (y = 0; y < pic_out->n[1]; ++y)
-    for (x = 0; x < pic_out->n[0]; ++x, ++out_pixel_pointer)
+    for (x = 0; x < pic_out->n[0]; ++x)
     {
-      if ( x < 2  || y < 2 || (x > pic_in->n[0]-3) || (y > pic_in->n[1]-3) ) // set border pixels to 0
+      if ( x < 2  || y < 2 || (x > pic_out->n[0]-3) || (y > pic_out->n[1]-3) ) // set border pixels to 0
       {
         *out_pixel_pointer = 0;
       }
@@ -80,6 +80,7 @@ ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
         *out_pixel_pointer = *in_pixel_pointer;
         ++in_pixel_pointer;
       }
+      ++out_pixel_pointer;
     }
     
   return pic_out;
@@ -117,7 +118,7 @@ ipMITKSegmentationShrinkBy1Pixel (ipPicDescriptor* pic_in )
   in_pixel_pointer = pic_in->data;
   
   for (y = 0; y < pic_in->n[1]; ++y)
-    for (x = 0; x < pic_in->n[0]; ++x, ++in_pixel_pointer)
+    for (x = 0; x < pic_in->n[0]; ++x)
     {
       if ( x < 2  || y < 2 || (x > pic_in->n[0]-3) || (y > pic_in->n[1]-3) ) // ignore border pixels
       {
@@ -127,6 +128,7 @@ ipMITKSegmentationShrinkBy1Pixel (ipPicDescriptor* pic_in )
         *out_pixel_pointer = *in_pixel_pointer;
         ++out_pixel_pointer;
       }
+      ++in_pixel_pointer;
     }
     
   return pic_out;

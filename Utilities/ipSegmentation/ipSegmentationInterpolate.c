@@ -42,12 +42,18 @@ ipPicDescriptor*
 ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
 {
   //prepare the images
-  ipPicDescriptor* pic_out = ipPicCopyHeader(pic_in, NULL);
-  if (pic_out == NULL) {
-      ipMITKSegmentationError (ipMITKSegmentationPIC_NULL);
+  ipPicDescriptor* pic_out;
+  ipMITKSegmentationTYPE* out_pixel_pointer;
+  ipMITKSegmentationTYPE* in_pixel_pointer;
+  unsigned int x, y;  
+
+  pic_out = ipPicCopyHeader(pic_in, NULL);
+  if (pic_out == NULL) 
+  {
+    ipMITKSegmentationError (ipMITKSegmentationPIC_NULL);
   }
 
-  if ((pic_out->type != ipMITKSegmentationTYPE_ID) || (pic_out->bpe != ipMITKSegmentationBPE)) 
+ if ((pic_out->type != ipMITKSegmentationTYPE_ID) || (pic_out->bpe != ipMITKSegmentationBPE)) 
   {
     ipMITKSegmentationError (ipMITKSegmentationWRONG_TYPE);
   }
@@ -55,14 +61,13 @@ ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
   // pad by 1 pixel
   pic_out->n[0] += 4;
   pic_out->n[1] += 4;
-    
+   
   // allocate image data
-  pic_out->data = malloc ( pic_out->n[0] * pic_out->n[1] * (pic_out->bpe/8) );
-
+  pic_out->data = malloc ( pic_out->n[0] * pic_out->n[1] * ((pic_out->bpe)/8) );
   // copy pixel data
-  ipMITKSegmentationTYPE* out_pixel_pointer = pic_out->data;
-  ipMITKSegmentationTYPE* in_pixel_pointer = pic_in->data;
-  unsigned int x, y;
+  out_pixel_pointer = (ipMITKSegmentationTYPE*) (pic_out->data);
+  in_pixel_pointer = (ipMITKSegmentationTYPE*) (pic_in->data);
+  
   for (y = 0; y < pic_out->n[1]; ++y)
     for (x = 0; x < pic_out->n[0]; ++x, ++out_pixel_pointer)
     {
@@ -84,8 +89,13 @@ ipMITKSegmentationPadBy1Pixel (ipPicDescriptor* pic_in)
 ipPicDescriptor*
 ipMITKSegmentationShrinkBy1Pixel (ipPicDescriptor* pic_in )
 {
+  ipPicDescriptor* pic_out;
+  ipMITKSegmentationTYPE* out_pixel_pointer;
+  ipMITKSegmentationTYPE* in_pixel_pointer;
+  unsigned int x, y;  
+
   //prepare the images
-  ipPicDescriptor* pic_out = ipPicCopyHeader(pic_in, NULL);
+  pic_out = ipPicCopyHeader(pic_in, NULL);
   if (pic_out == NULL) {
       ipMITKSegmentationError (ipMITKSegmentationPIC_NULL);
   }
@@ -103,9 +113,9 @@ ipMITKSegmentationShrinkBy1Pixel (ipPicDescriptor* pic_in )
   pic_out->data = malloc ( pic_out->n[0] * pic_out->n[1] * (pic_out->bpe/8) );
 
   // copy pixel data
-  ipMITKSegmentationTYPE* out_pixel_pointer = pic_out->data;
-  ipMITKSegmentationTYPE* in_pixel_pointer = pic_in->data;
-  unsigned int x, y;
+  out_pixel_pointer = pic_out->data;
+  in_pixel_pointer = pic_in->data;
+  
   for (y = 0; y < pic_in->n[1]; ++y)
     for (x = 0; x < pic_in->n[0]; ++x, ++in_pixel_pointer)
     {
@@ -140,6 +150,7 @@ ipMITKSegmentationInterpolate (ipPicDescriptor* pPic1, ipPicDescriptor* pPic2, c
     ipInt2_t last_x, last_y;                   /* last pixel for distance calculation in enlarged image version */
     ipInt2_t *pixel[2];                        /* pointer to the current pixels */
     ipMITKSegmentationTYPE* pixel_out;
+	ipPicDescriptor* returnImage;
 
     ipPicDescriptor* pic1 = ipMITKSegmentationPadBy1Pixel( pPic1 );
     ipPicDescriptor* pic2 = ipMITKSegmentationPadBy1Pixel( pPic2 );
@@ -198,7 +209,7 @@ ipMITKSegmentationInterpolate (ipPicDescriptor* pPic1, ipPicDescriptor* pPic2, c
     ipPicFree(pic1);
     ipPicFree(pic2);
 
-    ipPicDescriptor* returnImage = ipMITKSegmentationShrinkBy1Pixel( pic_out );
+    returnImage = ipMITKSegmentationShrinkBy1Pixel( pic_out );
 
     ipPicFree(pic_out);
 

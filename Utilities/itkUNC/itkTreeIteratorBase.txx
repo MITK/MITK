@@ -305,7 +305,6 @@ TreeIteratorBase<TTreeType>::Disconnect()
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
   parent->Remove( const_cast<TreeNodeType*>(m_Position) );
   m_Tree->Modified();
-  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
   int size = m_Position->CountChildren();
 
   for( int i=0; i< size; i++ ) 
@@ -313,6 +312,8 @@ TreeIteratorBase<TTreeType>::Disconnect()
     TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));	// always add first child in list, because AddChild() removes the added node from its former parent (== m_position)
     parent->AddChild( child );
     }
+  
+  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
 
   m_Position = NULL;
   return true;

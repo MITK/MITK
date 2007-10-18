@@ -251,8 +251,6 @@ namespace itk
   };
 
 
-    // InvokeEvent(TreeChangeEvent<TTreeType>( position ));
-  
 } // namespace itk
 
 #endif

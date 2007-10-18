@@ -25,6 +25,18 @@ namespace itk {
  *  \brief TreeIteratorBase class
  * 
  * This class provides the base implementation for tree iterators
+ *
+ * Events will notify interested observers about tree changes. These events all derive from TreeChangeEvent. They are:
+ *
+ *  - TreeNodeChangeEvent: invoked when Set() is called, i.e. exactly one node changes
+ *  - TreeAddEvent: invoked when Add() is called.
+ *  - TreeRemoveEvent: when a single node has been removed, i.e. Disconnect() has been called.
+ *  - TreePruneEvent: when a node and all its children were removed, i.e. Remove() has been called.
+ *
+ *  All those events have a member GetChangePosition(), which returns an iterator to the position that has changd. Please
+ *  note that this iterator may not be fully functional, but you should always be able to use its Get() method to retrieve
+ *  the thing it points to.
+ *
  */
 template <class TTreeType>
 class TreeIteratorBase

@@ -122,6 +122,7 @@ mitk::RenderingManager::RenderingManager()
 
 mitk::RenderingManager::~RenderingManager()
 {
+
 }
 
 void
@@ -157,8 +158,6 @@ mitk::RenderingManager
 
   m_IsRendering[renderWindow] = false;
  }
-
-
 
 }
 
@@ -623,23 +622,45 @@ int mitk::RenderingManager::GetCurrentLOD() //returns the LOD requested for the 
 void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for the next rendering
 { 
   //std::cout<<"SetCurrentLOD("<<lod<<")"<<std::endl;
-  m_CurrentLOD=lod;
+  if(m_CurrentLOD != lod)
+  {
+    if(lod > m_MaxLOD)
+    {
+      itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
+      return;
+    }
+    m_CurrentLOD = lod;
+  }
 }
 
 void mitk::RenderingManager::SetNumberOfLOD(int number)
 {
+  bool * newLODarray = new bool[number];
+  memcpy(newLODarray, m_ShadingEnabled, (number > m_MaxLOD ? m_MaxLOD : number)*sizeof(bool));
   m_MaxLOD = number-1;
+  delete [] m_ShadingEnabled;
+  m_ShadingEnabled = newLODarray;
 }
 
 //enable/disable shading
 void mitk::RenderingManager::SetShading(bool state, int lod)
 { 
+  if(lod>m_MaxLOD)
+  {
+    itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
+    return;
+  }
   m_ShadingEnabled[lod] = state;
 
 }
 
 bool mitk::RenderingManager::GetShading(int lod)
 { 
+  if(lod>m_MaxLOD)
+  {
+    itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
+    return false;
+  }
   return m_ShadingEnabled[lod];
 }
 

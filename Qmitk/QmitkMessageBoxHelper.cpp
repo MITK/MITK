@@ -1,0 +1,208 @@
+#include "QmitkMessageBoxHelper.h"    
+#include "QmitkUserInputSimulation.h"
+
+#include <qapplication.h>
+#include <qwidgetlist.h>
+#include <qobjectlist.h>
+#include <qmessagebox.h>
+#include <qpushbutton.h>
+#include <qthread.h>
+
+#include <iostream>
+
+#include "mitkCallbackFromGUIThread.h"
+#include <itkCommand.h>
+
+// helper class, runs a thread for preprocessing of a selected image/organ/appearance combination
+class QmitkMessageBoxHelperDialogWaitThread :public QThread
+{
+public:
+
+  QmitkMessageBoxHelperDialogWaitThread(QmitkMessageBoxHelper* helper, const char* classname, int maxWaitSeconds)
+    :m_ClassName( classname ),
+     m_MaxWaitSeconds( maxWaitSeconds ),
+     m_MessageBoxHelper( helper ),
+     m_FoundWidget(NULL)
+  {
+  }
+
+  virtual void run()
+  {
+    float totalSeconds(0.0);
+
+    while (totalSeconds < m_MaxWaitSeconds)
+    {
+      usleep( 500000 ); // _micro_ seconds
+      totalSeconds += 0.5;
+
+      std::cout << "look, look" << std::endl;
+
+      m_FoundWidget = m_MessageBoxHelper->FindTopLevelWindow( m_ClassName.ascii() );
+
+      if (m_FoundWidget)
+      {
+        std::cout << "Found dialog after " << totalSeconds << "s" << std::endl;
+
+        m_MessageBoxHelper->SetFoundDialog( m_FoundWidget );
+        itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
+        command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogFound);
+        mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
+        return;
+      }
+    }
+
+    std::cout << "Could not find dialog" << std::endl;
+
+    m_MessageBoxHelper->SetFoundDialog( NULL );
+    itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
+    command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogNotFound);
+    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
+  }
+
+private:
+  QString m_ClassName;
+  int m_MaxWaitSeconds;
+  QmitkMessageBoxHelper* m_MessageBoxHelper;
+  QWidget* m_FoundWidget;
+};
+
+
+
+QmitkMessageBoxHelper::QmitkMessageBoxHelper(QObject* parent, const char* name)
+:QObject(parent, name),
+ m_WhichButton(0),
+ m_DialogWaitingThread(NULL),
+ m_FoundDialog(NULL)
+{
+  QObject::connect( &m_Timer, SIGNAL(timeout()), this, SLOT(CloseMessageBoxesNow()) );
+}
+
+void QmitkMessageBoxHelper::CloseMessageBoxes(unsigned int whichButton, unsigned int delay)
+{
+  m_WhichButton = whichButton;
+  m_Timer.start( delay, true );
+}
+
+void QmitkMessageBoxHelper::CloseMessageBoxesNow()
+{
+  QWidgetList* toplevelWidgets = QApplication::topLevelWidgets();
+  QWidgetListIt toplevelWidgetsIter(*toplevelWidgets);
+
+  QWidget* widget;
+  while ( (widget = toplevelWidgetsIter.current()) )
+  {
+    if (widget->isA("QMessageBox")) 
+    {
+      std::cout << "Found a message box! Trying to close it as requested..." << std::endl;
+      
+      QObjectList* childList = widget->queryList( "QPushButton" );
+      QObjectListIt childIter( *childList ); 
+
+      QObject* child;
+      unsigned int count( childList->count()-1 ); // on first testing, qmessagebox inserts buttons right to left (or something similar), so the first button in this list is the right-most
+      while ( (child = childIter.current()) )
+      {
+        QPushButton* button = static_cast<QPushButton*>(child);
+
+        if ( count == m_WhichButton )
+        {
+          std::cout << m_WhichButton << ". button is labeled '" << button->text().ascii() << "'. Will be clicked now..." << std::endl;
+          QmitkUserInputSimulation::MouseDown   ( button, Qt::LeftButton );
+          QmitkUserInputSimulation::MouseRelease( button, Qt::LeftButton );
+        }
+
+        --count;
+        ++childIter;
+      }
+
+      delete childList;
+    }
+
+    ++toplevelWidgetsIter;
+  }
+
+  delete toplevelWidgets;
+}
+
+QWidget* QmitkMessageBoxHelper::FindTopLevelWindow( const char* classname )
+{
+  QWidgetList* toplevelWidgets = QApplication::topLevelWidgets();
+  QWidgetListIt toplevelWidgetsIter(*toplevelWidgets);
+
+  QWidget* widget;
+  while ( (widget = toplevelWidgetsIter.current()) )
+  {
+    //std::cout << "  Found class '" << widget->className() << "'" << std::endl;
+    if (widget->isA( classname ))
+    {
+      return widget;
+    }
+
+    ++toplevelWidgetsIter;
+  }
+
+  delete toplevelWidgets;
+
+  return NULL;
+}
+
+void QmitkMessageBoxHelper::WaitForDialogAndCallback( const char* classname, int maxWaitSeconds )
+{
+  if (m_DialogWaitingThread)
+    m_DialogWaitingThread->wait();
+
+  m_DialogWaitingThread = new QmitkMessageBoxHelperDialogWaitThread( this, classname, maxWaitSeconds );
+  
+  m_DialogWaitingThread->start( QThread::LowPriority ); 
+}
+
+void QmitkMessageBoxHelper::SetFoundDialog( QWidget* widget )
+{
+  m_FoundDialog = widget;
+}
+
+void QmitkMessageBoxHelper::DialogFound(const itk::EventObject&)
+{
+  std::cout << "Found dialog (" << m_FoundDialog << ")" << std::endl;
+
+  emit DialogFound( m_FoundDialog );
+
+  m_DialogWaitingThread->wait();
+  delete m_DialogWaitingThread;
+}
+
+void QmitkMessageBoxHelper::DialogNotFound(const itk::EventObject&)
+{
+  emit DialogFound( NULL );
+
+  m_DialogWaitingThread->wait();
+  delete m_DialogWaitingThread;
+}
+
+QWidget* QmitkMessageBoxHelper::FindDialogItem(const char* widgetName, QWidget* parent)
+{
+  std::cout << "Looking for " << widgetName << " below " << parent->name() << "(" << parent->className() << ")" << std::endl;
+
+  QObjectList* childList = parent->queryList( "QWidget" );
+  QObjectListIt childIter( *childList ); 
+
+  QString name(widgetName);
+
+  QObject* child;
+  while ( (child = childIter.current()) )
+  {
+    if ( name == child->name() )
+    {
+      delete childList;
+      return (QWidget*)child;
+    }
+
+    ++childIter;
+  }
+ 
+  std::cout << "Not found. oh oh ..." << std::endl;
+  delete childList;
+  return NULL;
+}
+
+

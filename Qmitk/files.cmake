@@ -12,8 +12,8 @@ SET(CPP_FILES
   QmitkApplicationBase/QmitkFunctionalityFactory.cpp
   QmitkApplicationBase/QmitkFunctionalityTesting.cpp
   QmitkApplicationBase/QmitkSaveProjectWidget.cpp
-  QmitkBaseComponent.cpp
   QmitkBaseAlgorithmComponent.cpp
+  QmitkBaseComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
   QmitkCallbackFromGUIThread.cpp
   QmitkChiliPluginSaveDialog.cpp
@@ -24,22 +24,26 @@ SET(CPP_FILES
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
+  QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
+  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
-  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
-  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
-  QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
+  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLightBoxReaderDialog.cpp
   QmitkLineEditLevelWindowWidget.cpp
+  QmitkMessageBoxHelper.cpp
+  QmitkNewSegmentationDialog.cpp
   QmitkPiecewiseFunctionCanvas.cpp
   QmitkPluginListViewItem.cpp
   QmitkProgressBar.cpp
+  QmitkPropertyListPopup.cpp           
+  QmitkPropertyListPopupProvider.cpp           
   QmitkPropertyListViewItem.cpp
   QmitkPropertyListViewItemFactory.cpp
   QmitkPropertyObservers/PropertyViewTestWidget.cpp
@@ -61,11 +65,16 @@ SET(CPP_FILES
   QmitkRenderingManager.cpp
   QmitkRenderingManagerFactory.cpp
   QmitkRenderWindow.cpp
+  QmitkSlicesInterpolator.cpp
   QmitkSliderLevelWindowWidget.cpp
   QmitkStatusBar.cpp
   QmitkStepperAdapter.cpp
+  QmitkToolReferenceDataSelectionBox.cpp  
+  QmitkToolSelectionBox.cpp  
+  QmitkToolWorkingDataListBox.cpp  
   QmitkTransferFunctionCanvas.cpp
   QmitkUndoRedoButton.cpp
+  QmitkUserInputSimulation.cpp
   QmitkVideoBackground.cpp
   qundoredobutton.cpp
   VtkQRenderWindowInteractor.cpp
@@ -75,23 +84,23 @@ SET(UI_FILES
   QmitkApplicationBase/QmitkControlsRightFctLayoutTemplate.ui
   QmitkApplicationBase/QmitkMainTemplate.ui
   QmitkApplicationBase/QmitkMemoryUsageIndicator.ui
-  QmitkApplicationBase/QmitkRawImageFileOpener.ui
-  QmitkApplicationBase/QmitkRawImageFileSequenceOpener.ui
   QmitkApplicationBase/QmitkNablaBase.ui
   QmitkApplicationBase/QmitkOptionDialog.ui
+  QmitkApplicationBase/QmitkRawImageFileOpener.ui
+  QmitkApplicationBase/QmitkRawImageFileSequenceOpener.ui
   QmitkApplicationBase/QmitkRenderWindowSelector.ui
   QmitkApplicationBase/QmitkSystemInfo.ui
   QmitkApplicationBase/QmitkTreeNodeSelector.ui
   QmitkFunctionalityComponentContainerGUI.ui
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSeedPointSetComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui
@@ -129,21 +138,24 @@ SET(MOC_H_FILES
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
+  QmitkFunctionalityComponents/QmitkImageCropperComponent.h
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
+  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
-  QmitkFunctionalityComponents/QmitkThresholdComponent.h
-  QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
-  QmitkFunctionalityComponents/QmitkImageCropperComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
+  QmitkFunctionalityComponents/QmitkThresholdComponent.h
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
   QmitkLightBoxReaderDialog.h
   QmitkLineEditLevelWindowWidget.h
+  QmitkMessageBoxHelper.h
+  QmitkNewSegmentationDialog.h
   QmitkPiecewiseFunctionCanvas.h
   QmitkProgressBar.h
+  QmitkPropertyListPopup.h           
   QmitkPropertyListViewItem.h
   QmitkPropertyObservers/PropertyViewTestWidget.h
   QmitkPropertyObservers/QmitkBasePropertyView.h
@@ -161,8 +173,12 @@ SET(MOC_H_FILES
   QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
   QmitkPropertyObservers/QmitkStringPropertyView.h
   QmitkRenderingManager.h
+  QmitkSlicesInterpolator.h
   QmitkSliderLevelWindowWidget.h
   QmitkStepperAdapter.h
+  QmitkToolReferenceDataSelectionBox.h  
+  QmitkToolSelectionBox.h  
+  QmitkToolWorkingDataListBox.h  
   QmitkTransferFunctionCanvas.h
   QmitkUndoRedoButton.h
   QmitkVideoBackground.h

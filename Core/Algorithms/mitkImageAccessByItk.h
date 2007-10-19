@@ -449,6 +449,73 @@ PURPOSE.  See the above copyright notices for more information.
   }                                                                                              \
 }
 
+#define _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, pixeltype2, dimension) \
+  if ( typeId2 == typeid(pixeltype2) )                                                                         \
+  {                                                                                                            \
+    typedef itk::Image<pixeltype, dimension> ImageType1;                                                       \
+    typedef itk::Image<pixeltype2, dimension> ImageType2;                                                      \
+    typedef mitk::ImageToItk<ImageType1> ImageToItkType1;                                                      \
+    typedef mitk::ImageToItk<ImageType2> ImageToItkType2;                                                      \
+    itk::SmartPointer<ImageToItkType1> imagetoitk1 = ImageToItkType1::New();                                  \
+    imagetoitk1->SetInput(mitkImage1);                                                   \
+    imagetoitk1->Update();                                                              \
+    itk::SmartPointer<ImageToItkType2> imagetoitk2 = ImageToItkType2::New();                                  \
+    imagetoitk2->SetInput(mitkImage2);                                                   \
+    imagetoitk2->Update();                                                              \
+    itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());                                  \
+  }     
+       
+#define _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, dimension)                    \
+  if ( typeId1 == typeid(pixeltype) )                                                                                \
+  {                                                                                                                  \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, double, dimension) else          \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, float, dimension) else           \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, int, dimension) else             \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, unsigned int, dimension) else    \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, short, dimension) else           \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, unsigned short, dimension) else  \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, char, dimension) else            \
+    _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, unsigned char, dimension)        \
+  }     
+
+#define _accessTwoImagesAllTypesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension)               \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, double, dimension) else            \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, float, dimension) else             \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, int, dimension) else               \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, unsigned int, dimension) else      \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, short, dimension) else             \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, unsigned short, dimension) else    \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, char, dimension) else              \
+      _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, unsigned char,  dimension)         \
+
+//##Documentation
+//## @brief Access two mitk-images with known dimension by itk-images
+//## 
+//## For usage, see AccessByItk.
+//## @param dimension dimension of the mitk-image. 
+//##
+//## If one of the images has a different dimension, an exception is thrown 
+//## (by assert).
+//## If you do not know the dimension for sure, use AccessByItk.
+//## \sa AccessByItk
+//## \sa AccessFixedDimensionByItk
+//## \sa AccessFixedTypeByItk
+//## \sa AccessFixedPixelTypeByItk
+//## @ingroup Adaptor
+#define AccessTwoImagesFixedDimensionByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension)  \
+{                                                                                                    \
+  const std::type_info& typeId1=*(mitkImage1)->GetPixelType().GetTypeId();                           \
+  const std::type_info& typeId2=*(mitkImage2)->GetPixelType().GetTypeId();                           \
+  const mitk::Image* constImage1 = mitkImage1;                                                       \
+  const mitk::Image* constImage2 = mitkImage2;                                                       \
+  const_cast<mitk::Image*>(constImage1)->Update();                                                   \
+  const_cast<mitk::Image*>(constImage2)->Update();                                                   \
+  assert((mitkImage1)->GetDimension()==dimension);                                                   \
+  assert((mitkImage2)->GetDimension()==dimension);                                                   \
+  _accessTwoImagesAllTypesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension)             \
+}
+
+
 //----------------------- cast functions. Will be moved to mitkImageCast.h -----------------
 namespace mitk 
 {

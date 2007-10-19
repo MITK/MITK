@@ -392,6 +392,7 @@ CommonFunctionality::DataTreeIteratorVector CommonFunctionality::FilterNodes(mit
 #include "mitkSurfaceVtkWriter.h"
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkXMLPolyDataWriter.h>
 
 std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char* aFileName)
 {
@@ -412,6 +413,15 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       writer->SetInput( surface );
       writer->SetFileName(qfileName.latin1());
       writer->GetVtkWriter()->SetFileTypeToBinary();
+      writer->Write();
+    }
+    else
+    if(qfileName.endsWith(".vtp")==true)
+    {
+      mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
+      writer->SetInput( surface );
+      writer->SetFileName(qfileName.latin1());
+      writer->GetVtkWriter()->SetDataModeToBinary();
       writer->Write();
     }
     else

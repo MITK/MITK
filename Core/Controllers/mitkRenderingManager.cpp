@@ -635,11 +635,7 @@ void mitk::RenderingManager::SetCurrentLOD(int lod) //sets the LOD requested for
 
 void mitk::RenderingManager::SetNumberOfLOD(int number)
 {
-  bool * newLODarray = new bool[number];
-  memcpy(newLODarray, m_ShadingEnabled, (number > m_MaxLOD ? m_MaxLOD : number)*sizeof(bool));
   m_MaxLOD = number-1;
-  delete [] m_ShadingEnabled;
-  m_ShadingEnabled = newLODarray;
 }
 
 //enable/disable shading

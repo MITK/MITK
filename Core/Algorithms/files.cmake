@@ -1,4 +1,11 @@
 SET(CPP_FILES
+  mitkCalculateSegmentationVolume.cpp
+  mitkDiffImageApplier.cpp
+  mitkExtractImageFilter.cpp
+  mitkNonBlockingAlgorithm.cpp
+  mitkSegmentationSink.cpp
+  mitkShowSegmentationAsSurface.cpp
+  mitkOverwriteSliceImageFilter.cpp
   mitkAngleCorrectByPointFilter.cpp
   mitkAutoCropImageFilter.cpp
   mitkBaseDataSource.cpp

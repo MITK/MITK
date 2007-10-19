@@ -1,4 +1,7 @@
 SET(CPP_FILES  
+  mitkApplyDiffImageOperation.cpp
+  mitkCompressedImageContainer.cpp
+  mitkOrganTypeProperty.cpp
   mitkAbstractTransformGeometry.cpp
   mitkAffineTransformationOperation.cpp
   mitkApplicationCursor.cpp

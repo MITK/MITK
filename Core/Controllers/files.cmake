@@ -1,4 +1,6 @@
 SET(CPP_FILES
+  mitkToolManager.cpp
+  mitkSegmentationInterpolation.cpp
   mitkBaseController.cpp
   mitkCameraController.cpp
   mitkCameraRotationController.cpp

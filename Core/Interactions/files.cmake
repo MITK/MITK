@@ -1,5 +1,22 @@
 SET(CPP_FILES
   mitkAction.cpp
+  mitkTool.cpp
+  mitkAddContourTool.cpp
+  mitkContourTool.cpp
+  mitkCorrectorTool2D.cpp
+  mitkRegionGrowingTool.cpp
+  mitkSegTool2D.cpp
+  mitkSegTool3D.cpp
+  mitkSetRegionTool.cpp
+  mitkFillRegionTool.cpp
+  mitkEraseRegionTool.cpp
+  mitkSubstractContourTool.cpp
+  mitkAddContourToolFactory.cpp
+  mitkCorrectorTool2DFactory.cpp
+  mitkRegionGrowingToolFactory.cpp
+  mitkSubstractContourToolFactory.cpp
+  mitkFillRegionToolFactory.cpp
+  mitkEraseRegionToolFactory.cpp
   mitkAffineInteractor.cpp
   mitkConferenceEventMapper.cpp
   mitkConnectPointsInteractor.cpp

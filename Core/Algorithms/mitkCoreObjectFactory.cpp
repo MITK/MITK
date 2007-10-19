@@ -85,6 +85,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
+#include "mitkAddContourToolFactory.h"
+#include "mitkSubstractContourToolFactory.h"
+#include "mitkRegionGrowingToolFactory.h"
+#include "mitkCorrectorTool2DFactory.h"
+#include "mitkFillRegionToolFactory.h"
+#include "mitkEraseRegionToolFactory.h"
+
+
 #include "mitkUnstructuredGrid.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
 
@@ -202,6 +210,14 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
     mitk::PointSetWriterFactory::RegisterOneFactory();
     mitk::ImageWriterFactory::RegisterOneFactory();
+
+    itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( SubstractContourToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( RegionGrowingToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( CorrectorTool2DFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( FillRegionToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( EraseRegionToolFactory::New() );
+
 
     alreadyDone = true;
   }

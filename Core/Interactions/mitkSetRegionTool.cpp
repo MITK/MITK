@@ -1,0 +1,267 @@
+#include "mitkSetRegionTool.h"
+
+#include "mitkToolManager.h"
+#include "mitkOverwriteSliceImageFilter.h"
+
+#include "ipSegmentation.h"
+
+mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
+:SegTool2D("PressMoveRelease"),
+ m_PaintingPixelValue(paintingPixelValue),
+ m_FillContour(false)
+{
+}
+
+mitk::SetRegionTool::~SetRegionTool()
+{
+}
+
+void mitk::SetRegionTool::Activated()
+{
+  Superclass::Activated();
+}
+
+void mitk::SetRegionTool::Deactivated()
+{
+  Superclass::Deactivated();
+}
+
+bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+{
+  if (!SegTool2D::OnMousePressed( action, stateEvent )) return false;
+
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  // 1. Get the working image
+  Image::Pointer workingSlice   = SegTool2D::GetAffectedWorkingSlice( positionEvent );
+  if ( workingSlice.IsNull() ) return false; // can't do anything without the segmentation
+ 
+  // if click was outside the image, don't continue
+  const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
+  itk::Index<2> projectedPointIn2D;
+  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
+  if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
+  {
+    std::cout << "point apparently not inside segmentation slice" << std::endl;
+    return false; // can't use that as a seed point
+  }
+
+    // Convert to ipMITKSegmentationTYPE (because ipMITKSegmentationGetContour8N relys on that data type)
+    itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+    CastToItkImage( workingSlice, correctPixelTypeImage );
+    assert (correctPixelTypeImage.IsNotNull() );
+
+  // possible bug in CastToItkImage ?
+  // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
+  // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
+  // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
+  // solution here: we overwrite it with an unity matrix
+  itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+  imageDirection.SetIdentity();
+  correctPixelTypeImage->SetDirection(imageDirection);
+
+    Image::Pointer temporarySlice = Image::New();
+  //  temporarySlice = ImportItkImage( correctPixelTypeImage );
+    CastToMitkImage( correctPixelTypeImage, temporarySlice );
+
+
+  // check index positions
+  ipPicDescriptor* originalPicSlice = temporarySlice->GetSliceData()->GetPicDescriptor();
+ 
+  int m_SeedPointMemoryOffset = projectedPointIn2D[1] * originalPicSlice->n[0] + projectedPointIn2D[0];
+
+  if ( m_SeedPointMemoryOffset >= static_cast<int>( originalPicSlice->n[0] * originalPicSlice->n[1] ) ||
+       m_SeedPointMemoryOffset < 0 )
+  {
+    std::cerr << "Memory offset calculation if mitk::SetRegionTool has some serious flaw! Aborting.." << std::endl;
+    return false;
+  }
+  
+  // 2. Determine the contour that surronds the selected "piece of the image"
+  
+  // find a contour seed point
+  unsigned int oneContourOffset = static_cast<unsigned int>( m_SeedPointMemoryOffset ); // safe because of earlier check if m_SeedPointMemoryOffset < 0
+
+  /** 
+    * The logic of finding a starting point for the contour is the following:
+    * 
+    *  - If the initial seed point is 0, we are either inside a hole or outside of every segmentation.
+    *    We move to the right until we hit a 1, which must be part of a contour. 
+    *
+    *  - If the initial seed point is 1, then ...
+    *    we now do the same (running to the right) until we hit a 1
+    *    TODO this is done because I don't understand the commented code and it seems to make no difference
+    *
+    *  In both cases the found contour point is used to extract a contour and
+    *  then a test is applied to find out if the initial seed point is contained
+    *  in the contour. If this is the case, filling should be applied, otherwise
+    *  nothing is done.
+    */
+  unsigned int size = originalPicSlice->n[0] * originalPicSlice->n[1];
+/*
+  unsigned int rowSize = originalPicSlice->n[0];
+*/
+  ipMITKSegmentationTYPE* data = static_cast<ipMITKSegmentationTYPE*>(originalPicSlice->data);
+
+  if ( data[oneContourOffset] == 0 ) // initial seed 0
+  {
+    for ( ; oneContourOffset < size; ++oneContourOffset )
+    {
+      if ( data[oneContourOffset] > 0 ) break;
+    }
+  }
+  else if ( data[oneContourOffset] == 1 ) // initial seed 1
+  {
+    unsigned int lastValidPixel = size-1; // initialization, will be changed lateron
+    bool inSeg = true;    // inside segmentation?
+    unsigned int lineStart = 0;
+    for ( ; oneContourOffset < size; ++oneContourOffset )
+    {
+      if ( ( data[oneContourOffset] == 0 ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
+      {
+        inSeg = false;
+        lineStart = 0;
+        lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
+/**/    break;
+      }
+/*/
+      else if ( ( data[oneContourOffset] == 0 ) && !inSeg ) // pixel 0 and inside-flag unset: this happens at the second pixel after leaving a filled region
+      {
+        ++lineStart;
+        if ( lineStart > originalPicSlice->n[0] ) break;
+        bool colEmpty = true;
+        for (unsigned int  i = oneContourOffset % rowSize; i <  size; i += rowSize) // scan all pixels of the current column(!) beginning in column lineStart 
+        {
+          if ( data[oneContourOffset] > 0 )
+          {
+            colEmpty = false;
+            break;
+          }
+        }
+        if (colEmpty)
+          break;
+      }
+*/
+      else // pixel 1, inside-flag doesn't matter: this happens while we are inside a filled region
+      {
+        inSeg = true; // first iteration lands here
+        lineStart = 0;
+      }
+      
+    }
+    oneContourOffset = lastValidPixel;
+  }
+  else
+  {
+    std::cerr << "Fill/Erase was never intended to work with other than binary images." << std::endl;
+    m_FillContour = false;
+    return false;
+  }
+ 
+  int numberOfContourPoints( 0 );
+  int newBufferSize( 0 );
+  float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
+
+  bool cursorInsideContour = ipMITKSegmentationIsInsideContour( contourPoints, numberOfContourPoints, projectedPointIn2D[0], projectedPointIn2D[1]);
+
+  // decide if contour should be filled or not
+  m_FillContour = cursorInsideContour;
+
+  if (m_FillContour)
+  {
+    // copy point from float* to mitk::Contour 
+    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    contourInImageIndexCoordinates->Initialize();
+    Point3D newPoint;
+    for (int index = 0; index < numberOfContourPoints; ++index)
+    {
+      /*
+      newPoint[0] = contourPoints[ 2 * index + 0 ] - 0.5;
+      newPoint[1] = contourPoints[ 2 * index + 1] - 0.5;
+      newPoint[2] = 0;
+      */
+      newPoint[0] = contourPoints[ 2 * index + 0 ];
+      newPoint[1] = contourPoints[ 2 * index + 1];
+      newPoint[2] = 0;
+
+      contourInImageIndexCoordinates->AddVertex( newPoint );
+    }
+
+    Contour::Pointer contourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
+
+    // 3. Show the contour
+    SegTool2D::SetFeedbackContour( *contourInWorldCoordinates );
+    
+    SegTool2D::SetFeedbackContourVisible(true);
+    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  }
+
+  free(contourPoints);
+
+  return true;
+}
+
+bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+{
+  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
+  SegTool2D::SetFeedbackContourVisible(false);
+  
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  
+  if (!m_FillContour) return true;
+  
+  if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
+
+  DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  if (!workingNode) return false;
+
+  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  if ( !image || !planeGeometry ) return false;
+
+  int affectedDimension( -1 );
+  int affectedSlice( -1 );
+  if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
+  {
+    // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
+    Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+
+    if ( slice.IsNull() )
+    {
+      std::cerr << "Unable to extract slice." << std::endl;
+      return false;
+    }
+      
+    Contour* feedbackContour( SegTool2D::GetFeedbackContour() );
+    Contour::Pointer projectedContour = SegTool2D::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
+                                                                                                                   // false: don't constrain the contour to the image's inside
+    if (projectedContour.IsNull()) return false;
+
+    SegTool2D::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+
+    // 5. Write the modified 2D working data slice back into the image
+    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
+    slicewriter->SetInput( image );
+    slicewriter->SetCreateUndoInformation( true );
+    slicewriter->SetSliceImage( slice );
+    slicewriter->SetSliceDimension( affectedDimension );
+    slicewriter->SetSliceIndex( affectedSlice );
+    slicewriter->Update();
+
+    // 6. Make sure the result is drawn again --> is visible then. 
+    assert( positionEvent->GetSender()->GetRenderWindow() );
+    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  }
+  else
+  {
+    std::cout << "SegTool2D could not determine which slice of the image you are drawing on." << std::endl;
+  }
+
+  return true;
+}
+

@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkWeakPointerProperty.h"
+#include "mitkVtkRepresentationProperty.h"
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -528,7 +529,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   float rgb[3] = { 1.0, 1.0, 1.0 };
                   node->GetColor( rgb, renderer );
                   imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-
+                  m_BackgroundActor->GetProperty()->SetColor(1,1,1);
 
                   // Apply opacity property (of the node, not of the plane)
                   float opacity = 0.999;
@@ -611,6 +612,12 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       this->GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(
         this->GetDataTreeNode()->GetData())) );
   }
+
+  mitk::VtkRepresentationProperty* representationProperty;
+  this->GetDataTreeNode()->GetProperty(representationProperty, "representation", renderer);
+  if ( representationProperty != NULL )
+    m_BackgroundActor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
+
 }
 
 } // namespace mitk

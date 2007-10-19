@@ -1,6 +1,4 @@
 SET(CPP_FILES
-  mitkToolManager.cpp
-  mitkSegmentationInterpolation.cpp
   mitkBaseController.cpp
   mitkCameraController.cpp
   mitkCameraRotationController.cpp
@@ -11,11 +9,13 @@ SET(CPP_FILES
   mitkOperationEvent.cpp
   mitkProgressBar.cpp
   mitkRenderingManager.cpp
+  mitkSegmentationInterpolation.cpp
   mitkSliceNavigationController.cpp
   mitkSlicesCoordinator.cpp
   mitkSlicesRotator.cpp
   mitkStatusBar.cpp
   mitkStepper.cpp
+  mitkToolManager.cpp
   mitkUndoController.cpp
   mitkUndoModel.cpp
   mitkVerboseLimitedLinearUndo.cpp

@@ -2,7 +2,6 @@ SET(CPP_FILES
   mitkBaseDataIOFactory.cpp
   mitkBaseXMLWriter.cpp
   mitkChiliPluginIpPicStub.c
-  mitkPACSPlugin.cpp
   mitkFileReader.cpp
   mitkFileSeriesReader.cpp
   mitkFileWriter.cpp
@@ -11,9 +10,11 @@ SET(CPP_FILES
   mitkItkImageFileIOFactory.cpp
   mitkItkImageFileReader.cpp
   mitkItkImageWrite.cpp
+  mitkLightBoxImageReader.cpp
   mitkMeshReader.cpp
   mitkObjFileIOFactory.cpp
   mitkObjFileReader.cpp
+  mitkPACSPlugin.cpp
   mitkParRecFileIOFactory.cpp
   mitkParRecFileReader.cpp
   mitkPicFileIOFactory.cpp
@@ -32,11 +33,11 @@ SET(CPP_FILES
   mitkStlVolumeTimeSeriesIOFactory.cpp
   mitkStlVolumeTimeSeriesReader.cpp
   mitkSurfaceVtkWriter.cpp
-  mitkSurfaceVtkWriter.txx
   mitkSurfaceVtkWriterFactory.cpp
+  mitkSurfaceVtkWriter.txx
   mitkUnstructuredGridVtkWriter.cpp
-  mitkUnstructuredGridVtkWriter.txx
   mitkUnstructuredGridVtkWriterFactory.cpp
+  mitkUnstructuredGridVtkWriter.txx
   mitkVtiFileIOFactory.cpp
   mitkVtiFileReader.cpp
   mitkVtkImageIOFactory.cpp
@@ -51,6 +52,4 @@ SET(CPP_FILES
   mitkXMLWriter.cpp
   vtkPointSetXMLParser.cpp
   # XMLPointIO.cpp
-
-  mitkLightBoxImageReader.cpp
 )

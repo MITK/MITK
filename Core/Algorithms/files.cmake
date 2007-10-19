@@ -1,23 +1,19 @@
 SET(CPP_FILES
-  mitkCalculateSegmentationVolume.cpp
-  mitkDiffImageApplier.cpp
-  mitkExtractImageFilter.cpp
-  mitkNonBlockingAlgorithm.cpp
-  mitkSegmentationSink.cpp
-  mitkShowSegmentationAsSurface.cpp
-  mitkOverwriteSliceImageFilter.cpp
   mitkAngleCorrectByPointFilter.cpp
   mitkAutoCropImageFilter.cpp
   mitkBaseDataSource.cpp
   mitkBaseProcess.cpp
   mitkBoundingObjectCutter.cpp
+  mitkCalculateSegmentationVolume.cpp
   mitkCallbackFromGUIThread.cpp
   mitkContourSetToPointSetFilter.cpp
   mitkCoreObjectFactory.cpp
   mitkCylindricToCartesianFilter.cpp
   mitkDataTreeNodeFactory.cpp
   mitkDataTreeNodeSource.cpp
+  mitkDiffImageApplier.cpp
   mitkDopplerToStrainRateFilter.cpp
+  mitkExtractImageFilter.cpp
   mitkGeometry2DDataToSurfaceFilter.cpp
   mitkGeometryClipImageFilter.cpp
   mitkGeometryDataSource.cpp
@@ -38,6 +34,8 @@ SET(CPP_FILES
   mitkManualSegmentationToSurfaceFilter.cpp
   mitkMaskImageFilter.cpp
   mitkMeshSource.cpp
+  mitkNonBlockingAlgorithm.cpp
+  mitkOverwriteSliceImageFilter.cpp
   mitkPadImageFilter.cpp
   mitkPlaneCutFilter.cpp
   mitkPlaneFit.cpp
@@ -47,6 +45,8 @@ SET(CPP_FILES
   mitkPointSetToGeometryDataFilter.cpp
   mitkPolygonToRingFilter.cpp
   mitkProbeFilter.cpp
+  mitkSegmentationSink.cpp
+  mitkShowSegmentationAsSurface.cpp
   mitkSubImageSelector.cpp
   mitkSurfaceSource.cpp
   mitkSurfaceToImageFilter.cpp

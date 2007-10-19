@@ -1,10 +1,8 @@
 SET(CPP_FILES  
-  mitkApplyDiffImageOperation.cpp
-  mitkCompressedImageContainer.cpp
-  mitkOrganTypeProperty.cpp
   mitkAbstractTransformGeometry.cpp
   mitkAffineTransformationOperation.cpp
   mitkApplicationCursor.cpp
+  mitkApplyDiffImageOperation.cpp
   mitkBaseData.cpp
   mitkBaseProperty.cpp
   mitkBoundingObject.cpp
@@ -16,11 +14,23 @@ SET(CPP_FILES
   mitkColorSequenceCycleH.cpp
   mitkColorSequenceHalfTones.cpp
   mitkColorSequenceRainbow.cpp
+  mitkCompressedImageContainer.cpp
   mitkCone.cpp
   mitkContour.cpp
   mitkContourSet.cpp
   mitkCuboid.cpp
   mitkCylinder.cpp
+  mitkDataStorage/mitkDataStorage.cpp
+  mitkDataStorage/mitkNodePredicateAND.cpp
+  mitkDataStorage/mitkNodePredicateBase.cpp
+  mitkDataStorage/mitkNodePredicateCompositeBase.cpp
+  mitkDataStorage/mitkNodePredicateData.cpp
+  mitkDataStorage/mitkNodePredicateDataType.cpp
+  mitkDataStorage/mitkNodePredicateDimension.cpp
+  mitkDataStorage/mitkNodePredicateNOT.cpp
+  mitkDataStorage/mitkNodePredicateOR.cpp
+  mitkDataStorage/mitkNodePredicateProperty.cpp
+  mitkDataStorage/mitkNodePredicateSource.cpp
   mitkDataTree.cpp
   mitkDataTreeFilter.cpp
   mitkDataTreeFilterFunctions.cpp
@@ -60,12 +70,13 @@ SET(CPP_FILES
   mitkModeOperation.cpp
   mitkOperationActor.cpp
   mitkOperation.cpp
-  mitkPicHelper.cpp
+  mitkOrganTypeProperty.cpp
   mitkPicHeaderProperty.cpp
+  mitkPicHelper.cpp
   mitkPixelType.cpp
   mitkPlaneGeometry.cpp
-  mitkPlaneOperation.cpp
   mitkPlaneLandmarkProjector.cpp
+  mitkPlaneOperation.cpp
   mitkPointData.cpp
   mitkPointOperation.cpp
   mitkPointSet.cpp
@@ -87,28 +98,17 @@ SET(CPP_FILES
   mitkThinPlateSplineCurvedGeometry.cpp
   mitkTimeSlicedGeometry.cpp
   mitkTransferFunction.cpp
-  # mitkUSLookupTableSource.cpp
   mitkUnstructuredGrid.cpp
+  # mitkUSLookupTableSource.cpp
   mitkVector.cpp
-  mitkVideoSource.cpp
   # mitkVesselGraphOperation.cpp
   # mitkVesselTreeGeometry3D.cpp
   # mitkVesselTreeLookupTable.cpp
   # mitkVesselTreeOperation.cpp
+  mitkVideoSource.cpp
   mitkVtkInterpolationProperty.cpp
   mitkVtkRepresentationProperty.cpp
   mitkVtkScalarModeProperty.cpp
   mitkWeakPointerProperty.cpp
   mitkXMLIO.cpp
-  mitkDataStorage/mitkDataStorage.cpp
-  mitkDataStorage/mitkNodePredicateAND.cpp
-  mitkDataStorage/mitkNodePredicateBase.cpp
-  mitkDataStorage/mitkNodePredicateCompositeBase.cpp
-  mitkDataStorage/mitkNodePredicateData.cpp
-  mitkDataStorage/mitkNodePredicateDataType.cpp
-  mitkDataStorage/mitkNodePredicateDimension.cpp
-  mitkDataStorage/mitkNodePredicateNOT.cpp
-  mitkDataStorage/mitkNodePredicateOR.cpp
-  mitkDataStorage/mitkNodePredicateProperty.cpp
-  mitkDataStorage/mitkNodePredicateSource.cpp
 )

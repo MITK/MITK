@@ -14,6 +14,7 @@ SET(CPP_FILES
   mitkImageMapper2D.cpp
   mitkLineMapper2D.cpp
   # mitkLineVtkMapper3D.cpp
+  mitkLogoRendering.cpp
   mitkMapper2D.cpp
   mitkMapper3D.cpp
   mitkMapper.cpp
@@ -26,18 +27,17 @@ SET(CPP_FILES
   mitkPointSetVtkMapper3D.cpp
   mitkPolyDataGLMapper2D.cpp
   mitkRenderWindow.cpp
+  mitkSimpleTextRendering.cpp
   mitkSplineMapper2D.cpp
   mitkSplineVtkMapper3D.cpp
   mitkSurfaceMapper2D.cpp
   mitkSurfaceVtkMapper3D.cpp
+  mitkUnstructuredGridVtkMapper3D.cpp
   # mitkVectorImageMapper2D.cpp
   # mitkVectorImageVtkGlyphMapper3D.cpp
-  mitkUnstructuredGridVtkMapper3D.cpp
   mitkVolumeDataVtkMapper3D.cpp
   mitkVtkARRenderWindow.cpp
   mitkVtkRenderWindow.cpp
   mitkVtkStencilRenderWindow.cpp
-  mitkLogoRendering.cpp
-  mitkSimpleTextRendering.cpp
 )
 

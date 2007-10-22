@@ -235,7 +235,7 @@ void KeyboardInput( QWidget* widget, int key, int state )
 {
   QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, NULL, state );
   QApplication::postEvent( widget, ke );
-  QKeyEvent* ke2 = new QKeyEvent( QEvent::KeyRelease, key, NULL, 0 );
+  QKeyEvent* ke2 = new QKeyEvent( QEvent::KeyRelease, key, NULL, state );
   QApplication::postEvent( widget, ke2 );
   qApp->processEvents();
 }

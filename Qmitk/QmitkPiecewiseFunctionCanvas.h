@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKPIECEWISEFUNCTIONCANVAS_H_INCLUDED
 
 #include "QmitkTransferFunctionCanvas.h"
+
 #include <vtkPiecewiseFunction.h>
 
-class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
+class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas 
+{
   Q_OBJECT
 
   public:
@@ -47,10 +49,10 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
      void SetPiecewiseFunctionGO(vtkPiecewiseFunction* piecewiseFunction)
      {
       this->m_PiecewiseFunction = piecewiseFunction;
-          //this->SetMin(m_PiecewiseFunction->GetRange()[0]);
-          this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.01);
+          this->SetMin(m_PiecewiseFunction->GetRange()[0]);
+          this->SetMax((m_PiecewiseFunction->GetRange()[1]));
       //this->SetMin(0);
-      this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
+      //this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
       setEnabled(true);
 
       m_IsGradientOpacityFunction = true;
@@ -59,67 +61,81 @@ class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas {
 
     };
 
-    void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) {
+    void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) 
+    {
       m_PiecewiseFunction->AddPoint(x,val);
     };  
-    void RemoveFunctionPoint(vtkFloatingPointType x) {
+    void RemoveFunctionPoint(vtkFloatingPointType x) 
+    {
       int old_size = GetFunctionSize();
       m_PiecewiseFunction->RemovePoint(x); 
-      if (GetFunctionSize() + 1 != old_size) {
+      if (GetFunctionSize() + 1 != old_size) 
+      {
         std::cout << "old/new size" << old_size << "/" << GetFunctionSize() << std::endl;
         std::cout << "called with x=" << x << std::endl;
       }
     };
-    vtkFloatingPointType GetFunctionX(int index) {
+    vtkFloatingPointType GetFunctionX(int index) 
+    {
       return m_PiecewiseFunction->GetDataPointer()[index*2];
     }
     
-    float GetFunctionY(int index) {
+    float GetFunctionY(int index) 
+    {
       return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index*2]);
     }
     
-    int GetFunctionSize() {
+    int GetFunctionSize() 
+    {
       return m_PiecewiseFunction->GetSize();
     }
     void DoubleClickOnHandle(int /*handle*/) {};
     void MoveFunctionPoint(int index, std::pair<vtkFloatingPointType,vtkFloatingPointType> pos);
 
 
-    double GetFunctionMax(){
+    double GetFunctionMax()
+    {
       return m_PiecewiseFunction->GetRange()[1];
     }
 
-    double GetFunctionMin(){
+    double GetFunctionMin()
+    {
       return m_PiecewiseFunction->GetRange()[0];
     }
 
-    double GetFunctionRange(){
+    double GetFunctionRange()
+    {
       double range;
-      if((m_PiecewiseFunction->GetRange()[0])<0){
+      if((m_PiecewiseFunction->GetRange()[0])<0)
+      {
         range = (m_PiecewiseFunction->GetRange()[1])-(m_PiecewiseFunction->GetRange()[0]);
         return range;
       }
-      else{
+      else
+      {
         range = m_PiecewiseFunction->GetRange()[1];
         return range;
       }
     }
 
-    void RemoveAllFunctionPoints(){
-    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,this->GetFunctionMax(),1);
-    m_PiecewiseFunction->AddPoint(0.0,0.0);
+    void RemoveAllFunctionPoints()
+    {
+      m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,this->GetFunctionMax(),1);
+      m_PiecewiseFunction->AddPoint(0.0,0.0);
     }
 
-    void ResetGO(){ //Gradient Opacity
+    void ResetGO()
+    { //Gradient Opacity
      m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,0,1);
      m_PiecewiseFunction->AddSegment(0,1,((this->GetFunctionRange())*0.125),1);
      m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.125),1,((this->GetFunctionRange())*0.2),1);
      m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.2),1,((this->GetFunctionRange())*0.25),1);
     }
-
+    
   protected: 
     vtkPiecewiseFunction* m_PiecewiseFunction;
     bool m_IsGradientOpacityFunction;
+
 
 };
 #endif

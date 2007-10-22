@@ -129,7 +129,6 @@ void
 mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
-  std::cout<<"AddRenderWindow("<<renderWindow<<")"<<std::endl;
   m_RenderWindowList[renderWindow] = 0;
   
   m_AllRenderWindows.push_back( renderWindow );

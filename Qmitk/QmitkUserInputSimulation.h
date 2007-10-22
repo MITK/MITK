@@ -46,10 +46,16 @@ class QmitkUserInputSimulation
     static void MouseDrawLine( QWidget* widget, int button, Qt::Orientation orientation );
  
     static void SimulateKeyboardTyping( QWidget* widget, const QString& text );
-    static void KeyboardTypeKey( QWidget* widget, char c );
-    static void KeyboardKeyDown( QWidget* widget, char c );
-    static void KeyboardKeyRelease( QWidget* widget, char c );
-    static void KeyboardInput( QWidget* widget, int key, int state = Qt::NoButton );
+
+    // Simulate a keyboard event using a characteras key identifier
+    static void KeyboardTypeKey( QWidget* widget, char c, int state = Qt::NoButton );
+    static void KeyboardKeyDown( QWidget* widget, char c, int state = Qt::NoButton );
+    static void KeyboardKeyRelease( QWidget* widget, char c, int state = Qt::NoButton );
+
+    //  Simulate a keyboard event; use int or Qt::xxxButton as identifier, Qt::ShiftButton;
+    static void KeyboardTypeKey( QWidget* widget, int key, int state = Qt::NoButton );
+    static void KeyboardKeyDown( QWidget* widget, int key, int state = Qt::NoButton );
+    static void KeyboardKeyRelease( QWidget* widget, int key, int state = Qt::NoButton );
 
   protected:
 

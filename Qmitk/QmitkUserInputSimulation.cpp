@@ -209,35 +209,45 @@ void QmitkUserInputSimulation::SimulateKeyboardTyping( QWidget* widget, const QS
   }
 }
 
-void QmitkUserInputSimulation::KeyboardTypeKey( QWidget* widget, char c )
+void QmitkUserInputSimulation::KeyboardTypeKey( QWidget* widget, char c, int state )
 {
-  KeyboardKeyDown( widget, c );
-  KeyboardKeyRelease( widget, c );
+  KeyboardKeyDown( widget, c, state );
+  KeyboardKeyRelease( widget, c, state );
 }
 
-void QmitkUserInputSimulation::KeyboardKeyDown( QWidget* widget, char c )
+void QmitkUserInputSimulation::KeyboardKeyDown( QWidget* widget, char c, int state )
 {
   // TODO replace parameter 2 (Qt::Key_unknown) with something sensible
-  QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, Qt::Key_unknown, QChar(c).latin1(), 0, QChar(c) );
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, Qt::Key_unknown, QChar(c).latin1(), state, QChar(c) );
   QApplication::postEvent( widget, ke );
   qApp->processEvents();
 }
 
-void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, char c )
+void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, char c, int state )
 {
   // TODO replace parameter 2 (Qt::Key_unknown) with something sensible
-  QKeyEvent* ke = new QKeyEvent( QEvent::KeyRelease, Qt::Key_unknown, QChar(c).latin1(), 0, QChar(c) );
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyRelease, Qt::Key_unknown, QChar(c).latin1(), state, QChar(c) );
   QApplication::postEvent( widget, ke );
   qApp->processEvents();
 }
 
-void QmitkUserInputSimulation::KeyboardInput( QWidget* widget, int key, int state )
+void QmitkUserInputSimulation::KeyboardTypeKey( QWidget* widget, int key, int state )
+{
+  KeyboardKeyDown( widget, key, state );
+  KeyboardKeyRelease( widget, key, state );
+}
+
+void QmitkUserInputSimulation::KeyboardKeyDown( QWidget* widget, int key, int state )
 {
   QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, NULL, state );
   QApplication::postEvent( widget, ke );
-  QKeyEvent* ke2 = new QKeyEvent( QEvent::KeyRelease, key, NULL, state );
-  QApplication::postEvent( widget, ke2 );
   qApp->processEvents();
 }
 
+void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, int key, int state )
+{
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyRelease, key, NULL, state );
+  QApplication::postEvent( widget, ke );
+  qApp->processEvents();
+}
 

@@ -97,4 +97,3 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
     }
 }
 
-

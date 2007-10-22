@@ -110,7 +110,7 @@ mitk::RenderingManager::RenderingManager()
 : m_UpdatePending( false ), 
   m_Interval( 10 ),
   m_CurrentLOD( 0 ),
-  m_MaxLOD( 0 ),
+  m_MaxLOD( 3 ),
   m_Numberof3DRW( 0 ),
   m_ClippingPlaneEnabled( false )
 {
@@ -129,6 +129,7 @@ void
 mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
+  std::cout<<"AddRenderWindow("<<renderWindow<<")"<<std::endl;
   m_RenderWindowList[renderWindow] = 0;
   
   m_AllRenderWindows.push_back( renderWindow );
@@ -143,7 +144,7 @@ mitk::RenderingManager
     this, &RenderingManager::RenderingStartCallback
   );
   renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
-
+  
   MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
   progressCallbackCommand->SetCallbackFunction(
     this, &RenderingManager::RenderingProgressCallback
@@ -269,19 +270,20 @@ mitk::RenderingManager
     this->StopTimer();
     
     /** Level-Of-Detail **/
-    /*
-    if(m_Numberof3DRW > 1)
+
+    /*if(m_Numberof3DRW > 0)
     {
       if(m_CurrentLOD < m_MaxLOD)
       {
         int nextLOD = m_CurrentLOD+1;
         SetCurrentLOD(nextLOD);
-        this->RequestUpdateAll3D();
+        this->RequestUpdate(renderWindow);
+        //this->RequestUpdateAll3D();
       }
-    }
-    */
+    }*/
   }
 
+  m_LastUpdatedRW = renderWindow;
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Repaint(onlyOverlay);
 }
@@ -291,7 +293,6 @@ void mitk::RenderingManager::RequestUpdateVtkRenderWindow(vtkRenderWindow* rende
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    //std::cout<<"it->second: "<<it->second<<std::endl;
     if ( it->first->GetVtkRenderWindow() == renderwindow )
     {
       this->RequestUpdate(it->first);
@@ -435,7 +436,7 @@ mitk::RenderingManager
 ::UpdateCallback()
 {
 
-
+  //std::cout<<"updatecallback"<<std::endl;
   // Satisfy all pending update requests
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
@@ -560,13 +561,14 @@ mitk::RenderingManager
     this->DoFinishAbortRendering();
     
     /** Level-Of-Detail **/
-    if(m_Numberof3DRW == 1)
+   if(m_Numberof3DRW > 0)
     {
       if(m_CurrentLOD < m_MaxLOD)
       {
         int nextLOD = m_CurrentLOD+1;
         SetCurrentLOD(nextLOD);
-        this->RequestUpdateAll3D();
+        this->RequestUpdate(m_LastUpdatedRW);
+        //this->RequestUpdateAll3D();
       }
     }
   }

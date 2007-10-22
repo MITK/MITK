@@ -60,7 +60,6 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 {        
-  m_Firstcall = true;
   m_PlaneSet = false;
   
   m_ClippingPlane = vtkPlane::New();  
@@ -364,13 +363,23 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
   assert(openGlRenderer);
   vtkRenderWindow* vtkRendWin = (openGlRenderer->GetVtkRenderWindow());
-
+  
   vtkRenderWindowInteractor* interactor = vtkRendWin->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
-  
-  if (vtkRendWin && m_Firstcall) 
+  bool NewRW = true;
+  for(unsigned int i = 0; i < m_VtkRWList.size(); i++)
   {
+    if(m_VtkRWList[i] == vtkRendWin)
+    {
+      NewRW = false;
+    }
+  }
+  
+  if(NewRW)
+  {
+    m_VtkRWList.push_back(vtkRendWin);
+    
     mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
 
     vtkCallbackCommand* cbc = vtkCallbackCommand::New();
@@ -384,7 +393,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     vtkCallbackCommand *endCommand = vtkCallbackCommand::New();
     endCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
     vtkRendWin->AddObserver( vtkCommand::EndEvent, endCommand );
-    m_Firstcall=false;
     
     mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
     
@@ -395,10 +403,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::RenderingManager::GetInstance()->SetShadingValues(m_VolumePropertyHigh->GetAmbient(),m_VolumePropertyHigh->GetDiffuse(),m_VolumePropertyHigh->GetSpecular(),m_VolumePropertyHigh->GetSpecularPower());
 
     mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
-  } 
-  else 
-  {
-    //std::cout << "no vtk renderwindow" << std::endl;
   }
   SetClippingPlane(interactor);
 

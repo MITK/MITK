@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
 
+#include <vector>
+
 class vtkVolumeRayCastMapper;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkVolumeTextureMapper2D;
@@ -94,13 +96,13 @@ protected:
   int m_LowResID;
   int m_MedResID;
   int m_HiResID;
-  bool m_Firstcall;
   bool m_PlaneSet;
   double m_PlaneNormalA;
   double m_PlaneNormalB;
   double m_PlaneNormalC;
 
 
+  std::vector<vtkRenderWindow*> m_VtkRWList;
 };
 
 } // namespace mitk

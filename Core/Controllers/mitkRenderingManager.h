@@ -201,6 +201,8 @@ protected:
   std::vector<bool> m_ShadingEnabled;
   bool m_ClippingPlaneEnabled;
   std::vector<float> m_ShadingValues;
+  
+  RenderWindow *m_LastUpdatedRW;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );

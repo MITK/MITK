@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 
+#include "mitkNodePredicateProperty.h"
+#include "mitkDataStorage.h"
+#include "mitkProperties.h"
+
 #include <qapplication.h>
 #include <qeventloop.h>
 
@@ -40,7 +44,7 @@ QmitkAbortEventFilter::~QmitkAbortEventFilter()
 }
 
 bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
-{ 
+{   
   if (mitk::RenderingManager::GetInstance()->IsRendering() )
   {
     switch ( event->type() )
@@ -159,7 +163,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     }
   }
  else
-  {
+ {
     switch ( event->type() )
     {
       case QEvent::MouseButtonPress:
@@ -174,7 +178,15 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         if(m_ButtonPressed)
         {
         //std::cout << "#MM2 "<<std::endl;
-          mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+          mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
+          mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", new mitk::BoolProperty(true));
+          mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet = 
+              dataStorage->GetSubset( VolRenTurnedOn );
+          if ( VolRenSet->Size() > 0 )
+          {
+            mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+          }
+          
         }
         return false;
       }

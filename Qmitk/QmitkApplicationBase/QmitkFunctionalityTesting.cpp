@@ -108,10 +108,10 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   if(nextFunctionality != NULL)
   {
     std::cout << "Activating \"" << nextFunctionality->className() <<"\" "<< std::flush;
-    m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
+    m_CloseMessagesTimer.start(5000,true); // close message boxes if RaiseFunctionality doesn't return
     m_QmitkFctMediator->RaiseFunctionality(nextId);
     m_CloseMessagesTimer.stop();
-    m_ActivateTimer.start(5000,true); // after redraw activate next
+    m_ActivateTimer.start(2000,true); // after redraw activate next
   }
   else
   {
@@ -125,7 +125,7 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
   testing->m_NumberOfFunctionalitiesFailed = 0;
 
   QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
-  testing->m_CloseMessagesTimer.start(10000,true); // close message boxes if RaiseFunctionality doesn't return
+  testing->m_CloseMessagesTimer.start(5000,true); // close message boxes if RaiseFunctionality doesn't return
 
   std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
   if (qfm->GetActiveFunctionality()) {

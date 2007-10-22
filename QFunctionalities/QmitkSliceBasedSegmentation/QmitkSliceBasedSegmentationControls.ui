@@ -1,0 +1,505 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkSliceBasedSegmentationControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkSliceBasedSegmentationControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>209</width>
+            <height>448</height>
+        </rect>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>0</width>
+            <height>0</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>QmitkSliceBasedSegmentation</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>grpReferenceData</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Patient image</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QmitkToolReferenceDataSelectionBox" row="0" column="0">
+                    <property name="name">
+                        <cstring>m_ToolReferenceDataSelectionBox</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>1</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>btnReinit</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image0</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Reorientate view on image</string>
+                    </property>
+                </widget>
+                <widget class="QSlider" row="3" column="0">
+                    <property name="name">
+                        <cstring>sliderThreshold</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="3" column="1">
+                    <property name="name">
+                        <cstring>btnAcceptThreshold</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Ok</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>btnNewFromThreshold</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image1</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Threshold</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Create new segmentation by thresholding the original image</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="1" column="0">
+                    <property name="name">
+                        <cstring>chkPixelSmoothing</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Smooth pixels</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>groupBox3</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Segmentations</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QmitkToolWorkingDataListBox" row="0" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>m_ToolWorkingDataListBox</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="3">
+                    <property name="name">
+                        <cstring>btnSaveSegmentation</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image2</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Save segmentation to file</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>btnNewSegmentation</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image3</iconset>
+                    </property>
+                    <property name="textLabel">
+                        <string>New segmentation</string>
+                    </property>
+                    <property name="popupDelay">
+                        <number>300</number>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="2">
+                    <property name="name">
+                        <cstring>btnLoadSegmentation</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image4</iconset>
+                    </property>
+                    <property name="textLabel">
+                        <string>Load segmentation from file</string>
+                    </property>
+                </widget>
+                <widget class="Line" row="2" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>line1</cstring>
+                    </property>
+                    <property name="frameShape">
+                        <enum>HLine</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>btnDeleteSegmentation</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image5</iconset>
+                    </property>
+                    <property name="textLabel">
+                        <string>Delete selected segmentations</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="3" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>btnAutoCropSegmentation</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image6</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Crop</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Crop image to segmentation bounds</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="4" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>btnCreateSurface</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image7</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Surface</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Crop image to segmentation bounds</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="5" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>btnVolumetry</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image8</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Volumetry</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Crop image to segmentation bounds</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QmitkToolSelectionBox">
+            <property name="name">
+                <cstring>m_ToolSelectionBox</cstring>
+            </property>
+        </widget>
+        <widget class="QGroupBox">
+            <property name="name">
+                <cstring>grpInterpolation</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="title">
+                <string>Interpolation</string>
+            </property>
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="checked">
+                <bool>false</bool>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QmitkSlicesInterpolator">
+                    <property name="name">
+                        <cstring>m_SlicesInterpolator</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2_2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>16</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
+</widget>
+<customwidgets>
+    <customwidget>
+        <class>QmitkToolSelectionBox</class>
+        <header location="global">QmitkToolSelectionBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image9</pixmap>
+    </customwidget>
+    <customwidget>
+        <class>QmitkSlicesInterpolator</class>
+        <header location="global">QmitkSlicesInterpolator.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image9</pixmap>
+    </customwidget>
+    <customwidget>
+        <class>QmitkToolWorkingDataListBox</class>
+        <header location="global">QmitkToolWorkingDataListBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image9</pixmap>
+    </customwidget>
+    <customwidget>
+        <class>QmitkToolReferenceDataSelectionBox</class>
+        <header location="global">QmitkToolReferenceDataSelectionBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image9</pixmap>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="140">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000534944415418958d8fc10dc0300c02e3ccd309d85f3741f6713f4d9592582a4f74061c409b1a525e10cda4a1ec6e567ac12a6d033f5552fe028170b87bada49cd00a6f8940f01cb16ceea7272425e6951bddbb0195a12cabe8aea4b10000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="288">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000e749444154388dbd94410a833010457f5a2b085d781da5b835f40439a2dbec3cc10c089ec595b868c16e6aa8c6c408a1b3ca90c99b0f33f9828810332e516900120028cb728e012322912c49dbb6bb45755d07c1841000be0a9718c771b77018062f2cbfe7e69c6c2fd36b0aee1845510000a669f24b7baf53e7509819009065991fb8916401b9e355de348d1fb809efda303394520000adf57960dff756814ba1abc1e1622ba5cc63adf5a1d243e09e425f83d58caa47653d964f89f915fe910c504ae92c1237110c147f779bb3c611ddbebcc045dd19954ee016120ab5dce63788c88c3714f801e6194c8a9c0ab3320000000049454e44ae426082</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="189">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000008449444154388dc552410e80200c6b8dffff15bcc097f0817a7106756c440f3621215953da0ea80900f4e6945a40009204002009bb8fd07348621d917a481a8abb021e71e42c74602f4722a983ac93259c4ee0b3c025c23db3877ba4470759e6d0812172913ab00fd3afd29b1bfedfc2a2267a99254d15bad6ade21039d9d92acf7e9ab803e3605c870cae24320000000049454e44ae426082</data>
+    </image>
+    <image name="image3">
+        <data format="PNG" length="146">89504e470d0a1a0a0000000d494844520000000d000000100806000000cda3f53900000059494441542891ed92310ac0300c03a5d2ffff4a7e503e709d124287341d0b3d3078d0190d160d49e269682815d19025016885edb1a7e26d0918f2b14cdfe8c7cf5d61aeb825cdf56dbfabd7f9a56f48672ab6bdfed889547c01ceff2d2d96015fdb0000000049454e44ae426082</data>
+    </image>
+    <image name="image4">
+        <data format="PNG" length="204">89504e470d0a1a0a0000000d494844520000000f0000000c0806000000bd42e7e4000000934944415428919d92310ec4200c0467d13d809aceed3d21ff274f484b47cd0f7cc5295142827297955cd8b09e154275a9d0204dc9d9a92e55a5152c1a342042df87d20a694aeeeeec2bbd935b344a2b07e3be17e0ee072800924eb33ed1d03c92a46dc1c93c225e2578f55b7f4d21c9c313e3aa707fe5924a9eb3c253aa45fb929fbef646fed768d10879ce5a0fee0a8e3fed03f0dc68f1726dfc090000000049454e44ae426082</data>
+    </image>
+    <image name="image5">
+        <data format="PNG" length="124">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000434944415418958d8e510a00200843b7ee7fe6eca760cd0509a2cec71827fe6ac85ebb913405294f9dcdd19d2e0307f9ba1d4c191be8d0a5a78c0c11ea802550cb07800b4b480e0c89ab907f0000000049454e44ae426082</data>
+    </image>
+    <image name="image6">
+        <data format="PNG" length="238">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000b549444154388dad94410ec5200844b161d133cdfdc3795c74e18ebfe8c76a2ad65a27318454260fd41211a988d0aa18fec91201d00d805a52c65183328a48a808cb0f6f0c6d7f9370462ee15701d040e7e9dc5a7c22f6c6c2bd79a9b63d4368975433f41463cc2b1d89d291bad45d42d3cefb95b0bf6f88309bf1b92af306e13674e7b8413a4b7833ebb4fc3843ef347b84ee3d9c557e2965eb6fdfb2d55433fc4269b5d52903986addc8cc63f90c69e5ef9f88f4077f88c4d5efecf2280000000049454e44ae426082</data>
+    </image>
+    <image name="image7">
+        <data format="PNG" length="664">89504e470d0a1a0a0000000d494844520000001200000012080600000056ce8e570000025f49444154388dad943d4b2b4118859fecdeddcd4403eb0a11b10a8a22580684544af017081696fe010b1552da08460b3b5bbb80694410441b21c2dafa0f044131f8856c56a33bbbefad0cc6e47ec13ddd30c3c379cf9c9994effbfc0ffdf8dde6e2e2a298a609401cc754abd5d43f81565656a4bfbf9f7abd8eebba88084747476c6f6fcbdada5a4f58eafb689b9b9b522e97999a9aa2afaf0f114144489284b7b737767777999999e982195f171b1b1b522e9729140a28a508c3908f8f0f1e1f1fb9bbbbe3e9e98952a9c4fefebe148b45e939daf2f2b26c6d6d512814d05a13451149921004015a6bc230c4300c3ccf636e6e8e6c364bb15814dff7531d20cff3989e9ec6300c9acd268ee3d06ab51091b623a514b66d23224c4c4c7487bdb0b020c7c7c7388e43188628a57878784029c5f5f535f7f7f700445104c0c0c000232323542a95b62b03c0b22c72b91c49926059165a6b001a8d461bf255ad560bcff3b06dbb336c11218e639224c1344db4d668ad7b4200d2e934b66d934ea73b415a6b0e0f0f89e318ad35d96c96200808c3b027687474942449b8b8b8e0336c03a056aba50e0e0e787f7fa7d96c1204014a2932994c17249fcf635916b7b7b754abd54e4700ebebeba99d9d1d5e5f5fb9babac2b66d060707db071dc7617c7c9ce1e1615e5e5e585a5aa25eafb78bd9d56cdff765767696e7e7e7f6f5bbae4b3e9fc7755d6e6e6e28954ad46ab58e7677341b60757595d3d3531a8d06b95c8eb1b13126272789a288cbcb4be6e7e7bb203d1d017cd6bf52a96059164343439c9f9fb3b7b7c7d9d9d9df3ddaef40d334c964329c9c9cfcf20bf923e85ff413190321891dfaf0160000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
+        <data format="PNG" length="295">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000ee49444154388dcd943d8a844010469fba81b4b4898906e201ccbc80799fc10b08ce35cc8ccd4d0c0dbc82187a06efd09981bdc13003cb2eebc2f6c07c5941d5a33eeac759d7159b72add200073036811f005a6b2b3029a57dcbff024a299152324d931de04f7a1df0d17edbb6946549144528a5d8f79ddbed469224645946d7759750a3b536dcd7c7f8be6faaaa32711c1bc008214c51144629f5cc5996e54bcd300ccff89be5a669e8fb9ebaae0138cf93799e19c791200800d8b6eddaf243799e0310862100699a128621aeeb228400e0388ebf033dcffb35bed2fbaf8dc37dca56602fb965ebefcb79fb8ffd09be634fe05bf0832e0000000049454e44ae426082</data>
+    </image>
+    <image name="image9">
+        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

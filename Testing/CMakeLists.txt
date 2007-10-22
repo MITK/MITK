@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS} ${IPSEGMENTATION_INCLUDE_DIR})
 
 ENABLE_TESTING()
 
@@ -7,50 +7,56 @@ SET(${KITNAME}_TESTS
   mitkAbstractTransformGeometryTest.cpp
   mitkActionTest.cpp
   mitkAutoCropImageFilterTest.cpp
-  mitkContourTest.cpp
   mitkContourMapper2DTest.cpp
+  mitkContourTest.cpp
   mitkDataStorageTest.cpp
-  mitkDataTreeTest.cpp
   mitkDataTreeFilterTest.cpp
-  mitkEventTest.cpp
+  mitkDataTreeTest.cpp
   mitkEnumerationPropertyTest.cpp
+  mitkEventTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
+  mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
-  mitkImageTest.cpp
   mitkImageDataItemTest.cpp
-  mitkImageToItkTest.cpp
   mitkImageMapper2DTest.cpp
+  mitkImageTest.cpp
+  mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
-  mitkLevelWindowTest.cpp
+  mitkITKThreadingTest.cpp
   mitkLevelWindowManagerTest.cpp
+  mitkLevelWindowTest.cpp
   mitkMeshTest.cpp
+  mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneGeometryTest.cpp
-  mitkPointSetTest.cpp
   mitkPointSetFileIOTest.cpp
+  mitkPointSetTest.cpp
   mitkPropertyListTest.cpp
   mitkRenderWindowTest.cpp
-  mitkSliceNavigationControllerTest.cpp
+  mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
+  mitkSliceNavigationControllerTest.cpp
   mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
+  mitkToolManagerTest.cpp
   mitkTransitionTest.cpp
-  mitkGeometryDataToSurfaceFilterTest.cpp
-  mitkITKThreadingTest.cpp
 )
 
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS
-  mitkPicFileReaderTest.cpp
-  mitkImageTimeSelectorTest.cpp
-  mitkImageSliceSelectorTest.cpp
+  mitkCompressedImageContainerTest.cpp  
   mitkCylindricToCartesianFilterTest.cpp
+  mitkExtractImageFilterTest.cpp  
+  mitkImageSliceSelectorTest.cpp
+  mitkImageTimeSelectorTest.cpp
   mitkManualSegmentationToSurfaceFilterTest.cpp
+  mitkOverwriteSliceImageFilterTest.cpp  
+  mitkPicFileReaderTest.cpp
 )
 
 # list of images for which the tests are run

@@ -26,67 +26,57 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <stdlib.h>
 
-void QmitkUserInputSimulation::MouseDown( QWidget* widget, int button )
+void QmitkUserInputSimulation::MouseDown( QWidget* widget, int button, int state )
 {
   if (!widget) return;
 
-  MouseDownXY( widget, widget->width()/2, widget->height()/2, button );
+  MouseDownXY( widget, widget->width()/2, widget->height()/2, button, state );
 }
 
 
-void QmitkUserInputSimulation::MouseDownXY( QWidget* widget, int x, int y, int button )
+void QmitkUserInputSimulation::MouseDownXY( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
-  QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonPress, QPoint( x, y ), button, Qt::NoButton );
+  QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonPress, QPoint( x, y ), button, state );
   QApplication::postEvent( widget, me );
   qApp->processEvents();
 }
 
 
-void QmitkUserInputSimulation::MouseMoveXY( QWidget* widget, int x, int y, int state )
+void QmitkUserInputSimulation::MouseMoveXY( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
-  QMouseEvent* me = new QMouseEvent( QEvent::MouseMove, QPoint( x, y ), widget->mapToGlobal(QPoint( x, y )), Qt::NoButton, state );
+  QMouseEvent* me = new QMouseEvent( QEvent::MouseMove, QPoint( x, y ), widget->mapToGlobal(QPoint( x, y )), button, state );
   QApplication::postEvent( widget, me );
   qApp->processEvents();
 }
 
 
-void QmitkUserInputSimulation::CtrlDragMouseXY( QWidget* widget, int x, int y, int mouseButton )
+void QmitkUserInputSimulation::MouseRelease( QWidget* widget, int button, int state )
 {
   if (!widget) return;
 
-  QMouseEvent* me = new QMouseEvent( QEvent::MouseMove, QPoint( x, y ), widget->mapToGlobal(QPoint( x, y )), mouseButton, QMouseEvent::ControlButton );
-  QApplication::postEvent( widget, me );
-  qApp->processEvents();
+  MouseReleaseXY( widget, widget->width()/2, widget->height()/2, button, state );
 }
 
 
-void QmitkUserInputSimulation::MouseRelease( QWidget* widget, int button )
+void QmitkUserInputSimulation::MouseReleaseXY( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
-  MouseReleaseXY( widget, widget->width()/2, widget->height()/2, button );
-}
-
-
-void QmitkUserInputSimulation::MouseReleaseXY( QWidget* widget, int x, int y, int button )
-{
-  if (!widget) return;
-
-  QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonRelease, QPoint( x, y ), button, button );
+  QMouseEvent* me = new QMouseEvent( QEvent::MouseButtonRelease, QPoint( x, y ), button, state );
   QApplication::postEvent( widget, me );
   qApp->processEvents();
 }
     
-void QmitkUserInputSimulation::MouseClick( QWidget* widget, int button )
+void QmitkUserInputSimulation::MouseClick( QWidget* widget, int button, int state )
 {
   if (!widget) return;
 
-  MouseDown   ( widget, button );
-  MouseRelease( widget, button );
+  MouseDown   ( widget, button, state );
+  MouseRelease( widget, button, state );
 }
     
 void QmitkUserInputSimulation::MouseMoveScrollWheel( QWidget* widget, int delta )
@@ -240,4 +230,14 @@ void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, char c )
   QApplication::postEvent( widget, ke );
   qApp->processEvents();
 }
+
+void KeyboardInput( QWidget* widget, int key, int state )
+{
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, NULL, state );
+  QApplication::postEvent( widget, ke );
+  QKeyEvent* ke2 = new QKeyEvent( QEvent::KeyRelease, key, NULL, 0 );
+  QApplication::postEvent( widget, ke2 );
+  qApp->processEvents();
+}
+
 

@@ -26,18 +26,17 @@ class QmitkUserInputSimulation
   public:
 
     /// See documentation of QMouseEvent for values of \param button
-    static void MouseDown( QWidget* widget, int button );
+    static void MouseDown( QWidget* widget, int button, int state = Qt::NoButton );
     
-    static void MouseDownXY( QWidget* widget, int x, int y, int button );
+    static void MouseDownXY( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
 
-    static void MouseMoveXY( QWidget* widget, int x, int y, int state );
-    static void CtrlDragMouseXY( QWidget* widget, int x, int y, int mouseButton );
+    static void MouseMoveXY( QWidget* widget, int x, int y, int button = Qt::NoButton, int state = Qt::NoButton );
 
-    static void MouseRelease( QWidget* widget, int button );
+    static void MouseRelease( QWidget* widget, int button, int state = Qt::NoButton );
     
-    static void MouseReleaseXY( QWidget* widget, int x, int y, int button );
+    static void MouseReleaseXY( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
     
-    static void MouseClick( QWidget* widget, int button );
+    static void MouseClick( QWidget* widget, int button, int state = Qt::NoButton );
 
     static void MouseMoveScrollWheel( QWidget* widget, int delta );
     static void MouseMoveScrollWheel( QWidget* widget, int x, int y, int delta );
@@ -50,6 +49,7 @@ class QmitkUserInputSimulation
     static void KeyboardTypeKey( QWidget* widget, char c );
     static void KeyboardKeyDown( QWidget* widget, char c );
     static void KeyboardKeyRelease( QWidget* widget, char c );
+    static void KeyboardInput( QWidget* widget, int key, int state = Qt::NoButton );
 
   protected:
 

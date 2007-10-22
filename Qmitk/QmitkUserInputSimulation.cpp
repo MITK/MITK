@@ -231,7 +231,7 @@ void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, char c )
   qApp->processEvents();
 }
 
-void KeyboardInput( QWidget* widget, int key, int state )
+void QmitkUserInputSimulation::KeyboardInput( QWidget* widget, int key, int state )
 {
   QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, NULL, state );
   QApplication::postEvent( widget, ke );

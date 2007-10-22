@@ -27,16 +27,15 @@ class QmitkUserInputSimulation
 
     /// See documentation of QMouseEvent for values of \param button
     static void MouseDown( QWidget* widget, int button, int state = Qt::NoButton );
-    
-    static void MouseDownXY( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
+    static void MouseDown( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
 
-    static void MouseMoveXY( QWidget* widget, int x, int y, int button = Qt::NoButton, int state = Qt::NoButton );
+    static void MouseMove( QWidget* widget, int x, int y, int button = Qt::NoButton, int state = Qt::NoButton );
 
     static void MouseRelease( QWidget* widget, int button, int state = Qt::NoButton );
-    
-    static void MouseReleaseXY( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
+    static void MouseRelease( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
     
     static void MouseClick( QWidget* widget, int button, int state = Qt::NoButton );
+    static void MouseClick( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
 
     static void MouseMoveScrollWheel( QWidget* widget, int delta );
     static void MouseMoveScrollWheel( QWidget* widget, int x, int y, int delta );

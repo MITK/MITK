@@ -30,11 +30,11 @@ void QmitkUserInputSimulation::MouseDown( QWidget* widget, int button, int state
 {
   if (!widget) return;
 
-  MouseDownXY( widget, widget->width()/2, widget->height()/2, button, state );
+  MouseDown( widget, widget->width()/2, widget->height()/2, button, state );
 }
 
 
-void QmitkUserInputSimulation::MouseDownXY( QWidget* widget, int x, int y, int button, int state )
+void QmitkUserInputSimulation::MouseDown( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
@@ -44,7 +44,7 @@ void QmitkUserInputSimulation::MouseDownXY( QWidget* widget, int x, int y, int b
 }
 
 
-void QmitkUserInputSimulation::MouseMoveXY( QWidget* widget, int x, int y, int button, int state )
+void QmitkUserInputSimulation::MouseMove( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
@@ -58,11 +58,11 @@ void QmitkUserInputSimulation::MouseRelease( QWidget* widget, int button, int st
 {
   if (!widget) return;
 
-  MouseReleaseXY( widget, widget->width()/2, widget->height()/2, button, state );
+  MouseRelease( widget, widget->width()/2, widget->height()/2, button, state );
 }
 
 
-void QmitkUserInputSimulation::MouseReleaseXY( QWidget* widget, int x, int y, int button, int state )
+void QmitkUserInputSimulation::MouseRelease( QWidget* widget, int x, int y, int button, int state )
 {
   if (!widget) return;
 
@@ -77,6 +77,14 @@ void QmitkUserInputSimulation::MouseClick( QWidget* widget, int button, int stat
 
   MouseDown   ( widget, button, state );
   MouseRelease( widget, button, state );
+}
+
+void QmitkUserInputSimulation::MouseClick( QWidget* widget, int x, int y, int button, int state )
+{
+  if (!widget) return;
+
+  MouseDown   ( widget, x, y, button, state );
+  MouseRelease( widget, x, y,  button, state );
 }
     
 void QmitkUserInputSimulation::MouseMoveScrollWheel( QWidget* widget, int delta )
@@ -111,15 +119,15 @@ void QmitkUserInputSimulation::MouseDrawRandom( QWidget* widget, int button, uns
     
     if (i == 0 ) 
     {
-      MouseDownXY( widget, (int)x, (int)y, button ); // mouse down
+      MouseDown( widget, (int)x, (int)y, button ); // mouse down
     }
 
-    MouseMoveXY( widget, (int)x, (int)y, button );  // mouse move
+    MouseMove( widget, (int)x, (int)y, button );  // mouse move
     //std::cout << "(" << x << "," << y << ") " << std::flush;
 
     if (i == points ) 
     {
-      MouseReleaseXY( widget, (int)x, (int)y, button ); // mouse release
+      MouseRelease( widget, (int)x, (int)y, button ); // mouse release
     }
   }
 
@@ -148,15 +156,15 @@ void QmitkUserInputSimulation::MouseDrawCircle( QWidget* widget, int button, flo
     
     if (i == firstDegree ) 
     {
-      MouseDownXY( widget, (int)x, (int)y, button ); // mouse down
+      MouseDown( widget, (int)x, (int)y, button ); // mouse down
     }
 
-    MouseMoveXY( widget, (int)x, (int)y, button );  // mouse move
+    MouseMove( widget, (int)x, (int)y, button );  // mouse move
     //std::cout << "(" << x << "," << y << ") " << std::flush;
 
     if (i == secondLastDegree ) 
     {
-      MouseReleaseXY( widget, (int)x, (int)y, button ); // mouse release
+      MouseRelease( widget, (int)x, (int)y, button ); // mouse release
     }
   }
 }
@@ -188,15 +196,15 @@ void QmitkUserInputSimulation::MouseDrawLine( QWidget* widget, int button, Qt::O
     
     if (i == -100 ) 
     {
-      MouseDownXY( widget, (int)x, (int)y, button ); // mouse down
+      MouseDown( widget, (int)x, (int)y, button ); // mouse down
     }
 
-    MouseMoveXY( widget, (int)x, (int)y, button );  // mouse move
+    MouseMove( widget, (int)x, (int)y, button );  // mouse move
     //std::cout << "(" << x << "," << y << ") " << std::flush;
 
     if (i == 99 ) 
     {
-      MouseReleaseXY( widget, (int)x, (int)y, button ); // mouse release
+      MouseRelease( widget, (int)x, (int)y, button ); // mouse release
     }
   }
 }

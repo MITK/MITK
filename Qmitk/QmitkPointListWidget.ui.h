@@ -319,3 +319,26 @@ mitk::DataTreeNode* QmitkPointListWidget::GetDataTreeNode()
 {
   return m_DatatreeNode.GetPointer();
 }
+
+
+void QmitkPointListWidget::Reinitialize( bool disableInteraction )
+{
+  // disable previous pointset
+  if ( m_PointSet.IsNotNull() )
+    m_PointSet->RemoveObserver( m_CurrentObserverID );
+  if ( disableInteraction )
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_CurrentInteraction );
+
+  // reset member variables
+  m_DataChangedCommand = itk::SimpleMemberCommand<QmitkPointListWidget>::New();
+  m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
+  m_CurrentObserverID = 0;
+  m_CurrentInteraction = NULL;
+  m_CurrentPolygonInteraction = NULL;
+  m_DatatreeNode = NULL;
+  m_PointSet = NULL;
+  
+  // reset gui
+  InteractivePointList->clear();
+  m_NumberOfPointsLabel->setText(QString::number(0));
+}

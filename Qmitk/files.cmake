@@ -32,6 +32,7 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
   QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
@@ -101,6 +102,7 @@ SET(UI_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponentGUI.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponentGUI.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui
@@ -146,6 +148,7 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
   QmitkFunctionalityComponents/QmitkThresholdComponent.h
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.h
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h

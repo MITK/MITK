@@ -129,6 +129,7 @@
     <slot>PointSelect( int ItemIndex )</slot>
     <slot>ItemsOfListUpdate()</slot>
     <slot>RemoveInteraction()</slot>
+    <slot>Reinitialize( bool disableInteraction )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

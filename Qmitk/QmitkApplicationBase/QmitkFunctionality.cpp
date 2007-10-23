@@ -69,6 +69,10 @@ void QmitkFunctionality::Deactivated()
   m_Activated = false;
 }
 
+void QmitkFunctionality::Reinitialize()
+{
+}
+
 bool QmitkFunctionality::IsActivated()
 {
   return m_Activated;

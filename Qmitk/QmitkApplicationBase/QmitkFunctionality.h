@@ -182,6 +182,10 @@ public:
   */
   virtual void Deactivated();
 
+  /*!
+  \brief called when a functionality sould reset itself to its initial state. This is e.g. the case when File->CloseProject is called.
+  */
+  virtual void Reinitialize();
 
   //##Documentation
   //## @brief Is the functionality currently active?

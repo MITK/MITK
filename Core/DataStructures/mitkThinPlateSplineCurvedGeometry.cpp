@@ -27,6 +27,7 @@ mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
 
   m_VtkTargetLandmarks = vtkPoints::New();
   m_VtkProjectedLandmarks = vtkPoints::New();
+  m_ThinPlateSplineTransform->SetInverseIterations(5000);
 }
 
 mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()

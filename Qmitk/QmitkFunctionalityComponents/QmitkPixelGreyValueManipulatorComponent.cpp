@@ -345,10 +345,8 @@ void QmitkPixelGreyValueManipulatorComponent::Activated()
 	{
 		m_AddedChildList[i]->Activated();
 	} 
-	if(m_BoundingObject)
-	{
-		mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
-	}
+	if(m_BoundingObjectInteractor.IsNotNull())
+	  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
 }
 
 /***************       DEACTIVATED      ***************/
@@ -360,9 +358,7 @@ void QmitkPixelGreyValueManipulatorComponent::Deactivated()
 		m_AddedChildList[i]->Deactivated();
 	} 
 	if(m_BoundingObjectInteractor)
-	{
 		mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
-	}
 }
 
 /***************      SET THRESHOLD     ***************/
@@ -417,7 +413,7 @@ void QmitkPixelGreyValueManipulatorComponent::HandleSegmentationArea(int area)
 			mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
 		}
 		m_PixelGreyValueManipulatorComponentGUI->GetSegmentationContent()->setShown(m_PixelGreyValueManipulatorComponentGUI->GetSegmentationSelectorGroupBox()->isChecked());
-		break;
+    break;
 	case 2: 
 		if(m_BoundingObjectInteractor)
 		{
@@ -502,7 +498,9 @@ void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::Da
 	m_BoundingObjectNode->SetVisibility(true);
 	mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
 	iteratorBoundingObject->Add(m_BoundingObjectNode);
+    
 	m_BoundingObjectInteractor = mitk::AffineInteractor::New( "AffineInteractions ctrl-drag", m_BoundingObjectNode );
+	m_BoundingObjectNode->SetInteractor(m_BoundingObjectInteractor);
 }
 
 
@@ -601,7 +599,14 @@ void QmitkPixelGreyValueManipulatorComponent::ChangeGreyValue()
 {
 	QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 	mitk::Image*  image = m_MitkImage;
-	AccessFixedDimensionByItk_1(image, CreateChangedGreyValueImage, 3, m_Segmentation.GetPointer()); 
+ // if(m_PixelGreyValueManipulatorComponentGUI->GetManipulationAreaComboBox()->currentItem() == 3)
+ // {
+	//AccessFixedDimensionByItk_1(image, CreateChangedGreyValueMitkImage, 3, m_Segmentation.GetPointer()); 
+ // }
+ // else
+ // {
+  AccessFixedDimensionByItk_1(image, CreateChangedGreyValueImage, 3, m_Segmentation.GetPointer()); 
+  //}
 	QApplication::restoreOverrideCursor();
 }
 
@@ -1116,7 +1121,9 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 				while(!(it.IsAtEnd()))
 				{
 					mitk::Point3D point3D;
-					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+					//itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+          mitk::vtk2itk(it.GetIndex(),point3D);
+          m_MitkImage->GetGeometry()->IndexToWorld(point3D,point3D);
 					if(m_BoundingObject->IsInside(point3D))
 					{
 						itShifted.Set(pixelChangeValue);
@@ -1164,6 +1171,111 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 	AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
 
 }// end of CHANGED GREY VALUE IMAGE
+
+
+/**************CHANGED GREY VALUE MITK Image TEMPLATE*************/
+//Only for using BoundingBoxes
+//template < typename TPixel, unsigned int VImageDimension >    
+//void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueMitkImage( mitk::Image * mitkImage, const mitk::Image* segmentation)
+//{
+//	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
+//	std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
+//	//typedef itk::Image< TPixel, VImageDimension > ItkImageType;
+//	//itk::ImageRegionConstIterator<ItkImageType> it(itkImage, itkImage->GetLargestPossibleRegion() );
+//
+//	//typedef itk::Image< unsigned char, VImageDimension > ItkSegmentationImageType;
+//	//typename ItkSegmentationImageType::Pointer itkSegmentation;
+//
+//	//if(segmentation != NULL)
+//	//{
+//	//	mitk::CastToItkImage(segmentation, itkSegmentation);
+//	//}
+//
+//	//typename ItkImageType::Pointer itkShiftedImage = ItkImageType::New();
+//  mitk::Image::Pointer mitkShiftedImage = mitk::Image::New();
+//
+//  //mitk::Image::Pointer segmentation = mitk::Image::New();
+//  //segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
+//  //mitk::PixelType pixelType( typeid(SEGMENTATION_DATATYPE) );
+//	mitkShiftedImage->Initialize(mitkImage->GetLargestPossibleRegion());
+//	//itkShiftedImage->Allocate();
+//	itk::ImageRegionIterator<ItkImageType> itShifted(itkShiftedImage, itkShiftedImage->GetLargestPossibleRegion() );
+//
+//	const typename ItkImageType::RegionType & imageRegion = itkImage->GetLargestPossibleRegion();
+//
+//	int imageDim = 1;
+//
+//	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
+//	{
+//		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+//	}
+//
+//	int value1;
+//	int value2;
+//	int baseValue;
+//
+//	GetManipulationValueFromGUI(value1, value2, baseValue);
+//
+//	int pixelChangeValue = value1;
+//
+//	
+//	
+//		if(m_BoundingObject)
+//		{
+//			std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
+//			if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
+//			{
+//				while(!(it.IsAtEnd()))
+//				{
+//					mitk::Point3D point3D;
+//					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+//					if(m_BoundingObject->IsInside(point3D))
+//					{
+//						itShifted.Set(pixelChangeValue);
+//					}
+//					else
+//					{
+//						itShifted.Set(it.Get());
+//					}
+//					++it;
+//					++itShifted;
+//					--imageDim;
+//					if(imageDim % 1000 == 0)
+//					{
+//						//std::cout<<imageDim<<std::endl;
+//					}
+//				}//end of while
+//			}//end of !checked
+//
+//			else //manipulate outsidethe bounding box
+//			{
+//				while(!(it.IsAtEnd()))
+//				{
+//					mitk::Point3D point3D;
+//					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
+//         
+//					if(!(m_BoundingObject->IsInside(point3D)))
+//					{
+//						itShifted.Set(pixelChangeValue);
+//					}
+//					else
+//					{
+//						itShifted.Set(it.Get());
+//					}
+//					++it;
+//					++itShifted;
+//					--imageDim;
+//					if(imageDim % 1000 == 0)
+//					{
+//						//std::cout<<imageDim<<std::endl;
+//					}
+//				}//end of while
+//			}//end of checked
+//		}//if(m_BoundingObject)
+//	
+//	AddManipulatedImageIntoTree<ItkImageType>(itkShiftedImage);
+//
+//}// end of CHANGED GREY VALUE IMAGE
 
 
 /************** LIGHTEN OR SHADE TEMPLATE *************/

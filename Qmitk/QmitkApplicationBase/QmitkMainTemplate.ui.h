@@ -1487,6 +1487,14 @@ void QmitkMainTemplate::fileCloseProject()
   {
     m_UndoController->Clear(); // clear the undo/redo stacks
   }
+  //
+  // reset all functionalities to their initial state 
+  for ( unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i )
+  {
+    QmitkFunctionality* f = qfm->GetFunctionalityById(i);
+    if ( f != NULL )
+      f->Reinitialize();
+  } 
 }
 
 

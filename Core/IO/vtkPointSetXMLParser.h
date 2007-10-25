@@ -1,7 +1,7 @@
 #ifndef _VTK_POINT_SET_XML_READER__H_
 #define _VTK_POINT_SET_XML_READER__H_
 
-#include <mitkMesh.h>
+#include <mitkPointSet.h>
 #include <vtkXMLParser.h>
 #include <stack>
 #include <list>
@@ -22,7 +22,7 @@ namespace mitk
 class vtkPointSetXMLParser : public vtkXMLParser
 {
 public:
-    typedef mitk::Mesh PointSetType;
+    typedef mitk::PointSet PointSetType;
 
     typedef std::stack< std::string > ParseStack;
     

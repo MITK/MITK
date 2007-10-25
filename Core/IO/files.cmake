@@ -11,7 +11,6 @@ SET(CPP_FILES
   mitkItkImageFileReader.cpp
   mitkItkImageWrite.cpp
   mitkLightBoxImageReader.cpp
-  mitkMeshReader.cpp
   mitkObjFileIOFactory.cpp
   mitkObjFileReader.cpp
   mitkPACSPlugin.cpp

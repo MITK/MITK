@@ -165,7 +165,7 @@ mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& , 
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::LoadParentChildRelation( const std::string& seriesOID )
+void mitk::PACSPlugin::LoadParentChildRelation( const std::string& )
 {
   return;
 }

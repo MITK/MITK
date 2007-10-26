@@ -98,6 +98,16 @@ public:
   TransferFunction::RGBControlPoints GetRGBPoints();
   
   /*!
+  \brief Remove one controlpoint of a channel
+  */
+  void RemovePoint(int channel, double x);
+  
+  /*!
+  \brief Remove one rgb controlpoint
+  */
+  void RemoveRGBPoint(double x);
+  
+  /*!
   \brief Removes all controlpoints of a channel
   */
   void ClearPoints(int channel);

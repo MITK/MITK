@@ -143,6 +143,58 @@ mitk::TransferFunction::RGBControlPoints mitk::TransferFunction::GetRGBPoints()
   return m_RGBPoints;
 }
 
+void mitk::TransferFunction::RemovePoint(int channel, double x)
+{
+  switch ( channel )
+  {
+    case 0: //scalar opacity
+    {
+      for(unsigned int i = 0; i < m_ScalarOpacityPoints.size(); i++)
+      {
+        if(m_ScalarOpacityPoints[i].first == x)
+        {
+          m_ScalarOpacityPoints.erase(m_ScalarOpacityPoints.begin()+i);
+          m_ScalarOpacityFunction->RemovePoint(x);
+          break;
+        }
+      }
+      break;
+    }
+    
+    case 1: //gradient opacity
+    { 
+      for(unsigned int i = 0; i < m_GradientOpacityPoints.size(); i++)
+      {
+        if(m_GradientOpacityPoints[i].first == x)
+        {
+          m_GradientOpacityPoints.erase(m_GradientOpacityPoints.begin()+i);
+          m_GradientOpacityFunction->RemovePoint(x);
+          break;
+        }
+      }
+      break;
+    }
+    
+    default:
+    {
+      std::cerr<<"cannot access channel "<<channel<<std::endl;
+    }
+  }
+}
+
+void mitk::TransferFunction::RemoveRGBPoint(double x)
+{
+  for(unsigned int i = 0; i < m_RGBPoints.size(); i++)
+  {
+    if(m_RGBPoints[i].first == x)
+    {
+      m_RGBPoints.erase(m_RGBPoints.begin()+i);
+      m_ColorTransferFunction->RemovePoint(x);
+      break;
+    }
+  }
+}
+
 void mitk::TransferFunction::ClearPoints(int channel)
 {
   switch ( channel )

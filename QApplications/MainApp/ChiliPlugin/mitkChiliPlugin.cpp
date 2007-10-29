@@ -2178,13 +2178,13 @@ void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager *lbm, int tiles )
 
   SendLightBoxCountChangedEvent(); // tell the application
 }
-  
+
 /** Button to import the lightbox. */
 void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 {
   if( m_InImporting ) return;
 
-  if (ChiliIsFillingLightbox()) 
+  if( ChiliIsFillingLightbox() )
   {
     QMessageBox::information( 0, "MITK", "Lightbox not ready. Try again when lightbox filling is completed!" );
     return;
@@ -2200,7 +2200,26 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     //dont use "LoadCompleteSeries( ... )", the Buttons called LightboxImportButtons, so use the LoadImagesFromLightbox-Function too
     //for images
     resultNodes = LoadImagesFromLightbox( selectedLightbox );
-    for( unsigned int n = 0; n < resultNodes.size(); n++ )
+
+    if( resultNodes.size() > 8 )
+    {
+      if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected more then 8 Result-Images.\nMore Images makes the Application slower,\nso you can choose if you want to add the 2D-Images too.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+      {
+        for( unsigned int n = 0; n < resultNodes.size(); n++ )
+          DataStorage::GetInstance()->Add( resultNodes[n] );
+      }
+      else
+      {
+        for( unsigned int n = 0; n < resultNodes.size(); n++ )
+        {
+           mitk::BaseProperty::Pointer propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
+          if( propertyImageNumber.IsNull() || ( propertyImageNumber.IsNotNull() && propertyImageNumber->GetValueAsString() != "1" ) )
+            DataStorage::GetInstance()->Add( resultNodes[n] );
+        }
+      }
+    }
+    else
+      for( unsigned int n = 0; n < resultNodes.size(); n++ )
         DataStorage::GetInstance()->Add( resultNodes[n] );
 
 #ifdef CHILI_PLUGIN_VERSION_CODE

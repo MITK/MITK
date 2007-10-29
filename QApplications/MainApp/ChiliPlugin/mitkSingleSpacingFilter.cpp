@@ -407,6 +407,7 @@ void mitk::SingleSpacingFilter::GenerateNodes()
           {
             tempDistance = (*iterTwo).origin - (*iterOne).origin;
             referenceSpacing = Round( tempDistance.GetNorm(), 2 );
+
             while( referenceSpacing < groupList[n].foundSpacings.front().spacing[2] && iterTwo != copyToWork.end() )
             {
               iterTwo++;
@@ -439,179 +440,182 @@ void mitk::SingleSpacingFilter::GenerateNodes()
         }
       }
 
-      //create mitk::Image
-      Vector3D rightVector, downVector, spacing;
-      Point3D origin;
-      ipPicDescriptor* header;
-      Image::Pointer resultImage;
-
-      header = ipPicCopyHeader( result.front().includedSlices.front().currentPic, NULL );
-
-      if( result.size() == 1 && groupList[n].dimension == 2 )
+      if( result.size() > 0 )
       {
-        //2D
-        if( min_t == 1 )
+        //create mitk::Image
+        Vector3D rightVector, downVector, spacing;
+        Point3D origin;
+        ipPicDescriptor* header;
+        Image::Pointer resultImage;
+
+        header = ipPicCopyHeader( result.front().includedSlices.front().currentPic, NULL );
+
+        if( result.size() == 1 && groupList[n].dimension == 2 )
         {
-          header->dim = 2;
-          header->n[2] = 0;
-          header->n[3] = 0;
-        }
-        //2D + t
-        else
-        {
-          header->dim = 4;
-          header->n[2] = 1;
-          header->n[3] = min_t;
-        }
-      }
-      else
-      {
-        //3D
-        if( groupList[n].dimension == 2 )
-          header->n[2] = result.size();
-        else
-          header->n[2] = result.front().includedSlices.front().currentPic->n[2];
-
-        if( min_t == 1 )
-        {
-          header->dim = 3;
-          header->n[3] = 0;
-        }
-        //3D + t
-        else
-        {
-          header->dim = 4;
-          header->n[3] = min_t;
-        }
-      }
-
-      resultImage = Image::New();
-      resultImage->Initialize( header );
-
-      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-      pFetchSliceGeometryFromPic( result.front().includedSlices.front().currentPic, isg );
-
-      //rightVector, downVector, origin
-      vtk2itk( isg->u, rightVector );
-      vtk2itk( isg->v, downVector );
-      vtk2itk( isg->o, origin );
-
-      // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
-      if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
-        rightVector[0] = 1;
-      if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
-        downVector[2] = -1;
-
-      // set the timeBounds
-      ScalarType timeBounds[] = {0.0, 1.0};
-      // set the planeGeomtry
-      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-
-      //spacing
-      vtk2itk( isg->ps, spacing );
-      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
-        spacing.Fill(1.0);
-
-      //get the most used spacing without rounding
-      if( result.size() > 1 && groupList[n].dimension == 2 )
-      {
-        std::list<SpacingStruct> SpacingList;
-        Vector3D tmpSpacing;
-
-        std::vector< PositionAtSpace >::iterator iterFirst = result.begin();
-        std::vector< PositionAtSpace >::iterator iterSecond = iterFirst;
-        iterSecond++;
-
-        //count the different spacings
-        for( ; iterSecond != result.end(); iterSecond++)
-        {
-          tmpSpacing = iterSecond->origin - iterFirst->origin;
-          spacing[2] = tmpSpacing.GetNorm();
-
-          //search for spacing
-          std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
-          while( searchIter != SpacingList.end() )
+          //2D
+          if( min_t == 1 )
           {
-            if( searchIter->spacing == spacing )
-            {
-              searchIter->count++;
-              break;
-            }
-            else
-              searchIter++;
+            header->dim = 2;
+            header->n[2] = 0;
+            header->n[3] = 0;
           }
-          //if not exist, create new entry
-          if( searchIter == SpacingList.end() )
-          {
-            SpacingStruct newElement;
-            newElement.spacing = spacing;
-            newElement.count = 1;
-            SpacingList.push_back( newElement );
-          }
-          iterFirst = iterSecond;
-        }
-        //get maximum spacing
-        int count = 0;
-        for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
-        {
-          if( searchIter->count > count )
-          {
-            spacing = searchIter->spacing;
-            count = searchIter->count;
-          }
-        }
-      }
-
-      delete isg;
-
-      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
-      planegeometry->SetOrigin( origin );
-      planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
-      planegeometry->SetTimeBounds( timeBounds );
-      // slicedGeometry
-      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-      slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-      // timeSlicedGeometry
-      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-      timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
-      timeSliceGeometry->TransferItkToVtkTransform();
-
-      // Image->SetGeometry
-      resultImage->SetGeometry( timeSliceGeometry );
-
-      // add the slices to the created mitk::Image
-      for( unsigned int x = 0; x < result.size(); x++ )
-      {
-        for( unsigned int t = 0; t < min_t; t++ )
-        {
-          if( groupList[n].dimension == 3 )
-            resultImage->SetPicVolume( result[x].includedSlices[t].currentPic, t );
+          //2D + t
           else
-            resultImage->SetPicSlice( result[x].includedSlices[t].currentPic, x, t );
+          {
+            header->dim = 4;
+            header->n[2] = 1;
+            header->n[3] = min_t;
+          }
         }
-      }
-
-      if( resultImage->IsInitialized() && resultImage.IsNotNull() )
-      {
-        DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-        node->SetData( resultImage );
-        DataTreeNodeFactory::SetDefaultImageProperties( node );
-
-        if( groupList[n].seriesDescription == "" )
-          groupList[n].seriesDescription = "no SeriesDescription";
-        node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
-        node->SetProperty( "NumberOfSlices", new IntProperty( result.size() ) );
-        node->SetProperty( "NumberOfTimeSlices", new IntProperty( min_t ) );
-        if( m_SeriesOID != "" )
-          node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
-
-        mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( result.front().includedSlices.front().currentPic );
-        for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
+        else
         {
-          node->SetProperty( iter->first.c_str(), iter->second.first );
+          //3D
+          if( groupList[n].dimension == 2 )
+            header->n[2] = result.size();
+          else
+            header->n[2] = result.front().includedSlices.front().currentPic->n[2];
+
+          if( min_t == 1 )
+          {
+            header->dim = 3;
+            header->n[3] = 0;
+          }
+          //3D + t
+          else
+          {
+            header->dim = 4;
+            header->n[3] = min_t;
+          }
         }
 
-        m_Output.push_back( node );
+        resultImage = Image::New();
+        resultImage->Initialize( header );
+
+        interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+        pFetchSliceGeometryFromPic( result.front().includedSlices.front().currentPic, isg );
+
+        //rightVector, downVector, origin
+        vtk2itk( isg->u, rightVector );
+        vtk2itk( isg->v, downVector );
+        vtk2itk( isg->o, origin );
+
+        // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
+        if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
+          rightVector[0] = 1;
+        if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
+          downVector[2] = -1;
+
+        // set the timeBounds
+        ScalarType timeBounds[] = {0.0, 1.0};
+        // set the planeGeomtry
+        PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+
+        //spacing
+        vtk2itk( isg->ps, spacing );
+        if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
+          spacing.Fill(1.0);
+
+        //get the most used spacing without rounding
+        if( result.size() > 1 && groupList[n].dimension == 2 )
+        {
+          std::list<SpacingStruct> SpacingList;
+          Vector3D tmpSpacing;
+
+          std::vector< PositionAtSpace >::iterator iterFirst = result.begin();
+          std::vector< PositionAtSpace >::iterator iterSecond = iterFirst;
+          iterSecond++;
+
+          //count the different spacings
+          for( ; iterSecond != result.end(); iterSecond++)
+          {
+            tmpSpacing = iterSecond->origin - iterFirst->origin;
+            spacing[2] = tmpSpacing.GetNorm();
+
+            //search for spacing
+            std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
+            while( searchIter != SpacingList.end() )
+            {
+              if( searchIter->spacing == spacing )
+              {
+                searchIter->count++;
+                break;
+              }
+              else
+                searchIter++;
+            }
+            //if not exist, create new entry
+            if( searchIter == SpacingList.end() )
+            {
+              SpacingStruct newElement;
+              newElement.spacing = spacing;
+              newElement.count = 1;
+              SpacingList.push_back( newElement );
+            }
+            iterFirst = iterSecond;
+          }
+          //get maximum spacing
+          int count = 0;
+          for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+          {
+            if( searchIter->count > count )
+            {
+              spacing = searchIter->spacing;
+              count = searchIter->count;
+            }
+          }
+        }
+
+        delete isg;
+
+        planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+        planegeometry->SetOrigin( origin );
+        planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
+        planegeometry->SetTimeBounds( timeBounds );
+        // slicedGeometry
+        SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+        slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
+        // timeSlicedGeometry
+        TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+        timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
+        timeSliceGeometry->TransferItkToVtkTransform();
+
+        // Image->SetGeometry
+        resultImage->SetGeometry( timeSliceGeometry );
+
+        // add the slices to the created mitk::Image
+        for( unsigned int x = 0; x < result.size(); x++ )
+        {
+          for( unsigned int t = 0; t < min_t; t++ )
+          {
+            if( groupList[n].dimension == 3 )
+              resultImage->SetPicVolume( result[x].includedSlices[t].currentPic, t );
+            else
+              resultImage->SetPicSlice( result[x].includedSlices[t].currentPic, x, t );
+          }
+        }
+
+        if( resultImage->IsInitialized() && resultImage.IsNotNull() )
+        {
+          DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+          node->SetData( resultImage );
+          DataTreeNodeFactory::SetDefaultImageProperties( node );
+
+          if( groupList[n].seriesDescription == "" )
+            groupList[n].seriesDescription = "no SeriesDescription";
+          node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
+          node->SetProperty( "NumberOfSlices", new IntProperty( result.size() ) );
+          node->SetProperty( "NumberOfTimeSlices", new IntProperty( min_t ) );
+          if( m_SeriesOID != "" )
+            node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
+
+          mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( result.front().includedSlices.front().currentPic );
+          for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter !=  tempPropertyList->GetMap()->end(); iter++ )
+          {
+            node->SetProperty( iter->first.c_str(), iter->second.first );
+          }
+
+          m_Output.push_back( node );
+        }
       }
     }
   }

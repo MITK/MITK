@@ -801,20 +801,69 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
     ScalarType timeBounds[] = {0.0, 1.0};
     // set the planeGeomtry
     PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-    if( m_PossibleOutputs[n].dimension == 3 )
+
+    //spacing
+    Vector3D spacing;
+    vtk2itk( isg->ps, spacing );
+    if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
+      spacing.Fill(1.0);
+
+    //get the most counted spacing
+    if( m_PossibleOutputs[n].descriptors.size() > 2 && m_PossibleOutputs[n].dimension == 2 )
     {
-      Vector3D spacing;
-      vtk2itk( isg->ps, spacing );
-      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-        spacing.Fill(1.0);
-      for (unsigned int i = 0; i < 3; ++i)
-        spacing[i] = Round( spacing[i], 2 );
-      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+      std::list<SpacingStruct> SpacingList;
+      Vector3D tmpSpacing, origin, originb4;
+      std::list< ipPicDescriptor* >::iterator iterFirst = m_PossibleOutputs[n].descriptors.begin();
+      interSliceGeometry_t* isgSecond = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+      pFetchSliceGeometryFromPic( (*iterFirst), isgSecond );
+      //first origin
+      vtk2itk( isgSecond->o, originb4 );
+
+      for( std::list< ipPicDescriptor* >::iterator iterSecond = iterFirst; iterSecond != m_PossibleOutputs[n].descriptors.end(); iterSecond++)
+      {
+        pFetchSliceGeometryFromPic( (*iterSecond), isgSecond );
+        vtk2itk( isgSecond->o, origin );
+        if( !Equal(origin, originb4 ) )
+        {
+          tmpSpacing = origin - originb4;
+          spacing[2] = tmpSpacing.GetNorm();
+          //search for spacing
+          std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
+          while( searchIter != SpacingList.end() )
+          {
+            if( searchIter->spacing == spacing )
+            {
+              searchIter->count++;
+              break;
+            }
+            else
+              searchIter++;
+          }
+          //if not exist, create new entry
+          if( searchIter == SpacingList.end() )
+          {
+            SpacingStruct newElement;
+            newElement.spacing = spacing;
+            newElement.count = 1;
+            SpacingList.push_back( newElement );
+          }
+          originb4 = origin;
+        }
+      }
+      //get maximum spacing
+      int count = 0;
+      for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+      {
+        if( searchIter->count > count )
+        {
+          spacing = searchIter->spacing;
+          count = searchIter->count;
+        }
+      }
+      delete isgSecond;
     }
-    else
-    {
-      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &m_PossibleOutputs[n].sliceSpacing );
-    }
+
+    planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
     planegeometry->SetOrigin( origin );
     planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
     planegeometry->SetTimeBounds( timeBounds );

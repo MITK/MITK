@@ -109,6 +109,12 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** Thats the real Outputs. */
     std::vector< DataTreeNode::Pointer > m_Output;
 
+    struct SpacingStruct
+    {
+      Vector3D spacing;
+      int count;
+    };
+
     /**
     This function seperate the PossibleOutputs:
     - all slices without isg get ignored

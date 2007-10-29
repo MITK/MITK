@@ -594,18 +594,134 @@ void mitk::SpacingSetFilter::GenerateNodes()
 #ifdef CHILI_PLUGIN_VERSION_CODE
   for( unsigned int n = 0; n < groupList.size(); n++)
   {
-    //TODO groupList[n].resultCombinations.size() > 1
+    //TODO groupList[n].resultCombinations.size() > 1, thats mean that there are more than one combinations to create the image
 
-    if( groupList[n].dimension > 2 )
+    for( std::vector < std::set< Slice* > >::iterator iter = groupList[n].resultCombinations.front().begin(); iter != groupList[n].resultCombinations.front().end(); iter ++ )
     {
-//TODO erzeugung des mitk::images funktioniert so nicht, da die pics aus chili nicht das tag isg haben, sondern die isg von chili; davon weiß image nichts, deswegen müssen die geomtrien selber initialisiert werden und damit dann das mitk::image
+      //create mitk::Image
+      Vector3D rightVector, downVector, spacing;
+      Point3D origin;
+      ipPicDescriptor* header;
       Image::Pointer resultImage;
-      resultImage = Image::New();
-      resultImage->Initialize( groupList[n].includedSlices.front().currentPic );
-      int count = 0;
-      for( std::vector< Slice >::iterator iterator = groupList[n].includedSlices.begin(); iterator != groupList[n].includedSlices.end(); iterator++ )
+
+      header = ipPicCopyHeader( (*iter->begin())->currentPic, NULL );
+
+      if( (*iter).size() == 1 )
+      //2D
       {
-        resultImage->SetPicVolume( iterator->currentPic ,count );
+        header->dim = 2;
+        header->n[2] = 0;
+        header->n[3] = 0;
+      }
+      else
+      //3D
+      {
+        header->dim = 3;
+        header->n[2] = iter->size();
+        header->n[3] = 0;
+      }
+
+      resultImage = Image::New();
+      resultImage->Initialize( header, 1, -1, iter->size() );
+
+      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+      if( !pFetchSliceGeometryFromPic( (*iter->begin())->currentPic, isg ) )
+      {
+        delete isg;
+        return;
+      }
+
+      //rightVector, downVector
+      vtk2itk( isg->u, rightVector );
+      vtk2itk( isg->v, downVector );
+      // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
+      if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
+        rightVector[0] = 1;
+      if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
+        downVector[2] = -1;
+
+      //spacing
+      vtk2itk( isg->ps, spacing );
+      if( ( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 ) || spacing[2] == 0.01 )
+        spacing.Fill(1.0);
+
+      //get the most used spacing
+      if( (*iter).size() > 1 &&  groupList[n].dimension == 2 )
+      {
+        std::list<SpacingStruct> SpacingList;
+        std::set< Slice* >::iterator iterFirst = (*iter).begin();
+        std::set< Slice* >::iterator iterSecond = iterFirst;
+        iterSecond++;
+        Vector3D tmpSpacing;
+
+        for( ; iterSecond != (*iter).end(); iterSecond++ )
+        {
+          tmpSpacing = (*iterSecond)->origin - (*iterFirst)->origin;
+          spacing[2] = tmpSpacing.GetNorm();
+          //search for spacing
+          std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
+          while( searchIter != SpacingList.end() )
+          {
+            if( searchIter->spacing == spacing )
+            {
+              searchIter->count++;
+              break;
+            }
+            else
+              searchIter++;
+          }
+          //if not exist, create new entry
+          if( searchIter == SpacingList.end() )
+          {
+            SpacingStruct newElement;
+            newElement.spacing = spacing;
+            newElement.count = 1;
+            SpacingList.push_back( newElement );
+          }
+          iterFirst = iterSecond;
+        }
+        //get maximum spacing
+        int count = 0;
+        for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+        {
+          if( searchIter->count > count )
+          {
+            spacing = searchIter->spacing;
+            count = searchIter->count;
+          }
+        }
+      }
+      //origin
+      vtk2itk( isg->o, origin );
+
+      // set the timeBounds
+      ScalarType timeBounds[] = {0.0, 1.0};
+      // set the planeGeomtry
+      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+
+      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+      planegeometry->SetOrigin( origin );
+      planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
+      planegeometry->SetTimeBounds( timeBounds );
+      // slicedGeometry
+      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+      slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
+      // timeSlicedGeometry
+      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+      timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
+      timeSliceGeometry->TransferItkToVtkTransform();
+
+      // Image->SetGeometry
+      resultImage->SetGeometry( timeSliceGeometry );
+
+      // add the slices to the created mitk::Image
+      int count = 0;
+      for( std::set< Slice* >::iterator it = (*iter).begin(); it != (*iter).end(); it++)
+      {
+        if( groupList[n].dimension == 3 )
+          resultImage->SetPicVolume( (*it)->currentPic, count );
+        else
+          resultImage->SetPicSlice( (*it)->currentPic, count, 0 );
         count ++;
       }
 
@@ -618,159 +734,19 @@ void mitk::SpacingSetFilter::GenerateNodes()
         if( groupList[n].seriesDescription == "" )
           groupList[n].seriesDescription = "no SeriesDescription";
         node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
-        node->SetProperty( "NumberOfSlices", new IntProperty( groupList[n].includedSlices.front().currentPic->n[2] ) );
+        node->SetProperty( "NumberOfSlices", new IntProperty( (*iter).size() ) );
         if( m_SeriesOID != "" )
           node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
 
-        mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( groupList[n].includedSlices.front().currentPic );
+        mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( (*iter->begin())->currentPic );
         for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
         {
           node->SetProperty( iter->first.c_str(), iter->second.first );
         }
+
         m_Output.push_back( node );
       }
-    }
-    else
-    {
-      //for 2D-slices a real spacing is needed, because if a volume have a spacing 5 and the 2D-slice with 0.01 mitk create a lots of slices wich not used / needed, therefore we have to initialize the 2D-slice with the same spacing like the volume
-      Vector3D maxSpacing;
-      maxSpacing[2] = 0;
-      for( std::vector < std::set< Slice* > >::iterator iter = groupList[n].resultCombinations.front().begin(); iter != groupList[n].resultCombinations.front().end(); iter ++ )
-      {
-        if( (*iter).size() > 1 )
-        {
-          std::set< Slice* >::iterator nextIter = iter->begin();
-          nextIter++;
-          Vector3D tempSpacing = (*nextIter)->origin - (*iter->begin())->origin;
-          tempSpacing[2] = tempSpacing.GetNorm();
-          tempSpacing[2] = Round( tempSpacing[2], 2 );
-          if( tempSpacing[2] > maxSpacing[2] )
-            maxSpacing = tempSpacing;
-        }
-     }
-
-      //now we know the included maxspacing and can create all possible outputs
-      for( std::vector < std::set< Slice* > >::iterator iter = groupList[n].resultCombinations.front().begin(); iter != groupList[n].resultCombinations.front().end(); iter ++ )
-      {
-        //create mitk::Image
-        Vector3D rightVector, downVector, spacing;
-        Point3D origin;
-        ipPicDescriptor* header;
-        Image::Pointer resultImage;
-
-        header = ipPicCopyHeader( (*iter->begin())->currentPic, NULL );
-
-        if( (*iter).size() == 1 )
-        //2D
-        {
-          header->dim = 2;
-          header->n[2] = 0;
-          header->n[3] = 0;
-        }
-        else
-        //3D
-        {
-          header->dim = 3;
-          header->n[2] = iter->size();
-          header->n[3] = 0;
-        }
-
-        resultImage = Image::New();
-        resultImage->Initialize( header, 1, -1, iter->size() );
-
-        interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-        if( !pFetchSliceGeometryFromPic( (*iter->begin())->currentPic, isg ) )
-        {
-          delete isg;
-          return;
-        }
-
-        //rightVector, downVector
-        vtk2itk( isg->u, rightVector );
-        vtk2itk( isg->v, downVector );
-        // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
-        if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
-          rightVector[0] = 1;
-        if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
-          downVector[2] = -1;
-
-        //spacing
-        vtk2itk( isg->ps, spacing );
-        if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-          spacing.Fill(1.0);
-        else
-        {
-          for (unsigned int i = 0; i < 3; ++i)
-            spacing[i] = Round( spacing[i], 2 );
-        }
-
-        if( (*iter).size() > 1 )
-        {
-          std::set< Slice* >::iterator nextIter = iter->begin();
-          nextIter++;
-          Vector3D tempSpacing = (*nextIter)->origin - (*iter->begin())->origin;
-          spacing[2] = tempSpacing.GetNorm();
-          spacing[2] = Round( spacing[2], 2 );
-        }
-        else
-        {
-          spacing[2] = maxSpacing[2];
-        }
-
-        //origin
-        vtk2itk( isg->o, origin );
-
-        // set the timeBounds
-        ScalarType timeBounds[] = {0.0, 1.0};
-        // set the planeGeomtry
-        PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-
-        planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
-        planegeometry->SetOrigin( origin );
-        planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
-        planegeometry->SetTimeBounds( timeBounds );
-        // slicedGeometry
-        SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-        slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-        // timeSlicedGeometry
-        TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-        timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
-        timeSliceGeometry->TransferItkToVtkTransform();
-
-        // Image->SetGeometry
-        resultImage->SetGeometry( timeSliceGeometry );
-
-        // add the slices to the created mitk::Image
-        int count = 0;
-        for( std::set< Slice* >::iterator it = (*iter).begin(); it != (*iter).end(); it++)
-        {
-          resultImage->SetPicSlice( (*it)->currentPic, count, 0 );
-          count ++;
-        }
-
-        if( resultImage->IsInitialized() && resultImage.IsNotNull() )
-        {
-          DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-          node->SetData( resultImage );
-          DataTreeNodeFactory::SetDefaultImageProperties( node );
-
-          if( groupList[n].seriesDescription == "" )
-            groupList[n].seriesDescription = "no SeriesDescription";
-          node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
-          node->SetProperty( "NumberOfSlices", new IntProperty( (*iter).size() ) );
-          if( m_SeriesOID != "" )
-            node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
-
-          mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( (*iter->begin())->currentPic );
-          for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
-          {
-            node->SetProperty( iter->first.c_str(), iter->second.first );
-          }
-
-          m_Output.push_back( node );
-        }
-        delete isg;
-      }
+      delete isg;
     }
   }
 #endif

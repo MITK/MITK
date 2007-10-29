@@ -106,6 +106,12 @@ class SpacingSetFilter : public PicDescriptorToNode
     std::vector< std::set< Slice* > >::iterator iterGroupEnd;
     unsigned int totalCombinationCount;
 
+    struct SpacingStruct
+    {
+      Vector3D spacing;
+      int count;
+    };
+
     /** input */
     std::list< ipPicDescriptor* > m_PicDescriptorList;
     std::string m_SeriesOID;

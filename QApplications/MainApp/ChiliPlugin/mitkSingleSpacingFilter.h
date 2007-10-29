@@ -109,6 +109,12 @@ class SingleSpacingFilter : public PicDescriptorToNode
     /** the group-list */
     std::vector< Group > groupList;
 
+    struct SpacingStruct
+    {
+      Vector3D spacing;
+      int count;
+    };
+
     /** input */
     std::list< ipPicDescriptor* > m_PicDescriptorList;
     std::string m_SeriesOID;

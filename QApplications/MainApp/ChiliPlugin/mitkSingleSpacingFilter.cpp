@@ -399,7 +399,7 @@ void mitk::SingleSpacingFilter::GenerateNodes()
           std::vector< PositionAtSpace >::iterator iterOne = copyToWork.begin();
           std::vector< PositionAtSpace >::iterator iterTwo = iterOne;
 
-          bool stop = false;
+          bool stop = false, sliceAddedB4 = false;
           Vector3D tempDistance;
           double referenceSpacing;
 
@@ -420,16 +420,20 @@ void mitk::SingleSpacingFilter::GenerateNodes()
               if( min_t == 0 || (*iterOne).includedSlices.size() < min_t )
                 min_t = (*iterOne).includedSlices.size();
               copyToWork.erase( iterOne );
+              sliceAddedB4 = true;
               iterTwo--;
               iterOne = iterTwo;
             }
             else
             {
               stop = true;
-              result.push_back( (*iterOne) );
+              if( sliceAddedB4 )
+              {
+                result.push_back( (*iterOne) );
+                if( min_t == 0 || (*iterOne).includedSlices.size() < min_t )
+                  min_t = (*iterOne).includedSlices.size();
+              }
               copyToWork.erase( iterOne );
-              if( min_t == 0 || (*iterOne).includedSlices.size() < min_t )
-                min_t = (*iterOne).includedSlices.size();
             }
           }
         }
@@ -503,23 +507,64 @@ void mitk::SingleSpacingFilter::GenerateNodes()
       // set the planeGeomtry
       PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
 
+      //spacing
+      vtk2itk( isg->ps, spacing );
+      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
+        spacing.Fill(1.0);
+
+      //get the most used spacing without rounding
       if( result.size() > 1 && groupList[n].dimension == 2 )
       {
-        planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &groupList[n].foundSpacings.front().spacing );
-      }
-      else
-      {
-        Vector3D spacing;
-        vtk2itk( isg->ps, spacing );
-        if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-          spacing.Fill(1.0);
-        for (unsigned int i = 0; i < 3; ++i)
-          spacing[i] = Round( spacing[i], 2 );
-        planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+        std::list<SpacingStruct> SpacingList;
+        Vector3D tmpSpacing;
+
+        std::vector< PositionAtSpace >::iterator iterFirst = result.begin();
+        std::vector< PositionAtSpace >::iterator iterSecond = iterFirst;
+        iterSecond++;
+
+        //count the different spacings
+        for( ; iterSecond != result.end(); iterSecond++)
+        {
+          tmpSpacing = iterSecond->origin - iterFirst->origin;
+          spacing[2] = tmpSpacing.GetNorm();
+
+          //search for spacing
+          std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
+          while( searchIter != SpacingList.end() )
+          {
+            if( searchIter->spacing == spacing )
+            {
+              searchIter->count++;
+              break;
+            }
+            else
+              searchIter++;
+          }
+          //if not exist, create new entry
+          if( searchIter == SpacingList.end() )
+          {
+            SpacingStruct newElement;
+            newElement.spacing = spacing;
+            newElement.count = 1;
+            SpacingList.push_back( newElement );
+          }
+          iterFirst = iterSecond;
+        }
+        //get maximum spacing
+        int count = 0;
+        for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+        {
+          if( searchIter->count > count )
+          {
+            spacing = searchIter->spacing;
+            count = searchIter->count;
+          }
+        }
       }
 
       delete isg;
 
+      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
       planegeometry->SetOrigin( origin );
       planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
       planegeometry->SetTimeBounds( timeBounds );

@@ -512,14 +512,12 @@ mitk::Vector3D mitk::LightBoxImageReaderImpl::GetSpacingFromLB( LocalImageInfoAr
     {
       toNext = it->origin-origin0;
       spacing[2] = toNext.GetNorm();
+/*
       // round after 2. decimal digit
-      for (unsigned int i = 0; i < 3; ++i)
-      {
-        spacing[i] *= 100.0;
-        spacing[i] = ROUND(spacing[i]);
-        spacing[i] /= 100.0;
-      }
-
+      spacing[2] *= 100.0;
+      spacing[2] = ROUND(spacing[2]);
+      spacing[2] /= 100.0;
+*/
       spacingList.push_back( spacing );
       origin0 = it->origin;
     }

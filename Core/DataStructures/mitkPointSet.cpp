@@ -243,7 +243,13 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
   if ( (unsigned int) t < m_PointSetSeries.size() )
   {
     mitk::Point3D indexPoint;
-    this->GetGeometry( t )->WorldToIndex( point, indexPoint );
+    mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
+    if (tempGeometry == NULL)
+    {
+      std::cout<<"mitkPointSet.cpp::L252:GetGeometry of "<< t <<" returned NULL!\n";
+      return;
+    }
+    tempGeometry->WorldToIndex( point, indexPoint );
     m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
     
     //boundingbox has to be computed anyway

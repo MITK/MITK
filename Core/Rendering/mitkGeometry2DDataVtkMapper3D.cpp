@@ -529,7 +529,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   float rgb[3] = { 1.0, 1.0, 1.0 };
                   node->GetColor( rgb, renderer );
                   imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-                  m_BackgroundActor->GetProperty()->SetColor(1,1,1);
+                  //m_BackgroundActor->GetProperty()->SetColor(1,1,1);
 
                   // Apply opacity property (of the node, not of the plane)
                   float opacity = 0.999;

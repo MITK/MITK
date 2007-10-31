@@ -98,17 +98,6 @@ RootTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
-/** Go to the next node */
-/*
-template <class TTreeType>
-const typename RootTreeIterator<TTreeType>::TreeNodeType* 
-RootTreeIterator<TTreeType>::Next() const
-{
-  this->m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return this->m_Position;
-}
-*/
-
 /** Find the next node */
 template <class TTreeType>
 const typename RootTreeIterator<TTreeType>::TreeNodeType* 

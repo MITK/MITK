@@ -103,7 +103,7 @@ TreeNode<TValueType>
 
 /** Set the value of a node */
 template <class TValueType>
-TValueType TreeNode<TValueType>::Set(TValueType data)
+TValueType TreeNode<TValueType>::Set(const TValueType data)
 {
   TValueType help = m_Data;
   m_Data = data;
@@ -152,7 +152,7 @@ int
 TreeNode<TValueType>
 ::CountChildren( ) const 
 {
-  return m_Children.size();
+  return static_cast<int>(m_Children.size());
 }
 
 /** Remove a child node from the current node */
@@ -231,11 +231,11 @@ void
 TreeNode<TValueType>
 ::AddChild( int number, TreeNode<TValueType> *node ) 
 {  
-  int size = m_Children.size();
+  size_t size = m_Children.size();
 
-  if ( number > size ) 
+  if ( (size_t)number > size ) 
     {
-    for ( int i=size; i <= number; i++ )
+    for ( size_t i=size; i <= (size_t)number; i++ )
       {
       m_Children[i] = NULL;
       }
@@ -280,6 +280,7 @@ TreeNode<TValueType>
 }
 
 /** Get children given a name and a depth */
+#if !defined(CABLE_CONFIGURATION)
 template <class TValueType>
 typename TreeNode<TValueType>::ChildrenListType* 
 TreeNode<TValueType>
@@ -294,13 +295,14 @@ TreeNode<TValueType>
 
   while( childrenListIt != childrenListEnd )
     {
-    if( name == NULL )
+    if( name == NULL || strstr(typeid(**childrenListIt).name(), name) )
       {
       children->push_back(*childrenListIt);
       }
     if( depth > 0 )
       {
-      ChildrenListType * nextchildren = (**childrenListIt).GetChildren(depth-1, name);  
+      ChildrenListType * nextchildren = (**childrenListIt).GetChildren(depth-1,
+                                                                       name);  
       // Add the child to the current list
       typename ChildrenListType::const_iterator nextIt = nextchildren->begin();
       while(nextIt != nextchildren->end())
@@ -315,6 +317,7 @@ TreeNode<TValueType>
 
   return children;
 }
+#endif
 
 
 } // namespace itk

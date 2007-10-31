@@ -103,17 +103,6 @@ InOrderTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
-/** Const next */
-/*
-template <class TTreeType>
-const typename InOrderTreeIterator<TTreeType>::TreeNodeType*
-InOrderTreeIterator<TTreeType>::Next() const
-{
-  m_Position = const_cast<TreeNodeType* >(FindNextNode());
-  return m_Position;
-}
-*/
-
 
 /** Find the next node */
 template <class TTreeType>
@@ -188,4 +177,3 @@ TreeIteratorBase<TTreeType>* InOrderTreeIterator<TTreeType>::Clone()
 } // end namespace itk
 
 #endif
-

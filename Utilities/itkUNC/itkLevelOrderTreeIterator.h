@@ -164,16 +164,6 @@ LevelOrderTreeIterator<TTreeType>::Next()
 }
 
 /** Const Next */
-/*
-template <class TTreeType>
-const typename LevelOrderTreeIterator<TTreeType>::TreeNodeType* 
-LevelOrderTreeIterator<TTreeType>::Next() const
-{
-  m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return m_Position;
-}
-*/
-/** Get the start Level */
 template <class TTreeType>
 int LevelOrderTreeIterator<TTreeType>::GetStartLevel() const
 {

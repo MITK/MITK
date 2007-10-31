@@ -133,7 +133,14 @@ SliceNavigationController::Update(
   SliceNavigationController::ViewDirection viewDirection,
   bool top, bool frontside, bool rotated )
 {
-  if ( m_InputWorldGeometry.IsNull() || m_BlockUpdate )
+  const TimeSlicedGeometry* worldTimeSlicedGeometry =
+    dynamic_cast< const TimeSlicedGeometry * >(
+      m_InputWorldGeometry.GetPointer() );
+
+  if( m_BlockUpdate || 
+      m_InputWorldGeometry.IsNull() || 
+      ( (worldTimeSlicedGeometry != NULL) && (worldTimeSlicedGeometry->GetTimeSteps() == 0) )
+    )
   {
     return;
   }
@@ -158,10 +165,6 @@ SliceNavigationController::Update(
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
     
     m_CreatedWorldGeometry = NULL;
-    const TimeSlicedGeometry* worldTimeSlicedGeometry =
-      dynamic_cast< const TimeSlicedGeometry * >(
-        m_InputWorldGeometry.GetPointer() );
-
     switch ( viewDirection )
     {
     case Original:

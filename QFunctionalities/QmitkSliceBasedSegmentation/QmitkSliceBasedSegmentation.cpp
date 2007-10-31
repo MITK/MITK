@@ -350,12 +350,15 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         surfaceFilter->SetParameter("Sync visibility", true );
         
         surfaceFilter->StartAlgorithm(); // starts thread
-    
-        QMessageBox::information(NULL, "MITK", QString("Surface creation is started in a background task, it will take some time..."), QMessageBox::Ok);
       }
     }
     
     mitk::ProgressBar::GetInstance()->Progress();
+  }
+   
+  if ( !nodes.empty() )
+  {
+    QMessageBox::information(NULL, "MITK", QString("Surface creation is started in a background task, it will take some time..."), QMessageBox::Ok);
   }
 
   QApplication::restoreOverrideCursor();

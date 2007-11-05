@@ -234,20 +234,9 @@ template <class TValueType>
 bool TreeContainer<TValueType>::Clear() 
 {
   PreOrderTreeIterator<Self> it(this,m_Root);
-  it.GoToBegin();
-  while(!it.IsAtEnd())
-    {
-    if(it.Remove())
-      {
-      ++it;
-      }
-    else
-      {
-      return false;
-      }
-    }
+  bool success = it.Remove();
   m_Root = NULL;
-  return true;
+  return success;
 }
 
 /** Get node given a value */

@@ -121,9 +121,18 @@ protected:
 } // namespace itk
 
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTreeContainer.txx"
+#define ITK_TEMPLATE_TreeContainer(_, EXPORT, x, y) namespace itk { \
+  _(1(class EXPORT TreeContainer< ITK_TEMPLATE_1 x >)) \
+  namespace Templates { typedef TreeContainer< ITK_TEMPLATE_1 x > \
+                                                  TreeContainer##y; } \
+  }
+
+#if ITK_TEMPLATE_EXPLICIT
+# include "Templates/itkTreeContainer+-.h"
 #endif
 
+#if ITK_TEMPLATE_TXX
+#include "itkTreeContainer.txx"
+#endif
 
 #endif

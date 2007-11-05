@@ -79,7 +79,7 @@ public:
   virtual bool GoToParent( );
 
   /** Set the current value of the node */
-  bool Set( ValueType element);
+  void Set( ValueType element);
 
   /** Return true if the current node has a child */
   virtual bool HasChild(int number = 0) const;
@@ -119,8 +119,8 @@ public:
   virtual const TreeNodeType* GetNode() const;
 
   /** Get the root */
-  TreeNodeType* &GetRoot();
-  const TreeNodeType* &GetRoot() const;
+  TreeNodeType* GetRoot();
+  const TreeNodeType* GetRoot() const;
   
   /** Get the tree */
   TTreeType* GetTree() const;
@@ -171,18 +171,17 @@ public:
   Self &
   operator++()
   {
-    if ( !IsAtEnd() )
-    {
-      this->Next();
-    }
+    assert( !IsAtEnd() );
+    this->Next();
     return *this;
   }
-
-  void operator++(int)
+  /** operator++ */
+  void
+  operator++(int)
   {
-    ++(*this);
+    assert( !IsAtEnd() );
+    this->Next();
   }
-
   /** operator = */
   virtual Self& operator=(Self& iterator) 
     {
@@ -214,9 +213,18 @@ protected:
 } //end namespace itk
 
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTreeIteratorBase.txx"
+#define ITK_TEMPLATE_TreeIteratorBase(_, EXPORT, x, y) namespace itk { \
+  _(1(class EXPORT TreeIteratorBase< ITK_TEMPLATE_1 x >)) \
+  namespace Templates { typedef TreeIteratorBase< ITK_TEMPLATE_1 x > \
+                                                  TreeIteratorBase##y; } \
+  }
+
+#if ITK_TEMPLATE_EXPLICIT
+# include "Templates/itkTreeIteratorBase+-.h"
 #endif
 
+#if ITK_TEMPLATE_TXX
+#include "itkTreeIteratorBase.txx"
+#endif
 
 #endif

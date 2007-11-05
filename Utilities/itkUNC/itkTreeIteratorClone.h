@@ -43,7 +43,9 @@ public:
     m_Pointer(0)
     { 
     if(p.m_Pointer!=NULL)
+      {
       m_Pointer=p.m_Pointer->Clone();
+      }
     }
   
   /** Constructor to pointer p  */
@@ -51,7 +53,9 @@ public:
     m_Pointer(0)
     { 
     if(p!=NULL) 
+      {
       m_Pointer=p->Clone();
+      }
     }                             
   
   /** Constructor to reference p  */

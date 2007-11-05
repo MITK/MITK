@@ -103,17 +103,6 @@ PostOrderTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
-/** Go to the next node  (const function) */
-/*
-template <class TTreeType>
-const typename PostOrderTreeIterator<TTreeType>::TreeNodeType* 
-PostOrderTreeIterator<TTreeType>::Next() const
-{
-  m_Position = const_cast<TreeNodeType*>(FindNextNode());
-  return m_Position;
-}
-*/
-
 /** Find the next node */
 template <class TTreeType>
 const typename PostOrderTreeIterator<TTreeType>::TreeNodeType* 

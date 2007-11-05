@@ -70,13 +70,18 @@ TreeIteratorBase<TTreeType>::Get() const
 
 /** Set the current value of the node */
 template <class TTreeType>
-void
+bool
 TreeIteratorBase<TTreeType>::Set(ValueType element) 
 {
-  assert(m_Position);
-  m_Position->Set(element);
-  m_Tree->Modified();
-  m_Tree->InvokeEvent( TreeNodeChangeEvent<TTreeType>(*this) );  
+  if ( m_Position )
+  {
+    m_Position->Set(element);
+    m_Tree->Modified();
+    m_Tree->InvokeEvent( TreeNodeChangeEvent<TTreeType>(*this) );
+    return true;
+   }
+    
+   return false;
 }
 
 /** Add a value to the node. This creates a new child node */
@@ -86,11 +91,11 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
 {
   if ( m_Position == NULL && m_Root == NULL ) 
     {
-    bool returnValue = false;  
+    bool returnValue = false;
+    
     if ( m_Tree ) 
-      {
       returnValue = const_cast<TTreeType*>(m_Tree)->SetRoot( element );      
-      }
+
       // signal AddEvent for self
       m_Root = dynamic_cast<const TreeNodeType*>(const_cast<TTreeType*>(m_Tree)->GetRoot());
       m_Position =  const_cast<TreeNodeType*>(m_Root);
@@ -99,9 +104,7 @@ TreeIteratorBase<TTreeType>::Add(ValueType element)
       return returnValue;
     } 
   else if ( m_Position == NULL )    
-    {
     return false;    
-    }
   
   typename TreeNodeType::Pointer node = TreeNodeType::New();
   node->Set(element);
@@ -204,6 +207,7 @@ TreeIteratorBase<TTreeType>::GetSubTree() const
   tree->SetRoot(m_Position);
   tree->SetSubtree(true);
   return tree;
+  return NULL;
 }
 
 /** Return true of the current node has a child */
@@ -301,8 +305,9 @@ TreeIteratorBase<TTreeType>::Disconnect()
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
   parent->Remove( const_cast<TreeNodeType*>(m_Position) );
   m_Tree->Modified();
+  int size = m_Position->CountChildren();
 
-  while (m_Position->CountChildren() > 0) 
+  for( int i=0; i< size; i++ ) 
     {
     TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));	// always add first child in list, because AddChild() removes the added node from its former parent (== m_position)
     parent->AddChild( child );
@@ -320,7 +325,7 @@ TreeIteratorBase<TTreeType>*
 TreeIteratorBase<TTreeType>::Children() 
 {
   itkGenericOutputMacro("Not implemented yet");
-  ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet", ITK_LOCATION);
+  ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet");
   throw e_; /* Explicit naming to work around Intel compiler bug.  */
   return 0;
 }
@@ -344,7 +349,7 @@ template <class TTreeType>
 TreeIteratorBase<TTreeType>* TreeIteratorBase<TTreeType>::Parents() 
 {
   itkGenericOutputMacro("Not implemented yet");
-  ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet",ITK_LOCATION);
+  ::itk::ExceptionObject e_(__FILE__, __LINE__, "Not implemented yet");
   throw e_; /* Explicit naming to work around Intel compiler bug.  */ 
   return 0;
 }
@@ -440,7 +445,7 @@ TreeIteratorBase<TTreeType>::GetNode() const
 
 /** Get the root */
 template <class TTreeType>
-typename TreeIteratorBase<TTreeType>::TreeNodeType*
+typename TreeIteratorBase<TTreeType>::TreeNodeType* &
 TreeIteratorBase<TTreeType>::GetRoot() 
 {
   return const_cast<TreeNodeType*>(m_Root);
@@ -448,7 +453,7 @@ TreeIteratorBase<TTreeType>::GetRoot()
 
 /** Get the root (const) */
 template <class TTreeType>
-const typename TreeIteratorBase<TTreeType>::TreeNodeType*
+const typename TreeIteratorBase<TTreeType>::TreeNodeType* &
 TreeIteratorBase<TTreeType>::GetRoot() const
 {
   return m_Root;
@@ -480,7 +485,8 @@ TreeIteratorBase<TTreeType>::Remove()
     
   m_Position->SetParent(NULL); // we don't have a parent anymore
   m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
-  while (m_Position->CountChildren() > 0)  // remove all children
+  int size = m_Position->CountChildren(); // remove all children
+  for( int i=0; i< size; i++ ) 
     {
     //always remove first child (id 0)
     TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));

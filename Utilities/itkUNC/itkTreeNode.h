@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <iostream>
 #include <itkObject.h>
-#include <itkObjectFactory.h>
 
 namespace itk
 {
@@ -61,7 +60,7 @@ public:
   const TValueType& Get() const;
 
   /** Set the current value of the node */
-  TValueType Set(const TValueType data);
+  TValueType Set( TValueType data);
 
   /** Get the child node */
   TreeNode<TValueType>* GetChild( int number ) const;
@@ -102,14 +101,10 @@ public:
   virtual void AddChild( int number, TreeNode<TValueType> *node );
 
   /** Get the children list */
-#if !defined(CABLE_CONFIGURATION)
   virtual ChildrenListType* GetChildren( unsigned int depth=0, char * name=NULL) const;
-#endif
   
   /** Get the internal list of children */
-#if !defined(CABLE_CONFIGURATION)
   virtual ChildrenListType& GetChildrenList() {return m_Children;}
-#endif
 
   /** Set the data of the node */
   //virtual void SetData(TValueType data) {m_Data = data;}
@@ -126,27 +121,12 @@ protected:
   Pointer m_Parent;
   mutable bool m_Freeing;
   ChildrenListType m_Children;
-private:
-  TreeNode(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
 };
 
 } // end namespace itk
 
-// Define instantiation macro for this template.
-#define ITK_TEMPLATE_TreeNode(_, EXPORT, x, y) namespace itk { \
-  _(1(class EXPORT TreeNode< ITK_TEMPLATE_1 x >)) \
-  namespace Templates { typedef TreeNode< ITK_TEMPLATE_1 x > \
-                                                  TreeNode##y; } \
-  }
-
-#if ITK_TEMPLATE_EXPLICIT
-# include "Templates/itkTreeNode+-.h"
-#endif
-
-#if ITK_TEMPLATE_TXX
+#ifndef ITK_MANUAL_INSTANTIATION
 #include "itkTreeNode.txx"
 #endif
-
 
 #endif

@@ -116,9 +116,20 @@ LeafTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
+/** Const next */
+/*
+template <class TTreeType>
+const typename LeafTreeIterator<TTreeType>::TreeNodeType* 
+LeafTreeIterator<TTreeType>::Next() const
+{
+  m_Position = const_cast<TreeNodeType* >(FindNextNode());
+  return m_Position;
+}
+*/
+
 /** Find the next node given the position */
 template <class TTreeType>
-const typename Le  afTreeIterator<TTreeType>::TreeNodeType* 
+const typename LeafTreeIterator<TTreeType>::TreeNodeType* 
 LeafTreeIterator<TTreeType>::FindNextNode() const 
 {
   PreOrderTreeIterator<TTreeType> it(this->m_Tree,this->m_Position); 

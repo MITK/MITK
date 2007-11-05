@@ -90,6 +90,17 @@ PreOrderTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
+/** Return the next node const */
+/*
+template <class TTreeType>
+const typename PreOrderTreeIterator<TTreeType>::TreeNodeType* 
+PreOrderTreeIterator<TTreeType>::Next() const
+{
+  this->m_Position = const_cast<TreeNodeType* >(FindNextNode());
+  return this->m_Position;
+}
+*/
+
 /** Find the next node */
 template <class TTreeType>
 const typename PreOrderTreeIterator<TTreeType>::TreeNodeType* 
@@ -171,3 +182,4 @@ TreeIteratorBase<TTreeType>* PreOrderTreeIterator<TTreeType>::Clone()
 } // end namespace itk
 
 #endif
+

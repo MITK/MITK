@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
-#include "mitkBaseData.h"
+#include <itkObject.h>
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -43,10 +43,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   
-class TransferFunction : public mitk::BaseData
+  class TransferFunction : public itk::Object
 {
 public:
   
+  mitkClassMacro(TransferFunction, itk::DataObject);
   itkSetMacro(Min,int);
   itkSetMacro(Max,int);
   itkGetMacro(Min,int);
@@ -58,7 +59,6 @@ public:
   void InitializeByMitkImage(const mitk::Image* image);
   void InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram);
   
-  mitkClassMacro(TransferFunction, BaseData);
   itkNewMacro(Self);
   
   TransferFunction();
@@ -116,12 +116,6 @@ public:
   \brief Removes all rgb controlpoints
   */
   void ClearRGBPoints();
-    
-  
-  virtual void SetRequestedRegionToLargestPossibleRegion();
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  virtual bool VerifyRequestedRegion();
-  virtual void SetRequestedRegion(itk::DataObject *data);
   
 protected:
   

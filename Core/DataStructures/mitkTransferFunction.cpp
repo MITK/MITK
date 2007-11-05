@@ -226,26 +226,6 @@ void mitk::TransferFunction::ClearRGBPoints()
   m_ColorTransferFunction->RemoveAllPoints();
 }
 
-void mitk::TransferFunction::SetRequestedRegionToLargestPossibleRegion()
-{
-    //nothing
-}
-
-bool mitk::TransferFunction::RequestedRegionIsOutsideOfTheBufferedRegion()
-{
-  return false;    
-}
-
-bool mitk::TransferFunction::VerifyRequestedRegion()
-{
-  return true;
-}
-
-void mitk::TransferFunction::SetRequestedRegion(itk::DataObject*)
-{
-    //nothing
-}
-
 void mitk::TransferFunction::InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram) {
   m_Histogram = histogram;
   m_Min = (int)GetHistogram()->GetBinMin(0,0);

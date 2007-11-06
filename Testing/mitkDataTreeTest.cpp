@@ -744,5 +744,6 @@ int TreeDestructionTest(bool useClearMethod) {
     image6 = NULL;
     memcheck;
     std::cout<<"[PASSED]"<<std::endl;
+    return EXIT_SUCCESS;
   }
 

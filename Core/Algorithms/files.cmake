@@ -14,6 +14,7 @@ SET(CPP_FILES
   mitkDiffImageApplier.cpp
   mitkDopplerToStrainRateFilter.cpp
   mitkExtractImageFilter.cpp
+  mitkExtractDirectedPlaneImageFilter.cpp
   mitkGeometry2DDataToSurfaceFilter.cpp
   mitkGeometryClipImageFilter.cpp
   mitkGeometryDataSource.cpp

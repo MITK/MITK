@@ -21,8 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkStateMachine.h"
+#include "mitkToolEvents.h"
 
 #include <iostream>
+#include <string>
+#include <itkObject.h>
 
 namespace mitk
 {
@@ -57,12 +60,14 @@ class ToolManager;
 
   \warning Only to be instantiated by mitk::ToolManager (because SetToolManager has to be called). All other uses are unsupported.
 
+  \TODO create a good set of default tool events with and without parameters and way to easily add new events
+
   $Author$
 */
 class Tool : public StateMachine
 {
   public:
-    
+
     mitkClassMacro(Tool, StateMachine);
 
     // no New(), there should only be subclasses
@@ -89,6 +94,27 @@ class Tool : public StateMachine
       You can group several tools by assigning a group name. Graphical tool selectors might use this information to group tools. (What other reason could there be?)
     */
     virtual const char* GetGroup() const;
+
+    /**
+     * \brief Interface for GUI creation.
+     *
+     * This is the basic interface for creation of a GUI object belonging to one tool.
+     *
+     * Tools that support a GUI (e.g. for display/editing of parameters) should follow some rules:
+     *  
+     *  - A Tool and its GUI are two separate classes
+     *  - There may be several instances of a GUI at the same time.
+     *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
+     *  - The GUI part inherits both from itk::Object and some GUI toolkit class
+     *  - The GUI class name HAS to be constructed like tool->GetClassName() + "Toolkit", where "Toolkit" is e.g. "Qt" (currently the only one possible)
+     *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
+     *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
+     *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
+     *  - Calling methods of a tool by its GUI is done directly. 
+     *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool. 
+     *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a method call.
+     */
+    virtual itk::Object::Pointer GetGUI(const std::string& toolkit);
 
   protected:
     

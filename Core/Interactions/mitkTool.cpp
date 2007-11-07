@@ -1,4 +1,5 @@
 #include "mitkTool.h"
+#include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)
 :StateMachine(type)
@@ -27,7 +28,32 @@ void mitk::Tool::Deactivated()
 {
   StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
+    
+itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkit)
+{
+  itk::Object::Pointer object;
 
+  std::string classname = this->GetNameOfClass();
+  std::string guiClassname = classname + toolkit;
+
+  std::list<itk::LightObject::Pointer> allGUIs = itk::ObjectFactoryBase::CreateAllInstance(guiClassname.c_str());
+  for( std::list<itk::LightObject::Pointer>::iterator iter = allGUIs.begin();
+       iter != allGUIs.end();
+       ++iter )
+  {
+    if (object.IsNull())
+    {
+      object = dynamic_cast<itk::Object*>( iter->GetPointer() );
+    }
+    else
+    {
+      std::cerr << "ERROR: There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
+      return NULL; // people should see and fix this error
+    }
+  }
+
+  return object;
+}
 
 //--------------------------------------------------------------------------------
 //----          ToolLogger

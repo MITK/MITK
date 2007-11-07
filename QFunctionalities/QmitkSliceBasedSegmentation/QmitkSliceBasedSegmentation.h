@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionality.h"
 
-#include "mitkConfig.h" // IMPORTANT: this defines or undefines BUILD_TESTING !
+#include "mitkTestingConfig.h" // IMPORTANT: this defines or undefines BUILD_TESTING !
 
 #include <string>
 #include <itkImage.h>

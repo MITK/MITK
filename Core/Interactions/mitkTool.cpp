@@ -29,12 +29,12 @@ void mitk::Tool::Deactivated()
   StateMachine::ResetStatemachineToStartState(); // forget about the past
 }
     
-itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkit)
+itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
 {
   itk::Object::Pointer object;
 
   std::string classname = this->GetNameOfClass();
-  std::string guiClassname = classname + toolkit;
+  std::string guiClassname = toolkitPrefix + classname + toolkitPostfix;
 
   std::list<itk::LightObject::Pointer> allGUIs = itk::ObjectFactoryBase::CreateAllInstance(guiClassname.c_str());
   for( std::list<itk::LightObject::Pointer>::iterator iter = allGUIs.begin();

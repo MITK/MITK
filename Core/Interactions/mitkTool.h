@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkStateMachine.h"
 #include "mitkToolEvents.h"
+#include "itkObjectFactoryBase.h"
+#include "itkVersion.h"
+#include "mitkToolFactoryMacro.h"
 
 #include <iostream>
 #include <string>
@@ -106,7 +109,7 @@ class Tool : public StateMachine
      *  - There may be several instances of a GUI at the same time.
      *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
      *  - The GUI part inherits both from itk::Object and some GUI toolkit class
-     *  - The GUI class name HAS to be constructed like tool->GetClassName() + "Toolkit", where "Toolkit" is e.g. "Qt" (currently the only one possible)
+     *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g. MyTool -> wxMyToolGUI 
      *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
      *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
      *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
@@ -114,7 +117,7 @@ class Tool : public StateMachine
      *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool. 
      *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a method call.
      */
-    virtual itk::Object::Pointer GetGUI(const std::string& toolkit);
+    virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
 
   protected:
     

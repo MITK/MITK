@@ -55,6 +55,8 @@ class FillRegionTool : public SetRegionTool
 
 };
 
+MITK_TOOL_FACTORY_MACRO(FillRegionTool, "MITK 2D contour drawing tool (add contour)")
+
 } // namespace
 
 #endif

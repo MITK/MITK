@@ -61,6 +61,8 @@ class SubstractContourTool : public ContourTool
 
 };
 
+MITK_TOOL_FACTORY_MACRO(SubstractContourTool, "MITK 2D contour drawing tool (substract contour)");
+
 } // namespace
 
 #endif

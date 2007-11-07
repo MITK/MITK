@@ -1,7 +1,7 @@
 SET(CPP_FILES
   mitkAction.cpp
   mitkAddContourTool.cpp
-  mitkAddContourToolFactory.cpp
+  #mitkAddContourToolFactory.cpp
   mitkAffineInteractor.cpp
   mitkConferenceEventMapper.cpp
   mitkConnectPointsInteractor.cpp
@@ -9,19 +9,19 @@ SET(CPP_FILES
   mitkContourTool.cpp
   mitkCoordinateSupplier.cpp
   mitkCorrectorTool2D.cpp
-  mitkCorrectorTool2DFactory.cpp
+  #mitkCorrectorTool2DFactory.cpp
   mitkDisplayCoordinateOperation.cpp
   mitkDisplayInteractor.cpp
   mitkDisplayPositionEvent.cpp
   mitkDisplayVectorInteractor.cpp
   mitkEraseRegionTool.cpp
-  mitkEraseRegionToolFactory.cpp
+  #mitkEraseRegionToolFactory.cpp
   mitkEvent.cpp
   mitkEventDescription.cpp
   mitkEventMapper.cpp
   mitkExtrudedContourInteractor.cpp
   mitkFillRegionTool.cpp
-  mitkFillRegionToolFactory.cpp
+  #mitkFillRegionToolFactory.cpp
   mitkGlobalInteraction.cpp
   mitkHierarchicalInteractor.cpp
   # mitkInteractionDebug.cpp
@@ -36,7 +36,7 @@ SET(CPP_FILES
   mitkPositionTracker.cpp
   mitkPrimStripInteractor.cpp
   mitkRegionGrowingTool.cpp
-  mitkRegionGrowingToolFactory.cpp
+  #mitkRegionGrowingToolFactory.cpp
   mitkSeedsInteractor.cpp
   mitkSegTool2D.cpp
   mitkSegTool3D.cpp
@@ -46,7 +46,7 @@ SET(CPP_FILES
   mitkStateMachine.cpp
   mitkStateMachineFactory.cpp
   mitkSubstractContourTool.cpp
-  mitkSubstractContourToolFactory.cpp
+  #mitkSubstractContourToolFactory.cpp
   mitkTool.cpp
   mitkTransition.cpp
 )

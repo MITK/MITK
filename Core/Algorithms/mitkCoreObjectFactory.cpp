@@ -85,12 +85,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
-#include "mitkAddContourToolFactory.h"
-#include "mitkSubstractContourToolFactory.h"
-#include "mitkRegionGrowingToolFactory.h"
-#include "mitkCorrectorTool2DFactory.h"
-#include "mitkFillRegionToolFactory.h"
-#include "mitkEraseRegionToolFactory.h"
+#include "mitkAddContourTool.h"
+#include "mitkSubstractContourTool.h"
+#include "mitkRegionGrowingTool.h"
+#include "mitkCorrectorTool2D.h"
+#include "mitkFillRegionTool.h"
+#include "mitkEraseRegionTool.h"
 
 
 #include "mitkUnstructuredGrid.h"

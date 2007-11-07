@@ -105,6 +105,8 @@ class RegionGrowingTool : public SegTool2D
     bool m_FillFeedbackContour;
 };
 
+MITK_TOOL_FACTORY_MACRO(RegionGrowingTool, "MITK 2D region growing tool")
+
 } // namespace
 
 #endif

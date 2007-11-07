@@ -92,6 +92,8 @@ class CorrectorTool2D : public SegTool2D
     Image::Pointer m_WorkingSlice;
 };
 
+MITK_TOOL_FACTORY_MACRO(CorrectorTool2D, "MITK 2D correction tool")
+
 } // namespace
 
 #endif

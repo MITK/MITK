@@ -1,6 +1,7 @@
 #include "QmitkToolSelectionBox.h" 
 #include <qtoolbutton.h>
 #include <qobjectlist.h>
+#include <qtooltip.h>
 
 #include <itkCommand.h>
 
@@ -278,7 +279,9 @@ void QmitkToolSelectionBox::RecreateButtons()
     button->setToggleButton( true );
     QString label( "&" );
     label += tool->GetName();
+    QString tooltip = tool->GetName();
     button->setTextLabel( label );              // a label
+    QToolTip::add( button, tooltip );
     button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
     QString firstLetter = QString( tool->GetName() );
     firstLetter.truncate( 1 );

@@ -21,8 +21,6 @@
 
 namespace itk{
 
-//template <class TTreeType> class TreeContainer;
-
 template <class TTreeType>
 class RootTreeIterator : public TreeIteratorBase<TTreeType> 
 {
@@ -38,15 +36,22 @@ public:
   RootTreeIterator( TreeType* tree, const TreeNodeType* start=NULL);
 
   /** Return the type of the iterator */
-  int GetType() const;  
+  int GetType() const;
+
+  /** Clone function */
   TreeIteratorBase<TTreeType>* Clone();
 
 protected:
+
+  /** Return the next node */
   const ValueType& Next();
+
+  /** Return true if the next node exists */
   bool HasNext() const;
 
 private:
 
+  /** Find the next node */
   const TreeNodeType* FindNextNode() const;
 };
 
@@ -64,7 +69,6 @@ RootTreeIterator<TTreeType>::RootTreeIterator(TTreeType* tree, const TreeNodeTyp
   this->m_Position = this->m_Begin;
 }
 
-
 /** Return the type of the iterator */
 template <class TTreeType>
 int 
@@ -73,7 +77,7 @@ RootTreeIterator<TTreeType>::GetType() const
   return TreeIteratorBase<TTreeType>::ROOT;
 }
 
-/** has a next node?*/
+/** Return true if the next node exists */
 template <class TTreeType>
 bool 
 RootTreeIterator<TTreeType>::HasNext() const
@@ -84,7 +88,6 @@ RootTreeIterator<TTreeType>::HasNext() const
     }
   return false;
 }
-
 
 /** Go to the next node */
 template <class TTreeType>
@@ -122,8 +125,7 @@ RootTreeIterator<TTreeType>::FindNextNode() const
   return this->m_Position->GetParent();
 }
 
-
-/** */
+/** Clone function */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* RootTreeIterator<TTreeType>::Clone() 
 {

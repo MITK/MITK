@@ -21,7 +21,6 @@
 
 namespace itk{
 
-
 template <class TTreeType>
 class InOrderTreeIterator : public TreeIteratorBase<TTreeType> 
 {
@@ -39,14 +38,21 @@ public:
 
   /** Get the type of iterator */
   int GetType() const;
+  
+  /** Clone function */
   TreeIteratorBase<TTreeType>* Clone();
 
 protected:
+
+  /** Return the next node */
   const ValueType& Next();
+
+  /** Return true if the next node exists */
   bool HasNext() const;
 
 private:
 
+  /** Find the next node */
   const TreeNodeType* FindNextNode() const;
 
 };
@@ -66,7 +72,6 @@ InOrderTreeIterator<TTreeType>::InOrderTreeIterator( TTreeType* tree, TreeNodeTy
     :TreeIteratorBase<TTreeType>(tree,start)
 {
 }
-
 
 /** Get the type of the iterator */
 template <class TTreeType>
@@ -94,8 +99,8 @@ template <class TTreeType>
 const typename InOrderTreeIterator<TTreeType>::ValueType&
 InOrderTreeIterator<TTreeType>::Next() 
 {
-  m_Position =  const_cast<TreeNodeType* >(FindNextNode());
-  return m_Position->Get();
+  this->m_Position =  const_cast<TreeNodeType* >(FindNextNode());
+  return this->m_Position->Get();
 }
 
 /** Const next */
@@ -115,23 +120,23 @@ template <class TTreeType>
 const typename InOrderTreeIterator<TTreeType>::TreeNodeType* 
 InOrderTreeIterator<TTreeType>::FindNextNode() const 
 {
-  if ( m_Position == NULL )
+  if ( this->m_Position == NULL )
     {
     return NULL;
     }
   
-  if ( m_Position->HasChildren() )
+  if ( this->m_Position->HasChildren() )
     {
-    return m_Position->GetChild(0);
+    return this->m_Position->GetChild(0);
     }
     
-  if ( !m_Position->HasParent() )
+  if ( !this->m_Position->HasParent() )
     {
     return NULL;
     }
   
-  TreeNodeType* child = m_Position;
-  TreeNodeType* parent = m_Position->GetParent();
+  TreeNodeType* child = this->m_Position;
+  TreeNodeType* parent = this->m_Position->GetParent();
 
   int ChildPosition = parent->ChildPosition( child );
   int lastChildPosition = parent->CountChildren() - 1;
@@ -152,7 +157,7 @@ InOrderTreeIterator<TTreeType>::FindNextNode() const
     parent = parent->GetParent();
 
     // Subtree
-    if( parent->ChildPosition( m_Root ) >= 0 )
+    if( parent->ChildPosition( this->m_Root ) >= 0 )
       {
       return NULL;
       }
@@ -171,11 +176,11 @@ InOrderTreeIterator<TTreeType>::FindNextNode() const
   return NULL;
 }
 
-/** */
+/** Clone function */
 template <class TTreeType>
 TreeIteratorBase<TTreeType>* InOrderTreeIterator<TTreeType>::Clone() 
 {
-  InOrderTreeIterator* clone = new InOrderTreeIterator( const_cast<TTreeType*>(m_Tree) );
+  InOrderTreeIterator* clone = new InOrderTreeIterator( const_cast<TTreeType*>(this->m_Tree) );
   *clone = *this;
   return clone;
 }

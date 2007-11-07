@@ -305,7 +305,6 @@ TreeIteratorBase<TTreeType>::Disconnect()
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(m_Position->GetParent());
   parent->Remove( const_cast<TreeNodeType*>(m_Position) );
   m_Tree->Modified();
-  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
   int size = m_Position->CountChildren();
 
   for( int i=0; i< size; i++ ) 
@@ -313,6 +312,8 @@ TreeIteratorBase<TTreeType>::Disconnect()
     TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));	// always add first child in list, because AddChild() removes the added node from its former parent (== m_position)
     parent->AddChild( child );
     }
+  
+  m_Tree->InvokeEvent( TreeRemoveEvent<TTreeType>( *this ) );
 
   m_Position = NULL;
   return true;
@@ -426,27 +427,6 @@ int TreeIteratorBase<TTreeType>::Count()
   return size;
 }
 
-/**  Count the number of nodes */
-template <class TTreeType>
-int TreeIteratorBase<TTreeType>::Count(TreeNodeType* node ) 
-{
-  int size = 0;
-
-  if ( !node->hasChildren() )
-    {
-    return 0;
-    }
-
-  TreeIteratorBase<TTreeType> it(this,node);
-
-  while ( !it.IsAtEnd() )
-   {
-   ++it; 
-   size++;
-   }
-  return size;
-}
-
 /** Get the node pointed by the iterator */
 template <class TTreeType>
 typename TreeIteratorBase<TTreeType>::TreeNodeType* 
@@ -488,44 +468,36 @@ TreeIteratorBase<TTreeType>::Remove()
     {
     return false;
     }
-  
+    
+  //keep node alive just a bit longer (for the notification)
+  typename TreeNodeType::Pointer position = m_Position;
+
   if ( m_Position->HasParent() )
     {
     TreeNodeType* parent = m_Position->GetParent();
-    //keep node alive just a bit longer
-    typename TreeNodeType::Pointer position = m_Position;
     parent->Remove( m_Position );                        // removes this node (and implicitly all children, too)
-    //restore parent, which was set to NULL in the previous line ( so the event receiver can still find the parent )
-//  m_Position->SetParent(parent);                       // restoring the parent did not work since about revision 7010 
-                                                         // and the new SetParent() behaviour does not allow calling randomly
-    m_Tree->Modified();
-//   m_Position->SetParent(NULL);
-    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );    
-
-    int size = m_Position->CountChildren();
-    for( int i=0; i< size; i++ ) 
-      {
-      //always remove first child (id 0)
-      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));
-      m_Position->Remove( child );
-      }
     }
   else if (m_Root == m_Position)
     {
     m_Root = NULL;
-    m_Tree->SetRoot(NULL);
-    m_Tree->Modified();
-    m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
-    int size = m_Position->CountChildren();
-    for( int i=0; i< size; i++ ) 
-      {
-      //always remove first child (id 0)
-      TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));
-      m_Position->Remove( child );
-      }
+    m_Tree->SetRoot(NULL); // this won't do anything if root is already != NULL  ==> root cannot be removed
+    }
+    
+  m_Position->SetParent(NULL); // we don't have a parent anymore
+  m_Tree->InvokeEvent( TreePruneEvent<TTreeType>(*this) );
+  int size = m_Position->CountChildren(); // remove all children
+  for( int i=0; i< size; i++ ) 
+    {
+    //always remove first child (id 0)
+    TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));
+    m_Position->Remove( child );
     }
 
-  m_Position = NULL;  // Smart pointer
+  position = NULL;
+  m_Position = NULL;  // Smart pointer, deletes *m_Position
+  
+  m_Tree->Modified();
+
   return true;
 }
 

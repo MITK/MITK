@@ -620,9 +620,6 @@ public:
 
   /// change notifications from the data tree
   void TreeChange(const itk::EventObject &);
-  //void TreeAdd(const itk::EventObject &);
-  //void TreePrune(const itk::EventObject &);
-  //void TreeRemove(const itk::EventObject &);
 
   /// Call with true to enable updates whenever the data tree changes. Default is false,
   /// which requires you to call Update() from time to time
@@ -679,9 +676,6 @@ private:
   const mitk::BaseRenderer* m_Renderer;
 
   unsigned long  m_TreeChangeConnection;
-  //unsigned long  m_TreeAddConnection;
-  //unsigned long  m_TreePruneConnection;
-  //unsigned long  m_TreeRemoveConnection;
 
   // remember the most recently selected item
   //ItemPointer m_LastSelectedItem;

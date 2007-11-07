@@ -301,8 +301,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
             sprintf(buffer,"%d",j+1);
             l.append(buffer);
           }
-          mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-          OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+          if (unselectedColor != NULL)
+          {
+            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+            float* rgb; rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
+            OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l, rgb);
+          }
+          else
+          {
+            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+          }
        /*   this->WriteTextXY(pt2d[0] + text2dDistance, 
             pt2d[1] + text2dDistance, l,renderer);*/
         }

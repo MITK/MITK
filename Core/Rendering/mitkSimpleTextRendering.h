@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <map>
 
+#include "mitkColorProperty.h"
+
 class vtkRenderer;
 class vtkCamera;
 class vtkTextProperty;
@@ -58,7 +60,7 @@ public:
   * As return value, a text label id is returned, which may
   * be used for further setting of text appereance.
   */
-  int  AddTextLabel(double posX, double posY, std::string text);
+  int  AddTextLabel(double posX, double posY, std::string text, float* rgb = NULL);
   
   /**
   * Removes a text label from the label collection.

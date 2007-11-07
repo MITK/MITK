@@ -687,12 +687,12 @@ void mitk::OpenGLRenderer::SetCameraController(CameraController* cameraControlle
   m_CameraController->SetRenderer(this);
 }
 
-int mitk::OpenGLRenderer::WriteSimpleText(double posX, double posY, std::string text)
+int mitk::OpenGLRenderer::WriteSimpleText(double posX, double posY, std::string text, float* rgb)
 {
   if(m_SimpleTextRenderer.IsNull())
     m_SimpleTextRenderer = mitk::SimpleTextRendering::New();
 
-  return m_SimpleTextRenderer->AddTextLabel(posX,posY,text);
+  return m_SimpleTextRenderer->AddTextLabel(posX,posY,text, rgb);
 }
 
 vtkTextProperty* mitk::OpenGLRenderer::GetTextLabelProperty(int text_id)

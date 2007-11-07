@@ -140,7 +140,7 @@ void mitk::SimpleTextRendering::ClearTextLabelCollection()
   m_TextCollection.clear();
 }
 
-int mitk::SimpleTextRendering::AddTextLabel(double posX, double posY, std::string text)
+int mitk::SimpleTextRendering::AddTextLabel(double posX, double posY, std::string text, float* rgb)
 {
   if(text.size() > 0)
   {
@@ -148,7 +148,14 @@ int mitk::SimpleTextRendering::AddTextLabel(double posX, double posY, std::strin
 
     textActor->SetPosition(posX,posY);
     textActor->SetInput(text.c_str());
-    textActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f); //TODO: Read color from node property
+    if (rgb != NULL)
+    {
+      textActor->GetTextProperty()->SetColor(rgb[0], rgb[1], rgb[2]);
+    }
+    else
+    {
+     textActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f); //TODO: Read color from node property
+    }
     int text_id = m_TextCollection.size();
     m_TextCollection.insert(TextMapType::value_type(text_id,textActor));
     return text_id;

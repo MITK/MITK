@@ -380,10 +380,9 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   vtkFloatingPointType bounds[6];
   bool boundsInitialized = false;
 
-  int i;
-  for ( i = 0; i < 6; ++i )
+  for ( int i = 0; i < 6; ++i )
   {
-    bounds[0] = 0.0;
+    bounds[i] = 0.0;
   }
 
 

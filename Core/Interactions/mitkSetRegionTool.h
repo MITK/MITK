@@ -60,10 +60,15 @@ class SetRegionTool : public SegTool2D
     
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
+    virtual bool OnInvertLogic  (Action*, const StateEvent*);
 
     int m_PaintingPixelValue;
 
     bool m_FillContour;
+    bool m_StatusFillWholeSlice;
+
+    Contour::Pointer m_SegmentationContourInWorldCoordinates;
+    Contour::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

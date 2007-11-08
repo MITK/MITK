@@ -6,9 +6,10 @@
 #include "ipSegmentation.h"
 
 mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
-:SegTool2D("PressMoveRelease"),
+:SegTool2D("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue),
- m_FillContour(false)
+ m_FillContour(false),
+ m_StatusFillWholeSlice(false)
 {
 }
 
@@ -91,7 +92,6 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     *
     *  - If the initial seed point is 1, then ...
     *    we now do the same (running to the right) until we hit a 1
-    *    TODO this is done because I don't understand the commented code and it seems to make no difference
     *
     *  In both cases the found contour point is used to extract a contour and
     *  then a test is applied to find out if the initial seed point is contained
@@ -123,26 +123,8 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
         inSeg = false;
         lineStart = 0;
         lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
-/**/    break;
+        break;
       }
-/*/
-      else if ( ( data[oneContourOffset] == 0 ) && !inSeg ) // pixel 0 and inside-flag unset: this happens at the second pixel after leaving a filled region
-      {
-        ++lineStart;
-        if ( lineStart > originalPicSlice->n[0] ) break;
-        bool colEmpty = true;
-        for (unsigned int  i = oneContourOffset % rowSize; i <  size; i += rowSize) // scan all pixels of the current column(!) beginning in column lineStart 
-        {
-          if ( data[oneContourOffset] > 0 )
-          {
-            colEmpty = false;
-            break;
-          }
-        }
-        if (colEmpty)
-          break;
-      }
-*/
       else // pixel 1, inside-flag doesn't matter: this happens while we are inside a filled region
       {
         inSeg = true; // first iteration lands here
@@ -176,11 +158,6 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
-      /*
-      newPoint[0] = contourPoints[ 2 * index + 0 ] - 0.5;
-      newPoint[1] = contourPoints[ 2 * index + 1] - 0.5;
-      newPoint[2] = 0;
-      */
       newPoint[0] = contourPoints[ 2 * index + 0 ];
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
@@ -188,14 +165,39 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       contourInImageIndexCoordinates->AddVertex( newPoint );
     }
 
-    Contour::Pointer contourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
+    m_SegmentationContourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 
     // 3. Show the contour
-    SegTool2D::SetFeedbackContour( *contourInWorldCoordinates );
+    SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
     
     SegTool2D::SetFeedbackContourVisible(true);
     positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
   }
+
+  // always generate a second contour, containing the whole image (used when CTRL is pressed)
+  {
+    // copy point from float* to mitk::Contour 
+    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    contourInImageIndexCoordinates->Initialize();
+    Point3D newPoint;
+    newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex( newPoint );
+    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = 0; newPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex( newPoint );
+    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex( newPoint );
+    newPoint[0] = 0; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex( newPoint );
+
+    m_WholeImageContourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
+
+    // 3. Show the contour
+    SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
+    
+    SegTool2D::SetFeedbackContourVisible(true);
+    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  }
+
 
   free(contourPoints);
 
@@ -213,7 +215,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   assert( positionEvent->GetSender()->GetRenderWindow() );
   positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
   
-  if (!m_FillContour) return true;
+  if (!m_FillContour && !m_StatusFillWholeSlice) return true;
   
   if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
 
@@ -261,6 +263,39 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   {
     std::cout << "SegTool2D could not determine which slice of the image you are drawing on." << std::endl;
   }
+
+  m_WholeImageContourInWorldCoordinates = NULL;
+  m_SegmentationContourInWorldCoordinates = NULL;
+
+  return true;
+}
+
+/**
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0. 
+*/
+bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+{
+  if (!SegTool2D::OnInvertLogic(action, stateEvent)) return false;
+  
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  if (m_StatusFillWholeSlice)
+  {
+    // use contour extracted from image data
+    if (m_SegmentationContourInWorldCoordinates.IsNotNull())
+      SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
+    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  } 
+  else
+  {
+    // use some artificial contour
+    if (m_WholeImageContourInWorldCoordinates.IsNotNull())
+      SegTool2D::SetFeedbackContour( *m_WholeImageContourInWorldCoordinates );
+    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  }
+
+  m_StatusFillWholeSlice = !m_StatusFillWholeSlice;
 
   return true;
 }

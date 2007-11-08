@@ -54,6 +54,7 @@ mitk::Geometry3D::Geometry3D()
 mitk::Geometry3D::~Geometry3D()
 {
   m_VtkMatrix->Delete();
+  m_VtkIndexToWorldTransform->Delete();
 }
 
 

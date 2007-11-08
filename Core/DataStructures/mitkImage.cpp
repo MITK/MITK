@@ -626,7 +626,7 @@ void mitk::Image::Initialize()
   }
   m_CompleteData = NULL;
 
-  if(m_TimeSelectorForExtremaObject.IsNull())
+  if(m_TimeSelectorForExtremaObject.IsNull() && (GetReferenceCount() > 0))
   {
     m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
 

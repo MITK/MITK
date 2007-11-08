@@ -196,7 +196,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   affectedSlice = ROUND( indexPoint[affectedDimension] );
 
   // check if this index is still within the image
-  if ( affectedSlice < 0 || affectedSlice > image->GetDimension(affectedDimension) ) return false;
+  if ( affectedSlice < 0 || affectedSlice > static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
  
   return true;
 }

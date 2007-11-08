@@ -142,11 +142,11 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
         ipUInt2_t dist = (ipUInt2_t)(10.0 * sqrt( dists[0] ));
         //ipUInt2_t grad = (ipUInt2_t)(1000.0 * ipMITKSegmentationGetDistGradient( cofs, seg ));
         *((ipUInt2_t*)distPic->data + cofs) = dist;
-        //*((ipUInt2_t*)gradPic->data + cofs) = grad;
+        // *((ipUInt2_t*)gradPic->data + cofs) = grad;
       }
       else {
         *((ipUInt2_t*)distPic->data + cofs) = 0;
-        //*((ipUInt2_t*)gradPic->data + cofs) = 1000;
+        // *((ipUInt2_t*)gradPic->data + cofs) = 1000;
       }
     }
   }
@@ -198,7 +198,7 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
   int oldOfs, testOfs, gradCand=-1;
   float grad, minGrad;
   bool skelettonReached = false;
-  bool skelettonLeft = false;
+//bool skelettonLeft = false;
   ipUInt2_t histVal;
   ipUInt1_t segVal;
   ipUInt2_t maxHist = 10000;
@@ -287,9 +287,9 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
 
   if (res.absMin < (res.numPoints-10)) {
     res.absMin += (int)(sqrt(minDist)/2.0);
-    int cutX = (int)(res.traceline[2*res.absMin]-0.5); 
-    int cutY = (int)(res.traceline[2*res.absMin+1]-0.5);
-    int cutOfs = cutX + line*cutY;
+//  int cutX = (int)(res.traceline[2*res.absMin]-0.5); 
+//  int cutY = (int)(res.traceline[2*res.absMin+1]-0.5);
+//  int cutOfs = cutX + line*cutY;
 //  histVal = *((ipUInt2_t*)history->data+cutOfs);
 //  printf( "histVal at Cut=%i\n", histVal );
 //  if (histVal > 1) {

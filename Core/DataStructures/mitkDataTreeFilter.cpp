@@ -491,7 +491,7 @@ void DataTreeFilter::DeleteSelectedItemsAndSubItems()
   }
 }
 
-void DataTreeFilter::TreeChange(const itk::EventObject& e)
+void DataTreeFilter::TreeChange( const itk::EventObject& itkNotUsed( e ) )
 {
   //if ( typeid(e) != typeid(itk::TreeChangeEvent<DataTreeBase>) ) return;
   DEBUG_MSG_STATE("Before TreeChangeEvent")

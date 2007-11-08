@@ -34,8 +34,10 @@ not cleared in this function and can thus hold history data of several growing p
 */
 template<typename PicType>
 ipPicDescriptor*
-tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, PicType lowerBound, PicType upperBound, int maxIterations, ipPicDescriptor *segBuffer, int &contourOfs, float &startCol, ipPicDescriptor *histBuffer )
+tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBoundFlt, float upperBoundFlt, int maxIterations, ipPicDescriptor *segBuffer, int &contourOfs, float &startCol, ipPicDescriptor *histBuffer )
 {
+  PicType lowerBound = static_cast<PicType>(lowerBoundFlt);
+  PicType upperBound = static_cast<PicType>(upperBoundFlt);
   std::queue<int> ofsQueue;
 
   if (maxIterations <= 0) maxIterations = 32000;

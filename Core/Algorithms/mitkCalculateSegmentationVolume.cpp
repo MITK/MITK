@@ -35,7 +35,7 @@ CalculateSegmentationVolume::~CalculateSegmentationVolume()
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void CalculateSegmentationVolume::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* dummy )
+void CalculateSegmentationVolume::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* itkNotUsed(dummy) )
 {
   itk::ImageRegionConstIteratorWithIndex<itk::Image<TPixel, VImageDimension> > iterBinaryImage( itkImage, itkImage->GetLargestPossibleRegion() );
   typename itk::ImageRegionConstIteratorWithIndex<itk::Image<TPixel, VImageDimension> >::IndexType currentIndex;

@@ -228,7 +228,7 @@ bool mitk::PointSetInteractor
   {
     if (theEvent->GetSender() != NULL)
     {
-      timeStep = theEvent->GetSender()->GetTimeStep();
+      timeStep = theEvent->GetSender()->GetTimeStep(pointSet);
       timeInMS = theEvent->GetSender()->GetTime();
     }
   }

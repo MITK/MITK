@@ -99,9 +99,9 @@ void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
-  if ( renderer != NULL )
+  if ( ( renderer != NULL ) && ( m_DataTreeNode != NULL ) )
   {
-    m_TimeStep = renderer->GetTimeStep();
+    m_TimeStep = renderer->GetTimeStep(m_DataTreeNode->GetData());
   }
   else
   {

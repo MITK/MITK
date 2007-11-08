@@ -523,6 +523,7 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
     //  vicc->SetRenderWindow(NULL);
     //  vicc->GetVtkInteractor()->Disable();
     //}
+    if ( m_LightKit != NULL ) m_LightKit->Delete();
     m_VtkRenderer->Delete();
   }
   else

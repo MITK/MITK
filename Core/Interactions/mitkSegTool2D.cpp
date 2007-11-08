@@ -194,6 +194,9 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
 
   imageGeometry->WorldToIndex( projectedPoint, indexPoint );
   affectedSlice = ROUND( indexPoint[affectedDimension] );
+
+  // check if this index is still within the image
+  if ( affectedSlice < 0 || affectedSlice > image->GetDimension(affectedDimension) ) return false;
  
   return true;
 }
@@ -390,7 +393,7 @@ void mitk::SegTool2D::SliceBasedSegmentationBugMessage( const std::string& messa
   std::cout << " " << message << std::endl;
   std::cout << "********************************************************************************" << std::endl;
   std::cout << "  " << std::endl;
-  std::cout << " If your image is rotated, try to press the button next to the image selection. " << std::endl;
+  std::cout << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl;
   std::cout << "  " << std::endl;
   std::cout << " Please file a BUG REPORT: " << std::endl;
   std::cout << " http://makalu.inet.dkfz-heidelberg.de/bugzilla/enter_bug.cgi?product=ReLiver&component=QmitkSliceBasedSegmentation&assigned_to=d.maleike%40dkfz-heidelberg.de" << std::endl;

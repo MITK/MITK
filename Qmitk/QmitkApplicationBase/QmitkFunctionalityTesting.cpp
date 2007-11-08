@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdlib.h>
 #include <iostream>
 
+#include <mitkTestingConfig.h>
+
 QmitkFunctionalityTesting::QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent, const char * name ) 
   : QObject(parent, name), m_QmitkFctMediator(qfm)
 {

@@ -776,9 +776,7 @@ mitk::ImageMapper2D
 
   transform->Concatenate( boundingGeometry->GetVtkTransform() );
 
-
   transform->TransformPoints( points, newPoints );
-
 
   bounds[0] = bounds[2] = 10000000.0;
   bounds[1] = bounds[3] = -10000000.0;
@@ -796,6 +794,11 @@ mitk::ImageMapper2D
   this->LineIntersectZero( newPoints, 5, 6, bounds );
   this->LineIntersectZero( newPoints, 6, 7, bounds );
   this->LineIntersectZero( newPoints, 7, 4, bounds );
+
+  // clean up vtk data
+  points->Delete();
+  newPoints->Delete();
+  transform->Delete();
 
   if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
     || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )

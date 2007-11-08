@@ -412,6 +412,11 @@ bool mitk::ExtractDirectedPlaneImageFilter
   this->LineIntersectZero( newPoints, 6, 7, bounds );
   this->LineIntersectZero( newPoints, 7, 4, bounds );
 
+  // clean up vtk data
+  points->Delete();
+  newPoints->Delete();
+  transform->Delete();
+
   if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
     || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
   {

@@ -35,7 +35,8 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
 :QListView(parent, name),
  m_ShowOnlySelected(true),
  m_SelfCall(false),
- m_LastKeyFilterObject(NULL)
+ m_LastKeyFilterObject(NULL),
+ m_LastSelectedReferenceData(NULL)
 {
   m_ToolManager = mitk::ToolManager::New(); // this widget should be placeable from designer so it can't take other than the defaul parameters
 
@@ -58,6 +59,13 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
   m_ToolWorkingDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolWorkingDataChangedEvent(), command );
   }
 
+  {
+  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
+  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
+  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
+  }
+
+
 }
 
 QmitkToolWorkingDataListBox::~QmitkToolWorkingDataListBox()
@@ -72,6 +80,7 @@ mitk::ToolManager* QmitkToolWorkingDataListBox::GetToolManager()
 void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
   m_ToolManager->RemoveObserver( m_ToolWorkingDataChangedObserverTag );
+  m_ToolManager->RemoveObserver( m_ToolReferenceDataChangedObserverTag );
 
   m_ToolManager = &newManager;
 
@@ -80,6 +89,13 @@ void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) 
   command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
   m_ToolWorkingDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolWorkingDataChangedEvent(), command );
   }
+
+  {
+  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
+  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
+  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
+  }
+
 
   UpdateDataDisplay();
 }
@@ -114,7 +130,18 @@ void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified(const itk::Ev
 
   UpdateDataDisplay();
 }
- 
+
+void QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified(const itk::EventObject&)
+{
+  if ( m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData )
+  {
+    m_ToolManager->SetWorkingData(NULL);
+    UpdateDataDisplay();
+
+    m_LastSelectedReferenceData = m_ToolManager->GetReferenceData(0);
+  }
+}
+  
 void QmitkToolWorkingDataListBox::UpdateDataDisplayLater()
 {
   qApp->postEvent( this, new QmitkToolWorkingDataListBoxUpdateDataEvent() ); // one round through the event loop
@@ -311,16 +338,30 @@ mitk::DataTreeNode* QmitkToolWorkingDataListBox::GetSelectedNode()
 
   return NULL;
 }
-mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes()
+
+mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool onlyDerivedFromOriginal )
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
   mitk::NodePredicateProperty isSegmentation("segmentation", new mitk::BoolProperty(true));
-  //mitk::NodePredicateDataType isImage("Image");
-  //mitk::NodePredicateAND segmentationPredicate( isSegmentation, isImage );
-
-  //mitk::DataStorage::SetOfObjects::ConstPointer allObjects = dataStorage->GetSubset( segmentationPredicate );
-  mitk::DataStorage::SetOfObjects::ConstPointer allObjects = dataStorage->GetSubset( isSegmentation );
+  mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
+ 
+  if ( onlyDerivedFromOriginal )
+  {
+    mitk::DataTreeNode* sourceNode( m_ToolManager->GetReferenceData(0) );
+    if (sourceNode)
+    {
+      allObjects = dataStorage->GetDerivations( sourceNode, &isSegmentation, false );
+    }
+    else
+    {
+      allObjects = mitk::DataStorage::SetOfObjects::New();
+    }
+  }
+  else
+  {
+    allObjects = dataStorage->GetSubset( isSegmentation );
+  }
 
   mitk::ToolManager::DataVectorType resultVector;
 
@@ -367,7 +408,7 @@ void QmitkToolWorkingDataListBox::SetShowOnlySelected(bool on)
 void QmitkToolWorkingDataListBox::UpdateNodeVisibility()
 {
   // hide or show all nodes of our list
-  mitk::ToolManager::DataVectorType allObjects = GetAllNodes();
+  mitk::ToolManager::DataVectorType allObjects = GetAllNodes(false); // really get all possible "segmentation"s and hide/show them
   for ( mitk::ToolManager::DataVectorType::const_iterator objectIter = allObjects.begin();
         objectIter != allObjects.end();
         ++objectIter)

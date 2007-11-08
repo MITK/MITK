@@ -76,11 +76,12 @@ class QmitkToolWorkingDataListBox : public QListView
     mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
-    mitk::ToolManager::DataVectorType GetAllNodes();
+    mitk::ToolManager::DataVectorType GetAllNodes( bool onlyDerivedFromOriginal = true );
     mitk::ToolManager::DataVectorType GetSelectedNodes();
     mitk::DataTreeNode* GetSelectedNode();
     
     void OnToolManagerWorkingDataModified(const itk::EventObject&);
+    void OnToolManagerReferenceDataModified(const itk::EventObject&);
 
     // \param columns Comma separated list of key:title pairs please. E.g. 'SetAdditionalColumns( "name:Name,volume:Vol." )'
     void SetAdditionalColumns(const std::string& columns);
@@ -118,12 +119,15 @@ class QmitkToolWorkingDataListBox : public QListView
     ColumnsList m_AdditionalColumns;
     
     unsigned long m_ToolWorkingDataChangedObserverTag;
+    unsigned long m_ToolReferenceDataChangedObserverTag;
     
     bool m_ShowOnlySelected;
     
     bool m_SelfCall;
     
     QObject* m_LastKeyFilterObject;
+
+    mitk::DataTreeNode* m_LastSelectedReferenceData;
 };
  
 #endif

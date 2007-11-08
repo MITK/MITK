@@ -29,14 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
 {
-	//Create Image out of nowhere
-	mitk::Image::Pointer image;
-	mitk::PixelType pt(typeid(int));
-	unsigned int dim[]={100,100,20};
+  //Create Image out of nowhere
+  mitk::Image::Pointer image;
+  mitk::PixelType pt(typeid(int));
+  unsigned int dim[]={100,100,20};
 
   std::cout << "Creating image: ";
-	image=mitk::Image::New();
-	image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  image=mitk::Image::New();
+  image->Initialize(pt, 3, dim);
   int *p = (int*)image->GetData();
   int size = dim[0]*dim[1]*dim[2];
   int i;
@@ -70,12 +70,11 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   std::cout<<"[PASSED]"<<std::endl;
 
-
   std::cout << "Creating (native) RenderWindow: ";
   mitk::RenderWindow* renderwindow = new mitk::RenderWindow("the render window");
   renderwindow->InitRenderer();
   std::cout<<"[PASSED]"<<std::endl;
-renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Vermutlich noch Problem mit SwapBuffers (aufruf über vtkRenderWindow::Frame())
+  renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Vermutlich noch Problem mit SwapBuffers (aufruf über vtkRenderWindow::Frame())
 
   std::cout << "RenderWindow::SetData(iterator): ";
   renderwindow->GetRenderer()->SetData(&it);
@@ -93,6 +92,7 @@ renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Ve
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  delete renderwindow;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

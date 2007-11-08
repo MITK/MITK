@@ -49,6 +49,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 
   vtkPolyData* polys = sphereSource->GetOutput();
   surface->SetVtkPolyData( polys );
+  sphereSource->Delete();
   std::cout << "Testing mitk::Surface::SetVtkPolyData(): ";
   if (surface->GetVtkPolyData() ==  NULL ) {
     std::cout<<"[FAILED]"<<std::endl;
@@ -123,6 +124,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     sphereSource->GetOutput()->ComputeBounds();
     sphereSource->GetOutput()->GetBounds( bounds[i] );
     surface->SetVtkPolyData( sphereSource->GetOutput(),i );
+    sphereSource->Delete();
   }
 
   surface->UpdateOutputInformation();
@@ -184,6 +186,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->SetPhiResolution(10);
   sphereSource->Update();
   surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
+  sphereSource->Delete();
   
   inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
   time = 3;

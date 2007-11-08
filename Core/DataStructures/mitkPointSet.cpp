@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSet::PointSet()
 {
-  m_Initialized = false;
+  m_Initialized = true;
   m_PointSetSeries.resize( 1 );
 
   m_PointSetSeries[0] = DataType::New();

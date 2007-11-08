@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAction.h"
 
 //##ModelId=3EF222410127
-void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
+void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( operation ) )
 {
   /*DisplayCoordinateOperation* dcOperation = static_cast<DisplayCoordinateOperation*>(operation);
   if(dcOperation==NULL) return;
@@ -41,7 +41,7 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* operation)
     m_CurrentDisplayCoordinate=dcOperation->GetCurrentDisplayCoordinate();
 //    std::cout << m_CurrentDisplayCoordinate << std::endl;
     
-    /*std::cout<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
+    std::cout<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
       << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate 
       << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate 
       << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate 

@@ -304,7 +304,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           if (unselectedColor != NULL)
           {
             mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-            float* rgb = 0;
+            float rgb[3];//yellow
             rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
             OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l, rgb);
           }

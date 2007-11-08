@@ -1506,7 +1506,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer in
           temp.PicTagContent = nameProperty->GetValueAsString();
           picTagList.push_back( temp );
 
-          //the second condition is a special case; the user have the oportunity to "save the new nodes only"; but the parent-child-relationship between the "old" and new node should created too; therefore we needed the volumedescription at the relationship and have to use "AddVolumeToParentChil(...)"; therefore we need the original imageinstanceuids; so SetTagList( picTagList, true );
+          //the second condition is a special case; the user have the oportunity to "save the new nodes only"; but the parent-child-relationship between the "old" and new node should created too; therefore we needed the volumedescription at the relationship and have to use "AddVolumeToParentChild(...)"; therefore we need the original imageinstanceuids; so SetTagList( picTagList, true );
           if( overrideExistingSeries && seriesOIDProperty && seriesOIDProperty->GetValueAsString() == seriesOID || seriesOIDProperty && seriesOIDProperty->GetValueAsString() == seriesOID && !overrideExistingSeries )
             converterToDescriptor->SetTagList( picTagList, true );
           else
@@ -2386,29 +2386,48 @@ void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 }
 
 #ifdef WIN32
-/*
-using namespace System.Security;
-using namespace System.IO;
-*/
+
+#include <Windows.h>
+#include <stdio.h>
+#define BUFSIZE 512
+
 /** Create a temporary directory for windows. */
 std::string mitk::ChiliPlugin::GetTempDirectory()
 {
 /*
-  std::string tempPath, resultTempPath;
+  DWORD BufSize=BUFSIZE;
+  char PathBuffer[BUFSIZE];
+  char TempName[BUFSIZE];  
+  DWORD RetVal;
+  UINT uRetVal;
 
-  try
+  // Get the temp path.
+  RetVal = GetTempPath( BufSize, PathBuffer );
+  if( RetVal > BufSize || RetVal == 0 )
   {
-    tempPath = Path.GetTempPath();
-    if( tempPath == NULL )
-    tempPath = "C:\\Temp";
-    resultTempPath = GetRandomFileName();
-    resultTempPath = tempPath + "\\" + resultTempPath;
-    if( CreateDirectory( resultTempPath, NULL ) )
-      return newTmpDirectory;
+    return "";
   }
-  return "";
+
+  // Create a unique name.
+  uRetVal = GetTempFileName( PathBuffer, "NEW", 0, TempName );
+  if( uRetVal == 0 )
+  {
+    return "";
+  }
+
+  std::string makeTmpDirectory = TempName;
+  makeTmpDirectory = "mkdir " + makeTmpDirectory;
+  system( makeTmpDirectory.c_str() );
+
+  return TempName;
 */
-  return "C:\\Temp";
+
+  std::string tmpDirectory = "C:\\WINDOWS\\Temp\\ChiliTemp\\";
+  std::string removeDirectory = "rm /s " + tmpDirectory;
+  std::string makeDirectory = "mkdir " + tmpDirectory;
+  system( removeDirectory.c_str() );
+  system( makeDirectory.c_str() );
+  return tmpDirectory;
 }
 
 #else

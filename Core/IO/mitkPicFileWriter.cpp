@@ -256,7 +256,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
         
     if ( bytes_written != number_of_bytes )
     {
-      fprintf( stderr, "Error while writing (ferror indicates %u), only %u bytes were written! Eof indicator is %u.\n", ferror(outfile), bytes_written, feof(outfile) );
+      fprintf( stderr, "Error while writing (ferror indicates %u), only %u bytes were written! Eof indicator is %u.\n", ferror(outfile), ( (unsigned int) ( bytes_written ) ), feof(outfile) );
       fclose( outfile );
       return( -1 );
     }

@@ -156,7 +156,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
    3.1.1 Call a ipSegmentation algorithm to create a nice cut
    3.1.2 Set the result of this algorithm as the feedback contour
 */ 
-bool mitk::RegionGrowingTool::OnMousePressedInside(Action* action, const StateEvent* stateEvent, ipPicDescriptor* workingPicSlice, int initialWorkingOffset)
+bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, ipPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
@@ -217,7 +217,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* action, const StateEv
    3.2.2 Determine initial region growing parameters from the level window settings of the image
    3.2.3 Perform a region growing (which generates a new feedback contour)
 */
-bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* action, const StateEvent* stateEvent)
+bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action ), const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.2 If we have a reference image, then perform an initial region growing, considering the reference image's level window

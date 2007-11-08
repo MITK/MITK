@@ -36,7 +36,7 @@ NonBlockingAlgorithm::~NonBlockingAlgorithm()
 {
 }
 
-void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm* other)
+void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm* itkNotUsed(other))
 { 
   // define one input, one output basedata object
 

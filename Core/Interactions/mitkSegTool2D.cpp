@@ -231,7 +231,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   }
 }
 
-mitk::Contour::Pointer mitk::SegTool2D::ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside)
+mitk::Contour::Pointer mitk::SegTool2D::ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool itkNotUsed( correctionForIpSegmentation ), bool constrainToInside)
 {
   if ( !slice || !contourIn3D ) return NULL;
 
@@ -262,7 +262,7 @@ mitk::Contour::Pointer mitk::SegTool2D::ProjectContourTo2DSlice(Image* slice, Co
   return projectedContour;
 }
     
-mitk::Contour::Pointer mitk::SegTool2D::BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool correctionForIpSegmentation)
+mitk::Contour::Pointer mitk::SegTool2D::BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
   if ( !slice || !contourIn2D ) return NULL;
 

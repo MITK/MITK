@@ -135,7 +135,7 @@ void mitk::ToolManager::OnOneOfTheReferenceDataDeletedConst(const itk::Object* c
   OnOneOfTheReferenceDataDeleted( const_cast<itk::Object*>(caller), e );
 }
 
-void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object* caller, const itk::EventObject& e)
+void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
 {
   //std::cout << "Deleted: " << (void*)caller << " Removing from reference data list." << std::endl;
   DataVectorType v;
@@ -203,7 +203,7 @@ void mitk::ToolManager::OnOneOfTheWorkingDataDeletedConst(const itk::Object* cal
   OnOneOfTheWorkingDataDeleted( const_cast<itk::Object*>(caller), e );
 }
 
-void mitk::ToolManager::OnOneOfTheWorkingDataDeleted(itk::Object* caller, const itk::EventObject& e)
+void mitk::ToolManager::OnOneOfTheWorkingDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
 {
   //std::cout << "Deleted: " << (void*)caller << " Removing from reference data list." << std::endl;
   DataVectorType v;

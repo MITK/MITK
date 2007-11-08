@@ -330,7 +330,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
   unsigned int upperBound(0);
   bool bounds( false );
 
-  for (lowerBound = sliceIndex - 1; lowerBound >= 0; --lowerBound)
+  for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
   {
     if ( m_SegmentationCountInSlice[sliceDimension][lowerBound] > 0 )
     {

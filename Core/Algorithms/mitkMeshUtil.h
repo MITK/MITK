@@ -1323,7 +1323,7 @@ private:
       v2 = (pnt2-pnt0).Get_vnl_vector();
       res = vnl_cross_3d( v1, v2 );
       pv = pnt0.GetVectorFromOrigin().Get_vnl_vector();
-      double d = res[0]*pv[0] + res[1]*pv[1] + res[2]*pv[2];
+      //double d = res[0]*pv[0] + res[1]*pv[1] + res[2]*pv[2];
 
       // subdivision
       typename MeshType::PointType pnt01, pnt12, pnt20;

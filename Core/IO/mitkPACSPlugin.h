@@ -224,9 +224,9 @@ class PACSPlugin : public itk::Object
     virtual QcLightbox* GetCurrentLightbox();
 
     /*!
-    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually three different readers available. The first one use the image number and the spacing between two slices. The second one use the slice location and all possible spacing-combinations between the slices. The third one use the most common spacing.
-    @param readerType   Actually 0 used for the PicDescriptorToNode(ImageNumber), 1 for the PicDescriptorToNodeSecond(SpacingCombination) and 2 used for PicDescriptorToNodeThird(most common spacing).
-    If no parameter set, the PicDescriptorToNode get used.
+    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually three different readers available. The first one use the image number and the spacing between two slices.The second one use the most common spacing. The third one use the slice location and all possible spacing-combinations between the slices. 
+    @param readerType   Actually 0 used for the ImageNumberFilter, 1 for the SingleSpacingFilter and 2 used for SpacingSetFilter.
+    If no parameter set, the ImageNumberFilter get used.
     */
     virtual void SetReaderType( unsigned int readerType = 0 );
 
@@ -259,7 +259,7 @@ class PACSPlugin : public itk::Object
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
     Important: Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ).
-    The function GlobalIterateTextTwoCallback(...) return a list of all textOID's and textPath's from all included text-files in this series.
+    The function GlobalIterateToLoadAllText(...) return a list of all textOID's and textPath's from all included text-files in this series.
     With this information LoadOneText( seriesOID, textOID, textPath ) is used step by step.
     The parameter have to be set.
     */
@@ -285,6 +285,7 @@ class PACSPlugin : public itk::Object
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
+
     /*!
     \brief This function load the saved nodes and the relation between.
     @param seriesOID   Set the series to load from.
@@ -293,15 +294,15 @@ class PACSPlugin : public itk::Object
     virtual void LoadParentChildRelation( const std::string& seriesOID );
 
     /*!
-    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    \brief Save Images- and Texts-Files with User-Dialog to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
-    This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... .
-    Then SaveAsNewSeries(...) or SaveToSeries(...) get used.
+    This function provides a dialog where the user can select if he want to create a new series, save to series, override, ... and the series to save.
+    SaveAsNewSeries(...) or SaveToSeries(...) get used.
     */
     virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
 
     /*!
-    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    \brief Save Images- and Texts-Files without User-Dialog as new Series to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
     @param studyOID   In which study the new series should created?
     @param seriesNumber   With wich seriesNumber the series should created?
@@ -312,12 +313,13 @@ class PACSPlugin : public itk::Object
     virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries );
 
     /*!
-    \brief Save Images- and Texts-Files to Chili via Fileupload.
+    \brief Save Images- and Texts-Files without User-Dialog to given series to Chili via Fileupload.
     @param inputNodes   Thats the nodes to save.
     @param StudyOID   In which study should saved?
     @param SeriesOID   In which series should saved?
     @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not ( only possible if the data saved by MBI )?
-    This function save the nodes to via FileUpload to chili. The parent-child-relation saved automatically.
+    This function save the nodes via FileUpload to chili. No dialog get used. The parent-child-relation saved automatically.
+    USE THIS FUNCTION ONLY, IF YOU KNOW THE DESTINATION-SERIES.
     */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
 

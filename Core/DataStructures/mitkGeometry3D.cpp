@@ -329,6 +329,7 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
     }
 
   default:
+    vtktransform->Delete();
     return;
   }
   m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());

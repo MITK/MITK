@@ -157,7 +157,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[PASSED]"<<std::endl;
   }
   
-  std::cout << "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry(): ";
+  std::cout << "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry(): \n";
   const mitk::TimeSlicedGeometry* inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
 
   int time = 3;
@@ -177,7 +177,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[PASSED]"<<std::endl;
   }
 
-  std::cout << "Explicitly changing the data of timestep 3 and checking for timebounds ccorrectness of surface's geometry again.";
+  std::cout << "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again:\n";
   
   sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);

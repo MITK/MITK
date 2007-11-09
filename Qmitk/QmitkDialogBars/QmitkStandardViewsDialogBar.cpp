@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStandardViews.h"
 #include "QmitkSelectableGLWidget.h"
+#include "QmitkStandardViewsDialogBar.xpm"
 
 #include <qaction.h>
 #include <qlabel.h>

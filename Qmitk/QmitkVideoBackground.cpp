@@ -35,7 +35,7 @@ public:
     m_ImageWidth = x; m_ImageHeight = y;
   }
 
-  virtual void Execute(vtkObject *caller, unsigned long, void*)
+  virtual void Execute(vtkObject */*caller*/, unsigned long, void*)
   {
     /*vtkRenderWindow * RenderWindow = reinterpret_cast<vtkRenderWindow*>(caller);
     int * windowSize = RenderWindow->GetScreenSize();

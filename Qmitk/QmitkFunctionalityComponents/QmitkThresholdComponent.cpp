@@ -507,7 +507,7 @@ mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode(
 // called from NewThresholdSegmentation
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * thresholdComponent)
+void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/)
 {
 	// iterator on m_MitkImage
 	typedef itk::Image< TPixel, VImageDimension > ItkImageType;
@@ -541,7 +541,7 @@ void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDi
 
 	while(!(itMitkImage.IsAtEnd()))
 	{
-		if(itMitkImage.Get() >= thresholdValue)
+		if((signed)itMitkImage.Get() >= thresholdValue)
 			//if the pixel-value of the m_Mitk-Image is higher or equals the threshold
 		{
 			itSegmented.Set(1);

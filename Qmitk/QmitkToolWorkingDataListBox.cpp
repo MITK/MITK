@@ -167,7 +167,7 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
   bool columnAdjustingNeccessary( false );
 
   // fix column number and labels
-  if (m_AdditionalColumns.size() + 2 > QListView::columns())
+  if (m_AdditionalColumns.size() + 2 > (unsigned)QListView::columns())
   {
     for (unsigned int col = QListView::columns(); col < m_AdditionalColumns.size() + 2; ++col) // we have to add some columns
     {
@@ -176,7 +176,7 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
 
     columnAdjustingNeccessary = true;
   }
-  else if (m_AdditionalColumns.size() + 2 < QListView::columns())
+  else if (m_AdditionalColumns.size() + 2 < (unsigned) QListView::columns())
   {
     for (unsigned int col = QListView::columns()-1; col >= m_AdditionalColumns.size() + 2; --col) // we have to remove some columns
     {
@@ -281,13 +281,13 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
   if (columnAdjustingNeccessary)
   {
 
-    for (unsigned int col = 1; col < QListView::columns(); ++col)
+    for (unsigned int col = 1; col < (unsigned) QListView::columns(); ++col)
     {
       if (col>1) QListView::setColumnWidthMode(col, QListView::Maximum);
       QListView::header()->setStretchEnabled(true, col); 
     }
     
-    for (unsigned int col = 1; col < QListView::columns(); ++col)
+    for (unsigned int col = 1; col < (unsigned) QListView::columns(); ++col)
       QListView::adjustColumn(col);
     
     QListView::setResizeMode( QListView::LastColumn ); // stretch to fill whole width of box

@@ -686,7 +686,7 @@ void QmitkSliceBasedSegmentation::ITKThresholding( itk::Image<TPixel, VImageDime
 
   while (!outputIterator.IsAtEnd())
   {
-    if ( inputIterator.Get() >= threshold )
+    if ( (signed)inputIterator.Get() >= threshold )
     {
       outputIterator.Set( 1 );
     }

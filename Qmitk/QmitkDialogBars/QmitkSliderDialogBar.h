@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDialogBar.h"
 #include "mitkDataTreeFilter.h"
 
-#include "QmitkSliderDialogBar.xpm"
 
 
 /**

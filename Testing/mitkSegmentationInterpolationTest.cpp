@@ -153,7 +153,7 @@ bool mitkSegmentationInterpolationTestClass::CreateTwoSlices(int slicedim)
         break;
     }
       
-    if ( ((z == 0) || (z == 2)) && (x >= pad[xdim]) && (x < (dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < (dim[ydim]-pad[ydim])) )
+    if ( ((z == 0) || (z == 2)) && (x >= pad[xdim]) && (x < ( (signed) dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < ( (signed) dim[ydim]-pad[ydim])) )
     {
       *p = 1;
     }
@@ -203,7 +203,7 @@ bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
   ipMITKSegmentationTYPE* p = (ipMITKSegmentationTYPE*)interpolated->GetData(); // pointer to pixel data
 
   int size = dim[xdim]*dim[ydim];
-  if ( interpolated->GetDimension(0) * interpolated->GetDimension(1) != size )
+  if ( (signed) interpolated->GetDimension(0) * (signed) interpolated->GetDimension(1) != size )
   {
     std::cout << "  (EE) Size of interpolated image differs from original segmentation..." << std::endl;
     return false;
@@ -221,7 +221,7 @@ bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
    
     //if (value == 1) std::cout << "O"; else std::cout << ".";
 
-    if ( (x >= pad[xdim]) && (x < (dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < (dim[ydim]-pad[ydim])) && (value != 1) )
+    if ( (x >= pad[xdim]) && (x < ((signed) dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < ((signed) dim[ydim]-pad[ydim])) && (value != 1) )
     {
       std::cout << "  (EE) Interpolation of a square figure failed" << std::endl;
       std::cout << "  Value at " << x << " " << y << ": " << (int)value << std::endl;

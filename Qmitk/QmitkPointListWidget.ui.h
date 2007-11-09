@@ -60,14 +60,14 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
   mitk::PointSet::PointIdentifier pointId;
   //unsigned int pointIndex; // Momentary not used.
   mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet()->GetPoints()->Begin();  
-  for ( unsigned int currentIndex = 0 ; currentIndex <= ItemIndex ; ++currentIndex, ++it )
+  for ( unsigned int currentIndex = 0 ; (signed)currentIndex <= ItemIndex ; ++currentIndex, ++it )
   {
     if ( it == m_PointSet->GetPointSet()->GetPoints()->End())
     {
       itkGenericOutputMacro("couldn't determine point id from index");
       return;  
     }    
-    if ( currentIndex == ItemIndex )
+    if ( (signed)currentIndex == ItemIndex )
       pointId = it->Index();
   }   
   

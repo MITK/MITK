@@ -175,8 +175,8 @@ void mitk::SegmentationInterpolation::ScanChangedSlice( itk::Image<DATATYPE, 2>*
     {
       DATATYPE value = *(pixelData + u + v * dim0max);
 
-      assert ( m_SegmentationCountInSlice[dim0][u] + value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-      assert ( m_SegmentationCountInSlice[dim1][v] + value >= 0 );
+      assert ( (signed) m_SegmentationCountInSlice[dim0][u] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
+      assert ( (signed) m_SegmentationCountInSlice[dim1][v] + (signed)value >= 0 );
 
       m_SegmentationCountInSlice[dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[dim0][u] + value ); 
       m_SegmentationCountInSlice[dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[dim1][v] + value );
@@ -185,7 +185,7 @@ void mitk::SegmentationInterpolation::ScanChangedSlice( itk::Image<DATATYPE, 2>*
   }
 
   // flag for the dimension of the slice itself 
-  assert ( m_SegmentationCountInSlice[sliceDimension][sliceIndex] + numberOfPixels >= 0 );
+  assert ( (signed) m_SegmentationCountInSlice[sliceDimension][sliceIndex] + numberOfPixels >= 0 );
   m_SegmentationCountInSlice[sliceDimension][sliceIndex] += numberOfPixels;
   
   //std::cout << "scan from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
@@ -223,8 +223,8 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
 
         TPixel value = iter.Get();
 
-        assert ( m_SegmentationCountInSlice[0][x] + value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-        assert ( m_SegmentationCountInSlice[1][y] + value >= 0 );
+        assert ( (signed) m_SegmentationCountInSlice[0][x] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
+        assert ( (signed) m_SegmentationCountInSlice[1][y] + (signed)value >= 0 );
 
         m_SegmentationCountInSlice[0][x] = static_cast<unsigned int>( m_SegmentationCountInSlice[0][x] + value ); 
         m_SegmentationCountInSlice[1][y] = static_cast<unsigned int>( m_SegmentationCountInSlice[1][y] + value );
@@ -235,7 +235,7 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
       }
       iter.NextLine();
     }
-    assert ( m_SegmentationCountInSlice[2][z] + numberOfPixels >= 0 );
+    assert ( (signed) m_SegmentationCountInSlice[2][z] + numberOfPixels >= 0 );
     m_SegmentationCountInSlice[2][z] += numberOfPixels;
     numberOfPixels = 0;
 

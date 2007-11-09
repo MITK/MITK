@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImage.h>
 
 /***************       CONSTRUCTOR      ***************/
-QmitkSingleTimeStepExporterComponent::QmitkSingleTimeStepExporterComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+QmitkSingleTimeStepExporterComponent::QmitkSingleTimeStepExporterComponent(QObject * parent, const char * parentName, bool /*updateSelector*/, bool /*showSelector*/, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkInteractionFunctionalityComponent(parent, parentName, mitkStdMultiWidget, it),
 m_SingleTimeStepExporterComponentGUI(NULL),
 m_DataIt(it),
@@ -150,7 +150,7 @@ void QmitkSingleTimeStepExporterComponent::AddSliceImage()
 {
 	if(m_Active)
 	{
-		mitk::DataTreeFilter::Item* m_currentItem(NULL);
+		//mitk::DataTreeFilter::Item* m_currentItem(NULL);
 		//if(m_SingleTimeStepExporterComponentGUI)
 		//{
 		//	if(mitk::DataTreeFilter* filter = m_SingleTimeStepExporterComponentGUI->GetTreeNodeSelector()->GetFilter())
@@ -221,7 +221,7 @@ QWidget* QmitkSingleTimeStepExporterComponent::CreateControlWidget(QWidget* pare
 	m_ImageTimeSelector = mitk::ImageTimeSelector::New();
 
 	m_Stepper = mitk::Stepper::New();  
-	QmitkStepperAdapter* stepperAdapter = new QmitkStepperAdapter(((QObject*)(m_SingleTimeStepExporterComponentGUI->GetQmitkSliderNavigator())), m_Stepper, "stepperAdapter");  
+	//QmitkStepperAdapter* stepperAdapter = new QmitkStepperAdapter(((QObject*)(m_SingleTimeStepExporterComponentGUI->GetQmitkSliderNavigator())), m_Stepper, "stepperAdapter");  
 
 	// new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetTransversalSlider(), m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversal");
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSliderNavigator.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkStdMultiWidget.h"
+#include "QmitkSliderDialogBar.xpm"
 
 #include <qaction.h>
 #include <qlabel.h>

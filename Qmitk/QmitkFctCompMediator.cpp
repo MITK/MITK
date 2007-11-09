@@ -40,7 +40,7 @@ QmitkFctCompMediator::~QmitkFctCompMediator()
 }
 
 
-void QmitkFctCompMediator::Initialize(QWidget *aLayoutTemplate)
+void QmitkFctCompMediator::Initialize(QWidget* /*aLayoutTemplate*/)
 {
 
 }

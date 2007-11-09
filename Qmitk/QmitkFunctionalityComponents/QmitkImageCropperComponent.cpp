@@ -65,11 +65,11 @@ QmitkImageCropperComponent::opExchangeNodes::opExchangeNodes( mitk::OperationTyp
 QmitkImageCropperComponent::QmitkImageCropperComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it, QmitkFunctionalityComponentContainer * parentObject)
 : QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_ImageCropperImageNode(NULL),
-m_ImageCropperComponentGUI(NULL),
-m_ImageCropperNodeExisting(false),
 m_MultiWidget(mitkStdMultiWidget),
 m_BoundingObjectExists(false),
-m_ParentObject(parentObject)
+m_ParentObject(parentObject),
+m_ImageCropperComponentGUI(NULL),
+m_ImageCropperNodeExisting(false)
 {
 	SetDataTreeIterator(it);
 	SetAvailability(true);

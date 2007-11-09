@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDialogBar.h"
 #include "mitkDataTreeFilter.h"
 
-#include "QmitkStandardViewsDialogBar.xpm"
 
 /**
  * \brief DialogBar for selection an standard view in the 3D widget.

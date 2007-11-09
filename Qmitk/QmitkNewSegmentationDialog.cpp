@@ -95,7 +95,7 @@ void QmitkNewSegmentationDialog::onOrganImmediatelySelected(const QString& organ
   selectedOrgan = organ;
   edtName->setText( organ );
 
-  if ( lstOrgans->currentItem() != (lstOrgans->count()-1) )
+  if ( (signed)(lstOrgans->currentItem()) != (signed)(lstOrgans->count()-1) )
   {
     accept(); // close
   }
@@ -108,7 +108,7 @@ void QmitkNewSegmentationDialog::onOrganImmediatelySelected(const QString& organ
 
 void QmitkNewSegmentationDialog::onOrganSelected(int index)
 {
-  if ( index == (lstOrgans->count()-1) )
+  if ( index == (signed)(lstOrgans->count()-1) )
   {
     // "Other organ..." selected, we shouldn't close the dialog now
     newOrganEntry = true;

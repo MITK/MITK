@@ -355,7 +355,7 @@ void QmitkPropertyListPopup::onBoolPropertyClicked(int param)
   }
 }
 
-void QmitkPropertyListPopup::MaterialEditorChangesAccepted(QmitkMaterialEditor* ed)
+void QmitkPropertyListPopup::MaterialEditorChangesAccepted(QmitkMaterialEditor* /*ed*/)
 {
 }
 

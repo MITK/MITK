@@ -168,7 +168,7 @@ private:
   \brief template to create thresholdSegmentation
   */
  template < typename TPixel, unsigned int VImageDimension >
- void ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * thresholdComponent);
+ void ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/);
 
   /***************        ATTRIBUTES      ***************/
 

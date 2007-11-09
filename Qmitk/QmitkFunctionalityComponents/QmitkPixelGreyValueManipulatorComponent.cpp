@@ -63,8 +63,8 @@ m_PixelChangedImageCounter(0),
 m_ManipulationMode(0),
 m_ManipulationArea(0),
 m_PointSet(NULL),
-m_DataIt(it),
 m_BoundingObject(NULL),
+m_DataIt(it),
 m_BoundingObjectInteractor(NULL),
 m_BoundingObjectExistingFlag(false)
 {
@@ -646,7 +646,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 
 	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
 	{
-		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden mï¿½ssen
 	}
 
 	int value1;
@@ -786,7 +786,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 
 	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
 	{
-		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden mï¿½ssen
 	}
 
 	int value1;
@@ -1021,7 +1021,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 
 	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
 	{
-		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden mï¿½ssen
 	}
 
 	int value1;
@@ -1207,7 +1207,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 //
 //	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
 //	{
-//		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+//		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden mï¿½ssen
 //	}
 //
 //	int value1;
@@ -1304,7 +1304,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 
 	for(unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
 	{
-		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden müssen
+		imageDim *= imageRegion.GetSize(dimension); //Anzahl der Pixel des Bildes die in unten stehender while-Schleife durchlaufen werden mï¿½ssen
 	}
 
 	int value1;

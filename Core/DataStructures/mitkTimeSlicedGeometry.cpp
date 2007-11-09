@@ -244,6 +244,19 @@ void mitk::TimeSlicedGeometry::ResizeToNumberOfTimeSteps( unsigned int timeSteps
 {
   if( timeSteps <= m_TimeSteps ) return;
 
+  if(m_TimeSteps == 1)
+  {
+    Geometry3D* g3d = m_Geometry3Ds[0];
+    const TimeBounds & timeBounds = g3d->GetTimeBounds();
+    if( (timeBounds[0] == ScalarTypeNumericTraits::NonpositiveMin()) || 
+        (timeBounds[1]==ScalarTypeNumericTraits::max())
+      )
+    {
+      mitk::ScalarType timeBounds[] = {0.0, 1.0};
+      m_Geometry3Ds[0]->SetTimeBounds( timeBounds );
+    }
+  }
+
   // Resize to Number of timesteps; initialize with empty geometries
   Geometry3D::Pointer gnull=NULL;
   m_Geometry3Ds.resize(timeSteps, gnull);

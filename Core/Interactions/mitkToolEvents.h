@@ -226,19 +226,17 @@ typedef ParameterToolEvent<int>            IntegerToolEvent;
 typedef ParameterToolEvent<float>          FloatToolEvent;
 typedef ParameterToolEvent<bool>           BoolToolEvent;
 
-// TODO some macro to let tools define their own event classes as inner classes (should then inherit from something like FloatToolEvent
-//      inheritance, because it allows observers to distinguish events
-
 } // namespace
 
-
+// some macros to let tools define their own event classes as inner classes (should then inherit from something like FloatToolEvent
+// inheritance, because it allows observers to distinguish events
 
 #define mitkToolEventMacro( eventname, baseevent ) \
 class eventname : public baseevent \
 { \
     virtual const char * GetEventName() const \
     { \
-      return #baseevent; \
+      return #eventname ; \
     } \
 };
 
@@ -250,7 +248,7 @@ class eventname : public ParameterToolEvent<paramtype1> \
   public: \
     virtual const char * GetEventName() const \
     { \
-      return #eventname; \
+      return #eventname "(" #paramtype1 ")" ; \
     } \
 \
     eventname( const paramtype1 parameter ) \
@@ -271,7 +269,7 @@ class eventname : public TwoParameterToolEvent<paramtype1, paramtype2> \
   public: \
     virtual const char * GetEventName() const \
     { \
-      return #eventname; \
+      return #eventname "(" #paramtype1 "," #paramtype2 ")" ; \
     } \
 \
     eventname( const paramtype1 parameter1, const paramtype2 parameter2 ) \
@@ -283,12 +281,4 @@ class eventname : public TwoParameterToolEvent<paramtype1, paramtype2> \
 \
     eventname();\
 };
-/*
-    eventname(const eventname& s)  \
-    : ToolEvent(s),  \
-      m_Parameter(s.m_Parameter)  \
-    { \
-    }  \
-*/
-
 

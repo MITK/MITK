@@ -2,7 +2,6 @@
 #define _vtk_Gradient_Background_h_
 
 
-#include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
 
 class vtkRenderer;
@@ -66,9 +65,9 @@ public:
    * Sets the gradient colors. The gradient
    * will smoothly fade from color1 to color2
    */
-  virtual void SetGradientColors( vtkFloatingPointType r1, vtkFloatingPointType g1, vtkFloatingPointType b1, vtkFloatingPointType r2, vtkFloatingPointType g2, vtkFloatingPointType b2);
-  virtual void SetUpperColor(vtkFloatingPointType r, vtkFloatingPointType g, vtkFloatingPointType b );
-  virtual void SetLowerColor(vtkFloatingPointType r, vtkFloatingPointType g, vtkFloatingPointType b );
+  virtual void SetGradientColors( double r1, double g1, double b1, double r2, double g2, double b2);
+  virtual void SetUpperColor(double r, double g, double b );
+  virtual void SetLowerColor(double r, double g, double b );
 
   /**
    * Enables drawing of the color gradient background.

@@ -142,20 +142,20 @@ vtkPolyDataMapper* mitk::GradientBackground::GetMapper()
  * Sets the gradient colors. The gradient
  * will smoothly fade from color1 to color2
  */
-void mitk::GradientBackground::SetGradientColors( vtkFloatingPointType r1, vtkFloatingPointType g1, vtkFloatingPointType b1, vtkFloatingPointType r2, vtkFloatingPointType g2, vtkFloatingPointType b2 )
+void mitk::GradientBackground::SetGradientColors( double r1, double g1, double b1, double r2, double g2, double b2 )
 {
   m_Lut->SetTableValue( m_Lut->GetIndex(0), r1, g1, b1 );
   m_Lut->SetTableValue( m_Lut->GetIndex(1), r2, g2, b2 );
 }
 
 
-void mitk::GradientBackground::SetUpperColor(vtkFloatingPointType r, vtkFloatingPointType g, vtkFloatingPointType b )
+void mitk::GradientBackground::SetUpperColor(double r, double g, double b )
 {
   m_Lut->SetTableValue( m_Lut->GetIndex(0), r, g, b );
 }
 
 
-void mitk::GradientBackground::SetLowerColor(vtkFloatingPointType r, vtkFloatingPointType g, vtkFloatingPointType b )
+void mitk::GradientBackground::SetLowerColor(double r, double g, double b )
 {
   m_Lut->SetTableValue( m_Lut->GetIndex(1), r, g, b );
 }

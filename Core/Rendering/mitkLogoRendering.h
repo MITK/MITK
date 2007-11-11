@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define _vtk_Logo_Rendering_h_
 
 
-#include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
 
 class vtkRenderer;

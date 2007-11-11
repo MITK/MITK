@@ -442,7 +442,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 	//m_GUI->layout()->addChildLayout(buttonLayout);
 	m_BackButton->setShown(true);
 	m_NextButton->setShown(true);
-  m_GUI->layout()->AlignTop;
+  //m_GUI->layout()->AlignTop;
 	m_GUI->layout()->activate();
 	m_GUI->repaint();
 
@@ -470,7 +470,7 @@ void QmitkFunctionalityComponentContainer::SetWizardText(const QString& /*text*/
 	GetImageContent()->updateGeometry();
 	GetImageContent()->repaint();
 	m_GUI->updateGeometry();
-	m_GUI->layout()->AlignTop;
+	//m_GUI->layout()->AlignTop;
 	m_GUI->layout()->activate();
 	m_GUI->repaint();
 

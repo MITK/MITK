@@ -39,9 +39,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 : QmitkFunctionality( parent, name, it ),
+  m_Plugin( NULL ),
   m_MultiWidget( mitkStdMultiWidget ),
-  m_Controls( NULL ),
-  m_Plugin( NULL )
+  m_Controls( NULL )
 {
   SetAvailability( true );
   // register to chili plugin as observer

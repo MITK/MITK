@@ -207,8 +207,8 @@ void mitk::LogoRendering::SetupCamera()
   if ( !image )
     return;
   
-  vtkFloatingPointType spacing[3];
-  vtkFloatingPointType origin[3];
+  double spacing[3];
+  double origin[3];
   int   dimensions[3];
 
   image->GetSpacing(spacing);
@@ -245,7 +245,7 @@ void mitk::LogoRendering::SetupCamera()
 void mitk::LogoRendering::SetupPosition()
 { // Position and Scale of the logo
   
-  vtkFloatingPointType newPos[4];
+  double newPos[4];
   int dimensions[3];
   vtkImageData * image = m_Actor->GetInput();
   image->GetDimensions(dimensions);

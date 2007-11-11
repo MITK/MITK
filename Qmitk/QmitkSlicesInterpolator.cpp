@@ -389,7 +389,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject& e)
+void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject& /*e*/)
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   UpdateVisibleSuggestion();

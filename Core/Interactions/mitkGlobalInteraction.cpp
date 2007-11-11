@@ -42,6 +42,10 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
 
 mitk::GlobalInteraction::~GlobalInteraction()
 {
+  if ( m_FocusManager != NULL )
+  {
+    m_FocusManager = NULL;
+  }
   //s_GlobalInteraction doesn't have to be set = NULL;
 }
 

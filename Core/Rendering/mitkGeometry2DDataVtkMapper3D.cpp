@@ -90,7 +90,6 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
   m_EdgeActor->SetMapper( m_EdgeMapper );
 
-
   m_BackgroundMapper->ImmediateModeRenderingOn();
 
   m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
@@ -125,6 +124,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_EdgeActor->Delete();
   m_BackgroundMapper->Delete();
   m_BackgroundActor->Delete();
+  m_DefaultLookupTable->Delete();
 
   // Delete entries in m_ImageActors list one by one
   ActorList::iterator it;

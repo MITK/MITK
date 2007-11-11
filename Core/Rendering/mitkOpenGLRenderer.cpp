@@ -509,6 +509,17 @@ void mitk::OpenGLRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
 */
 mitk::OpenGLRenderer::~OpenGLRenderer()
 {
+  if ( m_WorldPointPicker != NULL )
+  {
+    m_WorldPointPicker->Delete();
+    m_WorldPointPicker = NULL;
+  }
+  if ( m_PointPicker != NULL )
+  {
+    m_PointPicker->Delete();
+    m_PointPicker = NULL;
+  }
+
   if(m_VtkRenderer!=NULL)
   {
     if(m_RenderWindow!=NULL)

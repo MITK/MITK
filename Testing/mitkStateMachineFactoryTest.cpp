@@ -45,6 +45,8 @@ int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  statemachineFactory->Delete();
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

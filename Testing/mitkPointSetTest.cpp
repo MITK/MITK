@@ -66,6 +66,7 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  delete doOp;
   
   mitk::Point3D tempPoint;
   tempPoint.Fill(0);

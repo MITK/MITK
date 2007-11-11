@@ -61,6 +61,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+  delete doOp;
   
   //get the point and check if it is still the same
   std::cout << "Create an operation and add a point. Then try to get that point.";

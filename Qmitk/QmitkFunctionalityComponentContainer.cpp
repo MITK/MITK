@@ -390,7 +390,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 			m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(w);
 			visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
 			idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
-			//QLayout* visibleWidgetLayout = new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+			QLayout* visibleWidgetLayout = new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
 		}
 
 		QLayout* layout;

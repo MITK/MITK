@@ -15,6 +15,15 @@ mitk::StandardFileLocations::~StandardFileLocations()
 {
 }
 
+mitk::StandardFileLocations* mitk::StandardFileLocations::GetInstance()
+{
+  static StandardFileLocations::Pointer m_Instance = 0;
+
+  if(m_Instance.IsNull())
+    m_Instance = StandardFileLocations::New();
+  return m_Instance;
+}
+
 
 void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
 {

@@ -37,8 +37,6 @@ namespace mitk
     typedef  StandardFileLocations   Self;
     typedef  itk::Command             Superclass;
     typedef  itk::SmartPointer<Self>  Pointer;
-
-    itkNewMacro( Self );
     
     /*!
     \brief Adds a directory into the search queue:
@@ -84,16 +82,11 @@ namespace mitk
     */
     std::string GetOptionDirectory();
 
-    static StandardFileLocations* GetInstance()
-    {
-      static StandardFileLocations::Pointer m_Instance = 0;
-
-      if(m_Instance.IsNull())
-        m_Instance = StandardFileLocations::New();
-      return m_Instance;
-    }
+    static StandardFileLocations* GetInstance();
 
   protected:
+
+    itkNewMacro( Self );
 
     typedef std::vector<std::string> FileSearchVectorType;
     FileSearchVectorType  m_SearchDirectories;
@@ -104,6 +97,7 @@ namespace mitk
     std::string SearchDirectoriesForFile(const char * filename);
 
   private:
+
     // Private Copy Constructor
     StandardFileLocations( const StandardFileLocations& );
   };

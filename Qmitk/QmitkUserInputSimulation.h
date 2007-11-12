@@ -30,6 +30,7 @@ class QmitkUserInputSimulation
     static void MouseDown( QWidget* widget, int x, int y, int button, int state = Qt::NoButton );
 
     static void MouseMove( QWidget* widget, int x, int y, int state );
+    static void MouseMove( QWidget* widget, int x, int y, int button, int state);
 
     static void MouseRelease( QWidget* widget,               int button);
     static void MouseRelease( QWidget* widget,               int button, int state);

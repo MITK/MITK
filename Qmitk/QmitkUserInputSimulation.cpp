@@ -43,12 +43,21 @@ void QmitkUserInputSimulation::MouseDown( QWidget* widget, int x, int y, int but
   qApp->processEvents();
 }
 
-
 void QmitkUserInputSimulation::MouseMove( QWidget* widget, int x, int y, int state )
 {
   if (!widget) return;
 
   QMouseEvent* me = new QMouseEvent( QEvent::MouseMove, QPoint( x, y ), widget->mapToGlobal(QPoint( x, y )), Qt::NoButton, state );
+  QApplication::postEvent( widget, me );
+  qApp->processEvents();
+}
+
+
+void QmitkUserInputSimulation::MouseMove( QWidget* widget, int x, int y, int button, int state )
+{
+  if (!widget) return;
+
+  QMouseEvent* me = new QMouseEvent( QEvent::MouseMove, QPoint( x, y ), widget->mapToGlobal(QPoint( x, y )), button, state );
   QApplication::postEvent( widget, me );
   qApp->processEvents();
 }

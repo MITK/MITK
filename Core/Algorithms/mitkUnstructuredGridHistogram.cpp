@@ -19,14 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnstructuredGrid.h>
 
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkIdList.h>
 
 #include "mitkUnstructuredGridHistogram.h"
 
 
-mitk::UnstructuredGridHistogram::UnstructuredGridHistogram()
-{
-}
 
 mitk::UnstructuredGridHistogram::~UnstructuredGridHistogram()
 {
@@ -39,9 +37,6 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
 
   vtkUnstructuredGrid* vtkUGrid = ugrid->GetVtkUnstructuredGrid();
   
-  //std::cout << "initializing histogram\n";
-  //vtkUGrid->PrintSelf(cout, 0);
-  const vtkIdType numPoints = vtkUGrid->GetNumberOfPoints();
   double* range = vtkUGrid->GetScalarRange();
    
   SizeType size;
@@ -55,19 +50,39 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
   
   this->Superclass::Initialize(size, lowerBound, upperBound);
   
-  vtkDataArray* pointData = vtkUGrid->GetPointData()->GetScalars();
-  vtkIdList* cellIds = vtkIdList::New();
-  for (vtkIdType pointId = 0; pointId < numPoints; pointId++) {
-    vtkUGrid->GetPointCells(pointId, cellIds);
-    double numIds = (double)cellIds->GetNumberOfIds();
-    double scalar = pointData->GetComponent(pointId, 0);
-    //std::cout << "scalar value: " << scalar;
-    int bin = numBins - 1;
-    if (scalar != upperBound[0])
-      bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
-    //std::cout << " bin: " << bin << std::endl;
-    this->IncreaseFrequency(bin, scalar/numIds);
-    cellIds->Reset();
+  vtkDataArray* data;
+  if (m_UsePointData) data = vtkUGrid->GetPointData()->GetScalars();
+  else data = vtkUGrid->GetCellData()->GetScalars();
+  
+  if (data == 0) return;
+  
+  if (m_UsePointData)
+  {
+    vtkIdList* cellIds = vtkIdList::New();
+    for (vtkIdType pointId = 0; pointId < vtkUGrid->GetNumberOfPoints(); pointId++) {
+      vtkUGrid->GetPointCells(pointId, cellIds);
+      double numIds = (double)cellIds->GetNumberOfIds();
+      double scalar = data->GetComponent(pointId, 0);
+      //std::cout << "scalar value: " << scalar;
+      int bin = numBins - 1;
+      if (scalar != upperBound[0])
+        bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
+      //std::cout << " bin: " << bin << std::endl;
+      this->IncreaseFrequency(bin, scalar/numIds);
+      cellIds->Reset();
+    }
+    cellIds->Delete();
   }
-  cellIds->Delete();
+  else
+  {
+    for (vtkIdType cellId = 0; cellId < vtkUGrid->GetNumberOfCells(); cellId++) {
+      double scalar = data->GetComponent(cellId, 0);
+      //std::cout << "scalar value: " << scalar;
+      int bin = numBins - 1;
+      if (scalar != upperBound[0])
+        bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
+      //std::cout << " bin: " << bin << std::endl;
+      this->IncreaseFrequency(bin, scalar);
+    }
+  }
 }

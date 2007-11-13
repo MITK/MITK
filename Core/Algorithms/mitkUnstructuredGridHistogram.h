@@ -36,11 +36,15 @@ public:
 	
 	void Initialize(mitk::UnstructuredGrid*);
 	
+	void SetUsePointData() { m_UsePointData = true; }
+	void SetUseCellData() { m_UsePointData = false; }
 	
 protected:
-	UnstructuredGridHistogram();
+	UnstructuredGridHistogram() : m_UsePointData(true) {}
 
 	virtual ~UnstructuredGridHistogram();
+	
+	bool m_UsePointData;
 };
 
 } // namespace mitk

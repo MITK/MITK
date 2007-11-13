@@ -79,6 +79,7 @@ int mitkRenderWindowTest(int /*argc*/, char* /*argv*/[])
   cone->Delete();
   coneMapper->Delete();
   coneActor->Delete();
+  ownvtkrenderer->Delete();
   delete renderwindow;
 
   std::cout<<"[TEST DONE]"<<std::endl;

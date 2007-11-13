@@ -65,7 +65,8 @@ mitk::StateMachineFactory::StateMachineFactory()
 {}
 
 mitk::StateMachineFactory::~StateMachineFactory()
-{}
+{
+}
 
 
 /**
@@ -332,8 +333,6 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   else if ( name == STATE_MACHINE ) 
   {
     //doesn't have to be done
-    // m_AktState = NULL;
-    // m_StartStates = NULL;
   } 
   else if ( name == TRANSITION ) 
   {
@@ -342,6 +341,10 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   else if ( name == ACTION ) 
   {
     m_AktAction = NULL;
+  }
+  else if ( name == STATE )
+  {
+    m_AktState = NULL;
   }
 }
 

@@ -82,7 +82,8 @@ ENDFOREACH(d)
 
 SET(${KITNAME}_INCLUDE_DIRS ${PROJECT_BINARY_DIR} ${${KITNAME}_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
 
-FOREACH(dir Core/DataStructures/mitkDataStorage Utilities Utilities/ipPic Utilities/IIL4MITK Utilities/pic2vtk)
+FOREACH(dir Core/DataStructures/mitkDataStorage Utilities Utilities/ipPic
+Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml)
   SET(${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 ENDFOREACH(dir)
   

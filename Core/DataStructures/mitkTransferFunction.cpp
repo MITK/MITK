@@ -36,7 +36,11 @@ mitk::TransferFunction::TransferFunction()
   
 }
 
-mitk::TransferFunction::~TransferFunction() {
+mitk::TransferFunction::~TransferFunction() 
+{
+  m_ScalarOpacityFunction->Delete();
+  m_ColorTransferFunction->Delete();
+  m_GradientOpacityFunction->Delete();
 }
 
 

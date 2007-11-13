@@ -62,6 +62,7 @@ protected:
 
   virtual ~UnstructuredGridVtkMapper3D();
 
+  virtual void GenerateData();
   virtual void GenerateData(mitk::BaseRenderer* renderer);
   
   void SetProperties(mitk::BaseRenderer* renderer);

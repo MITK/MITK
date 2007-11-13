@@ -100,12 +100,15 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
     m_Volume->Delete();
 }
 
+void mitk::UnstructuredGridVtkMapper3D::GenerateData()
+{
+  m_Assembly->VisibilityOn();
+}
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
-  bool visible = IsVisible(renderer);
-
-  if(visible==false)
+  
+  if(!IsVisible(renderer))
   {
     m_Assembly->VisibilityOff();
     return;
@@ -122,32 +125,16 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
     return;
   }
 
-  //
-  // get the world time
-  //
-  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-
-  //
-  // convert the world time in time steps of the input object
-  //
-  int timestep=0;
-  if( time > -ScalarTypeNumericTraits::max() )
-    timestep = inputTimeGeometry->MSToTimeStep( time );
-  if( inputTimeGeometry->IsValidTime( timestep ) == false )
+  if( inputTimeGeometry->IsValidTime(this->m_TimeStep ) == false )
   {
     m_Assembly->VisibilityOff();
     return;
   }
-//  std::cout << "time: "<< time << std::endl;
-//  std::cout << "timestep: "<<timestep << std::endl;
-  
+
   //
   // set the input-object at time t for the mapper
   //
-
-  vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid( timestep );
+  vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid( this->m_TimeStep );
   if(grid == 0) 
   {
     m_Assembly->VisibilityOff();
@@ -163,11 +150,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
   //
   SetProperties(renderer);
 
-  if (visible) {
-    m_Assembly->VisibilityOn();
-  }
-
-  m_Assembly->SetUserTransform(GetDataTreeNode()->GetVtkTransform(timestep));
+  m_Assembly->SetUserTransform(GetDataTreeNode()->GetVtkTransform(this->m_TimeStep));
 }
 
 void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* renderer)

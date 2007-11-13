@@ -93,6 +93,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   delete renderwindow;
+  tree = NULL; // As the tree has been registered explicitely, destroy it again.
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

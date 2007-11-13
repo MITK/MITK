@@ -432,9 +432,9 @@ typedef enum EEventType
   Type_Style = 91,				// internal style event
   Type_TabletPress = 92,			// tablet press
   Type_TabletRelease = 93,			// tablet release
-  Type_TDMouseInput = 94,	// 3D mouse input occured
-  Type_TDMouseKeyDown = 95,	// 3D mouse input occured
   Type_User = 1000,				// first user event id
+  Type_TDMouseInput = 1094,	// 3D mouse input occured
+  Type_TDMouseKeyDown = 1095,	// 3D mouse input occured
   Type_MaxUser = 65535
 };
 

@@ -804,10 +804,12 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
 
 void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node)
 {
+  node->SetProperty( "linewidth", new mitk::IntProperty(1) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "grid representation", new mitk::GridRepresentationProperty);
   node->SetProperty( "grid volume mapper", new mitk::GridVolumeMapperProperty);
   node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
+  node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
   node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
   node->SetVisibility(true);
 }

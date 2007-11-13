@@ -55,4 +55,5 @@ SET(CPP_FILES
   mitkUnstructuredGridHistogram.cpp
   mitkUnstructuredGridSource.cpp
   mitkVolumeCalculator.cpp
+  vtkPointSetSlicer.cxx
 )

@@ -281,6 +281,8 @@ DataTreeFilter::~DataTreeFilter()
   m_Items->clear();
   m_Item.clear(); // should already BE clear by now
   m_SelectedItems.clear();
+
+  if ( m_Filter ) delete m_Filter;
 }
 
 const DataTreeBase* DataTreeFilter::GetDataTree() const

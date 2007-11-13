@@ -29,7 +29,7 @@ mitk::NativeRenderWindowInteractor::NativeRenderWindowInteractor() : m_MitkRende
 
 mitk::NativeRenderWindowInteractor::~NativeRenderWindowInteractor() 
 {
-
+  m_NativeVtkRenderWindowInteractor->Delete();
 }
 
 void mitk::NativeRenderWindowInteractor::SetMitkRenderWindow(mitk::RenderWindow* renderwindow)

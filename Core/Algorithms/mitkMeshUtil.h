@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnstructuredGrid.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkProperty.h>
 #include <vtkFloatArray.h>
 
@@ -51,17 +52,37 @@ template <typename MeshType>
 class NullScalarAccessor
 {
 public:
-  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* /*pointData*/, typename MeshType::PointIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  {
+    return (vtkFloatingPointType) 0.0;
+  };
+  
+  static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* /*cellData*/, typename MeshType::CellIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
     return (vtkFloatingPointType) 0.0;
   };
 };
 
 template <typename MeshType>
-class MeanCurvatureAccessor
+class MeshScalarAccessor
 {
 public:
-  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
+  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* pointData, typename MeshType::PointIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  {
+    return (vtkFloatingPointType)pointData->GetElement(idx);
+  };
+  
+  static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* cellData, typename MeshType::CellIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
+  {
+    return (vtkFloatingPointType)cellData->GetElement(idx);
+  };
+};
+
+template <typename MeshType>
+class MeanCurvatureAccessor : public NullScalarAccessor<MeshType>
+{
+public:
+  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
   {
     typename MeshType::PixelType dis;    
     mesh->GetPointData(idx, &dis);
@@ -70,10 +91,10 @@ public:
 };
 
 template <typename MeshType>
-class SimplexMeshAccessor
+class SimplexMeshAccessor : public NullScalarAccessor<MeshType>
 {
 public:
-  static inline vtkFloatingPointType GetScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
+  static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* point, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int type = 0 )
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 
@@ -169,68 +190,90 @@ class MeshUtil
     /*!
     Visit a line and create the VTK_LINE cell   
     */
-    void Visit(unsigned long , floatLineCell* t)
+    void Visit(unsigned long cellId, floatLineCell* t)
     {
       vtkIdType pts[2];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num==2) { // useless because itk::LineCell always returns 2
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+                         ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
     /*!
     Visit a polygon and create the VTK_POLYGON cell   
     */
-    void Visit(unsigned long , floatPolygonCell* t)
+    void Visit(unsigned long cellId, floatPolygonCell* t)
     {
       vtkIdType pts[4096];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num > 4096) {
         std::cerr << "Problem in mitkMeshUtil: Polygon with more than maximum number of vertices encountered." << std::endl;
       }
       else if (num > 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertPolygon( num, (vtkIdType*)pts );
+        vtkCellId = this->InsertPolygon( num, (vtkIdType*)pts );
       }
       else if (num == 3) { 
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTriangle( (vtkIdType*)pts );
+        vtkCellId = this->InsertTriangle( (vtkIdType*)pts );
       }
       else if (num==2) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
     /*!
     Visit a triangle and create the VTK_TRIANGLE cell   
     */
-    void Visit(unsigned long , floatTriangleCell* t)
+    void Visit(unsigned long cellId, floatTriangleCell* t)
     {
       vtkIdType pts[3];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num == 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTriangle( (vtkIdType*)pts );
+        vtkCellId = this->InsertTriangle( (vtkIdType*)pts );
       }
       else if (num==2) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
     /*! 
     Visit a quad and create the VTK_QUAD cell 
     */
-    void Visit(unsigned long , floatQuadrilateralCell* t)
+    void Visit(unsigned long cellId, floatQuadrilateralCell* t)
     {
       vtkIdType pts[4];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num == 4) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) 
         {
@@ -240,63 +283,95 @@ class MeshUtil
           i++;
           //pts[i++] = *it;
         }
-        this->InsertQuad( (vtkIdType*)pts );
+        vtkCellId = this->InsertQuad( (vtkIdType*)pts );
       }
       else if (num == 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTriangle( (vtkIdType*)pts );
+        vtkCellId = this->InsertTriangle( (vtkIdType*)pts );
       }
       else if (num==2) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
     
     /*! 
     Visit a tetrahedra and create the VTK_TETRA cell 
     */
-    void Visit(unsigned long , floatTetrahedronCell* t)
+    void Visit(unsigned long cellId, floatTetrahedronCell* t)
     {
       vtkIdType pts[4];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num == 4) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTetra( (vtkIdType*)pts );
+        vtkCellId = this->InsertTetra( (vtkIdType*)pts );
       }
       else if (num == 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTriangle( (vtkIdType*)pts );
+        vtkCellId = this->InsertTriangle( (vtkIdType*)pts );
       }
       else if (num==2) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
     
     /*! 
     Visit a hexahedron and create the VTK_HEXAHEDRON cell 
     */
-    void Visit(unsigned long , floatHexahedronCell* t)
+    void Visit(unsigned long cellId, floatHexahedronCell* t)
     {
       vtkIdType pts[8];
       int i=0;
       unsigned long num = t->GetNumberOfVertices();
+      vtkIdType vtkCellId = -1;
       if (num == 8) {
-        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertHexahedron( (vtkIdType*)pts );
+        for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++)
+          {
+          if (i == 2)
+            pts[i++] = *(it+1);
+          else if (i == 3)
+            pts[i++] = *(it-1);
+          else if (i == 6)
+            pts[i++] = *(it+1);
+          else if (i == 7)
+            pts[i++] = *(it-1);
+          else
+            pts[i++] = *it;
+          }
+        vtkCellId = this->InsertHexahedron( (vtkIdType*)pts );
       }
       else if (num == 4) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertQuad( (vtkIdType*)pts );
+        vtkCellId = this->InsertQuad( (vtkIdType*)pts );
       }
       else if (num == 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertTriangle( (vtkIdType*)pts );
+        vtkCellId = this->InsertTriangle( (vtkIdType*)pts );
       }
       else if (num==2) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
-        this->InsertLine( (vtkIdType*)pts );
+        vtkCellId = this->InsertLine( (vtkIdType*)pts );
+      }
+      
+      if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
+      {
+        this->m_CellScalars->InsertTuple1(vtkCellId,
+            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
   };
@@ -394,7 +469,15 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType *pts = (vtkIdType*)t->PointIdsBegin();
       if (num == 8) 
+      {
+        vtkIdType tmp[8];
+        for (unsigned int i = 0; i < 8; i++) tmp[i] = pts[i];
+        pts[2] = tmp[3];
+        pts[3] = tmp[2];
+        pts[6] = tmp[7];
+        pts[7] = tmp[6];
         this->InsertHexahedron(pts);
+      }
     }
   };
 
@@ -408,8 +491,17 @@ class MeshUtil
   {
     vtkCellArray* m_Cells;
     int* m_TypeArray;
-    vtkIdType cellId;
+    //vtkIdType cellId;
+    
+  protected:
+    bool m_UseCellScalarAccessor;
+    vtkFloatArray* m_CellScalars;
+    typename MeshType::CellDataContainer::Pointer m_CellData;
+    
   public:
+    
+    SingleCellArrayInsertImplementation() : m_UseCellScalarAccessor(false) {}
+    
     /*! Set the vtkCellArray that will be constructed
     */
     void SetCellArray(vtkCellArray* cells)
@@ -425,40 +517,63 @@ class MeshUtil
       m_TypeArray = i;
     }
     
-    void InsertLine(vtkIdType *pts)
+    void SetUseCellScalarAccessor(bool flag) 
     {
-      this->cellId = m_Cells->InsertNextCell(2, pts);
-      m_TypeArray[this->cellId] = VTK_LINE;
-    }
-
-    void InsertTriangle(vtkIdType *pts)
-    {
-      this->cellId = m_Cells->InsertNextCell(3, pts);
-      m_TypeArray[this->cellId] = VTK_TRIANGLE;
-    }
-
-    void InsertPolygon(vtkIdType npts, vtkIdType *pts)
-    {
-      this->cellId = m_Cells->InsertNextCell(npts, pts);
-      m_TypeArray[this->cellId] = VTK_POLYGON;
-    }
-
-    void InsertQuad(vtkIdType *pts)
-    {
-      this->cellId = m_Cells->InsertNextCell(4, pts);
-      m_TypeArray[this->cellId] = VTK_QUAD;
+      m_UseCellScalarAccessor = flag;
     }
     
-    void InsertTetra(vtkIdType *pts)
+    void SetCellScalars(vtkFloatArray* scalars)
     {
-      this->cellId = m_Cells->InsertNextCell(4, pts);
-      m_TypeArray[this->cellId] = VTK_TETRA;
+      m_CellScalars = scalars;
     }
     
-    void InsertHexahedron(vtkIdType *pts)
+    vtkFloatArray* GetCellScalars() { return m_CellScalars; }
+    
+    void SetMeshCellData(typename MeshType::CellDataContainer* data)
     {
-      this->cellId = m_Cells->InsertNextCell(8, pts);
-      m_TypeArray[this->cellId] = VTK_HEXAHEDRON;
+      m_CellData = data;
+    }
+    
+    vtkIdType InsertLine(vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(2, pts);
+      m_TypeArray[cellId] = VTK_LINE;
+      return cellId;
+    }
+
+    vtkIdType InsertTriangle(vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(3, pts);
+      m_TypeArray[cellId] = VTK_TRIANGLE;
+      return cellId;
+    }
+
+    vtkIdType InsertPolygon(vtkIdType npts, vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(npts, pts);
+      m_TypeArray[cellId] = VTK_POLYGON;
+      return cellId;
+    }
+
+    vtkIdType InsertQuad(vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(4, pts);
+      m_TypeArray[cellId] = VTK_QUAD;
+      return cellId;
+    }
+    
+    vtkIdType InsertTetra(vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(4, pts);
+      m_TypeArray[cellId] = VTK_TETRA;
+      return cellId;
+    }
+    
+    vtkIdType InsertHexahedron(vtkIdType *pts)
+    {
+      vtkIdType cellId = m_Cells->InsertNextCell(8, pts);
+      m_TypeArray[cellId] = VTK_HEXAHEDRON;
+      return cellId;
     }
   };
 
@@ -473,7 +588,17 @@ class MeshUtil
     vtkCellArray* m_TriangleCells;
     vtkCellArray* m_PolygonCells;
     vtkCellArray* m_QuadCells;
+    
+  protected:
+    bool m_UseCellScalarAccessor;
+    vtkFloatArray* m_CellScalars;
+    typename MeshType::CellDataContainer::Pointer m_CellData;
+
   public:
+    
+    DistributeInsertImplementation() : m_UseCellScalarAccessor(false) {}
+
+    
     /*! Set the vtkCellArray that will be constructed
     */
     void SetCellArrays(vtkCellArray* lines, vtkCellArray* triangles, vtkCellArray* polygons, vtkCellArray* quads) 
@@ -484,28 +609,28 @@ class MeshUtil
       m_QuadCells = quads;
     }
 
-    void InsertLine(vtkIdType *pts)
+    vtkIdType InsertLine(vtkIdType *pts)
     {
-      m_LineCells->InsertNextCell(2, pts);
+      return m_LineCells->InsertNextCell(2, pts);
     }
 
-    void InsertTriangle(vtkIdType *pts)
+    vtkIdType InsertTriangle(vtkIdType *pts)
     {
-      m_TriangleCells->InsertNextCell(3, pts);
+      return m_TriangleCells->InsertNextCell(3, pts);
     }
 
-    void InsertPolygon(vtkIdType npts, vtkIdType *pts)
+    vtkIdType InsertPolygon(vtkIdType npts, vtkIdType *pts)
     {
-      m_PolygonCells->InsertNextCell(npts, pts);
+      return m_PolygonCells->InsertNextCell(npts, pts);
     }
 
-    void InsertQuad(vtkIdType *pts)
+    vtkIdType InsertQuad(vtkIdType *pts)
     {
-      m_QuadCells->InsertNextCell(4, pts);
+      return m_QuadCells->InsertNextCell(4, pts);
     }
     
-    void InsertTetra(vtkIdType *pts) {} // ignored
-    void InsertHexahedron(vtkIdType *pts) {} // ignored
+    vtkIdType InsertTetra(vtkIdType *pts) { return -1; } // ignored
+    vtkIdType InsertHexahedron(vtkIdType *pts) { return -1; } // ignored
   };
 
   //typedef typename MeshType::CellType                CellType;
@@ -795,7 +920,12 @@ public:
   /*!
   create an vtkUnstructuredGrid object from an itkMesh
   */
-  static vtkUnstructuredGrid* MeshToUnstructuredGrid(MeshType* mesh)
+  static vtkUnstructuredGrid* MeshToUnstructuredGrid(
+      MeshType* mesh, 
+      bool usePointScalarAccessor = false, 
+      bool useCellScalarAccessor = false, 
+      unsigned int pointDataType = 0, 
+      mitk::Geometry3D* geometryFrame=NULL)
   {
     /*! 
     default SingleCellArray line cell visitior definition 
@@ -861,7 +991,11 @@ public:
 #else
     vtkPoints* vpoints = vtkPoints::New();
 #endif
-
+    vtkFloatArray* pointScalars = vtkFloatArray::New();
+    vtkFloatArray* cellScalars = vtkFloatArray::New();
+    pointScalars->SetNumberOfComponents(1);
+    cellScalars->SetNumberOfComponents(1);
+    
     typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
     typename MeshType::PointsContainer::Iterator i;
 
@@ -876,27 +1010,55 @@ public:
 
     // initialize vtk-classes for points and scalars
     vpoints->SetNumberOfPoints(maxIndex+1);
+    pointScalars->SetNumberOfTuples(maxIndex+1);
+    cellScalars->SetNumberOfTuples(mesh->GetNumberOfCells());
     
     vtkFloatingPointType vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
-    
-    for(i = points->Begin(); i != points->End(); ++i)
+    if (geometryFrame == 0)
     {
-      // Get the point index from the point container iterator
-      int idx = i->Index();
+      for(i = points->Begin(); i != points->End(); ++i)
+      {
+        // Get the point index from the point container iterator
+        int idx = i->Index();
 
-      itkPhysicalPoint = i->Value();
-      mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
-      // Set the vtk point at the index with the the coord array from itk
-      // itk returns a const pointer, but vtk is not const correct, so
-      // we have to use a const cast to get rid of the const
-      //      vpoints->SetPoint(idx, const_cast<DATATYPE*>(i->Value().GetDataPointer()));
-      //vpoints->SetPoint(idx, (typename MeshType::PixelType*)(i->Value().GetDataPointer()));
-      vpoints->SetPoint(idx, vtkpoint);
+        itkPhysicalPoint = i->Value();
+        mitk::itk2vtk(itkPhysicalPoint, vtkpoint);
+        // Set the vtk point at the index with the the coord array from itk
+        vpoints->SetPoint(idx, vtkpoint);
+
+        if(usePointScalarAccessor)
+        {   
+          pointScalars->InsertTuple1( idx, ScalarAccessor::GetPointScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+        }
+      }
+    }
+    else
+    {
+      mitk::Point3D mitkWorldPoint;
+      for(i = points->Begin(); i != points->End(); ++i)
+      {
+        // Get the point index from the point container iterator
+        int idx = i->Index();
+
+        itkPhysicalPoint = i->Value();
+        geometryFrame->ItkPhysicalPointToWorld(itkPhysicalPoint, mitkWorldPoint);
+        mitk::itk2vtk(mitkWorldPoint, vtkpoint);
+        // Set the vtk point at the index with the the coord array from itk
+        vpoints->SetPoint(idx, vtkpoint);
+
+        if(usePointScalarAccessor)
+        {   
+          pointScalars->InsertTuple1( idx, ScalarAccessor::GetPointScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+        }
+      }
     }
     // Set the points on the vtk grid
     vgrid->SetPoints(vpoints);
-    // Now create the cells using the MulitVisitor
+    if (usePointScalarAccessor)
+      vgrid->GetPointData()->SetScalars(pointScalars);
+    
+    // Now create the cells using the MultiVisitor
     // 1. Create a MultiVisitor
     typename MeshType::CellType::MultiVisitor::Pointer mv =
       MeshType::CellType::MultiVisitor::New();
@@ -929,6 +1091,34 @@ public:
     tetv->SetCellArray(cells);
     hv->SetTypeArray(types);
     hv->SetCellArray(cells);
+    
+    if (useCellScalarAccessor)
+    {
+      lv->SetUseCellScalarAccessor(true);
+      lv->SetCellScalars(cellScalars);
+      lv->SetMeshCellData(mesh->GetCellData());
+
+      pv->SetUseCellScalarAccessor(true);
+      pv->SetCellScalars(cellScalars);
+      pv->SetMeshCellData(mesh->GetCellData());
+
+      tv->SetUseCellScalarAccessor(true);
+      tv->SetCellScalars(cellScalars);
+      tv->SetMeshCellData(mesh->GetCellData());
+
+      qv->SetUseCellScalarAccessor(true);
+      qv->SetCellScalars(cellScalars);
+      qv->SetMeshCellData(mesh->GetCellData());
+
+      tetv->SetUseCellScalarAccessor(true);
+      tetv->SetCellScalars(cellScalars);
+      tetv->SetMeshCellData(mesh->GetCellData());
+
+      hv->SetUseCellScalarAccessor(true);
+      hv->SetCellScalars(cellScalars);
+      hv->SetMeshCellData(mesh->GetCellData());
+    }
+    
     // add the visitors to the multivisitor
     mv->AddVisitor(lv);
     mv->AddVisitor(pv);
@@ -941,12 +1131,17 @@ public:
     // cell types of the visitors added to the MultiVisitor
     mesh->Accept(mv);
     // Now set the cells on the vtk grid with the type array and cell array
-    vgrid->SetCells(types, cells);  
+    
+    vgrid->SetCells(types, cells);
+    vgrid->GetCellData()->SetScalars(cellScalars);
+    
     // Clean up vtk objects (no vtkSmartPointer ... )
     cells->Delete();
     vpoints->Delete();
     delete[] types;
 
+    pointScalars->Delete();
+    cellScalars->Delete();
     //std::cout << "meshToUnstructuredGrid end" << std::endl;
     return vgrid;
   }
@@ -1059,7 +1254,7 @@ public:
 
         if(useScalarAccessor)
         {   
-          scalars->InsertTuple1( idx, ScalarAccessor::GetScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+          scalars->InsertTuple1( idx, ScalarAccessor::GetPointScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
         }
       }
     }
@@ -1082,7 +1277,7 @@ public:
 
         if(useScalarAccessor)
         {   
-          scalars->InsertTuple1( idx, ScalarAccessor::GetScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
+          scalars->InsertTuple1( idx, ScalarAccessor::GetPointScalar( mesh->GetPointData(), i->Index(), mesh, pointDataType ) );
         }
       }
     }

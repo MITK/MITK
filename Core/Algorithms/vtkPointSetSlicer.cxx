@@ -496,7 +496,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
     std::vector<vtkIdType> pset;
     for (i=0; i<pnum; i++)
     {
-      if (find(pset.begin(), pset.end(), pts[i]) == pset.end())
+      if (std::find(pset.begin(), pset.end(), pts[i]) == pset.end())
         pset.push_back(pts[i]);
     }
 
@@ -568,7 +568,7 @@ int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
   return 1;
 }
 
-void vtkPointSetSlicer::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPointSetSlicer::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

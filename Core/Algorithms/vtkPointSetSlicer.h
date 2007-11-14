@@ -19,16 +19,36 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _VTKPOINTSETSLICER_H_
 #define _VTKPOINTSETSLICER_H_
 
-#include "vtkPolyDataAlgorithm.h"
+#include <iostream>
 
 class vtkCutter;
 class vtkPlane;
+class vtkPointLocator;
+class vtkCell;
+class vtkCellArray;
+class vtkPointData;
+class vtkCellData;
+
+
+#if (VTK_MAJOR_VERSION < 5)
+#include "vtkDataSetToPolyDataFilter.h"
+
+class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFilter
+{
+public:
+  vtkTypeMacro(vtkPointSetSlicer,vtkDataSetToPolyDataFilter);
+  
+#else
+#include "vtkPolyDataAlgorithm.h"
 
 class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  
+#endif
+  
+  void PrintSelf(std::ostream& os, vtkIndent indent);
 
   // Description:
   // Construct with user-specified implicit function; initial value of 0.0; and

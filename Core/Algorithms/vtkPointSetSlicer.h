@@ -94,9 +94,13 @@ protected:
   vtkPointSetSlicer(vtkPlane* cf = 0);
   ~vtkPointSetSlicer();
 
+#if (VTK_MAJOR_VERSION >= 5)
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
+#else
+  virtual void Execute();
+#endif
   
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
   

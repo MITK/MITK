@@ -107,9 +107,7 @@ unsigned long vtkPointSetSlicer::GetMTime()
   return mTime;
 }
 
-
-// Cut through data generating surface.
-//
+#if (VTK_MAJOR_VERSION >= 5)
 int vtkPointSetSlicer::RequestData(
   vtkInformation * /*request*/,
   vtkInformationVector **inputVector,
@@ -181,6 +179,58 @@ int vtkPointSetSlicer::RequestData(
 
   return 1;
 }
+int vtkPointSetSlicer::RequestUpdateExtent(
+  vtkInformation *,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *)
+{
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+  return 1;
+}
+int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
+}
+#else
+void vtkPointSetSlicer::Exectue()
+{
+  vtkDebugMacro(<< "Executing cutter");
+
+  vtkDataSet *input = this->GetInput();
+  vtkPolyData *output = this->GetOutput();
+
+  if (!input)
+  {
+    vtkErrorMacro("No input specified");
+    return;
+  }
+
+  if (!this->SlicePlane)
+  {
+    vtkErrorMacro("No slice plane specified");
+    return;
+  }
+
+  if ( input->GetNumberOfPoints() < 1 )
+  {
+    vtkErrorMacro("Input data set is empty");
+    return;
+  }
+
+  if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
+  { 
+    vtkDebugMacro(<< "Executing Unstructured Grid Cutter");   
+    this->UnstructuredGridCutter(input, output);
+  }
+  else
+  {
+    vtkDebugMacro(<< "Executing DataSet Cutter");
+    //this->DataSetCutter(input, output);
+  }
+}
+#endif
 
 void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
 {
@@ -552,21 +602,6 @@ void vtkPointSetSlicer::CreateDefaultLocator()
     }
 }
 
-int vtkPointSetSlicer::RequestUpdateExtent(
-  vtkInformation *,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *)
-{
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
-  return 1;
-}
-
-int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  return 1;
-}
 
 void vtkPointSetSlicer::PrintSelf(std::ostream& os, vtkIndent indent)
 {

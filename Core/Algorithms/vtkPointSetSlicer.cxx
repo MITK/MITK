@@ -245,7 +245,6 @@ void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
   cellTypeDimensions[VTK_POLY_LINE] = 1;
   cellTypeDimensions[VTK_QUADRATIC_EDGE] = 1;
   cellTypeDimensions[VTK_PARAMETRIC_CURVE] = 1;
-  cellTypeDimensions[VTK_HIGHER_ORDER_EDGE] = 1;
   cellTypeDimensions[VTK_TRIANGLE] = 2;
   cellTypeDimensions[VTK_TRIANGLE_STRIP] = 2;
   cellTypeDimensions[VTK_POLYGON] = 2;
@@ -256,9 +255,10 @@ void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
   cellTypeDimensions[VTK_PARAMETRIC_SURFACE] = 2;
   cellTypeDimensions[VTK_PARAMETRIC_TRI_SURFACE] = 2;
   cellTypeDimensions[VTK_PARAMETRIC_QUAD_SURFACE] = 2;
+#if (VTK_MAJOR_VERSION >= 5)
+  cellTypeDimensions[VTK_HIGHER_ORDER_EDGE] = 1;
   cellTypeDimensions[VTK_HIGHER_ORDER_TRIANGLE] = 2;
   cellTypeDimensions[VTK_HIGHER_ORDER_QUAD] = 2;
-#if (VTK_MAJOR_VERSION >= 5)
   cellTypeDimensions[VTK_HIGHER_ORDER_POLYGON] = 2;
 #endif
 }

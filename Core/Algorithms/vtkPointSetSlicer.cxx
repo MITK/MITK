@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 #include <vector>
+#include <algorithm>
 
 #include "vtkPointSetSlicer.h"
 
@@ -429,7 +430,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
     POLY_CASES *polyCase;
     EDGE_LIST  *edge;
     int i, j, index, *vert;
-    int pnum;
+    volatile int pnum;
     int v1, v2, newCellId;
     double t, x1[3], x2[3], x[3], deltaScalar;
     vtkIdType offset = verts->GetNumberOfCells() + lines->GetNumberOfCells();
@@ -452,7 +453,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
       if (edge[i] > -1) pnum++;
       else break;
 
-    vtkIdType pts[pnum];
+    vtkIdType* pts = new vtkIdType[pnum];
     for (i=0; i<pnum; i++) // insert polygon
     {
       vert = edges[edge[i]];
@@ -510,12 +511,13 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
       newCellId = offset + polys->InsertNextCell(pset.size(),pts);
       outCd->CopyData(inCd,cellId,newCellId);
     }
+    delete [] pts;
 
   }
   else
   {
     cell->Contour(0, cellScalars, locator, verts, lines, polys,
-        inPd, outPd, inCd, cellId, outCd);
+      inPd, outPd, inCd, cellId, outCd);
   }
 }
 

@@ -26,8 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkGenericCell.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
 #include "vtkMergePoints.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -37,7 +35,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-
+#if (VTK_MAJOR_VERSION >= 5)
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#endif
 
 vtkStandardNewMacro(vtkPointSetSlicer);
 
@@ -256,7 +257,9 @@ void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
   cellTypeDimensions[VTK_PARAMETRIC_QUAD_SURFACE] = 2;
   cellTypeDimensions[VTK_HIGHER_ORDER_TRIANGLE] = 2;
   cellTypeDimensions[VTK_HIGHER_ORDER_QUAD] = 2;
+#if (VTK_MAJOR_VERSION >= 5)
   cellTypeDimensions[VTK_HIGHER_ORDER_POLYGON] = 2;
+#endif
 }
 
 

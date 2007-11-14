@@ -25,6 +25,7 @@ class vtkCutter;
 class vtkPlane;
 class vtkPointLocator;
 class vtkCell;
+class vtkDataArray;
 class vtkCellArray;
 class vtkPointData;
 class vtkCellData;

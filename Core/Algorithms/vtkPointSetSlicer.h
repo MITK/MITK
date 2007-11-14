@@ -33,6 +33,7 @@ class vtkCellData;
 
 #if (VTK_MAJOR_VERSION < 5)
 #include "vtkDataSetToPolyDataFilter.h"
+#define VTK_NUMBER_OF_CELL_TYPES 68
 
 class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFilter
 {

@@ -32,12 +32,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkPolyData.h"
 #include "vtkPlane.h"
 #include "vtkCutter.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+
 #include "vtkUnstructuredGrid.h"
 
 #if (VTK_MAJOR_VERSION >= 5)
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #endif
 
 vtkStandardNewMacro(vtkPointSetSlicer);
@@ -195,7 +196,7 @@ int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
   return 1;
 }
 #else
-void vtkPointSetSlicer::Exectue()
+void vtkPointSetSlicer::Execute()
 {
   vtkDebugMacro(<< "Executing cutter");
 

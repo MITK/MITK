@@ -50,19 +50,19 @@ TextLoggerConferenceKit::MouseMove( const char* sender, float w1, float w2, floa
 
 
   void
-TextLoggerConferenceKit::MyTokenPriority(long int tid)
+TextLoggerConferenceKit::MyTokenPriority(long int /*tid*/)
 {
   //  qp->sendMessage( mitk::m_QmitkChiliPluginConferenceID + mitk::ARRANGEc, list );
 }
 
   void
-TextLoggerConferenceKit::AskForToken(long int tid)
+TextLoggerConferenceKit::AskForToken(long int /*tid*/)
 {
   //  qp->sendMessage( mitk::m_QmitkChiliPluginConferenceID + mitk::TOKENREQUESTc , list );
 };
 
   void
-TextLoggerConferenceKit::SetToken(long int sender, long int requester)
+TextLoggerConferenceKit::SetToken(long int /*sender*/, long int /*requester*/)
 {
   //  qp->sendMessage( mitk::m_QmitkChiliPluginConferenceID + mitk::TOKENSETc , list );
 };

@@ -204,9 +204,9 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
   int numberOfPixels(0); // number of pixels in this slice that are not 0
   
   typename IteratorType::IndexType index;
-  unsigned int x;
-  unsigned int y;
-  unsigned int z;
+  unsigned int x = 0;
+  unsigned int y = 0;
+  unsigned int z = 0;
 
   iter.GoToBegin();
   while ( !iter.IsAtEnd() )

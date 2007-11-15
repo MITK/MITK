@@ -118,19 +118,24 @@ void mitk::MeshVtkMapper3D::GenerateData()
 
   int j;
 
-  vtkFloatingPointType rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  float floatRgba[4] = {1.0f,1.0f,1.0f,1.0f};
+  vtkFloatingPointType doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
   mitk::Color tmpColor;
 
   // check for color prop and use it for rendering if it exists
-  m_DataTreeNode->GetColor((float*)rgba, NULL); 
+  m_DataTreeNode->GetColor(floatRgba, NULL); 
  
   if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer()) != NULL)
   {
     tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer())->GetValue();
-    rgba[0] = tmpColor[0];
-    rgba[1] = tmpColor[1];
-    rgba[2] = tmpColor[2];
-    rgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+    floatRgba[0] = tmpColor[0];
+    floatRgba[1] = tmpColor[1];
+    floatRgba[2] = tmpColor[2];
+    floatRgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+    doubleRgba[0] = floatRgba[0];
+    doubleRgba[1] = floatRgba[1];
+    doubleRgba[2] = floatRgba[2];
+    doubleRgba[3] = floatRgba[3];
   }
 
   if(itkMesh->GetNumberOfPoints()>0)
@@ -154,7 +159,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
 
     // setup mapper, actor and add to assembly
     m_SpheresMapper->SetInput(m_Spheres->GetOutput());
-    m_SpheresActor->GetProperty()->SetColor(rgba);
+    m_SpheresActor->GetProperty()->SetColor(doubleRgba);
     m_PropAssembly->AddPart(m_SpheresActor);
   }
 
@@ -177,7 +182,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
         m_ContourActor->GetProperty()->SetRepresentationToWireframe();
       else
         m_ContourActor->GetProperty()->SetRepresentationToSurface();
-      m_ContourActor->GetProperty()->SetColor(rgba);
+      m_ContourActor->GetProperty()->SetColor(doubleRgba);
       m_PropAssembly->AddPart(m_ContourActor);
     }
   }

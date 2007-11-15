@@ -29,7 +29,7 @@ mitk::PicDescriptorToNode::~PicDescriptorToNode()
 }
 
 // set-function
-void mitk::PicDescriptorToNode::SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
+void mitk::PicDescriptorToNode::SetInput( std::list< ipPicDescriptor* > /*inputPicDescriptorList*/, std::string /*inputSeriesOID*/ )
 {
 }
 

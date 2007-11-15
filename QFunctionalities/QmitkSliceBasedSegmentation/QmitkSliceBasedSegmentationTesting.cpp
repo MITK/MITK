@@ -204,18 +204,19 @@ bool QmitkSliceBasedSegmentation::TestAllTools()
           sliceWidget = m_MultiWidget->mitkWidget3->GetRenderWindow();
           break;
       }
-
+/*
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.25, 0.25, 0.2 );
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.75, 0.75, 0.2 );
+*/
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.75, 0.25, 0.2 );
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.25, 0.75, 0.2 );
 
       std::cout << " chaos " << std::flush;
-      QmitkUserInputSimulation::MouseDrawRandom( sliceWidget, Qt::LeftButton, 100 ); // random points
+      QmitkUserInputSimulation::MouseDrawRandom( sliceWidget, Qt::LeftButton, 50 ); // random points
 
       if (    std::string("Region growing") == tool->GetName() // little more stress for problematic tools
            || std::string("Correction") == tool->GetName()) 

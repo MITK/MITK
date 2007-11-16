@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "math.h"
 #include <stdlib.h>
+#include "mitkChiliMacros.h"
 
 // function to round
 double mitk::SpacingSetFilter::Round(double number, unsigned int decimalPlaces)
@@ -532,7 +533,7 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
 #endif
 }
 
-void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination )
+void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombination) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   //to found a combination which represent the whole, the single combinations get combined

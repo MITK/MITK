@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkPicHeaderProperty.h"
-
+#include "mitkChiliMacros.h"
 #include "math.h"
 
 // helper class to sort PicDescriptors primary by there imageNumber; if the imageNumber equal, the sliceLocation get used
@@ -115,7 +115,7 @@ class compare_PicDescriptor_ImageNumber
 class compare_PicDescriptor_SliceLocation
 {
   public:
-  bool operator() ( ipPicDescriptor* &first, ipPicDescriptor* &second)
+  bool operator() ( ipPicDescriptor*& mitkHideIfNoVersionCode( first ) , ipPicDescriptor*& mitkHideIfNoVersionCode( second ) )
   {
     bool returnValue = false;
 #ifdef CHILI_PLUGIN_VERSION_CODE

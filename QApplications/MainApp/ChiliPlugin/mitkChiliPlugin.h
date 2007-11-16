@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/plugin.h>
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>
-
 #include <tinyxml.h>  // xml used to save the parent-child-relationship
 #include "mitkImageToPicDescriptor.h"  // define the "TagInformationList"
 

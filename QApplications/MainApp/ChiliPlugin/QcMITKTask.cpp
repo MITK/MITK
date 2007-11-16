@@ -12,13 +12,13 @@ QcMITKTask::~QcMITKTask()
 }
 
 
-void QcMITKTask::showEvent(QShowEvent *se)
+void QcMITKTask::showEvent(QShowEvent * /*se*/)
 {
   setVisible( true );
 }
 
 
-void QcMITKTask::hideEvent(QHideEvent *he)
+void QcMITKTask::hideEvent(QHideEvent * /*he*/)
 { 
   setVisible( false );
 }

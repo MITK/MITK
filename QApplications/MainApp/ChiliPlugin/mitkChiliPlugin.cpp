@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSpacingSetFilter.h"
 #include "QmitkChiliPluginSaveDialog.h"
 #include "mitkLightBoxImageReader.h"  //TODO entfernen wenn das neue Chili-Release installiert ist
+#include "mitkChiliMacros.h"
+
 //MITK
 #include <mitkCoreObjectFactory.h>
 #include <QmitkStdMultiWidget.h>
@@ -246,7 +248,7 @@ bool mitk::ChiliPlugin::IsPlugin()
 /** STUDY-, PATIENT-, SERIES- AND TEXT-INFORMATIONS */
 
 /** Return the studyinformation. If you dont set the seriesOID, you get the current selected study. If you want a specific study, set the OID. If no study could found, this function return StudyInformation.OID == "". */
-mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesOID )
+mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   StudyInformation resultInformation;
   resultInformation.OID = "";
@@ -313,7 +315,7 @@ mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const
 }
 
 /** Return the patientinformation. If you dont set the seriesOID, you get the current selected patient. If you want a specific patient, set the OID. If no patient could found, this function return PatientInformation.OID == "". */
-mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesOID )
+mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   PatientInformation resultInformation;
   resultInformation.OID = "";
@@ -377,7 +379,7 @@ mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( c
 }
 
 /** Return the seriesinformation. If you dont set the seriesOID, you get the current selected series. If you want a specific series, set the OID. If no series could found, this function return SeriesInformation.OID == "". */
-mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesOID )
+mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   SeriesInformation resultInformation;
   resultInformation.OID = "";
@@ -450,7 +452,7 @@ mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationL
 }
 
 /** This function Iterate over all series of one study and save the series-properties to m_SeriesInformationList. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateSeriesForCompleteInformation( int rows, int row, series_t* series, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateSeriesForCompleteInformation( int /*rows*/, int /*row*/, series_t* series, void* user_data )
 {
   mitk::ChiliPlugin* callingObject = static_cast<mitk::ChiliPlugin*>(user_data);
   //create new element
@@ -481,7 +483,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateSeriesForCompleteInformation( int rows,
 }
 
 /** Return the textinformation. You have to set the textOID to get the information. If no text could found, this function return TextInformation.OID == "". */
-mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& textOID )
+mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& mitkHideIfNoVersionCode(textOID) )
 {
   TextInformation resultInformation;
   resultInformation.OID = "";
@@ -522,7 +524,7 @@ mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const s
 }
 
 /** Return a list of all textinformation. You have to set the seriesOID to get the textList. If no texts could found, this function returns an empty list. This function dont return the text which used to save and load the parent-child-relationship. */
-mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& seriesOID )
+mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   //get used to save all found text
   m_TextInformationList.clear();
@@ -701,7 +703,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 }
 
 /** Load all image- and text-files from the series. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -741,7 +743,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( 
 }
 
 /** This function load all images from the given series(OID). This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats saved, they get load from harddisk with the DataTreeNodeFactory. */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSeries( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -869,7 +871,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSer
 }
 
 /** This function iterate over all images of a series. The single images get saved to harddisk and the filenames to a internal filelist. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateLoadImage( int rows, int row, image_t* image, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateLoadImage( int /*rows*/, int mitkHideIfNoVersionCode(row), image_t* mitkHideIfNoVersionCode(image), void* mitkHideIfNoVersionCode(user_data) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   ChiliPlugin* callingObject = static_cast<ChiliPlugin*>( user_data );
@@ -947,7 +949,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateLoadImage( int rows, int row, image_t* 
 }
 
 /** This function load all text-files from the series. Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& seriesOID )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeries( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -1014,7 +1016,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateToLoadAllText( int rows, int row, text_
 #endif
 
 /** To load a single text-file, you need more than the textOID, this function search for the missing attributes and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ). */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& textOID )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& mitkHideIfNoVersionCode(textOID) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1058,7 +1060,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& t
 }
 
 /** This function load a single text-file. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk. */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& mitkHideIfNoVersionCode(seriesOID), const std::string& mitkHideIfNoVersionCode(textOID), const std::string& mitkHideIfNoVersionCode(textPath) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1289,7 +1291,7 @@ void mitk::ChiliPlugin::LoadParentChildRelation( const std::string& seriesOID )
 /** SAVE-FUNCTIONS */
 
 /** This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... . Then SaveAsNewSeries(...) or SaveToSeries(...) get used. */
-void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
+void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode(inputNodes) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1366,7 +1368,7 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inp
 }
 
 /** This function create a new series and use the function SaveToSeries() . No dialog is used. */
-void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries )
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode(inputNodes), std::string mitkHideIfNoVersionCode(studyOID), int mitkHideIfNoVersionCode(seriesNumber), std::string mitkHideIfNoVersionCode(seriesDescription), bool mitkHideIfNoVersionCode(overrideExistingSeries) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1413,7 +1415,7 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
 }
 
 /** This function save the nodes to via FileUpload to chili. */
-void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries )
+void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode(inputNodes), std::string mitkHideIfNoVersionCode(studyOID), std::string mitkHideIfNoVersionCode(seriesOID), bool mitkHideIfNoVersionCode(overrideExistingSeries) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1694,7 +1696,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer in
 /** RELATIONSHIP-FUNCTIONS */
 
 /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
-void mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& seriesOID )
+void mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1760,7 +1762,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateTextForRelation( int rows, int row, tex
 #endif
 
 /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
-void mitk::ChiliPlugin::AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image )
+void mitk::ChiliPlugin::AddVolumeToParentChild( std::list< std::string > mitkHideIfNoVersionCode(newVolume), DataTreeNode::Pointer mitkHideIfNoVersionCode(node), bool mitkHideIfNoVersionCode(image) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -1910,7 +1912,7 @@ void mitk::ChiliPlugin::SaveRelationShip()
 }
 
 /** This function return if the overgiven values creates circles or not. */
-bool mitk::ChiliPlugin::RelationCreateCircle( std::string parent, std::string child )
+bool mitk::ChiliPlugin::RelationCreateCircle( std::string mitkHideIfNoVersionCode(parent), std::string mitkHideIfNoVersionCode(child) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
@@ -2074,7 +2076,7 @@ int mitk::ChiliPlugin::GetMaximumImageNumber( std::string seriesOID )
 }
 
 /** Function to iterate over all images from a series. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateImagesForMaximalImageNumber( int rows, int row, image_t* image, void* user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateImagesForMaximalImageNumber( int /*rows*/, int /*row*/, image_t* image, void* user_data )
 {
   ChiliPlugin* callingObject = static_cast<ChiliPlugin*>( user_data );
   if( image->number > callingObject->m_MaximumImageNumber )
@@ -2083,7 +2085,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateImagesForMaximalImageNumber( int rows, 
 }
 
 /** Create the needed tags to save a pic-file to chili. */
-mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPlugin::GetNeededTagList( study_t* study, patient_t* patient, series_t* series )
+mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPlugin::GetNeededTagList( study_t* mitkHideIfNoVersionCode(study), patient_t* mitkHideIfNoVersionCode(patient), series_t* mitkHideIfNoVersionCode(series) )
 {
   mitk::ImageToPicDescriptor::TagInformationList resultList;
   resultList.clear();
@@ -2147,13 +2149,13 @@ mitk::ImageToPicDescriptor::TagInformationList mitk::ChiliPlugin::GetNeededTagLi
 }
 
 /** Event if a new study get selected (from QcPlugin). */
-void mitk::ChiliPlugin::studySelected( study_t* study )
+void mitk::ChiliPlugin::studySelected( study_t* /*study*/ )
 {
   SendStudySelectedEvent();
 }
 
 /** Event if the lightbox get tiles (from QcPlugin). */
-void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager *lbm, int tiles )
+void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager* /*lbm*/, int tiles )
 {
   m_LightBoxCount = tiles;
 

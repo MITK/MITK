@@ -105,7 +105,7 @@ float* tmGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
 
 float* ipMITKSegmentationGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
 {
-  float *newBuffer;
+  float *newBuffer = NULL;
   ipPicTypeMultiplexR4( tmGetContour4N, seg, newBuffer, startOfs, numPoints, sizeBuffer, pointBuffer );
   return newBuffer;
 }
@@ -194,7 +194,7 @@ float* tmGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
 
 float* ipMITKSegmentationGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
 {
-  float *newBuffer;
+  float *newBuffer = NULL;
   ipPicTypeMultiplexR4( tmGetContour8N, seg, newBuffer, startOfs, numPoints, sizeBuffer, pointBuffer );
   return newBuffer;
 }

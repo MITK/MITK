@@ -18,12 +18,7 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   
-  std::string path = argv[1];
-  itksys::SystemTools::ConvertToUnixSlashes(path);
-  std::string fileIn = path + "/BallBinary30x30x30.pic.gz";
-
-  
-  fileIn = itksys::SystemTools::ConvertToOutputPath(fileIn.c_str());
+  std::string fileIn = argv[1];
   std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
   mitk::Image::Pointer image = NULL;
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();

@@ -448,7 +448,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   catch ( itk::ExceptionObject & ex )
   {
     itkGenericOutputMacro( << "Exception during file open: " << ex );
-    QMessageBox::critical ( this, "Exception caught!", ex.what() );
+    QMessageBox::critical ( this, "File Open failed.", "Could not open the file." );
   }
 
   QApplication::restoreOverrideCursor();

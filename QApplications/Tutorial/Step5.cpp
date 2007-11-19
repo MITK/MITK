@@ -4,6 +4,7 @@
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
+#include "mitkDataStorage.h"
 
 #include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
@@ -43,6 +44,8 @@ int main(int argc, char* argv[])
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
   // create an iterator on the tree
   mitk::DataTreePreOrderIterator it(tree);
+  // create DataStorageInstance
+  mitk::DataStorage::CreateInstance(tree);
 
   //Part II: Create some data by reading files
   int i;

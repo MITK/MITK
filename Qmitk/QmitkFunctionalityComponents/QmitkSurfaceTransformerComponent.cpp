@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurface.h"
-#include "mitkinteractionconst.h" 
+#include "mitkInteractionConst.h" 
 
 //#include <vtkLinearTransform.h>
 //#include <vtkMatrix4x4.h>

@@ -140,6 +140,10 @@ public slots:
   /** \brief Slot method that will be called if the mirror-operation is activated or deactivated by the mirror button. */ 
 	void TransformationModeMirror(bool toggleflag);
 
+  void TransformXBox();
+  void TransformYBox();
+  void TransformZBox();
+
 
 	/***************************** SLOTS TO TRANSFORM *************************************/
 
@@ -214,6 +218,10 @@ protected:
 	a reference to the node with the thresholdImage and adjusted preferences to show the threshold
 	*/
 	mitk::DataTreeNode::Pointer m_SurfaceTransformerImageNode;
+
+  double m_XTranslate;
+  double m_YTranslate;
+  double m_ZTranslate;
 
 private:
 

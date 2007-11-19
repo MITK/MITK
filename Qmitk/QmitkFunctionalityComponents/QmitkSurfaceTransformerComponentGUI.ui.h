@@ -84,3 +84,21 @@ QPushButton* QmitkSurfaceTransformerComponentGUI::GetMirrorButton()
 {
  return m_MirrorButton;
 }
+
+
+QLineEdit* QmitkSurfaceTransformerComponentGUI::GetXBox()
+{
+  return m_XBox;
+}
+
+
+QLineEdit* QmitkSurfaceTransformerComponentGUI::GetYBox()
+{
+  return m_YBox;
+}
+
+
+QLineEdit* QmitkSurfaceTransformerComponentGUI::GetZBox()
+{
+  return m_ZBox;
+}

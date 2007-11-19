@@ -1,4 +1,4 @@
-﻿<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>QmitkSurfaceTransformerComponentGUI</class>
 <widget class="QWidget">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>295</width>
-            <height>114</height>
+            <width>240</width>
+            <height>144</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -204,148 +204,234 @@
                                     <property name="title">
                                         <string></string>
                                     </property>
-                                    <widget class="QPushButton">
+                                    <vbox>
                                         <property name="name">
-                                            <cstring>m_ScaleButton</cstring>
+                                            <cstring>unnamed</cstring>
                                         </property>
-                                        <property name="geometry">
-                                            <rect>
-                                                <x>97</x>
-                                                <y>11</y>
-                                                <width>37</width>
-                                                <height>37</height>
-                                            </rect>
-                                        </property>
-                                        <property name="maximumSize">
-                                            <size>
-                                                <width>37</width>
-                                                <height>37</height>
-                                            </size>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image0</pixmap>
-                                        </property>
-                                        <property name="accel">
-                                            <string>Ctrl+Alt+S</string>
-                                        </property>
-                                        <property name="toggleButton">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="toolTip" stdset="0">
-                                            <string>"AltGr + S" Scale: use the up-, and down-Arrows to scale the surface</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>m_RotateButton</cstring>
-                                        </property>
-                                        <property name="geometry">
-                                            <rect>
-                                                <x>54</x>
-                                                <y>11</y>
-                                                <width>37</width>
-                                                <height>37</height>
-                                            </rect>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image1</pixmap>
-                                        </property>
-                                        <property name="accel">
-                                            <string>Ctrl+Alt+R</string>
-                                        </property>
-                                        <property name="toggleButton">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="toolTip" stdset="0">
-                                            <string>"AltGr + R" Rotate: use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to rotate the surface</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>m_MoveButton</cstring>
-                                        </property>
-                                        <property name="geometry">
-                                            <rect>
-                                                <x>11</x>
-                                                <y>11</y>
-                                                <width>37</width>
-                                                <height>37</height>
-                                            </rect>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image2</pixmap>
-                                        </property>
-                                        <property name="accel">
-                                            <string>Ctrl+Alt+µ</string>
-                                        </property>
-                                        <property name="toggleButton">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="toolTip" stdset="0">
-                                            <string>"AltGr + M" Move : use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to move the surface</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>m_MirrorButton</cstring>
-                                        </property>
-                                        <property name="geometry">
-                                            <rect>
-                                                <x>140</x>
-                                                <y>10</y>
-                                                <width>37</width>
-                                                <height>37</height>
-                                            </rect>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image3</pixmap>
-                                        </property>
-                                        <property name="accel">
-                                            <string>Ctrl+Alt+F</string>
-                                        </property>
-                                        <property name="toggleButton">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="toolTip" stdset="0">
-                                            <string>"AltGr + F" Mirror: Use the Buttons X, Y or Z to mirror the object around the x- y- or z-Axis</string>
-                                        </property>
-                                    </widget>
+                                        <widget class="QLayoutWidget">
+                                            <property name="name">
+                                                <cstring>layout5</cstring>
+                                            </property>
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QPushButton">
+                                                    <property name="name">
+                                                        <cstring>m_MoveButton</cstring>
+                                                    </property>
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy>
+                                                            <hsizetype>0</hsizetype>
+                                                            <vsizetype>0</vsizetype>
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string></string>
+                                                    </property>
+                                                    <property name="pixmap">
+                                                        <pixmap>image0</pixmap>
+                                                    </property>
+                                                    <property name="accel">
+                                                        <string>Ctrl+Alt+µ</string>
+                                                    </property>
+                                                    <property name="toggleButton">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>"AltGr + M" Move : use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to move the surface</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QPushButton">
+                                                    <property name="name">
+                                                        <cstring>m_RotateButton</cstring>
+                                                    </property>
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy>
+                                                            <hsizetype>0</hsizetype>
+                                                            <vsizetype>0</vsizetype>
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string></string>
+                                                    </property>
+                                                    <property name="pixmap">
+                                                        <pixmap>image1</pixmap>
+                                                    </property>
+                                                    <property name="accel">
+                                                        <string>Ctrl+Alt+R</string>
+                                                    </property>
+                                                    <property name="toggleButton">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>"AltGr + R" Rotate: use the up-, down-, left-, right-Arrows and the "A"- and "S"-Key to rotate the surface</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QPushButton">
+                                                    <property name="name">
+                                                        <cstring>m_ScaleButton</cstring>
+                                                    </property>
+                                                    <property name="maximumSize">
+                                                        <size>
+                                                            <width>37</width>
+                                                            <height>37</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string></string>
+                                                    </property>
+                                                    <property name="pixmap">
+                                                        <pixmap>image2</pixmap>
+                                                    </property>
+                                                    <property name="accel">
+                                                        <string>Ctrl+Alt+S</string>
+                                                    </property>
+                                                    <property name="toggleButton">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>"AltGr + S" Scale: use the up-, and down-Arrows to scale the surface</string>
+                                                    </property>
+                                                </widget>
+                                                <widget class="QPushButton">
+                                                    <property name="name">
+                                                        <cstring>m_MirrorButton</cstring>
+                                                    </property>
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy>
+                                                            <hsizetype>0</hsizetype>
+                                                            <vsizetype>0</vsizetype>
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string></string>
+                                                    </property>
+                                                    <property name="pixmap">
+                                                        <pixmap>image3</pixmap>
+                                                    </property>
+                                                    <property name="accel">
+                                                        <string>Ctrl+Alt+F</string>
+                                                    </property>
+                                                    <property name="toggleButton">
+                                                        <bool>true</bool>
+                                                    </property>
+                                                    <property name="toolTip" stdset="0">
+                                                        <string>"AltGr + F" Mirror: Use the Buttons X, Y or Z to mirror the object around the x- y- or z-Axis</string>
+                                                    </property>
+                                                </widget>
+                                            </hbox>
+                                        </widget>
+                                        <widget class="QLayoutWidget">
+                                            <property name="name">
+                                                <cstring>layout4</cstring>
+                                            </property>
+                                            <hbox>
+                                                <property name="name">
+                                                    <cstring>unnamed</cstring>
+                                                </property>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout2</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1</cstring>
+                                                            </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>0</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>X:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_XBox</cstring>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout1</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_2</cstring>
+                                                            </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>0</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Y:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_YBox</cstring>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                                <widget class="QLayoutWidget">
+                                                    <property name="name">
+                                                        <cstring>layout3</cstring>
+                                                    </property>
+                                                    <hbox>
+                                                        <property name="name">
+                                                            <cstring>unnamed</cstring>
+                                                        </property>
+                                                        <widget class="QLabel">
+                                                            <property name="name">
+                                                                <cstring>textLabel1_3</cstring>
+                                                            </property>
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy>
+                                                                    <hsizetype>5</hsizetype>
+                                                                    <vsizetype>0</vsizetype>
+                                                                    <horstretch>0</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
+                                                            <property name="text">
+                                                                <string>Z:</string>
+                                                            </property>
+                                                        </widget>
+                                                        <widget class="QLineEdit">
+                                                            <property name="name">
+                                                                <cstring>m_ZBox</cstring>
+                                                            </property>
+                                                        </widget>
+                                                    </hbox>
+                                                </widget>
+                                            </hbox>
+                                        </widget>
+                                    </vbox>
                                 </widget>
                             </vbox>
                         </widget>
@@ -375,13 +461,13 @@
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="1049">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b2540022630543251d2ea544856405650330007195415c33300071f540dc4453100473f101aa2950c60e469c82445430aa60782ba069ceaab5e602001a0dda13</data>
+        <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc44531004735180322a174381b2b232650a9495d15490ee8661ad4019ab0265980294c0436602c5c1718d0f106502613750c39bc34c01e1544d71c6c17443ad3517007ac5b397</data>
     </image>
     <image name="image1">
         <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc4453100473f1013405ca60804b813212c0a240190da02b40d186a402a600dd6a381faa005d1e26a20c5580290ff710580136799843600a30e55115e0928728c06e801ec29bf8e40928805b31700a087a9308057af8821a224c9c02ec2a208278d3839e1ec114457c9a4449c828d90729e360cd16a8590f4bc6d253aab5e6020017f2ae7a</data>
     </image>
     <image name="image2">
-        <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc44531004735180322a174381b2b232650a9495d15490ee8661ad4019ab0265980294c0436602c5c1718d0f106502613750c39bc34c01e1544d71c6c17443ad3517007ac5b397</data>
+        <data format="XPM.GZ" length="1049">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b2540022630543251d2ea544856405650330007195415c33300071f540dc4453100473f101aa2950c60e469c82445430aa60782ba069ceaab5e602001a0dda13</data>
     </image>
     <image name="image3">
         <data format="XPM.GZ" length="1034">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232b25400210543251d2e25658564056503300071f540dc4453100473f1014c05cac35a8132048015c0d9480a94e1da9591397005307351148069aa2920e8069820b202145f282b63f1a632c20a78e0a0ba01c4204e012274d1140059c429a0dc0d84bd890c06739ac405946aadb9004545b20b</data>
@@ -412,6 +498,12 @@
     <function returnType="QPushButton *">GetRotateButton()</function>
     <function returnType="QPushButton *">GetScaleButton()</function>
     <function returnType="QPushButton *">GetMirrorButton()</function>
+    <function returnType="QLineEdit *">GetXBox()</function>
+    <function returnType="QLineEdit *">GetYBox()</function>
+    <function returnType="QLineEdit *">GetZBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+</includehints>
 </UI>

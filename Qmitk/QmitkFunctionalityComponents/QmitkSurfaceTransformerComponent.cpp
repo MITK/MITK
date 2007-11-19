@@ -21,11 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDataTreeComboBox.h>
 #include "QmitkStdMultiWidget.h"
 
+#include "mitkAction.h"
 #include "mitkDataTreeFilterFunctions.h"
+#include "mitkProperties.h"
+#include "mitkOperation.h"
+#include "mitkOperationEvent.h"
 #include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
-#include "mitkProperties.h"
+#include "mitkRotationOperation.h"
 #include "mitkSurface.h"
+#include "mitkinteractionconst.h" 
 
 //#include <vtkLinearTransform.h>
 //#include <vtkMatrix4x4.h>
@@ -38,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkReverseSense.h"
 
 #include <vtkTransform.h>
+#include <vtkMatrixToLinearTransform.h>
 
 
 #include <qgroupbox.h>
@@ -67,6 +73,9 @@ m_Scale(0.9)
 
   SetComponentName("SurfaceTransformer");
   m_Node = it->Get();
+  m_XTranslate = 0.0;
+  m_YTranslate = 0.0;
+  m_ZTranslate = 0.0;
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -129,9 +138,262 @@ void QmitkSurfaceTransformerComponent::CreateConnections()
     connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetRotateButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeRotate(bool)));
     connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetScaleButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeScale(bool)));
     connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetMirrorButton()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(TransformationModeMirror(bool)));
+  
+    //connect TextLabels
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetXBox()),  SIGNAL(returnPressed()), (QObject*) this, SLOT(TransformXBox()));
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetYBox()),  SIGNAL(returnPressed()), (QObject*) this, SLOT(TransformYBox()));
+    connect( (QObject*)(m_SurfaceTransformerComponentGUI->GetZBox()),  SIGNAL(returnPressed()), (QObject*) this, SLOT(TransformZBox()));
   }
 }
 
+
+void QmitkSurfaceTransformerComponent::TransformXBox()
+{
+  if(m_SurfaceTransformerComponentGUI->GetMoveButton()->isOn())
+  {
+  //std::cout<<"Move"<<std::endl;
+  double xValue = m_SurfaceTransformerComponentGUI->GetXBox()->text().toDouble();
+  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,xValue);
+  m_XTranslate =  xValue;
+  surface->UpdateOutputData();
+  }
+  else if(m_SurfaceTransformerComponentGUI->GetRotateButton()->isOn())
+  {
+    //mitk::OperationType OpROTATE;
+    
+    //get rotation angle from GUI
+    double xValue = m_SurfaceTransformerComponentGUI->GetXBox()->text().toDouble();
+
+    //get surface that shall be rotated
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    mitk::Point3D geometryCenterPoint = surface->GetGeometry()->GetCenter();
+    surface->CalculateBoundingBox();
+    mitk::Point3D boundingBoxCenterPoint = surface->GetGeometry()->GetBoundingBox()->GetCenter();
+    //surface->GetGeometry()->
+    
+    //get the center of the surface that shall be rotated
+    mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
+
+    //define the rotationaxix
+    mitk::Vector3D rotationaxis;   
+    rotationaxis[0] =  1;
+    rotationaxis[1] =  0;
+    rotationaxis[2] =  0;
+
+    /* calculate rotation angle in degrees */
+    mitk::ScalarType angle = xValue;
+    //mitk::ScalarType angle = atan2((mitk::ScalarType)rotationaxis.GetNorm(), (mitk::ScalarType) (xValue)) * (180/vnl_math::pi);
+    
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
+    mitk::RotationOperation* doOp = new mitk::RotationOperation(mitk::OpROTATE, surfaceCenter, rotationaxis, angle);
+
+    /* execute the Operation */
+    surface->GetGeometry()->ExecuteOperation(doOp);
+
+    surface->UpdateOutputData();
+
+     //mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+     // if (rotateOp == NULL)
+     // {
+     //   mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+     //   return;
+     // }
+     // Vector3D rotationVector = rotateOp->GetVectorOfRotation();
+     // Point3D center = rotateOp->GetCenterOfRotation();
+     // ScalarType angle = rotateOp->GetAngleOfRotation();
+     // angle = (angle < -360) ? -360 : angle;
+     // angle = (angle >  360) ?  360 : angle;
+     // vtktransform->PostMultiply();
+     // vtktransform->Translate(-center[0], -center[1], -center[2]);
+     // vtktransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
+     // vtktransform->Translate(center[0], center[1], center[2]);
+     // vtktransform->PreMultiply();
+
+
+
+
+  //  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  //  vtkTransform* trans = vtkTransform::New();
+
+  //  double xValue = m_SurfaceTransformerComponentGUI->GetXBox()->text().toDouble();
+
+  //  //trans = dynamic_cast<vtkTransform*>(surface->GetGeometry()->GetVtkTransform());
+  //  
+  //  //undo all former transformations
+  //  trans->Identity();
+
+  //  //get the center of the local coordinates
+  //  mitk::Point3D centerpoint = surface->GetGeometry()->GetCenter();
+  //  float centerX = centerpoint[0];
+  //  float centerY = centerpoint[1];
+  //  float centerZ = centerpoint[2];
+  //  
+  //  double cX = centerX;
+  //  double cY = centerY;
+  //  double cZ = centerZ;
+
+  //  ////move the surface to the center
+  //  //trans->GetMatrix()->SetElement(0,3,cX);
+  //  //trans->GetMatrix()->SetElement(1,3,cY);
+  //  //trans->GetMatrix()->SetElement(2,3,cZ);
+  //  
+  //  //rotate the surface
+  //  vtkTransform* transRotX = trans->RotateX(xValue);
+  //  vtkTransform* transCent = trans->RotateWXYZ(xValue, cX, cY, cZ);
+  //  vtkTransform* transPoin = trans->Translate(cX, cY, cZ)
+
+
+  //  trans = ((trans->RotateX(xValue)) - (trans->RotateWXYZ(xValue, cX, cY, cZ)) + (trans->Translate(cX, cY, cZ)));
+
+  //  //RotateWXYZ (double angle, const float axis[3])
+  //  //RotateWXYZ (double angle, double x, double y, double z)
+
+  //  ////move the surface back from the center
+  //  //trans->GetMatrix()->SetElement(0,3,-cX);
+  //  //trans->GetMatrix()->SetElement(1,3,-cY);
+  //  //trans->GetMatrix()->SetElement(2,3,-cZ);
+
+  //  //translate the surface to the last given coordinates again (redo the undo translation)
+  //  trans->GetMatrix()->SetElement(0,3,m_XTranslate);
+  //  trans->GetMatrix()->SetElement(1,3,m_YTranslate);
+  //  trans->GetMatrix()->SetElement(2,3,m_ZTranslate);
+
+  //vtkMatrixToLinearTransform* maToLinTran;
+  //maToLinTran = dynamic_cast<vtkMatrixToLinearTransform*>(surface->GetGeometry()->GetVtkTransform());
+  //maToLinTran->SetMatrix( trans->GetMatrix());
+
+  ////surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,m_XTranslate);
+  ////surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(1,3,m_YTranslate);
+  ////surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(2,3,m_ZTranslate);
+  ////vtkTransform* transform = vtkTransform::New();
+  ////transform->RotateX(xValue);
+  ////Transform(transform);
+
+  ////double xValue = m_SurfaceTransformerComponentGUI->GetXBox()->text().toDouble();
+  //////mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  ////vtkTransform* transform = vtkTransform::New();
+  ////transform->RotateX(xValue);
+  ////Transform(transform);
+  ////mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  ////surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,0.0);
+
+
+  ////surface->GetGeometry()->GetVtkTransform()->RotateX(xValue);
+
+  }
+  else
+  {
+   std::cout<<"Weder Rotation noch Move ist angeschaltet"<<std::endl;
+  }
+  //  GetTumorNode()->GetData()->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,x);
+    //->GetVtkPolyData()->Get
+}
+
+void QmitkSurfaceTransformerComponent::TransformYBox()
+{
+  if(m_SurfaceTransformerComponentGUI->GetMoveButton()->isOn())
+  {
+  //std::cout<<"Move"<<std::endl;
+  double yValue = m_SurfaceTransformerComponentGUI->GetYBox()->text().toDouble();
+  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(1,3,yValue);
+  m_YTranslate =  yValue;
+  surface->UpdateOutputData();
+  }
+  else if(m_SurfaceTransformerComponentGUI->GetRotateButton()->isOn())
+  {
+       //get rotation angle from GUI
+    double yValue = m_SurfaceTransformerComponentGUI->GetYBox()->text().toDouble();
+
+    //get surface that shall be rotated
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    mitk::Point3D geometryCenterPoint = surface->GetGeometry()->GetCenter();
+    surface->CalculateBoundingBox();
+    mitk::Point3D boundingBoxCenterPoint = surface->GetGeometry()->GetBoundingBox()->GetCenter();
+    //surface->GetGeometry()->
+    
+    //get the center of the surface that shall be rotated
+    mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
+
+    //define the rotationaxix
+    mitk::Vector3D rotationaxis;   
+    rotationaxis[0] =  0;
+    rotationaxis[1] =  1;
+    rotationaxis[2] =  0;
+
+    /* calculate rotation angle in degrees */
+    mitk::ScalarType angle = yValue;
+    //mitk::ScalarType angle = atan2((mitk::ScalarType)rotationaxis.GetNorm(), (mitk::ScalarType) (xValue)) * (180/vnl_math::pi);
+    
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
+    mitk::RotationOperation* doOp = new mitk::RotationOperation(mitk::OpROTATE, surfaceCenter, rotationaxis, angle);
+
+    /* execute the Operation */
+    surface->GetGeometry()->ExecuteOperation(doOp);
+
+    surface->UpdateOutputData();
+
+  }
+  else
+  {
+   std::cout<<"Weder Rotation noch Move ist angeschaltet"<<std::endl;
+  }
+  //  GetTumorNode()->GetData()->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,x);
+    //->GetVtkPolyData()->Get
+}
+void QmitkSurfaceTransformerComponent::TransformZBox()
+{
+  if(m_SurfaceTransformerComponentGUI->GetMoveButton()->isOn())
+  {
+  //std::cout<<"Move"<<std::endl;
+  double zValue = m_SurfaceTransformerComponentGUI->GetZBox()->text().toDouble();
+  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+  surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(2,3,zValue);
+  m_ZTranslate =  zValue;
+  surface->UpdateOutputData();
+  }
+  else if(m_SurfaceTransformerComponentGUI->GetRotateButton()->isOn())
+  {
+       //get rotation angle from GUI
+    double zValue = m_SurfaceTransformerComponentGUI->GetZBox()->text().toDouble();
+
+    //get surface that shall be rotated
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    mitk::Point3D geometryCenterPoint = surface->GetGeometry()->GetCenter();
+    surface->CalculateBoundingBox();
+    mitk::Point3D boundingBoxCenterPoint = surface->GetGeometry()->GetBoundingBox()->GetCenter();
+    //surface->GetGeometry()->
+    
+    //get the center of the surface that shall be rotated
+    mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
+
+    //define the rotationaxix
+    mitk::Vector3D rotationaxis;   
+    rotationaxis[0] =  0;
+    rotationaxis[1] =  0;
+    rotationaxis[2] =  1;
+
+    /* calculate rotation angle in degrees */
+    mitk::ScalarType angle = zValue;
+    //mitk::ScalarType angle = atan2((mitk::ScalarType)rotationaxis.GetNorm(), (mitk::ScalarType) (xValue)) * (180/vnl_math::pi);
+    
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
+    mitk::RotationOperation* doOp = new mitk::RotationOperation(mitk::OpROTATE, surfaceCenter, rotationaxis, angle);
+
+    /* execute the Operation */
+    surface->GetGeometry()->ExecuteOperation(doOp);
+
+    surface->UpdateOutputData();
+
+  }
+  else
+  {
+   std::cout<<"Weder Rotation noch Move ist angeschaltet"<<std::endl;
+  }
+  //  GetTumorNode()->GetData()->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(0,3,x);
+    //->GetVtkPolyData()->Get
+}
 
 /************** TRANSFORMATION MODE MOVE **************/
 void QmitkSurfaceTransformerComponent::TransformationModeMove(bool toggleflag)
@@ -575,6 +837,7 @@ void QmitkSurfaceTransformerComponent::Transform(vtkTransform* transform)
   vtkTransformPolyDataFilter* transformFilter = vtkTransformPolyDataFilter::New();
   mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
 
+  
   transformFilter->SetInput( surface->GetVtkPolyData() );  
   transformFilter->SetTransform( transform );
 
@@ -652,100 +915,100 @@ QWidget* QmitkSurfaceTransformerComponent::CreateControlWidget(QWidget* parent)
 
   //create connection between keys and translation methods
 
-  m_Left = new QAccel(m_GUI);        // create accels for multiWidget
-  m_Left->connectItem( m_Left->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveLeft()));                     // MoveLeft() slot
+  m_Left = new QAccel(m_GUI);                               // create accels for multiWidget
+  m_Left->connectItem( m_Left->insertItem(Qt::Key_Left),    // adds Qt::Key_Left accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveLeft()));                                      // MoveLeft() slot
 
-  m_Right = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Right = new QAccel(m_GUI);                              // create accels for multiWidget
   m_Right->connectItem( m_Right->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveRight()));                     // MoveRight() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveRight()));                                     // MoveRight() slot
 
-  m_Up = new QAccel(m_GUI);        // create accels for multiWidget
-  m_Up->connectItem( m_Up->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveForward()));                     // MoveUp() slot
+  m_Up = new QAccel(m_GUI);                                 // create accels for multiWidget
+  m_Up->connectItem( m_Up->insertItem(Qt::Key_Up),          // adds SHIFT+ALT accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveForward()));                                   // MoveUp() slot
 
-  m_Down = new QAccel(m_GUI);        // create accels for multiWidget
-  m_Down->connectItem( m_Down->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveBackward()));                     // MoveDown() slot
+  m_Down = new QAccel(m_GUI);                               // create accels for multiWidget
+  m_Down->connectItem( m_Down->insertItem(Qt::Key_Down),    // adds SHIFT+ALT accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveBackward()));                                  // MoveDown() slot
 
-  m_Forward = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Forward = new QAccel(m_GUI);                            // create accels for multiWidget
   m_Forward->connectItem( m_Forward->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveUp()));                     // MoveForward() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveUp()));                                        // MoveForward() slot
 
-  m_Backward = new QAccel(m_GUI);        // create accels for multiWidget
+  m_Backward = new QAccel(m_GUI);                           // create accels for multiWidget
   m_Backward->connectItem( m_Backward->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MoveDown()));                     // MoveBackward() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MoveDown()));                                      // MoveBackward() slot
 
 
 
   //create connection between keys and rotation methods
 
-  m_RotX = new QAccel(m_GUI);        // create accels for multiWidget
-  m_RotX->connectItem( m_RotX->insertItem(Qt::Key_Left), // adds Qt::Key_Left accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotX()));                     // RotY() slot
+  m_RotX = new QAccel(m_GUI);                               // create accels for multiWidget
+  m_RotX->connectItem( m_RotX->insertItem(Qt::Key_Left),    // adds Qt::Key_Left accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotX()));                                          // RotY() slot
 
-  m_RotInvX = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvX = new QAccel(m_GUI);                            // create accels for multiWidget
   m_RotInvX->connectItem( m_RotInvX->insertItem(Qt::Key_Right), // adds Qt::Key_Right accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotInvX()));                     // RotInvX() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotInvX()));                                       // RotInvX() slot
 
-  m_RotY = new QAccel(m_GUI);        // create accels for multiWidget
-  m_RotY->connectItem( m_RotY->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotY()));                     // RotY() slot
+  m_RotY = new QAccel(m_GUI);                               // create accels for multiWidget
+  m_RotY->connectItem( m_RotY->insertItem(Qt::Key_Up),      // adds SHIFT+ALT accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotY()));                                          // RotY() slot
 
-  m_RotInvY = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvY = new QAccel(m_GUI);                            // create accels for multiWidget
   m_RotInvY->connectItem( m_RotInvY->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotInvY()));                     // RotInvY() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotInvY()));                                       // RotInvY() slot
 
-  m_RotZ = new QAccel(m_GUI);        // create accels for multiWidget
-  m_RotZ->connectItem( m_RotZ->insertItem(Qt::Key_A), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotZ()));                     // RotZ() slot
+  m_RotZ = new QAccel(m_GUI);                               // create accels for multiWidget
+  m_RotZ->connectItem( m_RotZ->insertItem(Qt::Key_A),       // adds SHIFT+ALT accelerator
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotZ()));                                          // RotZ() slot
 
-  m_RotInvZ = new QAccel(m_GUI);        // create accels for multiWidget
+  m_RotInvZ = new QAccel(m_GUI);                            // create accels for multiWidget
   m_RotInvZ->connectItem( m_RotInvZ->insertItem(Qt::Key_S), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(RotInvZ()));                     // RotInvZ() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(RotInvZ()));                                       // RotInvZ() slot
 
 
   //create connection between keys and scale methods
 
-  m_ScaleUp = new QAccel(m_GUI);        // create accels for multiWidget
+  m_ScaleUp = new QAccel(m_GUI);                            // create accels for multiWidget
   m_ScaleUp->connectItem( m_ScaleUp->insertItem(Qt::Key_Up), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(ScaleUp()));                     // RotY() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(ScaleUp()));                                       // RotY() slot
 
-  m_ScaleDown = new QAccel(m_GUI);        // create accels for multiWidget
+  m_ScaleDown = new QAccel(m_GUI);                          // create accels for multiWidget
   m_ScaleDown->connectItem( m_ScaleDown->insertItem(Qt::Key_Down), // adds SHIFT+ALT accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(ScaleDown()));                     // RotY() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(ScaleDown()));                                     // RotY() slot
 
 
   //create connection between keys and mirror methods
 
-  m_MirrorX = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorX = new QAccel(m_GUI);                            // create accels for multiWidget
   m_MirrorX->connectItem( m_MirrorX->insertItem(Qt::Key_X), // adds Key_X accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MirrorX()));                     // MirrorX() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MirrorX()));                                       // MirrorX() slot
 
-  m_MirrorY = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorY = new QAccel(m_GUI);                            // create accels for multiWidget
   m_MirrorY->connectItem( m_MirrorY->insertItem(Qt::Key_Y), // adds Key_Y accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MirrorY()));                     // MirrorY() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MirrorY()));                                       // MirrorY() slot
 
-  m_MirrorZ = new QAccel(m_GUI);        // create accels for multiWidget
+  m_MirrorZ = new QAccel(m_GUI);                            // create accels for multiWidget
   m_MirrorZ->connectItem( m_MirrorZ->insertItem(Qt::Key_Z), // adds Key_Y accelerator
-    this,                                       // connected to SurfaceCreator
-    SLOT(MirrorZ()));                     // MirrorZ() slot
+    this,                                                   // connected to SurfaceCreator
+    SLOT(MirrorZ()));                                       // MirrorZ() slot
 
   /*  see list of Keys at http://doc.trolltech.com/3.3/qt.html#Key-enum */
 

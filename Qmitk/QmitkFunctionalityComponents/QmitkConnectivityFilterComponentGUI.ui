@@ -163,6 +163,11 @@
                                     <string>Point Marked Surface</string>
                                 </property>
                             </item>
+                            <item>
+                                <property name="text">
+                                    <string>Delete Point Marked Surface</string>
+                                </property>
+                            </item>
                             <property name="name">
                                 <cstring>m_ParameterModeComboBox</cstring>
                             </property>
@@ -260,7 +265,4 @@
     <function returnType="QCheckBox *">GetReplaceSurfaceCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-</includehints>
 </UI>

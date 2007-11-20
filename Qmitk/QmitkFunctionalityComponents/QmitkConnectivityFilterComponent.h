@@ -118,6 +118,9 @@ public slots:
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
 
+/** \brief Method that is called after the filter selection was changed */
+  void TextBoxChanged(int number);
+
    signals:
 
     // Emitted when the property changes. The parameter gives you the new value of the property.
@@ -139,12 +142,12 @@ protected:
   //mitk::DataTreeIteratorClone m_MitkImageIterator;
 
 
-
+void ExecuteOperation(mitk::Operation * operation );
 
 private:
 
   /** \brief Method to create the pointset-object that is necessary for some connectivity-options. See also  - \ref QmitkSeedPointSetComponent*/
-  //void CreatePointSet();
+  void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
 

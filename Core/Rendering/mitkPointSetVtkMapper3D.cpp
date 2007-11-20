@@ -184,7 +184,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
 
@@ -209,7 +209,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         cube->SetYLength(pointSize/2);
         cube->SetZLength(pointSize/2);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         cube->SetCenter(point1[0],point1[1],point1[2]);
         //cube->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         source = cube;
@@ -220,7 +220,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkConeSource *cone = vtkConeSource::New();
         cone->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         cone->SetCenter(point1[0],point1[1],point1[2]);
         //cone->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         cone->SetResolution(20);
@@ -232,7 +232,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkCylinderSource *cylinder = vtkCylinderSource::New();
         cylinder->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         cylinder->SetCenter(point1[0],point1[1],point1[2]);
         //cylinder->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         cylinder->SetResolution(20);
@@ -244,7 +244,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         sphere->SetThetaResolution(20);
@@ -257,7 +257,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index());
+        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         sphere->SetThetaResolution(20);
@@ -304,7 +304,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       vtkTransform *aLabelTransform =vtkTransform::New();
       aLabelTransform->Identity();
       mitk::Point3D point1;
-      point1 = input->GetPoint(pointsIter->Index());
+      point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
       aLabelTransform->Translate(point1[0]+2,point1[1]+2,point1[2]);
       //aLabelTransform->Translate(pointsIter.Value()[0]+2,pointsIter.Value()[1]+2,pointsIter.Value()[2]);
       aLabelTransform->Scale(5.7,5.7,5.7);
@@ -593,7 +593,7 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
     {
       vtkIdType cell[2] = {j-1,j};
       mitk::Point3D point1;
-      point1 = input->GetPoint(pointsIter->Index());
+      point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
       points->InsertPoint(j,point1[0],point1[1],point1[2]);
       if (j>0)
         polys->InsertNextCell(2,cell);

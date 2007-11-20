@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachine.h"
 
 #include "mitkGlobalInteraction.h"
+#include <mitkStandardFileLocations.h>
 
 #include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
@@ -572,25 +573,8 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
-  std::string xmlFileName;
-
-  const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
-  if (mitkConf != NULL)
-  {
-    xmlFileName  = mitkConf;
-    xmlFileName += "/";
-    xmlFileName = itksys::SystemTools::ConvertToOutputPath(xmlFileName.c_str());
-    xmlFileName += "StateMachine.xml";
-    if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
-      return LoadBehavior(xmlFileName);
-  }
-  xmlFileName = "StateMachine.xml";
-
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
-    return LoadBehavior(xmlFileName);
-
-  xmlFileName = MITK_ROOT;
-  xmlFileName += "/Core/Interactions/StateMachine.xml";
+  // Search for StateMachine.xml, bypass relative path in mitkSourceTree for additional search
+  std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Interactions");
   if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
     return LoadBehavior(xmlFileName);
 

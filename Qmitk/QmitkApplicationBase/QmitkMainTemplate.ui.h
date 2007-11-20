@@ -411,11 +411,12 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
   mitk::DataTreePreOrderIterator it(m_Tree);
+  QString qFileName( fileName );
   try
   {
     factory->SetFileName( fileName );
     factory->SetImageSerie(false);
-
+    
     /*QString qFileName( fileName );
     
     // just in case this is a series
@@ -448,7 +449,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   catch ( itk::ExceptionObject & ex )
   {
     itkGenericOutputMacro( << "Exception during file open: " << ex );
-    QMessageBox::critical ( this, "File Open failed.", "Could not open the file." );
+    QMessageBox::critical ( this, "File Open failed.", "Could not open file: " + qFileName );
   }
 
   QApplication::restoreOverrideCursor();

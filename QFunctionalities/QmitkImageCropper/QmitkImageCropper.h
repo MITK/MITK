@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkOperationActor.h>
 #include <mitkOperation.h>
 #include <mitkAffineInteractor.h>
+#include <itkImage.h>
+#include <qprogressdialog.h>
+
 
 class QmitkStdMultiWidget;
 class QmitkImageCropperControls;
@@ -127,6 +130,7 @@ public slots:
 
   void ImageSelectionChanged();
   void CropImage();
+  void SurroundingCheck(bool value);
 
 protected:  
   /*!  
@@ -180,10 +184,15 @@ protected:
    */
   virtual void RemoveBoundingObjectFromNode();
 
+  template < typename TPixel, unsigned int VImageDimension >
+  void AddSurrounding( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image::Pointer image);
+
 private:
 
   // operation constant
   static const mitk::OperationType OP_EXCHANGE;
 
+  QProgressDialog *progress;
+  mitk::Image::Pointer m_surrImage;
 };
 #endif // !defined(QMITK_IMAGECROPPER_H__INCLUDED)

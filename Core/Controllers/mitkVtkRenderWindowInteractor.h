@@ -45,6 +45,10 @@ public:
   itkSetObjectMacro(MitkRenderer, mitk::BaseRenderer);
   itkGetObjectMacro(MitkRenderer, mitk::BaseRenderer);
   virtual void Resize(int w, int h) = 0;
+
+  virtual ~VtkRenderWindowInteractor()
+  {
+  };
 };
 
 } // mitk

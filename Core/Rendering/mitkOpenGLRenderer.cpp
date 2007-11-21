@@ -124,8 +124,9 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
       }
     }
 
-    //update the vtk-based mappers
-    UpdateIncludingVtkActors();
+    // make sure that the vtk-based mappers are updated the
+    // next time Update is called
+    m_LastUpdateVtkActorsTime = 0;
 
     Modified();
   }
@@ -133,6 +134,9 @@ void mitk::OpenGLRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 
 void mitk::OpenGLRenderer::UpdateIncludingVtkActors()
 {
+  if(GetRenderWindow()->GetVtkRenderWindow()->GetMapped() == 0)
+    return;
+
   Update();
 
   m_LastUpdateVtkActorsTime = GetMTime();
@@ -527,7 +531,11 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
       m_RenderWindow->GetVtkRenderWindow()->RemoveRenderer(this->m_VtkRenderer);
       m_RenderWindow->GetVtkRenderWindow()->SetInteractor(NULL);
     }
-    m_CameraController = NULL;
+    if(m_CameraController.IsNotNull())
+    {
+      m_CameraController->SetRenderer(NULL);
+      m_CameraController = NULL;
+    }
     //VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
     //if(vicc!=NULL)
     //{
@@ -538,7 +546,11 @@ mitk::OpenGLRenderer::~OpenGLRenderer()
     m_VtkRenderer->Delete();
   }
   else
+  if(m_CameraController.IsNotNull())
+  {
+    m_CameraController->SetRenderer(NULL);
     m_CameraController = NULL;
+  }
   if(m_PixelMapGL != NULL)
     delete [] m_PixelMapGL;
 }

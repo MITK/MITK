@@ -98,6 +98,8 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
+  if(m_CameraController.IsNotNull())
+    m_CameraController->SetRenderer(NULL);
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
   RendererSet::iterator pos = instances.find( this );
   instances.erase( pos );

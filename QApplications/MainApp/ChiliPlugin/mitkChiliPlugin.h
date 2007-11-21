@@ -225,10 +225,9 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     @param studyOID   In which study the new series should created?
     @param seriesNumber   With wich seriesNumber the series should created?
     @param seriesDescription   With wich seriesDescription the series should created?
-    @param overrideExistingSeries   Should existing data override ( only possible if the data saved by MBI )?
     This function create a new series and use the function SaveToSeries() . No dialog is used.
     */
-    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries );
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription );
 
     /*!
     \brief Save Images- and Texts-Files without User-Dialog to given series to Chili via Fileupload.
@@ -366,13 +365,15 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     /** This list get used to load and save the parent-child-relation. If you want to save the file, you have to check that a new relation dont create circles. If you want to load files, you have to load the parents first. */
     std::list<ParentChildStruct> m_ParentChildList;
 
-    /** This variable save the OID of the parent-child-text. */
-    std::string m_ParentOID;
+    /** Return if the Parent-Child-Xml-File exist. */
+    bool m_ParentXmlExist;
+    /** To save the parent-child-relation the xml-file has to override, therefore the textoid is needed. */
+    std::string m_TextOIDParentChild;
     /** Thats the xml-file where the parent-child-realtionship saved. */
     TiXmlDocument* m_currentXmlDoc;
 
-    /** Check the series if a ParentChild-TextFile exist and set m_currentXmlDoc. */
-    void CheckCurrentSeriesForRelation( const std::string& seriesOID );
+    /** Check the series if a ParentChild-TextFile exist, load them or create a new one. If a file exist and its not possible to load them, the function return false. */
+    bool CheckCurrentSeriesForRelation( const std::string& seriesOID );
     /** This function add a volume to the xml-file, therefore it check the included one and add only new one. */
     void AddVolumeToParentChild( std::list< std::string > newVolume, DataTreeNode::Pointer node, bool image );
 

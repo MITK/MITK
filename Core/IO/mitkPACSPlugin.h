@@ -307,10 +307,9 @@ class PACSPlugin : public itk::Object
     @param studyOID   In which study the new series should created?
     @param seriesNumber   With wich seriesNumber the series should created?
     @param seriesDescription   With wich seriesDescription the series should created?
-    @param overrideExistingSeries   Should existing data override ( only possible if the data saved by MBI )?
     This function create a new series and use the function SaveToSeries() . No dialog is used.
     */
-    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription, bool overrideExistingSeries );
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription );
 
     /*!
     \brief Save Images- and Texts-Files without User-Dialog to given series to Chili via Fileupload.

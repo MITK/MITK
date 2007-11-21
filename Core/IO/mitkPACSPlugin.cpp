@@ -176,7 +176,7 @@ void mitk::PACSPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string, bool )
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string )
 {
 }
 

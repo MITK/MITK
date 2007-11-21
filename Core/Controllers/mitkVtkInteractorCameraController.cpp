@@ -39,8 +39,12 @@ mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char* t
 
 mitk::VtkInteractorCameraController::~VtkInteractorCameraController()
 {
-  m_VtkInteractor->SetRenderWindow(NULL);
-  m_VtkInteractor->Delete();
+  if(m_VtkInteractor!=NULL)
+  {
+    m_VtkInteractor->SetRenderWindow(NULL);
+    m_VtkInteractor->Delete();
+    m_VtkInteractor = NULL;
+  }
 }
 
 void mitk::VtkInteractorCameraController::Resize(int w, int h)
@@ -224,10 +228,9 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 
 bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* renderer)
 {
+  Superclass::SetRenderer(renderer);
   if (renderer)
   {
-    Superclass::SetRenderer(renderer);
-
     VtkRenderWindowInteractor* windowInteractor =
     dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
     if (windowInteractor == NULL)
@@ -248,6 +251,7 @@ bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* render
   else
   {
     m_VtkInteractor->Delete();
+    m_VtkInteractor = NULL;
   }
   return true;
 }

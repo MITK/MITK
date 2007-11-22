@@ -1,5 +1,6 @@
 #include "mitkToolManager.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkCoreObjectFactory.h"
 
 #include <itkObjectFactoryBase.h>
 #include <itkCommand.h>
@@ -11,6 +12,8 @@ mitk::ToolManager::ToolManager(const char* groups)
  m_ActiveToolID(-1),
  m_RegisteredClients(0)
 {
+  mitk::CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
+
   // get a list of all known mitk::Tools
   std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 

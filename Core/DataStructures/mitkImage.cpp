@@ -477,7 +477,8 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
       sl=AllocateSliceData(s,t,n,data,importMemoryManagement);
       if(sl.GetPointer()==NULL) return false;
     }
-    memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
+    if ( sl->GetData() != data )
+      memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
     sl->Modified();
     //we have changed the data: call Modified()! 
     Modified();
@@ -486,7 +487,8 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
   {
     sl=AllocateSliceData(s,t,n,data,importMemoryManagement);
     if(sl.GetPointer()==NULL) return false;
-    memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));   
+    if ( sl->GetData() != data )
+      memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));   
     //we just added a missing slice, which is not regarded as modification.
     //Therefore, we do not call Modified()!
   }
@@ -505,7 +507,8 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
       vol=AllocateVolumeData(t,n,data,importMemoryManagement);
       if(vol.GetPointer()==NULL) return false;
     }
-    memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+    if ( vol->GetData() != data )
+      memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
     vol->Modified();
     vol->SetComplete(true);
     //we have changed the data: call Modified()! 
@@ -515,7 +518,10 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
   {
     vol=AllocateVolumeData(t,n,data,importMemoryManagement);
     if(vol.GetPointer()==NULL) return false;
-    memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+    if ( vol->GetData() != data )
+    { 
+      memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+    }
     vol->SetComplete(true);
     //we just added a missing Volume, which is not regarded as modification.
     //Therefore, we do not call Modified()!
@@ -535,7 +541,8 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
       ch=AllocateChannelData(n,data,importMemoryManagement);
       if(ch.GetPointer()==NULL) return false;
     }
-    memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+    if ( ch->GetData() != data )
+      memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
     ch->Modified();
     ch->SetComplete(true);
     //we have changed the data: call Modified()! 
@@ -545,7 +552,8 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
   {
     ch=AllocateChannelData(n,data,importMemoryManagement);
     if(ch.GetPointer()==NULL) return false;
-    memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+    if ( ch->GetData() != data )
+      memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
     ch->SetComplete(true);
     //we just added a missing Channel, which is not regarded as modification.
     //Therefore, we do not call Modified()!

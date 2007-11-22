@@ -496,8 +496,9 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
                   vtkPolyDataMapper * mapper = dynamic_cast<vtkPolyDataMapper*>( picker->GetMapper() );
                   assert ( mapper );
 
-                  vtkPolyData* polyData = mapper->GetInput();
-                  assert( polyData );
+                  /*vtkPolyData* polyData = mapper->GetInput();
+                  assert( polyData );*/
+                  assert( mapper->GetInput() );
 
                   //vtkCell* cell = polyData->GetCell( picker->GetCellId());
                   //assert( cell );

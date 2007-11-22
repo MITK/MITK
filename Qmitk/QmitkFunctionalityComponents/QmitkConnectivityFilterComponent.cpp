@@ -324,7 +324,7 @@ vesselCenterPickedEvent.SetPickedPoint3D( minEleX, minEleY, minEleZ );
 this->InvokeEvent( vesselCenterPickedEvent );
 }
 }
-}}/*
+}}*/
 
 /*************** CREATE SEEDPOINT WIDGET **************/
 void QmitkConnectivityFilterComponent::CreatePointSet()

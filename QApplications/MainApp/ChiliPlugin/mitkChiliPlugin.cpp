@@ -1696,8 +1696,8 @@ bool mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& mitkHi
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
-  return;
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function." );
+  return false;
 
 #else
 

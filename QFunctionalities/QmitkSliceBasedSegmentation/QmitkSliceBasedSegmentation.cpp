@@ -347,7 +347,7 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         mitk::DataTreeBase::Pointer dataTree = GetDataTreeIterator()->GetTree();
         surfaceFilter->SetPointerParameter("Data tree", dataTree );
         surfaceFilter->SetParameter("Show result", true );
-        surfaceFilter->SetParameter("Sync visibility", true );
+        surfaceFilter->SetParameter("Sync visibility", false );
         
         surfaceFilter->StartAlgorithm(); // starts thread
       }

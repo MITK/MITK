@@ -493,13 +493,13 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
                 //if ( picker->Pick(pointNumberX[0], pointNumberX[1], 0.0f, renderer))
                 if ( picker->Pick(pointNumberX[0], pointNumberX[1], 0.0f, renderer))
                 {
-                  vtkPolyDataMapper * mapper = dynamic_cast<vtkPolyDataMapper*>( picker->GetMapper() );
-                  assert ( mapper );
-
-                  /*vtkPolyData* polyData = mapper->GetInput();
-                  assert( polyData );*/
-                  assert( mapper->GetInput() );
-
+                  //vtkPolyDataMapper * mapper = dynamic_cast<vtkPolyDataMapper*>( picker->GetMapper() );
+                  //assert ( mapper );
+                  //
+                  //vtkPolyData* polyData = mapper->GetInput();
+                  //assert( polyData );*/
+                  //assert( mapper->GetInput() );
+                  //
                   //vtkCell* cell = polyData->GetCell( picker->GetCellId());
                   //assert( cell );
                   pdConnectivity->DeleteSpecifiedRegion(picker->GetCellId( )); 

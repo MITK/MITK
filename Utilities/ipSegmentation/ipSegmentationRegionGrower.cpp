@@ -73,15 +73,29 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
   
   int line = segBuffer->n[0];
   int maxOfs = (int)(line * segBuffer->n[1]);
-  PicType *start = ((PicType*)src->data) + startOfs;
+  //PicType *start = ((PicType*)src->data) + startOfs;
   // init borders:
   PicType lowest, highest;
   if (relativeBounds) {
-    // TODO: check for start at edge of image!!!
+    
     // average base color from 3x3 block:
-    PicType baseCol = (PicType) (0.0f + *start + *(start+1) + *(start+1-line) + *(start-line) 
-                         + *(start-1-line) + *(start-1) + *(start-1+line)
-                         + *(start+line) + *(start+1+line)          ) / 9;
+    // check for edges of image
+    int offset;
+    int numberOfValidOffsets = 0;
+    PicType baseCol = 0;
+    offset = startOfs;           if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs+1;         if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs+1-line;    if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs-line;      if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs-1-line;    if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs-1;         if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs-1+line;    if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs+line;      if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+    offset = startOfs+1+line;    if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
+
+    if ( numberOfValidOffsets > 0 )
+      baseCol = (PicType)( (float)baseCol / (float)numberOfValidOffsets );
+
     lowest = baseCol - lowerBound;
     highest = baseCol + upperBound;
     startCol = (float)baseCol;

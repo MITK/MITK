@@ -326,7 +326,8 @@ this->InvokeEvent( vesselCenterPickedEvent );
 }
 }}*/
 
-/*************** CREATE SEEDPOINT WIDGET **************/
+  
+/************** CREATE SEEDPOINT WIDGET **************/
 void QmitkConnectivityFilterComponent::CreatePointSet()
 {
   m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);

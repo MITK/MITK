@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkUserInputSimulation.h"
 
+#include <itkMersenneTwisterRandomVariateGenerator.h>
+
 #include <qevent.h>
 #include <qapplication.h>
 
@@ -120,16 +122,27 @@ void QmitkUserInputSimulation::MouseDrawRandom( QWidget* widget, int button, uns
 {
   if (!widget) return;
 
+  static itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomgen= itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+  static bool done = false;
+  if (!done)
+  {
+    time_t randomInit = std::time(0);
+    randomgen->SetSeed( randomInit );
+    done = true;
+  }
+
   float w = (float)widget->width();
   float h = (float)widget->height();
   
   for (unsigned int i = 0; i <= points; ++i )
   {
     double r;
-    r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+    //r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+    r = randomgen->GetVariate();
     float x = r * w;
 
-    r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+    //r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+    r = randomgen->GetVariate();
     float y = r * h;
     
     if (i == 0 ) 

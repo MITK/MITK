@@ -1670,7 +1670,14 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
   //save relationship
   if( ableToSaveParentChild )
   {
+    //save the datatreenode-relations
     SaveRelationShip();
+
+    //if no file exist, we need a new textoid to create the chili-entry
+    if( !m_ParentXmlExist )
+      m_TextOIDParentChild = dbGetNewOID();
+    //else use the known one to overrride them
+
     //add the saved file to the series
     std::string pathAndFile = m_tempDirectory + "ParentChild.xml";
     if( !pStoreDataFromFile( pathAndFile.c_str(), "ParentChild.xml", "application/MITK.xml", NULL, study.instanceUID, patient.oid, study.oid, series.oid, m_TextOIDParentChild.c_str() ) )
@@ -1696,7 +1703,7 @@ bool mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& mitkHi
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
   return false;
 
 #else

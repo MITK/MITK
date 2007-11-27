@@ -167,6 +167,21 @@ void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long
 
 void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
+  if(IsVisible(renderer)==false ||
+      GetDataTreeNode() == NULL || 
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false 
+    )
+  {
+    //  FIXME: don't understand this 
+    if (m_Prop3D) {
+      //      std::cout << "visibility off" <<std::endl;
+
+      m_Prop3D->VisibilityOff(); 
+    }
+    return;
+  }
+  
   SetPreferences();
 
   if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 0)
@@ -184,25 +199,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_VolumeLOD->SetSelectedLODID(m_HiResID);
     //std::cout<<" Hi "<<std::endl;
   }
-  else{
+  else
+  {
     //std::cout<<"Could not get current LOD "<<std::endl;
   }
-
-
-  if(IsVisible(renderer)==false ||
-      GetDataTreeNode() == NULL || 
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false 
-    )
-  {
-    //  FIXME: don't understand this 
-    if (m_Prop3D) {
-      //      std::cout << "visibility off" <<std::endl;
-
-      m_Prop3D->VisibilityOff(); 
-    }
-    return;
-  }
+  
   if (m_Prop3D) {
     m_Prop3D->VisibilityOn();
   }

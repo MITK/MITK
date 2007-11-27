@@ -61,9 +61,6 @@ public:
   
   itkNewMacro(Self);
   
-  TransferFunction();
-  ~TransferFunction();
-  
   typedef std::vector<std::pair<double, double> > ControlPoints;
   typedef std::vector<std::pair<double, itk::RGBPixel<double> > > RGBControlPoints;
   
@@ -118,6 +115,8 @@ public:
   void ClearRGBPoints();
   
 protected:
+  TransferFunction();
+  virtual ~TransferFunction();
   
   /*!
   * controlpoints of the piecewise linear opacity functions (scalar and gradient)

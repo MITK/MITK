@@ -127,7 +127,7 @@ void QmitkUserInputSimulation::MouseDrawRandom( QWidget* widget, int button, uns
   if (!done)
   {
     //time_t randomInit = std::time(0);
-    randomgen->SetSeed( 0 );
+    randomgen->SetSeed( (unsigned int) 0 );
     done = true;
   }
 

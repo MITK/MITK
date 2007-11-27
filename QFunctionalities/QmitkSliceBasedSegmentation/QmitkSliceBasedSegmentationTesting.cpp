@@ -50,7 +50,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
 {
   std::cout << std::endl;
   time_t randomInit = std::time(0);
-  //time_t randomInit = 1187613660; // some errors on muhu (fixed)
+  randomInit = 0; // some errors on muhu (fixed)
   std::cout << "Initializing random number generator with " << randomInit << std::endl;
   std::srand(randomInit);
 

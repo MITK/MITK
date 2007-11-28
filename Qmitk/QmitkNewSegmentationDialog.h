@@ -54,6 +54,8 @@ class QmitkNewSegmentationDialog : public QDialog
   signals:
 
   public slots:
+
+    void setPrompt( const QString& prompt );
   
   protected slots:
 
@@ -64,6 +66,7 @@ class QmitkNewSegmentationDialog : public QDialog
 
   protected:
 
+    QLabel*  lblPrompt;
     QListBox*  lstOrgans;
     QLineEdit* edtName;
 

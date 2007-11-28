@@ -636,6 +636,7 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
     {
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
+      dialog.setPrompt("What did you just segment?");
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar

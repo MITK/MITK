@@ -20,7 +20,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent, const ch
   verticalLayout->setSpacing(5);
 
   // list of all known organs
-  verticalLayout->addWidget( new QLabel( "What do you want to segment?", this ) );
+  lblPrompt = new QLabel( "What do you want to segment?", this );
+  verticalLayout->addWidget( lblPrompt );
   lstOrgans = new QListBox( this, "lstOrgans" );
   verticalLayout->addWidget( lstOrgans );
 
@@ -140,5 +141,10 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString& newText)
 
   selectedOrgan = newText;
   edtName->setText( newText );
+}
+    
+void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )
+{
+  lblPrompt->setText( prompt );
 }
 

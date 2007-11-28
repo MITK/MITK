@@ -93,6 +93,9 @@
                     <property name="text">
                         <string>Ok</string>
                     </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Accept threshold and create a new segmentation</string>
+                    </property>
                 </widget>
                 <widget class="QToolButton" row="2" column="0" rowspan="1" colspan="2">
                     <property name="name">
@@ -136,6 +139,9 @@
                     </property>
                     <property name="text">
                         <string>Smooth pixels</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Whether or not the pixels should be smoothed</string>
                     </property>
                 </widget>
             </grid>
@@ -312,7 +318,7 @@
                         <enum>BesideIcon</enum>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Crop image to segmentation bounds</string>
+                        <string>Generate surface model from segmentation</string>
                     </property>
                 </widget>
                 <widget class="QToolButton" row="5" column="0" rowspan="1" colspan="4">
@@ -340,7 +346,7 @@
                         <enum>BesideIcon</enum>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Crop image to segmentation bounds</string>
+                        <string>Calculate volume of segmentation</string>
                     </property>
                 </widget>
             </grid>
@@ -502,4 +508,10 @@
     </image>
 </images>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkToolReferenceDataSelectionBox.h</includehint>
+    <includehint>QmitkToolWorkingDataListBox.h</includehint>
+    <includehint>QmitkToolSelectionBox.h</includehint>
+    <includehint>QmitkSlicesInterpolator.h</includehint>
+</includehints>
 </UI>

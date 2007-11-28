@@ -1009,6 +1009,7 @@ void QmitkStdMultiWidget::DisablePositionTracking()
       if(it.Get() == m_PositionTrackerNode.GetPointer() )
       {
         it.Disconnect();
+        break;
       }
       ++it;
     }

@@ -96,7 +96,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif // MBI_INTERNAL
 
 
- bool mitk::DataTreeNodeFactory::m_IilInterpolationActive = true;		// default value for iilInterpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;		// default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {
@@ -711,10 +711,8 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
   node->SetProperty( "use color", new mitk::BoolProperty( true ) );
-  //node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
-  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_IilInterpolationActive ) );	// set to user configurable default value (see global options)
+  node->SetProperty( "texture interpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
-  node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
   node->SetOpacity(1.0f);
@@ -789,9 +787,8 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
 {
   node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
   node->SetProperty( "use color", new mitk::BoolProperty( true ) );
-  node->SetProperty( "iilInterpolation", new mitk::BoolProperty( false ) );
+  node->SetProperty( "texture interpolation", new mitk::BoolProperty( false ) );
   node->SetProperty( "vtkInterpolation", new mitk::BoolProperty( true ) );
-  node->SetProperty( "texture interpolation", new mitk::BoolProperty( true ) );
   node->SetProperty( "layer", new mitk::IntProperty(1));
   node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
   node->SetProperty( "binary", new mitk::BoolProperty(true) );

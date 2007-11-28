@@ -55,7 +55,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   m_FeedbackNode->SetProperty( "binary", new mitk::BoolProperty(true) );
   m_FeedbackNode->SetProperty( "outline binary", new mitk::BoolProperty(true) );
   m_FeedbackNode->SetProperty( "color", new mitk::ColorProperty(0.0, 1.0, 1.0) );
-  m_FeedbackNode->SetProperty( "iilInterpolation", new mitk::BoolProperty(false) );
+  m_FeedbackNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
   m_FeedbackNode->SetProperty( "layer", new mitk::IntProperty( 20 ) );
   m_FeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   m_FeedbackNode->SetProperty( "name", new mitk::StringProperty("Interpolation feedback") );

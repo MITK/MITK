@@ -138,7 +138,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
   // Render the image
-  image->setInterpolation( rendererInfo.m_IilInterpolation );
+  image->setInterpolation( rendererInfo.m_TextureInterpolation );
   
 
   image->display( renderer->GetRenderWindow() );
@@ -869,12 +869,12 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   rgba[3] = opacity;
 
   // check for interpolation properties
-  bool iilInterpolation = false;
+  bool textureInterpolation = false;
   GetDataTreeNode()->GetBoolProperty(
-    "iilInterpolation", iilInterpolation, renderer
+    "texture interpolation", textureInterpolation, renderer
   );
 
-  rendererInfo.m_IilInterpolation = iilInterpolation;
+  rendererInfo.m_TextureInterpolation = textureInterpolation;
 
   bool useColor = false;
   GetDataTreeNode()->GetBoolProperty( "use color", useColor, renderer );
@@ -1005,7 +1005,7 @@ mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()
 : m_RendererID(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
   m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
-  m_IilInterpolation(true),
+  m_TextureInterpolation(true),
   m_ObserverID( 0 )
 {
   m_PixelsPerMM.Fill(0);

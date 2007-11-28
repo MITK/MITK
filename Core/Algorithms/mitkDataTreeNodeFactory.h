@@ -131,7 +131,7 @@ public:
    */
   void SetImageSerie(bool serie);
 
-  static bool m_IilInterpolationActive;
+  static bool m_TextureInterpolationActive;
   
 protected:
 

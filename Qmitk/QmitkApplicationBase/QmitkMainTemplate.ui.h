@@ -733,7 +733,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
   m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(false) );
   m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
-  m_Options->SetProperty( "Default value for iilInterpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_IilInterpolationActive) );
+  m_Options->SetProperty( "Default value for texture interpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
   m_Options->SetProperty( "Default dataset path", new mitk::StringProperty("") );
 }
 
@@ -878,9 +878,9 @@ void QmitkMainTemplate::Initialize()
   m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
   // Initialize other global options
-  mitk::BoolProperty* iilProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for iilInterpolation").GetPointer() );          
-  if (iilProperty != NULL)
-    mitk::DataTreeNodeFactory::m_IilInterpolationActive = iilProperty->GetValue();
+  mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );          
+  if (textureInterpolationProperty != NULL)
+    mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
@@ -1204,9 +1204,9 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
-    mitk::BoolProperty* iilProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for iilInterpolation").GetPointer() );          
-    if (iilProperty != NULL)
-      mitk::DataTreeNodeFactory::m_IilInterpolationActive = iilProperty->GetValue();
+    mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );          
+    if (textureInterpolationProperty != NULL)
+      mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
     // Pass global options to all available dialog bars (other than
     // functionalities, dialog bars currently store their options

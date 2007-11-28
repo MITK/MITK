@@ -61,7 +61,7 @@ QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const 
   m_ThresholdFeedbackNode = mitk::DataTreeNode::New();
   mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_ThresholdFeedbackNode );
   m_ThresholdFeedbackNode->SetProperty( "color", new mitk::ColorProperty(0.2, 1.0, 0.2) );
-  m_ThresholdFeedbackNode->SetProperty( "iilInterpolation", new mitk::BoolProperty(false) );
+  m_ThresholdFeedbackNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
   m_ThresholdFeedbackNode->SetProperty( "layer", new mitk::IntProperty( 20 ) );
   m_ThresholdFeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(100, 1) ) );
   m_ThresholdFeedbackNode->SetProperty( "name", new mitk::StringProperty("Thresholding feedback") );
@@ -547,7 +547,7 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode(
   // visualization properties
   segmentationNode->SetProperty( "binary", new mitk::BoolProperty(true) );
   segmentationNode->SetProperty( "color", mitk::DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
-  segmentationNode->SetProperty( "iilInterpolation", new mitk::BoolProperty(false) );
+  segmentationNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
   segmentationNode->SetProperty( "layer", new mitk::IntProperty(10) );
   segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   segmentationNode->SetProperty( "opacity", new mitk::FloatProperty(0.3) );
@@ -722,7 +722,7 @@ void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
   {
-    node->SetProperty("iilInterpolation", new mitk::BoolProperty(on));
+    node->SetProperty("texture interpolation", new mitk::BoolProperty(on));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -732,7 +732,7 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
  if (node)
  {
     bool on(false);
-    if (node->GetBoolProperty("iilInterpolation", on))
+    if (node->GetBoolProperty("texture interpolation", on))
     {
       m_Controls->chkPixelSmoothing->setEnabled(true);
       m_Controls->chkPixelSmoothing->setChecked(on);

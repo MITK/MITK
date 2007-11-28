@@ -137,7 +137,7 @@ public:
     /** \brief Reference geometry associated with the world geometry */
     const Geometry3D *m_ReferenceGeometry;
    
-    bool m_IilInterpolation;
+    bool m_TextureInterpolation;
 
     /** \brief stores the id of the observer for delete event of renderer */
     unsigned long m_ObserverID;

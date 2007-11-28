@@ -138,6 +138,14 @@ void  QmitkMaterialShowcase::SetOpacity( vtkFloatingPointType opacity )
 }
 
 
+void  QmitkMaterialShowcase::SetLineWidth( float lineWidth )
+{
+    m_MaterialProperty->SetLineWidth( lineWidth );
+    m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
+    this->UpdateRenderWindow();
+}
+
+
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
   m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();

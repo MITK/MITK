@@ -166,6 +166,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     property->SetOpacity( materialProperty->GetOpacity() );
     property->SetInterpolation( materialProperty->GetVtkInterpolation() );
     property->SetRepresentation( materialProperty->GetVtkRepresentation() );
+    property->SetLineWidth( materialProperty->GetLineWidth() );
   }
   else
   {

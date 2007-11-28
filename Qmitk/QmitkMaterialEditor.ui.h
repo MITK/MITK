@@ -116,7 +116,23 @@ void QmitkMaterialEditor::OnOpacityChanged( int value )
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-
+/**
+ * Slot which reacts on a line width change by the user. Fills the current 
+ * material property with the new line width and forwards it to the current 
+ * showcase.
+ * @param value the slider value, which represents the line width. 
+ */
+void QmitkMaterialEditor::OnLineWidthChanged( int value )
+{
+    float lineWidth = static_cast<float>(value);
+    for ( unsigned int index = 0 ; index < m_MaterialProperties->Size() ; ++index )
+    {
+      m_MaterialProperties->GetElement( index )->SetLineWidth( lineWidth );
+      m_Showcases[ index ]->SetLineWidth( lineWidth );
+    }
+    
+    if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 /**
  * Slot which reacts on a button-OK click. The temporary materials are copied
  * to the ones provided by the user of the dialog. The dialog will be accepted
@@ -296,6 +312,9 @@ void QmitkMaterialEditor::SetActiveShowcase( unsigned int number )
     m_SlOpacity->blockSignals(true);
     m_SlOpacity->setValue( static_cast<int> ( materialProperty->GetOpacity() * ( m_SlOpacity->maxValue() - m_SlOpacity->minValue() ) + m_SlOpacity->minValue() ) );
     m_SlOpacity->blockSignals(false);
+    m_SlLineWidth->blockSignals(true);
+    m_SlLineWidth->setValue( static_cast<int> ( materialProperty->GetLineWidth() ) );
+    m_SlLineWidth->blockSignals(false);
     m_CbInterpolation->blockSignals(true);
     m_CbInterpolation->setCurrentItem( materialProperty->GetVtkInterpolation() );
     m_CbInterpolation->blockSignals(false);

@@ -248,6 +248,11 @@ public:
      *        surfaces.
      */
     virtual void SetRepresentation( RepresentationType representation );
+    
+    /**
+     * Set/Get the width of a Line. The width is expressed in screen units. The default is 1.0.
+     */
+    virtual void SetLineWidth( float lineWidth );
 
     /**
      * @returns the color of the material
@@ -301,6 +306,11 @@ public:
      * vtk constants.
      */
     virtual int GetVtkRepresentation() const;
+    
+    /**
+     * @returns the line width used for wireframe rendering as a fraction of screen units
+     */
+    virtual float GetLineWidth() const;
 
     /**
      * Fills the current materials with the properties of the
@@ -369,6 +379,8 @@ protected:
 
     vtkFloatingPointType m_Opacity;
 
+    float m_LineWidth;
+    
     InterpolationType m_Interpolation;
 
     RepresentationType m_Representation;
@@ -385,6 +397,7 @@ protected:
     static const char* OPACITY_KEY; 
     static const char* INTERPOLATION_KEY; 
     static const char* REPRESENTATION_KEY;
+    static const char* LINE_WIDTH_KEY;
 
     static const char* COLOR;     
     static const char* SPECULAR_COLOR;     

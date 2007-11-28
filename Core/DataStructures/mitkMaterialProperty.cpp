@@ -20,6 +20,7 @@ mitk::MaterialProperty::MaterialProperty( Color color, vtkFloatingPointType opac
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  SetLineWidth( GetLineWidth() );
   m_Name = "";
 }
 
@@ -38,6 +39,7 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  SetLineWidth( GetLineWidth() );
   m_Name = "";
 }
 
@@ -58,6 +60,7 @@ mitk::MaterialProperty::MaterialProperty( vtkFloatingPointType red, vtkFloatingP
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  SetLineWidth( GetLineWidth() );
   m_Name = "";
 }
 
@@ -75,6 +78,7 @@ mitk::MaterialProperty::MaterialProperty( mitk::MaterialProperty::Color color, v
   SetOpacity( opacity );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  SetLineWidth( GetLineWidth() );
 }
 
 
@@ -91,6 +95,7 @@ mitk::MaterialProperty::MaterialProperty( mitk::DataTreeNode* node, mitk::BaseRe
   SetOpacity( GetOpacity() );
   SetInterpolation( GetInterpolation() );
   SetRepresentation( GetRepresentation() );
+  SetLineWidth( GetLineWidth() );
 }
 
 mitk::MaterialProperty::MaterialProperty( const MaterialProperty& property ) : mitk::BaseProperty()
@@ -259,6 +264,17 @@ void mitk::MaterialProperty::SetRepresentation( RepresentationType representatio
     m_DataTreeNode->SetProperty( REPRESENTATION_KEY, new mitk::VtkRepresentationProperty( representation ), m_Renderer );
   }
   m_Representation = representation;
+  Modified();
+}
+
+
+void mitk::MaterialProperty::SetLineWidth( float lineWidth )
+{
+  if ( ForwardToDataTreeNode() )
+  {
+    m_DataTreeNode->SetProperty( LINE_WIDTH_KEY, new mitk::FloatProperty( lineWidth ), m_Renderer );
+  }
+  m_LineWidth = lineWidth;
   Modified();
 }
 
@@ -434,7 +450,19 @@ int mitk::MaterialProperty::GetVtkRepresentation() const
   }
 }
 
-
+float mitk::MaterialProperty::GetLineWidth() const
+{
+  if ( ForwardToDataTreeNode() )
+  {
+    mitk::FloatProperty * lineWidth = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( LINE_WIDTH_KEY, m_Renderer ).GetPointer() );
+    if ( lineWidth != NULL )
+      return lineWidth->GetValue();
+    else
+      return m_LineWidth;
+  }
+  else
+    return m_LineWidth;
+}
 
 void mitk::MaterialProperty::Initialize( const MaterialProperty& property, const bool& copyDataTreeNode )
 {
@@ -451,6 +479,7 @@ void mitk::MaterialProperty::Initialize( const MaterialProperty& property, const
   this->SetOpacity( property.GetOpacity() );
   this->SetInterpolation( property.GetInterpolation() );
   this->SetRepresentation( property.GetRepresentation() );
+  this->SetLineWidth( property.GetLineWidth() );
   this->SetName( property.GetName() );
 }
 
@@ -472,7 +501,8 @@ bool mitk::MaterialProperty::operator==( const BaseProperty& property ) const
              m_Opacity == other->GetOpacity() &&
              m_Interpolation == other->GetInterpolation() &&
              m_Name == other->GetName() &&
-             m_Representation == other->GetRepresentation()
+             m_Representation == other->GetRepresentation() &&
+             m_LineWidth == other->GetLineWidth()
            );
 }
 
@@ -495,6 +525,7 @@ void mitk::MaterialProperty::InitializeStandardValues()
   m_Opacity = 1.0 ;
   m_Interpolation = Gouraud;
   m_Representation = Surface;
+  m_LineWidth = 1.0;
   m_Name = "";
 }
 
@@ -521,6 +552,7 @@ void mitk::MaterialProperty::PrintSelf ( std::ostream &os ) const
   os << "SpecularCoefficient: " << GetSpecularCoefficient() << std::endl;
   os << "SpecularPower: " << GetSpecularPower() << std::endl;
   os << "Opacity: " << GetOpacity() << std::endl;
+  os << "Line width: " << GetLineWidth() << std::endl;
   switch ( GetInterpolation() )
   {
   case ( Flat ) : os << "Interpolation: Flat" << std::endl;
@@ -597,6 +629,7 @@ const char* mitk::MaterialProperty::SPECULAR_POWER_KEY = "specular_power";
 const char* mitk::MaterialProperty::OPACITY_KEY = "opacity";
 const char* mitk::MaterialProperty::INTERPOLATION_KEY = "interpolation";
 const char* mitk::MaterialProperty::REPRESENTATION_KEY = "representation";
+const char* mitk::MaterialProperty::LINE_WIDTH_KEY = "3d line width";
 
 const char* mitk::MaterialProperty::COLOR = "COLOR";
 const char* mitk::MaterialProperty::SPECULAR_COLOR = "SPECULAR_COLOR";

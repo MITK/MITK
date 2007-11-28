@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>237</width>
-            <height>387</height>
+            <width>271</width>
+            <height>416</height>
         </rect>
     </property>
     <property name="caption">
@@ -51,45 +51,6 @@
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>
-            </property>
-        </widget>
-        <widget class="QComboBox" row="5" column="1">
-            <item>
-                <property name="text">
-                    <string>Flat</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>Gouraud</string>
-                </property>
-            </item>
-            <item>
-                <property name="text">
-                    <string>Phong</string>
-                </property>
-            </item>
-            <property name="name">
-                <cstring>m_CbInterpolation</cstring>
-            </property>
-            <property name="currentItem">
-                <number>1</number>
-            </property>
-        </widget>
-        <widget class="QLabel" row="5" column="0">
-            <property name="name">
-                <cstring>textLabel2</cstring>
-            </property>
-            <property name="text">
-                <string>Interpolation</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="6" column="0">
-            <property name="name">
-                <cstring>textLabel3_2</cstring>
-            </property>
-            <property name="text">
-                <string>Representation</string>
             </property>
         </widget>
         <widget class="QLabel" row="2" column="0">
@@ -177,17 +138,6 @@
                 <enum>Horizontal</enum>
             </property>
         </widget>
-        <widget class="QLabel" row="4" column="0">
-            <property name="name">
-                <cstring>textLabel5</cstring>
-            </property>
-            <property name="text">
-                <string>Opacity</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>Defines the transparency of the object.</string>
-            </property>
-        </widget>
         <widget class="QLabel" row="3" column="0">
             <property name="name">
                 <cstring>textLabel3</cstring>
@@ -202,38 +152,43 @@
         <widget class="QComboBox" row="6" column="1">
             <item>
                 <property name="text">
-                    <string>Points</string>
+                    <string>Flat</string>
                 </property>
             </item>
             <item>
                 <property name="text">
-                    <string>Wireframe</string>
+                    <string>Gouraud</string>
                 </property>
             </item>
             <item>
                 <property name="text">
-                    <string>Surface</string>
+                    <string>Phong</string>
                 </property>
             </item>
             <property name="name">
-                <cstring>m_CbRepresentation</cstring>
+                <cstring>m_CbInterpolation</cstring>
             </property>
             <property name="currentItem">
-                <number>2</number>
+                <number>1</number>
             </property>
         </widget>
-        <widget class="QSlider" row="4" column="1">
+        <widget class="QLabel" row="7" column="0">
             <property name="name">
-                <cstring>m_SlOpacity</cstring>
+                <cstring>textLabel3_2</cstring>
             </property>
-            <property name="maxValue">
-                <number>100</number>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
+            <property name="text">
+                <string>Representation</string>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="7" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="6" column="0">
+            <property name="name">
+                <cstring>textLabel2</cstring>
+            </property>
+            <property name="text">
+                <string>Interpolation</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="8" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>layout2</cstring>
             </property>
@@ -258,6 +213,76 @@
                     </property>
                 </widget>
             </hbox>
+        </widget>
+        <widget class="QComboBox" row="7" column="1">
+            <item>
+                <property name="text">
+                    <string>Points</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Wireframe</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Surface</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>m_CbRepresentation</cstring>
+            </property>
+            <property name="currentItem">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="4" column="0">
+            <property name="name">
+                <cstring>textLabel5</cstring>
+            </property>
+            <property name="text">
+                <string>Opacity</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Defines the transparency of the object.</string>
+            </property>
+        </widget>
+        <widget class="QSlider" row="4" column="1">
+            <property name="name">
+                <cstring>m_SlOpacity</cstring>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLabel" row="5" column="0">
+            <property name="name">
+                <cstring>textLabel5_2</cstring>
+            </property>
+            <property name="text">
+                <string>Line width</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Defines the transparency of the object.</string>
+            </property>
+        </widget>
+        <widget class="QSlider" row="5" column="1">
+            <property name="name">
+                <cstring>m_SlLineWidth</cstring>
+            </property>
+            <property name="minValue">
+                <number>1</number>
+            </property>
+            <property name="maxValue">
+                <number>10</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
         </widget>
     </grid>
 </widget>
@@ -316,6 +341,12 @@
         <receiver>QmitkMaterialEditor</receiver>
         <slot>OnRepresentationChanged(int)</slot>
     </connection>
+    <connection>
+        <sender>m_SlLineWidth</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkMaterialEditor</receiver>
+        <slot>OnLineWidthChanged(int)</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
@@ -339,6 +370,7 @@
     <slot access="protected">OnColorChanged( int value )</slot>
     <slot access="protected">OnSpecularPowerChanged( int value )</slot>
     <slot access="protected">OnOpacityChanged( int value )</slot>
+    <slot>OnLineWidthChanged( int value )</slot>
     <slot access="protected">OnOKClicked()</slot>
     <slot access="protected">OnCancelClicked()</slot>
     <slot access="protected">OnPreviewClicked()</slot>

@@ -15,6 +15,7 @@ SET(CPP_FILES
   mitkSlicesRotator.cpp
   mitkStatusBar.cpp
   mitkStepper.cpp
+  mitkTestManager.cpp
   mitkToolManager.cpp
   mitkUndoController.cpp
   mitkUndoModel.cpp

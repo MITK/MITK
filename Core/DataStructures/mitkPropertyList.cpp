@@ -67,13 +67,17 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
     // compatible? then use operator= to assign value
     if (it->second.first->Assignable( *property ))
     {
-      *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
+      it->second.first = property;
+      this->Modified();
       return;
     }
     
-    // Neither identical nor compatible? Then override the old entry.
-    it->second.first=NULL;
-    m_Properties.erase(it);
+    // Neither identical nor compatible? Then don't do anything and produce a
+    // warning message.
+    std::cerr << "In " __FILE__ ", l." << __LINE__ 
+      << ": Trying to replace existing property with incompatible substitute." 
+      << std::endl;
+    return;
   }
 
   //no? add/replace it.
@@ -81,7 +85,7 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
   newProp.first = propertyKey;
   newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
   m_Properties.insert ( newProp );
-  Modified();
+  this->Modified();
 }
 
 void mitk::PropertyList::ReplaceProperty(const char* propertyKey, BaseProperty* property)

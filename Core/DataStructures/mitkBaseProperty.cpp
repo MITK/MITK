@@ -45,9 +45,9 @@ std::string mitk::BaseProperty::GetValueAsString() const
   as the right-hand-side argument of an assignment. This test will most probably include
   some dynamic_cast.
  */
-bool mitk::BaseProperty::Assignable(const BaseProperty&) const
+bool mitk::BaseProperty::Assignable(const BaseProperty &property ) const
 {
-  return false;
+  return ( typeid( *this ) == typeid( property ) );
 }
 
 /*!

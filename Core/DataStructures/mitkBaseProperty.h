@@ -53,7 +53,7 @@ class BaseProperty : public itk::Object, public XMLIO
     
     virtual std::string GetValueAsString() const;
     
-    virtual bool Assignable(const BaseProperty&) const;
+    virtual bool Assignable(const BaseProperty& ) const;
     
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
     

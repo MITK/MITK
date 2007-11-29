@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkCalculateSegmentationVolume.h"
+#include "mitkVtkResliceInterpolationProperty.h"
 
 #include <itkImageRegionIterator.h>
 
@@ -558,7 +559,7 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode(
   segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   segmentationNode->SetProperty( "opacity", new mitk::FloatProperty(0.3) );
   segmentationNode->SetProperty( "segmentation", new mitk::BoolProperty(true) );
-  segmentationNode->SetProperty( "vtkInterpolation", new mitk::BoolProperty(false) ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
+  segmentationNode->SetProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
 
   return segmentationNode;
 }

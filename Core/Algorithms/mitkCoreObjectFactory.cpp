@@ -67,6 +67,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
+#include "mitkVtkResliceInterpolationProperty.h"
 
 #include "mitkPicFileIOFactory.h"
 #include "mitkPointSetIOFactory.h"
@@ -126,6 +127,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_CPP( EnumerationProperty, "EnumerationProperty" )
     CREATE_CPP( VtkInterpolationProperty, "VtkInterpolationProperty" )
     CREATE_CPP( VtkRepresentationProperty, "VtkRepresentationProperty" )
+    CREATE_CPP( VtkResliceInterpolationProperty, "VtkResliceInterpolationProperty" )
     CREATE_ITK( GeometryData, "GeometryData" )
     CREATE_ITK( Contour, "Contour" )
     CREATE_ITK( Surface, "Surface" )

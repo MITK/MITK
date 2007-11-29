@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
+#include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkRenderWindow.h"
 #include "mitkAbstractTransformGeometry.h"
 
@@ -528,18 +529,29 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // neighbor if the input image is too small.
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
   {
-    bool vtkInterpolation = false;
-    GetDataTreeNode()->GetBoolProperty(
-      "vtkInterpolation", vtkInterpolation, renderer
-    );
+    VtkResliceInterpolationProperty *resliceInterpolationProperty;
+    this->GetDataTreeNode()->GetProperty(
+      resliceInterpolationProperty, "reslice interpolation" );
 
-    if (vtkInterpolation)
+    int interpolationMode = VTK_RESLICE_NEAREST;
+    if ( resliceInterpolationProperty != NULL )
     {
-      rendererInfo.m_Reslicer->SetInterpolationModeToLinear();
+      interpolationMode = resliceInterpolationProperty->GetInterpolation();
     }
-    else 
+
+    switch ( interpolationMode )
     {
+    case VTK_RESLICE_NEAREST:
       rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
+      break;
+
+    case VTK_RESLICE_LINEAR:
+      rendererInfo.m_Reslicer->SetInterpolationModeToLinear();
+      break;
+
+    case VTK_RESLICE_CUBIC:
+      rendererInfo.m_Reslicer->SetInterpolationModeToCubic();
+      break;
     }
   }
   else

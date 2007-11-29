@@ -238,6 +238,7 @@ void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
       {
         enumProp->SetValue( activatedItem );
         m_PropertyList->InvokeEvent( itk::ModifiedEvent() );
+        m_PropertyList->Modified();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }

@@ -629,7 +629,7 @@ const char* mitk::MaterialProperty::SPECULAR_POWER_KEY = "specular_power";
 const char* mitk::MaterialProperty::OPACITY_KEY = "opacity";
 const char* mitk::MaterialProperty::INTERPOLATION_KEY = "interpolation";
 const char* mitk::MaterialProperty::REPRESENTATION_KEY = "representation";
-const char* mitk::MaterialProperty::LINE_WIDTH_KEY = "3d line width";
+const char* mitk::MaterialProperty::LINE_WIDTH_KEY = "wireframe line width";
 
 const char* mitk::MaterialProperty::COLOR = "COLOR";
 const char* mitk::MaterialProperty::SPECULAR_COLOR = "SPECULAR_COLOR";

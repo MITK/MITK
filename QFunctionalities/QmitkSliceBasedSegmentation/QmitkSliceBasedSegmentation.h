@@ -169,6 +169,8 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
 
     mitk::DataTreeNode::Pointer m_ThresholdFeedbackNode;
 
+    unsigned int m_NumberOfVolumeCalculationThreads;
+
 };
 #endif // !defined(QmitkSliceBasedSegmentation_H__INCLUDED)
 

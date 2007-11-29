@@ -54,7 +54,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it), 
   m_MultiWidget(mitkStdMultiWidget), 
-  m_Controls(NULL)
+  m_Controls(NULL),
+  m_NumberOfVolumeCalculationThreads(0)
 {
   SetAvailability(true);
 
@@ -376,7 +377,6 @@ void QmitkSliceBasedSegmentation::CalculateVolumeForSegmentation()
   }
 
   mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(nodes.size());
 
   // for all selected nodes: try to crop the image
   for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
@@ -400,13 +400,19 @@ void QmitkSliceBasedSegmentation::CalculateVolumeForSegmentation()
         volumeFilter->SetPointerParameter("Input", image);
         volumeFilter->SetPointerParameter("Group node", node);
 
+        if ( m_Controls->btnVolumetry->isEnabled() )
+        {
+          m_Controls->btnVolumetry->setTextLabel("Calculating...");
+          m_Controls->btnVolumetry->setEnabled(false);
+        }
+
+
+        ++m_NumberOfVolumeCalculationThreads;
         volumeFilter->StartAlgorithm();
       }
     }
-    
-    mitk::ProgressBar::GetInstance()->Progress();
   }
-
+    
   QApplication::restoreOverrideCursor();
 }
 
@@ -753,4 +759,11 @@ void QmitkSliceBasedSegmentation::OnVolumeCalculationDone()
 {
   m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  --m_NumberOfVolumeCalculationThreads;
+
+  if (m_NumberOfVolumeCalculationThreads == 0)
+  {
+    m_Controls->btnVolumetry->setTextLabel("Volumetry");
+    m_Controls->btnVolumetry->setEnabled(true);
+  }
 }

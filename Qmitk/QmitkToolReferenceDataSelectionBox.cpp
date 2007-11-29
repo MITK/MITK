@@ -74,6 +74,7 @@ void QmitkToolReferenceDataSelectionBox::SetToolManager(mitk::ToolManager& newMa
 void QmitkToolReferenceDataSelectionBox::UpdateDataDisplay()
 { 
   m_ReferenceDataSelectionBox->GetFilter()->SetDataStorageResultset( GetAllPossibleReferenceImages() ); /// \todo Also forward the current selected. Perhaps wait for new combobox.
+  EnsureOnlyReferenceImageIsVisibile();
 }
 
 void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::DataTreeFilter::Item* item)
@@ -81,6 +82,17 @@ void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::Dat
   mitk::DataTreeNode* selectedNode = const_cast<mitk::DataTreeNode*>( item->GetNode() );
 
   emit ReferenceNodeSelected(selectedNode);
+
+  m_SelfCall = true;
+  m_ToolManager->SetReferenceData(selectedNode); // maybe NULL
+  m_SelfCall = false;
+
+  EnsureOnlyReferenceImageIsVisibile();
+}
+
+void QmitkToolReferenceDataSelectionBox::EnsureOnlyReferenceImageIsVisibile()
+{
+  mitk::DataTreeNode* selectedNode = m_ToolManager->GetReferenceData(0);
 
   mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes = GetAllPossibleReferenceImages();
   for ( mitk::DataStorage::SetOfObjects::const_iterator nodeIter = allImageNodes->begin();
@@ -94,10 +106,6 @@ void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::Dat
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-
-  m_SelfCall = true;
-  m_ToolManager->SetReferenceData(selectedNode); // maybe NULL
-  m_SelfCall = false;
 }
 
 void QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified(const itk::EventObject&)

@@ -75,6 +75,8 @@ class QmitkToolReferenceDataSelectionBox : public QVBox
 
     void OnReferenceDataSelected(const mitk::DataTreeFilter::Item* item);
 
+    void EnsureOnlyReferenceImageIsVisibile();
+
   protected:
 
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPossibleReferenceImages();

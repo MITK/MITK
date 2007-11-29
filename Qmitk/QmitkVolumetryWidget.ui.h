@@ -174,6 +174,8 @@ void QmitkVolumetryWidget::m_ThresholdSlider_valueChanged( int value)
 
 void QmitkVolumetryWidget::CreateOverlayChild()
 {
+  if (m_DataTreeIteratorClone.IsNull()) return;
+
   if (m_Node)
   {
     m_OverlayNode = mitk::DataTreeNode::New();
@@ -197,6 +199,7 @@ void QmitkVolumetryWidget::CreateOverlayChild()
       if (  node == m_Node )
       {
         iteratorClone->Add(m_OverlayNode);
+        break;
       }
       ++iteratorClone;
     }

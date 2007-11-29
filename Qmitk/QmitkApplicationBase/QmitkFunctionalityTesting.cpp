@@ -87,11 +87,11 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   std::cout<<"[PASSED]"<<std::endl;
 
 #ifdef BUILD_TESTING
-  std::cout << "GUI test for \"" << m_QmitkFctMediator->GetActiveFunctionality()->className() <<"\": "<< std::flush;
   m_CloseMessagesTimer.stop();
   QmitkFunctionality* activeFunctionality = m_QmitkFctMediator->GetActiveFunctionality();
   if (activeFunctionality)
   {
+    std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
     if ( activeFunctionality->TestYourself() )
     {
       std::cout<<"[PASSED]"<<std::endl;

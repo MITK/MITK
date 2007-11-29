@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "mitkTestingMacros.h"
 #include "mitkGenericProperty.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 template <typename T>
 int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T::ValueType testValue2, std::string testValue1AsString, std::string testValue2AsString, std::string type)
 {
-  std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1AsString << ", " << testValue2AsString << ") ";
+  std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1AsString << ", " << testValue2AsString << ") \n";
   
   typename T::Pointer prop = new T();
   typename T::Pointer prop2 = new T(testValue1);
@@ -40,19 +41,9 @@ int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T:
   prop->SetValue(testValue1);
   unsigned long tAfterAll = prop->GetMTime();
   
-  if (prop->GetValue() != testValue1 || prop->GetValueAsString() != testValue1AsString) 
-  {
-    std::cout << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[PASSED]" << std::endl;
+  MITK_TEST_CONDITION_REQUIRED(prop->GetValue() == testValue1 && prop->GetValueAsString() == testValue1AsString,"Testing SetValue") 
     
-  std::cout << "    Testing equality operator (operator==): ";
-  if ( (! (*prop == *prop2)) || (*prop2 == *prop3) ) {
-    std::cout << " [FAILED]" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[PASSED]" << std::endl;
+  MITK_TEST_CONDITION_REQUIRED((*prop == *prop2),"Testing equality operator (operator==)");
   
   prop->SetValue(testValue2);
   unsigned long tAfterEverything = prop->GetMTime();
@@ -80,7 +71,7 @@ int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T:
 
 int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
 {
-  int retVal(EXIT_SUCCESS);
+  MITK_TEST_BEGIN(GenericPropertyTest)
 
   // testing for some different data types
   TestGenericPropertyForDataType<mitk::IntProperty>(1, 2, "1", "2", "int");
@@ -116,6 +107,5 @@ int mitkGenericPropertyTest(int /*argc*/, char* /*argv*/[])
   TestGenericPropertyForDataType<mitk::Vector3DProperty>( p1, p2, "[2, 3, 4]", "[-1, 2, 3]", "mitk::Vector3D");
   }
  
-  std::cout << "[TEST DONE]"<<std::endl;
-  return retVal;
+  MITK_TEST_END();
 }

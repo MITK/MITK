@@ -130,6 +130,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   opts.fccType = streamtypeVIDEO;
   //creates a video with minor quality! Use different codec (must be installed on local machine) to generate movies with higher quality
   opts.fccHandler = mmioFOURCC('M','S','V','C'); 
+  opts.dwQuality = 90000; // means 90% quality; dwQuality goes from [0...10000]
   
   
   
@@ -140,7 +141,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 
   if (!AVISaveOptions(NULL, 0, 1, &m_pStream, (LPAVICOMPRESSOPTIONS FAR *) &aopts))  {
     AVISaveOptionsFree(1,(LPAVICOMPRESSOPTIONS FAR *) &aopts);
-    return false;
+    //return false;
   }
 
   #endif

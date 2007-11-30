@@ -47,19 +47,20 @@ namespace mitk {
     mitk::TestManager::GetInstance()->NumberOfFailedTests() )    \
     return EXIT_FAILURE;                                  \
   } else {                                                \
-    MITK_TEST_OUTPUT(<< mitkTestName << ": [DONE PASSED]")    \
+    MITK_TEST_OUTPUT(<< mitkTestName << ": "<< mitk::TestManager::GetInstance()->NumberOfPassedTests() << " tests [DONE PASSED]")    \
     return EXIT_SUCCESS;                                  \
   }                                                       \
 
 #define MITK_TEST_CONDITION(COND,MSG) \
   MITK_TEST_OUTPUT_NO_ENDL(<< MSG) \
   if ( ! (COND) ) {        \
-    mitkTestResult = EXIT_FAILURE;              \
+    mitk::TestManager::GetInstance()->TestFailed(); \
     MITK_TEST_OUTPUT(<< " [FAILED]\n" << "In " << __FILE__        \
                      << ", line " << __LINE__    \
-                     << ":  #COND : [FAILED]")    \
+                     << ":  " #COND " : [FAILED]")    \
   } else {                         \
-    MITK_TEST_OUTPUT(<< "[PASSED]") \
+    MITK_TEST_OUTPUT(<< " [PASSED]") \
+    mitk::TestManager::GetInstance()->TestPassed(); \
  }
 
 #define MITK_TEST_CONDITION_REQUIRED(COND,MSG) \
@@ -69,7 +70,8 @@ namespace mitk {
                      << ", line " << __LINE__                      \
                      << ", expression is false: \"" #COND "\"")    \
   } else {                         \
-    MITK_TEST_OUTPUT(<< "[PASSED]") \
+    MITK_TEST_OUTPUT(<< " [PASSED]") \
+    mitk::TestManager::GetInstance()->TestPassed(); \
  }
 
 

@@ -108,6 +108,7 @@ SET(CPP_FILES
   mitkVideoSource.cpp
   mitkVtkInterpolationProperty.cpp
   mitkVtkRepresentationProperty.cpp
+  mitkVtkResliceInterpolationProperty.cpp
   mitkVtkScalarModeProperty.cpp
   mitkWeakPointerProperty.cpp
   mitkXMLIO.cpp

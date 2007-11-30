@@ -67,16 +67,25 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
     // compatible? then use operator= to assign value
     if (it->second.first->Assignable( *property ))
     {
-      it->second.first = property;
+      *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
       this->Modified();
       return;
     }
     
-    // Neither identical nor compatible? Then don't do anything and produce a
-    // warning message.
-    std::cerr << "In " __FILE__ ", l." << __LINE__ 
-      << ": Trying to replace existing property with incompatible substitute." 
-      << std::endl;
+    if ( typeid( *(it->second.first.GetPointer()) ) != typeid( *property ) )
+    {
+      // Accept only if the two types are matching. For replacing, use 
+      // ReplaceProperty.
+      std::cerr << "In " __FILE__ ", l." << __LINE__ 
+        << ": Trying to set existing property to a property with different type." 
+        << " Use ReplaceProperty() instead."
+        << std::endl;
+      return;
+    }
+
+    // If types are identical, but the property has no operator= (s.a.),
+    // overwrite the pointer.
+    it->second.first = property;
     return;
   }
 

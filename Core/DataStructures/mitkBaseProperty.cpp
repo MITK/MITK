@@ -47,7 +47,7 @@ std::string mitk::BaseProperty::GetValueAsString() const
  */
 bool mitk::BaseProperty::Assignable(const BaseProperty &property ) const
 {
-  return ( typeid( *this ) == typeid( property ) );
+  return false;
 }
 
 /*!

@@ -68,7 +68,6 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
     if (it->second.first->Assignable( *property ))
     {
       *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
-      this->Modified();
       return;
     }
     

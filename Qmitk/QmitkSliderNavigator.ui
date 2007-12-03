@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>485</width>
+            <width>235</width>
             <height>137</height>
         </rect>
     </property>
@@ -51,7 +51,7 @@
             </property>
             <property name="sizePolicy">
                 <sizepolicy>
-                    <hsizetype>1</hsizetype>
+                    <hsizetype>0</hsizetype>
                     <vsizetype>0</vsizetype>
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
@@ -73,7 +73,7 @@
             </property>
             <property name="sizePolicy">
                 <sizepolicy>
-                    <hsizetype>3</hsizetype>
+                    <hsizetype>5</hsizetype>
                     <vsizetype>0</vsizetype>
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
@@ -83,6 +83,12 @@
                 <size>
                     <width>0</width>
                     <height>0</height>
+                </size>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>150</width>
+                    <height>32767</height>
                 </size>
             </property>
             <property name="maxValue">
@@ -106,13 +112,13 @@
             </property>
             <property name="minimumSize">
                 <size>
-                    <width>36</width>
+                    <width>45</width>
                     <height>0</height>
                 </size>
             </property>
             <property name="maximumSize">
                 <size>
-                    <width>36</width>
+                    <width>45</width>
                     <height>32767</height>
                 </size>
             </property>
@@ -137,13 +143,13 @@
             </property>
             <property name="minimumSize">
                 <size>
-                    <width>36</width>
+                    <width>45</width>
                     <height>0</height>
                 </size>
             </property>
             <property name="maximumSize">
                 <size>
-                    <width>36</width>
+                    <width>45</width>
                     <height>32767</height>
                 </size>
             </property>

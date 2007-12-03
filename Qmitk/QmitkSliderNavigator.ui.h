@@ -181,7 +181,7 @@ QString QmitkSliderNavigator::ClippedValueToString( float value )
   }
   else
   {
-    return QString::number( value, 'f', 3 );
+    return QString::number( value, 'f', 2 );
   }
 }
 
@@ -225,8 +225,18 @@ void QmitkSliderNavigator::SetLabels()
   
   if ( m_HasLabelUnit )
   {
-    minText += "<br>[" + this->GetLabelUnit() + "]";
-    maxText += "<br>[" + this->GetLabelUnit() + "]";
+    minText += " " + this->GetLabelUnit();
+    maxText += " " + this->GetLabelUnit();
+  }
+
+  if ( m_MinValueValid )
+  {
+    minText += "<br>(pos 0)";
+  }
+
+  if ( m_MaxValueValid )
+  {
+    maxText += "<br>(pos " + QString::number( m_Stepper->GetSteps() - 1 ) + ")";
   }
 
   minText += "</font></p>";

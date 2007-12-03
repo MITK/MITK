@@ -556,7 +556,7 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode(
   segmentationNode->SetProperty( "color", mitk::DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
   segmentationNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
   segmentationNode->SetProperty( "layer", new mitk::IntProperty(10) );
-  segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
+  segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0.5, 1) ) );
   segmentationNode->SetProperty( "opacity", new mitk::FloatProperty(0.3) );
   segmentationNode->SetProperty( "segmentation", new mitk::BoolProperty(true) );
   segmentationNode->SetProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)

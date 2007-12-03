@@ -16,8 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <iostream>
 #include "mitkClassName.h"
+
+#include "mitkTestingMacros.h"
+
+#include <iostream>
 
 /**
  *  Simple example for a test for the (non-existent) class "ClassName".

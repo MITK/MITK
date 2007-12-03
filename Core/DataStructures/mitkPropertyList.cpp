@@ -18,8 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPropertyList.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
+
+#include "mitkXMLWriter.h"
+#include "mitkXMLReader.h"
 
 const std::string mitk::PropertyList::XML_NODE_NAME = "propertyList";
 const std::string mitk::PropertyList::XML_ALREADY_SEEN = "PROPERTY_REFERENCE";
@@ -29,7 +30,6 @@ mitk::UIDGenerator mitk::PropertyList::m_UIDGenerator;
 std::map<std::string, mitk::BaseProperty*> mitk::PropertyList::m_AlreadyReadFromXML;
 std::map<mitk::BaseProperty*, std::string> mitk::PropertyList::m_AlreadyWrittenToXML;
 
-//##ModelId=3D6A0E9E0029
 mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
 {
     PropertyMap::const_iterator it;
@@ -41,7 +41,7 @@ mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *property
         return NULL;
 }
 
-//##ModelId=3D78B966005F
+
 void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
 {
   if (!property) return;
@@ -96,6 +96,7 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
   this->Modified();
 }
 
+
 void mitk::PropertyList::ReplaceProperty(const char* propertyKey, BaseProperty* property)
 {
   if (!property) return;
@@ -117,37 +118,43 @@ void mitk::PropertyList::ReplaceProperty(const char* propertyKey, BaseProperty* 
   Modified();
 }
 
-//##ModelId=3E38FEFE0125
+
 mitk::PropertyList::PropertyList()
 {
 }
 
 
-//##ModelId=3E38FEFE0157
 mitk::PropertyList::~PropertyList()
 {
   Clear();
 }
 
+
+/**
+ * Consider the list as changed when any of the properties has changed recently.
+ */
 unsigned long mitk::PropertyList::GetMTime() const
 {
-  PropertyMap::const_iterator it = m_Properties.begin(), end = m_Properties.end();
-  for(;it!=end;++it)
+  for ( PropertyMap::const_iterator it = m_Properties.begin() ;
+        it != m_Properties.end();
+        ++it )
   {
-    if(it->second.first.IsNull())
+    if( it->second.first.IsNull() )
     {
       itkWarningMacro(<< "Property '" << it->first <<"' contains nothing (NULL).");
       continue;
     }
-    if(Superclass::GetMTime() < it->second.first->GetMTime())
+    if( Superclass::GetMTime() < it->second.first->GetMTime() )
     {
       Modified();
       break;
     }
   }
-    return Superclass::GetMTime();
+    
+  return Superclass::GetMTime();
 }
-//##ModelId=3EF1B0160286
+
+
 bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
 {
   PropertyMap::iterator it;  
@@ -163,6 +170,7 @@ bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
   return false;
 }
 
+
 mitk::PropertyList::Pointer mitk::PropertyList::Clone()
 {
   mitk::PropertyList::Pointer newPropertyList = PropertyList::New();
@@ -172,6 +180,7 @@ mitk::PropertyList::Pointer mitk::PropertyList::Clone()
 
   return newPropertyList.GetPointer();
 }
+
 
 void mitk::PropertyList::Clear()
 {
@@ -183,6 +192,7 @@ void mitk::PropertyList::Clear()
   }
   m_Properties.clear();
 }
+
 
 bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter ) 
 {
@@ -224,7 +234,8 @@ bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter )
 
   return true;
 }
-    
+
+
 bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
 {
 
@@ -281,16 +292,19 @@ bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
   return true;
 }
 
+
 void mitk::PropertyList::PrepareXML_IO()
 {
   m_AlreadyReadFromXML.clear();
   m_AlreadyWrittenToXML.clear();
 }
 
+
 const std::string& mitk::PropertyList::GetXMLNodeName() const
 {
   return XML_NODE_NAME;
 }
+
 
 bool mitk::PropertyList::IsEnabled(const char *propertyKey) 
 {
@@ -304,6 +318,7 @@ bool mitk::PropertyList::IsEnabled(const char *propertyKey)
     return false;
   }
 }
+
 
 void mitk::PropertyList::SetEnabled(const char *propertyKey,bool enabled) 
 {

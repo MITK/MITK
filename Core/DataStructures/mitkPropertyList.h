@@ -16,75 +16,110 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 
 #include "mitkCommon.h"
-#include <itkObjectFactory.h>
 #include "mitkBaseProperty.h"
+#include "mitkXMLIO.h"
+#include "mitkUIDGenerator.h"
+
+#include <itkObjectFactory.h>
+
 #include <string>
 #include <map> 
-#include <mitkXMLIO.h>
-#include <mitkUIDGenerator.h>
 
 namespace mitk {
 
-	class XMLWriter;
+class XMLWriter;
 
-//##ModelId=3E031F200392
-//##Documentation
-//## @brief List of properties (instances of subclasses of BaseProperty)
-//##
-//## List of properties (instances of subclasses of BaseProperty). The
-//## properties are stored in a map, thus each property is associated with a
-//## key of type string. 
-//## @ingroup DataTree
+/**
+ * @brief Key-value list holding instances of BaseProperty
+ *
+ * This list is meant to hold an arbitrary list of "properties", 
+ * which should describe the object associated with this list.
+ *
+ * Usually you will use PropertyList as part of a DataTreeNode 
+ * object - in this context the properties describe the data object
+ * held by the DataTreeNode (e.g. whether the object is rendered at
+ * all, which color is used for rendering, what name should be
+ * displayed for the object, etc.)
+ *
+ * The values in the list are not fixed, you may introduce any kind
+ * of property that seems useful - all you have to do is inherit 
+ * from BaseProperty.
+ *
+ * The list is organized as a key-value pairs, i.e.
+ *
+ *   \li "name" : pointer to a StringProperty
+ *   \li "visible" : pointer to a BoolProperty
+ *   \li "color" : pointer to a ColorProperty
+ *   \li "volume" : pointer to a FloatProperty
+ *
+ * Please see the documentation of SetProperty and ReplaceProperty for two
+ * quite different semantics. Normally SetProperty is what you want - this
+ * method will try to change the value of an existing property and will
+ * not allow you to replace e.g. a ColorProperty with an IntProperty.
+ * 
+ * @ingroup DataTree
+ */
 class PropertyList : public itk::Object, public XMLIO
 {
-public:
+
+  public:
+
     mitkClassMacro(PropertyList, itk::Object);
 
-    /** Method for creation through the object factory. */
+    /** 
+     * Method for creation through the object factory. 
+     */
     itkNewMacro(Self);
+
+    /**
+     * Map structure to hold the properties: the map key is a string,
+     * the value consists of the actual property object (BaseProperty) and
+     * a bool flag (indicating whether a property is "enabled").
+     *
+     * The "enabled" flag is there to "keep a property without showing it", i.e.
+     * GetProperty will not tell that there such a thing. Is there any real world use for this? (bug #1052)
+     */
     typedef std::map< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMap;
     typedef std::pair< std::string,std::pair<BaseProperty::Pointer,bool> > PropertyMapElementType;
-public:
-    //##ModelId=3D6A0E9E0029
-    //##Documentation
-    //## @brief Get a property by its name. 
+
+    /**
+     * @brief Get a property by its name. 
+     */
     mitk::BaseProperty::Pointer GetProperty(const char *propertyKey) const;
 
-    //##ModelId=3D78B966005F
-    //##Documentation
-    //## @brief Set a property in the list/map. This is set-by-value. 
-    //##
-    //## @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
-    //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
-    //##
-    //## The actual OBJECT holding the value of the property is not replaced, but its value 
-    //## is modified to match that of @a property. To really replace the object holding the
-    //## property - which would make sense if you want to change the type (bool, string) of the property
-    //## - call ReplaceProperty.
+    /**
+     * @brief Set a property in the list/map by value.
+     * 
+     * The actual OBJECT holding the value of the property is not replaced, but its value 
+     * is modified to match that of @a property. To really replace the object holding the
+     * property - which would make sense if you want to change the type (bool, string) of the property
+     * - call ReplaceProperty.
+     */
     void SetProperty(const char* propertyKey, BaseProperty* property);
 
-    //## @brief Set a property object in the list/map. This is kind of set-by-reference (seems the wrong word - delete this comment if it's not). 
-    //##
-    //## The actual OBJECT holding the value of the property is replaced by this function.
-    //## This is useful if you want to change the type of the property, like from BoolProperty to StringProperty.
-    //## Another use is to share one and the same property object among several ProperyList/DataTreeNode objects, which
-    //## makes them appear synchronized.
+    /**
+     * @brief Set a property object in the list/map by reference.
+     *
+     * The actual OBJECT holding the value of the property is replaced by this function.
+     * This is useful if you want to change the type of the property, like from BoolProperty to StringProperty.
+     * Another use is to share one and the same property object among several ProperyList/DataTreeNode objects, which
+     * makes them appear synchronized.
+     */
     void ReplaceProperty(const char* propertyKey, BaseProperty* property);
 
-    //##ModelId=3ED94AAE0075
-    //##Documentation
-    //## @brief Get the timestamp of the last change of the map or the last change of one of 
-    //## the properties store in the list (whichever is later).
+    /**
+     * @brief Get the timestamp of the last change of the map or the last change of one of 
+     * the properties store in the list (whichever is later).
+     */
     virtual unsigned long GetMTime() const;
 
-    //##ModelId=3EF1B0160286
-    //##Documentation
-    //## @brief Remove a property from the list/map.
+    /**
+     * @brief Remove a property from the list/map.
+     */
     bool DeleteProperty(const char* propertyKey);
 
     const PropertyMap* GetMap() const { return &m_Properties; }
@@ -103,30 +138,36 @@ public:
     virtual void SetEnabled(const char *propertyKey,bool enabled);
 
     static const std::string XML_NODE_NAME;
-protected:
-    //##ModelId=3E38FEFE0125
+
+  protected:
+
     PropertyList();
 
 
-    //##ModelId=3E38FEFE0157
     virtual ~PropertyList();
 
-    //##ModelId=3D6A0F0B00BC
-    //##Documentation
-    //## @brief Map of properties.
+    /**
+     * @brief Map of properties.
+     */
     PropertyMap m_Properties;
 
-    //##Documentation
     virtual const std::string& GetXMLNodeName() const;
 
-private:
+  private:
 
-    /// Needed for XML writing. Generates UIDs to identify memory addresses.
+    /**
+     * Needed for XML writing. Generates UIDs to identify memory addresses.
+     */
     static UIDGenerator m_UIDGenerator;
 
-    /// Used during XML reading. Stores, which properties have already been read/created.
+    /**
+     * Used during XML reading. Stores, which properties have already been read/created.
+     */
     static std::map<std::string, BaseProperty*> m_AlreadyReadFromXML;
-    /// Used during XML writing. Stores, which properties have already been written, so that each property is only written once.
+
+    /*
+     * Used during XML writing. Stores, which properties have already been written, so that each property is only written once.
+     */
     static std::map<BaseProperty*, std::string> m_AlreadyWrittenToXML;
 
     static const std::string XML_ALREADY_SEEN;
@@ -134,6 +175,5 @@ private:
 
 } // namespace mitk
 
-
-
 #endif /* PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D */
+

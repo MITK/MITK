@@ -20,7 +20,6 @@ QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* 
   m_ToolManager = mitk::ToolManager::New();
 
   m_ReferenceDataSelectionBox = new QmitkDataTreeComboBox( this );
-  
 
   connect( m_ReferenceDataSelectionBox, SIGNAL(activated(const mitk::DataTreeFilter::Item*)),
            this, SLOT(OnReferenceDataSelected(const mitk::DataTreeFilter::Item*)) );
@@ -74,6 +73,10 @@ void QmitkToolReferenceDataSelectionBox::SetToolManager(mitk::ToolManager& newMa
 void QmitkToolReferenceDataSelectionBox::UpdateDataDisplay()
 { 
   m_ReferenceDataSelectionBox->GetFilter()->SetDataStorageResultset( GetAllPossibleReferenceImages() ); /// \todo Also forward the current selected. Perhaps wait for new combobox.
+  if (! m_ReferenceDataSelectionBox->GetFilter()->GetSelectMostRecentItemMode() )
+  {
+    m_ReferenceDataSelectionBox->GetFilter()->SetSelectMostRecentItemMode( true ); // automagically select new items
+  }
   EnsureOnlyReferenceImageIsVisibile();
 }
 

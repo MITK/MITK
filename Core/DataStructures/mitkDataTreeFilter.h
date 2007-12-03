@@ -527,6 +527,7 @@ public:
 
     /// Returns the associated DataTreeNode
     const mitk::DataTreeNode* GetNode() const;  
+
   protected:
 
     /// Intentionally hidden
@@ -628,6 +629,9 @@ public:
   /// Force regeneration of the whole item list
   void Update();
 
+  bool GetSelectMostRecentItemMode();
+  void SetSelectMostRecentItemMode(bool automaticallySelectMostRecent);
+
 protected:
 
   // intentionally hidden (itk::Object / SmartPointer)
@@ -685,6 +689,11 @@ private:
   DataTreeNodeSet m_LastSelectedNodes; /// for reconstruction of selection after regeneration of items
 
   bool m_AutoUpdate;
+
+  unsigned long m_LargestMTime;
+  Item* m_LargestMTimeItem;
+  
+  bool m_SelectMostRecentItemMode;
 
 #ifndef NDEBUG
 public:

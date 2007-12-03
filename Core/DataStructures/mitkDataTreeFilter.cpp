@@ -256,7 +256,8 @@ DataTreeFilter::DataTreeFilter(DataTreeBase* datatree)
   m_Renderer(NULL),
   m_TreeChangeConnection(0),
   m_LastSelectedItem(NULL),
-  m_AutoUpdate(false)
+  m_AutoUpdate(false),
+  m_SelectMostRecentItemMode(false)
 #ifndef NDEBUG
   , m_DEBUG(false)
 #endif
@@ -304,6 +305,20 @@ void DataTreeFilter::DisconnectTreeEvents()
 {
   // remove this as observer from the data tree
   m_DataTree->RemoveObserver( m_TreeChangeConnection );
+}
+
+bool DataTreeFilter::GetSelectMostRecentItemMode()
+{
+  return m_SelectMostRecentItemMode;
+}
+
+void DataTreeFilter::SetSelectMostRecentItemMode(bool automaticallySelectMostRecent)
+{
+  if (automaticallySelectMostRecent != m_SelectMostRecentItemMode)
+  {
+    m_SelectMostRecentItemMode = automaticallySelectMostRecent;
+    GenerateModelFromTree();
+  }
 }
 
 void DataTreeFilter::SetPropertiesLabels(const PropertyList labels)
@@ -530,6 +545,13 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
       unsigned int newIndex = list->Size();
       Item::Pointer newItem = Item::New( iter->Get(), this, newIndex, parent );
       list->CreateElementAt( newIndex ) = newItem;
+
+      if ( newItem->GetNode() && newItem->GetNode()->GetMTime() > m_LargestMTime )
+      {
+        m_LargestMTime = newItem->GetNode()->GetMTime();
+        m_LargestMTimeItem = newItem;
+      }
+
     
       // restore selection state for this new item
       for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
@@ -598,6 +620,9 @@ void DataTreeFilter::GenerateModelFromTree()
   DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new DataTreePreOrderIterator(m_DataTree);
   
+  m_LargestMTime = 0;
+  m_LargestMTimeItem = NULL;
+
   /*
   if root matches
     create an Item for root
@@ -612,6 +637,12 @@ void DataTreeFilter::GenerateModelFromTree()
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
     Item* newItem = m_Items->ElementAt(0); 
+
+    if ( newItem->GetNode() && newItem->GetNode()->GetMTime() > m_LargestMTime )
+    {
+      m_LargestMTime = newItem->GetNode()->GetMTime();
+      m_LargestMTimeItem = newItem;
+    }
 
     // restore selection state for this new item
     for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
@@ -651,7 +682,15 @@ void DataTreeFilter::GenerateModelFromTree()
   delete treeIter; // release data tree iterator
   InvokeEvent( TreeFilterUpdateAllEvent() );
 
-  DEBUG_MSG_STATE("After GenerateModel")
+  DEBUG_MSG_STATE("After GenerateModel - before selection of most recent item")
+
+  if ( m_SelectMostRecentItemMode && m_LargestMTimeItem && m_LargestMTimeItem->GetNode() && !m_LargestMTimeItem->IsSelected() )
+  {
+    //std::cout << "LargestMTimeItem: " << (const std::string)(m_LargestMTimeItem->GetProperty("name"))<< std::endl;
+    m_LargestMTimeItem->SetSelected( true );
+  }
+  
+  DEBUG_MSG_STATE("After GenerateModel - after selection of most recent item")
 }
 
 void DataTreeFilter::SetAutoUpdate(bool autoUpdatesEnabled)
@@ -712,3 +751,4 @@ void DataTreeFilter::PrintStateForDebug(std::ostream& out)
 } // namespace mitk 
 
 // vi: textwidth=90
+

@@ -45,7 +45,7 @@ std::string mitk::BaseProperty::GetValueAsString() const
   as the right-hand-side argument of an assignment. This test will most probably include
   some dynamic_cast.
  */
-bool mitk::BaseProperty::Assignable(const BaseProperty &property ) const
+bool mitk::BaseProperty::Assignable( const BaseProperty& ) const
 {
   return false;
 }
@@ -58,7 +58,7 @@ mitk::BaseProperty& mitk::BaseProperty::operator=(const BaseProperty& rhs)
 {
   if (this == &rhs) return *this; // no self assignment
 
-  // place meaningful copy code here (nothing possible with BaseProeprties
+  // place meaningful copy code here (nothing possible with BaseProeprties)
 
   return *this;
 }

@@ -169,10 +169,9 @@ void mitk::ImageWriter::GenerateData()
   else
   {
     PicFileWriter::Pointer picWriter = PicFileWriter::New();
-    //case: filename got always an extension
     size_t found;
-    found = m_FileName.find( m_Extension );
-    if( found == std::string::npos )
+    found = m_FileName.find( m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
+    if( m_FileName.length() > 3 && found != m_FileName.length() - 4 )
     {
       //if Extension not in Filename
       ::itk::OStringStream filename;

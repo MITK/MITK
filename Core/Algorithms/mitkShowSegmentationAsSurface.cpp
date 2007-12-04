@@ -150,7 +150,14 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     
     std::string uid = m_UIDGeneratorSurfaces.GetUID();
     m_Node->SetProperty( "FILENAME", new StringProperty( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
-    m_Node->SetProperty( "name", new StringProperty("surface representation") );
+    std::string groupNodesName ("surface");
+    
+    DataTreeNode* groupNode = GetGroupNode();
+    if (groupNode)
+    {
+      groupNode->GetName( groupNodesName );
+    }
+    m_Node->SetProperty( "name", new StringProperty(groupNodesName) );
    
     // synchronize this object's color with the parent's color
     //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );

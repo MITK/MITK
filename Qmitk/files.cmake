@@ -27,6 +27,7 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.cpp
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
@@ -97,6 +98,7 @@ SET(UI_FILES
   QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSeedPointSetComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
@@ -143,6 +145,7 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkImageCropperComponent.h
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.h
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h

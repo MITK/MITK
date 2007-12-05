@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 class QmitkConnectivityFilterComponentGUI;
-class QmitkSeedPointSetComponent;
+class QmitkDisplayPointSetComponent;
 class QmitkStdMultiWidget;
 
 /**
@@ -94,7 +94,7 @@ virtual QGroupBox* GetImageContent();
   /** \brief Method to return the outermost checkable ComboBox that is to decide whether the content shall be shown or not */
   virtual QGroupBox * GetMainCheckBoxContainer();
 
-  void SetPointSet(QmitkSeedPointSetComponent* pointSet);
+  void SetPointSet(QmitkDisplayPointSetComponent* pointSet);
 
   /***************      (DE)ACTIVATED     ***************/
 
@@ -146,7 +146,7 @@ void ExecuteOperation(mitk::Operation * operation );
 
 private:
 
-  /** \brief Method to create the pointset-object that is necessary for some connectivity-options. See also  - \ref QmitkSeedPointSetComponent*/
+  /** \brief Method to create the pointset-object that is necessary for some connectivity-options. See also  - \ref QmitkDisplayPointSetComponent*/
   void CreatePointSet();
 
   /***************        ATTRIBUTES      ***************/
@@ -180,7 +180,7 @@ private:
   mitk::DataTreeIteratorBase* m_DataIt;
 
    /** \brief Member of a point Set that can be used to set Points in the visualisation widgets*/
-  QmitkSeedPointSetComponent* m_PointSet;
+  QmitkDisplayPointSetComponent* m_PointSet;
   
    /** \brief Member how many connectivities were created yet*/
   int m_ConnectivityCounter;

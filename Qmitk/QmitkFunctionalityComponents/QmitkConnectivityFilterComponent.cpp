@@ -27,21 +27,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDataTreeNodeFactory.h>
 #include "mitkDisplayCoordinateOperation.h"
+#include <mitkOpenGLRenderer.h>
 #include "mitkProperties.h"
+#include "mitkVector.h"
 
 #include <QmitkDataTreeComboBox.h>
-#include "QmitkSeedPointSetComponent.h"
+#include "QmitkDisplayPointSetComponent.h"
 #include "QmitkStdMultiWidget.h"
 #include <QmitkPointListWidget.h>
 
 #include <vtkCell.h>
+#include <vtkCellData.h>
 #include <vtkCellPicker.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderer.h>
+#include <vtkUnsignedIntArray.h>
 
 
-//#include "QmitkSeedPointSetComponent.h"
+//#include "QmitkDisplayPointSetComponent.h"
 
 //#include <vtkImageGaussianSmooth.h>
 #include <vtkPolyDataConnectivityFilter.h>
@@ -201,20 +205,20 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
     m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
   }
 
-  //vtkRenderer* renderer = (vtkRenderer*)m_MultiWidget->GetRenderWindow4()->GetRenderer();
+  vtkRenderer* renderer = (vtkRenderer*)m_MultiWidget->GetRenderWindow4()->GetRenderer();
 
   CreatePointSet();
   //m_PointSet->Deactivated();
   return m_ConnectivityFilterComponentGUI;
 
 }
-void QmitkConnectivityFilterComponent::TextBoxChanged(int /*number*/)
+void QmitkConnectivityFilterComponent::TextBoxChanged(int number)
 {
   if(m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem()==3)
   {}
 
 }
-void QmitkConnectivityFilterComponent::ExecuteOperation(mitk::Operation * /*operation*/ )
+void QmitkConnectivityFilterComponent::ExecuteOperation(mitk::Operation * operation )
 {
   //mitk::DisplayCoordinateOperation * displayOperation = operation;
   //mitk::Point2D p2d = displayOperation->GetCurrentDisplayCoordinate();
@@ -324,13 +328,12 @@ vesselCenterPickedEvent.SetPickedPoint3D( minEleX, minEleY, minEleZ );
 this->InvokeEvent( vesselCenterPickedEvent );
 }
 }
-}}*/
+}}
 
-  
-/************** CREATE SEEDPOINT WIDGET **************/
+/*************** CREATE SEEDPOINT WIDGET **************/
 void QmitkConnectivityFilterComponent::CreatePointSet()
 {
-  m_PointSet = new QmitkSeedPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);
+  m_PointSet = new QmitkDisplayPointSetComponent(GetParent(), GetFunctionalityName(), GetMultiWidget(), m_DataIt);
   m_PointSet->CreateControlWidget(m_ConnectivityFilterComponentGUI);
   m_AddedChildList.push_back(m_PointSet);
   m_ConnectivityFilterComponentGUI->layout()->add(m_PointSet->GetGUI());
@@ -381,7 +384,7 @@ void QmitkConnectivityFilterComponent::SetContentContainerVisibility(bool)
 
 
 /***************      SET POINTSET      ***************/
-void QmitkConnectivityFilterComponent::SetPointSet(QmitkSeedPointSetComponent* pointSet)
+void QmitkConnectivityFilterComponent::SetPointSet(QmitkDisplayPointSetComponent* pointSet)
 {
   m_PointSet = pointSet;
 }
@@ -423,7 +426,21 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
 
   int filterMode = m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem();
+  int fm = filterMode;
 
+  //for(int modulus = 0; modulus <2; modulus++)
+  //{
+  //  if(filterMode == 3)
+  //  {
+  //    if(fm == 3)
+  //    {
+  //      fm = 1;
+  //    }
+  //    else
+  //    {
+  //      fm = 3;
+  //    }
+  //  }
   vtkPolyDataConnectivityFilter* pdConnectivity = vtkPolyDataConnectivityFilter::New();
   m_SelectedItem = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem();
   if(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetItems()->Size() > 0)//if itemSelector is not empty
@@ -434,16 +451,17 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
     int numberOfExtractedRegions = pdConnectivity->GetNumberOfExtractedRegions();
     pdConnectivity->InitializeSpecifiedRegionList();
 
-    switch(filterMode) 
+    switch(fm) 
     { 
     case 0: /*show largest Region*/
       {
-        ; 
+        //modulus++; 
       }
       break; 
 
     case 1: /*show all Regions*/
       {
+        pdConnectivity->InitializeSpecifiedRegionList();
         pdConnectivity->SetExtractionModeToAllRegions();               
       }
       break; 
@@ -490,20 +508,91 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
               {
                 mitk::PointSet::PointType pointNumberX  = pointSet->GetPoint(i); 
                 vtkCellPicker * picker = vtkCellPicker::New();
-                //picker->SetTolerance( 0.001f );
+                picker->SetTolerance( 0.001f );
                 //if ( picker->Pick(pointNumberX[0], pointNumberX[1], 0.0f, renderer))
-                if ( picker->Pick(pointNumberX[0], pointNumberX[1], 0.0f, renderer))
+
+                //to get DisplayCoordinates from the renderer where the last Point was set in the pointset
+                mitk::Point2D lastPoint= m_PointSet->GetPointSetInteractor()->GetLastDisplayCoordinates();
+
+                //to get renderer from the pointset where the last Point was set
+                mitk::OpenGLRenderer* openGLRenderer = dynamic_cast<mitk::OpenGLRenderer*>(m_PointSet->GetPointSetInteractor()->GetLastRenderer());
+                vtkRenderer* lastRenderer = dynamic_cast<vtkRenderer*>(openGLRenderer->GetVtkRenderer());
+
+                if(lastRenderer)
                 {
-                  //vtkPolyDataMapper * mapper = dynamic_cast<vtkPolyDataMapper*>( picker->GetMapper() );
-                  //assert ( mapper );
-                  //
-                  //vtkPolyData* polyData = mapper->GetInput();
-                  //assert( polyData );*/
-                  //assert( mapper->GetInput() );
-                  //
-                  //vtkCell* cell = polyData->GetCell( picker->GetCellId());
-                  //assert( cell );
-                  pdConnectivity->DeleteSpecifiedRegion(picker->GetCellId( )); 
+                  //vtkRenderer* lastRenderer = (vtkRenderer*) (m_PointSet->GetPointSetInteractor()->GetLastRenderer());
+                  pdConnectivity->SetExtractionModeToAllRegions();
+                  int regNums = pdConnectivity->GetNumberOfExtractedRegions();
+                  regNums--;
+
+                  for(int rN = 0; rN < regNums; rN++)
+                  {
+                     pdConnectivity->AddSpecifiedRegion(rN);
+                  }
+
+                  unsigned int surfacePieceID = 0;
+
+                  if ( picker->Pick(lastPoint[0], lastPoint[1], 0.0f, lastRenderer))
+                  {
+                    vtkPolyDataMapper * mapper = dynamic_cast<vtkPolyDataMapper*>( picker->GetMapper() );
+                    assert ( mapper );
+
+                    vtkPolyData* polyData = mapper->GetInput();
+                    assert( polyData );
+
+                    vtkCell* cell = polyData->GetCell( picker->GetCellId());
+                    assert( cell );
+
+
+                    vtkIdList* pointIds = cell->GetPointIds();
+                    assert( pointIds );
+
+                    vtkPointData* pointData = polyData->GetPointData();
+                    assert( pointData );
+
+                    //
+                    // get the surfaceId data from the surface polyData
+                    //
+                  /*  int index;
+                    for (unsigned int i=0 ; i < pointData->GetNumberOfArrays (); ++i)
+                    {
+                     std::cout << i<<" "<<pointData->GetArrayName(i)<< pointData->GetArray(i)->GetClassName()<< std::endl;
+                     index = i;
+                    }*/
+                    
+                    int index;
+                    int numOfArrays = polyData->GetCellData()->GetNumberOfArrays();
+                    for (unsigned int i=0 ; i < polyData->GetCellData()->GetNumberOfArrays(); ++i)
+                    {
+                     std::cout << i<<" "<<pointData->GetArrayName(i)<< polyData->GetCellData()->GetArray(i)->GetName()<< std::endl;
+                     index = i;
+                    }
+                    
+                    //vtkUnsignedIntArray* surfaceIds = dynamic_cast<vtkUnsignedIntArray*>( pointData->GetArray( "surfaceIds", index ) );
+                    //vtkUnsignedIntArray* surfaceIds = dynamic_cast<vtkUnsignedIntArray*>( pointData->GetArray(index) );
+                    vtkUnsignedIntArray* surfaceIds = dynamic_cast<vtkUnsignedIntArray*>( polyData->GetCellData()->GetArray(index) );
+                    if ( ( ! surfaceIds ) || ( index < 0 ) )
+                    {
+                      std::cout<<"you did not pick a vessel tree!";
+                      return;
+                    }
+
+                    //
+                    // take any point from the cell to get the associated surfacePieceId
+                    //
+                    surfacePieceID = surfaceIds->GetValue( pointIds->GetId( 0 ) );
+                    pdConnectivity->DeleteSpecifiedRegion(surfacePieceID); 
+                    pdConnectivity->SetExtractionModeToSpecifiedRegions();
+                  }
+                  else
+                  {
+                    std::cout<<"you did not pick a vessel tree!";
+                  }
+
+
+                  //pdConnectivity->SetExtractionModeToCellSeededRegions ();
+                  //pdConnectivity->Update();
+                  //pdConnectivity->SetExtractionModeToSpecifiedRegions();
                 }
               }
             }
@@ -511,34 +600,6 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         }
       }
       break;
-
-      //case 3: /*Delete Point Marked Surface*/
-      //   {
-      // if(m_PointSet!=NULL)
-      // {
-      //if(m_PointSet->GetPointSetNode().IsNotNull())
-      //{
-      //	//std::cout<<"Punkte sind da:"<<std::endl;
-      //	mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(m_PointSet->GetPointSetNode()->GetData());
-      //	int numberOfPoints = pointSet->GetSize();
-      //	if(numberOfPoints > 0)
-      //	{
-      //		mitk::PointSet::PointType pointOne = pointSet->GetPoint(0);
-      //		
-      //		double x1 = pointOne[0];
-      //		double y1 = pointOne[1];
-      //		double z1 = pointOne[2];
-
-      //		pdConnectivity->SetClosestPoint(x1, y1, z1);
-      //		pdConnectivity->SetExtractionModeToClosestPointRegion();
-      //		int id = pdConnectivity->GetNumberOfExtractedRegions();
-      //		pdConnectivity->DeleteSpecifiedRegion(id);
-
-      //	}
-      //}
-      // }
-      //}
-      //break;
 
     default: ; break; 
     }
@@ -605,8 +666,8 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
           mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 
-          //bool isSurface = false;
-          //bool isConnectivity = false;
+          bool isSurface = false;
+          bool isConnectivity = false;
 
           while(!(iteratorConnectivity->IsAtEnd()))
           {
@@ -649,10 +710,14 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
       ++itConnectivity;
     }//end of while ( !itConnectivity->IsAtEnd() )
     //multiWidget->RequestUpdate();
-    m_MultiWidget->GetRenderWindow1()->repaint();
-    m_MultiWidget->GetRenderWindow2()->repaint();
-    m_MultiWidget->GetRenderWindow3()->repaint();
-    m_MultiWidget->GetRenderWindow4()->repaint();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+    //m_MultiWidget->GetRenderWindow1()->repaint();
+    //m_MultiWidget->GetRenderWindow2()->repaint();
+    //m_MultiWidget->GetRenderWindow3()->repaint();
+    //m_MultiWidget->GetRenderWindow4()->repaint();
   }//end of if itemSelector is not empty
+  //}//end of for
+
 }//end of showConnected()
+
 

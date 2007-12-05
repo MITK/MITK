@@ -296,6 +296,9 @@ QWidget* QmitkPixelGreyValueManipulatorComponent::CreateControlWidget(QWidget* p
 	CreatePointSet();
 	m_CheckBoxChecked = m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked();
 
+  ////disable global operationmodes that only work for the whole image at the beginning
+  //m_PixelGreyValueManipulatorComponentGUI->GetManipulationModeComboBox()->Get
+
 	return m_PixelGreyValueManipulatorComponentGUI;
 }
 

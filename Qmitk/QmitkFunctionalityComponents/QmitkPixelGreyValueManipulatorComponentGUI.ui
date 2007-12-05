@@ -249,6 +249,16 @@
                                                     <string>Lighten / Shade</string>
                                                 </property>
                                             </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>Median Filter</string>
+                                                </property>
+                                            </item>
+                                            <item>
+                                                <property name="text">
+                                                    <string>Homogenise</string>
+                                                </property>
+                                            </item>
                                             <property name="name">
                                                 <cstring>m_ManipulationModeComboBox</cstring>
                                             </property>

@@ -1357,8 +1357,4 @@
     <function returnType="QCheckBox *">GetInverseCheckBox()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-    <includehint>QmitkDataTreeComboBox.h</includehint>
-</includehints>
 </UI>

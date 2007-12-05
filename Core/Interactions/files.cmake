@@ -12,6 +12,7 @@ SET(CPP_FILES
   #mitkCorrectorTool2DFactory.cpp
   mitkDisplayCoordinateOperation.cpp
   mitkDisplayInteractor.cpp
+  mitkDisplayPointSetInteractor.cpp
   mitkDisplayPositionEvent.cpp
   mitkDisplayVectorInteractor.cpp
   mitkEraseRegionTool.cpp

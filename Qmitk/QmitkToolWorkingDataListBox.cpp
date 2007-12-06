@@ -20,6 +20,7 @@
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 #include "mitkNodePredicateBase.h"
+#include "mitkNodePredicateOR.h"
  
 class QmitkToolWorkingDataListBoxUpdateDataEvent : public QCustomEvent
 {
@@ -344,6 +345,9 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
   mitk::NodePredicateProperty isSegmentation("segmentation", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty isSegmentationMarker("segmentation marker", new mitk::BoolProperty(true));
+  mitk::NodePredicateOR combinedPredicate(isSegmentation, isSegmentationMarker);
+
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
  
   if ( onlyDerivedFromOriginal )
@@ -351,7 +355,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
     mitk::DataTreeNode* sourceNode( m_ToolManager->GetReferenceData(0) );
     if (sourceNode)
     {
-      allObjects = dataStorage->GetDerivations( sourceNode, &isSegmentation, false );
+      allObjects = dataStorage->GetDerivations( sourceNode, &combinedPredicate, false );
     }
     else
     {
@@ -360,7 +364,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
   }
   else
   {
-    allObjects = dataStorage->GetSubset( isSegmentation );
+    allObjects = dataStorage->GetSubset( combinedPredicate );
   }
 
   mitk::ToolManager::DataVectorType resultVector;

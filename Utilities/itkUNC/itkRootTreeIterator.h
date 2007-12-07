@@ -126,4 +126,3 @@ TreeIteratorBase<TTreeType>* RootTreeIterator<TTreeType>::Clone()
 } // end namespace itk
 
 #endif
-

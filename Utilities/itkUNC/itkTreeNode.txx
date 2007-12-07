@@ -24,7 +24,7 @@ namespace itk
 
 /** Constructor */
 template <class TValueType>
-TreeNode<TValueType>::TreeNode() : m_Parent(NULL), m_Freeing(false)
+TreeNode<TValueType>::TreeNode() : m_Parent(NULL)
 {
 }
 
@@ -36,44 +36,15 @@ TreeNode<TValueType>::~TreeNode()
     {
     m_Parent->Remove(this);
     }
-    
-  m_Children.clear();
-  m_Data = 0;
-}
 
-template <class TValueType>
-void
-TreeNode<TValueType>::UnRegister() const
-{
-  int size = m_Children.size();
-  if((size > 0) && (size == GetReferenceCount()-1) && (m_Freeing==false))
+  for ( size_t i=m_Children.size() ; i > 0; i-- )
   {
-    // we have a dead reference loop, thus we are 
-    // going to free ourselves and our children
-    m_Freeing = true;
-    for ( int i=0; i<size; ++i )
-      {
-      // always use position 0, because child is
-      // automatically removed from m_Children
-      // in SetParent
-      m_Children[0]->SetParent(NULL);
-      }
-    
-    assert(m_Children.size()==0);
-/*    if(m_Children.size()!=0) //XXX
-      {
-      std::cout << "child size!=0" << std::endl;
-	  const_cast<ChildrenListType*>(&m_Children)->clear();
-      }
-*/
-    assert(m_ReferenceCount==1);
-/*    if(m_ReferenceCount!=1) //XXX
-      {
-      std::cout << "m_ReferenceCount!=1" << std::endl;
-      }
-*/
+     m_Children[i-1]->SetParent(NULL);
+      m_Children[i-1] = 0;
   }
-  Superclass::UnRegister();
+  m_Children.clear();
+  m_Parent = NULL;
+  m_Data = 0;
 }
 
 /** Return the parent node */
@@ -132,9 +103,9 @@ TreeNode<TValueType>::SetParent( TreeNode<TValueType>* node)
 {
   //keep ourself alive just a bit longer
   Pointer ourself = this;
-  if(m_Parent.IsNotNull())
+  if(m_Parent != NULL)
     {
-    m_Parent->Remove(this);		//XXX Disconnect instead of remove???
+    m_Parent->Remove(this);
     }
   m_Parent = node;
 }
@@ -221,8 +192,8 @@ int TreeNode<TValueType>::ChildPosition( TValueType element ) const
 template <class TValueType>
 void TreeNode<TValueType>::AddChild( TreeNode<TValueType> *node ) 
 {
-  m_Children.push_back(node);
   node->SetParent(this);
+  m_Children.push_back(node);
 }
 
 /** Add a child at a specific position in the children list */

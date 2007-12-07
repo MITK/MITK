@@ -7,6 +7,8 @@
 #include <mitkImage.h>
 #include <mitkDataTreeFilterFunctions.h>
 
+#include <set>
+
 #ifndef NDEBUG
 #include <ostream>
   #define DEBUG_STATE           if (m_DEBUG) PrintStateForDebug(std::cout);
@@ -614,6 +616,16 @@ void DataTreeFilter::GenerateModelFromTree()
   DEBUG_MSG_STATE("Before GenerateModel")
 
   StoreCurrentSelectionState();
+
+  // remember all nodes we have now
+  DataTreeNodeSet oldNodes;
+  for ( TreeNodeItemMap::iterator iterOldNodes = m_Item.begin();
+        iterOldNodes != m_Item.end();
+        ++iterOldNodes )
+
+  {
+    oldNodes.insert( iterOldNodes->first );
+  }
   
   m_Items = ItemList::New(); // clear list (nice thanks to smart pointers)
 
@@ -684,12 +696,21 @@ void DataTreeFilter::GenerateModelFromTree()
 
   DEBUG_MSG_STATE("After GenerateModel - before selection of most recent item")
 
-  if ( m_SelectMostRecentItemMode && m_LargestMTimeItem && m_LargestMTimeItem->GetNode() && !m_LargestMTimeItem->IsSelected() )
+  if ( m_SelectMostRecentItemMode )
+  for ( TreeNodeItemMap::iterator iterNewNodes = m_Item.begin();
+        iterNewNodes != m_Item.end();
+        ++iterNewNodes )
+
   {
-    //std::cout << "LargestMTimeItem: " << (const std::string)(m_LargestMTimeItem->GetProperty("name"))<< std::endl;
-    m_LargestMTimeItem->SetSelected( true );
+    if ( oldNodes.find( iterNewNodes->first ) == oldNodes.end() )
+    {
+      // found a completely new item, automatically select that
+      iterNewNodes->second->SetSelected( true );
+      DEBUG_MSG_STATE("After GenerateModel - after selection of most recent item")
+      return;
+    }
   }
-  
+   
   DEBUG_MSG_STATE("After GenerateModel - after selection of most recent item")
 }
 

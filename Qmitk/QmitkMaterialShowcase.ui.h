@@ -148,7 +148,6 @@ void  QmitkMaterialShowcase::SetLineWidth( float lineWidth )
 
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
-  std::cout <<"********************  UpdateRenderWindow  *****************"<<std::endl;
   m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();
 }
 

@@ -106,6 +106,7 @@
     <function access="private" specifier="non virtual">destroy()</function>
     <function returnType="mitk::MaterialProperty *">GetMaterialProperty()</function>
     <function access="protected">mousePressEvent( QMouseEvent * e )</function>
+    <function access="protected">showEvent( QShowEvent * e )</function>
     <function returnType="unsigned int">GetShowcaseNumber()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>

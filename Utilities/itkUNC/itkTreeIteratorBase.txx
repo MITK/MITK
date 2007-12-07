@@ -305,6 +305,8 @@ TreeIteratorBase<TTreeType>::Disconnect()
   while (m_Position->CountChildren() > 0) 
     {
     TreeNodeType* child = dynamic_cast<TreeNodeType*>(m_Position->GetChild(0));	// always add first child in list, because AddChild() removes the added node from its former parent (== m_position)
+    // FIXME: workaround for buggy AddChild implementation: reference counting goes down to zero during reparenting.
+    typename TreeNodeType::Pointer childKeepAlive = child;
     parent->AddChild( child );
     }
   

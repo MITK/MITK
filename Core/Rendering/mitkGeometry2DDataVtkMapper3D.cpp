@@ -468,10 +468,15 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   vtkLookupTable *lookupTableSource;
 
                   // check for "use color"
-                  bool useColor = true;
+                  bool useColor;
                   if ( !node->GetBoolProperty( "use color", useColor, planeRenderer ) )
                   {
                     useColor = false;
+                  }
+
+                  if ( binary )
+                  {
+                    useColor = true;
                   }
                   
                   // check for LookupTable

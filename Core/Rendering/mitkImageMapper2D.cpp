@@ -888,40 +888,6 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
   rendererInfo.m_TextureInterpolation = textureInterpolation;
 
-  bool useColor = false;
-  GetDataTreeNode()->GetBoolProperty( "use color", useColor, renderer );
-  mitk::LookupTableProperty::Pointer LookupTableProp;
-
-  if ( !useColor )
-  {
-    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-      this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer()
-      );
-    
-    if ( LookupTableProp.IsNull() )
-    {
-      useColor = true;
-    }
-  }
-
-  if ( useColor )
-  {
-    m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
-    image->setColor( rgba[0], rgba[1], rgba[2], rgba[3] );
-  }
-  else 
-  {
-    m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
-    // only update the lut, when the properties have changed...
-    if ( LookupTableProp->GetLookupTable()->GetMTime()
-           <= this->GetDataTreeNode()->GetPropertyList()->GetMTime() )
-    {
-      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
-      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
-    }
-    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());	
-  }
-
   mitk::LevelWindow levelWindow;
 
   bool binary = false;
@@ -946,6 +912,42 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     }
 
     image->setExtrema( levelWindow.GetMin(), levelWindow.GetMax() ); 
+  }
+
+  bool useColor = false;
+  GetDataTreeNode()->GetBoolProperty( "use color", useColor, renderer );
+  mitk::LookupTableProperty::Pointer LookupTableProp;
+
+  if ( !useColor )
+  {
+    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
+      this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer()
+      );
+    
+    if ( LookupTableProp.IsNull() )
+    {
+      useColor = true;
+    }
+  }
+
+  if ( useColor || binary )
+  {
+    // If lookup table use is NOT requested (or we have a binary image...):
+    m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
+    image->setColor( rgba[0], rgba[1], rgba[2], rgba[3] );
+  }
+  else 
+  {
+    // If lookup table use is requested:
+    m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
+    // only update the lut, when the properties have changed...
+    if ( LookupTableProp->GetLookupTable()->GetMTime()
+           <= this->GetDataTreeNode()->GetPropertyList()->GetMTime() )
+    {
+      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
+      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+    }
+    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());	
   }
 }
 

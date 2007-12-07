@@ -690,9 +690,6 @@ private:
 
   bool m_AutoUpdate;
 
-  unsigned long m_LargestMTime;
-  Item* m_LargestMTimeItem;
-  
   bool m_SelectMostRecentItemMode;
 
 #ifndef NDEBUG

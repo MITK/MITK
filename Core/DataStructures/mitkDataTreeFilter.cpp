@@ -548,13 +548,6 @@ void DataTreeFilter::AddMatchingChildren(DataTreeIteratorBase* iter, ItemList* l
       Item::Pointer newItem = Item::New( iter->Get(), this, newIndex, parent );
       list->CreateElementAt( newIndex ) = newItem;
 
-      if ( newItem->GetNode() && newItem->GetNode()->GetMTime() > m_LargestMTime )
-      {
-        m_LargestMTime = newItem->GetNode()->GetMTime();
-        m_LargestMTimeItem = newItem;
-      }
-
-    
       // restore selection state for this new item
       for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
            siter != m_LastSelectedNodes.end();
@@ -632,9 +625,6 @@ void DataTreeFilter::GenerateModelFromTree()
   DataTreeIteratorBase* treeIter =  // get an iterator to the data tree
     new DataTreePreOrderIterator(m_DataTree);
   
-  m_LargestMTime = 0;
-  m_LargestMTimeItem = NULL;
-
   /*
   if root matches
     create an Item for root
@@ -649,12 +639,6 @@ void DataTreeFilter::GenerateModelFromTree()
   {
     m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
     Item* newItem = m_Items->ElementAt(0); 
-
-    if ( newItem->GetNode() && newItem->GetNode()->GetMTime() > m_LargestMTime )
-    {
-      m_LargestMTime = newItem->GetNode()->GetMTime();
-      m_LargestMTimeItem = newItem;
-    }
 
     // restore selection state for this new item
     for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();

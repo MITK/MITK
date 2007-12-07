@@ -103,8 +103,12 @@ void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) 
      
 void QmitkToolWorkingDataListBox::OnWorkingDataSelectionChanged()
 {
+  static mitk::ToolManager::DataVectorType previouslySelectedNodes;
+
   mitk::ToolManager::DataVectorType selection = this->GetSelectedNodes();
-  
+  ///if ( selection == previouslySelectedNodes ) return;
+  previouslySelectedNodes = selection;
+ 
   if (selection.size() >0)
   {
     const mitk::DataTreeNode* node = selection[0];
@@ -114,7 +118,7 @@ void QmitkToolWorkingDataListBox::OnWorkingDataSelectionChanged()
   {
     emit WorkingNodeSelected(NULL);
   }
-
+ 
   m_SelfCall = true;
   m_ToolManager->SetWorkingData( selection ); // maybe empty
   m_SelfCall = false;
@@ -125,6 +129,7 @@ void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified(const itk::Ev
   UpdateNodeVisibility();
 
   if (m_SelfCall) return;
+
 
   const mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
   emit WorkingNodeSelected(node);
@@ -158,6 +163,7 @@ void QmitkToolWorkingDataListBox::customEvent(QCustomEvent* e)
  
 void QmitkToolWorkingDataListBox::UpdateDataDisplay()
 {
+  
   // get old/correct selection
   mitk::ToolManager::DataVectorType oldSelectedNodes = m_ToolManager->GetWorkingData(); // maybe empty
 
@@ -294,7 +300,6 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
     QListView::setResizeMode( QListView::LastColumn ); // stretch to fill whole width of box
     QListView::header()->adjustHeaderSize(); 
   }
-
 }
     
 mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetSelectedNodes()
@@ -515,13 +520,26 @@ QmitkToolWorkingDataListBox::StringListType QmitkToolWorkingDataListBox::Split( 
   return resultVector;
 }
 
-void QmitkToolWorkingDataListBox::keyReleaseEvent( QKeyEvent * e )
+void QmitkToolWorkingDataListBox::keyReleaseEvent( QKeyEvent* k )
 {
 //handle DELETE key, reach through all others
-  if ( e->key() == Qt::Key_Delete )
+  if ( k->key() == Qt::Key_Delete )
   {
     emit DeleteKeyPressed();
   }
+
+  if ( k->key() >= Qt::Key_0 && k->key() <= Qt::Key_9 ) return;
+  if ( k->key() == Qt::Key_Space ) return;
+
+  QListView::keyPressEvent(k);
+}
+
+void QmitkToolWorkingDataListBox::keyPressEvent( QKeyEvent* k )
+{
+  if ( k->key() >= Qt::Key_0 && k->key() <= Qt::Key_9 ) return;
+  if ( k->key() == Qt::Key_Space ) return;
+
+  QListView::keyPressEvent(k);
 }
 
 bool QmitkToolWorkingDataListBox::eventFilter( QObject *o, QEvent *e )
@@ -541,15 +559,14 @@ bool QmitkToolWorkingDataListBox::eventFilter( QObject *o, QEvent *e )
         {
           mitk::DataTreeNode* node = allSegmentations.at(figuredOutIndex);
           m_ToolManager->SetWorkingData( node );
+          return false; // let anybody know about this event, don't swallow it
         }
         catch(std::out_of_range)
         {
-          return QListView::eventFilter( o, e );
         }
       }
-
-      return false; // let anybody know about this event, don't swallow it
     }
+
     else if ( k->key() == Qt::Key_Space )
     {
       mitk::ToolManager::DataVectorType segmentations = m_ToolManager->GetWorkingData();

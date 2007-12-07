@@ -106,6 +106,7 @@ class QmitkToolWorkingDataListBox : public QListView
     void UpdateDataDisplayLater();
     StringListType Split( const std::string& wholeString, const char separator = ',', const char escape = '\\');
     
+    void keyPressEvent( QKeyEvent * e );
     void keyReleaseEvent( QKeyEvent * e );
 
     /// used to filter shortcut keys (1,2,3...)

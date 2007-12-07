@@ -268,6 +268,7 @@ void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
 
 bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
 {
+  // implementation wrong! EndsWith should be tested differently.
   return m_FileName.find( name ) != std::string::npos;
 }
 
@@ -924,7 +925,14 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
   if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
   {
-    nameProp = new mitk::StringProperty( this->GetBaseFileName() );
+    nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutExtension( m_FileName ) );
+    if (FileNameEndsWith( ".pic" ))
+    {
+      m_FileName = m_FileName.substr( 0, m_FileName.length()-4 );
+    }
+  
+    itksys::SystemTools::GetFilenameWithoutExtension( m_FileName );
+
     node->SetProperty( "name", nameProp );
   }
 }

@@ -40,7 +40,6 @@ TreeNode<TValueType>::~TreeNode()
   for ( size_t i=m_Children.size() ; i > 0; i-- )
   {
      m_Children[i-1]->SetParent(NULL);
-      m_Children[i-1] = 0;
   }
   m_Children.clear();
   m_Parent = NULL;
@@ -192,6 +191,7 @@ int TreeNode<TValueType>::ChildPosition( TValueType element ) const
 template <class TValueType>
 void TreeNode<TValueType>::AddChild( TreeNode<TValueType> *node ) 
 {
+  Pointer nodeKeepAlive = node;    
   node->SetParent(this);
   m_Children.push_back(node);
 }

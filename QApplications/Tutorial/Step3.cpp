@@ -6,6 +6,7 @@
 #include <mitkTransferFunctionProperty.h>
 #include <itksys/SystemTools.hxx>
 #include <qapplication.h>
+#include <mitkRenderingManager.h>
 #include <qhbox.h>
 
 //##Documentation
@@ -103,6 +104,7 @@ int main(int argc, char* argv[])
   // *********************************************************
   // use it as a 3D view!
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
+
   // *********************************************************
   // ******************* END OF NEW PART 2 *******************
   // *********************************************************
@@ -110,6 +112,8 @@ int main(int argc, char* argv[])
   //Part VI: Qt-specific initialization
   qtapplication.setMainWidget(&renderWindow);
   renderWindow.show();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   // for testing
   #include "QtTesting.h"

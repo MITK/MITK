@@ -155,11 +155,11 @@ void Step6::SetupWidgets()
   // Part II: handle updates: To avoid unnecessary updates, we have to
   // define when to update. The RenderingManager serves this purpose, and
   // each RenderWindow has to be registered to it.
-  mitk::RenderingManager *renderingManager =
+  /*mitk::RenderingManager *renderingManager =
     mitk::RenderingManager::GetInstance();
   renderingManager->AddRenderWindow( renderWindow );
   renderingManager->AddRenderWindow( view2->GetRenderWindow() );
-  renderingManager->AddRenderWindow( view3->GetRenderWindow() );
+  renderingManager->AddRenderWindow( view3->GetRenderWindow() );*/
 
   setCentralWidget(m_TopLevelWidget);
 }

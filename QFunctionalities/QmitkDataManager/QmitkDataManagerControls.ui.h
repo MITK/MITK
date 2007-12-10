@@ -366,7 +366,7 @@ void QmitkDataManagerControls::Info_clicked()
     info->m_DataNodeName->setText(selected->text(0));
     ::itk::OStringStream itkOutput;
     selected->GetDataTreeNode()->GetData()->Print(itkOutput);
-    if(selected->GetDataTreeNode()->GetInteractor().IsNotNull())
+    if(selected->GetDataTreeNode()->GetInteractor() != NULL)
       selected->GetDataTreeNode()->GetInteractor()->Print(itkOutput);
     info->m_teOutputPane->append("--------------------DataInfo--------------------");
     info->m_teOutputPane->append(selected->text(0));

@@ -92,7 +92,7 @@ public:
   vtkLinearTransform* GetVtkTransform(int t=0) const;
   //##Documentation
   //## @brief Get the Interactor 
-  Interactor::Pointer GetInteractor() const;
+  Interactor* GetInteractor() const;
 
   //##ModelId=3E33F4E4025B
   //##Documentation

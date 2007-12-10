@@ -61,7 +61,7 @@ mitk::BaseData* mitk::DataTreeNode::GetData() const
   return m_Data;
 }
 
-mitk::Interactor::Pointer mitk::DataTreeNode::GetInteractor() const
+mitk::Interactor* mitk::DataTreeNode::GetInteractor() const
 {
   return m_Interactor;
 }
@@ -100,7 +100,7 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 //##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
-  Interactor* interactor = GetInteractor().GetPointer();
+  Interactor* interactor = this->GetInteractor();
 
   if ( interactor )
   {

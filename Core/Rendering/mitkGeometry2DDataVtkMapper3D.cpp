@@ -64,6 +64,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeMapper = vtkPolyDataMapper::New();
 
   m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
+  m_SurfaceCreatorBoundingBox = mitk::BoundingBox::New();
+  m_SurfaceCreatorPointsContainer = mitk::BoundingBox::PointsContainer::New();
   m_Edges = vtkFeatureEdges::New();
   m_EdgeTransformer = vtkTransformPolyDataFilter::New();
   m_EdgeActor = vtkActor::New();
@@ -71,6 +73,9 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_BackgroundActor = vtkActor::New();
   m_Prop3DAssembly = vtkAssembly::New();
   m_ImageAssembly = vtkAssembly::New();
+
+
+  m_SurfaceCreatorBoundingBox->SetPoints( m_SurfaceCreatorPointsContainer );
 
   // Make sure that the FeatureEdge algorithm is initialized with a "valid"
   // (though empty) input
@@ -309,9 +314,28 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     // Clip the Geometry2D with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
     {
-      m_SurfaceCreator->SetBoundingBox(
-        input->GetGeometry2D()->GetReferenceGeometry()->GetBoundingBox()
-      );
+      Geometry3D *referenceGeometry = 
+        input->GetGeometry2D()->GetReferenceGeometry();
+
+      mitk::BoundingBox::PointType boundingBoxMin, boundingBoxMax;
+      boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
+      boundingBoxMax = referenceGeometry->GetBoundingBox()->GetMaximum();
+
+      if ( referenceGeometry->GetImageGeometry() )
+      {
+        for ( unsigned int i = 0; i < 3; ++i )
+        {
+          boundingBoxMin[i] -= 0.5;
+          boundingBoxMax[i] -= 0.5;
+        }
+      }
+
+      m_SurfaceCreatorPointsContainer->CreateElementAt( 0 ) = boundingBoxMin;
+      m_SurfaceCreatorPointsContainer->CreateElementAt( 1 ) = boundingBoxMax;
+
+      m_SurfaceCreatorBoundingBox->ComputeBoundingBox();
+
+      m_SurfaceCreator->SetBoundingBox( m_SurfaceCreatorBoundingBox );
     }
     else
     {

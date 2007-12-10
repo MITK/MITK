@@ -119,6 +119,10 @@ protected:
 
   mitk::Geometry2DDataToSurfaceFilter::Pointer m_SurfaceCreator;
 
+  mitk::BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
+
+  mitk::BoundingBox::PointsContainer::Pointer m_SurfaceCreatorPointsContainer;
+
   /** \brief Edge extractor for tube-shaped frame */
   vtkFeatureEdges *m_Edges;
 

@@ -1,3 +1,20 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
 #define MITK_TOOL_FACTORY_MACRO(CLASS_NAME, DESCRIPTION) \
  \
 class CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \

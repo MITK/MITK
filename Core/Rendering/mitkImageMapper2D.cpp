@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkImageMapper2D.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision$

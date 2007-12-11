@@ -115,22 +115,22 @@ void QmitkDataManagerControls::SetDataTreeIterator(mitk::DataTreeIteratorBase* i
 void QmitkDataManagerControls::RemoveButtonClicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected) {
+    mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
+    assert(selectedIterator.IsNotNull());
 
-  switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want to delete this item?"),
-        QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
-  {
-    case QMessageBox::Yes: //Remove the item from view and tree
-      if (selected)
-      {
-        mitk::DataTreeIteratorClone selectedIterator = selected->GetDataTreeIterator();
-        assert(selectedIterator.IsNotNull());
+    switch(QMessageBox::question(this, tr("DataManager"), tr("Do you really want to delete the item '").append(selected->text(0)).append("' ?"),
+          QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
+    {
+      case QMessageBox::Yes: //Remove the item from view and tree
         delete selected;
         selectedIterator->Remove();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-      break;
-    case QMessageBox::No: break;
-    case QMessageBox::Cancel: break;
+        break;
+
+      case QMessageBox::No: break;
+      case QMessageBox::Cancel: break;
+    }
   }
 }
 
@@ -185,11 +185,15 @@ void QmitkDataManagerControls::ReInitButton_clicked()
 void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
 {
   QmitkDataTreeViewItem* dtvi = dynamic_cast<QmitkDataTreeViewItem*>(item);
-  assert(dtvi != NULL);
-  assert(dtvi->GetDataTreeNode().IsNotNull());
-  m_NodePropertiesView->SetPropertyList(dtvi->GetDataTreeNode()->GetPropertyList());
-  RendererChange();
-  AffineInteraction_clicked();
+  if (dtvi != NULL) {
+    assert(dtvi->GetDataTreeNode().IsNotNull());
+    m_NodePropertiesView->SetPropertyList(dtvi->GetDataTreeNode()->GetPropertyList());
+    RendererChange();
+    AffineInteraction_clicked();
+  } 
+  bool buttonState = ! (dtvi == NULL || dtvi->GetDataTreeNode() == m_DataTreeIterator->Get());
+  m_SaveButton->setEnabled(buttonState);
+  m_RemoveButton->setEnabled(buttonState);    
 }
 
 void QmitkDataManagerControls::RenderWindowSelected( int id )

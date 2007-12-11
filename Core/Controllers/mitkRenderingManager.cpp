@@ -129,48 +129,35 @@ void
 mitk::RenderingManager
 ::AddRenderWindow( RenderWindow *renderWindow )
 {
-	bool rwexists = false;
-	for (RenderWindowVector::iterator iter = m_AllRenderWindows.begin();
-       iter != m_AllRenderWindows.end();
-       ++iter)
+  m_RenderWindowList[renderWindow] = 0;
+
+  m_AllRenderWindows.push_back( renderWindow );
+
+  typedef itk::MemberCommand< RenderingManager > MemberCommandType;
+
+  mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
+
+  if(renderer)
   {
-    if ( renderWindow == (*iter) )
-    {
-	  rwexists = true;
-      break;
-    }
-  }
-  if(!rwexists)
-  {
-	  m_RenderWindowList[renderWindow] = 0;
+    MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
+    startCallbackCommand->SetCallbackFunction(
+    this, &RenderingManager::RenderingStartCallback
+    );
+    renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+  
+    MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
+    progressCallbackCommand->SetCallbackFunction(
+    this, &RenderingManager::RenderingProgressCallback
+    );
+    renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
 
-	  m_AllRenderWindows.push_back( renderWindow );
+    MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
+    endCallbackCommand->SetCallbackFunction( 
+    this, &RenderingManager::RenderingEndCallback
+    );
+    renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
 
-	  typedef itk::MemberCommand< RenderingManager > MemberCommandType;
-
-	  mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
-
-	  if(renderer){
-	   MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
-	   startCallbackCommand->SetCallbackFunction(
-		this, &RenderingManager::RenderingStartCallback
-	  );
-	  renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
-	  
-	  MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
-	  progressCallbackCommand->SetCallbackFunction(
-		this, &RenderingManager::RenderingProgressCallback
-	  );
-	  renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
-
-	  MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
-	  endCallbackCommand->SetCallbackFunction( 
-		this, &RenderingManager::RenderingEndCallback
-	  );
-	  renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
-
-	  m_IsRendering[renderWindow] = false;
-	 }
+    m_IsRendering[renderWindow] = false;
   }
 }
 

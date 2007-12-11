@@ -1,6 +1,7 @@
 #include <QmitkRenderWindow.h>
 
 #include <mitkDataTreeNodeFactory.h>
+#include <mitkDataStorage.h>
 #include <mitkProperties.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
@@ -23,7 +24,6 @@
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );
-
   if(argc<2)
   {
     fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
@@ -35,6 +35,8 @@ int main(int argc, char* argv[])
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
   // create an iterator on the tree
   mitk::DataTreePreOrderIterator it(tree);
+  // create DataStorageInstance
+  mitk::DataStorage::CreateInstance(tree);
 
   //Part II: Create some data by reading files
   int i;
@@ -104,6 +106,7 @@ int main(int argc, char* argv[])
   // *********************************************************
   // use it as a 3D view!
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
+  mitk::RenderingManager::GetInstance()->AddRenderWindow(&renderWindow);
 
   // *********************************************************
   // ******************* END OF NEW PART 2 *******************

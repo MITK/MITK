@@ -16,14 +16,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
+#include "QmitkAbortEventFilter.h"
 #include "QmitkRenderingManager.h"
 #include "QmitkAbortEventFilter.h"
+#include <qapplication.h>
 #include <qtimer.h>
 
 
 QmitkRenderingManager::QmitkRenderingManager()
 {
+  qApp->installEventFilter( QmitkAbortEventFilter::GetInstance() );
   m_QmitkRenderingManagerInternal = new QmitkRenderingManagerInternal;
   m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
 }

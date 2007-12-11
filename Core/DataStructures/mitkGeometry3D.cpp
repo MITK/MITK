@@ -590,3 +590,7 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }
 
+void
+mitk::Geometry3D::ResetSubTransforms()
+{
+}

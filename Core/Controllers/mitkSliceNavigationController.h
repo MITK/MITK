@@ -47,6 +47,7 @@ namespace mitk {
 
 class PlaneGeometry;
 class Geometry3D;
+class BaseRenderer;
 
 /**
  * \brief Controls the selection of the slice the associated BaseRenderer
@@ -364,6 +365,16 @@ class SliceNavigationController : public BaseController
      */
     const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
 
+    /** \brief Sets the BaseRenderer associated with this SNC (if any). While
+     * the BaseRenderer is not directly used by SNC, this is a convenience
+     * method to enable BaseRenderer access via the SNC. */
+    void SetRenderer( BaseRenderer *renderer );
+
+    /** \brief Gets the BaseRenderer associated with this SNC (if any). While
+     * the BaseRenderer is not directly used by SNC, this is a convenience
+     * method to enable BaseRenderer access via the SNC. Returns NULL if no
+     * BaseRenderer has been specified*/
+    BaseRenderer *GetRenderer() const;
 
     /** \brief Re-orients the slice stack to include the plane specified by
      * the given point an normal vector. 
@@ -415,6 +426,8 @@ class SliceNavigationController : public BaseController
     ViewDirection m_ViewDirection;
 
     mitk::RenderingManager::Pointer m_RenderingManager;
+
+    mitk::BaseRenderer *m_Renderer;
 
     itkSetMacro(Top, bool);
     itkGetMacro(Top, bool);

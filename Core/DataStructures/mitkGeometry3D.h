@@ -21,16 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkVector.h"
-#include <itkAffineGeometryFrame.h>
 #include "mitkOperationActor.h"
-#include <itkBoundingBox.h>
-#include <mitkXMLIO.h>
+#include "mitkXMLIO.h"
+
 #include <itkIndex.h>
+#include <itkBoundingBox.h>
+#include <itkQuaternionRigidTransform.h>
+#include <itkAffineGeometryFrame.h>
 
 class vtkLinearTransform;
 class vtkMatrixToLinearTransform;
 class vtkMatrix4x4;
-class Operation;
 
 namespace mitk {
 
@@ -71,6 +72,9 @@ class Geometry3D : public AffineGeometryFrame3D, public OperationActor, public X
 {
 public:
   mitkClassMacro(Geometry3D, AffineGeometryFrame3D);
+
+  typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
+  typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -428,6 +432,13 @@ protected:
   //## ExternAbstractTransformGeometry.
   virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
+
+  /** Resets sub-transforms that compose m_IndexToWorldTransform, by using
+   * the current value of m_IndexToWorldTransform and setting the rotation
+   * component to zero. */
+  virtual void ResetSubTransforms();
+
+
   mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
   mutable mitk::TimeBounds m_TimeBounds;
@@ -453,6 +464,12 @@ protected:
   static const std::string INDEX_TO_WORLD_TRANSFORM;
 
 private:
+  TransformType::Pointer m_IndexToWorldBaseTransform;
+  QuaternionTransformType::Pointer m_IndexToWorldRotationTransform;
+
+  VnlQuaternionType m_RotationQuaternion;
+
+
   float m_FloatSpacing[3];
   vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 

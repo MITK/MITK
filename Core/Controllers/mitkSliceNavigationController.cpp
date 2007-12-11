@@ -53,7 +53,8 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_Rotated( false ),
   m_BlockUpdate( false ),
   m_SliceLocked( false ),
-  m_SliceRotationLocked( false )
+  m_SliceRotationLocked( false ),
+  m_Renderer( NULL )
 {
   typedef itk::SimpleMemberCommand< SliceNavigationController > SNCCommandType;
   SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
@@ -477,6 +478,21 @@ SliceNavigationController::GetCurrentPlaneGeometry()
     return NULL;
   }
 }
+
+
+void 
+SliceNavigationController::SetRenderer( BaseRenderer *renderer )
+{
+  m_Renderer = renderer;
+}
+
+BaseRenderer *
+SliceNavigationController::GetRenderer() const
+{
+  return m_Renderer;
+}
+
+
 
 void
 SliceNavigationController::AdjustSliceStepperRange()

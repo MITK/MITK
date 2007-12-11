@@ -102,23 +102,23 @@ protected:
     virtual ~FileWriter();
 };
 
-#define mitkWriterMacro                                                     \
-virtual void Write()                                                        \
-{                                                                           \
-  if ( this->GetInput() == NULL )                                           \
-    {                                                                       \
-    itkExceptionMacro(<<"Write:Please specify an input!");                  \
-    return;                                                                 \
-    }                                                                       \
-  /* Fill in image information.*/                                           \
-  this->UpdateOutputInformation();                                          \
-  (*this->GetInputs().begin())->SetRequestedRegionToLargestPossibleRegion();\
-  this->PropagateRequestedRegion(NULL);                                     \
-  this->UpdateOutputData(NULL);                                             \
-}                                                                           \
-virtual void Update()                                                       \
-{                                                                           \
-  Write();                                                                  \
+#define mitkWriterMacro                                                       \
+virtual void Write()                                                          \
+{                                                                             \
+  if ( this->GetInput() == NULL )                                             \
+    {                                                                         \
+    itkExceptionMacro(<<"Write:Please specify an input!");                    \
+    return;                                                                   \
+    }                                                                         \
+  /* Fill in image information.*/                                             \
+  this->UpdateOutputInformation();                                            \
+  (*(this->GetInputs().begin()))->SetRequestedRegionToLargestPossibleRegion();\
+  this->PropagateRequestedRegion(NULL);                                       \
+  this->UpdateOutputData(NULL);                                               \
+}                                                                             \
+virtual void Update()                                                         \
+{                                                                             \
+  Write();                                                                    \
 }                                                                           
 
 } // namespace mitk

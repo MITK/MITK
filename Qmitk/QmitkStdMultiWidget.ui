@@ -164,6 +164,7 @@
     <include location="global" impldecl="in declaration">mitkCoordinateSupplier.h</include>
     <include location="global" impldecl="in declaration">mitkPositionTracker.h</include>
     <include location="global" impldecl="in declaration">mitkSlicesRotator.h</include>
+    <include location="global" impldecl="in declaration">mitkSlicesSwiveller.h</include>
     <include location="global" impldecl="in declaration">mitkGradientBackground.h</include>
     <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
     <include location="global" impldecl="in declaration">mitkColorProperty.h</include>
@@ -171,25 +172,27 @@
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
-    <variable>mitk::LogoRendering::Pointer m_LogoRendering3;</variable>
-    <variable>mitk::LogoRendering::Pointer m_LogoRendering2;</variable>
-    <variable>mitk::LogoRendering::Pointer m_LogoRendering1;</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
-    <variable>bool m_SlicesRotation;</variable>
-    <variable>mitk::SlicesRotator* m_SlicesRotator;</variable>
-    <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
-    <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
-    <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
-    <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
-    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
-    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
-    <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
-    <variable>int m_Layout;</variable>
-    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET};</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>
-    <variable>mitk::GradientBackground::Pointer m_GradientBackground4;</variable>
+    <variable>int m_PlaneMode;</variable>
+    <variable access="public">enum { PLANE_MODE_SLICING = 0, PLANE_MODE_ROTATION, PLANE_MODE_SWIVEL };</variable>
     <variable>mitk::LogoRendering::Pointer m_LogoRendering4;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground4;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground3;</variable>
+    <variable access="public">enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT, LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3, LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4, LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET};</variable>
+    <variable>int m_Layout;</variable>
+    <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
+    <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
+    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
+    <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
+    <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
+    <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
+    <variable>mitk::SlicesRotator *m_SlicesRotator;</variable>
+    <variable>mitk::SlicesSwiveller *m_SlicesSwiveller;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
+    <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering1;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering2;</variable>
+    <variable>mitk::LogoRendering::Pointer m_LogoRendering3;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -199,6 +202,9 @@
     <signal>WidgetPlanesRotationLinked(bool)</signal>
     <signal>WidgetPlanesRotationEnabled(bool)</signal>
     <signal>ViewsInitialized()</signal>
+    <signal>WidgetPlaneModeSlicing(bool)</signal>
+    <signal>WidgetPlaneModeRotation(bool)</signal>
+    <signal>WidgetPlaneModeSwivel(bool)</signal>
 </signals>
 <slots>
     <slot>changeLayoutTo2DImagesUp()</slot>
@@ -228,7 +234,6 @@
     <slot>MoveCrossToPosition( const mitk::Point3D &amp; newPosition )</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
     <slot>DisableNavigationControllerEventListening()</slot>
-    <slot>EnableSliceRotation( bool on )</slot>
     <slot>EnableGradientBackground()</slot>
     <slot>DisableGradientBackground()</slot>
     <slot>EnableDepartmentLogo()</slot>
@@ -238,9 +243,12 @@
     <slot>SetWidgetPlanesLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLinked( bool link )</slot>
-    <slot>SetWidgetPlanesRotationEnabled( bool on )</slot>
+    <slot>SetWidgetPlaneMode( int mode )</slot>
     <slot>SetGradientBackgroundColors( const mitk::Color &amp; upper, const mitk::Color &amp; lower )</slot>
     <slot>SetDepartmentLogoPath( const char * path )</slot>
+    <slot>SetWidgetPlaneModeToSlicing( bool activate )</slot>
+    <slot>SetWidgetPlaneModeToRotation( bool activate )</slot>
+    <slot>SetWidgetPlaneModeToSwivel( bool activate )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
@@ -258,6 +266,7 @@
     <function>DisablePositionTracking()</function>
     <function returnType="int">GetLayout() const</function>
     <function specifier="non virtual" returnType="mitk::SlicesRotator *">GetSlicesRotator() const</function>
+    <function returnType="mitk::SlicesSwiveller *">GetSlicesSwiveller() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

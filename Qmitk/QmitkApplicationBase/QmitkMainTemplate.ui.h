@@ -410,12 +410,11 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
   mitk::DataTreePreOrderIterator it(m_Tree);
-  QString qFileName( fileName );
   try
   {
     factory->SetFileName( fileName );
     factory->SetImageSerie(false);
-    
+
     /*QString qFileName( fileName );
     
     // just in case this is a series
@@ -448,7 +447,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   catch ( itk::ExceptionObject & ex )
   {
     itkGenericOutputMacro( << "Exception during file open: " << ex );
-    QMessageBox::critical ( this, "File Open failed.", "Could not open file: " + qFileName );
+    QMessageBox::critical ( this, "Exception caught!", ex.what() );
   }
 
   QApplication::restoreOverrideCursor();
@@ -798,6 +797,10 @@ void QmitkMainTemplate::Initialize()
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), toolbarShowPlanes, SLOT(setOn(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesVisibilityChanged(bool)), viewShowPlanesAction, SLOT(setOn(bool)));
 
+    // en-/disable mouse position tracking in 2D views
+    connect(viewTrackPositionAction, SIGNAL(toggled(bool)), this, SLOT(toolbarPositionOrientation_toggled(bool)));
+
+
     // lock/unlock plane widgets when the corresponding buttons/menu items are checked... 
     connect(toolbarLockPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
     connect(viewLockPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
@@ -811,15 +814,49 @@ void QmitkMainTemplate::Initialize()
     // linking of slices during rotation
     connect(viewLinkSliceRotationAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesRotationLinked(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLinked(bool)), viewLinkSliceRotationAction, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLinked(bool)), viewLinkSliceRotationAction, SLOT(setOn(bool)));
 
-    
-    // enabling/disabling of slices rotation in general
-    connect(viewSlicesRotationAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesRotationEnabled(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewSlicesRotationAction, SLOT(setOn(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationEnabled(bool)), viewLockSliceRotationAction, SLOT(setEnabled(bool)));
+   
+    // plane slicing mode signal handling
+    connect(viewPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToSlicing(bool)));
+    connect(toolbarPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToSlicing(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)), 
+      viewPlaneSlicingModeAction, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)), 
+      toolbarPlaneSlicingModeAction, SLOT(setOn(bool)));
 
-   }
+    // plane rotation mode signal handling
+    connect(viewPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToRotation(bool)));
+    connect(toolbarPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToRotation(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+      viewPlaneRotationModeAction, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+      toolbarPlaneRotationModeAction, SLOT(setOn(bool)));
+
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)),
+      viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+      viewLockSliceRotationAction, SLOT(setEnabled(bool)));
+
+    // plane swivel mode signal handling
+    connect(viewPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToSwivel(bool)));
+    connect(toolbarPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+      SLOT(SetWidgetPlaneModeToSwivel(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+      viewPlaneSwivelModeAction, SLOT(setOn(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+      toolbarPlaneSwivelModeAction, SLOT(setOn(bool)));
+
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+      viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+      viewLockSliceRotationAction, SLOT(setEnabled(bool)));
+  }
 
   this->InitializeFunctionality();
 
@@ -834,7 +871,7 @@ void QmitkMainTemplate::Initialize()
 
   // Pass global options to all available dialog bars (other than
   // functionalities, dialog bars currently store their options
-  // (enabled/disabled state and potentially other options in the
+  // (enabled/disabled state and potentially other options) in the
   // global options list).
   qfm->ApplyOptionsToDialogBars( m_Options );
 
@@ -877,7 +914,7 @@ void QmitkMainTemplate::Initialize()
   m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
   // Initialize other global options
-  mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );          
+  mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );
   if (textureInterpolationProperty != NULL)
     mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
@@ -1036,6 +1073,8 @@ void QmitkMainTemplate::destroy()
 #ifdef MBI_INTERNAL
   delete m_SceneWidget;
 #endif
+
+  m_Tree = NULL;
 }
 
 QmitkMainTemplate* QmitkMainTemplate::GetInstance()
@@ -1203,13 +1242,13 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
-    mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );          
+    mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );
     if (textureInterpolationProperty != NULL)
       mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
     // Pass global options to all available dialog bars (other than
     // functionalities, dialog bars currently store their options
-    // (enabled/disabled state and potentially other options in the global
+    // (enabled/disabled state and potentially other options) in the global
     // options list).
     qfm->ApplyOptionsToDialogBars( m_Options );
     

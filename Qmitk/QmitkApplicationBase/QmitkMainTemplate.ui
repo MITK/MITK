@@ -27,7 +27,7 @@
 </widget>
 <menubar>
     <property name="name">
-        <cstring>menubar</cstring>
+        <cstring>menuBar</cstring>
     </property>
     <item text="&amp;File" name="File">
         <action name="fileOpenAction"/>
@@ -51,9 +51,13 @@
         <separator/>
         <action name="viewShowPlanesAction"/>
         <action name="viewLockPlanesAction"/>
-        <action name="viewLockSliceRotationAction"/>
+        <action name="viewTrackPositionAction"/>
         <separator/>
-        <action name="viewSlicesRotationAction"/>
+        <action name="viewPlaneSlicingModeAction"/>
+        <action name="viewPlaneRotationModeAction"/>
+        <action name="viewPlaneSwivelModeAction"/>
+        <separator/>
+        <action name="viewLockSliceRotationAction"/>
         <action name="viewLinkSliceRotationAction"/>
     </item>
     <item text="&amp;Options" name="Options">
@@ -93,7 +97,10 @@
         <action name="Fullscreen"/>
         <action name="toolbarShowPlanes"/>
         <action name="toolbarLockPlanes"/>
-        <action name="toolbarPositionOrientation"/>
+        <separator/>
+        <action name="toolbarPlaneSlicingModeAction"/>
+        <action name="toolbarPlaneRotationModeAction"/>
+        <action name="toolbarPlaneSwivelModeAction"/>
     </toolbar>
 </toolbars>
 <customwidgets>
@@ -462,26 +469,6 @@
     </action>
     <action>
         <property name="name">
-            <cstring>toolbarPositionOrientation</cstring>
-        </property>
-        <property name="toggleAction">
-            <bool>true</bool>
-        </property>
-        <property name="iconSet">
-            <iconset>image6</iconset>
-        </property>
-        <property name="text">
-            <string>Position Tracking</string>
-        </property>
-        <property name="menuText">
-            <string>Enable Position Tracking</string>
-        </property>
-        <property name="whatsThis">
-            <string>Positon tracking shows a projection from the input device to the other planes</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
             <cstring>viewHideAction</cstring>
         </property>
         <property name="text">
@@ -534,23 +521,6 @@
         </property>
         <property name="toolTip">
             <string>To undo one action or a group of actions.</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>viewSlicesRotationAction</cstring>
-        </property>
-        <property name="toggleAction">
-            <bool>true</bool>
-        </property>
-        <property name="on">
-            <bool>false</bool>
-        </property>
-        <property name="text">
-            <string>Enable plane rotation</string>
-        </property>
-        <property name="menuText">
-            <string>Enable plane &amp;rotation</string>
         </property>
     </action>
     <action>
@@ -707,16 +677,16 @@
             <bool>true</bool>
         </property>
         <property name="on">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="enabled">
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Rotate planes together</string>
+            <string>Link Plane Rotation</string>
         </property>
         <property name="menuText">
-            <string>Rotate planes together</string>
+            <string>Link Plane Rotation</string>
         </property>
         <property name="toolTip">
             <string>During rotation the planes of a 2D view are rotated together.</string>
@@ -772,6 +742,138 @@
             <string>Show Gradient Background</string>
         </property>
     </action>
+    <actiongroup>
+        <property name="name">
+            <cstring>planeModeGroup</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+        <action>
+            <property name="name">
+                <cstring>viewPlaneSlicingModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="on">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Plane Slicing Mode</string>
+            </property>
+            <property name="menuText">
+                <string>Plane &amp;Slicing Mode</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>viewPlaneRotationModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Plane Rotation Mode</string>
+            </property>
+            <property name="menuText">
+                <string>Plane Ro&amp;tation Mode</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>viewPlaneSwivelModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Plane Swivel Mode</string>
+            </property>
+            <property name="menuText">
+                <string>Plane S&amp;wivel Mode</string>
+            </property>
+        </action>
+    </actiongroup>
+    <actiongroup>
+        <property name="name">
+            <cstring>toolbarPlaneModeGroup</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+        <action>
+            <property name="name">
+                <cstring>toolbarPlaneSlicingModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="on">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image6</iconset>
+            </property>
+            <property name="text">
+                <string>Plane slicing mode</string>
+            </property>
+            <property name="toolTip">
+                <string>Plane slicing mode</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>toolbarPlaneRotationModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image7</iconset>
+            </property>
+            <property name="text">
+                <string>Plane slicing mode</string>
+            </property>
+            <property name="toolTip">
+                <string>Plane slicing mode</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>toolbarPlaneSwivelModeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image8</iconset>
+            </property>
+            <property name="text">
+                <string>Plane swivel mode</string>
+            </property>
+            <property name="toolTip">
+                <string>Plane swivel mode</string>
+            </property>
+        </action>
+    </actiongroup>
+    <action>
+        <property name="name">
+            <cstring>viewTrackPositionAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Track Mouse Position</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -787,13 +889,19 @@
         <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154789c63646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619d3e2d9940000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="PNG" length="152">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005f49444154789c633c76ec18032d00134d4c25c5609b5fe1ff6d7e85ffa7bac1a482518387b0c12c308690bd2ddea474e4e0614662d4bd83aaa3998b1989cdd2b0cc71846d252331ea875ee48d1a3c6a30266021ac040288cd18304033170300154f1735e931148d0000000049454e44ae426082</data>
+        <data format="PNG" length="152">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005f49444154789c633c76ec18032d00134d4c25c5609b5fe1ff6d7e85ffa7bac1a4825183470dc6042c308690bd2dde347ae4e0614662d4bd83aaa3998b19892d2b60b9ee08db4a4662d40fbdc81b3578081bcc42580904109b7e6180662e060028c3173589613ef60000000049454e44ae426082</data>
     </image>
     <image name="image5">
-        <data format="PNG" length="267">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d249444154789ce553410ac230109c547d8436087e2304fa893ed34f88651fe1a55aaa7d45494f69624d248bc68b038192ddce4e26134144c881220b2b87588fb5d1636dbe4ecc4536e235f707b955b31dfd4022d6c7527c958f97214aa9a0efc9c496747f700b00ba1608918b941cdbe35b322267815ff3f7678fcb4ac7a374719fb74d01f8bd5eadacb4b99f1a01fc221576520812cec3655facc68a5bd7024038054bb0736c2fd00d0ae30f9ef4bbe3b389fb8144ece97e440c00c57907006856c7682c9ffa392a3848569caad4229be209cd86435a74b3bc410000000049454e44ae426082</data>
+        <data format="PNG" length="285">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000e449444154789ccd93610a82401085df6a1da214a16b2c0b1ec34b768948f610fdb1c4f20e42d99f467769976610a107a2b8c337cfe78cb2d6620d25ab5025603354a319aa915bbf615b489fec52e01fa2908a1fc547f94e4f3977bd55b13a91e36bfef86aa2b50efe503698a0c561be00a06d80105c7116843e9f60d6ce11b867eefb29e3ac34f119bdcc8fb76d02b8b5ce59569af17eaa9507e6a86d00e0c5aa9dc0d429a41c7e86c5819af87219e239a69ce91e93184c4e438e1781b98ec59bf7cba908dcf556c5366c11180092f31e0050a7c7e8f478f5121712b11d739d925673fc06e63944dd031f9e4b0000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="PNG" length="372">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000013b49444154789ccd94416a83401486ff29a1db60054f93d295d014047739800b6b0bee8ae809b2938834c58d2b910aae5de82624e40c71e9057a00174e3775c0a4916814f2af86378f6fdefcf3de90fd7e8f3174370ab50b78562ee8ac5cd0c1c15d755be0d56a457ddf6fb5a517581004789e87300ccfc27b5b5155151cc7411445ffc2aff6d8b66d044170029fd48b87a7c756cf769b2d6179af6f8d3dd775a1eb3a7dfffac4cf5fde605de1380e3e9e5f4e2bae4f3aa77a38769b2d4118524a299224c17c3e87a669e0791ea6693246af8aabaa429aa688e31800b05eafc1715c23a717b8280a4ca753a2280a592e9700803ccfaf075b96c5ae2c8a2200c0f33c1c0e07d600573f5e5996c4b22c004096652c3e48574892440cc380aaaa2c3669c9ef2459961b5d755bbfdb25bad88addfd77eb001d6bb48a7f01fe6f6740e7331c200000000049454e44ae426082</data>
+        <data format="PNG" length="243">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ba49444154789ccd95510ec42008449dcd9e8afb876bb13fc54c69856a6ab2f327a54f64a485aab61dfa6ca1fe055844ec75b08898994dc14bb0435b6b6d069e8219ea7a0aff660f551500cc81007a7ca962ae8821aa0a5e67955fc04f8daaf2c093c73df563bbb8151cf3dcd89edee36854346d14a34d8de11dec46bd55f1a9c707fcb48e2fc4d81df402667875a5aa3c549f4d777df61ea7033232341a75a774a463cf0fe8fae48de071934c692b02bc3c3eab346f55db7e4d3fedc0a661d0482b170000000049454e44ae426082</data>
+    </image>
+    <image name="image7">
+        <data format="PNG" length="246">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bd49444154789cd595b11582401044ffa06d6821f70cecc27635d946ecc2c03571e1d013e180804948e0cfdcb2033233d650b30a15d88fbdf1f4b838c0f37c07c0ccb40838e4ee0048f22183c960495f0666a69452cf6832381e8cc4ee8e247f5feb13970c227dae595b91522a426146e2507efcc5c0432bb75a41b6076e671c0b9eeb5f6d4781a16b13fc7edb63551c85a45969a1b06e92da9a42fd387ae0489ad7340c9aeba10e9c270b387473dfdd8ef589737d7ec5a626d6e6fe792f01a759d2b0cea8a70000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
+        <data format="PNG" length="272">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d749444154789cb5955112c42008434d674fe5fd078fe5fe14368b54a5d3f2d55a796248152252de88e3156a29e5b33bb1d6daf55944f008b8d6da7b376e01d057f02558a1c08f73be4fe15330431902a0afe0b734de89101c419cc67970d0a81006c0b4d63196e50facd0d61a78814847de95ce63cd0f9ee8bbbf1b006c07bae0a37f1e17b5ed8a2b90ef874a61601101fbf32e3cacd8c16dfccac3d4b4013e48a1704ed0457cb28e738e7d9b9dc7ec94c831b3b362ea8ab392a1d248d314d8ff859958dacd6f3f3aedc2bccc9da7eed8b94152e04c7c01b077aa3e63281ec00000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -964,12 +1072,6 @@
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>viewShowPlanesAction_toggled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>toolbarPositionOrientation</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>toolbarPositionOrientation_toggled(bool)</slot>
     </connection>
     <connection>
         <sender>RowWidgetSmall3nBig4</sender>

@@ -100,17 +100,28 @@ void QmitkStdMultiWidget::init()
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
+  // Set plane mode (slicing/rotation behavior) to slicing (default)
+  m_PlaneMode = PLANE_MODE_SLICING;
+
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();
   // @TODO next line causes sure memory leak
   // rotator will be created nonetheless (will be switched on and off)
-  m_SlicesRotation = false; 
   m_SlicesRotator = new mitk::SlicesRotator("slices-rotator");
   m_SlicesRotator->AddSliceController( 
     mitkWidget1->GetSliceNavigationController() );
   m_SlicesRotator->AddSliceController( 
     mitkWidget2->GetSliceNavigationController() );
   m_SlicesRotator->AddSliceController(
+    mitkWidget3->GetSliceNavigationController() );
+
+  // create a slice swiveller (using the same state-machine as SlicesRotator)
+  m_SlicesSwiveller = new mitk::SlicesSwiveller("slices-rotator");
+  m_SlicesSwiveller->AddSliceController( 
+    mitkWidget1->GetSliceNavigationController() );
+  m_SlicesSwiveller->AddSliceController( 
+    mitkWidget2->GetSliceNavigationController() );
+  m_SlicesSwiveller->AddSliceController(
     mitkWidget3->GetSliceNavigationController() );
 
   //initialize timeNavigationController: send time via sliceNavigationControllers
@@ -1052,16 +1063,10 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
   mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
 
-  if (m_SlicesRotation)
+  switch ( m_PlaneMode )
   {
-    m_SlicesRotator->HandleEvent( &stateEvent );
-    
-    // just in case SNCs will develop something that depends on the mouse 
-    // button being released again
-    m_SlicesRotator->HandleEvent( &stateEvent2 );
-  }
-  else
-  {
+  default:
+  case PLANE_MODE_SLICING:
     mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent );
     mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent );
     mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent );
@@ -1071,6 +1076,23 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
     mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
     mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
     mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
+    break;
+
+  case PLANE_MODE_ROTATION:
+    m_SlicesRotator->HandleEvent( &stateEvent );
+    
+    // just in case SNCs will develop something that depends on the mouse 
+    // button being released again
+    m_SlicesRotator->HandleEvent( &stateEvent2 );
+    break;
+
+  case PLANE_MODE_SWIVEL:
+    m_SlicesSwiveller->HandleEvent( &stateEvent );
+    
+    // just in case SNCs will develop something that depends on the mouse 
+    // button being released again
+    m_SlicesSwiveller->HandleEvent( &stateEvent2 );
+    break;
   }
   
   // determine if cross is now out of display
@@ -1089,83 +1111,55 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 {
   // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction* globalInteraction = 
-    mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
   
-  if (m_SlicesRotation)
+  switch ( m_PlaneMode )
   {
-    globalInteraction->AddListener( m_SlicesRotator );
+  default:
+  case PLANE_MODE_SLICING:
+    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
+    break;
+
+  case PLANE_MODE_ROTATION:
+    gi->AddListener( m_SlicesRotator );
+    break;
+
+  case PLANE_MODE_SWIVEL:
+    gi->AddListener( m_SlicesSwiveller );
+    break;
   }
-  else
-  {
-    globalInteraction->AddListener( mitkWidget1->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget2->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget3->GetSliceNavigationController() );
-    globalInteraction->AddListener( mitkWidget4->GetSliceNavigationController() );
-  }
-    
-  globalInteraction->AddListener( timeNavigationController );
+
+  gi->AddListener( timeNavigationController );
 }
 
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
 {
   // Do not let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction* globalInteraction = 
-    mitk::GlobalInteraction::GetInstance();
+  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
 
-  if (m_SlicesRotation)
+  switch ( m_PlaneMode )
   {
-    globalInteraction->RemoveListener( m_SlicesRotator );
-  }
-  else
-  {
-    globalInteraction->RemoveListener(
-      mitkWidget1->GetSliceNavigationController());
-    globalInteraction->RemoveListener( 
-      mitkWidget2->GetSliceNavigationController());
-    globalInteraction->RemoveListener( 
-      mitkWidget3->GetSliceNavigationController());
-    globalInteraction->RemoveListener( 
-      mitkWidget4->GetSliceNavigationController());
-  }
-  
-  globalInteraction->RemoveListener( timeNavigationController );
-}
+  default:
+  case PLANE_MODE_SLICING:
+    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+    break;
 
-void QmitkStdMultiWidget::EnableSliceRotation(bool on)
-{
-  if (on == m_SlicesRotation) return;
+  case PLANE_MODE_ROTATION:
+    gi->RemoveListener( m_SlicesRotator );
+    break;
 
-  m_SlicesRotation = on;
-  // @ TODO add bool m_NavigationControllerListeningEnable!
-  mitk::GlobalInteraction* globalInteraction = 
-    mitk::GlobalInteraction::GetInstance();
-  if (on)
-  {
-    globalInteraction->RemoveListener( 
-      mitkWidget1->GetSliceNavigationController());
-    globalInteraction->RemoveListener(
-      mitkWidget2->GetSliceNavigationController());
-    globalInteraction->RemoveListener(
-      mitkWidget3->GetSliceNavigationController());
-    globalInteraction->RemoveListener(
-      mitkWidget4->GetSliceNavigationController());
-    globalInteraction->AddListener( m_SlicesRotator );
+  case PLANE_MODE_SWIVEL:
+    gi->RemoveListener( m_SlicesSwiveller );
+    break;
   }
-  else
-  {
-    globalInteraction->RemoveListener( m_SlicesRotator );
-    globalInteraction->AddListener( 
-      mitkWidget1->GetSliceNavigationController() );
-    globalInteraction->AddListener(
-      mitkWidget2->GetSliceNavigationController() );
-    globalInteraction->AddListener(
-      mitkWidget3->GetSliceNavigationController() );
-    globalInteraction->AddListener(
-      mitkWidget4->GetSliceNavigationController() );
 
-    ReInitializeStandardViews();
-  }
+  gi->RemoveListener( timeNavigationController );
 }
 
 int QmitkStdMultiWidget::GetLayout() const
@@ -1206,6 +1200,11 @@ void QmitkStdMultiWidget::DisableDepartmentLogo()
 mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
 {
   return m_SlicesRotator;
+}
+
+mitk::SlicesSwiveller * QmitkStdMultiWidget::GetSlicesSwiveller() const
+{
+  return m_SlicesSwiveller;
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible)
@@ -1258,15 +1257,86 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 {
   m_SlicesRotator->SetLinkPlanes( link );
+  m_SlicesSwiveller->SetLinkPlanes( link );
   emit WidgetPlanesRotationLinked( link );
 }
 
-void QmitkStdMultiWidget::SetWidgetPlanesRotationEnabled( bool on )
+void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
 {
-  EnableSliceRotation( on );
-  emit WidgetPlanesRotationEnabled(on);
-}
+  // Do nothing if mode didn't change
+  if ( m_PlaneMode == mode )
+  {
+    return;
+  }
 
+  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
+
+  // Remove listeners of previous mode
+  switch ( m_PlaneMode )
+  {
+  default:
+  case PLANE_MODE_SLICING:
+    // Notify MainTemplate GUI that this mode has been deselected
+    emit WidgetPlaneModeSlicing( false );
+
+    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+    break;
+
+  case PLANE_MODE_ROTATION:
+    // Notify MainTemplate GUI that this mode has been deselected
+    emit WidgetPlaneModeRotation( false );
+
+    gi->RemoveListener( m_SlicesRotator );
+    break;
+
+  case PLANE_MODE_SWIVEL:
+    // Notify MainTemplate GUI that this mode has been deselected
+    emit WidgetPlaneModeSwivel( false );
+
+    gi->RemoveListener( m_SlicesSwiveller );
+    break;
+  }
+
+
+  // Set new mode and add corresponding listener to GlobalInteraction
+  m_PlaneMode = mode;
+
+  switch ( m_PlaneMode )
+  {
+  default:
+  case PLANE_MODE_SLICING:
+    // Notify MainTemplate GUI that this mode has been selected
+    emit WidgetPlaneModeSlicing( true );
+
+    // Add listeners
+    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
+
+    this->ReInitializeStandardViews();
+    break;
+
+  case PLANE_MODE_ROTATION:
+    // Notify MainTemplate GUI that this mode has been selected
+    emit WidgetPlaneModeRotation( true );
+
+    // Add listener
+    gi->AddListener( m_SlicesRotator );
+    break;
+
+  case PLANE_MODE_SWIVEL:
+    // Notify MainTemplate GUI that this mode has been selected
+    emit WidgetPlaneModeSwivel( true );
+
+    // Add listener
+    gi->AddListener( m_SlicesSwiveller );
+    break;
+  }
+}
 
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
@@ -1284,4 +1354,31 @@ void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
   m_LogoRendering2->SetLogoSource(path);
   m_LogoRendering3->SetLogoSource(path);
   m_LogoRendering4->SetLogoSource(path);
+}
+
+
+void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )
+{
+  if ( activate )
+  {
+    this->SetWidgetPlaneMode( PLANE_MODE_SLICING );
+  }
+}
+
+
+void QmitkStdMultiWidget::SetWidgetPlaneModeToRotation( bool activate )
+{
+  if ( activate )
+  {
+    this->SetWidgetPlaneMode( PLANE_MODE_ROTATION );
+  }
+}
+
+
+void QmitkStdMultiWidget::SetWidgetPlaneModeToSwivel( bool activate )
+{
+  if ( activate )
+  {
+    this->SetWidgetPlaneMode( PLANE_MODE_SWIVEL );
+  }
 }

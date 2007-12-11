@@ -132,6 +132,7 @@ void mitk::RenderWindow::InitRenderer()
     m_Renderer->InitSize(size[0], size[1]);
 
   m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
+  m_SliceNavigationController->SetRenderer( m_Renderer.GetPointer() );
   m_SliceNavigationController->ConnectGeometrySliceEvent( m_Renderer.GetPointer());
   m_SliceNavigationController->ConnectGeometryUpdateEvent( m_Renderer.GetPointer() );
   m_SliceNavigationController->ConnectGeometryTimeEvent( m_Renderer.GetPointer(), false );

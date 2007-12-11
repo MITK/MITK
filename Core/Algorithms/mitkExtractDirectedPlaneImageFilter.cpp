@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "picimage.h"
 
 
+
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)
 {
@@ -196,7 +197,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     heightInMM -= mmPerPixel[1];
 
     // Use inverse transform of the input geometry for reslicing the 3D image
-    m_Reslicer->SetResliceTransform(
+    m_Reslicer->SetResliceTransform( 
       inputGeometry->GetVtkTransform()->GetLinearInverse() ); 
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
@@ -211,7 +212,6 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
       // Calculate the actual bounds of the transformed plane clipped by the
       // dataset bounding box; this is required for drawing the texture at the
       // correct position during 3D mapping.
-
       boundsInitialized = this->CalculateClippedPlaneBounds(
         m_WorldGeometry->GetReferenceGeometry(), planeGeometry, bounds );
     }
@@ -258,6 +258,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     // Set background level to BLACK instead of translucent, to avoid
     // boundary artifacts (see Geometry2DDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -1023 );
+    composedResliceTransform->Delete();
   }
   else
   {
@@ -273,6 +274,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   }
 
   vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
+  unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
   unitSpacingImageFilter->SetInput( inputData );
 
   m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
@@ -329,7 +331,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
   // xMax and yMax are meant exclusive until now, whereas 
   // SetOutputExtent wants an inclusive bound. Thus, we need 
-  // to substract 1.
+  // to subtract 1.
   m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 1 );
 
   // Do the reslicing. Modified() is called to make sure that the reslicer is
@@ -343,15 +345,23 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   // 1. Check the result
   vtkImageData* reslicedImage = m_Reslicer->GetOutput();
 
+  ipPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
+
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
   {
     itkWarningMacro(<<"Reslicer returned empty image");
     return;
   }
 
-  Image * resultImage = this->GetOutput();
-  resultImage->Initialize( reslicedImage );
-  resultImage->SetVolume( reslicedImage->GetScalarPointer() );
+  unsigned int dimensions[2];
+  dimensions[0] = (unsigned int)extent[0]; dimensions[1] = (unsigned int)extent[1];
+  Vector3D spacingVector;
+  FillVector3D(spacingVector, mmPerPixel[0], mmPerPixel[1], 1.0);
+
+  mitk::Image::Pointer resultImage = this->GetOutput();
+  resultImage->Initialize( pic );
+  resultImage->SetSpacing( spacingVector );
+  resultImage->SetPicVolume( pic );
 }
 
 

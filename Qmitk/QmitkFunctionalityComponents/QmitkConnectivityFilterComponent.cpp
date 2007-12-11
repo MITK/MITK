@@ -205,20 +205,20 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
     m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
   }
 
-  vtkRenderer* renderer = (vtkRenderer*)m_MultiWidget->GetRenderWindow4()->GetRenderer();
+  //vtkRenderer* renderer = (vtkRenderer*)m_MultiWidget->GetRenderWindow4()->GetRenderer();
 
   CreatePointSet();
   //m_PointSet->Deactivated();
   return m_ConnectivityFilterComponentGUI;
 
 }
-void QmitkConnectivityFilterComponent::TextBoxChanged(int number)
+void QmitkConnectivityFilterComponent::TextBoxChanged(int /*number*/)
 {
   if(m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem()==3)
   {}
 
 }
-void QmitkConnectivityFilterComponent::ExecuteOperation(mitk::Operation * operation )
+void QmitkConnectivityFilterComponent::ExecuteOperation(mitk::Operation * /*operation*/ )
 {
   //mitk::DisplayCoordinateOperation * displayOperation = operation;
   //mitk::Point2D p2d = displayOperation->GetCurrentDisplayCoordinate();
@@ -328,8 +328,8 @@ vesselCenterPickedEvent.SetPickedPoint3D( minEleX, minEleY, minEleZ );
 this->InvokeEvent( vesselCenterPickedEvent );
 }
 }
-}}
-
+}}*/
+  
 /*************** CREATE SEEDPOINT WIDGET **************/
 void QmitkConnectivityFilterComponent::CreatePointSet()
 {
@@ -503,7 +503,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
             int numberOfPoints = pointSet->GetSize();
             if(numberOfPoints > 0)
             {
-              vtkRenderer* renderer = (vtkRenderer*)(m_MultiWidget->GetRenderWindow4()->GetRenderer());
+              //vtkRenderer* renderer = (vtkRenderer*)(m_MultiWidget->GetRenderWindow4()->GetRenderer());
               for(int i = 0; i<numberOfPoints; i++)
               {
                 mitk::PointSet::PointType pointNumberX  = pointSet->GetPoint(i); 
@@ -560,9 +560,9 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
                      index = i;
                     }*/
                     
-                    int index;
-                    int numOfArrays = polyData->GetCellData()->GetNumberOfArrays();
-                    for (unsigned int i=0 ; i < polyData->GetCellData()->GetNumberOfArrays(); ++i)
+                    int index = 0;
+                    //int numOfArrays = polyData->GetCellData()->GetNumberOfArrays();
+                    for (int i=0 ; i < polyData->GetCellData()->GetNumberOfArrays(); ++i)
                     {
                      std::cout << i<<" "<<pointData->GetArrayName(i)<< polyData->GetCellData()->GetArray(i)->GetName()<< std::endl;
                      index = i;
@@ -666,8 +666,8 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
 
           mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 
-          bool isSurface = false;
-          bool isConnectivity = false;
+          //bool isSurface = false;
+          //bool isConnectivity = false;
 
           while(!(iteratorConnectivity->IsAtEnd()))
           {

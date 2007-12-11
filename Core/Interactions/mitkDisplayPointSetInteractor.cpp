@@ -44,7 +44,7 @@ bool mitk::DisplayPointSetInteractor
   bool ok = false;//for return type bool
 
   //get the timestep to also support 3D+T
-  const mitk::Event *theEvent = stateEvent->GetEvent();
+  //const mitk::Event *theEvent = stateEvent->GetEvent();
 
   /*Each case must watch the type of the event!*/
   /*Each time a Point is added or removed or finished moved, the display-coordinates and the last renderer is stored.*/

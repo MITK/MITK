@@ -13,6 +13,7 @@ SET(CPP_FILES
   mitkSliceNavigationController.cpp
   mitkSlicesCoordinator.cpp
   mitkSlicesRotator.cpp
+  mitkSlicesSwiveller.cpp
   mitkStatusBar.cpp
   mitkStepper.cpp
   mitkTestManager.cpp

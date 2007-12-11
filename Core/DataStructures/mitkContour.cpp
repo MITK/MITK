@@ -86,7 +86,7 @@ bool mitk::Contour::RequestedRegionIsOutsideOfTheBufferedRegion()
 
 bool mitk::Contour::VerifyRequestedRegion()
 {
-  return false;
+  return true;
 }
 
 void mitk::Contour::SetRequestedRegion(itk::DataObject*)

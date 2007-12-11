@@ -1,7 +1,7 @@
 /*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $Id$
+Id:        $Id$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$

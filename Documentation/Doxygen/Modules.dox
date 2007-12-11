@@ -98,7 +98,7 @@
 */
  
 /**
-  \defgroup Reliver ReLiver classes
+  \defgroup Reliver Classes related to SliceBasedSegmentation
 
   \brief ReLiver specific classes
 */

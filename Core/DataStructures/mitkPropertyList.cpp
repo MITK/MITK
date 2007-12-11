@@ -29,7 +29,7 @@ mitk::UIDGenerator mitk::PropertyList::m_UIDGenerator;
 std::map<std::string, mitk::BaseProperty*> mitk::PropertyList::m_AlreadyReadFromXML;
 std::map<mitk::BaseProperty*, std::string> mitk::PropertyList::m_AlreadyWrittenToXML;
 
-mitk::BaseProperty::Pointer mitk::PropertyList::GetProperty(const char *propertyKey) const
+mitk::BaseProperty* mitk::PropertyList::GetProperty(const char *propertyKey) const
 {
     PropertyMap::const_iterator it;
     

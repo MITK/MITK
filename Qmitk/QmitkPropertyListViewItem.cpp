@@ -93,7 +93,7 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
   {
     m_Control->setPaletteForegroundColor(QApplication::palette().active().foreground());
     float value = text.toFloat();
-    mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+    mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
     if (value != floatProp->GetValue())
     {
       m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value));
@@ -113,7 +113,7 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
   {
     m_Control->setPaletteForegroundColor(QApplication::palette().active().foreground());
     int value = text.toInt();
-    mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+    mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
     if (value != intProp->GetValue())
     {
       m_PropertyList->SetProperty(m_Name.c_str(), new mitk::IntProperty(value));
@@ -129,7 +129,7 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
 
 void QmitkPropertyListViewItem::ColorControlActivated()
 {
-  mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
   mitk::Color col = colorProp->GetColor();
   QColor result = QColorDialog::getColor(QColor((int)(col.GetRed() * 255), (int)(col.GetGreen() * 255), (int)(col.GetBlue() * 255)));
   if (result.isValid())
@@ -227,7 +227,7 @@ void QmitkPropertyListViewItem::EnabledButtonClicked()
 
 void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
 {
-  mitk::EnumerationProperty* enumProp = dynamic_cast<mitk::EnumerationProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  mitk::EnumerationProperty* enumProp = dynamic_cast<mitk::EnumerationProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
   if ( enumProp != NULL )
   {
     std::string activatedItem( item.latin1() );
@@ -256,7 +256,7 @@ void  QmitkPropertyListViewFloatSlider::SliderValueChanged(int value)
 void QmitkPropertyListViewFloatSlider::UpdateView()
 {
   m_Slider->blockSignals(true);
-  mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer());
+  mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
   if (floatProp)
   {
     QString text;
@@ -270,7 +270,7 @@ void QmitkPropertyListViewFloatSlider::UpdateView()
 
 void QmitkPropertyListViewItem::MaterialEditorActivated()
 {
-  if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty(m_Name.c_str()).GetPointer()))
+  if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty(m_Name.c_str())))
   {
     QmitkMaterialEditor* materialEditor = new QmitkMaterialEditor( NULL );
     materialEditor->Initialize( materialProperty );

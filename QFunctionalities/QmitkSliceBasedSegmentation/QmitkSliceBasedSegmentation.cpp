@@ -601,7 +601,7 @@ void QmitkSliceBasedSegmentation::InitiateCreateNewSegmentationFromThreshold(boo
         m_Controls->sliderThreshold->setMinValue( static_cast<int>( image->GetScalarValueMin() ) );
         m_Controls->sliderThreshold->setMaxValue( static_cast<int>( image->GetScalarValueMax() ) );
   
-        mitk::LevelWindowProperty::Pointer lwp = dynamic_cast<mitk::LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ).GetPointer() );
+        mitk::LevelWindowProperty::Pointer lwp = dynamic_cast<mitk::LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
         if (lwp)
         {
           m_Controls->sliderThreshold->setValue( static_cast<int>( lwp->GetLevelWindow().GetLevel() ) );

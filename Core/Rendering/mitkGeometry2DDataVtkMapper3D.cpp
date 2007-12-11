@@ -283,8 +283,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   {
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(
-      GetDataTreeNode()->GetProperty("surfacegeometry", renderer).GetPointer()
-    );
+      GetDataTreeNode()->GetProperty("surfacegeometry", renderer));
 
     if ( (surfacecreatorprop.IsNull())
       || (surfacecreatorprop->GetSmartPointer().IsNull())
@@ -390,8 +389,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
             mitk::WeakPointerProperty::Pointer rendererProp =
               dynamic_cast< mitk::WeakPointerProperty * >(
                 GetDataTreeNode()->GetPropertyList()
-                  ->GetProperty("renderer").GetPointer()
-              );
+                  ->GetProperty("renderer"));
 
             if ( rendererProp.IsNotNull() )
             {
@@ -506,8 +504,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   mitk::LookupTableProperty::Pointer lookupTableProp;
                   lookupTableProp = dynamic_cast< mitk::LookupTableProperty * >(
                     node->GetPropertyList()
-                      ->GetProperty( "LookupTable" ).GetPointer()
-                  );
+                      ->GetProperty( "LookupTable" ));
 
                   // If there is a lookup table supplied, use it; otherwise,
                   // use the default grayscale table
@@ -621,8 +618,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     // Get the plane's color and set the tube properties accordingly
     mitk::ColorProperty::Pointer colorProperty;
     colorProperty = dynamic_cast<mitk::ColorProperty*>(
-      this->GetDataTreeNode()->GetProperty( "color" ).GetPointer( )
-    );
+      this->GetDataTreeNode()->GetProperty( "color" ));
 
     if ( colorProperty.IsNotNull() )
     {

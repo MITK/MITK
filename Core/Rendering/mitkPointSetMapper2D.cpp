@@ -177,17 +177,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
     //get the properties for coloring the points
     float unselectedColor[4] = {1.0, 1.0, 0.0, 1.0};//yellow
     //check if there is an unselected property
-    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("unselectedcolor")) != NULL)
     {
-      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("unselectedcolor"))->GetValue();
       unselectedColor[0] = tmpColor[0];
       unselectedColor[1] = tmpColor[1];
       unselectedColor[2] = tmpColor[2];
       unselectedColor[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
     }
-    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer()) != NULL)
+    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("unselectedcolor")) != NULL)
     {
-      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("unselectedcolor").GetPointer())->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("unselectedcolor"))->GetValue();
       unselectedColor[0] = tmpColor[0];
       unselectedColor[1] = tmpColor[1];
       unselectedColor[2] = tmpColor[2];
@@ -201,17 +201,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     //get selected property
     float selectedColor[4] = {1.0, 0.0, 0.6, 1.0};
-    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer()) != NULL)
+    if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("selectedcolor")) != NULL)
     {
-      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("selectedcolor").GetPointer())->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("selectedcolor"))->GetValue();
       selectedColor[0] = tmpColor[0];
       selectedColor[1] = tmpColor[1];
       selectedColor[2] = tmpColor[2];
       selectedColor[3] = 1.0f;
     }
-    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer()) != NULL)
+    else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("selectedcolor")) != NULL)
     {
-      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("selectedcolor").GetPointer())->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("selectedcolor"))->GetValue();
       selectedColor[0] = tmpColor[0];
       selectedColor[1] = tmpColor[1];
       selectedColor[2] = tmpColor[2];
@@ -289,10 +289,10 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
         // now paint text if available
         if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()
-              ->GetProperty("label").GetPointer()) != NULL)
+              ->GetProperty("label")) != NULL)
         {
           const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
-            this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+            this->GetDataTreeNode()->GetProperty("label"))->GetValue();
           char buffer[20];
           std::string l = pointLabel;
           if (input->GetSize()>1)
@@ -376,17 +376,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         {
           //get contour color property
           float contourColor[4] = {unselectedColor[0], unselectedColor[1], unselectedColor[2], unselectedColor[3]};//so if no property set, then use unselected color
-          if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer()) != NULL)
+          if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
           {
-            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("contourcolor").GetPointer())->GetValue();
+            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))->GetValue();
             contourColor[0] = tmpColor[0];
             contourColor[1] = tmpColor[1];
             contourColor[2] = tmpColor[2];
             contourColor[3] = 1.0f;
           }
-          else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer()) != NULL)
+          else if (dynamic_cast<mitk::ColorProperty*>(node->GetPropertyList(NULL)->GetProperty("contourcolor")) != NULL)
           {
-            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("contourcolor").GetPointer())->GetValue();
+            mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))->GetValue();
             contourColor[0] = tmpColor[0];
             contourColor[1] = tmpColor[1];
             contourColor[2] = tmpColor[2];

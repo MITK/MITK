@@ -107,7 +107,7 @@ DataTreeNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* n
   {
     DataTreeIteratorClone treeIter = dataTree->GetIteratorToNode( groupNode );
 
-    SmartPointerProperty* spp = dynamic_cast<SmartPointerProperty*>( groupNode->GetProperty(name).GetPointer() );
+    SmartPointerProperty* spp = dynamic_cast<SmartPointerProperty*>( groupNode->GetProperty(name));
 
     if (spp) // try to find this node as a child 
     {

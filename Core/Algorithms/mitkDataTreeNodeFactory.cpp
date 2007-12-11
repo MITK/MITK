@@ -921,7 +921,7 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
 {
   mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
   node->SetProperty( StringProperty::PATH, pathProp );
-  mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name").GetPointer());
+  mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
   if(nameProp.IsNull() || nameProp->GetValue()=="No Name!")
   {
     nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutExtension( m_FileName ) );

@@ -920,8 +920,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   if ( !useColor )
   {
     LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-      this->GetDataTreeNode()->GetProperty("LookupTable").GetPointer()
-      );
+      this->GetDataTreeNode()->GetProperty("LookupTable"));
     
     if ( LookupTableProp.IsNull() )
     {

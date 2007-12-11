@@ -373,10 +373,10 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 
         //Axis-aligned bounding box(AABB) around the cell if selected and set in Property
         bool showBoundingBox;
-        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox").GetPointer()) == NULL)
+        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox")) == NULL)
 		  		showBoundingBox = false;
 			  else
-				  showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox").GetPointer())->GetValue();
+				  showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox"))->GetValue();
 
         if(showBoundingBox) 
         {

@@ -124,9 +124,9 @@ void mitk::MeshVtkMapper3D::GenerateData()
   // check for color prop and use it for rendering if it exists
   m_DataTreeNode->GetColor(floatRgba, NULL); 
  
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer()) != NULL)
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor")) != NULL)
   {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor").GetPointer())->GetValue();
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor"))->GetValue();
     floatRgba[0] = tmpColor[0];
     floatRgba[1] = tmpColor[1];
     floatRgba[2] = tmpColor[2];
@@ -141,7 +141,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
   {
     // build m_Spheres->GetOutput() vtkPolyData
     float pointSize = 2.0;
-    mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize").GetPointer());
+    mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
     if (pointSizeProp.IsNotNull())
       pointSize = pointSizeProp->GetValue();
 

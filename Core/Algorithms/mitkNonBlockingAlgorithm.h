@@ -138,7 +138,7 @@ class NonBlockingAlgorithm : public itk::Object
     {
       //std::cout << "GetParameter normal(" << parameter << ") " << typeid(T).name() << std::endl;
       //m_ParameterListMutex->Lock();
-      BaseProperty* p = m_Parameters->GetProperty(parameter).GetPointer();
+      BaseProperty* p = m_Parameters->GetProperty(parameter);
       GenericProperty<T>* gp = dynamic_cast< GenericProperty<T>* >( p );
       if ( gp )
       {
@@ -159,7 +159,7 @@ class NonBlockingAlgorithm : public itk::Object
     {
       //std::cout << this << "->GetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
       //m_ParameterListMutex->Lock();
-      BaseProperty* p = m_Parameters->GetProperty(parameter).GetPointer();
+      BaseProperty* p = m_Parameters->GetProperty(parameter);
       if (p)
       {
         SmartPointerProperty* spp = dynamic_cast< SmartPointerProperty* >( p );

@@ -62,8 +62,8 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width").GetPointer()) != NULL)
-      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width").GetPointer())->GetValue();
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width")) != NULL)
+      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width"))->GetValue();
     glLineWidth(lineWidth);
 
     if (input->GetClosed())

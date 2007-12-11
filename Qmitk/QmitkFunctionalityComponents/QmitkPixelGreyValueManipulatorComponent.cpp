@@ -1461,9 +1461,9 @@ void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(typena
 	{
 		std::string nodeName;
 
-		if( m_SegmentationNode->GetPropertyList().IsNotNull() )
+		if( m_SegmentationNode->GetPropertyList()!=NULL )
 		{
-			if( m_SegmentationNode->GetPropertyList()->GetProperty("name").IsNotNull() )
+			if( m_SegmentationNode->GetPropertyList()->GetProperty("name")!= NULL )
 			{
 				nodeName = m_SegmentationNode->GetPropertyList()->GetProperty("name")->GetValueAsString();
 			}//end of if( m_SegmentationNode->GetPropertyList()->GetProperty("name") != NULL)

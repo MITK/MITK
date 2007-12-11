@@ -571,7 +571,7 @@ QmitkFctMediator
 
       mitk::BoolProperty *dialogBarState = 
         dynamic_cast< mitk::BoolProperty * >( 
-          m_Options->GetProperty( dialogBarStateName.ascii() ).GetPointer() );          
+          m_Options->GetProperty( dialogBarStateName.ascii() ));          
 
       bool enableDialogBar;
       if ( dialogBarState != NULL )

@@ -136,7 +136,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     GetParameter("Wireframe", wireframe );
     if (wireframe)
     {
-      MaterialProperty* mp = dynamic_cast<MaterialProperty*>( m_Node->GetProperty("material").GetPointer() );
+      MaterialProperty* mp = dynamic_cast<MaterialProperty*>( m_Node->GetProperty("material"));
       if (mp)
       {
         mp->SetRepresentation( MaterialProperty::Wireframe );

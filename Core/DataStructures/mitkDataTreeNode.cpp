@@ -193,7 +193,7 @@ void mitk::DataTreeNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }
 //##ModelId=3E3FE0420273
-mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
+mitk::PropertyList* mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
   if(renderer==NULL)
     return m_PropertyList;
@@ -209,7 +209,7 @@ mitk::PropertyList::Pointer mitk::DataTreeNode::GetPropertyList(const mitk::Base
 }
 
 //##ModelId=3EF189DB0111
-mitk::BaseProperty::Pointer mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
+mitk::BaseProperty* mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
 {
   if (defaultRendererUsed)
       *defaultRendererUsed = false;
@@ -266,7 +266,7 @@ mitk::DataTreeNode::GroupTagList mitk::DataTreeNode::GetGroupTags() const
 
 bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValue, mitk::BaseRenderer* renderer) const
 {
-  mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::BoolProperty::Pointer boolprop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer));
   if(boolprop.IsNull())
     return false;
 
@@ -276,7 +276,7 @@ bool mitk::DataTreeNode::GetBoolProperty(const char* propertyKey, bool& boolValu
 
 bool mitk::DataTreeNode::GetIntProperty(const char* propertyKey, int &intValue, mitk::BaseRenderer* renderer) const
 {
-  mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::IntProperty::Pointer intprop = dynamic_cast<mitk::IntProperty*>(GetProperty(propertyKey, renderer));
   if(intprop.IsNull())
     return false;
 
@@ -286,7 +286,7 @@ bool mitk::DataTreeNode::GetIntProperty(const char* propertyKey, int &intValue, 
 
 bool mitk::DataTreeNode::GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer) const
 {
-  mitk::FloatProperty::Pointer floatprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::FloatProperty::Pointer floatprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(floatprop.IsNull())
     return false;
 
@@ -296,7 +296,7 @@ bool mitk::DataTreeNode::GetFloatProperty(const char* propertyKey, float &floatV
 
 bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const
 {
-  mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
   if(stringProp.IsNull())
   {
     return false;
@@ -310,7 +310,7 @@ bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* 
 
 bool mitk::DataTreeNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer));
   if(colorprop.IsNull())
     return false;
 
@@ -321,7 +321,7 @@ bool mitk::DataTreeNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, co
 //##ModelId=3EF19420016B
 bool mitk::DataTreeNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-  mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
   if(opacityprop.IsNull())
     return false;
 
@@ -332,7 +332,7 @@ bool mitk::DataTreeNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer
 //##ModelId=3EF194220204
 bool mitk::DataTreeNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
-  mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+  mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer));
   if(levWinProp.IsNull())
     return false;
 
@@ -368,7 +368,7 @@ void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* render
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   bool defaultRendererUsed = false;
-  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer, &defaultRendererUsed).GetPointer());
+  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer, &defaultRendererUsed));
 
   if (prop && !defaultRendererUsed)
     prop->SetValue(visible);
@@ -553,7 +553,7 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
   mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( xmlReader.GetSourceFilePath() );
   this->SetProperty( StringProperty::PATH, pathProp );
   // fixes the update problem of colorProperty and materialProperty
-  mitk::MaterialProperty::Pointer material = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty("material").GetPointer());
+  mitk::MaterialProperty::Pointer material = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty("material"));
   if(material)
     material->SetDataTreeNode(this);
 
@@ -589,7 +589,7 @@ const std::string& mitk::DataTreeNode::GetXMLNodeName() const
 
 void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
 {
-  mitk::BoolProperty* selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected").GetPointer());
+  mitk::BoolProperty* selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected"));
 
   if ( selectedProperty == NULL ) 
   {
@@ -675,7 +675,7 @@ bool mitk::DataTreeNode::IsInteractorEnabled() const
 template <typename T>
 bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
 {
-  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed) );
   if ( gp != NULL )
   {
     value = gp->GetValue();

@@ -159,7 +159,7 @@ public:
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
-  mitk::PropertyList::Pointer GetPropertyList(const mitk::BaseRenderer* renderer = NULL) const;
+  mitk::PropertyList* GetPropertyList(const mitk::BaseRenderer* renderer = NULL) const;
 
   //##ModelId=3EF189DB0111
   //##Documentation
@@ -172,7 +172,7 @@ public:
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
-  mitk::BaseProperty::Pointer GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const;
+  mitk::BaseProperty* GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const;
 
   //##Documentation
   //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
@@ -187,7 +187,7 @@ public:
   template <typename T>
     bool GetProperty(itk::SmartPointer<T> &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
   {
-    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed));
     return property.IsNotNull();
   }
 
@@ -204,7 +204,7 @@ public:
   template <typename T>
     bool GetProperty(T* &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
   {
-    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed));
     return property!=NULL;
   }
 
@@ -216,7 +216,7 @@ public:
     bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL) const
 #ifdef _MSC_VER
     {
-      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed).GetPointer());
+      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed));
       if ( gp != NULL )
       {
         value = gp->GetValue();
@@ -291,7 +291,7 @@ public:
 
   bool GetName(std::string &nodeName, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
   {
-    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer).GetPointer());
+    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
     if(stringProp.IsNull())
     {
       return false;
@@ -313,7 +313,7 @@ public:
   //## If there is no "name" Property, an empty string will be returned.
   virtual std::string GetName() const
   {
-    mitk::StringProperty* sp = dynamic_cast<mitk::StringProperty*>(this->GetProperty("name").GetPointer());
+    mitk::StringProperty* sp = dynamic_cast<mitk::StringProperty*>(this->GetProperty("name"));
     if (sp == NULL)
       return "";
     return sp->GetValue();

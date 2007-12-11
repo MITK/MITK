@@ -39,7 +39,7 @@ bool TestXMLWriter()
   list2->SetProperty("int", intProp);
 
   // everything ok?
-  mitk::IntProperty* ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int").GetPointer() );
+  mitk::IntProperty* ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int") );
 
   if (!ip1)
   {
@@ -53,7 +53,7 @@ bool TestXMLWriter()
     return false;
    }
   
-  mitk::IntProperty* ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int").GetPointer() );
+  mitk::IntProperty* ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
 
   if (ip1 != ip2)
   {
@@ -102,8 +102,8 @@ bool TestXMLWriter()
   std::cout << "Test if everything is still as before writing..." << std::endl;
    // everything ok?
 
-  ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int").GetPointer() );
-  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int").GetPointer() );
+  ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int"));
+  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
 
   if (!ip1)
   {
@@ -117,7 +117,7 @@ bool TestXMLWriter()
     return false;
    }
   
-  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int").GetPointer() );
+  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
 
   if (ip1 != ip2)
   {

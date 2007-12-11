@@ -47,7 +47,7 @@ bool mitk::NodePredicateProperty::CheckNode(const mitk::DataTreeNode* node) cons
   //if (m_ValidProperty.IsNull())
   if (m_ValidProperty == NULL)
   {
-    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()).IsNotNull()); // search only for name
+    return (node->GetPropertyList()->GetProperty(m_ValidPropertyName.c_str()) != NULL); // search only for name
   }
   else
   {

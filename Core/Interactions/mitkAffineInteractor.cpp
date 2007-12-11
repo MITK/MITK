@@ -104,14 +104,14 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::ColorProperty::Pointer color;
       mitk::StateEvent* newStateEvent = NULL;
 
-      selected = dynamic_cast<mitk::BoolProperty*>(m_DataTreeNode->GetProperty("selected").GetPointer());
+      selected = dynamic_cast<mitk::BoolProperty*>(m_DataTreeNode->GetProperty("selected"));
 
       if ( selected.IsNull() ) {
         selected = new mitk::BoolProperty();
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      color = dynamic_cast<mitk::ColorProperty*>(m_DataTreeNode->GetProperty("color").GetPointer());
+      color = dynamic_cast<mitk::ColorProperty*>(m_DataTreeNode->GetProperty("color"));
 
       if ( color.IsNull() ) {
         color = new mitk::ColorProperty();

@@ -110,7 +110,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
             node->GetIntProperty("layer", layer);
             if ( layer >= maxLayer )
             {
-              mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+              mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
               if (levelWindowProperty.IsNotNull())
               {  
                 m_LevelWindowProperty = levelWindowProperty;
@@ -160,7 +160,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
       {
         if (node->IsVisible(NULL))
         {
-          mitk::LevelWindowProperty* levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+          mitk::LevelWindowProperty* levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
           if (levWinProp == levelWindowProperty)
           {
             m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
@@ -235,7 +235,7 @@ void mitk::LevelWindowManager::TreeChanged(const itk::EventObject&)
         {
           if (node->IsVisible(NULL))
           {
-            mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+            mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
             if (levelWindowProperty)
             {
               if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)
@@ -278,7 +278,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
       mitk::DataTreeNode* node = (*objectIter).GetPointer();
       if (node)
       {
-        mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        mitk::LevelWindowProperty* levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
         if (levelWindowProperty)
         {
           if (m_LevelWindowProperty.GetPointer() == levelWindowProperty)

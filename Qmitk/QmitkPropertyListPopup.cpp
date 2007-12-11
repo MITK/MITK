@@ -98,7 +98,7 @@ void QmitkPropertyListPopup::fillPopup()
     m_PopupMenu->setCheckable(true); // in general, there could are some checkable items in this menu
 
     // color
-    mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>( m_PropertyList->GetProperty("color").GetPointer() );
+    mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>( m_PropertyList->GetProperty("color"));
     if (colorProperty)
     {
       mitk::Color col = colorProperty->GetColor();
@@ -124,7 +124,7 @@ void QmitkPropertyListPopup::fillPopup()
 
 
     // opacity
-    if ( mitk::FloatProperty* opacityProperty = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity").GetPointer() ))
+    if ( mitk::FloatProperty* opacityProperty = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity")))
     {
       m_OriginalOpacity = new mitk::FloatProperty( opacityProperty->GetValue() );
       QPopupMenu* opacityPopup = new QPopupMenu( m_PopupMenu );
@@ -146,7 +146,7 @@ void QmitkPropertyListPopup::fillPopup()
 
     // Build up a "name" entry. On click, call onNameChangeClicked.
     m_NameMenuID = m_PopupMenu->insertItem("Name...");
-    mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name").GetPointer() );
+    mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name"));
     m_PopupMenu->setItemEnabled( m_NameMenuID, nameProperty != NULL );
     if (nameProperty)
     {
@@ -156,7 +156,7 @@ void QmitkPropertyListPopup::fillPopup()
 
     // Build up a checkable "visible" entry. On click, call onVisibleChanged.
     m_VisibleMenuID = m_PopupMenu->insertItem("Visibility");
-    mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible").GetPointer() );
+    mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible"));
     m_PopupMenu->setItemEnabled( m_VisibleMenuID, visibleProperty != NULL );
     if (visibleProperty)
     {
@@ -229,7 +229,7 @@ void QmitkPropertyListPopup::fillPopup()
 bool QmitkPropertyListPopup::AddMaterialPopup()
 {
   // normal material
-  if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material").GetPointer() )) // normal "material"
+  if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material"))) // normal "material"
   {
     m_OriginalMaterial = new mitk::MaterialProperty( *materialProperty );
     QPopupMenu* materialPopup = new QPopupMenu( m_PopupMenu );
@@ -261,7 +261,7 @@ void QmitkPropertyListPopup::popup( const QPoint& pos, int indexAtPoint )
 
 void QmitkPropertyListPopup::onNameClicked()
 {
-  mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name").GetPointer() );
+  mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name"));
   if (nameProperty)
   {
     bool ok;
@@ -299,7 +299,7 @@ void QmitkPropertyListPopup::onNameClicked()
 void QmitkPropertyListPopup::onVisibleClicked()
 {
   m_PopupMenu->setItemChecked( m_VisibleMenuID, !m_PopupMenu->isItemChecked(m_VisibleMenuID) );
-  mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible").GetPointer() );
+  mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible"));
   if (visibleProperty)
   {
     visibleProperty->SetValue( m_PopupMenu->isItemChecked( m_VisibleMenuID ) );
@@ -311,7 +311,7 @@ void QmitkPropertyListPopup::onVisibleClicked()
 
 void QmitkPropertyListPopup::onColorClicked()
 {
-  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>( m_PropertyList->GetProperty("color").GetPointer() );
+  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>( m_PropertyList->GetProperty("color"));
   if (colorProperty)
   {
     mitk::Color col = colorProperty->GetColor();
@@ -366,7 +366,7 @@ void QmitkPropertyListPopup::popupAboutToHide()
 
   UpdateNodeMaterialOnPopupHiding( changes );
 
-  mitk::FloatProperty* opacity = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity").GetPointer() );
+  mitk::FloatProperty* opacity = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity"));
   if (opacity)
   {
     if ( !(*opacity == *m_OriginalOpacity) )
@@ -395,7 +395,7 @@ void QmitkPropertyListPopup::popupMenuItemHighlighted(int id)
 
 void QmitkPropertyListPopup::UpdateNodeMaterialOnPopupHiding( bool& changes )
 {
-  mitk::MaterialProperty* material = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material").GetPointer() );
+  mitk::MaterialProperty* material = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material"));
   if (material)
   {
     mitk::DataTreeNode* node = material->GetDataTreeNode();

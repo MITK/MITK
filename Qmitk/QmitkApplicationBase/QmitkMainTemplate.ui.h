@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$ 
- 
+Version:   $Revision$
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -41,20 +41,20 @@ PURPOSE.  See the above copyright notices for more information.
   of "HTML documentation path" is read. It is expected that there are HTML pages in this directory. To this path is added
   "FUNCTIONALITY_CLASS_NAMEUserManual.html", where FUNCTIONALITY_CLASS_NAME is the class name of a concrete functionality.
 
-  <b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose 
+  <b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose
            "HTML documentation path" to point to "~/mitk/doxygen/". The help browser will then try to open
            ~/mitk/doxygen/QmitkSimpleExampleFunctionalityUserManual.html
-  
+
 
   \subsection QmitkMainTemplateHelpBrowserSub2 How to create the help page
 
   If you have Doxygen installed on your system, the MITK build system is able to generate a lot of HTML documentation from
-  all the classes of the source tree. To do that you have to build the target "doc" (Visual Studio: right-click the target, 
+  all the classes of the source tree. To do that you have to build the target "doc" (Visual Studio: right-click the target,
   choose "Build/Erzeugen"; Linux: make doc)
 
-  To add a help page to the Doxygen output, you should create a directory "UserManual" inside your functionality directory 
+  To add a help page to the Doxygen output, you should create a directory "UserManual" inside your functionality directory
   (because the build system configures Doxygen to look for images in these directories).
-  Inside the directory "UserManual" you create a file called FUNCTIONALITY_CLASS_NAMEUserManual.dox with basically this content 
+  Inside the directory "UserManual" you create a file called FUNCTIONALITY_CLASS_NAMEUserManual.dox with basically this content
 
 \verbatim
 
@@ -62,9 +62,9 @@ PURPOSE.  See the above copyright notices for more information.
 \page QmitkFUNCTIONALITY_CLASS_NAMEUserManual The functionality to solve all problems
 
 Available sections:
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualOverview 
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails 
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen 
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualOverview
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails
+  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen
 
 \section QmitkLymphNodeVolumetryUserManualOverview Overview of the problems
 
@@ -179,7 +179,7 @@ template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)
 {
   QString value;
-  
+
   if ( (p[0]>=0 && p[1] >=0 && p[2]>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] )
   {
     if(pic->bpe!=24)
@@ -252,7 +252,7 @@ public:
 					{
 						m_TimeSelector->SetInput(NULL);
 					}
-					else if ( image->IsInitialized() ) 
+					else if ( image->IsInitialized() )
           {
             m_TimeSelector->SetInput(image);
             mitk::Image* image3D = m_TimeSelector->GetOutput();
@@ -384,7 +384,7 @@ void QmitkMainTemplate::fileOpen()
     {
       defaultPath = QString::null;
     }
-    
+
     QStringList fileNames = QFileDialog::getOpenFileNames(
       mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), defaultPath);
 
@@ -416,7 +416,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     factory->SetImageSerie(false);
 
     /*QString qFileName( fileName );
-    
+
     // just in case this is a series
     int fnstart = qFileName.findRev( QRegExp("[/\\\\]"), qFileName.length() ); // last occurence of / or \  (\\\\ because of C++ quoting and regex syntax)
     if ( fnstart<0 ) fnstart=0;
@@ -466,7 +466,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
     {
       defaultPath = QString::null;
     }
-    
+
     QString fileName = QFileDialog::getOpenFileName(defaultPath,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), 0, 0, "Open Sequence");
 
     if ( !fileName.isNull() )
@@ -486,7 +486,7 @@ void QmitkMainTemplate::fileOpenImageSequence()
 
       char prefix[1024], pattern[1024];
       // now we want to work with fileName again to include the path, thus
-      // add the length of the path to start; the variable "path" does not 
+      // add the length of the path to start; the variable "path" does not
       // contain trailing slashes, therefore the second addend in the followong line:
       start += path.length()+(fileName.length()-path.length()-name.length());
 
@@ -553,12 +553,12 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
       }
     }
   }
-  
+
   m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
   m_MultiWidget->RequestUpdate();
   m_MultiWidget->Fit();
   m_StandardViewsInitialized = true;
-  
+
   if ( dataFound ) //assure that we have at least one valid output
   {
     if (firstImage!=NULL)
@@ -567,7 +567,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
         m_MultiWidget->changeLayoutToWidget1();
       }
   }
-} 
+}
 
 void QmitkMainTemplate::fileOpenProject()
 {
@@ -586,14 +586,14 @@ void QmitkMainTemplate::fileOpenProject()
     {
       itkGenericOutputMacro( << "Exception during file open project: " << ex );
     }
-  } 
+  }
 #else
   QString fileName = QFileDialog::getOpenFileName(NULL,"MITK Project File (*.mitk)");
 
   if ( !fileName.isNull() )
   {
     try
-    {    
+    {
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
       mitk::DataTreePreOrderIterator it(m_Tree);
@@ -629,7 +629,7 @@ void QmitkMainTemplate::fileSaveProjectAs()
   if ( !fileName.isNull() )
   {
   try
-    {    
+    {
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
       mitk::DataTreePreOrderIterator it(m_Tree);
@@ -658,18 +658,18 @@ void QmitkMainTemplate::fileSave()
   {
     itkGenericOutputMacro( << "Exception during file open project: " << ex );
   }
-#else  
+#else
   QString fileName;
 
   if ( m_ProjectFileName.length() > 5 )
     fileName = m_ProjectFileName;
-  else 
+  else
     fileName = fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
 
   if ( !fileName.isNull() )
   {
   try
-    {    
+    {
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
       mitk::DataTreePreOrderIterator it(m_Tree);
@@ -712,7 +712,7 @@ void QmitkMainTemplate::init()
 
   QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
   this->statusBar()->addWidget(memoryIndicator, 0, true);
-  
+
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
 
@@ -801,7 +801,7 @@ void QmitkMainTemplate::Initialize()
     connect(viewTrackPositionAction, SIGNAL(toggled(bool)), this, SLOT(toolbarPositionOrientation_toggled(bool)));
 
 
-    // lock/unlock plane widgets when the corresponding buttons/menu items are checked... 
+    // lock/unlock plane widgets when the corresponding buttons/menu items are checked...
     connect(toolbarLockPlanes,    SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
     connect(viewLockPlanesAction, SIGNAL(toggled(bool)), m_MultiWidget, SLOT(SetWidgetPlanesLocked(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesLockedChanged(bool)), toolbarLockPlanes, SLOT(setOn(bool)));
@@ -816,45 +816,45 @@ void QmitkMainTemplate::Initialize()
     connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLinked(bool)), viewLinkSliceRotationAction, SLOT(setOn(bool)));
     connect(m_MultiWidget, SIGNAL(WidgetPlanesRotationLinked(bool)), viewLinkSliceRotationAction, SLOT(setOn(bool)));
 
-   
+
     // plane slicing mode signal handling
-    connect(viewPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(viewPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToSlicing(bool)));
-    connect(toolbarPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(toolbarPlaneSlicingModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToSlicing(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)),
       viewPlaneSlicingModeAction, SLOT(setOn(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSlicing(bool)),
       toolbarPlaneSlicingModeAction, SLOT(setOn(bool)));
 
     // plane rotation mode signal handling
-    connect(viewPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(viewPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToRotation(bool)));
-    connect(toolbarPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(toolbarPlaneRotationModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToRotation(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)),
       viewPlaneRotationModeAction, SLOT(setOn(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)),
       toolbarPlaneRotationModeAction, SLOT(setOn(bool)));
 
     connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)),
       viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeRotation(bool)),
       viewLockSliceRotationAction, SLOT(setEnabled(bool)));
 
     // plane swivel mode signal handling
-    connect(viewPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(viewPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToSwivel(bool)));
-    connect(toolbarPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget, 
+    connect(toolbarPlaneSwivelModeAction, SIGNAL(toggled(bool)), m_MultiWidget,
       SLOT(SetWidgetPlaneModeToSwivel(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)),
       viewPlaneSwivelModeAction, SLOT(setOn(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)),
       toolbarPlaneSwivelModeAction, SLOT(setOn(bool)));
 
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)),
       viewLinkSliceRotationAction, SLOT(setEnabled(bool)));
-    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)), 
+    connect(m_MultiWidget, SIGNAL(WidgetPlaneModeSwivel(bool)),
       viewLockSliceRotationAction, SLOT(setEnabled(bool)));
   }
 
@@ -877,44 +877,43 @@ void QmitkMainTemplate::Initialize()
 
   // initialize multiwidget with options
   // gradient background
-  mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background").GetPointer() );          
+  mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background") );
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
 
-  mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1").GetPointer() );
-  mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2").GetPointer() );
+  mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1"));
+  mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2"));
   if  ( upperColProp && lowerColProp )
   {
     m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
   }
   // department logo
-  mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Department logo visible").GetPointer() );          
+  mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Department logo visible") );
   if (logoProperty != NULL)
     this->enableDepartmentLogo(logoProperty->GetValue());
-  mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path").GetPointer() );
+  mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path"));
   if (logoPath)
   {
     m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
   }
 
   // default dataset path
-  m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( 
-    m_Options->GetProperty("Default dataset path").GetPointer() );
+  m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Default dataset path"));
 
   // use dark palette on/off
-  mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
+  mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette"));
   if(mitk::PACSPlugin::GetInstance()->IsPlugin())
     this->enableDarkPalette(true);
   else
     if (darkProperty != NULL)
       this->enableDarkPalette(darkProperty->GetValue());
 
-  mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color").GetPointer() );
+  mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color"));
   mitk::Color c = colProperty->GetColor();
   m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
   // Initialize other global options
-  mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );
+  mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
   if (textureInterpolationProperty != NULL)
     mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
@@ -941,7 +940,7 @@ void QmitkMainTemplate::InitializeQfm()
 {
   //create an QmitkFctMediator. This is an invisible object that controls, manages and mediates functionalities
   qfm=new QmitkFctMediator(this);
- 
+
   //create an QmitkButtonFctLayoutTemplate. This is an simple example for an layout of the different widgets, of which
   //a functionality and the management consists: the main widget, the control widget and a menu for selecting the
   //active functionality.
@@ -950,7 +949,7 @@ void QmitkMainTemplate::InitializeQfm()
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
   qfm->Initialize( this );
-  
+
 }
 
 
@@ -1068,7 +1067,7 @@ void QmitkMainTemplate::destroy()
   std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
   filename += "/MITKOptions.xml";
   SaveOptionsToFile( filename.c_str() );
-  
+
   delete qfm;
 #ifdef MBI_INTERNAL
   delete m_SceneWidget;
@@ -1141,7 +1140,7 @@ void QmitkMainTemplate::helpContents()
 {
   mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
   mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
-  
+
   QDir homedir( pathproperty->GetValueAsString().c_str() );
   QString home( homedir.absPath() + "/" );
   QString firstpage = home;
@@ -1152,7 +1151,7 @@ void QmitkMainTemplate::helpContents()
     QmitkFunctionality* f = qfm->GetActiveFunctionality();
     if (f)
     {
-      firstpage += f->metaObject()->className(); 
+      firstpage += f->metaObject()->className();
       firstpage += "UserManual.html";
     }
 
@@ -1172,7 +1171,7 @@ void QmitkMainTemplate::helpContents()
 void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 {
   QmitkOptionDialog* optionDialog = new QmitkOptionDialog(this, "Options");
-  
+
   // first add a global options panel
   optionDialog->m_FunctionalitySelectionList->insertItem("Global options", 1);  // start at index 1, because index 0 does not show up in gui
 
@@ -1180,8 +1179,8 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   QmitkPropertyListView* dialog = new QmitkPropertyListView(this);
   dialog->SetPropertyList(m_Options);
   optionDialog->m_OptionWidgetStack->addWidget(dialog, 1);
-  
-  // for each functionality: If the funcionality has an option widget, 
+
+  // for each functionality: If the funcionality has an option widget,
   // add it to the  m_FunctionalitySelectionList and the m_OptionWidgetStack
   for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
   {
@@ -1192,7 +1191,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
       optionWidget = new QLabel("no options available", this);
     optionDialog->m_OptionWidgetStack->addWidget(optionWidget, i+2);
   }
-  
+
   // preselect active functionality
   optionDialog->m_FunctionalitySelectionList->setSelected(qfm->GetActiveFunctionalityId() + 1, true);
   optionDialog->m_OptionWidgetStack->raiseWidget(qfm->GetActiveFunctionalityId() + 2);
@@ -1201,35 +1200,34 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
   if (optionDialog->exec() == QDialog::Accepted)
   {
     // first process global options
-    
+
     // gradient background
     mitk::BaseProperty::Pointer bp =  m_Options->GetProperty("Use gradient background");
     mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( bp.GetPointer() );
     this->enableGradientBackground(gradProperty->GetValue());
 
-    mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1").GetPointer() );
-    mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2").GetPointer() );
+    mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1"));
+    mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2"));
     if  ( upperColProp && lowerColProp )
     {
       m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
     }
-    
+
     // department logo
     mitk::BaseProperty::Pointer logop =  m_Options->GetProperty("Department logo visible");
     mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( logop.GetPointer() );
-    mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path").GetPointer() );
+    mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path"));
     if (logoPath)
     {
       m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
     }
     this->enableDepartmentLogo(logoProperty->GetValue());
-    
+
     // default dataset path
-    m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( 
-    m_Options->GetProperty("Default dataset path").GetPointer() );
+    m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Default dataset path"));
 
     // dark palette
-    mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette").GetPointer() );          
+    mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette"));
     if(mitk::PACSPlugin::GetInstance()->IsPlugin())
       this->enableDarkPalette(true);
     else
@@ -1242,7 +1240,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
-    mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation").GetPointer() );
+    mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
     if (textureInterpolationProperty != NULL)
       mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
 
@@ -1251,14 +1249,14 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     // (enabled/disabled state and potentially other options) in the global
     // options list).
     qfm->ApplyOptionsToDialogBars( m_Options );
-    
+
     // next, notify the functionalities of changes in their options
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
     {
       QmitkFunctionality* f = qfm->GetFunctionalityById(i);
       if (f != NULL)
         f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i + 2));
-    } 
+    }
   }
   delete optionDialog;
 }
@@ -1302,7 +1300,7 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
     }
 
   }
- 
+
   // end tree
   xmlw.EndNode();
 }
@@ -1317,7 +1315,7 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
 
   // traverse the tree, tell the appropriate functionalities about their loaded options
   iter.GoToBegin();
- 
+
   while (!iter.IsAtEnd())
   {
     // get propertylist
@@ -1333,9 +1331,9 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
         mitk::BaseProperty::Pointer bp = pl->GetProperty("MITKSampleAppFunctionalityName");
         mitk::StringProperty* id = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
         std::string idstring;
-        if (id) 
+        if (id)
           idstring = id->GetValueAsString();
-        
+
         if (idstring == "MITKSampleApp")
         {
           // set all global options read from the config file
@@ -1355,8 +1353,8 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
           }
         }
       }
-    } 
-    
+    }
+
     ++iter;
   }
 }
@@ -1367,13 +1365,13 @@ void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )
   {
     toolbarShowPlanes->setText("Hide Planes");
     toolbarShowPlanes->setMenuText("Hide Planes");
-    toolbarShowPlanes->setToolTip("Hide Planes");  
+    toolbarShowPlanes->setToolTip("Hide Planes");
   }
-  else    
+  else
   {
     toolbarShowPlanes->setText("Show Planes");
     toolbarShowPlanes->setMenuText("Show Planes");
-    toolbarShowPlanes->setToolTip("Show Planes"); 
+    toolbarShowPlanes->setToolTip("Show Planes");
   }
 
   toolbarShowPlanes->setOn( on );
@@ -1418,14 +1416,14 @@ void QmitkMainTemplate::fileOpenRawImage()
 //new code for Raw Image reading
 void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
 {
- 
+
   if(!fileName) return;
 
   // open dialog window and get parameters
   QmitkRawImageFileOpener* rawFileOpener = new QmitkRawImageFileOpener(this, "QmitkRawFileOpener");
-  
+
   mitk::Image::Pointer m_ResultImage = rawFileOpener->ShowAndTryToRead(fileName);
-  
+
   if (m_ResultImage.IsNotNull())
   {
       mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
@@ -1437,26 +1435,26 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
       mitk::DataTreePreOrderIterator it(m_Tree);
       m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
   }
-  
+
 }
 
-// code for Raw Image Sequence Reading (multiple 2D slices belonging to the same 3D stack) 
+// code for Raw Image Sequence Reading (multiple 2D slices belonging to the same 3D stack)
 void QmitkMainTemplate::fileOpenRawImageSequence()
 {
   QStringList fileNames = QFileDialog::getOpenFileNames("Raw images: (*.raw *.ct)","/home", NULL);
   fileOpenRawImageSequence(fileNames);
-  
+
 }
 
 void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
 {
   if(!fileNames.empty())
-  {    
+  {
     // open dialog window and get parameters
     QmitkRawImageFileSequenceOpener* rawFileSequenceOpener = new QmitkRawImageFileSequenceOpener(this, "QmitkRawFileSequenceOpener");
-  
+
     mitk::Image::Pointer m_ResultImage = rawFileSequenceOpener->ShowAndTryToRead(fileNames);
-  
+
     if (m_ResultImage.IsNotNull())
     {
         mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
@@ -1469,7 +1467,7 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
         m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
     }
   }
-    
+
 }
 
 void QmitkMainTemplate::enableGradientBackground( bool enable)
@@ -1500,7 +1498,7 @@ void QmitkMainTemplate::enableDarkPalette( bool enable )
 
 void QmitkMainTemplate::fileCloseProject()
 {
-  /* This method deletes all nodes but the three widget planes, their grouping node 
+  /* This method deletes all nodes but the three widget planes, their grouping node
      and nodes that do not have a data object. This should free most of the used memory.
      If other nodes (with helper objects like the widget planes) should be kept, they have
      to be added here as a predicate. */
@@ -1527,13 +1525,13 @@ void QmitkMainTemplate::fileCloseProject()
     m_UndoController->Clear(); // clear the undo/redo stacks
   }
   //
-  // reset all functionalities to their initial state 
+  // reset all functionalities to their initial state
   for ( unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i )
   {
     QmitkFunctionality* f = qfm->GetFunctionalityById(i);
     if ( f != NULL )
       f->Reinitialize();
-  } 
+  }
 }
 
 

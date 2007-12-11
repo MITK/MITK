@@ -88,7 +88,7 @@ class PropertyList : public itk::Object, public XMLIO
     /**
      * @brief Get a property by its name. 
      */
-    mitk::BaseProperty::Pointer GetProperty(const char *propertyKey) const;
+    mitk::BaseProperty* GetProperty(const char *propertyKey) const;
 
     /**
      * @brief Set a property in the list/map by value.

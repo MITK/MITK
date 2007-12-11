@@ -273,7 +273,7 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
            colIter != m_AdditionalColumns.end();
            ++colIter, ++col)
       {
-        mitk::FloatProperty::Pointer floatProperty = dynamic_cast<mitk::FloatProperty*>( node->GetProperty( colIter->first.c_str() ).GetPointer() );
+        mitk::FloatProperty::Pointer floatProperty = dynamic_cast<mitk::FloatProperty*>( node->GetProperty( colIter->first.c_str() ));
         if (floatProperty.IsNotNull())
         {
           float value( floatProperty->GetValue() );

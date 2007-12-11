@@ -303,7 +303,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(
       GetDataTreeNode()->GetProperty(
-        "surfacegeometry", renderer).GetPointer());
+        "surfacegeometry", renderer));
 
     if( (surfacecreatorprop.IsNull()) || 
         (surfacecreatorprop->GetSmartPointer().IsNull()) ||

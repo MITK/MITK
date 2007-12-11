@@ -85,9 +85,9 @@ namespace mitk
       
       virtual bool NodeMatches(DataTreeNode* node) const
       {
-        return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
+        return (    node != NULL && node->GetData()                               // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<T*>(node->GetData() )                            // data is of a certain type
-                 && (   node->GetProperty(m_PropertyName.c_str()).IsNotNull()    // there is a certain property
+                 && (   node->GetProperty(m_PropertyName.c_str())!= NULL          // there is a certain property
                     )
                 );
       }

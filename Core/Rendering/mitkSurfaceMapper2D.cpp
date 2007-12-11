@@ -75,10 +75,10 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
   Superclass::SetDataTreeNode( node );
 
   bool useCellData;
-  if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring")) == NULL)
     useCellData = false;
   else
-    useCellData = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring").GetPointer())->GetValue();
+    useCellData = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring"))->GetValue();
 
   if (!useCellData)
   {
@@ -132,10 +132,10 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
     return;
 
-  if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth")) == NULL)
     m_LineWidth = 1;
   else
-    m_LineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth").GetPointer())->GetValue();
+    m_LineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetProperty("linewidth"))->GetValue();
 
   //
   // get the world time
@@ -176,10 +176,10 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       lut = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
 
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
-        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
-        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum")) != NULL)        
+        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
+      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
+        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
       lut->SetTableRange(scalarsMin, scalarsMax);
       lut->Build();

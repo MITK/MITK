@@ -338,7 +338,7 @@ bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWr
 
     if (writeRootNodeToo)
     {
-      StringProperty* sprop = dynamic_cast<StringProperty*>( node->GetProperty("FILENAME").GetPointer() );
+      StringProperty* sprop = dynamic_cast<StringProperty*>( node->GetProperty("FILENAME"));
       if (sprop) // if this property is set, then use it as a filename
       {
         xmlWriter.SetSourceFileName( sprop->GetValue() );      

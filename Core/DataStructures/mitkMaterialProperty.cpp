@@ -317,7 +317,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetColorCoefficient() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * colorCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( COLOR_COEFFICIENT_KEY, m_Renderer ).GetPointer() );
+    mitk::FloatProperty * colorCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( COLOR_COEFFICIENT_KEY, m_Renderer ) );
     if ( colorCoefficient != NULL )
       return colorCoefficient->GetValue();
     else
@@ -331,7 +331,7 @@ mitk::MaterialProperty::Color mitk::MaterialProperty::GetSpecularColor() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::ColorProperty * colorProperty = dynamic_cast<mitk::ColorProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COLOR_KEY, m_Renderer ).GetPointer() );
+    mitk::ColorProperty * colorProperty = dynamic_cast<mitk::ColorProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COLOR_KEY, m_Renderer ) );
     if ( colorProperty != NULL )
     {
       mitk::Color color = colorProperty->GetColor();
@@ -350,7 +350,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetSpecularCoefficient() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * specularCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COEFFICIENT_KEY, m_Renderer ).GetPointer() );
+    mitk::FloatProperty * specularCoefficient = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_COEFFICIENT_KEY, m_Renderer ));
     if ( specularCoefficient != NULL )
     {
       return specularCoefficient->GetValue();
@@ -371,7 +371,7 @@ vtkFloatingPointType mitk::MaterialProperty::GetSpecularPower() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * specularPower = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_POWER_KEY, m_Renderer ).GetPointer() );
+    mitk::FloatProperty * specularPower = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( SPECULAR_POWER_KEY, m_Renderer ));
     if ( specularPower != NULL )
       return specularPower->GetValue();
     else
@@ -398,7 +398,7 @@ mitk::MaterialProperty::InterpolationType mitk::MaterialProperty::GetInterpolati
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY, m_Renderer ).GetPointer() );
+    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY, m_Renderer ));
     if ( interpolationProperty != NULL )
       return static_cast<mitk::MaterialProperty::InterpolationType>( interpolationProperty->GetValueAsId() );
     else
@@ -412,7 +412,7 @@ mitk::MaterialProperty::RepresentationType mitk::MaterialProperty::GetRepresenta
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY, m_Renderer ).GetPointer() );
+    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY, m_Renderer ));
     if ( representationProperty != NULL )
       return static_cast<mitk::MaterialProperty::RepresentationType>( representationProperty->GetValueAsId() );
     else
@@ -427,7 +427,7 @@ int mitk::MaterialProperty::GetVtkInterpolation() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY, m_Renderer ).GetPointer() );
+    mitk::VtkInterpolationProperty * interpolationProperty = dynamic_cast<mitk::VtkInterpolationProperty*>( m_DataTreeNode->GetProperty( INTERPOLATION_KEY, m_Renderer ));
     if ( interpolationProperty != NULL )
       return interpolationProperty->GetVtkInterpolation();
     else
@@ -449,7 +449,7 @@ int mitk::MaterialProperty::GetVtkRepresentation() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY, m_Renderer ).GetPointer() );
+    mitk::VtkRepresentationProperty * representationProperty = dynamic_cast<mitk::VtkRepresentationProperty*>( m_DataTreeNode->GetProperty( REPRESENTATION_KEY, m_Renderer ));
     if ( representationProperty != NULL )
       return representationProperty->GetVtkRepresentation();
     else
@@ -471,7 +471,7 @@ float mitk::MaterialProperty::GetLineWidth() const
 {
   if ( ForwardToDataTreeNode() )
   {
-    mitk::FloatProperty * lineWidth = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( LINE_WIDTH_KEY, m_Renderer ).GetPointer() );
+    mitk::FloatProperty * lineWidth = dynamic_cast<mitk::FloatProperty*>( m_DataTreeNode->GetProperty( LINE_WIDTH_KEY, m_Renderer ));
     if ( lineWidth != NULL )
       return lineWidth->GetValue();
     else

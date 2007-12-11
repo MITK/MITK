@@ -197,7 +197,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QPopupMenu* contextmenu)
       mitk::DataTreeNode* node = (*objectIter).GetPointer();
       if (node)
       {
-        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
         if (levelWindowProperty.IsNotNull())
         {
           std::string name;
@@ -272,7 +272,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
       mitk::DataTreeNode* node = (*objectIter).GetPointer();
       if (node)
       {
-        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow").GetPointer());
+        mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
         if (levelWindowProperty.IsNotNull())
         {
           std::string name;

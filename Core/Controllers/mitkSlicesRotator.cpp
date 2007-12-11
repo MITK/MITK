@@ -39,6 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkApplicationCursor.h>
 
+#include <vtkLinearTransform.h>
+
 #include <math.h>
 
 #include "rotate_cursor.xpm"
@@ -56,8 +58,7 @@ SlicesRotator::Pointer SlicesRotator::New()
 }
 
 SlicesRotator::SlicesRotator(const char* machine)
-: SlicesCoordinator(machine),
-  m_LinkPlanes( false )
+: SlicesCoordinator(machine)
 {
 
 }
@@ -182,20 +183,102 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       // create RotationOperation and apply to all SNCs that should be rotated
       RotationOperation op(OpROTATE, m_CenterOfRotation, axisOfRotation, angle);
+
+      // TEST
+      int i = 0;
+
       for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
       {
         if ( !(*iter)->GetSliceRotationLocked() )
         {
+          BaseRenderer *renderer = (*iter)->GetRenderer();
+          DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+
+          std::cout << i << ":" << std::endl;
+
+          Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
+          displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+          displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
+
+          std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
+
           const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
           const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
           if (!timeSlicedGeometry) continue;
           
           const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
-          
+
+          //vtkLinearTransform *inverseTransformVtk = 
+          //  displayGeometry->GetVtkTransform()->GetLinearInverse();
+
+          //ScalarType pvtkCenterOfRotation[3];
+          //pvtkCenterOfRotation[0] = m_CenterOfRotation[0];
+          //pvtkCenterOfRotation[1] = m_CenterOfRotation[1];
+          //pvtkCenterOfRotation[2] = m_CenterOfRotation[2];
+
+          //ScalarType scaleFactorMMPerUnitX = 
+          //  displayGeometry->GetExtentInMM(0) / displayGeometry->GetExtent(0);
+          //ScalarType scaleFactorMMPerUnitY = 
+          //  displayGeometry->GetExtentInMM(1) / displayGeometry->GetExtent(1);  
+
+          //ScalarType scaleFactorMMPerDisplayUnit = displayGeometry->GetScaleFactorMMPerDisplayUnit();
+          //Vector2D &originInMM = displayGeometry->GetOriginInMM();
+
+          ////displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+
+          //ScalarType pvtkDisplayPost[3];
+          //inverseTransformVtk->TransformPoint( pvtkCenterOfRotation, pvtkDisplayPost );
+
+          //pvtkDisplayPost[0] *= scaleFactorMMPerUnitX;
+          //pvtkDisplayPost[1] *= scaleFactorMMPerUnitY;
+
+          ////displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
+          //pvtkDisplayPost[0] -= originInMM[0];
+          //pvtkDisplayPost[1] -= originInMM[1];
+
+          //pvtkDisplayPost[0] /= scaleFactorMMPerDisplayUnit;
+          //pvtkDisplayPost[1] /= scaleFactorMMPerDisplayUnit;
+
+          //point2DDisplayPost[0] = pvtkDisplayPost[0];
+          //point2DDisplayPost[1] = pvtkDisplayPost[1];
+
+
+          displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+          displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
+          Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
+
+          Vector2D origin = displayGeometry->GetOriginInMM();
+          std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
+          std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
+          std::cout << "  Origin - " << origin << std::endl;
+          ++i;
+
+          displayGeometry->MoveBy( vector2DDisplayDiff );
+
           (*iter)->SendCreatedWorldGeometryUpdate();
         }
       } 
- 
+      std::cout << "--------------------------------" << std::endl;
+
+      
+      
+      // TEST
+      //BaseRenderer* renderer = stateEvent->GetEvent()->GetSender(); // TODO this is NOT SNC-specific! Should be!
+      //
+      //DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
+      //if (!displayGeometry) break;
+
+      //Point2D point2DWorld, point2DDisplay;
+      //displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+      //displayGeometry->WorldToDisplay( point2DWorld, point2DDisplay );
+
+      //std::cout << "RotationCenter: " << m_CenterOfRotation << std::endl;
+      //std::cout << "PointWorld:     " << point2DWorld << std::endl;
+      //std::cout << "PointDisplay:   " << point2DDisplay << std::endl;
+      //std::cout << "--------------------------------------------" << std::endl;
+
+
+
       RenderingManager::GetInstance()->RequestUpdateAll();
       
       ok = true;

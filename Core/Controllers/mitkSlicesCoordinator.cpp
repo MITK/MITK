@@ -30,7 +30,8 @@ namespace mitk {
 //}
 
 SlicesCoordinator::SlicesCoordinator(const char* machine)
-:StateMachine(machine)
+: StateMachine(machine),
+  m_LinkPlanes( true )
 {
 }
 

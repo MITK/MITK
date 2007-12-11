@@ -25,74 +25,74 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-/** \brief Enables rotation of visible slices (for sliced geometries).
-  @ingroup NavigationControl
-
-  This class takes care of several SliceNavigationControllers and handles 
-  slice selection / slice rotation. It is added as listener to 
-  GlobalInteraction by QmitkStdMultiWidget.
-
-
-  The SlicesRotator class adds the possibility of slice rotation to the "normal" behaviour of
-  SliceNavigationControllers. This additional class is needed, because one has to be aware of several
-  "visible slices" (selected Geometry2Ds of some SliceNavigationControllers) in order to choose 
-  between rotation and slice selection.
-
-  Rotation is achieved by modifying (rotating) the generated TimeSlicedGeometry of the
-  corresponding SliceNavigationController.
-
-  The rule to choose between slice rotation and selection is easy:
-
-  - For a mouse down event, count the number of visible planes, which
-    are "near" the cursor. If this number equals 2 (one for the window, which
-    currently holds the cursor, one for the intersection line of another visible slice), 
-    then initiate rotation, else select slices near the cursor.
-  
-  In contrast to the situation without the SlicesRotator, the SliceNavigationControllers are now
-  not directly registered as listeners to GlobalInteraction. SlicesRotator is registered as a listener
-  and decides whether something should be rotated or whether another slice should be selected. In the latter
-  case, a PositionEvent is just forwarded to the SliceNavigationController.
-  
-  */
+/**
+ * \brief Enables rotation of visible slices (for sliced geometries).
+ * \ingroup NavigationControl
+ *
+ * This class takes care of several SliceNavigationControllers and handles 
+ * slice selection / slice rotation. It is added as listener to 
+ * GlobalInteraction by QmitkStdMultiWidget.
+ *
+ * The SlicesRotator class adds the possibility of slice rotation to the
+ * "normal" behaviour of SliceNavigationControllers. This additional class
+ * is needed, because one has to be aware of several "visible slices" 
+ * (selected Geometry2Ds of some SliceNavigationControllers) in order to
+ * choose between rotation and slice selection.
+ *
+ * Rotation is achieved by modifying (rotating) the generated
+ * TimeSlicedGeometry of the corresponding SliceNavigationController.
+ *
+ * With SlicesRotator, the rule to choose between slice rotation and 
+ * selection is simple: For a mouse down event, count the number of visible
+ * planes, which are "near" the cursor. If this number equals 2 (one for the 
+ * window, which currently holds the cursor, one for the intersection line of
+ * another visible slice), then initiate rotation, else select slices near 
+ * the cursor. If "LinkPlanes" is set to true, the rotation is applied to the
+ * planes of all registered SNCs, not only of the one associated with the
+ * directly selected plane.
+ *  
+ * In contrast to the situation without the SlicesRotator, the
+ * SliceNavigationControllers are now not directly registered as listeners to 
+ * GlobalInteraction. SlicesRotator is registered as a listener and decides 
+ * whether something should be rotated or whether another slice should be 
+ * selected. In the latter case, a PositionEvent is just forwarded to the 
+ * SliceNavigationController.
+ *
+ * \sa SlicesSwiveller
+ */
 class SlicesRotator : public SlicesCoordinator
 {
-  public:
+public:
 
-    mitkClassMacro(SlicesRotator, SlicesCoordinator);
-   
-    /// @TODO FIX StateMachine smart pointer handling (or learn about the reason)
-    static Pointer New();
-    /// @TODO public ONLY because of StateMachine's meddling with m_ReferenceCount
-    SlicesRotator(const char* machine);
-
-    virtual void SetGeometry(const itk::EventObject& EventObject);
-
-    /** Set/Get whether to link planes (fix their relative angle) */
-    itkSetMacro( LinkPlanes, bool );
-    itkGetMacro( LinkPlanes, bool );
-    itkBooleanMacro( LinkPlanes );
-    
-  protected:
-
-    // clear list of controllers
-    virtual ~SlicesRotator();
-
-    // check if the slices of this SliceNavigationController can be rotated (???) Possible
-    virtual void OnSliceControllerAdded(SliceNavigationController* snc);
+  mitkClassMacro(SlicesRotator, SlicesCoordinator);
   
-    virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
+  /// @TODO FIX StateMachine smart pointer handling (or learn about the reason)
+  static Pointer New();
+  /// @TODO public ONLY because of StateMachine's meddling with m_ReferenceCount
+  SlicesRotator(const char* machine);
 
-    virtual void UpdateRelevantSNCs();
+  virtual void SetGeometry(const itk::EventObject& EventObject);
 
-    virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent);
- 
-    SNCVector m_RelevantSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
-    SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated
+protected:
 
-    Point3D  m_LastCursorPosition;
-    Point3D  m_CenterOfRotation;
+  // clear list of controllers
+  virtual ~SlicesRotator();
 
-    bool m_LinkPlanes;
+  // check if the slices of this SliceNavigationController can be rotated (???) Possible
+  virtual void OnSliceControllerAdded(SliceNavigationController* snc);
+
+  virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
+
+  virtual void UpdateRelevantSNCs();
+
+  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent);
+
+  SNCVector m_RelevantSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
+  SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated
+
+  Point3D  m_LastCursorPosition;
+  Point3D  m_CenterOfRotation;
+
 };
 
 } // namespace 

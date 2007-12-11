@@ -230,5 +230,7 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 
   // add result to data tree
   mitk::DataStorage::GetInstance()->Add( newNode );
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

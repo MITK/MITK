@@ -48,13 +48,13 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_InputWorldGeometry( NULL ),
   m_CreatedWorldGeometry( NULL ), 
   m_ViewDirection( Transversal ),
+  m_Renderer( NULL ),
   m_Top( false ),
   m_FrontSide( false ),
   m_Rotated( false ),
   m_BlockUpdate( false ),
   m_SliceLocked( false ),
-  m_SliceRotationLocked( false ),
-  m_Renderer( NULL )
+  m_SliceRotationLocked( false )
 {
   typedef itk::SimpleMemberCommand< SliceNavigationController > SNCCommandType;
   SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;

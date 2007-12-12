@@ -1207,6 +1207,7 @@
     <function>Initialize()</function>
     <function>InitializeFunctionality()</function>
     <function>InitializeQfm()</function>
+    <function>RaiseDialogBars()</function>
     <function returnType="QmitkStdMultiWidget *">GetMultiWidget()</function>
     <function>parseCommandLine()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>

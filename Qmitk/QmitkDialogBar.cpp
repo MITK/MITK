@@ -44,6 +44,8 @@ QmitkDialogBar
 ::CreateControlWidget( QWidget *parent )
 {
   m_GroupBox = new QGroupBox( parent );
+  m_GroupBox->setHidden( true );
+
   m_GroupBox->setColumnLayout( 0, Qt::Vertical );
   m_GroupBox->layout()->setSpacing( 6 );
   m_GroupBox->setMargin( 11 );

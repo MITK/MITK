@@ -277,7 +277,7 @@ namespace mitk
         return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<mitk::Image*>(node->GetData() )                            // data is an image
                  && (dynamic_cast<mitk::Image*>(node->GetData() )->GetDimension() == DIM)
-                 && (   node->GetProperty(m_PropertyName.c_str()).IsNull()    // there is a certain property
+                 && (   node->GetProperty(m_PropertyName.c_str()) == NULL    // there is a certain property
                     )
                 );
       }

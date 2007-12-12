@@ -98,7 +98,7 @@ namespace CommonFunctionality
       extrema[1] = 4096;
       MinMax<TImageType>(itkImage,extrema[0],extrema[1]);
 
-      mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetPropertyList()->GetProperty("levelwindow").GetPointer());
+      mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetPropertyList()->GetProperty("levelwindow"));
       if( levWinProp.IsNull() )
       {
         levWinProp = new mitk::LevelWindowProperty();

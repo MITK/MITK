@@ -184,7 +184,7 @@ void QmitkImageCropper::ImageSelectionChanged()
 }
 
 
-void QmitkImageCropper::SurroundingCheck(bool value)
+void QmitkImageCropper::SurroundingCheck(bool /*value*/)
 {
   m_IteratorToImageToCrop = m_Controls->selectedImage();
 
@@ -332,11 +332,11 @@ void QmitkImageCropper::AddSurrounding( itk::Image< TPixel, VImageDimension >* i
   progress->setCaption("Image cropper");
   progress->show();
 
-  for (int i=0;i<size[0];i++)	
+  for (unsigned int i=0;i<size[0];i++)	
   {
-    for (int j=0;j<size[1];j++)
+    for (unsigned int j=0;j<size[1];j++)
     {
-      for (int k=0;k<size[2];k++)
+      for (unsigned int k=0;k<size[2];k++)
       {		    
         idx[0]=i;
         idx[1]=j;

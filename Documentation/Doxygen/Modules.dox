@@ -100,7 +100,7 @@
 /**
   \defgroup Reliver Classes related to SliceBasedSegmentation
 
-  \brief A couple of classes related to SliceBasedSegmentation.
+  \brief ReLiver specific classes
 */
 
 

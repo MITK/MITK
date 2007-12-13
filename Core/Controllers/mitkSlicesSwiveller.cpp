@@ -312,8 +312,8 @@ bool SlicesSwiveller
       SNCVector::iterator iter;
       for ( iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter )
       {
-        //unsigned int slice = (*iter)->GetSlice()->GetPos();
-        //unsigned int time  = (*iter)->GetTime()->GetPos();
+        unsigned int slice = (*iter)->GetSlice()->GetPos();
+        unsigned int time  = (*iter)->GetTime()->GetPos();
         
         const PlaneGeometry *planeGeometry = (*iter)->GetCurrentPlaneGeometry();
         if ( !planeGeometry ) continue;

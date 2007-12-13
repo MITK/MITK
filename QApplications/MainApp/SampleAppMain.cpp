@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
     */
     //vtkMapper::GlobalImmediateModeRenderingOn();
     mainWindow.showMaximized();
+    mainWindow.RaiseDialogBars();
     if(enableFunctionalityTesting) {
       std::cout.setf(std::ios_base::unitbuf);
       return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator());

@@ -176,10 +176,10 @@ void QmitkPointListWidget::RemoveInteraction()
   
 }
 
-void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
+void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor* sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
 {
   mitk::PointSet::Pointer pointset;
-  if ((*sop).IsNull())
+  if (sop == NULL)
   {
     //new layer property
     mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
@@ -204,9 +204,9 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
     //declaring a new Interactor
     if (numberOfPoints!=UNLIMITED)//limited number of points
-      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode, numberOfPoints);
+      sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode, numberOfPoints);
     else   //unlimited number of points
-      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode);
+      sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode);
 
     //datatreenode: and give set the data, layer and Interactor
     dataTreeNode->SetData(pointset);
@@ -224,7 +224,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     dataTreeNode->SetProperty("label",label);
     // }
 
-    dataTreeNode->SetInteractor(*sop);
+    dataTreeNode->SetInteractor(sop);
     dataTreeNode->SetProperty("name", label); /// name is identical with label????
     *node = dataTreeNode;
 
@@ -249,7 +249,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   m_CurrentObserverID = pointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
 
   //new Interactor
-  m_CurrentInteraction = *sop;
+  m_CurrentInteraction = sop;
   prefix= l;
   m_DatatreeNode= *node;
   //tell the global Interactor, that there is another one to ask if it can handle the event
@@ -257,9 +257,9 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   ItemsOfListUpdate();
 }
 
-void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int itkNotUsed(numberOfPoints), mitk::Point3D c, std::string l )
+void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor* sop, mitk::DataTreeNode::Pointer * node, int itkNotUsed(numberOfPoints), mitk::Point3D c, std::string l )
 {
-  if ((*sop).IsNull())
+  if (sop == NULL)
   {
     //new layer property
     std::cout << "creating polygon interactor ..." << std::endl;
@@ -279,7 +279,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     //then crate a TreeNode, to connect the data to...
     mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
-    *sop = mitk::PolygonInteractor::New("polygoninteractor", dataTreeNode);
+    sop = mitk::PolygonInteractor::New("polygoninteractor", dataTreeNode);
 
 
     //datatreenode: and give set the data, layer and Interactor
@@ -289,7 +289,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     //dataTreeNode->SetProperty("contour",contour);
     //dataTreeNode->SetProperty("close",close);
     dataTreeNode->SetProperty("label",label);
-    dataTreeNode->SetInteractor(*sop);
+    dataTreeNode->SetInteractor(sop);
     dataTreeNode->SetProperty("name", name); /// name is identical with label????
     *node = dataTreeNode;
 
@@ -305,7 +305,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
   }
 
   //new Interactor
-  m_CurrentPolygonInteraction = *sop;
+  m_CurrentPolygonInteraction = sop;
   prefix= l;
   m_DatatreeNode= *node;
   //tell the global Interactor, that there is another one to ask if it can handle the event

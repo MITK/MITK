@@ -245,7 +245,7 @@ void QmitkDisplayPointSetComponent::CreatePointSetNode()
         mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
         m_PointSetInteractor = mitk::DisplayPointSetInteractor::New("pointsetinteractor", m_PointSetNode, 2);
         m_PointSetInteractor->DebugOn();
-        m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction((mitk::PointSetInteractor::Pointer*) &m_PointSetInteractor, &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
+        m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction((mitk::PointSetInteractor*) m_PointSetInteractor.GetPointer(), &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
         m_PointSetNode->SetProperty("color",color);
         m_PointSetNode->SetInteractor(m_PointSetInteractor);
         m_PointSetNode->SetIntProperty("layer", 101);

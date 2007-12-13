@@ -48,7 +48,7 @@ public:
 
   //##Documentation
   //## @brief Set the BaseRenderer to be controlled by this vtk-based camera controller
-  virtual bool SetRenderer(mitk::BaseRenderer* renderer);
+  virtual void SetRenderer(const mitk::BaseRenderer* renderer);
 
 protected:
   /**

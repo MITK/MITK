@@ -220,12 +220,10 @@ void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 #else
     m_VtkInteractor->InteractorStyle->OnChar(ctrl, shift, (char)ke->ascii(), ke->count());
 #endif
-
   }
-
 }
 
-bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* renderer)
+void mitk::VtkInteractorCameraController::SetRenderer(const mitk::BaseRenderer* renderer)
 {
   Superclass::SetRenderer(renderer);
   if (renderer)
@@ -241,7 +239,7 @@ bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* render
       windowInteractor->SetMitkRenderer(const_cast<mitk::BaseRenderer*>(this->GetRenderer()));
     }
     m_VtkInteractor->Initialize();
-    mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
+    const mitk::OpenGLRenderer* glRenderer = dynamic_cast<const mitk::OpenGLRenderer*>(renderer);
     if (glRenderer)
     {
       m_VtkInteractor->SetRenderWindow(glRenderer->GetVtkRenderWindow());
@@ -249,10 +247,10 @@ bool mitk::VtkInteractorCameraController::SetRenderer(mitk::BaseRenderer* render
     }
   else
   {
+    m_VtkInteractor->SetRenderWindow(NULL);
     m_VtkInteractor->Delete();
     m_VtkInteractor = NULL;
   }
-  return true;
 }
 
 vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor()

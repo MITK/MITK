@@ -319,7 +319,6 @@ public:
     }
   }
 
-
   virtual void TreeChanged(const itk::EventObject &)
   {
     mitk::Image* image = NULL;
@@ -333,7 +332,6 @@ public:
       m_TimeSelector->SetInput(image);
     }
   }
-
 
   mitk::Image* GetImageFromDataTree()
   {
@@ -871,6 +869,12 @@ void QmitkMainTemplate::Initialize()
   }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
+  // Pass global options to all available dialog bars (other than
+  // functionalities, dialog bars currently store their options
+  // (enabled/disabled state and potentially other options) in the
+  // global options list).
+  qfm->ApplyOptionsToDialogBars( m_Options );
+
   // initialize multiwidget with options
   // gradient background
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background") );
@@ -920,21 +924,6 @@ void QmitkMainTemplate::Initialize()
     );
 
   m_MultiWidget->EnableNavigationControllerEventListening();
-}
-
-
-/** \brief Activates all DialogBars which are specified in the global options
- */
-void QmitkMainTemplate::RaiseDialogBars()
-{
-  if ( m_Options.IsNotNull() )
-  {
-    // Pass global options to all available dialog bars (other than
-    // functionalities, dialog bars currently store their options
-    // (enabled/disabled state and potentially other options) in the
-    // global options list).
-    qfm->ApplyOptionsToDialogBars( m_Options );
-  }
 }
 
 

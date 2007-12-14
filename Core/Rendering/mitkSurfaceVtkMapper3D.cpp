@@ -177,6 +177,10 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     property->SetDiffuse( 1.0f );
     property->SetSpecular( 0.0f );
     property->SetSpecularPower( 1.0f );
+
+    int lineWidth = 0;
+    this->GetDataTreeNode()->GetIntProperty("wireframe line width", lineWidth);
+    m_Actor->GetProperty()->SetLineWidth( lineWidth );
   }
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
@@ -210,10 +214,6 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   bool scalarVisibility = false;
   this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
   m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
-
-  int lineWidth = 0;
-  this->GetDataTreeNode()->GetIntProperty("line width", lineWidth);
-  m_Actor->GetProperty()->SetLineWidth( lineWidth );
 
   if(scalarVisibility)
   {

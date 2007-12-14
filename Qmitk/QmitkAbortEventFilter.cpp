@@ -177,15 +177,18 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         if(m_ButtonPressed)
         {
         //std::cout << "#MM2 "<<std::endl;
-          mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
-          mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", new mitk::BoolProperty(true));
-          mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet = 
-              dataStorage->GetSubset( VolRenTurnedOn );
-          if ( VolRenSet->Size() > 0 )
+          try
           {
-            mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+            mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
+            mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", new mitk::BoolProperty(true));
+            mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet = 
+                dataStorage->GetSubset( VolRenTurnedOn );
+            if ( VolRenSet->Size() > 0 )
+            {
+              mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+            }
           }
-          
+          catch(...){}
         }
         return false;
       }

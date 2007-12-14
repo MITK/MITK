@@ -587,7 +587,7 @@ void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
   mitkWidget4->GetRenderer()->SetData(it);
 }
 
-void QmitkStdMultiWidget::Fit()
+void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
 {
   vtkRenderer * vtkrenderer;
   mitkWidget1->GetRenderer()->GetDisplayGeometry()->Fit();
@@ -597,21 +597,59 @@ void QmitkStdMultiWidget::Fit()
 
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
+
+  vtkFloatingPointType bounds[6];
+  if(boundingBox != NULL)
+  {
+    mitk::BoundingBox::BoundsArrayType tmp = boundingBox->GetBounds();
+    bounds[0] = tmp[0];
+    bounds[1] = tmp[1];
+    bounds[2] = tmp[2];
+    bounds[3] = tmp[3];
+    bounds[4] = tmp[4];
+    bounds[5] = tmp[5];
+  }
+
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))
     ->GetVtkRenderer();
-  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
+  if ( vtkrenderer!=NULL )
+  {
+    if(boundingBox == NULL)
+      vtkrenderer->ResetCamera();
+    else
+      vtkrenderer->ResetCamera(bounds);
+  }
+
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))
     ->GetVtkRenderer();
+  if ( vtkrenderer!=NULL )
+  {
+    if(boundingBox == NULL)
+      vtkrenderer->ResetCamera();
+    else
+      vtkrenderer->ResetCamera(bounds);
+  }
 
-  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))
     ->GetVtkRenderer();
+  if ( vtkrenderer!=NULL )
+  {
+    if(boundingBox == NULL)
+      vtkrenderer->ResetCamera();
+    else
+      vtkrenderer->ResetCamera(bounds);
+  }
 
-  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))
     ->GetVtkRenderer();
+  if ( vtkrenderer!=NULL )
+  {
+    if(boundingBox == NULL)
+      vtkrenderer->ResetCamera();
+    else
+      vtkrenderer->ResetCamera(bounds);
+  }
 
-  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
@@ -803,11 +841,8 @@ bool QmitkStdMultiWidget::InitializeStandardViews(
         // Tell observers that views are initialized now
         emit ViewsInitialized();
 
-        // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
-        // that Fit() resets the camera according to the new geometry.
-        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        this->Fit();
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+        this->Fit(geometry->GetBoundingBox());
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }
@@ -871,11 +906,8 @@ bool QmitkStdMultiWidget
       clonedgeometry.GetPointer());
     timeNavigationController->Update();
     
-    // Temporary solution: Use ForceImmediateUpdate instead of RequestUpdate so
-    // that Fit() resets the camera according to the new geometry.
-    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    this->Fit();
+    this->Fit(geometry->GetBoundingBox());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     boundingBoxInitialized=true;
   }

@@ -211,6 +211,10 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
   m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
 
+  int lineWidth = 0;
+  this->GetDataTreeNode()->GetIntProperty("line width", lineWidth);
+  m_Actor->GetProperty()->SetLineWidth( lineWidth );
+
   if(scalarVisibility)
   {
     mitk::VtkScalarModeProperty* scalarMode;

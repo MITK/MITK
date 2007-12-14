@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkExtractImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkITKImageImport.h"
 
 #include <itkExtractImageFilter.h>
 
@@ -106,9 +107,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
 
   // re-import to MITK
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
-  resultImage->InitializeByItk( slice.GetPointer() );
-  resultImage->SetImportVolume( slice->GetBufferPointer(), 0, 0, Image::ManageMemory );
-  slice->GetPixelContainer()->ContainerManageMemoryOff(); 
+  GrabItkImageMemory(slice, resultImage, NULL, false);
   // set a nice geometry for display and point transformations
   itk::Point< float, VImageDimension > origin;
   itkImage->TransformIndexToPhysicalPoint( inSliceRegion.GetIndex(), origin );

@@ -144,4 +144,42 @@ mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, co
   return importer->GetOutput();
 }
 
+template <typename ItkOutputImageType> 
+mitk::Image::Pointer mitk::GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
+{
+  mitk::Image::Pointer resultImage;
+  if(mitkImage != NULL)
+  {
+    resultImage = mitkImage;
+  }
+  else
+  {
+    resultImage = mitk::Image::New();
+  }
+  resultImage->InitializeByItk( itkimage.GetPointer() );
+  resultImage->SetImportVolume( itkimage->GetBufferPointer(), 0, 0,
+    Image::ManageMemory );
+  itkimage->GetPixelContainer()->ContainerManageMemoryOff();
+  return resultImage;
+}
+
+template <typename ItkOutputImageType> 
+mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
+{
+  mitk::Image::Pointer resultImage;
+  if(mitkImage != NULL)
+  {
+    resultImage = mitkImage;
+  }
+  else
+  {
+    resultImage = mitk::Image::New();
+  }
+  resultImage->InitializeByItk( itkimage );
+  resultImage->SetImportVolume( itkimage->GetBufferPointer(), 0, 0,
+    Image::ManageMemory );
+  itkimage->GetPixelContainer()->ContainerManageMemoryOff();
+  return resultImage;
+}
+
 #endif //__mitkITKImageImport_txx

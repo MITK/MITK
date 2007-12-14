@@ -123,8 +123,43 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 //## need to make sure that Update() is called on the mitk::Image before
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
+//## \sa GrabItkImageMemory
 template <typename ItkOutputImageType> 
 Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry = NULL, bool update = true);
+
+//##Documentation
+//## @brief Grabs the memory of an itk::Image (with a specific type) 
+//## and puts it into an mitk::Image.
+//## @ingroup Adaptor
+//##
+//## The memory is managed by the mitk::Image after calling this
+//## function. The itk::Image remains valid until the mitk::Image  
+//## decides to free the memory.
+//## \param update: if \a true, fill mitk::Image, which will execute the
+//## up-stream pipeline connected to the input itk::Image. Otherwise you
+//## need to make sure that Update() is called on the mitk::Image before
+//## its data is being used, e.g., by connecting it to an mitk-pipeline
+//## and call Update of a downstream filter at some time.
+//## \sa ImportItkImage
+template <typename ItkOutputImageType> 
+Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
+
+//##Documentation
+//## @brief Grabs the memory of an itk::Image (with a specific type) 
+//## and puts it into an mitk::Image.
+//## @ingroup Adaptor
+//##
+//## The memory is managed by the mitk::Image after calling this
+//## function. The itk::Image remains valid until the mitk::Image  
+//## decides to free the memory.
+//## \param update: if \a true, fill mitk::Image, which will execute the
+//## up-stream pipeline connected to the input itk::Image. Otherwise you
+//## need to make sure that Update() is called on the mitk::Image before
+//## its data is being used, e.g., by connecting it to an mitk-pipeline
+//## and call Update of a downstream filter at some time.
+//## \sa ImportItkImage
+template <typename ItkOutputImageType> 
+Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
 
 } // namespace mitk
 

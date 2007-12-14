@@ -30,5 +30,20 @@ ccmake ../mitk</tt> (assuming you are still in the directory you did the checkou
 If you use Windows, then you just start the CMake GUI and enter the location of the source and of the binary tree. 
 CMake will create a Visual Studio solution in the root of your binary tree.
 
+Essential variables to configure are ITK_DIR and VTK_DIR. The demo application can only be built with Qt3, Qt4 is not supported yet. 
+If you 
+
 \note "Installing" MITK via cmake (or using "make install") is not yet supported. You can find the application in <tt>&lt;binary_dir&gt;/mitk/bin</tt> and the libraries in <tt>&lt;binary_dir&gt;/mitk/lib</tt>.
+
+\section Documentation
+
+If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get  a new project (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in the Documentation/Doxygen directory of your binary tree or in the MITK_DOXYGEN_OUTPUT_DIR if specified. See below.
+
+\section MITK specific configuration variables  
+ - \b USE_QT: this can be set to OFF to build only the Qt-independent classes of MITK
+ - \b MITK_BUILD_TUTORIAL: Build the tutorial applications (Step1 to n)
+ - \b MITK_CHILI_PLUGIN: MITK can be used for building plugins for the CHILI teleradiology application (<a href="http://www.chili-radiology.com/">CHILI GmbH Heidelberg</A>). You need the CHILI SDK for this. 
+ - \b MITK_DOXYGEN_OUTPUT_DIR: specify the directory where the doxygen documentation will we generated. 
+ - \b USE_ITKZLIB: This should be ON in nearly all cases.
+
 */

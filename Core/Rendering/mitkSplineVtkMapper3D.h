@@ -30,7 +30,7 @@ namespace mitk
   //## @brief Vtk-based mapper for Spline between points from PointSet
   //##
   //## properties looked for:
-  //## "linewidth" = with of the spline
+  //## "line width" = with of the spline
   //## @ingroup Mapper
 class SplineVtkMapper3D : public PointSetVtkMapper3D
 {

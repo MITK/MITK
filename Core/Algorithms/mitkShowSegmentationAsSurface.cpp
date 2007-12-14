@@ -144,7 +144,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     }
   
     m_Node->SetProperty("opacity", new FloatProperty(0.3) );
-    m_Node->SetProperty("linewidth", new IntProperty(1) );
+    m_Node->SetProperty("line width", new IntProperty(1) );
     m_Node->SetProperty("scalar visibility", new BoolProperty(false) );
     
     std::string uid = m_UIDGeneratorSurfaces.GetUID();

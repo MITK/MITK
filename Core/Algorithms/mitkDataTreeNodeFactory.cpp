@@ -764,7 +764,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "linewidth", new mitk::IntProperty(2) );
+  node->SetProperty( "line width", new mitk::IntProperty(2) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetProperty( "scalar visibility", new mitk::BoolProperty(false) );
@@ -802,7 +802,7 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
 
 void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "linewidth", new mitk::IntProperty(1) );
+  node->SetProperty( "line width", new mitk::IntProperty(1) );
   node->SetProperty( "layer", new mitk::IntProperty(0));
   node->SetProperty( "grid representation", new mitk::GridRepresentationProperty);
   node->SetProperty( "grid volume mapper", new mitk::GridVolumeMapperProperty);
@@ -903,7 +903,7 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
 
 void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "linewidth", new mitk::IntProperty(2) );
+  node->SetProperty( "line width", new mitk::IntProperty(2) );
   node->SetProperty( "layer", new mitk::IntProperty(1));
   node->SetProperty( "pointsize", new mitk::FloatProperty(1.0));
   node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));//yellow

@@ -84,7 +84,7 @@ void mitk::PointSetSliceMapper2D::GenerateData()
     m_Color = new mitk::ColorProperty(1.0f, 1.0f, 1.0f);
   }
   
-  if (!node->GetProperty(m_LineWidth, "linewidth"))
+  if (!node->GetProperty(m_LineWidth, "line width"))
   {
     m_LineWidth = new mitk::IntProperty(1);
   }

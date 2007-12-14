@@ -178,8 +178,8 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     property->SetSpecular( 0.0f );
     property->SetSpecularPower( 1.0f );
 
-    int lineWidth = 0;
-    this->GetDataTreeNode()->GetIntProperty("wireframe line width", lineWidth);
+    float lineWidth = 1;
+    this->GetDataTreeNode()->GetFloatProperty("wireframe line width", lineWidth);
     m_Actor->GetProperty()->SetLineWidth( lineWidth );
   }
 

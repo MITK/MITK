@@ -153,6 +153,23 @@ public:
   void ReplaceProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);
 
   //##Documentation
+  //## @brief Add the property (instance of BaseProperty) if it does 
+  //## not exist (or always if \a overwrite is \a true) 
+  //## with key @a propertyKey in the PropertyList 
+  //## of the @a renderer (if NULL, use BaseRenderer-independent 
+  //## PropertyList). This is set-by-value.
+  //##
+  //## For \a overwrite == \a false the property is \em not changed 
+  //## if it already exists. For \a overwrite == \a true the method 
+  //## is identical to SetProperty.
+  //##
+  //## @sa SetProperty
+  //## @sa GetProperty
+  //## @sa m_PropertyList
+  //## @sa m_MapOfPropertyLists
+  void AddProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+ 
+  //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
   //## NULL, the BaseRenderer-independent PropertyList of this DataTreeNode
   //## is returned. 

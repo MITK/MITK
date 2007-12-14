@@ -185,9 +185,35 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   return instance;
 }
 
-void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* /*node*/) 
+#include <mitkDataTreeNodeFactory.h>
+
+void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node) 
 {
-  // don't do anything. Implementation is in subclasses.
+  if(node==NULL)
+    return;
+
+  mitk::DataTreeNode::Pointer nodePointer = node;
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(image.IsNotNull())
+  {
+    mitk::ImageMapper2D::SetDefaultProperties(node);
+    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+  }
+
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+  if(surface.IsNotNull())
+  {
+    mitk::SurfaceMapper2D::SetDefaultProperties(node);
+    mitk::SurfaceVtkMapper3D::SetDefaultProperties(node);
+  }
+
+  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
+  if(pointSet.IsNotNull())
+  {
+    mitk::PointSetMapper2D::SetDefaultProperties(node);
+    mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
+  }
 }
 
 mitk::CoreObjectFactory::CoreObjectFactory() 

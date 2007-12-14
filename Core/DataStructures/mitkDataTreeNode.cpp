@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderWindow.h"
 #include "mitkGenericProperty.h"
 
+#include "mitkCoreObjectFactory.h"
+
 const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
 //##ModelId=3D6A0E8C02CC
@@ -74,6 +76,8 @@ void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 
     m_Mappers.clear();
     m_Mappers.resize(10);
+
+    mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
 
     m_DataReferenceChangedTime.Modified();
     Modified();
@@ -411,6 +415,17 @@ void mitk::DataTreeNode::ReplaceProperty(const char *propertyKey,
                                          const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->ReplaceProperty(propertyKey, propertyValue);
+}
+
+void mitk::DataTreeNode::AddProperty(const char *propertyKey, 
+                                     BaseProperty* propertyValue, 
+                                     const mitk::BaseRenderer* renderer,
+                                     bool overwrite)
+{
+  if((overwrite) || (GetProperty(propertyKey, renderer) == NULL))
+  {
+    SetProperty(propertyKey, propertyValue, renderer);
+  }
 }
 
 

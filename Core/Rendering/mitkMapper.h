@@ -106,7 +106,17 @@ public:
     //##Documentation
     virtual const std::string& GetXMLNodeName() const;
 
-  protected:
+    /** \brief Set default values of properties used by this mapper
+    * to \a node
+    *
+    * \param node The node for which the properties are set
+    * \param overwrite overwrite existing properties (default: \a false)
+    * \param renderer defines which property list of node is used 
+    * (default: \a NULL, i.e. default property list)
+    */
+    static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+protected:
     //##ModelId=3E3C337E0162
     Mapper();
 

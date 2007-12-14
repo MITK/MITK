@@ -67,26 +67,24 @@ public:
 
   itkGetMacro(GenerateNormals, bool);
 
-  //##ModelId=3E70F60301D5
   virtual const mitk::Surface* GetInput();
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
+
+  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
 protected:
-  //##ModelId=3E70F60301F4
   SurfaceVtkMapper3D();
 
-  //##ModelId=3E70F60301F5
   virtual ~SurfaceVtkMapper3D();
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   bool m_GenerateNormals;
 
-  //##ModelId=3E70F60301C9
   vtkActor* m_Actor;
 
-  //##ModelId=3E70F60301CA
   vtkPolyDataMapper* m_VtkPolyDataMapper;
 
   vtkPolyDataNormals* m_VtkPolyDataNormals;

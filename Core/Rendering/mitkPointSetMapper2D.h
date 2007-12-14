@@ -65,6 +65,8 @@ public:
 
   virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
+  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
 protected:
   PointSetMapper2D();
 

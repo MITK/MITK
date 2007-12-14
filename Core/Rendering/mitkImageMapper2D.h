@@ -186,6 +186,7 @@ public:
   /** \brief Release memory allocated for buffering */
   virtual void Clear();
 
+  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
   ImageMapper2D();

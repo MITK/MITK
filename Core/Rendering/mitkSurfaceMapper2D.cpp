@@ -364,3 +364,10 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   glEnd ();
   glLineWidth(1.0);
 }
+
+void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+{
+  node->AddProperty( "line width", new mitk::IntProperty(2), renderer, overwrite );
+  node->AddProperty( "scalar mode", new mitk::VtkScalarModeProperty, renderer, overwrite );
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
+}

@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkRenderWindow.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkDataTreeNodeFactory.h"
 
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
@@ -1098,3 +1099,43 @@ mitk::ImageMapper2D::RendererInfo
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 }
+
+void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+{
+  node->AddProperty( "opacity", new mitk::FloatProperty(1.0f), renderer, overwrite );
+  node->AddProperty( "color", new ColorProperty(1.0,1.0,1.0), renderer, overwrite );
+  node->AddProperty( "use color", new mitk::BoolProperty( true ), renderer, overwrite );
+  node->AddProperty( "binary", new mitk::BoolProperty( false ), renderer, overwrite );
+  node->AddProperty( "outline binary", new mitk::BoolProperty( false ), renderer, overwrite );
+  node->AddProperty( "texture interpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
+  node->AddProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty );
+  node->AddProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(image.IsNotNull())
+  {
+    if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
+    {
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetAuto( image );
+      levWinProp->SetLevelWindow( levelwindow );
+      node->SetProperty( "levelwindow", levWinProp, renderer );
+    }
+    if((overwrite) || (node->GetProperty("LookupTable", renderer)==NULL))
+    {
+      // add a default rainbow lookup table for color mapping
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+      vtkLut->SetHueRange(0.6667, 0.0);
+      vtkLut->SetTableRange(0.0, 20.0);
+      vtkLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+    }
+  }
+
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+

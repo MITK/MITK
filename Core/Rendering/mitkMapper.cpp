@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 #include "mitkDataTreeNode.h"
 #include "mitkBaseRenderer.h"
+#include "mitkProperties.h"
 
 const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
 
@@ -157,4 +158,11 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 const std::string& mitk::Mapper::GetXMLNodeName() const
 {
   return XML_NODE_NAME;
+}
+
+void mitk::Mapper::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+{
+  node->AddProperty( "visible", new mitk::BoolProperty(true), renderer, overwrite );
+  node->AddProperty( "layer", new mitk::IntProperty(0), renderer, overwrite);
+  node->AddProperty( "name", new mitk::StringProperty("No Name!"), renderer, overwrite );
 }

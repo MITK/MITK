@@ -16,15 +16,20 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkVolumeDataVtkMapper3D.h"
-#include "mitkLevelWindow.h"
+
 #include "mitkDataTreeNode.h"
+
 #include "mitkProperties.h"
+#include "mitkLevelWindow.h"
 #include "mitkColorProperty.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkTransferFunctionProperty.h"
+
+#include "mitkOpenGLRenderer.h"
 #include "mitkVtkRenderWindow.h"
 #include "mitkRenderingManager.h"
+
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -515,4 +520,55 @@ void mitk::VolumeDataVtkMapper3D::DelClippingPlane()
 void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
 {
 
+}
+
+void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+{
+  node->AddProperty( "volumerendering", new mitk::BoolProperty( false ), renderer, overwrite );
+  node->AddProperty( "binary", new mitk::BoolProperty( false ), renderer, overwrite );
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(image.IsNotNull())
+  {
+    if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
+    {
+      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetAuto( image );
+      levWinProp->SetLevelWindow( levelwindow );
+      node->SetProperty( "levelwindow", levWinProp, renderer );
+    }
+    if((overwrite) || (node->GetProperty("LookupTable", renderer)==NULL))
+    {
+      // add a default rainbow lookup table for color mapping
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+      vtkLut->SetHueRange(0.6667, 0.0);
+      vtkLut->SetTableRange(0.0, 20.0);
+      vtkLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+    }
+    if((overwrite) || (node->GetProperty("TransferFunction", renderer)==NULL))
+    {
+      // add a default transfer function
+      mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+      float m_Min = image->GetScalarValueMin();
+      float m_Max = image->GetScalarValueMax();
+      tf->GetScalarOpacityFunction()->Initialize();
+      tf->GetScalarOpacityFunction()->AddPoint ( m_Min, 0 );
+      tf->GetScalarOpacityFunction()->AddPoint ( m_Max, 1 );
+      tf->GetColorTransferFunction()->AddRGBPoint(m_Min,1,0,0);
+      tf->GetColorTransferFunction()->AddRGBPoint(m_Max,1,1,0);
+      tf->GetGradientOpacityFunction()->Initialize();
+      tf->GetGradientOpacityFunction()->AddPoint(m_Min,1.0);
+      tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
+      tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
+      tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);  
+      node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
+    }
+  }
+
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

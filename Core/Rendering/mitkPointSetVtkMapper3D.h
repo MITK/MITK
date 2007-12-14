@@ -78,6 +78,8 @@ public:
   virtual vtkProp* GetProp();
   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
 
+  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
 protected:
   PointSetVtkMapper3D();
 

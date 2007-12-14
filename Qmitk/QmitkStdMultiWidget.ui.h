@@ -589,6 +589,11 @@ void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
 
 void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
 {
+  mitkWidget1->GetRenderer()->UpdateIncludingVtkActors();
+  mitkWidget2->GetRenderer()->UpdateIncludingVtkActors();
+  mitkWidget3->GetRenderer()->UpdateIncludingVtkActors();
+  mitkWidget4->GetRenderer()->UpdateIncludingVtkActors();
+
   vtkRenderer * vtkrenderer;
   mitkWidget1->GetRenderer()->GetDisplayGeometry()->Fit();
   mitkWidget2->GetRenderer()->GetDisplayGeometry()->Fit();
@@ -841,7 +846,7 @@ bool QmitkStdMultiWidget::InitializeStandardViews(
         // Tell observers that views are initialized now
         emit ViewsInitialized();
 
-        this->Fit(geometry->GetBoundingBox());
+        this->Fit();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }

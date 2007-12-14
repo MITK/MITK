@@ -245,7 +245,13 @@ void QmitkDisplayPointSetComponent::CreatePointSetNode()
         mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
         m_PointSetInteractor = mitk::DisplayPointSetInteractor::New("pointsetinteractor", m_PointSetNode, 2);
         m_PointSetInteractor->DebugOn();
-        m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction((mitk::PointSetInteractor::Pointer*) &m_PointSetInteractor, &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
+        mitk::PointSetInteractor::Pointer tmpPointSetInteractor = m_PointSetInteractor.GetPointer(); // point list widget expects an mitk::PointSetInteractor::Pointer*, 
+                                                                                                     // not an mitk::DisplayPointSetInteractor::Pointer. Thus, an
+                                                                                                     // appropriate smart pointer is instantiated here. It seems that 
+                                                                                                     // the point list widget makes a copy of the smart pointer, so
+                                                                                                     // I think there should be no problem, when execution leaves the
+                                                                                                     // scope of tmpPointSetInteractor.
+        m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction(&tmpPointSetInteractor, &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
         m_PointSetNode->SetProperty("color",color);
         m_PointSetNode->SetInteractor(m_PointSetInteractor);
         m_PointSetNode->SetIntProperty("layer", 101);

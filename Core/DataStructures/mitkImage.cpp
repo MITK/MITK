@@ -863,7 +863,23 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   if(m_Dimension>=3)
     spacing[2]=spacinglist[2];
 
+  // access origin of vtkImage
+    Point3D origin;
+  vtkFloatingPointType vtkorigin[3];
+  vtkimagedata->GetOrigin(vtkorigin);
+  FillVector3D(origin, vtkorigin[0], 0.0, 0.0);
+  if(m_Dimension>=2)
+    origin[1]=vtkorigin[1];
+  if(m_Dimension>=3)
+    origin[2]=vtkorigin[2];
+
   SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+
+  // re-initialize PlaneGeometry with origin and direction
+  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(slicedGeometry->GetGeometry2D(0));
+  planeGeometry->SetOrigin(origin);
+
+  // re-initialize SlicedGeometry3D
   slicedGeometry->SetSpacing(spacing);
   GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
 

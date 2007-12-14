@@ -587,7 +587,7 @@ void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
   mitkWidget4->GetRenderer()->SetData(it);
 }
 
-void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
+void QmitkStdMultiWidget::Fit(const mitk::Geometry3D* geometry)
 {
   mitkWidget1->GetRenderer()->UpdateIncludingVtkActors();
   mitkWidget2->GetRenderer()->UpdateIncludingVtkActors();
@@ -604,9 +604,10 @@ void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
   vtkObject::GlobalWarningDisplayOff();
 
   vtkFloatingPointType bounds[6];
-  if(boundingBox != NULL)
+  mitk::BoundingBox::ConstPointer boundingBox;
+  if((geometry != NULL) && ((boundingBox=geometry->GetBoundingBox()).IsNotNull()))
   {
-    mitk::BoundingBox::BoundsArrayType tmp = boundingBox->GetBounds();
+    const mitk::BoundingBox::BoundsArrayType& tmp = boundingBox->GetBounds();
     bounds[0] = tmp[0];
     bounds[1] = tmp[1];
     bounds[2] = tmp[2];
@@ -619,7 +620,7 @@ void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
     ->GetVtkRenderer();
   if ( vtkrenderer!=NULL )
   {
-    if(boundingBox == NULL)
+    if(boundingBox.IsNull())
       vtkrenderer->ResetCamera();
     else
       vtkrenderer->ResetCamera(bounds);
@@ -629,7 +630,7 @@ void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
     ->GetVtkRenderer();
   if ( vtkrenderer!=NULL )
   {
-    if(boundingBox == NULL)
+    if(boundingBox.IsNull())
       vtkrenderer->ResetCamera();
     else
       vtkrenderer->ResetCamera(bounds);
@@ -639,7 +640,7 @@ void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
     ->GetVtkRenderer();
   if ( vtkrenderer!=NULL )
   {
-    if(boundingBox == NULL)
+    if(boundingBox.IsNull())
       vtkrenderer->ResetCamera();
     else
       vtkrenderer->ResetCamera(bounds);
@@ -649,7 +650,7 @@ void QmitkStdMultiWidget::Fit(const mitk::BoundingBox* boundingBox)
     ->GetVtkRenderer();
   if ( vtkrenderer!=NULL )
   {
-    if(boundingBox == NULL)
+    if(boundingBox.IsNull())
       vtkrenderer->ResetCamera();
     else
       vtkrenderer->ResetCamera(bounds);
@@ -910,8 +911,7 @@ bool QmitkStdMultiWidget
     timeNavigationController->SetInputWorldGeometry(
       clonedgeometry.GetPointer());
     timeNavigationController->Update();
-    
-    this->Fit(geometry->GetBoundingBox());
+    this->Fit(geometry);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     boundingBoxInitialized=true;

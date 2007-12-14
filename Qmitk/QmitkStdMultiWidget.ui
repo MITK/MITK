@@ -221,7 +221,7 @@
     <slot>changeLayoutTo2x2Dand3DWidget()</slot>
     <slot>changeLayoutToLeft2Dand3DRight2D()</slot>
     <slot>SetData( mitk::DataTreeIteratorBase * it )</slot>
-    <slot>Fit(const mitk::BoundingBox* boundingBox = NULL)</slot>
+    <slot>Fit(const mitk::Geometry3D* geometry = NULL)</slot>
     <slot>AddPositionTrackingPointSet( mitk::DataTreeIteratorBase * treeIterator )</slot>
     <slot>AddDisplayPlaneSubTree( mitk::DataTreeIteratorBase * it )</slot>
     <slot>EnableStandardLevelWindow()</slot>

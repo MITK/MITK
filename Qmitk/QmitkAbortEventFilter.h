@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobject.h>
 #include <utility>
 #include <queue>
+#include <iostream>
 
 class QmitkAbortEventFilter : public QObject
 {
@@ -51,5 +52,14 @@ private:
   EventQueue m_EventQueue;
 };
 
+class QmitkDebugEventFilter : public QObject
+{
+ protected:
+   bool eventFilter( QObject* object, QEvent* event )
+   {
+     std::cout << "event:" << event->type() << ( event->spontaneous() ? "true" : "false" ) << " / " << object->className() << " / " << object->name() << std::endl; 
+     return false;
+   }
+};
 
 #endif /* QMITKABORTEVENTFILTER_H_HEADER_INCLUDED_C135A197 */

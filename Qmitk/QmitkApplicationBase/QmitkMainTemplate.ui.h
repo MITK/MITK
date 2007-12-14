@@ -175,6 +175,9 @@ Tadaa
 #include <stdexcept>
 #include "mitkPACSPlugin.h"
 
+#include <QmitkAbortEventFilter.h>
+
+
 template <class T>
 static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &s, T /*dummy*/=0)
 {
@@ -920,6 +923,8 @@ void QmitkMainTemplate::Initialize()
     );
 
   m_MultiWidget->EnableNavigationControllerEventListening();
+
+  //qApp->installEventFilter( new QmitkDebugEventFilter );
 }
 
 
@@ -1545,7 +1550,6 @@ void QmitkMainTemplate::fileCloseProject()
   }
 }
 
-
 void QmitkMainTemplate::enableDepartmentLogo(bool enable)
 {
   if(enable)
@@ -1556,5 +1560,4 @@ void QmitkMainTemplate::enableDepartmentLogo(bool enable)
   {
     m_MultiWidget->DisableDepartmentLogo();
   }
-
 }

@@ -194,13 +194,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
           BaseRenderer *renderer = (*iter)->GetRenderer();
           DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
-          std::cout << i << ":" << std::endl;
+          // std::cout << i << ":" << std::endl;
 
           Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
           displayGeometry->Map( m_CenterOfRotation, point2DWorld );
           displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
-          std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
+          // std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
 
           const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
           const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
@@ -248,9 +248,9 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
           Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
           Vector2D origin = displayGeometry->GetOriginInMM();
-          std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
-          std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
-          std::cout << "  Origin - " << origin << std::endl;
+          // std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
+          // std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
+          // std::cout << "  Origin - " << origin << std::endl;
           ++i;
 
           displayGeometry->MoveBy( vector2DDisplayDiff );
@@ -258,7 +258,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
           (*iter)->SendCreatedWorldGeometryUpdate();
         }
       } 
-      std::cout << "--------------------------------" << std::endl;
+      // std::cout << "--------------------------------" << std::endl;
 
       
       

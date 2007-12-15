@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkScalarModeProperty.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPointData.h>

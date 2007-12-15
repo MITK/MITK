@@ -147,6 +147,9 @@ mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, co
 template <typename ItkOutputImageType> 
 mitk::Image::Pointer mitk::GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
 {
+  if(update)
+    itkimage->Update();
+
   mitk::Image::Pointer resultImage;
   if(mitkImage != NULL)
   {
@@ -160,12 +163,19 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(itk::SmartPointer<ItkOutputImageTy
   resultImage->SetImportVolume( itkimage->GetBufferPointer(), 0, 0,
     Image::ManageMemory );
   itkimage->GetPixelContainer()->ContainerManageMemoryOff();
+
+  if(geometry != NULL)
+    resultImage->SetGeometry(static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer()));
+
   return resultImage;
 }
 
 template <typename ItkOutputImageType> 
 mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
 {
+  if(update)
+    itkimage->Update();
+
   mitk::Image::Pointer resultImage;
   if(mitkImage != NULL)
   {
@@ -179,6 +189,10 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
   resultImage->SetImportVolume( itkimage->GetBufferPointer(), 0, 0,
     Image::ManageMemory );
   itkimage->GetPixelContainer()->ContainerManageMemoryOff();
+
+  if(geometry != NULL)
+    resultImage->SetGeometry(static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer()));
+
   return resultImage;
 }
 

@@ -224,18 +224,18 @@ void QmitkSliderNavigator::SetLabels()
   
   if ( m_HasLabelUnit )
   {
-    minText += " " + this->GetLabelUnit();
-    maxText += " " + this->GetLabelUnit();
+    minText += "&nbsp;" + this->GetLabelUnit();
+    maxText += "&nbsp;" + this->GetLabelUnit();
   }
 
   if ( m_MinValueValid )
   {
-    minText += "<br>(pos 0)";
+    minText += "<br>(pos&nbsp;0)";
   }
 
   if ( m_MaxValueValid )
   {
-    maxText += "<br>(pos " + QString::number( m_Stepper->GetSteps() - 1 ) + ")";
+    maxText += "<br>(pos&nbsp;" + QString::number( m_Stepper->GetSteps() - 1 ) + ")";
   }
 
   minText += "</font></p>";

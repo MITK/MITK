@@ -275,7 +275,14 @@ mitk::SlicedGeometry3D::InitializePlanes(
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  slices = static_cast< int >(directedExtent / viewSpacing + 0.5);
+  if ( directedExtent >= viewSpacing )
+  {
+    slices = static_cast< int >(directedExtent / viewSpacing + 0.5);
+  }
+  else
+  {
+    slices = 1;
+  }
 
   bool flipped = (top == false);
   
@@ -341,7 +348,14 @@ mitk::SlicedGeometry3D
     + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
-  m_Slices = static_cast< unsigned int >(directedExtent / spacing[2] + 0.5);
+  if ( directedExtent >= spacing[2] )
+  {
+    m_Slices = static_cast< unsigned int >(directedExtent / spacing[2] + 0.5);
+  }
+  else
+  {
+    m_Slices = 1;
+  }
 
   // The origin of our "first plane" needs to be adapted to this new extent.
   // To achieve this, we first calculate the current distance to the volume's

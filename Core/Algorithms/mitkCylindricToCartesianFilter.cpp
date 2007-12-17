@@ -118,10 +118,11 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue
 
       ztp=zt+z_start;
       fzp=fz+z_start;
-      step=*ztp;
 
       for(z=z_start;z<nz_size;++z, dp-=nxy_size)
       {
+        step=*(ztp++);
+
         register T *opt=op;
         opt+=step;
         f =*opt*f0;	++opt;
@@ -136,8 +137,6 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue
         ft+=*opt*f3;
 
         *dp=(T)((1-*fzp)*f+*fzp*ft+0.5);
-
-        step=*(++ztp);
       }
 
       dp+=nxy_size*nz_size;

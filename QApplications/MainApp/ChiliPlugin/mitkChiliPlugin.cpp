@@ -537,7 +537,7 @@ mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList(
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** This function Iterate over all texts of one series and save the text-properties to m_TextInformationList. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateTextForCompleteInformation( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateTextForCompleteInformation( int /* rows */, int /* row */, text_t *text, void *user_data )
 {
   mitk::ChiliPlugin* callingObject = static_cast<mitk::ChiliPlugin*>(user_data);
 
@@ -993,7 +993,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeri
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** This function iterate over all text-files from a series and save the text-path and text-oid to the m_TextFileList. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateToLoadAllText( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateToLoadAllText( int /* rows */, int /* row */, text_t *text, void *user_data )
 {
   //cast to chiliplugin to save the single textfileinformation
   ChiliPlugin* callingObject = static_cast<ChiliPlugin*>(user_data);
@@ -1092,7 +1092,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& m
   }
 
   //if there are no fileextension in the filename, the reader not able to load the file and the plugin crashed
-  if( fileName.find_last_of(".") == -1 )
+  if( fileName.find_last_of(".") == std::string::npos )
   {
     //if the user dont close chili, he can look at the file in the tempdirectory, therefore the file downloaded first and checked afterwards
     std::cout << "ChiliPlugin (LoadOneText): Reader not able to read file without extension.\nIf you dont close Chili you can find the file here: "<< pathAndFile <<"." << std::endl;
@@ -1488,7 +1488,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
           //ImageToPicDescriptor
           ImageToPicDescriptor::Pointer converterToDescriptor = ImageToPicDescriptor::New();
           //Input
-          LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<LevelWindowProperty*>( (*nodeIter)->GetProperty("levelwindow").GetPointer() );
+          LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<LevelWindowProperty*>( (*nodeIter)->GetProperty("levelwindow") );
           if( levelWindowProperty.IsNotNull() )
           {
             converterToDescriptor->SetLevelWindow( levelWindowProperty->GetLevelWindow() );
@@ -1743,7 +1743,7 @@ bool mitk::ChiliPlugin::CheckCurrentSeriesForRelation( const std::string& mitkHi
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 /** Iterate over all text and search for "ParentChild.xml", the function GetTextInformationList() dont return this one. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateTextForRelation( int rows, int row, text_t *text, void *user_data )
+ipBool_t mitk::ChiliPlugin::GlobalIterateTextForRelation( int /* rows */, int /* row */, text_t *text, void *user_data )
 {
   //cast to chiliplugin to save the single textfileinformation
   ChiliPlugin* callingObject = static_cast<ChiliPlugin*>(user_data);
@@ -1804,7 +1804,7 @@ void mitk::ChiliPlugin::AddVolumeToParentChild( std::list< std::string > mitkHid
     volumeCount++;
     //check if the ids from the newVolume alway exist in the saved volume
     TiXmlElement* singleID = singleVolume->FirstChildElement();
-    int idCount = 0;  //we have to count the ids, they can be different sized
+    unsigned int idCount = 0;  //we have to count the ids, they can be different sized
     bool match = true;
     while( singleID && match )
     {
@@ -1819,7 +1819,7 @@ void mitk::ChiliPlugin::AddVolumeToParentChild( std::list< std::string > mitkHid
         match = false;
     }
     //do we found a match?
-    if( match && idCount == newVolume.size() )
+    if( match && ( idCount == newVolume.size() ) )
     {
       //set the volumeDescription and dont create a new volume
       createNewVolume = false;
@@ -1900,7 +1900,7 @@ void mitk::ChiliPlugin::SaveRelationShip()
     {
       //searching for the "parent"-node
       std::list<ParentChildStruct>::iterator getParent = m_ParentChildList.begin();
-      for( getParent; getParent != m_ParentChildList.end(); getParent++ )
+      for( ; getParent != m_ParentChildList.end(); getParent++ )
       {
         if( getParent->Node == (*relationIter) )
           break;

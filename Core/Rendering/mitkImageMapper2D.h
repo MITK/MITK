@@ -43,7 +43,6 @@ class vtkPoints;
 
 namespace mitk {
 
-class RenderWindow;
 
 
 /** \brief Mapper to resample and display 2D slices of a 3D image.

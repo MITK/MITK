@@ -62,3 +62,4 @@ class vtkMitkRenderProp : public vtkProp
 
 
 #endif /* VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723 */
+

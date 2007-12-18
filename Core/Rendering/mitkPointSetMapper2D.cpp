@@ -454,6 +454,7 @@ void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk
   node->AddProperty( "line width", new mitk::IntProperty(2), renderer, overwrite );
   node->AddProperty( "pointsize", new mitk::FloatProperty(1.0), renderer, overwrite);
   node->AddProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
+  node->AddProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
   node->AddProperty( "contour", new mitk::BoolProperty(false), renderer, overwrite );
   node->AddProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "close", new mitk::BoolProperty(false), renderer, overwrite );

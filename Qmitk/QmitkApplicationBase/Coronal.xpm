@@ -1,5 +1,5 @@
 /* XPM */
-static char * Coronal_xpm[] = {
+static const char * Coronal_xpm[] = {
 "16 16 33 1",
 " 	c #FFFFFF",
 ".	c #D6D6D6",

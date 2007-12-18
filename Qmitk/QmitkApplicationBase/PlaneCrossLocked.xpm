@@ -1,5 +1,5 @@
 /* XPM */
-static char * PlaneCrossLocked_xpm[] = {
+static const char * PlaneCrossLocked_xpm[] = {
 "22 22 6 1",
 " 	c None",
 ".	c #02C01D",

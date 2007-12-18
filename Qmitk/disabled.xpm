@@ -1,5 +1,5 @@
 /* XPM */
-static char * disabled_xpm[] = {
+static const char * disabled_xpm[] = {
 "16 16 2 1",
 " 	c None",
 ".	c #FE0202",

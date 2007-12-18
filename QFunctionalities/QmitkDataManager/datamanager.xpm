@@ -1,5 +1,5 @@
 /* XPM */
-static char *datamanager_xpm[]={
+static const char *datamanager_xpm[]={
 "22 22 178 2",
 "Qt c None",
 ".t c #0032ab",

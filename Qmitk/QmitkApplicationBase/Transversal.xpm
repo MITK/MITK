@@ -1,5 +1,5 @@
 /* XPM */
-static char * Transversal_xpm[] = {
+static const char * Transversal_xpm[] = {
 "16 16 11 1",
 " 	c #FFFFFF",
 ".	c #C3C3C3",

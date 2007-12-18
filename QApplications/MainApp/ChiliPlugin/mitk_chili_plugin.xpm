@@ -1,5 +1,5 @@
 /* XPM */
-static char * mitk_chili_plugin_xpm[] = {
+static const char * mitk_chili_plugin_xpm[] = {
 "40 40 344 2",
 "  	c None",
 ". 	c #000000",

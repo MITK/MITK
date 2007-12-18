@@ -1,5 +1,5 @@
 /* XPM */
-static char * PlaneCrossMouse_xpm[] = {
+static const char * PlaneCrossMouse_xpm[] = {
 "22 22 26 1",
 " 	c None",
 ".	c #02C01D",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnThresholdImage_xpm[] = {
+static const char * btnThresholdImage_xpm[] = {
 "20 20 14 1",
 " 	c None",
 ".	c #000000",

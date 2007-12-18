@@ -1,5 +1,5 @@
 /* XPM */
-static char * isoSurface_xpm[] = {
+static const char * isoSurface_xpm[] = {
 "128 128 774 2",
 "  	c None",
 ". 	c #000000",

@@ -113,8 +113,8 @@ void QmitkRegionGrowing::Activated()
 
 void QmitkRegionGrowing::Deactivated()
 {
-  QmitkFunctionality::Deactivated();
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);
+  QmitkFunctionality::Deactivated();
 }
 
 void QmitkRegionGrowing::DoRegionGrowing()

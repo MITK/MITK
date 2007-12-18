@@ -113,8 +113,10 @@ void QmitkRegionGrowing::Activated()
 
 void QmitkRegionGrowing::Deactivated()
 {
+  QmitkFunctionality::Deactivated();
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);
 }
+
 void QmitkRegionGrowing::DoRegionGrowing()
 {
   const mitk::DataTreeIteratorClone* iterator = m_Controls->m_TreeNodeSelector->GetSelectedIterator(); // should never fail, the selection widget cares for that

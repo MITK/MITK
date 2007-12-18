@@ -20,7 +20,7 @@ SET(${KITNAME}_TESTS
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
   mitkImageDataItemTest.cpp
-  mitkImageMapper2DTest.cpp
+  # mitkImageMapper2DTest.cpp
   mitkImageTest.cpp
   mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
@@ -34,7 +34,7 @@ SET(${KITNAME}_TESTS
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPropertyListTest.cpp
-  mitkRenderWindowTest.cpp
+  # mitkRenderWindowTest.cpp
   mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp

@@ -50,6 +50,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register char *s = (char*) vtkImage->GetScalarPointer();
 		register char *a = (char*) malloc(sizeof(char)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( register unsigned int i = 0; i < vtkSize; i++ ) {
@@ -69,6 +74,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register char *s = (char*) vtkImage->GetScalarPointer();	
 		register char *a = (char*) malloc(sizeof(char)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -83,6 +93,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();	
 		register unsigned char *a = (unsigned char*) malloc(sizeof(unsigned char)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -97,6 +112,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register short *s = (short*) vtkImage->GetScalarPointer();	
 		register short *a = (short*) malloc(sizeof(short)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -111,6 +131,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register unsigned short *s = (unsigned short*) vtkImage->GetScalarPointer();	
 		register unsigned short *a = (unsigned short*) malloc(sizeof(unsigned short)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 
@@ -126,6 +151,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register int *s = (int*) vtkImage->GetScalarPointer();	
 		register int *a = (int*) malloc(sizeof(int)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -140,6 +170,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register unsigned int *s = (unsigned int*) vtkImage->GetScalarPointer();	
 		register unsigned int *a = (unsigned int*) malloc(sizeof(unsigned int)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -154,6 +189,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register long *s = (long*) vtkImage->GetScalarPointer();	
 		register long *a = (long*) malloc(sizeof(long)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -168,6 +208,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register unsigned long *s = (unsigned long*) vtkImage->GetScalarPointer();	
 		register unsigned long *a = (unsigned long*) malloc(sizeof(unsigned long)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -182,6 +227,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register float *s = (float*) vtkImage->GetScalarPointer();	
 		register float *a = (float*) malloc(sizeof(float)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 		for ( unsigned long i = 0; i < size; i++ )
@@ -196,6 +246,11 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 		register double *s = (double*) vtkImage->GetScalarPointer();	
 		register double *a = (double*) malloc(sizeof(double)* size);
+    if(a==NULL)
+    {
+      ipPicFree( pic );
+      return NULL;	
+    }
 		pic->data = a;
 
 

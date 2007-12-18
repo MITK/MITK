@@ -39,7 +39,8 @@ public:
     :m_ClassName( classname ),
      m_MaxWaitSeconds( maxWaitSeconds ),
      m_MessageBoxHelper( helper ),
-     m_FoundWidget(NULL)
+     m_FoundWidget(NULL),
+     m_Stop(false)
   {
   }
 
@@ -49,6 +50,13 @@ public:
 
     while (totalSeconds < m_MaxWaitSeconds)
     {
+      m_Mutex.lock();
+      if (m_Stop)
+      {
+        m_Mutex.unlock();
+        break;
+      }
+      m_Mutex.unlock();
       usleep( 500000 ); // _micro_ seconds
       totalSeconds += 0.5;
 
@@ -76,11 +84,20 @@ public:
     mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
   }
 
+  void StopThread()
+  {
+    m_Mutex.lock();
+    m_Stop = true;
+    m_Mutex.unlock();
+  }
+
 private:
   QString m_ClassName;
   int m_MaxWaitSeconds;
   QmitkMessageBoxHelper* m_MessageBoxHelper;
   QWidget* m_FoundWidget;
+  QMutex m_Mutex;
+  bool m_Stop;
 };
 
 
@@ -173,6 +190,14 @@ void QmitkMessageBoxHelper::WaitForDialogAndCallback( const char* classname, int
   m_DialogWaitingThread->start( QThread::LowPriority ); 
 }
 
+void QmitkMessageBoxHelper::StopWaitForDialogAndCallback()
+{
+  if(m_DialogWaitingThread)
+  {
+    m_DialogWaitingThread->StopThread();
+  }
+}
+
 void QmitkMessageBoxHelper::SetFoundDialog( QWidget* widget )
 {
   m_FoundDialog = widget;
@@ -186,6 +211,7 @@ void QmitkMessageBoxHelper::DialogFound(const itk::EventObject&)
 
   m_DialogWaitingThread->wait();
   delete m_DialogWaitingThread;
+  m_DialogWaitingThread = NULL;
 }
 
 void QmitkMessageBoxHelper::DialogNotFound(const itk::EventObject&)
@@ -194,6 +220,7 @@ void QmitkMessageBoxHelper::DialogNotFound(const itk::EventObject&)
 
   m_DialogWaitingThread->wait();
   delete m_DialogWaitingThread;
+  m_DialogWaitingThread = NULL;
 }
 
 QWidget* QmitkMessageBoxHelper::FindDialogItem(const char* widgetName, QWidget* parent)

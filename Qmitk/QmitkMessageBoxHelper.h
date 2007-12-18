@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qobject.h>
 #include <qtimer.h>
+#include <qmutex.h>
 
 #include <itkEventObject.h>
 
@@ -58,6 +59,11 @@ class QmitkMessageBoxHelper : public QObject
      * Has to be done threaded because there are modal dialogs that won't give back control until they are closed
      */
     void WaitForDialogAndCallback( const char* classname, int maxWaitSeconds = 10 );
+
+    /**
+     * Stops the thread which waits for a toplevel window (dialog).
+     */
+    void StopWaitForDialogAndCallback();
 
   protected:
 

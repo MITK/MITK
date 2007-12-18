@@ -1,5 +1,5 @@
 /* XPM */
-static char * 3D_xpm[] = {
+static const char * 3D_xpm[] = {
 "16 16 44 1",
 " 	c #FFFFFF",
 ".	c #EDEDED",

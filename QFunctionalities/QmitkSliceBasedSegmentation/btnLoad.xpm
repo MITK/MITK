@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnLoad_xpm[] = {
+static const char * btnLoad_xpm[] = {
 "15 12 3 1",
 " 	c None",
 ".	c #000000",

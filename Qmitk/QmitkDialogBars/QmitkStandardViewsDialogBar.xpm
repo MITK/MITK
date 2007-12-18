@@ -1,5 +1,5 @@
 /* XPM */
-static char * QmitkStandardViewsDialogBar_xpm[] = {
+static const char * QmitkStandardViewsDialogBar_xpm[] = {
 "22 22 5 1",
 " 	c None",
 ".	c #02C01D",

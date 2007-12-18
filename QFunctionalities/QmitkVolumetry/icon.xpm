@@ -1,5 +1,5 @@
 /* XPM */
-static char * volumetry_xpm[] = {
+static const char * volumetry_xpm[] = {
 "23 23 3 1",
 " 	c None",
 ".	c #000000",

@@ -1,5 +1,5 @@
 /* XPM */
-static char * Sagittal_xpm[] = {
+static const char * Sagittal_xpm[] = {
 "16 16 44 1",
 " 	c #FFFFFF",
 ".	c #C2C2C2",

@@ -656,10 +656,11 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, m
 {
   node->AddProperty( "line width", new mitk::IntProperty(2), renderer, overwrite );
   node->AddProperty( "pointsize", new mitk::FloatProperty(1.0), renderer, overwrite);
-  node->AddProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f), renderer, overwrite);//yellow
   node->AddProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
   node->AddProperty( "contour", new mitk::BoolProperty(false), renderer, overwrite );
   node->AddProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "contoursize", new mitk::FloatProperty(0.5), renderer, overwrite );
   node->AddProperty( "close", new mitk::BoolProperty(false), renderer, overwrite );
+  node->AddProperty( "show points", new mitk::BoolProperty(true), renderer, overwrite );
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

@@ -59,7 +59,7 @@ bool mitk::MovieGenerator::WriteMovie()
   bool ok = false;
   if (m_stepper)
   {
-    if (m_renderer) m_renderer->MakeCurrent();
+    if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();
     //m_stepper->First();
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
 
@@ -74,7 +74,7 @@ bool mitk::MovieGenerator::WriteMovie()
     GLbyte *data = new GLbyte[imgSize];
     for (unsigned int i=0; i<m_stepper->GetSteps(); i++)
     {
-      if (m_renderer) m_renderer->MakeCurrent();
+      if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();
       RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
       glReadPixels( 0, 0, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
       AddFrame( data );
@@ -90,7 +90,7 @@ bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
 {  
   if (m_renderer) 
   {
-    m_renderer->MakeCurrent();
+    m_renderer->GetRenderWindow()->MakeCurrent();
     
     if(!m_initialized)
     {

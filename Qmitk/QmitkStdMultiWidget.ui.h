@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry2DDataMapper2D.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkPositionEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkGlobalInteraction.h"
@@ -46,11 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void QmitkStdMultiWidget::init()
 { 
-  mitkWidget1->setPaletteBackgroundColor("red");
-  mitkWidget2->setPaletteBackgroundColor("green");
-  mitkWidget3->setPaletteBackgroundColor("blue");
-  mitkWidget4->setPaletteBackgroundColor("yellow");
-
+  
   planesIterator = NULL;
   m_PositionTracker = NULL;
 
@@ -60,46 +56,31 @@ void QmitkStdMultiWidget::init()
   mitk::DataTreeNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
 
-  // ... of widget 1
-  qcolor=mitkWidget1->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0;
-  color[1]=qcolor.green()/255.0;
-  color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(color);
+  // of widget 1
+  planeNode=mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(1.0,0.0,0.0);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
   // ... of widget 2
-  qcolor=mitkWidget2->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0;
-  color[1]=qcolor.green()/255.0;
-  color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(color);
+  planeNode=mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(0.0,1.0,0.0);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
   // ... of widget 3
-  qcolor=mitkWidget3->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0;
-  color[1]=qcolor.green()/255.0;
-  color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(color);
+  planeNode=mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(0.0,0.0,1.0);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
   // ... of widget 4
-  qcolor=mitkWidget4->paletteBackgroundColor();
-  color[0]=qcolor.red()/255.0;
-  color[1]=qcolor.green()/255.0; 
-  color[2]=qcolor.blue()/255.0;
-  planeNode=mitkWidget4->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(color);
+  planeNode=mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(1.0,1.0,0.0);
   layer = new mitk::IntProperty(1000);
   planeNode->SetProperty("layer",layer);
 
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 
@@ -135,7 +116,7 @@ void QmitkStdMultiWidget::init()
   timeNavigationController->ConnectGeometryTimeEvent(
     mitkWidget4->GetSliceNavigationController(), false);
   mitkWidget1->GetSliceNavigationController()
-    ->ConnectGeometrySendEvent(mitkWidget4->GetRenderer());
+    ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
   //reverse connection between sliceNavigationControllers and timeNavigationController
   mitkWidget1->GetSliceNavigationController()
@@ -159,44 +140,64 @@ void QmitkStdMultiWidget::init()
   // setup gradient background
   m_GradientBackground1 = mitk::GradientBackground::New();
   m_GradientBackground1->SetRenderWindow(
-    mitkWidget1->GetRenderer()->GetRenderWindow() );
+    mitkWidget1->GetRenderWindow() );
   m_GradientBackground1->Disable();
   
   m_GradientBackground2 = mitk::GradientBackground::New();
   m_GradientBackground2->SetRenderWindow( 
-    mitkWidget2->GetRenderer()->GetRenderWindow() );
+    mitkWidget2->GetRenderWindow() );
   m_GradientBackground2->Disable();
   
   m_GradientBackground3 = mitk::GradientBackground::New();
   m_GradientBackground3->SetRenderWindow( 
-    mitkWidget3->GetRenderer()->GetRenderWindow() );
+    mitkWidget3->GetRenderWindow() );
   m_GradientBackground3->Disable();
   
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
-    mitkWidget4->GetRenderer()->GetRenderWindow() );
+    mitkWidget4->GetRenderWindow() );
   m_GradientBackground4->SetGradientColors(0.0,0.1,0.3,0.7,0.7,0.8);
   m_GradientBackground4->Enable();
   // setup the department logo rendering
   m_LogoRendering1 = mitk::LogoRendering::New();
   m_LogoRendering1->SetRenderWindow(
-    mitkWidget1->GetRenderer()->GetRenderWindow() );
+    mitkWidget1->GetRenderWindow() );
   m_LogoRendering1->Disable();
 
   m_LogoRendering2 = mitk::LogoRendering::New();
   m_LogoRendering2->SetRenderWindow(
-    mitkWidget2->GetRenderer()->GetRenderWindow() );
+    mitkWidget2->GetRenderWindow() );
   m_LogoRendering2->Disable();
 
   m_LogoRendering3 = mitk::LogoRendering::New();
   m_LogoRendering3->SetRenderWindow(
-    mitkWidget3->GetRenderer()->GetRenderWindow() );
+    mitkWidget3->GetRenderWindow() );
   m_LogoRendering3->Disable();
   
   m_LogoRendering4 = mitk::LogoRendering::New();
   m_LogoRendering4->SetRenderWindow(
-    mitkWidget4->GetRenderer()->GetRenderWindow() );
+    mitkWidget4->GetRenderWindow() );
   m_LogoRendering4->Enable();
+
+  m_RectangleRendering1 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering1->SetRenderWindow(
+    mitkWidget1->GetRenderWindow() );
+  m_RectangleRendering1->Enable(1.0,0.0,0.0);
+  
+  m_RectangleRendering2 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering2->SetRenderWindow(
+    mitkWidget2->GetRenderWindow() );
+  m_RectangleRendering2->Enable(0.0,1.0,0.0);
+  
+  m_RectangleRendering3 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering3->SetRenderWindow(
+    mitkWidget3->GetRenderWindow() );
+  m_RectangleRendering3->Enable(0.0,0.0,1.0);
+  
+  m_RectangleRendering4 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering4->SetRenderWindow(
+    mitkWidget4->GetRenderWindow() );
+  m_RectangleRendering4->Enable(1.0,1.0,0.0);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -581,24 +582,19 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 
 void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
 {
-  mitkWidget1->GetRenderer()->SetData(it);
-  mitkWidget2->GetRenderer()->SetData(it);
-  mitkWidget3->GetRenderer()->SetData(it);
-  mitkWidget4->GetRenderer()->SetData(it);
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetData(it);
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetData(it);
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetData(it);
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetData(it);
 }
 
 void QmitkStdMultiWidget::Fit(const mitk::Geometry3D* geometry)
 {
-  mitkWidget1->GetRenderer()->UpdateIncludingVtkActors();
-  mitkWidget2->GetRenderer()->UpdateIncludingVtkActors();
-  mitkWidget3->GetRenderer()->UpdateIncludingVtkActors();
-  mitkWidget4->GetRenderer()->UpdateIncludingVtkActors();
-
   vtkRenderer * vtkrenderer;
-  mitkWidget1->GetRenderer()->GetDisplayGeometry()->Fit();
-  mitkWidget2->GetRenderer()->GetDisplayGeometry()->Fit();
-  mitkWidget3->GetRenderer()->GetDisplayGeometry()->Fit();
-  mitkWidget4->GetRenderer()->GetDisplayGeometry()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDisplayGeometry()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetDisplayGeometry()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetDisplayGeometry()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetDisplayGeometry()->Fit();
 
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
@@ -616,45 +612,17 @@ void QmitkStdMultiWidget::Fit(const mitk::Geometry3D* geometry)
     bounds[5] = tmp[5];
   }
 
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget1->GetRenderer()))
-    ->GetVtkRenderer();
-  if ( vtkrenderer!=NULL )
-  {
-    if(boundingBox.IsNull())
-      vtkrenderer->ResetCamera();
-    else
-      vtkrenderer->ResetCamera(bounds);
-  }
+  vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetVtkRenderer();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
 
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget2->GetRenderer()))
-    ->GetVtkRenderer();
-  if ( vtkrenderer!=NULL )
-  {
-    if(boundingBox.IsNull())
-      vtkrenderer->ResetCamera();
-    else
-      vtkrenderer->ResetCamera(bounds);
-  }
+  vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetVtkRenderer();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
 
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget3->GetRenderer()))
-    ->GetVtkRenderer();
-  if ( vtkrenderer!=NULL )
-  {
-    if(boundingBox.IsNull())
-      vtkrenderer->ResetCamera();
-    else
-      vtkrenderer->ResetCamera(bounds);
-  }
+  vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetVtkRenderer();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
 
-  vtkrenderer = ((mitk::OpenGLRenderer*)(mitkWidget4->GetRenderer()))
-    ->GetVtkRenderer();
-  if ( vtkrenderer!=NULL )
-  {
-    if(boundingBox.IsNull())
-      vtkrenderer->ResetCamera();
-    else
-      vtkrenderer->ResetCamera(bounds);
-  }
+  vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetVtkRenderer();
+  if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
 
   vtkObject::SetGlobalWarningDisplay(w);
 }
@@ -700,8 +668,8 @@ void QmitkStdMultiWidget
   mitk::Geometry2DDataMapper2D::Pointer mapper;
 
   // ... of widget 1
-  planeNode=mitkWidget1->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode=(mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget1Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
@@ -713,8 +681,8 @@ void QmitkStdMultiWidget
   mapper->SetDataIteratorToOtherGeometry2Ds(&childIterator);
 
   // ... of widget 2
-  planeNode=mitkWidget2->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode=(mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget2Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
@@ -725,8 +693,8 @@ void QmitkStdMultiWidget
   dit->Add(planeNode);
 
   // ... of widget 3
-  planeNode=mitkWidget3->GetRenderer()->GetCurrentWorldGeometry2DNode();
-  planeNode->SetColor(white, mitkWidget4->GetRenderer());
+  planeNode=(mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  planeNode->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   planeNode->SetProperty("visible", new mitk::BoolProperty(true));
   planeNode->SetProperty("name", new mitk::StringProperty("widget3Plane"));
   planeNode->SetProperty("includeInBoundingBox", new mitk::BoolProperty(false));
@@ -749,7 +717,7 @@ QmitkStdMultiWidget::GetTimeNavigationController()
 void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
-  mitk::DataTreeIteratorClone it = mitkWidget1->GetRenderer()->GetData();
+  mitk::DataTreeIteratorClone it = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetData();
   levelWindowWidget->setDataTree(dynamic_cast<mitk::DataTree*>(it->GetTree()));
   levelWindowWidget->show();
 }
@@ -922,18 +890,18 @@ bool QmitkStdMultiWidget
 
 void QmitkStdMultiWidget::RequestUpdate()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->RequestUpdate();
-  mitkWidget2->GetRenderer()->GetRenderWindow()->RequestUpdate();
-  mitkWidget3->GetRenderer()->GetRenderWindow()->RequestUpdate();
-  mitkWidget4->GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitkWidget1->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitkWidget2->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitkWidget3->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitkWidget4->GetRenderWindow());
 }
 
 void QmitkStdMultiWidget::ForceImmediateUpdate()
 {
-  mitkWidget1->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
-  mitkWidget2->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
-  mitkWidget3->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
-  mitkWidget4->GetRenderer()->GetRenderWindow()->ForceImmediateUpdate();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitkWidget1->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitkWidget2->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitkWidget3->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitkWidget4->GetRenderWindow());
 }
 
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
@@ -973,22 +941,22 @@ void QmitkStdMultiWidget::ReInitializeStandardViews()
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
 {
-  return mitkWidget1->GetRenderWindow();
+  return mitkWidget1;
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow2() const
 {
-  return mitkWidget2->GetRenderWindow();
+  return mitkWidget2;
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow3() const
 {
-  return mitkWidget3->GetRenderWindow();
+  return mitkWidget3;
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
 {
-  return mitkWidget4->GetRenderWindow();
+  return mitkWidget4;
 }
 
 const mitk::Point3D &
@@ -1095,7 +1063,7 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   // tell the slice navigation controllers to move there
 
   mitk::Point2D p2d;
-  mitk::PositionEvent event( mitkWidget1->GetRenderer(), 0, 0, 0, 
+  mitk::PositionEvent event( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()), 0, 0, 0, 
     mitk::Key_unknown, p2d, newPosition );
   mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
   mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
@@ -1134,11 +1102,11 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   
   // determine if cross is now out of display
   // if so, move the display window
-  EnsureDisplayContainsPoint( mitkWidget1->GetRenderer()
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())
     ->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitkWidget2->GetRenderer()
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())
     ->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitkWidget3->GetRenderer()
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())
     ->GetDisplayGeometry(), newPosition );
 
   // update displays

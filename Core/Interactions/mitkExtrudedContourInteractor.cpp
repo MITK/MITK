@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
-#include <mitkOpenGLRenderer.h>
+#include <mitkVtkPropRenderer.h>
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkVtkRepresentationProperty.h>
 
@@ -99,7 +99,7 @@ bool mitk::ExtrudedContourInteractor::ExecuteAction(mitk::Action* action, mitk::
   if(posEvent==NULL)
   {
     const mitk::DisplayPositionEvent* displayPosEvent = dynamic_cast<const mitk::DisplayPositionEvent*>(stateEvent->GetEvent());
-    mitk::OpenGLRenderer* sender = (mitk::OpenGLRenderer*) stateEvent->GetEvent()->GetSender();
+    mitk::VtkPropRenderer* sender = (mitk::VtkPropRenderer*) stateEvent->GetEvent()->GetSender();
 
     if((displayPosEvent == NULL) || (sender == NULL))
       return false;

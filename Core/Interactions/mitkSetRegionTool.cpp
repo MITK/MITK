@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ipSegmentation.h"
 
+#include "mitkBaseRenderer.h"
+
 mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
 :SegTool2D("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue),
@@ -188,7 +190,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
     
     SegTool2D::SetFeedbackContourVisible(true);
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
 
   // always generate a second contour, containing the whole image (used when CTRL is pressed)
@@ -212,7 +214,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
     
     SegTool2D::SetFeedbackContourVisible(true);
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
 
 
@@ -230,7 +232,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
   
@@ -274,7 +276,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
     // 6. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
   else
   {
@@ -302,14 +304,14 @@ bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateE
     // use contour extracted from image data
     if (m_SegmentationContourInWorldCoordinates.IsNotNull())
       SegTool2D::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   } 
   else
   {
     // use some artificial contour
     if (m_WholeImageContourInWorldCoordinates.IsNotNull())
       SegTool2D::SetFeedbackContour( *m_WholeImageContourInWorldCoordinates );
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
 
   m_StatusFillWholeSlice = !m_StatusFillWholeSlice;

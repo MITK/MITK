@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <vector>
 
+#include "QmitkRenderWindow.h"
 
 // itk includes
 #include <itkMinimumMaximumImageCalculator.h>
@@ -55,7 +56,6 @@ namespace mitk
 {
   class Surface;
   class Image;
-  class RenderWindow;
   class VesselTreeData;
 }
 
@@ -225,7 +225,7 @@ namespace CommonFunctionality
    *                     of the screen shot
    * @returns the filename of the saved file
    */
-  std::string SaveScreenshot( mitk::RenderWindow* renderWindow , const char* filename = NULL );
+  std::string SaveScreenshot( QmitkRenderWindow* renderWindow , const char* filename = NULL );
 
   void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
 

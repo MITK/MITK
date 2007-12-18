@@ -23,12 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkDataTreeNode.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkRenderWindow.h"
+
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkDataTreeNodeFactory.h"
 
@@ -99,6 +99,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   glLoadIdentity();
   glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
   glMatrixMode( GL_MODELVIEW );
+  glDepthMask(GL_FALSE);
 
   // Define clipping planes to clip the image according to the bounds
   // correlating to the current world geometry. The "extent" of the bounds
@@ -248,7 +249,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       // draw text
 
-      mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+      mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
 
       Point2D pt2D;
       pt2D[0] = x + (size / 9.0);
@@ -256,11 +257,11 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       displayGeometry->IndexToWorld( pt2D, pt2D );
       displayGeometry->WorldToDisplay( pt2D, pt2D );
 
-      OpenGLrenderer->WriteSimpleText( pt2D[0], pt2D[1], volumeString.str() );
+      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0], pt2D[1]);
     }
   }
 
-  glPushMatrix();
+  //glPushMatrix();
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
   glOrtho(
@@ -269,8 +270,9 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
     0.0, 1.0
   );
 
-  glMatrixMode( GL_MODELVIEW );
-  glPopMatrix();
+  glDepthMask(GL_TRUE);
+  //glMatrixMode( GL_MODELVIEW );
+  //glPopMatrix();
 }
 
 

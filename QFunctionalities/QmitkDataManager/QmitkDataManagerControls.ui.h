@@ -30,10 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkFocusManager.h>
 #include <mitkRenderingManager.h>
-#include <mitkRenderWindow.h>
 #include <mitkAffineInteractor.h>
 #include <QmitkSystemInfo.h>
 #include <mitkCoreObjectFactory.h>
+
+#include <mitkBaseRenderer.h>
+#include <vtkRenderWindow.h>
 
 #include <itkImage.h>
 
@@ -54,12 +56,25 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   // refill the combo boxes
   m_RenderWindowCombo->clear();
   m_RenderWindowComboMulti->clear();
-  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-  for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();iter++)
+  
+  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++)
   {
-    if ((*iter)->GetName())
+    if((*mapit).second->GetName())
     {
-      std::string winName((*iter)->GetName());
+      std::string winName((*mapit).second->GetName());
+      //  winName.erase(0,winName.find("::")+2);
+      m_RenderWindowCombo->insertItem(winName.c_str());
+      m_RenderWindowComboMulti->insertItem(winName.c_str());
+    }
+  }
+  
+  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++)
+  {
+    if( (*mapit).second->GetName())
+    {
+      std::string winName(((*mapit).second)->GetName());
       //  winName.erase(0,winName.find("::")+2);
       m_RenderWindowCombo->insertItem(winName.c_str());
       m_RenderWindowComboMulti->insertItem(winName.c_str());
@@ -67,7 +82,7 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   }
 
   // try to select focused RenderWindow
-  mitk::RenderWindow* focusedRenderWindow = NULL;
+  vtkRenderWindow* focusedRenderWindow = NULL;
 
   mitk::FocusManager* fm =
     mitk::GlobalInteraction::GetInstance()->GetFocusManager();
@@ -79,8 +94,9 @@ void QmitkDataManagerControls::UpdateRendererCombo()
 
   if (focusedRenderWindow)
   {
-    m_RenderWindowCombo->setCurrentText(focusedRenderWindow->GetName());
-    m_RenderWindowComboMulti->setCurrentText(focusedRenderWindow->GetName());
+    
+    m_RenderWindowCombo->setCurrentText(mitk::BaseRenderer::GetInstance(focusedRenderWindow)->GetName());
+    m_RenderWindowComboMulti->setCurrentText(mitk::BaseRenderer::GetInstance(focusedRenderWindow)->GetName());
   }
   else
   {
@@ -204,9 +220,10 @@ void QmitkDataManagerControls::RenderWindowSelected( int id )
   {
     int selectedItem = id;
     int itemNumber = -1;
-    const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-    mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-    for (iter = rws.begin();iter != rws.end();++iter)
+    
+    mitk::BaseRendererMapType::iterator mapit;  
+    for(mapit = mitk::baseRendererMap.begin(); 
+        mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
     {
       ++itemNumber;
       if(itemNumber==selectedItem)
@@ -274,10 +291,11 @@ void QmitkDataManagerControls::RendererChange()
     {
       if  (m_RenderWindowCombo->isEnabled())
       {
-        const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowCombo->currentText().ascii());
+        vtkRenderWindow* renWin =  mitk::BaseRenderer::GetRenderWindowByName( m_RenderWindowCombo->currentText().ascii());
+              
         if (renWin)
         {
-          m_NodePropertiesView->SetPropertyList(selectedNode->GetPropertyList(renWin->GetRenderer()));
+          m_NodePropertiesView->SetPropertyList(selectedNode->GetPropertyList(mitk::BaseRenderer::GetInstance(renWin)) );
         }
       }
       else
@@ -305,10 +323,10 @@ void QmitkDataManagerControls::RendererChangeMulti()
   mitk::BaseRenderer* renderer = NULL;
   if  (m_RenderWindowComboMulti->isEnabled())
   {
-    const mitk::RenderWindow* renWin =  mitk::RenderWindow::GetByName(m_RenderWindowComboMulti->currentText().ascii());
+    vtkRenderWindow* renWin =  mitk::BaseRenderer::GetRenderWindowByName(m_RenderWindowComboMulti->currentText().ascii());
     if (renWin)
     {
-      renderer = renWin->GetRenderer();
+      renderer = mitk::BaseRenderer::GetInstance(renWin);
     }
   }
   m_MultiNodePropertiesView->SetMultiMode(propNames, treeNodes, renderer);

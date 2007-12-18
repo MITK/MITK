@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKVTKLAYERCONTROLLER_H_HEADER_INCLUDED_C1EDO02D
 
 #include <vector>
-
+#include <map>
 class vtkRenderWindow;
 class vtkRenderer;
 
 namespace mitk 
 {
+
 
 /**
  * Manages the VTK layer hierarchy
@@ -40,6 +41,10 @@ class VtkLayerController
     VtkLayerController(vtkRenderWindow* renderWindow);
     ~VtkLayerController();
 
+    
+    static VtkLayerController* GetInstance(vtkRenderWindow* renWin);
+    static void AddInstance(vtkRenderWindow* renWin, vtkRenderer * mitkSceneRenderer);
+    static void RemoveInstance(vtkRenderWindow* renWin);
     
     /**
     * Returns the current vtkRenderer of the Scene

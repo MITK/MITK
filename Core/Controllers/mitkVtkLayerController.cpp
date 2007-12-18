@@ -23,6 +23,40 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRendererCollection.h>
 #include <algorithm>
 
+typedef std::map<const vtkRenderWindow*,mitk::VtkLayerController*> vtkLayerControllerMapType;
+static vtkLayerControllerMapType vtkLayerControllerMap;
+
+mitk::VtkLayerController * mitk::VtkLayerController::GetInstance(vtkRenderWindow* renWin)
+{
+  for(vtkLayerControllerMapType::iterator mapit = vtkLayerControllerMap.begin(); 
+      mapit != vtkLayerControllerMap.end(); mapit++)
+  {
+    if( (*mapit).first == renWin)
+      return (*mapit).second;
+
+  }
+  return NULL;
+}
+
+void  mitk::VtkLayerController::AddInstance(vtkRenderWindow* renWin, vtkRenderer * mitkSceneRenderer)
+{
+  // ensure that no vtkRenderWindow is managed twice
+  mitk::VtkLayerController::RemoveInstance(renWin);
+
+  // instanciate controller, add it to the map
+  mitk::VtkLayerController* ControllerInstance = new mitk::VtkLayerController(renWin);
+  ControllerInstance->InsertSceneRenderer(mitkSceneRenderer);
+
+  vtkLayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
+}     
+
+void  mitk::VtkLayerController::RemoveInstance(vtkRenderWindow* renWin)
+{
+  vtkLayerControllerMapType::iterator mapit = vtkLayerControllerMap.find(renWin);
+  if(mapit != vtkLayerControllerMap.end())
+    vtkLayerControllerMap.erase(mapit);
+}
+
 mitk::VtkLayerController::VtkLayerController(vtkRenderWindow* renderWindow)
 {
   m_RenderWindow = renderWindow;

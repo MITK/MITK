@@ -35,7 +35,7 @@ void QmitkSelectableGLWidget::init()
   rendererName += name();
 
   // create Renderer
-  m_Renderer= new mitk::OpenGLRenderer( rendererName ); 
+  m_Renderer= new mitk::VtkPropRenderer( rendererName ); 
 
   // create widget
   QString composedName("QSGLWt::");
@@ -50,14 +50,12 @@ void QmitkSelectableGLWidget::init()
   * QGL::Rgba enable use of rgba rather than color_index
   * QGL::StencilBuffer for use of stencilbuffer in OpenGL
   */
-  m_RenderWindow = new QmitkRenderWindow(
-    m_Renderer, QGLFormat( /*QGL::Rgba |*/ QGL::AlphaChannel ),
-    this, composedName
-  );
+  m_RenderWindow = new QmitkRenderWindow(m_Renderer,this, composedName);
+  
 }
 
 
-mitk::OpenGLRenderer* QmitkSelectableGLWidget::GetRenderer()
+mitk::VtkPropRenderer* QmitkSelectableGLWidget::GetRenderer()
 {
   return m_Renderer.GetPointer();
 }

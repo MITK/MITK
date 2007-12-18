@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
+#include "mitkProperties.h"
 #include <vtkProp3D.h>
+#include <vtkLODProp3D.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkLinearTransform.h>
@@ -49,6 +51,42 @@ void mitk::BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
   int timeStep = renderer->GetTimeStep(GetDataTreeNode()->GetData());
   vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(timeStep);
   m_Prop3D->SetUserTransform(vtktransform);
+}
+
+void mitk::BaseVtkMapper3D::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false) 
+    return;
+  
+  if(GetProp()->GetVisibility())
+    GetProp()->RenderOpaqueGeometry(renderer->GetVtkRenderer());
+}
+
+void mitk::BaseVtkMapper3D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false) 
+    return;
+  
+ /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
+  {
+    if(  dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->
+                                           GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
+         dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->
+                                           GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false)    
+       return;
+  }*/
+  
+   if(GetProp()->GetVisibility())
+    GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+}
+
+void mitk::BaseVtkMapper3D::MitkRenderOverlay(mitk::BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false) 
+    return;
+  
+  if(GetProp()->GetVisibility())
+    GetProp()->RenderOverlay(renderer->GetVtkRenderer());
 }
 
 void mitk::BaseVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)

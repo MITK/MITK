@@ -48,11 +48,11 @@ namespace mitk
 
     ////##Documentation
     ////## @brief returns the mitkRenderWindow in which the video is displayed.
-    mitk::RenderWindow* GetRenderWindow();
+    vtkRenderWindow* GetRenderWindow();
     ////##Documentation
     ////## @brief sets the mitkRenderWindow in which the video is displayed.
     ////## must be initialized before enabling the background.
-    void SetRenderWindow(const mitk::RenderWindow* renderWindow);
+    void SetRenderWindow(vtkRenderWindow* renderWindow);
     ////##Documentation
     ////## @brief sets the width,height and number of scalar components of the image.
     ////## must be correctly initialized before enabling the background.
@@ -86,7 +86,7 @@ namespace mitk
 
     void InitVtkImageImport();
 
-    const mitk::RenderWindow*   m_RenderWindow;
+    vtkRenderWindow*            m_RenderWindow;
     vtkRenderer*                m_ImageRenderer;
     vtkImageActor*              m_Actor;
     vtkImageImport*             m_VtkImageImport;

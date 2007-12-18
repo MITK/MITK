@@ -17,46 +17,56 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkRenderWindow.h"
-#include "mitkOpenGLRenderer.h"
-#include "mitkRenderWindow.h"
+
 #include <qcursor.h>
+#include <qlayout.h>
 #include "mitkDisplayPositionEvent.h"
 #include "QmitkRenderingManagerFactory.h"
+#include "mitkVtkLayerController.h"
+#include "mitkRenderingManager.h"
+#include "vtkRenderer.h"
 
-QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent, const char *name)
-  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), 
-    m_InResize(false), m_DrawOverlayOnly(false)
-{
-  this->InitRenderer();
-  setFocusPolicy(QWidget::StrongFocus);
-  setMouseTracking(true);
-}
-
-QmitkRenderWindow::QmitkRenderWindow(QGLFormat glf, QWidget *parent, const char *name)
-  : QGLWidget(glf, parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false), m_DrawOverlayOnly(false)
-
-{
-  this->InitRenderer();
-  setFocusPolicy(QWidget::StrongFocus);
-  setMouseTracking(true);
-}
 
 QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
-: QGLWidget(parent, name), mitk::RenderWindow(name, renderer), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false), m_DrawOverlayOnly(false)
+: QVTKWidget(parent, name)
 
 {
   this->InitRenderer();
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
+
+  m_InResize = false;
 }
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
-: QGLWidget(parent, name), mitk::RenderWindow(name, NULL), m_InitNeeded(false), m_ResizeNeeded(false), m_InResize(false), m_DrawOverlayOnly(false)
+: QVTKWidget(parent, name)
 
 {
-  this->InitRenderer();
+  if(m_Renderer.IsNull())
+  {
+    std::string rendererName(name);
+    m_Renderer = new mitk::VtkPropRenderer( rendererName.c_str(), GetRenderWindow());
+  }
+
+  m_Renderer->InitRenderer(this->GetRenderWindow());
+
+  mitk::BaseRenderer::AddInstance(GetRenderWindow(),m_Renderer);
+
+  mitk::RenderingManager::GetInstance()->AddRenderWindow(GetRenderWindow());
+
+  m_RenderProp = vtkMitkRenderProp::New();
+  m_RenderProp->SetPropRenderer(m_Renderer);
+  m_Renderer->GetVtkRenderer()->AddViewProp(m_RenderProp);
+  
+  if((this->GetRenderWindow()->GetSize()[0] > 10) 
+      && (this->GetRenderWindow()->GetSize()[1] > 10))
+    m_Renderer->InitSize(this->GetRenderWindow()->GetSize()[0], this->GetRenderWindow()->GetSize()[1]);
+
+  
   setFocusPolicy(QWidget::StrongFocus);
   setMouseTracking(true);
+
+  m_InResize = false;
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -64,121 +74,9 @@ QmitkRenderWindow::~QmitkRenderWindow()
 
 }
 
-void QmitkRenderWindow::InitRenderer()
-{
-  m_InitNeeded = true;
-  m_ResizeNeeded = true;
-
-  RenderWindow::InitRenderer();
-
-  this->setAutoBufferSwap( false );
-}
-bool QmitkRenderWindow::PrepareRendering()
-{
-  // Get the native window ID and pass it
-  // to the m_Renderer
-  // before we render for the first time...
-  if ( m_InitNeeded )
-  {
-    WId nId = winId();
-    this->SetWindowId( (void*) nId );
-    m_InitNeeded = false;
-  }
-
-  // rendering when not visible might cause serious problems (program may hang)
-  if ( QGLWidget::isVisible() )
-  {
-    if ( m_Renderer.IsNotNull() )
-    {
-      return true; // allow rendering
-    }
-  }
-  return false; // block rendering
-}
-
-/*!
-\brief Initialize the OpenGL Window
-*/
-void QmitkRenderWindow::initializeGL() 
-{
-  if(m_Renderer.IsNotNull())
-    m_Renderer->Initialize();
-}
-
-/*!
-\brief Resize the OpenGL Window
-*/
-void QmitkRenderWindow::resizeGL( int w, int h ) 
-{
-  if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
-    return;
-  m_InResize = true;
-
-  if(QGLWidget::isVisible())
-  {
-    if(m_Renderer.IsNotNull())
-    {
-      m_Renderer->Resize(w, h);
-    }
-
-    updateGL();
-  }
-  else
-  {
-    m_ResizeNeeded = true;
-  }
-
-  m_InResize = false;
-}
-
-/*!
-\brief Render the scene
-*/
-void QmitkRenderWindow::paintGL( )
-{
-  // Calls back to PrepareRendering()
-  m_Renderer->Render(m_DrawOverlayOnly);
-}
-
-void QmitkRenderWindow::showEvent ( QShowEvent * )
-{
-  // when the widget becomes visible the first time, we need to tell vtk the window size
-  if(m_ResizeNeeded)
-  {
-    m_ResizeNeeded=false;
-    if(m_Renderer.IsNotNull())
-      m_Renderer->InitSize(width(),height());
-  }
-}
-
-
-void QmitkRenderWindow::MakeCurrent()
-{
-  makeCurrent();
-}
-
-void QmitkRenderWindow::SwapBuffers() 
-{
-  swapBuffers();
-};
-
-bool QmitkRenderWindow::IsSharing () const
-{
-  return isSharing();
-}
-
-void QmitkRenderWindow::SetSize(int w, int h)
-{
-  if((w != width()) || (h != height()))
-  {
-    this->resize(w,h);
-  }
-  mitk::RenderWindow::SetSize(w,h);
-}
-
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
 {
-  QGLWidget::mousePressEvent(me);
+  QVTKWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
   {
     mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
@@ -189,7 +87,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
 {
-  QGLWidget::mouseReleaseEvent(me);
+  QVTKWidget::mouseReleaseEvent(me);
   if (m_Renderer.IsNotNull()) 
   {
     mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
@@ -200,7 +98,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
 {
-  QGLWidget::mouseMoveEvent(me);
+  QVTKWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
     mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
@@ -222,14 +120,31 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
-  we->ignore();
-  /*  QGLWidget::wheelEvent(we);
-  if (m_Renderer.IsNotNull())
-    m_Renderer->WheelEvent(we); */
+  QVTKWidget::wheelEvent(we);
+  
+  if ( GetSliceNavigationController()->GetSliceLocked() )
+    return;
+  
+  mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
+  
+  if (stepper->GetSteps() <= 1)
+  {
+    stepper = GetSliceNavigationController()->GetTime();
+  }
+
+  if (we->orientation() * we->delta()  > 0) 
+  {
+    stepper->Next();
+  }
+  else
+  {
+    stepper->Previous();
+  }
 }
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
 {
+  QVTKWidget::keyPressEvent(ke);
   if (m_Renderer.IsNotNull())
   {
     QPoint cp = mapFromGlobal(QCursor::pos());
@@ -240,29 +155,54 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   }
 }
 
-void QmitkRenderWindow::Repaint( bool onlyOverlay )
-{
-  m_DrawOverlayOnly = onlyOverlay;
-  repaint();
-}; 
-
-QSize QmitkRenderWindow::minimumSizeHint () const
-{
-  return QSize(100, 100);
+void QmitkRenderWindow::InitRenderer()
+{ 
 }
 
-QSizePolicy QmitkRenderWindow::sizePolicy() const
+void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
 {
-  return QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, 0, 0);
+   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
+    return;
+   m_InResize = true;
+
+  if(this->isVisible())
+  {
+    if(m_Renderer.IsNotNull())
+    {
+      m_Renderer->Resize(event->size().width(), event->size().height());
+    }
+
+    this->update();
+    //updateGL();
+  }
+  
+  m_InResize = false;
 }
 
-QSize QmitkRenderWindow::sizeHint () const 
+mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
 {
-  return QSize(100, 100);
+  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetSliceNavigationController();
+}
+mitk::CameraRotationController * QmitkRenderWindow::GetCameraRotationController()
+{
+  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetCameraRotationController();
 }
 
-void QmitkRenderWindow::focusInEvent(QFocusEvent*)  {};
-void QmitkRenderWindow::focusOutEvent(QFocusEvent*) {}; 
+mitk::BaseController * QmitkRenderWindow::GetController()
+{
+  mitk::BaseRenderer * renderer = mitk::BaseRenderer::GetInstance(GetRenderWindow());
+  switch ( renderer->GetMapperID() )
+  {
+    case mitk::BaseRenderer::Standard2D:
+      return GetSliceNavigationController();
+
+    case mitk::BaseRenderer::Standard3D:
+      return GetCameraRotationController();
+
+    default:
+      return GetSliceNavigationController();
+  }
+}
 
 // Create and register RenderingManagerFactory for this platform.
 QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
@@ -270,8 +210,8 @@ QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
 //We have to put this in a file containing a class that is directly used
 //somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 
 //it is removed by the linker. 
-#include "VtkQRenderWindowInteractor.h"
-VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
+//#include "VtkQRenderWindowInteractor.h"
+//VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
 
 #include "QmitkApplicationCursor.h"
 QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance

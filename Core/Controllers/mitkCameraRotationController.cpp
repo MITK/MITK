@@ -20,8 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <itkCommand.h>
 #include <vtkRenderer.h>
-#include "mitkRenderWindow.h"
-#include "mitkOpenGLRenderer.h"
+#include <vtkRenderWindow.h>
+
+#include "mitkVtkPropRenderer.h"
+#include "mitkRenderingManager.h"
 
 mitk::CameraRotationController::CameraRotationController(const char * type)
   : BaseController(type), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
@@ -53,20 +55,21 @@ void mitk::CameraRotationController::RotateCamera()
     int newStepperValue = m_Slice->GetPos();
     m_Camera->Azimuth( m_LastStepperValue - newStepperValue );
     m_LastStepperValue = newStepperValue;
-    const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!
+    //const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!
+    mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow);
     //m_MultiWidget->RequestUpdate();
   }
 }
 
 void mitk::CameraRotationController::AcquireCamera()
 {
-  BaseRenderer* renderer = m_RenderWindow->GetRenderer();
+  BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
 
-  const mitk::OpenGLRenderer *openGLRenderer = dynamic_cast<const mitk::OpenGLRenderer * >( renderer );
-  if (openGLRenderer) 
+  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
+  if (propRenderer) 
   { 
     // get vtk renderer
-    vtkRenderer* vtkrenderer = openGLRenderer->GetVtkRenderer();
+    vtkRenderer* vtkrenderer = propRenderer->GetVtkRenderer();
     if (vtkrenderer) 
     { 
       // get vtk camera

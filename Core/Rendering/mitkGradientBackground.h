@@ -27,6 +27,7 @@ class vtkActor;
 class vtkPolyDataMapper;
 class vtkLookupTable;
 class vtkPolyData;
+class vtkRenderWindow;
 
 namespace mitk {
 
@@ -52,13 +53,13 @@ public:
    * will be shown. Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetRenderWindow( mitk::RenderWindow* renderWindow );
+  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
 
   /**
    * Returns the vtkRenderWindow, which is used
    * for displaying the gradient background
    */
-  virtual mitk::RenderWindow* GetRenderWindow();
+  virtual vtkRenderWindow* GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
@@ -140,7 +141,7 @@ protected:
    */
   ~GradientBackground();
 
-  mitk::RenderWindow* m_RenderWindow;
+  vtkRenderWindow* m_RenderWindow;
 
   vtkRenderer* m_Renderer;
 

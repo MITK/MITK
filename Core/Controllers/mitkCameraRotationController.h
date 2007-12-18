@@ -22,11 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseController.h"
 
 class vtkCamera;
-
+class vtkRenderWindow;
 
 namespace mitk {
 
-class RenderWindow;
 
 class CameraRotationController : public BaseController
 {
@@ -37,8 +36,11 @@ public:
 
   void RotateCamera();
   void AcquireCamera();
-  itkSetMacro(RenderWindow, RenderWindow*);
-  itkGetConstMacro(RenderWindow, const RenderWindow*);
+
+  void SetRenderWindow(vtkRenderWindow * renWin)
+  {
+    m_RenderWindow = renWin;
+  }
 
   virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
@@ -49,7 +51,7 @@ protected:
 private:
   int m_LastStepperValue;
   vtkCamera* m_Camera;
-  const RenderWindow* m_RenderWindow;
+  vtkRenderWindow* m_RenderWindow;
 };
 
 }

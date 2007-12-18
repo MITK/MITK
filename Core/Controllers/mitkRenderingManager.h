@@ -28,7 +28,6 @@ class vtkRenderWindow;
 namespace mitk
 {
 
-class RenderWindow;
 class RenderingManager;
 class RenderingManagerFactory;
 
@@ -74,7 +73,7 @@ public:
 
   mitkClassMacro(RenderingManager,itk::Object);
 
-  typedef std::vector< RenderWindow* > RenderWindowVector;
+  typedef std::vector< vtkRenderWindow* > RenderWindowVector;
 
   static Pointer New();
 
@@ -97,25 +96,25 @@ public:
 
   /** Adds a RenderWindow. This is required if the methods #RequestUpdateAll
    * or #ForceImmediateUpdate are to be used. */
-  void AddRenderWindow( RenderWindow *renderWindow );
+  void AddRenderWindow( vtkRenderWindow *renderWindow );
 
   /** Removes a RenderWindow. */
-  void RemoveRenderWindow( RenderWindow *renderWindow );
+  void RemoveRenderWindow( vtkRenderWindow *renderWindow );
 
   /** Get a list of all registered RenderWindows */
   const RenderWindowVector& GetAllRegisteredRenderWindows();
 
-  RenderWindow* GetRenderWindowByName(const std::string&);
+  vtkRenderWindow* GetRenderWindowByName(const std::string&);
 
   /** Requests an update for the specified RenderWindow. The time of
    * execution usually depends on the specified minimum interval. */
-  void RequestUpdate( RenderWindow *renderWindow );
+  void RequestUpdate( vtkRenderWindow *renderWindow );
   
   /** Requests an update for the specified VtkRenderWindow. */
   void RequestUpdateVtkRenderWindow(vtkRenderWindow* renderwindow);
 
   /** Immediately executes an update of the specified RenderWindow. */
-  void ForceImmediateUpdate( RenderWindow *renderWindow );
+  void ForceImmediateUpdate( vtkRenderWindow *renderWindow );
 
   /** Requests all currently registered RenderWindows to be updated. */
   void RequestUpdateAll( bool includeVtkActors = false ); // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done
@@ -134,7 +133,7 @@ public:
   void ForceImmediateUpdateIncludingVtkActors();
   
   /** Requests an Overlay for the specified RenderWindow. */
-  void RequestOverlayUpdate( RenderWindow *renderWindow );
+  void RequestOverlayUpdate( vtkRenderWindow *renderWindow );
 
   /** Requests an overlay update all RenderWindows.*/
   void RequestOverlayUpdateAll();
@@ -154,7 +153,7 @@ public:
   virtual void UpdateCallback();
 
   bool IsRendering() const;
-  void AbortRendering( RenderWindow* renderWindow );
+  void AbortRendering( vtkRenderWindow* renderWindow );
 
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
@@ -201,14 +200,14 @@ protected:
   bool m_ClippingPlaneEnabled;
   std::vector<float> m_ShadingValues;
   
-  RenderWindow *m_LastUpdatedRW;
+  vtkRenderWindow *m_LastUpdatedRW;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
 
 private:
-  typedef std::map< RenderWindow *, int > RenderWindowList;
+  typedef std::map< vtkRenderWindow *, int > RenderWindowList;
 
   RenderWindowList m_RenderWindowList;
   RenderWindowList m_IsRendering;

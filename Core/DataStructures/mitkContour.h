@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
-#include "mitkRenderWindow.h"
+#include <vtkRenderWindow.h>
 
 #include <itkPolyLineParametricPath.h>
 
@@ -89,12 +89,12 @@ public:
   * set the current render window. This is helpful if one 
   * wants to draw the contour in one special window only.
   */
-  void SetCurrentWindow(mitk::RenderWindow* rw);
+  void SetCurrentWindow(vtkRenderWindow* rw);
 
   /**
   * returns the points to the current render window
   */
-  mitk::RenderWindow* GetCurrentWindow() const;
+  vtkRenderWindow* GetCurrentWindow() const;
 
   /**
   * returns the number of points stored in the contour
@@ -152,7 +152,7 @@ private:
   /**
   * the current render window
   */ 
-  mitk::RenderWindow* m_CurrentWindow;
+  vtkRenderWindow* m_CurrentWindow;
 
   /**
   * the bounding box of the contour

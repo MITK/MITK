@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStatusBar.h>
 #include <mitkPositionEvent.h>
 #include <vtkWorldPointPicker.h>
-#include <mitkOpenGLRenderer.h>
+
 
 mitk::GlobalInteraction::Pointer mitk::GlobalInteraction::s_GlobalInteraction(NULL);
 

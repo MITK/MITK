@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
 
 mitk::Mapper::Mapper()
-: m_TimeStep( 0 )
+  : m_TimeStep( 0 ), m_VtkBased( true )
 {
 
 }

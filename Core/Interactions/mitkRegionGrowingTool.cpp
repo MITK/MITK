@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
 
+#include "mitkBaseRenderer.h"
+#include "mitkRenderingManager.h"
+
 #include "ipSegmentation.h"
 
 #include "mitkRegionGrowingTool.xpm"
@@ -209,7 +212,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
 
       SegTool2D::SetFeedbackContour( *contourInWorldCoordinates );
       SegTool2D::SetFeedbackContourVisible(true);
-      positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+      mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       m_FillFeedbackContour = true;
     }
     else
@@ -288,7 +291,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
       // display the contour
       SegTool2D::SetFeedbackContourVisible(true);
-      positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+      mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
         
       m_FillFeedbackContour = true;
     }
@@ -328,7 +331,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         ipMITKSegmentationFree( result );
 
         // 3. Update the contour
-        positionEvent->GetSender()->GetRenderWindow()->ForceImmediateUpdate();
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
       }
     }
   }
@@ -383,7 +386,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         }
         
         SegTool2D::SetFeedbackContourVisible(false);
-        positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+        mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       }
     }
   }

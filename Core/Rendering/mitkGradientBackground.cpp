@@ -18,11 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGradientBackground.h"
 
 #include "mitkVtkLayerController.h"
-#include <mitkVtkRenderWindow.h>
-#include <mitkRenderWindow.h>
 
 
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkMapper.h>
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
@@ -113,7 +112,7 @@ mitk::GradientBackground::~GradientBackground()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::GradientBackground::SetRenderWindow( mitk::RenderWindow* renderWindow )
+void mitk::GradientBackground::SetRenderWindow( vtkRenderWindow * renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -122,7 +121,7 @@ void mitk::GradientBackground::SetRenderWindow( mitk::RenderWindow* renderWindow
  * Returns the vtkRenderWindow, which is used
  * for displaying the gradient background
  */
-mitk::RenderWindow* mitk::GradientBackground::GetRenderWindow()
+vtkRenderWindow* mitk::GradientBackground::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -184,7 +183,7 @@ void mitk::GradientBackground::SetLowerColor(double r, double g, double b )
  */
 void mitk::GradientBackground::Enable()
 {
-  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_Renderer,true);  
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertBackgroundRenderer(m_Renderer,true);
 }
 
 /**
@@ -195,8 +194,8 @@ void mitk::GradientBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
-    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_Renderer);
-  }
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_Renderer);
+  } 
 }
 
 
@@ -210,9 +209,8 @@ bool mitk::GradientBackground::IsEnabled()
     if ( m_RenderWindow == NULL )
         return false;
     else
-        return ( m_RenderWindow->GetVtkLayerController()->IsRendererInserted(m_Renderer));    
+        return ( mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_Renderer));
 }
-
 
 void mitk::GradientBackground::SetRequestedRegionToLargestPossibleRegion()
 {

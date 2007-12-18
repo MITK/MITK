@@ -69,13 +69,14 @@ void QmitkStandardViews::SetCameraController( mitk::CameraController * controlle
   m_CameraController = controller;
 }
 
-void QmitkStandardViews::SetCameraControllerFromRenderWindow( mitk::RenderWindow * window )
+void QmitkStandardViews::SetCameraControllerFromRenderWindow( vtkRenderWindow * window )
 {
   if ( window != NULL )
   {
-    if ( window->GetRenderer() != NULL )
-      if ( window->GetRenderer()->GetCameraController() != NULL )
-        m_CameraController = window->GetRenderer()->GetCameraController();
+    if ( mitk::BaseRenderer::GetInstance(window) != NULL )
+      if ( mitk::BaseRenderer::GetInstance(window)->GetCameraController() != NULL )
+        m_CameraController = mitk::BaseRenderer::GetInstance(window)->GetCameraController();
+    
   }
   else
   {

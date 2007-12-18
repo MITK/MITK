@@ -20,8 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNATIVERENDERWINDOWINTERACTOR_H_HEADER_INCLUDED_C1C53722
 
 #include "mitkCommon.h"
-#include "mitkRenderWindow.h"
+#include "itkObject.h"
+#include "itkObjectFactory.h"
 
+class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 
 namespace mitk
@@ -36,14 +38,14 @@ public:
 
   virtual void Start();
 
-  void SetMitkRenderWindow(RenderWindow* renderwindow);
-  itkGetMacro(MitkRenderWindow, RenderWindow*);
+  void SetMitkRenderWindow(vtkRenderWindow * renderwindow);
+  itkGetMacro(MitkRenderWindow, vtkRenderWindow*);
 
 protected:
   NativeRenderWindowInteractor();
   virtual ~NativeRenderWindowInteractor();
 
-  RenderWindow* m_MitkRenderWindow;
+  vtkRenderWindow* m_MitkRenderWindow;
 
   vtkRenderWindowInteractor* m_NativeVtkRenderWindowInteractor;
 };

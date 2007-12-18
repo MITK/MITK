@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkExtrudedContour.h"
 #include "mitkVector.h"
+#include "mitkBaseProcess.h"
 
 #include <itkSmartPointerForwardReference.txx>
 

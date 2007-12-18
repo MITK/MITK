@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUndoController.h"
 #include "mitkDisplayPositionEvent.h"
 #include "vtkTransform.h"
-#include "mitkRenderWindow.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkProperties.h"
 #include <itkBoundingBox.h>
 #include <itkFixedArray.h>
@@ -41,8 +41,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkWorldPointPicker.h>
 #include <vtkPicker.h>
-#include "mitkOpenGLRenderer.h"
-#include "mitkBaseRenderer.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkFocusManager.h"
 #include "mitkEventMapper.h"
@@ -333,7 +331,7 @@ bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPos
   double z;
 
   FocusManager::FocusElement* fe = mitk::GlobalInteraction::GetInstance()->GetFocus();
-  mitk::OpenGLRenderer* glRenderer = dynamic_cast<mitk::OpenGLRenderer*>( fe );
+  mitk::VtkPropRenderer* glRenderer = dynamic_cast<mitk::VtkPropRenderer*>( fe );
   if ( glRenderer == NULL )
   {
     return false;

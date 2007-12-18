@@ -205,7 +205,8 @@ void iil4mitkImage::drawTextures (iil4mitkWidget* widget)
     iil4mitkWidget* w;
     unsigned int available, total;
   
-    w = (widget->IsSharing () ? widget->SharedWidget () : widget);
+    //w = (widget->IsSharing () ? widget->SharedWidget () : widget);
+    w = (false ? NULL : widget);
     std::map<void*,Textures*>::iterator tex_it = _textures.find (w);
     if(tex_it!=_textures.end())
       textures = tex_it->second;
@@ -253,7 +254,8 @@ void iil4mitkImage::drawTextures (iil4mitkWidget* widget)
       tex [1] = power2(s);
       res [1] = 1.0f/tex[1];
   
-      if (widget->isVisible (pos [0], pos [1], len [0], len [1])) { 
+      //if (widget->isVisible (pos [0], pos [1], len [0], len [1])) {
+      if (true) {
       // widget->makeCurrent ();  
       texture->bind ();
       // widget->makeCurrent ();  

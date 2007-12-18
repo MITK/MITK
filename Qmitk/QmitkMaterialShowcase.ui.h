@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkTextActor.h>
-#include <mitkOpenGLRenderer.h>
+#include <mitkVtkPropRenderer.h>
 #include <vtkRenderer.h>
 #include <vtkTextProperty.h>
 #include <vtkCoordinate.h>
@@ -79,7 +79,7 @@ void QmitkMaterialShowcase::init()
 
 void QmitkMaterialShowcase::destroy()
 {
-  m_SelectableGLWidget->GetRenderWindow()->GetVtkLayerController()->RemoveRenderer( m_TextRenderer );
+  mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()->GetRenderWindow())->RemoveRenderer( m_TextRenderer );
   m_TextRenderer->Delete();
   m_TextActor->Delete();
 }
@@ -92,7 +92,8 @@ void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* propert
     {
       m_TextActor->SetInput( m_MaterialProperty->GetName().c_str() );
       m_TextActor->SetAlignmentPoint( 2);
-      m_SelectableGLWidget->GetRenderWindow()->GetVtkLayerController()->InsertForegroundRenderer( m_TextRenderer, true );
+      mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()->GetRenderWindow())
+                                            ->InsertForegroundRenderer( m_TextRenderer, true );
     }
     this->UpdateRenderWindow();
 }
@@ -165,7 +166,8 @@ void  QmitkMaterialShowcase::SetLineWidth( float lineWidth )
 
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
-  m_SelectableGLWidget->GetRenderWindow()->RequestUpdate();
+  mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()
+    ->GetRenderWindow())->InsertForegroundRenderer( m_TextRenderer, true );
 }
 
 

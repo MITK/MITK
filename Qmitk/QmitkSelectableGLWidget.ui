@@ -29,18 +29,18 @@
 </widget>
 <includes>
     <include location="local" impldecl="in declaration">QmitkRenderWindow.h</include>
-    <include location="local" impldecl="in declaration">mitkOpenGLRenderer.h</include>
+    <include location="local" impldecl="in declaration">mitkVtkPropRenderer.h</include>
     <include location="local" impldecl="in declaration">mitkSliceNavigationController.h</include>
     <include location="local" impldecl="in declaration">mitkCameraRotationController.h</include>
     <include location="local" impldecl="in implementation">QmitkSelectableGLWidget.ui.h</include>
 </includes>
 <variables>
     <variable>QmitkRenderWindow *m_RenderWindow;</variable>
-    <variable>mitk::OpenGLRenderer::Pointer m_Renderer;</variable>
+    <variable>mitk::VtkPropRenderer::Pointer m_Renderer;</variable>
 </variables>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function returnType="mitk::OpenGLRenderer *">GetRenderer()</function>
+    <function returnType="mitk::VtkPropRenderer *">GetRenderer()</function>
     <function returnType="QmitkRenderWindow *">GetRenderWindow() const</function>
     <function access="protected">wheelEvent( QWheelEvent * e )</function>
     <function returnType="mitk::SliceNavigationController *">GetSliceNavigationController() const</function>

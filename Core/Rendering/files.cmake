@@ -21,14 +21,11 @@ SET(CPP_FILES
   mitkMeshMapper2D.cpp
   mitkMeshVtkMapper3D.cpp
   mitkNativeRenderWindowInteractor.cpp
-  mitkOpenGLRenderer.cpp
   mitkPointDataVtkMapper3D.cpp
   mitkPointSetMapper2D.cpp
   mitkPointSetSliceMapper2D.cpp
   mitkPointSetVtkMapper3D.cpp
   mitkPolyDataGLMapper2D.cpp
-  mitkRenderWindow.cpp
-  mitkSimpleTextRendering.cpp
   mitkSplineMapper2D.cpp
   mitkSplineVtkMapper3D.cpp
   mitkSurfaceMapper2D.cpp
@@ -37,8 +34,10 @@ SET(CPP_FILES
   # mitkVectorImageMapper2D.cpp
   # mitkVectorImageVtkGlyphMapper3D.cpp
   mitkVolumeDataVtkMapper3D.cpp
-  mitkVtkARRenderWindow.cpp
-  mitkVtkRenderWindow.cpp
-  mitkVtkStencilRenderWindow.cpp
+  vtkMitkRenderProp.cpp
+  mitkVtkPropRenderer.cpp
+  mitkColoredRectangleRendering.cpp
+  vtkMitkRectangleProp.cpp
+  
 )
 

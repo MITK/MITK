@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDisplayCoordinateOperation.h>
 #include <mitkDisplayVectorInteractor.h>
 #include <mitkBaseRenderer.h>
-#include <mitkRenderWindow.h>
+#include <mitkRenderingManager.h>
 
 #include <mitkInteractionConst.h>
 
@@ -51,7 +51,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
     case OpMOVE :
       {
         renderer->GetDisplayGeometry()->MoveBy(dcOperation->GetLastToCurrentDisplayVector()*(-1.0));
-        renderer->GetRenderWindow()->RequestUpdate();
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
         ok = true;
       }
       break;
@@ -81,7 +81,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
         center[0] = renderer->GetDisplayGeometry()->GetDisplayWidth()/2;
         center[1] = renderer->GetDisplayGeometry()->GetDisplayHeight()/2;
         renderer->GetDisplayGeometry()->Zoom(factor, center);
-        renderer->GetRenderWindow()->RequestUpdate();
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
         ok = true;
       }
       break;

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 
 #include "mitkDataStorage.h"
+#include "mitkBaseRenderer.h"
 
 #include "mitkPlaneGeometry.h"
 #include "mitkRenderingManager.h"
@@ -63,9 +64,10 @@ mitk::SegTool2D::SegTool2D(const char* type)
        iter != renderWindows.end();
        ++iter)
   {
-    if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
+    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
+    //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
     {
-      m_FeedbackContourNode->SetProperty("visible", new BoolProperty(false), (*iter)->GetRenderer());
+      m_FeedbackContourNode->SetProperty("visible", new BoolProperty(false), mitk::BaseRenderer::GetInstance((*iter)));
     }
   }
 

@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRotationOperation.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 
 #include "mitkLine.h"
@@ -318,7 +317,7 @@ bool SlicesSwiveller
         const PlaneGeometry *planeGeometry = (*iter)->GetCurrentPlaneGeometry();
         if ( !planeGeometry ) continue;
 
-        if ( *iter == renderer->GetRenderWindow()->GetSliceNavigationController() )
+        if ( *iter == renderer->GetSliceNavigationController() )
         {
           clickedGeometry = planeGeometry;
           m_SNCsToBeRotated.push_back(*iter);

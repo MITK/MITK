@@ -103,6 +103,17 @@ public:
 
     virtual void Update(mitk::BaseRenderer* renderer);
 
+    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer) = 0;
+    virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) = 0;
+    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) = 0;
+    
+   
+
+    bool IsVtkBased() const
+    {
+      return m_VtkBased;
+    }
+
     //##Documentation
     virtual const std::string& GetXMLNodeName() const;
 
@@ -132,6 +143,8 @@ protected:
 
     //## Update time step, for use in subclasses
     virtual void CalculateTimeStep( mitk::BaseRenderer *renderer );
+
+    bool m_VtkBased;
 
     //## The current time step of the dataset to be rendered, for use in subclasses
     int m_TimeStep;

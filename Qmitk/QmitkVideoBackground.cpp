@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkVideoBackground.h"
 // MITK includes
 #include "mitkVtkLayerController.h"
-#include "mitkVtkRenderWindow.h"
-#include "mitkRenderWindow.h"
 // QT includes
 #include "qtimer.h"
 // VTK includes
@@ -110,12 +108,12 @@ QmitkVideoBackground::~QmitkVideoBackground()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void QmitkVideoBackground::SetRenderWindow(const mitk::RenderWindow* renderWindow )
+void QmitkVideoBackground::SetRenderWindow(vtkRenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 
   m_VideoCallback = vtkVideoSizeCallback::New();
-  m_RenderWindow->GetVtkRenderWindow()->AddObserver(vtkCommand::ModifiedEvent,m_VideoCallback);
+  //m_RenderWindow->AddObserver(vtkCommand::ModifiedEvent,m_VideoCallback);
 }
 /**
  * Enables drawing of the color Video background.
@@ -136,7 +134,7 @@ void QmitkVideoBackground::Enable()
  
   m_VideoCallback->SetVtkVideoRenderer(m_VideoRenderer);
   m_VideoCallback->SetVideoDimensions(m_ImageWidth, m_ImageHeight);
-  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_VideoRenderer,true);
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertBackgroundRenderer(m_VideoRenderer,true);
   m_QTimer->start(m_TimerDelay);
   
 }
@@ -149,7 +147,7 @@ void QmitkVideoBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
-    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_VideoRenderer);
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_VideoRenderer);
     m_QTimer->stop();
   }
 }
@@ -159,7 +157,7 @@ void QmitkVideoBackground::Disable()
  */
 bool QmitkVideoBackground::IsEnabled()
 {
-  if ( m_RenderWindow->GetVtkLayerController()->IsRendererInserted(m_VideoRenderer) )
+  if (mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_VideoRenderer))
       return true;
   else
       return false;    
@@ -174,7 +172,7 @@ void QmitkVideoBackground::UpdateVideo()
     m_VtkImageImport->SetImportVoidPointer(src);
     m_VtkImageImport->Modified();
     m_VtkImageImport->Update();
-    m_RenderWindow->GetVtkRenderWindow()->Render();
+    m_RenderWindow->Render();
   } 
 }
 

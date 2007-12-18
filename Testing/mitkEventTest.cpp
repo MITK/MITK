@@ -17,12 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkEvent.h>
-#include <mitkOpenGLRenderer.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <fstream>
 int mitkEventTest(int /*argc*/, char* /*argv*/[])
 {
-  mitk::OpenGLRenderer::Pointer renderer = new mitk::OpenGLRenderer; 
+  mitk::VtkPropRenderer::Pointer renderer = new mitk::VtkPropRenderer; 
   
   //Create Event
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);

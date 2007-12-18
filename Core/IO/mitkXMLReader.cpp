@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkEventMapper.h>
-#include <mitkRenderWindow.h>
 #include <mitkBaseXMLWriter.h>
 #include <itksys/SystemTools.hxx>
 #include <vtkObjectFactory.h>

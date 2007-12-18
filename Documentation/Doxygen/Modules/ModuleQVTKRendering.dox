@@ -1,0 +1,73 @@
+/**
+
+\page Rendering in MITK - Integration into VTK rendering pipeline using the QT-VTK widget
+
+\brief This page describes the MITK rendering mechanism switching to the QTVTK widget. MITK releases with version > 0.8 use this new rendering pipeline. Several changes in contrast to the established old rendering pipeline are explained in the following.
+
+
+
+
+\section vktRendering VTK Rendering Pipeline
+
+\image html RenderingOverviewVTK.png "Rendering in VTK"
+
+\li In VTK, the vtkRenderWindow coordinates the rendering process. Several vtkRenderers may be associated to one vtkRenderWindow. 
+\li All visible objects, which can exist in a rendered scene (2D and 3D scene), inherit from vtkProp.
+\li A vtkPropAssembly is an assembly of several vtkProps, which appears like one single vtkProp.
+\li MITK uses a new interface class, the "vtkMitkRenderProp", which is inherited from vtkProp. Similar to a vtkPropAssembly, all MITK rendering stuff is performed via this interface class.
+\li Thus, the MITK rendering process is completely integrated into the VTK rendering pipeline. From VTK point of view, MITK renders like a custom vtkProp object.
+
+More information about the VTK rendering pipeline can be found at http://www.vtk.org and in the several VTK books.
+
+
+
+\section mitkRendering MITK Rendering Pipeline
+
+In contrast to the former MITK rendering pipeline, the new process is tightly connected to VTK, which makes it straight forward and simple.
+In consequence, several MITK classes have been dropped out:
+
+\li Qmitk::SelectableGLWidget and all inheritors
+\li mitk::RenderWindow
+\li mitk::VtkRenderWindow and all inheritors 
+\li mitk::OpenGLRenderer
+\li mitk::SimpleTextRendering
+
+Instead, we use the above mentioned "vtkMitkRenderProp" in conjunction with a new mitk::VtkPropRenderer for integration into the VTK pipeline. Also, the QmitkRenderWindow does not inherit
+from mitk::RenderWindow, but from the QVTKWidget, which is provided by VTK.
+
+The main classes of the MITK rendering process can be illustrated like this:
+
+\image html qVtkRenderingClassOverview.png "Rendering in MITK"
+
+A render request to the vtkRenderWindow does not only update the VTK pipeline, but also the MITK pipeline. However, the mitk::RenderingManager still coordinates the rendering update behaviour.
+Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function
+of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient 
+background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::LogoRendering), etc. Despite these specific
+renderers, a kind of "SceneRenderer" is member of each QmitkRenderWindow. This vtkRenderer is associated with the custom vtkMitkRenderProp and is responsible for the MITK rendering.
+
+A sequence diagramm, which illustrates the actions after calling the Render() function of the MITK-Scene vtkRenderer is shown below:
+
+\image html qVtkRenderingSequence.png "Sequence overview MITK scene rendering"
+
+
+
+
+\section programmerGuide User Guide: Changes in programming of rendering related stuff
+
+\li Within a functionality the vtkRenderWindow can be accessed like this: vtkRenderWindow* vtkRenWin    = m_MultiWidget->mitkWidget4->GetRenderWindow();
+\li Within a functionality the mitkBaseRenderer can be accessed like this: mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow());
+\li An update request of the overall QmitkStdMultiWidget can be performed with: m_MultiWidget->RequestUpdate();
+\li An update of the overall QmitkStdMultiWidget can be forced with: m_MultiWidget->ForceImmediateUpdate();
+\li A single QmitkRenderWindow update request can be done like this: mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
+\li A single QmitkRenderWindow update can be forced like this: mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
+\li Getting a BaseRenderer by the widget name can be done like this: mitk::BaseRenderer::GetByName("mitkWidget1"); 
+
+Note:
+
+\li Dynamic casts of a mitk::BaseRenderer class to an OpenGLRenderer (or now, to an VtkPropRenderer) should be avoided. The "MITK Scene" vtkRenderer and the vtkRenderWindow as well, are
+therefore now included in the mitk::BaseRenderer.
+
+
+
+
+*/

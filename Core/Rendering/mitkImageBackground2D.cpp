@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageBackground2D.h"
 // MITK includes
 #include "mitkVtkLayerController.h"
-#include "mitkVtkRenderWindow.h"
-#include "mitkRenderWindow.h"
 
 // VTK includes
 #include "vtkSystemIncludes.h"
@@ -103,7 +101,7 @@ mitk::ImageBackground2D::~ImageBackground2D()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::ImageBackground2D::SetRenderWindow( const mitk::RenderWindow* renderWindow )
+void mitk::ImageBackground2D::SetRenderWindow(vtkRenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 
@@ -129,8 +127,9 @@ int mitk::ImageBackground2D::GetParallelScale()
 void mitk::ImageBackground2D::Enable()
 {
   m_ImageRenderer = vtkRenderer::New();
-  m_RenderWindow->GetVtkLayerController()->InsertBackgroundRenderer(m_ImageRenderer,true);
-    
+
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertBackgroundRenderer(m_ImageRenderer,true);
+     
   char * c = 0;
   Update(c);
   m_Actor->SetInput(m_VtkImageImport->GetOutput());
@@ -154,7 +153,7 @@ void mitk::ImageBackground2D::Enable()
 void mitk::ImageBackground2D::Disable()
 {
   if ( this->IsEnabled() )
-    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_ImageRenderer);    
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_ImageRenderer);        
 }
 /**
  * Checks, if the Video background is currently
@@ -162,7 +161,7 @@ void mitk::ImageBackground2D::Disable()
  */
 bool mitk::ImageBackground2D::IsEnabled()
 {
-  if ( m_RenderWindow->GetVtkLayerController()->IsRendererInserted(m_ImageRenderer) )
+  if ( mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_ImageRenderer)) 
       return true;
   else
       return false;    
@@ -187,7 +186,7 @@ void mitk::ImageBackground2D::Update(char * dataPointer)
   m_VtkImageImport->SetImportVoidPointer(m_ImageData);
   m_VtkImageImport->Modified();
   m_VtkImageImport->Update();
-  m_RenderWindow->GetVtkRenderWindow()->Render();
+  m_RenderWindow->Render();
    
 }
 
@@ -262,7 +261,7 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int width, int height, 
   m_VtkImageImport->SetImportVoidPointer(m_ImageData);
   m_VtkImageImport->Modified();
   m_VtkImageImport->Update();
-  m_RenderWindow->GetVtkRenderWindow()->Render();
+  m_RenderWindow->Render();
    
 }
 

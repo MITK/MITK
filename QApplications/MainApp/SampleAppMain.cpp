@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdexcept>
 
 #include <mitkStandardFileLocations.h>
+#include <mitkProperties.h>
+#include <mitkVector.h>
+
+#include <QmitkFunctionalityTesting.h>
+#include <sstream>
 
 /*
 * BUG: ATI-grafics-cards are slow in building up display lists in case of displaying transparent surfaces.
@@ -30,8 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 */
 //#include <vtkMapper.h>
 
-#include <QmitkFunctionalityTesting.h>
-#include <sstream>
+#include <QmitkControlsRightFctLayoutTemplate.h>
+#include <qsplitter.h>
+
 
 int main(int argc, char* argv[])
 {
@@ -70,9 +76,62 @@ int main(int argc, char* argv[])
     * Activating GlobalImmediateModeRendering in vtk solves this problem. Also add #include vtkMapper above
     */
     //vtkMapper::GlobalImmediateModeRenderingOn();
-    mainWindow.showMaximized();
+    
+     
+    //B/     Setup MainApp Widget size (default: maximized) ////
+    mitk::Point3dProperty* sizeProp = dynamic_cast<mitk::Point3dProperty*>
+                                      (mainWindow.m_Options->GetProperty("Startup window size"));
+    if(sizeProp)
+    {
+      mitk::Point3D p = sizeProp->GetValue();
+      if(p[0] == 0.0 && p[1] == 0.0)
+        mainWindow.showMaximized();
+      else
+      {
+        mainWindow.resize(sizeProp->GetValue()[0], sizeProp->GetValue()[1]);      
+        mainWindow.show();
+      }
+    }
+    else
+      mainWindow.showMaximized();
+
     mainWindow.RaiseDialogBars();
-    if(enableFunctionalityTesting) {
+
+    //B/ Setup  MultiWidget size (default: 2/3 of total MainApp width) ////
+    mitk::Point3dProperty* splitterSizeProp = dynamic_cast<mitk::Point3dProperty*>
+                                      (mainWindow.m_Options->GetProperty("Main Splitter ratio"));
+
+    QmitkControlsRightFctLayoutTemplate* fctwidget = (QmitkControlsRightFctLayoutTemplate*) mainWindow.centralWidget();
+    if(fctwidget)
+    {
+      QValueList<int> i;
+
+      if(splitterSizeProp)
+      {
+        mitk::Point3D p = splitterSizeProp->GetValue();
+        if(p[0] == 0.0 && p[1] == 0.0)
+        {
+          i.push_back(mainWindow.width()/3*2);
+          i.push_back(mainWindow.width()/3*1);
+        }
+        else
+        {
+          i.push_back(p[0]);
+          i.push_back(p[1]);
+        }
+      }
+      else
+      {
+        i.push_back(mainWindow.width()/3*2);
+        i.push_back(mainWindow.width()/3*1);
+      }
+      fctwidget->MainSplitter->setSizes(i);
+      mainWindow.repaint();
+    }    
+    
+    
+    if(enableFunctionalityTesting) 
+    {
       std::cout.setf(std::ios_base::unitbuf);
       return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator());
     }

@@ -44,6 +44,10 @@ class GLMapper2D : public Mapper2D
     //## @brief Apply color and opacity read from the PropertyList
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
+    void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
+    void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
+    void MitkRenderOverlay(mitk::BaseRenderer* renderer);
+
   protected:
     //##ModelId=3E681470037E
     GLMapper2D();

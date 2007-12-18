@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <strstream>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
-#include "mitkRenderWindow.h"
 #include "QmitkRenderWindow.h"
 #include "mitkCoreObjectFactory.h"
 #include "QmitkCommonFunctionality.h"
@@ -521,7 +520,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   return fileName;
 }
 
-std::string CommonFunctionality::SaveScreenshot( mitk::RenderWindow* renderWindow , const char* filename )
+std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow , const char* filename )
 {
   //
   // perform some error checking

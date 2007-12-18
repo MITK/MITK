@@ -1,6 +1,7 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -32,9 +33,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
-#include "mitkRenderWindow.h"
-#include "mitkVtkRenderWindow.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkBaseRenderer.h"
+
+#include <vtkRenderWindow.h>
 
 #include <vtkRenderWindow.h>
 
@@ -126,43 +127,42 @@ mitk::RenderingManager::~RenderingManager()
 
 void
 mitk::RenderingManager
-::AddRenderWindow( RenderWindow *renderWindow )
+::AddRenderWindow( vtkRenderWindow *renderWindow )
 {
   m_RenderWindowList[renderWindow] = 0;
-
+  
   m_AllRenderWindows.push_back( renderWindow );
 
   typedef itk::MemberCommand< RenderingManager > MemberCommandType;
 
-  mitk::BaseRenderer* renderer = renderWindow->GetRenderer();
-
+  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
+  
   if(renderer)
   {
+
     MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
     startCallbackCommand->SetCallbackFunction(
-    this, &RenderingManager::RenderingStartCallback
-    );
+      this, &RenderingManager::RenderingStartCallback);
     renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
-  
+    
     MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
     progressCallbackCommand->SetCallbackFunction(
-    this, &RenderingManager::RenderingProgressCallback
-    );
+      this, &RenderingManager::RenderingProgressCallback);
     renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
 
     MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
     endCallbackCommand->SetCallbackFunction( 
-    this, &RenderingManager::RenderingEndCallback
-    );
+      this, &RenderingManager::RenderingEndCallback);
     renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
 
     m_IsRendering[renderWindow] = false;
-  }
+ }
+
 }
 
 void
 mitk::RenderingManager
-::RemoveRenderWindow( RenderWindow *renderWindow )
+::RemoveRenderWindow( vtkRenderWindow *renderWindow )
 {
   m_RenderWindowList.erase( renderWindow );
 
@@ -180,7 +180,7 @@ mitk::RenderingManager
   return m_AllRenderWindows;
 }
 
-mitk::RenderWindow* 
+vtkRenderWindow* 
 mitk::RenderingManager::
 GetRenderWindowByName(const std::string& name)
 {
@@ -188,10 +188,10 @@ GetRenderWindowByName(const std::string& name)
        iter != m_AllRenderWindows.end();
        ++iter)
   {
-    if ( name == (*iter)->GetName() )
+   /* if ( name == (*iter)->GetName() )
     {
       return *iter;
-    }
+    }*/
   }
 
   return NULL;
@@ -199,7 +199,7 @@ GetRenderWindowByName(const std::string& name)
 
 void
 mitk::RenderingManager
-::RequestUpdate( RenderWindow *renderWindow )
+::RequestUpdate( vtkRenderWindow *renderWindow )
 {
   if (m_IsRendering[renderWindow])
   {
@@ -233,7 +233,7 @@ mitk::RenderingManager
     {
       m_UpdatePending = true;
     }
-    if(it->first->GetRenderer()->GetMapperID() == 2)
+    if(mitk::BaseRenderer::GetInstance(it->first)->GetMapperID() == 2)
     {
       m_Numberof3DRW++;
     }
@@ -243,20 +243,8 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::ForceImmediateUpdate( RenderWindow *renderWindow )
+::ForceImmediateUpdate( vtkRenderWindow *renderWindow )
 {
-  bool onlyOverlay =        (( m_RenderWindowList[renderWindow] == 1 )) ? true:false;
-  bool includingVtkActors = (( m_RenderWindowList[renderWindow] == 3 )) ? true:false;
-
-  if ( includingVtkActors ) // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done 
-  {
-    // if the render window is rendered via an mitk::OpenGLRenderer
-    // call UpdateIncludingVtkActors. 
-    OpenGLRenderer* openGLRenderer = dynamic_cast<OpenGLRenderer*>( renderWindow->GetRenderer() );
-    if ( openGLRenderer ) openGLRenderer->UpdateIncludingVtkActors();
-
-  }
-
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = 0;
 
@@ -283,7 +271,8 @@ mitk::RenderingManager
 
   m_LastUpdatedRW = renderWindow;
   // Immediately repaint this window (implementation platform specific)
-  renderWindow->Repaint(onlyOverlay);
+  renderWindow->Render();
+ 
 }
 
 void mitk::RenderingManager::RequestUpdateVtkRenderWindow(vtkRenderWindow* renderwindow)
@@ -291,7 +280,7 @@ void mitk::RenderingManager::RequestUpdateVtkRenderWindow(vtkRenderWindow* rende
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    if ( it->first->GetVtkRenderWindow() == renderwindow )
+    if ( it->first == renderwindow )
     {
       this->RequestUpdate(it->first);
       break;
@@ -335,7 +324,8 @@ void mitk::RenderingManager::RequestUpdateAll3D(bool includeVtkActors)
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
+    if(mitk::BaseRenderer::GetInstance(it->first)->GetMapperID() == 2)
+    //if(it->first->GetRenderer()->GetMapperID() == 2) //if RenderWindow uses a 3D Mapper
     {
       if ( it->second < magicUpdateFlag )
       {
@@ -365,7 +355,8 @@ mitk::RenderingManager
     it->second = 0;
 
     // Immediately repaint this window (implementation platform specific)
-    it->first->Repaint(onlyOverlay);
+    //it->first->Repaint(onlyOverlay);
+    it->first->Render();
   }
 
   if ( m_UpdatePending )
@@ -391,10 +382,10 @@ mitk::RenderingManager
     
     // if the render window is rendered via an mitk::OpenGLRenderer
     // call UpdateIncludingVtkActors. 
-    OpenGLRenderer* openGLRenderer = dynamic_cast<OpenGLRenderer*>( it->first->GetRenderer() );
+  /*  OpenGLRenderer* openGLRenderer = dynamic_cast<OpenGLRenderer*>( it->first->GetRenderer() );
     if ( openGLRenderer )
-      openGLRenderer->UpdateIncludingVtkActors();
-    it->first->Repaint(onlyOverlay);
+      openGLRenderer->UpdateIncludingVtkActors();*/
+    it->first->Render();//(onlyOverlay);
   }
 
   if ( m_UpdatePending )
@@ -449,7 +440,7 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::RequestOverlayUpdate( RenderWindow *renderWindow )
+::RequestOverlayUpdate( vtkRenderWindow *renderWindow )
 {
 
   // don't distroy rendering request
@@ -592,13 +583,13 @@ mitk::RenderingManager
 
 void
 mitk::RenderingManager
-::AbortRendering( mitk::RenderWindow* renderWindow )
+::AbortRendering( vtkRenderWindow* renderWindow )
 { 
   //std::cout<<" abort "<<std::endl;
 
   if ( renderWindow && m_IsRendering[renderWindow] )
   { 
-    renderWindow->GetVtkRenderWindow()->SetAbortRender( true );
+    renderWindow->SetAbortRender( true );
     //m_UpdatePending = true;
   }
   else
@@ -608,7 +599,7 @@ mitk::RenderingManager
     {
       if ( m_IsRendering[it->first] )
       {
-        it->first->GetVtkRenderWindow()->SetAbortRender( true );       
+        it->first->SetAbortRender( true );       
       }
     }
   }

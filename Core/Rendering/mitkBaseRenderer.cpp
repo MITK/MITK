@@ -17,13 +17,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseRenderer.h"
-#include "mitkRenderWindow.h"
 
+// Geometries
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 
+// Controllers
+#include "mitkCameraController.h"
 #include "mitkSliceNavigationController.h"
+#include "mitkCameraRotationController.h"
+#include "mitkVtkInteractorCameraController.h"
 
+#include "mitkVtkLayerController.h"
+
+// Events
 #include "mitkEventMapper.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkPositionEvent.h"
@@ -34,17 +41,73 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
-#include "mitkCameraController.h"
 
+// VTK
 #include <vtkLinearTransform.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkCamera.h>
+
+#include <vtkProperty.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
 
 
-mitk::BaseRenderer::RendererSet mitk::BaseRenderer::instances;
+mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
+{
+   for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+      mapit != baseRendererMap.end(); mapit++)
+  {
+    if( (*mapit).first == renWin)
+      return (*mapit).second;
+  }
+  return NULL;
+}
+
+void mitk::BaseRenderer::AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer)
+{
+  if(renWin == NULL || baseRenderer == NULL)
+    return;
+
+  // ensure that no BaseRenderer is managed twice
+  mitk::BaseRenderer::RemoveInstance(renWin);
+
+  baseRendererMap.insert(BaseRendererMapType::value_type(renWin,baseRenderer));
+}
+
+void mitk::BaseRenderer::RemoveInstance(vtkRenderWindow* renWin)
+{
+  BaseRendererMapType::iterator mapit = baseRendererMap.find(renWin);
+  if(mapit != baseRendererMap.end())
+    baseRendererMap.erase(mapit);
+}
+
+mitk::BaseRenderer* mitk::BaseRenderer::GetByName( const std::string& name )
+{
+  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+    mapit != baseRendererMap.end(); mapit++)
+  {
+    if( (*mapit).second->m_Name == name)
+      return (*mapit).second;
+  }
+  return NULL;
+}
+
+vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& name )
+{
+  for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
+  mapit != baseRendererMap.end(); mapit++)
+  {
+    if( (*mapit).second->m_Name == name)
+      return (*mapit).first;
+  }
+  return NULL;
+}
 
 
 //##ModelId=3E3D2F120050
-mitk::BaseRenderer::BaseRenderer( const char* name ) :
-  m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_RenderWindow(NULL),
+mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
+  m_MapperID(defaultMapper), m_DataTreeIterator(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
@@ -59,10 +122,17 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
     itkWarningMacro(<< "Created unnamed renderer. Bad for serialization. Please choose a name.");
   }
 
+  if(renWin != NULL)
+    m_RenderWindow = renWin;
+  else
+  {
+    itkWarningMacro(<< "Created mitkBaseRenderer without vtkRenderWindow present.");
+  }
+
   m_Size[0] = 0;
   m_Size[1] = 0;
 
-  instances.insert( this );
+  //instances.insert( this );
 
   //adding this BaseRenderer to the List of all BaseRenderer
   mitk::GlobalInteraction::GetInstance()->AddFocusElement(this);
@@ -88,9 +158,32 @@ mitk::BaseRenderer::BaseRenderer( const char* name ) :
   m_DisplayGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
   m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();
 
+
+  m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
+  m_SliceNavigationController->ConnectGeometrySliceEvent(this);
+  m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
+  m_SliceNavigationController->ConnectGeometryTimeEvent(this, false );
+
+  m_CameraRotationController = mitk::CameraRotationController::New();
+  m_CameraRotationController->SetRenderWindow( m_RenderWindow );
+  m_CameraRotationController->AcquireCamera();
+
+  m_CameraController = VtkInteractorCameraController::New(); //B/
+  
+
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
+
+  m_VtkRenderer = vtkRenderer::New();
+  
+  if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == NULL)
+  {  
+    mitk::VtkLayerController::AddInstance(m_RenderWindow,m_VtkRenderer);
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
+  }
+  else
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);  
 }
 
 
@@ -100,8 +193,6 @@ mitk::BaseRenderer::~BaseRenderer()
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
-  RendererSet::iterator pos = instances.find( this );
-  instances.erase( pos );
   m_DataTreeIterator = NULL;
 }
 
@@ -144,10 +235,21 @@ void mitk::BaseRenderer::Resize(int w, int h)
 }
 
 //##ModelId=3E33163A0261
-void mitk::BaseRenderer::InitRenderer(mitk::RenderWindow* renderwindow)
+void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
 {
   m_RenderWindow = renderwindow;
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
+  
+  if(m_CameraController.IsNotNull())
+  {
+    VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
+    if(vicc!=NULL)
+    {
+      vicc->SetRenderer(this);
+      //vicc->GetVtkInteractor()->Disable();
+    }
+  }
+
 }
 
 //##ModelId=3E3799250397
@@ -342,6 +444,30 @@ void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEv
   SetTimeStep(timeEvent->GetPos());
 }
 
+void mitk::BaseRenderer::GetBounds(double bounds[6]) const
+{
+  if(this->GetWorldGeometry() == NULL)
+  {
+    bounds[0] = 0;
+    bounds[1] = 0;
+    bounds[2] = 0;
+    bounds[3] = 0;
+    bounds[4] = 0;
+    bounds[5] = 0;
+    return;
+  }
+  BoundingBox::Pointer boundingBox = 
+    this->GetWorldGeometry()->CalculateBoundingBoxRelativeToTransform(NULL);
+  const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
+  bounds[0] = worldBounds[0];
+  bounds[1] = worldBounds[1];
+  bounds[2] = worldBounds[2];
+  bounds[3] = worldBounds[3];
+  bounds[4] = worldBounds[4];
+  bounds[5] = worldBounds[5];
+}
+
+
 //##ModelId=3E6D5DD30322
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
@@ -455,27 +581,32 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
   mitk::EventMapper::MapEvent(&event);
 }
 
-void mitk::BaseRenderer::Render( bool drawOverlayOnly )
-{
-  // Initialize the render context and do the rendering, if the RenderWindow
-  // allows for it.
-  if ( m_RenderWindow && m_RenderWindow->PrepareRendering() )
-  {
-    this->Repaint(drawOverlayOnly );
-  }
-}
-
-//##ModelId=3EF1627503C4
-void mitk::BaseRenderer::MakeCurrent()
-{
-}
-
-
 void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 {
   std::cout<<"BaseRenderer::DrawOverlayMouse()- should be inconcret implementation OpenGLRenderer."<<std::endl;
 }
 
+void mitk::BaseRenderer::RequestUpdate()
+{
+  mitk::RenderingManager::GetInstance()->RequestUpdate(this->m_RenderWindow);
+}
+
+void mitk::BaseRenderer::ForceImmediateUpdate()
+{
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
+}
+
+
+/*!
+Sets the new camera controller and deletes the vtkRenderWindowInteractor in case of the VTKInteractorCameraController
+*/
+void mitk::BaseRenderer::SetCameraController(CameraController* cameraController)
+{
+  m_CameraController->SetRenderer(NULL);
+  m_CameraController = NULL;
+  m_CameraController = cameraController;
+  m_CameraController->SetRenderer(this);
+}
 
 void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

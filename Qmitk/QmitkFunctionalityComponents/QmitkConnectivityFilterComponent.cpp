@@ -21,12 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeFilterFunctions.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
-#include "mitkRenderWindow.h"
 #include "mitkSurface.h"
 
 #include <mitkDataTreeNodeFactory.h>
 #include "mitkDisplayCoordinateOperation.h"
-#include <mitkOpenGLRenderer.h>
+#include <mitkVtkPropRenderer.h>
 #include "mitkProperties.h"
 #include "mitkVector.h"
 
@@ -514,7 +513,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
                 mitk::Point2D lastPoint= m_PointSet->GetPointSetInteractor()->GetLastDisplayCoordinates();
 
                 //to get renderer from the pointset where the last Point was set
-                mitk::OpenGLRenderer* openGLRenderer = dynamic_cast<mitk::OpenGLRenderer*>(m_PointSet->GetPointSetInteractor()->GetLastRenderer());
+                mitk::VtkPropRenderer* openGLRenderer = dynamic_cast<mitk::VtkPropRenderer*>(m_PointSet->GetPointSetInteractor()->GetLastRenderer());
                 vtkRenderer* lastRenderer = dynamic_cast<vtkRenderer*>(openGLRenderer->GetVtkRenderer());
 
                 if(lastRenderer)

@@ -22,8 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkDataTree.h"
 
-#include "mitkOpenGLRenderer.h"
-#include "mitkRenderWindow.h"
+#include "mitkVtkPropRenderer.h"
 
 #include <fstream>
 int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
@@ -63,7 +62,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
   std::cout << "visible bounds: " << bounds << std::endl;
   
-  mitk::OpenGLRenderer::Pointer renderer = new mitk::OpenGLRenderer;
+  mitk::VtkPropRenderer::Pointer renderer = new mitk::VtkPropRenderer;
   
   //  QmitkRenderWindow *rw = new QmitkRenderWindow(renderer, NULL, NULL);  
 
@@ -72,7 +71,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   
   renderer->SetData(&it);
 
-  std::cout<<"testing mitk::OpenGLRenderer::GetRenderWindow()"<<std::endl;
+  std::cout<<"testing mitk::VtkPropRenderer::GetRenderWindow()"<<std::endl;
   /*  mitk::RenderWindow* window = renderer->GetRenderWindow();
   if (window == NULL)
   {

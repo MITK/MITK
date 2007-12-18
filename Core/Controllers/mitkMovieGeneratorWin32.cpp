@@ -33,7 +33,7 @@ void mitk::MovieGeneratorWin32::SetFileName( const char *fileName )
 
 void mitk::MovieGeneratorWin32::InitBitmapHeader()
 {
-  if (m_renderer) m_renderer->MakeCurrent();  // take the correct viewport!
+  if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();  // take the correct viewport!
   GLint viewport[4]; // Where The Viewport Values Will Be Stored
   glGetIntegerv( GL_VIEWPORT, viewport ); // Retrieves The Viewport Values (X, Y, Width, Height)
   m_width = viewport[2];  m_width -= m_width % 4;

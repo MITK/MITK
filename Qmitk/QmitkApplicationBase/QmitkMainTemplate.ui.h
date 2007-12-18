@@ -111,6 +111,7 @@ Tadaa
 #include <QmitkCommonFunctionality.h>
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkHelpBrowser.h>
+#include <qsplitter.h>
 
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -120,11 +121,13 @@ Tadaa
 #include <vtkStructuredPoints.h>
 #include <vtkStructuredPointsReader.h>
 #include <vtkStructuredPointsWriter.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 
 #include <map>
 
 #include <mitkProperties.h>
+#include <mitkVector.h>
 
 #include <mitkDataTree.h>
 #include <string>
@@ -415,11 +418,12 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 
   mitk::DataTreePreOrderIterator it(m_Tree);
+  QString qFileName( fileName );
   try
   {
     factory->SetFileName( fileName );
     factory->SetImageSerie(false);
-
+    
     /*QString qFileName( fileName );
 
     // just in case this is a series
@@ -452,7 +456,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   catch ( itk::ExceptionObject & ex )
   {
     itkGenericOutputMacro( << "Exception during file open: " << ex );
-    QMessageBox::critical ( this, "Exception caught!", ex.what() );
+    QMessageBox::critical ( this, "File Open failed.", "Could not open file: " + qFileName );
   }
 
   QApplication::restoreOverrideCursor();
@@ -738,6 +742,10 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
   m_Options->SetProperty( "Default value for texture interpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
   m_Options->SetProperty( "Default dataset path", new mitk::StringProperty("") );
+  mitk::Point3D point;
+  mitk::FillVector3D(point,0.0,0.0,0.0);
+  m_Options->SetProperty( "Startup window size", new mitk::Point3dProperty(point) );
+  m_Options->SetProperty( "Main Splitter ratio", new mitk::Point3dProperty(point) );
 }
 
 /*!
@@ -909,8 +917,7 @@ void QmitkMainTemplate::Initialize()
 
   mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color"));
   mitk::Color c = colProperty->GetColor();
-  m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
-
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
   // Initialize other global options
   mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
   if (textureInterpolationProperty != NULL)
@@ -1080,9 +1087,31 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 
 void QmitkMainTemplate::destroy()
 {
+  mitk::Point3D point;
+  
+  //save MainWindow size
+  if(this->isMaximized())
+    mitk::FillVector3D(point,0.0,0.0,0.0);
+  else
+    mitk::FillVector3D(point,this->size().width(),this->size().height(),0.0);
+  m_Options->SetProperty( "Startup window size", new mitk::Point3dProperty(point) );
+
+  //save Main Splitter ratio
+  if(this->isMaximized())
+    mitk::FillVector3D(point,0.0,0.0,0.0);
+  else
+    mitk::FillVector3D(point,this->size().width(),this->size().height(),0.0);
+  
+  QmitkControlsRightFctLayoutTemplate* fctwidget =  (QmitkControlsRightFctLayoutTemplate*) this->centralWidget();
+  if(fctwidget)
+  {
+    mitk::FillVector3D(point, fctwidget->MainSplitter->sizes()[0], fctwidget->MainSplitter->sizes()[1], 0.0);
+    m_Options->SetProperty( "Main Splitter ratio", new mitk::Point3dProperty(point) );
+  }
+  
+  // save now
   std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
-  filename += "/MITKOptions.xml";
-  SaveOptionsToFile( filename.c_str() );
+  filename += "/MITKOptions.xml";  SaveOptionsToFile( filename.c_str() );
 
   delete qfm;
 #ifdef MBI_INTERNAL
@@ -1254,7 +1283,8 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( bp.GetPointer() );
     mitk::Color c = colProperty->GetColor();
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
-    m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+    //m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
 
     mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
     if (textureInterpolationProperty != NULL)

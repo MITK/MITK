@@ -2,11 +2,11 @@
 #define IIL_WIDGET_WRAPPER
 
 #include <assert.h>
-#include <mitkRenderWindow.h>
+#include <vtkRenderWindow.h>
 #include <mitkGL.h>
 
 class iil4mitkItem;
 
-typedef mitk::RenderWindow iil4mitkWidget;
+typedef vtkRenderWindow iil4mitkWidget;
 
 #endif

@@ -50,12 +50,12 @@
                         <property name="spacing">
                             <number>0</number>
                         </property>
-                        <widget class="QmitkSelectableGLWidget" row="0" column="0">
+                        <widget class="QmitkRenderWindow" row="0" column="0">
                             <property name="name">
                                 <cstring>mitkWidget1</cstring>
                             </property>
                         </widget>
-                        <widget class="QmitkSelectableGLWidget" row="0" column="1">
+                        <widget class="QmitkRenderWindow" row="0" column="1">
                             <property name="name">
                                 <cstring>mitkWidget2</cstring>
                             </property>
@@ -63,12 +63,12 @@
                                 <bool>true</bool>
                             </property>
                         </widget>
-                        <widget class="QmitkSelectableGLWidget" row="1" column="0">
+                        <widget class="QmitkRenderWindow" row="1" column="0">
                             <property name="name">
                                 <cstring>mitkWidget3</cstring>
                             </property>
                         </widget>
-                        <widget class="QmitkSelectableGLWidget" row="1" column="1">
+                        <widget class="QmitkRenderWindow" row="1" column="1">
                             <property name="name">
                                 <cstring>mitkWidget4</cstring>
                             </property>
@@ -125,8 +125,8 @@
         <slot access="public" specifier="">slot()</slot>
     </customwidget>
     <customwidget>
-        <class>QmitkSelectableGLWidget</class>
-        <header location="global">QmitkSelectableGLWidget.h</header>
+        <class>QmitkRenderWindow</class>
+        <header location="global">QmitkRenderWindow.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -169,10 +169,13 @@
     <include location="global" impldecl="in declaration">mitkLevelWindowProperty.h</include>
     <include location="global" impldecl="in declaration">mitkColorProperty.h</include>
     <include location="global" impldecl="in declaration">mitkLogoRendering.h</include>
+    <include location="global" impldecl="in declaration">mitkColoredRectangleRendering.h</include>
     <include location="local" impldecl="in implementation">QmitkStdMultiWidget.ui.h</include>
 </includes>
 <variables>
+    <variable>mitk::ColoredRectangleRendering::Pointer m_RectangleRendering3;</variable>
     <variable>int m_PlaneMode;</variable>
+    <variable>mitk::ColoredRectangleRendering::Pointer m_RectangleRendering1;</variable>
     <variable access="public">enum { PLANE_MODE_SLICING = 0, PLANE_MODE_ROTATION, PLANE_MODE_SWIVEL };</variable>
     <variable>mitk::LogoRendering::Pointer m_LogoRendering4;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground4;</variable>
@@ -193,6 +196,8 @@
     <variable>mitk::LogoRendering::Pointer m_LogoRendering1;</variable>
     <variable>mitk::LogoRendering::Pointer m_LogoRendering2;</variable>
     <variable>mitk::LogoRendering::Pointer m_LogoRendering3;</variable>
+    <variable>mitk::ColoredRectangleRendering::Pointer m_RectangleRendering2;</variable>
+    <variable>mitk::ColoredRectangleRendering::Pointer m_RectangleRendering4;</variable>
 </variables>
 <signals>
     <signal>WheelMoved( QWheelEvent* )</signal>
@@ -269,4 +274,11 @@
     <function returnType="mitk::SlicesSwiveller *">GetSlicesSwiveller() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkRenderWindow.h</includehint>
+    <includehint>QmitkRenderWindow.h</includehint>
+    <includehint>QmitkRenderWindow.h</includehint>
+    <includehint>QmitkRenderWindow.h</includehint>
+    <includehint>QmitkLevelWindowWidget.h</includehint>
+</includehints>
 </UI>

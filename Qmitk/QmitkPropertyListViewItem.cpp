@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 // mitk related includes
 #include "mitkConfig.h"
-#include "mitkRenderWindow.h"
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"

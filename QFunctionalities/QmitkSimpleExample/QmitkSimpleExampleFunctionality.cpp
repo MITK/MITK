@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 #include <mitkBaseRenderer.h>
 #include "QmitkRenderWindow.h"
-#include "QmitkSelectableGLWidget.h"
+#include "QmitkMainTemplate.h"
 #include "QmitkStdMultiWidget.h"
 #include <QmitkStepperAdapter.h>
 #include <mitkMovieGenerator.h>
@@ -37,8 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 
 // for stereo setting
-#include <mitkOpenGLRenderer.h>
-#include <mitkVtkRenderWindow.h>
 #include <vtkRenderWindow.h>
 
 // for zoom/pan
@@ -116,7 +114,7 @@ void QmitkSimpleExampleFunctionality::generateMovie()
   mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
   if (movieGenerator.IsNotNull()) {
     movieGenerator->SetStepper( stepper );
-    movieGenerator->SetRenderer( multiWidget->mitkWidget1->GetRenderer() );
+    movieGenerator->SetRenderer( mitk::BaseRenderer::GetInstance(multiWidget->mitkWidget1->GetRenderWindow()) );
     QString movieFileName = QFileDialog::getSaveFileName( QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name" );
     if (!movieFileName.isEmpty()) {
       movieGenerator->SetFileName( movieFileName.ascii() );
@@ -134,8 +132,8 @@ void QmitkSimpleExampleFunctionality::Activated()
   QmitkFunctionality::Activated();
   assert( multiWidget != NULL );
   // init widget 4 as a 3D widget
-  multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
-
+  mitk::BaseRenderer::GetInstance(multiWidget->mitkWidget4->GetRenderWindow())->SetMapperID(2);
+ 
   //if(m_NavigatorsInitialized)
   //{
   //  multiWidget->ReInitializeStandardViews();
@@ -144,8 +142,14 @@ void QmitkSimpleExampleFunctionality::Activated()
 
 void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
 {
-  vtkRenderWindow * vtkrenderwindow =
-    ((mitk::OpenGLRenderer*)(multiWidget->mitkWidget4->GetRenderer()))->GetVtkRenderWindow();
+  /* From vtkRenderWindow.h tells us about stereo rendering:
+  Set/Get what type of stereo rendering to use. CrystalEyes mode uses frame-sequential capabilities available in OpenGL to drive LCD shutter glasses and stereo projectors. RedBlue mode is a simple type of stereo for use with red-blue glasses. Anaglyph mode is a superset of RedBlue mode, but the color output channels can be configured using the AnaglyphColorMask and the color of the original image can be (somewhat maintained using AnaglyphColorSaturation; the default colors for Anaglyph mode is red-cyan. Interlaced stereo  mode produces a composite image where horizontal lines alternate between left and right views. StereoLeft and StereoRight modes choose one or the other stereo view. Dresden mode is yet another stereoscopic interleaving.
+  */
+ 
+  vtkRenderWindow * vtkrenderwindow = multiWidget->mitkWidget4->GetRenderWindow();
+  
+  // note: foreground vtkRenderers (at least the department logo renderer) produce errors in stereoscopic visualization.
+  // Therefore, we disable the logo visualization during stereo rendering.
   switch(id)
   {
   case 0:
@@ -154,12 +158,16 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
   case 1:
     vtkrenderwindow->SetStereoTypeToRedBlue();
     vtkrenderwindow->StereoRenderOn();
+    multiWidget->DisableDepartmentLogo();
     break;
   case 2:
     vtkrenderwindow->SetStereoTypeToDresden();
     vtkrenderwindow->StereoRenderOn();
+    multiWidget->DisableDepartmentLogo();
     break;
   }
-  multiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
-  multiWidget->mitkWidget4->GetRenderer()->GetRenderWindow()->RequestUpdate();
+
+  
+  mitk::BaseRenderer::GetInstance(multiWidget->mitkWidget4->GetRenderWindow())->SetMapperID(2);
+  multiWidget->RequestUpdate();
 }

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 
 #ifndef VCL_VC60
 #include "mitkMeshUtil.h"

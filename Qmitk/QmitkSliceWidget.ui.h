@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkLevelWindowWidget.h"
 
 #include <vtkRenderer.h>
+#include "mitkRenderingManager.h"
 
 void QmitkSliceWidget::init()
 {
@@ -50,7 +51,7 @@ void QmitkSliceWidget::init()
   hlayout=new QHBoxLayout(container);
 
   // create Renderer
-  m_Renderer= new mitk::OpenGLRenderer("Renderer::SliceWidget");
+  m_Renderer= new mitk::VtkPropRenderer("Renderer::SliceWidget");
 
   // create widget
   QString composedName("QmitkSliceWidget::");
@@ -69,7 +70,7 @@ void QmitkSliceWidget::init()
 }
 
 
-mitk::OpenGLRenderer* QmitkSliceWidget::GetRenderer()
+mitk::VtkPropRenderer* QmitkSliceWidget::GetRenderer()
 {
   return m_Renderer;
 }
@@ -215,7 +216,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   }
 
   GetRenderer()->GetDisplayGeometry()->Fit();
-  GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderer()->GetRenderWindow());
   //int w=vtkObject::GetGlobalWarningDisplay();
   //vtkObject::GlobalWarningDisplayOff();  
   //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
@@ -227,7 +228,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
 void QmitkSliceWidget::UpdateGL()
 {
   GetRenderer()->GetDisplayGeometry()->Fit();
-  GetRenderer()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderer()->GetRenderWindow());
 }
 
 void QmitkSliceWidget::mousePressEvent( QMouseEvent * e )

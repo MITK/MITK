@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDataTreeComboBox.h>
 
 #include "QmitkStepperAdapter.h"
-#include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"

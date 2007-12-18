@@ -17,23 +17,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkVtkInteractorCameraController.h"
-#include "mitkRenderWindow.h"
-#include "mitkVtkRenderWindowInteractor.h"
 #include "mitkInteractionConst.h"
 #include <vtkInteractorStyleSwitch.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCommand.h>
-#include "mitkVtkRenderWindow.h"
 #include "mitkAction.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 
 mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char* type) : CameraController(type), m_VtkInteractor(NULL)
 {
-  m_VtkInteractor = vtkRenderWindowInteractor::New();
-  vtkInteractorStyleSwitch* interactorswitch = dynamic_cast<vtkInteractorStyleSwitch*>(m_VtkInteractor->GetInteractorStyle());
-
-  if(interactorswitch!=NULL)
-    interactorswitch->SetCurrentStyleToTrackballCamera();
+  //m_VtkInteractor = vtkRenderWindowInteractor::New();
+ 
 }
 
 mitk::VtkInteractorCameraController::~VtkInteractorCameraController()
@@ -228,8 +222,13 @@ void mitk::VtkInteractorCameraController::SetRenderer(const mitk::BaseRenderer* 
   Superclass::SetRenderer(renderer);
   if (renderer)
   {
-    VtkRenderWindowInteractor* windowInteractor =
-    dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
+    // CHG 11-07: QVTK-Widget comes along with vtkRenderWindow and vtkRenWinInteractor, therefore do not 
+    // generate a new one any more
+    m_VtkInteractor = renderer->GetVtkRenderer()->GetRenderWindow()->GetInteractor();
+  }
+
+  /*  VtkRenderWindowInteractor* windowInteractor =
+      dynamic_cast<VtkRenderWindowInteractor*>(m_VtkInteractor);
     if (windowInteractor == NULL)
     {
       itkWarningMacro(<< "renderwindow is not an mitk::VtkRenderWindow");
@@ -239,18 +238,16 @@ void mitk::VtkInteractorCameraController::SetRenderer(const mitk::BaseRenderer* 
       windowInteractor->SetMitkRenderer(const_cast<mitk::BaseRenderer*>(this->GetRenderer()));
     }
     m_VtkInteractor->Initialize();
-    const mitk::OpenGLRenderer* glRenderer = dynamic_cast<const mitk::OpenGLRenderer*>(renderer);
-    if (glRenderer)
-    {
-      m_VtkInteractor->SetRenderWindow(glRenderer->GetVtkRenderWindow());
-    }
-    }
+   
+    m_VtkInteractor->SetRenderWindow(renderer->GetVtkRenderWindow());
+   
+  }
   else
   {
     m_VtkInteractor->SetRenderWindow(NULL);
     m_VtkInteractor->Delete();
     m_VtkInteractor = NULL;
-  }
+  }*/
 }
 
 vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor()
@@ -259,7 +256,7 @@ vtkRenderWindowInteractor* mitk::VtkInteractorCameraController::GetVtkInteractor
 }
 
 ///*
-//bool mitk::VtkInteractorCameraController::ExecuteAction(Action*, mitk::StateEvent const * /*stateEvent*/)
+//bool mitk::VtkInteractorCameraController::ExecuteAction(Action*, mitk::StateEvent const * /*stateEvent*/
 //{
 //  return false;
 //}

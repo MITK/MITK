@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkPointSet.h"
 
 #include <vtkActor.h>

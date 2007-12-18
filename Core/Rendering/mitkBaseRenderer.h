@@ -26,12 +26,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DData.h"
 #include "mitkCameraController.h"
 #include "mitkEventTypedefs.h"
-#include <set>
+#include <map>
 
+#include "mitkSliceNavigationController.h"
+#include "mitkCameraController.h"
+#include "mitkCameraRotationController.h"
+
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 
 namespace mitk {
 
-class RenderWindow;
+typedef std::map<vtkRenderWindow*,mitk::BaseRenderer*> BaseRendererMapType;
+static mitk::BaseRendererMapType baseRendererMap;
+
+class SliceNavigationController;
+class CameraRotationController;
 class CameraController;
 
 //##ModelId=3C6E9AA90306
@@ -58,15 +68,22 @@ class BaseRenderer : public itk::Object
 {
 public:
 
+  
+  static mitk::BaseRenderer* GetInstance(vtkRenderWindow * renWin);
+  static void AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer);
+  static void RemoveInstance(vtkRenderWindow* renWin);
+
+  static BaseRenderer* GetByName( const std::string& name );
+  static vtkRenderWindow* GetRenderWindowByName( const std::string& name );
+
   itkEventMacro( RendererResetEvent, itk::AnyEvent );
 
-  typedef std::set<BaseRenderer*> RendererSet;
   /** Standard class typedefs. */
   //##ModelId=3E691E0901DB
   mitkClassMacro(BaseRenderer, itk::Object);
 
   //##ModelId=3E3D2F120050
-  BaseRenderer( const char* name = NULL );
+  BaseRenderer( const char* name = NULL, vtkRenderWindow * renWin = NULL );
 
   //##Documentation
   //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
@@ -89,27 +106,17 @@ public:
   //##ModelId=3E6423D20264
   //##Documentation
   //## @brief Access the RenderWindow into which this renderer renders.
-  mitk::RenderWindow* GetRenderWindow() const
+  vtkRenderWindow* GetRenderWindow() const
   {
     return m_RenderWindow;
   }
+  vtkRenderer* GetVtkRenderer() const
+  {
+    return m_VtkRenderer;
+  }
 
-  //##ModelId=3E330B9C02F9
-  //##Documentation
-  //## @brief Initiates the rendering. The associated RenderWindow is given
-  //## the chance to initialize the rendering context, and block rendering if
-  //## required (e.g. if the render window is currently invisible).
-  //##
-  //## Note: Subclasses should implement Repaint(), not Render().
-  virtual void Render(bool drawOverlayOnly = false );
-
-  //##ModelId=3EF1627503C4
-  //##Documentation
-  //## @brief Makes the widget, this renderer is drawing into, the current widget for
-  //## (e.g., if the renderer is an OpenGL-based renderer as mitk::OpenGLRenderer)
-  //## OpenGL operations, i.e. makes the widget's rendering context the current
-  //## OpenGL rendering context.
-  virtual void MakeCurrent();
+  vtkRenderWindow* m_RenderWindow;
+  vtkRenderer*     m_VtkRenderer;
 
   //##ModelId=3E330C4D0395
   //##Documentation
@@ -134,7 +141,7 @@ public:
   //##ModelId=3E33163A0261
   //##Documentation
   //## @brief Initialize the renderer with a RenderWindow (@a renderwindow).
-  virtual void InitRenderer(mitk::RenderWindow* renderwindow);
+  virtual void InitRenderer(vtkRenderWindow* renderwindow);
 
   //##ModelId=3E3799250397
   //##Documentation
@@ -287,7 +294,10 @@ public:
 
   itkGetMacro(Size, int*);
 
+  void SetCameraController(CameraController* cameraController);
   itkGetObjectMacro(CameraController, mitk::CameraController);
+  itkGetObjectMacro(SliceNavigationController, mitk::SliceNavigationController);
+  itkGetObjectMacro(CameraRotationController, mitk::CameraRotationController);
 
   //##ModelId=3E6D5DD30322
   //##Documentation
@@ -323,19 +333,6 @@ public:
   }
 
   //##Documentation
-  //## @brief get the Renderer by the name
-  //## @note
-  static const BaseRenderer* GetByName( const std::string& name )
-  {
-    for (RendererSet::const_iterator iter = instances.begin();iter != instances.end();iter++) {
-      if (name == (*iter)->m_Name) {
-        return *iter;
-      }
-    }
-    return NULL;
-  }
-
-  //##Documentation
   //## @brief get the x_size of the RendererWindow
   //## @note
   const int GetSizeX() const
@@ -351,15 +348,16 @@ public:
     return m_Size[1];
   }
 
+  void GetBounds(double bounds[6]) const;
+
+  void RequestUpdate();
+  void ForceImmediateUpdate();
+  
 protected:
 
   //##ModelId=3E3D2F12008C
   virtual ~BaseRenderer();
 
-  //##ModelId=3E330B9C02F9
-  //##Documentation
-  //## @brief Do the rendering. To be implemented in subclasses.
-  virtual void Repaint(bool overlay=false) = 0;
 
   //##ModelId=3E330B930328
   //##Documentation
@@ -376,11 +374,6 @@ protected:
   //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
   mitk::DataTreeIteratorClone m_DataTreeIterator;
 
-  //##ModelId=3E3D1FCA0272
-  //##Documentation
-  //## @brief The RenderWindow to render into.
-  RenderWindow* m_RenderWindow;
-
   //##ModelId=3E6423D20213
   //##Documentation
   //## @brief Timestamp of last call of Update().
@@ -390,7 +383,12 @@ protected:
   //##Documentation
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
-  mitk::CameraController::Pointer m_CameraController;
+  mitk::CameraController::Pointer           m_CameraController;
+  mitk::SliceNavigationController::Pointer  m_SliceNavigationController;
+  mitk::CameraRotationController::Pointer   m_CameraRotationController;
+
+
+
 
   //##ModelId=3E6D5DD302E6
   //##Documentation
@@ -407,6 +405,7 @@ protected:
   //##Documentation
   //## @brief Sets m_CurrentWorldGeometry2D
   virtual void SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d);
+
 private:
   //##Documentation
   //## Pointer to the worldgeometry, describing the maximal area to be rendered
@@ -509,7 +508,7 @@ protected:
   unsigned long m_CurrentWorldGeometry2DTransformTime;
 
   std::string m_Name;
-  static RendererSet instances;
+  
 };
 
 } // namespace mitk

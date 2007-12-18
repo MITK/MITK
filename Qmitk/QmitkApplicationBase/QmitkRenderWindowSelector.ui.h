@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 ** destructor.
 *****************************************************************************/
 
-#include <mitkRenderWindow.h>
+#include <vtkRenderWindow.h>
 #include <mitkBaseRenderer.h>
 
 #include <mitkGlobalInteraction.h>
@@ -53,7 +53,7 @@ void QmitkRenderWindowSelector::init()
 
 void QmitkRenderWindowSelector::UpdateRendererList()
 {
-  mitk::RenderWindow* focusedRenderWindow = NULL;
+  vtkRenderWindow* focusedRenderWindow = NULL;
 
   mitk::FocusManager* fm =
     mitk::GlobalInteraction::GetInstance()->GetFocusManager();
@@ -67,17 +67,19 @@ void QmitkRenderWindowSelector::UpdateRendererList()
   int selectedItem = -1;
   int itemNumber = 0;
   m_lbRenderWindows->clear();
-  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-  for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();++iter,++itemNumber)
+
+
+  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
   {
-    if ((*iter)->GetName())
+    if( (*mapit).second->GetName())
     {
-      m_lbRenderWindows->insertItem(QString((*iter)->GetName()));
-      if(focusedRenderWindow==(*iter))
+      m_lbRenderWindows->insertItem(QString((*mapit).second->GetName()));
+      if(focusedRenderWindow==(*mapit).first)
         selectedItem = itemNumber;
     }
-
   }
+
   if (selectedItem>=0)
   {
     m_lbRenderWindows->setCurrentItem(selectedItem);
@@ -89,13 +91,14 @@ void QmitkRenderWindowSelector::UpdateRendererList()
 }
 
 
-mitk::RenderWindow* QmitkRenderWindowSelector::GetSelectedRenderWindow()
+vtkRenderWindow* QmitkRenderWindowSelector::GetSelectedRenderWindow()
 {  
   int selectedItem = m_lbRenderWindows->currentItem();
   int itemNumber = -1;
-  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-  for (iter = rws.begin();iter != rws.end();++iter)
+
+  mitk::BaseRendererMapType::iterator mapit;
+  for(mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
   {
     ++itemNumber;
     if(itemNumber==selectedItem)
@@ -103,7 +106,7 @@ mitk::RenderWindow* QmitkRenderWindowSelector::GetSelectedRenderWindow()
   }
   if(itemNumber==selectedItem)
   {
-    return (*iter);
+    return (*mapit).first;
   }
   return NULL;
 }

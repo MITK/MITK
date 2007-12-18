@@ -27,7 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <mitkBaseRenderer.h>
 #include <mitkRenderingManager.h>
-#include <mitkRenderWindow.h>
+
+#include "mitkPointOperation.h"
+
 
 const int QmitkPointListWidget::UNLIMITED = 999;
 
@@ -75,7 +77,8 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
     mitk::Point2D p2d;
     mitk::Point3D p3d;
     mitk::FillVector3D(p3d, (ppt)[0],(ppt)[1],(ppt)[2]);
-    mitk::BaseRenderer::Pointer anyRenderer = (*(mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().begin()))->GetRenderer();
+    mitk::BaseRenderer::Pointer anyRenderer = mitk::BaseRenderer::GetByName("mitkWidget1");
+   
     mitk::PositionEvent event(anyRenderer, 0, 0, 0, mitk::Key_unknown, p2d, p3d);
     mitk::StateEvent *stateEvent = new mitk::StateEvent(mitk::EIDLEFTMOUSEBTN , &event);    
 
@@ -86,16 +89,6 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
     delete stateEvent;
   }
 }
-
-void QmitkPointListWidget::keyPressEvent(QKeyEvent* e)
-{
-  //pass the event to the mitk global interaction 
-  mitk::BaseRenderer::Pointer anyRenderer = (*(mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().begin()))->GetRenderer();
-  mitk::Event *tempEvent = new mitk::Event(anyRenderer, e->type(), mitk::BS_NoButton, mitk::BS_NoButton, e->key());
-  mitk::EventMapper::MapEvent(tempEvent);
-  delete tempEvent;
-}
-
 
 void QmitkPointListWidget::ItemsOfListUpdate()
 {
@@ -340,4 +333,34 @@ void QmitkPointListWidget::Reinitialize( bool disableInteraction )
   // reset gui
   InteractivePointList->clear();
   m_NumberOfPointsLabel->setText(QString::number(0));
+}
+
+void QmitkPointListWidget::keyPressEvent( QKeyEvent * e )
+{
+  //pass the event to the mitk global interaction 
+  mitk::BaseRenderer::Pointer anyRenderer = mitk::BaseRenderer::GetByName("mitkWidget1");
+  mitk::Event *tempEvent = new mitk::Event(anyRenderer, e->type(), mitk::BS_NoButton, mitk::BS_NoButton, e->key());
+  mitk::EventMapper::MapEvent(tempEvent);
+  delete tempEvent;
+
+  if(e->key() == QKeyEvent::Key_F2)
+  {
+    mitk::PointOperation* doOp = new mitk::PointOperation(
+      mitk::OpMOVEPOINTUP, m_PointSet->SearchSelectedPoint(), m_PointSet->GetPoint( m_PointSet->SearchSelectedPoint() ));
+
+    //execute the Operation
+    m_PointSet->ExecuteOperation(doOp);
+
+  }
+  if(e->key() == QKeyEvent::Key_F3)
+  {
+    mitk::PointOperation* doOp = new mitk::PointOperation(
+      mitk::OpMOVEPOINTDOWN, m_PointSet->SearchSelectedPoint(), m_PointSet->GetPoint( m_PointSet->SearchSelectedPoint() ));
+
+
+    //execute the Operation
+    m_PointSet->ExecuteOperation(doOp);
+
+  }
+
 }

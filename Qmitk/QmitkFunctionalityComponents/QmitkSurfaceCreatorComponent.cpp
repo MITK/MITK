@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include "QmitkStdMultiWidget.h"
 
-#include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"
@@ -705,7 +704,7 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceContour()
     if(getSurfaceNode())
     {
       getSurfaceNode()->SetVisibility(false, NULL);
-      getSurfaceNode()->SetVisibility(true, m_MultiWidget->mitkWidget4->GetRenderer());
+      getSurfaceNode()->SetVisibility( true, mitk::BaseRenderer::GetInstance( m_MultiWidget->mitkWidget4->GetRenderWindow() ) );
     }
   }
   m_MultiWidget->RequestUpdate();

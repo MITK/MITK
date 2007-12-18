@@ -19,23 +19,32 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkGLMapper2D.h"
 
-//##ModelId=3E681470037E
 mitk::GLMapper2D::GLMapper2D()
 {
+  m_VtkBased = false;
 }
 
 
-//##ModelId=3E681470039C
 mitk::GLMapper2D::~GLMapper2D()
 {
 }
 
-//##ModelId=3E67E9390346
-void mitk::GLMapper2D::Paint(mitk::BaseRenderer *)
+void mitk::GLMapper2D::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
+  if(IsVisible(renderer)==false) 
+    return;
+
+  Paint(renderer);  
+}
+void mitk::GLMapper2D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
+{
+ 
+}
+void mitk::GLMapper2D::MitkRenderOverlay(mitk::BaseRenderer* renderer)
+{
+ 
 }
 
-//##ModelId=3EF17AA10120
 void mitk::GLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
     float rgba[4]={1.0f,1.0f,1.0f,1.0f};

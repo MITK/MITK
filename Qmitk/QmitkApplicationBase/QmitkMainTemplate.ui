@@ -1152,7 +1152,7 @@
     <variable>mitk::DataTree::Pointer m_Tree;</variable>
     <variable>bool m_StandardViewsInitialized;</variable>
     <variable access="private">bool m_FineUndoEnabled;</variable>
-    <variable>mitk::PropertyList::Pointer m_Options;</variable>
+    <variable access="public">mitk::PropertyList::Pointer m_Options;</variable>
     <variable>QString m_ProjectFileName;</variable>
     <variable>mitk::StringProperty::Pointer m_DefaultDatasetPath;</variable>
     <variable>bool m_FirstFileOpen;</variable>

@@ -1,6 +1,7 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2007-07-13 17:30:13 +0200 (Fr, 13 Jul 2007) $
 Version:   $Revision: 11283 $
@@ -15,18 +16,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _vtk_Simple_Text_Rendering_h_
-#define _vtk_Simple_Text_Rendering_h_
+#ifndef _vtk_Colored_Rectangle_Rendering_h_
+#define _vtk_Colored_Rectangle_Rendering_h_
 
 
+#include <vtkSystemIncludes.h>
 #include <mitkBaseData.h>
 
 #include <vector>
 #include <map>
 
-#include "mitkColorProperty.h"
-
 class vtkRenderer;
+class vtkRenderWindow;
 class vtkCamera;
 class vtkTextProperty;
 class vtkTextActor;
@@ -34,7 +35,6 @@ class vtkTextActor;
 
 namespace mitk {
 
-class RenderWindow;  
 /**
  * This is a simple approach for rendering text with the help
  * of the vtkTextActor class.
@@ -42,61 +42,25 @@ class RenderWindow;
  * This class is instanciated as a member of the mitk::OpenGLRenderer
  * and should be only accounted via the Renderer.
  */
-class SimpleTextRendering : public BaseData
+class ColoredRectangleRendering : public BaseData
 {
 public:
 
-  mitkClassMacro( SimpleTextRendering, BaseData );
+  mitkClassMacro( ColoredRectangleRendering, BaseData );
   itkNewMacro( Self );
 
-  /**
-  * Adds a text label to a label collection, which will be rendered .
-  * This method is invoked by the mitkOpenGLRenderer.
-  * Any mapper may use the WriteSimpleText() function of the
-  * the OpenGLRenderer.
-  *
-  * As return value, a text label id is returned, which may
-  * be used for further setting of text appereance.
-  */
-  int  AddTextLabel(double posX, double posY, std::string text, float* rgb = NULL);
-  
-  /**
-  * Removes a text label from the label collection.
-  */
-  void RemoveTextLabel(int text_id);
-  
-  /**
-  * Returns the vtkTextProperty of a specific text label
-  * in the label collection.
-  * This method is used by mitk::OpenGLRenderer::GetTextLabelProperty().
-  * 
-  * It facilitates a simple way for setting up text properties like 
-  * font, size, color etc.
-  */
-  vtkTextProperty* GetVtkTextProperty(int text_id);
-
-  /**
-  * Clears the list of text labels.
-  */
-  void ClearTextLabelCollection();
-
-  /**
-  * Returns the number of text labels, which are added to the label collection.
-  */
-  int GetNumberOfTextLabels();
-  
   /**
    * Sets the renderwindow, in which the text
    * will be shown. Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetRenderWindow( mitk::RenderWindow* renderWindow );
-
+  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
+  
   /**
    * Enables drawing of the text.
    * If you want to disable it, call the Disable() function.
    */
-  virtual void Enable();
+  virtual void Enable(float col1, float col2, float col3);
 
   /**
    * Disables drawing of the text.
@@ -138,7 +102,7 @@ public:
    * Returns the vtkRenderWindow, which is used
    * for displaying the text
    */
-  virtual mitk::RenderWindow* GetRenderWindow();
+  virtual vtkRenderWindow* GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
@@ -153,19 +117,17 @@ protected:
   /**
    * Constructor
    */
-  SimpleTextRendering();
+  ColoredRectangleRendering();
 
   /**
    * Destructor
    */
-  ~SimpleTextRendering();
-
-  typedef std::map<unsigned int,vtkTextActor*> TextMapType;
-  TextMapType m_TextCollection;
+  ~ColoredRectangleRendering();
   
-  mitk::RenderWindow* m_RenderWindow;
-  vtkRenderer*        m_TextRenderer;
+  vtkRenderWindow*    m_RenderWindow;
+  vtkRenderer*        m_RectangleRenderer;
   bool                m_IsEnabled;
+ 
 };
 
 } //end of namespace mitk

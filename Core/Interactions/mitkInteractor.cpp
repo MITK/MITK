@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStatusBar.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
-#include <mitkOpenGLRenderer.h>
 #include "mitkInteractionConst.h"
 #include <vtkLinearTransform.h>
 #include <itkVector.h>

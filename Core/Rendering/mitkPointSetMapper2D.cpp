@@ -24,7 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkLinearTransform.h"
 #include "mitkStringProperty.h"
 #include "mitkPointSet.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
+#include "mitkGL.h"
 
 //const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
@@ -302,15 +303,15 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           }
           if (unselectedColor != NULL)
           {
-            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];//yellow
             rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
-            OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l, rgb);
+            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,rgb[0], rgb[1],rgb[2]);
           }
           else
           {
-            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance, l);
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance);
           }
        /*   this->WriteTextXY(pt2d[0] + text2dDistance, 
             pt2d[1] + text2dDistance, l,renderer);*/
@@ -412,8 +413,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
             Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
 
-            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(pos2d[0], pos2d[1], buffer.str());
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
             //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
           }
 
@@ -431,8 +432,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
             Vector2D pos2d = lastPt2d.GetVectorFromOrigin()+vec2d*text2dDistance*text2dDistance;
 
-            mitk::OpenGLRenderer* OpenGLrenderer = dynamic_cast<mitk::OpenGLRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(pos2d[0], pos2d[1], buffer.str());
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+            OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
             //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
           }
       }

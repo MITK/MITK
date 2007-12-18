@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 #include <mitkStateEvent.h>
-#include <mitkOpenGLRenderer.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <vtkRenderer.h>
 
@@ -88,7 +88,7 @@ bool mitk::ContourInteractor::ExecuteAction(mitk::Action* action, mitk::StateEve
   if(posEvent==NULL)
   {
     const mitk::DisplayPositionEvent* displayPosEvent = dynamic_cast<const mitk::DisplayPositionEvent*>(stateEvent->GetEvent());
-    mitk::OpenGLRenderer* sender = (mitk::OpenGLRenderer*) stateEvent->GetEvent()->GetSender();
+    mitk::VtkPropRenderer* sender = (mitk::VtkPropRenderer*) stateEvent->GetEvent()->GetSender();
 
     if((displayPosEvent == NULL) || (sender == NULL))
       return false;

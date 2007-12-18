@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLogoRendering.h"
 
 #include "mitkVtkLayerController.h"
-#include <mitkVtkRenderWindow.h>
-#include <mitkRenderWindow.h>
 
 #include <mitkStandardFileLocations.h>
 #include <mitkConfig.h>
@@ -29,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkImageImport.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkMapper.h>
 #include <vtkImageActor.h>
 #include <vtkImageMapper.h>
@@ -94,7 +93,7 @@ mitk::LogoRendering::~LogoRendering()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::LogoRendering::SetRenderWindow( mitk::RenderWindow* renderWindow )
+void mitk::LogoRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -103,7 +102,7 @@ void mitk::LogoRendering::SetRenderWindow( mitk::RenderWindow* renderWindow )
  * Returns the vtkRenderWindow, which is used
  * for displaying the logo
  */
-mitk::RenderWindow* mitk::LogoRendering::GetRenderWindow()
+vtkRenderWindow* mitk::LogoRendering::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -206,7 +205,7 @@ void mitk::LogoRendering::Enable()
     SetupCamera();
     SetupPosition();
     
-    m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(m_Renderer,true);
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_Renderer,false);
     
     m_IsEnabled = true;
   }
@@ -343,7 +342,7 @@ void mitk::LogoRendering::Disable()
 {
   if ( this->IsEnabled() && !m_ForceShowMBIDepartmentLogo )
   {
-    m_RenderWindow->GetVtkLayerController()->RemoveRenderer(m_Renderer);
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_Renderer);
     m_IsEnabled = false;
   }
 }

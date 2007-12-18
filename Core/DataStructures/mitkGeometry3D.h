@@ -375,7 +375,7 @@ public:
   //## @brief Calculates a bounding-box around the geometry relative 
   //## to a coordinate system defined by a transform
   //##
-  mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform);
+  mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const;
 
   //##Documentation
   //## @brief clones the geometry

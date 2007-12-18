@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkBaseData.h>
 
 class vtkRenderer;
+class vtkRenderWindow;
 class vtkMapper;
 class vtkCamera;
 class vtkImageActor;
@@ -56,7 +57,7 @@ public:
    * will be shown. Make sure, you have called this function
    * before calling Enable()
    */
-  virtual void SetRenderWindow( mitk::RenderWindow* renderWindow );
+  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
 
   /**
    * Sets the source file for the logo. 
@@ -118,7 +119,7 @@ public:
    * Returns the vtkRenderWindow, which is used
    * for displaying the logo
    */
-  virtual mitk::RenderWindow* GetRenderWindow();
+  virtual vtkRenderWindow* GetRenderWindow();
 
   /**
    * Returns the renderer responsible for
@@ -157,7 +158,7 @@ protected:
    */
   ~LogoRendering();
 
-  mitk::RenderWindow* m_RenderWindow;
+  vtkRenderWindow*    m_RenderWindow;
   vtkRenderer*        m_Renderer;
   vtkImageActor*      m_Actor;
   vtkImageMapper*     m_Mapper;

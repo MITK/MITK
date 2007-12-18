@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkPointListWidget.h>
 
-#include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"

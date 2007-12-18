@@ -180,6 +180,8 @@ public:
    */
   void InsertPoint( PointIdentifier id, PointType point, int t = 0 );
 
+  void SwapPointPosition( PointIdentifier id, bool moveUpwards, int t = 0 );
+
 
   /**
    * \brief searches a selected point and returns the id of that point. 

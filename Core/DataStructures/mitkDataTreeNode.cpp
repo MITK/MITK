@@ -34,7 +34,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkXMLReader.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
-#include "mitkRenderWindow.h"
 #include "mitkGenericProperty.h"
 
 #include "mitkCoreObjectFactory.h"

@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
 
+#include "mitkBaseRenderer.h"
+#include "mitkRenderingManager.h"
+
 mitk::ContourTool::ContourTool(int paintingPixelValue)
 :SegTool2D("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue)
@@ -73,8 +76,8 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
-
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  
   return true;
 }
 
@@ -90,7 +93,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
   if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
 
@@ -132,7 +135,8 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
     // 6. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   }
   else
   {

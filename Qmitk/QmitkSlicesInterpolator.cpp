@@ -160,7 +160,7 @@ void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& 
 {
   if ( TranslateAndInterpolateChangedSlice( e, 2 ) )
   {
-    m_MultiWidget->mitkWidget1->GetRenderWindow()->RequestUpdate();
+    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RequestUpdate();
   }
 }
 
@@ -168,7 +168,7 @@ void QmitkSlicesInterpolator::OnSagittalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 0 ) )
   {
-    m_MultiWidget->mitkWidget2->GetRenderWindow()->RequestUpdate();
+    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate();    
   }
 }
 
@@ -176,7 +176,7 @@ void QmitkSlicesInterpolator::OnFrontalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 1 ) )
   {
-    m_MultiWidget->mitkWidget3->GetRenderWindow()->RequestUpdate();
+    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RequestUpdate();
   }
 }
 

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 ** destructor.
 *****************************************************************************/
 
-#include <mitkRenderWindow.h>
+#include <vtkRenderWindow.h>
 #include <mitkBaseRenderer.h>
 
 #include <mitkGlobalInteraction.h>
@@ -53,7 +53,7 @@ void QmitkSystemInfo::init()
 
 void QmitkSystemInfo::UpdateRendererList()
 {
-  mitk::RenderWindow* focusedRenderWindow = NULL;
+  vtkRenderWindow* focusedRenderWindow = NULL;
 
   mitk::FocusManager* fm =
     mitk::GlobalInteraction::GetInstance()->GetFocusManager();
@@ -67,16 +67,16 @@ void QmitkSystemInfo::UpdateRendererList()
   int selectedItem = -1;
   int itemNumber = 0;
   m_lbRenderer->clear();
-  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-  for (mitk::RenderWindow::RenderWindowSet::const_iterator iter = rws.begin();iter != rws.end();++iter,++itemNumber)
-  {
-    if ((*iter)->GetName())
-    {
-      m_lbRenderer->insertItem(QString((*iter)->GetName()));
-      if(focusedRenderWindow==(*iter))
-        selectedItem = itemNumber;
-    }
 
+  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
+  {
+    if( (*mapit).second->GetName())
+    {
+      m_lbRenderer->insertItem(QString((*mapit).second->GetName()));
+      if(focusedRenderWindow==(*mapit).first)
+        selectedItem = itemNumber;      
+    }
   }
   if (selectedItem>=0)
   {
@@ -92,22 +92,24 @@ void QmitkSystemInfo::AddRendererInfo()
 {
   int selectedItem = m_lbRenderer->currentItem() ;
   int itemNumber = -1;
-  const mitk::RenderWindow::RenderWindowSet rws = mitk::RenderWindow::GetInstances();
-  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-  for (iter = rws.begin();iter != rws.end();++iter)
+
+  mitk::BaseRendererMapType::iterator mapit;
+  for(mapit = mitk::baseRendererMap.begin(); 
+      mapit != mitk::baseRendererMap.end(); mapit++)
   {
     ++itemNumber;
     if(itemNumber==selectedItem)
       break;
+  
   }
   if(itemNumber==selectedItem)
   {
     ::itk::OStringStream itkOutput;
-    (*iter)->GetRenderer()->Print(itkOutput);
+    (*mapit).second->Print(itkOutput);
     m_teOutputPane->append("------------------RendererInfo------------------");
-    m_teOutputPane->append((*iter)->GetName());
+    m_teOutputPane->append((*mapit).second->GetName());
     m_teOutputPane->append(itkOutput.str().c_str());
-    m_teOutputPane->append((*iter)->GetName());
+    m_teOutputPane->append((*mapit).second->GetName());
     m_teOutputPane->append("--------------End of RendererInfo---------------");
   }
 }

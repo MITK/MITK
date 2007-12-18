@@ -161,6 +161,8 @@ typedef enum EOperations
   OpMOVELINE = 301, //move a line
   OpMOVECELL = 302, //move a line
   OpUNDOMOVE = 303,
+  OpMOVEPOINTUP = 304,
+  OpMOVEPOINTDOWN = 305,
   OpREMOVE = 400, //remove a point at position
   OpREMOVELINE = 401, //remove a line at position
   OpREMOVECELL = 402, //remove a cell
@@ -262,6 +264,8 @@ typedef enum EActions
   AcMOVEPOINT = 90,
   AcMOVESELECTED = 91,
   AcMOVE = 92,
+  AcMOVEPOINTUP = 93,
+  AcMOVEPOINTDOWN = 94,
   AcREMOVEPOINT = 100,
   AcREMOVE = 101,
   AcREMOVELINE = 102,

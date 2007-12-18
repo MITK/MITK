@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCameraController.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
 #include "vtkCamera.h"
@@ -71,7 +71,7 @@ void mitk::CameraController::SetViewToCaudal()
 
 void mitk::CameraController::SetStandardView( mitk::CameraController::StandardView view )
 {
-  const mitk::OpenGLRenderer* glRenderer = dynamic_cast<const mitk::OpenGLRenderer*>(m_Renderer);
+  const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(m_Renderer);
   if (glRenderer)
   {
     vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();

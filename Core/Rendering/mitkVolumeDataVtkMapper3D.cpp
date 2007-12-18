@@ -26,8 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTableProperty.h"
 #include "mitkTransferFunctionProperty.h"
 
-#include "mitkOpenGLRenderer.h"
-#include "mitkVtkRenderWindow.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
 
@@ -137,10 +136,10 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 
 void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
 
-  mitk::VtkRenderWindow* renderWindow = dynamic_cast<mitk::VtkRenderWindow*>(caller);
+  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
   if ( renderWindow )
   {
-    BaseRenderer* renderer = renderWindow->GetMitkRenderer();
+    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
     renderer->InvokeEvent( itk::ProgressEvent() );
   }
 
@@ -149,20 +148,21 @@ void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long
 
 void mitk::VolumeDataVtkMapper3D::EndCallback(vtkObject *caller, unsigned long , void *, void *){
   
-  mitk::VtkRenderWindow* renderWindow = dynamic_cast<mitk::VtkRenderWindow*>(caller);
+  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
   if ( renderWindow )
   {
-    BaseRenderer* renderer = renderWindow->GetMitkRenderer();
+    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
     renderer->InvokeEvent( itk::EndEvent() );
   }
 
 }
 
-void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long , void *, void *){
-  mitk::VtkRenderWindow* renderWindow = dynamic_cast<mitk::VtkRenderWindow*>(caller);
+void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long , void *, void *)
+{
+  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
   if ( renderWindow )
   { 
-    BaseRenderer* renderer = renderWindow->GetMitkRenderer();
+    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
     renderer->InvokeEvent( itk::StartEvent() );    
   }
 
@@ -365,9 +365,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_VolumePropertyHigh->SetGradientOpacity( gradientTransferFunction ); 
   m_VolumePropertyHigh->SetInterpolationTypeToLinear();
 
-  mitk::OpenGLRenderer* openGlRenderer = dynamic_cast<mitk::OpenGLRenderer*>(renderer);
-  assert(openGlRenderer);
-  vtkRenderWindow* vtkRendWin = (openGlRenderer->GetVtkRenderWindow());
+  vtkRenderWindow* vtkRendWin = renderer->GetRenderWindow();
+
   
   vtkRenderWindowInteractor* interactor = vtkRendWin->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);

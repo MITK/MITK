@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkOperation.h"
 #include "mitkOperationEvent.h"
-#include "mitkRenderWindow.h"
 #include "mitkRenderingManager.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurface.h"

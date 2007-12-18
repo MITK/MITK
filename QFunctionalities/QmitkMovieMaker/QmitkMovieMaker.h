@@ -25,6 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMovieGenerator.h"
 #include "itkCommand.h"
 
+
+#include "QVTKWidget.h"
+#include "vtkEventQtSlotConnect.h"
+#include "mitkRenderWindow.h"
+#include "mitkVtkPropRenderer.h"
+
 class QmitkStdMultiWidget;
 class QmitkMovieMakerControls;
 class QmitkStepperAdapter;
@@ -203,14 +209,26 @@ public slots:
    */
   void AdvanceAnimation();
 
+  
+
 protected slots:  
 
+  void RenderSlot();
   void GenerateMovie();
   
   void GenerateScreenshot();
 
 
 protected:  
+
+  QObject *parentWidget;
+  QVTKWidget * widget;
+  vtkEventQtSlotConnect * connections;
+  mitk::RenderWindow * renderWindow;
+  mitk::VtkPropRenderer::Pointer m_PropRenderer;
+
+
+
   
   QmitkMovieMakerControls* m_Controls;
   

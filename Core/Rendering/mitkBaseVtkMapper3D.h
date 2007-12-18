@@ -44,6 +44,10 @@ public:
 
   virtual vtkProp* GetProp();
 
+  void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
+  void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
+  void MitkRenderOverlay(mitk::BaseRenderer* renderer);
+
   //##Documentation
   //## @brief Set the vtkTransform of the m_Prop3D for
   //## the current time step of \a renderer

@@ -130,10 +130,11 @@
     <slot>ItemsOfListUpdate()</slot>
     <slot>RemoveInteraction()</slot>
     <slot>Reinitialize( bool disableInteraction )</slot>
+    <slot>keyPressEvent( QKeyEvent * e )</slot>
+    
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function access="protected">keyPressEvent( QKeyEvent * e )</function>
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
     <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>

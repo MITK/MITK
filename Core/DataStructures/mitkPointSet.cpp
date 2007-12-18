@@ -256,6 +256,30 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
   }
 }
 
+void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
+{
+  if(GetSize(t) > 1 && GetNumberOfSelected(t) == 1)
+  {
+    PointType point = GetPoint(id,t);
+
+    if(moveUpwards)
+    {//up
+      if(IndexExists(id-1,t))
+      {
+        m_PointSetSeries[t]->GetPoints()->DeleteIndex(id);
+        InsertPoint(id-1,point,t);
+      }
+    }
+    else
+    {//down
+      if(IndexExists(id+1,t))
+      {
+        m_PointSetSeries[t]->GetPoints()->DeleteIndex(id);
+        InsertPoint(id,point,t);
+      }
+    }
+  }
+}
 
 bool mitk::PointSet::IndexExists( int position, int t )
 {
@@ -453,6 +477,36 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       pointData.pointSpec = pointOp->GetPointType();
       m_PointSetSeries[timeStep]->SetPointData(pointOp->GetIndex(), pointData);
       this->Modified();
+    }
+    break;
+
+  case OpMOVEPOINTUP: // move point position within the pointset 
+    {
+      int position = SearchPoint(pointOp->GetPoint(), 0.0, timeStep);
+      mitk::Point3D point1 = pointOp->GetPoint();
+        
+      if(position >= 1)
+      {        
+        mitk::Point3D point2 = m_PointSetSeries[timeStep]->GetPoints()->GetElement(position-1);
+        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position-1,point1);
+        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position,point2);
+        this->Modified();
+      }
+      
+    }
+    break;
+  case OpMOVEPOINTDOWN: // move point position within the pointset 
+    {
+      int position = SearchPoint(pointOp->GetPoint(), 0.0, timeStep);
+      mitk::Point3D point1 = pointOp->GetPoint();
+
+      if(position >= 0 && GetSize(timeStep) > position)
+      {        
+        mitk::Point3D point2 = m_PointSetSeries[timeStep]->GetPoints()->GetElement(position+1);
+        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position+1,point1);
+        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position,point2);
+        this->Modified();
+      }
     }
     break;
 

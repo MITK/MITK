@@ -88,7 +88,7 @@
 </images>
 <includes>
     <include location="local" impldecl="in declaration">mitkCameraController.h</include>
-    <include location="local" impldecl="in declaration">mitkRenderWindow.h</include>
+    <include location="local" impldecl="in declaration">vtkRenderWindow.h</include>
     <include location="local" impldecl="in implementation">QmitkStandardViews.ui.h</include>
 </includes>
 <variables>
@@ -99,7 +99,7 @@
 </signals>
 <slots>
     <slot>SetCameraController( mitk::CameraController * controller )</slot>
-    <slot>SetCameraControllerFromRenderWindow( mitk::RenderWindow * window )</slot>
+    <slot>SetCameraControllerFromRenderWindow( vtkRenderWindow * window )</slot>
     <slot access="protected">hotspotClicked( const QString &amp; s )</slot>
 </slots>
 <functions>

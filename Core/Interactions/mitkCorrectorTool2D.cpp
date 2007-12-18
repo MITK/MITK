@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
+#include "mitkBaseRenderer.h"
+#include "mitkRenderingManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
@@ -80,7 +82,7 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
 }
@@ -94,7 +96,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
   if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
 
@@ -150,7 +152,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
     // 6. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );
-    positionEvent->GetSender()->GetRenderWindow()->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   }
   else
   {

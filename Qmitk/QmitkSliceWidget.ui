@@ -196,7 +196,7 @@
 </images>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
-    <include location="local" impldecl="in declaration">mitkOpenGLRenderer.h</include>
+    <include location="local" impldecl="in declaration">mitkVtkPropRenderer.h</include>
     <include location="global" impldecl="in declaration">qpopupmenu.h</include>
     <include location="local" impldecl="in declaration">QmitkRenderWindow.h</include>
     <include location="local" impldecl="in declaration">mitkSliceNavigationController.h</include>
@@ -208,7 +208,7 @@
     <variable access="private">mitk::DataTree::Pointer m_DataTree;</variable>
     <variable access="private">bool popUpEnabled;</variable>
     <variable access="private">mitk::DataTreeIteratorClone m_DataTreeIterator;</variable>
-    <variable access="private">mitk::OpenGLRenderer::Pointer m_Renderer;</variable>
+    <variable access="private">mitk::VtkPropRenderer::Pointer m_Renderer;</variable>
     <variable access="private">mitk::SlicedGeometry3D::Pointer m_SlicedGeometry;</variable>
     <variable access="private">QPopupMenu* popUp;</variable>
     <variable>mitk::SliceNavigationController::ViewDirection m_View;</variable>
@@ -226,7 +226,7 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function returnType="mitk::OpenGLRenderer *">GetRenderer()</function>
+    <function returnType="mitk::VtkPropRenderer *">GetRenderer()</function>
     <function returnType="QFrame *">GetSelectionFrame()</function>
     <function>UpdateGL()</function>
     <function>mousePressEvent( QMouseEvent * e )</function>

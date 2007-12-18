@@ -47,9 +47,6 @@ QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false ), m_TestingParame
   QmitkMainTemplate::Initialize();
 
   parseCommandLine();
-
-  resize(1024,768);
-
 }
 /*
 *  Destroys the object and frees any allocated resources
@@ -61,7 +58,8 @@ SampleApp::~SampleApp()
 
 void SampleApp::InitializeFunctionality()
 {
-  m_MultiWidget->mitkWidget4->GetRenderer()->SetMapperID(2);
+  
+  
   //create and add functionalities. Functionalities are also invisible objects, which can be asked to 
   //create their different parts (main widget, control widget, toolbutton for selection).
   mitk::DataTreePreOrderIterator iterator(m_Tree);

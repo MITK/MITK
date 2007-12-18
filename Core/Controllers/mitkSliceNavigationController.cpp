@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSliceNavigationController.h"
 #include "mitkBaseRenderer.h"
-#include "mitkRenderWindow.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
@@ -30,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
 #include "mitkFocusManager.h"
-#include "mitkOpenGLRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
 #include "mitkInteractionConst.h"

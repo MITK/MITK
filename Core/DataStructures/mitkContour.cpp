@@ -97,12 +97,12 @@ mitk::Contour::PathType::Pointer mitk::Contour::GetContourPath() const
   return m_ContourPath;
 }
 
-void mitk::Contour::SetCurrentWindow(mitk::RenderWindow* rw)
+void mitk::Contour::SetCurrentWindow(vtkRenderWindow* rw)
 {
   m_CurrentWindow = rw;
 }
 
-mitk::RenderWindow* mitk::Contour::GetCurrentWindow() const
+vtkRenderWindow* mitk::Contour::GetCurrentWindow() const
 {
   return m_CurrentWindow;
 }

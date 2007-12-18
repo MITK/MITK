@@ -19,79 +19,62 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 #define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 
-#include <qgl.h>
+//#include <qgl.h>
 #include "mitkCommon.h"
-#include "mitkBaseRenderer.h"
-#include "mitkRenderWindow.h"
+
+#include "qlayout.h"
+#include "QVTKWidget.h"
+
+#include "mitkVtkPropRenderer.h"
+#include "vtkMitkRenderProp.h"
+#include "mitkSliceNavigationController.h"
+#include "mitkCameraRotationController.h"
 
 /**
- * \brief Qt implementation of mitk::RenderWindow
+ * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
  */
-class QmitkRenderWindow : public QGLWidget, public mitk::RenderWindow
+class QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
 {
 public:
-  QmitkRenderWindow(mitk::BaseRenderer* renderer, QGLFormat glf, QWidget *parent = 0, const char *name = 0);
-
-  QmitkRenderWindow(QGLFormat glf, QWidget *parent = 0, const char *name = 0);
-
+ 
   QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent = 0, const char *name = 0);
-
   QmitkRenderWindow(QWidget *parent = 0, const char *name = 0);
-
   virtual ~QmitkRenderWindow();
 
-  virtual void MakeCurrent();
+  void InitRenderer();
+  
+  virtual mitk::SliceNavigationController * GetSliceNavigationController(); 
+  virtual mitk::CameraRotationController * GetCameraRotationController();
+  virtual mitk::BaseController * GetController();
 
-  virtual void SwapBuffers ();
-
-  virtual bool IsSharing () const;
-
-  virtual void SetSize(int w, int h);
-
-  virtual QSize minimumSizeHint () const;
-
-  virtual QSizePolicy sizePolicy() const;
-
-  virtual QSize sizeHint () const;
-
-
-  virtual void mousePressEvent(QMouseEvent*);
-
-  virtual void mouseReleaseEvent(QMouseEvent*);
-
-  virtual void mouseMoveEvent(QMouseEvent*);
-
-  virtual void wheelEvent(QWheelEvent*);
-
-  virtual void keyPressEvent(QKeyEvent*);
-
-  virtual void focusInEvent(QFocusEvent*);
-
-  virtual void focusOutEvent(QFocusEvent*); 
-
+  
 protected:
-  virtual void Repaint(bool onlyOverlay = false );
+    
+    // overloaded resize handler
+    virtual void resizeEvent(QResizeEvent* event);
 
-  virtual void paintGL();
+    // overloaded mouse press handler
+    virtual void mousePressEvent(QMouseEvent* event);
+    // overloaded mouse move handler
+    virtual void mouseMoveEvent(QMouseEvent* event);
+    // overloaded mouse release handler
+    virtual void mouseReleaseEvent(QMouseEvent* event);
+    // overloaded key press handler
+    virtual void keyPressEvent(QKeyEvent* event);
+#ifndef QT_NO_WHEELEVENT
+    // overload wheel mouse event
+    virtual void wheelEvent(QWheelEvent*);
+#endif
 
-  virtual void initializeGL();
 
-  virtual void resizeGL(int w, int h);
+private:
+  mitk::VtkPropRenderer::Pointer m_Renderer;
+  vtkMitkRenderProp*             m_RenderProp;
 
-  virtual void showEvent(QShowEvent *);
+  bool                           m_InResize;
 
-  virtual void InitRenderer();
-
-  virtual bool PrepareRendering();
-
-  bool m_InitNeeded;
-
-  bool m_ResizeNeeded;
-
-  bool m_InResize;
-
-  bool m_DrawOverlayOnly;
+ 
 
 };
 

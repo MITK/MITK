@@ -130,15 +130,6 @@ int main(int argc, char* argv[])
   // slice itself in 3D: add it to the tree!
   it.Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
-  // Part VI: handle updates: To avoid unnecessary updates, we have to
-  // define when to update. The RenderingManager serves this purpose, and
-  // each RenderWindow has to be registered to it.
-  mitk::RenderingManager *renderingManager =
-    mitk::RenderingManager::GetInstance();
-  renderingManager->AddRenderWindow( &renderWindow );
-  renderingManager->AddRenderWindow( view2.GetRenderWindow() );
-  renderingManager->AddRenderWindow( view3.GetRenderWindow() );
-
   //Part VII: Qt-specific initialization
   qtapplication.setMainWidget(&toplevelWidget);
   toplevelWidget.show();

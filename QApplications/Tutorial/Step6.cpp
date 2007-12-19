@@ -129,7 +129,6 @@ void Step6::SetupWidgets()
   renderWindow->GetRenderer()->SetData(&it);
   // use it as a 3D view
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-  mitk::RenderingManager::GetInstance()->AddRenderWindow(renderWindow);
 
   // Part Ib: 2D view for slicing transversally
   // create QmitkSliceWidget, which is based on the class

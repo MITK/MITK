@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   // create a renderwindow
   QmitkRenderWindow renderWindow;
   // tell the renderwindow which (part of) the tree to render
-  renderWindow.GetRenderer()->SetData(&it);
+  mitk::BaseRenderer::GetInstance(renderWindow.GetRenderWindow())->SetData(&it);
 
   //Part V: Qt-specific initialization
   qtapplication.setMainWidget(&renderWindow);

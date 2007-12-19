@@ -106,7 +106,6 @@ int main(int argc, char* argv[])
   // *********************************************************
   // use it as a 3D view!
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-  mitk::RenderingManager::GetInstance()->AddRenderWindow(&renderWindow);
 
   // *********************************************************
   // ******************* END OF NEW PART 2 *******************

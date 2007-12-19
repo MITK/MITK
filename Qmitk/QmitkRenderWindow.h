@@ -38,8 +38,7 @@ class QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
 {
 public:
  
-  QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent = 0, const char *name = 0);
-  QmitkRenderWindow(QWidget *parent = 0, const char *name = 0);
+  QmitkRenderWindow(QWidget *parent = 0, const char *name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL);
   virtual ~QmitkRenderWindow();
 
   void InitRenderer();
@@ -47,7 +46,7 @@ public:
   virtual mitk::SliceNavigationController * GetSliceNavigationController(); 
   virtual mitk::CameraRotationController * GetCameraRotationController();
   virtual mitk::BaseController * GetController();
-
+  virtual mitk::VtkPropRenderer* GetRenderer() { return m_Renderer; }
   
 protected:
     

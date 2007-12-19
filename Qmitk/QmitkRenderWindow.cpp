@@ -27,19 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkRenderer.h"
 
 
-QmitkRenderWindow::QmitkRenderWindow(mitk::BaseRenderer* renderer, QWidget *parent, const char *name)
-: QVTKWidget(parent, name)
-
-{
-  this->InitRenderer();
-  setFocusPolicy(QWidget::StrongFocus);
-  setMouseTracking(true);
-
-  m_InResize = false;
-}
-
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name)
-: QVTKWidget(parent, name)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::VtkPropRenderer* renderer)
+: QVTKWidget(parent, name), m_Renderer(renderer)
 
 {
   if(m_Renderer.IsNull())

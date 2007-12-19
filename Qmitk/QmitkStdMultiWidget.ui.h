@@ -52,7 +52,7 @@ void QmitkStdMultiWidget::init()
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
-  float color[3] = {1.0f,1.0f,1.0f};
+  //float color[3] = {1.0f,1.0f,1.0f};
   mitk::DataTreeNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
 

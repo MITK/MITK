@@ -233,7 +233,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
       int layer=1;
       node->GetIntProperty("layer", layer, this);
   
-      int nr = (layer<<16) - mapperNo;
+      int nr = (layer<<16) + mapperNo;
       m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
       mapperNo++;
     }

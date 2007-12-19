@@ -91,15 +91,15 @@ void QmitkViewInitialization::Apply()
       break;            
   }
 
-  mitk::RenderWindow* renderwindow = m_Controls->m_RenderWindowSelector->GetSelectedRenderWindow();
+  vtkRenderWindow* renderwindow = m_Controls->m_RenderWindowSelector->GetSelectedRenderWindow();
   if(renderwindow != NULL)
   {
-    renderwindow->GetSliceNavigationController()->Update(viewDirection, 
+    mitk::BaseRenderer::GetInstance(renderwindow)->GetSliceNavigationController()->Update(viewDirection, 
       m_Controls->cbTop->isChecked(), 
       m_Controls->cbFrontSide->isChecked(), 
       m_Controls->cbRotated->isChecked()
     );
-    renderwindow->GetRenderer()->GetDisplayGeometry()->Fit();
+    mitk::BaseRenderer::GetInstance(renderwindow)->GetDisplayGeometry()->Fit();
   }
 }
 

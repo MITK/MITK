@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkPropRenderer.h"
 #include "mitkGlobalInteraction.h"
 
-
 #include "icon.xpm"
 
 #include <iostream>
@@ -39,8 +38,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qspinbox.h>
 #include <qcombobox.h>
 
-
-
 #include "qapplication.h"
 
 #include "vtkRenderWindowInteractor.h"
@@ -50,14 +47,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include "vtkMitkRenderProp.h"
 
-
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "vtkRenderWindowInteractor.h"
 
-#include "vtkSphereSource.h"
-#include "vtkDataSetMapper.h"
-#include "vtkElevationFilter.h"
 
 QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
   QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
@@ -308,62 +301,16 @@ void QmitkMovieMaker::AdvanceAnimation()
 
 void QmitkMovieMaker::StartPlaying()
 {
+  // Restart timer with 5 msec interval - this should be fine-grained enough
+  // even for high display refresh frequencies
+  m_Timer->start( 5 );
 
-  vtkSphereSource* cyl = vtkSphereSource::New();
-  vtkElevationFilter* ele = vtkElevationFilter::New();
-  ele->SetLowPoint(0.0, -0.5, 0.0);
-  ele->SetHighPoint(0.0, 0.5, 0.0);
-  ele->SetInput(cyl->GetOutput());
-  vtkDataSetMapper* mapper = vtkDataSetMapper::New();
-  mapper->SetInput(ele->GetOutput());
-  ele->Delete();
-  cyl->Delete();
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  mapper->Delete();
-  
-  // ANLEGEN des QVTK Widget
-  widget = new QVTKWidget(0, "testwidget");
-  widget->resize(512,512);
- 
+  m_Time->restart();
 
-  // ANLEGEN von vtkPROP und m_PropRenderer  
-  vtkMitkRenderProp* renProp = vtkMitkRenderProp::New();
-  m_PropRenderer = new mitk::VtkPropRenderer("test");
-  
-  m_PropRenderer->SetData(m_DataTreeIterator.GetPointer());
-  renProp->SetPropRenderer(m_PropRenderer);
-  m_PropRenderer->SetMapperID(1);
-  m_PropRenderer->GetDisplayGeometry()->Fit();
-  
-  vtkRenderer * vtkRenderer = m_PropRenderer->GetVtkRenderer();  //renderWindow->GetRenderer()->GetVtkRenderer();//vtkRenderer::New();
-
-  vtkRenderer->AddViewProp(renProp);
-  //vtkRenderer->AddViewProp(actor);
-
-  // vtk
-  mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderWindow()->AddRenderer(vtkRenderer);
-  //widget->SetRenderWindow((vtkRenderWindow*) renderWindow->GetVtkRenderWindow());
- 
-  
-  widget->GetRenderWindow()->AddRenderer(vtkRenderer);
-  
-  // INTERACTION  
-
-  /* vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-  iren->SetRenderWindow(renWin);*/
-  // event handling
-  connections = vtkEventQtSlotConnect::New();
-  connections->Connect(widget->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::ModifiedEvent,
-                       this,SLOT(RenderSlot()) );
-
-
-
-
-  widget->show();
-
- 
+  m_Controls->btnPlay->setHidden( true );
+  m_Controls->btnPause->setHidden( false );
+  if(m_movieGenerator.IsNull())
+    m_Controls->btnMovie->setEnabled( false );
 }
 
 void QmitkMovieMaker::RenderSlot( )

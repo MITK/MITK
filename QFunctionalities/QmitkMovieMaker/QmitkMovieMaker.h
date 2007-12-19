@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QVTKWidget.h"
 #include "vtkEventQtSlotConnect.h"
-#include "mitkRenderWindow.h"
+#include "vtkRenderWindow.h"
 #include "mitkVtkPropRenderer.h"
 
 class QmitkStdMultiWidget;
@@ -224,7 +224,7 @@ protected:
   QObject *parentWidget;
   QVTKWidget * widget;
   vtkEventQtSlotConnect * connections;
-  mitk::RenderWindow * renderWindow;
+  vtkRenderWindow * renderWindow;
   mitk::VtkPropRenderer::Pointer m_PropRenderer;
 
 

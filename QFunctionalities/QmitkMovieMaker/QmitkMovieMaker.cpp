@@ -104,24 +104,24 @@ mitk::BaseController* QmitkMovieMaker::GetSpatialController()
   mitk::BaseRenderer* focusedRenderer =
     mitk::GlobalInteraction::GetInstance()->GetFocus();
 
-  if ( m_MultiWidget->GetRenderWindow1()->GetRenderer() == focusedRenderer )
+  if ( mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow() ) == focusedRenderer )
   {
-    return m_MultiWidget->GetRenderWindow1()->GetController();
+    return m_MultiWidget->mitkWidget1->GetController();
   }
-  else if ( m_MultiWidget->GetRenderWindow2()->GetRenderer() == focusedRenderer )
+  else if ( mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow() ) == focusedRenderer )
   {
-    return m_MultiWidget->GetRenderWindow2()->GetController();
+    return m_MultiWidget->mitkWidget2->GetController();
   }
-  else if ( m_MultiWidget->GetRenderWindow3()->GetRenderer() == focusedRenderer )
+  else if ( mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow() ) == focusedRenderer )
   {
-    return m_MultiWidget->GetRenderWindow3()->GetController();
+    return m_MultiWidget->mitkWidget3->GetController();
   }
-  else if ( m_MultiWidget->GetRenderWindow4()->GetRenderer() == focusedRenderer )
+  else if ( mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow() ) == focusedRenderer )
   {
-    return m_MultiWidget->GetRenderWindow4()->GetController();
+    return m_MultiWidget->mitkWidget4->GetController();
   }
 
-  return m_MultiWidget->GetRenderWindow4()->GetController();
+  return m_MultiWidget->mitkWidget4->GetController();
 }
 
 mitk::BaseController* QmitkMovieMaker::GetTemporalController()
@@ -146,14 +146,14 @@ QWidget* QmitkMovieMaker::CreateControlWidget(QWidget *parent)
     );
 
     // Initialize "Selected Window" combo box
-    const mitk::RenderWindow::RenderWindowSet rws =
-      mitk::RenderWindow::GetInstances();
+    const mitk::RenderingManager::RenderWindowVector rwv =
+      mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
-    mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-    for (iter = rws.begin(); iter != rws.end(); ++iter)
+    mitk::RenderingManager::RenderWindowVector::const_iterator iter;
+    for (iter = rwv.begin(); iter != rwv.end(); ++iter)
     {
-      m_Controls->cmbSelectedStepperWindow->insertItem((*iter)->GetName(), -1);
-      m_Controls->cmbSelectedRecordingWindow->insertItem((*iter)->GetName(), -1);
+      m_Controls->cmbSelectedStepperWindow->insertItem(mitk::BaseRenderer::GetInstance((*iter))->GetName(), -1);
+      m_Controls->cmbSelectedRecordingWindow->insertItem(mitk::BaseRenderer::GetInstance((*iter))->GetName(), -1);
     }
   }
 
@@ -259,17 +259,17 @@ void QmitkMovieMaker::FocusChange()
   this->UpdateDirection();
 
   // Set newly focused window as active in "Selected Window" combo box
-  const mitk::RenderWindow::RenderWindowSet rws =
-    mitk::RenderWindow::GetInstances();
+  const mitk::RenderingManager::RenderWindowVector rwv =
+    mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
   int i;
-  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-  for (iter = rws.begin(), i = 0; iter != rws.end(); ++iter, ++i)
+  mitk::RenderingManager::RenderWindowVector::const_iterator iter;
+  for (iter = rwv.begin(), i = 0; iter != rwv.end(); ++iter, ++i)
   {
     mitk::BaseRenderer* focusedRenderer =
       mitk::GlobalInteraction::GetInstance()->GetFocusManager()->GetFocused();
 
-    if ( focusedRenderer == (*iter)->GetRenderer() )
+    if ( focusedRenderer == mitk::BaseRenderer::GetInstance((*iter)) )
     {
       m_Controls->cmbSelectedStepperWindow->setCurrentItem( i );
       m_Controls->cmbSelectedStepperWindow_activated(i);
@@ -342,7 +342,7 @@ void QmitkMovieMaker::StartPlaying()
   //vtkRenderer->AddViewProp(actor);
 
   // vtk
-  renderWindow->GetVtkRenderWindow()->AddRenderer(vtkRenderer);
+  mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderWindow()->AddRenderer(vtkRenderer);
   //widget->SetRenderWindow((vtkRenderWindow*) renderWindow->GetVtkRenderWindow());
  
   
@@ -431,17 +431,17 @@ void QmitkMovieMaker::SetAspect( int aspect )
 void QmitkMovieMaker::SetStepperWindow( int window )
 {
   // Set newly selected window / renderer as focused
-  const mitk::RenderWindow::RenderWindowSet rws =
-    mitk::RenderWindow::GetInstances();
+  const mitk::RenderingManager::RenderWindowVector rwv =
+    mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
  
   int i;
-  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-  for (iter = rws.begin(), i = 0; iter != rws.end(); ++iter, ++i)
+  mitk::RenderingManager::RenderWindowVector::const_iterator iter;
+  for (iter = rwv.begin(), i = 0; iter != rwv.end(); ++iter, ++i)
   {
     if ( i == window )
     {
       mitk::GlobalInteraction::GetInstance()->GetFocusManager()
-        ->SetFocused( (*iter)->GetRenderer() );
+        ->SetFocused( mitk::BaseRenderer::GetInstance((*iter)) );
       break;
     }
   }
@@ -449,16 +449,16 @@ void QmitkMovieMaker::SetStepperWindow( int window )
 void QmitkMovieMaker::SetRecordingWindow( int window )
 {
   // Set newly selected window for recording
-  const mitk::RenderWindow::RenderWindowSet rws =
-    mitk::RenderWindow::GetInstances();
+  const mitk::RenderingManager::RenderWindowVector rwv =
+    mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
  
   int i;
-  mitk::RenderWindow::RenderWindowSet::const_iterator iter;
-  for (iter = rws.begin(), i = 0; iter != rws.end(); ++iter, ++i)
+  mitk::RenderingManager::RenderWindowVector::const_iterator iter;
+  for (iter = rwv.begin(), i = 0; iter != rwv.end(); ++iter, ++i)
   {
     if ( i == window )
     {
-      m_RecordingRenderer = (*iter)->GetRenderer();
+      m_RecordingRenderer = mitk::BaseRenderer::GetInstance( (*iter) );
       break;
     }
   }

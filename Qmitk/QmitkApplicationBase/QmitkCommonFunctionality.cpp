@@ -16,20 +16,21 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <qregexp.h>
-#include <qpixmap.h>
-#include <qimage.h>
 #include <qmessagebox.h>
 #include <string>
 #include <strstream>
 #include "mitkPointSetWriter.h"
 #include "mitkConfig.h"
-#include "QmitkRenderWindow.h"
 #include "mitkCoreObjectFactory.h"
 #include "QmitkCommonFunctionality.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
 
 #include <ipPic/ipPic.h>
+
+#include <vtkWindowToImageFilter.h>
+#include <vtkRenderWindow.h>
+#include <vtkPNGWriter.h>
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
 { 
@@ -520,7 +521,8 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   return fileName;
 }
 
-std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow , const char* filename )
+
+std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow , const char* filename )
 {
   //
   // perform some error checking
@@ -530,8 +532,7 @@ std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow
     itkGenericOutputMacro( << "render window is NULL!" );
     return std::string("");
   }
-  QmitkRenderWindow* qtRenderWindow = dynamic_cast<QmitkRenderWindow*>(renderWindow);
-  if ( ! qtRenderWindow )
+  if ( ! renderWindow )
   {
     itkGenericOutputMacro( << "Unsupported type of render window! The only supported type is currently QmitkRenderWindow." );
     return std::string("");
@@ -541,7 +542,11 @@ std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow
   // create the screenshot before the filechooser is opened,
   // so there the file chooser will not be part of the screenshot
   //
-  QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
+  //QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
+
+  // new Version: 
+  vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New(); 
+  vtkPNGWriter* pngWriter = vtkPNGWriter::New();
   
   //
   // if the provided filename is empty ask the user 
@@ -552,26 +557,30 @@ std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow
   if( filename == NULL )
   {
     //
-    // Build a string containing the supported file formats from qt
-    //
-    std::strstream format;
-    format << "all (";
-    for ( unsigned int i = 0; i < QImageIO::outputFormats().count(); i++ ) {
-      format << "*." << QImageIO::outputFormats().at( i ) << " ";
-    }
-    format << ")";
-    
-    //
     // show a file selector with the supported file formats
     //
-    QString qfileName = QFileDialog::getSaveFileName( QString( "" ), QString( format.str() ).lower() );
+    QString qfileName = QFileDialog::getSaveFileName( QString( "" ), QString( ".png" ).lower() );
     if ( qfileName == NULL )
       return "";
     concreteFilename = qfileName.latin1();
   }
   else
     concreteFilename = filename;
-  
+
+  // make sure the filename ends with .png
+  const std::string outFileSuffix("png");
+  std::string::size_type pos = concreteFilename.rfind('.');
+
+  if ( pos == std::string::npos )
+    concreteFilename = concreteFilename + '.' + outFileSuffix;
+  else 
+  {
+    std::string extname = concreteFilename.substr(pos+1);
+    if ( extname.empty() ) concreteFilename += outFileSuffix; // name ended with '.'
+    if ( !(extname == outFileSuffix) )
+      concreteFilename.replace( pos+1, std::string::npos, "png" );
+  }
+
   //
   // wait for 500 ms to let the file chooser close itself
   //  
@@ -584,11 +593,15 @@ std::string CommonFunctionality::SaveScreenshot( QmitkRenderWindow* renderWindow
   //
   // save the screenshot under the given filename
   //
-  QString extension = itksys::SystemTools::GetFilenameLastExtension( concreteFilename ).c_str();
-  extension = extension.remove('.');  
-  if ( ! buffer.save( concreteFilename.c_str() , extension.upper() ) )
-  {
+
+  wti->SetInput( renderWindow );
+  pngWriter->SetInput( wti->GetOutput() );
+  pngWriter->SetFileName( concreteFilename.c_str() );
+  
+  pngWriter->Write();
+
+  if ( pngWriter->GetErrorCode() != 0 )
     QMessageBox::information(NULL, "Save Screenshot...", "The file could not be saved. Please check filename, format and access rights...");
-  }
+
   return concreteFilename;  
 }

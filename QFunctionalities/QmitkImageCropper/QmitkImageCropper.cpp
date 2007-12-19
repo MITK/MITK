@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qspinbox.h>
 #include <qslider.h>
 
-#include <mitkRenderWindow.h>
+#include <vtkRenderWindow.h>
 #include <mitkRenderingManager.h>
 #include <QmitkStdMultiWidget.h>
 

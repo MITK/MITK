@@ -193,14 +193,14 @@ bool QmitkSliceBasedSegmentation::TestAllTools()
       switch (window)
       {
         case 1:
-          sliceWidget = m_MultiWidget->mitkWidget1->GetRenderWindow(); // IMPORTANT to send the events to the renderwindow and not to the multiwidget or one selectableglwidget
+          sliceWidget = m_MultiWidget->GetRenderWindow1(); // IMPORTANT to send the events to the renderwindow and not to the multiwidget or one selectableglwidget
           break;
         case 2:
-          sliceWidget = m_MultiWidget->mitkWidget2->GetRenderWindow();
+          sliceWidget = m_MultiWidget->GetRenderWindow2();
           break;
         case 3:
         default:
-          sliceWidget = m_MultiWidget->mitkWidget3->GetRenderWindow();
+          sliceWidget = m_MultiWidget->GetRenderWindow3();
           break;
       }
 /*
@@ -278,14 +278,14 @@ bool QmitkSliceBasedSegmentation::TestInterpolation()
     switch (window)
     {
       case 1:
-        sliceWidget = m_MultiWidget->mitkWidget1->GetRenderWindow(); // IMPORTANT to send the events to the renderwindow and not to the multiwidget or one selectableglwidget
+        sliceWidget = m_MultiWidget->GetRenderWindow1(); // IMPORTANT to send the events to the renderwindow and not to the multiwidget or one selectableglwidget
         break;
       case 2:
-        sliceWidget = m_MultiWidget->mitkWidget2->GetRenderWindow();
+        sliceWidget = m_MultiWidget->GetRenderWindow2();
         break;
       case 3:
       default:
-        sliceWidget = m_MultiWidget->mitkWidget3->GetRenderWindow();
+        sliceWidget = m_MultiWidget->GetRenderWindow3();
         break;
     }
 

@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMovieGenerator.h"
 #include "itkCommand.h"
 
-
 #include "QVTKWidget.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkRenderWindow.h"
@@ -208,7 +207,6 @@ public slots:
    * the last call to this function.
    */
   void AdvanceAnimation();
-
   
 
 protected slots:  
@@ -226,9 +224,6 @@ protected:
   vtkEventQtSlotConnect * connections;
   vtkRenderWindow * renderWindow;
   mitk::VtkPropRenderer::Pointer m_PropRenderer;
-
-
-
   
   QmitkMovieMakerControls* m_Controls;
   

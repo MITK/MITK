@@ -393,6 +393,7 @@ void QmitkMovieMaker::SetStepperWindow( int window )
     }
   }
 }
+
 void QmitkMovieMaker::SetRecordingWindow( int window )
 {
   // Set newly selected window for recording

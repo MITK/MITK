@@ -199,6 +199,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char* /*argv*/ [])
   //}
   //std::cout<<"[PASSED]"<<std::endl;
 
+  sphericalTransform->Delete();
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -50,7 +50,7 @@ void QmitkSelectableGLWidget::init()
   * QGL::Rgba enable use of rgba rather than color_index
   * QGL::StencilBuffer for use of stencilbuffer in OpenGL
   */
-  m_RenderWindow = new QmitkRenderWindow(m_Renderer,this, composedName);
+  m_RenderWindow = new QmitkRenderWindow(this, composedName,m_Renderer);
   
 }
 

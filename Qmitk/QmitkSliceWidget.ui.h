@@ -59,7 +59,7 @@ void QmitkSliceWidget::init()
     composedName+=name();
   else
     composedName+="QmitkGLWidget";
-  m_RenderWindow = new QmitkRenderWindow(m_Renderer, container, composedName);
+  m_RenderWindow = new QmitkRenderWindow(container, composedName,m_Renderer);
   hlayout->addWidget(m_RenderWindow);
 
   new QmitkStepperAdapter( m_NavigatorWidget,

@@ -1,0 +1,26 @@
+- Subversion!
+- functionality for slice-by-slice segmentation including interpolation between segmented slices (QmitkSliceBasedSegmentation). For more information see http://www.mitk.org/slicebasedsegmentation.html
+    - example code for 
+      - use of zlib for image compression ( mitk::CompressedImageContainer )
+      - observe changes in the slicer/MPR ( QmitkSlicesInterpolator )
+      - how to safely implement undo
+- MPR planes rotatable
+- improved level-window slider including scale marks, definable presets, selection of image to work on, etc.
+- additional tutorial step describing functionality creation, see http://www.mitk.org/documentation/doxygen/Step9Page.html
+- better build system, esp. those cmake files that need to be changed to add sources are much simpler
+- GUI for basic RAW image import (contribution - Xabier ...)
+- DataStorage -- needs explanation!
+- Progress bar
+- always-available modules for standard views and selection of slices
+- Level-Of-Detail mechanism for volume rendering
+- Textual volume annotation in 2D views
+- Two plane rotation modes: axis rotation and swivel rotation
+- Rendering of multiple overlapping/semi-transparent image-slices in 3D
+- Unified properties for plane reslicing / rendering interpolation modes
+- Improved 3D+t concepts; 3D+t support for Surfaces and PointSets
+- support for "Connexion 3D SpaceNavigator (TM) Mouse": Activate option MITK_USE_TD_MOUSE in cmake to enable interaction with a connexion 3D mouse in 3D widget.
+
+Minor interface changes to lower command complexibility (-classes::method):
+- mitkDataTreeNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkDataTreeNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 

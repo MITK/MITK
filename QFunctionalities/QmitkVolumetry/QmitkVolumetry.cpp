@@ -31,8 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDataTreeComboBox.h"
 
 // for stereo setting
-#include <mitkOpenGLRenderer.h>
-#include <mitkVtkRenderWindow.h>
 #include <vtkRenderWindow.h>
 
 // for zoom/pan

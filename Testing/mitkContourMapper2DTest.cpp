@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkPropRenderer.h"
 
 #include <fstream>
+
 int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 {
   mitk::Contour::Pointer contour;
@@ -61,24 +62,18 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
   std::cout << "visible bounds: " << bounds << std::endl;
-  
-  mitk::VtkPropRenderer::Pointer renderer = new mitk::VtkPropRenderer;
-  
-  //  QmitkRenderWindow *rw = new QmitkRenderWindow(renderer, NULL, NULL);  
-
-  
+ 
+  vtkRenderWindow* renWin = vtkRenderWindow::New();
+  mitk::VtkPropRenderer * renderer = new mitk::VtkPropRenderer("ContourRenderer",renWin);
+    
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
   
   renderer->SetData(&it);
 
-  std::cout<<"testing mitk::VtkPropRenderer::GetRenderWindow()"<<std::endl;
-  /*  mitk::RenderWindow* window = renderer->GetRenderWindow();
-  if (window == NULL)
-  {
-      return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-  */
   std::cout<<"[TEST DONE]"<<std::endl;
+
+  renWin->Delete();
+  renderer->Delete();
+
   return EXIT_SUCCESS;
 }

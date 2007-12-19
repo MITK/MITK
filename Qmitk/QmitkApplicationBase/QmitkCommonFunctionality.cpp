@@ -603,5 +603,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   if ( pngWriter->GetErrorCode() != 0 )
     QMessageBox::information(NULL, "Save Screenshot...", "The file could not be saved. Please check filename, format and access rights...");
 
+  wti->Delete();
+  pngWriter->Delete();
   return concreteFilename;  
 }

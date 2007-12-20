@@ -46,4 +46,29 @@ If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool 
  - \b MITK_DOXYGEN_OUTPUT_DIR: specify the directory where the doxygen documentation will we generated. 
  - \b USE_ITKZLIB: This should be ON in nearly all cases.
 
+\section MITKConfig.cmake
+
+\link NewFunctionalityPage
+
+In the binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
+
+FIND_PACKAGE(MITK)
+
+On Windows you also need
+FIND_PACKAGE(ITK)
+FIND_PACKAGE(VTK)
+to get the library dependencies right.
+
+After that you can set your include path with
+
+INCLUDE_DIRECTORIES(${QMITK_INCLUDE_DIRS})
+
+and create an application:
+
+LINK_DIRECTORIES(${MITK_LINK_DIRECTORIES})
+ADD_EXECUTABLE(MyApp MyApp.cpp)
+TARGET_LINK_LIBRARIES(Step1 ${QMITK_LIBRARIES})
+
+
+\note IMPORTANT: do not include the ITK_USE_FILE in your project when using MITK. There's a conflict in the ITK and MITK tree classes which will be resolved soon. 
 */

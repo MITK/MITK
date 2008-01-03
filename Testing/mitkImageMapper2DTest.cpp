@@ -18,10 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImage.h>
 #include <mitkDataTree.h>
-#include <mitkRenderWindow.h>
+//#include <mitkRenderWindow.h>
 #include <mitkImageMapper2D.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <mitkNativeRenderWindowInteractor.h>
 
@@ -69,18 +70,13 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Creating (native) RenderWindow: ";
-  mitk::RenderWindow* renderwindow = new mitk::RenderWindow("the render window");
-  renderwindow->InitRenderer();
-  std::cout<<"[PASSED]"<<std::endl;
-  renderwindow->GetRenderer()->InitSize(400,400); //ohne dies leider kein Bild. Vermutlich noch Problem mit SwapBuffers (aufruf über vtkRenderWindow::Frame())
-
-  std::cout << "RenderWindow::SetData(iterator): ";
-  renderwindow->GetRenderer()->SetData(&it);
+  std::cout << "Creating VtkPropRenderer: ";
+  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
+  mitk::VtkPropRenderer *propRenderer = new mitk::VtkPropRenderer( "the renderer", renderWindow );
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "RenderWindow::Update(): ";
-  renderwindow->RequestUpdate();
+  std::cout << "BaseRenderer::SetData(iterator): ";
+  propRenderer->SetData(&it);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing if an mitk::ImageMapper2D was created: ";
@@ -91,7 +87,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  delete renderwindow;
+  renderWindow->Delete();
   tree = NULL; // As the tree has been registered explicitely, destroy it again.
 
   std::cout<<"[TEST DONE]"<<std::endl;

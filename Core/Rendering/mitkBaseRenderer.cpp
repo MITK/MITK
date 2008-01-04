@@ -160,9 +160,10 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
 
 
   m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
-  m_SliceNavigationController->ConnectGeometrySliceEvent(this);
-  m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
-  m_SliceNavigationController->ConnectGeometryTimeEvent(this, false );
+  m_SliceNavigationController->SetRenderer( this );
+  m_SliceNavigationController->ConnectGeometrySliceEvent( this );
+  m_SliceNavigationController->ConnectGeometryUpdateEvent( this );
+  m_SliceNavigationController->ConnectGeometryTimeEvent( this, false );
 
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow( m_RenderWindow );

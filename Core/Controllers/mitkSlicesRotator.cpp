@@ -191,6 +191,11 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         if ( !(*iter)->GetSliceRotationLocked() )
         {
           BaseRenderer *renderer = (*iter)->GetRenderer();
+          if ( renderer == NULL )
+          {
+            break;
+          }
+
           DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
           // std::cout << i << ":" << std::endl;

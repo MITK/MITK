@@ -183,7 +183,10 @@ QWidget* QmitkMessageBoxHelper::FindTopLevelWindow( const char* classname )
 void QmitkMessageBoxHelper::WaitForDialogAndCallback( const char* classname, int maxWaitSeconds )
 {
   if (m_DialogWaitingThread)
+  {
     m_DialogWaitingThread->wait();
+    delete m_DialogWaitingThread;
+  }
 
   m_DialogWaitingThread = new QmitkMessageBoxHelperDialogWaitThread( this, classname, maxWaitSeconds );
   
@@ -209,17 +212,23 @@ void QmitkMessageBoxHelper::DialogFound(const itk::EventObject&)
 
   emit DialogFound( m_FoundDialog );
 
-  m_DialogWaitingThread->wait();
-  delete m_DialogWaitingThread;
+  if (m_DialogWaitingThread)
+  {
+    m_DialogWaitingThread->wait();
+    delete m_DialogWaitingThread;
+  }
   m_DialogWaitingThread = NULL;
 }
 
 void QmitkMessageBoxHelper::DialogNotFound(const itk::EventObject&)
 {
   emit DialogFound( NULL );
-
-  m_DialogWaitingThread->wait();
-  delete m_DialogWaitingThread;
+  
+  if (m_DialogWaitingThread)
+  {
+    m_DialogWaitingThread->wait();
+    delete m_DialogWaitingThread;
+  }
   m_DialogWaitingThread = NULL;
 }
 

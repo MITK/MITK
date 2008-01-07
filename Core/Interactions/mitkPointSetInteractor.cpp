@@ -500,83 +500,99 @@ bool mitk::PointSetInteractor
         it = points->Begin();
         end = points->End();
         int position = 0;
+        int previousExistingPosition = -1;//to recognize the last existing position; needed because the iterator gets invalid if the point is deleted!
+        int lastDelPrevExistPosition = -1; //the previous position of the last deleted point
         while (it != end)
         {
-          //if point is selected
-          if (  pointSet->GetSelectInfo(it->Index(), timeStep) )
+          if (points->IndexExists(it->Index()))
           {
-            //get the coordinates of that point to be undoable
-            PointSet::PointType selectedPoint = it->Value();
-            mitk::Point3D itkPoint;
-            itkPoint[0] = selectedPoint[0];
-            itkPoint[1] = selectedPoint[1];
-            itkPoint[2] = selectedPoint[2];
-
-            position = it->Index();
-            PointOperation* doOp = new mitk::PointOperation(OpREMOVE, 
-              timeInMS, itkPoint, position);
-            //Undo
-            if (m_UndoEnabled)  //write to UndoMechanism
+            //if point is selected
+            if (  pointSet->GetSelectInfo(it->Index(), timeStep) )
             {
-              PointOperation* undoOp = new mitk::PointOperation(OpINSERT,
+              //get the coordinates of that point to be undoable
+              PointSet::PointType selectedPoint = it->Value();
+              mitk::Point3D itkPoint;
+              itkPoint[0] = selectedPoint[0];
+              itkPoint[1] = selectedPoint[1];
+              itkPoint[2] = selectedPoint[2];
+
+              position = it->Index();
+              PointOperation* doOp = new mitk::PointOperation(OpREMOVE, 
                 timeInMS, itkPoint, position);
-              OperationEvent *operationEvent = new OperationEvent(pointSet, 
-                doOp, undoOp, "Remove point");
-              m_UndoController->SetOperationEvent(operationEvent);
-            }
-            pointSet->ExecuteOperation(doOp);
+              //Undo
+              if (m_UndoEnabled)  //write to UndoMechanism
+              {
+                PointOperation* undoOp = new mitk::PointOperation(OpINSERT,
+                  timeInMS, itkPoint, position);
+                OperationEvent *operationEvent = new OperationEvent(pointSet, 
+                  doOp, undoOp, "Remove point");
+                m_UndoController->SetOperationEvent(operationEvent);
+              }
+              pointSet->ExecuteOperation(doOp);
 
-            //after delete the iterator is undefined, so start again and 
-            //count to the entry before! If there ist only one point, then 
-            //rather start at the begining, cause that is the point then.
-            it = points->Begin();
-            if (points->Size()>1)
+              //after delete the iterator is undefined, so start again 
+              //count to the last existing entry
+              if (points->Size()>1 && points->IndexExists(previousExistingPosition))
+              {
+                for (it = points->Begin(); it != points->End(); it++)
+                {
+                  if (it->Index() == previousExistingPosition)
+                  {
+                    lastDelPrevExistPosition = previousExistingPosition;
+                    break; //return if the iterator on the last existing position is found
+                  }
+                }
+              }
+              else // size <= 1 or no previous existing position set
+              {
+                //search for the first existing position
+                for (it = points->Begin(); it != points->End(); it++)
+                  if (points->IndexExists(it->Index()))
+                  {
+                    previousExistingPosition = it->Index();
+                    break;
+                  }
+              }
+
+              //now that we have set the iterator, lets get sure, that the next it++ will not crash!
+              if (it == end) { break; }
+
+            }//if
+            else
             {
-              for (int counter = 0; counter < position-1; counter++)
-                it++;
+              previousExistingPosition = it->Index();
             }
+          }//if index exists
 
-            if (it == end) { break; }
-
-          }//if
           it++;
         }//while
-        /*now select the point before the point/points that was/were deleted*/
         
-        //only then a select of a point is possible!
-        if (pointSet->GetSize( timeStep ) > 0)
+        if (lastDelPrevExistPosition < 0)//the var has not been set because the first element was deleted and there was no prev position
+          lastDelPrevExistPosition = previousExistingPosition; //go to the end
+
+        /*
+        * now select the point before the point/points that was/were deleted
+        */
+        if (pointSet->GetSize( timeStep ) > 0) //only then a select of a point is possible!
         {
-          //to not loose the position of the deleted point
-          int aPosition = position;
-          bool found = false;
-
-          --aPosition;//begin before the one deleted
-          for (;aPosition >= 0; --aPosition)//search backwards
+          if (points->IndexExists(lastDelPrevExistPosition))
           {
-            if (points->IndexExists(aPosition))
-            {
-              found = true;
-              break;
-            }
+            this->SelectPoint( lastDelPrevExistPosition, timeStep, timeInMS );
           }
-
-          if (!found)//no element before position! so look afterwards!
+          else
           {
-            mitk::PointSet::PointsContainer::Iterator it, end;
-            it = points->Begin();
-            end = points->End();
-            //go to the position in front of the point, that was deleted
-            for (int counter = 0; counter < position-1; ++counter)
-            {
-              ++it;
-            }
-            aPosition = it->Index();
+            //select the first existing element
+            for (mitk::PointSet::PointsContainer::Iterator it = points->Begin(); it != points->End(); it++)
+              if (points->IndexExists(it->Index()))
+              {
+                this->SelectPoint( it->Index(), timeStep, timeInMS ); 
+                break;
+              }
           }
-          this->SelectPoint( aPosition, timeStep, timeInMS );
         }//if
         ok = true;
       }//else
-    }
+    }//case
 
     // Update the display
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

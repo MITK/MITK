@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidgetlist.h>
 #include <qobjectlist.h>
 #include <qmessagebox.h>
+#include <qinputdialog.h>
 
 #include <stdlib.h>
 #include <iostream>
@@ -50,8 +51,14 @@ void QmitkFunctionalityTesting::CloseFirstMessageBox() {
     while ( ( widget = topWidgetsIt.current()) != 0 ) {
        ++topWidgetsIt;
        if (widget->isA("QMessageBox")) {
-        std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
+         std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
          ((QMessageBox*)widget)->close();
+         boxClosed=true;
+         break;
+       }
+       if( widget->isA("QInputDialog")) {
+         std::cout << "Found a toplevel input dialog box! Please give it a parent. Closing it..." << std::endl;
+         ((QInputDialog*)widget)->close();
          boxClosed=true;
          break;
        }

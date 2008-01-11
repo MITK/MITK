@@ -55,7 +55,7 @@ public:
   {
     return (vtkFloatingPointType) 0.0;
   };
-  
+
   static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* /*cellData*/, typename MeshType::CellIdentifier /*idx*/, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
     return (vtkFloatingPointType) 0.0;
@@ -70,7 +70,7 @@ public:
   {
     return (vtkFloatingPointType)pointData->GetElement(idx);
   };
-  
+
   static inline vtkFloatingPointType GetCellScalar(typename MeshType::CellDataContainer* cellData, typename MeshType::CellIdentifier idx, MeshType* /*mesh*/ = NULL, unsigned int /*type*/ = 0)
   {
     return (vtkFloatingPointType)cellData->GetElement(idx);
@@ -83,7 +83,7 @@ class MeanCurvatureAccessor : public NullScalarAccessor<MeshType>
 public:
   static inline vtkFloatingPointType GetPointScalar(typename MeshType::PointDataContainer* /*point*/, typename MeshType::PointIdentifier idx, MeshType* mesh, unsigned int /*type*/ = 0)
   {
-    typename MeshType::PixelType dis;    
+    typename MeshType::PixelType dis = 0;    
     mesh->GetPointData(idx, &dis);
     return (vtkFloatingPointType) dis;
   };
@@ -97,7 +97,6 @@ public:
   {
     typename MeshType::GeometryMapPointer geometryData = mesh->GetGeometryData();
 
-    typename MeshType::PixelType dis;
     if (type == 0)
     {
       double val = mesh->GetMeanCurvature( idx );
@@ -123,7 +122,7 @@ public:
       mesh->GetDistance(idx);
     else if (type == 5)
     {
-      typename MeshType::PixelType dis;    
+      typename MeshType::PixelType dis = 0;    
       mesh->GetPointData(idx, &dis);
       return (vtkFloatingPointType) dis;
     }
@@ -133,8 +132,6 @@ public:
     }
     else
       return (vtkFloatingPointType) 0;
-
-    return (vtkFloatingPointType) dis;
   };
 };
 
@@ -199,11 +196,11 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-                         ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
@@ -231,11 +228,11 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
@@ -256,11 +253,11 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
 
@@ -292,14 +289,14 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
-    
+
     /*! 
     Visit a tetrahedra and create the VTK_TETRA cell 
     */
@@ -321,14 +318,14 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
-    
+
     /*! 
     Visit a hexahedron and create the VTK_HEXAHEDRON cell 
     */
@@ -340,7 +337,7 @@ class MeshUtil
       vtkIdType vtkCellId = -1;
       if (num == 8) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++)
-          {
+        {
           if (i == 2)
             pts[i++] = *(it+1);
           else if (i == 3)
@@ -351,7 +348,7 @@ class MeshUtil
             pts[i++] = *(it-1);
           else
             pts[i++] = *it;
-          }
+        }
         vtkCellId = this->InsertHexahedron( (vtkIdType*)pts );
       }
       else if (num == 4) {
@@ -366,11 +363,11 @@ class MeshUtil
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
         vtkCellId = this->InsertLine( (vtkIdType*)pts );
       }
-      
+
       if (this->m_UseCellScalarAccessor && vtkCellId >= 0)
       {
         this->m_CellScalars->InsertTuple1(vtkCellId,
-            ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
+          ScalarAccessor::GetCellScalar(this->m_CellData, cellId));
       }
     }
   };
@@ -448,7 +445,7 @@ class MeshUtil
         this->InsertQuad(pts);
       }
     }
-    
+
     /*! 
     Visit a tetrahedron and create the VTK_TETRA cell 
     */
@@ -459,7 +456,7 @@ class MeshUtil
       if (num == 4) 
         this->InsertTetra(pts);
     }
-    
+
     /*! 
     Visit a hexahedron and create the VTK_HEXAHEDRON cell 
     */
@@ -491,16 +488,16 @@ class MeshUtil
     vtkCellArray* m_Cells;
     int* m_TypeArray;
     //vtkIdType cellId;
-    
+
   protected:
     bool m_UseCellScalarAccessor;
     vtkFloatArray* m_CellScalars;
     typename MeshType::CellDataContainer::Pointer m_CellData;
-    
+
   public:
-    
+
     SingleCellArrayInsertImplementation() : m_UseCellScalarAccessor(false) {}
-    
+
     /*! Set the vtkCellArray that will be constructed
     */
     void SetCellArray(vtkCellArray* cells)
@@ -515,24 +512,24 @@ class MeshUtil
     {
       m_TypeArray = i;
     }
-    
+
     void SetUseCellScalarAccessor(bool flag) 
     {
       m_UseCellScalarAccessor = flag;
     }
-    
+
     void SetCellScalars(vtkFloatArray* scalars)
     {
       m_CellScalars = scalars;
     }
-    
+
     vtkFloatArray* GetCellScalars() { return m_CellScalars; }
-    
+
     void SetMeshCellData(typename MeshType::CellDataContainer* data)
     {
       m_CellData = data;
     }
-    
+
     vtkIdType InsertLine(vtkIdType *pts)
     {
       vtkIdType cellId = m_Cells->InsertNextCell(2, pts);
@@ -560,14 +557,14 @@ class MeshUtil
       m_TypeArray[cellId] = VTK_QUAD;
       return cellId;
     }
-    
+
     vtkIdType InsertTetra(vtkIdType *pts)
     {
       vtkIdType cellId = m_Cells->InsertNextCell(4, pts);
       m_TypeArray[cellId] = VTK_TETRA;
       return cellId;
     }
-    
+
     vtkIdType InsertHexahedron(vtkIdType *pts)
     {
       vtkIdType cellId = m_Cells->InsertNextCell(8, pts);
@@ -587,17 +584,17 @@ class MeshUtil
     vtkCellArray* m_TriangleCells;
     vtkCellArray* m_PolygonCells;
     vtkCellArray* m_QuadCells;
-    
+
   protected:
     bool m_UseCellScalarAccessor;
     vtkFloatArray* m_CellScalars;
     typename MeshType::CellDataContainer::Pointer m_CellData;
 
   public:
-    
+
     DistributeInsertImplementation() : m_UseCellScalarAccessor(false) {}
 
-    
+
     /*! Set the vtkCellArray that will be constructed
     */
     void SetCellArrays(vtkCellArray* lines, vtkCellArray* triangles, vtkCellArray* polygons, vtkCellArray* quads) 
@@ -627,7 +624,7 @@ class MeshUtil
     {
       return m_QuadCells->InsertNextCell(4, pts);
     }
-    
+
     vtkIdType InsertTetra(vtkIdType *pts) { return -1; } // ignored
     vtkIdType InsertHexahedron(vtkIdType *pts) { return -1; } // ignored
   };
@@ -738,172 +735,172 @@ public:
     int cellId = 0;
     // poly ids start after verts and lines!
     int cellIdOfs = poly->GetNumberOfVerts() + poly->GetNumberOfLines();
-      for(; cellId < numcells; cellId++)
+    for(; cellId < numcells; cellId++)
+    {
+      vtkCellTypes[cellId] = poly->GetCellType( cellId+cellIdOfs );
+    }
+
+    // cells->Reserve(numcells);
+    vtkIdType npts;
+    vtkIdType* pts;
+    cellId = 0;
+
+    typedef typename MeshType::MeshTraits   OMeshTraits;
+    typedef typename OMeshTraits::PixelType       OPixelType; 
+    typedef typename MeshType::CellTraits					CellTraits;
+    typedef typename itk::CellInterface<OPixelType, CellTraits>   CellInterfaceType;
+    typedef typename itk::TriangleCell<CellInterfaceType>         TriCellType;
+    typedef typename TriCellType::CellAutoPointer	           TriCellPointer;
+
+    TriCellPointer newCell;
+    output->GetCells()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
+    output->GetCellData()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
+
+    for(vtkcells->InitTraversal(); vtkcells->GetNextCell(npts, pts); cellId++)
+    {
+      switch(vtkCellTypes[cellId])
       {
-        vtkCellTypes[cellId] = poly->GetCellType( cellId+cellIdOfs );
-      }
-
-      // cells->Reserve(numcells);
-      vtkIdType npts;
-      vtkIdType* pts;
-      cellId = 0;
-
-      typedef typename MeshType::MeshTraits   OMeshTraits;
-      typedef typename OMeshTraits::PixelType       OPixelType; 
-      typedef typename MeshType::CellTraits					CellTraits;
-      typedef typename itk::CellInterface<OPixelType, CellTraits>   CellInterfaceType;
-      typedef typename itk::TriangleCell<CellInterfaceType>         TriCellType;
-      typedef typename TriCellType::CellAutoPointer	           TriCellPointer;
-
-      TriCellPointer newCell;
-      output->GetCells()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
-      output->GetCellData()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
-
-      for(vtkcells->InitTraversal(); vtkcells->GetNextCell(npts, pts); cellId++)
-      {
-        switch(vtkCellTypes[cellId])
+      case VTK_TRIANGLE:
         {
-        case VTK_TRIANGLE:
+          if (npts != 3) continue; // skip non-triangles;
+          unsigned long pointIds[3];
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
+
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);//(unsigned long*)pts);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          break;    
+        } 
+
+      case VTK_QUAD:
+        {
+          if (npts != 4 ) continue; // skip non-quadrilateral
+          unsigned long pointIds[3];
+
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          cellId++;
+
+          pointIds[0] = (unsigned long) pts[2];
+          pointIds[1] = (unsigned long) pts[3];
+          pointIds[2] = (unsigned long) pts[0];
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          break;
+        }
+
+      case VTK_EMPTY_CELL:
+        {
+          if (npts != 3) 
           {
-            if (npts != 3) continue; // skip non-triangles;
-            unsigned long pointIds[3];
-            pointIds[0] = (unsigned long) pts[0];
-            pointIds[1] = (unsigned long) pts[1];
-            pointIds[2] = (unsigned long) pts[2];
-
-            newCell.TakeOwnership( new TriCellType );
-            newCell->SetPointIds(pointIds);//(unsigned long*)pts);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
-            break;    
-          } 
-
-        case VTK_QUAD:
-          {
-            if (npts != 4 ) continue; // skip non-quadrilateral
-            unsigned long pointIds[3];
-
-            pointIds[0] = (unsigned long) pts[0];
-            pointIds[1] = (unsigned long) pts[1];
-            pointIds[2] = (unsigned long) pts[2];
-            newCell.TakeOwnership( new TriCellType );
-            newCell->SetPointIds(pointIds);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
-            cellId++;
-
-            pointIds[0] = (unsigned long) pts[2];
-            pointIds[1] = (unsigned long) pts[3];
-            pointIds[2] = (unsigned long) pts[0];
-            newCell.TakeOwnership( new TriCellType );
-            newCell->SetPointIds(pointIds);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
-            break;
+            std::cout << "Error: Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
+            continue;
           }
+          unsigned long pointIds[3];
+          pointIds[0] = (unsigned long) pts[0];
+          pointIds[1] = (unsigned long) pts[1];
+          pointIds[2] = (unsigned long) pts[2];
 
-        case VTK_EMPTY_CELL:
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          break;    
+        } 
+
+        //case VTK_VERTEX:              // If need to implement use 
+        //case VTK_POLY_VERTEX:         // the poly->GetVerts() and 
+        //case VTK_LINE:                // poly->GetLines() routines 
+        //case VTK_POLY_LINE:           // outside of the switch..case.
+      case VTK_POLYGON:
+      case VTK_PIXEL:
+        {
+          if (npts != 4 ) continue;// skip non-quadrilateral
+          unsigned long pointIds[3];
+          for ( unsigned int idx = 0; idx <= 1; idx++ )
           {
-            if (npts != 3) 
-            {
-              std::cout << "Error: Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
-              continue;
-            }
-            unsigned long pointIds[3];
-            pointIds[0] = (unsigned long) pts[0];
-            pointIds[1] = (unsigned long) pts[1];
-            pointIds[2] = (unsigned long) pts[2];
-
+            pointIds[0] = (unsigned long) pts[idx];
+            pointIds[1] = (unsigned long) pts[idx+1];
+            pointIds[2] = (unsigned long) pts[idx+2];
             newCell.TakeOwnership( new TriCellType );
             newCell->SetPointIds(pointIds);
-            output->SetCell(cellId, newCell );
-            output->SetCellData(cellId, (typename MeshType::PixelType)3);
-            break;    
-          } 
-
-          //case VTK_VERTEX:              // If need to implement use 
-          //case VTK_POLY_VERTEX:         // the poly->GetVerts() and 
-          //case VTK_LINE:                // poly->GetLines() routines 
-          //case VTK_POLY_LINE:           // outside of the switch..case.
-        case VTK_POLYGON:
-        case VTK_PIXEL:
-          {
-            if (npts != 4 ) continue;// skip non-quadrilateral
-            unsigned long pointIds[3];
-            for ( unsigned int idx = 0; idx <= 1; idx++ )
-            {
-              pointIds[0] = (unsigned long) pts[idx];
-              pointIds[1] = (unsigned long) pts[idx+1];
-              pointIds[2] = (unsigned long) pts[idx+2];
-              newCell.TakeOwnership( new TriCellType );
-              newCell->SetPointIds(pointIds);
-              output->SetCell(cellId+idx, newCell );
-              output->SetCellData(cellId+idx, (typename MeshType::PixelType)3);
-            }
-            cellId++;
-            break;
+            output->SetCell(cellId+idx, newCell );
+            output->SetCellData(cellId+idx, (typename MeshType::PixelType)3);
           }
+          cellId++;
+          break;
+        }
 
-        case VTK_TETRA:
-        case VTK_VOXEL:
-        case VTK_HEXAHEDRON:
-        case VTK_WEDGE:
-        case VTK_PYRAMID:
-        case VTK_PARAMETRIC_CURVE:
-        case VTK_PARAMETRIC_SURFACE:
-        default:
-          std::cerr << "Warning, unhandled cell type " 
-            << vtkCellTypes[cellId] << std::endl;
+      case VTK_TETRA:
+      case VTK_VOXEL:
+      case VTK_HEXAHEDRON:
+      case VTK_WEDGE:
+      case VTK_PYRAMID:
+      case VTK_PARAMETRIC_CURVE:
+      case VTK_PARAMETRIC_SURFACE:
+      default:
+        std::cerr << "Warning, unhandled cell type " 
+          << vtkCellTypes[cellId] << std::endl;
+      }
+    }
+
+    if (poly->GetNumberOfStrips() != 0) 
+    {
+      vtkcells = poly->GetStrips();
+      numcells = vtkcells->GetNumberOfCells();
+      vtkCellTypes = new int[numcells];
+      int stripId = 0;
+      // strip ids start after verts, lines and polys!
+      int stripIdOfs = poly->GetNumberOfVerts() + poly->GetNumberOfLines() + poly->GetNumberOfPolys(); 
+      for(; stripId < numcells; stripId++)
+      {
+        vtkCellTypes[stripId] = poly->GetCellType( stripId+stripIdOfs );
+      }
+      stripId = 0;
+
+      vtkcells->InitTraversal();
+      while( vtkcells->GetNextCell(npts, pts) )
+      {
+        if (vtkCellTypes[stripId] != VTK_TRIANGLE_STRIP) 
+        {
+          std::cout << "Error: Only triangle strips supported!" << std::endl;
+          continue;
+        }
+        stripId++;
+
+        unsigned int numberOfTrianglesInStrip = npts - 2;
+        unsigned long pointIds[3];
+        pointIds[0] = (unsigned long) pts[0];
+        pointIds[1] = (unsigned long) pts[1];
+        pointIds[2] = (unsigned long) pts[2];
+
+        for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
+        {
+          newCell.TakeOwnership( new TriCellType );
+          newCell->SetPointIds(pointIds);
+          output->SetCell(cellId, newCell );
+          output->SetCellData(cellId, (typename MeshType::PixelType)3);
+          cellId++;
+          pointIds[0] = pointIds[1];
+          pointIds[1] = pointIds[2];
+          pointIds[2] = pts[t+3];
         }
       }
-
-      if (poly->GetNumberOfStrips() != 0) 
-      {
-        vtkcells = poly->GetStrips();
-        numcells = vtkcells->GetNumberOfCells();
-        vtkCellTypes = new int[numcells];
-        int stripId = 0;
-        // strip ids start after verts, lines and polys!
-        int stripIdOfs = poly->GetNumberOfVerts() + poly->GetNumberOfLines() + poly->GetNumberOfPolys(); 
-          for(; stripId < numcells; stripId++)
-          {
-            vtkCellTypes[stripId] = poly->GetCellType( stripId+stripIdOfs );
-          }
-          stripId = 0;
-
-          vtkcells->InitTraversal();
-          while( vtkcells->GetNextCell(npts, pts) )
-          {
-            if (vtkCellTypes[stripId] != VTK_TRIANGLE_STRIP) 
-            {
-              std::cout << "Error: Only triangle strips supported!" << std::endl;
-              continue;
-            }
-            stripId++;
-
-            unsigned int numberOfTrianglesInStrip = npts - 2;
-            unsigned long pointIds[3];
-            pointIds[0] = (unsigned long) pts[0];
-            pointIds[1] = (unsigned long) pts[1];
-            pointIds[2] = (unsigned long) pts[2];
-
-            for( unsigned int t=0; t < numberOfTrianglesInStrip; t++ )
-            {
-              newCell.TakeOwnership( new TriCellType );
-              newCell->SetPointIds(pointIds);
-              output->SetCell(cellId, newCell );
-              output->SetCellData(cellId, (typename MeshType::PixelType)3);
-              cellId++;
-              pointIds[0] = pointIds[1];
-              pointIds[1] = pointIds[2];
-              pointIds[2] = pts[t+3];
-            }
-          }
-      }   
-      //output->Print(std::cout);
-      output->BuildCellLinks();
-      delete[] vtkCellTypes;
-      return output;
+    }   
+    //output->Print(std::cout);
+    output->BuildCellLinks();
+    delete[] vtkCellTypes;
+    return output;
   }
 
   /*!
@@ -920,11 +917,11 @@ public:
   create an vtkUnstructuredGrid object from an itkMesh
   */
   static vtkUnstructuredGrid* MeshToUnstructuredGrid(
-      MeshType* mesh, 
-      bool usePointScalarAccessor = false, 
-      bool useCellScalarAccessor = false, 
-      unsigned int pointDataType = 0, 
-      mitk::Geometry3D* geometryFrame=NULL)
+    MeshType* mesh, 
+    bool usePointScalarAccessor = false, 
+    bool useCellScalarAccessor = false, 
+    unsigned int pointDataType = 0, 
+    mitk::Geometry3D* geometryFrame=NULL)
   {
     /*! 
     default SingleCellArray line cell visitior definition 
@@ -965,8 +962,8 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType, typename MeshType::CellTraits,
       itk::TetrahedronCell< itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
       SingleCellArrayUserVisitorType>               SingleCellArrayTetrahedronVisitor;
-      
-      
+
+
     /*! 
     default SingleCellArray hex cell visitior definition
     */
@@ -994,7 +991,7 @@ public:
     vtkFloatArray* cellScalars = vtkFloatArray::New();
     pointScalars->SetNumberOfComponents(1);
     cellScalars->SetNumberOfComponents(1);
-    
+
     typename MeshType::PointsContainer::Pointer points = mesh->GetPoints();
     typename MeshType::PointsContainer::Iterator i;
 
@@ -1011,7 +1008,7 @@ public:
     vpoints->SetNumberOfPoints(maxIndex+1);
     pointScalars->SetNumberOfTuples(maxIndex+1);
     cellScalars->SetNumberOfTuples(mesh->GetNumberOfCells());
-    
+
     vtkFloatingPointType vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
     if (geometryFrame == 0)
@@ -1056,7 +1053,7 @@ public:
     vgrid->SetPoints(vpoints);
     if (usePointScalarAccessor)
       vgrid->GetPointData()->SetScalars(pointScalars);
-    
+
     // Now create the cells using the MultiVisitor
     // 1. Create a MultiVisitor
     typename MeshType::CellType::MultiVisitor::Pointer mv =
@@ -1090,7 +1087,7 @@ public:
     tetv->SetCellArray(cells);
     hv->SetTypeArray(types);
     hv->SetCellArray(cells);
-    
+
     if (useCellScalarAccessor)
     {
       lv->SetUseCellScalarAccessor(true);
@@ -1117,7 +1114,7 @@ public:
       hv->SetCellScalars(cellScalars);
       hv->SetMeshCellData(mesh->GetCellData());
     }
-    
+
     // add the visitors to the multivisitor
     mv->AddVisitor(lv);
     mv->AddVisitor(pv);
@@ -1130,10 +1127,10 @@ public:
     // cell types of the visitors added to the MultiVisitor
     mesh->Accept(mv);
     // Now set the cells on the vtk grid with the type array and cell array
-    
+
     vgrid->SetCells(types, cells);
     vgrid->GetCellData()->SetScalars(cellScalars);
-    
+
     // Clean up vtk objects (no vtkSmartPointer ... )
     cells->Delete();
     vpoints->Delete();

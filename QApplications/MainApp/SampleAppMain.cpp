@@ -76,8 +76,7 @@ int main(int argc, char* argv[])
     * Activating GlobalImmediateModeRendering in vtk solves this problem. Also add #include vtkMapper above
     */
     //vtkMapper::GlobalImmediateModeRenderingOn();
-    
-     
+         
     //B/     Setup MainApp Widget size (default: maximized) ////
     mitk::Point3dProperty* sizeProp = dynamic_cast<mitk::Point3dProperty*>
                                       (mainWindow.m_Options->GetProperty("Startup window size"));
@@ -127,7 +126,9 @@ int main(int argc, char* argv[])
       }
       fctwidget->MainSplitter->setSizes(i);
       mainWindow.repaint();
-    }    
+    }
+    // reinit views after mainwindow and fctwidget initialization
+    mainWindow.viewReinitMultiWidget();
     
     
     if(enableFunctionalityTesting) 

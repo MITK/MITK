@@ -130,10 +130,12 @@ bool QmitkSliceBasedSegmentation::TestYourself()
     return false;
   }
   std::cout << "[PASSED]" << std::endl;
-  
+ 
+#ifndef MITK_FAST_TESTING
   // test if interpolation does not crash
   // THIS FIRST, because the drawing area is still clear here
   if (!TestInterpolation()) return false;
+#endif
 
   // Test: test all the tools
   if (!TestAllTools()) return false;
@@ -209,6 +211,10 @@ bool QmitkSliceBasedSegmentation::TestAllTools()
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.75, 0.75, 0.2 );
 */
+#ifdef MITK_FAST_TESTING
+      std::cout << " circle " << std::flush;
+      QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.5, 0.5, 0.3 );
+#else
       std::cout << " circle " << std::flush;
       QmitkUserInputSimulation::MouseDrawCircle( sliceWidget, Qt::LeftButton, 0.75, 0.25, 0.2 );
       std::cout << " circle " << std::flush;
@@ -225,6 +231,7 @@ bool QmitkSliceBasedSegmentation::TestAllTools()
           QmitkUserInputSimulation::MouseDrawRandom( sliceWidget, Qt::LeftButton, 5 ); // random points
         }
       }
+#endif
     }
 
     std::cout << "[PASSED]" << std::endl;

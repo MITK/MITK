@@ -3179,6 +3179,28 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
+  <stateMachine NAME="CurveModelInteractor">
+    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
+    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="918" Y_POS="441" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="43">
+        <action ID="21" />
+      </transition>
+    </state>
+    <state NAME="IsPointSelected" ID="43" X_POS="470" Y_POS="441" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="42">
+        <action ID="72" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="44" />
+    </state>
+    <state NAME="PointSelected" ID="44" X_POS="690" Y_POS="204" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="44">
+        <action ID="91" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="42">
+        <action ID="0" />
+      </transition>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

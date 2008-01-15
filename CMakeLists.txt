@@ -151,14 +151,26 @@ OPTION(USE_QT "Use Trolltech's Qt library" ON)
 
 IF(USE_QT)
   SET(QT_MT_REQUIRED 1)
-  FIND_PACKAGE(Qt3)
-  SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
-  FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents QmitkDialogBars) 
- SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk/${dir})
-ENDFOREACH(dir)
- INCLUDE(CMake/FunctionalityHelpers.cmake)
- SET(LIBS_FOR_QFUNCTIONALITY "Qmitk")
- SUBDIRS(Qmitk QFunctionalities QApplications)
+  # setting this to 3 since Qt4 support is in a very early stage of 
+  # development. If you want to use Qt4, please create an initial cache with
+  # a line  
+  # DESIRED_QT_VERSION:STRING=4
+  # 
+  # or by passing -DDESIRED_QT_VERSION:STRING=4 as option to the very first
+  # c(c)make call
+  SET(DESIRED_QT_VERSION 3 CACHE STRING "Pick a version of QT to use: 3 or     4")
+  FIND_PACKAGE(Qt)
+  IF(DESIRED_QT_VERSION EQUAL 3)
+    SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
+    FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents QmitkDialogBars) 
+   SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk/${dir})
+  ENDFOREACH(dir)
+   INCLUDE(CMake/FunctionalityHelpers.cmake)
+   SET(LIBS_FOR_QFUNCTIONALITY "Qmitk")
+   SUBDIRS(Qmitk QFunctionalities QApplications)
+ ELSE(DESIRED_QT_VERSION EQUAL 3)
+   SUBDIRS(Q4mitk)
+ ENDIF(DESIRED_QT_VERSION EQUAL 3)
 ENDIF(USE_QT)
 
 ADD_SUBDIRECTORY(Documentation)
@@ -175,7 +187,7 @@ SET(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 SET(REGISTER_QFUNCTIONALITY_CPP_IN "${PROJECT_SOURCE_DIR}/Qmitk/QmitkApplicationBase/RegisterQFunctionality.cpp.in")
 SET(MITK_LIBRARIES ${MITK_CORE_LIBRARIES} ${LIBRARIES_FOR_MITK_CORE} ${IPFUNC_LIBRARY} pic2vtk IIL4MITK ipSegmentation ann )
 IF(USE_QT)
-SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
+  SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
 ENDIF(USE_QT)
 CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 

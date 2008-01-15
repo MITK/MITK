@@ -3,4 +3,5 @@
   this file is generated. Do not change!
 */
 #cmakedefine BUILD_TESTING
+#cmakedefine MITK_FAST_TESTING
 

@@ -624,6 +624,13 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       - rendererInfo.m_PixelsPerMM[1] + 0.5 );
   }
 
+  
+  // Disallow huge dimensions
+  if ( (xMax-xMin) * (yMax-yMin) > 4096*4096 )
+  {
+    return;
+  }
+
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
   // xMax and yMax are meant exclusive until now, whereas 
   // SetOutputExtent wants an inclusive bound. Thus, we need 

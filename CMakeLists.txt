@@ -179,3 +179,55 @@ SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
 ENDIF(USE_QT)
 CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 
+# CPACK OPTIONS
+IF(WIN32 AND NOT UNIX)
+  
+  FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis
+    PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
+    DOC "Where is makensis.exe located"
+    )
+  IF(NOT NSIS_MAKENSIS)
+    SET(CPACK_GENERATOR ZIP)
+  ELSE(WIN32)
+    SET(CPACK_GENERATOR "NSIS;ZIP")
+  ENDIF(NOT NSIS_MAKENSIS)
+  
+  CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/MITKCPackOptions.cmake.in ${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
+  
+  SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake")
+  
+  SET(CPACK_PACKAGE_NAME "MITK")
+  SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK is a medical image processing tool")
+  SET(CPACK_PACKAGE_VENDOR "German Cancer Research Center (DKFZ)")
+  SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
+  SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
+  SET(CPACK_PACKAGE_VERSION_MAJOR "${MITK_VERSION_MAJOR}")
+  SET(CPACK_PACKAGE_VERSION_MINOR "${MITK_VERSION_MINOR}")
+  SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}")
+  
+  ############################# INSTALL TARGETS ########################## 
+  INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico DESTINATION bin)
+  INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
+   
+  #OPENCV DLLs may be added elsewhere to install target
+  
+  #QT
+  FILE(GLOB qtdlllist ${QT_INCLUDE_DIR}/../bin/*.dll)
+  FOREACH(qtlib ${qtdlllist})
+    INSTALL(FILES ${qtdlllist} DESTINATION bin)
+  ENDFOREACH(qtlib)
+  
+  #STATEMACHINE XML
+  INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Interactions/StateMachine.xml DESTINATION bin)
+ 
+  #VTK DLLs install target
+  FILE(GLOB vtkdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
+  FOREACH(vtklib ${vtkdlllist})
+    INSTALL(FILES ${vtkdlllist} DESTINATION bin)
+  ENDFOREACH(vtklib)
+  
+  # include required mfc libraries
+  INCLUDE(InstallRequiredSystemLibraries)
+  # include CPack model once all variables are set
+  INCLUDE(CPack)
+ENDIF(WIN32 AND NOT UNIX)

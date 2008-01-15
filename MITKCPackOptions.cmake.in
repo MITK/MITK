@@ -1,0 +1,24 @@
+if(CPACK_GENERATOR MATCHES "NSIS")
+  # set the install/unistall icon used for the installer itself
+  # There is a bug in NSI that does not handle full unix paths properly. 
+  SET(CPACK_NSIS_MUI_ICON "@PROJECT_SOURCE_DIR@\\mitk.ico")
+  SET(CPACK_NSIS_MUI_UNIICON "@PROJECT_SOURCE_DIR@\\mitk.ico")
+  # set the package header icon for MUI
+  SET(CPACK_PACKAGE_ICON "@PROJECT_SOURCE_DIR@\\mitk.bmp")
+  # tell cpack to create links to the doc files
+  SET(CPACK_NSIS_MENU_LINKS
+    "http://www.mitk.org" "MITK Web Site"
+    )
+  # tell cpack the executables you want in the start menu as links
+  SET(CPACK_PACKAGE_EXECUTABLES "MainApp" "MITK - Main Application")
+  # tell cpack to create a desktop link to MainApp
+  SET(CPACK_CREATE_DESKTOP_LINKS "MainApp")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\mitk.ico")
+  SET(CPACK_NSIS_DISPLAY_NAME "MITK - Medical Imaging Interaction Toolkit")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\www.mitk.org")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\www.mitk.org")
+  SET(CPACK_NSIS_CONTACT mitk@mitk.org)
+  SET(CPACK_NSIS_MODIFY_PATH ON)
+endif(CPACK_GENERATOR MATCHES "NSIS")
+
+

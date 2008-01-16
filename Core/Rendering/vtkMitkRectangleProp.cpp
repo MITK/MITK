@@ -46,7 +46,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
   GLfloat bbox[8] = {0.f , 0.f, (float)i[0], 0.f, (float)i[0], (float)i[1], 0.f, (float)i[1]};
   glColor3f(m_Color[0],m_Color[1],m_Color[2]);
    
-  glLineWidth(3.0f);
+  glLineWidth(5.0f);
   glBegin(GL_LINE_LOOP);
   for (int j = 0; j < 4; j++)
     glVertex2fv(&bbox[2*j]);

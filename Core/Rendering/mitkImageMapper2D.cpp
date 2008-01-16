@@ -661,12 +661,8 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  // 2. Store the result in a VTK image
-  rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
-  rendererInfo.m_Image->DeepCopy( reslicedImage );
-  rendererInfo.m_Image->Update();
 
-  // 3. Convert the resampling result to PIC image format
+  // 2. Convert the resampling result to PIC image format
   ipPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
 
   if (pic == NULL)
@@ -674,10 +670,13 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
+  bool imageIs2D = true;
+
   if ( pic->dim == 1 )
   {
     pic->dim = 2;
     pic->n[1] = 1;
+    imageIs2D = false;
   }
   assert( pic->dim == 2 );
 
@@ -693,6 +692,17 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 
 
+  // 3. Store the result in a VTK image
+  if ( imageIs2D )
+  {
+    rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
+    rendererInfo.m_Image->DeepCopy( reslicedImage );
+    rendererInfo.m_Image->Update();
+  }
+  else
+  {
+    rendererInfo.m_Image = NULL;
+  }
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();

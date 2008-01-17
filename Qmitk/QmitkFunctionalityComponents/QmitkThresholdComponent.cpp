@@ -354,6 +354,7 @@ void QmitkThresholdComponent::DeleteThresholdNode()
 			{
 				iteratorClone->Disconnect();
 				m_ThresholdNodeExisting = false;
+				return;
 			}
 			++iteratorClone;
 		}

@@ -54,7 +54,7 @@ public:
       if (m_Stop)
       {
         m_Mutex.unlock();
-        break;
+        return;
       }
       m_Mutex.unlock();
       usleep( 500000 ); // _micro_ seconds

@@ -114,6 +114,9 @@ void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
             PlaneGeometry::Transversal,
             image->GetGeometry()->GetExtent(2)-1, false);
           SetWorldGeometry(planegeometry);
+          GetDisplayGeometry()->Fit();
+          GetVtkRenderer()->ResetCamera();
+
           geometry_is_set=true;
           //@todo add connections
           //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
@@ -133,6 +136,7 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
   // Do we have to render ?
+  if(GetEmptyWorldGeometry()) return 0;
   if(GetData() == NULL) return 0;
   if(dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return 0;
 
@@ -236,17 +240,6 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
       int nr = (layer<<16) + mapperNo;
       m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
       mapperNo++;
-    }
-
-
-    if(m_NewRenderer)
-    { //B/ this one is not nice!
-      //B/ not sure whether this is still necessary, currently, it avoids a visualization of empty planes right after startup
-      int w=vtkObject::GetGlobalWarningDisplay();
-      vtkObject::GlobalWarningDisplayOff();
-      m_VtkRenderer->GetActiveCamera()->SetClippingRange(0.01,0.02);
-      vtkObject::SetGlobalWarningDisplay(w);
-      m_NewRenderer=false;
     }
   }
 }

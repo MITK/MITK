@@ -110,7 +110,8 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_MapperID(defaultMapper), m_DataTreeIterator(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
-  m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0)
+  m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
+  m_EmptyWorldGeometry(false)
 {
   if (name != NULL)
   {
@@ -275,7 +276,7 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
         if(m_Slice >= slicedWorldGeometry->GetSlices())
           m_Slice = slicedWorldGeometry->GetSlices()-1;
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
-        m_CurrentWorldGeometry = slicedWorldGeometry;
+        SetCurrentWorldGeometry(slicedWorldGeometry);
       }
     }
     else
@@ -298,7 +299,7 @@ void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
       if(slicedWorldGeometry!=NULL)
       {
         SetCurrentWorldGeometry2D(slicedWorldGeometry->GetGeometry2D(m_Slice));
-        m_CurrentWorldGeometry = slicedWorldGeometry;
+        SetCurrentWorldGeometry(slicedWorldGeometry);
       }
     }
     else
@@ -360,13 +361,13 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
         geometry2d = plane;
       }
       SetCurrentWorldGeometry2D(geometry2d); // calls Modified()
-      m_CurrentWorldGeometry = slicedWorldGeometry;
+      SetCurrentWorldGeometry(slicedWorldGeometry);
     }
     else
     {
       Geometry2D* geometry2d=dynamic_cast<Geometry2D*>(geometry);
       SetCurrentWorldGeometry2D(geometry2d);
-      m_CurrentWorldGeometry = geometry2d;
+      SetCurrentWorldGeometry(geometry2d);
       Modified();
     }
   }
@@ -397,6 +398,35 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
     m_CurrentWorldGeometry2DUpdateTime.Modified();
     Modified();
   }
+}
+
+void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
+{
+  m_CurrentWorldGeometry = geometry;
+  if(geometry == NULL)
+  {
+    m_Bounds[0] = 0;
+    m_Bounds[1] = 0;
+    m_Bounds[2] = 0;
+    m_Bounds[3] = 0;
+    m_Bounds[4] = 0;
+    m_Bounds[5] = 0;
+    m_EmptyWorldGeometry = true;
+    return;
+  }
+  BoundingBox::Pointer boundingBox = 
+    m_CurrentWorldGeometry->CalculateBoundingBoxRelativeToTransform(NULL);
+  const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
+  m_Bounds[0] = worldBounds[0];
+  m_Bounds[1] = worldBounds[1];
+  m_Bounds[2] = worldBounds[2];
+  m_Bounds[3] = worldBounds[3];
+  m_Bounds[4] = worldBounds[4];
+  m_Bounds[5] = worldBounds[5];
+  if(boundingBox->GetDiagonalLength2()<=mitk::eps)
+    m_EmptyWorldGeometry = true;
+  else
+    m_EmptyWorldGeometry = false;
 }
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject & geometrySendEvent)
@@ -445,27 +475,9 @@ void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject & geometryTimeEv
   SetTimeStep(timeEvent->GetPos());
 }
 
-void mitk::BaseRenderer::GetBounds(double bounds[6]) const
+const double* mitk::BaseRenderer::GetBounds() const
 {
-  if(this->GetWorldGeometry() == NULL)
-  {
-    bounds[0] = 0;
-    bounds[1] = 0;
-    bounds[2] = 0;
-    bounds[3] = 0;
-    bounds[4] = 0;
-    bounds[5] = 0;
-    return;
-  }
-  BoundingBox::Pointer boundingBox = 
-    this->GetWorldGeometry()->CalculateBoundingBoxRelativeToTransform(NULL);
-  const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
-  bounds[0] = worldBounds[0];
-  bounds[1] = worldBounds[1];
-  bounds[2] = worldBounds[2];
-  bounds[3] = worldBounds[3];
-  bounds[4] = worldBounds[4];
-  bounds[5] = worldBounds[5];
+  return m_Bounds;
 }
 
 

@@ -48,8 +48,8 @@ public:
   virtual mitk::BaseController * GetController();
   virtual mitk::VtkPropRenderer* GetRenderer() { return m_Renderer; }
   
-protected:
-    
+protected:    
+  
     // overloaded resize handler
     virtual void resizeEvent(QResizeEvent* event);
 

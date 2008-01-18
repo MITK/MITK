@@ -31,8 +31,7 @@ vtkMitkRenderProp::~vtkMitkRenderProp()
 
 double *vtkMitkRenderProp::GetBounds()
 {
-  m_VtkPropRenderer->GetBounds(m_Bounds);
-  return m_Bounds;
+  return const_cast<double*>(m_VtkPropRenderer->GetBounds());
 }
 
 void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer)

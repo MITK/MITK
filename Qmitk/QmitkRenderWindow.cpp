@@ -60,7 +60,9 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::Vt
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
-
+  mitk::BaseRenderer::RemoveInstance(GetRenderWindow());
+  m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
+  m_RenderProp->Delete();
 }
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
@@ -150,9 +152,11 @@ void QmitkRenderWindow::InitRenderer()
 
 void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
 {
-   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
+  QVTKWidget::resizeEvent(event);
+
+  if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
     return;
-   m_InResize = true;
+  m_InResize = true;
 
   if(this->isVisible())
   {
@@ -161,12 +165,13 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
       m_Renderer->Resize(event->size().width(), event->size().height());
     }
 
-    this->update();
+    //this->update();
     //updateGL();
   }
-  
+
   m_InResize = false;
 }
+
 
 mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
 {

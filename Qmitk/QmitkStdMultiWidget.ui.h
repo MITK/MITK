@@ -588,7 +588,7 @@ void QmitkStdMultiWidget::SetData( mitk::DataTreeIteratorBase* it )
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetData(it);
 }
 
-void QmitkStdMultiWidget::Fit(const mitk::Geometry3D* geometry)
+void QmitkStdMultiWidget::Fit()
 {
   vtkRenderer * vtkrenderer;
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDisplayGeometry()->Fit();
@@ -598,19 +598,6 @@ void QmitkStdMultiWidget::Fit(const mitk::Geometry3D* geometry)
 
   int w=vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
-
-  vtkFloatingPointType bounds[6];
-  mitk::BoundingBox::ConstPointer boundingBox;
-  if((geometry != NULL) && ((boundingBox=geometry->GetBoundingBox()).IsNotNull()))
-  {
-    const mitk::BoundingBox::BoundsArrayType& tmp = boundingBox->GetBounds();
-    bounds[0] = tmp[0];
-    bounds[1] = tmp[1];
-    bounds[2] = tmp[2];
-    bounds[3] = tmp[3];
-    bounds[4] = tmp[4];
-    bounds[5] = tmp[5];
-  }
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetVtkRenderer();
   if ( vtkrenderer!=NULL ) vtkrenderer->ResetCamera();
@@ -879,7 +866,7 @@ bool QmitkStdMultiWidget
     timeNavigationController->SetInputWorldGeometry(
       clonedgeometry.GetPointer());
     timeNavigationController->Update();
-    this->Fit(geometry);
+    this->Fit();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     boundingBoxInitialized=true;

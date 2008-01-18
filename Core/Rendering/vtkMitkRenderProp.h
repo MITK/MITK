@@ -56,8 +56,6 @@ class vtkMitkRenderProp : public vtkProp
     ~vtkMitkRenderProp();
 
     mitk::VtkPropRenderer::Pointer m_VtkPropRenderer;
-
-    double m_Bounds[6];
 };
 
 

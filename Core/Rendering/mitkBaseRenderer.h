@@ -299,6 +299,8 @@ public:
   itkGetObjectMacro(SliceNavigationController, mitk::SliceNavigationController);
   itkGetObjectMacro(CameraRotationController, mitk::CameraRotationController);
 
+  itkGetMacro(EmptyWorldGeometry, bool);
+
   //##ModelId=3E6D5DD30322
   //##Documentation
   //## @brief Mouse event dispatchers
@@ -348,7 +350,7 @@ public:
     return m_Size[1];
   }
 
-  void GetBounds(double bounds[6]) const;
+  const double* GetBounds() const;
 
   void RequestUpdate();
   void ForceImmediateUpdate();
@@ -405,6 +407,10 @@ protected:
   //##Documentation
   //## @brief Sets m_CurrentWorldGeometry2D
   virtual void SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d);
+
+  //##Documentation
+  //## @brief Sets m_CurrentWorldGeometry
+  virtual void SetCurrentWorldGeometry(mitk::Geometry3D* geometry);
 
 private:
   //##Documentation
@@ -508,7 +514,10 @@ protected:
   unsigned long m_CurrentWorldGeometry2DTransformTime;
 
   std::string m_Name;
+
+  double m_Bounds[6];
   
+  bool m_EmptyWorldGeometry;
 };
 
 } // namespace mitk

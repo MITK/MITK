@@ -455,6 +455,9 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 imageMapper->GetRendererInfo( planeRenderer );
 
                 imageMapper->GenerateAllData();
+                
+                // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
+                renderer->GetRenderWindow()->MakeCurrent();
 
                 // Retrieve and update image to be mapped
                 const ImageMapper2D::RendererInfo *rit =

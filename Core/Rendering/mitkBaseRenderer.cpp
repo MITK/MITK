@@ -111,8 +111,15 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
-  m_EmptyWorldGeometry(false)
+  m_EmptyWorldGeometry(true)
 {
+  m_Bounds[0] = 0;
+  m_Bounds[1] = 0;
+  m_Bounds[2] = 0;
+  m_Bounds[3] = 0;
+  m_Bounds[4] = 0;
+  m_Bounds[5] = 0;
+
   if (name != NULL)
   {
     m_Name = name;
@@ -341,35 +348,44 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
   {
     m_WorldGeometry = geometry;
     m_TimeSlicedWorldGeometry=dynamic_cast<TimeSlicedGeometry*>(geometry);
+    SlicedGeometry3D* slicedWorldGeometry;
     if(m_TimeSlicedWorldGeometry.IsNotNull())
     {
       itkDebugMacro("setting TimeSlicedWorldGeometry to " << m_TimeSlicedWorldGeometry);
       if(m_TimeStep >= m_TimeSlicedWorldGeometry->GetTimeSteps())
         m_TimeStep = m_TimeSlicedWorldGeometry->GetTimeSteps()-1;
-      SlicedGeometry3D* slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
-      if(slicedWorldGeometry!=NULL)
-      {
-        if(m_Slice >= slicedWorldGeometry->GetSlices() && (m_Slice != 0))
-          m_Slice = slicedWorldGeometry->GetSlices()-1;
-      }
-      assert(slicedWorldGeometry!=NULL); //only as long as the todo described in SetWorldGeometry is not done
-      Geometry2D::Pointer geometry2d = slicedWorldGeometry->GetGeometry2D(m_Slice);
+      slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(m_TimeSlicedWorldGeometry->GetGeometry3D(m_TimeStep));
+    }
+    else
+    {
+      slicedWorldGeometry=dynamic_cast<SlicedGeometry3D*>(geometry);
+    }
+    Geometry2D::Pointer geometry2d;
+    if(slicedWorldGeometry!=NULL)
+    {
+      if(m_Slice >= slicedWorldGeometry->GetSlices() && (m_Slice != 0))
+        m_Slice = slicedWorldGeometry->GetSlices()-1;
+      geometry2d = slicedWorldGeometry->GetGeometry2D(m_Slice);
       if(geometry2d.IsNull())
       {
         PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
         plane->InitializeStandardPlane(slicedWorldGeometry);
         geometry2d = plane;
       }
-      SetCurrentWorldGeometry2D(geometry2d); // calls Modified()
       SetCurrentWorldGeometry(slicedWorldGeometry);
     }
     else
     {
-      Geometry2D* geometry2d=dynamic_cast<Geometry2D*>(geometry);
-      SetCurrentWorldGeometry2D(geometry2d);
-      SetCurrentWorldGeometry(geometry2d);
-      Modified();
+      geometry2d=dynamic_cast<Geometry2D*>(geometry);
+      if(geometry2d.IsNull())
+      {
+        PlaneGeometry::Pointer plane = PlaneGeometry::New();
+        plane->InitializeStandardPlane(geometry);
+        geometry2d = plane;
+      }
+      SetCurrentWorldGeometry(geometry);
     }
+    SetCurrentWorldGeometry2D(geometry2d); // calls Modified()
   }
   if(m_CurrentWorldGeometry2D.IsNull())
     itkWarningMacro("m_CurrentWorldGeometry2D is NULL");

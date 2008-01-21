@@ -87,40 +87,18 @@ void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 {
   if(iterator!=GetData())
   {
-
-    bool geometry_is_set=false;
-
     BaseRenderer::SetData(iterator);
     static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture(m_DataTreeIterator.GetPointer());
 
     if (iterator != NULL)
     {
-      //initialize world geometry: use first slice of first node containing an image
-      mitk::DataTreeIteratorClone it=m_DataTreeIterator;
-      for(;it->IsAtEnd()==false;++it)
+      //initialize world geometry
+      mitk::Geometry3D::Pointer geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(const_cast<mitk::DataTreeIteratorBase*>(iterator), NULL, "includeInBoundingBox");
+      if ( geometry.IsNotNull() )
       {
-        mitk::DataTreeNode::Pointer node = it->Get();
-        if(node.IsNull())
-          continue;
-        BaseData::Pointer data=node->GetData();
-        if(data.IsNull())
-          continue;
-        Image::Pointer image = dynamic_cast<Image*>(data.GetPointer());
-        if((image.IsNotNull()) && (image->GetUpdatedGeometry()!=NULL))
-        {
-          mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-          planegeometry->InitializeStandardPlane(
-            image->GetGeometry(),
-            PlaneGeometry::Transversal,
-            image->GetGeometry()->GetExtent(2)-1, false);
-          SetWorldGeometry(planegeometry);
-          GetDisplayGeometry()->Fit();
-          GetVtkRenderer()->ResetCamera();
-
-          geometry_is_set=true;
-          //@todo add connections
-          //data->AddObserver(itk::EndEvent(), m_DataChangedCommand);
-        }
+        SetWorldGeometry(geometry);
+        GetDisplayGeometry()->Fit();
+        GetVtkRenderer()->ResetCamera();
       }
     }
   
@@ -213,34 +191,35 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   m_TextRenderer->RemoveAllViewProps();
   m_TextCollection.clear();
   
-  //preparing and gaining information about 2D rendering for OpenGL
-  if(GetDisplayGeometry()->IsValid())
-  {    
-    // clear priority_queue
-    m_MappersMap.clear();
-   
-    int mapperNo = 0;
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    for(;it->IsAtEnd()==false;++it)
-    {
-      mitk::DataTreeNode::Pointer node = it->Get();
-      if(node.IsNull())
-        continue;
-      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if(mapper.IsNull())
-        continue;
+  // clear priority_queue
+  m_MappersMap.clear();
+ 
+  int mapperNo = 0;
+  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+  for(;it->IsAtEnd()==false;++it)
+  {
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if(node.IsNull())
+      continue;
+    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    if(mapper.IsNull())
+      continue;
 
-      if(m_MapperID == 1 && mapper->IsVtkBased())
-        continue; //B/ no vtk mappers in 2D windows 
-  
-      // mapper without a layer property get layer number 1
-      int layer=1;
-      node->GetIntProperty("layer", layer, this);
-  
-      int nr = (layer<<16) + mapperNo;
-      m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
-      mapperNo++;
-    }
+    //if(GetDisplayGeometry()->IsValid())
+    //{
+
+    //}
+
+    if(m_MapperID == 1 && mapper->IsVtkBased())
+      continue; //B/ no vtk mappers in 2D windows 
+
+    // mapper without a layer property get layer number 1
+    int layer=1;
+    node->GetIntProperty("layer", layer, this);
+
+    int nr = (layer<<16) + mapperNo;
+    m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
+    mapperNo++;
   }
 }
 

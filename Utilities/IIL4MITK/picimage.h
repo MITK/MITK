@@ -14,7 +14,7 @@ public:
     /*!
     \brief The constructor.
     */
-    iil4mitkPicImage (const unsigned int size = 128);
+    iil4mitkPicImage (unsigned int size = 128);
 
     /*!
     \brief The destructor.

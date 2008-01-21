@@ -2,8 +2,8 @@
 #include "texture.h"
 #include "picimage.h"
 
-iil4mitkPicImage::iil4mitkPicImage (const unsigned int /*size*/)
-        : _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
+iil4mitkPicImage::iil4mitkPicImage (unsigned int size)
+        : iil4mitkImage(size), _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
 {
 }
 

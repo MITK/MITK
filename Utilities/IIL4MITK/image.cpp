@@ -18,10 +18,10 @@ power2 (const unsigned int x)
 
 const unsigned int iil4mitkImage::_bytes [] = {1, 2, 3, 4, 3};
 
-iil4mitkImage::iil4mitkImage ()
+iil4mitkImage::iil4mitkImage (unsigned int size)
 : _width (0), _height (0), _rx (0), _ry (0), _rw (0), _rh (0),
   _model (INTENSITY), _interpolation (false), _pixels (NULL),
-  _internal (GL_LUMINANCE)
+  _internal (GL_LUMINANCE), _size(size)
 {
 
 }
@@ -160,8 +160,8 @@ iil4mitkImage::display (iil4mitkWidget* widget)
     assert (_rx + _rw <= _width);
     assert (_ry + _rh <= _height);
 
-    bool texturing = glIsEnabled (GL_TEXTURE_2D);
-    bool blending = glIsEnabled (GL_BLEND);
+    GLboolean texturing = glIsEnabled (GL_TEXTURE_2D);
+    GLboolean blending = glIsEnabled (GL_BLEND);
 
     glClipPlane (GL_CLIP_PLANE4, planeX);
     glEnable (GL_CLIP_PLANE4);
@@ -185,14 +185,14 @@ iil4mitkImage::display (iil4mitkWidget* widget)
     glDisable (GL_CLIP_PLANE4);
     glDisable (GL_CLIP_PLANE5);
 
-    if (!texturing) glDisable (GL_TEXTURE_2D);
-    if (!blending) glDisable (GL_BLEND);
+    if (texturing == GL_FALSE) glDisable (GL_TEXTURE_2D);
+    if (blending  == GL_FALSE) glDisable (GL_BLEND);
   }
 }
 
 void iil4mitkImage::drawTextures (iil4mitkWidget* widget)
 {
-  const unsigned int s = 256; // size of the tiles
+  const unsigned int s = _size; // size of the tiles
   unsigned int n, m;  // number of the tiles
 
   n = (unsigned int) ceilf ((float) _rw / (float) (s - 2));

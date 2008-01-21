@@ -18,7 +18,7 @@ public:
     /*!
     \brief The constructor.
     */
-    iil4mitkImage ();
+    iil4mitkImage (unsigned int size = 128);
 
     /*!
     \brief The destructor.
@@ -187,6 +187,8 @@ private:
     */
     typedef std::vector<_iil4mitkTexture*> Textures;
     std::map<void*,Textures*> _textures;
+
+    unsigned int _size;
 
 };
 

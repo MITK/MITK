@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
   Base application that is used by most MITK applications.
 
   \section QmitkMainTemplateHelpBrowser Help window
-
+	
   \subsection QmitkMainTemplateHelpBrowserSub1 Which help file is displayed
 
   QmitkMainTemplate supports a very basic help system. If the users presses F1 or chooses Help/Content from the menu,
@@ -169,6 +169,10 @@ Tadaa
 #include <qpixmap.h>
 #include <qiconset.h>
 #include <qmessagebox.h>
+
+//drag&drop
+#include <qdragobject.h>
+#include <qstringlist.h>
 
 #include <ipPicTypeMultiplex.h>
 #include <mitkPointOperation.h>
@@ -339,7 +343,6 @@ public:
       m_TimeSelector->SetInput(image);
     }
   }
-
 
   mitk::Image* GetImageFromDataTree()
   {
@@ -1590,4 +1593,21 @@ void QmitkMainTemplate::enableDepartmentLogo(bool enable)
   {
     m_MultiWidget->DisableDepartmentLogo();
   }
+}
+
+void QmitkMainTemplate::dropEvent( QDropEvent * event )
+{ //open dragged files
+  QStringList fileNames;
+  if(QUriDrag::decodeLocalFiles(event,fileNames))
+  {
+    for(int i=0; i < fileNames.size();i++)
+    {
+      fileOpen(fileNames[i].ascii());
+    }
+  }
+}
+
+void QmitkMainTemplate::dragEnterEvent( QDragEnterEvent *event )
+{   // accept drags
+    event->accept();
 }

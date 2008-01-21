@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestManager.h"
 
 mitk::TestManager* mitk::TestManager::GetInstance() {
-  static mitk::TestManager* instance = new mitk::TestManager();
-  return instance;
+  static mitk::TestManager instance;
+  return &instance;
 }
 
 void mitk::TestManager::Initialize() {

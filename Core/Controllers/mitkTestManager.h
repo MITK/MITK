@@ -31,7 +31,7 @@ namespace mitk {
       void TestFailed();
       /** \brief Tell manager a subtest passed */
       void TestPassed();
-      ~TestManager();
+      virtual ~TestManager() {}
     protected:
       int m_FailedTests;
       int m_PassedTests;

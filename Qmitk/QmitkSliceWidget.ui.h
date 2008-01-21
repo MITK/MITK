@@ -50,16 +50,14 @@ void QmitkSliceWidget::init()
   QHBoxLayout *hlayout;
   hlayout=new QHBoxLayout(container);
 
-  // create Renderer
-  m_Renderer= new mitk::VtkPropRenderer("Renderer::SliceWidget");
-
   // create widget
   QString composedName("QmitkSliceWidget::");
   if(name()!=NULL)
     composedName+=name();
   else
     composedName+="QmitkGLWidget";
-  m_RenderWindow = new QmitkRenderWindow(container, composedName,m_Renderer);
+  m_RenderWindow = new QmitkRenderWindow(container, composedName,NULL);
+  m_Renderer = m_RenderWindow->GetRenderer();
   hlayout->addWidget(m_RenderWindow);
 
   new QmitkStepperAdapter( m_NavigatorWidget,

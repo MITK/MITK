@@ -274,6 +274,8 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       {
         m_InitialLowerThreshold = static_cast<int>(m_VisibleWindow / 10.0); // 20% of the visible gray values
         m_InitialUpperThreshold = static_cast<int>(m_VisibleWindow / 10.0);
+
+        initializedAlready = true;
       }
       
       m_LowerThreshold = m_InitialLowerThreshold;

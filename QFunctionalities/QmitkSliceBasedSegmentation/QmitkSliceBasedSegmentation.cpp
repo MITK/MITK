@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
+#include "QmitkCopyToClipBoardDialog.h"
 
 #include "mitkToolManager.h"
 #include "mitkProgressBar.h"
@@ -800,14 +801,17 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNotNull() && refImage.IsNotNull() )
       {
-        completeReport += QString("============= Gray value analysis of %1 ====================\n").arg(nodename);
+        completeReport += QString("============= Gray value analysis of %1 ====\n").arg(nodename);
         AccessFixedDimensionByItk_2( refImage, ITKHistogramming, 3, image, completeReport );
-        completeReport += QString("============= End of %1 ====================================\n\n\n").arg(nodename);
+        completeReport += QString("============= End of %1 ====================\n\n\n").arg(nodename);
       }
     }
   }
 
   std::cout << completeReport.ascii() << std::endl;
+
+  QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog(completeReport, NULL);
+  dialog->show();
 
   // TODO (bug #1155): nice output in some graphical window (ready for copy to clipboard)
   // TODO (bug #874): remove these 5 buttons for segmentation operations. find some good interface for them and make them use less GUI space 
@@ -818,8 +822,6 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
 template <typename TPixel, unsigned int VImageDimension>
 void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDimension>* referenceImage, mitk::Image* segmentation, QString& report )
 {
-  report += QString(" Called for 1\n");
-
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<SEGMENTATION_DATATYPE, VImageDimension> SegmentationType;
 
@@ -906,8 +908,10 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
       ++currentQuantile;
     }
   }
+
+  // report histogram values
   
-  report += QString("Minimum %1\n 5\% quantile: %2\n25\% quantile: %3\n50\% quantile: %4\n75\% quantile: %5\n95\% quantile: %6\nMax %7\n")
+  report += QString("      Minimum: %1\n  5\% quantile: %2\n 25\% quantile: %3\n 50\% quantile: %4\n 75\% quantile: %5\n 95\% quantile: %6\n      Maximum: %7\n")
                .arg(minimum)
                .arg(histogramQuantileValues[5])
                .arg(histogramQuantileValues[25])
@@ -915,11 +919,6 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
                .arg(histogramQuantileValues[75])
                .arg(histogramQuantileValues[95])
                .arg(maximum);
- 
-  // cast segmentation to typical segmentation type
-  // iterate whole segmentation
-  // iterate reference in parallel with segmentation (possible offset!)
-  // where segmentation == 1, count reference pixel for histogram
 }
 
 

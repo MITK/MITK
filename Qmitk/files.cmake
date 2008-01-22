@@ -18,6 +18,7 @@ SET(CPP_FILES
   QmitkCallbackFromGUIThread.cpp
   QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
+  QmitkCopyToClipBoardDialog.cpp
   QmitkDialogBar.cpp
   QmitkDialogBars/QmitkSliderDialogBar.cpp
   QmitkDialogBars/QmitkStandardViewsDialogBar.cpp
@@ -136,6 +137,7 @@ SET(MOC_H_FILES
   QmitkCallbackFromGUIThread.h
   QmitkChiliPluginSaveDialog.h
   QmitkColorTransferFunctionCanvas.h
+  QmitkCopyToClipBoardDialog.h
   QmitkDialogBar.h
   QmitkDialogBars/QmitkSliderDialogBar.h
   QmitkDialogBars/QmitkStandardViewsDialogBar.h

@@ -39,19 +39,19 @@ void vtkMitkRenderProp::SetPropRenderer(mitk::VtkPropRenderer::Pointer propRende
   this->m_VtkPropRenderer = propRenderer;
 }
 
-int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport* viewport)
+int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Opaque); 
 }
-int vtkMitkRenderProp::RenderTranslucentGeometry(vtkViewport* viewport)
+int vtkMitkRenderProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
 }
-int vtkMitkRenderProp::RenderOverlay(vtkViewport* viewport)
+int vtkMitkRenderProp::RenderOverlay(vtkViewport* /*viewport*/)
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Overlay);
 }
 
-void vtkMitkRenderProp::ReleaseGraphicsResources(vtkWindow* window)
+void vtkMitkRenderProp::ReleaseGraphicsResources(vtkWindow* /*window*/)
 { //B/ what shall we do here....
 }

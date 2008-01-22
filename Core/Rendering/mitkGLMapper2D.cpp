@@ -36,11 +36,11 @@ void mitk::GLMapper2D::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 
   Paint(renderer);  
 }
-void mitk::GLMapper2D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
+void mitk::GLMapper2D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* /*renderer*/)
 {
  
 }
-void mitk::GLMapper2D::MitkRenderOverlay(mitk::BaseRenderer* renderer)
+void mitk::GLMapper2D::MitkRenderOverlay(mitk::BaseRenderer* /*renderer*/)
 {
  
 }

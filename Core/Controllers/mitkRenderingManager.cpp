@@ -182,7 +182,7 @@ mitk::RenderingManager
 
 vtkRenderWindow* 
 mitk::RenderingManager::
-GetRenderWindowByName(const std::string& name)
+GetRenderWindowByName(const std::string& /*name*/)
 {
   for (RenderWindowVector::iterator iter = m_AllRenderWindows.begin();
        iter != m_AllRenderWindows.end();
@@ -349,7 +349,7 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    bool onlyOverlay = ( it->second == 1 ) ?true:false;
+    // bool onlyOverlay = ( it->second == 1 ) ?true:false;
 
     // Erase potentially pending requests
     it->second = 0;
@@ -375,7 +375,7 @@ mitk::RenderingManager
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    bool onlyOverlay = ( it->second == 1 ) ? true:false;
+    // bool onlyOverlay = ( it->second == 1 ) ? true:false;
 
     // Erase potentially pending requests
     it->second = 0;

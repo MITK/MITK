@@ -1600,7 +1600,7 @@ void QmitkMainTemplate::dropEvent( QDropEvent * event )
   QStringList fileNames;
   if(QUriDrag::decodeLocalFiles(event,fileNames))
   {
-    for(int i=0; i < fileNames.size();i++)
+    for(unsigned int i=0; i < fileNames.size();i++)
     {
       fileOpen(fileNames[i].ascii());
     }

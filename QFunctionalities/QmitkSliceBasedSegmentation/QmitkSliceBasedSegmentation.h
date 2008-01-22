@@ -139,6 +139,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     void AutoCropSegmentation();
     void CreateSurfaceFromSegmentation();
     void CalculateVolumeForSegmentation();
+    void CalculateStatisticsVolumeForSegmentation();
     void SaveSegmentation();
     void InitiateCreateNewSegmentationFromThreshold(bool toggled);
     void CreateNewSegmentationFromThreshold();
@@ -155,6 +156,9 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding( itk::Image<TPixel, VImageDimension>*, mitk::Image* );
+    
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKHistogramming( itk::Image<TPixel, VImageDimension>*, mitk::Image*, QString& );
 
     /**
       \brief Main widget showing the scene

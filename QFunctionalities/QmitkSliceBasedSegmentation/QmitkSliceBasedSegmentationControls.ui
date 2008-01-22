@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>209</width>
-            <height>448</height>
+            <width>283</width>
+            <height>507</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -265,9 +265,9 @@
                         <string>Delete selected segmentations</string>
                     </property>
                 </widget>
-                <widget class="QToolButton" row="3" column="0" rowspan="1" colspan="4">
+                <widget class="QToolButton" row="4" column="0" rowspan="1" colspan="4">
                     <property name="name">
-                        <cstring>btnAutoCropSegmentation</cstring>
+                        <cstring>btnCreateSurface</cstring>
                     </property>
                     <property name="font">
                         <font>
@@ -284,18 +284,18 @@
                         <bool>true</bool>
                     </property>
                     <property name="textLabel">
-                        <string>Crop</string>
+                        <string>Surface</string>
                     </property>
                     <property name="textPosition">
                         <enum>BesideIcon</enum>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Crop image to segmentation bounds</string>
+                        <string>Generate surface model from segmentation</string>
                     </property>
                 </widget>
-                <widget class="QToolButton" row="4" column="0" rowspan="1" colspan="4">
+                <widget class="QToolButton" row="3" column="0" rowspan="1" colspan="4">
                     <property name="name">
-                        <cstring>btnCreateSurface</cstring>
+                        <cstring>btnAutoCropSegmentation</cstring>
                     </property>
                     <property name="font">
                         <font>
@@ -312,13 +312,13 @@
                         <bool>true</bool>
                     </property>
                     <property name="textLabel">
-                        <string>Surface</string>
+                        <string>Crop</string>
                     </property>
                     <property name="textPosition">
                         <enum>BesideIcon</enum>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Generate surface model from segmentation</string>
+                        <string>Crop image to segmentation bounds</string>
                     </property>
                 </widget>
                 <widget class="QToolButton" row="5" column="0" rowspan="1" colspan="4">
@@ -341,6 +341,34 @@
                     </property>
                     <property name="textLabel">
                         <string>Volumetry</string>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Calculate volume of segmentation</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton" row="6" column="0" rowspan="1" colspan="4">
+                    <property name="name">
+                        <cstring>btnGrayValueStatistics</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image9</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Statistics</string>
                     </property>
                     <property name="textPosition">
                         <enum>BesideIcon</enum>
@@ -403,7 +431,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>16</height>
+                    <height>60</height>
                 </size>
             </property>
         </spacer>
@@ -424,7 +452,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image9</pixmap>
+        <pixmap>image10</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkSlicesInterpolator</class>
@@ -440,7 +468,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image9</pixmap>
+        <pixmap>image10</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkToolWorkingDataListBox</class>
@@ -456,7 +484,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image9</pixmap>
+        <pixmap>image10</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkToolReferenceDataSelectionBox</class>
@@ -472,7 +500,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image9</pixmap>
+        <pixmap>image10</pixmap>
     </customwidget>
 </customwidgets>
 <images>
@@ -495,15 +523,18 @@
         <data format="PNG" length="124">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000434944415418958d8e510a00200843b7ee7fe6eca760cd0509a2cec71827fe6ac85ebb913405294f9dcdd19d2e0307f9ba1d4c191be8d0a5a78c0c11ea802550cb07800b4b480e0c89ab907f0000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="PNG" length="238">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000b549444154388dad94410ec5200844b161d133cdfdc3795c74e18ebfe8c76a2ad65a27318454260fd41211a988d0aa18fec91201d00d805a52c65183328a48a808cb0f6f0c6d7f9370462ee15701d040e7e9dc5a7c22f6c6c2bd79a9b63d4368975433f41463cc2b1d89d291bad45d42d3cefb95b0bf6f88309bf1b92af306e13674e7b8413a4b7833ebb4fc3843ef347b84ee3d9c557e2965eb6fdfb2d55433fc4269b5d52903986addc8cc63f90c69e5ef9f88f4077f88c4d5efecf2280000000049454e44ae426082</data>
+        <data format="PNG" length="664">89504e470d0a1a0a0000000d494844520000001200000012080600000056ce8e570000025f49444154388dad943d4b2b4118859fecdeddcd4403eb0a11b10a8a22580684544af017081696fe010b1552da08460b3b5bbb80694410441b21c2dafa0f044131f8856c56a33bbbefad0cc6e47ec13ddd30c3c379cf9c9994effbfc0ffdf8dde6e2e2a298a609401cc754abd5d43f81565656a4bfbf9f7abd8eebba88084747476c6f6fcbdada5a4f58eafb689b9b9b522e97999a9aa2afaf0f114144489284b7b737767777999999e982195f171b1b1b522e9729140a28a508c3908f8f0f1e1f1fb9bbbbe3e9e98952a9c4fefebe148b45e939daf2f2b26c6d6d512814d05a13451149921004015a6bc230c4300c3ccf636e6e8e6c364bb15814dff7531d20cff3989e9ec6300c9acd268ee3d06ab51091b623a514b66d23224c4c4c7487bdb0b020c7c7c7388e43188628a57878784029c5f5f535f7f7f700445104c0c0c000232323542a95b62b03c0b22c72b91c49926059165a6b001a8d461bf255ad560bcff3b06dbb336c11218e639224c1344db4d668ad7b4200d2e934b66d934ea73b415a6b0e0f0f89e318ad35d96c96200808c3b027687474942449b8b8b8e0336c03a056aba50e0e0e787f7fa7d96c1204014a2932994c17249fcf635916b7b7b754abd54e4700ebebeba99d9d1d5e5f5fb9babac2b66d060707db071dc7617c7c9ce1e1615e5e5e585a5aa25eafb78bd9d56cdff765767696e7e7e7f6f5bbae4b3e9fc7755d6e6e6e28954ad46ab58e7677341b60757595d3d3531a8d06b95c8eb1b13126272789a288cbcb4be6e7e7bb203d1d017cd6bf52a96059164343439c9f9fb3b7b7c7d9d9d9df3ddaef40d334c964329c9c9cfcf20bf923e85ff413190321891dfaf0160000000049454e44ae426082</data>
     </image>
     <image name="image7">
-        <data format="PNG" length="664">89504e470d0a1a0a0000000d494844520000001200000012080600000056ce8e570000025f49444154388dad943d4b2b4118859fecdeddcd4403eb0a11b10a8a22580684544af017081696fe010b1552da08460b3b5bbb80694410441b21c2dafa0f044131f8856c56a33bbbefad0cc6e47ec13ddd30c3c379cf9c9994effbfc0ffdf8dde6e2e2a298a609401cc754abd5d43f81565656a4bfbf9f7abd8eebba88084747476c6f6fcbdada5a4f58eafb689b9b9b522e97999a9aa2afaf0f114144489284b7b737767777999999e982195f171b1b1b522e9729140a28a508c3908f8f0f1e1f1fb9bbbbe3e9e98952a9c4fefebe148b45e939daf2f2b26c6d6d512814d05a13451149921004015a6bc230c4300c3ccf636e6e8e6c364bb15814dff7531d20cff3989e9ec6300c9acd268ee3d06ab51091b623a514b66d23224c4c4c7487bdb0b020c7c7c7388e43188628a57878784029c5f5f535f7f7f700445104c0c0c000232323542a95b62b03c0b22c72b91c49926059165a6b001a8d461bf255ad560bcff3b06dbb336c11218e639224c1344db4d668ad7b4200d2e934b66d934ea73b415a6b0e0f0f89e318ad35d96c96200808c3b027687474942449b8b8b8e0336c03a056aba50e0e0e787f7fa7d96c1204014a2932994c17249fcf635916b7b7b754abd54e4700ebebeba99d9d1d5e5f5fb9babac2b66d060707db071dc7617c7c9ce1e1615e5e5e585a5aa25eafb78bd9d56cdff765767696e7e7e7f6f5bbae4b3e9fc7755d6e6e6e28954ad46ab58e7677341b60757595d3d3531a8d06b95c8eb1b13126272789a288cbcb4be6e7e7bb203d1d017cd6bf52a96059164343439c9f9fb3b7b7c7d9d9d9df3ddaef40d334c964329c9c9cfcf20bf923e85ff413190321891dfaf0160000000049454e44ae426082</data>
+        <data format="PNG" length="238">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000b549444154388dad94410ec5200844b161d133cdfdc3795c74e18ebfe8c76a2ad65a27318454260fd41211a988d0aa18fec91201d00d805a52c65183328a48a808cb0f6f0c6d7f9370462ee15701d040e7e9dc5a7c22f6c6c2bd79a9b63d4368975433f41463cc2b1d89d291bad45d42d3cefb95b0bf6f88309bf1b92af306e13674e7b8413a4b7833ebb4fc3843ef347b84ee3d9c557e2965eb6fdfb2d55433fc4269b5d52903986addc8cc63f90c69e5ef9f88f4077f88c4d5efecf2280000000049454e44ae426082</data>
     </image>
     <image name="image8">
         <data format="PNG" length="295">89504e470d0a1a0a0000000d49484452000000140000001408060000008d891d0d000000ee49444154388dcd943d8a844010469fba81b4b4898906e201ccbc80799fc10b08ce35cc8ccd4d0c0dbc82187a06efd09981bdc13003cb2eebc2f6c07c5941d5a33eeac759d7159b72add200073036811f005a6b2b3029a57dcbff024a299152324d931de04f7a1df0d17edbb6946549144528a5d8f79ddbed469224645946d7759750a3b536dcd7c7f8be6faaaa32711c1bc008214c51144629f5cc5996e54bcd300ccff89be5a669e8fb9ebaae0138cf93799e19c791200800d8b6eddaf243799e0310862100699a128621aeeb228400e0388ebf033dcffb35bed2fbaf8dc37dca56602fb965ebefcb79fb8ffd09be634fe05bf0832e0000000049454e44ae426082</data>
     </image>
     <image name="image9">
+        <data format="PNG" length="191">89504e470d0a1a0a0000000d49484452000000120000000c08060000006f12edbc00000086494441542891ad8e310ac3300c459f820b1a3ae46e1d72468f1a752b1fa0a00c0527314e6ad23e103286fff40508fe400288f8cd25221f114029e596647ece004cfb4f55c5dd51d5b1495ab3131dccecb04f49dbf320fa1abca0dba8958e1ca822771fbede139f366a436676d94c80880872cec38df62caf0579c826eaf21e9355d1ad2a0d2b2f292c328ba3a8440000000049454e44ae426082</data>
+    </image>
+    <image name="image10">
         <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
     </image>
 </images>

@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 
 #include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkMapContainer.h>
 
 #include <qaction.h>
 #include <qapplication.h>
@@ -48,6 +50,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qslider.h>
 #include <qcheckbox.h>
+
+#include <limits>
 
 #define SEGMENTATION_DATATYPE unsigned char
 
@@ -117,6 +121,7 @@ void QmitkSliceBasedSegmentation::CreateConnections()
     connect( m_Controls->btnAutoCropSegmentation, SIGNAL(clicked()), this, SLOT(AutoCropSegmentation()) );
     connect( m_Controls->btnCreateSurface, SIGNAL(clicked()), this, SLOT(CreateSurfaceFromSegmentation()) );
     connect( m_Controls->btnVolumetry, SIGNAL(clicked()), this, SLOT(CalculateVolumeForSegmentation()) );
+    connect( m_Controls->btnGrayValueStatistics, SIGNAL(clicked()), this, SLOT(CalculateStatisticsVolumeForSegmentation()) );
     connect( m_Controls->btnNewFromThreshold, SIGNAL(toggled(bool)), this, SLOT(InitiateCreateNewSegmentationFromThreshold(bool)) );
     connect( m_Controls->sliderThreshold, SIGNAL(valueChanged(int)), this, SLOT(CreateNewSegmentationFromThresholdSliderChanged(int)) );
     connect( m_Controls->btnAcceptThreshold, SIGNAL(clicked()), this, SLOT(CreateNewSegmentationFromThreshold()) );
@@ -440,7 +445,7 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (automaticNode->GetData());
 
-      // TODO what to do about the organ type? 
+      // TODO (bug #1160): what to do about the organ type? 
       mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, nodeName, "undefined" );
 
       mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
@@ -767,3 +772,154 @@ void QmitkSliceBasedSegmentation::OnVolumeCalculationDone()
     m_Controls->btnVolumetry->setEnabled(true);
   }
 }
+
+void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
+{
+  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+  if (!toolManager) return;
+
+  mitk::DataTreeNode* referencenode = toolManager->GetReferenceData(0);
+  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
+
+  QString completeReport;
+
+  // for all selected nodes: try to crop the image
+  for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
+        nodeiter != nodes.end();
+        ++nodeiter )
+  {
+    mitk::DataTreeNode::Pointer node = *nodeiter;
+    if (!node) continue;
+
+    std::string nodename("structure");
+    node->GetName(nodename);
+
+    if (node.IsNotNull())
+    {
+      mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( referencenode->GetData() );
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      if (image.IsNotNull() && refImage.IsNotNull() )
+      {
+        completeReport += QString("============= Gray value analysis of %1 ====================\n").arg(nodename);
+        AccessFixedDimensionByItk_2( refImage, ITKHistogramming, 3, image, completeReport );
+        completeReport += QString("============= End of %1 ====================================\n\n\n").arg(nodename);
+      }
+    }
+  }
+
+  std::cout << completeReport.ascii() << std::endl;
+
+  // TODO (bug #1155): nice output in some graphical window (ready for copy to clipboard)
+  // TODO (bug #874): remove these 5 buttons for segmentation operations. find some good interface for them and make them use less GUI space 
+}
+
+#define ROUND_P(x) ((int)((x)+0.5))
+    
+template <typename TPixel, unsigned int VImageDimension>
+void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDimension>* referenceImage, mitk::Image* segmentation, QString& report )
+{
+  report += QString(" Called for 1\n");
+
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<SEGMENTATION_DATATYPE, VImageDimension> SegmentationType;
+
+  typename SegmentationType::Pointer segmentationItk;
+  mitk::CastToItkImage( segmentation, segmentationItk );
+  
+  // generate histogram
+
+  typename SegmentationType::RegionType segmentationRegion = segmentationItk->GetLargestPossibleRegion();
+
+  segmentationRegion.Crop( referenceImage->GetLargestPossibleRegion() );
+    
+  itk::ImageRegionConstIteratorWithIndex< SegmentationType > segmentationIterator( segmentationItk, segmentationRegion);
+  itk::ImageRegionConstIteratorWithIndex< ImageType >        referenceIterator( referenceImage, segmentationRegion);
+
+  segmentationIterator.Begin();
+  referenceIterator.Begin();
+    
+  typedef itk::MapContainer<TPixel, long int> HistogramType;
+  TPixel minimum = std::numeric_limits<TPixel>::max();
+  TPixel maximum = std::numeric_limits<TPixel>::min();
+  HistogramType histogram;
+
+  while ( !segmentationIterator.IsAtEnd() )
+  {
+    itk::Point< float, 3 > pt;
+    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
+
+    typename ImageType::IndexType ind;
+    itk::ContinuousIndex<float, 3> contInd;
+    if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
+    {
+      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
+      
+      referenceIterator.SetIndex( ind );
+
+      if ( segmentationIterator.Get() > 0 )
+      {
+        ++histogram[referenceIterator.Get()];
+        if (referenceIterator.Get() < minimum) minimum = referenceIterator.Get();
+        if (referenceIterator.Get() > maximum) maximum = referenceIterator.Get();
+      }
+    }
+
+    ++segmentationIterator;
+  }
+
+  // evaluate histogram
+
+  long int totalCount(0);
+
+  for ( typename HistogramType::iterator iter = histogram.begin();
+        iter != histogram.end();
+        ++iter )
+  {
+    totalCount += iter->second;
+  }
+
+  TPixel histogramQuantileValues[102];
+
+  double quantiles[102];
+  for (unsigned int i = 0; i < 102; ++i) quantiles[i] = static_cast<double>(i) / 100.0; quantiles[102-1] = 2.0;
+
+  for (unsigned int i = 0; i < 102; ++i) histogramQuantileValues[i] = 0;
+
+  int currentQuantile(0);
+
+  double relativeCurrentCount(0.0);
+
+  for ( typename HistogramType::iterator iter = histogram.begin();
+        iter != histogram.end();
+        ++iter )
+  {
+    TPixel grayvalue = iter->first;
+    long int count = iter->second;
+
+    double relativeCount = static_cast<double>(count) / static_cast<double>(totalCount);
+
+    relativeCurrentCount += relativeCount;
+
+    while ( relativeCurrentCount >= quantiles[currentQuantile] )
+    {
+      histogramQuantileValues[currentQuantile] = grayvalue;
+      ++currentQuantile;
+    }
+  }
+  
+  report += QString("Minimum %1\n 5\% quantile: %2\n25\% quantile: %3\n50\% quantile: %4\n75\% quantile: %5\n95\% quantile: %6\nMax %7\n")
+               .arg(minimum)
+               .arg(histogramQuantileValues[5])
+               .arg(histogramQuantileValues[25])
+               .arg(histogramQuantileValues[50])
+               .arg(histogramQuantileValues[75])
+               .arg(histogramQuantileValues[95])
+               .arg(maximum);
+ 
+  // cast segmentation to typical segmentation type
+  // iterate whole segmentation
+  // iterate reference in parallel with segmentation (possible offset!)
+  // where segmentation == 1, count reference pixel for histogram
+}
+
+

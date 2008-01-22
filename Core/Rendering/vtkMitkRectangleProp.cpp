@@ -39,12 +39,19 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
   int * i = m_RenderWindow->GetSize();
 
+  m_RenderWindow->MakeCurrent();
+  //glClear(GL_COLOR_BUFFER_BIT);
+  //glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+  //glClearColor(m_Color[0],m_Color[1],m_Color[2],0);
+  
+
   Enable2DOpenGL();
 
   glEnable(GL_LINE_SMOOTH);
  
   GLfloat bbox[8] = {0.f , 0.f, (float)i[0], 0.f, (float)i[0], (float)i[1], 0.f, (float)i[1]};
   glColor3f(m_Color[0],m_Color[1],m_Color[2]);
+  //glRasterPos2d(0,0);
    
   glLineWidth(5.0f);
   glBegin(GL_LINE_LOOP);
@@ -57,6 +64,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 
   //glFlush(); // really necessary ?? //B/
 
+  //glClearColor(0,0,0,0);
   Disable2DOpenGL();
 
   return 1;

@@ -346,6 +346,9 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
 
   if(m_WorldGeometry != geometry)
   {
+    if(geometry->GetBoundingBox()->GetDiagonalLength2() == 0)
+      return;
+    
     m_WorldGeometry = geometry;
     m_TimeSlicedWorldGeometry=dynamic_cast<TimeSlicedGeometry*>(geometry);
     SlicedGeometry3D* slicedWorldGeometry;

@@ -32,7 +32,7 @@ class QmitkCopyToClipBoardDialog : public QDialog
 
   public:
     
-    QmitkCopyToClipBoardDialog(const QString& text, QObject* parent = 0, const char* name = 0);
+    QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkCopyToClipBoardDialog();
 
   signals:

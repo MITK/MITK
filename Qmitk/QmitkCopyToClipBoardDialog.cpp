@@ -3,7 +3,8 @@
 #include <qtextedit.h>
 #include <qlayout.h>
 
-QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString& text, QObject* parent, const char* name)
+QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent, const char* name)
+: QDialog(parent, name)
 {
   QBoxLayout * layout = new QVBoxLayout( this );
   QTextEdit* textedit = new QTextEdit(text, "", this);

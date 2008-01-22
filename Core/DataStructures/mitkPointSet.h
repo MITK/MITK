@@ -150,7 +150,7 @@ public:
   virtual void ExecuteOperation(Operation* operation);
 
   /** \brief returns the current size of the point-list */
-  virtual int GetSize( int t = 0 ) const;
+  virtual int GetSize( unsigned int t = 0 ) const;
 
   virtual unsigned int GetPointSetSeriesSize() const;
 
@@ -210,7 +210,7 @@ public:
    */
   int SearchPoint( Point3D point, float distance, int t = 0 );
 
-  virtual bool IsEmpty(int t) const;
+  virtual bool IsEmpty(unsigned int t) const;
 
   //virtual methods, that need to be implemented
   virtual void UpdateOutputInformation();

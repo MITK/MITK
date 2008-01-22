@@ -62,7 +62,7 @@ namespace mitk {
 
     virtual void CopyInformation(const itk::DataObject *data);
 
-    virtual bool IsEmpty(int t) const;
+    virtual bool IsEmpty(unsigned int t) const;
 
     virtual void Update();
 

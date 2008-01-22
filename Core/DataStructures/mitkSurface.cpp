@@ -70,7 +70,7 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
   m_CalculateBoundingBox = true;
 }
 
-bool mitk::Surface::IsEmpty(int t) const
+bool mitk::Surface::IsEmpty(unsigned int t) const
 {
   if(!IsInitialized())
     return false;

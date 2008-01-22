@@ -47,7 +47,7 @@ mitk::PointSet::~PointSet()
 {
 }
 
-bool mitk::PointSet::IsEmpty(int t) const
+bool mitk::PointSet::IsEmpty(unsigned int t) const
 {
   return IsInitialized() && (GetSize(t) <= 0);
 }
@@ -90,9 +90,9 @@ unsigned int mitk::PointSet::GetPointSetSeriesSize() const
 }
 
 
-int mitk::PointSet::GetSize( int t ) const
+int mitk::PointSet::GetSize( unsigned int t ) const
 {
-  if ( t < (int)m_PointSetSeries.size() )
+  if ( t < m_PointSetSeries.size() )
   {
     return m_PointSetSeries[t]->GetNumberOfPoints();
   }

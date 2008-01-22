@@ -203,7 +203,7 @@ public:
   //## \warning Returns IsInitialized()==false by default for 
   //## compatibility reasons. Override in sub-classes that
   //## support distinction between empty/non-empty state.
-  virtual bool IsEmpty(int t) const;
+  virtual bool IsEmpty(unsigned int t) const;
 
   //##Documentation
   //## @brief Check whether object contains data (at
@@ -230,7 +230,8 @@ public:
   void ExecuteOperation(Operation* operation);
 
   //##Documentation
-  //## @brief Set the Geometry3D of the data, which will be referenced (not copied!). 
+  //## @brief Set the Geometry3D of the data, which will be referenced (not copied!).
+  //## Assumes the data object has only 1 time step ( is a 3D object )
   //## 
   //## @warning This method will normally be called internally by the sub-class of BaseData 
   //## during initialization.
@@ -238,10 +239,25 @@ public:
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   //##Documentation
+  //## @brief Set the Geometry3D of a given time step, which will be referenced (not copied!). 
+  //## 
+  //## @warning This method will normally be called internally by the sub-class of BaseData 
+  //## during initialization.
+  //## \sa SetClonedGeometry
+  virtual void SetGeometry(Geometry3D* aGeometry3D, unsigned int time);
+
+  //##Documentation
   //## @brief Set a clone of the provided parameter as Geometry3D of the data. 
+  //## Assumes the data object has only 1 time step ( is a 3D object )
   //## 
   //## \sa SetGeometry
   virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
+
+  //##Documentation
+  //## @brief Set a clone of the provided geometry as Geometry3D of a given time step. 
+  //## 
+  //## \sa SetGeometry
+  virtual void SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time);
 
   //##Documentation
   //## @brief Get the PropertyList 
@@ -280,9 +296,9 @@ public:
   itk::SmartPointerForwardReference<mitk::BaseProcess> GetSource() const;
 
   //##Documentation
-  //## @brief Get the number of timesteps from the Timeslicedgeometry
+  //## @brief Get the number of time steps from the Timeslicedgeometry
   //## As the base data has not a data vector given by itself, the number
-  //## of timesteps is defined over the time sliced geometry. In sub classes,
+  //## of time steps is defined over the time sliced geometry. In sub classes,
   //## a better implementation could be over the length of the data vector.
   const unsigned int GetTimeSteps() const 
   { 
@@ -309,7 +325,7 @@ protected:
   ~BaseData();
 
   //##Documentation
-  //## @brief Initialize the TimeSlicedGeometry for a number of timesteps. 
+  //## @brief Initialize the TimeSlicedGeometry for a number of time steps. 
   //## The TimeSlicedGeometry is initialized empty and evenly timed.
   //## In many cases it will be necessary to overwrite this in sub-classes.
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );

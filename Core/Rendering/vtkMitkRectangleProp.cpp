@@ -37,34 +37,31 @@ double *vtkMitkRectangleProp::GetBounds()
 
 int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
-  int * i = m_RenderWindow->GetSize();
-
   m_RenderWindow->MakeCurrent();
-  //glClear(GL_COLOR_BUFFER_BIT);
-  //glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-  //glClearColor(m_Color[0],m_Color[1],m_Color[2],0);
   
-
   Enable2DOpenGL();
 
+  //make it nicer
   glEnable(GL_LINE_SMOOTH);
- 
+  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+  
+  //size and position
+  int * i = m_RenderWindow->GetSize();
   GLfloat bbox[8] = {0.f , 0.f, (float)i[0], 0.f, (float)i[0], (float)i[1], 0.f, (float)i[1]};
-  glColor3f(m_Color[0],m_Color[1],m_Color[2]);
-  //glRasterPos2d(0,0);
-   
+    
+  //render rectangle
   glLineWidth(5.0f);
   glBegin(GL_LINE_LOOP);
   for (int j = 0; j < 4; j++)
+  {
+    glColor3f(m_Color[0],m_Color[1],m_Color[2]);
     glVertex2fv(&bbox[2*j]);
-  glEnd ();
+  }
+  glEnd();
   glLineWidth(1.0f);
 
   glDisable(GL_LINE_SMOOTH);
 
-  //glFlush(); // really necessary ?? //B/
-
-  //glClearColor(0,0,0,0);
   Disable2DOpenGL();
 
   return 1;
@@ -100,9 +97,10 @@ void vtkMitkRectangleProp::Enable2DOpenGL()
    
   // Make sure depth testing and lighting are disabled for 2D rendering until  
   // we are finished rendering in 2D  
-  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );  
+  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_TEXTURE_2D);
   glDisable( GL_DEPTH_TEST );  
-  glDisable( GL_LIGHTING );  
+  glDisable( GL_LIGHTING   );
+  glDisable( GL_TEXTURE_2D );
 }
 
 void vtkMitkRectangleProp::Disable2DOpenGL()

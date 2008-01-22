@@ -104,12 +104,16 @@ protected:
 //## @brief Imports an itk::Image (with a specific type) as an mitk::Image.
 //## @ingroup Adaptor
 //##
-//## Instantiates instance of ITKImageImport
+//## Instantiates instance of ITKImageImport.
+//## mitk::ITKImageImport does not cast pixel types etc., it just imports
+//## image data. If you get a compile error, try image.GetPointer().
+//##
 //## \param update: if \a true, fill mitk::Image, which will execute the
 //## up-stream pipeline connected to the input itk::Image. Otherwise you
 //## need to make sure that Update() is called on the mitk::Image before
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
+//## \sa itk::Image::CastToMitkImage
 template <typename ItkOutputImageType> 
 Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry = NULL, bool update = true);
 
@@ -118,11 +122,15 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 //## @ingroup Adaptor
 //##
 //## Instantiates instance of ITKImageImport
+//## mitk::ITKImageImport does not cast pixel types etc., it just imports
+//## image data. If you get a compile error, try image.GetPointer().
+//##
 //## \param update: if \a true, fill mitk::Image, which will execute the
 //## up-stream pipeline connected to the input itk::Image. Otherwise you
 //## need to make sure that Update() is called on the mitk::Image before
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
+//## \sa itk::Image::CastToMitkImage
 //## \sa GrabItkImageMemory
 template <typename ItkOutputImageType> 
 Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry = NULL, bool update = true);

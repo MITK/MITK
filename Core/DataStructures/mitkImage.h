@@ -557,7 +557,12 @@ protected:
 
 //##Documentation
 //## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+//##
+//## CastToMitkImage does not cast pixel types etc., just image data
+//## Needs "mitkImage.h" header included.
+//## If you get a compile error, try image.GetPointer();
 //## @ingroup Adaptor
+//## \sa mitkITKImageImport
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
@@ -567,7 +572,12 @@ void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk:
 
 //##Documentation
 //## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+//##
+//## CastToMitkImage does not cast pixel types etc., just image data
+//## Needs "mitkImage.h" header included.
+//## If you get a compile error, try image.GetPointer();
 //## @ingroup Adaptor
+//## \sa mitkITKImageImport
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {

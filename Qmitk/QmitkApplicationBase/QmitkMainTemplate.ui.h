@@ -140,6 +140,7 @@ Tadaa
 
 #include <QmitkPropertyListView.h>
 
+#include <mitkPointSet.h>
 
 #include <mitkImageTimeSelector.h>
 
@@ -1008,10 +1009,30 @@ void QmitkMainTemplate::parseCommandLine()
     if(strcmp(qApp->argv()[i], "-testing")==0) {
       break;
     }
-    if(strcmp(qApp->argv()[i], "-testdata")==0) {
+    if(strcmp(qApp->argv()[i], "-testEmptyImage")==0) {
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
       treeNode->SetData(mitk::Image::New());
+      it.Add(treeNode);
+      break;
+    }
+    if(strcmp(qApp->argv()[i], "-testEmptySurface")==0) {
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
+      treeNode->SetData(mitk::Surface::New());
+      it.Add(treeNode);
+      break;
+    }
+    if(strcmp(qApp->argv()[i], "-testEmptyPointSet")==0) {
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
+      treeNode->SetData(mitk::PointSet::New());
+      it.Add(treeNode);
+      break;
+    }
+     if(strcmp(qApp->argv()[i], "-testEmptyNode")==0) {
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
       it.Add(treeNode);
       break;
     }

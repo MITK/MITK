@@ -280,14 +280,30 @@ void QmitkSliceBasedSegmentation::AutoCropSegmentation()
         mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
         cropFilter->SetInput( image );
         cropFilter->SetBackgroundValue( 0 );
-        cropFilter->Update();
-
-        image = cropFilter->GetOutput();
-        if (image.IsNotNull())
+        try
         {
-          node->SetData( image );
+          cropFilter->Update();
+
+          image = cropFilter->GetOutput();
+          if (image.IsNotNull())
+          {
+            node->SetData( image );
+          }
+          else
+          {
+            std::string nodeName;
+            problemBaeren += " ";
+            if ( node->GetName( nodeName ) )
+            {
+              problemBaeren += nodeName.c_str();
+            }
+            else
+            {
+              problemBaeren += "(no name)";
+            }
+          }
         }
-        else
+        catch(...)
         {
           std::string nodeName;
           problemBaeren += " ";
@@ -309,7 +325,9 @@ void QmitkSliceBasedSegmentation::AutoCropSegmentation()
   // report possible errors
   if (!problemBaeren.isEmpty())
   {
+#ifndef BUILD_TESTING
     QMessageBox::information(NULL, "MITK", QString("Could not crop these images:\n") + problemBaeren, QMessageBox::Ok);
+#endif
   }
 
   QApplication::restoreOverrideCursor();

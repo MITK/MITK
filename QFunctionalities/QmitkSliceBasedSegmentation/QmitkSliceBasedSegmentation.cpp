@@ -801,9 +801,9 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNotNull() && refImage.IsNotNull() )
       {
-        completeReport += QString("============= Gray value analysis of %1 ====\n").arg(nodename);
+        completeReport += QString("============= Gray value analysis of %1 ====\n").arg(nodename.c_str());
         AccessFixedDimensionByItk_2( refImage, ITKHistogramming, 3, image, completeReport );
-        completeReport += QString("============= End of %1 ====================\n\n\n").arg(nodename);
+        completeReport += QString("============= End of %1 ====================\n\n\n").arg(nodename.c_str());
       }
     }
   }

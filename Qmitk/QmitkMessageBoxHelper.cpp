@@ -114,7 +114,7 @@ QmitkMessageBoxHelper::QmitkMessageBoxHelper(QObject* parent, const char* name)
 void QmitkMessageBoxHelper::CloseMessageBoxes(unsigned int whichButton, unsigned int delay)
 {
   m_WhichButton = whichButton;
-  m_Timer.start( delay, true );
+  m_Timer.start( delay, false );
 }
 
 void QmitkMessageBoxHelper::CloseMessageBoxesNow()
@@ -143,6 +143,8 @@ void QmitkMessageBoxHelper::CloseMessageBoxesNow()
           std::cout << m_WhichButton << ". button is labeled '" << button->text().ascii() << "'. Will be clicked now..." << std::endl;
           QmitkUserInputSimulation::MouseDown   ( button, Qt::LeftButton );
           QmitkUserInputSimulation::MouseRelease( button, Qt::LeftButton );
+
+          m_Timer.stop();
         }
 
         --count;

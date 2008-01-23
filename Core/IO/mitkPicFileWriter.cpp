@@ -46,14 +46,14 @@ void mitk::PicFileWriter::GenerateData()
     return ;
   }
 
-  mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
+  Image::Pointer input = const_cast<Image*>(this->GetInput());
 
   ipPicDescriptor * picImage = input->GetPic();
-  mitk::SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
+  SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
   {
     //set tag "REAL PIXEL SIZE"
-    const mitk::Vector3D & spacing = slicedGeometry->GetSpacing();
+    const Vector3D & spacing = slicedGeometry->GetSpacing();
     ipPicTSV_t *pixelSizeTag;
     pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
     if (!pixelSizeTag)
@@ -87,25 +87,25 @@ void mitk::PicFileWriter::GenerateData()
       geometryTag->value = malloc( sizeof(float) * 3 * 4 );
       ipPicAddTag (picImage, geometryTag);
     }
-    const mitk::AffineTransform3D::OffsetType& offset = slicedGeometry->GetIndexToWorldTransform()->GetOffset();
+    const AffineTransform3D::OffsetType& offset = slicedGeometry->GetIndexToWorldTransform()->GetOffset();
     ((float*)geometryTag->value)[0] = offset[0];
     ((float*)geometryTag->value)[1] = offset[1];
     ((float*)geometryTag->value)[2] = offset[2];
 
-    const mitk::AffineTransform3D::MatrixType& matrix = slicedGeometry->GetIndexToWorldTransform()->GetMatrix();
-    const mitk::AffineTransform3D::MatrixType::ValueType* row0 = matrix[0];
-    const mitk::AffineTransform3D::MatrixType::ValueType* row1 = matrix[1];
-    const mitk::AffineTransform3D::MatrixType::ValueType* row2 = matrix[2];
+    const AffineTransform3D::MatrixType& matrix = slicedGeometry->GetIndexToWorldTransform()->GetMatrix();
+    const AffineTransform3D::MatrixType::ValueType* row0 = matrix[0];
+    const AffineTransform3D::MatrixType::ValueType* row1 = matrix[1];
+    const AffineTransform3D::MatrixType::ValueType* row2 = matrix[2];
 
-    mitk::Vector3D v;
+    Vector3D v;
 
-    mitk::FillVector3D(v, row0[0], row1[0], row2[0]);
+    FillVector3D(v, row0[0], row1[0], row2[0]);
     v.Normalize();
     ((float*)geometryTag->value)[3] = v[0];
     ((float*)geometryTag->value)[4] = v[1];
     ((float*)geometryTag->value)[5] = v[2];
 
-    mitk::FillVector3D(v, row0[1], row1[1], row2[1]);
+    FillVector3D(v, row0[1], row1[1], row2[1]);
     v.Normalize();
     ((float*)geometryTag->value)[6] = v[0];
     ((float*)geometryTag->value)[7] = v[1];
@@ -115,7 +115,7 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)geometryTag->value)[10] = spacing[1];
     ((float*)geometryTag->value)[11] = spacing[2];
   }
-  mitk::PicFileReader::ConvertHandedness(picImage);  // flip upside-down in MITK coordinates
+  PicFileReader::ConvertHandedness(picImage);  // flip upside-down in MITK coordinates
 
   // Following line added to detect write errors. If saving .pic files from the plugin is broken again,
   // please report a bug, don't just remove this line!
@@ -123,14 +123,14 @@ void mitk::PicFileWriter::GenerateData()
 
   if (ret != 0)
   {
-    mitk::PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
+    PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
     throw std::ios_base::failure("Error during .pic file writing in "__FILE__);
   }
 
-  mitk::PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
+  PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
 }
 
-void mitk::PicFileWriter::SetInput( mitk::Image* image )
+void mitk::PicFileWriter::SetInput( Image* image )
 {
   this->ProcessObject::SetNthInput( 0, image );
 }
@@ -143,7 +143,7 @@ const mitk::Image* mitk::PicFileWriter::GetInput()
   }
   else
   {
-    return static_cast< const mitk::Image * >( this->ProcessObject::GetInput( 0 ) );
+    return static_cast< const Image * >( this->ProcessObject::GetInput( 0 ) );
   }
 }
 

@@ -28,7 +28,7 @@ ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
 //##ModelId=3E1878400265
 void mitk::PicFileReader::GenerateOutputInformation()
 {
-    mitk::Image::Pointer output = this->GetOutput();
+    Image::Pointer output = this->GetOutput();
 
     if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
         return;
@@ -184,7 +184,7 @@ void mitk::PicFileReader::ConvertHandedness(ipPicDescriptor* pic)
 //##ModelId=3E187255016C
 void mitk::PicFileReader::GenerateData()
 {
-    mitk::Image::Pointer output = this->GetOutput();
+    Image::Pointer output = this->GetOutput();
 
     // Check to see if we can read the file given the name or prefix
     //

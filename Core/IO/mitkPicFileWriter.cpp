@@ -115,7 +115,7 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)geometryTag->value)[10] = spacing[1];
     ((float*)geometryTag->value)[11] = spacing[2];
   }
-  mitk::PicFileReader::ConvertHandedness(picImage);
+  mitk::PicFileReader::ConvertHandedness(picImage);  // flip upside-down in MITK coordinates
 
   // Following line added to detect write errors. If saving .pic files from the plugin is broken again,
   // please report a bug, don't just remove this line!
@@ -123,10 +123,11 @@ void mitk::PicFileWriter::GenerateData()
 
   if (ret != 0)
   {
+    mitk::PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
     throw std::ios_base::failure("Error during .pic file writing in "__FILE__);
   }
 
-  mitk::PicFileReader::ConvertHandedness(picImage); // why this?
+  mitk::PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
 }
 
 void mitk::PicFileWriter::SetInput( mitk::Image* image )

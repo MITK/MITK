@@ -196,6 +196,7 @@ void mitk::PicFileReader::GenerateData()
     if( m_FileName != "")
     {
         ipPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()), output->GetPic());
+        // comes upside-down (in MITK coordinates) from PIC file
         ConvertHandedness(pic);
 
         ipPicTSV_t *tsv;

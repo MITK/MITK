@@ -911,7 +911,7 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
 
   // report histogram values
   
-  report += QString("      Minimum: %1\n  5\% quantile: %2\n 25\% quantile: %3\n 50\% quantile: %4\n 75\% quantile: %5\n 95\% quantile: %6\n      Maximum: %7\n")
+  report += QString("      Minimum: %1\n  5% quantile: %2\n 25% quantile: %3\n 50% quantile: %4\n 75% quantile: %5\n 95% quantile: %6\n      Maximum: %7\n")
                .arg(minimum)
                .arg(histogramQuantileValues[5])
                .arg(histogramQuantileValues[25])

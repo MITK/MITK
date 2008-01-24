@@ -26,6 +26,7 @@ vtkStandardNewMacro(vtkMitkRectangleProp);
 vtkMitkRectangleProp::vtkMitkRectangleProp()
 {
 }
+
 vtkMitkRectangleProp::~vtkMitkRectangleProp()
 {
 }
@@ -35,7 +36,7 @@ double *vtkMitkRectangleProp::GetBounds()
   return NULL;
 }
 
-int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
+int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
 {
   m_RenderWindow->MakeCurrent();
   
@@ -66,11 +67,26 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 
   return 1;
 }
-int vtkMitkRectangleProp::RenderTranslucentGeometry(vtkViewport* viewport)
+
+void vtkMitkRectangleProp::SetRenderWindow(vtkRenderWindow* renWin)
+{
+  m_RenderWindow = renWin;
+}
+
+void vtkMitkRectangleProp::SetColor(float col1, float col2, float col3)
+{
+  m_Color[0] = col1;
+  m_Color[1] = col2;
+  m_Color[2] = col3;
+}
+
+
+int vtkMitkRectangleProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
 {
   return 0;
 }
-int vtkMitkRectangleProp::RenderOpaqueGeometry(vtkViewport* viewport)
+
+int vtkMitkRectangleProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
 {
   return 0;
 }
@@ -111,3 +127,4 @@ void vtkMitkRectangleProp::Disable2DOpenGL()
   glMatrixMode( GL_MODELVIEW );  
   glPopMatrix(); 
 }
+

@@ -27,32 +27,25 @@ class vtkMitkRectangleProp : public vtkProp
 {
   public:
     
-    static vtkMitkRectangleProp *New();
+    static vtkMitkRectangleProp* New();
 
     int RenderOpaqueGeometry(vtkViewport* viewport);
     int RenderTranslucentGeometry(vtkViewport* viewport);
     int RenderOverlay(vtkViewport* viewport);
 
-    void SetRenderWindow(vtkRenderWindow* renWin)
-    {
-      m_RenderWindow = renWin;
-    }
+    void SetRenderWindow(vtkRenderWindow* renWin);
 
-    void SetColor(float col1, float col2, float col3)
-    {
-      m_Color[0] = col1;
-      m_Color[1] = col2;
-      m_Color[2] = col3;
-    }
+    void SetColor(float col1, float col2, float col3);
 
-    double *GetBounds();
+    double* GetBounds();
 
   protected:
+    
+    vtkMitkRectangleProp();
+    virtual ~vtkMitkRectangleProp();
 
     void Enable2DOpenGL();
     void Disable2DOpenGL();
-    vtkMitkRectangleProp();
-    ~vtkMitkRectangleProp();
 
     vtkRenderWindow* m_RenderWindow;
     float m_Color[3];

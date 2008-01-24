@@ -63,7 +63,7 @@ mitk::SegmentationInterpolation::~SegmentationInterpolation()
     
 void mitk::SegmentationInterpolation::OnImageModified(const itk::EventObject&)
 {
-  if (!m_BlockModified  && m_Segmentation)
+  if (!m_BlockModified  && m_Segmentation.IsNotNull() )
   {
     SetSegmentationVolume( m_Segmentation );
   }

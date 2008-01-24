@@ -55,7 +55,7 @@ void mitk::PicFileWriter::GenerateData()
     //set tag "REAL PIXEL SIZE"
     const Vector3D & spacing = slicedGeometry->GetSpacing();
     ipPicTSV_t *pixelSizeTag;
-    pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
+    pixelSizeTag = ipPicQueryTag( picImage, (char*)"REAL PIXEL SIZE" );
     if (!pixelSizeTag)
     {
       pixelSizeTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
@@ -74,7 +74,7 @@ void mitk::PicFileWriter::GenerateData()
     //ISG == offset/origin           transformationmatrix(matrix)                                                              spancings
     //ISG == offset0 offset1 offset2 spalte0_0 spalte0_1 spalte0_2 spalte1_0 spalte1_1 spalte1_2 spalte2_0 spalte2_1 spalte2_2 spacing0 spacing1 spacing2
     ipPicTSV_t *geometryTag;
-    geometryTag = ipPicQueryTag( picImage, "ISG" );
+    geometryTag = ipPicQueryTag( picImage, (char*)"ISG" );
     if (!geometryTag)
     {
       geometryTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );

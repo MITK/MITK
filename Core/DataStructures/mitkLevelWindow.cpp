@@ -354,7 +354,7 @@ bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
   {
     return false;
   }
-  ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
+  ipPicTSV_t *tsv = ipPicQueryTag( pic, (char*)"LEVEL/WINDOW" );
   if( tsv != NULL )
   {
     double level = 0;

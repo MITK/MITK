@@ -102,7 +102,7 @@ DLL_API void annUpdateStats()				// update stats with current counts
 }
 
 										// print a single statistic
-void print_one_stat(char *title, ANNsampStat s, double div)
+void print_one_stat(const char *title, ANNsampStat s, double div)
 {
 	cout << title << "= [ ";
 	cout.width(9); cout << s.mean()/div			<< " : ";

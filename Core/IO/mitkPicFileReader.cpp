@@ -51,25 +51,25 @@ void mitk::PicFileReader::GenerateOutputInformation()
         int channels = 1;
 
         ipPicTSV_t *tsv;
-        if ( (tsv = ipPicQueryTag( header, "SOURCE HEADER" )) != NULL)
+        if ( (tsv = ipPicQueryTag( header, (char*)"SOURCE HEADER" )) != NULL)
         {
           if(tsv->n[0]>1e+06)
           {
             ipPicTSV_t *tsvSH;
-            tsvSH = ipPicDelTag( header, "SOURCE HEADER" );
+            tsvSH = ipPicDelTag( header, (char*)"SOURCE HEADER" );
             ipPicFreeTag(tsvSH);
           }
         }
-        if ( (tsv = ipPicQueryTag( header, "ICON80x80" )) != NULL)
+        if ( (tsv = ipPicQueryTag( header, (char*)"ICON80x80" )) != NULL)
         {
           ipPicTSV_t *tsvSH;
-          tsvSH = ipPicDelTag( header, "ICON80x80" );
+          tsvSH = ipPicDelTag( header, (char*)"ICON80x80" );
           ipPicFreeTag(tsvSH);
         }
-        if ( (tsv = ipPicQueryTag( header, "VELOCITY" )) != NULL)
+        if ( (tsv = ipPicQueryTag( header, (char*)"VELOCITY" )) != NULL)
         {
           ++channels;
-          ipPicDelTag( header, "VELOCITY" );
+          ipPicDelTag( header, (char*)"VELOCITY" );
         }
 
         if( header == NULL)
@@ -200,22 +200,22 @@ void mitk::PicFileReader::GenerateData()
         ConvertHandedness(pic);
 
         ipPicTSV_t *tsv;
-        if ( (tsv = ipPicQueryTag( pic, "SOURCE HEADER" )) != NULL)
+        if ( (tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" )) != NULL)
         {
           if(tsv->n[0]>1e+06)
           {
             ipPicTSV_t *tsvSH;
-            tsvSH = ipPicDelTag( pic, "SOURCE HEADER" );
+            tsvSH = ipPicDelTag( pic, (char*)"SOURCE HEADER" );
             ipPicFreeTag(tsvSH);
           }
         }
-        if ( (tsv = ipPicQueryTag( pic, "ICON80x80" )) != NULL)
+        if ( (tsv = ipPicQueryTag( pic, (char*)"ICON80x80" )) != NULL)
         {
           ipPicTSV_t *tsvSH;
-          tsvSH = ipPicDelTag( pic, "ICON80x80" );
+          tsvSH = ipPicDelTag( pic, (char*)"ICON80x80" );
           ipPicFreeTag(tsvSH);
         }
-        if ( (tsv = ipPicQueryTag( pic, "VELOCITY" )) != NULL)
+        if ( (tsv = ipPicQueryTag( pic, (char*)"VELOCITY" )) != NULL)
         {
           ipPicDescriptor* header = ipPicCopyHeader(pic, NULL);
           header->data = tsv->value;
@@ -223,7 +223,7 @@ void mitk::PicFileReader::GenerateData()
           output->SetChannel(header->data, 1);
           header->data = NULL;
           ipPicFree(header);
-          ipPicDelTag( pic, "VELOCITY" );
+          ipPicDelTag( pic, (char*)"VELOCITY" );
         }
 
         //slice-wise reading

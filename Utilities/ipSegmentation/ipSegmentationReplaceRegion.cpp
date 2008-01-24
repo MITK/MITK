@@ -29,7 +29,7 @@ ipMITKSegmentationReplaceRegion4N( ipPicDescriptor *seg, int startOfs, ipInt1_t 
   if (ipMITKSegmentationUndoIsEnabled (seg)) {
     ipMITKSegmentationUndoSave (seg);
   }
-  tag = ipPicDelTag (seg, tagSEGMENTATION_EMPTY);
+  tag = ipPicDelTag (seg, (char*)tagSEGMENTATION_EMPTY);
   if (tag) {
     ipPicFreeTag (tag);
   }

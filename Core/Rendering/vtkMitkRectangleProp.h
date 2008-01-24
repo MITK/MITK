@@ -60,3 +60,4 @@ class vtkMitkRectangleProp : public vtkProp
 
 
 #endif /* vtkMitkRectangleProp_H_HEADER_INCLUDED_C1C53723 */
+

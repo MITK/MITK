@@ -637,6 +637,8 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       //then add the transmitted vestor to them
       //create two operations and send them to superclass
       Point3D pointA, pointB;
+      pointA.Fill(0.0);
+      pointB.Fill(0.0);
       m_PointSetSeries[0]->GetPoint(lineOp->GetPIdA(), &pointA);
       m_PointSetSeries[0]->GetPoint(lineOp->GetPIdB(), &pointB);
 

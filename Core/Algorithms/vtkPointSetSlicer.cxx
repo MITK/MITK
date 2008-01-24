@@ -53,6 +53,7 @@ vtkPointSetSlicer::vtkPointSetSlicer(vtkPlane *cf)
 
   this->Cutter = vtkCutter::New();
   this->Cutter->GenerateValues( 1, 0, 1 );
+  
 }
 
 vtkPointSetSlicer::~vtkPointSetSlicer()

@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
+#include "vtkVersion.h"
+
 class vtkCutter;
 class vtkPlane;
 class vtkPointLocator;
@@ -31,7 +33,15 @@ class vtkPointData;
 class vtkCellData;
 
 
-#if (VTK_MAJOR_VERSION < 5)
+#if (VTK_MAJOR_VERSION >= 5)
+#include "vtkPolyDataAlgorithm.h"
+
+class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
+{
+public:
+  vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
+
+#else
 #include "vtkDataSetToPolyDataFilter.h"
 #define VTK_NUMBER_OF_CELL_TYPES 68
 
@@ -39,14 +49,6 @@ class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFil
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkDataSetToPolyDataFilter);
-  
-#else
-#include "vtkPolyDataAlgorithm.h"
-
-class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
-{
-public:
-  vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
   
 #endif
   

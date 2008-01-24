@@ -66,6 +66,8 @@ class SingleSpacingFilter : public PicDescriptorToNode
     */
     virtual std::vector< DataTreeNode::Pointer > GetOutput();
 
+    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
+
   protected:
 
     /** constructor */
@@ -120,6 +122,8 @@ class SingleSpacingFilter : public PicDescriptorToNode
 
     /** output */
     std::vector< DataTreeNode::Pointer > m_Output;
+
+    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
 
     /** function to put the input-PicDescriptors to struct Slice, PositionAtSpace and Group */
     void SortSlicesToGroup();

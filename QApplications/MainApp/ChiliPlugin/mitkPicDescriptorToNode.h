@@ -62,6 +62,8 @@ class PicDescriptorToNode : public itk::Object
     */
     virtual std::vector< DataTreeNode::Pointer > GetOutput();
 
+    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
+
   protected:
 
     PicDescriptorToNode();

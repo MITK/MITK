@@ -40,6 +40,13 @@ std::vector< mitk::DataTreeNode::Pointer > mitk::PicDescriptorToNode::GetOutput(
   return emptyResult;
 }
 
+std::vector< std::list< std::string > > mitk::PicDescriptorToNode::GetImageInstanceUIDs()
+{
+  std::vector< std::list< std::string > > emptyResult;
+  emptyResult.clear();
+  return emptyResult;
+}
+
 // the "main"-function
 void mitk::PicDescriptorToNode::Update()
 {

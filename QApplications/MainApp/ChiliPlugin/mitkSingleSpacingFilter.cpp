@@ -105,7 +105,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
     //set PicDescriptor
     newSlice.currentPic = (*currentPic);
     //set imageNumber
-    ipPicTSV_t* imagenumberTag = ipPicQueryTag( newSlice.currentPic, tagIMAGE_NUMBER );
+    ipPicTSV_t* imagenumberTag = ipPicQueryTag( newSlice.currentPic, (char*)tagIMAGE_NUMBER );
     if( imagenumberTag && imagenumberTag->type == ipPicInt )
       newSlice.imageNumber = *( (int*)(imagenumberTag->value) );
     else
@@ -113,10 +113,10 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( newSlice.currentPic, "SOURCE HEADER" );
+      tsv = ipPicQueryTag( newSlice.currentPic, (char*)"SOURCE HEADER" );
       if( tsv )
       {
-        if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) );
+        if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
           if( data != NULL )
             sscanf( (char *) data, "%d", &newSlice.imageNumber );
       }
@@ -143,7 +143,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
     vtk2itk( isg->ps, currentPixelSize );
     //seriesDescription
     std::string currentSeriesDescription;
-    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), tagSERIES_DESCRIPTION );
+    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), (char*)tagSERIES_DESCRIPTION );
     if( seriesDescriptionTag )
       currentSeriesDescription = static_cast<char*>( seriesDescriptionTag->value );
     else
@@ -151,7 +151,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( (*currentPic), "SOURCE HEADER" );
+      tsv = ipPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
       if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
         if( data != NULL )
           currentSeriesDescription = (char*)data;
@@ -581,11 +581,31 @@ void mitk::SingleSpacingFilter::GenerateNodes()
         // Image->SetGeometry
         resultImage->SetGeometry( timeSliceGeometry );
 
+        m_ImageInstanceUIDs.clear();
+        std::list< std::string > ListOfUIDs;
+        ListOfUIDs.clear();
+
         // add the slices to the created mitk::Image
         for( unsigned int x = 0; x < result.size(); x++ )
         {
           for( unsigned int t = 0; t < min_t; t++ )
           {
+            //get ImageInstanceUID
+            std::string SingleUID;
+            ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( result[x].includedSlices[t].currentPic, (char*)tagIMAGE_INSTANCE_UID );
+            if( missingImageTagQuery )
+              SingleUID = static_cast<char*>( missingImageTagQuery->value );
+            else
+            {
+              ipPicTSV_t *dicomHeader = ipPicQueryTag( result[x].includedSlices[t].currentPic, (char*)"SOURCE HEADER" );
+              void* data = NULL;
+              ipUInt4_t len = 0;
+              if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
+                SingleUID = static_cast<char*>( data );
+            }
+            ListOfUIDs.push_back( SingleUID );
+
+            //add to mitk::Image
             if( groupList[n].dimension == 3 )
               resultImage->SetPicVolume( result[x].includedSlices[t].currentPic, t );
             else
@@ -602,7 +622,10 @@ void mitk::SingleSpacingFilter::GenerateNodes()
           if( groupList[n].seriesDescription == "" )
             groupList[n].seriesDescription = "no SeriesDescription";
           node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
-          node->SetProperty( "NumberOfSlices", new IntProperty( result.size() ) );
+          if( groupList[n].dimension > 2 )
+            node->SetProperty( "NumberOfSlices", new IntProperty( result.front().includedSlices.front().currentPic->n[2] ) );
+          else
+            node->SetProperty( "NumberOfSlices", new IntProperty( result.size() ) );
           node->SetProperty( "NumberOfTimeSlices", new IntProperty( min_t ) );
           if( m_SeriesOID != "" )
             node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
@@ -614,11 +637,17 @@ void mitk::SingleSpacingFilter::GenerateNodes()
           }
 
           m_Output.push_back( node );
+          m_ImageInstanceUIDs.push_back( ListOfUIDs );
         }
       }
     }
   }
 #endif
+}
+
+std::vector< std::list< std::string > > mitk::SingleSpacingFilter::GetImageInstanceUIDs()
+{
+  return m_ImageInstanceUIDs;
 }
 
 const mitk::PropertyList::Pointer mitk::SingleSpacingFilter::CreatePropertyListFromPicTags( ipPicDescriptor* imageToExtractTagsFrom )

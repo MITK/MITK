@@ -71,7 +71,6 @@ SET(CPP_FILES
   mitkOperationActor.cpp
   mitkOperation.cpp
   mitkOrganTypeProperty.cpp
-  mitkPicHeaderProperty.cpp
   mitkPicHelper.cpp
   mitkPixelType.cpp
   mitkPlaneGeometry.cpp

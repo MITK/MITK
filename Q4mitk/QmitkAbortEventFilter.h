@@ -1,0 +1,67 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#ifndef QMITKABORTEVENTFILTER_H_HEADER_INCLUDED_C135A197
+#define QMITKABORTEVENTFILTER_H_HEADER_INCLUDED_C135A197
+
+#include <QObject>
+#include <QEvent>
+
+#include <utility>
+#include <queue>
+#include <iostream>
+
+class QmitkAbortEventFilter : public QObject
+{
+public:
+
+  static QmitkAbortEventFilter* GetInstance();
+
+  virtual ~QmitkAbortEventFilter();
+
+  void ProcessEvents();
+  void IssueQueuedEvents();
+ 
+protected:
+  QmitkAbortEventFilter();
+
+  bool eventFilter( QObject* object, QEvent* event );
+
+  bool m_ButtonPressed;
+  
+  bool m_MouseMoved;
+  
+private:
+  typedef std::pair< QObject*, QEvent* > ObjectEventPair;
+
+  typedef std::queue< ObjectEventPair > EventQueue;
+
+  EventQueue m_EventQueue;
+};
+
+class QmitkDebugEventFilter : public QObject
+{
+ protected:
+   bool eventFilter( QObject* object, QEvent* event )
+   {
+     std::cout << "event:" << event->type() << ( event->spontaneous() ? "true" : "false" ) << " / " << object->metaObject()->className() << " / " << object->objectName().toStdString() << std::endl; 
+     return false;
+   }
+};
+
+#endif /* QMITKABORTEVENTFILTER_H_HEADER_INCLUDED_C135A197 */

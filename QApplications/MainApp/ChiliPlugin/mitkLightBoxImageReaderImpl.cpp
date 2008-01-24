@@ -167,7 +167,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
         {
           /*if (numberOfTimePoints==1 && number==1)
           {
-          tsv=ipPicQueryTag(pic2,"SOURCE HEADER");
+          tsv=ipPicQueryTag(pic2,(char*)"SOURCE HEADER");
           dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0033, &data, &len);
           sscanf( (char *) data, "%f", &imagetime );
           }*/
@@ -297,7 +297,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     planegeometry->SetOrigin( origin );
     planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID(interSliceGeometry->forUID) );
 
-    ipPicTSV_t *tsv = ipPicQueryTag( originalHeader, "SOURCE HEADER" );
+    ipPicTSV_t *tsv = ipPicQueryTag( originalHeader, (char*)"SOURCE HEADER" );
 
     void* data; 
     ipUInt4_t len;
@@ -610,7 +610,7 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
       std::cout << "****** LightBoxImageReaderImpl::SortImage(): pic is NULL" << std::endl;
       continue;
     }
-    tsv=ipPicQueryTag(pic,"SOURCE HEADER");
+    tsv=ipPicQueryTag(pic,(char*)"SOURCE HEADER");
     if( tsv )
     {
       bool ok = dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len );
@@ -621,7 +621,7 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
       }
       else
       {
-        ipPicTSV_t* imagenumberTag = ipPicQueryTag( pic, tagIMAGE_NUMBER );
+        ipPicTSV_t* imagenumberTag = ipPicQueryTag( pic, (char*)tagIMAGE_NUMBER );
         if( imagenumberTag && imagenumberTag->type == ipPicInt )
         {
           info.imageNumber = *( (int*)(imagenumberTag->value) );

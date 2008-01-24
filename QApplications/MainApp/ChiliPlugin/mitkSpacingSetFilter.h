@@ -69,6 +69,8 @@ class SpacingSetFilter : public PicDescriptorToNode
     */
     virtual std::vector< DataTreeNode::Pointer > GetOutput();
 
+    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
+
   protected:
 
     /** constructor */
@@ -111,12 +113,26 @@ class SpacingSetFilter : public PicDescriptorToNode
       int count;
     };
 
+    void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
+    void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
+
+    Vector3D m_FirstTimeSlicedPosition;
+    bool m_VectorInitialize;
+    bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
+
+bool show;
+int count;
+
+    std::set< Slice* > m_Set;
+
     /** input */
     std::list< ipPicDescriptor* > m_PicDescriptorList;
     std::string m_SeriesOID;
 
     /** output */
     std::vector< DataTreeNode::Pointer > m_Output;
+
+    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
 
     /** function to put the input-PicDescriptors to struct slice and struct group */
     void SortSlicesToGroup();

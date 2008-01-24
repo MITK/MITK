@@ -113,16 +113,6 @@ class SpacingSetFilter : public PicDescriptorToNode
       int count;
     };
 
-    void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
-    void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
-
-    Vector3D m_FirstTimeSlicedPosition;
-    bool m_VectorInitialize;
-    bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
-
-bool show;
-int count;
-
     std::set< Slice* > m_Set;
 
     /** input */
@@ -131,7 +121,6 @@ int count;
 
     /** output */
     std::vector< DataTreeNode::Pointer > m_Output;
-
     std::vector< std::list< std::string > > m_ImageInstanceUIDs;
 
     /** function to put the input-PicDescriptors to struct slice and struct group */
@@ -144,7 +133,8 @@ int count;
     void SortPossibleCombinations();
     /** search the minimum number of combinations to represent all slices, therefore multitudes get used */
     void SearchForMinimumCombination();
-    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination );
+    /** check the found combinations if they are timesliced */
+    void CheckForTimeSlicedCombinations();
     /** generate the result - nodes */
     void GenerateNodes();
 
@@ -152,6 +142,10 @@ int count;
     static bool LocationSort ( const Slice elem1, const Slice elem2 );
     static bool CombinationSort( const std::set< Slice* > elem1, const std::set< Slice* > elem2 );
     double Round( double number, unsigned int decimalPlaces );
+    void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
+    void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
+    bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
+    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination );
     const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
 
     /** debug-output */

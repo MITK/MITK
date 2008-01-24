@@ -48,7 +48,7 @@
             <property name="minimumSize">
                 <size>
                     <width>0</width>
-                    <height>450</height>
+                    <height>200</height>
                 </size>
             </property>
             <property name="title">
@@ -71,7 +71,7 @@
                         </property>
                     </column>
                     <property name="name">
-                        <cstring>contentOfStudy</cstring>
+                        <cstring>studyContent</cstring>
                     </property>
                     <property name="enabled">
                         <bool>true</bool>
@@ -85,7 +85,7 @@
                         </sizepolicy>
                     </property>
                     <property name="hScrollBarMode">
-                        <enum>AlwaysOn</enum>
+                        <enum>Auto</enum>
                     </property>
                     <property name="selectionMode">
                         <enum>Single</enum>
@@ -99,7 +99,7 @@
                 </widget>
                 <widget class="QPushButton">
                     <property name="name">
-                        <cstring>LoadFromListView</cstring>
+                        <cstring>LoadFromStudyListView</cstring>
                     </property>
                     <property name="text">
                         <string>&amp;Load</string>
@@ -110,33 +110,65 @@
                 </widget>
             </vbox>
         </widget>
-        <spacer>
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>spacer2_2_2</cstring>
+                <cstring>groupBox2</cstring>
             </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>MinimumExpanding</enum>
-            </property>
-            <property name="sizeHint">
+            <property name="minimumSize">
                 <size>
-                    <width>20</width>
-                    <height>16</height>
+                    <width>0</width>
+                    <height>200</height>
                 </size>
             </property>
-        </spacer>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>LoadParentChildRelation</cstring>
+            <property name="title">
+                <string>Parent-Child-Relation</string>
             </property>
-            <property name="text">
-                <string>Load Parent-Child-Relation</string>
-            </property>
-            <property name="accel">
-                <string></string>
-            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string>Description</string>
+                        </property>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
+                    <property name="name">
+                        <cstring>PSContent</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="hScrollBarMode">
+                        <enum>Auto</enum>
+                    </property>
+                    <property name="selectionMode">
+                        <enum>Single</enum>
+                    </property>
+                    <property name="rootIsDecorated">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>LoadFromPSListView</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Load</string>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QPushButton">
             <property name="name">
@@ -152,23 +184,6 @@
                 <string>In this example the whole DataTree get saved.</string>
             </property>
         </widget>
-        <spacer>
-            <property name="name">
-                <cstring>spacer2_2</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
-            </property>
-            <property name="sizeType">
-                <enum>MinimumExpanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>20</width>
-                    <height>30</height>
-                </size>
-            </property>
-        </spacer>
         <widget class="QButtonGroup">
             <property name="name">
                 <cstring>buttonGroup1</cstring>
@@ -199,10 +214,10 @@
                         <cstring>SpacingFilter</cstring>
                     </property>
                     <property name="text">
-                        <string>Spacing-Se&amp;t-Filter</string>
+                        <string>Spa&amp;cing-Set-Filter</string>
                     </property>
                     <property name="accel">
-                        <string>Alt+T</string>
+                        <string>Alt+C</string>
                     </property>
                 </widget>
                 <widget class="QRadioButton">

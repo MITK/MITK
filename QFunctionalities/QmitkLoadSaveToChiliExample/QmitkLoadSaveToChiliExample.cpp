@@ -79,15 +79,14 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
 {
   if( m_Controls )
   {
-    connect( ( QObject* )( m_Controls->LoadFromListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromListView() ) );
+    connect( ( QObject* )( m_Controls->LoadFromStudyListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromStudyListView() ) );
+    connect( ( QObject* )( m_Controls->LoadFromPSListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromPSListView() ) );
 
     connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
 
     connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SingleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
-
-    connect( ( QObject* )( m_Controls->LoadParentChildRelation ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadParentChildRelation() ) );
   }
 }
 
@@ -103,61 +102,121 @@ void QmitkLoadSaveToChiliExample::Activated()
   QmitkFunctionality::Activated();
 }
 
-void QmitkLoadSaveToChiliExample::LoadParentChildRelation()
+/** This function load the selected element from the study-listview */
+void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
 {
-  m_Plugin->LoadParentChildRelation( m_Plugin->GetSeriesInformation().OID );
-}
-
-void QmitkLoadSaveToChiliExample::LoadFromListView()
-{
-  if( m_Controls->contentOfStudy->selectedItem() != 0 )
+  if( m_Controls->studyContent->selectedItem() != 0 )  //element selected?
   {
-    if( m_Controls->contentOfStudy->selectedItem()->depth() == 0 )  //load complete series
+    switch ( m_Controls->studyContent->selectedItem()->depth() )
     {
-      QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
-      if( entry )
+      case 0:  //load complete series
       {
-        std::string savedOID = entry->GetChiliOID();
-        AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
-      }
-    }
-    else
-      if( m_Controls->contentOfStudy->selectedItem()->depth() == 1 )
-      {
-        if( m_Controls->contentOfStudy->selectedItem()->text( 0 ) == "Image" )  //load all images
+        QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
+        if( entry )
         {
-          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+          std::string savedOID = entry->GetChiliOID();
+          AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
+        }
+        break;
+      }
+      case 1:  //load all known images or all text
+      {
+        if( m_Controls->studyContent->selectedItem()->text( 0 ) == "Known Images" )
+        {
+          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
           if( entry )
           {
             std::string savedOID = entry->GetChiliOID();
-            AddNodesToDataTree( m_Plugin->LoadAllImagesFromSeries( savedOID ) );
+            mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( savedOID );
+            while( !getAllElements.empty() )
+            {
+              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( savedOID, getAllElements.front().label );
+              if( temp.IsNotNull() )
+                mitk::DataStorage::GetInstance()->Add( temp );
+              getAllElements.pop_front();
+            }
           }
         }
         else
-          if( m_Controls->contentOfStudy->selectedItem()->text( 0 ) == "Text" )  //load all text
+          if( m_Controls->studyContent->selectedItem()->text( 0 ) == "Saved Text" )
           {
-            QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
+            QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
             if( entry )
             {
               std::string savedOID = entry->GetChiliOID();
               AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( savedOID ) );
             }
           }
+        break;
       }
-      else
-        if( m_Controls->contentOfStudy->selectedItem()->depth() == 3 )  //load single text
+      case 2:  //load single parent-child-volumes or text-groups with specific MIME-Types
+      {
+        QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
+        if( entry->parent() != 0 )
         {
-          QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->contentOfStudy->selectedItem() );
-          if( entry )
+          QmitkPluginListViewItem* parent = dynamic_cast<QmitkPluginListViewItem*>( entry->parent() );  //use the parent to know what to do
+          if( parent->text( 0 ) == "Known Images" )
           {
-            std::string savedOID = entry->GetChiliOID();
-            mitk::DataStorage::GetInstance()->Add( m_Plugin->LoadOneText( savedOID ) );
+            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), entry->GetVolumeLabel() );
+            if( temp.IsNotNull() )
+              mitk::DataStorage::GetInstance()->Add( temp );
           }
-
-          m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
-          m_MultiWidget->Fit();
-          m_MultiWidget->ReInitializeStandardViews();
+          else
+            if( parent->text( 0 ) == "Saved Text" )
+            {
+              QmitkPluginListViewItem* child = dynamic_cast<QmitkPluginListViewItem*>( entry->firstChild() );
+              std::string savedOID = child->GetChiliOID();
+              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
+              if( temp.IsNotNull() )
+                mitk::DataStorage::GetInstance()->Add( temp );
+              while( child->nextSibling() != 0 )
+              {
+                child = dynamic_cast<QmitkPluginListViewItem*>( child->nextSibling() );
+                std::string oid = child->GetChiliOID();
+                temp = m_Plugin->LoadOneText( oid );
+                mitk::DataStorage::GetInstance()->Add( temp );
+              }
+            }
         }
+        break;
+      }
+      case 3:  //load single text
+      {
+        QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
+        if( entry )
+        {
+          std::string savedOID = entry->GetChiliOID();
+          mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
+          if( temp.IsNotNull() )
+            mitk::DataStorage::GetInstance()->Add( temp );
+        }
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+    m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+    m_MultiWidget->Fit();
+    m_MultiWidget->ReInitializeStandardViews();
+  }
+}
+
+void QmitkLoadSaveToChiliExample::LoadFromPSListView()
+{
+  if( m_Controls->PSContent->selectedItem() != 0 )
+  {
+    QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->PSContent->selectedItem() );
+    if( entry )
+    {
+      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), entry->GetVolumeLabel() );
+      if( temp.IsNotNull() )
+        mitk::DataStorage::GetInstance()->Add( temp );
+      m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+      m_MultiWidget->Fit();
+      m_MultiWidget->ReInitializeStandardViews();
+    }
   }
 }
 
@@ -239,31 +298,58 @@ void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTree
 
 void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventObject& )
 {
-  m_Controls->contentOfStudy->clear();
+  m_Controls->studyContent->clear();
+  m_Controls->PSContent->clear();
+
   mitk::PACSPlugin::SeriesInformationList tempSeriesList = m_Plugin->GetSeriesInformationList();
+  mitk::PACSPlugin::PSRelationInformationList tempRelationList = m_Plugin->GetStudyRelationInformation();
+
+  //fill the studyInformation-view
   for( std::list<mitk::PACSPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
   {
     QmitkPluginListViewItem* seriesParent;
 
-    //seriesDescription
+    //add seriesDescription
     if( iter->Description == "" )
-      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, "no description" );
+      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), "", m_Controls->studyContent, "no description" );
     else
-      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), m_Controls->contentOfStudy, iter->Description.c_str() );
+      seriesParent = new QmitkPluginListViewItem( iter->OID.c_str(), "", m_Controls->studyContent, iter->Description.c_str() );
 
-    //imageCount, seriesNumber
-    QmitkPluginListViewItem* image = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Image" );
+    //add seriesNumber
     std::ostringstream seriesNumber;
     seriesNumber << "SeriesNumber: ";
     if( iter->Number != -1 )
       seriesNumber << iter->Number;
-    new QmitkPluginListViewItem( "", image , seriesNumber.str().c_str() );
+    new QmitkPluginListViewItem( "", "", seriesParent , seriesNumber.str().c_str() );
 
-    std::ostringstream imageCount;
-    imageCount << "ImageCount: " << iter->ImageCount;
-    new QmitkPluginListViewItem( "", image , imageCount.str().c_str() );
+    //add volumes which are saved in the parent-child-relation
+    mitk::PACSPlugin::PSRelationInformationList elementList = m_Plugin->GetSeriesRelationInformation( iter->OID );
+    if( !elementList.empty() )
+    {
+      QmitkPluginListViewItem* psVolumes = NULL;
 
-    //text
+      while( !elementList.empty() )
+      {
+        mitk::PACSPlugin::PSRelationInformation singleElement = elementList.front();
+        if( singleElement.image )  //only images should add
+        {
+          if( psVolumes == NULL )  //no images added before
+          {
+            psVolumes = new QmitkPluginListViewItem( iter->OID.c_str(), "", seriesParent, "Known Images" );  //create caption
+            if( iter->ImageCount != 0 )  //add ImageCount
+            {
+              std::ostringstream imageCount;
+              imageCount << "ImageCount: " << iter->ImageCount;
+              new QmitkPluginListViewItem( "", "", psVolumes , imageCount.str().c_str() );
+            }
+          }
+          new QmitkPluginListViewItem( iter->OID.c_str(), singleElement.label, psVolumes , singleElement.id );
+        }
+        elementList.pop_front();
+      }
+    }
+
+    //add text
     mitk::PACSPlugin::TextInformationList tempTextList = m_Plugin->GetTextInformationList( iter->OID.c_str() );
     std::vector< MimeTypeStruct > mimeTypeVector;
 
@@ -272,9 +358,8 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
     for( std::list<mitk::PACSPlugin::TextInformation>::iterator it = tempTextList.begin(); it != tempTextList.end(); it++)
     {
       //text-Name
-      char* textName;
-      textName = strrchr( (char*) it->ChiliText.c_str(), '-' );
-      textName++;
+      std::string textName = it->ChiliText.substr( it->ChiliText.find_last_of("-") + 1 );
+
       //search if MimeType always exist
       std::vector< MimeTypeStruct >::iterator searchBegin = mimeTypeVector.begin();
       std::vector< MimeTypeStruct >::iterator searchEnd = mimeTypeVector.end();
@@ -286,28 +371,64 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
         if( searchBegin->mimeType == it->MimeType )
         {
           //create singe "mime-type-item"
-          new QmitkPluginListViewItem( it->OID.c_str(), searchBegin->parentItem, textName );
+          new QmitkPluginListViewItem( it->OID.c_str(), "", searchBegin->parentItem, textName );
           //break up search
           searchBegin = searchEnd;
           found = true;
         }
         else searchBegin++;
       }
-
       //if this MimeType not shown yet
       if( !found )
       {
         //create the "main-text-item"
         if( textItem == NULL )
-          textItem = new QmitkPluginListViewItem( iter->OID.c_str(), seriesParent, "Text" );
+          textItem = new QmitkPluginListViewItem( iter->OID.c_str(), "", seriesParent, "Saved Text" );
         //create new "mime-type-group"
         MimeTypeStruct newMimeType;
         newMimeType.mimeType = it->MimeType;
-        newMimeType.parentItem = new QmitkPluginListViewItem( "", textItem, it->MimeType.c_str() );
+        newMimeType.parentItem = new QmitkPluginListViewItem( "", "", textItem, it->MimeType.c_str() );
         //create single "mime-type-item"
-        new QmitkPluginListViewItem( it->OID.c_str(), newMimeType.parentItem, textName );
+        new QmitkPluginListViewItem( it->OID.c_str(), "", newMimeType.parentItem, textName );
         mimeTypeVector.push_back( newMimeType );
       }
+    }
+  }
+
+  //fill the parent-child-view
+  for( mitk::PACSPlugin::PSRelationInformationList::iterator relationIter = tempRelationList.begin(); relationIter != tempRelationList.end(); relationIter ++)
+  {
+    if( relationIter->parentLabel.empty() )
+    {
+      QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( relationIter->oid, relationIter->label, m_Controls->PSContent, relationIter->id );
+
+      //use all Children
+      for( std::list<std::string>::iterator childIter = relationIter->childLabel.begin(); childIter != relationIter->childLabel.end(); childIter++ )
+      {
+        //search element
+        for( mitk::PACSPlugin::PSRelationInformationList::iterator searchIter = tempRelationList.begin(); searchIter != tempRelationList.end(); searchIter++ )
+        {
+          if( (*childIter) == searchIter->label )
+            AddElementsToPSContent( (*searchIter), tempRelationList, newParent );
+        }
+      }
+    }
+  }
+}
+
+void QmitkLoadSaveToChiliExample::AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent )
+{
+  //create element
+  QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( singleElement.oid, singleElement.label, parent, singleElement.id );
+
+  //use all Children
+  for( std::list<std::string>::iterator childIter = singleElement.childLabel.begin(); childIter != singleElement.childLabel.end(); childIter++ )
+  {
+    //search element
+    for( mitk::PACSPlugin::PSRelationInformationList::iterator searchIter = elementList.begin(); searchIter != elementList.end(); searchIter++ )
+    {
+      if( (*childIter) == searchIter->label )
+        AddElementsToPSContent( (*searchIter), elementList, newParent );
     }
   }
 }

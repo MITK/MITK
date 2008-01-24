@@ -206,7 +206,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
     }
 
     if( walkThroughStudies == 0 )
-      new QmitkPluginListViewItem( studyOID.c_str(), m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str() );
+      new QmitkPluginListViewItem( studyOID.c_str(), "", m_StudyListView, patientName.c_str(), patientID.c_str(), studyDescription.c_str() );
   }
 }
 
@@ -356,7 +356,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
         }
 
         if( walkThroughSeries == 0 )
-          new QmitkPluginListViewItem( iter->SeriesOID.c_str(), m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str() );
+          new QmitkPluginListViewItem( iter->SeriesOID.c_str(), "", m_SeriesListView, iter->SeriesNumber.c_str(), iter->SeriesDescription.c_str() );
       }
     }
   }

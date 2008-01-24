@@ -44,30 +44,38 @@ QmitkFunctionalityTesting::~QmitkFunctionalityTesting()
 }
 
 void QmitkFunctionalityTesting::CloseFirstMessageBox() {
+std::cout << "CloseFirstMessageBox:   New attept to close blocking top-level message boxes" << std::endl;
     bool boxClosed = false;
     QWidgetList* topWidgets = QApplication::topLevelWidgets();
+std::cout << "CloseFirstMessageBox:   QApplication reports a list of top-level widgets: " << topWidgets->count() << " widgets" << std::endl;
     QWidgetListIt topWidgetsIt(*topWidgets);
     QWidget* widget;
     while ( ( widget = topWidgetsIt.current()) != 0 ) {
        ++topWidgetsIt;
+std::cout << "CloseFirstMessageBox:   inspecting top-level widget '" << widget->name() << "' (class " << widget->className() << ")" << std::endl;
        if (widget->isA("QMessageBox")) {
-         std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
+         //std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
+std::cout << "CloseFirstMessageBox: **  Top-level Widget '" << widget->name() << "' is a QMessageBox. Calling its close() method." << std::endl;
          ((QMessageBox*)widget)->close();
          boxClosed=true;
          break;
        }
        if( widget->isA("QInputDialog")) {
-         std::cout << "Found a toplevel input dialog box! Please give it a parent. Closing it..." << std::endl;
+         //std::cout << "Found a toplevel input dialog box! Please give it a parent. Closing it..." << std::endl;
+std::cout << "CloseFirstMessageBox: ** Top-level Widget '" << widget->name() << "' is a QInputDialog. Calling its close() method." << std::endl;
          ((QInputDialog*)widget)->close();
          boxClosed=true;
          break;
        }
+std::cout << "CloseFirstMessageBox: inspecting QMessageBox children of top-level widget '" << widget->name() << "' (class " << widget->className() << ")" << std::endl;
     QObjectList *l = widget->queryList( "QMessageBox" );
+std::cout << "CloseFirstMessageBox:  Widget reports: " << topWidgets->count() << " children of type QMessageBox" << std::endl;
     QObjectListIt it( *l ); 
     QObject *obj;
     while ( (obj = it.current()) != 0 ) {
         ++it;
         std::cout << "Found a message box! Closing it ..." << std::endl;
+std::cout << "CloseFirstMessageBox: ** closing one of those message boxes" << std::endl;
         ((QMessageBox*)obj)->close();
         boxClosed = true;
         break;

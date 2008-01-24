@@ -128,6 +128,18 @@ class PACSPlugin : public itk::Object
     /** There can be lots of texts to one series, so we need a list. */
     typedef std::list<TextInformation> TextInformationList;
 
+    struct PSRelationInformation
+     {
+       std::string label;
+       std::string id;
+       std::string oid;
+       std::list<std::string> parentLabel;
+       std::list<std::string> childLabel;
+       bool image;
+     };
+
+     typedef std::list<PSRelationInformation> PSRelationInformationList;
+
     /*!
     \brief Return a mitk::PACSPlugin-Instance as singleton.
     @param destroyInstance   Needed because of double inheritance of mitk::ChiliPlugin, both want to destroy the instance.
@@ -142,58 +154,70 @@ class PACSPlugin : public itk::Object
     virtual int GetConferenceID();
 
     /*!
-    \brief Return true if the application run as plugin and false if its standalone.
+    \brief Return true if the application run as plugin and false if the application run as standalone.
     @returns True for Chili-Plugin, false for Standalone.
     */
     virtual bool IsPlugin();
 
     /*!
-    \brief Return the studyinformation.
-    @param seriesOID   If you dont set the input, you get the current selected study. If you want a specific study, set the input.
+    \brief Return all parent-child-saved-volumes to a series.
+    @param seriesOID   This parameter have to be set. All volume-entries to this seriesOID get searched.
+    @returns All parent-child-saved-volumes with the overgiven seriesOID.
+    Return an empty list if no entrie found.
+    IMPORTANT: This function dont set the attributes "childLabel" and "parentLabel".
+    */
+    virtual PSRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
+
+    /*!
+    \brief Return all parent-child-saved-volumen to a study.
+    @param studyOID   The XML-File of the study get loaded and all volume-entries returned. If no OID set, the current selected study get used.
+    @returns All parent-child-saved-volumes.
+    Return an empty list if no entrie found.
+    */
+    virtual PSRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
+
+    /*!
+    \brief Return the studyinformation to a series.
+    @param seriesOID   If no OID set, the current selected study get used.
     @returns The current or specific studyinformation.
-    If no study could found, this function return StudyInformation.OID == "".
-    If no parameter set, the current selected study returned.
+    Return StudyInformation.OID == "" if no entry found.
     */
     virtual StudyInformation GetStudyInformation( const std::string& seriesOID = "" );
 
     /*!
-    \brief Return the patientinformation.
-    @param seriesOID   If you dont set the input, you get the current selected patient. If you want a specific patient, set the input.
+    \brief Return the patientinformation to a series.
+    @param seriesOID   If no OID set, the current selected series get used.
     @returns The current or specific patientinformation.
-    If no patient could found, this function return PatientInformation.OID == "".
-    If no parameter set, the current selected patient returned.
+    Return PatientInformation.OID == "" if no entry found.
     */
     virtual PatientInformation GetPatientInformation( const std::string& seriesOID = "" );
 
     /*!
-    \brief Return the seriesinformation.
-    @param seriesOID   If you dont set the input, you get the current selected series. If you want a specific series, set the input.
+    \brief Return the seriesinformation to a series.
+    @param seriesOID   If no OID set, the current selected series get used.
     @returns The current or specific seriesinformation.
-    If no series could found, this function return SeriesInformation.OID == "".
-    If no parameter set, the current selected series returned.
+    Return SeriesInformation.OID == "" if no entry found.
     */
     virtual SeriesInformation GetSeriesInformation( const std::string& seriesOID = "" );
 
     /*!
-    \brief Return a list of all seriesinformation.
-    @param studyOID   If you dont set the input, you get the seriesList of the current selected study. If you want a list of a specific study, set the input.
+    \brief Return a list of all seriesinformation to a study.
+    @param studyOID   If no OID set, the current selected study get used.
     @returns The current or specific seriesinformationlist.
-    If no series could found, this function returns an empty list.
-    If no parameter set, the seriesList of the current selected study returned.
+    Return an empty list if no entry found.
     */
     virtual SeriesInformationList GetSeriesInformationList( const std::string& studyOID = "" );
 
     /*!
-    \brief Return the textinformation.
-    @param textOID   Set the textOID to get the information.
+    \brief Return the textinformation to the overgiven textOID.
+    @param textOID   This parameter have to be set.
     @returns The textinformation.
-    If no text could found, this function return TextInformation.OID == "".
-    The parameter have to be set.
+    Return TextInformation.OID == "" if no entry found.
     */
     virtual TextInformation GetTextInformation( const std::string& textOID );
 
     /*!
-    \brief Return a list of all textinformation.
+    \brief Return a list of all textinformation to a series.
     @param seriesOID   Set the seriesOID to get the textList.
     @returns A list of textinformation from one series.
     If no texts could found, this function returns an empty list.
@@ -223,11 +247,20 @@ class PACSPlugin : public itk::Object
     virtual QcLightbox* GetCurrentLightbox();
 
     /*!
-    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually three different readers available. The first one use the image number and the spacing between two slices.The second one use the most common spacing. The third one use the slice location and all possible spacing-combinations between the slices. 
+    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually three different readers available. The first one use the image number and the spacing between two slices.The second one use the most common spacing. The third one use the slice location and all possible spacing-combinations between the slices. Use this function to set the readers.
     @param readerType   Actually 0 used for the ImageNumberFilter, 1 for the SingleSpacingFilter and 2 used for SpacingSetFilter.
     If no parameter set, the ImageNumberFilter get used.
     */
     virtual void SetReaderType( unsigned int readerType = 0 );
+
+    /*!
+    \brief This function load a single parent-child-volume.
+    @param seriesOID   This parameter specify the parent-child-volume.
+    @param label   This parameter specify the parent-child-volume.
+    @returns The searched volume as DataTreeNode.
+    Return NULL if no entry found.
+    */
+    virtual DataTreeNode::Pointer LoadParentChildElement( const std::string& seriesOID, const std::string& label );
 
     /*!
     \brief Load all images from the given lightbox.
@@ -238,15 +271,15 @@ class PACSPlugin : public itk::Object
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
 
     /*!
-    \brief Load all Image- and Text-Files from the series.
+    \brief Load all Image- and Text-Files to a series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
-    The parameter have to be set. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...).
+    The seriesOID have to be set. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...).
     */
     virtual std::vector<DataTreeNode::Pointer> LoadCompleteSeries( const std::string& seriesOID );
 
     /*!
-    \brief Load all Images from the series.
+    \brief Load all Images to a series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
     The parameter have to be set. This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats should save, they get load from harddisk with the DataTreeNodeFactory.
@@ -254,13 +287,11 @@ class PACSPlugin : public itk::Object
     virtual std::vector<DataTreeNode::Pointer> LoadAllImagesFromSeries( const std::string& seriesOID );
 
     /*!
-    \brief Load all Text-files from the series.
+    \brief Load all Text-entries to a series.
     @param seriesOID   Set the series to load from.
     @returns Multiple mitk::DataTreeNodes as vector.
     Important: Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ).
-    The function GlobalIterateToLoadAllText(...) return a list of all textOID's and textPath's from all included text-files in this series.
-    With this information LoadOneText( seriesOID, textOID, textPath ) is used step by step.
-    The parameter have to be set.
+    The seriesOID have to be set.
     */
     virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
 
@@ -269,7 +300,7 @@ class PACSPlugin : public itk::Object
     @param textOID   Set the single text.
     @returns one mitk::DataTreeNode
     To load a single text-file, you need more than the textOID, this function search for the missing attributes with qTextQuery(...) and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ).
-    The parameter have to be set.
+    The textOID have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& textOID );
 
@@ -279,47 +310,38 @@ class PACSPlugin : public itk::Object
     @param textOID   Set the single text.
     @param textPath   The chili-database-path from the file which should read.
     @returns one mitk::DataTreeNode
-    This function load from database. All needed parameter set as input. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk.
-    The parameter have to be set.
+    This function load from database. The file get saved to harddisk and readed via factory. The file get deleted if it could read.
+    All parameter have to be set.
     */
     virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
-
-    /*!
-    \brief This function load the saved nodes and the relation between.
-    @param seriesOID   Set the series to load from.
-    This function load the saved nodes and the relation between them. Therefore the seriesOID is needed and have to be set. The function return no nodes, the function add the nodes automatically to the datastorage.
-    */
-    virtual void LoadParentChildRelation( const std::string& seriesOID );
-
     /*!
     \brief Save Images- and Texts-Files with User-Dialog to Chili via Fileupload.
-    @param inputNodes   Thats the nodes to save.
-    This function provides a dialog where the user can select if he want to create a new series, save to series, override, ... and the series to save.
-    SaveAsNewSeries(...) or SaveToSeries(...) get used.
+    @param inputNodes   The nodes to save.
+    This function provides a dialog where the user can select if he want to create a new series, save to series, override, ...
+    The nodes have to be set.
     */
     virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
 
     /*!
-    \brief Save Images- and Texts-Files without User-Dialog as new Series to Chili via Fileupload.
-    @param inputNodes   Thats the nodes to save.
-    @param studyOID   In which study the new series should created?
-    @param seriesNumber   With wich seriesNumber the series should created?
-    @param seriesDescription   With wich seriesDescription the series should created?
-    This function create a new series and use the function SaveToSeries() . No dialog is used.
+    \brief Save Images- and Texts-Files without User-Dialog as new series to Chili.
+    @param inputNodes   The nodes to save.
+    @param studyOID   The aim-study where the new series should created.
+    @param seriesNumber   The seriesNumber for the new series.
+    @param seriesDescription   The seriesDescription for the new series.
+    This function create a new series and save all nodes. No dialog is used.
     */
-    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, int seriesNumber, std::string seriesDescription );
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& studyOID, int seriesNumber, const std::string& seriesDescription );
 
     /*!
-    \brief Save Images- and Texts-Files without User-Dialog to given series to Chili via Fileupload.
-    @param inputNodes   Thats the nodes to save.
-    @param StudyOID   In which study should saved?
-    @param SeriesOID   In which series should saved?
-    @param overrideExistingSeries   If nodes alway exist in this study, do you want to override them or not ( only possible if the data saved by MBI )?
-    This function save the nodes via FileUpload to chili. No dialog get used. The parent-child-relation saved automatically.
-    USE THIS FUNCTION ONLY, IF YOU KNOW THE DESTINATION-SERIES.
+    \brief Save Images- and Texts-Files without User-Dialog to a series.
+    @param inputNodes   The nodes to save.
+    @param StudyOID   The aim-study where the nodes should saved.
+    @param SeriesOID   The aim-series where the nodes should saved.
+    @param overrideExistingSeries   Its possible that the nodes to save always exist. Set true if you want to override existing data.
+    Only data which are saved by MBI can be override.
     */
-    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, std::string studyOID, std::string seriesOID, bool overrideExistingSeries );
+    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesOID, bool overrideExistingSeries );
 
     mitkClassMacro( PACSPlugin,itk::Object );
     itkNewMacro( PACSPlugin );

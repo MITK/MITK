@@ -52,6 +52,25 @@ bool mitk::PACSPlugin::IsPlugin()
   return false;
 }
 
+mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetSeriesRelationInformation( const std::string& )
+{
+  PSRelationInformationList emptyResult;
+  emptyResult.clear();
+  return emptyResult;
+}
+
+mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetStudyRelationInformation( const std::string& )
+{
+  PSRelationInformationList emptyResult;
+  emptyResult.clear();
+  return emptyResult;
+}
+
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadParentChildElement( const std::string&, const std::string& )
+{
+  return NULL;
+}
+
 /** DefaultImplementation */
 mitk::PACSPlugin::StudyInformation mitk::PACSPlugin::GetStudyInformation( const std::string& )
 {
@@ -164,23 +183,17 @@ mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& , 
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::LoadParentChildRelation( const std::string& )
-{
-  return;
-}
-
-/** DefaultImplementation */
 void mitk::PACSPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 {
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , std::string , int , std::string )
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , const std::string& , int , const std::string& )
 {
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer , std::string , std::string , bool )
+void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer  , const std::string& , bool )
 {
 }
 

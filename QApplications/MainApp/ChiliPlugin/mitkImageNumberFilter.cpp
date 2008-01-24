@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
-#include "mitkPicHeaderProperty.h"
 #include "mitkChiliMacros.h"
 #include "math.h"
 
@@ -39,7 +38,7 @@ class compare_PicDescriptor_ImageNumber
   {
     int imageNumberPic1 = 0, imageNumberPic2 = 0;
 
-    ipPicTSV_t* imagenumberTag1 = ipPicQueryTag( first, tagIMAGE_NUMBER );
+    ipPicTSV_t* imagenumberTag1 = ipPicQueryTag( first, (char*)tagIMAGE_NUMBER );
     if( imagenumberTag1 && imagenumberTag1->type == ipPicInt )
     {
       imageNumberPic1 = *( (int*)(imagenumberTag1->value) );
@@ -49,7 +48,7 @@ class compare_PicDescriptor_ImageNumber
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( first, "SOURCE HEADER" );
+      tsv = ipPicQueryTag( first, (char*)"SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
@@ -59,7 +58,7 @@ class compare_PicDescriptor_ImageNumber
       }
     }
 
-    ipPicTSV_t* imagenumberTag2 = ipPicQueryTag( second, tagIMAGE_NUMBER );
+    ipPicTSV_t* imagenumberTag2 = ipPicQueryTag( second, (char*)tagIMAGE_NUMBER );
     if( imagenumberTag2 && imagenumberTag2->type == ipPicInt )
     {
       imageNumberPic2 = *( (int*)(imagenumberTag2->value) );
@@ -69,7 +68,7 @@ class compare_PicDescriptor_ImageNumber
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( second, "SOURCE HEADER" );
+      tsv = ipPicQueryTag( second, (char*)"SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
@@ -227,7 +226,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
     vtk2itk( isg->ps, pixelSize );
 
     //SeriesDescription
-    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), tagSERIES_DESCRIPTION );
+    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), (char*)tagSERIES_DESCRIPTION );
     if( seriesDescriptionTag )
     {
       currentSeriesDescription = static_cast<char*>( seriesDescriptionTag->value );
@@ -237,7 +236,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( (*currentPic), "SOURCE HEADER" );
+      tsv = ipPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
@@ -318,7 +317,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
         }
         else
         {
-          if( foundMatch && ( m_PossibleOutputs[ curCount ].origin != currentOrigin || m_PossibleOutputs[ curCount ].numberOfSlices != (*currentPic)->n[2] ) )
+          if( foundMatch && ( m_PossibleOutputs[ curCount ].origin != currentOrigin || m_PossibleOutputs[ curCount ].numberOfSlices != (int)(*currentPic)->n[2] ) )
           {
             foundMatch = false;
             curCount++;
@@ -394,6 +393,8 @@ void mitk::ImageNumberFilter::SeperateOutputsBySpacing()
       m_PossibleOutputs[n].numberOfTimeSlices = m_PossibleOutputs[n].descriptors.size()-1;
       continue;
     }
+    if( m_PossibleOutputs[n].dimension == 4 )
+      continue;
 
     std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin();
     std::list< ipPicDescriptor* >::iterator iterend = m_PossibleOutputs[n].descriptors.end();
@@ -721,6 +722,8 @@ void mitk::ImageNumberFilter::SplitDummiVolumes()
 void mitk::ImageNumberFilter::CreateNodesFromOutputs()
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
+  m_ImageInstanceUIDs.clear();
+
   for( unsigned int n = 0; n < m_PossibleOutputs.size(); n++)
   {
     //check the count of slices with the numberOfSlices and numberOfTimeSlices
@@ -735,163 +738,204 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
       continue;
     }
 
-    //create mitk::Image
-    int slice = 0, time = 0;
-    Image::Pointer resultImage;
-    Point3D origin;
-    Vector3D rightVector, downVector, origincur, originb4;
-    ipPicDescriptor* header;
-    header = ipPicCopyHeader( m_PossibleOutputs[n].descriptors.front(), NULL );
+    Image::Pointer resultImage = Image::New();
+    std::list< std::string > ListOfUIDs;
+    ListOfUIDs.clear();
 
-    //2D
-    if( m_PossibleOutputs[n].numberOfSlices == 0 )
+    if( m_PossibleOutputs[n].dimension == 4 )
     {
-      if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
-      {
-        header->dim = 2;
-        header->n[2] = 0;
-        header->n[3] = 0;
-      }
-      // +t
+      resultImage->Initialize( m_PossibleOutputs[n].descriptors.front() );
+      resultImage->SetPicChannel( m_PossibleOutputs[n].descriptors.front() );
+
+      //get ImageInstanceUID
+      std::string SingleUID;
+      ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( m_PossibleOutputs[n].descriptors.front(), (char*)tagIMAGE_INSTANCE_UID );
+      if( missingImageTagQuery )
+        SingleUID = static_cast<char*>( missingImageTagQuery->value );
       else
       {
-        header->dim = 4;
-        header->n[2] = 1;
-        header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
+        ipPicTSV_t *dicomHeader = ipPicQueryTag( m_PossibleOutputs[n].descriptors.front(), (char*)"SOURCE HEADER" );
+        void* data = NULL;
+        ipUInt4_t len = 0;
+        if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
+          SingleUID = static_cast<char*>( data );
       }
+      ListOfUIDs.push_back( SingleUID );
     }
-    //3D
     else
     {
-      if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
+      int slice = 0, time = 0;
+      Point3D origin;
+      Vector3D rightVector, downVector, origincur, originb4;
+      ipPicDescriptor* header;
+      header = ipPicCopyHeader( m_PossibleOutputs[n].descriptors.front(), NULL );
+
+      //2D
+      if( m_PossibleOutputs[n].numberOfSlices == 0 )
       {
-        header->dim = 3;
-        header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
-        header->n[3] = 0;
+        if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
+        {
+          header->dim = 2;
+          header->n[2] = 0;
+          header->n[3] = 0;
+        }
+        // +t
+        else
+        {
+          header->dim = 4;
+          header->n[2] = 1;
+          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
+        }
       }
-      // +t
+      //3D
       else
       {
-        header->dim = 4;
-        header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
-        header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
-      }
-    }
-    resultImage = Image::New();
-    interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-    resultImage->Initialize( header, 1, -1, m_PossibleOutputs[n].numberOfSlices+1 );
-
-    if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
-    {
-      delete isg;
-      return;
-    }
-    vtk2itk( isg->u, rightVector );
-    vtk2itk( isg->v, downVector );
-    vtk2itk( isg->o, origin );
-
-    // its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
-    if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
-      rightVector[0] = 1;
-    if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
-      downVector[2] = -1;
-
-    // set the timeBounds
-    ScalarType timeBounds[] = {0.0, 1.0};
-    // set the planeGeomtry
-    PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-
-    //spacing
-    Vector3D spacing;
-    vtk2itk( isg->ps, spacing );
-    if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
-      spacing.Fill(1.0);
-
-    //get the most counted spacing
-    if( m_PossibleOutputs[n].descriptors.size() > 2 && m_PossibleOutputs[n].dimension == 2 )
-    {
-      std::list<SpacingStruct> SpacingList;
-      Vector3D tmpSpacing, origin, originb4;
-      std::list< ipPicDescriptor* >::iterator iterFirst = m_PossibleOutputs[n].descriptors.begin();
-      interSliceGeometry_t* isgSecond = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-      pFetchSliceGeometryFromPic( (*iterFirst), isgSecond );
-      //first origin
-      vtk2itk( isgSecond->o, originb4 );
-
-      for( std::list< ipPicDescriptor* >::iterator iterSecond = iterFirst; iterSecond != m_PossibleOutputs[n].descriptors.end(); iterSecond++)
-      {
-        pFetchSliceGeometryFromPic( (*iterSecond), isgSecond );
-        vtk2itk( isgSecond->o, origin );
-        if( !Equal(origin, originb4 ) )
+        if( m_PossibleOutputs[n].numberOfTimeSlices == 0 )
         {
-          tmpSpacing = origin - originb4;
-          spacing[2] = tmpSpacing.GetNorm();
-          //search for spacing
-          std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
-          while( searchIter != SpacingList.end() )
+          header->dim = 3;
+          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
+          header->n[3] = 0;
+        }
+        // +t
+        else
+        {
+          header->dim = 4;
+          header->n[2] = m_PossibleOutputs[n].numberOfSlices + 1;
+          header->n[3] = m_PossibleOutputs[n].numberOfTimeSlices + 1;
+        }
+      }
+      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+      resultImage->Initialize( header, 1, -1, m_PossibleOutputs[n].numberOfSlices+1 );
+
+      if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
+      {
+        delete isg;
+        return;
+      }
+      vtk2itk( isg->u, rightVector );
+      vtk2itk( isg->v, downVector );
+      vtk2itk( isg->o, origin );
+
+      // its possible that a 2D-Image have no right- or down-Vector,but its not possible to initialize a [0,0,0] vector
+      if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
+        rightVector[0] = 1;
+      if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
+        downVector[2] = -1;
+
+      // set the timeBounds
+      ScalarType timeBounds[] = {0.0, 1.0};
+      // set the planeGeomtry
+      PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
+
+      //spacing
+      Vector3D spacing;
+      vtk2itk( isg->ps, spacing );
+      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0  || spacing[2] == 0.01 )
+        spacing.Fill(1.0);
+
+      //get the most counted spacing (the real spacing is needed, the saved one is rounded)
+      if( m_PossibleOutputs[n].descriptors.size() > 2 && m_PossibleOutputs[n].dimension == 2 )
+      {
+        std::list<SpacingStruct> SpacingList;
+        Vector3D tmpSpacing, origin, originb4;
+        std::list< ipPicDescriptor* >::iterator iterFirst = m_PossibleOutputs[n].descriptors.begin();
+        interSliceGeometry_t* isgSecond = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+        pFetchSliceGeometryFromPic( (*iterFirst), isgSecond );
+        //first origin
+        vtk2itk( isgSecond->o, originb4 );
+
+        for( std::list< ipPicDescriptor* >::iterator iterSecond = iterFirst; iterSecond != m_PossibleOutputs[n].descriptors.end(); iterSecond++)
+        {
+          pFetchSliceGeometryFromPic( (*iterSecond), isgSecond );
+          vtk2itk( isgSecond->o, origin );
+          if( !Equal(origin, originb4 ) )
           {
-            if( searchIter->spacing == spacing )
+            tmpSpacing = origin - originb4;
+            spacing[2] = tmpSpacing.GetNorm();
+            //search for spacing
+            std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
+            while( searchIter != SpacingList.end() )
             {
-              searchIter->count++;
-              break;
+              if( searchIter->spacing == spacing )
+              {
+                searchIter->count++;
+                break;
+              }
+              else
+                searchIter++;
             }
-            else
-              searchIter++;
+            //if not exist, create new entry
+            if( searchIter == SpacingList.end() )
+            {
+              SpacingStruct newElement;
+              newElement.spacing = spacing;
+              newElement.count = 1;
+              SpacingList.push_back( newElement );
+            }
+            originb4 = origin;
           }
-          //if not exist, create new entry
-          if( searchIter == SpacingList.end() )
-          {
-            SpacingStruct newElement;
-            newElement.spacing = spacing;
-            newElement.count = 1;
-            SpacingList.push_back( newElement );
-          }
-          originb4 = origin;
         }
-      }
-      //get maximum spacing
-      int count = 0;
-      for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
-      {
-        if( searchIter->count > count )
+        //get maximum spacing
+        int count = 0;
+        for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
         {
-          spacing = searchIter->spacing;
-          count = searchIter->count;
+          if( searchIter->count > count )
+          {
+            spacing = searchIter->spacing;
+            count = searchIter->count;
+          }
+        }
+        delete isgSecond;
+      }
+
+      planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
+      planegeometry->SetOrigin( origin );
+      planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
+      planegeometry->SetTimeBounds( timeBounds );
+      // slicedGeometry
+      SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
+      slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
+      // timeSlicedGeometry
+      TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
+      timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
+      timeSliceGeometry->TransferItkToVtkTransform();
+      // Image->SetGeometry
+      resultImage->SetGeometry( timeSliceGeometry );
+
+      // add the slices to the created mitk::Image
+      for( std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin(); iter != m_PossibleOutputs[n].descriptors.end(); iter++)
+      {
+        //get ImageInstanceUID
+        std::string SingleUID;
+        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( (*iter), (char*)tagIMAGE_INSTANCE_UID );
+        if( missingImageTagQuery )
+          SingleUID = static_cast<char*>( missingImageTagQuery->value );
+        else
+        {
+          ipPicTSV_t *dicomHeader = ipPicQueryTag( (*iter), (char*)"SOURCE HEADER" );
+          void* data = NULL;
+          ipUInt4_t len = 0;
+          if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
+            SingleUID = static_cast<char*>( data );
+        }
+        ListOfUIDs.push_back( SingleUID );
+
+        //add to mitk::Image
+        if( m_PossibleOutputs[n].dimension == 3 )
+          resultImage->SetPicVolume( (*iter), time );
+        else
+          resultImage->SetPicSlice( (*iter), slice, time );
+
+        if( time < m_PossibleOutputs[n].numberOfTimeSlices )
+          time ++;
+        else
+        {
+          time = 0;
+          slice ++;
         }
       }
-      delete isgSecond;
+      delete isg;
     }
-
-    planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
-    planegeometry->SetOrigin( origin );
-    planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( m_PossibleOutputs[n].refferenceUID.c_str() ) );
-    planegeometry->SetTimeBounds( timeBounds );
-    // slicedGeometry
-    SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-    slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-    // timeSlicedGeometry
-    TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-    timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
-    timeSliceGeometry->TransferItkToVtkTransform();
-    // Image->SetGeometry
-    resultImage->SetGeometry( timeSliceGeometry );
-
-    // add the slices to the created mitk::Image
-    for( std::list< ipPicDescriptor* >::iterator iter = m_PossibleOutputs[n].descriptors.begin(); iter != m_PossibleOutputs[n].descriptors.end(); iter++)
-    {
-      if( m_PossibleOutputs[n].dimension == 3 )
-        resultImage->SetPicVolume( (*iter), time );
-      else
-        resultImage->SetPicSlice( (*iter), slice, time );
-      if( time < m_PossibleOutputs[n].numberOfTimeSlices )
-        time ++;
-      else
-      {
-        time = 0;
-        slice ++;
-      }
-    }
-    delete isg;
 
     // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties
     if( resultImage->IsInitialized() && resultImage.IsNotNull() )
@@ -915,9 +959,15 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
       }
 
       m_Output.push_back( node );
+      m_ImageInstanceUIDs.push_back( ListOfUIDs );
     }
   }
 #endif
+}
+
+std::vector< std::list< std::string > > mitk::ImageNumberFilter::GetImageInstanceUIDs()
+{
+  return m_ImageInstanceUIDs;
 }
 
 const mitk::PropertyList::Pointer mitk::ImageNumberFilter::CreatePropertyListFromPicTags( ipPicDescriptor* imageToExtractTagsFrom )
@@ -1000,7 +1050,7 @@ void mitk::ImageNumberFilter::DebugOutput()
       ipPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( (*it), "SOURCE HEADER" );
+      tsv = ipPicQueryTag( (*it), (char*)"SOURCE HEADER" );
       if( tsv )
       {
         bool ok = dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len );
@@ -1009,7 +1059,7 @@ void mitk::ImageNumberFilter::DebugOutput()
       }
       if( imageNumber == 0)
       {
-        ipPicTSV_t* imagenumberTag = ipPicQueryTag( (*it), tagIMAGE_NUMBER );
+        ipPicTSV_t* imagenumberTag = ipPicQueryTag( (*it), (char*)tagIMAGE_NUMBER );
         if( imagenumberTag && imagenumberTag->type == ipPicInt )
           imageNumber = *( (int*)(imagenumberTag->value) );
       }

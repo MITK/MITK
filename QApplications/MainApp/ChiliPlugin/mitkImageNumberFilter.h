@@ -67,6 +67,8 @@ class ImageNumberFilter : public PicDescriptorToNode
     */
     virtual std::vector< DataTreeNode::Pointer > GetOutput();
 
+    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
+
   protected:
 
     ImageNumberFilter();
@@ -108,6 +110,8 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** Thats the real Outputs. */
     std::vector< DataTreeNode::Pointer > m_Output;
 
+    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
+
     struct SpacingStruct
     {
       Vector3D spacing;
@@ -142,7 +146,7 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** This function create the mitk::Image and put them into the mitk::DataTreeNodes. All pic-tags, the SeriesOID, NumberOfSlices and NumberOfTimeSlices get added as mitk::DataTreeNode::Porperty. */
     void CreateNodesFromOutputs();
 
-    /** Create a propertyList from the given PicDescriptor. Therefore all pic-tags get readed and added as mitk::PicHeaderProperty. */
+    /** Create a propertyList from the given PicDescriptor. Therefore all pic-tags get readed and added. */
     const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
 
     /** A helpfunction to round. */

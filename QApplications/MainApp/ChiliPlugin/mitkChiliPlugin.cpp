@@ -1895,11 +1895,9 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
     {
       std::cout << "ChiliPlugin (SaveToChili): Error while saving parent-child-relationship." << std::endl;
     }
-/*
    else
       if( remove(  pathAndFile.c_str() ) != 0 )
         std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: "<< pathAndFile << std::endl;
-*/
   }
 
   clearStudyStruct( &study );
@@ -2295,7 +2293,15 @@ std::string mitk::ChiliPlugin::CheckForVolumeLabel( std::list< std::string > Ima
       singleID = singleID->NextSiblingElement();
     }
     if( ( ImageInstanceUIDs.size() == idCount ) && match )
-      return singleVolume->FirstAttribute()->Value();
+    {
+      for( TiXmlAttribute* search = singleVolume->FirstAttribute(); search; search = search->Next() )
+      {
+        std::string reference = search->Name();
+        if( reference == "label" )
+          return search->Value();
+      }
+      return "";
+    }
   }
   return "";
 }

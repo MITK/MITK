@@ -17,14 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkPluginListViewItem.h"
 
-QmitkPluginListViewItem::QmitkPluginListViewItem( QString ChiliOID, QListView * parent, QString label1, QString label2, QString label3, QString label4, QString label5, QString label6, QString label7, QString label8 )
+QmitkPluginListViewItem::QmitkPluginListViewItem( QString ChiliOID, QString VolumeLabel, QListView * parent, QString label1, QString label2, QString label3, QString label4, QString label5, QString label6, QString label7, QString label8 )
 :QListViewItem( parent, label1, label2, label3, label4, label5, label6, label7, label8 ),
-  m_ChiliOID( ChiliOID )
+  m_ChiliOID( ChiliOID ),
+  m_VolumeLabel( VolumeLabel )
 {}
 
-QmitkPluginListViewItem::QmitkPluginListViewItem( QString ChiliOID, QListViewItem * parent, QString label1, QString label2, QString label3, QString label4, QString label5, QString label6, QString label7, QString label8 )
+QmitkPluginListViewItem::QmitkPluginListViewItem( QString ChiliOID, QString VolumeLabel, QListViewItem * parent, QString label1, QString label2, QString label3, QString label4, QString label5, QString label6, QString label7, QString label8 )
 :QListViewItem( parent, label1, label2, label3, label4, label5, label6, label7, label8 ),
-  m_ChiliOID( ChiliOID )
+  m_ChiliOID( ChiliOID ),
+  m_VolumeLabel( VolumeLabel )
 {}
 
 QmitkPluginListViewItem::~QmitkPluginListViewItem()
@@ -34,5 +36,10 @@ QmitkPluginListViewItem::~QmitkPluginListViewItem()
 QString QmitkPluginListViewItem::GetChiliOID()
 {
   return m_ChiliOID;
+}
+
+QString QmitkPluginListViewItem::GetVolumeLabel()
+{
+  return m_VolumeLabel;
 }
 

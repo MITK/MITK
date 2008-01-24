@@ -25,17 +25,19 @@ class QmitkPluginListViewItem : public QListViewItem
 
     public:
 
-      QmitkPluginListViewItem( QString ChiliOID, QListView * parent, QString label1, QString label2 = QString::null, QString label3 = QString::null, QString label4 = QString::null, QString label5 = QString::null, QString label6 = QString::null, QString label7 = QString::null, QString label8 = QString::null );
+      QmitkPluginListViewItem( QString ChiliOID, QString VolumeLabel, QListView * parent, QString label1, QString label2 = QString::null, QString label3 = QString::null, QString label4 = QString::null, QString label5 = QString::null, QString label6 = QString::null, QString label7 = QString::null, QString label8 = QString::null );
 
-      QmitkPluginListViewItem( QString ChiliOID, QListViewItem * parent, QString label1, QString label2 = QString::null, QString label3 = QString::null, QString label4 = QString::null, QString label5 = QString::null, QString label6 = QString::null, QString label7 = QString::null, QString label8 = QString::null );
+      QmitkPluginListViewItem( QString ChiliOID, QString VolumeLabel, QListViewItem * parent, QString label1, QString label2 = QString::null, QString label3 = QString::null, QString label4 = QString::null, QString label5 = QString::null, QString label6 = QString::null, QString label7 = QString::null, QString label8 = QString::null );
 
       virtual ~QmitkPluginListViewItem();
 
       QString GetChiliOID();
+      QString GetVolumeLabel();
 
     protected:
 
       QString m_ChiliOID;
+      QString m_VolumeLabel;
 };
 
 #endif

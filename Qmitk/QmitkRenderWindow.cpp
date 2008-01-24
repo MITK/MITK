@@ -60,6 +60,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::Vt
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
+  mitk::RenderingManager::GetInstance()->RemoveRenderWindow(GetRenderWindow());
   mitk::BaseRenderer::RemoveInstance(GetRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();

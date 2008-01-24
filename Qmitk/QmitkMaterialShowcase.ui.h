@@ -58,13 +58,13 @@ void QmitkMaterialShowcase::init()
     m_DataTree = mitk::DataTree::New();
     mitk::DataTreePreOrderIterator it( m_DataTree );    
     it.Add( m_DataTreeNode );
-    m_SelectableGLWidget->GetRenderer()->SetData( &it );
-    m_SelectableGLWidget->GetRenderer()->SetMapperID( 2 );
+    m_RenderWindow->GetRenderer()->SetData( &it );
+    m_RenderWindow->GetRenderer()->SetMapperID( 2 );
     sphereSource->Delete();    
     
     m_TextActor = vtkTextActor::New();
-    //m_TextActor->SetAlignmentPoint( 2);
-    m_TextActor->SetInput( "Hello World!");
+    m_TextActor->SetAlignmentPoint( 2);
+    m_TextActor->SetInput( "");
     m_TextActor->ScaledTextOff();
     vtkTextProperty* textProperty = m_TextActor->GetTextProperty();
     textProperty->SetFontSize( 13 );
@@ -79,7 +79,7 @@ void QmitkMaterialShowcase::init()
 
 void QmitkMaterialShowcase::destroy()
 {
-  mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()->GetRenderWindow())->RemoveRenderer( m_TextRenderer );
+  mitk::VtkLayerController::GetInstance(m_RenderWindow->GetRenderWindow())->RemoveRenderer( m_TextRenderer );
   m_TextRenderer->Delete();
   m_TextActor->Delete();
 }
@@ -92,7 +92,7 @@ void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* propert
     {
       m_TextActor->SetInput( m_MaterialProperty->GetName().c_str() );
       m_TextActor->SetAlignmentPoint( 2);
-      mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()->GetRenderWindow())
+      mitk::VtkLayerController::GetInstance(m_RenderWindow->GetRenderWindow())
                                             ->InsertForegroundRenderer( m_TextRenderer, true );
     }
     this->UpdateRenderWindow();
@@ -166,8 +166,7 @@ void  QmitkMaterialShowcase::SetLineWidth( float lineWidth )
 
 void QmitkMaterialShowcase::UpdateRenderWindow()
 {
-  mitk::VtkLayerController::GetInstance(m_SelectableGLWidget->GetRenderWindow()
-    ->GetRenderWindow())->InsertForegroundRenderer( m_TextRenderer, true );
+  mitk::VtkLayerController::GetInstance(m_RenderWindow->GetRenderWindow())->InsertForegroundRenderer( m_TextRenderer, true );
 }
 
 

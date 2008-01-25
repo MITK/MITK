@@ -862,7 +862,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
 }
 
 /** This function return the ipPicDescriptors for the image_instance_uids saved at the m_SavedImageInstanceUIDs-list. */
-ipBool_t mitk::ChiliPlugin::GlobalIterateLoadOnlySingleImages( int /*rows*/, int row, image_t* mitkHideIfNoVersionCode(image), void* mitkHideIfNoVersionCode(user_data) )
+ipBool_t mitk::ChiliPlugin::GlobalIterateLoadOnlySingleImages( int /*rows*/, int mitkHideIfNoVersionCode(row), image_t* mitkHideIfNoVersionCode(image), void* mitkHideIfNoVersionCode(user_data) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   ChiliPlugin* callingObject = static_cast<ChiliPlugin*>( user_data );
@@ -2015,6 +2015,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateForText( int /*rows*/, int /*row*/, tex
 /** This function add a new volume-entry for the overgiven nodes. */
 void mitk::ChiliPlugin::AddNewEntryToXML( DataTreeNode::Pointer node, std::list< std::string > mitkHideIfNoVersionCode(CurrentImageInstanceUIDs), const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
+#ifdef CHILI_PLUGIN_VERSION_CODE
   //check
   if( !m_currentXmlDoc ) return;
   TiXmlElement* volume = m_currentXmlDoc->FirstChildElement("volumes");
@@ -2069,6 +2070,7 @@ void mitk::ChiliPlugin::AddNewEntryToXML( DataTreeNode::Pointer node, std::list<
       m_currentXmlDoc->SaveFile( pathAndFile.c_str() );
     }
   }
+#endif
 }
 
 /** This function save the relations between the nodes. */
@@ -2193,6 +2195,7 @@ void mitk::ChiliPlugin::InitCircleCheckStructure()
 /** This function save a single relation to the xml-file. Therefore all existing relations get check for circles. */
 bool mitk::ChiliPlugin::SaveSingleRelation( const std::string& mitkHideIfNoVersionCode( childVolumeLabel ), const std::string& mitkHideIfNoVersionCode( parentVolumeLabel ) )
 {
+#ifdef CHILI_PLUGIN_VERSION_CODE
   if( !m_currentXmlDoc ) return false;
   TiXmlElement* relation = m_currentXmlDoc->FirstChildElement("relations");
   if( !relation ) return false;
@@ -2270,6 +2273,8 @@ bool mitk::ChiliPlugin::SaveSingleRelation( const std::string& mitkHideIfNoVersi
     m_currentXmlDoc->SaveFile( pathAndFile.c_str() );
   }
   return !circleFound;
+#endif
+  return false;
 }
 
 /** This function return the volume-label. Therefore the saved volumes get checked with the overgiven image_instance_UIDs. */

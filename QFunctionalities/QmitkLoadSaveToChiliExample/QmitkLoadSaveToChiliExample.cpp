@@ -157,7 +157,8 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* parent = dynamic_cast<QmitkPluginListViewItem*>( entry->parent() );  //use the parent to know what to do
           if( parent->text( 0 ) == "Known Images" )
           {
-            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), entry->GetVolumeLabel() );
+            std::string vLabel = entry->GetVolumeLabel();
+            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), vLabel );
             if( temp.IsNotNull() )
               mitk::DataStorage::GetInstance()->Add( temp );
           }
@@ -210,7 +211,8 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
     QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->PSContent->selectedItem() );
     if( entry )
     {
-      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), entry->GetVolumeLabel() );
+      std::string vLabel = entry->GetVolumeLabel();
+      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), vLabel );
       if( temp.IsNotNull() )
         mitk::DataStorage::GetInstance()->Add( temp );
       m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
@@ -343,7 +345,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
               new QmitkPluginListViewItem( "", "", psVolumes , imageCount.str().c_str() );
             }
           }
-          new QmitkPluginListViewItem( iter->OID.c_str(), singleElement.label, psVolumes , singleElement.id );
+          new QmitkPluginListViewItem( iter->OID.c_str(), singleElement.label.c_str(), psVolumes , singleElement.id.c_str() );
         }
         elementList.pop_front();
       }
@@ -371,7 +373,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
         if( searchBegin->mimeType == it->MimeType )
         {
           //create singe "mime-type-item"
-          new QmitkPluginListViewItem( it->OID.c_str(), "", searchBegin->parentItem, textName );
+          new QmitkPluginListViewItem( it->OID.c_str(), "", searchBegin->parentItem, textName.c_str() );
           //break up search
           searchBegin = searchEnd;
           found = true;
@@ -389,7 +391,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
         newMimeType.mimeType = it->MimeType;
         newMimeType.parentItem = new QmitkPluginListViewItem( "", "", textItem, it->MimeType.c_str() );
         //create single "mime-type-item"
-        new QmitkPluginListViewItem( it->OID.c_str(), "", newMimeType.parentItem, textName );
+        new QmitkPluginListViewItem( it->OID.c_str(), "", newMimeType.parentItem, textName.c_str() );
         mimeTypeVector.push_back( newMimeType );
       }
     }
@@ -400,7 +402,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
   {
     if( relationIter->parentLabel.empty() )
     {
-      QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( relationIter->oid, relationIter->label, m_Controls->PSContent, relationIter->id );
+      QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( relationIter->oid.c_str(), relationIter->label.c_str(), m_Controls->PSContent, relationIter->id.c_str() );
 
       //use all Children
       for( std::list<std::string>::iterator childIter = relationIter->childLabel.begin(); childIter != relationIter->childLabel.end(); childIter++ )
@@ -419,7 +421,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
 void QmitkLoadSaveToChiliExample::AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent )
 {
   //create element
-  QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( singleElement.oid, singleElement.label, parent, singleElement.id );
+  QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( singleElement.oid.c_str(), singleElement.label.c_str(), parent, singleElement.id.c_str() );
 
   //use all Children
   for( std::list<std::string>::iterator childIter = singleElement.childLabel.begin(); childIter != singleElement.childLabel.end(); childIter++ )

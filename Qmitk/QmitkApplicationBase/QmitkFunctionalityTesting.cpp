@@ -46,7 +46,8 @@ QmitkFunctionalityTesting::~QmitkFunctionalityTesting()
 void QmitkFunctionalityTesting::CloseFirstMessageBox() {
 std::cout << "CloseFirstMessageBox:   New attept to close blocking top-level message boxes" << std::endl;
     bool boxClosed = false;
-    QWidgetList* topWidgets = QApplication::topLevelWidgets();
+    //QWidgetList* topWidgets = QApplication::topLevelWidgets();
+    QWidgetList* topWidgets = QApplication::allWidgets();
 std::cout << "CloseFirstMessageBox:   QApplication reports a list of top-level widgets: " << topWidgets->count() << " widgets" << std::endl;
     QWidgetListIt topWidgetsIt(*topWidgets);
     QWidget* widget;
@@ -67,9 +68,12 @@ std::cout << "CloseFirstMessageBox: ** Top-level Widget '" << widget->name() << 
          boxClosed=true;
          break;
        }
+         
+       continue;
+
 std::cout << "CloseFirstMessageBox: inspecting QMessageBox children of top-level widget '" << widget->name() << "' (class " << widget->className() << ")" << std::endl;
     QObjectList *l = widget->queryList( "QMessageBox" );
-std::cout << "CloseFirstMessageBox:  Widget reports: " << topWidgets->count() << " children of type QMessageBox" << std::endl;
+std::cout << "CloseFirstMessageBox:  Widget reports: " << l->count() << " children of type QMessageBox" << std::endl;
     QObjectListIt it( *l ); 
     QObject *obj;
     while ( (obj = it.current()) != 0 ) {

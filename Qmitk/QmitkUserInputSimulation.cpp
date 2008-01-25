@@ -274,14 +274,14 @@ void QmitkUserInputSimulation::KeyboardTypeKey( QWidget* widget, int key, int st
 
 void QmitkUserInputSimulation::KeyboardKeyDown( QWidget* widget, int key, int state )
 {
-  QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, 0, state );
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyPress, key, 32, state );
   QApplication::postEvent( widget, ke );
   qApp->processEvents();
 }
 
 void QmitkUserInputSimulation::KeyboardKeyRelease( QWidget* widget, int key, int state )
 {
-  QKeyEvent* ke = new QKeyEvent( QEvent::KeyRelease, key, 0, state );
+  QKeyEvent* ke = new QKeyEvent( QEvent::KeyRelease, key, 32, state );
   QApplication::postEvent( widget, ke );
   qApp->processEvents();
 }

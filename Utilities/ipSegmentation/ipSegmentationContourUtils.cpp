@@ -97,9 +97,16 @@ bool ipMITKSegmentationIsInsideContour( float *contour, int sizeContour, float x
 
   int i, j;
   bool res = false;
-  for (i=0, j=sizeContour-1; i<sizeContour; j=i++) {
-    if ((((contour[2*i+1]<=y) && (y<contour[2*j+1])) ||  ((contour[2*j+1]<=y) && (y<contour[2*i+1]))) &&
-      (x < (contour[2*j] - contour[2*i]) * (y - contour[2*i+1]) / (contour[2*j+1] - contour[2*i+1]) + contour[2*i]))
+  for ( i=0, j=sizeContour-1;
+        i<sizeContour; 
+        j=i++) 
+  {
+    if (
+            (     ((contour[2*i+1]<=y) && (y<contour[2*j+1])) 
+               || ((contour[2*j+1]<=y) && (y<contour[2*i+1]))  ) 
+         &&
+            (  x < (contour[2*j] - contour[2*i]) * (y - contour[2*i+1]) / (contour[2*j+1] - contour[2*i+1]) + contour[2*i])
+       )
 
       res = !res;
   }

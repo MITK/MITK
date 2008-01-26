@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
   #include "zlib.h"
 #else
   // make sure "our" zlib is used
-  #include "ipPic/itkzlib/zlib.h"
+  #include "itk_zlib.h"
 #endif
 
 #include <stdlib.h>

@@ -590,10 +590,8 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #  define ipPicFWrite _ipPicFWrite
 #  define ipPicFEOF gzeof
 #  define ipPicFClose gzclose
-#  include "itk_zlib_mangle_itk3.h"
-#  include "itkzlib/zlib.h"
+#  include "itk_zlib.h"
 #else
-#  include "itkzlib/zlib.h"
 #  define ipPicFile_t gzFile
 #  define ipPicFOpen gzopen
 #  define ipPicFTell gztell
@@ -602,6 +600,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #  define ipPicFWrite _ipPicFWrite
 #  define ipPicFEOF gzeof
 #  define ipPicFClose gzclose
+#  include <zlib.h>
 #endif
 #else
 #  define ipPicFile_t FILE *

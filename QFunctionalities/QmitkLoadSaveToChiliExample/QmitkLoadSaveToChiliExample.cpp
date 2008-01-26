@@ -158,7 +158,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           if( parent->text( 0 ) == "Known Images" )
           {
             std::string vLabel = entry->GetVolumeLabel();
-            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), vLabel );
+            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
             if( temp.IsNotNull() )
               mitk::DataStorage::GetInstance()->Add( temp );
           }
@@ -212,7 +212,7 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
     if( entry )
     {
       std::string vLabel = entry->GetVolumeLabel();
-      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID(), vLabel );
+      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
       if( temp.IsNotNull() )
         mitk::DataStorage::GetInstance()->Add( temp );
       m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );

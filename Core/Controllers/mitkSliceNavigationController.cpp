@@ -424,6 +424,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
     {
       this->GetSlice()->SetPos( 0 );
     }
+    this->SendCreatedWorldGeometryUpdate();
   }
 }
 
@@ -435,6 +436,8 @@ SliceNavigationController::ReorientSlices( const Point3D &point,
   PlaneOperation op( OpORIENT, point, normal );
 
   m_CreatedWorldGeometry->ExecuteOperation( &op );
+
+  this->SendCreatedWorldGeometryUpdate();
 }
 
 

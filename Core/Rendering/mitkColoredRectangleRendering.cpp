@@ -72,9 +72,10 @@ void mitk::ColoredRectangleRendering::Disable()
   if ( this->IsEnabled())
   {
     #if ( VTK_MAJOR_VERSION >= 5 )
-      m_RectangleRenderer->SetErase(1);
+      m_RectangleRenderer->EraseOn();
+    #else
+      m_RenderWindow->SetErase(1);
     #endif
-    m_RenderWindow->SetErase(1);
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_RectangleRenderer);
     m_IsEnabled = false;
   }
@@ -95,11 +96,12 @@ void mitk::ColoredRectangleRendering::Enable(float col1, float col2, float col3)
   if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
   {
     #if ( VTK_MAJOR_VERSION >= 5 )
-      m_RectangleRenderer->SetErase(1);
+      m_RectangleRenderer->EraseOff();
+    #else
+      m_RenderWindow->SetErase(0); 
     #endif
     m_RectangleRenderer->SetInteractive(0);
-
-    m_RenderWindow->SetErase(1); 
+    
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);
     
     m_IsEnabled = true;

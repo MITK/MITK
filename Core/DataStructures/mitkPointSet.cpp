@@ -555,6 +555,18 @@ void mitk::PointSet::UpdateOutputInformation()
     {
       const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
       BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
+      
+      // Ensure minimal bounds of 1.0 in each dimension
+      for ( unsigned int j = 0; j < 3; ++j )
+      {
+        if ( itkBounds[j*2+1] - itkBounds[j*2] < 1.0 )
+        {
+          BoundingBox::CoordRepType center = 
+            (itkBounds[j*2] + itkBounds[j*2+1]) / 2.0;
+          itkBounds[j*2] = center - 0.5;
+          itkBounds[j*2+1] = center + 0.5;
+        }
+      }
       this->GetGeometry(i)->SetBounds(itkBounds);
     }
     m_CalculateBoundingBox = false;

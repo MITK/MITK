@@ -242,8 +242,11 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   glLoadIdentity();  
    
   // Set up the orthographic projection  
-  glOrtho( iViewport[0], iViewport[0]+iViewport[2],  
-  iViewport[1]+iViewport[3], iViewport[1], -1, 1 );  
+  glOrtho( 
+    iViewport[0], iViewport[0]+iViewport[2],  
+    iViewport[1], iViewport[1]+iViewport[3],
+    -1.0, 1.0 
+  );
   glMatrixMode( GL_MODELVIEW );  
   glPushMatrix();  
   glLoadIdentity();  

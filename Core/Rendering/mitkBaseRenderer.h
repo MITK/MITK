@@ -37,9 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-typedef std::map<vtkRenderWindow*,mitk::BaseRenderer*> BaseRendererMapType;
-static mitk::BaseRendererMapType baseRendererMap;
-
 class SliceNavigationController;
 class CameraRotationController;
 class CameraController;
@@ -67,7 +64,8 @@ class CameraController;
 class BaseRenderer : public itk::Object
 {
 public:
-
+  typedef std::map<vtkRenderWindow*,mitk::BaseRenderer*> BaseRendererMapType;
+  static BaseRendererMapType baseRendererMap;
   
   static mitk::BaseRenderer* GetInstance(vtkRenderWindow * renWin);
   static void AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer);

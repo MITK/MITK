@@ -68,8 +68,8 @@ void QmitkSystemInfo::UpdateRendererList()
   int itemNumber = 0;
   m_lbRenderer->clear();
 
-  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
+  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
   {
     if( (*mapit).second->GetName())
     {
@@ -93,9 +93,9 @@ void QmitkSystemInfo::AddRendererInfo()
   int selectedItem = m_lbRenderer->currentItem() ;
   int itemNumber = -1;
 
-  mitk::BaseRendererMapType::iterator mapit;
-  for(mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++)
+  mitk::BaseRenderer::BaseRendererMapType::iterator mapit;
+  for(mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++)
   {
     ++itemNumber;
     if(itemNumber==selectedItem)

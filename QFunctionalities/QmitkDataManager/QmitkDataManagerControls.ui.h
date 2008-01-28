@@ -57,8 +57,8 @@ void QmitkDataManagerControls::UpdateRendererCombo()
   m_RenderWindowCombo->clear();
   m_RenderWindowComboMulti->clear();
   
-  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++)
+  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++)
   {
     if((*mapit).second->GetName())
     {
@@ -69,18 +69,6 @@ void QmitkDataManagerControls::UpdateRendererCombo()
     }
   }
   
-  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++)
-  {
-    if( (*mapit).second->GetName())
-    {
-      std::string winName(((*mapit).second)->GetName());
-      //  winName.erase(0,winName.find("::")+2);
-      m_RenderWindowCombo->insertItem(winName.c_str());
-      m_RenderWindowComboMulti->insertItem(winName.c_str());
-    }
-  }
-
   // try to select focused RenderWindow
   vtkRenderWindow* focusedRenderWindow = NULL;
 
@@ -221,9 +209,9 @@ void QmitkDataManagerControls::RenderWindowSelected( int id )
     int selectedItem = id;
     int itemNumber = -1;
     
-    mitk::BaseRendererMapType::iterator mapit;  
-    for(mapit = mitk::baseRendererMap.begin(); 
-        mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
+    mitk::BaseRenderer::BaseRendererMapType::iterator mapit;  
+    for(mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+        mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
     {
       ++itemNumber;
       if(itemNumber==selectedItem)
@@ -291,11 +279,15 @@ void QmitkDataManagerControls::RendererChange()
     {
       if  (m_RenderWindowCombo->isEnabled())
       {
-        vtkRenderWindow* renWin =  mitk::BaseRenderer::GetRenderWindowByName( m_RenderWindowCombo->currentText().ascii());
-              
-        if (renWin)
+        QString rendererName = m_RenderWindowCombo->currentText();
+        if(rendererName.isEmpty() == false)
         {
-          m_NodePropertiesView->SetPropertyList(selectedNode->GetPropertyList(mitk::BaseRenderer::GetInstance(renWin)) );
+          vtkRenderWindow* renWin =  mitk::BaseRenderer::GetRenderWindowByName(rendererName.ascii());
+                
+          if (renWin)
+          {
+            m_NodePropertiesView->SetPropertyList(selectedNode->GetPropertyList(mitk::BaseRenderer::GetInstance(renWin)) );
+          }
         }
       }
       else

@@ -81,6 +81,7 @@ void QmitkDataManager::Activated()
 {
   QmitkFunctionality::Activated();
   assert( m_MultiWidget != NULL );
+  m_Controls->UpdateRendererCombo();
 }
 
 void QmitkDataManager::initWidgets()

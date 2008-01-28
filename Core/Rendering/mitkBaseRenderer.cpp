@@ -52,6 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 
+mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
 {

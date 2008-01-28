@@ -69,8 +69,8 @@ void QmitkRenderWindowSelector::UpdateRendererList()
   m_lbRenderWindows->clear();
 
 
-  for(mitk::BaseRendererMapType::iterator mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
+  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
   {
     if( (*mapit).second->GetName())
     {
@@ -96,9 +96,9 @@ vtkRenderWindow* QmitkRenderWindowSelector::GetSelectedRenderWindow()
   int selectedItem = m_lbRenderWindows->currentItem();
   int itemNumber = -1;
 
-  mitk::BaseRendererMapType::iterator mapit;
-  for(mapit = mitk::baseRendererMap.begin(); 
-      mapit != mitk::baseRendererMap.end(); mapit++, itemNumber++)
+  mitk::BaseRenderer::BaseRendererMapType::iterator mapit;
+  for(mapit = mitk::BaseRenderer::baseRendererMap.begin(); 
+      mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
   {
     ++itemNumber;
     if(itemNumber==selectedItem)

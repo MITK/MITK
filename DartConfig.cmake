@@ -4,7 +4,7 @@ OPTION(USE_KITWARE_DARTBOARD "Use the Kitware Dartboard for Build Submissions." 
 # never use kitware dashboard, since it doesn't work at the moment (10.10.2007)
 SET (DROP_METHOD xmlrpc)
 SET (DROP_SITE "http://makalu:8081")
-SET (DROP_LOCATION "MITK")
+SET (DROP_LOCATION "MITK-public")
 SET (NIGHTLY_START_TIME "21:00:00 CET")	
 SET (DART_TESTING_TIMEOUT 900)
 

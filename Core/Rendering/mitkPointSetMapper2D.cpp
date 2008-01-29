@@ -311,10 +311,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           else
           {
             mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance);
+            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + text2dDistance, pt2d[1] + text2dDistance,0.0,1.0,0.0);
           }
-       /*   this->WriteTextXY(pt2d[0] + text2dDistance, 
-            pt2d[1] + text2dDistance, l,renderer);*/
         }
         
         if((m_ShowPoints) && (scalardiff<4.0))

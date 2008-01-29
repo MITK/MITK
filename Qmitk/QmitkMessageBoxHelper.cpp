@@ -128,7 +128,6 @@ std::cout << "CloseMessageBoxesNow:   QApplication reports a list of top-level w
   QWidget* widget;
   while ( (widget = toplevelWidgetsIter.current()) )
   {
-std::cout << "CloseMessageBoxesNow:   inspecting top-level widget '" << widget->name() << "' (class " << widget->className() << ")" << std::endl;
     if (widget->isA("QMessageBox")) 
     {
       //std::cout << "Found a message box! Trying to close it as requested..." << std::endl;

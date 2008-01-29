@@ -53,7 +53,6 @@ std::cout << "CloseFirstMessageBox:   QApplication reports a list of top-level w
     QWidget* widget;
     while ( ( widget = topWidgetsIt.current()) != 0 ) {
        ++topWidgetsIt;
-std::cout << "CloseFirstMessageBox:   inspecting top-level widget '" << widget->name() << "' (class " << widget->className() << ")" << std::endl;
        if (widget->isA("QMessageBox")) {
          //std::cout << "Found a toplevel message box! Give it a parent! Closing it ..." << std::endl;
 std::cout << "CloseFirstMessageBox: **  Top-level Widget '" << widget->name() << "' is a QMessageBox. Calling its close() method." << std::endl;

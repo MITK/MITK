@@ -2013,7 +2013,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateForText( int /*rows*/, int /*row*/, tex
 #endif
 
 /** This function add a new volume-entry for the overgiven nodes. */
-void mitk::ChiliPlugin::AddNewEntryToXML( DataTreeNode::Pointer node, std::list< std::string > mitkHideIfNoVersionCode(CurrentImageInstanceUIDs), const std::string& mitkHideIfNoVersionCode(seriesOID) )
+void mitk::ChiliPlugin::AddNewEntryToXML( DataTreeNode::Pointer mitkHideIfNoVersionCode(node), std::list< std::string > mitkHideIfNoVersionCode(CurrentImageInstanceUIDs), const std::string& mitkHideIfNoVersionCode(seriesOID) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   //check

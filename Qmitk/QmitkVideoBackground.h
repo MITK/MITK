@@ -50,7 +50,7 @@ class QmitkVideoBackground : public QObject
   Q_OBJECT
 
 public:
-  QmitkVideoBackground(mitk::VideoSource* v);
+  QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay = 25); // TimerDelay = refresh rate of video in ms.
    ~QmitkVideoBackground();
 
   ////##Documentation

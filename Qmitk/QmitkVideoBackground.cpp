@@ -67,12 +67,12 @@ public:
   }
 };
 
-QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v)
+QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
 {
   m_VideoSource = v; 
   m_ImageWidth  = 720;
   m_ImageHeight = 576;
-  m_TimerDelay  = 50;
+  m_TimerDelay  = TimerDelay;
   ResetVideoBackground();
 }
 void QmitkVideoBackground::ResetVideoBackground()

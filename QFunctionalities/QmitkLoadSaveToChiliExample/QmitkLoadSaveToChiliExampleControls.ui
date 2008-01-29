@@ -224,6 +224,9 @@
                     <property name="name">
                         <cstring>SingleSpacingFilter</cstring>
                     </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
                     <property name="text">
                         <string>Si&amp;ngle-Spacing-Filter</string>
                     </property>

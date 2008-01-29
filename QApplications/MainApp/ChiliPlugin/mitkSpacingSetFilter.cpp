@@ -429,6 +429,7 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
     //if more possible combinations included, we searching for the smallest number of combinations which represented the whole
     {
       std::vector< std::set< Slice* > >::iterator iterBegin = groupList[n].possibleCombinations.begin();
+      int remainingCombinations = groupList[n].possibleCombinations.size();
       std::vector< std::set< Slice* > >::iterator iterEnd = groupList[n].possibleCombinations.end();
       iterEnd--;
       //here the final result get saved
@@ -461,8 +462,9 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
         }
         else
         //else we have to search, combine, check, ...
-          RekCombinationSearch( iterBegin, (*iterBegin), resultCombination );
+          RekCombinationSearch( iterBegin, remainingCombinations, (*iterBegin), resultCombination );
         iterBegin++;
+        remainingCombinations--;
       }
       //the result get copied
       groupList[n].resultCombinations = groupResultCombinations;
@@ -471,7 +473,7 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
 #endif
 }
 
-void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombination) )
+void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), unsigned int mitkHideIfNoVersionCode(remainingCombinations), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombination) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   //to found a combination which represent the whole, the single combinations get combined
@@ -480,6 +482,7 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
   //the new combination get checked with the next combination and combined until they represented the whole
 
   iterBegin++;
+  remainingCombinations--;
   while ( iterBegin != iterGroupEnd )
   {
     //if we have found a result, we should not combine more combinationens than the result included
@@ -493,10 +496,18 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
     if( groupResultCombinations.size() != 0 && ( ( ( groupResultCombinations.front().size() - resultCombination.size() ) * iterBegin->size() ) + currentCombination.size() ) < totalCombinationCount )
       return;
 
+    //the current result integrated 90 combinations from 100
+    //the current combination count is five position bevor the last element
+    //the current combinations included one element
+    //the five positions with five elements can not fill 10 needed element, so we can break up
+    if( groupResultCombinations.size() != 0 && ( remainingCombinations * iterBegin->size() ) < ( groupResultCombinations.front().size() - resultCombination.size() ) )
+      return;
+
     //create intersection
     std::set< Slice* > intersection;
     intersection.clear();
     set_intersection( currentCombination.begin(), currentCombination.end(), (*iterBegin).begin(), (*iterBegin).end(), inserter( intersection, intersection.begin() ) );
+
     //if the intersection is empty the set's can be unified
     if( intersection.empty() )
     {
@@ -519,11 +530,12 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
       }
       else
       //if the current union not contain all elements we have to continue the search
-        RekCombinationSearch( iterBegin, tempUnion, resultCombination );
+        RekCombinationSearch( iterBegin, remainingCombinations, tempUnion, resultCombination );
       //for the recursive degression we have to delete the add combination from the possible result
       resultCombination.pop_back();
     }
     iterBegin++;
+    remainingCombinations--;
   }
 #endif
 }
@@ -531,7 +543,6 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
 void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
-//TODO 2D +t (min.3)
   //for every group
   for( unsigned int n = 0; n < groupList.size(); n++)
   {
@@ -592,8 +603,12 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
               }
             }
           }
+          if( !addCombination )
+            singleCombination.push_back( *root );
         }
       }
+      if( (*last).size() > 0 )
+        singleCombination.push_back( *last );
       newResult.push_back( singleCombination );
     }
     else
@@ -601,7 +616,6 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
 
     groupList[n].resultCombinations = newResult;
   }
-
 #endif
 }
 

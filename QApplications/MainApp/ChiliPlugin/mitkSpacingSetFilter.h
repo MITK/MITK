@@ -145,7 +145,7 @@ class SpacingSetFilter : public PicDescriptorToNode
     void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
     void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
     bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
-    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination );
+    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, unsigned int remainingCombinations, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination );
     const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
 
     /** debug-output */

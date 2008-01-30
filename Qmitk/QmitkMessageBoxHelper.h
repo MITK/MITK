@@ -58,7 +58,7 @@ class QmitkMessageBoxHelper : public QObject
      * Spawn thread to wait for a toplevel window (dialog).
      * Has to be done threaded because there are modal dialogs that won't give back control until they are closed
      */
-    void WaitForDialogAndCallback( const char* classname, int maxWaitSeconds = 10 );
+    void WaitForDialogAndCallback( const char* classname, int maxWaitSeconds = 20 );
 
     /**
      * Stops the thread which waits for a toplevel window (dialog).

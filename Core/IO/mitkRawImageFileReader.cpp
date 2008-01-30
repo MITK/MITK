@@ -80,7 +80,9 @@ void mitk::RawImageFileReader::GenerateData()
   // check file dimensionality and pixel type and perform reading according to it
   if (m_Dimensionality == 2)
   {
-         if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 2 >();
+         if (m_PixelType == SCHAR) TypedGenerateData<signed char, 2 >();
+    else if (m_PixelType == UCHAR) TypedGenerateData<unsigned char, 2 >();
+    else if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 2 >();
     else if (m_PixelType == USHORT) TypedGenerateData<unsigned short int, 2 >();
     else if (m_PixelType == UINT)   TypedGenerateData<unsigned int, 2 >();
     else if (m_PixelType == SINT)   TypedGenerateData<signed int, 2 >();
@@ -94,7 +96,9 @@ void mitk::RawImageFileReader::GenerateData()
    }
   else if (m_Dimensionality==3)
   {
-         if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 3 >();
+         if (m_PixelType == SCHAR) TypedGenerateData<signed char, 3 >();
+    else if (m_PixelType == UCHAR) TypedGenerateData<unsigned char, 3 >();
+    else if (m_PixelType == SSHORT) TypedGenerateData<signed short int, 3 >();
     else if (m_PixelType == USHORT) TypedGenerateData<unsigned short int, 3 >();
     else if (m_PixelType == UINT)   TypedGenerateData<unsigned int, 3 >();
     else if (m_PixelType == SINT)   TypedGenerateData<signed int, 3 >();

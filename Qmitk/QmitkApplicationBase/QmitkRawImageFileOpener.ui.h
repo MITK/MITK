@@ -75,21 +75,27 @@ mitk::Image::Pointer QmitkRawImageFileOpener::ShowAndTryToRead(const char * file
   switch (m_Pixel) 
   {
   case 0:
-    reader->SetPixelType(mitk::RawImageFileReader::SSHORT);
+    reader->SetPixelType(mitk::RawImageFileReader::SCHAR);
     break;
   case 1:
-    reader->SetPixelType(mitk::RawImageFileReader::USHORT);
+    reader->SetPixelType(mitk::RawImageFileReader::UCHAR);
     break;
   case 2:
-    reader->SetPixelType(mitk::RawImageFileReader::SINT);
+    reader->SetPixelType(mitk::RawImageFileReader::SSHORT);
     break;
   case 3:
-    reader->SetPixelType(mitk::RawImageFileReader::UINT);
+    reader->SetPixelType(mitk::RawImageFileReader::USHORT);
     break;
   case 4:
-    reader->SetPixelType(mitk::RawImageFileReader::DOUBLE);
+    reader->SetPixelType(mitk::RawImageFileReader::SINT);
     break;
   case 5:
+    reader->SetPixelType(mitk::RawImageFileReader::UINT);
+    break;
+  case 6:
+    reader->SetPixelType(mitk::RawImageFileReader::DOUBLE);
+    break;
+  case 7:
     reader->SetPixelType(mitk::RawImageFileReader::FLOAT);
     break; 
   }

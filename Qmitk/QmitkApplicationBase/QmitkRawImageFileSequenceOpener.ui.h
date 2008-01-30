@@ -71,26 +71,34 @@ mitk::Image::Pointer QmitkRawImageFileSequenceOpener::ShowAndTryToRead(QStringLi
   switch (m_Pixel) 
   {
   case 0:
+    reader->SetPixelType(mitk::RawImageFileReader::SCHAR);
+    pixelType.Initialize(typeid(signed char),1);
+    break;
+  case 1:
+    reader->SetPixelType(mitk::RawImageFileReader::UCHAR);
+    pixelType.Initialize(typeid(unsigned char),1);
+    break;
+  case 2:
     reader->SetPixelType(mitk::RawImageFileReader::SSHORT);
     pixelType.Initialize(typeid(signed short),1);
     break;
-  case 1:
+  case 3:
     reader->SetPixelType(mitk::RawImageFileReader::USHORT);
     pixelType.Initialize(typeid(unsigned short),1);
     break;
-  case 2:
+  case 4:
     reader->SetPixelType(mitk::RawImageFileReader::SINT);
     pixelType.Initialize(typeid(signed int),1);
     break;
-  case 3:
+  case 5:
     reader->SetPixelType(mitk::RawImageFileReader::UINT);
     pixelType.Initialize(typeid(unsigned int),1);
     break;
-  case 4:
+  case 6:
     reader->SetPixelType(mitk::RawImageFileReader::DOUBLE);
     pixelType.Initialize(typeid(double),1);
     break;
-  case 5:
+  case 7:
     reader->SetPixelType(mitk::RawImageFileReader::FLOAT);
     pixelType.Initialize(typeid(float),1);
     break; 

@@ -54,7 +54,7 @@ public:
     itkGetStringMacro(FilePattern);
     
     /** Supported pixel types. */
-    typedef enum {USHORT,SSHORT, UINT, SINT, FLOAT, DOUBLE} IOPixelType;
+    typedef enum {UCHAR,SCHAR,USHORT,SSHORT, UINT, SINT, FLOAT, DOUBLE} IOPixelType;
     itkSetMacro(PixelType, IOPixelType);
     
     /** Endianity of bits. */

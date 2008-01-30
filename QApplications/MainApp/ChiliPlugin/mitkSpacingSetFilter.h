@@ -103,9 +103,9 @@ class SpacingSetFilter : public PicDescriptorToNode
     std::vector< Group > groupList;
 
     /** internal use */
-    std::vector< std::vector < std::set< Slice* > > > groupResultCombinations;
-    std::vector< std::set< Slice* > >::iterator iterGroupEnd;
-    unsigned int totalCombinationCount;
+    std::vector< std::vector < std::set< Slice* > > > m_GroupResultCombinations;
+    std::vector< std::set< Slice* > >::iterator m_IterGroupEnd;
+    unsigned int m_TotalCombinationCount;
 
     struct SpacingStruct
     {
@@ -145,7 +145,7 @@ class SpacingSetFilter : public PicDescriptorToNode
     void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
     void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
     bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
-    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, unsigned int remainingCombinations, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombination );
+    void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, unsigned int remainingCombinations, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombinations );
     const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
 
     /** debug-output */
@@ -153,6 +153,8 @@ class SpacingSetFilter : public PicDescriptorToNode
     void ShowAllPossibleCombinations();
     void ShowAllResultCombinations();
     void ShowAllSlicesWithUsedSpacings();
+
+int number;
 };
 
 } // namespace mitk

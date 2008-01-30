@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include <stdio.h>
+
 #include "mitkSpacingSetFilter.h"
 
 // Chili-Includes
@@ -73,7 +75,7 @@ void mitk::SpacingSetFilter::Update()
   m_Output.clear();
   groupList.clear();
   m_ImageInstanceUIDs.clear();
-
+number = 1;
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
     SortSlicesToGroup();
@@ -163,6 +165,7 @@ void mitk::SpacingSetFilter::SortSlicesToGroup()
     }
     //dimension
     int currentDimension = (*currentPic)->dim;
+
     if( currentDimension < 2 || currentDimension > 4 )
     {
       std::cout<<"SpacingSetFilter-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
@@ -436,15 +439,15 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
       groupList[n].resultCombinations.clear();
 
       //this variables used by RekCombinationSearch()
-      iterGroupEnd = groupList[n].possibleCombinations.end();  // -> the end to search and combine
-      totalCombinationCount = groupList[n].includedSlices.size();  // -> the count of all included slices (total set)
-      groupResultCombinations.clear();  // -> all results with the minimum count of used combinations; changed while RekCombinationSearch(); at the end the results get saved to groupList[n].resultCombinations
+      m_IterGroupEnd = groupList[n].possibleCombinations.end();  // -> the end to search and combine
+      m_TotalCombinationCount = groupList[n].includedSlices.size();  // -> the count of all included slices (total set)
+      m_GroupResultCombinations.clear();  // -> all results with the minimum count of used combinations; changed while RekCombinationSearch(); at the end the results get saved to groupList[n].resultCombinations
 
       while( iterBegin != iterEnd )
       {
         //the possible combinations sorted, from combinations with lots of elements to combinations with less elements
         //if the mulitplication from the current minimal-needed-combination-count with the current combination-element-count is lower then the count of all needed slices, there is no possibility to create a result wich include all slices and we can break up
-        if( groupResultCombinations.size() != 0 && ( ( ( (*iterBegin).size() ) * ( groupResultCombinations.front().size() ) ) < totalCombinationCount ) )
+        if( m_GroupResultCombinations.size() != 0 && ( ( ( (*iterBegin).size() ) * ( m_GroupResultCombinations.front().size() ) ) < m_TotalCombinationCount ) )
           break;
 
         //the current combination
@@ -453,12 +456,12 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
         resultCombination.push_back( (*iterBegin) );
 
         //if the count is equal, the set's included the same elements and we have a result
-        if( totalCombinationCount == (*iterBegin).size() )
+        if( m_TotalCombinationCount == (*iterBegin).size() )
         {
-          if( groupResultCombinations.size() != 0 && groupResultCombinations.front().size() > 1 )
-            groupResultCombinations.clear();
-          if( groupResultCombinations.size() == 0 || groupResultCombinations.front().size() == 1 )
-            groupResultCombinations.push_back( resultCombination );
+          if( m_GroupResultCombinations.size() != 0 && m_GroupResultCombinations.front().size() > 1 )
+            m_GroupResultCombinations.clear();
+          if( m_GroupResultCombinations.size() == 0 || m_GroupResultCombinations.front().size() == 1 )
+            m_GroupResultCombinations.push_back( resultCombination );
         }
         else
         //else we have to search, combine, check, ...
@@ -467,13 +470,13 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
         remainingCombinations--;
       }
       //the result get copied
-      groupList[n].resultCombinations = groupResultCombinations;
+      groupList[n].resultCombinations = m_GroupResultCombinations;
     }
   }
 #endif
 }
 
-void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), unsigned int mitkHideIfNoVersionCode(remainingCombinations), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombination) )
+void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), unsigned int mitkHideIfNoVersionCode(remainingCombinations), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombinations) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   //to found a combination which represent the whole, the single combinations get combined
@@ -481,26 +484,33 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
   //if the intersection not empty the two combinations included the same elements
   //the new combination get checked with the next combination and combined until they represented the whole
 
+  //resultCombinations = current used combinations (as single combinations)
+  //currentCombination = current used combinations (as one union combination)
+  //groupResultCombinations.front() = current minimal known combinations
+  //iterBegin = current combination to check
+  //remainingCombinations = number of remeaning combinations to check
+  //m_TotalCombinationCount = number of
+
   iterBegin++;
   remainingCombinations--;
-  while ( iterBegin != iterGroupEnd )
+  while ( iterBegin != m_IterGroupEnd )
   {
     //if we have found a result, we should not combine more combinationens than the result included
-    if( groupResultCombinations.size() != 0 && resultCombination.size() >= groupResultCombinations.front().size() )
+    if( m_GroupResultCombinations.size() != 0 && resultCombinations.size() >= m_GroupResultCombinations.front().size() )
       return;
 
     //the current result can integrated two more combinations bevor the size is equal to the number of combinations from the found result
     //the current combination count have 5 elements less than the total combination
     //the current found combinations have only one element, they are sorted, so they dont get more
     //two more integrations with combinations with one element can not fill the lack of 5 elements, so we can break up
-    if( groupResultCombinations.size() != 0 && ( ( ( groupResultCombinations.front().size() - resultCombination.size() ) * iterBegin->size() ) + currentCombination.size() ) < totalCombinationCount )
+    if( m_GroupResultCombinations.size() != 0 && ( ( ( m_GroupResultCombinations.front().size() - resultCombinations.size() ) * iterBegin->size() ) + currentCombination.size() ) < m_TotalCombinationCount )
       return;
 
     //the current result integrated 90 combinations from 100
     //the current combination count is five position bevor the last element
     //the current combinations included one element
     //the five positions with five elements can not fill 10 needed element, so we can break up
-    if( groupResultCombinations.size() != 0 && ( remainingCombinations * iterBegin->size() ) < ( groupResultCombinations.front().size() - resultCombination.size() ) )
+    if( m_GroupResultCombinations.size() != 0 && ( remainingCombinations * iterBegin->size() ) < ( m_TotalCombinationCount - currentCombination.size() ) )
       return;
 
     //create intersection
@@ -517,22 +527,22 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
       set_union( currentCombination.begin(), currentCombination.end(), (*iterBegin).begin(), (*iterBegin).end(), inserter( tempUnion, tempUnion.begin() ) );
       //we have to save the new combination of the two one and the single used combination to create the single resultimages at the end
       //tempUnion contain the combination of the two one
-      //resultCombination contain the single combinations of the current tempUnion
-      resultCombination.push_back( (*iterBegin) );
+      //resultCombinations contain the single combinations of the current tempUnion
+      resultCombinations.push_back( (*iterBegin) );
 
       //to check if the tempUnion contain the whole slices, we use the size; the union is a std::set which not contain equal elements
-      if( totalCombinationCount == tempUnion.size() )
+      if( m_TotalCombinationCount == tempUnion.size() )
       {
-        if( groupResultCombinations.size() != 0 && groupResultCombinations.front().size() > resultCombination.size() )
-          groupResultCombinations.clear();
-        if( groupResultCombinations.size() == 0 || groupResultCombinations.front().size() == resultCombination.size() )
-          groupResultCombinations.push_back( resultCombination );
+        if( m_GroupResultCombinations.size() != 0 && m_GroupResultCombinations.front().size() > resultCombinations.size() )
+          m_GroupResultCombinations.clear();
+        if( m_GroupResultCombinations.size() == 0 || m_GroupResultCombinations.front().size() == resultCombinations.size() )
+          m_GroupResultCombinations.push_back( resultCombinations );
       }
       else
       //if the current union not contain all elements we have to continue the search
-        RekCombinationSearch( iterBegin, remainingCombinations, tempUnion, resultCombination );
+        RekCombinationSearch( iterBegin, remainingCombinations, tempUnion, resultCombinations );
       //for the recursive degression we have to delete the add combination from the possible result
-      resultCombination.pop_back();
+      resultCombinations.pop_back();
     }
     iterBegin++;
     remainingCombinations--;

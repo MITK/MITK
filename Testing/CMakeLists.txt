@@ -1,5 +1,5 @@
 INCLUDE(${MITK_SOURCE_DIR}/CMake/TestingHelpers.cmake)
-INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS} ${IPSEGMENTATION_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR})
 
 ENABLE_TESTING()
 
@@ -31,6 +31,7 @@ SET(${KITNAME}_TESTS
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointLocatorTest.cpp  
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPropertyListTest.cpp

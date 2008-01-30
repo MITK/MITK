@@ -41,6 +41,7 @@ SET(CPP_FILES
   mitkPlaneCutFilter.cpp
   mitkPlaneFit.cpp
   mitkPlanesPerpendicularToLinesFilter.cpp
+  mitkPointLocator.cpp
   mitkPointSetSource.cpp
   mitkPointSetToCurvedGeometryFilter.cpp
   mitkPointSetToGeometryDataFilter.cpp

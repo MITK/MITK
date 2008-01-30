@@ -121,6 +121,7 @@ void QmitkMessageBoxHelper::CloseMessageBoxesNow()
 {
 std::cout << "CloseMessageBoxesNow:   New attept to close blocking top-level message boxes" << std::endl;
   //QWidgetList* toplevelWidgets = QApplication::topLevelWidgets();
+  qApp->processEvents(); // last deperate try
   QWidgetList* toplevelWidgets = QApplication::allWidgets();
   QWidgetListIt toplevelWidgetsIter(*toplevelWidgets);
 

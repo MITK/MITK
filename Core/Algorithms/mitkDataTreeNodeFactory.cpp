@@ -267,8 +267,9 @@ void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
 
 bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
 {
-  // implementation wrong! EndsWith should be tested differently.
-  return m_FileName.find( name ) != std::string::npos;
+  if (m_FileName.size() < name.size()) return false;
+  
+  return m_FileName.substr(m_FileName.size() - name.size()) == name;
 }
 
 bool mitk::DataTreeNodeFactory::FilePatternEndsWith( const std::string& name )

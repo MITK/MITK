@@ -134,20 +134,17 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   {
     unsigned int lastValidPixel = size-1; // initialization, will be changed lateron
     bool inSeg = true;    // inside segmentation?
-    unsigned int lineStart = 0;
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
       if ( ( data[oneContourOffset] == 0 ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
       {
         inSeg = false;
-        lineStart = 0;
         lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
         break;
       }
       else // pixel 1, inside-flag doesn't matter: this happens while we are inside a filled region
       {
         inSeg = true; // first iteration lands here
-        lineStart = 0;
       }
       
     }
@@ -159,7 +156,13 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     m_FillContour = false;
     return false;
   }
- 
+
+  if (oneContourOffset == size) // nothing found until end of slice
+  {
+    m_FillContour = false;
+    return false;
+  }
+  
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
   float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc

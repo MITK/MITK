@@ -96,7 +96,7 @@
 #include "ipPic.h"
 
 ipPicDescriptor *
-ipPicGetHeader( char *infile_name, ipPicDescriptor *pic )
+ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
 {
   ipPicFile_t  infile;
 

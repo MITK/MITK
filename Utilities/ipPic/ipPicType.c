@@ -70,7 +70,7 @@
  *
  */
 
-static char *_ipPicTypeName[_ipPicTypeMax] =
+static const char *_ipPicTypeName[_ipPicTypeMax] =
 {
   "ipPicUnknown",
   "ipPicBool",
@@ -83,7 +83,7 @@ static char *_ipPicTypeName[_ipPicTypeMax] =
   "ipPicTSV"
 };
 
-char *ipPicTypeName( ipUInt4_t type )
+const char *ipPicTypeName( ipUInt4_t type )
 {
   if( type > _ipPicTypeMax )
     return( _ipPicTypeName[0] );

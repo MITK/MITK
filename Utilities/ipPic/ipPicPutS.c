@@ -98,7 +98,7 @@
 
 #include "ipPic.h"
 
-void ipPicPutSlice( char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
+void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
   ipPicDescriptor *pic_in;
 

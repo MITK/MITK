@@ -114,7 +114,7 @@ extern size_t
 _ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream);
 
 int
-ipPicPut( char *outfile_name, ipPicDescriptor *pic )
+ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
 {
   FILE *outfile;
 

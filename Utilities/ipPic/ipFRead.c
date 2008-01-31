@@ -141,7 +141,7 @@ ipPicFReadCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
 }
 
 int
-ipPicAccess( char *path, int mode )
+ipPicAccess( const char *path, int mode )
 {
   int status;
 
@@ -159,7 +159,7 @@ ipPicAccess( char *path, int mode )
   return( status );
 }
 int
-ipPicRemoveFile( char *path )
+ipPicRemoveFile( const char *path )
 {
   int status;
 

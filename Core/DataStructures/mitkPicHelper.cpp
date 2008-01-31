@@ -30,10 +30,10 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
   ipPicTSV_t *tsv;
   bool pixelSize = false;
 
-  tsv = ipPicQueryTag( pic, (char*)"REAL PIXEL SIZE" );
+  tsv = ipPicQueryTag( pic, "REAL PIXEL SIZE" );
   if(tsv==NULL)
   {
-    tsv = ipPicQueryTag( pic, (char*)"PIXEL SIZE" );
+    tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
     pixelSize = true;
   }
   if(tsv)
@@ -55,7 +55,7 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
     }
     if(tagFound && pixelSize)
     {
-      tsv = ipPicQueryTag( pic, (char*)"PIXEL SPACING" );
+      tsv = ipPicQueryTag( pic, "PIXEL SPACING" );
       if(tsv)
       {
         mitk::ScalarType zSpacing = 0;
@@ -134,7 +134,7 @@ bool mitk::PicHelper::SetSpacing(const ipPicDescriptor* aPic, SlicedGeometry3D* 
   Vector3D spacing(slicedgeometry->GetSpacing());
 
   ipPicTSV_t *tsv;
-  if ( (tsv = ipPicQueryTag( pic, (char*)"REAL PIXEL SIZES" )) != NULL)
+  if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
   {    
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
@@ -170,7 +170,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
   mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
 
   ipPicTSV_t *geometryTag;
-  if ( (geometryTag = ipPicQueryTag( const_cast<ipPicDescriptor*>(pic), (char*)"ISG" )) != NULL)
+  if ( (geometryTag = ipPicQueryTag( const_cast<ipPicDescriptor*>(pic), "ISG" )) != NULL)
   {    
     mitk::Point3D  origin;
     mitk::Vector3D rightVector;
@@ -214,7 +214,7 @@ bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGe
     mitk::Point3D origin;
     mitk::Vector3D rightDV, bottomDV;
     ipPicTSV_t *tsv;
-    if ( (tsv = ipPicQueryTag( pic, (char*)"REAL PIXEL SIZES" )) != NULL)
+    if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
     {    
       unsigned int count = (unsigned int) tsv->n[1];
       float* value = (float*) tsv->value;

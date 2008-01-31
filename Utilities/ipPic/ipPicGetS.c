@@ -101,7 +101,7 @@
 
 #include "ipPic.h"
 
-ipPicDescriptor *ipPicGetSlice( char *infile_name, ipPicDescriptor *pic, ipUInt4_t slice )
+ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
   ipPicFile_t infile;
 

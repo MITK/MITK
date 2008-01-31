@@ -96,7 +96,7 @@
 #include "ipPic.h"
 
 ipPicDescriptor *
-ipPicGetTags( char *infile_name, ipPicDescriptor *pic )
+ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
 {
   ipPicFile_t infile;
 

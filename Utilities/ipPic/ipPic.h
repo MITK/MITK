@@ -809,9 +809,9 @@ extern void _ipCp( void *source, void *destination, unsigned long int len );
 extern void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes );
 extern void _ipCpCvtEndian( void *source, void *destination, unsigned long int len, unsigned char bytes );
 
-extern ipPicFile_t _ipPicOpenPicFileIn( char *path );
-extern int ipPicAccess( char *path, int mode );
-extern int ipPicRemoveFile( char *path );
+extern ipPicFile_t _ipPicOpenPicFileIn( const char *path );
+extern int ipPicAccess( const char *path, int mode );
+extern int ipPicRemoveFile( const char *path );
 
 extern ipBool_t ipPicGetWriteCompression( void );
 extern ipBool_t ipPicSetWriteCompression( ipBool_t compression );
@@ -853,13 +853,13 @@ extern ipPicDescriptor *_ipPicOldGetSlice( FILE *infile, ipPicDescriptor *pic, i
 
 extern ipPicDescriptor *ipPicCopyHeader( ipPicDescriptor *pic, ipPicDescriptor *pic_new );
 
-extern ipPicDescriptor *ipPicGet( char *picfile_name, ipPicDescriptor *pic );
-extern ipPicDescriptor *ipPicGetHeader( char *picfile_name, ipPicDescriptor *pic );
-extern ipPicDescriptor *ipPicGetSlice( char *picfile_name, ipPicDescriptor *pic, ipUInt4_t slice );
+extern ipPicDescriptor *ipPicGet( const char *picfile_name, ipPicDescriptor *pic );
+extern ipPicDescriptor *ipPicGetHeader( const char *picfile_name, ipPicDescriptor *pic );
+extern ipPicDescriptor *ipPicGetSlice( const char *picfile_name, ipPicDescriptor *pic, ipUInt4_t slice );
 
 extern _ipPicTagsElement_t *_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type );
 extern _ipPicTagsElement_t *_ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv );
-extern _ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, char *tag );
+extern _ipPicTagsElement_t *_ipPicFindTag( _ipPicTagsElement_t *head, const char *tag );
 extern ipUInt4_t _ipPicTagsSize( _ipPicTagsElement_t *head );
 extern ipUInt4_t _ipPicTagsNumber( _ipPicTagsElement_t *head );
 extern void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_type );
@@ -869,11 +869,11 @@ extern _ipPicTagsElement_t *_ipPicCloneTags( _ipPicTagsElement_t *head );
 
 extern void ipPicAddTag( ipPicDescriptor *pic, ipPicTSV_t *tsv );
 extern void ipPicAddSubTag( ipPicTSV_t *parent, ipPicTSV_t *tsv );
-extern ipPicTSV_t * ipPicDelTag( ipPicDescriptor *pic, char *tag );
-extern ipPicTSV_t * ipPicDelSubTag( ipPicTSV_t *parent, char *tag );
-extern ipPicDescriptor *ipPicGetTags( char *picfile_name, ipPicDescriptor *pic );
-extern ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, char *t );
-extern ipPicTSV_t *ipPicQuerySubTag( ipPicTSV_t *parent, char *t );
+extern ipPicTSV_t * ipPicDelTag( ipPicDescriptor *pic, const char *tag );
+extern ipPicTSV_t * ipPicDelSubTag( ipPicTSV_t *parent, const char *tag );
+extern ipPicDescriptor *ipPicGetTags( const char *picfile_name, ipPicDescriptor *pic );
+extern ipPicTSV_t *ipPicQueryTag( ipPicDescriptor *pic, const char *t );
+extern ipPicTSV_t *ipPicQuerySubTag( ipPicTSV_t *parent, const char *t );
 extern void ipPicFreeTag( ipPicTSV_t *tsv );
 
 
@@ -883,15 +883,15 @@ extern void _ipPicWriteTagsMem( _ipPicTagsElement_t *head, ipUInt1_t **mem_ptr )
 extern ipUInt1_t *ipPicPutMem( ipPicDescriptor *pic, int *mem_size );
 
 
-extern int ipPicPut( char *picfile_name, ipPicDescriptor *pic );
-extern void ipPicPutSlice( char *picfile_name, ipPicDescriptor *pic, ipUInt4_t slice );
+extern int ipPicPut( const char *picfile_name, ipPicDescriptor *pic );
+extern void ipPicPutSlice( const char *picfile_name, ipPicDescriptor *pic, ipUInt4_t slice );
 
 #define _ipPicInfoNORMAL	0
 #define _ipPicInfoSHORT		(1 << 0)
 void _ipPicInfo( FILE *stream, ipPicDescriptor *pic, ipUInt4_t flags );
 void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t level, ipUInt4_t flags );
 
-extern char *ipPicTypeName( ipUInt4_t type );
+extern const char *ipPicTypeName( ipUInt4_t type );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

@@ -114,7 +114,7 @@
 #include "ipPic.h"
 
 ipPicFile_t
-_ipPicOpenPicFileIn( char *path )
+_ipPicOpenPicFileIn( const char *path )
 {
   ipPicFile_t infile;
 
@@ -138,7 +138,7 @@ _ipPicOpenPicFileIn( char *path )
 }
 
 ipPicDescriptor *
-ipPicGet( char *infile_name, ipPicDescriptor *pic )
+ipPicGet( const char *infile_name, ipPicDescriptor *pic )
 {
   ipPicFile_t infile;
 

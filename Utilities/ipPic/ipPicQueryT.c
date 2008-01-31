@@ -68,7 +68,7 @@
  */
 
 ipPicTSV_t *
-ipPicQueryTag( ipPicDescriptor *pic, char *tag )
+ipPicQueryTag( ipPicDescriptor *pic, const char *tag )
 {
   _ipPicTagsElement_t *found;
 
@@ -80,7 +80,7 @@ ipPicQueryTag( ipPicDescriptor *pic, char *tag )
     return( found->tsv );
 }
 ipPicTSV_t *
-ipPicQuerySubTag( ipPicTSV_t *parent, char *tag )
+ipPicQuerySubTag( ipPicTSV_t *parent, const char *tag )
 {
   _ipPicTagsElement_t *found;
 
@@ -93,7 +93,7 @@ ipPicQuerySubTag( ipPicTSV_t *parent, char *tag )
 }
 
 _ipPicTagsElement_t *
-_ipPicFindTag( _ipPicTagsElement_t *head, char *tag )
+_ipPicFindTag( _ipPicTagsElement_t *head, const char *tag )
 {
   int i;
   char name[_ipPicTAGLEN+1];

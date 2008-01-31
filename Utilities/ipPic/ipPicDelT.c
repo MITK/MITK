@@ -60,10 +60,10 @@
 
 static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
                                     _ipPicTagsElement_t *which,
-                                    char *tag );
+                                    const char *tag );
 
 ipPicTSV_t *
-ipPicDelTag( ipPicDescriptor *pic, char *tag )
+ipPicDelTag( ipPicDescriptor *pic, const char *tag )
 {
   _ipPicTagsElement_t *which;
 
@@ -73,7 +73,7 @@ ipPicDelTag( ipPicDescriptor *pic, char *tag )
 }
 
 ipPicTSV_t *
-ipPicDelSubTag( ipPicTSV_t *parent, char *tag )
+ipPicDelSubTag( ipPicTSV_t *parent, const char *tag )
 {
   _ipPicTagsElement_t *which;
 
@@ -93,7 +93,7 @@ ipPicDelSubTag( ipPicTSV_t *parent, char *tag )
 }
 
 ipPicTSV_t *
-_ipPicRemoveTag( _ipPicTagsElement_t **head, _ipPicTagsElement_t *which, char *tag )
+_ipPicRemoveTag( _ipPicTagsElement_t **head, _ipPicTagsElement_t *which, const char *tag )
 {
   ipPicTSV_t *tsv = NULL;
 

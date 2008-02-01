@@ -68,8 +68,6 @@ public:
   //## AbstractTransformGeometry
   itkGetConstObjectMacro(Plane, PlaneGeometry);
   
-  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
-
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
 
   //##ModelId=3EF4A2660256
@@ -96,6 +94,10 @@ public:
 
   virtual bool IsAbove(const Point3D& pt3d_mm) const;
 
+  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
+
+  virtual const Transform3D* GetParametricTransform() const;
+
   //##Documentation
   //## @brief Change the parametric bounds to @a oversampling times 
   //## the bounds of m_Plane.
@@ -107,11 +109,26 @@ public:
 
   virtual void Initialize();
 
+  //##Documentation
+  //## @brief Calculates the standard part of a Geometry3D 
+  //## (IndexToWorldTransform and bounding box) around the 
+  //## curved geometry. Has to be implemented in subclasses.
+  //##
+  //## \sa SetFrameGeometry
+  virtual void CalculateFrameGeometry();
+
+  //##Documentation
+  //## @brief Set the frame geometry which is used as the standard
+  //## part of an Geometry3D (IndexToWorldTransform and bounding box)
+  //##
+  //## Maybe used as a hint within which the interpolation shall occur 
+  //## by concrete sub-classes.
+  //## \sa CalculateFrameGeometry
+  virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
+
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
-  //##ModelId=3EF4A266029C
   AbstractTransformGeometry();
-  //##ModelId=3EF4A266029D
   virtual ~AbstractTransformGeometry();
   
   void InitializeGeometry(Self * newGeometry) const;
@@ -132,7 +149,6 @@ protected:
   //## @note The PlaneGeometry is cloned, @em not linked/referenced.
   virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
 
-  //##ModelId=3EF4A266021A
   //##Documentation
   //## @brief The rectangular area that is used for transformation by 
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
@@ -140,6 +156,8 @@ protected:
   mitk::PlaneGeometry::Pointer m_Plane;
 
   itk::VtkAbstractTransform<ScalarType>::Pointer m_ItkVtkAbstractTransform;
+
+  mitk::Geometry3D::Pointer m_FrameGeometry;
 };
 
 } // namespace mitk

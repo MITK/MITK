@@ -223,8 +223,8 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     const mitk::AbstractTransformGeometry* abstractGeometry =
       dynamic_cast< const AbstractTransformGeometry * >(m_WorldGeometry);
 
-    extent[0] = m_WorldGeometry->GetParametricExtent(0);
-    extent[1] = m_WorldGeometry->GetParametricExtent(1);
+    extent[0] = abstractGeometry->GetParametricExtent(0);
+    extent[1] = abstractGeometry->GetParametricExtent(1);
 
     widthInMM = abstractGeometry->GetParametricExtentInMM(0);
     heightInMM = abstractGeometry->GetParametricExtentInMM(1);

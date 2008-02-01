@@ -65,6 +65,14 @@ public:
   itkSetMacro(UseAllPoints, bool);
   itkBooleanMacro(UseAllPoints);
 
+  //##Documentation
+  //## @brief Set an explicit frame of the created sliced geometry
+  //##
+  //## Uses the IndexToWorldTransform and bounding box of the
+  //## provided geometry.
+  //## \sa CalculateFrameGeometry
+  virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
+
 protected:
   PlanesPerpendicularToLinesFilter();
 
@@ -87,6 +95,9 @@ protected:
   //## @brief SlicedGeometry3D containing the created planes
   //##
   SlicedGeometry3D::Pointer m_CreatedGeometries;
+
+  mitk::Geometry3D::Pointer m_FrameGeometry;
+
 private:
   std::deque<mitk::PlaneGeometry::Pointer> planes;
   Point3D last;

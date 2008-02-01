@@ -476,8 +476,8 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     const mitk::AbstractTransformGeometry* abstractGeometry =
       dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
 
-    rendererInfo.m_Extent[0] = worldGeometry->GetParametricExtent(0);
-    rendererInfo.m_Extent[1] = worldGeometry->GetParametricExtent(1);
+    rendererInfo.m_Extent[0] = abstractGeometry->GetParametricExtent(0);
+    rendererInfo.m_Extent[1] = abstractGeometry->GetParametricExtent(1);
 
     widthInMM = abstractGeometry->GetParametricExtentInMM(0);
     heightInMM = abstractGeometry->GetParametricExtentInMM(1);

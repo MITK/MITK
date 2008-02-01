@@ -41,17 +41,6 @@ public:
   //## @brief Get the landmarks through which the geometry shall pass
   itkGetConstObjectMacro(TargetLandmarks, mitk::PointSet::DataType::PointsContainer);
 
-  //##Documentation
-  //## @brief Set frame geometry within which the interpolation shall occur.
-  //##
-  //## Used as a hint, may be ignored depending on the concrete sub-classes.
-  itkSetConstObjectMacro(FrameGeometry, mitk::Geometry3D);
-  //##Documentation
-  //## @brief Get frame geometry within which the interpolation shall occur.
-  //##
-  //## Used as a hint, may be ignored depending on the concrete sub-classes.
-  itkGetConstObjectMacro(FrameGeometry, mitk::Geometry3D);
-
   virtual void ComputeGeometry() = 0;
 
 protected:
@@ -63,7 +52,6 @@ protected:
 
   mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 
-  mitk::Geometry3D::ConstPointer m_FrameGeometry;
 };
 
 } // namespace mitk

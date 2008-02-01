@@ -29,9 +29,9 @@ std::string mitk::Geometry2D::SCALAR_FACTOR_MM_PRT_UNIT_Y =
 
 
 mitk::Geometry2D::Geometry2D()
-: m_ScaleFactorMMPerUnitX( 1.0 ), 
-  m_ScaleFactorMMPerUnitY( 1.0 ),
-  m_ReferenceGeometry( NULL )
+  : m_ScaleFactorMMPerUnitX( 1.0 ), 
+    m_ScaleFactorMMPerUnitY( 1.0 ),
+    m_ReferenceGeometry( NULL )
 {
 }
 

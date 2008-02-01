@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAbstractTransform.h>
 
 //##ModelId=3EF4A266029C
-mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL)
+mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL), m_FrameGeometry(NULL)
 {
   Initialize();
 }
@@ -35,7 +35,6 @@ void mitk::AbstractTransformGeometry::Initialize()
   Superclass::Initialize();
 
   m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
-  m_ParametricTransform = m_ItkVtkAbstractTransform;
 }
 
 //##ModelId=3EF4A2660237
@@ -51,6 +50,11 @@ mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtentInMM(int di
     itkExceptionMacro(<<"m_Plane is NULL.");
   }
   return m_Plane->GetExtentInMM(direction);
+}
+
+const mitk::Transform3D* mitk::AbstractTransformGeometry::GetParametricTransform() const
+{
+  return m_ItkVtkAbstractTransform;
 }
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
@@ -83,10 +87,10 @@ bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Po
 //##ModelId=3EF4A266025F
 void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
-  assert((m_ParametricTransform.IsNotNull()) && (m_Plane.IsNotNull()));
+  assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
 
   m_Plane->Map(pt2d_mm, pt3d_mm);
-  pt3d_mm = m_ParametricTransform->TransformPoint(pt3d_mm);
+  pt3d_mm = m_ItkVtkAbstractTransform->TransformPoint(pt3d_mm);
 }
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
@@ -179,8 +183,7 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
 
 		SetParametricBounds(b);
 
-    //@warning affine-transforms and bounding-box should be set by specific sub-classes!
-    SetBounds(m_Plane->GetBoundingBox()->GetBounds());
+    CalculateFrameGeometry();
   }
   else
   {
@@ -189,6 +192,28 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
     m_Plane=NULL;
   }
   Modified();
+}
+
+void mitk::AbstractTransformGeometry::CalculateFrameGeometry()
+{
+  if((m_Plane.IsNull()) || (m_FrameGeometry.IsNotNull()))
+    return;
+  //@warning affine-transforms and bounding-box should be set by specific sub-classes!
+  SetBounds(m_Plane->GetBoundingBox()->GetBounds());
+}
+
+void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+{
+  if((frameGeometry != NULL) && (frameGeometry->IsValid()))
+  {
+    m_FrameGeometry = static_cast<mitk::Geometry3D*>(frameGeometry->Clone().GetPointer());
+    SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
+    SetBounds(m_FrameGeometry->GetBounds());
+  }
+  else
+  {
+    m_FrameGeometry = NULL;
+  }
 }
 
 unsigned long mitk::AbstractTransformGeometry::GetMTime() const
@@ -222,5 +247,11 @@ mitk::AffineGeometryFrame3D::Pointer mitk::AbstractTransformGeometry::Clone() co
 void mitk::AbstractTransformGeometry::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
+
+  if(m_ParametricBoundingBox.IsNotNull())
+    newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
+
   newGeometry->SetPlane(m_Plane);
+
+  newGeometry->SetFrameGeometry(m_FrameGeometry);
 }

@@ -82,34 +82,6 @@ public:
   virtual void SetFloatBounds(const float bounds[6]);
   virtual void SetFloatBounds(const double bounds[6]);
 
-  //##Documentation
-  //## @brief Get the parametric bounding-box
-  //## 
-  itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
-#if ( ITK_VERSION_MAJOR == 1 ) && ITK_VERSION_MINOR <= 6
-  const BoundingBox::BoundsArrayType GetParametricBounds() const
-#else
-  const BoundingBox::BoundsArrayType& GetParametricBounds() const
-#endif 
-  {
-    assert(m_ParametricBoundingBox.IsNotNull());
-    return m_ParametricBoundingBox->GetBounds();
-  }
- 
-  mitk::ScalarType GetParametricExtent(int direction) const
-  {
-    assert(direction>=0 && direction<3);
-    assert(m_ParametricBoundingBox.IsNotNull());
-
-    BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
-    return bounds[direction*2+1]-bounds[direction*2];
-  }
- 
-  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const
-  {
-    return GetExtentInMM(direction);
-  }
-
   virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
   itkGetConstReferenceMacro(TimeBounds, TimeBounds);
@@ -239,8 +211,6 @@ public:
   {
     return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
   }
-
-  itkGetConstObjectMacro(ParametricTransform, mitk::Transform3D);
 
   //##ModelId=3DDE65D1028A
   void WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
@@ -372,6 +342,35 @@ public:
   virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
 
   //##Documentation
+  //## @brief Get the parametric bounding-box
+  //## 
+  itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
+  const BoundingBox::BoundsArrayType& GetParametricBounds() const
+  {
+    assert(m_ParametricBoundingBox.IsNotNull());
+    return m_ParametricBoundingBox->GetBounds();
+  }
+ 
+  mitk::ScalarType GetParametricExtent(int direction) const
+  {
+    assert(direction>=0 && direction<3);
+    assert(m_ParametricBoundingBox.IsNotNull());
+
+    BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
+    return bounds[direction*2+1]-bounds[direction*2];
+  }
+ 
+  virtual mitk::ScalarType GetParametricExtentInMM(int direction) const
+  {
+    return GetExtentInMM(direction);
+  }
+
+  virtual const Transform3D* GetParametricTransform() const
+  {
+    return m_IndexToWorldTransform;
+  }
+
+  //##Documentation
   //## @brief Calculates a bounding-box around the geometry relative 
   //## to a coordinate system defined by a transform
   //##
@@ -432,12 +431,10 @@ protected:
   //## ExternAbstractTransformGeometry.
   virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
-
   /** Resets sub-transforms that compose m_IndexToWorldTransform, by using
    * the current value of m_IndexToWorldTransform and setting the rotation
    * component to zero. */
   virtual void ResetSubTransforms();
-
 
   mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
@@ -445,8 +442,6 @@ protected:
 
   vtkMatrix4x4* m_VtkMatrix;
   
-  mitk::Transform3D::Pointer m_ParametricTransform;
-
   bool m_ImageGeometry;
 
   //##Documentation

@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCubeSource.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
+#include <vtkGeneralTransform.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
 #include <vtkStripper.h>
@@ -298,11 +299,38 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       m_PlaneSource->SetXResolution( m_XResolution );
       m_PlaneSource->SetYResolution( m_YResolution );
     }
+    if ( m_PlaceByGeometry )
+    {
+      // Let the output use the input geometry to appropriately transform the
+      // coordinate system.
+      mitk::AffineGeometryFrame3D::TransformType *affineTransform = 
+        abstractGeometry->GetIndexToWorldTransform();
 
-    // Use the non-rigid transform for transforming the plane.
-    m_VtkTransformPlaneFilter->SetTransform(
-      abstractGeometry->GetVtkAbstractTransform()
-    );
+      mitk::TimeSlicedGeometry *timeGeometry = output->GetTimeSlicedGeometry();
+      timeGeometry->SetIndexToWorldTransform( affineTransform );
+
+      mitk::Geometry3D *g3d = timeGeometry->GetGeometry3D( 0 );
+      g3d->SetIndexToWorldTransform( affineTransform );
+
+      vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
+      composedResliceTransform->Identity();
+      composedResliceTransform->Concatenate(
+        abstractGeometry->GetVtkTransform()->GetLinearInverse() );
+      composedResliceTransform->Concatenate(
+        abstractGeometry->GetVtkAbstractTransform()
+        );
+      // Use the non-rigid transform for transforming the plane.
+      m_VtkTransformPlaneFilter->SetTransform(
+        composedResliceTransform
+      );
+    }
+    else
+    {
+      // Use the non-rigid transform for transforming the plane.
+      m_VtkTransformPlaneFilter->SetTransform(
+        abstractGeometry->GetVtkAbstractTransform()
+      );
+    }
 
     if ( m_UseBoundingBox )
     {

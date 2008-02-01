@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkBasedCurvedGeometry::LandmarkBasedCurvedGeometry() 
-  : m_TargetLandmarks(NULL), m_FrameGeometry(NULL)
+  : m_TargetLandmarks(NULL)
 {
 }
 

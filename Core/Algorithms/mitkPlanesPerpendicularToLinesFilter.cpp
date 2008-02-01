@@ -153,6 +153,12 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
       m_CreatedGeometries->SetGeometry2D(planes.front(), s);
 
     m_CreatedGeometries->SetEvenlySpaced(false);
+
+    if(m_FrameGeometry.IsNotNull())
+    {
+      m_CreatedGeometries->SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
+      m_CreatedGeometries->SetBounds(m_FrameGeometry->GetBounds());
+    }
   }
 
   output->SetGeometry(m_CreatedGeometries);
@@ -189,4 +195,16 @@ void mitk::PlanesPerpendicularToLinesFilter::SetInput(const mitk::Mesh *input)
   // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput(0, 
     const_cast< mitk::Mesh * >( input ) );
+}
+
+void mitk::PlanesPerpendicularToLinesFilter::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+{
+  if((frameGeometry != NULL) && (frameGeometry->IsValid()))
+  {
+    m_FrameGeometry = static_cast<mitk::Geometry3D*>(frameGeometry->Clone().GetPointer());
+  }
+  else
+  {
+    m_FrameGeometry = NULL;
+  }
 }

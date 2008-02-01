@@ -40,7 +40,7 @@ const std::string mitk::Geometry3D::INDEX_TO_WORLD_TRANSFORM = "INDEX_TO_WORLD_T
 
 // Standard Constructor for the new makro. sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D()
-    : m_ParametricBoundingBox(NULL),
+  : m_ParametricBoundingBox(NULL),
     m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0)
 {
   FillVector3D(m_FloatSpacing, 1,1,1);
@@ -88,8 +88,6 @@ void mitk::Geometry3D::Initialize()
 
   m_VtkMatrix->Identity();
 
-  m_ParametricTransform = m_IndexToWorldTransform;
-
   m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
@@ -107,7 +105,6 @@ void mitk::Geometry3D::TransferItkToVtkTransform()
 void mitk::Geometry3D::TransferVtkToItkTransform()
 {
   TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
-  m_ParametricTransform = m_IndexToWorldTransform;
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 }
@@ -157,7 +154,7 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &p
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
-  pt_mm = m_ParametricTransform->TransformPoint(pt_units);
+  pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
@@ -167,7 +164,7 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
-  vec_mm = m_ParametricTransform->TransformVector(vec_units);
+  vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
 }
 
 void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
@@ -175,7 +172,6 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
     Superclass::SetIndexToWorldTransform(transform);
-    m_ParametricTransform = m_IndexToWorldTransform;
     CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
     vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
     TransferItkToVtkTransform();
@@ -199,9 +195,6 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 
   //newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix()); IW
   //newGeometry->TransferVtkToItkTransform(); //MH
-
-  if(m_ParametricBoundingBox.IsNotNull())
-    newGeometry->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
 
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
   newGeometry->m_ImageGeometry = m_ImageGeometry;

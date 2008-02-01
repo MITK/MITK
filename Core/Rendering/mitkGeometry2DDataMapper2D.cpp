@@ -130,7 +130,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     
     typedef Geometry3D::TransformType TransformType;
     const TransformType *transform = dynamic_cast< const TransformType * >(
-      referenceGeometry->GetParametricTransform() );
+      referenceGeometry->GetIndexToWorldTransform() );
 
     TransformType::Pointer inverseTransform = TransformType::New();
     transform->GetInverse( inverseTransform );

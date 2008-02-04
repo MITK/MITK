@@ -824,10 +824,13 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
     }
   }
 
-  std::cout << completeReport.ascii() << std::endl;
+  if(completeReport.isEmpty() == false)
+  {
+    std::cout << completeReport.ascii() << std::endl;
 
-  QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog(completeReport, NULL);
-  dialog->show();
+    QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog(completeReport, NULL);
+    dialog->show();
+  }
 
   // TODO (bug #1155): nice output in some graphical window (ready for copy to clipboard)
   // TODO (bug #874): remove these 5 buttons for segmentation operations. find some good interface for them and make them use less GUI space 

@@ -68,7 +68,6 @@ SET(CPP_FILES
   mitkMemoryUtilities.cpp
   mitkMesh.cpp
   mitkModeOperation.cpp
-  mitkOperationActor.cpp
   mitkOperation.cpp
   mitkOrganTypeProperty.cpp
   mitkPicHelper.cpp

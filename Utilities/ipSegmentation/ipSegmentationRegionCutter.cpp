@@ -94,8 +94,9 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
 {
   bool debug(false);
   tCutResult res;
-  res.traceline = (float*)malloc( 5000*sizeof(float)*2 );
-  res.onGradient = (bool*)malloc( 5000*sizeof(bool) );
+  int resContourSize = 5000;
+  res.traceline = (float*)malloc( resContourSize*sizeof(float)*2 );
+  res.onGradient = (bool*)malloc( resContourSize*sizeof(bool) );
   res.numPoints = 0;
   res.absMin = 0;
   res.cutIt = false;
@@ -131,63 +132,6 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
   // trace to center:
   int line = history->n[0];
 
-/*
-  ipPicDescriptor *distPic = ipPicClone( history );
-  ipPicDescriptor *gradPic = ipPicClone( history );
-    for (int x=1; x<(line-1); x++) {
-    for (int y=1; y<(line-1); y++) {
-      int cofs = y*line + x;
-      if (*((ipUInt1_t*)seg->data + cofs)) {
-        QUERY_DIST(cofs)
-        ipUInt2_t dist = (ipUInt2_t)(10.0 * sqrt( dists[0] ));
-        //ipUInt2_t grad = (ipUInt2_t)(1000.0 * ipMITKSegmentationGetDistGradient( cofs, seg ));
-        *((ipUInt2_t*)distPic->data + cofs) = dist;
-        // *((ipUInt2_t*)gradPic->data + cofs) = grad;
-      }
-      else {
-        *((ipUInt2_t*)distPic->data + cofs) = 0;
-        // *((ipUInt2_t*)gradPic->data + cofs) = 1000;
-      }
-    }
-  }
-  for (int x=1; x<(line-1); x++) {
-    for (int y=1; y<(line-1); y++) {
-      int cofs = y*line + x;
-      if (*((ipUInt1_t*)seg->data + cofs)) {
-        double d0 = (double) *((ipUInt2_t*)distPic->data + cofs);
-        double d1 = (double) *((ipUInt2_t*)distPic->data + cofs+1);
-        double d2 = (double) *((ipUInt2_t*)distPic->data + cofs-1);
-        double d3 = (double) *((ipUInt2_t*)distPic->data + cofs+line);
-        double d4 = (double) *((ipUInt2_t*)distPic->data + cofs-line);
-        double d5 = (double) *((ipUInt2_t*)distPic->data + cofs+1+line);
-        double d6 = (double) *((ipUInt2_t*)distPic->data + cofs-1-line);
-        double d7 = (double) *((ipUInt2_t*)distPic->data + cofs-1+line);
-        double d8 = (double) *((ipUInt2_t*)distPic->data + cofs+1-line);
-        double nhv = (d1+d2+d3+d4+d5+d6+d7+d8) / 8.0;
-        if (d0 > nhv) {
-          double grad = sqrt( (d1-d2)*(d1-d2) + (d3-d4)*(d3-d4) ) / 20.0;
-          if (grad < 0.95) {
-            *((ipUInt2_t*)gradPic->data + cofs) = 1;
-          }
-          else {
-            *((ipUInt2_t*)gradPic->data + cofs) = 0;
-          }
-        }  
-        else {
-          *((ipUInt2_t*)gradPic->data + cofs) = 0;
-        }
-      }
-      else {
-        *((ipUInt2_t*)gradPic->data + cofs) = 0;
-      }
-    }
-  }
-  ipPicPut( "dist.pic", distPic );
-  ipPicPut( "grad.pic", gradPic );
-  ipPicFree( distPic );
-  ipPicFree( gradPic );
-*/
-
   int maxOfs = line * history->n[1];
   QUERY_DIST(ofs)
   float maxDist = dists[0];
@@ -207,13 +151,22 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
     oldOfs = nextOfs;
     nextOfs = candOfs;
     // store point info:
-    if (res.numPoints < 5000) {
+    if (res.numPoints < resContourSize) {
       res.traceline[2*res.numPoints] = (float)(nextOfs % line) + 0.5;
       res.traceline[2*res.numPoints+1] = (float)(nextOfs / line) + 0.5;
       if (nextOfs==gradCand) res.onGradient[res.numPoints] = true;
       else res.onGradient[res.numPoints] = false;
+      
       res.numPoints++;
+      
+      if (res.numPoints == resContourSize)
+      {
+        resContourSize *= 2; // explodes, but such contours must be very strange
+        res.traceline = (float*)realloc( res.traceline,  resContourSize*sizeof(float)*2 );
+        res.onGradient = (bool*)realloc( res.onGradient, resContourSize*sizeof(bool) );
+      }
     }
+
     maxHist = *((ipUInt2_t*)history->data + nextOfs);  // don't exceed this history!
     maxDist = 0;  // clear maxDist
     minGrad = 1.0;  // clear minGrad
@@ -359,10 +312,10 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
   free( contour );
   // free ANN stuff:
   annDeallocPt( queryPt );
-    annDeallocPts( dataPts );
-    delete[] nnIdx;
-    delete[] dists;
-    delete annTree;
+  annDeallocPts( dataPts );
+  delete[] nnIdx;
+  delete[] dists;
+  delete annTree;
 
   return res;
 }

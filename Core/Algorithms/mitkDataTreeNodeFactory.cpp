@@ -766,7 +766,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
   node->SetProperty( "line width", new mitk::IntProperty(2) );
-  node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "layer", new mitk::IntProperty(1)); // Normally, surfaces are supposed to overlay images (on layer 0).
   node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetProperty( "scalar visibility", new mitk::BoolProperty(false) );
   node->SetProperty( "color mode", new mitk::BoolProperty(false) );

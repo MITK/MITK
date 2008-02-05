@@ -24,7 +24,7 @@ ipMITKSegmentationClear (ipPicDescriptor* segmentation)
 {
   ipMITKSegmentationTYPE *cur, *last; 
   ipPicTSV_t* tag; 
-  char *src; 
+  const char *src; 
   ipUInt1_t *dst;
   ipUInt4_t i, j;
 

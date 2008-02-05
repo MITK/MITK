@@ -142,7 +142,6 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
   int oldOfs, testOfs, gradCand=-1;
   float grad, minGrad;
   bool skelettonReached = false;
-//bool skelettonLeft = false;
   ipUInt2_t histVal;
   ipUInt1_t segVal;
   ipUInt2_t maxHist = 10000;
@@ -164,6 +163,12 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
         resContourSize *= 2; // explodes, but such contours must be very strange
         res.traceline = (float*)realloc( res.traceline,  resContourSize*sizeof(float)*2 );
         res.onGradient = (bool*)realloc( res.onGradient, resContourSize*sizeof(bool) );
+        if ((res.traceline == NULL) || (res.onGradient == NULL))
+        {
+          res.numPoints = 0;
+          res.cutIt = false;
+          return res;
+        }
       }
     }
 

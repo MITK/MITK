@@ -156,6 +156,13 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
       if (nextOfs==gradCand) res.onGradient[res.numPoints] = true;
       else res.onGradient[res.numPoints] = false;
       
+      if (debug)
+      {
+        printf( "(%.f,%.f): H=%i, G=%i\n", res.traceline[2*res.numPoints], 
+        res.traceline[2*res.numPoints+1], 
+        *((ipUInt2_t*)history->data+nextOfs), 
+        res.onGradient[res.numPoints] );
+      }
       res.numPoints++;
       
       if (res.numPoints == resContourSize)
@@ -241,7 +248,7 @@ tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor
                         if (debug) printf( "." );
     }
     else if (debug) printf( "x" );
-  } while (candOfs != nextOfs);
+  } while (candOfs != nextOfs && maxHist > 0);
 
   if (res.absMin < (res.numPoints-10)) {
     res.absMin += (int)(sqrt(minDist)/2.0);

@@ -46,10 +46,17 @@ const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 //}
 
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
-  : mitk::StateMachine(type), m_DataTreeNode(dataTreeNode), m_Mode(SMDESELECTED)
+: StateMachine(type), 
+  m_DataTreeNode(dataTreeNode), 
+  m_Mode(SMDESELECTED)
 {
   if (m_DataTreeNode != NULL)
     m_DataTreeNode->SetInteractor(this);
+
+  // handle these actions in those Methods
+  CONNECT_ACTION( AcMODEDESELECT,  OnModeDeselect );
+  CONNECT_ACTION( AcMODESELECT,    OnModeSelect );
+  CONNECT_ACTION( AcMODESUBSELECT, OnModeSubSelect );
 }
 
 mitk::BaseData* mitk::Interactor::GetData() const
@@ -77,53 +84,47 @@ bool mitk::Interactor::IsSelected() const
 
 void mitk::Interactor::CreateModeOperation(ModeType mode)
 {
-  mitk::ModeOperation* doOp = new mitk::ModeOperation(OpMODECHANGE, mode);
+  ModeOperation* doOp = new ModeOperation(OpMODECHANGE, mode);
   if (m_UndoEnabled)
   {
-    mitk::ModeOperation* undoOp = new mitk::ModeOperation(OpMODECHANGE, this->GetMode());
+    ModeOperation* undoOp = new ModeOperation(OpMODECHANGE, this->GetMode());
     OperationEvent *operationEvent = new OperationEvent(this, doOp, undoOp);
     m_UndoController->SetOperationEvent(operationEvent);
   }
   this->ExecuteOperation(doOp);
 }
 
-bool mitk::Interactor::ExecuteAction(Action* action, mitk::StateEvent const* /*stateEvent*/) 
+bool mitk::Interactor::OnModeDeselect(Action* action, StateEvent const*)
 {
-  GlobalInteraction* global = mitk::GlobalInteraction::GetInstance();
+  GlobalInteraction* global = GlobalInteraction::GetInstance();
   if (global == NULL)
     itkWarningMacro("Message from Interactor.cpp: GlobalInteraction == NULL! Check use of Interactor!");
-  
-  switch (action->GetActionId())
-  {
-  case AcMODEDESELECT:
-    {
-      if( this->GetMode() !=  SMDESELECTED)
-      {
-        this->CreateModeOperation(SMDESELECTED);
-        global->RemoveFromSelectedInteractors(this);
-      }
-      return true;
-    }
-  case AcMODESELECT:
-    { 
-      if( this->GetMode() !=  SMSELECTED)
-      {
-        this->CreateModeOperation(SMSELECTED);
-        global->AddToSelectedInteractors(this);
-      }
-      return true;
-    }
-  case AcMODESUBSELECT:
-    {
-      mitk::StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
-      return false;
-    }
-  default:
-    {
-      itkWarningMacro("Message from Interactor.cpp: Action could not be understood!");
-    }
-  }
 
+  if( this->GetMode() !=  SMDESELECTED)
+  {
+    this->CreateModeOperation(SMDESELECTED);
+    global->RemoveFromSelectedInteractors(this);
+  }
+  return true;
+}
+
+bool mitk::Interactor::OnModeSelect(Action* action, StateEvent const*)
+{
+  GlobalInteraction* global = GlobalInteraction::GetInstance();
+  if (global == NULL)
+    itkWarningMacro("Message from Interactor.cpp: GlobalInteraction == NULL! Check use of Interactor!");
+
+  if( this->GetMode() !=  SMSELECTED)
+  {
+    this->CreateModeOperation(SMSELECTED);
+    global->AddToSelectedInteractors(this);
+  }
+  return true;
+}
+
+bool mitk::Interactor::OnModeSubSelect(Action* action, StateEvent const*)
+{
+  StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
   return false;
 }
 
@@ -137,7 +138,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     returnvalueKey = 0.0;
 
   //if it is a key event that can be handled in the current state
-  mitk::DisplayPositionEvent const  *disPosEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+  DisplayPositionEvent const  *disPosEvent = dynamic_cast <const DisplayPositionEvent *> (stateEvent->GetEvent());
 
   //Key event handling:
   if (disPosEvent == NULL)
@@ -151,7 +152,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
 
   //Mouse event handling:
   //on MouseMove do nothing! reimplement if needed differently
-  if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
+  if (stateEvent->GetEvent()->GetType() == Type_MouseMove)
   {
     return 0;
   }
@@ -166,20 +167,20 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
   //compute the center of the data taken care of if != NULL
   if (GetData() != NULL)
   {
-    const mitk::BoundingBox *bBox = GetData()->GetUpdatedTimeSlicedGeometry()->GetBoundingBox();
+    const BoundingBox *bBox = GetData()->GetUpdatedTimeSlicedGeometry()->GetBoundingBox();
     if (bBox == NULL)
       return 0;
 
 
-    mitk::DisplayPositionEvent const  *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+    DisplayPositionEvent const  *event = dynamic_cast <const DisplayPositionEvent *> (stateEvent->GetEvent());
     if (event != NULL)
     {
       //transforming the Worldposition to local coordinatesystem
-      mitk::Point3D point;
+      Point3D point;
       GetData()->GetTimeSlicedGeometry()->WorldToIndex(event->GetWorldPosition(), point);
 
       //distance between center and point 
-      mitk::BoundingBox::PointType center = bBox->GetCenter();
+      BoundingBox::PointType center = bBox->GetCenter();
       returnvalueBB = point.EuclideanDistanceTo(center);
 
       //now compared to size of boundingbox to get between 0 and 1;

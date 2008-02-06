@@ -103,10 +103,6 @@ public:
   //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
-  //##Documentation
-  //## @brief Executes Actions 
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
-
   static const std::string XML_NODE_NAME;
 
 protected:
@@ -124,6 +120,10 @@ protected:
   **/
   ~Interactor(){}
 
+  bool OnModeSelect(Action* action, StateEvent const*);
+  bool OnModeDeselect(Action* action, StateEvent const*);
+  bool OnModeSubSelect(Action* action, StateEvent const*);
+
   //##Documentation
   //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
   virtual void ExecuteOperation(Operation* operation);
@@ -138,7 +138,8 @@ protected:
   //##Documentation
   //## @brief convenience method for accessing the data contained in the 
   //## node to which this interactor is associated to
-  mitk::BaseData* GetData() const;
+  BaseData* GetData() const;
+
 
   //##Documentation
   //## @brief Used by friend class DataTreeNode
@@ -152,9 +153,10 @@ protected:
   //## @brief Mode of Selection
   ModeType m_Mode;
 
-  friend class mitk::DataTreeNode;
-  friend class mitk::HierarchicalInteractor;
+  friend class DataTreeNode;
+  friend class HierarchicalInteractor;
 };
 
 }//namespace mitk
 #endif /* INTERACTOR_H_HEADER_INCLUDED */
+

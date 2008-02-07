@@ -3197,7 +3197,7 @@
         <action ID="91" />
       </transition>
       <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="42">
-        <action ID="0" />
+        <action ID="43" />
       </transition>
     </state>
   </stateMachine>
@@ -3211,4 +3211,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

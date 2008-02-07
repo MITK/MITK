@@ -166,7 +166,8 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
   float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-
+  assert(contourPoints == NULL && numberOfContourPoints > 0);
+    
   bool cursorInsideContour = ipMITKSegmentationIsInsideContour( contourPoints, numberOfContourPoints, projectedPointIn2D[0], projectedPointIn2D[1]);
 
   // decide if contour should be filled or not

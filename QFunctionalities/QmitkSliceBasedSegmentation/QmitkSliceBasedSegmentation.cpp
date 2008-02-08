@@ -856,14 +856,19 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
   itk::ImageRegionConstIteratorWithIndex< SegmentationType > segmentationIterator( segmentationItk, segmentationRegion);
   itk::ImageRegionConstIteratorWithIndex< ImageType >        referenceIterator( referenceImage, segmentationRegion);
 
-  segmentationIterator.Begin();
-  referenceIterator.Begin();
+  segmentationIterator.GoToBegin();
+  referenceIterator.GoToBegin();
     
   typedef itk::MapContainer<TPixel, long int> HistogramType;
   TPixel minimum = std::numeric_limits<TPixel>::max();
   TPixel maximum = std::numeric_limits<TPixel>::min();
   HistogramType histogram;
+    
+  double mean(0.0);
+  double sd(0.0);
+  double voxelCount(0.0);
 
+  // first pass for mean, min, max, histogram values
   while ( !segmentationIterator.IsAtEnd() )
   {
     itk::Point< float, 3 > pt;
@@ -882,13 +887,46 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
         ++histogram[referenceIterator.Get()];
         if (referenceIterator.Get() < minimum) minimum = referenceIterator.Get();
         if (referenceIterator.Get() > maximum) maximum = referenceIterator.Get();
+      
+        mean =   (mean * ( static_cast<double>(voxelCount) / static_cast<double>(voxelCount+1) ) )  // 3 points:   old center * 2/3 + currentPoint * 1/3;
+           + static_cast<double>(referenceIterator.Get() ) / static_cast<double>(voxelCount+1);
+
+        voxelCount += 1.0;
       }
     }
 
     ++segmentationIterator;
   }
 
-  // evaluate histogram
+  // second pass for SD
+  segmentationIterator.GoToBegin();
+  referenceIterator.GoToBegin();
+  while ( !segmentationIterator.IsAtEnd() )
+  {
+    itk::Point< float, 3 > pt;
+    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
+
+    typename ImageType::IndexType ind;
+    itk::ContinuousIndex<float, 3> contInd;
+    if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
+    {
+      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
+      
+      referenceIterator.SetIndex( ind );
+
+      if ( segmentationIterator.Get() > 0 )
+      {
+        sd += ((static_cast<double>(referenceIterator.Get() ) - mean)*(static_cast<double>(referenceIterator.Get() ) - mean));
+      }
+    }
+
+    ++segmentationIterator;
+  }
+
+  sd /= static_cast<double>(voxelCount - 1);
+  sd = sqrt( sd );
+
+  // evaluate histogram, generate quantiles
 
   long int totalCount(0);
 
@@ -930,14 +968,16 @@ void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDim
 
   // report histogram values
   
-  report += QString("      Minimum: %1\n  5% quantile: %2\n 25% quantile: %3\n 50% quantile: %4\n 75% quantile: %5\n 95% quantile: %6\n      Maximum: %7\n")
+  report += QString("      Minimum: %1\n  5% quantile: %2\n 25% quantile: %3\n 50% quantile: %4\n 75% quantile: %5\n 95% quantile: %6\n      Maximum: %7\n          Mean:%8\n            SD:%9\n")
                .arg(minimum)
                .arg(histogramQuantileValues[5])
                .arg(histogramQuantileValues[25])
                .arg(histogramQuantileValues[50])
                .arg(histogramQuantileValues[75])
                .arg(histogramQuantileValues[95])
-               .arg(maximum);
+               .arg(maximum)
+               .arg(mean)
+               .arg(sd);
 }
 
 

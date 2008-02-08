@@ -1168,6 +1168,7 @@
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
+    <signal>OptionsLoaded()</signal>
 </signals>
 <slots>
     <slot>fileOpen()</slot>

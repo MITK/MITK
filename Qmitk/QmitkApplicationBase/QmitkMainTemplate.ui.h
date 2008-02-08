@@ -882,7 +882,9 @@ void QmitkMainTemplate::Initialize()
 
   if (!optionsFile.empty())
   {
+    std::cout<<"loading..."<<std::endl;
     LoadOptionsFromFile(optionsFile.c_str());
+    std::cout << "...finished!" << std::endl;
   }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
@@ -1427,6 +1429,8 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
 
     ++iter;
   }
+  
+  emit OptionsLoaded();
 }
 
 void QmitkMainTemplate::viewShowPlanesAction_toggled( bool on )

@@ -71,16 +71,16 @@ QmitkSliderDialogBar
   QGrid *grid = new QGrid( 2, Qt::Horizontal, parent );
 
   new QLabel( "Transversal", grid );
-  QmitkSliderNavigator *sliderNavigator1 = new QmitkSliderNavigator( grid );
+  QmitkSliderNavigator *sliderNavigator1 = new QmitkSliderNavigator( grid, "Transversal Slider" );
 
   new QLabel( "Sagittal", grid );
-  QmitkSliderNavigator *sliderNavigator2 = new QmitkSliderNavigator( grid );
+  QmitkSliderNavigator *sliderNavigator2 = new QmitkSliderNavigator( grid, "Sagittal Slider" );
 
   new QLabel( "Coronal", grid );
-  QmitkSliderNavigator *sliderNavigator3 = new QmitkSliderNavigator( grid );
+  QmitkSliderNavigator *sliderNavigator3 = new QmitkSliderNavigator( grid, "Coronal Slider" );
 
   new QLabel( "Time", grid );
-  QmitkSliderNavigator *sliderNavigatorTime = new QmitkSliderNavigator( grid );
+  QmitkSliderNavigator *sliderNavigatorTime = new QmitkSliderNavigator( grid, "Time Slider" );
 
   sliderNavigator1->ShowLabels( true );
   sliderNavigator2->ShowLabels( true );

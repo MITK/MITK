@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include<itkCommand.h>
 #include<itkEventObject.h>
+#include "mitkCommon.h"
 
 namespace mitk
 {
@@ -76,7 +77,7 @@ namespace mitk
   be registered with mitk::CallbackFromGUIThread. See the (very simple) implmentation of 
   QmitkCallbackFromGUIThread for an example.
 */
-class CallbackFromGUIThreadImplementation
+class MITK_CORE_EXPORT CallbackFromGUIThreadImplementation
 {
   public:
     
@@ -173,7 +174,7 @@ void ThreadedClass::ChangeGUIElementsToIndicateProgress(const itk::EventObject& 
 
 \todo Create a set of "normal" parameter-event-objects that people might want to use.
 */
-class CallbackFromGUIThread
+class MITK_CORE_EXPORT CallbackFromGUIThread
 {
   public:
 
@@ -200,4 +201,5 @@ class CallbackFromGUIThread
 } // namespace
 
 #endif
+
 

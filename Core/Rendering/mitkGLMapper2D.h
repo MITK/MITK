@@ -31,7 +31,7 @@ namespace mitk {
 //##
 //## Those must implement the abstract method Paint(BaseRenderer).
 //## @ingroup Mapper
-class GLMapper2D : public Mapper2D
+class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
 {
   public:
     //##ModelId=3E67E9390346
@@ -60,4 +60,5 @@ class GLMapper2D : public Mapper2D
 
 
 #endif /* MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872 */
+
 

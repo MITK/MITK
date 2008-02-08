@@ -57,11 +57,12 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkW
 
 
 
-template class SurfaceVtkWriter<vtkSTLWriter>;
+template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkSTLWriter>;
 
-template class SurfaceVtkWriter<vtkPolyDataWriter>;
+template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkPolyDataWriter>;
 
-template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
+template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkXMLPolyDataWriter>;
 
 }
+
 

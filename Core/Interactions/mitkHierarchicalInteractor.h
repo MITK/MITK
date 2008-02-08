@@ -30,7 +30,7 @@ namespace mitk {
   //##
   //## A hierarchicalInteractor administrates the forewarding of events to other Interactors or even HierarchicalInteractors
   //## @ingroup Interaction
-  class HierarchicalInteractor : public Interactor
+  class MITK_CORE_EXPORT HierarchicalInteractor : public Interactor
   {
   public:
 

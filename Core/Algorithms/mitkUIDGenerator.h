@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include<string>
+#include "mitkCommon.h"
 
 namespace mitk {
 
@@ -34,7 +35,7 @@ namespace mitk {
 
   You will get another quite unique ID each time you call GetUID.
 */
-class UIDGenerator
+class MITK_CORE_EXPORT UIDGenerator
 {
   public:
     UIDGenerator(const char* prefix = "UID_", unsigned int lengthOfRandomPart = 8);

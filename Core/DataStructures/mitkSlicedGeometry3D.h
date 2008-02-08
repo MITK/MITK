@@ -64,7 +64,7 @@ class SliceNavigationController;
  *
  * \ingroup Geometry
  */
-class SlicedGeometry3D : public mitk::Geometry3D
+class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::Geometry3D
 {
 public:
   mitkClassMacro(SlicedGeometry3D, Geometry3D);

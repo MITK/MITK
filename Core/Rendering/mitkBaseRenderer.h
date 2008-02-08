@@ -61,7 +61,7 @@ class CameraController;
 //## rendering process also should be reworked to use VTK based classes for
 //## both 2D and 3D rendering.
 //## @ingroup Renderer
-class BaseRenderer : public itk::Object
+class MITK_CORE_EXPORT BaseRenderer : public itk::Object
 {
 public:
   typedef std::map<vtkRenderWindow*,mitk::BaseRenderer*> BaseRendererMapType;

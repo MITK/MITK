@@ -34,7 +34,7 @@ namespace mitk {
 //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
 //## @sa AbstractTransformGeometry
 //## @ingroup Geometry
-class ExternAbstractTransformGeometry : public AbstractTransformGeometry
+class MITK_CORE_EXPORT ExternAbstractTransformGeometry : public AbstractTransformGeometry
 {
 public:
   mitkClassMacro(ExternAbstractTransformGeometry, AbstractTransformGeometry);

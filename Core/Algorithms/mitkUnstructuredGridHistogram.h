@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Subclass of itk::Histogram, specialized for a mitk::UnstructuredGrid
 //##
-class UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
+class MITK_CORE_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
 {
 public:
 	mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>);

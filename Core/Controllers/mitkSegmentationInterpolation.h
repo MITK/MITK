@@ -63,7 +63,7 @@ class Image;
 
   $Author$
 */
-class SegmentationInterpolation : public itk::Object
+class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
 {
   public:
     
@@ -129,7 +129,7 @@ class SegmentationInterpolation : public itk::Object
     /**
       \brief Protected class of mitk::SegmentationInterpolation. Don't use (you shouldn't be able to do so)!
     */
-    class SetChangedSliceOptions
+    class MITK_CORE_EXPORT SetChangedSliceOptions
     {
       public:
         SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, void* pixels ) 
@@ -179,4 +179,5 @@ class SegmentationInterpolation : public itk::Object
 } // namespace
 
 #endif
+
 

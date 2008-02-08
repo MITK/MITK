@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITKIMAGECAST_H_HEADER_INCLUDED
 #define MITKIMAGECAST_H_HEADER_INCLUDED
- 
+
 #include <mitkImageAccessByItk.h>
 
 #endif // of MITKIMAGECAST_H_HEADER_INCLUDED

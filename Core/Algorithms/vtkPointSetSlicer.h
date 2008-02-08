@@ -32,11 +32,12 @@ class vtkCellArray;
 class vtkPointData;
 class vtkCellData;
 
+#include "mitkCommon.h"
 
 #if (VTK_MAJOR_VERSION >= 5)
 #include "vtkPolyDataAlgorithm.h"
 
-class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
+class MITK_CORE_EXPORT /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
@@ -45,7 +46,7 @@ public:
 #include "vtkDataSetToPolyDataFilter.h"
 #define VTK_NUMBER_OF_CELL_TYPES 68
 
-class /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFilter
+class MITK_CORE_EXPORT /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFilter
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkDataSetToPolyDataFilter);

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_BASEPROPERTYOBSERVER_H_INCLUDED
 
 #include <itkEventObject.h>
+#include "mitkCommon.h"
 
 namespace mitk {
 
@@ -35,7 +36,7 @@ namespace mitk {
 
 class BaseProperty;
 
-class PropertyObserver 
+class MITK_CORE_EXPORT PropertyObserver 
 {
   public:
 
@@ -56,7 +57,7 @@ class PropertyObserver
     bool m_SelfCall;
 };
   
-class PropertyView : public PropertyObserver
+class MITK_CORE_EXPORT PropertyView : public PropertyObserver
 {
   public:
 
@@ -71,7 +72,7 @@ class PropertyView : public PropertyObserver
     const mitk::BaseProperty* m_Property;
 };
 
-class PropertyEditor : public PropertyObserver
+class MITK_CORE_EXPORT PropertyEditor : public PropertyObserver
 {
   public:
 
@@ -89,4 +90,5 @@ class PropertyEditor : public PropertyObserver
 }
 
 #endif
+
 

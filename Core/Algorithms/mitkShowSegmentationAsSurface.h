@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
 
-class ShowSegmentationAsSurface : public SegmentationSink
+class MITK_CORE_EXPORT ShowSegmentationAsSurface : public SegmentationSink
 {
   public:
     
@@ -58,4 +58,5 @@ class ShowSegmentationAsSurface : public SegmentationSink
 } // namespace
 
 #endif
+
 

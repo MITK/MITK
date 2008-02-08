@@ -38,7 +38,7 @@ class UndoStackItem;
 * Basically does the same, as LimitedLinearUndo class, but it allows you to retrieve a string list, which describes
 * the undo stack or the redo stack. This can be used for display by GUI elements.
 */
-class VerboseLimitedLinearUndo : public LimitedLinearUndo
+class MITK_CORE_EXPORT VerboseLimitedLinearUndo : public LimitedLinearUndo
 {
   
 public:

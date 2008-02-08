@@ -15,9 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#define MITK_TOOL_FACTORY_MACRO(CLASS_NAME, DESCRIPTION) \
+
+#define MITK_TOOL_FACTORY_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
  \
-class CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
+class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
 { \
   public:   \
  \
@@ -73,9 +74,11 @@ class CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
  \
 };
 
-#define MITK_TOOL_GUI_FACTORY_MACRO(CLASS_NAME, DESCRIPTION) \
+/* GUI classes are _not_ exported! */
+
+#define MITK_TOOL_GUI_FACTORY_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
  \
-class CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
+class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
 { \
   public:   \
  \
@@ -130,6 +133,7 @@ class CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
     void operator=(const Self&);    /* purposely not implemented */ \
  \
 };
+
 
 
 

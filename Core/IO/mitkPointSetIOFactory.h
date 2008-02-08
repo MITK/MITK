@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PointSetReader objects using an object factory.
 //##
 //## @ingroup IO
-class PointSetIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT PointSetIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

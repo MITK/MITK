@@ -35,7 +35,7 @@ namespace mitk
  * for mitk::DataTreeNodeSource.
  * @ingroup Process
  */
-  class DataTreeNodeSource : public itk::ProcessObject
+  class MITK_CORE_EXPORT DataTreeNodeSource : public itk::ProcessObject
 {
 public:
     mitkClassMacro( DataTreeNodeSource, itk::ProcessObject );

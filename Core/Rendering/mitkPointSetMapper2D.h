@@ -51,7 +51,7 @@ class PointSet;
  *
  * @ingroup Mapper
  */
-class PointSetMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT PointSetMapper2D : public GLMapper2D
 {
 public:
   mitkClassMacro(PointSetMapper2D, GLMapper2D);

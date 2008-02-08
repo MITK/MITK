@@ -41,7 +41,7 @@ namespace mitk
 * of the file reader in the class mitk::BaseDataIOFactory.
 * @ingroup IO
 */
-class DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader
+class MITK_CORE_EXPORT DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader
 {
 public:
 

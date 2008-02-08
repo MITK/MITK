@@ -34,7 +34,7 @@ namespace mitk {
   //## Not derived from event to hold only one object stateevent, pass it to the statemachines, 
   //## set the next event and reuse this object
   //## @ingroup Interaction
-  class StateEvent
+  class MITK_CORE_EXPORT StateEvent
   {
   public:
     //##ModelId=3E5B7B9E0137

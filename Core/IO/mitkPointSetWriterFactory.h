@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class PointSetWriterFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

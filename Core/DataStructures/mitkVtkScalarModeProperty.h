@@ -32,7 +32,7 @@ namespace mitk
  * \li VTK_SCALAR_MODE_USE_POINT_FIELD_DATA/3/PointFieldData
  * \li VTK_SCALAR_MODE_USE_CELL_FIELD_DATA/4/CellFieldData
  */
-class VtkScalarModeProperty : public EnumerationProperty
+class MITK_CORE_EXPORT VtkScalarModeProperty : public EnumerationProperty
 {
 public:
 
@@ -91,4 +91,5 @@ protected:
 } // end of namespace mitk
 
 #endif //_MITK_VTK_SCALARMODE_PROPERTY__H_
+
 

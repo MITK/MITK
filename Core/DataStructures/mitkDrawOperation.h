@@ -33,7 +33,7 @@ namespace mitk {
 //##
 //## Stores everything for adding and deleting seeds.
 //## @ingroup Undo
-class DrawOperation : public Operation
+class MITK_CORE_EXPORT DrawOperation : public Operation
 {
   public:
   //##ModelId=3F0189F003A2
@@ -74,4 +74,5 @@ class DrawOperation : public Operation
 };
 }//namespace mitk
 #endif /* MITKDRAWOPERATION_H*/
+
 

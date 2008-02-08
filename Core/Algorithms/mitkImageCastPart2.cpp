@@ -48,23 +48,23 @@ typedef itk::Image<unsigned short, 3> itkImageUS3;
 typedef itk::Image<char, 3>           itkImageSC3;
 typedef itk::Image<unsigned char, 3>  itkImageUC3;
 
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageD2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageF2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSI2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUI2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSS2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUS2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSC2>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUC2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageD2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageF2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSI2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUI2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSS2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUS2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSC2>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUC2>&);
 
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageD3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageF3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSI3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUI3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSS3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUS3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSC3>&);
-template void CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUC3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageD3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageF3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSI3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUI3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSS3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUS3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageSC3>&);
+template void MITK_CORE_EXPORT CastToItkImage(const mitk::Image *, itk::SmartPointer<itkImageUC3>&);
 
 #ifndef DOXYGEN_SKIP
 //// Extension for RGB (and maybe also for vector types)

@@ -32,7 +32,7 @@ namespace mitk {
   //## 
   //## Stores display position of the mouse and 3D world position in mm.
   //## @ingroup Interaction
-  class PositionEvent : public DisplayPositionEvent
+  class MITK_CORE_EXPORT PositionEvent : public DisplayPositionEvent
   {
   public:
     //##ModelId=3E5B7CF900F0

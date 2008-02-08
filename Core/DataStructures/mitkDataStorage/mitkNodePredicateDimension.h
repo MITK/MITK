@@ -31,7 +31,7 @@ namespace mitk {
   //##
   //## Evaluates to "false" for unsupported datasets.
   //## @ingroup DataStorage
-  class NodePredicateDimension : public NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateDimension : public NodePredicateBase
   {
   public:
     //##Documentation

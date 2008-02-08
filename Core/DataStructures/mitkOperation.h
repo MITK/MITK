@@ -31,7 +31,7 @@ typedef int OperationType ;
 //## @brief Base class of all Operation-classes
 //##
 //## @ingroup Undo
-class Operation
+class MITK_CORE_EXPORT Operation
 {
 public:
   //##ModelId=3E7830E70054
@@ -50,7 +50,7 @@ public:
   OperationType m_OperationType;
 };
 
-class OperationEndEvent : public itk::EndEvent
+class MITK_CORE_EXPORT OperationEndEvent : public itk::EndEvent
 { 
 public: 
   typedef OperationEndEvent Self; 

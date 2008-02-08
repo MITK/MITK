@@ -40,7 +40,7 @@ class DataTreeNode;
 //## that interface to the graphics library (e.g., OpenGL, vtk). 
 //## @todo Should Mapper be a subclass of ImageSource?
 //## @ingroup Mapper
-class Mapper : public itk::Object, public XMLIO
+class MITK_CORE_EXPORT Mapper : public itk::Object, public XMLIO
 {
 public:
     mitkClassMacro(Mapper, itk::Object);

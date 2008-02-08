@@ -55,6 +55,7 @@ QWidget * QmitkDataManager::CreateMainWidget(QWidget *parent)
   }
 }
 
+
 QWidget * QmitkDataManager::CreateControlWidget(QWidget *parent)
 {
   if (m_Controls == NULL)

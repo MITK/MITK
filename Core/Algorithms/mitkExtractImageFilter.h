@@ -46,7 +46,7 @@ namespace mitk
  
   Last contributor: $Author$
 */
-class ExtractImageFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
 {
   public:
     
@@ -84,4 +84,5 @@ class ExtractImageFilter : public ImageToImageFilter
 } // namespace
 
 #endif
+
 

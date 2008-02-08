@@ -36,7 +36,7 @@ class Image;
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
  * @ingroup IO
  */
-class ImageWriter :  public mitk::FileWriter
+class MITK_CORE_EXPORT ImageWriter :  public mitk::FileWriter
 {
 public:
 

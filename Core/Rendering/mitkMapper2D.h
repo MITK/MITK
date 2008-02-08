@@ -34,7 +34,7 @@ namespace mitk {
 //## @note [not yet used:] SetGeometry3D() tells the Mapper2D which slices will
 //## potentially be requested.
 //## @ingroup Mapper
-class Mapper2D : public Mapper
+class MITK_CORE_EXPORT Mapper2D : public Mapper
 {
   public:
     mitkClassMacro(Mapper2D,Mapper);

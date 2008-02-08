@@ -31,7 +31,7 @@ namespace mitk {
 //## @brief Data class containing Geometry2D objects
 //## @ingroup Geometry
 //##
-class Geometry2DData : public GeometryData
+class MITK_CORE_EXPORT Geometry2DData : public GeometryData
 {
 public:
   mitkClassMacro(Geometry2DData, GeometryData);

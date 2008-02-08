@@ -40,7 +40,7 @@ class RenderWindow;
  * of a vtkRenderWindow.
  
  */
-class LogoRendering : public BaseData
+class MITK_CORE_EXPORT LogoRendering : public BaseData
 {
 public:
 

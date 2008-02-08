@@ -52,7 +52,7 @@ class ImageDataItem;
 //##
 //## For importing ITK images use of mitk::ITKImageImport is recommended.
 //## @ingroup Data
-class Image : public SlicedData
+class MITK_CORE_EXPORT Image : public SlicedData
 {
   friend class SubImageSelector;
 

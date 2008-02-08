@@ -63,7 +63,7 @@ class BaseRenderer;
 //##
 //## @warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
 //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
-class DataTreeNode : public itk::DataObject, public XMLIO
+class MITK_CORE_EXPORT DataTreeNode : public itk::DataObject, public XMLIO
 {
 public:
 
@@ -534,4 +534,5 @@ MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& 
 
 
 #endif /* DATATREENODE_H_HEADER_INCLUDED_C1E14338 */
+
 

@@ -37,7 +37,7 @@ namespace mitk {
 //## Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
 //## GUI elements, whether each of the stacks is empty or not (to enable/disable button, ...)
 //##ModelId=3E5F5D3F0075
-class LimitedLinearUndo : public UndoModel, public itk::Object
+class MITK_CORE_EXPORT LimitedLinearUndo : public UndoModel, public itk::Object
 {
 public:
   //##ModelId=3F0451950379

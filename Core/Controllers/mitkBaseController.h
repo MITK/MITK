@@ -39,7 +39,7 @@ class BaseRenderer;
 //## there is 3D+t data.
 //## @note not yet implemented
 //## @ingroup NavigationControl
-class BaseController : public StateMachine
+class MITK_CORE_EXPORT BaseController : public StateMachine
 {
 public:
   /** Standard class typedefs. */

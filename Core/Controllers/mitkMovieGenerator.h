@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class  MovieGenerator : public  itk::LightObject
+class MITK_CORE_EXPORT  MovieGenerator : public  itk::LightObject
 {
 public:
 

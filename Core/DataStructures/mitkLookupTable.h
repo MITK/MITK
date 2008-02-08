@@ -36,7 +36,7 @@ namespace mitk
 //## @brief LookupTable containing a vtkLookupTable
 //## @ingroup Data
 //##
-class LookupTable : public itk::DataObject, public XMLIO
+class MITK_CORE_EXPORT LookupTable : public itk::DataObject, public XMLIO
 {
 public:
     /** 

@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PicFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class PicFileIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT PicFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

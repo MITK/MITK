@@ -30,7 +30,7 @@ namespace mitk {
   //## 
   //## 
   //## @ingroup DataStorage
-  class NodePredicateNOT : public NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateNOT : public NodePredicateBase
   {
   public:
     //##Documentation

@@ -59,7 +59,7 @@ class Geometry2DData;
 //## it.
 //## @todo make extension easier
 //## @ingroup Process
-class Geometry2DDataToSurfaceFilter : public SurfaceSource
+class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
 {
   public:
     mitkClassMacro(Geometry2DDataToSurfaceFilter, SurfaceSource);

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define XMLIO_H_HEADER_INCLUDED
 
 #include <string>
+#include "mitkCommon.h"
 
 namespace mitk {
 
@@ -40,7 +41,7 @@ namespace mitk {
   //## What should be implemented in the functions WriteXMLData() and ReadXMLData() of new classes?
   //## Just have a look to the documentation of the module IO classes.
   //## @ingroup IO
-  class XMLIO {
+  class MITK_CORE_EXPORT XMLIO {
   
   public:
 

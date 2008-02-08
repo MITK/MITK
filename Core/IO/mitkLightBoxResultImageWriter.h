@@ -36,7 +36,7 @@ class Image;
   this is the default-implementation, for the real implementation look at mitkLightBoxResultImageWriterImpl
   */
 
-class LightBoxResultImageWriter : public BaseProcess
+class MITK_CORE_EXPORT LightBoxResultImageWriter : public BaseProcess
 {
   public:
     /** Standard class typedefs. */
@@ -96,4 +96,5 @@ class LightBoxResultImageWriter : public BaseProcess
 } // namespace mitk
 
 #endif /* LIGHTBOXRESULTIMAGEWRITER_H_HEADER_INCLUDED_C1F48A22 */
+
 

@@ -35,7 +35,7 @@ The vtkMitkRenderProp is a custom vtkProp derived class, which implements the re
 \sa rendering
 \ingroup rendering
 */
-class vtkMitkRenderProp : public vtkProp
+class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
 {
   public:
     
@@ -60,4 +60,5 @@ class vtkMitkRenderProp : public vtkProp
 
 
 #endif /* VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723 */
+
 

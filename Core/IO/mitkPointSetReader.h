@@ -39,7 +39,7 @@ namespace mitk
  * is not yet supported!
  * @ingroup IO
 */
-class PointSetReader: public PointSetSource, public FileReader
+class MITK_CORE_EXPORT PointSetReader: public PointSetSource, public FileReader
 {
 public:
 

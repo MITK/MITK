@@ -37,7 +37,7 @@ namespace mitk
 
   $Author$
 */
-class CompressedImageContainer : public itk::Object
+class MITK_CORE_EXPORT CompressedImageContainer : public itk::Object
 {
   public:
     
@@ -84,4 +84,5 @@ class CompressedImageContainer : public itk::Object
 } // namespace
 
 #endif
+
 

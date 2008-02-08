@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkMacro.h>
 #include <itkExceptionObject.h>
+#include "mitkCommon.h"
 
 namespace mitk
 {
-class MemoryUtilities
+class MITK_CORE_EXPORT MemoryUtilities
 {
 public:
   /** 
@@ -94,4 +95,5 @@ protected:
 } //end of namespace mitk
 
 #endif
+
 

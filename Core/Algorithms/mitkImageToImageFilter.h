@@ -29,7 +29,7 @@ namespace mitk {
 //## @brief Superclass of all classes having one or more Images as input and
 //## generating Images as output
 //## @ingroup Process
-class ImageToImageFilter : public ImageSource
+class MITK_CORE_EXPORT ImageToImageFilter : public ImageSource
 {
 public:
 	mitkClassMacro(ImageToImageFilter,ImageSource);

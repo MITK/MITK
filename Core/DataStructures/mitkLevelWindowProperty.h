@@ -29,7 +29,7 @@ namespace mitk {
 //## @brief Property for level/window data
 //##
 //## @ingroup DataTree
-class LevelWindowProperty : public BaseProperty
+class MITK_CORE_EXPORT LevelWindowProperty : public BaseProperty
 {
 
 protected:

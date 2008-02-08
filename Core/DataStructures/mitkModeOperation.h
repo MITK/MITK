@@ -30,7 +30,7 @@ namespace mitk {
 //## @brief class that holds the information for a change of the modus of an interactor object
 //##
 //## @ingroup Undo
-class ModeOperation : public Operation
+class MITK_CORE_EXPORT ModeOperation : public Operation
 {
 public:
   typedef Interactor::ModeType ModeType;

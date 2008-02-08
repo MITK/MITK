@@ -19,7 +19,7 @@ namespace mitk
  * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
  * @ingroup Process
  */
-class vtkPointSetXMLParser : public vtkXMLParser
+class MITK_CORE_EXPORT vtkPointSetXMLParser : public vtkXMLParser
 {
 public:
     typedef mitk::PointSet PointSetType;

@@ -40,7 +40,7 @@ class RenderWindow;
  * scene. After setting the renderwindow, the gradient may be 
  * activated by calling Enable()
  */
-class GradientBackground : public BaseData
+class MITK_CORE_EXPORT GradientBackground : public BaseData
 {
 public:
 
@@ -156,4 +156,5 @@ protected:
 
 } //end of namespace mitk
 #endif
+
 

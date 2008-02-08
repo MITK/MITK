@@ -29,7 +29,7 @@ namespace mitk {
 //##ModelId=3E5F53AA026C
 
 //## @ingroup Undo
-class UndoController
+class MITK_CORE_EXPORT UndoController
 {
   public:
   //##ModelId=3F01770900C3

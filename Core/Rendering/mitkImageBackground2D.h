@@ -40,7 +40,7 @@ namespace mitk
   * pointer to the image. Also the image dimensions needs to be set correctly before enabling the 
   * background.
   */
-  class ImageBackground2D : public itk::Object
+  class MITK_CORE_EXPORT ImageBackground2D : public itk::Object
   {
     public:
      mitkClassMacro( ImageBackground2D, itk::Object );
@@ -101,4 +101,5 @@ namespace mitk
 } // namespace mitk
 
 #endif
+
 

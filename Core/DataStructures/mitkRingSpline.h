@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class RingSpline: public ClosedSpline 
+class MITK_CORE_EXPORT RingSpline: public ClosedSpline 
 {
 public:
   mitkClassMacro(RingSpline, ClosedSpline);
@@ -55,4 +55,5 @@ private:
 } // namespace mitk
 
 #endif /* MITKRingSpline_H_HEADER_INCLUDED */
+
 

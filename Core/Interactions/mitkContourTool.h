@@ -47,7 +47,7 @@ class Image;
 
   $Author$
 */
-class ContourTool : public SegTool2D
+class MITK_CORE_EXPORT ContourTool : public SegTool2D
 {
   public:
     
@@ -73,4 +73,5 @@ class ContourTool : public SegTool2D
 } // namespace
 
 #endif
+
 

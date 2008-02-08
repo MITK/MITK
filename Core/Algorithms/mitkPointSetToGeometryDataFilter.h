@@ -28,7 +28,7 @@ namespace mitk
  * Common superclass for all algorithms having one or more point
  * sets as input and producing one or more geometry datas as output
  */
-class PointSetToGeometryDataFilter : public GeometryDataSource
+class MITK_CORE_EXPORT PointSetToGeometryDataFilter : public GeometryDataSource
 {
 public:
   /**
@@ -72,4 +72,5 @@ protected:
 
 
 #endif
+
 

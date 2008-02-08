@@ -32,7 +32,7 @@ namespace mitk {
   //##Documentation
   //## @brief Class for storing surfaces (vtkPolyData)
   //## @ingroup Data
-  class Surface : public BaseData
+  class MITK_CORE_EXPORT Surface : public BaseData
   {
   protected:
 

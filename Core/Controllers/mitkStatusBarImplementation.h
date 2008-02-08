@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITKSTATUSBARIMPLEMENTATION_H
 #define MITKSTATUSBARIMPLEMENTATION_H
+#include "mitkCommon.h"
 
 namespace mitk {
 //##Documentation
 //## @brief GUI indepentent Interface for all Gui depentent implementations of a StatusBar.
-class StatusBarImplementation
+class MITK_CORE_EXPORT StatusBarImplementation
 {
 public:
   //##Documentation

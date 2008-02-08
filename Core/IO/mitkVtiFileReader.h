@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read image files in vtk file format
 //## @ingroup IO
-class VtiFileReader : public ImageSource, public FileReader
+class MITK_CORE_EXPORT VtiFileReader : public ImageSource, public FileReader
 {
 public:
   mitkClassMacro(VtiFileReader, FileReader);

@@ -39,7 +39,7 @@ namespace mitk {
 //## returning the result of GetOutput()): GetData(), GetPic() and
 //## GetVtkImageData().
 //## @ingroup Process
-class ImageSource : public BaseProcess
+class MITK_CORE_EXPORT ImageSource : public BaseProcess
 {
 public:
   mitkClassMacro(ImageSource,BaseProcess);

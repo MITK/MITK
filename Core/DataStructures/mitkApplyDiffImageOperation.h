@@ -35,7 +35,7 @@ namespace mitk {
  @ingroup Undo
  @ingroup Reliver
 */
-class ApplyDiffImageOperation : public Operation
+class MITK_CORE_EXPORT ApplyDiffImageOperation : public Operation
 {
   protected:
   
@@ -78,4 +78,5 @@ class ApplyDiffImageOperation : public Operation
 } // namespace mitk
 
 #endif 
+
 

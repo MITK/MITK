@@ -34,7 +34,7 @@ namespace mitk {
 //## @todo only one plane supported yet, add 4D support
 //## @warning first version, not yet tested.
 //## @ingroup Process
-class PlaneCutFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT PlaneCutFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(PlaneCutFilter, ImageToImageFilter);
@@ -73,4 +73,5 @@ protected:
 } // namespace mitk
 
 #endif /* PLANECUTFILTER_H_HEADER_INCLUDED_C1F48A22 */
+
 

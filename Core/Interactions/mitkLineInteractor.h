@@ -35,7 +35,7 @@ namespace mitk
   //## Interact with a line drawn between two declared points. 
   //## The line can be selected, which selects its edges (the two points), so that the line can be moved.
   //## @ingroup Interaction
-  class LineInteractor : public HierarchicalInteractor
+  class MITK_CORE_EXPORT LineInteractor : public HierarchicalInteractor
   {
   public:
     mitkClassMacro(LineInteractor, HierarchicalInteractor);

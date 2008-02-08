@@ -27,7 +27,7 @@ namespace mitk {
 
 class Event;
 
-class CoreObjectFactory : public CoreObjectFactoryBase
+class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(CoreObjectFactory,CoreObjectFactoryBase);

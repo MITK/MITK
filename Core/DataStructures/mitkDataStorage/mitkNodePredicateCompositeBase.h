@@ -31,7 +31,7 @@ namespace mitk {
   //## predicates that are compositions of other predicates like AND and OR.
   //## 
   //## @ingroup DataStorage
-  class NodePredicateCompositeBase : public NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateCompositeBase : public NodePredicateBase
   {
   public:
     //##Documentation

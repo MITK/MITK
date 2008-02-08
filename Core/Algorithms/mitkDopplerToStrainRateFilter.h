@@ -30,7 +30,7 @@ namespace mitk {
 //## @brief 
 //## @ingroup Process
 
-class DopplerToStrainRateFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(DopplerToStrainRateFilter, ImageToImageFilter);
@@ -76,4 +76,5 @@ private:
 } // namespace mitk
 
 #endif /* MITKDOPPLERTOSTRAINRATE_H_HEADER_INCLUDED_C1F48A22 */
+
 

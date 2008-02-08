@@ -38,7 +38,7 @@ typedef itk::RGBPixel< float > Color;
 //## @brief RGB color property
 //##
 //## @ingroup DataTree
-class ColorProperty : public BaseProperty
+class MITK_CORE_EXPORT ColorProperty : public BaseProperty
 {
 protected:
   //##ModelId=3E86A3B00061

@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read file formats supported by itk
 //## @ingroup IO
-class ItkImageFileReader : public ImageSource, public FileReader
+class MITK_CORE_EXPORT ItkImageFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(ItkImageFileReader, FileReader);

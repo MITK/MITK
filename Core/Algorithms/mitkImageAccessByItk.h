@@ -514,6 +514,11 @@ PURPOSE.  See the above copyright notices for more information.
   _accessTwoImagesAllTypesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension)             \
 }
 
+#ifdef mitkCore_EXPORTS
+#define MITK_CORE_EXPORT_EXTERN 
+#else
+#define MITK_CORE_EXPORT_EXTERN extern 
+#endif
 
 //----------------------- cast functions. Will be moved to mitkImageCast.h -----------------
 namespace mitk 
@@ -525,7 +530,7 @@ namespace mitk
   //##Documentation
   //## @brief Cast an mitk::Image to an itk::Image with a specific type. You don't have to initialize the itk::Image<..>::Pointer.
   //## @ingroup Adaptor
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
+ template <typename ItkOutputImageType> extern void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage);
 }
 
 //----------------------- include to be removed  -----------------------

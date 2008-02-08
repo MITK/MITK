@@ -39,7 +39,7 @@ namespace mitk {
  * @todo clean up, this is messy. bug #524
  * 
  */
-class AutoCropImageFilter : public SubImageSelector
+class MITK_CORE_EXPORT AutoCropImageFilter : public SubImageSelector
 {
 public:
 
@@ -108,4 +108,5 @@ protected:
 } // namespace mitk
 
 #endif
+
 

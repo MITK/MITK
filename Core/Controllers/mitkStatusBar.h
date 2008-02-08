@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSTATUSBAR_H
 #define MITKSTATUSBAR_H
 #include <itkObject.h>
+#include "mitkCommon.h"
 #include "mitkStatusBarImplementation.h"
 
 
@@ -32,7 +33,7 @@ namespace mitk {
 //## all mitk-classes use this class to display text on GUI-StatusBar.
 //## The mainapplication has to set the internal held StatusBarImplementation with SetInstance(..).
 //## @ingroup Interaction
-class StatusBar : public itk::Object
+class MITK_CORE_EXPORT StatusBar : public itk::Object
 {
 public:
   itkTypeMacro(StatusBar, itk::Object);

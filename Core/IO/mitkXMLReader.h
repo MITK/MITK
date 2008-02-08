@@ -42,12 +42,12 @@ namespace mitk{
   //## The XMLIO class manages the writing and reading of data.
   //## An example of how to start the XMLWriter can be found in the function Load() of the DataTree class.
   //## @ingroup IO
-  class XMLReader : public vtkXMLParser {
+  class MITK_CORE_EXPORT XMLReader : public vtkXMLParser {
 
   public:
     
     /// Brief Class defines XML nodes
-    class XMLNode
+    class MITK_CORE_EXPORT XMLNode
     {
     public:
       typedef std::vector<XMLNode*> ChildrensType;

@@ -37,7 +37,7 @@ namespace mitk
 
   $Author$
 */
-class SegTool3D : public Tool
+class MITK_CORE_EXPORT SegTool3D : public Tool
 {
   public:
     
@@ -53,4 +53,5 @@ class SegTool3D : public Tool
 } // namespace
 
 #endif
+
 

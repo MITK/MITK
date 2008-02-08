@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
 
-class CalculateSegmentationVolume : public SegmentationSink
+class MITK_CORE_EXPORT CalculateSegmentationVolume : public SegmentationSink
 {
   public:
     
@@ -56,4 +56,5 @@ class CalculateSegmentationVolume : public SegmentationSink
 } // namespace
 
 #endif
+
 

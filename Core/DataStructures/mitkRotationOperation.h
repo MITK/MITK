@@ -28,7 +28,7 @@ namespace mitk {
 //## @brief Operation, that holds everything necessary for an rotation operation 
 //##
 //## @ingroup Undo
-class RotationOperation : public Operation
+class MITK_CORE_EXPORT RotationOperation : public Operation
 {
 public:
   RotationOperation(OperationType operationType, Point3D pointOfRotation, Vector3D vectorOfRotation, ScalarType angleOfRotation);

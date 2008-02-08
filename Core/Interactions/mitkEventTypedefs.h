@@ -27,7 +27,7 @@ namespace mitk {
 
 class WheelEvent;
 
-class BaseEvent 
+class MITK_CORE_EXPORT BaseEvent 
 {
 public:
   BaseEvent(int type, int state, int x = 0,int y = 0, int globalX=0, int globalY = 0) : m_X(x), m_Y(y), m_GlobalX(globalX), m_GlobalY(globalY) , m_State(state),m_Type(type) {};
@@ -42,7 +42,7 @@ protected:
 
 typedef DisplayPositionEvent MouseEvent;
 
-class KeyEvent : public BaseEvent 
+class MITK_CORE_EXPORT KeyEvent : public BaseEvent 
 {
   //int m_Ascii;
   std::string m_Text;

@@ -44,7 +44,7 @@ namespace mitk {
   //## a segmentation.
   //## 
   //## @ingroup DataStorage
-  class DataStorage : public itk::Object
+  class MITK_CORE_EXPORT DataStorage : public itk::Object
   {
   public:
     mitkClassMacro(DataStorage, itk::Object);

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //add only those headers here that are really necessary for all classes!
 #include "itkObject.h"
+#include "mitkConfig.h"
 
 typedef unsigned int MapperSlotId;
 
@@ -92,15 +93,18 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
  *  
  *    class MITK_EXPORT ClassName : public SomeClass {};
  */
-#if defined(WIN32)
-  #if defined(BUILDING_MITK_DLL)
-    #define MITK_EXPORT __declspec(dllexport)
-  #elif defined(IMPORTING_MITK_DLL)
-    #define MITK_EXPORT __declspec(dllimport)
+#if defined(WIN32) && defined(MITK_BUILD_SHARED_CORE)
+  #ifdef mitkCore_EXPORTS
+    #define MITK_CORE_EXPORT __declspec(dllexport)
   #else
-    #define MITK_EXPORT
-  #endif
+    #define MITK_CORE_EXPORT __declspec(dllimport)
+  #endif        
 #else
-  #define MITK_EXPORT
+  #define MITK_CORE_EXPORT
 #endif
+
+
+// legacy support for designer plugin 
+#define MITK_EXPORT
+
 

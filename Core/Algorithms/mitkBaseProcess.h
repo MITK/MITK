@@ -43,7 +43,7 @@ class BaseData;
 //## functions to the generated output that guarantee an up-to-date result, see
 //## for example mitk::ImageSource. 
 //## @ingroup Process
-class BaseProcess : public itk::ProcessObject
+class MITK_CORE_EXPORT BaseProcess : public itk::ProcessObject
 {
 public:
   mitkClassMacro(BaseProcess, itk::ProcessObject);

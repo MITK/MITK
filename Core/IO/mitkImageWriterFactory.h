@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class ImageWriterFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

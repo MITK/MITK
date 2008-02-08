@@ -37,11 +37,11 @@ namespace mitk
   {
     //##Documentation
     //## @brief Search a data tree for (the first) iterator to a given node
-    DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node);
+    MITK_CORE_EXPORT DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node);
 
     //##Documentation
     //## @brief Search a data tree for (the first) iterator to a given node
-    DataTreeIteratorClone FindIteratorToNode(const DataTreeIteratorBase* startPosition, const DataTreeNode* node);
+    MITK_CORE_EXPORT DataTreeIteratorClone FindIteratorToNode(const DataTreeIteratorBase* startPosition, const DataTreeNode* node);
 
     //##Documentation
     //## @brief Add itk-image to data tree
@@ -97,10 +97,11 @@ namespace mitk
     /** Get child node which has a specified name
      * @returns child node of iterator which has the given name
     */
-    DataTreeIteratorClone GetNamedChild(mitk::DataTreeIteratorBase* iterator, std::string name);
+    MITK_CORE_EXPORT DataTreeIteratorClone GetNamedChild(mitk::DataTreeIteratorBase* iterator, std::string name);
   };
 
 } // namespace mitk
 
 #endif /* DATATREEHELPER_H_HEADER_INCLUDED_C1C7797C */
+
 

@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in Philips PAR/REC file format
 //## @ingroup IO
-class ParRecFileReader : public ImageSource, public FileReader
+class MITK_CORE_EXPORT ParRecFileReader : public ImageSource, public FileReader
 {
 public:
   mitkClassMacro(ParRecFileReader, FileReader);
@@ -72,4 +72,5 @@ protected:
 } // namespace mitk
 
 #endif /* PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22 */
+
 

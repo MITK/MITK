@@ -37,7 +37,7 @@ namespace mitk {
 //## initialized by sub-classes (e.g., by setting
 //## it to an vtkActor).
 //## @ingroup Mapper
-class BaseVtkMapper3D : public Mapper3D
+class MITK_CORE_EXPORT BaseVtkMapper3D : public Mapper3D
 {
 public:
   mitkClassMacro(BaseVtkMapper3D, Mapper3D);

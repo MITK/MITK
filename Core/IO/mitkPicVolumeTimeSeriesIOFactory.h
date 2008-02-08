@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PicVolumeTimeSeriesReader objects using an object factory.
 //##
 //## @ingroup IO
-class PicVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT PicVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

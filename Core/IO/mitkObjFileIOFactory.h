@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of ObjFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class ObjFileIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT ObjFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

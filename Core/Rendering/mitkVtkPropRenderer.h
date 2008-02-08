@@ -49,7 +49,7 @@ VtkPropRenderer replaces the old OpenGLRenderer.
 \sa rendering
 \ingroup rendering
 */
-class VtkPropRenderer : public BaseRenderer
+class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
 {
 public:
   

@@ -34,7 +34,7 @@ class PointSet;
 //## @brief OpenGL-based mapper to display a spline based on a mitk::PointSet in a 2D window.
 //##
 //## @ingroup Mapper
-class SplineMapper2D : public PointSetMapper2D
+class MITK_CORE_EXPORT SplineMapper2D : public PointSetMapper2D
 {
 public:
   mitkClassMacro ( SplineMapper2D, PointSetMapper2D );

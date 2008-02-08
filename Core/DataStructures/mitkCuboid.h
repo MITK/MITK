@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing an cuboid
 //## @ingroup Data
-class Cuboid : public BoundingObject
+class MITK_CORE_EXPORT Cuboid : public BoundingObject
 {
 public:
   mitkClassMacro(Cuboid, BoundingObject);  
@@ -42,4 +42,5 @@ protected:
 
 }
 #endif /* MITCUBOID_H_HEADER_INCLUDED */
+
 

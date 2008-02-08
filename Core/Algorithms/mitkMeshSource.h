@@ -34,7 +34,7 @@ namespace mitk
  * DataObject. 
  * @ingroup Process
  */
-class MeshSource : public itk::ProcessObject
+class MITK_CORE_EXPORT MeshSource : public itk::ProcessObject
 {
 public:
     mitkClassMacro( MeshSource, itk::ProcessObject );

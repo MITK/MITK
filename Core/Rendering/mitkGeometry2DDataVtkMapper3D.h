@@ -49,7 +49,7 @@ class ImageMapper2D;
  * 
  *  \ingroup Mapper
  */
-class Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
 public:
   mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);

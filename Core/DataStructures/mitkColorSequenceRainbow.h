@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class ColorSequenceRainbow : public ColorSequence
+class MITK_CORE_EXPORT ColorSequenceRainbow : public ColorSequence
 {
 public:
   ColorSequenceRainbow();
@@ -63,4 +63,5 @@ private:
 }
 
 #endif
+
 

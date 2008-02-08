@@ -51,7 +51,7 @@ namespace mitk
 
   $Author$
 */
-class RegionGrowingTool : public SegTool2D
+class MITK_CORE_EXPORT RegionGrowingTool : public SegTool2D
 {
   public:
     
@@ -104,9 +104,10 @@ class RegionGrowingTool : public SegTool2D
     bool m_FillFeedbackContour;
 };
 
-MITK_TOOL_FACTORY_MACRO(RegionGrowingTool, "MITK 2D region growing tool")
+MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, RegionGrowingTool, "MITK 2D region growing tool")
 
 } // namespace
 
 #endif
+
 

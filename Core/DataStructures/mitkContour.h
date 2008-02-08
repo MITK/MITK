@@ -32,7 +32,7 @@ namespace mitk
 * This class holds stores vertices for drawing a contour 
 *
 */
-class Contour : public BaseData
+class MITK_CORE_EXPORT Contour : public BaseData
 {
 public:
   mitkClassMacro(Contour, BaseData);

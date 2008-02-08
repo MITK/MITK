@@ -37,7 +37,7 @@ namespace mitk {
   * This class holds a map of transitions to next States. 
   * @ingroup Interaction
   **/
-  class State : public itk::Object
+  class MITK_CORE_EXPORT State : public itk::Object
   {
   public:
     mitkClassMacro(State, itk::Object);

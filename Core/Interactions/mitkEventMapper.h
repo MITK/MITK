@@ -57,7 +57,7 @@ namespace mitk {
   //## Here the ObjectEventID gets increased,
   //## not the GroupEventId(must get increased by a StateMachine, that has the information when a new Group of operation starts)
   //## @ingroup Interaction
-  class EventMapper : public vtkXMLParser
+  class MITK_CORE_EXPORT EventMapper : public vtkXMLParser
   {
   public:
     //##ModelId=3F02F896006D
@@ -193,4 +193,5 @@ namespace mitk {
 } // namespace mitk
 
 #endif /* EVENTMAPPER_H_HEADER_INCLUDED_C187864A */
+
 

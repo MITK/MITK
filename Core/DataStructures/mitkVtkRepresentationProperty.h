@@ -29,7 +29,7 @@ namespace mitk
  * VTK_POINTS/0/Points, VTK_WIREFRAME/1/Wireframe, VTK_SURFACE/2/Surface
  * Default is the Surface representation
  */
-class VtkRepresentationProperty : public EnumerationProperty
+class MITK_CORE_EXPORT VtkRepresentationProperty : public EnumerationProperty
 {
 public:
 
@@ -91,4 +91,5 @@ protected:
 };
 } // end of namespace mitk
 #endif
+
 

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
 
-class SegmentationSink : public NonBlockingAlgorithm
+class MITK_CORE_EXPORT SegmentationSink : public NonBlockingAlgorithm
 {
   public:
     
@@ -51,4 +51,5 @@ class SegmentationSink : public NonBlockingAlgorithm
 } // namespace
 
 #endif
+
 

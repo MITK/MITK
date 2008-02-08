@@ -34,7 +34,7 @@ class Image;
 //## @brief Adapter for vtkProbeFilter, making it a 3D+t filter
 //## 
 //## @ingroup Process
-class ProbeFilter : public SurfaceSource
+class MITK_CORE_EXPORT ProbeFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(ProbeFilter, SurfaceSource);

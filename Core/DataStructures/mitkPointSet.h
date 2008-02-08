@@ -85,7 +85,7 @@ namespace mitk {
  *
  * \ingroup Data
  */
-class PointSet : public BaseData
+class MITK_CORE_EXPORT PointSet : public BaseData
 {
 public:
   mitkClassMacro(PointSet, BaseData);

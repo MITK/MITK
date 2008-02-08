@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Reader to read raw image files
 /**  The user must set the dimensionality, the dimensions and the pixel type. If they are incorrect, the image will not be opened or the visualization will be incorrect. */
 //## @ingroup IO
-class RawImageFileReader : public ImageSource, public FileReader
+class MITK_CORE_EXPORT RawImageFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(RawImageFileReader, FileReader);
@@ -107,4 +107,5 @@ protected:
 } // namespace mitk
 
 #endif /* RawImageFileReader_H_HEADER_INCLUDED */
+
 

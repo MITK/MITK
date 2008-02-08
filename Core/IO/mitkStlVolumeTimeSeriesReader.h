@@ -28,7 +28,7 @@ namespace mitk
 //##Documentation
 //## @brief Reader to read a series of volume files in stl-format
 //## @ingroup IO
-class StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
+class MITK_CORE_EXPORT StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
 {
 public:
     mitkClassMacro( StlVolumeTimeSeriesReader, FileReader );
@@ -63,4 +63,5 @@ protected:
 } // namespace mitk
 
 #endif 
+
 

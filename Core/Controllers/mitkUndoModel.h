@@ -33,7 +33,7 @@ class OperationActor;
 //##
 //## all necessary operations, that all UndoModels share.
 //## @ingroup Undo
-class UndoModel
+class MITK_CORE_EXPORT UndoModel
 {
   public:
   //##ModelId=3E95950F02B1
@@ -92,4 +92,5 @@ class UndoModel
 
 }// namespace mitk
 #endif /* UNDOMODEL_H_HEADER_INCLUDED_C16ED098 */
+
 

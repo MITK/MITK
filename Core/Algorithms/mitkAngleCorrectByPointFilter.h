@@ -28,7 +28,7 @@ namespace mitk {
 //##Documentation
 //## @brief 
 //## @ingroup Process
-class AngleCorrectByPointFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(AngleCorrectByPointFilter, ImageToImageFilter);
@@ -70,4 +70,5 @@ protected:
 } // namespace mitk
 
 #endif /* MITKANGLECORRECTBYPOINTFILTER_H_HEADER_INCLUDED_C1F48A22 */
+
 

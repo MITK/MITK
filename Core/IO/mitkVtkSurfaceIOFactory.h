@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of VtkSurfaceReader objects using an object factory.
 //##
 //## @ingroup IO
-class VtkSurfaceIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT VtkSurfaceIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

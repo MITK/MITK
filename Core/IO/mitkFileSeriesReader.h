@@ -32,7 +32,7 @@ namespace mitk
  * a given prefix and pattern.
  * Subclasses may use this function to load a series of files.
  */
-class FileSeriesReader : public FileReader 
+class MITK_CORE_EXPORT FileSeriesReader : public FileReader 
 {
 public:
     mitkClassMacro( FileSeriesReader, FileReader );
@@ -61,4 +61,5 @@ protected:
 }
 
 #endif
+
 

@@ -29,7 +29,7 @@ namespace mitk
   //##Documentation
   //## @brief Interaction for mitk::Mesh: Connect existing points to lines
   //## @ingroup Interaction
-  class ConnectPointsInteractor : public Interactor
+  class MITK_CORE_EXPORT ConnectPointsInteractor : public Interactor
   {
   public:
     mitkClassMacro(ConnectPointsInteractor, Interactor);

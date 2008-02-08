@@ -22,8 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkActor2D.h"
 #include "vtkRenderWindow.h"
+#include "mitkCommon.h"
 
-class vtkMitkRectangleProp : public vtkProp
+class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {
   public:
     
@@ -53,4 +54,5 @@ class vtkMitkRectangleProp : public vtkProp
 
 
 #endif /* vtkMitkRectangleProp_H_HEADER_INCLUDED_C1C53723 */
+
 

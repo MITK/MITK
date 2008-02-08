@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
+#include "mitkCommon.h"
 
 #ifndef DOXYGEN_SKIP
 
@@ -61,9 +62,9 @@ typedef enum PointSpecificationType
 };
 
 typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-extern const ScalarType eps;
-extern const ScalarType sqrteps;
-extern const double large;
+MITK_CORE_EXPORT extern const ScalarType eps;
+MITK_CORE_EXPORT extern const ScalarType sqrteps;
+MITK_CORE_EXPORT extern const double large;
 
 template <class T> class VectorTraits {
   public:

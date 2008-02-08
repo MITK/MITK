@@ -30,7 +30,7 @@ namespace mitk {
   //##
   //## Stores everything for de-/ selecting, inserting , moving and removing a line.
   //## @ingroup Undo
-  class LineOperation : public mitk::CellOperation
+  class MITK_CORE_EXPORT LineOperation : public mitk::CellOperation
   {
   public:
     mitkClassMacro(LineOperation, CellOperation);
@@ -60,4 +60,5 @@ namespace mitk {
   };
 }//namespace mitk
 #endif /* MITKLINEOPERATION_H_INCLUDED*/
+
 

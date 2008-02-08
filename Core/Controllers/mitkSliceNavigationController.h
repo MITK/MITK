@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 #define mitkTimeSlicedGeometryEventMacro( classname , super ) \
- class classname : public super { \
+ class MITK_CORE_EXPORT classname : public super { \
    public: \
      typedef classname Self; \
      typedef super Superclass; \
@@ -135,7 +135,7 @@ class BaseRenderer;
  * \todo implement for non-evenly-timed geometry!
  * \ingroup NavigationControl
  */
-class SliceNavigationController : public BaseController
+class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 {
   public:
     mitkClassMacro(SliceNavigationController,BaseController);
@@ -227,7 +227,7 @@ class SliceNavigationController : public BaseController
 
     itkEventMacro( UpdateEvent, itk::AnyEvent );
 
-    class TimeSlicedGeometryEvent : public itk::AnyEvent 
+    class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent 
     { 
       public: 
         typedef TimeSlicedGeometryEvent Self; 

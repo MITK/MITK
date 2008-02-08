@@ -34,7 +34,7 @@ class Surface;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::SurfaceSource.
 //## @ingroup Process
-class SurfaceSource : public BaseProcess
+class MITK_CORE_EXPORT SurfaceSource : public BaseProcess
 {
 public:
   mitkClassMacro(SurfaceSource, BaseProcess);

@@ -57,7 +57,7 @@ template <
   typename TElementIdentifier,
   typename TElement
   >
-class ITK_EXPORT SmartPointerVectorContainer: 
+class SmartPointerVectorContainer: 
   public Object,
   public std::vector<itk::SmartPointer<TElement> >  /** difference: we handle smart pointers */
 {
@@ -219,4 +219,5 @@ public:
 #endif
 
 #endif
+
 

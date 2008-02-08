@@ -31,7 +31,7 @@ namespace mitk {
   //## One can connect it via itk::GlobalInteraction->AddStateMachine(new mitk::DisplayVectorInteractor("move", new DisplayInterActor()));
   //## to the global state machine.
   //## @ingroup Interaction
-  class DisplayInteractor : public mitk::OperationActor
+  class MITK_CORE_EXPORT DisplayInteractor : public mitk::OperationActor
   {
   public:
 

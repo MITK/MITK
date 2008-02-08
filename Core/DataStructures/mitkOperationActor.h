@@ -41,7 +41,7 @@ class OperationEvent;
 //## @brief abstract class, that can be used  by Undo to undo an operation.
 //## 
 //## @ingroup Undo
-class OperationActor
+class MITK_CORE_EXPORT OperationActor
 {
 public:
     virtual ~OperationActor() {};

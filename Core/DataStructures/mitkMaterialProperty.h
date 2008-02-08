@@ -45,7 +45,7 @@ class BaseRenderer;
  *
  * @see vtkProperty
 */
-class MaterialProperty : public BaseProperty
+class MITK_CORE_EXPORT MaterialProperty : public BaseProperty
 {
 public:
     mitkClassMacro( MaterialProperty, BaseProperty );

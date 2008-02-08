@@ -36,7 +36,7 @@ namespace mitk {
   //## Ether Button (Mouse) or Key (Keyboard) is set. if both are set
   //## accidentally then the button is accepted.
   //## @ingroup Interaction
-  class Event
+  class MITK_CORE_EXPORT Event
   {
   public:
     //##ModelId=3E5B3007000F

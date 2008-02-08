@@ -34,7 +34,7 @@ namespace mitk {
   //##
   //## sends a Point, that can be processed in its own OperationActor
   //## @ingroup Interaction
-  class CoordinateSupplier : public StateMachine
+  class MITK_CORE_EXPORT CoordinateSupplier : public StateMachine
   {
   public:
     mitkClassMacro(CoordinateSupplier, StateMachine);

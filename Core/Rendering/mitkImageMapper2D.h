@@ -61,7 +61,7 @@ namespace mitk {
  *
  * \ingroup Mapper
  */
-class ImageMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT ImageMapper2D : public GLMapper2D
 {
   friend class CoreObjectFactory;
 
@@ -97,7 +97,7 @@ public:
   /** \brief Internal storage class for data needed for rendering into a
    * renderer
    */
-  class RendererInfo
+  class MITK_CORE_EXPORT RendererInfo
   {
     /** \brief internal id of the renderer the data is stored for */
     int m_RendererID;

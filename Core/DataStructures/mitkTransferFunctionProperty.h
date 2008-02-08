@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class TransferFunctionProperty : public BaseProperty
+  class MITK_CORE_EXPORT TransferFunctionProperty : public BaseProperty
   {
     public:
       mitkClassMacro(TransferFunctionProperty, BaseProperty);

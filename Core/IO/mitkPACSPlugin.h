@@ -53,7 +53,7 @@ typedef enum
 
   This is the default-implementation, for the real implementation look at mitkChiliPluginImpl.
   */
-class PACSPlugin : public itk::Object
+class MITK_CORE_EXPORT PACSPlugin : public itk::Object
 {
   public:
 

@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of VtkVolumeTimeSeriesReader objects using an object factory.
 //##
 //## @ingroup IO
-class VtkVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT VtkVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

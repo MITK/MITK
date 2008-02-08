@@ -28,7 +28,7 @@ namespace mitk {
 //##Documentation
 //## @brief Provides an easy way to calculate an itk::Histogram for a mitk::Image
 //##
-class HistogramGenerator : public itk::Object
+class MITK_CORE_EXPORT HistogramGenerator : public itk::Object
 {
 public:
 	mitkClassMacro(HistogramGenerator,itk::Object);

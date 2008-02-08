@@ -30,7 +30,7 @@ namespace mitk {
 //## @brief Property for LookupTable data
 //##
 //## @ingroup DataTree
-class LookupTableProperty : public BaseProperty
+class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
 {
 
 protected:

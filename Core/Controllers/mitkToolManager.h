@@ -84,7 +84,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class ToolManager : public itk::Object
+class MITK_CORE_EXPORT ToolManager : public itk::Object
 {
   public:
 
@@ -216,4 +216,5 @@ class ToolManager : public itk::Object
 } // namespace
 
 #endif
+
 

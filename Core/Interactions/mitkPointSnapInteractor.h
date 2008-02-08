@@ -36,7 +36,7 @@ namespace mitk
   //## If so, then it only activates the point, so that the LineInteractor (hierarchicaly 
   //## above this PointSnapInteractor) can add a line to that Point.
   //## @ingroup Interaction
-  class PointSnapInteractor : public HierarchicalInteractor
+  class MITK_CORE_EXPORT PointSnapInteractor : public HierarchicalInteractor
   {
   public:
     mitkClassMacro(PointSnapInteractor, HierarchicalInteractor);
@@ -75,4 +75,5 @@ namespace mitk
   };
 }//namespace mitk
 #endif /* MITKPOINTSNAPINTERACTOR_H_HEADER_INCLUDED */
+
 

@@ -28,7 +28,7 @@ namespace mitk
 //## @brief IOAdapterBase class is an abstract adapter class for IO process objects. 
 //##
 //## @ingroup IO
-class IOAdapterBase: public itk::Object
+class MITK_CORE_EXPORT IOAdapterBase: public itk::Object
 {
 public:
   /** Standard typedefs. */

@@ -30,7 +30,7 @@ namespace mitk {
 //## transition to an other state.
 //##
 //## @ingroup Undo
-class StateTransitionOperation : public Operation
+class MITK_CORE_EXPORT StateTransitionOperation : public Operation
 {
   public:
 	  //##ModelId=3E78311303E7

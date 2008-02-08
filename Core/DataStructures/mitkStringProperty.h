@@ -30,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief Property for strings
 //## @ingroup DataTree
-class StringProperty : public BaseProperty
+class MITK_CORE_EXPORT StringProperty : public BaseProperty
 {
 protected:
     //##ModelId=3E3FDF21017D

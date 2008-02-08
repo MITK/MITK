@@ -36,7 +36,7 @@ typedef Line<ScalarType, 3> Line3D;
  * 
  * \ingroup Geometry
  */
-class PlaneGeometry : public Geometry2D
+class MITK_CORE_EXPORT PlaneGeometry : public Geometry2D
 {
 public:
   mitkClassMacro(PlaneGeometry,Geometry2D);

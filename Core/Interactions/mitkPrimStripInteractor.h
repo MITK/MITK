@@ -34,7 +34,7 @@ namespace mitk
   //## The whole list can be selected by selecting all the other lower interactables.
   //## the selection of the whole dataSet is only possible by seting the property of the DataTreeNode.
   //## @ingroup Interaction
-  class PrimStripInteractor: public HierarchicalInteractor
+  class MITK_CORE_EXPORT PrimStripInteractor: public HierarchicalInteractor
   {
   public:
     mitkClassMacro(PrimStripInteractor, HierarchicalInteractor);

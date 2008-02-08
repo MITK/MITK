@@ -66,7 +66,7 @@ namespace mitk {
  * stated otherwise.
  * \ingroup Geometry
  */
-class Geometry2D : public mitk::Geometry3D
+class MITK_CORE_EXPORT Geometry2D : public mitk::Geometry3D
 {
 public:
   mitkClassMacro(Geometry2D, mitk::Geometry3D);

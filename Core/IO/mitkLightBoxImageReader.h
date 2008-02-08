@@ -31,7 +31,7 @@ namespace mitk {
 
   this is the default-implementation, for the real implementation look at mitkLightBoxImageReaderImpl
   */
-  class LightBoxImageReader : public ImageSource
+  class MITK_CORE_EXPORT LightBoxImageReader : public ImageSource
   {
     public:
       /** Standard class typedefs. */

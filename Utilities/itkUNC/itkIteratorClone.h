@@ -24,7 +24,7 @@ namespace itk
 {
 
 template <class TObjectType>
-class ITK_EXPORT IteratorClone 
+class IteratorClone 
 {
 public:
   typedef IteratorClone<TObjectType> Self;

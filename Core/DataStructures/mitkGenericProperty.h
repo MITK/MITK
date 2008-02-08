@@ -157,7 +157,7 @@ bool GenericProperty<T>::ReadXMLData( XMLReader& xmlReader )
  * @param Type the value type of the GenericProperty
  */
 #define mitkSpecializeGenericProperty(PropertyName,Type,DefaultValue)  \
-class PropertyName: public GenericProperty< Type >        \
+class MITK_CORE_EXPORT PropertyName: public GenericProperty< Type >        \
 {                                                         \
 public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \
@@ -167,4 +167,5 @@ public:                                                   \
 };
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */
+
 

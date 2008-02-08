@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITKPROGRESSBARIMPLEMENTATION_H
 #define MITKPROGRESSBARIMPLEMENTATION_H
-
+#include "mitkCommon.h"
+	 
 namespace mitk 
 {
 
   //##Documentation
   //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
-  class ProgressBarImplementation
+  class MITK_CORE_EXPORT ProgressBarImplementation
   {
 
   public:

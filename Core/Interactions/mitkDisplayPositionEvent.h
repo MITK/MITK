@@ -33,7 +33,7 @@ namespace mitk {
 //## 3D world position in mm is calculated via picking (delegated to the 
 //## BaseRenderer).
 //## @ingroup Interaction
-class DisplayPositionEvent : public Event
+class MITK_CORE_EXPORT DisplayPositionEvent : public Event
 {
   public:
     //##Documentation

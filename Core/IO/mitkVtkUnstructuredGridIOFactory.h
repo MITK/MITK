@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of VtkUnstructuredGridReader objects using an object factory.
 //##
 //## @ingroup IO
-class VtkUnstructuredGridIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT VtkUnstructuredGridIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

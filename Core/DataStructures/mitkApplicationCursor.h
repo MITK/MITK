@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
 #define MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
+#include "mitkCommon.h"
 
 namespace mitk
 {
@@ -28,7 +29,7 @@ namespace mitk
   be registered with mitk::ApplicationCursor. See the (very simple) implmentation of 
   QmitkApplicationCursor for an example.
 */
-class ApplicationCursorImplementation
+class MITK_CORE_EXPORT ApplicationCursorImplementation
 {
   public:
     
@@ -54,7 +55,7 @@ class ApplicationCursorImplementation
   reset the cursor to its former state. This is mimicking Qt's Application::setOverrideCuror() 
   behaviour, but should be ok for most cases where you want to switch a cursor.
 */
-class ApplicationCursor
+class MITK_CORE_EXPORT ApplicationCursor
 {
   public:
 
@@ -84,4 +85,5 @@ class ApplicationCursor
 } // namespace
 
 #endif
+
 

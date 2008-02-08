@@ -31,7 +31,7 @@ namespace mitk
  @todo Add file writing method, move writers into a similar factory scheme
  @ingroup IO
 */
-class BaseDataIO : public itk::Object
+class MITK_CORE_EXPORT BaseDataIO : public itk::Object
 {
 public:  
 
@@ -63,4 +63,5 @@ private:
 } // end namespace mitk
 
 #endif
+
 

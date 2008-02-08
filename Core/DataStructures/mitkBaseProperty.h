@@ -37,7 +37,7 @@ namespace mitk {
     Subclasses must implement an operator==(const BaseProperty& property), which
     is used by PropertyList to check whether a property has been changed.
 */
-class BaseProperty : public itk::Object, public XMLIO
+class MITK_CORE_EXPORT BaseProperty : public itk::Object, public XMLIO
 {
   public:
 
@@ -78,4 +78,5 @@ class BaseProperty : public itk::Object, public XMLIO
 
 
 #endif /* BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */
+
 

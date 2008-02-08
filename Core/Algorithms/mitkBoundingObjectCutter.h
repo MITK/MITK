@@ -37,7 +37,7 @@ namespace mitk {
 //## Pixel on the outside of the BoundingObject will have a pixelvalue of m_OutsideValue
 //## \todo What Image resolution/spacing should be used, if no input image is given?
 //## @ingroup Process
-class BoundingObjectCutter : public ImageToImageFilter
+class MITK_CORE_EXPORT BoundingObjectCutter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
@@ -125,5 +125,6 @@ protected:
 } // namespace mitk
 
 #endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */
+
 
 

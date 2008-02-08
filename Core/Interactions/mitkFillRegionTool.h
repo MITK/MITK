@@ -37,7 +37,7 @@ namespace mitk
 
   $Author$
 */
-class FillRegionTool : public SetRegionTool
+class MITK_CORE_EXPORT FillRegionTool : public SetRegionTool
 {
   public:
     
@@ -54,9 +54,10 @@ class FillRegionTool : public SetRegionTool
 
 };
 
-MITK_TOOL_FACTORY_MACRO(FillRegionTool, "MITK 2D contour drawing tool (add contour)")
+MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, FillRegionTool, "MITK 2D contour drawing tool (add contour)")
 
 } // namespace
 
 #endif
+
 

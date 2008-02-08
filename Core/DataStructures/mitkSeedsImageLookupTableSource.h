@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class SeedsImageLookupTableSource : public LookupTableSource
+class MITK_CORE_EXPORT SeedsImageLookupTableSource : public LookupTableSource
 {
 public:
   typedef enum {Seeds, DefaultLUT, Force} LookupTableMode;

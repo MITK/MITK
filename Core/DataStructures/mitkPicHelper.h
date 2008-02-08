@@ -31,7 +31,7 @@ class SlicedGeometry3D;
 //##Documentation
 //## @brief Internal class for managing references on sub-images
 //## @ingroup Data
-class PicHelper
+class MITK_CORE_EXPORT PicHelper
 {
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }

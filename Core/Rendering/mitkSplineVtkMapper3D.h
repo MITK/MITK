@@ -32,7 +32,7 @@ namespace mitk
   //## properties looked for:
   //## "line width" = with of the spline
   //## @ingroup Mapper
-class SplineVtkMapper3D : public PointSetVtkMapper3D
+class MITK_CORE_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
 {
 public:
 
@@ -87,4 +87,5 @@ protected:
 
 
 #endif
+
 

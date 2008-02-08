@@ -64,7 +64,7 @@ class PointSet;
   *
   * @ingroup Mapper
   */
-class PointSetVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT PointSetVtkMapper3D : public BaseVtkMapper3D
 {
 public:
   mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);

@@ -55,7 +55,7 @@ namespace mitk {
 //## unless you can be sure that the underlying geometry of @a displaygeometry
 //## is really the @a certaingeometry.
 //## @ingroup Geometry
-class DisplayGeometry : public Geometry2D
+class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 {
 public:
   mitkClassMacro(DisplayGeometry,Geometry2D);

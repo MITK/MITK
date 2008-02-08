@@ -32,7 +32,7 @@ namespace mitk {
  *
  * @ingroup Undo
  */
-class PlaneOperation : public PointOperation
+class MITK_CORE_EXPORT PlaneOperation : public PointOperation
 {
 public:
   PlaneOperation( OperationType operationType, Point3D point, Vector3D normal );
@@ -50,4 +50,5 @@ private:
 
 
 #endif /* MITKPlaneOperation_H */
+
 

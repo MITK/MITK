@@ -41,7 +41,7 @@ class vtkCellArray;
 namespace mitk
 {
 
-class PointDataVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT PointDataVtkMapper3D : public BaseVtkMapper3D
 {
 public:
 
@@ -77,4 +77,5 @@ protected:
 
 
 #endif
+
 

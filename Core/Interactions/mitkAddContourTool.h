@@ -42,7 +42,7 @@ namespace mitk
 
   $Author$
 */
-class AddContourTool : public ContourTool
+class MITK_CORE_EXPORT AddContourTool : public ContourTool
 {
   public:
     
@@ -59,9 +59,10 @@ class AddContourTool : public ContourTool
 
 };
 
-MITK_TOOL_FACTORY_MACRO(AddContourTool, "MITK 2D contour drawing tool (add contour)")
+MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, AddContourTool, "MITK 2D contour drawing tool (add contour)")
 
 } // namespace
 
 #endif
+
 

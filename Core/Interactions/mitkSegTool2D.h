@@ -60,7 +60,7 @@ class BaseRenderer;
 
   $Author$
 */
-class SegTool2D : public SegTool3D
+class MITK_CORE_EXPORT SegTool2D : public SegTool3D
 {
   public:
     
@@ -156,4 +156,5 @@ class SegTool2D : public SegTool3D
 } // namespace
 
 #endif
+
 

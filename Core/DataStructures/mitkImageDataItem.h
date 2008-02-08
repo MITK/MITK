@@ -30,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief Internal class for managing references on sub-images
 //## @ingroup Data
-class ImageDataItem : public itk::LightObject
+class MITK_CORE_EXPORT ImageDataItem : public itk::LightObject
 {
 public:
   mitkClassMacro(ImageDataItem, itk::LightObject);

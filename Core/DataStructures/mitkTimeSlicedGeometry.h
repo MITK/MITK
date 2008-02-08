@@ -45,7 +45,7 @@ namespace mitk {
 //## itk::DataObject::UpdateOutputInformation().
 //## 
 //## @ingroup Geometry
-class TimeSlicedGeometry : public Geometry3D
+class MITK_CORE_EXPORT TimeSlicedGeometry : public Geometry3D
 {
 public:
   mitkClassMacro(TimeSlicedGeometry, Geometry3D);

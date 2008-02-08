@@ -31,7 +31,7 @@ namespace mitk {
   //## Those must implement the abstract
   //## method vtkProp* GetProp().
   //## @ingroup Mapper
-  class BaseVtkMapper2D : public Mapper2D
+  class MITK_CORE_EXPORT BaseVtkMapper2D : public Mapper2D
   {
   public:
     virtual vtkProp* GetProp() = 0;

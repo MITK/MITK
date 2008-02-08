@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class LevelWindowPreset : public vtkXMLParser
+  class MITK_CORE_EXPORT LevelWindowPreset : public vtkXMLParser
   {
   public:
     LevelWindowPreset();

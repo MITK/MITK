@@ -25,7 +25,7 @@ class SocketClient;
 
 namespace mitk{
 
-class InteractionDebug
+class MITK_CORE_EXPORT InteractionDebug
 {
   static InteractionDebug* m_Instance;
   static char* m_FileName;

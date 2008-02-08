@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
@@ -62,5 +62,6 @@ private:
 } // end namespace mitk
 
 #endif // UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+
 
 

@@ -34,7 +34,7 @@ namespace mitk
 
   Last contributor $Author$
 */
-class OrganTypeProperty : public EnumerationProperty
+class MITK_CORE_EXPORT OrganTypeProperty : public EnumerationProperty
 {
   public:
     
@@ -54,4 +54,5 @@ class OrganTypeProperty : public EnumerationProperty
 } // namespace
 
 #endif
+
 

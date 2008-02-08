@@ -35,7 +35,7 @@ namespace mitk {
 //##Documentation
 //## @brief Vtk-based mapper for mitk::Contour
 //## @ingroup Mapper
-class ContourVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT ContourVtkMapper3D : public BaseVtkMapper3D
 {
 public:
   mitkClassMacro(ContourVtkMapper3D, BaseVtkMapper3D);

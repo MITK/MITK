@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of VtkImageReader objects using an object factory.
 //##
 //## @ingroup IO
-class VtkImageIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT VtkImageIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

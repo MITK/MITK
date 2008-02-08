@@ -32,7 +32,7 @@ namespace mitk {
   //## A name and an ID is added to the information of an event, so the event can
   //## be processed futher on.
   //## @ingroup Interaction
-  class EventDescription : public Event
+  class MITK_CORE_EXPORT EventDescription : public Event
   {
   public:
     //##ModelId=3E5B30A30095

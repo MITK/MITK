@@ -29,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## @brief Create Planes perpendicular to lines containted in a Mesh
 //## @ingroup Process
-class PlanesPerpendicularToLinesFilter : public GeometryDataSource
+class MITK_CORE_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
 {
 public:
   mitkClassMacro(PlanesPerpendicularToLinesFilter, GeometryDataSource);

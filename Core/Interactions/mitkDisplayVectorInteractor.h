@@ -33,7 +33,7 @@ namespace mitk {
   * This includes the interaction of Zooming and Panning.
   * @ingroup Interaction
   **/
-  class DisplayVectorInteractor : public StateMachine
+  class MITK_CORE_EXPORT DisplayVectorInteractor : public StateMachine
   {
   public:
     mitkClassMacro(DisplayVectorInteractor, StateMachine);
@@ -75,4 +75,5 @@ namespace mitk {
 
 
 #endif /* MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB */
+
 

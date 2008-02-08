@@ -42,7 +42,7 @@ namespace mitk {
  * This class is instanciated as a member of the mitk::OpenGLRenderer
  * and should be only accounted via the Renderer.
  */
-class ColoredRectangleRendering : public BaseData
+class MITK_CORE_EXPORT ColoredRectangleRendering : public BaseData
 {
 public:
 

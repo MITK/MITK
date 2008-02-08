@@ -26,7 +26,7 @@ namespace mitk {
  * \brief Interface for FileWriters with extra information.
  * Should be merged into FileWriter. 
 */
-class FileWriterWithInformation : public FileWriter {
+class MITK_CORE_EXPORT FileWriterWithInformation : public FileWriter {
   public:
     mitkClassMacro(FileWriterWithInformation,FileWriter);
 
@@ -37,4 +37,5 @@ class FileWriterWithInformation : public FileWriter {
 };
 }
 #endif
+
 

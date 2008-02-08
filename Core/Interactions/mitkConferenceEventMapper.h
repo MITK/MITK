@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class ConferenceEventMapper : public EventMapper
+  class MITK_CORE_EXPORT ConferenceEventMapper : public EventMapper
   {
     public:
       ConferenceEventMapper();
@@ -42,4 +42,5 @@ namespace mitk {
 } // namespace mitk
 
 #endif
+
 

@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of VtiFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class VtiFileIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT VtiFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

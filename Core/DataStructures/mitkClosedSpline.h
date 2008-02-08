@@ -25,7 +25,7 @@ class vtkCardinalSpline;
 
 namespace mitk {
 
-class ClosedSpline: public PointSet 
+class MITK_CORE_EXPORT ClosedSpline: public PointSet 
 {
 public:
   mitkClassMacro(ClosedSpline, PointSet);
@@ -43,7 +43,7 @@ public:
   };
 
   //##@brief struct for spline marks
-  class SplineMarkerDataType 
+  class MITK_CORE_EXPORT SplineMarkerDataType 
   {
     unsigned int id;  //to give the point a special ID
     unsigned int segment; //spline segment number - segments are defined by tow surounding points
@@ -101,4 +101,5 @@ private:
 } // namespace mitk
 
 #endif /* MITKClosedSpline_H_HEADER_INCLUDED */
+
 

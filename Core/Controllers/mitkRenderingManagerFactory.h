@@ -44,7 +44,7 @@ namespace mitk
  * cannot easily be controlled).
  * \ingroup Renderer
  */
-class RenderingManagerFactory
+class MITK_CORE_EXPORT RenderingManagerFactory
 {
 public:
   virtual ~RenderingManagerFactory() {};

@@ -40,7 +40,7 @@ namespace mitk {
   * During buildprocess at runtime each statemachine is parsed for well formed style.
   * @ingroup Interaction
   **/
-  class StateMachineFactory : public vtkXMLParser
+  class MITK_CORE_EXPORT StateMachineFactory : public vtkXMLParser
   {
   public:
     /**

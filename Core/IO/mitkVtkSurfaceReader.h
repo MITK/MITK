@@ -24,7 +24,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read surface files in vtk-format
 //## @ingroup IO
-class VtkSurfaceReader : public SurfaceSource
+class MITK_CORE_EXPORT VtkSurfaceReader : public SurfaceSource
 {
 public:
     mitkClassMacro(VtkSurfaceReader, SurfaceSource);

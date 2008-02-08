@@ -68,7 +68,7 @@ typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
 //## @ingroup Geometry
-class Geometry3D : public AffineGeometryFrame3D, public OperationActor, public XMLIO
+class MITK_CORE_EXPORT Geometry3D : public AffineGeometryFrame3D, public OperationActor, public XMLIO
 {
 public:
   mitkClassMacro(Geometry3D, AffineGeometryFrame3D);

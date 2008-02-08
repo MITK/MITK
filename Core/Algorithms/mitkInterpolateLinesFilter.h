@@ -42,7 +42,7 @@ namespace mitk {
 //## in 2D between them, and map them back via the 
 //## Geometry2D in the 3D-world. 
 //## @ingroup Process
-class InterpolateLinesFilter : public SurfaceSource
+class MITK_CORE_EXPORT InterpolateLinesFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(InterpolateLinesFilter, SurfaceSource);

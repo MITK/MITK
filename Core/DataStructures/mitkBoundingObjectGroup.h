@@ -28,7 +28,7 @@ namespace mitk {
 //##
 //## Calculates a bounding box that contains all sub-bounding boxes.
 //## @ingroup Data
-class BoundingObjectGroup : public mitk::BoundingObject
+class MITK_CORE_EXPORT BoundingObjectGroup : public mitk::BoundingObject
 {
 public:
   typedef itk::VectorContainer<unsigned int, mitk::BoundingObject::Pointer> BoundingObjectContainer;

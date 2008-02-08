@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+#include "mitkCommon.h"
 
 namespace mitk
 {
@@ -30,7 +31,7 @@ namespace mitk
   Call mitk::StandardFileLocations::FindFile(filename) to look for configuration files.
   Call mitk::StandardFileLocations::GetOptionDirectory() to look for/save option files.
   */
-  class StandardFileLocations : public itk::Object 
+  class MITK_CORE_EXPORT StandardFileLocations : public itk::Object 
   {
   public:
     typedef  StandardFileLocations   Self;
@@ -104,4 +105,5 @@ namespace mitk
 } // namespace
 
 #endif
+
 

@@ -31,7 +31,7 @@ namespace mitk {
   //## value of the requested data types GetNameOfClass() method.
   //## 
   //## @ingroup DataStorage
-  class NodePredicateDataType : public NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateDataType : public NodePredicateBase
   {
   public:
     //##Documentation

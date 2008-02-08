@@ -29,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## @brief Class for defining the data type of pixels 
 //## @ingroup Data
-class PixelType
+class MITK_CORE_EXPORT PixelType
 {
 public:
   itkTypeMacro(PixelType, None);

@@ -45,7 +45,7 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is 
  * rendered in 3D via a vtkPolyData.
  */
-class PointSetSliceMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT PointSetSliceMapper2D : public GLMapper2D
 {
 public:
 

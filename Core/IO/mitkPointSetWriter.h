@@ -35,7 +35,7 @@ namespace mitk
  * yet supported.
  * @ingroup Process
  */
-class PointSetWriter : public mitk::FileWriter
+class MITK_CORE_EXPORT PointSetWriter : public mitk::FileWriter
 {
 public:
 

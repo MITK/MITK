@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
 #include "mitkVector.h"
+#include "mitkCommon.h"
 
 struct ipPicDescriptor;
 
@@ -40,7 +41,7 @@ class Image;
 //## level window is initialized from an image.
 //##
 //## @ingroup DataTree
-class LevelWindow
+class MITK_CORE_EXPORT LevelWindow
 {
 public:
   LevelWindow(ScalarType level=127.5, ScalarType window=255.0);

@@ -41,7 +41,7 @@ class SlicedGeometry3D;
 //## 
 //## SlicedData-objects have geometries of type SlicedGeometry3D or sub-classes.
 //## @ingroup Data
-class SlicedData : public BaseData
+class MITK_CORE_EXPORT SlicedData : public BaseData
 {
 public:
   mitkClassMacro(SlicedData, BaseData);

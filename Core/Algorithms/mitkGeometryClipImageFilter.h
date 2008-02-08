@@ -37,7 +37,7 @@ namespace mitk {
 //## or a TimeSlicedGeometry containing multiple instances
 //## of Geometry2D
 //## @ingroup Process
-class GeometryClipImageFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT GeometryClipImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);
@@ -155,4 +155,5 @@ public:
 } // namespace mitk
 
 #endif /* MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
+
 

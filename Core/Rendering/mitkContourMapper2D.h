@@ -34,7 +34,7 @@ class Contour;
  * 
  * @ingroup Mapper
  */
-class ContourMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT ContourMapper2D : public GLMapper2D
 {
 public:
     

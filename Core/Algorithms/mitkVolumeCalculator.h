@@ -32,7 +32,7 @@ namespace mitk
   //##Documentation
   //## @brief Provides an easy way to calculate the volume of a mitk::Image
   //## The given volume is in milliliters. There is also a method to get the raw voxel count.
-  class VolumeCalculator : public itk::Object
+  class MITK_CORE_EXPORT VolumeCalculator : public itk::Object
   {
   public:
     mitkClassMacro(VolumeCalculator,itk::Object);
@@ -66,4 +66,5 @@ namespace mitk
 } // namespace mitk
 
 #endif /* VOLUME_CALCULATOR_H_HEADER_INCLUDED */
+
 

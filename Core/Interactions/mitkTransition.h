@@ -38,7 +38,7 @@ namespace mitk {
   * Several actions are stored, that have to be executed after the statechange.
   * @ingroup Interaction
   **/
-  class Transition : public itk::Object
+  class MITK_CORE_EXPORT Transition : public itk::Object
   {
   public:
     mitkClassMacro(Transition, itk::Object);

@@ -28,7 +28,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in DKFZ-pic-format
 //## @ingroup IO
-class PicFileReader : public ImageSource, public FileReader
+class MITK_CORE_EXPORT PicFileReader : public ImageSource, public FileReader
 {
 public:
     mitkClassMacro(PicFileReader, FileReader);
@@ -86,4 +86,5 @@ protected:
 } // namespace mitk
 
 #endif /* PICFILEREADER_H_HEADER_INCLUDED_C1F48A22 */
+
 

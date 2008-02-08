@@ -51,7 +51,7 @@ class HierarchicalInteractor;
 //## the appropriate type of event to process the actions. Especially in guarding states (a state, that checks certain conditions (e.g. is picked)
 //## the according Event must be called to continue in states. No return false here!
 //## @ingroup Interaction
-class Interactor : public StateMachine
+class MITK_CORE_EXPORT Interactor : public StateMachine
 {
 public:
     mitkClassMacro(Interactor, StateMachine);
@@ -159,4 +159,5 @@ protected:
 
 }//namespace mitk
 #endif /* INTERACTOR_H_HEADER_INCLUDED */
+
 

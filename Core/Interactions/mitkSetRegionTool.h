@@ -43,7 +43,7 @@ class Image;
 
   $Author$
 */
-class SetRegionTool : public SegTool2D
+class MITK_CORE_EXPORT SetRegionTool : public SegTool2D
 {
   public:
     
@@ -73,4 +73,5 @@ class SetRegionTool : public SegTool2D
 } // namespace
 
 #endif
+
 

@@ -31,7 +31,7 @@ class DataTreeNode;
 //## This interface can be implemented by factories which add new mapper classes or extend the
 //## data tree deserialization mechanism.
 
-class CoreObjectFactoryBase : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::ObjectFactoryBase
 {
   public:
     mitkClassMacro(CoreObjectFactoryBase,itk::ObjectFactoryBase);

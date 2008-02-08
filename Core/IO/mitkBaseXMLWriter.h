@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stack>
 #include <sstream>
 
+#include "mitkCommon.h"
+
 namespace mitk{
 
   //##Documentation
@@ -37,10 +39,10 @@ namespace mitk{
   //## The XMLIO class manages the writing and reading of the data.
   //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
   //## @ingroup IO
-  class BaseXMLWriter {
+  class MITK_CORE_EXPORT BaseXMLWriter {
     
     /// encapsulates all information of a node in a stream
-    class StreamNode
+    class MITK_CORE_EXPORT StreamNode
     {
     public:
       StreamNode( std::string name ): m_Name(name){};

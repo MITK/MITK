@@ -36,7 +36,7 @@ namespace mitk {
 //## the last it goes to the first.
 //## if it is not set, it returnes NULL if it steps behind the last Widget.
 //## @ingroup Interaction
-  class FocusManager : public itk::Object
+  class MITK_CORE_EXPORT FocusManager : public itk::Object
 {
   public:
   mitkClassMacro(FocusManager, itk::Object);

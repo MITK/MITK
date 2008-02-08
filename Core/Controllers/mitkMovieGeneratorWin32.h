@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 
-class MovieGeneratorWin32 : public MovieGenerator
+class MITK_CORE_EXPORT MovieGeneratorWin32 : public MovieGenerator
 {
 
 public:

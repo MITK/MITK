@@ -66,7 +66,7 @@ class ToolManager;
 
   $Author$
 */
-class Tool : public StateMachine
+class MITK_CORE_EXPORT Tool : public StateMachine
 {
   public:
 
@@ -133,7 +133,7 @@ class Tool : public StateMachine
       At the moment the verboseness-level is defined at compile-time 
       (and by default 0 - nearly no messages get to the commandline).
      */
-    class ToolLogger
+    class MITK_CORE_EXPORT ToolLogger
     {
 
       struct NullStream: std::ostream 
@@ -190,4 +190,5 @@ class Tool : public StateMachine
 } // namespace
 
 #endif
+
 

@@ -46,7 +46,7 @@ namespace mitk
  *
  * @ingroup DataTree
  */
-class EnumerationProperty : public BaseProperty
+class MITK_CORE_EXPORT EnumerationProperty : public BaseProperty
 {
 public:
 
@@ -210,4 +210,5 @@ private:
 } // namespace
 
 #endif
+
 

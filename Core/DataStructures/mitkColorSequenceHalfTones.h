@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class ColorSequenceHalfTones : public ColorSequence
+  class MITK_CORE_EXPORT ColorSequenceHalfTones : public ColorSequence
   {
     public:
     ColorSequenceHalfTones();
@@ -64,4 +64,5 @@ namespace mitk
 }
 
 #endif
+
 

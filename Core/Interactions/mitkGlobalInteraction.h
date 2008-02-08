@@ -58,7 +58,7 @@ namespace mitk {
   //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so 
   //## so that several geometric objects, that lie on top of each other, can be selected.
   //## @ingroup Interaction
- class GlobalInteraction : public StateMachine
+ class MITK_CORE_EXPORT GlobalInteraction : public StateMachine
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
@@ -227,4 +227,5 @@ namespace mitk {
 } // namespace mitk
 
 #endif /* GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A */
+
 

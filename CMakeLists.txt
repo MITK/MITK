@@ -10,7 +10,7 @@ INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")
 SET(LIBPOSTFIX "")
-SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib CACHE INTERNAL "Single output directory for building all libraries.")
+SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")
 
 # MITK_VERSION
@@ -74,7 +74,7 @@ IF(MITK_CHILI_PLUGIN)
 ENDIF(MITK_CHILI_PLUGIN)
 
 SET(CORE_DIRECTORIES DataStructures Algorithms IO Rendering Interactions Controllers)
-OPTION(MITK_BUILD_SINGLE_CORE_LIB "Build all subdirectories of Core into single library, required for dlls on win32" OFF)
+OPTION(MITK_BUILD_SINGLE_CORE_LIB "Build all subdirectories of Core into single library, required for dlls on win32" ON)
 MARK_AS_ADVANCED(MITK_BUILD_SINGLE_CORE_LIB)
 
 

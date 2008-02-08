@@ -34,7 +34,7 @@ namespace mitk {
   class UndoController;
   
   // base class of statem machine functors
-  class TStateMachineFunctor
+  class MITK_CORE_EXPORT TStateMachineFunctor
   {
     public:
       virtual bool DoAction(Action*, const StateEvent*)=0;        // call using function
@@ -127,7 +127,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
   map and call the appropriate method in your derived class.
 
 **/
-  class StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
+  class MITK_CORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
   {
 
   public:
@@ -272,4 +272,5 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
 
 
 #endif /* STATEMACHINE_H_HEADER_INCLUDED_C18896BD */
+
 

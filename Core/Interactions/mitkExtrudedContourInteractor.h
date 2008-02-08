@@ -29,7 +29,7 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
-  class ExtrudedContourInteractor : public mitk::Interactor
+  class MITK_CORE_EXPORT ExtrudedContourInteractor : public mitk::Interactor
   {
   public:
     mitkClassMacro(ExtrudedContourInteractor, Interactor);

@@ -33,7 +33,7 @@ namespace mitk
    * Points can be added, removed and moved.
    * \ingroup Interaction
    */
-  class PointSetInteractor : public Interactor
+  class MITK_CORE_EXPORT PointSetInteractor : public Interactor
   {
   public:
     mitkClassMacro(PointSetInteractor, Interactor);

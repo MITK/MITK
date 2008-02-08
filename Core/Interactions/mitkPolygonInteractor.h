@@ -32,7 +32,7 @@ namespace mitk
   //##
   //## Interact with a Polygon. 
   //## @ingroup Interaction
-  class PolygonInteractor : public HierarchicalInteractor
+  class MITK_CORE_EXPORT PolygonInteractor : public HierarchicalInteractor
   {
   public:
     mitkClassMacro(PolygonInteractor, HierarchicalInteractor);

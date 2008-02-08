@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class LevelWindowManager : public itk::Object {
+  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object {
   public:
 
     mitkClassMacro(LevelWindowManager, itk::Object)

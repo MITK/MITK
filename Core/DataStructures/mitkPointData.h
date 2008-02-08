@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class PointData : public mitk::BaseData
+class MITK_CORE_EXPORT PointData : public mitk::BaseData
 {
 public:
   mitkClassMacro( PointData, BaseData );

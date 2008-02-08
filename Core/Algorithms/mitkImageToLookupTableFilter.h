@@ -28,7 +28,7 @@ namespace mitk
 * Creates a mitk::LookupTable from an image. This may be used to 
 * create a default coloring scheme for vector images...
 */
-class ImageToLookupTableFilter : public LookupTableSource
+class MITK_CORE_EXPORT ImageToLookupTableFilter : public LookupTableSource
 {
 public:
 

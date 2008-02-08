@@ -36,7 +36,7 @@ namespace mitk
 
   $Author: maleike $
 */
-class DiffImageApplier : public itk::Object, public OperationActor
+class MITK_CORE_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
     
@@ -81,4 +81,5 @@ class DiffImageApplier : public itk::Object, public OperationActor
 } // namespace
 
 #endif
+
 

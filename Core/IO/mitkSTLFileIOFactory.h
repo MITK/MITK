@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of STLFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class STLFileIOFactory : public itk::ObjectFactoryBase
+class MITK_CORE_EXPORT STLFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

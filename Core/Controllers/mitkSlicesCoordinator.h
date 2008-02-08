@@ -43,7 +43,7 @@ class StateEvent;
  * rotation, is done in subclasses. This separation is done for the case that 
  * some other multi-slice coordination should be implemented.
  */
-class SlicesCoordinator : public StateMachine
+class MITK_CORE_EXPORT SlicesCoordinator : public StateMachine
 {
 public:
 
@@ -95,4 +95,5 @@ protected:
 } // namespace 
 
 #endif 
+
 

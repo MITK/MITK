@@ -32,7 +32,7 @@ namespace mitk {
 //##Documentation
 //## @brief 
 //## @ingroup Process
-class MaskImageFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT MaskImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(MaskImageFilter, ImageToImageFilter);
@@ -100,4 +100,5 @@ protected:
 } // namespace mitk
 
 #endif /* MITKMASKIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
+
 

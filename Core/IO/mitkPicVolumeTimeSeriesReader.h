@@ -29,7 +29,7 @@ namespace mitk
 //##Documentation
 //## @brief Reader to read a series of volume files in DKFZ-pic-format
 //## @ingroup IO
-class PicVolumeTimeSeriesReader : public ImageSource, public FileSeriesReader
+class MITK_CORE_EXPORT PicVolumeTimeSeriesReader : public ImageSource, public FileSeriesReader
 {
 public:
     mitkClassMacro( PicVolumeTimeSeriesReader, FileReader );
@@ -66,4 +66,5 @@ protected:
 } // namespace mitk
 
 #endif 
+
 

@@ -62,7 +62,7 @@ class XMLWriter;
  * 
  * @ingroup DataTree
  */
-class PropertyList : public itk::Object, public XMLIO
+class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
 {
 
   public:
@@ -175,4 +175,5 @@ class PropertyList : public itk::Object, public XMLIO
 } // namespace mitk
 
 #endif /* PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D */
+
 

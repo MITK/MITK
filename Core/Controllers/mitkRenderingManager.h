@@ -67,7 +67,7 @@ class RenderingManagerFactory;
  * update frequency of a 3D window could be less then that of a 2D window
  * \ingroup Renderer
  */
-class RenderingManager : public itk::Object
+class MITK_CORE_EXPORT RenderingManager : public itk::Object
 {
 public:
 

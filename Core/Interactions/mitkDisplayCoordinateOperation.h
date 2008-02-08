@@ -37,7 +37,7 @@ namespace mitk {
   //##Documentation
   //## @brief Operation with informations necessary for operations of DisplayVectorInteractor
   //## @ingroup Undo
-  class DisplayCoordinateOperation : public Operation
+  class MITK_CORE_EXPORT DisplayCoordinateOperation : public Operation
   {
   public:
     //##ModelId=3EF1D349027C

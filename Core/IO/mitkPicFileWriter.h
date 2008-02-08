@@ -37,7 +37,7 @@ class Image;
  * @brief Writer for mitk::Image
  * @ingroup IO
  */
-class PicFileWriter : public mitk::FileWriter
+class MITK_CORE_EXPORT PicFileWriter : public mitk::FileWriter
 {
 public:
 

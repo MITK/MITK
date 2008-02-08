@@ -3,6 +3,7 @@
   this file is generated. Do not change!
 */
 #define MITK_ROOT "${PROJECT_SOURCE_DIR}/"
+#cmakedefine MITK_BUILD_SHARED_CORE
 #cmakedefine USE_ITKZLIB
 #cmakedefine MITK_CHILI_PLUGIN
 #define MITK_CHILI_PLUGIN_SDK_IPPIC_H "@MITK_CHILI_PLUGIN_SDK_IPPIC_H@"

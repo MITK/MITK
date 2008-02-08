@@ -29,7 +29,7 @@ class vtkRenderWindowInteractor;
 namespace mitk
 {
 
-class NativeRenderWindowInteractor : public itk::Object
+class MITK_CORE_EXPORT NativeRenderWindowInteractor : public itk::Object
 {
 public:
   mitkClassMacro(NativeRenderWindowInteractor, itk::Object);
@@ -52,4 +52,5 @@ protected:
 
 }
 #endif /* MITKNATIVERENDERWINDOWINTERACTOR_H_HEADER_INCLUDED_C1C53722 */
+
 

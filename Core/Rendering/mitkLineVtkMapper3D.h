@@ -49,7 +49,7 @@ namespace mitk {
 //## @brief Vtk-based mapper to draw Lines from PointSet
 //##
 //## @ingroup Mapper
-class LineVtkMapper3D : public PointSetVtkMapper3D
+class MITK_CORE_EXPORT LineVtkMapper3D : public PointSetVtkMapper3D
 {
   public:
 

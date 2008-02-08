@@ -27,7 +27,7 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
-  class ContourInteractor : public mitk::Interactor
+  class MITK_CORE_EXPORT ContourInteractor : public mitk::Interactor
   {
   public:
     mitkClassMacro(ContourInteractor, Interactor);

@@ -49,7 +49,7 @@ namespace mitk {
 //## @brief Vtk-based mapper for VolumeData
 //##
 //## @ingroup Mapper
-class VolumeDataVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT VolumeDataVtkMapper3D : public BaseVtkMapper3D
 {
 public:
   mitkClassMacro(VolumeDataVtkMapper3D, BaseVtkMapper3D);

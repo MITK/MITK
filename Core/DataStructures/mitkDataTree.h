@@ -65,7 +65,7 @@ typedef	itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
 //## @ingroup DataTree
-class DataTree : public DataTreeBase
+class MITK_CORE_EXPORT DataTree : public DataTreeBase
 {
 
 public:
@@ -178,4 +178,5 @@ protected:
 
 } // namespace mitk
 #endif /* DATATREE_H_HEADER_INCLUDED_C1C7797C */
+
 

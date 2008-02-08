@@ -30,7 +30,7 @@ namespace mitk {
   //## NodePredicateData(NULL) returns true if a DataTreeNode does not have a data object (e.g. ->GetData() returns NULL).
   //## This could return an unexpected number of nodes (e.g. the root node of the tree)
   //## @ingroup DataStorage
-  class NodePredicateData : public NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateData : public NodePredicateBase
   {
   public:
     //##Documentation

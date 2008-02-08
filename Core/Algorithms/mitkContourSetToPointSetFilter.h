@@ -35,7 +35,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class ContourSetToPointSetFilter : public PointSetSource
+class MITK_CORE_EXPORT ContourSetToPointSetFilter : public PointSetSource
 {
 public:
   mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);

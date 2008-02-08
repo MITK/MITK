@@ -50,7 +50,7 @@ namespace mitk {
  * \brief Vtk-based mapper for PointList
  * \ingroup Mapper
  */
-class MeshVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT MeshVtkMapper3D : public BaseVtkMapper3D
 {
 public:
 

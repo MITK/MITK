@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Base class of all mappers for 3D display
 //## @ingroup Mapper
-class Mapper3D : public Mapper
+class MITK_CORE_EXPORT Mapper3D : public Mapper
 {
   public:
     mitkClassMacro(Mapper3D,Mapper);

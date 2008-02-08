@@ -41,7 +41,7 @@ class DisplayGeometry;
 //## OpenGL-based mapper to display a Geometry2D in a 2D window. The result is
 //## normally a line. An important usage of this class is to show the
 //## orientation of the slices displayed in other 2D windows.
-class SurfaceMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT SurfaceMapper2D : public GLMapper2D
 {
 public:
   mitkClassMacro(SurfaceMapper2D, GLMapper2D);

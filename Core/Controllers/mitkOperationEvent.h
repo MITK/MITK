@@ -43,7 +43,7 @@ namespace mitk {
 //## Currently this is used only by PointSetInteractor. How this is done and when to use
 //## GroupEventIDs is still undocumented.
 //## @ingroup Undo
-class UndoStackItem
+class MITK_CORE_EXPORT UndoStackItem
 {
   public:
     UndoStackItem(std::string description = "");
@@ -144,7 +144,7 @@ class UndoStackItem
 //## check this flag before you call anything on destination
 //##
 //## @ingroup Undo
-class OperationEvent : public UndoStackItem
+class MITK_CORE_EXPORT OperationEvent : public UndoStackItem
 {
 public:
   //OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId );

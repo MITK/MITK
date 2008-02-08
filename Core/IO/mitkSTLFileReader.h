@@ -24,7 +24,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in stl-format
 //## @ingroup IO
-class STLFileReader : public SurfaceSource
+class MITK_CORE_EXPORT STLFileReader : public SurfaceSource
 {
 public:
     mitkClassMacro(STLFileReader, SurfaceSource);

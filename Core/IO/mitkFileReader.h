@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-class FileReader
+class MITK_CORE_EXPORT FileReader
 {
   public:
     //##ModelId=3EF4A7BC0213
@@ -90,4 +90,5 @@ protected:
 };
 } // namespace mitk
 #endif /* FILEREADER_H_HEADER_INCLUDED_C1E7E521 */
+
 

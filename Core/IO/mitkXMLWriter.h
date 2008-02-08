@@ -35,7 +35,7 @@ namespace mitk{
   //## The XMLIO class manages the writing and reading of data.
   //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
   //## @ingroup IO
-  class XMLWriter : public BaseXMLWriter {
+  class MITK_CORE_EXPORT XMLWriter : public BaseXMLWriter {
 
     std::string m_Filename;
     std::string m_SubFolder;

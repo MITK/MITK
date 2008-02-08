@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 
+#include "mitkCommon.h"
 
 namespace mitk {
   class DataTreeNode;
@@ -31,7 +32,7 @@ namespace mitk {
   //## and that are tagged as Organtype == 'Liver'".
   //##
   //## @ingroup DataStorage
-  class NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateBase
   {
 
   public:

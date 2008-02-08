@@ -36,7 +36,7 @@ namespace mitk
  * for mitk::BaseDataSource.
  * @ingroup Process
  */
-class BaseDataSource : public BaseProcess
+class MITK_CORE_EXPORT BaseDataSource : public BaseProcess
 {
 public:
     mitkClassMacro( BaseDataSource, BaseProcess );

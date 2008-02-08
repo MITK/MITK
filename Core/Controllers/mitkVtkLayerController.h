@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 #include <map>
+#include "mitkCommon.h"
+
 class vtkRenderWindow;
 class vtkRenderer;
 
@@ -35,7 +37,7 @@ namespace mitk
  * Renderers can be registered via the insert... functions and 
  * removed via the RemoveRenderer function.
  */
-class VtkLayerController
+class MITK_CORE_EXPORT VtkLayerController
 {
 	public:
     VtkLayerController(vtkRenderWindow* renderWindow);
@@ -121,4 +123,5 @@ class VtkLayerController
 
 
 #endif /* MITKVTKLAYERCONTROLLER_H_HEADER_INCLUDED_C1EDO02D */
+
 

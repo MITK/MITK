@@ -37,7 +37,7 @@ class BaseRenderer;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class Geometry2DDataMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper2D
 {
 
 public:

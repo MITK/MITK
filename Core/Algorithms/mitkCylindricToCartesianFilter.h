@@ -32,7 +32,7 @@ namespace mitk {
 //## @todo tag with transducer position not yet transformed.
 //## @todo the line limiting the sector is assumed to be available as a pic tag. Is this ok?
 //## @ingroup Process
-class CylindricToCartesianFilter : public ImageToImageFilter
+class MITK_CORE_EXPORT CylindricToCartesianFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(CylindricToCartesianFilter, ImageToImageFilter);
@@ -100,4 +100,5 @@ protected:
 } // namespace mitk
 
 #endif /* MITKCYLINDRICTOCARTESIANFILTER_H_HEADER_INCLUDED_C1F48A22 */
+
 

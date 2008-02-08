@@ -165,10 +165,11 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
+  std::cout << "getting contour from offset " << oneContourOffset << " ("<<oneContourOffset%originalPicSlice->n[0]<<","<<oneContourOffset/originalPicSlice->n[0]<<")"<<std::endl;
   float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
   
-  // \todo: this fails
-  //assert(contourPoints == NULL && numberOfContourPoints > 0);
+  std::cout << "contourPoints " << contourPoints << " (N="<<numberOfContourPoints<<")"<<std::endl;
+  assert(contourPoints == NULL || numberOfContourPoints > 0);
     
   bool cursorInsideContour = ipMITKSegmentationIsInsideContour( contourPoints, numberOfContourPoints, projectedPointIn2D[0], projectedPointIn2D[1]);
 

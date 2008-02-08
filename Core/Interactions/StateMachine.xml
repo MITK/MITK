@@ -3179,6 +3179,25 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
+  <stateMachine NAME="OnePointDoubleClickInteraction">
+    <state NAME="empty" ID="0" START_STATE="TRUE">
+      <transition NAME="doubleclick" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="10" />
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="103" />
+      </transition>
+    </state>
+    <state NAME="point available" ID="1">
+      <transition NAME="doubleclick" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="103" />
+        <action ID="10" />
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="103" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="CurveModelInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="918" Y_POS="441" WIDTH="100" HEIGHT="50">

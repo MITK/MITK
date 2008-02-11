@@ -1042,6 +1042,45 @@ void QmitkMainTemplate::parseCommandLine()
   }
 }
 
+/**
+ * returns true, when the application is run in testing mode and
+ * false otherwise
+ */
+bool QmitkMainTemplate::IsTesting( )
+{
+  bool testing = false;
+  for ( int i = 1; i < qApp->argc(); ++i )
+  {
+    if ( strcmp ( qApp->argv() [i], "-testing" ) == 0 )
+    {
+      testing = true;
+      break;
+    }
+    else if ( strcmp ( qApp->argv() [i], "-testEmptyImage" ) == 0 )
+    {
+      testing = true;
+      break;
+    }
+    else if ( strcmp ( qApp->argv() [i], "-testEmptySurface" ) == 0 )
+    {
+      testing = true;
+      break;
+    }
+    else if ( strcmp ( qApp->argv() [i], "-testEmptyPointSet" ) == 0 )
+    {
+      testing = true;
+      break;
+    }
+    else if ( strcmp ( qApp->argv() [i], "-testEmptyNode" ) == 0 )
+    {
+      testing = true;
+      break;
+    }
+  }
+  return testing;
+}
+
+
 mitk::DataTree::Pointer QmitkMainTemplate::GetTree()
 {
   return m_Tree;
@@ -1636,3 +1675,4 @@ void QmitkMainTemplate::dragEnterEvent( QDragEnterEvent *event )
 {   // accept drags
     event->accept();
 }
+

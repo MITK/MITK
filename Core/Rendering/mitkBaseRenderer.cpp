@@ -202,6 +202,9 @@ mitk::BaseRenderer::~BaseRenderer()
 {
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
+  
+  mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
+  
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
   m_DataTreeIterator = NULL;
 }

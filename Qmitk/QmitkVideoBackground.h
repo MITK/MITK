@@ -70,7 +70,7 @@ public:
     ResetVideoBackground();
   }
   ////##Documentation
-  ////## @brief sets the update rate of the video in milli seconds, by default 50.
+  ////## @brief sets the update rate of the video in milli seconds, by default 25.
   void SetTimerDelay(int ms)
   {
     m_TimerDelay = ms;

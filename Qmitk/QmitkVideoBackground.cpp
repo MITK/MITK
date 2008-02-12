@@ -175,25 +175,3 @@ void QmitkVideoBackground::UpdateVideo()
     m_RenderWindow->Render();
   } 
 }
-
- // how to superimpose a logo
- // vtkCamera*          camera2        = vtkCamera::New();
- // vtkImageMapper   *   mapper2D      = vtkImageMapper::New();
- // vtkPNGReader      *  pngReader   = vtkPNGReader::New();
- // vtkActor2D      *    actor2D     = vtkActor2D::New();
- // pngReader->SetFileName("D:\\mbilogo.png");
- // pngReader->Update();
- // mapper2D->SetInput(pngReader->GetOutput());
- // double range[2];
- // pngReader->GetOutput()->GetScalarRange(range);
- // mapper2D->SetColorWindow(range[1] - range[0] );
- // mapper2D->SetColorLevel((range[0]+range[1])/2);
- // actor2D->SetPosition(0,0);
- ///* actor2D->SetWidth(300);
- // actor2D->SetHeight(200);*/
- // actor2D->SetMapper(mapper2D);
- // actor2D->SetLayerNumber(99);
- // m_RenderWindow->GetVtkLayerController()->GetSceneRenderer()->AddActor2D(actor2D);
-  /*renderer2->SetActiveCamera(camera);
-  renderer2->ResetCamera();
-  m_RenderWindow->GetVtkLayerController()->InsertForegroundRenderer(renderer2,true);*/

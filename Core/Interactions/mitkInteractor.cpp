@@ -94,7 +94,7 @@ void mitk::Interactor::CreateModeOperation(ModeType mode)
   this->ExecuteOperation(doOp);
 }
 
-bool mitk::Interactor::OnModeDeselect(Action* action, StateEvent const*)
+bool mitk::Interactor::OnModeDeselect(Action* /*action*/, StateEvent const*)
 {
   GlobalInteraction* global = GlobalInteraction::GetInstance();
   if (global == NULL)
@@ -108,7 +108,7 @@ bool mitk::Interactor::OnModeDeselect(Action* action, StateEvent const*)
   return true;
 }
 
-bool mitk::Interactor::OnModeSelect(Action* action, StateEvent const*)
+bool mitk::Interactor::OnModeSelect(Action* /*action*/, StateEvent const*)
 {
   GlobalInteraction* global = GlobalInteraction::GetInstance();
   if (global == NULL)
@@ -122,7 +122,7 @@ bool mitk::Interactor::OnModeSelect(Action* action, StateEvent const*)
   return true;
 }
 
-bool mitk::Interactor::OnModeSubSelect(Action* action, StateEvent const*)
+bool mitk::Interactor::OnModeSubSelect(Action* /*action*/, StateEvent const*)
 {
   StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
   return false;

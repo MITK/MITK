@@ -46,11 +46,10 @@ vtkProp* mitk::MeshVtkMapper3D::GetProp()
   return m_PropAssembly;
 }
 
-void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::MeshVtkMapper3D::UpdateVtkTransform()
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(
-      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
 
   m_SpheresActor->SetUserTransform(vtktransform);
   m_ContourActor->SetUserTransform(vtktransform);
@@ -104,7 +103,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
   mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
   input->Update();
 
-  mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( m_TimeStep );
+  mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( this->GetTimestep() );
 
   if ( itkMesh.GetPointer() == NULL) 
   {
@@ -230,7 +229,7 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  if( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
+  if( inputTimeGeometry->IsValidTime( this->GetTimestep() ) == false )
   {
     m_PropAssembly->VisibilityOff();
     return;

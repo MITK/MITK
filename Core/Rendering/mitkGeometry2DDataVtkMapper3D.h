@@ -62,7 +62,7 @@ public:
    * only)
    */
   virtual vtkProp *GetProp();
-  virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
+  virtual void UpdateVtkTransform();
 
   /**
    *  \brief Get the Geometry2DData to map

@@ -107,23 +107,6 @@ void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
   {
     m_TimeStep = 0;
   }
-  /*
-  //
-  // get the world time
-  //
-  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-
-  //
-  // convert the world time in time steps of the input object
-  //
-  int m_TimeStep=0;
-  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-  {
-    m_TimeStep = inputTimeGeometry->MSToTimeStep( time );
-  }
-  */
 }
 
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
@@ -133,7 +116,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 
   this->CalculateTimeStep( renderer );
   
-  //safty cause there are datatreenodes, that have no defined data (video-nodes and root)
+  //safety cause there are datatreenodes that have no defined data (video-nodes and root)
   unsigned int dataMTime = 0;
   mitk::BaseData::Pointer data = static_cast<mitk::BaseData *>(node->GetData());
   if (data.IsNotNull())

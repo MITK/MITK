@@ -52,9 +52,9 @@ public:
   //## @brief Set the vtkTransform of the m_Prop3D for
   //## the current time step of \a renderer
   //##
-  //## Called by mitk::OpenGLRenderer::Update and
-  //## UpdateIncludingVtkActors
-  virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
+  //## Called by mitk::VtkPropRenderer::Update before rendering
+  //##
+  virtual void UpdateVtkTransform();
 
   //##Documentation
   //## @brief Apply color and opacity read from the PropertyList
@@ -70,24 +70,9 @@ public:
   itkGetObjectMacro(Geometry,Geometry3D);
   itkSetObjectMacro(Geometry,Geometry3D);
 
-  itkGetConstMacro(SliceNr,int);
-  itkSetMacro(SliceNr,int);
-
-  itkGetConstMacro(TimeNr,int);
-  itkSetMacro(TimeNr,int);
-
-  itkGetConstMacro(ChannelNr,int);
-  itkSetMacro(ChannelNr,int);
-
 protected:
   Geometry3D::Pointer m_Geometry;
   LevelWindow m_LevelWindow;
-
-  int m_SliceNr;
-
-  int m_TimeNr;
-
-  int m_ChannelNr;
 
   vtkProp3D* m_Prop3D;
 };

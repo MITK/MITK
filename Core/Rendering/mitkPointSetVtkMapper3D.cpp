@@ -110,7 +110,9 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
   input->Update();
 
-  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( m_TimeStep );
+  int timestep = this->GetTimestep();
+
+  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
 
   if ( itkPointSet.GetPointer() == NULL) 
   {
@@ -183,7 +185,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
 
@@ -208,7 +210,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         cube->SetYLength(pointSize/2);
         cube->SetZLength(pointSize/2);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         cube->SetCenter(point1[0],point1[1],point1[2]);
         //cube->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         source = cube;
@@ -219,7 +221,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkConeSource *cone = vtkConeSource::New();
         cone->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         cone->SetCenter(point1[0],point1[1],point1[2]);
         //cone->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         cone->SetResolution(20);
@@ -231,7 +233,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkCylinderSource *cylinder = vtkCylinderSource::New();
         cylinder->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         cylinder->SetCenter(point1[0],point1[1],point1[2]);
         //cylinder->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         cylinder->SetResolution(20);
@@ -243,7 +245,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         sphere->SetThetaResolution(20);
@@ -256,7 +258,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
         vtkSphereSource *sphere = vtkSphereSource::New();
         sphere->SetRadius(pointSize);
         mitk::Point3D point1;
-        point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+        point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
         //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
         sphere->SetThetaResolution(20);
@@ -303,7 +305,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       vtkTransform *aLabelTransform =vtkTransform::New();
       aLabelTransform->Identity();
       mitk::Point3D point1;
-      point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+      point1 = input->GetPoint(pointsIter->Index(), timestep);
       aLabelTransform->Translate(point1[0]+2,point1[1]+2,point1[2]);
       //aLabelTransform->Translate(pointsIter.Value()[0]+2,pointsIter.Value()[1]+2,pointsIter.Value()[2]);
       aLabelTransform->Scale(5.7,5.7,5.7);
@@ -426,7 +428,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  if ( inputTimeGeometry->IsValidTime( m_TimeStep ) == false )
+  if ( inputTimeGeometry->IsValidTime( this->GetTimestep() ) == false )
   {
     m_PointsAssembly->VisibilityOff();
     return;
@@ -435,21 +437,13 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 
 vtkProp* mitk::PointSetVtkMapper3D::GetProp()
 {
-  if(GetDataTreeNode()!=NULL && 
-    m_PointsAssembly != NULL) 
-  {
-    m_SelectedActor->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
-    m_UnselectedActor->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
-    m_ContourActor->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
-  } 
   return m_PointsAssembly;
 }
 
-void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::UpdateVtkTransform()
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(
-      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
 
   m_SelectedActor->SetUserTransform(vtktransform);
   m_UnselectedActor->SetUserTransform(vtktransform);
@@ -582,7 +576,8 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
     input->Update();
 
-    mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( m_TimeStep );
+    int timestep = this->GetTimestep();
+    mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
     if ( itkPointSet.GetPointer() == NULL) 
     {
       return;
@@ -592,7 +587,7 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
     {
       vtkIdType cell[2] = {j-1,j};
       mitk::Point3D point1;
-      point1 = input->GetPoint(pointsIter->Index(), m_TimeStep);
+      point1 = input->GetPoint(pointsIter->Index(), timestep);
       points->InsertPoint(j,point1[0],point1[1],point1[2]);
       if (j>0)
         polys->InsertNextCell(2,cell);

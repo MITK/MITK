@@ -35,7 +35,6 @@ class BaseRenderer;
 class Geometry2D;
 class DisplayGeometry;
 
-//##ModelId=3EF17FBD0315
 //##Documentation
 //## @brief OpenGL-based mapper to display a Geometry2D in a 2D window
 //## OpenGL-based mapper to display a Geometry2D in a 2D window. The result is
@@ -48,10 +47,8 @@ public:
 
   itkNewMacro(Self);
 
-  //##ModelId=3EF18053036B
   const mitk::Surface * GetInput(void);
 
-  //##ModelId=3EF18053039D
   virtual void Paint(BaseRenderer * renderer);
 
   //##Documentation
@@ -74,15 +71,12 @@ public:
 
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 protected:
-  //##ModelId=3EF180540006
+
   SurfaceMapper2D();
 
-  //##ModelId=3EF180540019
   virtual ~SurfaceMapper2D();
 
-  //##ModelId=3EF18053031B
-  vtkPlane* m_Plane;
-  //##ModelId=3EF18053034D
+  vtkPlane*  m_Plane;
   vtkCutter* m_Cutter;
 
   mitk::Surface::ConstPointer m_Surface;

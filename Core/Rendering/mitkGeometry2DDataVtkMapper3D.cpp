@@ -157,11 +157,10 @@ Geometry2DDataVtkMapper3D::GetProp()
   return m_Prop3D;
 }
 
-void mitk::Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::Geometry2DDataVtkMapper3D::UpdateVtkTransform()
 {
   m_ImageAssembly->SetUserTransform( 
-    this->GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(
-      this->GetDataTreeNode()->GetData())) );
+    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 }
 
 const Geometry2DData *
@@ -603,8 +602,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Edges->SetInput( surfacePolyData );
 
     m_EdgeTransformer->SetTransform( 
-      this->GetDataTreeNode()->GetVtkTransform(
-        renderer->GetTimeStep( this->GetDataTreeNode()->GetData())) );
+      this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 
     // Determine maximum extent
     vtkFloatingPointType* surfaceBounds = surfacePolyData->GetBounds();
@@ -636,8 +634,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
 
     m_ImageAssembly->SetUserTransform( 
-      this->GetDataTreeNode()->GetVtkTransform(renderer->GetTimeStep(
-        this->GetDataTreeNode()->GetData())) );
+      this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
   }
 
   mitk::VtkRepresentationProperty* representationProperty;

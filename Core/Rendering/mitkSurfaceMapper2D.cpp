@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkAbstractMapper.h>
 
-//##ModelId=3EF180540006
+
 mitk::SurfaceMapper2D::SurfaceMapper2D()
 {
   m_Plane  = vtkPlane::New();
@@ -56,12 +56,10 @@ mitk::SurfaceMapper2D::SurfaceMapper2D()
   m_LUT->Build();
 }
 
-//##ModelId=3EF180540019
 mitk::SurfaceMapper2D::~SurfaceMapper2D()
 {
 }
 
-//##ModelId=3EF18053036B
 const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
 {
   if(m_Surface.IsNotNull())
@@ -115,7 +113,6 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
 }
 
 
-//##ModelId=3EF18053039D
 void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
@@ -142,14 +139,15 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry.IsNotNull() );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
 
-  //
-  // convert the world time to time steps of the input object
-  //
+  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
   int timestep=0;
+
   if( time > ScalarTypeNumericTraits::NonpositiveMin() )
     timestep = inputTimeGeometry->MSToTimeStep( time );
+
+ // int timestep = this->GetTimestep();
+
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
     return;
 
@@ -249,7 +247,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    // travers the cut contour
+    // traverse the cut contour
     PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut);
 
   }
@@ -287,7 +285,6 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
     }
   }
 
-
   vtkPoints    *vpoints = contour->GetPoints();
   vtkDataArray *vpointscalars = contour->GetPointData()->GetScalars();
 
@@ -318,7 +315,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
     //convert 3D point (in mm) to 2D point on slice (also in mm)
     worldGeometry->Map(p, p2d);
 
-    //convert point (until now mm and in worldcoordinates) to display coordinates (units )
+    //convert point (until now mm and in world coordinates) to display coordinates (units )
     displayGeometry->WorldToDisplay(p2d, p2d);
     last=p2d;
 
@@ -332,7 +329,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
       //convert 3D point (in mm) to 2D point on slice (also in mm)
       worldGeometry->Map(p, p2d);
 
-      //convert point (until now mm and in worldcoordinates) to display coordinates (units )
+      //convert point (until now mm and in world coordinates) to display coordinates (units )
       displayGeometry->WorldToDisplay(p2d, p2d);
 
       vtkFloatingPointType color[3];

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
 
-mitk::BaseVtkMapper3D::BaseVtkMapper3D() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0), m_Prop3D(NULL)
+mitk::BaseVtkMapper3D::BaseVtkMapper3D() : m_Prop3D(NULL)
 {
   //vtkMapper::GlobalImmediateModeRenderingOn();
 }
@@ -39,17 +39,12 @@ mitk::BaseVtkMapper3D::~BaseVtkMapper3D()
 
 vtkProp* mitk::BaseVtkMapper3D::GetProp()
 {
-  if(GetDataTreeNode()!=NULL && 
-    m_Prop3D != NULL) {
-      m_Prop3D->SetUserTransform(GetDataTreeNode()->GetVtkTransform());
-  } 
   return m_Prop3D;
 }
 
-void mitk::BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::BaseVtkMapper3D::UpdateVtkTransform()
 {
-  int timeStep = renderer->GetTimeStep(GetDataTreeNode()->GetData());
-  vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(timeStep);
+  vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
   m_Prop3D->SetUserTransform(vtktransform);
 }
 

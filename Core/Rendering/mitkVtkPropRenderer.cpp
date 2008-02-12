@@ -300,7 +300,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataTreeNode* datatreenode)
         if(vtkmapper3d != NULL)
         {
           vtkmapper3d->Update(this);
-          vtkmapper3d->UpdateVtkTransform(this);
+          vtkmapper3d->UpdateVtkTransform();
           m_VtkMapperPresent=true;
         }
       }

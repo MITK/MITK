@@ -50,22 +50,13 @@ mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 vtkProp*
 mitk::SplineVtkMapper3D::GetProp()
 {
-  if (GetDataTreeNode() == NULL)
-    return NULL; 
-
-  //to assign User Transforms in superclass
-  Superclass::GetProp();
-
-  m_SplinesActor->SetUserTransform( GetDataTreeNode()->GetVtkTransform() );
-  
   return m_SplineAssembly;
 }
 
-void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::SplineVtkMapper3D::UpdateVtkTransform()
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(
-      renderer->GetTimeStep(this->GetDataTreeNode()->GetData()));
+    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
 
   m_SplinesActor->SetUserTransform(vtktransform);
 }

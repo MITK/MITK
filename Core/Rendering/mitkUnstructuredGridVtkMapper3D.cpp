@@ -124,7 +124,8 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
     return;
   }
 
-  if( inputTimeGeometry->IsValidTime(this->m_TimeStep ) == false )
+  int timestep = this->GetTimestep();
+  if( inputTimeGeometry->IsValidTime( timestep ) == false )
   {
     m_Assembly->VisibilityOff();
     return;
@@ -133,14 +134,13 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
   //
   // set the input-object at time t for the mapper
   //
-  vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid( this->m_TimeStep );
+  vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid( timestep );
   if(grid == 0) 
   {
     m_Assembly->VisibilityOff();
     return;
   }
 
- 
   m_VtkTriangleFilter->SetInput(grid);  
   m_VtkDataSetMapper->SetInput(grid);
 
@@ -148,8 +148,6 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
   // apply properties read from the PropertyList
   //
   SetProperties(renderer);
-
-  m_Assembly->SetUserTransform(GetDataTreeNode()->GetVtkTransform(this->m_TimeStep));
 }
 
 void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* renderer)

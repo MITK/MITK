@@ -100,6 +100,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
 
+mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
+
 itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className ) 
 {  
   itk::Object::Pointer pointer;

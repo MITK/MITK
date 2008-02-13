@@ -43,7 +43,8 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 
-    FileWriterList m_FileWriters;
+    
+    static FileWriterList m_FileWriters;
 };
 
 } // namespace mitk

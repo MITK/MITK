@@ -23,8 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <utility>
 #include <queue>
 #include <iostream>
+#include <mitkCommon.h>
 
-class QmitkAbortEventFilter : public QObject
+class QMITK_EXPORT QmitkAbortEventFilter : public QObject
 {
 public:
 
@@ -52,7 +53,7 @@ private:
   EventQueue m_EventQueue;
 };
 
-class QmitkDebugEventFilter : public QObject
+class QMITK_EXPORT QmitkDebugEventFilter : public QObject
 {
  protected:
    bool eventFilter( QObject* object, QEvent* event )

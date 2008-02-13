@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
   This class very simply calls the QApplication's methods setOverrideCursor() and
   restoreOverrideCursor().
 */
-class QmitkApplicationCursor : public mitk::ApplicationCursorImplementation
+class QMITK_EXPORT QmitkApplicationCursor : public mitk::ApplicationCursorImplementation
 {
   public:
 

@@ -33,8 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
  * Depending on this mode, differenct functions of the associated undo model are called.
  * \ingroup Widgets
  */
-class 
-MITK_EXPORT
+class QMITK_EXPORT 
 QmitkUndoRedoButton : public QUndoRedoButton
 {
   Q_OBJECT;

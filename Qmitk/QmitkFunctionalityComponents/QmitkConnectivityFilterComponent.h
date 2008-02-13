@@ -50,7 +50,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkConnectivityFilterComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkConnectivityFilterComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

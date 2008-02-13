@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   */
 
-class QmitkLevelWindowWidgetContextMenu : public QWidget {
+class QMITK_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget {
 
   Q_OBJECT
 

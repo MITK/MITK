@@ -36,8 +36,7 @@ class PopupUndoRedoListBox;
  * This class does just the display job. The derived QmitkUndoRedoButton 
  * connects the real mitk::VerboseLimitedLinearUndo to this widget.
  */
-class 
-MITK_EXPORT
+class QMITK_EXPORT
 QUndoRedoButton : public QFrame
 {
   Q_OBJECT;

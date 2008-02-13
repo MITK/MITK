@@ -55,7 +55,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 
-class QmitkSingleTimeStepExporterComponent : public QmitkInteractionFunctionalityComponent
+class QMITK_EXPORT QmitkSingleTimeStepExporterComponent : public QmitkInteractionFunctionalityComponent
 {
 
   Q_OBJECT

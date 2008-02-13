@@ -39,8 +39,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITK_BASEALGORITHMCOMPONENT_H
 #define QMITK_BASEALGORITHMCOMPONENT_H
 
+#include <mitkCommon.h>
+
 class QmitkDataTreeComboBox;
-class QmitkBaseAlgorithmComponent 
+class QMITK_EXPORT QmitkBaseAlgorithmComponent 
 {
 
   public:

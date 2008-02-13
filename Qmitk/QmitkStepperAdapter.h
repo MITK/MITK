@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## \warning The \a Navigator has to be aware that it might have caused the changes 
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
 //## @ingroup NavigationControl
-class QmitkStepperAdapter : public QObject
+class QMITK_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
@@ -49,7 +49,7 @@ public:
     this->Refetch();
   }
 
-  class ItkEventListener : public itk::Command
+  class QMITK_EXPORT ItkEventListener : public itk::Command
   {
     public:
       mitkClassMacro(ItkEventListener, itk::Command);

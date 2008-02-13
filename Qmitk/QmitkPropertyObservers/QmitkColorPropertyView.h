@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlabel.h>
 
 /// @ingroup Widgets
-class QmitkColorPropertyView : public QLabel, public mitk::PropertyView
+class QMITK_EXPORT QmitkColorPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \ingroup Functionalities
  */
-class QmitkSliderDialogBar : public QmitkDialogBar
+class QMITK_EXPORT QmitkSliderDialogBar : public QmitkDialogBar
 {
   Q_OBJECT
 

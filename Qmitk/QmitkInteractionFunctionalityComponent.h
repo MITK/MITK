@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QmitkDataTreeComboBox;
 class QmitkStdMultiWidget;
 
-class QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComponent
+class QMITK_EXPORT QmitkInteractionFunctionalityComponent : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 

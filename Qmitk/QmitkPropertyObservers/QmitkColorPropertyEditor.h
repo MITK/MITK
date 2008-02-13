@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QListBox;
 
 /// @ingroup Widgets
-class QmitkPopupColorChooser : public QFrame
+class QMITK_EXPORT QmitkPopupColorChooser : public QFrame
 {
   Q_OBJECT
     
@@ -70,7 +70,7 @@ class QmitkPopupColorChooser : public QFrame
 };
 
 /// @ingroup Widgets
-class QmitkColorPropertyEditor : public QmitkColorPropertyView
+class QMITK_EXPORT QmitkColorPropertyEditor : public QmitkColorPropertyView
 {
   Q_OBJECT
 

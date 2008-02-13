@@ -49,7 +49,7 @@ class QVBox;
  *
  * \ingroup Functionalities
  */
-class QmitkFctMediator : public QObject
+class QMITK_EXPORT QmitkFctMediator : public QObject
 {
   Q_OBJECT
 

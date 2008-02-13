@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qlistbox.h>
 #include <qvbox.h>
+#include <mitkCommon.h>
 
 class QLabel;
     
 /// A QListBox that tracks all mouse events and hands them on to its parent. Used by ListBoxPopup
-class PassOnMouseListBox : public QListBox
+class QMITK_EXPORT PassOnMouseListBox : public QListBox
 {
 
   Q_OBJECT
@@ -42,7 +43,7 @@ class PassOnMouseListBox : public QListBox
 };
 
 /// A popup containing a listbox (PassOnMouseListBox) and a label. Tracks all mouse events. Derived classes can implement appropriate behaviour.
-class PopupActionHistory : public QFrame
+class QMITK_EXPORT PopupActionHistory : public QFrame
 {
 
   Q_OBJECT

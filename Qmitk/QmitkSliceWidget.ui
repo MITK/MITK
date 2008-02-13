@@ -194,7 +194,9 @@
         <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="local" impldecl="in declaration">mitkVtkPropRenderer.h</include>
     <include location="global" impldecl="in declaration">qpopupmenu.h</include>

@@ -117,7 +117,7 @@ There is a more extensive documentation at QmitkMainTemplate
 
 \ingroup Functionalities
 */
-class QmitkFunctionality : public QmitkBaseFunctionalityComponent
+class QMITK_EXPORT QmitkFunctionality : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
     bool m_Available;

@@ -53,7 +53,7 @@ class QmitkSeedPointSetComponent;
 */
 
 
-class QmitkPixelGreyValueManipulatorComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkPixelGreyValueManipulatorComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

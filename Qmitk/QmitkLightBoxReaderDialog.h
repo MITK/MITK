@@ -25,7 +25,7 @@ class QLabel;
 class QListBox;
 class QPushButton;
 
-class QmitkLightBoxReaderDialog : public QDialog
+class QMITK_EXPORT QmitkLightBoxReaderDialog : public QDialog
 {
   Q_OBJECT
 

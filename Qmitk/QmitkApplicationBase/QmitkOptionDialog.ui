@@ -210,7 +210,9 @@
         <slot>m_FunctionalitySelectionList_selected(int)</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in implementation">QmitkOptionDialog.ui.h</include>
 </includes>
 <slots>

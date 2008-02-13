@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 class vtkColorTransferFunction;
-class QmitkTransferFunctionCanvas : public QWidget
+class QMITK_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
 
   Q_OBJECT

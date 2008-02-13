@@ -1125,7 +1125,9 @@
         <slot>fileCloseProject()</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
     <include location="global" impldecl="in implementation">QmitkFctMediator.h</include>
     <include location="global" impldecl="in implementation">QmitkControlsRightFctLayoutTemplate.h</include>

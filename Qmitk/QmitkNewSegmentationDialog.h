@@ -25,6 +25,7 @@ class QLineEdit;
 class QListBox;
 class QPushButton;
 
+#include <mitkCommon.h>
 
 /**
   \brief Dialog for QmitkSliceBasedSegmentation.
@@ -38,7 +39,7 @@ class QPushButton;
 
   Last contribution by $Author$.
 */
-class QmitkNewSegmentationDialog : public QDialog
+class QMITK_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 

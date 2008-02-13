@@ -174,7 +174,9 @@
         <slot>setTimerInterval(int)</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="global" impldecl="in declaration">mitkStepper.h</include>
     <include location="global" impldecl="in implementation">qtimer.h</include>
 </includes>

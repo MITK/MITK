@@ -41,7 +41,7 @@ class QmitkMaterialEditor;
   When all changes are done successfully, clients are notified by the signal propertyListChangesDone.
 
 */
-class QmitkPropertyListPopup : public QObject
+class QMITK_EXPORT QmitkPropertyListPopup : public QObject
 {
   Q_OBJECT
 

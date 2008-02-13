@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  plugin/plugin_QmitkUndoRedoButton.cpp
   popupactionhistory.cpp
   popupundoredo.cpp
   qclickablelabel.cpp

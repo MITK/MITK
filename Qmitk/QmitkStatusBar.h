@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 //##
 //## All mitk-classes will call this class for output:
 //## mitk::StatusBar::GetInstance();
-class QmitkStatusBar : public mitk::StatusBarImplementation
+class QMITK_EXPORT QmitkStatusBar : public mitk::StatusBarImplementation
 {
 public:
 

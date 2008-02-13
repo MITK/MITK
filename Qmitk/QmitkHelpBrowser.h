@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qmainwindow.h>
 #include <qtextbrowser.h>
+#include <mitkCommon.h>
 
 class QComboBox;
 class QPopupMenu;
 
-class QmitkHelpBrowser : public QMainWindow
+class QMITK_EXPORT QmitkHelpBrowser : public QMainWindow
 {
     Q_OBJECT
 public:

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkPiecewiseFunction.h>
 
-class QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas 
+class QMITK_EXPORT QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas 
 {
   Q_OBJECT
 

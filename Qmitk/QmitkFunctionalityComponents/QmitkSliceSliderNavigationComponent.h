@@ -41,7 +41,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkSliceSliderNavigationComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkSliceSliderNavigationComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

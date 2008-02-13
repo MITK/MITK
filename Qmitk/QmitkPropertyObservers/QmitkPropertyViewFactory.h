@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QWidget;
 
-class QmitkPropertyViewFactory
+class QMITK_EXPORT QmitkPropertyViewFactory
 {
   public:
 

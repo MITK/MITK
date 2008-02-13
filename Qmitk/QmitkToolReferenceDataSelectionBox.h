@@ -42,7 +42,7 @@ class QmitkDataTreeComboBox;
 
   $Author$
 */
-class QmitkToolReferenceDataSelectionBox : public QVBox
+class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
 {
   Q_OBJECT
 

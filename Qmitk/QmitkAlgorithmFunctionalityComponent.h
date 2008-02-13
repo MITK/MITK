@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // TODO : check inheritance! only one base class can be subtype of QObject (see man moc)
 
-class QmitkAlgorithmFunctionalityComponent : public QmitkBaseFunctionalityComponent, public QmitkBaseAlgorithmComponent
+class QMITK_EXPORT QmitkAlgorithmFunctionalityComponent : public QmitkBaseFunctionalityComponent, public QmitkBaseAlgorithmComponent
 {
 
   Q_OBJECT

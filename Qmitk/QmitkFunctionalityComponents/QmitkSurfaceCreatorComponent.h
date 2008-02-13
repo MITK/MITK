@@ -48,7 +48,7 @@ namespace mitk{
 */
 
 
-class QmitkSurfaceCreatorComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkSurfaceCreatorComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

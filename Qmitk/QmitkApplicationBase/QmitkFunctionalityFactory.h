@@ -24,7 +24,7 @@ class QmitkFunctionality;
 class QmitkStdMultiWidget;
 class QObject;
 
-class QmitkFunctionalityFactory {
+class QMITK_EXPORT QmitkFunctionalityFactory {
 
 public:
   typedef QmitkFunctionality*(*CreateFunctionalityPtr)(QObject*, QmitkStdMultiWidget*, mitk::DataTreeIteratorBase*);

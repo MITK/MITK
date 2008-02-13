@@ -234,7 +234,9 @@
         <slot>GetParameters()</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkRawImageFileReader.h</include>
     <include location="local" impldecl="in implementation">mitkRawImageFileReader.h</include>
     <include location="local" impldecl="in implementation">QmitkRawImageFileSequenceOpener.ui.h</include>

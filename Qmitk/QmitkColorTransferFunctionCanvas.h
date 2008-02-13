@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkTransferFunctionCanvas.h"
 #include <vtkColorTransferFunction.h>
-class QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
+class QMITK_EXPORT QmitkColorTransferFunctionCanvas : public QmitkTransferFunctionCanvas {
   Q_OBJECT
 
   public:

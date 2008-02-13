@@ -47,12 +47,12 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkImageCropperComponent : public QmitkFunctionalityComponentContainer, public mitk::OperationActor
+class QMITK_EXPORT QmitkImageCropperComponent : public QmitkFunctionalityComponentContainer, public mitk::OperationActor
 {
 	Q_OBJECT
     // Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode) 
     // and to two data sets (mitk::BaseData) instances
-  class opExchangeNodes: public mitk::Operation
+  class QMITK_EXPORT opExchangeNodes: public mitk::Operation
   {
     public: opExchangeNodes( mitk::OperationType type,  mitk::DataTreeNode* node, 
                                                         mitk::BaseData* oldData, 

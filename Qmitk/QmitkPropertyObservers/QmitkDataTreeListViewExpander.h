@@ -39,7 +39,7 @@ class QGridLayout;
   row on the screen. One row always corresponds to one mitk::DataTreeFilter::Item and a list of widgets
   (which display different properties of a mitk::DataTreeNode).
 */
-class QmitkListViewItemIndex
+class QMITK_EXPORT QmitkListViewItemIndex
 {
   public:
 
@@ -84,7 +84,7 @@ class QmitkListViewItemIndex
   Not much new information here, if you know QmitkListViewItemIndex. This class only adds
   show/hide methods.
 */
-class QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
+class QMITK_EXPORT QmitkListViewExpanderIcon : public QLabel, public QmitkListViewItemIndex
 {
   Q_OBJECT
 

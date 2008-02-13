@@ -18,12 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKPROPERTYLISTVIEWITEMFACTORY_H_INCLUDED
 #define QMITKPROPERTYLISTVIEWITEMFACTORY_H_INCLUDED
 #include <string>
+#include <mitkCommon.h>
+
 class QWidget;
 class QmitkPropertyListViewItem;
 namespace mitk {
   class PropertyList;
 }
-class QmitkPropertyListViewItemFactory {
+class QMITK_EXPORT QmitkPropertyListViewItemFactory {
   public:
     static QmitkPropertyListViewItemFactory* GetInstance();
     virtual QmitkPropertyListViewItem* CreateQmitkPropertyListViewItem(mitk::PropertyList *propList, const std::string name, QWidget* parent, bool createOnlyControl) const;

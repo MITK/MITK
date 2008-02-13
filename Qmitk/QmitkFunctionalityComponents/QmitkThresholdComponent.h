@@ -42,7 +42,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

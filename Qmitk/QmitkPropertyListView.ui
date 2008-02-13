@@ -29,7 +29,9 @@
         </widget>
     </vbox>
 </widget>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkPropertyList.h</include>
     <include location="local" impldecl="in declaration">QmitkCommonFunctionality.h</include>
     <include location="local" impldecl="in declaration">qgrid.h</include>

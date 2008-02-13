@@ -65,7 +65,7 @@ class QmitkLevelWindowWidgetContextMenu;
 
   */
 
-class QmitkSliderLevelWindowWidget : public QWidget {
+class QMITK_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 

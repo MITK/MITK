@@ -1322,7 +1322,9 @@
         <slot>raiseWidget(int)</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="local" impldecl="in implementation">QmitkPixelGreyValueManipulatorComponentGUI.ui.h</include>
 </includes>

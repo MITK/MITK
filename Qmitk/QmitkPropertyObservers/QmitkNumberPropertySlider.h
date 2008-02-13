@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qslider.h>
 
 /// @ingroup Widgets
-class QmitkNumberPropertySlider : public QSlider, public mitk::PropertyEditor
+class QMITK_EXPORT QmitkNumberPropertySlider : public QSlider, public mitk::PropertyEditor
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )

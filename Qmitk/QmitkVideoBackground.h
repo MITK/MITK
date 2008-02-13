@@ -45,7 +45,7 @@ namespace mitk {
  * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
  * background.
  */
-class QmitkVideoBackground : public QObject
+class QMITK_EXPORT QmitkVideoBackground : public QObject
 {
   Q_OBJECT
 

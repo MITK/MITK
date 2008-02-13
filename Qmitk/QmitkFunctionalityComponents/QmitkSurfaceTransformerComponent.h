@@ -45,7 +45,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkSurfaceTransformerComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkSurfaceTransformerComponent : public QmitkFunctionalityComponentContainer
 {
 
 	Q_OBJECT

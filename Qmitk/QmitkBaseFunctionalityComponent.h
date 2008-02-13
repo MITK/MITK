@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkBaseComponent.h"
 #include "mitkDataTreeFilter.h"
 
-class QmitkBaseFunctionalityComponent : public QmitkBaseComponent
+class QMITK_EXPORT QmitkBaseFunctionalityComponent : public QmitkBaseComponent
 {
   Q_OBJECT
 

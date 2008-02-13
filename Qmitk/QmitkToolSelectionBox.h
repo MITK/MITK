@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-class QmitkToolSelectionBox : public QButtonGroup
+class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
 {
   Q_OBJECT
 

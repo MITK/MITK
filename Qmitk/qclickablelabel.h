@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlabel.h>
 #include <vector>
 #include <map>
+#include <mitkCommon.h>
 
 /**
   \brief A QLabel with multiple hotspots, that can be clicked
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
   Specially useful in connection with a pixmap.
   Stretched images should be avoided, because the hotspots will not be adjusted in any way.
 */
-class QClickableLabel : public QLabel
+class QMITK_EXPORT QClickableLabel : public QLabel
 {
   Q_OBJECT
 

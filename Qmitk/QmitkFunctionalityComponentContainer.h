@@ -54,7 +54,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
+class QMITK_EXPORT QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 

@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkUserInputSimulationMacroshincluded
 
 #include <qwidget.h>
+#include <mitkCommon.h>
 
-class QmitkUserInputSimulation
+class QMITK_EXPORT QmitkUserInputSimulation
 {
   public:
 

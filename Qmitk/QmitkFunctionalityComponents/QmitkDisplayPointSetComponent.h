@@ -49,7 +49,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkDisplayPointSetComponent : public QmitkInteractionFunctionalityComponent
+class QMITK_EXPORT QmitkDisplayPointSetComponent : public QmitkInteractionFunctionalityComponent
 {
 
   Q_OBJECT

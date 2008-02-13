@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \ingroup Functionalities
  */
-class QmitkStandardViewsDialogBar : public QmitkDialogBar
+class QMITK_EXPORT QmitkStandardViewsDialogBar : public QmitkDialogBar
 {
   Q_OBJECT
 

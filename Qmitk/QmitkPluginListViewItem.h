@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkPluginListViewItem_h_included
 
 #include <qlistview.h>
+#include <mitkCommon.h>
 
-class QmitkPluginListViewItem : public QListViewItem
+class QMITK_EXPORT QmitkPluginListViewItem : public QListViewItem
 {
 
     public:

@@ -124,7 +124,7 @@ PURPOSE.  See the above copyright notices for more information.
   lists.
 
 */
-class QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
+class QMITK_EXPORT QmitkDataTreeListView : public QWidget, public QmitkListViewItemIndex
 {
   Q_OBJECT;
 

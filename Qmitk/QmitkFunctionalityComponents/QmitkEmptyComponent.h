@@ -41,7 +41,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QmitkEmptyComponent : public QmitkFunctionalityComponentContainer
+class QMITK_EXPORT QmitkEmptyComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

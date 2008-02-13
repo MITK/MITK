@@ -1,7 +1,7 @@
 #include <qwidgetplugin.h>
 #include "mitkCommon.h"
 
-class 
+class QMITK_EXPORT 
 MITK_EXPORT
 QmitkUndoRedoButtonPlugin : public QWidgetPlugin
 {

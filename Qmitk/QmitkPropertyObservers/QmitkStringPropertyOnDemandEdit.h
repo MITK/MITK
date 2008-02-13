@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qlabel.h>
 
-class QClickableLabel2 : public QLabel
+class QMITK_EXPORT QClickableLabel2 : public QLabel
 {
   Q_OBJECT
 
@@ -44,7 +44,7 @@ class QClickableLabel2 : public QLabel
 
 
 /// @ingroup Widgets
-class QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
+class QMITK_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
 {
   Q_OBJECT
 

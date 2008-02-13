@@ -19,13 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define POPUPUNDOREDO_H
 
 #include "popupactionhistory.h"
+#include <mitkCommon.h>
 
 class QString;
 class QMouseEvent;
 class QCloseEvent;
 
 /// A subclass of PopupListBox, implementing the behaviour of a MS Word undo/redo list
-class PopupUndoRedoListBox : public PopupActionHistory
+class QMITK_EXPORT PopupUndoRedoListBox : public PopupActionHistory
 {
   Q_OBJECT
 public:

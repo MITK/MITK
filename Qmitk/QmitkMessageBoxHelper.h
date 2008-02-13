@@ -23,13 +23,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmutex.h>
 
 #include <itkEventObject.h>
+#include <mitkCommon.h>
 
 class QmitkMessageBoxHelperDialogWaitThread;
 
 /**
   * \brief Test helper class for closing message boxes.
   */
-class QmitkMessageBoxHelper : public QObject
+class QMITK_EXPORT QmitkMessageBoxHelper : public QObject
 {
   Q_OBJECT
 

@@ -43,7 +43,7 @@ class QCustomEvent;
 
   $Author$
 */
-class QmitkToolWorkingDataListBox : public QListView
+class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
 {
   Q_OBJECT
 

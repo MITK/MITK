@@ -43,7 +43,7 @@ the widgets in the application window controlled by a layout template.
 
 \ingroup Functionalities
 */
-class QmitkFctCompMediator : public QObject
+class QMITK_EXPORT QmitkFctCompMediator : public QObject
 {
   Q_OBJECT
 protected:

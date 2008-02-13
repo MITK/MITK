@@ -34,7 +34,7 @@ class QmitkNumberPropertyEditor;
 class QmitkDataTreeListView;
 class QmitkDataTreeComboBox;
 
-class PropertyViewTest : public QWidget
+class QMITK_EXPORT PropertyViewTest : public QWidget
 {
   Q_OBJECT
 

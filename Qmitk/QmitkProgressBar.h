@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## All mitk-classes will call this class for output:
 //## mitk::ProgressBar::GetInstance();
 
-class QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
+class QMITK_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 
   Q_OBJECT

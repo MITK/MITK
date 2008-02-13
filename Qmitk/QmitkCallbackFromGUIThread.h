@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 /*!
   \brief Qt specific implementation of mitk::CallbackFromGUIThreadImplementation
 */
-class QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
+class QMITK_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
 {
 
   Q_OBJECT

@@ -99,8 +99,14 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #else
     #define MITK_CORE_EXPORT __declspec(dllimport)
   #endif        
+  #ifdef Qmitk_EXPORTS
+    #define QMITK_EXPORT __declspec(dllexport)
+  #else
+    #define QMITK_EXPORT __declspec(dllimport)
+  #endif        
 #else
   #define MITK_CORE_EXPORT
+  #define QMITK_CORE_EXPORT
 #endif
 
 

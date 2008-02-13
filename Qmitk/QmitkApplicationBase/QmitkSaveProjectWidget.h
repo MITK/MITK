@@ -34,7 +34,7 @@ class QToolButton;
 //## Class QmitkSaveProjectWidget represents a dialog for storing a project.
 //## Items (nodes of the datatree) can be selected to store.
 //## @ingroup Widgets
-class QmitkSaveProjectWidget : public QWidget
+class QMITK_EXPORT QmitkSaveProjectWidget : public QWidget
 {
   Q_OBJECT
 

@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkCopyToClipBoardDialog_h_Included
 
 #include <qdialog.h>
-
+#include <mitkCommon.h>
 /**
   \brief Displays read-only QTextEdit.
 
   For output of any kind of information that might be copied into other applications.
 */
-class QmitkCopyToClipBoardDialog : public QDialog
+class QMITK_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 

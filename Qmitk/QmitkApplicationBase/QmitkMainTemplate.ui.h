@@ -210,7 +210,7 @@ static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &
     s+= "point out of data";
   }
 }
-class posOutputType : public mitk::OperationActor
+class QMITK_EXPORT posOutputType : public mitk::OperationActor
 {
   mitk::DataTreeIteratorClone m_DataTreeIterator;
   mitk::ImageTimeSelector::Pointer m_TimeSelector;

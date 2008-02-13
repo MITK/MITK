@@ -54,7 +54,7 @@ class QGroupBox;
  *
  * \ingroup Functionalities
  */
-class QmitkDialogBar : public QmitkBaseFunctionalityComponent
+class QMITK_EXPORT QmitkDialogBar : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 

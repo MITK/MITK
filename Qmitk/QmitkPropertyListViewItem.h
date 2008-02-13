@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qwidget.h>
 #include <qobject.h>
 #include <string>
+#include <mitkCommon.h>
 
 class QPushButton;
 class QTextEdit;
@@ -32,7 +33,7 @@ namespace mitk
   class PropertyList;
 }
 
-class QmitkPropertyListViewItem : public QObject
+class QMITK_EXPORT QmitkPropertyListViewItem : public QObject
 {
   Q_OBJECT
 public:
@@ -63,7 +64,7 @@ protected slots:
   void EnabledButtonClicked();
 };
 
-class QmitkPropertyListViewFloatSlider : public QmitkPropertyListViewItem
+class QMITK_EXPORT QmitkPropertyListViewFloatSlider : public QmitkPropertyListViewItem
 {
   Q_OBJECT
 public:

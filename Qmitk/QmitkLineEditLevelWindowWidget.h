@@ -32,7 +32,7 @@ class QLineEdit;
 
   */
 
-class QmitkLineEditLevelWindowWidget : public QWidget {
+class QMITK_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 
   Q_OBJECT
 

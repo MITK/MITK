@@ -42,10 +42,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qstring.h>
 #include <qobject.h>
 #include <vector>
+#include <mitkCommon.h>
 
 class QGroupBox;
 
-class QmitkBaseComponent : public QObject
+class QMITK_EXPORT QmitkBaseComponent : public QObject
 {
   Q_OBJECT
 

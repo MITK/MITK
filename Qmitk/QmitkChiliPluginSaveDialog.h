@@ -27,7 +27,7 @@ class QRadioButton;
 class QLabel;
 class QVBoxLayout;
 
-class QmitkChiliPluginSaveDialog : public QDialog
+class QMITK_EXPORT QmitkChiliPluginSaveDialog : public QDialog
 {
   Q_OBJECT
 

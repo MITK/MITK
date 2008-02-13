@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtimer.h>
 #include <list>
 #include <string>
+#include <mitkCommon.h>
 
 class QmitkFctMediator;
 class QTimer;
 
-class QmitkFunctionalityTesting : public QObject
+class QMITK_EXPORT QmitkFunctionalityTesting : public QObject
 {
   Q_OBJECT
 public:
@@ -40,4 +41,4 @@ protected:
   QTimer m_ActivateTimer;
 };
 
-int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);
+int QMITK_EXPORT StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);

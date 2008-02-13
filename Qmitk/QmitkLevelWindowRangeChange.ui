@@ -127,7 +127,9 @@
     <tabstop>okButton</tabstop>
     <tabstop>cancelButton</tabstop>
 </tabstops>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="global" impldecl="in implementation">qmessagebox.h</include>
     <include location="local" impldecl="in implementation">QmitkLevelWindowRangeChange.ui.h</include>
 </includes>

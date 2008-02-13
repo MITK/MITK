@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
  */
-class QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
+class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
 {
 public:
  

@@ -314,7 +314,9 @@
         <slot>UpdateSliderLabel()</slot>
     </connection>
 </connections>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
+    <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
     <include location="local" impldecl="in declaration">mitkDataTree.h</include>
     <include location="global" impldecl="in implementation">string</include>

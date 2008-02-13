@@ -38,7 +38,7 @@ class QmitkPropertyListPopup;
 
   $Author$
 */
-class QmitkPropertyListPopupProvider : public itk::Object
+class QMITK_EXPORT QmitkPropertyListPopupProvider : public itk::Object
 {
   public:
     typedef QmitkPropertyListPopupProvider Self;

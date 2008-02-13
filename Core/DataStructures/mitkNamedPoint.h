@@ -23,7 +23,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 namespace mitk {
 
-class MITK_CORE_EXPORT NamedPoint{
+class NamedPoint{
 
   std::string m_Name;
   mitk::Point3D m_Point;

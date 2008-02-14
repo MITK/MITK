@@ -5,8 +5,8 @@
 class QObject;
 class QmitkStdMultiWidget;
 
-bool Register@FUNCTIONALITY_NAME@();
-QmitkFunctionality* Create@FUNCTIONALITY_NAME@Instance(QObject *parent, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt); 
+@FUNCTIONALITY_EXPORT@ bool Register@FUNCTIONALITY_NAME@();
+@FUNCTIONALITY_EXPORT@ QmitkFunctionality* Create@FUNCTIONALITY_NAME@Instance(QObject *parent, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* dataIt); 
 
 // 
 // this works for dll's but not for static linkage

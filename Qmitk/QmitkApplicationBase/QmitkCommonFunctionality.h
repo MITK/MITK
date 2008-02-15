@@ -207,6 +207,7 @@ namespace CommonFunctionality
   QMITK_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
 
   QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
+  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const char *fileExtensions );
   QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
   QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence();
   QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpen();

@@ -42,6 +42,12 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
   if (aFileName == NULL)
   {
     fileName = QFileDialog::getSaveFileName(QString(fileWriter->GetDefaultFilename()),fileWriter->GetFileDialogPattern());
+
+    // Check if an extension exists already and if not, append the default extension
+    if ( fileName.find( '.' ) == -1 )
+    {
+      fileName.append( fileWriter->GetDefaultExtension() );
+    }
   }
   else
     fileName = aFileName;
@@ -250,7 +256,12 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
+  return CommonFunctionality::FileOpenSpecific( mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
+}
+
+mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const char *fileExtensions )
+{
+  QString fileName = QFileDialog::getOpenFileName( NULL, fileExtensions );
   if ( !fileName.isNull() )
   {
     mitk::DataTreeNode::Pointer result = FileOpen(fileName.ascii());

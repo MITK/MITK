@@ -35,13 +35,20 @@ class vtkVideoSizeCallback;
 
 namespace mitk {
 
-  class RenderWindow;
-}
+struct VideoBackgroundVectorInfo
+{
+  vtkRenderWindow*  renWin;
+  vtkRenderer*      videoRenderer;
+  vtkImageActor*    videoActor;
+  vtkImageImport*   videoImport;
+};
+
+
 /**
  * Displays a video in the background
- * of a vtkRenderWindow.
+ * of one or more vtkRenderWindow(s).
  * The video is provided by a mitkVideoSource / GetVideoTexture().
- * Caution: As the texture data is not being copied, a user is responsible for a valid 
+ * Caution: As the texture data is not being copied, the user is responsible for a valid 
  * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
  * background.
  */
@@ -54,12 +61,10 @@ public:
    ~QmitkVideoBackground();
 
   ////##Documentation
-  ////## @brief returns the mitkRenderWindow in which the video is displayed.
-  vtkRenderWindow* GetRenderWindow();
-  ////##Documentation
   ////## @brief sets the mitkRenderWindow in which the video is displayed.
   ////## must be initialized before enabling the background.
-  void SetRenderWindow(vtkRenderWindow* renderWindow);
+  void AddRenderWindow(vtkRenderWindow* renderWindow);
+  void RemoveRenderWindow(vtkRenderWindow* renderWindow);
   ////##Documentation
   ////## @brief sets the width and height of the video.
   ////## must be correctly initialized before enabling the background.
@@ -92,8 +97,9 @@ public:
 protected:
   void ResetVideoBackground();
 
-  vtkRenderWindow*      m_RenderWindow;
-  vtkRenderer*                m_VideoRenderer;
+  typedef std::vector<VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
+  RenderWindowVectorInfoType      m_renderWindowVectorInfo;
+ 
   vtkImageActor*              m_Actor;
   vtkImageImport*             m_VtkImageImport;
  
@@ -103,12 +109,10 @@ protected:
   //VideoSource
   mitk::VideoSource*          m_VideoSource;
 
-  // Adjust Video Size
-  vtkVideoSizeCallback *      m_VideoCallback;
-
   int m_ImageWidth, m_ImageHeight, m_TimerDelay;
 };
 
+}
 
 
 #endif

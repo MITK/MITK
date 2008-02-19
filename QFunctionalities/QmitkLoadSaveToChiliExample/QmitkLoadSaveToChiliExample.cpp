@@ -114,7 +114,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
         {
-          std::string savedOID = entry->GetChiliOID();
+		  std::string savedOID = entry->GetChiliOID().ascii();
           AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
         }
         break;
@@ -126,7 +126,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
           if( entry )
           {
-            std::string savedOID = entry->GetChiliOID();
+            std::string savedOID = entry->GetChiliOID().ascii();
             mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( savedOID );
             while( !getAllElements.empty() )
             {
@@ -143,7 +143,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
             QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
             if( entry )
             {
-              std::string savedOID = entry->GetChiliOID();
+              std::string savedOID = entry->GetChiliOID().ascii();
               AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( savedOID ) );
             }
           }
@@ -157,7 +157,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* parent = dynamic_cast<QmitkPluginListViewItem*>( entry->parent() );  //use the parent to know what to do
           if( parent->text( 0 ) == "Known Images" )
           {
-            std::string vLabel = entry->GetVolumeLabel();
+            std::string vLabel = entry->GetVolumeLabel().ascii();
             mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
             if( temp.IsNotNull() )
               mitk::DataStorage::GetInstance()->Add( temp );
@@ -166,14 +166,14 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
             if( parent->text( 0 ) == "Saved Text" )
             {
               QmitkPluginListViewItem* child = dynamic_cast<QmitkPluginListViewItem*>( entry->firstChild() );
-              std::string savedOID = child->GetChiliOID();
+              std::string savedOID = child->GetChiliOID().ascii();
               mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
               if( temp.IsNotNull() )
                 mitk::DataStorage::GetInstance()->Add( temp );
               while( child->nextSibling() != 0 )
               {
                 child = dynamic_cast<QmitkPluginListViewItem*>( child->nextSibling() );
-                std::string oid = child->GetChiliOID();
+                std::string oid = child->GetChiliOID().ascii();
                 temp = m_Plugin->LoadOneText( oid );
                 mitk::DataStorage::GetInstance()->Add( temp );
               }
@@ -186,7 +186,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
         {
-          std::string savedOID = entry->GetChiliOID();
+          std::string savedOID = entry->GetChiliOID().ascii();
           mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
           if( temp.IsNotNull() )
             mitk::DataStorage::GetInstance()->Add( temp );
@@ -211,13 +211,15 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
     QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->PSContent->selectedItem() );
     if( entry )
     {
-      std::string vLabel = entry->GetVolumeLabel();
+      std::string vLabel = entry->GetVolumeLabel().ascii();
       mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
       if( temp.IsNotNull() )
+	  {
         mitk::DataStorage::GetInstance()->Add( temp );
-      m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
-      m_MultiWidget->Fit();
-      m_MultiWidget->ReInitializeStandardViews();
+        m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+        m_MultiWidget->Fit();
+        m_MultiWidget->ReInitializeStandardViews();
+	  }
     }
   }
 }

@@ -90,6 +90,7 @@ mitk::ChiliPlugin::ChiliPlugin()
   qApp->installEventFilter(logger);
 
   m_tempDirectory = GetTempDirectory();
+
   if( m_tempDirectory.empty() )
     QMessageBox::information( 0, "MITK", "MITK was not able to create a Temp-Directory.\nYou can only Load via Lightbox.\nMore should not be possible." );
   else
@@ -99,11 +100,13 @@ mitk::ChiliPlugin::ChiliPlugin()
 /** Destructor */
 mitk::ChiliPlugin::~ChiliPlugin()
 {
+  std::string removeDirectory = "";
+
   #ifdef WIN32
-    std::string removeDirectory = "rm /s " + m_tempDirectory;
+    removeDirectory = "rmdir /S /Q " + m_tempDirectory;
     std::cout << "ChiliPlugin: Delete directory "<< m_tempDirectory << std::endl;
   #else
-    std::string removeDirectory = "rm -r " + m_tempDirectory;
+    removeDirectory = "rm -r " + m_tempDirectory;
     std::cout << "ChiliPlugin: Delete directory "<< m_tempDirectory << std::endl;
   #endif
 
@@ -1747,7 +1750,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
           picTagList.pop_back();
 
           //save the single slices to CHILI
-          //pOpenAssociation();
+          pOpenAssociation();
 
           int count = 0;
           while( !myPicDescriptorList.empty() )
@@ -1779,7 +1782,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                 std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << pathAndFile << std::endl;
             }
           }
-          //pCloseAssociation();
+          pCloseAssociation();
           //set the new SERIESOID as Property
           if( !currentSeriesOID )
             (*nodeIter)->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
@@ -1810,13 +1813,13 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                   continue;
               }
               else  //the SERIESOIDs are different
-                textOID = dbGetNewOID();
+                textOID = pGetNewOID();
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
           }
           else  //the Text-File saved first time
-            textOID = dbGetNewOID();
+            textOID = pGetNewOID();
 
           //save Volume to Parent-Child-XML
           if( initParentChild && ( !currentVolumeLabel || !currentSeriesOID || ( currentSeriesOID && currentSeriesOID->GetValueAsString() != seriesOID ) ) )
@@ -1943,7 +1946,7 @@ bool mitk::ChiliPlugin::InitParentChild( const std::string& mitkHideIfNoVersionC
     TiXmlElement * relations = new TiXmlElement( "relations" );
     m_currentXmlDoc->LinkEndChild( relations );
     //create new text-oid
-    m_ParentTextOID = dbGetNewOID();
+    m_ParentTextOID = pGetNewOID();
   }
   else  //file exist
   {
@@ -2638,40 +2641,41 @@ void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 /** Create a temporary directory for windows. */
 std::string mitk::ChiliPlugin::GetTempDirectory()
 {
-/*
   DWORD BufSize=BUFSIZE;
   char PathBuffer[BUFSIZE];
   char TempName[BUFSIZE];  
   DWORD RetVal;
   UINT uRetVal;
 
-  // Get the temp path.
+  //get the temp path
   RetVal = GetTempPath( BufSize, PathBuffer );
   if( RetVal > BufSize || RetVal == 0 )
   {
     return "";
   }
 
-  // Create a unique name.
-  uRetVal = GetTempFileName( PathBuffer, "NEW", 0, TempName );
+  //create a unique name
+  uRetVal = GetTempFileName( PathBuffer, "CHI", 0, TempName );
   if( uRetVal == 0 )
   {
     return "";
   }
 
-  std::string makeTmpDirectory = TempName;
-  makeTmpDirectory = "mkdir " + makeTmpDirectory;
+  //the function create a random, not existing file; we dont want them, we want a directory
+  std::string tmpName = TempName;
+  tmpName = "del /Q " + tmpName;
+  system( tmpName.c_str() );
+
+  //use the random created name
+  std::string fileName = TempName;
+  fileName = fileName.substr( 0, fileName.find_first_of(".") );
+  fileName = fileName + "\\";
+  std::string makeTmpDirectory = "mkdir " + fileName;
+
+  //create directory
   system( makeTmpDirectory.c_str() );
 
-  return TempName;
-*/
-
-  std::string tmpDirectory = "C:\\WINDOWS\\Temp\\ChiliTemp\\";
-  std::string removeDirectory = "rm /s " + tmpDirectory;
-  std::string makeDirectory = "mkdir " + tmpDirectory;
-  system( removeDirectory.c_str() );
-  system( makeDirectory.c_str() );
-  return tmpDirectory;
+  return fileName;
 }
 
 #else

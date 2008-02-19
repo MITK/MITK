@@ -153,8 +153,6 @@ class SpacingSetFilter : public PicDescriptorToNode
     void ShowAllPossibleCombinations();
     void ShowAllResultCombinations();
     void ShowAllSlicesWithUsedSpacings();
-
-int number;
 };
 
 } // namespace mitk

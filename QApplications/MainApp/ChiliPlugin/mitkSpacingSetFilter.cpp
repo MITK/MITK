@@ -75,7 +75,6 @@ void mitk::SpacingSetFilter::Update()
   m_Output.clear();
   groupList.clear();
   m_ImageInstanceUIDs.clear();
-number = 1;
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
     SortSlicesToGroup();

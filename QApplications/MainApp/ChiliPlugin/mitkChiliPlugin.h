@@ -26,8 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <tinyxml.h>  // xml used to save the parent-child-relationship
 #include "mitkImageToPicDescriptor.h"  // define the "TagInformationList"
 
-extern "C" char *dbGetNewOID( void );  //TODO delete if its integrated into the plugin.h --> needed to get the textOID for the parentChildRelationship
-
 class QcMITKTask;
 class SampleApp;
 class QIDToolButton;

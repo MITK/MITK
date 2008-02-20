@@ -72,9 +72,12 @@ class QmitkLoadSaveToChiliExample : public QmitkFunctionality
 
   virtual void Activated();
 
+  virtual void TreeChanged();
+
 protected slots:
 
-  void SaveToChili();
+  void SaveDataTree();
+  void SaveSingleNodes();
   void LoadFromStudyListView();
   void LoadFromPSListView();
   void ChangeReaderType();
@@ -94,6 +97,8 @@ protected:
   void PluginEventNewStudySelected(const itk::EventObject&);
 
   void AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent );
+
+  void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 
   /*!
   * default main widget containing 4 windows showing 3

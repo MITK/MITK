@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>216</width>
-            <height>739</height>
+            <width>244</width>
+            <height>866</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -33,211 +33,285 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QGroupBox">
+        <widget class="QTabWidget">
             <property name="name">
-                <cstring>groupBox1</cstring>
+                <cstring>tabWidget</cstring>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>3</hsizetype>
-                    <vsizetype>7</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>0</width>
-                    <height>200</height>
-                </size>
-            </property>
-            <property name="title">
-                <string>content of selected Study:</string>
-            </property>
-            <vbox>
+            <widget class="QWidget">
                 <property name="name">
-                    <cstring>unnamed</cstring>
+                    <cstring>tab</cstring>
                 </property>
-                <widget class="QListView">
-                    <column>
+                <attribute name="title">
+                    <string>Load</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupBox1</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>3</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>200</height>
+                            </size>
+                        </property>
+                        <property name="title">
+                            <string>content of selected Study:</string>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QListView">
+                                <column>
+                                    <property name="text">
+                                        <string>Description</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <property name="name">
+                                    <cstring>studyContent</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>7</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="hScrollBarMode">
+                                    <enum>Auto</enum>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Single</enum>
+                                </property>
+                                <property name="rootIsDecorated">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="showToolTips">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>LoadFromStudyListView</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Load</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+L</string>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupBox2</cstring>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>200</height>
+                            </size>
+                        </property>
+                        <property name="title">
+                            <string>Parent-Child-Relation</string>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QListView">
+                                <column>
+                                    <property name="text">
+                                        <string>Description</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <property name="name">
+                                    <cstring>PSContent</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>7</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="hScrollBarMode">
+                                    <enum>Auto</enum>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Single</enum>
+                                </property>
+                                <property name="rootIsDecorated">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>LoadFromPSListView</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Load</string>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QButtonGroup">
+                        <property name="name">
+                            <cstring>buttonGroup1</cstring>
+                        </property>
+                        <property name="title">
+                            <string>Import-Filter:</string>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QRadioButton">
+                                <property name="name">
+                                    <cstring>ImageNumberFilter</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Image-N&amp;umber-Filter</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+U</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton">
+                                <property name="name">
+                                    <cstring>SpacingFilter</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Spa&amp;cing-Set-Filter</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+C</string>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton">
+                                <property name="name">
+                                    <cstring>SingleSpacingFilter</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>Si&amp;ngle-Spacing-Filter</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+N</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Save</string>
+                </attribute>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QGroupBox">
+                        <property name="name">
+                            <cstring>groupBox3</cstring>
+                        </property>
+                        <property name="title">
+                            <string>DataTree</string>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QListView">
+                                <column>
+                                    <property name="text">
+                                        <string>Nodes</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <property name="name">
+                                    <cstring>DataTreeView</cstring>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Single</enum>
+                                </property>
+                                <property name="resizeMode">
+                                    <enum>AllColumns</enum>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>SaveSelectedNodes</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Save selected Node(s)</string>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QPushButton">
+                        <property name="name">
+                            <cstring>SaveDataTree</cstring>
+                        </property>
                         <property name="text">
-                            <string>Description</string>
+                            <string>Sa&amp;ve current DataTree</string>
                         </property>
-                        <property name="clickable">
-                            <bool>true</bool>
+                        <property name="accel">
+                            <string>Alt+V</string>
                         </property>
-                        <property name="resizable">
-                            <bool>true</bool>
+                        <property name="toolTip" stdset="0">
+                            <string>In this example the whole DataTree get saved.</string>
                         </property>
-                    </column>
-                    <property name="name">
-                        <cstring>studyContent</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>3</hsizetype>
-                            <vsizetype>7</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="hScrollBarMode">
-                        <enum>Auto</enum>
-                    </property>
-                    <property name="selectionMode">
-                        <enum>Single</enum>
-                    </property>
-                    <property name="rootIsDecorated">
-                        <bool>true</bool>
-                    </property>
-                    <property name="showToolTips">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>LoadFromStudyListView</cstring>
-                    </property>
-                    <property name="text">
-                        <string>&amp;Load</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+L</string>
-                    </property>
-                </widget>
-            </vbox>
-        </widget>
-        <widget class="QGroupBox">
-            <property name="name">
-                <cstring>groupBox2</cstring>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>0</width>
-                    <height>200</height>
-                </size>
-            </property>
-            <property name="title">
-                <string>Parent-Child-Relation</string>
-            </property>
-            <vbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QListView">
-                    <column>
-                        <property name="text">
-                            <string>Description</string>
-                        </property>
-                        <property name="clickable">
-                            <bool>true</bool>
-                        </property>
-                        <property name="resizable">
-                            <bool>true</bool>
-                        </property>
-                    </column>
-                    <property name="name">
-                        <cstring>PSContent</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>3</hsizetype>
-                            <vsizetype>7</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="hScrollBarMode">
-                        <enum>Auto</enum>
-                    </property>
-                    <property name="selectionMode">
-                        <enum>Single</enum>
-                    </property>
-                    <property name="rootIsDecorated">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>LoadFromPSListView</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Load</string>
-                    </property>
-                </widget>
-            </vbox>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>SaveToChili</cstring>
-            </property>
-            <property name="text">
-                <string>Sa&amp;ve current DataTree</string>
-            </property>
-            <property name="accel">
-                <string>Alt+V</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>In this example the whole DataTree get saved.</string>
-            </property>
-        </widget>
-        <widget class="QButtonGroup">
-            <property name="name">
-                <cstring>buttonGroup1</cstring>
-            </property>
-            <property name="title">
-                <string>Import-Filter:</string>
-            </property>
-            <vbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>ImageNumberFilter</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Image-N&amp;umber-Filter</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+U</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>SpacingFilter</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Spa&amp;cing-Set-Filter</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+C</string>
-                    </property>
-                </widget>
-                <widget class="QRadioButton">
-                    <property name="name">
-                        <cstring>SingleSpacingFilter</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="text">
-                        <string>Si&amp;ngle-Spacing-Filter</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+N</string>
-                    </property>
-                    <property name="checked">
-                        <bool>false</bool>
-                    </property>
-                </widget>
-            </vbox>
+                    </widget>
+                </vbox>
+            </widget>
         </widget>
     </vbox>
 </widget>

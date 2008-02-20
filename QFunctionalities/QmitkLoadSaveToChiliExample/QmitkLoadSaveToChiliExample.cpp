@@ -36,6 +36,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateProperty.h>
 
+#include <QmitkDataTreeViewItem.h>
+
+#include <mitkProperties.h>
+
 QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 : QmitkFunctionality( parent, name, it ),
   m_Plugin( NULL ),
@@ -71,6 +75,7 @@ QWidget * QmitkLoadSaveToChiliExample::CreateControlWidget( QWidget *parent )
   if( m_Controls == NULL )
   {
     m_Controls = new QmitkLoadSaveToChiliExampleControls( parent );
+    SetDataTreeIterator( GetDataTreeIterator() );
   }
   return m_Controls;
 }
@@ -82,7 +87,8 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
     connect( ( QObject* )( m_Controls->LoadFromStudyListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromStudyListView() ) );
     connect( ( QObject* )( m_Controls->LoadFromPSListView ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( LoadFromPSListView() ) );
 
-    connect( ( QObject* )( m_Controls->SaveToChili ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveToChili() ) );
+    connect( ( QObject* )( m_Controls->SaveDataTree ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveDataTree() ) );
+    connect( ( QObject* )( m_Controls->SaveSelectedNodes ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( SaveSingleNodes() ) );
 
     connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
@@ -102,6 +108,11 @@ void QmitkLoadSaveToChiliExample::Activated()
   QmitkFunctionality::Activated();
 }
 
+void QmitkLoadSaveToChiliExample::TreeChanged()
+{
+  SetDataTreeIterator( GetDataTreeIterator() );
+}
+
 /** This function load the selected element from the study-listview */
 void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
 {
@@ -114,7 +125,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
         {
-		  std::string savedOID = entry->GetChiliOID().ascii();
+          std::string savedOID = entry->GetChiliOID().ascii();
           AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
         }
         break;
@@ -214,32 +225,59 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
       std::string vLabel = entry->GetVolumeLabel().ascii();
       mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
       if( temp.IsNotNull() )
-	  {
+      {
         mitk::DataStorage::GetInstance()->Add( temp );
+
         m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
         m_MultiWidget->Fit();
         m_MultiWidget->ReInitializeStandardViews();
-	  }
+      }
     }
   }
 }
 
-void QmitkLoadSaveToChiliExample::SaveToChili()
+void QmitkLoadSaveToChiliExample::SaveDataTree()
 {
   mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
   mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
   mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
   mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
-  mitk::NodePredicateData w5( NULL );
+  mitk::NodePredicateProperty w5( "helper object", new mitk::BoolProperty( true ) );
+  mitk::NodePredicateData w6( NULL );
   mitk::NodePredicateOR orpred;
   orpred.AddPredicate( w1 );
   orpred.AddPredicate( w2 );
   orpred.AddPredicate( w3 );
   orpred.AddPredicate( w4 );
   orpred.AddPredicate( w5 );
+  orpred.AddPredicate( w6 );
   mitk::NodePredicateNOT notpred( orpred );
 
   m_Plugin->SaveToChili( mitk::DataStorage::GetInstance()->GetSubset( notpred ) );
+}
+
+void QmitkLoadSaveToChiliExample::SaveSingleNodes()
+{
+  QmitkDataTreeViewItem* entry = dynamic_cast<QmitkDataTreeViewItem*>( m_Controls->DataTreeView->selectedItem() );
+  if( entry != NULL )
+  {
+    mitk::DataTreeIteratorBase* selectedIterator = entry->GetDataTreeIterator();
+    if (selectedIterator != NULL)
+    {
+      mitk::DataTreeNode* node = selectedIterator->Get();
+      if (node != NULL )
+      {
+        mitk::BaseProperty::Pointer testProperty = node->GetProperty( "helper object" );
+        if( testProperty.IsNull() || testProperty->GetValueAsString() == "0" )
+        {
+          mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
+          resultset->InsertElement( 0, node );
+
+          m_Plugin->SaveToChili( mitk::DataStorage::SetOfObjects::ConstPointer( resultset ) );
+        }
+      }
+    }
+  }
 }
 
 void QmitkLoadSaveToChiliExample::ChangeReaderType()
@@ -434,6 +472,26 @@ void QmitkLoadSaveToChiliExample::AddElementsToPSContent( mitk::PACSPlugin::PSRe
       if( (*childIter) == searchIter->label )
         AddElementsToPSContent( (*searchIter), elementList, newParent );
     }
+  }
+}
+
+void QmitkLoadSaveToChiliExample::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
+{
+  if( it == NULL )
+    return;
+
+  while( m_Controls->DataTreeView->firstChild() )
+  {
+    delete m_Controls->DataTreeView->firstChild();
+  }
+
+  m_DataTreeIterator = it;
+  mitk::DataTreeIteratorClone tempIt = m_DataTreeIterator;
+
+  if( !tempIt->IsAtEnd() )
+  {
+    new QmitkDataTreeViewItem( m_Controls->DataTreeView, "Loaded Data", "root", tempIt.GetPointer() );
+    ++tempIt;
   }
 }
 

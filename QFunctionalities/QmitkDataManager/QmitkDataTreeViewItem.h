@@ -16,15 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef DATA_TREE_VIEW_H
-#define DATA_TREE_VIEW_H
+#ifndef QMITK_DATA_TREE_VIEW_H
+#define QMITK_DATA_TREE_VIEW_H
 #include <qlistview.h>
 #include <qstring.h>
 
 class QWidget;
 #include <mitkDataTree.h>
 #include <itkCommand.h>
-#include <QmitkDataManagerControls.h>
+
 class NodeViewPropertyItem;
 class NodeViewCheckboxItem;
 
@@ -68,4 +68,4 @@ class QmitkFocusChangeCommand : public itk::Command {
 
 
 
-#endif //DATA_TREE_VIEW_H
+#endif //QMITK_DATA_TREE_VIEW_H

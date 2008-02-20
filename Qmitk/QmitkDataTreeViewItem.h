@@ -28,7 +28,7 @@ class QWidget;
 class NodeViewPropertyItem;
 class NodeViewCheckboxItem;
 
-class QmitkDataTreeViewItem : public QListViewItem
+class QMITK_EXPORT QmitkDataTreeViewItem : public QListViewItem
 {
 
   public:

@@ -18,6 +18,7 @@ SET(CPP_FILES
   QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
   QmitkCopyToClipBoardDialog.cpp
+  QmitkDataTreeViewItem.cpp  
   QmitkDialogBar.cpp
   QmitkDialogBars/QmitkSliderDialogBar.cpp
   QmitkDialogBars/QmitkStandardViewsDialogBar.cpp

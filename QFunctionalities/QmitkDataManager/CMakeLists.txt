@@ -1,6 +1,6 @@
 SET(FUNC_CPP 
   QmitkDataManager.cpp
-  QmitkDataTreeViewItem.cpp
+
   # QmitkFocusChangeCommand.cpp
   # QmitkSimpleCheckedDataTreeViewItem.cpp
   # QmitkDataTreeNodeFilter.cpp

@@ -146,7 +146,7 @@ bool mitk::ColorProperty::ReadXMLData( XMLReader& xmlReader )
     color[1] = value[1];
     color[2] = value[2];
     SetColor( color );
-    std::cout << "read mitk::ColorProperty: " << GetValueAsString () << std::endl;
+    //std::cout << "read mitk::ColorProperty: " << GetValueAsString () << std::endl;
     return true;
   }
   return false;

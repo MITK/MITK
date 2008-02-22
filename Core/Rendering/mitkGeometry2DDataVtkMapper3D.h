@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSystemIncludes.h>
 
 class vtkActor;
+class vtkArrowSource;
+class vtkAppendPolyData;
 class vtkTexture;
 class vtkImageMapToWindowLevelColors;
 class vtkPolyData;
@@ -37,6 +39,8 @@ class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
 class vtkTransformPolyDataFilter;
+class vtkTransform;
+class vtkTextActor;
 
 namespace mitk {
 
@@ -73,8 +77,7 @@ public:
    * \brief All images found when traversing the (sub-) tree starting at
    * \a iterator which are resliced by an ImageMapper2D will be mapped.
    */
-  virtual void SetDataIteratorForTexture(
-    const mitk::DataTreeIteratorBase *iterator );
+  virtual void SetDataIteratorForTexture(const mitk::DataTreeIteratorBase *iterator);
 
 protected:
   Geometry2DDataVtkMapper3D();
@@ -137,6 +140,12 @@ protected:
   /** \brief Actor for the tube-shaped frame */
   vtkActor *m_EdgeActor;
 
+  /** direction arrow display objects */
+  vtkArrowSource* m_DirectionSource;
+  vtkTransformPolyDataFilter* m_DirectionTransformer;
+  vtkAppendPolyData* m_DirectionAppender;
+  vtkTransform* m_DirectionTransform;
+
   /** \brief Mapper for black plane background */
   vtkDataSetMapper *m_BackgroundMapper;
 
@@ -177,9 +186,5 @@ protected:
   LastUpdateTimeList m_LastTextureUpdateTimes;
 
 };
-
 } // namespace mitk
-
-
-
 #endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */

@@ -409,16 +409,12 @@ void QmitkFctMediator::RaiseFunctionality( QmitkFunctionality *aFunctionality )
 {
   QmitkFunctionality *functionality;
   int id = 0;
-  for ( functionality = m_Functionalities.first(); 
-        functionality != 0; 
-        functionality = m_Functionalities.next(), ++id )
-  {
+  for ( functionality = m_Functionalities.first(); functionality != 0; functionality = m_Functionalities.next(), ++id )
     if ( functionality == aFunctionality )
     {
       this->RaiseFunctionality( id );
       return;
     }
-  }
 }
 
 void QmitkFctMediator::EnableDialogBar( int id, bool enable )
@@ -439,16 +435,12 @@ void QmitkFctMediator::EnableDialogBar( QmitkDialogBar *aDialogBar, bool enable 
 {
   QmitkDialogBar *dialogBar;
   int id = 0;
-  for ( dialogBar = m_DialogBars.first(); 
-        dialogBar != 0; 
-        dialogBar = m_DialogBars.next(), ++id )
-  {
+  for ( dialogBar = m_DialogBars.first(); dialogBar != 0; dialogBar = m_DialogBars.next(), ++id )
     if ( dialogBar == aDialogBar )
     {
       this->EnableDialogBar( id, enable );
       return;
     }
-  }
 }
 
 void QmitkFctMediator::ToggleDialogBar( QAction *action )
@@ -460,46 +452,28 @@ void QmitkFctMediator::ToggleDialogBar( QAction *action )
   }
 }
 
-QmitkDialogBar *
-QmitkFctMediator
-::GetDialogBarByName( const char *name )
+QmitkDialogBar* QmitkFctMediator::GetDialogBarByName( const char *name )
 {
   QmitkDialogBar *dialogBar;
-  for ( dialogBar = m_DialogBars.first(); 
-        dialogBar != 0; 
-        dialogBar = m_DialogBars.next() )
-  {
+  for ( dialogBar = m_DialogBars.first(); dialogBar != 0; dialogBar = m_DialogBars.next() )
     if (strcmp(dialogBar->GetFunctionalityName().ascii(),name)==0)
-    {
       return dialogBar;
-    }
-  }
   return NULL;
 }
 
-QmitkDialogBar *
-QmitkFctMediator
-::GetDialogBarById( int id )
+QmitkDialogBar* QmitkFctMediator::GetDialogBarById( int id )
 {
   return m_DialogBars.at( id );
 }
 
-int 
-QmitkFctMediator
-::GetDialogBarIdByName( const char *name )
+int QmitkFctMediator::GetDialogBarIdByName( const char *name )
 {
   QmitkDialogBar *dialogBar;
   int id = 0;
 
-  for ( dialogBar = m_DialogBars.first();
-        dialogBar != NULL;
-      dialogBar = m_DialogBars.next(), id++ ) 
-  {
+  for ( dialogBar = m_DialogBars.first(); dialogBar != NULL; dialogBar = m_DialogBars.next(), id++ ) 
     if (strcmp(dialogBar->GetFunctionalityName().ascii(),name)==0)
-    {
       return id;
-    }
-  }
   return -1;
 }
 
@@ -508,8 +482,7 @@ void QmitkFctMediator::HideControls(bool hide)
 {
   if(m_ControlStack==NULL) return;
 
-  QWidget *controlStackParent = 
-    dynamic_cast<QWidget*>(m_ControlStack->parent());
+  QWidget *controlStackParent = dynamic_cast<QWidget*>(m_ControlStack->parent());
 
   if(controlStackParent==NULL) return;
 
@@ -545,15 +518,12 @@ unsigned int QmitkFctMediator::GetDialogBarCount()
 }
 
 
-void 
-QmitkFctMediator
-::ApplyOptionsToDialogBars( mitk::PropertyList::Pointer options )
+void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer options)
 {
   m_Options = options;
 
   if ( m_Options.IsNotNull() )
   {
-
     int i;
     for ( i = 0; i < m_NumberOfDialogBars; ++i )
     {
@@ -566,12 +536,9 @@ QmitkFctMediator
 
       // Read (or create) application property for this dialog bar; enable or
       // disable it accordingly; default is disabled
-      QString dialogBarStateName = 
-        "DialogBar " + dialogBar->GetCaption() + " active";
+      QString dialogBarStateName = "DialogBar " + dialogBar->GetCaption() + " active";
 
-      mitk::BoolProperty *dialogBarState = 
-        dynamic_cast< mitk::BoolProperty * >( 
-          m_Options->GetProperty( dialogBarStateName.ascii() ));          
+      mitk::BoolProperty *dialogBarState = dynamic_cast< mitk::BoolProperty* >(m_Options->GetProperty(dialogBarStateName.ascii()));
 
       bool enableDialogBar;
       if ( dialogBarState != NULL )

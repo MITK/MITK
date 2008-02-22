@@ -1418,6 +1418,8 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
 
 void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
 {
+  std::cout << "Loading options file: " << filename << std::endl;
+
   // create a dummy tree with all the functionalities' propertylists
   mitk::DataTree::Pointer dummyTree = mitk::DataTree::New();
 
@@ -1442,7 +1444,7 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
         mitk::BaseProperty::Pointer bp = pl->GetProperty("MITKSampleAppFunctionalityName");
         mitk::StringProperty* id = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
         std::string idstring;
-        if (id)
+        if (id != NULL)
           idstring = id->GetValueAsString();
 
         if (idstring == "MITKSampleApp")
@@ -1457,10 +1459,10 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
         else
         {
           // give it to the appropriate functionality
-          QmitkFunctionality* f = qfm->GetFunctionalityByName( idstring.c_str() );
-          if ( f != NULL )
+          QmitkFunctionality* f = qfm->GetFunctionalityByName(idstring.c_str());
+          if (f != NULL)
           {
-            f->SetFunctionalityOptionsList( pl );
+            f->AddToFunctionalityOptionsList(pl);
           }
         }
       }

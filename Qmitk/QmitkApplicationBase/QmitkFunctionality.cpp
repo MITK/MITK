@@ -32,7 +32,6 @@ QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Act
 {
   std::cout << "Instantiating QmitkFunctionality. QObject::name(): " << this->name() << std::endl;
   SetDataTree(dataIt);
-  m_Options = mitk::PropertyList::New();
 }
 
 QmitkFunctionality::~QmitkFunctionality()
@@ -146,24 +145,34 @@ void QmitkFunctionality::OptionsChanged(QWidget* itkNotUsed(optionDialog))
   // Read new values from your option dialog and update your functionality accordingly
 }
 
+void QmitkFunctionality::CreateFunctionalityOptionsList()
+{
+  m_Options = mitk::PropertyList::New();
+}
+
 mitk::PropertyList* QmitkFunctionality::GetFunctionalityOptionsList()
 {
   return m_Options.GetPointer();
 }
 
-void QmitkFunctionality::SetFunctionalityOptionsList(mitk::PropertyList* pl)
+void QmitkFunctionality::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
 {
-  if (pl)
+  if (pl == NULL)
+    return;
+
+  /* if there is no option list, create it with default values */
+  if (m_Options.IsNull())
+    this->CreateFunctionalityOptionsList();
+
+  /* update existing options list with values of the new list */
+  for (mitk::PropertyList::PropertyMap::const_iterator it = pl->GetMap()->begin(); it != pl->GetMap()->end(); it++)
   {
-    if ( m_Options.IsNull() )
-      m_Options = mitk::PropertyList::New();
-    m_Options = pl->Clone();
+    m_Options->SetProperty(it->first.c_str(), it->second.first);
   }
   
+  //m_Options = pl->Clone();
   // more meaningful implementation, i.e. reaction to property values, to be done in sub-classes
 }
-
-
 
 void QmitkFunctionality::WaitCursorOn()
 {
@@ -171,11 +180,11 @@ void QmitkFunctionality::WaitCursorOn()
 }
 
 
-
 void QmitkFunctionality::WaitCursorOff()
 {
   QApplication::restoreOverrideCursor();
 }
+
 
 void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
 {
@@ -186,11 +195,13 @@ void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool
   }
 }
 
+
 void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog ) const
 {
   HandleException( e.what(), parent, showDialog );
 }
-  
+
+
 bool QmitkFunctionality::TestYourself()
 {
   std::cout << "NO TEST IMPLEMENTED : ";

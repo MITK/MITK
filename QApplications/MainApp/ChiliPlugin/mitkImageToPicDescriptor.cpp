@@ -215,7 +215,7 @@ void mitk::ImageToPicDescriptor::Update()
 
         // put the generated Image-tags to the slice
         // IMAGE_INSTANCE_UID
-        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_INSTANCE_UID );
+        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( missingImageTags, (char*)tagIMAGE_INSTANCE_UID );
         if( missingImageTagQuery )
         {
           DeleteTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
@@ -223,14 +223,14 @@ void mitk::ImageToPicDescriptor::Update()
           m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );
         }
         // IMAGE_DATE
-        missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_DATE );
+        missingImageTagQuery = ipPicQueryTag( missingImageTags, (char*)tagIMAGE_DATE );
         if( missingImageTagQuery )
         {
           DeleteTag( currentPicDescriptor, tagIMAGE_DATE );
           ipPicAddTag( currentPicDescriptor, CreateASCIITag( tagIMAGE_DATE, static_cast<char*>( missingImageTagQuery->value ) ) );
         }
         // IMAGE_TIME
-        missingImageTagQuery = ipPicQueryTag( missingImageTags, tagIMAGE_TIME );
+        missingImageTagQuery = ipPicQueryTag( missingImageTags, (char*)tagIMAGE_TIME );
         if( missingImageTagQuery )
         {
           DeleteTag( currentPicDescriptor, tagIMAGE_TIME );
@@ -278,13 +278,13 @@ void mitk::ImageToPicDescriptor::Update()
       else
       //if the slices should override, no tags get changed, but we need the imageInstanceUID
       {
-        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( currentPicDescriptor, tagIMAGE_INSTANCE_UID );
+        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( currentPicDescriptor, (char*)tagIMAGE_INSTANCE_UID );
         if( missingImageTagQuery )
           m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );
         else
         {
           //try to read from dicom-header
-          ipPicTSV_t *dicomHeader = ipPicQueryTag( currentPicDescriptor, "SOURCE HEADER" );
+          ipPicTSV_t *dicomHeader = ipPicQueryTag( currentPicDescriptor, (char*)"SOURCE HEADER" );
           void* data = NULL;
           ipUInt4_t len = 0;
           if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
@@ -362,7 +362,7 @@ void mitk::ImageToPicDescriptor::CopyDicomHeaderInformationToPicHeader( ipPicDes
     if( !picHeader )
     {
       //try to read from dicom-header
-      ipPicTSV_t *dicomHeader = ipPicQueryTag( pic, "SOURCE HEADER" );
+      ipPicTSV_t *dicomHeader = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
       void* data = NULL;
       ipUInt4_t len = 0;
       if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, tagsToImport[x].dicomGroup, tagsToImport[x].dicomElement, &data, &len ) && data != NULL )

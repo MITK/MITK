@@ -103,34 +103,37 @@ void mitk::PointSetSliceMapper2D::GenerateData( mitk::BaseRenderer* renderer )
   assert(m_VtkPointSet);
   m_VtkPointSet->Register(0);
     
-  mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
-  mitk::TransferFunctionProperty::Pointer transferFuncProp;
-  node->GetProperty(transferFuncProp, "TransferFunction", renderer);
-  if (transferFuncProp.IsNotNull())
+  if (m_ScalarVisibility->GetValue())
   {
-    mitk::TransferFunction::Pointer tf = transferFuncProp->GetValue();
-    if (m_ScalarsToColors) m_ScalarsToColors->UnRegister(0);
-    m_ScalarsToColors = static_cast<vtkScalarsToColors*>(tf->GetColorTransferFunction());
-    m_ScalarsToColors->Register(0);
-    
-    if (m_ScalarsToOpacity) m_ScalarsToOpacity->UnRegister(0);
-    m_ScalarsToOpacity = tf->GetScalarOpacityFunction();
-    m_ScalarsToOpacity->Register(0);
-  }
-  else
-  {
-    if (m_ScalarsToColors) m_ScalarsToColors->UnRegister(0);
-    m_ScalarsToColors = this->GetVtkLUT(renderer);
-    assert(m_ScalarsToColors);
-    m_ScalarsToColors->Register(0);
-    
-    float opacity;
-    node->GetOpacity(opacity, renderer);
-    if (m_ScalarsToOpacity) m_ScalarsToOpacity->UnRegister(0);
-    m_ScalarsToOpacity = vtkPiecewiseFunction::New();
-    double range[2];
-    m_VtkPointSet->GetScalarRange(range);
-    m_ScalarsToOpacity->AddSegment(range[0], opacity, range[1], opacity);
+    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+    mitk::TransferFunctionProperty::Pointer transferFuncProp;
+    node->GetProperty(transferFuncProp, "TransferFunction", renderer);
+    if (transferFuncProp.IsNotNull())
+    {
+      mitk::TransferFunction::Pointer tf = transferFuncProp->GetValue();
+      if (m_ScalarsToColors) m_ScalarsToColors->UnRegister(0);
+      m_ScalarsToColors = static_cast<vtkScalarsToColors*>(tf->GetColorTransferFunction());
+      m_ScalarsToColors->Register(0);
+      
+      if (m_ScalarsToOpacity) m_ScalarsToOpacity->UnRegister(0);
+      m_ScalarsToOpacity = tf->GetScalarOpacityFunction();
+      m_ScalarsToOpacity->Register(0);
+    }
+    else
+    {
+      if (m_ScalarsToColors) m_ScalarsToColors->UnRegister(0);
+      m_ScalarsToColors = this->GetVtkLUT(renderer);
+      assert(m_ScalarsToColors);
+      m_ScalarsToColors->Register(0);
+      
+      float opacity;
+      node->GetOpacity(opacity, renderer);
+      if (m_ScalarsToOpacity) m_ScalarsToOpacity->UnRegister(0);
+      m_ScalarsToOpacity = vtkPiecewiseFunction::New();
+      double range[2];
+      m_VtkPointSet->GetScalarRange(range);
+      m_ScalarsToOpacity->AddSegment(range[0], opacity, range[1], opacity);
+    }
   }
 }
 
@@ -230,6 +233,7 @@ void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
 
     vlines->GetNextCell( cellSize, cell );
 
+    float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
     if (m_ScalarVisibility->GetValue())
     {
       if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
@@ -238,20 +242,25 @@ void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
         double scalar = vcellscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
         m_ScalarsToColors->GetColor(scalar, rgb);
-        float rgba[4] = {(float)rgb[0], (float)rgb[1], (float)rgb[2], 1.0f };
+        rgba[0] = (float)rgb[0];
+        rgba[1] = (float)rgb[1];
+        rgba[2] = (float)rgb[2];
         rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
-        glColor4fv( rgba );
       }
       else if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA )
       {
         double scalar = vscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
         m_ScalarsToColors->GetColor(scalar, rgb);
-        float rgba[4] = {(float)rgb[0], (float)rgb[1], (float)rgb[2], 1.0f };
+        rgba[0] = (float)rgb[0];
+        rgba[1] = (float)rgb[1];
+        rgba[2] = (float)rgb[2];
         rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
-        glColor4fv( rgba );
       }
     }
+    
+    glColor4fv( rgba );
+    
 
     glBegin ( GL_LINE_LOOP );
     for ( int j = 0;j < cellSize;++j )
@@ -288,6 +297,7 @@ void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
 
     vpolys->GetNextCell( cellSize, cell );
 
+    float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
     if (m_ScalarVisibility->GetValue())
     {
       if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
@@ -296,20 +306,24 @@ void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
         double scalar = vcellscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
         m_ScalarsToColors->GetColor(scalar, rgb);
-        float rgba[4] = {(float)rgb[0], (float)rgb[1], (float)rgb[2], 1.0f };
+        rgba[0] = (float)rgb[0];
+        rgba[1] = (float)rgb[1];
+        rgba[2] = (float)rgb[2];
         rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
-        glColor4fv( rgba );
       }
       else if (m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA )
       {
         double scalar = vscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
         m_ScalarsToColors->GetColor(scalar, rgb);
-        float rgba[4] = {(float)rgb[0], (float)rgb[1], (float)rgb[2], 1.0f };
+        rgba[0] = (float)rgb[0];
+        rgba[1] = (float)rgb[1];
+        rgba[2] = (float)rgb[2];
         rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
         glColor4fv( rgba );
       }
     }
+    glColor4fv( rgba );
 
     //Point2D points[cellSize];
     glBegin( GL_POLYGON );
@@ -527,8 +541,8 @@ mitk::PointSetSliceMapper2D::~PointSetSliceMapper2D()
   m_Slicer->Delete();
   m_Plane->Delete();
   
-  m_ScalarsToOpacity->UnRegister(0);
-  m_ScalarsToColors->UnRegister(0);
+  if (m_ScalarsToOpacity != 0) m_ScalarsToOpacity->UnRegister(0);
+  if (m_ScalarsToColors != 0) m_ScalarsToColors->UnRegister(0);
   m_VtkPointSet->UnRegister(0);
 }
 

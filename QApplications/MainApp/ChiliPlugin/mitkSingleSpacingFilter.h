@@ -73,20 +73,29 @@ class SingleSpacingFilter : public PicDescriptorToNode
     /** constructor */
     SingleSpacingFilter();
 
-    /** struct for every single slice/point/picDescriptor */
-    struct Slice
-    {
-      ipPicDescriptor* currentPic;
-      int imageNumber;
-    };
+    /** input */
+    std::string m_SeriesOID;
+    std::list< ipPicDescriptor* > m_PicDescriptorList;
 
     /** this struct combine all slices with the same origin */
-    struct PositionAtSpace
+    struct Position
     {
       Vector3D origin;
       Vector3D normal;
-      std::vector< Slice > includedSlices;
+      std::vector< ipPicDescriptor* > includedPics;
     };
+
+    /** struct for a single group */
+    struct Group
+    {
+      std::vector< Position > includedPositions;
+      std::string referenceUID;
+      std::string seriesDescription;
+      int dimension;
+      Vector3D pixelSize;
+      Vector3D normalWithImageSize;
+   };
+   std::vector< Group > m_GroupVector;
 
     /** the spacing created between the PositionAtSpace */
     struct Spacing
@@ -95,55 +104,25 @@ class SingleSpacingFilter : public PicDescriptorToNode
       int count;
     };
 
-    /** struct for a single group */
-    struct Group
-    {
-      std::vector< PositionAtSpace > includedPositions;
-      std::vector< Spacing > foundSpacings;
-      std::string referenceUID;
-      std::string seriesDescription;
-      int dimension;
-      Vector3D pixelSize;
-      Vector3D normalWithImageSize;
-   };
-
-    /** the group-list */
-    std::vector< Group > groupList;
-
-    struct SpacingStruct
-    {
-      Vector3D spacing;
-      int count;
-    };
-
-    /** input */
-    std::list< ipPicDescriptor* > m_PicDescriptorList;
-    std::string m_SeriesOID;
-
     /** output */
     std::vector< DataTreeNode::Pointer > m_Output;
-
     std::vector< std::list< std::string > > m_ImageInstanceUIDs;
 
     /** function to put the input-PicDescriptors to struct Slice, PositionAtSpace and Group */
     void SortSlicesToGroup();
     /** sort the PositionAtSpace for every group by there location */
-    void SortGroupsByLocation();
-    /** create the spacings, therefore every spacing between two PositionAtSpace get created and counted, the highest one get used */
-    void CreateSpacings();
-    /** generate the result - nodes */
-    void GenerateNodes();
+    void SortGroupsAndSlices();
+
+    void CreateResults();
+    void SearchParameter( unsigned int currentGroup );
+    void GenerateNodes( std::vector<Position*> usedPos, Vector3D spacing, unsigned int timeCount, unsigned int currentGroup );
 
     /** helpfunctions */
-    static bool LocationSort( const PositionAtSpace elem1, const PositionAtSpace elem2 );
-    static bool SpacingCountSort( const Spacing elem1, const Spacing elem2 );
-    static bool ImageNumberSort( const Slice elem1, const Slice elem2 );
+    static bool PositionSort( const Position& elem1, const Position& elem2 );
+    static bool SliceSort( ipPicDescriptor* elem1, ipPicDescriptor* elem2 );
+
     double Round( double number, unsigned int decimalPlaces );
     const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
-
-    /** debug-output */
-    void ShowAllGroupsWithSlices();
-    void ShowAllFoundSpacings();
 };
 
 } // namespace mitk

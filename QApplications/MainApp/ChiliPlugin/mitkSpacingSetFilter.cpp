@@ -688,7 +688,8 @@ void mitk::SpacingSetFilter::GenerateNodes()
           else
             header->dim = 4;
           header->n[2] = (*iter->begin())->currentPic->n[2];
-          header->n[3] = iter->size()-1;
+          sliceSteps = (*iter->begin())->currentPic->n[2];
+          header->n[3] = iter->size();
         }
         else
         {

@@ -50,6 +50,9 @@ namespace mitk
       ////## @brief returns true if video capturing is active.
       bool IsCapturingEnabled();
 
+      int GetImageWidth(){return m_CaptureWidth;}
+      int GetImageHeight(){return m_CaptureHeight;}
+
     protected:
       VideoSource();
 	    virtual ~VideoSource();  

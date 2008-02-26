@@ -36,8 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
 {
   m_VideoSource = v; 
-  m_ImageWidth  = 720;
-  m_ImageHeight = 576;
+  m_ImageWidth  = v->GetImageWidth();
+  m_ImageHeight = v->GetImageHeight();
   m_TimerDelay  = TimerDelay;
   ResetVideoBackground();
 }

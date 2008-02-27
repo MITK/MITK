@@ -60,7 +60,8 @@ bool LevelWindowPreset::LoadPreset(std::string fileName)
 
 void  LevelWindowPreset::StartElement (const char *elementName, const char **atts)
 {
-  if ( elementName == PRESET )
+  std::string elementNameString = elementName;
+  if ( elementNameString == PRESET )
   {
     std::string name = ReadXMLStringAttribut( "NAME", atts );
     std::string level = ReadXMLStringAttribut( "LEVEL", atts );

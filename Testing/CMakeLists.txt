@@ -58,6 +58,7 @@ SET(${KITNAME}_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp  
   mitkPicFileReaderTest.cpp
+  mitkVtkPropRendererTest.cpp
 )
 
 # list of images for which the tests are run

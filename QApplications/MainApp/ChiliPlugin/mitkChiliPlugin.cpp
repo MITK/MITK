@@ -92,7 +92,7 @@ mitk::ChiliPlugin::ChiliPlugin()
   m_tempDirectory = GetTempDirectory();
 
   if( m_tempDirectory.empty() )
-    QMessageBox::information( 0, "MITK", "MITK was not able to create a Temp-Directory.\nYou can only Load via Lightbox.\nMore should not be possible." );
+    QMessageBox::information( 0, "MITK", "MITK was not able to create a temporary directory.\nYou can only load data from CHILI using the yellow light box import buttons." );
   else
     std::cout << "ChiliPlugin: Create and use directory "<< m_tempDirectory << std::endl;
 }
@@ -227,7 +227,7 @@ QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
   {
     QTimer* timer = new QTimer(realPluginInstance);
     connect( timer, SIGNAL(timeout()), realPluginInstance, SLOT(CreateSampleApp()) );
-    timer->start(1000, true);
+    timer->start(4000, true);
 
     done = true;
   }
@@ -257,7 +257,7 @@ mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your CHILI version does not support this function (GetStudyInformation)." );
   return resultInformation;
 
 #else
@@ -324,7 +324,7 @@ mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( c
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetPatientInformation)." );
   return resultInformation;
 
 #else
@@ -388,7 +388,7 @@ mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( con
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetSeriesInformation)." );
   return resultInformation;
 
 #else
@@ -492,7 +492,7 @@ mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const s
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetTextInformation)." );
   return resultInformation;
 
 #else
@@ -589,7 +589,7 @@ QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
       return newLightbox;
     }
   }
-  QMessageBox::information( 0, "MITK", "You have reached the maximum count of Lightboxes. No one more can created." );
+  QMessageBox::information( 0, "MITK", "Application asked for a new lightbox. CHILI cannot handle more than 4 lightboxes, so please close one first." );
   return NULL;
 }
 
@@ -598,7 +598,7 @@ QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
 {
   QcLightbox* currentLightbox = lightboxManager()->getActiveLightbox();
   if( currentLightbox == NULL)
-    QMessageBox::information( 0, "MITK", "There is no selected Lightbox in Chili." );
+    QMessageBox::information( 0, "MITK", "Application asked for the currently active lightbox, but there is none." );
   return currentLightbox;
 }
 
@@ -619,7 +619,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetSeriesRelation
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetSeriesRelationInformation)." );
   return result;
 
 #else
@@ -689,7 +689,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetStudyRelationI
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetStudyRelationInformation)." );
   return result;
 
 #else
@@ -777,7 +777,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadParentChildElement)." );
   return NULL;
 
 #else
@@ -946,7 +946,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  //QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  //QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function." );
   //return resultVector;
 
   //TODO entfernen wenn das neue Chili-Release installiert ist
@@ -1051,7 +1051,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( 
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadCompleteSeries)." );
   return resultNodes;
 
 #else
@@ -1061,7 +1061,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadCompleteSeries( 
 
   if( seriesOID == "" )
   {
-    QMessageBox::information( 0, "MITK", "No SeriesOID set. Do you select a Series?" );
+    QMessageBox::information( 0, "MITK", "Attempt to load series without series ID. Is a series selected?" );
     return resultNodes;
   }
 
@@ -1091,7 +1091,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSer
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
   return resultNodes;
 
 #else
@@ -1297,7 +1297,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllTextsFromSeri
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllTextsFromSeries)." );
   return resultNodes;
 
 #else
@@ -1361,7 +1361,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& m
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadOneText)." );
   return NULL;
 
 #else
@@ -1405,7 +1405,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& m
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadOneText)." );
   return NULL;
 
 #else
@@ -1498,7 +1498,7 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mit
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
   return;
 
 #else
@@ -1575,7 +1575,7 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveAsNewSeries)." );
   return;
 
 #else
@@ -1622,7 +1622,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, youre current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToSeries)." );
   return;
 
 #else
@@ -1917,7 +1917,7 @@ bool mitk::ChiliPlugin::InitParentChild( const std::string& mitkHideIfNoVersionC
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function." );
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (InitParentChild)." );
   return false;
 
 #else
@@ -2435,7 +2435,7 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 
   if( ChiliFillingLightbox() )
   {
-    QMessageBox::information( 0, "MITK", "Lightbox not ready. Try again when lightbox filling is completed!" );
+    QMessageBox::information( 0, "MITK", "Lightbox not ready (still loading slices). Try again when lightbox filling is completed!" );
     return;
   }
 
@@ -2451,7 +2451,7 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 
     if( resultNodes.size() > 8 )
     {
-      if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected more then 8 Result-Images.\nMore Images makes the Application slower,\nso you can choose if you want to add the 2D-Images too.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+      if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected %1 distinct image volumes.\nDo you want to load all of them (might slow down MITK)?").arg(resultNodes.size()), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
       {
         for( unsigned int n = 0; n < resultNodes.size(); n++ )
           DataStorage::GetInstance()->Add( resultNodes[n] );

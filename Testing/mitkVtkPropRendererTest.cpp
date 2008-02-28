@@ -35,9 +35,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVtkLayerController.h>
 #include <mitkNativeRenderWindowInteractor.h>
 
+#include <itksys/SystemTools.hxx>
+
 #include <fstream>
 int mitkVtkPropRendererTest(int argc, char* argv[])
 {
+  //independently read header of pic file
+  ipPicDescriptor *picheader=NULL;
+  if(argc>=1)
+  {
+    if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
+      picheader = ipPicGetHeader(argv[1], NULL);
+  }
+  if(picheader==NULL)
+  {
+    std::cout<<"file not found/not a pic-file - test not applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
+  }
+  ipPicGetTags(argv[1], picheader);
+
   //Read pic-Image from file
   std::cout << "Reading image: ";
 	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();

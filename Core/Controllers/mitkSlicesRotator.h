@@ -75,7 +75,7 @@ public:
 
   virtual void RotateToPoint( SliceNavigationController *rotationPlaneSNC,
     SliceNavigationController *rotatedPlaneSNC,
-    const Point3D &point, unsigned int timeStep = 0, bool linked = false );
+    const Point3D &point, bool linked = false );
 
 protected:
 

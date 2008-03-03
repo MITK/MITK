@@ -95,7 +95,7 @@ void SlicesRotator::SetGeometry(const itk::EventObject& /*EventObject*/)
 
 void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC, 
   SliceNavigationController *rotatedPlaneSNC,
-  const Point3D &point, unsigned int timeStep, bool linked )
+  const Point3D &point, bool linked )
 {
   SliceNavigationController *thirdSNC = NULL;
 

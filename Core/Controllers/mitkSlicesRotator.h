@@ -73,6 +73,10 @@ public:
 
   virtual void SetGeometry(const itk::EventObject& EventObject);
 
+  virtual void RotateToPoint( SliceNavigationController *rotationPlaneSNC,
+    SliceNavigationController *rotatedPlaneSNC,
+    const Point3D &point, unsigned int timeStep = 0, bool linked = false );
+
 protected:
 
   // clear list of controllers

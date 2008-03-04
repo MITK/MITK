@@ -101,6 +101,9 @@ public:
 /** \brief Method to return the group-box that contains the tree-node-selector */
 virtual QGroupBox* GetImageContent();
 
+/** \brief Method to reload the selected Item after a treechange */
+void ImageSelected();
+
 ///***************         SET VALUES      **************/
 /** \brief Method to set the x, y and z values of the median3D-Filter */
 void SetMedian3DValue(int x, int y, int z);

@@ -123,6 +123,51 @@ void QmitkSurfaceCreatorComponent::CreateConnections()
   }
 }
 
+void QmitkSurfaceCreatorComponent::ImageSelected()
+{
+    const mitk::DataTreeFilter::Item* imageIt = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem();
+    m_SelectedItem = imageIt;
+    mitk::DataTreeFilter::Item* currentItem(NULL);
+    if(m_SurfaceCreatorComponentGUI)
+    {
+        if(mitk::DataTreeFilter* filter = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter())
+        {
+            if(imageIt)
+            {
+                currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+            }
+        }
+    }
+    if(currentItem)
+    {
+        currentItem->SetSelected(true);
+    }
+    if(m_SurfaceCreatorComponentGUI != NULL)
+    {
+        for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
+        {
+            QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+            if (functionalityComponent != NULL)
+                functionalityComponent->ImageSelected(m_SelectedItem);
+        }
+    }
+   
+
+    if(m_SurfaceCreatorComponentGUI)
+    {
+        mitk::DataTreeFilter* filter = m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter();
+        m_MitkImageIterator = filter->GetIteratorToSelectedItem();
+
+        if(m_MitkImageIterator.GetPointer())
+        {
+            m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+        }
+    }
+    m_SurfaceCounter = 0;
+    m_SurfaceCreatorComponentGUI->GetReplaceExistingSurfaceCheckBox()->setChecked(false);
+
+}
+
 /***************     IMAGE SELECTED     ***************/
 void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Item * imageIt)
 {
@@ -177,13 +222,14 @@ void QmitkSurfaceCreatorComponent::TreeChanged()
 		m_AddedChildList[i]->TreeChanged();
 	} 
 
-	if(m_MitkImageIterator.GetPointer())
-	{
-		if(m_MitkImageIterator->Get())
-		{
-			m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
-		}
-	}
+    ImageSelected();
+	//if(m_MitkImageIterator.GetPointer())
+	//{
+	//	if(m_MitkImageIterator->Get())
+	//	{
+	//		m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+	//	}
+	//}
 }
 
 /***************  CREATE CONTROL WIDGET  **************/

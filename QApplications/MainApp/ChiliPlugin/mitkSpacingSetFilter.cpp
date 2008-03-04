@@ -103,7 +103,7 @@ void mitk::SpacingSetFilter::SortSlicesToGroup()
     {
       //PicDescriptor without a geometry not able to sort in a volume
       std::cout<<"SpacingSetFilter-WARNING: Found image without SliceGeometry. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -168,7 +168,7 @@ void mitk::SpacingSetFilter::SortSlicesToGroup()
     if( currentDimension < 2 || currentDimension > 4 )
     {
       std::cout<<"SpacingSetFilter-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -229,7 +229,7 @@ void mitk::SpacingSetFilter::SortSlicesToGroup()
       newGroup.possibleCombinations.clear();
       groupList.push_back( newGroup );
     }
-  delete isg;
+  free( isg );
   }
 #endif
 }
@@ -737,7 +737,7 @@ void mitk::SpacingSetFilter::GenerateNodes()
         interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
         if( !pFetchSliceGeometryFromPic( (*iter->begin())->currentPic, isg ) )
         {
-          delete isg;
+          free( isg );
           return;
         }
 
@@ -861,7 +861,7 @@ void mitk::SpacingSetFilter::GenerateNodes()
             slice ++;
           }
         }
-        delete isg;
+        free( isg );
       }
 
       if( resultImage->IsInitialized() && resultImage.IsNotNull() )

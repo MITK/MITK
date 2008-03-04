@@ -90,8 +90,8 @@ class compare_PicDescriptor_ImageNumber
           returnValue = true;
         }
       }
-      delete isg1;
-      delete isg2;
+      free( isg1 );
+      free( isg2 );
       return returnValue;
     }
     else
@@ -126,8 +126,8 @@ class compare_PicDescriptor_SliceLocation
         returnValue = true;
       }
     }
-    delete isg1;
-    delete isg2;
+    free( isg1 );
+    free( isg2 );
 #endif
     return returnValue;
   }
@@ -209,7 +209,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
     {
       //PicDescriptor without a geometry not able to sort in a volume
       std::cout<<"ImageNumberFilter-WARNING: Found image without SliceGeometry. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -251,7 +251,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
     if( currentDimension < 2 || currentDimension > 4 )
     {
       std::cout<<"ImageNumberFilter-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -357,7 +357,7 @@ void mitk::ImageNumberFilter::CreatePossibleOutputs()
       newOutput.descriptors.push_back( (*currentPic) );
       m_PossibleOutputs.push_back( newOutput );
     }
-    delete isg;
+    free( isg );
   }
 #endif
 }
@@ -409,7 +409,7 @@ void mitk::ImageNumberFilter::SeperateOutputsBySpacing()
     isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
     if( !pFetchSliceGeometryFromPic( (*iter), isg ) )
     {
-      delete isg;
+      free( isg );
       return;
     }
 
@@ -433,7 +433,7 @@ void mitk::ImageNumberFilter::SeperateOutputsBySpacing()
 
         if( !pFetchSliceGeometryFromPic( (*iter), isg ) )
         {
-          delete isg;
+          free( isg );
           return;
         }
 
@@ -514,7 +514,7 @@ void mitk::ImageNumberFilter::SeperateOutputsBySpacing()
       m_PossibleOutputs[n].sliceSpacing = spacing;
       m_PossibleOutputs[n].numberOfTimeSlices = numberOfTimeSlices;
     }
-    delete isg;
+    free( isg );
   }
 #endif
 }
@@ -536,7 +536,7 @@ void mitk::ImageNumberFilter::SeperateOutputsByTime()
       interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
       if( !pFetchSliceGeometryFromPic( (*m_PossibleOutputs[n].descriptors.begin()), isg ) )
       {
-        delete isg;
+        free( isg );
         return;
       }
 
@@ -563,7 +563,7 @@ void mitk::ImageNumberFilter::SeperateOutputsByTime()
         //get the current origin
         if( !pFetchSliceGeometryFromPic( (*iter), isg ) )
         {
-          delete isg;
+          free( isg );
           return;
         }
 
@@ -675,7 +675,7 @@ void mitk::ImageNumberFilter::SeperateOutputsByTime()
         delete timeOutput;
       }
 
-      delete isg;
+      free( isg );
     }
     //we cleaned the current possibleOutput
     m_PossibleOutputs[n].differentTimeSlices = false;
@@ -714,7 +714,7 @@ void mitk::ImageNumberFilter::SplitDummiVolumes()
       m_PossibleOutputs.push_back( new2DOutput );
     }
   }
-  delete isg;
+  free( isg );
 #endif
 }
 
@@ -809,7 +809,7 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
 
       if( !pFetchSliceGeometryFromPic( m_PossibleOutputs[n].descriptors.front(), isg ) )
       {
-        delete isg;
+        free( isg );
         return;
       }
       vtk2itk( isg->u, rightVector );
@@ -885,7 +885,7 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
             count = searchIter->count;
           }
         }
-        delete isgSecond;
+        free( isgSecond );
       }
 
       planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
@@ -934,7 +934,7 @@ void mitk::ImageNumberFilter::CreateNodesFromOutputs()
           slice ++;
         }
       }
-      delete isg;
+      free( isg );
     }
 
     // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties

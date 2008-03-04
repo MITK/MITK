@@ -152,7 +152,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
     {
       //PicDescriptor without a geometry not able to sort in a volume
       std::cout<<"SingleSpacingFilter-WARNING: Found image without SliceGeometry. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -161,7 +161,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
     if( currentDimension < 2 || currentDimension > 4 )
     {
       std::cout<<"SingleSpacingFilter-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
-      delete isg;
+      free( isg );
       continue;
     }
 
@@ -289,7 +289,7 @@ void mitk::SingleSpacingFilter::SortSlicesToGroup()
       newGroup.includedPositions.push_back( newPosition );
       m_GroupVector.push_back( newGroup );
     }
-  delete isg;
+  free( isg );
   }
 #endif
 }
@@ -322,7 +322,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int currentGroup )
     vtk2itk( isg->ps, spacing );
     if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
       spacing.Fill(1.0);
-    delete isg;
+    free( isg );
   }
   else
   if( ( m_GroupVector[currentGroup].includedPositions.size() == 1 ) || ( m_GroupVector[currentGroup].includedPositions.size() == 2 ) ) //2D or 2D+t
@@ -395,7 +395,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int currentGroup )
     if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
       spacing.Fill(1.0);
 
-    delete isg;
+    free( isg );
 
     //get the most counted not rounded spacing
     std::list<Spacing> SpacingList;
@@ -568,7 +568,7 @@ void mitk::SingleSpacingFilter::GenerateNodes( std::vector<Position*> usedPos, V
     vtk2itk( isg->u, rightVector );
     vtk2itk( isg->v, downVector );
     vtk2itk( isg->o, origin );
-    delete isg;
+    free( isg );
 
     // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
     if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )

@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <tinyxml.h>  // xml used to save the parent-child-relationship
 #include "mitkImageToPicDescriptor.h"  // define the "TagInformationList"
 
+#ifndef WIN32
+extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );
+#endif
+
 class QcMITKTask;
 class SampleApp;
 class QIDToolButton;
@@ -371,6 +375,14 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
 
     /** This list get used to load image-files. The Plugin handle *.pic and *.dcm. *.dcm get converted to *.pic. */
     std::list<ipPicDescriptor*> m_ImageList;
+
+    struct StreamImageStruct
+    {
+      std::list<ipPicDescriptor*> imageList;
+      interSliceGeometry_t* geometry;
+      std::string seriesDescription;
+    };
+    std::vector<StreamImageStruct> m_StreamImageList;
 
     /** This list get used to save image_instance_uids. With this list the fitting ipPicDescriptors get load. */
     std::list<std::string> m_SavedImageInstanceUIDs;

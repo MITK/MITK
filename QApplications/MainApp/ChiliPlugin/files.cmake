@@ -14,6 +14,7 @@ SET(CPP_FILES
   mitkPicDescriptorToNode.cpp
   mitkSingleSpacingFilter.cpp
   mitkSpacingSetFilter.cpp
+  mitkStreamReader.cpp
   mitkImageNumberFilter.cpp
   QcMITKTask.cpp
   QmitkEventCollector.cpp

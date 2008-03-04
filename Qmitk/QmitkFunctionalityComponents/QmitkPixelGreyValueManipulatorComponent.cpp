@@ -43,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 #include <qstring.h>
 
+const char* NAMEFORBOUNDINGOBJECT = "Bounding Object for Pixel Manipulation";
 
 /***************       CONSTRUCTOR      ***************/
 QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent(QObject *parent, const char *parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
@@ -62,6 +63,8 @@ m_ManipulationMode(0),
 m_ManipulationArea(0),
 m_PointSet(NULL),
 m_BoundingObject(NULL),
+m_BoundingObjectGroup(NULL),/*BoundingObjectGroup that includes all created BoundingObjects to calculate a big one*/
+m_BoundingObjectList(NULL),/*Vector that includes all to the node added BoundingObjects*/
 m_DataIt(it),
 m_BoundingObjectInteractor(NULL),
 m_BoundingObjectExistingFlag(false)
@@ -347,7 +350,9 @@ void QmitkPixelGreyValueManipulatorComponent::Activated()
 		m_AddedChildList[i]->Activated();
 	} 
 	if(m_BoundingObjectInteractor.IsNotNull())
+    {
 	  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+    }
 }
 
 /***************       DEACTIVATED      ***************/
@@ -359,7 +364,9 @@ void QmitkPixelGreyValueManipulatorComponent::Deactivated()
 		m_AddedChildList[i]->Deactivated();
 	} 
 	if(m_BoundingObjectInteractor)
+    {
 		mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_BoundingObjectInteractor);
+    }
 }
 
 /***************      SET THRESHOLD     ***************/
@@ -464,44 +471,101 @@ void QmitkPixelGreyValueManipulatorComponent::CreateBoundingBox(int boundingObje
 		m_BoundingObject = mitk::Cuboid::New();
 		break;
 	}
-	mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
 
-	if(!m_BoundingObjectExistingFlag)
-	{
-		AddBoundingObjectToNode();
-	}
-	else
-	{
-		m_BoundingObjectNode->SetData( m_BoundingObject );
-		mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
-		m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
-	}
-	mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
 
-	m_BoundingObjectExistingFlag = true;
+
+
+    if(!m_BoundingObjectGroup)
+    {
+        m_BoundingObjectGroup = mitk::BoundingObjectGroup::New();
+        m_BoundingObjectGroup->SetCSGMode(mitk::BoundingObjectGroup::Union);
+    }
+
+    m_BoundingObjectGroup->AddBoundingObject(m_BoundingObject);
+    m_BoundingObjectGroup->UpdateOutputInformation();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+
+    ////    if(!m_BoundingObjectExistingFlag)
+    ////  {
+    AddBoundingObjectToNode();
+    //// }
+    ////else
+    ////{
+    ////    m_BoundingObjectNode->SetData( m_BoundingObjectGroup );
+    ////    mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+    ////    m_BoundingObjectGroup->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+    ////    //m_BoundingObjectNode->SetData( m_BoundingObject );
+    ////    //mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+    ////    //m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+    ////}
+    //mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+
+     mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+    m_BoundingObjectExistingFlag = true;
+
+
+
+	//mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+
+	//if(!m_BoundingObjectExistingFlag)
+	//{
+	//	AddBoundingObjectToNode();
+	//}
+	//else
+	//{
+	//	m_BoundingObjectNode->SetData( m_BoundingObject );
+	//	mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+	//	m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+	//}
+	//mitk::GlobalInteraction::GetInstance()->AddInteractor(m_BoundingObjectInteractor);
+
+	//m_BoundingObjectExistingFlag = true;
 
 }
 
 ///************* ADD BOUNDING BOX TO NODE  ************/
 void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::DataTreeIteratorClone& iterToNode*/)
 {
-	m_BoundingObjectNode = mitk::DataTreeNode::New(); 
-	mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
-	m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
-	mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_BoundingObjectNode );
-	m_BoundingObjectNode->SetData( m_BoundingObject );
-	m_BoundingObjectNode->SetProperty( "name", new mitk::StringProperty( "BoundingObject" ) );
-	m_BoundingObjectNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
-	m_BoundingObjectNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
-	m_BoundingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
-	m_BoundingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+    mitk::DataTreeNode::Pointer boundingNode = mitk::DataTreeNode::New(); 
+    boundingNode = mitk::DataTreeNode::New(); 
+    mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+    m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+    mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( boundingNode );
+    boundingNode->SetData( m_BoundingObject );
+    boundingNode->SetProperty( "name", new mitk::StringProperty(NAMEFORBOUNDINGOBJECT) );
+    boundingNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
+    boundingNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
+    boundingNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
+    boundingNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
 
-	m_BoundingObjectNode->SetVisibility(true);
-	mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
-	iteratorBoundingObject->Add(m_BoundingObjectNode);
-    
-	m_BoundingObjectInteractor = mitk::AffineInteractor::New( "AffineInteractions ctrl-drag", m_BoundingObjectNode );
-	m_BoundingObjectNode->SetInteractor(m_BoundingObjectInteractor);
+    boundingNode->SetVisibility(true);
+    mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
+    iteratorBoundingObject->Add(boundingNode);
+
+    m_BoundingObjectInteractor = mitk::AffineInteractor::New( "AffineInteractions ctrl-drag", m_BoundingObjectNode );
+    boundingNode->SetInteractor(m_BoundingObjectInteractor);
+    m_BoundingObjectList.push_back(boundingNode);
+
+	//m_BoundingObjectNode = mitk::DataTreeNode::New(); 
+	//mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
+	//m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
+	//mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_BoundingObjectNode );
+	//m_BoundingObjectNode->SetData( m_BoundingObject );
+	//m_BoundingObjectNode->SetProperty( "name", new mitk::StringProperty( NAMEFORBOUNDINGOBJECT ) );
+	//m_BoundingObjectNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
+	//m_BoundingObjectNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
+	//m_BoundingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
+	//m_BoundingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+
+	//m_BoundingObjectNode->SetVisibility(true);
+	//mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
+	//iteratorBoundingObject->Add(m_BoundingObjectNode);
+ //   
+	//m_BoundingObjectInteractor = mitk::AffineInteractor::New( "AffineInteractions ctrl-drag", m_BoundingObjectNode );
+	//m_BoundingObjectNode->SetInteractor(m_BoundingObjectInteractor);
+
+ //   m_BoundingObjectList.push_back(m_BoundingObjectNode);
 }
 
 
@@ -723,7 +787,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 
 	else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
 	{
-		if(m_BoundingObject)
+		if( m_BoundingObjectGroup)
 		{
 			while(!(it.IsAtEnd()))
 			{
@@ -731,7 +795,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 				itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
 				if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 				{
-					if(m_BoundingObject->IsInside(point3D))
+					if( m_BoundingObjectGroup->IsInside(point3D))
 					{
 						itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
 					}
@@ -742,7 +806,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLinearShiftedImage( itk::Ima
 				}
 				else //manipulate outsidethe bounding box
 				{
-					if(!(m_BoundingObject->IsInside(point3D)))
+					if(!( m_BoundingObjectGroup->IsInside(point3D)))
 					{
 						itShifted.Set(it.Get()+ (baseThreshold -shiftedThresholdOne));
 					}
@@ -886,7 +950,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 
 		else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
 		{
-			if(m_BoundingObject)
+			if( m_BoundingObjectGroup)
 			{
 				while(!(it.IsAtEnd()))
 				{
@@ -895,7 +959,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 
 					if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 					{
-						if(m_BoundingObject->IsInside(point3D))
+						if( m_BoundingObjectGroup->IsInside(point3D))
 						{
 							InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
 						}
@@ -906,7 +970,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateGradientShiftedImage( itk::I
 					}
 					else //manipulate outsidethe bounding box
 					{
-						if(!(m_BoundingObject->IsInside(point3D)))
+						if(!( m_BoundingObjectGroup->IsInside(point3D)))
 						{
 							InternalGradientShiftCalculation(shiftedThresholdOne, shiftedThresholdTwo, baseThreshold, itShifted, it, pointOne, pointTwo );
 						}
@@ -1114,7 +1178,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 
 	else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
 	{
-		if(m_BoundingObject)
+		if( m_BoundingObjectGroup)
 		{
 			std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
 			if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
@@ -1125,7 +1189,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 					//itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
           mitk::vtk2itk(it.GetIndex(),point3D);
           m_MitkImage->GetGeometry()->IndexToWorld(point3D,point3D);
-					if(m_BoundingObject->IsInside(point3D))
+					if( m_BoundingObjectGroup->IsInside(point3D))
 					{
 						itShifted.Set(pixelChangeValue);
 					}
@@ -1143,13 +1207,13 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
 				}//end of while
 			}//end of !checked
 
-			else //manipulate outsidethe bounding box
+			else //manipulate outside the bounding box
 			{
 				while(!(it.IsAtEnd()))
 				{
 					mitk::Point3D point3D;
 					itkImage->TransformIndexToPhysicalPoint(it.GetIndex(),point3D);
-					if(!(m_BoundingObject->IsInside(point3D)))
+					if(!( m_BoundingObjectGroup->IsInside(point3D)))
 					{
 						itShifted.Set(pixelChangeValue);
 					}
@@ -1390,7 +1454,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 
 	else if(m_ManipulationArea == 3) //if manipulation shall be only inside bounding object
 	{
-		if(m_BoundingObject)
+		if( m_BoundingObjectGroup)
 		{
 			while(!(it.IsAtEnd()))
 			{
@@ -1399,7 +1463,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 
 				if(!(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()))//manipulate inside the bounding box
 				{
-					if(m_BoundingObject->IsInside(point3D))
+					if( m_BoundingObjectGroup->IsInside(point3D))
 					{
 						itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
 					}
@@ -1410,7 +1474,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateLightenOrShadeImage( itk::Im
 				}
 				else //manipulate outsidethe bounding box
 				{
-					if(!(m_BoundingObject->IsInside(point3D)))
+					if(!( m_BoundingObjectGroup->IsInside(point3D)))
 					{
 						itShifted.Set(it.Get() + pixelChangeValue);//add the new pixel value on the old one
 					}

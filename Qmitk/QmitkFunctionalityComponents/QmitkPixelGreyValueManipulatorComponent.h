@@ -20,10 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_PIXELGREYVALUEMANIPULATORCOMPONENT_H
 
 #include "QmitkFunctionalityComponentContainer.h"
+
 #include <itkImage.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
+
+#include <mitkBoundingObjectGroup.h>
 #include <mitkBoundingObject.h>
+
 //NUR FUER POINTSET
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
@@ -295,6 +299,14 @@ private:
   * \brief The cuboid used for cropping.
   */
   mitk::BoundingObject::Pointer m_BoundingObject;
+
+  /** 
+  * @brief Vector with all added BoundingBoxes 
+  */
+  mitk::BoundingObjectGroup::Pointer m_BoundingObjectGroup;
+
+  /** \brief Vector with all nodes that contains boundingObjects */
+  std::vector<mitk::DataTreeNode::Pointer> m_BoundingObjectList; 
 
     /*!
   * \brief Tree node of the cuboid used for cropping.

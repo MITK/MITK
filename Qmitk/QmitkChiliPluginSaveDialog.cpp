@@ -141,14 +141,14 @@ QmitkChiliPluginSaveDialog::ReturnValue QmitkChiliPluginSaveDialog::GetSelection
   QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_StudyListView->selectedItem() );
   if( entry )
   {
-    std::string temp = entry->GetChiliOID();
+    std::string temp = entry->GetChiliOID().ascii();
     newReturnValue.StudyOID = temp.c_str();
   }
   //seriesOID
   entry = dynamic_cast<QmitkPluginListViewItem*>( m_SeriesListView->selectedItem() );
   if( entry )
   {
-    std::string temp = entry->GetChiliOID();
+    std::string temp = entry->GetChiliOID().ascii();
     newReturnValue.SeriesOID = temp.c_str();
   }
   //user selection
@@ -168,14 +168,14 @@ QmitkChiliPluginSaveDialog::ReturnValue QmitkChiliPluginSaveDialog::GetSelection
 QmitkChiliPluginSaveDialog::NewSeriesInformation QmitkChiliPluginSaveDialog::GetSeriesInformation()
 {
   NewSeriesInformation newSeriesInformation;
-  std::string seriesDescription = m_SeriesDescription->text();
+  std::string seriesDescription = m_SeriesDescription->text().ascii();
   newSeriesInformation.SeriesDescription = seriesDescription.c_str();
-  if( m_SeriesNumber->text() == "" )
+  if( m_SeriesNumber->text().ascii() == "" )
     newSeriesInformation.SeriesNumber = 0;
   else
   {
     std::stringstream ssStream;
-    ssStream << m_SeriesNumber->text();
+    ssStream << m_SeriesNumber->text().ascii();
     ssStream >> newSeriesInformation.SeriesNumber;
   }
   return newSeriesInformation;
@@ -194,7 +194,7 @@ void QmitkChiliPluginSaveDialog::AddStudy( std::string studyOID, std::string pat
     {
       if( entry )
       {
-        std::string savedOID = entry->GetChiliOID();
+        std::string savedOID = entry->GetChiliOID().ascii();
         if( savedOID != studyOID )
         {
           walkThroughStudies = walkThroughStudies->itemBelow();
@@ -335,7 +335,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
   {
     if( entry )
     {
-      std::string savedOID = entry->GetChiliOID();
+      std::string savedOID = entry->GetChiliOID().ascii();
       if( savedOID == iter->StudyOID )
       {
         //search if the series always shown
@@ -346,7 +346,7 @@ void QmitkChiliPluginSaveDialog::UpdateView()
         {
           if( entry )
           {
-            std::string secondOID = entry->GetChiliOID();
+            std::string secondOID = entry->GetChiliOID().ascii();
             if( secondOID != iter->SeriesOID )
             {
               walkThroughSeries = walkThroughSeries->itemBelow();
@@ -406,7 +406,7 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
   }
 
   QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_SeriesListView->selectedItem() );
-  std::string selectedSeriesOID = entry->GetChiliOID();
+  std::string selectedSeriesOID = entry->GetChiliOID().ascii();
 
   for( std::list< NodeInputs >::iterator iter = m_NodeInputs.begin(); iter != m_NodeInputs.end(); iter++ )
   {
@@ -439,7 +439,7 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
 /** If the user want to create a new series, this slot check if the seriesDescription is not empty. */
 void QmitkChiliPluginSaveDialog::CheckOutputs()
 {
-  if( m_New->isChecked() && m_SeriesDescription->text() == "" )
+  if( m_New->isChecked() && m_SeriesDescription->text().ascii() == "" )
   {
     QMessageBox::information( 0, "MITK", "You want to create a series without Description?\nPlease fill the Description." );
     m_SeriesDescription->setFocus();

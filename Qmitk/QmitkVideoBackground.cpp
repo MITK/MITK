@@ -53,12 +53,6 @@ mitk::QmitkVideoBackground::~QmitkVideoBackground()
   if ( m_renderWindowVectorInfo.size() > 0 )
     if ( this->IsEnabled() )
       this->Disable();
-  //if ( m_Actor!=NULL )
-  //  m_Actor->Delete();
-  ///*if ( m_VideoRenderer != NULL )
-  //  m_VideoRenderer->Delete();*/
-  //if ( m_VtkImageImport != NULL)
-  //  m_VtkImageImport->Delete();
 }
 /**
  * Sets the renderwindow, in which the Video background
@@ -84,8 +78,9 @@ void mitk::QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
   v.videoActor    = videoActor;
   v.videoImport   = videoImport;
   
-  m_renderWindowVectorInfo.push_back(v);  
- 
+  m_renderWindowVectorInfo.push_back(v); 
+
+  Modified();
 }
 
 void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
@@ -95,6 +90,9 @@ void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindo
   {
     if((*it).renWin == renderWindow)
     {
+      // unregister video backround renderer from renderwindow
+      mitk::VtkLayerController::GetInstance((*it).renWin)->RemoveRenderer((*it).videoRenderer);
+
       (*it).videoRenderer->Delete();
       (*it).videoActor->Delete();
       (*it).videoImport->Delete();
@@ -105,6 +103,16 @@ void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindo
   }
 }
 
+bool mitk::QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
+{
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+    it != m_renderWindowVectorInfo.end(); it++)
+  {
+    if((*it).renWin == renderWindow)
+      return true;
+  }
+  return false;
+}
 
 /**
  * Enables drawing of the color Video background.
@@ -112,22 +120,9 @@ void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindo
  */
 void mitk::QmitkVideoBackground::Enable()
 {
+  UpdateVideo();  
+  Modified();
   
-  UpdateVideo();
-  
-  
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
-    it != m_renderWindowVectorInfo.end(); it++)
-  {
-    (*it).videoActor->SetInput((*it).videoImport->GetOutput());
-    (*it).videoRenderer->AddActor2D((*it).videoActor);
-    (*it).videoRenderer->ResetCamera();
-    (*it).videoRenderer->InteractiveOff();
-    (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();
-    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
- 
-     mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);
-  }  
   m_QTimer->start(m_TimerDelay);
 }
 
@@ -139,11 +134,11 @@ void mitk::QmitkVideoBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
-    for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+    /*for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
       it != m_renderWindowVectorInfo.end(); it++)
     {
       mitk::VtkLayerController::GetInstance((*it).renWin)->RemoveRenderer((*it).videoRenderer);
-    }
+    }*/
     m_QTimer->stop();
   }
 }
@@ -176,5 +171,22 @@ void mitk::QmitkVideoBackground::UpdateVideo()
         mitk::RenderingManager::GetInstance()->RequestUpdate((*it).renWin);
       }
     }
+  } 
+}
+
+void mitk::QmitkVideoBackground::Modified()
+{ // ensures registration of video backrounds in each renderwindow
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+    it != m_renderWindowVectorInfo.end(); it++)
+  {
+    (*it).videoActor->SetInput((*it).videoImport->GetOutput());
+    (*it).videoRenderer->AddActor2D((*it).videoActor);
+    (*it).videoRenderer->ResetCamera();
+    (*it).videoRenderer->InteractiveOff();
+    (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();
+    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
+
+    if(!mitk::VtkLayerController::GetInstance((*it).renWin)->IsRendererInserted((*it).videoRenderer))
+      mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);
   } 
 }

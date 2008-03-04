@@ -65,6 +65,7 @@ public:
   ////## must be initialized before enabling the background.
   void AddRenderWindow(vtkRenderWindow* renderWindow);
   void RemoveRenderWindow(vtkRenderWindow* renderWindow);
+  bool IsRenderWindowIncluded(vtkRenderWindow* renderWindow);
   ////##Documentation
   ////## @brief sets the width and height of the video.
   ////## must be correctly initialized before enabling the background.
@@ -96,6 +97,8 @@ public:
   
 protected:
   void ResetVideoBackground();
+
+  void Modified();
 
   typedef std::vector<VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
   RenderWindowVectorInfoType      m_renderWindowVectorInfo;

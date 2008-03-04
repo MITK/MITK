@@ -23,11 +23,11 @@ RenderWindows represent the rendering target: an area of the user interface into
 
 As a framework, MITK aims at making use of the visualization capabilities of VTK as much as possible. For the application developer building on top of MITK, the way of how to utilize specific VTK features should be straightforward and familiar. Therefore, most of the MITK rendering components closely resemble or integrate corresponding VTK components.
 
-Just like VTK, MITK defines RenderWindows, Renderers and Mappers. These classes do not derive from their VTK counterparts, but integrate them and have similar scopes of responsibility. While the VTK rendering mechanism is mainly focused on establishing a pipeline of rendering components (data, filters, mappers, and renderers), MITK has a central DataTree and provides convenient ways of rendering different items of the tree according to their type. Internally, the VTK rendering pipeline is used as well in most cases, though it is more hidden from the application developer who merely makes use of existing rendering capabilities.
+Just like VTK, MITK defines Renderers and Mappers. These classes do not derive from their VTK counterparts, but integrate them and have similar scopes of responsibility. While the VTK rendering mechanism is mainly focused on establishing a pipeline of rendering components (data, filters, mappers, and renderers), MITK has a central DataTree and provides convenient ways of rendering different items of the tree according to their type. Internally, the VTK rendering pipeline is used as well in most cases, though it is more hidden from the application developer who merely makes use of existing rendering capabilities.
 
 RenderWindow and Renderer are realized as separate components to enable multiple Renderers to draw into one RenderWindow. Usually one RenderWindow would have just one associated Renderer, but under special circumstances (e.g. when many small data views need to be rendered simultaneously, as with a thumbnail gallery), multiple Renderers on one RenderWindow can yield performance benefits.
 
-Note that some Mappers (namely Mapper2D subclasses) do of yet not use VTK functionality for rendering. To further unify the rendering process, these classes should be revised or wrapped into a VTK-compatible interface.
+Note that some Mappers (namely Mapper2D subclasses) do not use VTK functionality for rendering. To further unify the rendering process, these classes should be revised or wrapped into a VTK-compatible interface.
 
 
 \section renderingManagerVisualizationRenderer Controlling it All: RenderingManager
@@ -41,7 +41,8 @@ The rendering process could be further simplified by making the DataTree automat
 
 \section implementationManagerVisualizationRenderer Platform-Specific Implementation
 
-To use the depictured components on a specific platform (i.e. GUI system), they have to be extended to interface the platform's native rendering capabilities. This can be done by subclassing the respective MITK classes and add the required functionality. For example, the RenderWindow is an abstract window into which mappers do render. In the QT specific implementation, QmitkRenderWindow derives from both RenderWindow (to avail of MITK rendering mechanisms) and QGLWidget (to have a valid GL context for painting). Of the above classes, RenderingManager needs also to be subclassed (to incorporate a platform-specific timer) while all other classes can be used directly (provided OpenGL is used for rendering, which is assumed).
+MITK tries to integrate seamlessly into the normal VTK rendering pipeline. The whole MITK data(tree) is capsuled into one customized vtkProp, the so-called vtkMitkRenderProp which is then integrated into VTK pipeline. 
 
-
+The VTK integration into GUI systems, like e.g. QT, is therefore equal to normal VTK usage. As an example, the MITK MainApp requires the QT-VTK widget (provided by VTK) for integration of renderWindows into GUI.
+Further information on this can be found in section "Related Pages" "Rendering in MITK by means of the QT-VTK widget".
 */

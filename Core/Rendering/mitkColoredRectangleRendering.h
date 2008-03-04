@@ -36,11 +36,11 @@ class vtkTextActor;
 namespace mitk {
 
 /**
- * This is a simple approach for rendering text with the help
- * of the vtkTextActor class.
- * It replaces the old GLUT text rendering interface of mitk.
- * This class is instanciated as a member of the mitk::OpenGLRenderer
- * and should be only accounted via the Renderer.
+ * This is a simple class for rendering colored rectangles
+ * at the boarders of vtkRenderWindows.
+ * The rectangle rendering itself is performed by means of a
+ * vtkProp (vtkMitkRectangleProp).
+ * This class instantiates the vtkProp and a corresponding vtkRenderer instance. 
  */
 class MITK_CORE_EXPORT ColoredRectangleRendering : public BaseData
 {
@@ -50,20 +50,20 @@ public:
   itkNewMacro( Self );
 
   /**
-   * Sets the renderwindow, in which the text
-   * will be shown. Make sure, you have called this function
+   * Sets the renderwindow, in which colored rectangle boarders will be shown. 
+   * Make sure, you have called this function
    * before calling Enable()
    */
   virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
   
   /**
-   * Enables drawing of the text.
+   * Enables drawing of the colored rectangle.
    * If you want to disable it, call the Disable() function.
    */
   virtual void Enable(float col1, float col2, float col3);
 
   /**
-   * Disables drawing of the text.
+   * Disables drawing of the colored rectangle.
    * If you want to enable it, call the Enable() function.
    */
   virtual void Disable();
@@ -75,25 +75,25 @@ public:
   virtual bool IsEnabled();
    
   /**
-   * Empty implementation, since the textRendering doesn't
+   * Empty implementation, since the rectangle rendering doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegionToLargestPossibleRegion();
   
   /**
-   * Empty implementation, since the textRendering doesn't
+   * Empty implementation, since the rectangle rendering doesn't
    * support the requested region concept
    */
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
   
   /**
-   * Empty implementation, since the textRendering doesn't
+   * Empty implementation, since the rectangle rendering doesn't
    * support the requested region concept
    */
   virtual bool VerifyRequestedRegion();
   
   /**
-   * Empty implementation, since the textRendering doesn't
+   * Empty implementation, since the rectangle rendering doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegion(itk::DataObject*);

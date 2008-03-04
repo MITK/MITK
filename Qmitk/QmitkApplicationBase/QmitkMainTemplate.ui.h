@@ -877,15 +877,10 @@ void QmitkMainTemplate::Initialize()
 
   this->InitializeFunctionality();
 
-
+  // loading application options
   std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
-
   if (!optionsFile.empty())
-  {
-    std::cout<<"loading..."<<std::endl;
     LoadOptionsFromFile(optionsFile.c_str());
-    std::cout << "...finished!" << std::endl;
-  }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
 
   // initialize multiwidget with options
@@ -893,13 +888,11 @@ void QmitkMainTemplate::Initialize()
   mitk::BoolProperty* gradProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use gradient background") );
   if (gradProperty != NULL)
     this->enableGradientBackground(gradProperty->GetValue());
-
   mitk::ColorProperty* upperColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 1"));
   mitk::ColorProperty* lowerColProp = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Gradient color 2"));
   if  ( upperColProp && lowerColProp )
-  {
     m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
-  }
+
   // department logo
   mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Department logo visible") );
   if (logoProperty != NULL)
@@ -921,9 +914,11 @@ void QmitkMainTemplate::Initialize()
     if (darkProperty != NULL)
       this->enableDarkPalette(darkProperty->GetValue());
 
+  // Background color
   mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color"));
   mitk::Color c = colProperty->GetColor();
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+  
   // Initialize other global options
   mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
   if (textureInterpolationProperty != NULL)
@@ -931,13 +926,8 @@ void QmitkMainTemplate::Initialize()
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
-  mitk::GlobalInteraction::GetInstance()->AddListener(
-    m_MultiWidget->GetMoveAndZoomInteractor()
-    );
-
+  mitk::GlobalInteraction::GetInstance()->AddListener(m_MultiWidget->GetMoveAndZoomInteractor());
   m_MultiWidget->EnableNavigationControllerEventListening();
-
-  //qApp->installEventFilter( new QmitkDebugEventFilter );
 }
 
 
@@ -978,7 +968,6 @@ void QmitkMainTemplate::InitializeQfm()
 
   //let the QmitkFctMediator know about the layout. This includes the toolbar and the layoutTemplate.
   qfm->Initialize( this );
-
 }
 
 
@@ -987,6 +976,7 @@ QmitkStdMultiWidget* QmitkMainTemplate::GetMultiWidget()
 {
   return m_MultiWidget;
 }
+
 
 void QmitkMainTemplate::parseCommandLine()
 {
@@ -1042,6 +1032,7 @@ void QmitkMainTemplate::parseCommandLine()
   }
 }
 
+
 /**
  * returns true, when the application is run in testing mode and
  * false otherwise
@@ -1086,55 +1077,66 @@ mitk::DataTree::Pointer QmitkMainTemplate::GetTree()
   return m_Tree;
 }
 
+
 void QmitkMainTemplate::changeTo2DImagesUpLayout()
 {
   m_MultiWidget->changeLayoutTo2DImagesUp();
 }
+
 
 void QmitkMainTemplate::changeTo2DImagesLeftLayout()
 {
   m_MultiWidget->changeLayoutTo2DImagesLeft();
 }
 
+
 void QmitkMainTemplate::changeToDefaultLayout()
 {
   m_MultiWidget->changeLayoutToDefault();
 }
+
 
 void QmitkMainTemplate::changeToBig3DLayout()
 {
   m_MultiWidget->changeLayoutToBig3D();
 }
 
+
 void QmitkMainTemplate::changeToWidget1Layout()
 {
   m_MultiWidget->changeLayoutToWidget1();
 }
+
 
 void QmitkMainTemplate::changeToWidget2Layout()
 {
   m_MultiWidget->changeLayoutToWidget2();
 }
 
+
 void QmitkMainTemplate::changeToWidget3Layout()
 {
   m_MultiWidget->changeLayoutToWidget3();
 }
+
 
 void QmitkMainTemplate::changeToColumnWidget3n4Layout()
 {
   m_MultiWidget->changeLayoutToColumnWidget3And4();
 }
 
+
 void QmitkMainTemplate::changeToRowWidget3n4Layout()
 {
   m_MultiWidget->changeLayoutToRowWidget3And4();
 }
 
+
 void QmitkMainTemplate::changeTo2x2Dand3DLayout()
 {
   m_MultiWidget->changeLayoutTo2x2Dand3DWidget();
 }
+
 
 void QmitkMainTemplate::changeToLeft2DAnd3DRight2DLayout()
 {
@@ -1149,6 +1151,7 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
   else
     showNormal();
 }
+
 
 void QmitkMainTemplate::destroy()
 {
@@ -1186,15 +1189,18 @@ void QmitkMainTemplate::destroy()
   m_Tree = NULL;
 }
 
+
 QmitkMainTemplate* QmitkMainTemplate::GetInstance()
 {
   return m_Instance;
 }
 
+
 QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
 {
   return qfm;
 }
+
 
 void QmitkMainTemplate::hideToolbar(bool on)
 {
@@ -1203,6 +1209,7 @@ void QmitkMainTemplate::hideToolbar(bool on)
   else
     ToolBar->show();
 }
+
 
 void QmitkMainTemplate::enableFineUndo( bool enabled )
 {
@@ -1217,6 +1224,7 @@ void QmitkMainTemplate::optionsSystem_InformationAction_activated()
   QmitkSystemInfo* systemInfo = new QmitkSystemInfo(this, "QmitkSystemInfo");
   systemInfo->show();
 }
+
 
 bool QmitkMainTemplate::GetStandardViewsInitialized()
 {

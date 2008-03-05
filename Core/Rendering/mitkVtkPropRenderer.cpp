@@ -124,12 +124,14 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   
   //go through the generated list and let the sorted mappers paint
   bool lastVtkBased = true;
+  bool sthVtkBased = false;
   
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
     if((mapper->IsVtkBased() == true) )
     {
+      sthVtkBased = true;
       mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
       if(vtkMapper)
       {
@@ -160,7 +162,12 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   if(lastVtkBased==false)
     Disable2DOpenGL();
   
- 
+  //fix for bug 1177. In 2D rendering the camera is not needed, but nevertheless it is used by 
+  //the vtk rendering mechanism to determine what is seen (and therefore has to be rendered)
+  //by using the bounds of the vtkMitkRenderProp
+  if(sthVtkBased == false)
+    this->GetVtkRenderer()->ResetCamera();
+
   // Render text
   if(type == VtkPropRenderer::Overlay)
   {

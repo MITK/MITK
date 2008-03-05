@@ -82,6 +82,18 @@ public:
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0);
 	vtkTextProperty * GetTextLabelProperty(int text_id);
+
+  // Initialization / geometry handling
+
+  /** This method calculates the bounds of the DataTree (if it contains any
+   * valid data), creates a geometry from these bounds and sets it as world
+   * geometry of the renderer.
+   *
+   * Call this method to re-initialize the renderer to the current DataTree
+   * (e.g. after loading an additional dataset), to ensure that the view is
+   * aligned correctly.
+   */
+  bool SetWorldGeometryToVisibleBounds();
   
 protected:
   

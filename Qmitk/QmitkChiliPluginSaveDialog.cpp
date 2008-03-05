@@ -170,7 +170,7 @@ QmitkChiliPluginSaveDialog::NewSeriesInformation QmitkChiliPluginSaveDialog::Get
   NewSeriesInformation newSeriesInformation;
   std::string seriesDescription = m_SeriesDescription->text().ascii();
   newSeriesInformation.SeriesDescription = seriesDescription.c_str();
-  if( m_SeriesNumber->text().ascii() == "" )
+  if( m_SeriesNumber->text() == "" || m_SeriesNumber->text() == "enter SeriesNumber" )
     newSeriesInformation.SeriesNumber = 0;
   else
   {
@@ -439,9 +439,9 @@ void QmitkChiliPluginSaveDialog::SetNodesByButtonGroup()
 /** If the user want to create a new series, this slot check if the seriesDescription is not empty. */
 void QmitkChiliPluginSaveDialog::CheckOutputs()
 {
-  if( m_New->isChecked() && m_SeriesDescription->text().ascii() == "" )
+  if( m_New->isChecked() && ( m_SeriesDescription->text() == "" || m_SeriesDescription->text() == "enter SeriesDescription" ) )
   {
-    QMessageBox::information( 0, "MITK", "You want to create a series without Description?\nPlease fill the Description." );
+    QMessageBox::information( 0, "MITK", "You didn't change the Description or want to create a series without.\nPlease fill the Description." );
     m_SeriesDescription->setFocus();
     return;
   }

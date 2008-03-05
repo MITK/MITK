@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
+#include "mitkChiliMacros.h"
 
 #include "math.h"
 #include <stdlib.h>
@@ -303,7 +304,7 @@ void mitk::SingleSpacingFilter::CreateResults()
 #endif
 }
 
-void mitk::SingleSpacingFilter::SearchParameter( unsigned int currentGroup )
+void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersionCode( currentGroup ) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   std::vector<Position*> usedPos;
@@ -481,7 +482,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int currentGroup )
 #endif
 }
 
-void mitk::SingleSpacingFilter::GenerateNodes( std::vector<Position*> usedPos, Vector3D spacing, unsigned int timeCount, unsigned int currentGroup )
+void mitk::SingleSpacingFilter::GenerateNodes( std::vector<Position*> mitkHideIfNoVersionCode( usedPos ), Vector3D mitkHideIfNoVersionCode( spacing ), unsigned int mitkHideIfNoVersionCode( timeCount ), unsigned int mitkHideIfNoVersionCode( currentGroup ) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
 

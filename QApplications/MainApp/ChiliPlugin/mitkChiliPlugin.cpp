@@ -1905,7 +1905,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
           mitk::BaseProperty::Pointer nameProperty = (*nodeIter)->GetProperty( "name" );
           mitk::ImageToPicDescriptor::TagInformationStruct temp;
           temp.PicTagDescription = tagSERIES_DESCRIPTION;
-          if( mameProperty )
+          if( nameProperty )
             temp.PicTagContent = nameProperty->GetValueAsString();
           else temp.PicTagContent = "no Description";
           picTagList.push_back( temp );

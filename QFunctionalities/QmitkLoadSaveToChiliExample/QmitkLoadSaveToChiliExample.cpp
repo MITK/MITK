@@ -124,10 +124,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
       {
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
-        {
-          std::string savedOID = entry->GetChiliOID().ascii();
-          AddNodesToDataTree( m_Plugin->LoadCompleteSeries( savedOID ) );
-        }
+          AddNodesToDataTree( m_Plugin->LoadCompleteSeries( entry->GetChiliOID().ascii() ) );
         break;
       }
       case 1:  //load all known images or all text
@@ -137,11 +134,10 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
           if( entry )
           {
-            std::string savedOID = entry->GetChiliOID().ascii();
-            mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( savedOID );
+            mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( entry->GetChiliOID().ascii() );
             while( !getAllElements.empty() )
             {
-              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( savedOID, getAllElements.front().label );
+              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), getAllElements.front().label );
               if( temp.IsNotNull() )
                 mitk::DataStorage::GetInstance()->Add( temp );
               getAllElements.pop_front();
@@ -153,10 +149,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           {
             QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
             if( entry )
-            {
-              std::string savedOID = entry->GetChiliOID().ascii();
-              AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( savedOID ) );
-            }
+              AddNodesToDataTree( m_Plugin->LoadAllTextsFromSeries( entry->GetChiliOID().ascii() ) );
           }
         break;
       }
@@ -168,8 +161,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* parent = dynamic_cast<QmitkPluginListViewItem*>( entry->parent() );  //use the parent to know what to do
           if( parent->text( 0 ) == "Known Images" )
           {
-            std::string vLabel = entry->GetVolumeLabel().ascii();
-            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
+            mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), entry->GetVolumeLabel().ascii() );
             if( temp.IsNotNull() )
               mitk::DataStorage::GetInstance()->Add( temp );
           }
@@ -177,15 +169,13 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
             if( parent->text( 0 ) == "Saved Text" )
             {
               QmitkPluginListViewItem* child = dynamic_cast<QmitkPluginListViewItem*>( entry->firstChild() );
-              std::string savedOID = child->GetChiliOID().ascii();
-              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
+              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( child->GetChiliOID().ascii() );
               if( temp.IsNotNull() )
                 mitk::DataStorage::GetInstance()->Add( temp );
               while( child->nextSibling() != 0 )
               {
                 child = dynamic_cast<QmitkPluginListViewItem*>( child->nextSibling() );
-                std::string oid = child->GetChiliOID().ascii();
-                temp = m_Plugin->LoadOneText( oid );
+                temp = m_Plugin->LoadOneText( child->GetChiliOID().ascii() );
                 mitk::DataStorage::GetInstance()->Add( temp );
               }
             }
@@ -197,8 +187,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
         {
-          std::string savedOID = entry->GetChiliOID().ascii();
-          mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( savedOID );
+          mitk::DataTreeNode::Pointer temp = m_Plugin->LoadOneText( entry->GetChiliOID().ascii() );
           if( temp.IsNotNull() )
             mitk::DataStorage::GetInstance()->Add( temp );
         }
@@ -222,8 +211,7 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
     QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->PSContent->selectedItem() );
     if( entry )
     {
-      std::string vLabel = entry->GetVolumeLabel().ascii();
-      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), vLabel );
+      mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), entry->GetVolumeLabel().ascii() );
       if( temp.IsNotNull() )
       {
         mitk::DataStorage::GetInstance()->Add( temp );

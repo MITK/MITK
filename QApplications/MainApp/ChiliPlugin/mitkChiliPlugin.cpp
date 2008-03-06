@@ -2062,7 +2062,11 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                 if( remove(  pathAndFile.c_str() ) != 0 )
                   std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << it->GetPointer()->GetFileName() << std::endl;
               }
-              //set the newTextOID as Property
+              //set the OID´s as Property
+              if( !currentSeriesOID )
+                (*nodeIter)->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+              else
+                (*nodeIter)->ReplaceProperty( "SeriesOID", new StringProperty( seriesOID ) );
               if( !currentTextOID )
                 (*nodeIter)->SetProperty( "TextOID", new StringProperty( textOID ) );
               else

@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         mainWindow.showMaximized();
       else
       {
-        mainWindow.resize(sizeProp->GetValue()[0], sizeProp->GetValue()[1]);      
+        mainWindow.resize((int)sizeProp->GetValue()[0], (int) sizeProp->GetValue()[1]);      
         mainWindow.show();
       }
     }
@@ -115,8 +115,8 @@ int main(int argc, char* argv[])
         }
         else
         {
-          i.push_back(p[0]);
-          i.push_back(p[1]);
+          i.push_back((int)p[0]);
+          i.push_back((int)p[1]);
         }
       }
       else

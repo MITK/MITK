@@ -536,7 +536,7 @@ bool mitk::PointSetInteractor
               {
                 for (it = points->Begin(); it != points->End(); it++)
                 {
-                  if (it->Index() == previousExistingPosition)
+                  if (it->Index() == (unsigned int) previousExistingPosition)
                   {
                     lastDelPrevExistPosition = previousExistingPosition;
                     break; //return if the iterator on the last existing position is found

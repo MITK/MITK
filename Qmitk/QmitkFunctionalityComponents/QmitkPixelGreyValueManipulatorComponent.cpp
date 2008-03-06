@@ -66,7 +66,6 @@ m_BoundingObject(NULL),
 m_BoundingObjectGroup(NULL),/*BoundingObjectGroup that includes all created BoundingObjects to calculate a big one*/
 m_BoundingObjectList(NULL),/*Vector that includes all to the node added BoundingObjects*/
 m_DataIt(it),
-m_BoundingObjectInteractor(NULL),
 m_BoundingObjectExistingFlag(false)
 {
 	SetDataTreeIterator(it);

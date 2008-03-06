@@ -823,16 +823,19 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
           for( TiXmlElement* singleID = singleVolume->FirstChildElement(); singleID; singleID = singleID->NextSiblingElement() )
           {
             std::string identification = singleID->Value();
-            std::string content = singleID->GetText();
-            if( identification == "TextOID" )  //if the found element are a text-file -> load them
-            {
-              QApplication::restoreOverrideCursor();
-              return LoadOneText( content );
-            }
-            else
-              if( identification == "ImageInstanceUID" )  //if the found element are a image-volume -> load the single slices
-                m_SavedImageInstanceUIDs.push_back( content );
-          }
+            if( singleID->GetText() )
+			{
+              std::string content = singleID->GetText();
+              if( identification == "TextOID" )  //if the found element are a text-file -> load them
+              {
+                QApplication::restoreOverrideCursor();
+                return LoadOneText( content );
+              }
+              else
+                if( identification == "ImageInstanceUID" )  //if the found element are a image-volume -> load the single slices
+                  m_SavedImageInstanceUIDs.push_back( content );
+			}
+		  }
 
           //with the image_instance_UIDs of the slices whe have to load the ipPicDescriptors
           m_ImageList.clear();
@@ -1902,7 +1905,9 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
           mitk::BaseProperty::Pointer nameProperty = (*nodeIter)->GetProperty( "name" );
           mitk::ImageToPicDescriptor::TagInformationStruct temp;
           temp.PicTagDescription = tagSERIES_DESCRIPTION;
-          temp.PicTagContent = nameProperty->GetValueAsString();
+          if( mameProperty )
+            temp.PicTagContent = nameProperty->GetValueAsString();
+          else temp.PicTagContent = "no Description";
           picTagList.push_back( temp );
 
           //for override images use saved pic-tags -> true, for add images create new pic-tags
@@ -2476,7 +2481,7 @@ std::string mitk::ChiliPlugin::CheckForVolumeLabel( std::list< std::string > Ima
     TiXmlElement* singleID = singleVolume->FirstChildElement();
     while( singleID && match )
     {
-      if( find( ImageInstanceUIDs.begin(), ImageInstanceUIDs.end(), singleID->GetText() ) != ImageInstanceUIDs.end() )
+      if( singleID->GetText() && find( ImageInstanceUIDs.begin(), ImageInstanceUIDs.end(), singleID->GetText() ) != ImageInstanceUIDs.end() )
         idCount++;
       else
         match = false; //one slice dont match, thats not the searched volume, take the next

@@ -794,7 +794,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
   if( InitParentChild( currentStudy.OID ) )
   {
     TiXmlElement* volume = m_currentXmlDoc->FirstChildElement("volumes");
-    if( !volume) return NULL;
+    if( !volume ) return NULL;
 
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
 
@@ -1096,7 +1096,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 
       //Init parent-child
       StudyInformation currentStudy = GetStudyInformation( lightbox->currentSeries()->oid );
-      if( InitParentChild( currentStudy.OID ) )
+      if( currentStudy.OID != "" && InitParentChild( currentStudy.OID ) )
       {
         //check if volume alway known in parent-child-xml
         std::vector< std::list< std::string > > ImageInstanceUIDs = converterToNode->GetImageInstanceUIDs();
@@ -1239,7 +1239,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadAllImagesFromSer
 
     //Init parent-child
     StudyInformation currentStudy = GetStudyInformation( seriesOID );
-    if( InitParentChild( currentStudy.OID ) )
+    if( currentStudy.OID != "" && InitParentChild( currentStudy.OID ) )
     {
       //check if volume alway known in parent-child-xml
       std::vector< std::list< std::string > > ImageInstanceUIDs = converterToNode->GetImageInstanceUIDs();
@@ -1549,7 +1549,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& m
 
   if( textOID == "" )
   {
-    std::cout << "ChiliPlugin (LoadOneTextFromSeries): No Text-OID set. Abort." << std::endl;
+    std::cout << "ChiliPlugin (LoadOneText): No Text-OID set. Abort." << std::endl;
     return NULL;
   }
 
@@ -1565,7 +1565,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadOneText( const std::string& m
   {
     clearTextStruct( &text );
     clearSeriesStruct( &series );
-    std::cout << "ChiliPlugin (GetTextInformation): pQueryText() failed. Abort." << std::endl;
+    std::cout << "ChiliPlugin (LoadOneText): pQueryText() failed. Abort." << std::endl;
     QApplication::restoreOverrideCursor();
     return NULL;
   }
@@ -1701,7 +1701,10 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mit
         StudyInformation tempStudy = GetStudyInformation( seriesOIDProperty->GetValueAsString() );
         SeriesInformation tempSeries = GetSeriesInformation( seriesOIDProperty->GetValueAsString() );
 
-        chiliPluginDialog.AddStudySeriesAndNode( tempStudy.OID, tempPatient.Name, tempPatient.ID, tempStudy.Description, tempSeries.OID, tempSeries.Number, tempSeries.Description, (*nodeIter) );
+        if( tempPatient.OID == "" || tempStudy.OID == "" || tempSeries.OID == "" )
+          chiliPluginDialog.AddNode( (*nodeIter) );
+        else
+          chiliPluginDialog.AddStudySeriesAndNode( tempStudy.OID, tempPatient.Name, tempPatient.ID, tempStudy.Description, tempSeries.OID, tempSeries.Number, tempSeries.Description, (*nodeIter) );
       }
       else
       {
@@ -1995,6 +1998,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
+			textOID = pGetNewOID();  //no such text-file found
           }
           else  //the Text-File saved first time
             textOID = pGetNewOID();

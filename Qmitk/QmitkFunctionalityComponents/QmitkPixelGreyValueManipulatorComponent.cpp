@@ -51,19 +51,12 @@ QmitkPixelGreyValueManipulatorComponent::QmitkPixelGreyValueManipulatorComponent
 m_MultiWidget(mitkStdMultiWidget),
 m_PixelGreyValueManipulatorComponentGUI(NULL),
 m_MitkImage(NULL),
-m_Segmentation(NULL),
 m_MitkImageIterator(NULL),
-m_PixelChangedImage(NULL),
-m_PixelChangedImageNode(NULL),
-m_SegmentedShiftResultNode(NULL),
-m_ItNewBuildSeg(NULL),
-m_SegmentationNode(NULL),
 m_PixelChangedImageCounter(0),
 m_ManipulationMode(0),
 m_ManipulationArea(0),
 m_PointSet(NULL),
-m_BoundingObject(NULL),
-m_BoundingObjectGroup(NULL),/*BoundingObjectGroup that includes all created BoundingObjects to calculate a big one*/
+/*m_BoundingObjectGroup(NULL), BoundingObjectGroup that includes all created BoundingObjects to calculate a big one*/
 m_BoundingObjectList(NULL),/*Vector that includes all to the node added BoundingObjects*/
 m_DataIt(it),
 m_BoundingObjectExistingFlag(false)

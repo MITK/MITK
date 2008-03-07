@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataTreeNode;
-
   /**
   This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
 

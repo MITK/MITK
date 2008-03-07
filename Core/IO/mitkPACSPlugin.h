@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define NUMBER_OF_THINKABLE_LIGHTBOXES 4
 
-class QcPlugin;
 class QcLightbox;
 
 namespace mitk {

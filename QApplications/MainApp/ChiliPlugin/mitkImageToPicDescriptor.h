@@ -18,13 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 #define IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 
-#include <ipPic/ipPic.h>
-#include <iostream>
-#include <list>
+#include <itkObject.h>
 
-#include <mitkLevelWindow.h>
 #include <mitkImage.h>
-#include "mitkCommon.h"
+#include <ipPic/ipPic.h>
+#include <list>
 
 namespace mitk {
 

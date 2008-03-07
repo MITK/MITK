@@ -15,13 +15,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-//Chili
+//CHILI
 #include <chili/isg.h>  //geometry
 #include <ipDicom/ipDicom.h>  //read DICOM-Files
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 #include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
 #include <ipPic/ipPic.h>  //ipPicDescriptor
-#include <ipPic/ipPicTags.h>  //Tags
+#include <ipPic/ipPicTags.h>  //ipPicTags
 //MITK-Plugin
 #include "mitkChiliPlugin.h"
 #include "mitkChiliPluginEvents.h"
@@ -29,12 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicDescriptorToNode.h"
 #include "mitkImageNumberFilter.h"
 #include "mitkSingleSpacingFilter.h"
-#include "mitkStreamReader.h"
 #include "mitkSpacingSetFilter.h"
+#include "mitkStreamReader.h"
 #include "QmitkChiliPluginSaveDialog.h"
 #include "mitkLightBoxImageReader.h"  //TODO entfernen wenn das neue Chili-Release installiert ist
 #include "mitkChiliMacros.h"
-
 //MITK
 #include <mitkCoreObjectFactory.h>
 #include <QmitkStdMultiWidget.h>
@@ -56,10 +55,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtimer.h>
 #include <qobjectlist.h>
 #include <qprogressbar.h>
-
+//XPM
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
 #include "chili_restart_mitk.xpm"
+//XML
+#include <tinyxml.h>
 
 QWidget* mitk::ChiliPlugin::s_Parent = NULL;
 /** Create event-logging object (ConferenceKit). */

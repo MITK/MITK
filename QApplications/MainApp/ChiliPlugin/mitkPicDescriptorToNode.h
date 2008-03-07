@@ -18,14 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PICDESCRIPTORTONODE_H_HEADER_INCLUDED
 #define PICDESCRIPTORTONODE_H_HEADER_INCLUDED
 
+#include <itkObject.h>
+
 #include <mitkDataTreeNode.h>
-#include <list>
 #include <ipPic/ipPic.h>
-#include "mitkCommon.h"
+#include <list>
 
 namespace mitk {
-
-class DataTreeNode;
 
   /**
   This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.

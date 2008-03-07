@@ -23,18 +23,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/plugin.h>
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>
-#include <tinyxml.h>  // xml used to save the parent-child-relationship
-#include "mitkImageToPicDescriptor.h"  // define the "TagInformationList"
+
+#include "mitkImageToPicDescriptor.h"  //using struct TagInformationList
 
 #ifndef WIN32
 extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );
 #endif
 
 class QcMITKTask;
-class SampleApp;
-class QIDToolButton;
-class Chili3Conference;
 class QHBoxLayout;
+class QIDToolButton;
+
+class Chili3Conference;
+class SampleApp;
+
+class TiXmlDocument;
 
 namespace mitk {
 

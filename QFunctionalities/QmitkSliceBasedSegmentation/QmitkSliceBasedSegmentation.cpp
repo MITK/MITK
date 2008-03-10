@@ -462,14 +462,20 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (automaticNode->GetData());
 
-      // TODO (bug #1160): what to do about the organ type? 
-      mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, nodeName, "undefined" );
+      QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
+      dialog.setPrompt("What organ did you just load?");
+      int dialogReturnValue = dialog.exec();
 
-      mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-      mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
+      if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
+      {
+        mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+        mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
+        mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
+
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+      }
     }
   }
   catch( std::exception& e )

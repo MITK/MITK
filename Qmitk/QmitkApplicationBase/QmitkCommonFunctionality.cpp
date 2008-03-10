@@ -556,7 +556,19 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   //QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
 
   // new Version: 
-  vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New(); 
+  vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New();
+	// take screenshot of render window without the coloured frame of 2 pixels
+	int* windowSize = renderWindow->GetSize();
+	double* renderWindowSize = new double[2];
+	renderWindowSize[0] = windowSize[0];
+	renderWindowSize[1] = windowSize[1];
+	double framesize = 2;
+	double* viewport = new double[4];
+	viewport[0] = (double)(framesize/renderWindowSize[0]);
+	viewport[1] = (double)(framesize/renderWindowSize[1]);
+	viewport[2] = (double)((renderWindowSize[0]-framesize)/renderWindowSize[0]);
+	viewport[3] = (double)((renderWindowSize[1]-framesize)/renderWindowSize[1]);
+	wti->SetViewport(viewport);
   vtkPNGWriter* pngWriter = vtkPNGWriter::New();
   
   //

@@ -157,6 +157,10 @@ public:
 
   /*!
   \brief method for creating a QAction object, i.e., toolbar button and menu entry
+  the toolbar button has to be an icon. A good way to package the icon image with the application
+  is to use the QEmbed tool (http://doc.trolltech.com/3.3/qembed.html) to embed a image file (.png for example)
+  into a c++ file, so that the file is included into the executable and does not need to be packaged externaly 
+  with the application. See http://doc.trolltech.com/3.3/qembed.html for more information
   */
   virtual QAction * CreateAction(QActionGroup * /*parent*/) { return NULL; };
 

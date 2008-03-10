@@ -14,4 +14,7 @@
     \code
     if (r1 >= r2)
     \endcode
+\li During automated testing in dartclients (ctest) some graphical tests do not 
+    close Qt messageboxes properly. Affects e.g. SliceBasedSegmentation. We did
+    not find a way to get this working. Seems to be a problem with ctest or Xvfb (was bug #1152)
 */

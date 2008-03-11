@@ -226,6 +226,8 @@ void mitk::VtkInteractorCameraController::SetRenderer(const mitk::BaseRenderer* 
     // generate a new one any more
     m_VtkInteractor = renderer->GetVtkRenderer()->GetRenderWindow()->GetInteractor();
 		m_VtkInteractor->SetRenderWindow(renderer->GetVtkRenderer()->GetRenderWindow());
+		// Enable possibility to (mouse-)interact with the renderer
+		m_VtkInteractor->Enable();
     m_VtkInteractor->Register(NULL);
   }
 

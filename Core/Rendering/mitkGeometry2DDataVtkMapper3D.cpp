@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 
 #include <vtkActor.h>
-#include <vtkArrowSource.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
 #include <vtkPolyDataMapper.h>
@@ -46,11 +45,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTubeFilter.h>
 #include <vtkMath.h>
 #include <vtkProp3DCollection.h>
-#include <vtkTransform.h>
-#include <vtkAppendPolyData.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
-
 
 #include <vtkImageShrink3D.h>
 #include <vtkImageConstantPad.h>
@@ -67,7 +61,7 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 {
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
- 
+
   m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
   m_SurfaceCreatorBoundingBox = mitk::BoundingBox::New();
   m_SurfaceCreatorPointsContainer = mitk::BoundingBox::PointsContainer::New();
@@ -81,33 +75,21 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
 
   m_SurfaceCreatorBoundingBox->SetPoints( m_SurfaceCreatorPointsContainer );
-  
-  // Make sure that the FeatureEdge algorithm is initialized with a "valid" (though empty) input
+
+  // Make sure that the FeatureEdge algorithm is initialized with a "valid"
+  // (though empty) input
   vtkPolyData *emptyPolyData = vtkPolyData::New();
   m_Edges->SetInput( emptyPolyData );
   emptyPolyData->Delete(); // decrease reference count
 
-  
-  m_EdgeTuber->SetInput( m_Edges->GetOutput() );
+  m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
+
+  m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
   m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
   m_EdgeTuber->SetNumberOfSides( 12 );
   m_EdgeTuber->CappingOn();
 
-  m_DirectionSource = vtkArrowSource::New();
-  m_DirectionTransformer = vtkTransformPolyDataFilter::New();
-  m_DirectionTransformer->SetInput(m_DirectionSource->GetOutput());
-  m_DirectionTransform = vtkTransform::New();
-  m_DirectionTransform->RotateY(90.0);
-  m_DirectionTransformer->SetTransform(m_DirectionTransform);
-
-  m_DirectionAppender = vtkAppendPolyData::New();
-  m_DirectionAppender->AddInput(m_EdgeTuber->GetOutput());
-  //m_DirectionAppender->AddInput(m_DirectionTransformer->GetOutput());   // uncomment to activate direction arrows on planes
-
-  m_EdgeTransformer->SetInput( m_DirectionAppender->GetOutput() );
-
-  m_EdgeMapper->SetInput(m_EdgeTransformer->GetOutput());
-
+  m_EdgeMapper->SetInput( m_EdgeTuber->GetOutput() );
   m_EdgeMapper->ScalarVisibilityOff();
 
   m_EdgeActor->SetMapper( m_EdgeMapper );
@@ -148,19 +130,18 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_BackgroundActor->Delete();
   m_DefaultLookupTable->Delete();
 
-  m_DirectionSource->Delete();
-  m_DirectionTransformer->Delete();
-  m_DirectionAppender->Delete();
-  m_DirectionTransform->Delete();
-
   // Delete entries in m_ImageActors list one by one
   ActorList::iterator it;
+
   for ( it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it )
+  {
     it->second->Delete();
+  }
 }
 
 
-vtkProp* Geometry2DDataVtkMapper3D::GetProp()
+vtkProp *
+Geometry2DDataVtkMapper3D::GetProp()
 {
   if ( (this->GetDataTreeNode() != NULL )
        && (m_Prop3D != NULL) 
@@ -182,13 +163,16 @@ void mitk::Geometry2DDataVtkMapper3D::UpdateVtkTransform()
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 }
 
-const Geometry2DData* Geometry2DDataVtkMapper3D::GetInput()
+const Geometry2DData *
+Geometry2DDataVtkMapper3D::GetInput()
 {
   return static_cast<const mitk::Geometry2DData * > ( GetData() );
 }
 
 
-void Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator)
+void 
+Geometry2DDataVtkMapper3D
+::SetDataIteratorForTexture(const mitk::DataTreeIteratorBase* iterator)
 {
   if(m_DataTreeIterator != iterator)
   {
@@ -249,7 +233,8 @@ void Geometry2DDataVtkMapper3D::SetDataIteratorForTexture(const mitk::DataTreeIt
 //}
 
 
-int Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
+int
+Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
 {
   int size;
 
@@ -261,7 +246,8 @@ int Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
 }
 
 
-void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void 
+Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   // Remove all actors from the assembly, and re-initialize it with the 
   // edge actor
@@ -295,11 +281,14 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if (input.IsNotNull() && (input->GetGeometry2D() != NULL))
   {
     mitk::SmartPointerProperty::Pointer surfacecreatorprop;
-    surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(GetDataTreeNode()->GetProperty("surfacegeometry", renderer));
-    if (   (surfacecreatorprop.IsNull())
-        || (surfacecreatorprop->GetSmartPointer().IsNull())
-        || ((m_SurfaceCreator = dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
-       )
+    surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(
+      GetDataTreeNode()->GetProperty("surfacegeometry", renderer));
+
+    if ( (surfacecreatorprop.IsNull())
+      || (surfacecreatorprop->GetSmartPointer().IsNull())
+      || ((m_SurfaceCreator = dynamic_cast<mitk::Geometry2DDataToSurfaceFilter*>(
+             surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() )
+      )
     {
       m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
       m_SurfaceCreator->PlaceByGeometryOn();
@@ -311,9 +300,13 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     int res;
     if (GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
+    {
       m_SurfaceCreator->SetXResolution(res);
+    }
     if (GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
+    {
       m_SurfaceCreator->SetYResolution(res);
+    }
     
     // Clip the Geometry2D with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
@@ -343,8 +336,13 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
     else
     {
-      // If no reference geometry is available, clip with the current global bounds
-      m_SurfaceCreator->SetBoundingBox(mitk::DataTree::ComputeVisibleBoundingBox(m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"));
+      // If no reference geometry is available, clip with the current global
+      // bounds
+      m_SurfaceCreator->SetBoundingBox(
+        mitk::DataTree::ComputeVisibleBoundingBox(
+          m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"
+        )
+      );
     }
 
     // Calculate the surface of the Geometry2D
@@ -353,9 +351,8 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     mitk::Surface *surface = m_SurfaceCreator->GetOutput();
 
     // Check if there's something to display, otherwise return
-    if (   (surface->GetVtkPolyData() == 0 )
-        || (surface->GetVtkPolyData()->GetNumberOfCells() == 0) 
-       )
+    if ( (surface->GetVtkPolyData() == 0 )
+      || (surface->GetVtkPolyData()->GetNumberOfCells() == 0) )
     {
       m_ImageAssembly->VisibilityOff();
       return;
@@ -389,12 +386,16 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
           {
             nodeCounter++;
             mitk::WeakPointerProperty::Pointer rendererProp =
-              dynamic_cast< mitk::WeakPointerProperty * >(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer"));
+              dynamic_cast< mitk::WeakPointerProperty * >(
+                GetDataTreeNode()->GetPropertyList()
+                  ->GetProperty("renderer"));
 
             if ( rendererProp.IsNotNull() )
             {
               mitk::BaseRenderer::Pointer planeRenderer =
-                dynamic_cast< mitk::BaseRenderer * >(rendererProp->GetWeakPointer().GetPointer());
+                dynamic_cast< mitk::BaseRenderer * >(
+                  rendererProp->GetWeakPointer().GetPointer()
+                );
 
               if ( planeRenderer.IsNotNull() )
               {
@@ -465,6 +466,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   rit->m_Image->Update();
                   texture->SetInput( rit->m_Image );
 
+
                   // check for level-window-prop and use it if it exists
                   mitk::ScalarType windowMin = 0.0;
                   mitk::ScalarType windowMax = 255.0;
@@ -478,8 +480,9 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                     windowMin = 0;
                     windowMax = 1;
                   }
-                  else if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" ) 
-                        || node->GetLevelWindow( levelWindow, planeRenderer ) )
+                  else
+                  if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" ) 
+                    || node->GetLevelWindow( levelWindow, planeRenderer ) )
                   {
                     windowMin = levelWindow.GetMin();
                     windowMax = levelWindow.GetMax();
@@ -490,24 +493,35 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   // check for "use color"
                   bool useColor;
                   if ( !node->GetBoolProperty( "use color", useColor, planeRenderer ) )
+                  {
                     useColor = false;
+                  }
 
                   if ( binary )
+                  {
                     useColor = true;
+                  }
                   
                   // check for LookupTable
                   mitk::LookupTableProperty::Pointer lookupTableProp;
                   lookupTableProp = dynamic_cast< mitk::LookupTableProperty * >(
-                    node->GetPropertyList()->GetProperty( "LookupTable" ));
+                    node->GetPropertyList()
+                      ->GetProperty( "LookupTable" ));
 
                   // If there is a lookup table supplied, use it; otherwise,
                   // use the default grayscale table
                   if ( lookupTableProp.IsNotNull()  && !useColor )
-                    lookupTableSource = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+                  {
+                    lookupTableSource = lookupTableProp->GetLookupTable()
+                      ->GetVtkLookupTable();
+                  }
                   else
+                  {
                     lookupTableSource = m_DefaultLookupTable;
+                  }
 
-                  LookupTableProperties &lutProperties = m_LookupTableProperties[imageMapper];
+                  LookupTableProperties &lutProperties = 
+                    m_LookupTableProperties[imageMapper];
 
                   // If there has been some change since the last pass which
                   // makes it necessary to re-build the lookup table, do it.
@@ -525,6 +539,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                     lookupTable->SetRange( windowMin, windowMax );
                   }
 
+
                   // We have to do this before GenerateAllData() is called
                   // since there may be no RendererInfo for renderer yet,
                   // thus GenerateAllData won't update the (non-existing)
@@ -541,6 +556,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   float rgb[3] = { 1.0, 1.0, 1.0 };
                   node->GetColor( rgb, renderer );
                   imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
+                  //m_BackgroundActor->GetProperty()->SetColor(1,1,1);
 
                   // Apply opacity property (of the node, not of the plane)
                   float opacity = 0.999;
@@ -579,14 +595,14 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
 
 
-    // Configure the tube-shaped frame: size according to the surface
+    // Configurate the tube-shaped frame: size according to the surface
     // bounds, color as specified in the plane's properties
     vtkPolyData *surfacePolyData = surface->GetVtkPolyData();
 
     m_Edges->SetInput( surfacePolyData );
 
-    m_EdgeTransformer->SetTransform(this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()));
-
+    m_EdgeTransformer->SetTransform( 
+      this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 
     // Determine maximum extent
     vtkFloatingPointType* surfaceBounds = surfacePolyData->GetBounds();
@@ -598,11 +614,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     if ( extent < extentZ ) extent = extentZ;
 
     // Adjust the radius according to extent
-    m_EdgeTuber->SetRadius(extent / 450.0);
-    float scale[3];
-    m_DirectionTransform->GetScale(scale);
-    m_DirectionTransform->Scale(extent / (10 * scale[0]), extent / (20.0 * scale[1]), extent / (20.0 * scale[2]));
-      
+    m_EdgeTuber->SetRadius( extent / 450.0 );
 
     // Get the plane's color and set the tube properties accordingly
     mitk::ColorProperty::Pointer colorProperty;
@@ -612,7 +624,9 @@ void Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     if ( colorProperty.IsNotNull() )
     {
       const mitk::Color& color = colorProperty->GetColor();
-      m_EdgeActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+      m_EdgeActor->GetProperty()->SetColor(
+        color.GetRed(), color.GetGreen(), color.GetBlue()
+      );
     }
     else
     {

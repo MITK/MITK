@@ -1,6 +1,6 @@
 /**
 
-\page Rendering in MITK by means of the QT-VTK widget
+\page Rendering Rendering in MITK by means of the QT-VTK widget
 
 \brief This page describes the MITK rendering mechanism switching to the QTVTK widget. MITK releases with version > 0.8 use this new rendering pipeline. Several changes in contrast to the established old rendering pipeline are explained in the following.
 

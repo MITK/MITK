@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include <string>
 #include <itkObject.h>
+#include <itkObjectFactory.h>
 
 class vtkRenderWindow;
 
@@ -229,7 +230,7 @@ private:
  * e.g. for tests. To use this (instead of a "real" RenderingManager),
  * instantiate the GenericRenderingManagerFactory somewhere in your code.
  */
-class GenericRenderingManager : public RenderingManager
+class MITK_CORE_EXPORT GenericRenderingManager : public RenderingManager
 {
 public:
   mitkClassMacro(GenericRenderingManager,RenderingManager);
@@ -244,31 +245,6 @@ protected:
   {
   };
 };
-
-/**
- * Factory for the GenericRenderingManager
- */
-class GenericRenderingManagerFactory : public mitk::RenderingManagerFactory
-{
-public:
-  GenericRenderingManagerFactory()
-  {
-    if ( !mitk::RenderingManager::HasFactory() )
-    {
-      mitk::RenderingManager::SetFactory( this );
-    }
-  };
-
-  virtual ~GenericRenderingManagerFactory() {};
-
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
-  {
-    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
-    RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
-    return smartPtr;
-  };
-};
-}
 
 
 } // namespace mitk

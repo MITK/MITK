@@ -62,6 +62,31 @@ private:
 
 };
 
+/**
+ * Factory for the GenericRenderingManager
+ */
+class MITK_CORE_EXPORT GenericRenderingManagerFactory : public RenderingManagerFactory
+{
+public:
+  GenericRenderingManagerFactory()
+  {
+    if ( !mitk::RenderingManager::HasFactory() )
+    {
+      mitk::RenderingManager::SetFactory( this );
+    }
+  };
+
+  virtual ~GenericRenderingManagerFactory() {};
+
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
+  {
+    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
+    RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
+    return smartPtr;
+  };
+};
+
+
 } // namespace mitk
 
 #endif

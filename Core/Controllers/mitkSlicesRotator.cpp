@@ -300,7 +300,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       // just reach through
       for (SNCVector::iterator iter = m_RelevantSNCs.begin(); iter != m_RelevantSNCs.end(); ++iter)
       {
-        if ( !(*iter)->GetSliceRotationLocked()  )
+        if ( !(*iter)->GetSliceLocked()  )
         {
           (*iter)->ExecuteAction(action, stateEvent);
         }
@@ -338,79 +338,76 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       for (SNCVector::iterator iter = m_SNCsToBeRotated.begin(); iter != m_SNCsToBeRotated.end(); ++iter)
       {
-        if ( !(*iter)->GetSliceRotationLocked() )
+        BaseRenderer *renderer = (*iter)->GetRenderer();
+        if ( renderer == NULL )
         {
-          BaseRenderer *renderer = (*iter)->GetRenderer();
-          if ( renderer == NULL )
-          {
-            continue;
-          }
-
-          DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
-
-          // std::cout << i << ":" << std::endl;
-
-          Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
-          displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-          displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
-
-          // std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
-
-          const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-          const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
-          if (!timeSlicedGeometry) continue;
-          
-          const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
-
-          //vtkLinearTransform *inverseTransformVtk = 
-          //  displayGeometry->GetVtkTransform()->GetLinearInverse();
-
-          //ScalarType pvtkCenterOfRotation[3];
-          //pvtkCenterOfRotation[0] = m_CenterOfRotation[0];
-          //pvtkCenterOfRotation[1] = m_CenterOfRotation[1];
-          //pvtkCenterOfRotation[2] = m_CenterOfRotation[2];
-
-          //ScalarType scaleFactorMMPerUnitX = 
-          //  displayGeometry->GetExtentInMM(0) / displayGeometry->GetExtent(0);
-          //ScalarType scaleFactorMMPerUnitY = 
-          //  displayGeometry->GetExtentInMM(1) / displayGeometry->GetExtent(1);  
-
-          //ScalarType scaleFactorMMPerDisplayUnit = displayGeometry->GetScaleFactorMMPerDisplayUnit();
-          //Vector2D &originInMM = displayGeometry->GetOriginInMM();
-
-          ////displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-
-          //ScalarType pvtkDisplayPost[3];
-          //inverseTransformVtk->TransformPoint( pvtkCenterOfRotation, pvtkDisplayPost );
-
-          //pvtkDisplayPost[0] *= scaleFactorMMPerUnitX;
-          //pvtkDisplayPost[1] *= scaleFactorMMPerUnitY;
-
-          ////displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
-          //pvtkDisplayPost[0] -= originInMM[0];
-          //pvtkDisplayPost[1] -= originInMM[1];
-
-          //pvtkDisplayPost[0] /= scaleFactorMMPerDisplayUnit;
-          //pvtkDisplayPost[1] /= scaleFactorMMPerDisplayUnit;
-
-          //point2DDisplayPost[0] = pvtkDisplayPost[0];
-          //point2DDisplayPost[1] = pvtkDisplayPost[1];
-
-
-          displayGeometry->Map( m_CenterOfRotation, point2DWorld );
-          displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
-          Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
-
-          Vector2D origin = displayGeometry->GetOriginInMM();
-          // std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
-          // std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
-          // std::cout << "  Origin - " << origin << std::endl;
-          ++i;
-
-          displayGeometry->MoveBy( vector2DDisplayDiff );
-
-          (*iter)->SendCreatedWorldGeometryUpdate();
+          continue;
         }
+
+        DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+
+        // std::cout << i << ":" << std::endl;
+
+        Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
+        displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+        displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
+
+        // std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
+
+        const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
+        const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
+        if (!timeSlicedGeometry) continue;
+        
+        const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&op);
+
+        //vtkLinearTransform *inverseTransformVtk = 
+        //  displayGeometry->GetVtkTransform()->GetLinearInverse();
+
+        //ScalarType pvtkCenterOfRotation[3];
+        //pvtkCenterOfRotation[0] = m_CenterOfRotation[0];
+        //pvtkCenterOfRotation[1] = m_CenterOfRotation[1];
+        //pvtkCenterOfRotation[2] = m_CenterOfRotation[2];
+
+        //ScalarType scaleFactorMMPerUnitX = 
+        //  displayGeometry->GetExtentInMM(0) / displayGeometry->GetExtent(0);
+        //ScalarType scaleFactorMMPerUnitY = 
+        //  displayGeometry->GetExtentInMM(1) / displayGeometry->GetExtent(1);  
+
+        //ScalarType scaleFactorMMPerDisplayUnit = displayGeometry->GetScaleFactorMMPerDisplayUnit();
+        //Vector2D &originInMM = displayGeometry->GetOriginInMM();
+
+        ////displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+
+        //ScalarType pvtkDisplayPost[3];
+        //inverseTransformVtk->TransformPoint( pvtkCenterOfRotation, pvtkDisplayPost );
+
+        //pvtkDisplayPost[0] *= scaleFactorMMPerUnitX;
+        //pvtkDisplayPost[1] *= scaleFactorMMPerUnitY;
+
+        ////displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
+        //pvtkDisplayPost[0] -= originInMM[0];
+        //pvtkDisplayPost[1] -= originInMM[1];
+
+        //pvtkDisplayPost[0] /= scaleFactorMMPerDisplayUnit;
+        //pvtkDisplayPost[1] /= scaleFactorMMPerDisplayUnit;
+
+        //point2DDisplayPost[0] = pvtkDisplayPost[0];
+        //point2DDisplayPost[1] = pvtkDisplayPost[1];
+
+
+        displayGeometry->Map( m_CenterOfRotation, point2DWorld );
+        displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
+        Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
+
+        Vector2D origin = displayGeometry->GetOriginInMM();
+        // std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
+        // std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
+        // std::cout << "  Origin - " << origin << std::endl;
+        ++i;
+
+        displayGeometry->MoveBy( vector2DDisplayDiff );
+
+        (*iter)->SendCreatedWorldGeometryUpdate();
       } 
       // std::cout << "--------------------------------" << std::endl;
 
@@ -500,7 +497,9 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         else
         {
           // @TODO here waits some bug to be found - maybe fixed by the || m_LinkPlanes in next line
-          if ( distancePixels <= ThreshHoldDistancePixels && (m_SNCsToBeRotated.empty() || m_LinkPlanes) )
+          if ( (distancePixels <= ThreshHoldDistancePixels)
+            && !(*iter)->GetSliceRotationLocked()
+            && (m_SNCsToBeRotated.empty() || m_LinkPlanes) )
           {
             // this one is behind the clicked "line"
             m_SNCsToBeRotated.push_back(*iter);
@@ -522,11 +521,14 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       bool move (true);
 
-      if ( geometryToBeRotated && otherGeometry && clickedGeometry ) // assure all three are valid, so calculation of center of rotation can be done
-      if ( numNearPlanes == 2 ) 
+      if ( geometryToBeRotated && otherGeometry && clickedGeometry
+        && ( numNearPlanes == 2 ) )
+      {
+        // assure all three are valid, so calculation of center of rotation can be done
         move = false;
+      }
       
-      StateEvent* newStateEvent(NULL);
+      StateEvent *newStateEvent(NULL);
 
       // question in state machine is: "rotate?"
       if (move)

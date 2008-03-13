@@ -478,46 +478,6 @@ mitk::RenderingManager
 }
 
 
-namespace mitk
-{
-class GenericRenderingManager : public RenderingManager
-{
-public:
-  mitkClassMacro(GenericRenderingManager,RenderingManager);
-  itkNewMacro(Self);
-
-protected:
-  virtual void RestartTimer()
-  {
-  };
-
-  virtual void StopTimer()
-  {
-  };
-};
-
-class GenericRenderingManagerFactory : public mitk::RenderingManagerFactory
-{
-public:
-  GenericRenderingManagerFactory()
-  {
-    if ( !mitk::RenderingManager::HasFactory() )
-    {
-      mitk::RenderingManager::SetFactory( this );
-    }
-  };
-
-  virtual ~GenericRenderingManagerFactory() {};
-
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
-  {
-    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
-    RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
-    return smartPtr;
-  };
-};
-}
-
 void
 mitk::RenderingManager
 ::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )

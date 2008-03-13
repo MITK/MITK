@@ -63,6 +63,9 @@ class RenderingManagerFactory;
  * appropriate timer for controlling the update execution process. See method
  * documentation for a description of how this can be done.
  *
+ * \sa GenericRenderingManager An "empty" RenderingManager implementation which
+ * can be used in tests etc.
+ *
  * \todo Individual timers for specific RenderWindows - the desired maximum
  * update frequency of a 3D window could be less then that of a 2D window
  * \ingroup Renderer
@@ -219,6 +222,54 @@ private:
   static RenderingManagerFactory *s_RenderingManagerFactory;
 
 };
+
+
+/**
+ * Generic RenderingManager implementation for "non-rendering-plattform",
+ * e.g. for tests. To use this (instead of a "real" RenderingManager),
+ * instantiate the GenericRenderingManagerFactory somewhere in your code.
+ */
+class GenericRenderingManager : public RenderingManager
+{
+public:
+  mitkClassMacro(GenericRenderingManager,RenderingManager);
+  itkNewMacro(Self);
+
+protected:
+  virtual void RestartTimer()
+  {
+  };
+
+  virtual void StopTimer()
+  {
+  };
+};
+
+/**
+ * Factory for the GenericRenderingManager
+ */
+class GenericRenderingManagerFactory : public mitk::RenderingManagerFactory
+{
+public:
+  GenericRenderingManagerFactory()
+  {
+    if ( !mitk::RenderingManager::HasFactory() )
+    {
+      mitk::RenderingManager::SetFactory( this );
+    }
+  };
+
+  virtual ~GenericRenderingManagerFactory() {};
+
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
+  {
+    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
+    RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
+    return smartPtr;
+  };
+};
+}
+
 
 } // namespace mitk
 

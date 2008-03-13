@@ -62,6 +62,9 @@ PURPOSE.  See the above copyright notices for more information.
 //XML
 #include <tinyxml.h>
 
+#include <QmitkControlsRightFctLayoutTemplate.h>
+#include <qsplitter.h>
+
 QWidget* mitk::ChiliPlugin::s_Parent = NULL;
 /** Create event-logging object (ConferenceKit). */
 Chili3ConferenceKitFactory chiliconferencekitfactory;
@@ -205,9 +208,21 @@ void mitk::ChiliPlugin::CreateSampleApp()
 
   // create one instance of SampleApp
   app = new SampleApp( task, "sample", 0 );
-  horzlayout->addWidget( app ); 
+  horzlayout->addWidget( app );
   horzlayout->activate();
   app->show();
+
+  // Setup  MultiWidget size (default: 2/3 of total MainApp width)
+  QmitkControlsRightFctLayoutTemplate* fctwidget = (QmitkControlsRightFctLayoutTemplate*) app->centralWidget();
+  if(fctwidget)
+  {
+    QValueList<int> i;
+    i.push_back(app->width()/3*2);
+    i.push_back(app->width()/3*1);
+
+    fctwidget->MainSplitter->setSizes(i);
+    app->repaint();
+  }
 
   if (!done)
   {
@@ -825,7 +840,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
           {
             std::string identification = singleID->Value();
             if( singleID->GetText() )
-			{
+            {
               std::string content = singleID->GetText();
               if( identification == "TextOID" )  //if the found element are a text-file -> load them
               {
@@ -835,8 +850,8 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
               else
                 if( identification == "ImageInstanceUID" )  //if the found element are a image-volume -> load the single slices
                   m_SavedImageInstanceUIDs.push_back( content );
-			}
-		  }
+            }
+          }
 
           //with the image_instance_UIDs of the slices whe have to load the ipPicDescriptors
           m_ImageList.clear();
@@ -999,72 +1014,74 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
     for( unsigned int n = 0; n < lightbox->getFrames(); n++ )
     {
       ipPicDescriptor* pic = lightbox->fetchPic(n);
-
-      #ifndef WIN32
-      if( pic->dim == 1 )  //jpeg-stream
+      if( pic )
       {
-        unsigned int frameNumber;
-        ipPicTSV_t *tsv;
-        void* data = NULL;
-        ipUInt4_t len = 0;
-        tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
-        if( tsv )
+        #ifndef WIN32
+        if( pic->dim == 1 )  //jpeg-stream
         {
-          if( dicomFindElement( (unsigned char*) tsv->value, 0x0028, 0x0008, &data, &len ) )
+          unsigned int frameNumber;
+          ipPicTSV_t *tsv;
+          void* data = NULL;
+          ipUInt4_t len = 0;
+          tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
+          if( tsv )
           {
-            if( data != NULL )
+            if( dicomFindElement( (unsigned char*) tsv->value, 0x0028, 0x0008, &data, &len ) )
             {
-              StreamImageStruct newElement;
-              newElement.imageList.clear();
-
-              sscanf( (char *) data, "%d", &frameNumber );
-
-              ipUInt4_t *offset_table;
-              offset_table = (ipUInt4_t *)malloc( sizeof(ipUInt4_t) * frameNumber );
-              for( unsigned int i = 0; i < frameNumber; ++i )
-                offset_table[i] = 0xffffffff;
-
-              for( unsigned int i = 0; i < frameNumber; i++ )
+              if( data != NULL )
               {
-                ipPicDescriptor* cinePic = ipPicDecompressJPEG( lightbox->fetchPic(n), i, frameNumber, NULL, offset_table );
-                newElement.imageList.push_back( cinePic );
-              }
-              free( offset_table );
+                StreamImageStruct newElement;
+                newElement.imageList.clear();
 
-              //interSliceGeometry
-              newElement.geometry = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-              if( !pFetchSliceGeometryFromPic( pic, newElement.geometry ) )
-              {
-                std::cout<<"Not able to load interSliceGeometry!"<<std::endl;
-                free( newElement.geometry );
-              }
+                sscanf( (char *) data, "%d", &frameNumber );
 
-              //SeriesDescription
-              ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( pic, (char*)tagSERIES_DESCRIPTION );
-              if( seriesDescriptionTag )
-                newElement.seriesDescription = static_cast<char*>( seriesDescriptionTag->value );
-              if( newElement.seriesDescription == "" )
-              {
-                ipPicTSV_t *tsv;
-                void* data = NULL;
-                ipUInt4_t len = 0;
-                tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
-                if( tsv )
+                ipUInt4_t *offset_table;
+                offset_table = (ipUInt4_t *)malloc( sizeof(ipUInt4_t) * frameNumber );
+                for( unsigned int i = 0; i < frameNumber; ++i )
+                  offset_table[i] = 0xffffffff;
+
+                for( unsigned int i = 0; i < frameNumber; i++ )
                 {
-                  if( dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
+                  ipPicDescriptor* cinePic = ipPicDecompressJPEG( lightbox->fetchPic(n), i, frameNumber, NULL, offset_table );
+                  newElement.imageList.push_back( cinePic );
+                }
+                free( offset_table );
+
+                //interSliceGeometry
+                newElement.geometry = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+                if( !pFetchSliceGeometryFromPic( pic, newElement.geometry ) )
+                {
+                  std::cout<<"Not able to load interSliceGeometry!"<<std::endl;
+                  free( newElement.geometry );
+                }
+
+                //SeriesDescription
+                ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( pic, (char*)tagSERIES_DESCRIPTION );
+                if( seriesDescriptionTag )
+                  newElement.seriesDescription = static_cast<char*>( seriesDescriptionTag->value );
+                if( newElement.seriesDescription == "" )
+                {
+                  ipPicTSV_t *tsv;
+                  void* data = NULL;
+                  ipUInt4_t len = 0;
+                  tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
+                  if( tsv )
                   {
-                    newElement.seriesDescription = (char*)data;
+                    if( dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
+                    {
+                      newElement.seriesDescription = (char*)data;
+                    }
                   }
                 }
+                m_StreamImageList.push_back( newElement );
               }
-              m_StreamImageList.push_back( newElement );
             }
           }
         }
+        else
+        #endif
+          lightboxPicDescriptorList.push_back( pic );
       }
-      else
-      #endif
-        lightboxPicDescriptorList.push_back( pic );
     }
 
     if( !lightboxPicDescriptorList.empty() )
@@ -2004,7 +2021,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
-			textOID = pGetNewOID();  //no such text-file found
+            textOID = pGetNewOID();  //no such text-file found
           }
           else  //the Text-File saved first time
             textOID = pGetNewOID();
@@ -2063,7 +2080,7 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                 if( remove(  pathAndFile.c_str() ) != 0 )
                   std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << it->GetPointer()->GetFileName() << std::endl;
               }
-              //set the OID´s as Property
+              //set the OIDï¿½s as Property
               if( !currentSeriesOID )
                 (*nodeIter)->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
               else
@@ -2620,6 +2637,20 @@ void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager* /*lbm*/, int tiles )
   SendLightBoxCountChangedEvent(); // tell the application
 }
 
+/** Throw an event, if the study changed. */
+void mitk::ChiliPlugin::SendStudySelectedEvent()
+{
+  //throw ITK event (defined in mitkChiliPluginEvents.h)
+  InvokeEvent( PluginStudySelected() );
+}
+
+/** Throw an event, if the lightboxcount changed. */
+void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
+{
+  //throw ITK event (defined in mitkChiliPluginEvents.h)
+  InvokeEvent( PluginLightBoxCountChanged() );
+}
+
 /** Button to import the lightbox. */
 void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 {
@@ -2680,20 +2711,6 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     qApp->processEvents();
     m_InImporting = false;
   }
-}
-
-/** Throw an event, if the study changed. */
-void mitk::ChiliPlugin::SendStudySelectedEvent()
-{
-  //throw ITK event (defined in mitkChiliPluginEvents.h)
-  InvokeEvent( PluginStudySelected() );
-}
-
-/** Throw an event, if the lightboxcount changed. */
-void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
-{
-  //throw ITK event (defined in mitkChiliPluginEvents.h)
-  InvokeEvent( PluginLightBoxCountChanged() );
 }
 
 /** Reinitialize the application. */

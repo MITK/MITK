@@ -72,7 +72,7 @@ QmitkRenderingManagerInternal::~QmitkRenderingManagerInternal()
 
 void QmitkRenderingManagerInternal::RestartTimer()
 {
-  m_Timer->start( m_QmitkRenderingManager->GetMinimumInterval());
+  m_Timer->start(5);
   //QTimer::singleShot(m_QmitkRenderingManager->GetMinimumInterval(), this, SLOT(QUpdateCallback()));
 }
 

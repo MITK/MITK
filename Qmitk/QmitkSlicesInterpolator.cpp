@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qcheckbox.h>
 #include <qpushbutton.h>
+#include <qpopupmenu.h>
+#include <qcursor.h>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -76,7 +78,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   m_FeedbackNode->SetProperty( "layer", new mitk::IntProperty( 20 ) );
   m_FeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
   m_FeedbackNode->SetProperty( "name", new mitk::StringProperty("Interpolation feedback") );
-  m_FeedbackNode->SetProperty( "opacity", new mitk::FloatProperty(0.2) );
+  m_FeedbackNode->SetProperty( "opacity", new mitk::FloatProperty(0.8) );
   m_FeedbackNode->SetProperty( "helper object", new mitk::BoolProperty(true) );
 }
     
@@ -255,7 +257,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
   }
 }
 
-void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
+void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimension)
 {
   // first creates a 3D diff image, then applies this diff to the segmentation
   if (m_Segmentation)
@@ -277,14 +279,14 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
     mitk::OverwriteSliceImageFilter::Pointer diffslicewriter = mitk::OverwriteSliceImageFilter::New();
     diffslicewriter->SetCreateUndoInformation( false );
     diffslicewriter->SetInput( diffImage );
-    diffslicewriter->SetSliceDimension( m_LastSliceDimension );
+    diffslicewriter->SetSliceDimension( sliceDimension );
 
     unsigned int totalChangedSlices(0);
-    unsigned int zslices = m_Segmentation->GetDimension( m_LastSliceDimension );
+    unsigned int zslices = m_Segmentation->GetDimension( sliceDimension );
     mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
     for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
     {
-      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( m_LastSliceDimension, sliceIndex ); 
+      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex ); 
       if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_Interpolator does
       {
         diffslicewriter->SetSliceImage( interpolation );
@@ -317,6 +319,23 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
     m_FeedbackNode->SetData(NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+}
+
+void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
+{
+  QPopupMenu orientationPopup(this);
+  orientationPopup.insertItem( "Transversal (red)", 2 );
+  orientationPopup.insertItem( "Sagittal (green)", 0 );
+  orientationPopup.insertItem( "Frontal (blue)", 1 );
+
+  connect( &orientationPopup, SIGNAL(activated(int)), this, SLOT(OnAcceptAllPopupActivated(int)) );
+
+  orientationPopup.exec( QCursor::pos() );
+}
+
+void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(int sliceDimension)
+{
+  AcceptAllInterpolations( sliceDimension );
 }
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)

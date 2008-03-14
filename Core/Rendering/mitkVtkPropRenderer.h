@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataTree.h"
+#include "mitkDataStorage.h"
 
 #include <itkCommand.h>
 
@@ -36,6 +37,7 @@ class vtkWorldPointPicker;
 class vtkPointPicker;
 class vtkTextActor;
 class vtkTextProperty;
+class vtkAssemblyPath;
 
 namespace mitk {
 
@@ -94,6 +96,18 @@ public:
    * aligned correctly.
    */
   bool SetWorldGeometryToVisibleBounds();
+
+  /**
+   * \brief Used by vtkPointPicker/vtkPicker.
+   * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+   */
+  void InitPathTraversal();
+  
+  /**
+   * \brief Used by vtkPointPicker/vtkPicker.
+   * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+   */
+  vtkAssemblyPath* GetNextPath();
   
 protected:
   
@@ -132,6 +146,8 @@ private:
   typedef std::map<unsigned int,vtkTextActor*> TextMapType;
   TextMapType m_TextCollection;
 
+  DataStorage::SetOfObjects::ConstPointer m_PickingObjects;
+  DataStorage::SetOfObjects::const_iterator m_PickingObjectsIterator;
 };
 
 } // namespace mitk

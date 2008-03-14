@@ -39,6 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInteractorCameraController.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
+#include "mitkSurface.h"
+#include "mitkNodePredicateDataType.h"
 
 // VTK
 #include <vtkRenderer.h>
@@ -53,6 +55,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkProp.h>
+#include <vtkAssemblyPath.h>
+#include <vtkAssemblyNode.h>
 
 
 
@@ -60,7 +64,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin )
   : BaseRenderer(name,renWin), 
   m_VtkMapperPresent(false), 
-  m_NewRenderer(true)  
+  m_NewRenderer(true)
 {
   m_WorldPointPicker = vtkWorldPointPicker::New();
   m_PointPicker = vtkPointPicker::New();
@@ -455,6 +459,40 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
      }
      case (PointPicking) :
      {
+       // create a new vtkRenderer
+       // give it all neccessary information (camera position, etc.)
+       // get all surfaces from datastorage, get actors from them
+       // add all those actors to the new renderer
+       // give this new renderer to pointpicker
+       /*
+       vtkRenderer* pickingRenderer = vtkRenderer::New();
+       pickingRenderer->SetActiveCamera( );
+      
+       DataStorage* dataStorage = DataStorage::GetInstance();
+       TNodePredicateDataType<Surface> isSurface;
+
+       DataStorage::SetOfObjects::ConstPointer allSurfaces = dataStorage->GetSubset( isSurface );
+       std::cout << "in picking: got " << allSurfaces->size() << " surfaces." << std::endl;
+
+       for (DataStorage::SetOfObjects::const_iterator iter = allSurfaces->begin();
+            iter != allSurfaces->end();
+            ++iter)
+       {
+         const DataTreeNode* currentNode = *iter;
+         BaseVtkMapper3D* baseVtkMapper3D = dynamic_cast<BaseVtkMapper3D*>( currentNode->GetMapper( BaseRenderer::Standard3D ) );
+         if ( baseVtkMapper3D )
+         {
+           vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetProp() );
+           if (actor)
+           {
+             std::cout << "a" << std::flush;
+             pickingRenderer->AddActor( actor );
+           }
+         }
+       }
+
+       std::cout << ";" << std::endl;
+       */
        m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
        vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
        break;
@@ -462,7 +500,9 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
     }
   }
   else
+  {
     Superclass::PickWorldPoint(displayPoint, worldPoint);
+  }
 }
 
 /*!
@@ -492,3 +532,61 @@ vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
 	return this->m_TextCollection[text_id]->GetTextProperty();
 }
+
+void mitk::VtkPropRenderer::InitPathTraversal()
+{
+  m_PickingObjects = DataStorage::GetInstance()->GetAll();
+  m_PickingObjectsIterator = m_PickingObjects->begin();
+
+}
+
+vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
+{
+  if ( m_PickingObjectsIterator == m_PickingObjects->end() )
+  {
+    return NULL;
+  }
+
+  vtkAssemblyPath* returnPath = vtkAssemblyPath::New();
+  //returnPath->Register(NULL);
+
+  bool success = false;
+ 
+  while (!success)
+  {
+    // loop until AddNode can be called successfully
+    const DataTreeNode* node = *m_PickingObjectsIterator;
+    if (node)
+    {
+      Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
+      if (mapper)
+      {
+        BaseVtkMapper3D* vtkmapper = dynamic_cast<BaseVtkMapper3D*>( mapper );
+        if (vtkmapper)
+        {
+          vtkProp* prop = vtkmapper->GetProp();
+          if (prop)
+          {
+            // add to assembly path
+            returnPath->AddNode( prop, prop->GetMatrix() );
+            success = true;
+          }
+        }
+      }
+    }
+
+    ++m_PickingObjectsIterator;
+
+    if ( m_PickingObjectsIterator == m_PickingObjects->end() ) break;
+  }
+
+  if ( success )
+  {
+    return returnPath;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+

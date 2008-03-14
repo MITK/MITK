@@ -51,6 +51,18 @@ class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
 
     void ReleaseGraphicsResources(vtkWindow* window);
 
+    /**
+     * \brief Used by vtkPointPicker/vtkPicker.
+     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+     */
+    virtual void InitPathTraversal();
+
+    /**
+     * \brief Used by vtkPointPicker/vtkPicker.
+     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+     */
+    virtual vtkAssemblyPath* GetNextPath();
+
   protected:
     vtkMitkRenderProp();
     ~vtkMitkRenderProp();

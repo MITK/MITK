@@ -55,3 +55,15 @@ int vtkMitkRenderProp::RenderOverlay(vtkViewport* /*viewport*/)
 void vtkMitkRenderProp::ReleaseGraphicsResources(vtkWindow* /*window*/)
 { //B/ what shall we do here....
 }
+
+void vtkMitkRenderProp::InitPathTraversal()
+{
+  m_VtkPropRenderer->InitPathTraversal();
+}
+
+vtkAssemblyPath* vtkMitkRenderProp::GetNextPath()
+{
+  return m_VtkPropRenderer->GetNextPath();
+}
+
+

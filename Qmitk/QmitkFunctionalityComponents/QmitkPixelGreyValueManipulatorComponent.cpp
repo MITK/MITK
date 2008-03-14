@@ -476,7 +476,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateBoundingBox(int boundingObje
     m_BoundingObjectGroup->AddBoundingObject(m_BoundingObject);
     m_BoundingObjectGroup->UpdateOutputInformation();
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     ////    if(!m_BoundingObjectExistingFlag)
     ////  {
@@ -498,7 +498,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateBoundingBox(int boundingObje
 
 
 
-    //mitk::RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+    //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     //if(!m_BoundingObjectExistingFlag)
     //{

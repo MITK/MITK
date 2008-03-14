@@ -260,7 +260,7 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
         break;
       }
   }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   
   EndModifyProperty();
 }
@@ -268,7 +268,7 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
 void QmitkNumberPropertyEditor::PropertyChanged()
 {
   DisplayNumber();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkNumberPropertyEditor::PropertyRemoved()

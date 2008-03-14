@@ -708,7 +708,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
       ++itConnectivity;
     }//end of while ( !itConnectivity->IsAtEnd() )
     //multiWidget->RequestUpdate();
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateIncludingVtkActors();
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     //m_MultiWidget->GetRenderWindow1()->repaint();
     //m_MultiWidget->GetRenderWindow2()->repaint();
     //m_MultiWidget->GetRenderWindow3()->repaint();

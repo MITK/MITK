@@ -291,7 +291,7 @@ void QmitkColorPropertyEditor::onColorSelected(QColor c)
     const_cast<mitk::ColorProperty*>(m_ColorProperty)->SetColor( r / 255.0, g / 255.0, b / 255.0 );
     const_cast<mitk::ColorProperty*>(m_ColorProperty)->Modified();
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

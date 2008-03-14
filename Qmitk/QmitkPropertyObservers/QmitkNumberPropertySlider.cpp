@@ -227,7 +227,7 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
         break;
       }
   }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   
   EndModifyProperty();
 }
@@ -235,7 +235,7 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
 void QmitkNumberPropertySlider::PropertyChanged()
 {
   DisplayNumber();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkNumberPropertySlider::PropertyRemoved()

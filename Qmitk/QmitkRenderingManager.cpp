@@ -71,7 +71,7 @@ QmitkRenderingManagerInternal::~QmitkRenderingManagerInternal()
 
 void QmitkRenderingManagerInternal::RestartTimer()
 {
-  m_Timer->start( m_QmitkRenderingManager->GetMinimumInterval(), TRUE );
+  m_Timer->start( 5, TRUE );
 }
 
 void QmitkRenderingManagerInternal::StopTimer()

@@ -72,7 +72,7 @@ void SegmentationSink::InsertBelowGroupNode(mitk::DataTreeNode* node)
 
   DataStorage::GetInstance()->Add( node, groupNode );
     
-  RenderingManager::GetInstance()->RequestUpdateAll(true); // including vtk actors
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 DataTreeNode* SegmentationSink::GetGroupNode()

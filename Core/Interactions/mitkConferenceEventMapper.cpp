@@ -57,7 +57,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
     br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
     //std::cout<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
     br->DrawOverlayMouse(pos_unit); //TEST
-    mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
+    //mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
   }
 
 
@@ -126,7 +126,7 @@ mitk::ConferenceEventMapper::MapEvent(const char* sender, float w1, float w2, fl
     br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
     //std::cout<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
     br->DrawOverlayMouse(pos_unit); //TEST
-    mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
+    //mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
   }
 
   return true;

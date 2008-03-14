@@ -444,7 +444,7 @@ void QmitkDataTreeListView::keyReleaseEvent(QKeyEvent* e)
     e->ignore();
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 /**

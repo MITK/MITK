@@ -127,7 +127,7 @@
 //    //this->RenderWindow->Render(); 
 //    
 //    //only way for VolumeRendering
-//    mitk::RenderingManager::GetInstance()->RequestUpdateVtkRenderWindow(this->RenderWindow);
+//    mitk::RenderingManager::GetInstance()->RequestUpdate(this->RenderWindow);
 //
 //  }
 //  // outside the above test so that third-party code can redirect

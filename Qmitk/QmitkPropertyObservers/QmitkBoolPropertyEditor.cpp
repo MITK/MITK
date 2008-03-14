@@ -42,7 +42,7 @@ void QmitkBoolPropertyEditor::onToggle(bool on)
     BeginModifyProperty();  // deregister from events
   
     const_cast<mitk::BoolProperty*>(m_BoolProperty)->SetValue(on);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll(true);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   
     EndModifyProperty();  // again register for events
   }

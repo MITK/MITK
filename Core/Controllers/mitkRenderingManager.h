@@ -47,10 +47,9 @@ class RenderingManagerFactory;
  * <em>request</em> an update, and waiting for other objects to possibly
  * issue the same request. The actual update will then only be executed at a
  * well-defined point in the main event loop (this may be each time after
- * event processing is done, or after a minimum user specified interval has
- * elapsed).
+ * event processing is done).
  *
- * Conviniency methods for updating all RenderWindows which have been
+ * Convinience methods for updating all RenderWindows which have been
  * registered with the RenderingManager exist. If theses methods are not
  * used, it is not required to register (add) RenderWindows prior to using
  * the RenderingManager.
@@ -78,6 +77,15 @@ public:
   mitkClassMacro(RenderingManager,itk::Object);
 
   typedef std::vector< vtkRenderWindow* > RenderWindowVector;
+  typedef std::vector< float > FloatVector;
+  typedef std::vector< bool > BoolVector;
+
+  enum
+  {
+    REQUEST_UPDATE_ALL = 0,
+    REQUEST_UPDATE_2DWINDOWS,
+    REQUEST_UPDATE_3DWINDOWS
+  };
 
   static Pointer New();
 
@@ -87,7 +95,7 @@ public:
 
   /** Get the object factory which produces the platform specific
    * RenderingManager instances. */
-  static const RenderingManagerFactory * GetFactory();
+  static const RenderingManagerFactory *GetFactory();
 
   /** Returns true if a factory has already been set. */
   static bool HasFactory();
@@ -106,49 +114,25 @@ public:
   void RemoveRenderWindow( vtkRenderWindow *renderWindow );
 
   /** Get a list of all registered RenderWindows */
-  const RenderWindowVector& GetAllRegisteredRenderWindows();
+  const RenderWindowVector &GetAllRegisteredRenderWindows();
 
-  vtkRenderWindow* GetRenderWindowByName(const std::string&);
-
-  /** Requests an update for the specified RenderWindow. The time of
-   * execution usually depends on the specified minimum interval. */
+    /** Requests an update for the specified RenderWindow, to be executed as
+   * soon as the main loop is ready for rendering. */
   void RequestUpdate( vtkRenderWindow *renderWindow );
   
-  /** Requests an update for the specified VtkRenderWindow. */
-  void RequestUpdateVtkRenderWindow(vtkRenderWindow* renderwindow);
-
   /** Immediately executes an update of the specified RenderWindow. */
   void ForceImmediateUpdate( vtkRenderWindow *renderWindow );
 
-  /** Requests all currently registered RenderWindows to be updated. */
-  void RequestUpdateAll( bool includeVtkActors = false ); // TODO temporary fix until bug 167 (new vtk-based rendering mechanism) is done
-  
-  /** Requests all currently registered RenderWindows which use 3DMappers to be updated. */
-  void RequestUpdateAll3D(bool includeVtkActors = false);
-
-  /** Immediately executes an update of all registered RenderWindows. */
-  void ForceImmediateUpdateAll();
+  /** Requests all currently registered RenderWindows to be updated. 
+   * If only 2D or 3D windows should be updated, this can be specified
+   * via the parameter requestType. */
+  void RequestUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
   
   /** Immediately executes an update of all registered RenderWindows.
-   * If the renderer associated with a render window is an OpenGLRenderer,
-   * its method UpdateIncludingVtkActors is called. Otherwise the
-   * repaint method of the widget will be called.
-   */
-  void ForceImmediateUpdateIncludingVtkActors();
+   * If only 2D or 3D windows should be updated, this can be specified
+   * via the parameter requestType. */
+  void ForceImmediateUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
   
-  /** Requests an Overlay for the specified RenderWindow. */
-  void RequestOverlayUpdate( vtkRenderWindow *renderWindow );
-
-  /** Requests an overlay update all RenderWindows.*/
-  void RequestOverlayUpdateAll();
-
-  /** Sets the minimum time interval in msec. When requesting an update for
-   * a specific RenderWindow for the first time, it will be executed only
-   * after at least this time interval has elapsed. */
-  void SetMinimumInterval( int msec );
-
-  /** Gets the currently set minimum time interval. Default is 10. */
-  int GetMinimumInterval() const;
 
   virtual ~RenderingManager();
 
@@ -157,26 +141,36 @@ public:
   virtual void UpdateCallback();
 
   bool IsRendering() const;
-  void AbortRendering( vtkRenderWindow* renderWindow );
+  void AbortRendering( vtkRenderWindow *renderWindow );
 
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
 
   int GetCurrentLOD();
-  void SetCurrentLOD(int lod);
-  void SetNumberOfLOD(int number);
+  void SetCurrentLOD( int lod );
+  void SetNumberOfLOD( int number );
   
-  void SetShading(bool state, int lod);
-  bool GetShading(int lod);
+  void SetShading( bool state, int lod );
+  bool GetShading( int lod );
   
-  void SetClippingPlaneStatus(bool status);
+  void SetClippingPlaneStatus( bool status );
   bool GetClippingPlaneStatus();
   
-  void SetShadingValues(float ambient, float diffuse, float specular, float specpower);
-  std::vector<float> GetShadingValues();
+  void SetShadingValues( float ambient, float diffuse, 
+    float specular, float specpower );
+
+  FloatVector &GetShadingValues();
   
+
 protected:
+  enum
+  {
+    RENDERING_INACTIVE = 0,
+    RENDERING_REQUESTED,
+    RENDERING_INPROGRESS
+  };
+
   RenderingManager();
 
   /** Abstract method for restarting the timer (to be implemented in
@@ -195,14 +189,21 @@ protected:
    * after update. */
   virtual void CheckUpdatePending();
 
+
+
   bool m_UpdatePending;
-  int m_Interval;
+
   int m_CurrentLOD;
+
   int m_MaxLOD;
-  int m_Numberof3DRW;
-  std::vector<bool> m_ShadingEnabled;
+
+  int m_NumberOf3DRW;
+
+  BoolVector m_ShadingEnabled;
+
   bool m_ClippingPlaneEnabled;
-  std::vector<float> m_ShadingValues;
+
+  FloatVector m_ShadingValues;
   
   vtkRenderWindow *m_LastUpdatedRW;
 
@@ -210,14 +211,13 @@ protected:
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
 
-private:
+
+
   typedef std::map< vtkRenderWindow *, int > RenderWindowList;
 
   RenderWindowList m_RenderWindowList;
-  RenderWindowList m_IsRendering;
   RenderWindowVector m_AllRenderWindows;
 
-  static RenderWindowList s_RenderWindowList;
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;
@@ -227,8 +227,10 @@ private:
 
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",
- * e.g. for tests. To use this (instead of a "real" RenderingManager),
- * instantiate the GenericRenderingManagerFactory somewhere in your code.
+ * e.g. for tests. Its factory (GenericRenderingManagerFactory) is 
+ * automatically on start-up and is used by default if not other
+ * RenderingManagerFactory is instantiated explicitly thereafter.
+ * (see mitkRenderingManager.cpp)
  */
 class MITK_CORE_EXPORT GenericRenderingManager : public RenderingManager
 {

@@ -183,13 +183,15 @@ void QmitkVolumeVisualization::ImmediateUpdate(bool state)
 void QmitkVolumeVisualization::EnableClippingPlane(bool state)
 {
   mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(state);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll( 
+    mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
 void QmitkVolumeVisualization::SetShadingValues(float ambient, float diffuse, float specular, float specpower)
 {
   mitk::RenderingManager::GetInstance()->SetShadingValues(ambient, diffuse, specular, specpower);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll3D();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll( 
+    mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
 

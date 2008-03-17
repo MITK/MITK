@@ -127,6 +127,8 @@ public:
    */
   virtual bool IsValidSlice( int s = 0 ) const;
 
+  virtual void SetReferenceGeometry( Geometry3D *referenceGeometry );
+
   /**
    * \brief Set the spacing (m_Spacing), in direction of the plane normal.
    *

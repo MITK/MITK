@@ -150,7 +150,9 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
     //add all planes to sliced-geometry
     int s;
     for(s=0; planes.empty()==false; planes.pop_front(), ++s)
+    {
       m_CreatedGeometries->SetGeometry2D(planes.front(), s);
+    }
 
     m_CreatedGeometries->SetEvenlySpaced(false);
 
@@ -158,6 +160,7 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
     {
       m_CreatedGeometries->SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
       m_CreatedGeometries->SetBounds(m_FrameGeometry->GetBounds());
+      m_CreatedGeometries->SetReferenceGeometry(m_FrameGeometry);
     }
   }
 

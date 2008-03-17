@@ -114,6 +114,7 @@ mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
   if ( this->IsValidSlice(s) )
   {
     m_Geometry2Ds[s] = geometry2D;
+    m_Geometry2Ds[s]->SetReferenceGeometry( m_ReferenceGeometry );
     return true;
   }
   return false;
@@ -473,6 +474,19 @@ bool
 mitk::SlicedGeometry3D::IsValidSlice( int s ) const
 {
   return ((s >= 0) && (s < (int)m_Slices));
+}
+
+void
+mitk::SlicedGeometry3D::SetReferenceGeometry( Geometry3D *referenceGeometry )
+{
+  m_ReferenceGeometry = referenceGeometry;
+
+  std::vector<Geometry2D::Pointer>::iterator it;
+
+  for ( it = m_Geometry2Ds.begin(); it != m_Geometry2Ds.end(); ++it )
+  {
+    (*it)->SetReferenceGeometry( referenceGeometry );
+  }
 }
 
 void

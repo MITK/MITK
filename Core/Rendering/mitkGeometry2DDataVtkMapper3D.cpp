@@ -403,14 +403,13 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 // generate an actor, a lookup table and a texture object to
                 // render the image associated with the ImageMapper2D.
                 vtkActor *imageActor;
+                vtkDataSetMapper *dataSetMapper;
                 vtkLookupTable *lookupTable;
                 vtkTexture *texture;
                 if ( m_ImageActors.count( imageMapper ) == 0 )
                 {
-                  vtkDataSetMapper *dataSetMapper = vtkDataSetMapper::New();
+                  dataSetMapper = vtkDataSetMapper::New();
                   dataSetMapper->ImmediateModeRenderingOn();
-                  dataSetMapper->SetInput( 
-                    m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
 
                   lookupTable = vtkLookupTable::New();
                   lookupTable->DeepCopy( m_DefaultLookupTable );
@@ -441,9 +440,24 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   // Else, retrieve the actor and associated objects from the
                   // previous pass.
                   imageActor = m_ImageActors[imageMapper];
+                  dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
                   texture = imageActor->GetTexture();
                   lookupTable = texture->GetLookupTable();
                 }
+
+                // Set poly data new each time its object changes (e.g. when
+                // switching between planar and curved geometries)
+                if ( dataSetMapper != NULL )
+                {
+                  if ( dataSetMapper->GetInput() != m_SurfaceCreator->GetOutput()->GetVtkPolyData() )
+                  {
+                    dataSetMapper->SetInput( 
+                      m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
+                  }
+                }
+
+                imageActor->GetMapper()->GetInput()->Update();
+                imageActor->GetMapper()->Update();
 
                 // We have to do this before GenerateAllData() is called
                 // since there may be no RendererInfo for renderer yet,

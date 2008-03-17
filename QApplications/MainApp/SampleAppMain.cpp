@@ -36,8 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 //#include <vtkMapper.h>
 
 #include <QmitkControlsRightFctLayoutTemplate.h>
-#include <qsplitter.h>
-
 
 int main(int argc, char* argv[])
 {
@@ -76,62 +74,13 @@ int main(int argc, char* argv[])
     * Activating GlobalImmediateModeRendering in vtk solves this problem. Also add #include vtkMapper above
     */
     //vtkMapper::GlobalImmediateModeRenderingOn();
-         
-    //B/     Setup MainApp Widget size (default: maximized) ////
-    mitk::Point3dProperty* sizeProp = dynamic_cast<mitk::Point3dProperty*>
-                                      (mainWindow.m_Options->GetProperty("Startup window size"));
-    if(sizeProp)
-    {
-      mitk::Point3D p = sizeProp->GetValue();
-      if(p[0] == 0.0 && p[1] == 0.0)
-        mainWindow.showMaximized();
-      else
-      {
-        mainWindow.resize((int)sizeProp->GetValue()[0], (int) sizeProp->GetValue()[1]);      
-        mainWindow.show();
-      }
-    }
-    else
-      mainWindow.showMaximized();
 
-    mainWindow.RaiseDialogBars();
+    mainWindow.SetDefaultWidgetSize();
 
-    //B/ Setup  MultiWidget size (default: 2/3 of total MainApp width) ////
-    mitk::Point3dProperty* splitterSizeProp = dynamic_cast<mitk::Point3dProperty*>
-                                      (mainWindow.m_Options->GetProperty("Main Splitter ratio"));
-
-    QmitkControlsRightFctLayoutTemplate* fctwidget = (QmitkControlsRightFctLayoutTemplate*) mainWindow.centralWidget();
-    if(fctwidget)
-    {
-      QValueList<int> i;
-
-      if(splitterSizeProp)
-      {
-        mitk::Point3D p = splitterSizeProp->GetValue();
-        if(p[0] == 0.0 && p[1] == 0.0)
-        {
-          i.push_back(mainWindow.width()/3*2);
-          i.push_back(mainWindow.width()/3*1);
-        }
-        else
-        {
-          i.push_back((int)p[0]);
-          i.push_back((int)p[1]);
-        }
-      }
-      else
-      {
-        i.push_back(mainWindow.width()/3*2);
-        i.push_back(mainWindow.width()/3*1);
-      }
-      fctwidget->MainSplitter->setSizes(i);
-      mainWindow.repaint();
-    }
     // reinit views after mainwindow and fctwidget initialization
     mainWindow.viewReinitMultiWidget();
-    
-    
-    if(enableFunctionalityTesting) 
+
+    if(enableFunctionalityTesting)
     {
       std::cout.setf(std::ios_base::unitbuf);
       return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator());

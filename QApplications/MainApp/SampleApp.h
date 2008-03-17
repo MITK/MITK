@@ -50,5 +50,6 @@ public:
 
   virtual void InitializeQfm();
 
+  virtual void SetDefaultWidgetSize();
 };
 

@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qlayout.h>
 
+#include <qsplitter.h>
+
 void RegisterFunctionalities();
 
 SampleApp::SampleApp( QWidget* parent, const char* name, WFlags fl, const char* testingParameter ):
@@ -58,8 +60,6 @@ SampleApp::~SampleApp()
 
 void SampleApp::InitializeFunctionality()
 {
-  
-  
   //create and add functionalities. Functionalities are also invisible objects, which can be asked to 
   //create their different parts (main widget, control widget, toolbutton for selection).
   mitk::DataTreePreOrderIterator iterator(m_Tree);
@@ -86,19 +86,19 @@ void SampleApp::InitializeFunctionality()
       QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
       functionalityInstance->CreateFunctionalityOptionsList();
       qfm->AddFunctionality(functionalityInstance);
-    }      
+    }
 
     // add all known functionalities
-    for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++) 
+    for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++)
     {
-      if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL ) 
+      if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL )
       {
         QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
         functionalityInstance->CreateFunctionalityOptionsList();
         qfm->AddFunctionality(functionalityInstance);
-      } 
+      }
     }
-  } 
+  }
   else
   {
     //
@@ -107,10 +107,62 @@ void SampleApp::InitializeFunctionality()
     {
      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
      qfm->AddFunctionality(functionalityInstance);
-    } 
+    }
   }
 
   mitk::StatusBar::GetInstance()->DisplayText("Functionalities added",3000);
+}
+
+void SampleApp::SetDefaultWidgetSize()
+{
+  //B/ Setup MainApp Widget size (default: maximized) ////
+  mitk::Point3dProperty* sizeProp = dynamic_cast<mitk::Point3dProperty*>(this->m_Options->GetProperty("Startup window size"));
+  if(sizeProp)
+  {
+    mitk::Point3D p = sizeProp->GetValue();
+    if(p[0] == 0.0 && p[1] == 0.0)
+      this->showMaximized();
+    else
+    {
+      this->resize((int)sizeProp->GetValue()[0], (int) sizeProp->GetValue()[1]);
+      this->show();
+    }
+  }
+  else
+    this->showMaximized();
+
+  this->RaiseDialogBars();
+
+  //B/ Setup  MultiWidget size (default: 2/3 of total MainApp width) ////
+  mitk::Point3dProperty* splitterSizeProp = dynamic_cast<mitk::Point3dProperty*>(this->m_Options->GetProperty("Main Splitter ratio"));
+
+  QmitkControlsRightFctLayoutTemplate* fctwidget = (QmitkControlsRightFctLayoutTemplate*) this->centralWidget();
+  if(fctwidget)
+  {
+    QValueList<int> i;
+
+    if(splitterSizeProp)
+    {
+      mitk::Point3D p = splitterSizeProp->GetValue();
+      if(p[0] == 0.0 && p[1] == 0.0)
+      {
+        i.push_back(this->width()/3*2);
+        i.push_back(this->width()/3*1);
+      }
+      else
+      {
+        i.push_back((int)p[0]);
+        i.push_back((int)p[1]);
+      }
+    }
+    else
+    {
+      i.push_back(this->width()/3*2);
+      i.push_back(this->width()/3*1);
+    }
+    fctwidget->MainSplitter->setSizes(i);
+    this->repaint();
+  }
 }
 
 void SampleApp::InitializeQfm()

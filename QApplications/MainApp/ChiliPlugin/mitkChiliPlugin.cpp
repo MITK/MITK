@@ -100,7 +100,7 @@ mitk::ChiliPlugin::ChiliPlugin()
   if( m_tempDirectory.empty() )
     QMessageBox::information( 0, "MITK", "MITK was not able to create a temporary directory.\nYou can only load data from CHILI using the yellow light box import buttons." );
   else
-    std::cout << "ChiliPlugin: Create and use directory "<< m_tempDirectory << std::endl;
+    std::cout << "CHILIPlugin: Create and use directory "<< m_tempDirectory << std::endl;
 }
 
 /** Destructor */
@@ -110,10 +110,10 @@ mitk::ChiliPlugin::~ChiliPlugin()
 
   #ifdef WIN32
     removeDirectory = "rmdir /S /Q " + m_tempDirectory;
-    std::cout << "ChiliPlugin: Delete directory "<< m_tempDirectory << std::endl;
+    std::cout << "CHILIPlugin: Delete directory "<< m_tempDirectory << std::endl;
   #else
     removeDirectory = "rm -r " + m_tempDirectory;
-    std::cout << "ChiliPlugin: Delete directory "<< m_tempDirectory << std::endl;
+    std::cout << "CHILIPlugin: Delete directory "<< m_tempDirectory << std::endl;
   #endif
 
   system( removeDirectory.c_str() );
@@ -211,18 +211,7 @@ void mitk::ChiliPlugin::CreateSampleApp()
   horzlayout->addWidget( app );
   horzlayout->activate();
   app->show();
-
-  // Setup  MultiWidget size (default: 2/3 of total MainApp width)
-  QmitkControlsRightFctLayoutTemplate* fctwidget = (QmitkControlsRightFctLayoutTemplate*) app->centralWidget();
-  if(fctwidget)
-  {
-    QValueList<int> i;
-    i.push_back(app->width()/3*2);
-    i.push_back(app->width()/3*1);
-
-    fctwidget->MainSplitter->setSizes(i);
-    app->repaint();
-  }
+  app->SetDefaultWidgetSize();
 
   if (!done)
   {
@@ -292,7 +281,7 @@ mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const
       study = (*dupStudyStruct( pCurrentStudy() ) );  //copy the StudyStruct
     else
     {
-      std::cout << "ChiliPlugin (GetStudyInformation): pCurrentStudy() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetStudyInformation): pCurrentStudy() failed. Abort." << std::endl;
       clearStudyStruct( &study );
       clearSeriesStruct( &series );
       return resultInformation;
@@ -306,7 +295,7 @@ mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const
     {
       clearStudyStruct( &study );
       clearSeriesStruct( &series );
-      std::cout << "ChiliPlugin (GetStudyInformation): pQuerySeries() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetStudyInformation): pQuerySeries() failed. Abort." << std::endl;
       return resultInformation;
     }
   }
@@ -361,7 +350,7 @@ mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( c
       patient = (*dupPatientStruct( pCurrentPatient() ) );  //copy patientstruct
     else
     {
-      std::cout << "ChiliPlugin (GetPatientInformation): pCurrentPatient() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetPatientInformation): pCurrentPatient() failed. Abort." << std::endl;
       clearPatientStruct( &patient );
       clearStudyStruct( &study );
       clearSeriesStruct( &series );
@@ -377,7 +366,7 @@ mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( c
       clearPatientStruct( &patient );
       clearStudyStruct( &study );
       clearSeriesStruct( &series );
-      std::cout << "ChiliPlugin (GetPatientInformation): pQueryPatient() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetPatientInformation): pQueryPatient() failed. Abort." << std::endl;
       return resultInformation;
     }
   }
@@ -421,7 +410,7 @@ mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( con
       series = (*dupSeriesStruct( pCurrentSeries() ) );  //copy seriesstruct
     else
     {
-      std::cout << "ChiliPlugin (GetSeriesInformation): pCurrentSeries() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetSeriesInformation): pCurrentSeries() failed. Abort." << std::endl;
       return resultInformation;
     }
   }
@@ -432,7 +421,7 @@ mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( con
     if( !pQuerySeries( this, &series, NULL, NULL ) )
     {
       clearSeriesStruct( &series );
-      std::cout << "ChiliPlugin (GetSeriesInformation): pQuerySeries() failed. Abort." << std::endl;
+      std::cout << "CHILIPlugin (GetSeriesInformation): pQuerySeries() failed. Abort." << std::endl;
       return resultInformation;
     }
   }

@@ -264,7 +264,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetRelations(co
     throw 2;
 
   if (m_DataTree->GetIteratorToNode(node)->IsAtEnd()) // node not in tree
-    throw 3;
+  {
+    return SetOfObjects::ConstPointer( SetOfObjects::New() );
+    //throw 3;
+  }
 
   /* Either read direct relations directly from adjacency list */
   if (onlyDirectlyRelated)  

@@ -50,7 +50,7 @@ namespace mitk
     }
     else
     {
-      return FALSE;
+      return false;
     }
   }
 

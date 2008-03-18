@@ -121,7 +121,7 @@ bool InteractionDebug::Event( const StateMachine* stateMachine, unsigned int Eve
     // std::cout << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
     return SocketClient::GetInstance()->send( EVENT, 8, m_Buffer );
   }
-  return TRUE;
+  return true;
 }
 
 /**

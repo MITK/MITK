@@ -95,7 +95,7 @@ public:
    * (e.g. after loading an additional dataset), to ensure that the view is
    * aligned correctly.
    */
-  bool SetWorldGeometryToVisibleBounds();
+  virtual bool SetWorldGeometryToDataTreeBounds();
 
   /**
    * \brief Used by vtkPointPicker/vtkPicker.

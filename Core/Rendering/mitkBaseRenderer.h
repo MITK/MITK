@@ -101,6 +101,7 @@ public:
   {
     return m_DataTreeIterator.GetPointer();
   };
+
   //##ModelId=3E6423D20264
   //##Documentation
   //## @brief Access the RenderWindow into which this renderer renders.
@@ -179,6 +180,18 @@ public:
   //##Documentation
   //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
   itkGetConstObjectMacro(CurrentWorldGeometry2D, mitk::Geometry2D);
+
+  //##Documentation
+  //## Calculates the bounds of the DataTree (if it contains any valid data), 
+  //## creates a geometry from these bounds and sets it as world geometry of the renderer.
+  //##
+  //## Call this method to re-initialize the renderer to the current DataTree
+  //## (e.g. after loading an additional dataset), to ensure that the view is
+  //## aligned correctly.
+  virtual bool SetWorldGeometryToDataTreeBounds()
+  {
+    return false;
+  }
 
   //##Documentation
   //## @brief Set/Get the DisplayGeometry (for 2D rendering)

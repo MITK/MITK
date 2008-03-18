@@ -95,11 +95,11 @@ void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
     static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture(m_DataTreeIterator.GetPointer());
 
     // Compute the geometry from the current data tree bounds and set it as world geometry
-    this->SetWorldGeometryToVisibleBounds();
+    this->SetWorldGeometryToDataTreeBounds();
   }
 }
 
-bool mitk::VtkPropRenderer::SetWorldGeometryToVisibleBounds()
+bool mitk::VtkPropRenderer::SetWorldGeometryToDataTreeBounds()
 {
   if ( this->GetData() != NULL )
   {
@@ -135,17 +135,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   // Do we have to render?
   if ( this->GetData() == NULL ) return 0;
   if ( dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return 0;
-
-  // Check if we have a valid world geometry, and if not, create one if 
-  // possible
-  if ( this->GetEmptyWorldGeometry())
-  {
-    if ( this->SetWorldGeometryToVisibleBounds() == false )
-    {
-      // Still no world geometry? --> nothing to render
-      return 0;
-    }
-  }
+  if ( this->GetEmptyWorldGeometry()) return 0;
 
   // Update mappers and prepare mapper queue
   if(type == VtkPropRenderer::Opaque)

@@ -57,7 +57,7 @@ m_ManipulationMode(0),
 m_ManipulationArea(0),
 m_PointSet(NULL),
 /*m_BoundingObjectGroup(NULL), BoundingObjectGroup that includes all created BoundingObjects to calculate a big one*/
-m_BoundingObjectList(NULL),/*Vector that includes all to the node added BoundingObjects*/
+/*m_BoundingObjectList(NULL),/*Vector that includes all to the node added BoundingObjects*/
 m_DataIt(it),
 m_BoundingObjectExistingFlag(false)
 {

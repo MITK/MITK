@@ -54,16 +54,16 @@ unsigned int InteractionDebug::GetHashValue()
 void InteractionDebug::OpenConection()
 {
   char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) GetHashValue();
-	wb += 4;
+	*((unsigned long*) wb) = (unsigned long) GetHashValue();
+	wb += sizeof(long);
   
   int size = strlen( m_FileName );
 
-  *((unsigned int*) wb) = (unsigned int) size;
-	wb += 4;
+  *((unsigned long*) wb) = (unsigned long) size;
+	wb += sizeof(long);
 
   strcpy( wb, m_FileName );
-  size += 8;
+  size += 2*sizeof(long);
 
   sendCounter();
   // std::cout << "Open Connection file name: " << m_FileName << std::endl;
@@ -80,19 +80,19 @@ bool InteractionDebug::NewStateMachine( const char* name, const StateMachine* st
 
   // Instance Address
   char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) stateMachine;
-	wb += 4;
+	*((unsigned long*) wb) = (unsigned long) stateMachine;
+	wb += sizeof(long);
 
   // Length of the name
   int size = strlen(name);
 
-	*((unsigned int*) wb) = (unsigned int) size;
-	wb += 4;
+	*((unsigned long*) wb) = (unsigned long) size;
+	wb += sizeof(long);
 
   // name
   strcpy(wb,name);
 
-  size += 8;
+  size += 2*sizeof(long);
 
   sendCounter();
   // std::cout << "NEW_STATE_MACHINE: instance: " << (unsigned int) stateMachine << " Type: " << name << std::endl;
@@ -111,15 +111,15 @@ bool InteractionDebug::Event( const StateMachine* stateMachine, unsigned int Eve
 
     // Instance Address
     char* wb = m_Buffer;
-	  *((unsigned int*) wb) = (unsigned int) stateMachine;
-	  wb += 4;
+	  *((unsigned long*) wb) = (unsigned long) stateMachine;
+	  wb += sizeof(long);
 
     // eventID
-	  *((unsigned int*) wb) = EventId;
+	  *((unsigned long*) wb) = EventId;
   	
     sendCounter();
     // std::cout << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
-    return SocketClient::GetInstance()->send( EVENT, 8, m_Buffer );
+    return SocketClient::GetInstance()->send( EVENT, 2*sizeof(long), m_Buffer );
   }
   return true;
 }
@@ -134,19 +134,19 @@ bool InteractionDebug::Transition( const StateMachine* stateMachine, const char*
 
   // Instance Address
   char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) stateMachine;
-	wb += 4;
+	*((unsigned long*) wb) = (unsigned long) stateMachine;
+	wb += sizeof(long);
 
   // transitionName
-  unsigned int size = strlen( transitionName );
-	*((unsigned int*) wb) = size;
+  unsigned long size = strlen( transitionName );
+	*((unsigned long*) wb) = size;
 
-  wb += 4;
+  wb += sizeof(long);
 
-  for ( unsigned int i=0; i<size; i++, wb++ )
+  for ( unsigned long i=0; i<size; i++, wb++ )
     *wb = transitionName[i];
 
-  size += 8;
+  size += 2*sizeof(long);
 	
   //sendCounter();
   //std::cout << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
@@ -163,23 +163,23 @@ bool InteractionDebug::Action( const StateMachine* stateMachine, const char* tra
 
   // Instance Address
   char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) stateMachine;
-	wb += 4;
+	*((unsigned long*) wb) = (unsigned long) stateMachine;
+	wb += sizeof(long);
 
   // transitionName
-  unsigned int size = strlen( transitionName );
-	*((unsigned int*) wb) = size;
+  unsigned long size = strlen( transitionName );
+	*((unsigned long*) wb) = size;
 
-	wb += 4;
+	wb += sizeof(long);
 
-  for ( unsigned int i=0; i<size; i++, wb++ )
+  for ( unsigned long i=0; i<size; i++, wb++ )
     *wb = transitionName[i];
 
-  wb += 4;
+  wb += sizeof(long);
 
-  *((unsigned int*) wb) = action;
+  *((unsigned long*) wb) = action;
 
-  size += 12;
+  size += 3*sizeof(long);
 
   sendCounter();
   // std::cout << "ACTION: instance: " << (unsigned int) stateMachine << " size: " << size << "action: " << action << " transitionName " << transitionName << std::endl;
@@ -196,11 +196,11 @@ bool InteractionDebug::DeleteStateMachine( const StateMachine* stateMachine )
 
   // Instance Address
   char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) stateMachine;
+	*((unsigned long*) wb) = (unsigned long) stateMachine;
 
   sendCounter();
   // std::cout << "DELETE_STATE_MACHINE: instance: << (unsigned int) stateMachine" << std::endl;
-  return SocketClient::GetInstance()->send( DELETE_STATE_MACHINE, 4, m_Buffer );
+  return SocketClient::GetInstance()->send( DELETE_STATE_MACHINE, sizeof(long), m_Buffer );
 }
 
 /**
@@ -226,14 +226,14 @@ void InteractionDebug::SetXMLFileName( const char* fileName )
 
 void InteractionDebug::sendCounter()
 {
-  static unsigned int m_Counter = 0;
-  static char my_Buffer[4];
+  static unsigned long m_Counter = 0;
+  static char my_Buffer[sizeof(long)];
   m_Counter++;
 
   char* wb = my_Buffer;
-	*((unsigned int*) wb) = (unsigned int) m_Counter;
+	*((unsigned long*) wb) = (unsigned long) m_Counter;
 
-  bool success = SocketClient::GetInstance()->send( 7, 4, wb );
+  bool success = SocketClient::GetInstance()->send( 7, sizeof(long), wb );
   if (success)
   {
     std::cout << "Counter: " <<  m_Counter << std::endl;

@@ -464,11 +464,12 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
 
       QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
       dialog.setPrompt("What organ did you just load?");
+      dialog.setSegmentationName( nodeName );
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
       {
-        mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
+        mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, dialog.GetSegmentationName(), dialog.GetOrganType() );
 
         mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
         mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image

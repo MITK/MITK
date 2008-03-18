@@ -164,4 +164,10 @@ void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )
 {
   lblPrompt->setText( prompt );
 }
+    
+void QmitkNewSegmentationDialog::setSegmentationName( const QString& name )
+{
+  edtName->setText( name );
+}
+
 

@@ -56,6 +56,7 @@ class QMITK_EXPORT QmitkNewSegmentationDialog : public QDialog
   public slots:
 
     void setPrompt( const QString& prompt );
+    void setSegmentationName( const QString& name );
   
   protected slots:
 

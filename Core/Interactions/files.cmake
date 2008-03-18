@@ -42,6 +42,7 @@ SET(CPP_FILES
   mitkSegTool2D.cpp
   mitkSegTool3D.cpp
   mitkSetRegionTool.cpp
+  mitkSocketClient.cpp
   mitkState.cpp
   mitkStateEvent.cpp
   mitkStateMachine.cpp

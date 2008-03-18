@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkStateMachine.h"
 #include "mitkStateMachineFactory.h"
 #include "mitkStateTransitionOperation.h"
@@ -29,10 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMacro.h>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
-
-#ifdef INTERACTION_DEBUG
 #include <mitkInteractionDebug.h>
-#endif
 
 const std::string mitk::StateMachine::XML_NODE_NAME = "stateMachine";
 const std::string mitk::StateMachine::STATE_MACHINE_TYPE = "STATE_MACHINE_TYPE";
@@ -59,9 +55,7 @@ mitk::StateMachine::StateMachine(const char * type)
   m_UndoController = new UndoController(VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 
-  #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->NewStateMachine( type, this );
-  #endif
 }
 
 mitk::StateMachine::~StateMachine()
@@ -74,11 +68,9 @@ mitk::StateMachine::~StateMachine()
     delete iter->second;
   }
 
-   delete m_UndoController;
+  delete m_UndoController;
 
-  #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->DeleteStateMachine( this );
-  #endif
 }
 
 std::string mitk::StateMachine::GetType() const
@@ -112,9 +104,7 @@ void mitk::StateMachine::ResetStatemachineToStartState()
 
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
-  #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->Event( this, stateEvent->GetId() );
-  #endif
 
   if (m_CurrentState.IsNull())
     return false;//m_CurrentState needs to be set first!
@@ -170,9 +160,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
     #endif
   }
 
-  #ifdef INTERACTION_DEBUG
   InteractionDebug::GetInstance()->Transition( this, tempTransition->GetName().c_str() );
-  #endif
 
 
   mitk::Transition::ActionVectorIterator actionIdIterator = tempTransition->GetActionBeginIterator();
@@ -187,9 +175,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
       itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
       #endif
 
-      #ifdef INTERACTION_DEBUG
       InteractionDebug::GetInstance()->Action( this, tempTransition->GetName().c_str(), (*actionIdIterator)->GetActionId() );
-      #endif
 
       ok = false;
     }
@@ -305,6 +291,4 @@ const std::string& mitk::StateMachine::GetXMLNodeName() const
   return XML_NODE_NAME;
 }
 
-#ifdef INTERACTION_DEBUG
 #include <mitkInteractionDebug.cpp>
-#endif

@@ -111,6 +111,7 @@ Tadaa
 #include <QmitkCommonFunctionality.h>
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkHelpBrowser.h>
+#include <QmitkSocketClient.h>
 #include <qsplitter.h>
 
 #include <vtkSTLReader.h>
@@ -1022,16 +1023,34 @@ void QmitkMainTemplate::parseCommandLine()
       it.Add(treeNode);
       break;
     }
-     if(strcmp(qApp->argv()[i], "-testEmptyNode")==0) {
+    if(strcmp(qApp->argv()[i], "-testEmptyNode")==0) {
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();
       it.Add(treeNode);
+      break;
+    }
+    if (strcmp(qApp->argv()[i], "-statemachineDebug")==0) {
       break;
     }
     fileOpen(qApp->argv()[i]);
   }
 }
 
+/**
+ * checks, whether the application is run in statemachine debug mode and
+ * creates a QmitkSocketClient object
+ */
+void QmitkMainTemplate::CheckStatemachineDebugMode()
+{
+  for ( int i = 1; i < qApp->argc(); ++i )
+  {
+    if (strcmp(qApp->argv()[i], "-statemachineDebug")==0)
+    {
+      QmitkSocketClient* socketClient = new QmitkSocketClient();
+      break;
+    }
+  }
+}
 
 /**
  * returns true, when the application is run in testing mode and

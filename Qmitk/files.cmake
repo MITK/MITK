@@ -70,6 +70,7 @@ SET(CPP_FILES
   QmitkRenderWindow.cpp
   QmitkSlicesInterpolator.cpp
   QmitkSliderLevelWindowWidget.cpp
+  QmitkSocketClient.cpp
   QmitkStatusBar.cpp
   QmitkStepperAdapter.cpp
   QmitkToolReferenceDataSelectionBox.cpp  
@@ -183,6 +184,7 @@ SET(MOC_H_FILES
   QmitkRenderingManager.h
   QmitkSlicesInterpolator.h
   QmitkSliderLevelWindowWidget.h
+  QmitkSocketClient.h
   QmitkStepperAdapter.h
   QmitkToolReferenceDataSelectionBox.h  
   QmitkToolSelectionBox.h  

@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkInteractionDebug.h"
-#include "SocketClient.h"
+#include "mitkSocketClient.h"
 #include <string.h>
 
 namespace mitk {
@@ -36,8 +36,7 @@ char* InteractionDebug::m_FileName = NULL;
   */
 InteractionDebug::InteractionDebug()
 {
-  m_SocketClient = new SocketClient();
-  m_SocketClient->open( "127.0.0.1", 34768 );
+  SocketClient::GetInstance()->open( "127.0.0.1", 34768 );
 }
 
 
@@ -68,7 +67,7 @@ void InteractionDebug::OpenConection()
 
   sendCounter();
   // std::cout << "Open Connection file name: " << m_FileName << std::endl;
-  m_SocketClient->send( OPEN_CONNECTION, size, m_Buffer );
+  SocketClient::GetInstance()->send( OPEN_CONNECTION, size, m_Buffer );
 }
 
 /**
@@ -97,7 +96,7 @@ bool InteractionDebug::NewStateMachine( const char* name, const StateMachine* st
 
   sendCounter();
   // std::cout << "NEW_STATE_MACHINE: instance: " << (unsigned int) stateMachine << " Type: " << name << std::endl;
-  return m_SocketClient->send( NEW_STATE_MACHINE, size, m_Buffer );
+  return SocketClient::GetInstance()->send( NEW_STATE_MACHINE, size, m_Buffer );
 }
 
 /**
@@ -105,20 +104,24 @@ bool InteractionDebug::NewStateMachine( const char* name, const StateMachine* st
   */
 bool InteractionDebug::Event( const StateMachine* stateMachine, unsigned int EventId )
 {
-  if ( stateMachine == NULL || stateMachine->GetType().empty() )
-    return false;
+  if ( EventId != 520)
+  {
+    if ( stateMachine == NULL || stateMachine->GetType().empty() )
+      return false;
 
-  // Instance Address
-  char* wb = m_Buffer;
-	*((unsigned int*) wb) = (unsigned int) stateMachine;
-	wb += 4;
+    // Instance Address
+    char* wb = m_Buffer;
+	  *((unsigned int*) wb) = (unsigned int) stateMachine;
+	  wb += 4;
 
-  // eventID
-	*((unsigned int*) wb) = EventId;
-	
-  sendCounter();
-  // std::cout << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
-  return m_SocketClient->send( EVENT, 8, m_Buffer );
+    // eventID
+	  *((unsigned int*) wb) = EventId;
+  	
+    sendCounter();
+    // std::cout << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
+    return SocketClient::GetInstance()->send( EVENT, 8, m_Buffer );
+  }
+  return TRUE;
 }
 
 /**
@@ -145,9 +148,9 @@ bool InteractionDebug::Transition( const StateMachine* stateMachine, const char*
 
   size += 8;
 	
-  sendCounter();
-  // std::cout << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
-  return m_SocketClient->send( TRANSITION, size, m_Buffer );
+  //sendCounter();
+  //std::cout << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
+  return SocketClient::GetInstance()->send( TRANSITION, size, m_Buffer );
 }
 
 /**
@@ -180,7 +183,7 @@ bool InteractionDebug::Action( const StateMachine* stateMachine, const char* tra
 
   sendCounter();
   // std::cout << "ACTION: instance: " << (unsigned int) stateMachine << " size: " << size << "action: " << action << " transitionName " << transitionName << std::endl;
-  return m_SocketClient->send( ACTION, size, m_Buffer );
+  return SocketClient::GetInstance()->send( ACTION, size, m_Buffer );
 }
 
 /**
@@ -197,7 +200,7 @@ bool InteractionDebug::DeleteStateMachine( const StateMachine* stateMachine )
 
   sendCounter();
   // std::cout << "DELETE_STATE_MACHINE: instance: << (unsigned int) stateMachine" << std::endl;
-  return m_SocketClient->send( DELETE_STATE_MACHINE, 4, m_Buffer );
+  return SocketClient::GetInstance()->send( DELETE_STATE_MACHINE, 4, m_Buffer );
 }
 
 /**
@@ -230,8 +233,16 @@ void InteractionDebug::sendCounter()
   char* wb = my_Buffer;
 	*((unsigned int*) wb) = (unsigned int) m_Counter;
 
-  std::cout << "Counter: " <<  m_Counter << std::endl;
-  m_SocketClient->send( 7, 4, wb );
+  bool success = SocketClient::GetInstance()->send( 7, 4, wb );
+  if (success)
+  {
+    std::cout << "Counter: " <<  m_Counter << std::endl;
+  }
+}
+
+void InteractionDebug::setMaxConnectionAdvance(int maxConnectionAdvance)
+{
+  SocketClient::GetInstance()->setMaxConnectionAdvance(1);
 }
 
 } // mitk

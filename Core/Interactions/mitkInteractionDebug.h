@@ -15,13 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-// mitkInteractionDebug.h
 #ifndef INTERACTION_DEBUG_H
 #define INTERACTION_DEBUG_H
 #include "mitkStateMachine.h"
-
-class SocketClient;
-// class StateMachine;
+#include "mitkSocketClient.h"
 
 namespace mitk{
 
@@ -30,7 +27,6 @@ class MITK_CORE_EXPORT InteractionDebug
   static InteractionDebug* m_Instance;
   static char* m_FileName;
 
-  SocketClient* m_SocketClient;
   char m_Buffer[255];
   
   static const int OPEN_CONNECTION;
@@ -50,6 +46,7 @@ public:
   bool Transition( const StateMachine* stateMachine, const char* transitionName );
   bool Action( const StateMachine* stateMachine, const char* transitionName, unsigned int action );
   bool DeleteStateMachine( const StateMachine* stateMachine );
+  void setMaxConnectionAdvance(int maxConectionAdvance);
   static InteractionDebug* GetInstance();
   static void SetXMLFileName( const char* fileName );
 

@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkStateMachineFactory.h"
 #include "mitkGlobalInteraction.h"
 #include <mitkStatusBar.h>
@@ -24,10 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkConfig.h>
 #include <mitkStandardFileLocations.h>
-
-#ifdef INTERACTION_DEBUG
 #include <mitkInteractionDebug.h>
-#endif
 
 /**
 * @brief This class builds up all the necessary structures for a statemachine.
@@ -104,10 +100,8 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
   stateMachineFactory->SetFileName( fileName.c_str() );
 
-#ifdef INTERACTION_DEBUG
-  InteractionDebug::SetXMLFileName( fileName.c_str() );
+  InteractionDebug::SetXMLFileName( "StateMachine.xml" );
   InteractionDebug::GetInstance()->OpenConection();
-#endif
 
   //parse the XML input. Method is implemented in vtkXMLParser
   if ( ! stateMachineFactory->Parse() )    

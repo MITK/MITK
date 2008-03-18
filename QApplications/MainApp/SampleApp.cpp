@@ -46,6 +46,8 @@ QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false ), m_TestingParame
   this->setCaption("MITK Application");
   std::cout << "Instantiating new SampleApp..." << std::endl;
 
+  QmitkMainTemplate::CheckStatemachineDebugMode();
+
   QmitkMainTemplate::Initialize();
 
   parseCommandLine();

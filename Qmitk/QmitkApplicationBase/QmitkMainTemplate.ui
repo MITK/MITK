@@ -1224,6 +1224,7 @@
     <function>InitializeQfm()</function>
     <function returnType="QmitkStdMultiWidget *">GetMultiWidget()</function>
     <function>parseCommandLine()</function>
+    <function>CheckStatemachineDebugMode()</function>
     <function returnType="bool">IsTesting()</function>
     <function returnType="mitk::DataTree::Pointer">GetTree()</function>
     <function access="private">destroy()</function>

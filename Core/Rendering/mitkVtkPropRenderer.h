@@ -109,6 +109,9 @@ public:
    */
   vtkAssemblyPath* GetNextPath();
   
+  vtkWorldPointPicker* GetWorldPointPicker();
+  vtkPointPicker* GetPointPicker();
+  
 protected:
   
   virtual ~VtkPropRenderer();

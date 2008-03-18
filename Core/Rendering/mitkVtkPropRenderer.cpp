@@ -579,4 +579,15 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
     return NULL;
   }
 }
+  
+vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()
+{
+  return m_WorldPointPicker;
+}
+
+vtkPointPicker* mitk::VtkPropRenderer::GetPointPicker()
+{
+  return m_PointPicker;
+}
+
 

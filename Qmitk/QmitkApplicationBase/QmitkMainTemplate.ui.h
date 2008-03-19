@@ -1046,7 +1046,7 @@ void QmitkMainTemplate::CheckStatemachineDebugMode()
   {
     if (strcmp(qApp->argv()[i], "-statemachineDebug")==0)
     {
-      QmitkSocketClient* socketClient = new QmitkSocketClient();
+      new QmitkSocketClient();
       break;
     }
   }

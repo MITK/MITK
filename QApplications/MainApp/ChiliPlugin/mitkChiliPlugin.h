@@ -27,7 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToPicDescriptor.h"  //using struct TagInformationList
 
 #ifndef WIN32
-extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );
+extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
+//extern "C" char *dbGetNewOID( void );  // <= CHILI 3.10
 #endif
 
 class QcMITKTask;

@@ -1030,7 +1030,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 
                 for( unsigned int i = 0; i < frameNumber; i++ )
                 {
-                  ipPicDescriptor* cinePic = ipPicDecompressJPEG( lightbox->fetchPic(n), i, frameNumber, NULL, offset_table );
+                  ipPicDescriptor* cinePic = ipPicDecompressJPEG( lightbox->fetchPic(n), i, frameNumber, NULL, offset_table );  // <= CHILI 3.12
                   newElement.imageList.push_back( cinePic );
                 }
                 free( offset_table );
@@ -1396,7 +1396,7 @@ ipBool_t mitk::ChiliPlugin::GlobalIterateLoadImage( int /*rows*/, int mitkHideIf
 
                 for( unsigned int i = 0; i < frameNumber; i++ )
                 {
-                  ipPicDescriptor* cinePic = ipPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
+                  ipPicDescriptor* cinePic = ipPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );  // <= CHILI 3.12
                   newElement.imageList.push_back( cinePic );
                 }
                 free( offset_table );
@@ -2005,14 +2005,19 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                   continue;
               }
               else  //the SERIESOIDs are different
-                textOID = pGetNewOID();
+                //textOID = dbGetNewOID();  // <= CHILI 3.10
+                textOID = pGetNewOID();  // > CHILI 3.10
+
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
-            textOID = pGetNewOID();  //no such text-file found
+            //textOID = dbGetNewOID();  // <= CHILI 3.10
+            textOID = pGetNewOID();  // > CHILI 3.10
+
           }
           else  //the Text-File saved first time
-            textOID = pGetNewOID();
+            //textOID = dbGetNewOID();  // <= CHILI 3.10
+            textOID = pGetNewOID();  // > CHILI 3.10
 
           //save Volume to Parent-Child-XML
           if( initParentChild && ( !currentVolumeLabel || !currentSeriesOID || ( currentSeriesOID && currentSeriesOID->GetValueAsString() != seriesOID ) ) )
@@ -2143,7 +2148,8 @@ bool mitk::ChiliPlugin::InitParentChild( const std::string& mitkHideIfNoVersionC
     TiXmlElement * relations = new TiXmlElement( "relations" );
     m_currentXmlDoc->LinkEndChild( relations );
     //create new text-oid
-    m_ParentTextOID = pGetNewOID();
+    //m_ParentTextOID = dbGetNewOID();  // <= CHILI 3.10
+    m_ParentTextOID = pGetNewOID();  // > CHILI 3.10
   }
   else  //file exist
   {

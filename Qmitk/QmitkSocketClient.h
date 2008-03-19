@@ -55,5 +55,4 @@ protected slots:
 	void error( int );
 	void timeout();
 };
-
 #endif // QMITKSOCKET_CLIENT

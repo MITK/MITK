@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGENUMBERFILTER_H_HEADER_INCLUDED
 
 #include <mitkPicDescriptorToNode.h>
+#include <vector>
 
 namespace mitk {
 

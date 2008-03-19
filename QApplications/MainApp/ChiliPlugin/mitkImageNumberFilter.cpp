@@ -23,9 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
 // MITK-Includes
-#include "mitkFrameOfReferenceUIDManager.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkProperties.h"
 #include "mitkChiliMacros.h"
 
 //help-functions

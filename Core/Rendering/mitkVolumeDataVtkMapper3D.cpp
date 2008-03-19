@@ -269,9 +269,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkPiecewiseFunction *gradientTransferFunction;
   vtkColorTransferFunction* colorTransferFunction;
 
-  opacityTransferFunction  = vtkPiecewiseFunction::New();
-  gradientTransferFunction  = vtkPiecewiseFunction::New();
-  colorTransferFunction    = vtkColorTransferFunction::New();
+  opacityTransferFunction = NULL;
+  gradientTransferFunction = NULL;
+  colorTransferFunction = NULL;
 
   m_ImageCast->SetShift(0);
     

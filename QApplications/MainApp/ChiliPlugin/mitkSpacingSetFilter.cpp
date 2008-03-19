@@ -15,36 +15,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <stdio.h>
-
 #include "mitkSpacingSetFilter.h"
 
-// Chili-Includes
+// CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
-#include <ipPic/ipPic.h>
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
 // MITK-Includes
-#include "mitkFrameOfReferenceUIDManager.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkProperties.h"
-
-#include "math.h"
-#include <stdlib.h>
 #include "mitkChiliMacros.h"
-
-// function to round
-double mitk::SpacingSetFilter::Round(double number, unsigned int decimalPlaces)
-{
-  double d = pow( (long double)10.0, (int)decimalPlaces );
-  double x;
-  if( number > 0 )
-    x = floor( number * d + 0.5 ) / d;
-  else
-    x = floor( number * d - 0.5 ) / d;
-  return x;
-}
 
 // constructor
 mitk::SpacingSetFilter::SpacingSetFilter()
@@ -56,19 +35,6 @@ mitk::SpacingSetFilter::~SpacingSetFilter()
 {
 }
 
-// set-function
-void mitk::SpacingSetFilter::SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
-{
-  m_SeriesOID = inputSeriesOID;
-  m_PicDescriptorList = inputPicDescriptorList;
-}
-
-// get-function
-std::vector< mitk::DataTreeNode::Pointer > mitk::SpacingSetFilter::GetOutput()
-{
-  return m_Output;
-}
-
 // the "main"-function
 void mitk::SpacingSetFilter::Update()
 {
@@ -77,8 +43,8 @@ void mitk::SpacingSetFilter::Update()
   m_ImageInstanceUIDs.clear();
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
-    SortSlicesToGroup();
-    SortGroupsByLocation();
+    SortPicsToGroup();
+    SortSlicesByLocation();
     //ShowAllGroupsWithSlices();
     CreatePossibleCombinations();
     SortPossibleCombinations();
@@ -87,12 +53,11 @@ void mitk::SpacingSetFilter::Update()
     SearchForMinimumCombination();
     //ShowAllResultCombinations();
     CheckForTimeSlicedCombinations();
-    GenerateNodes();
   }
   else std::cout<<"SpacingSetFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
 
-void mitk::SpacingSetFilter::SortSlicesToGroup()
+void mitk::SpacingSetFilter::SortPicsToGroup()
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
@@ -234,15 +199,15 @@ void mitk::SpacingSetFilter::SortSlicesToGroup()
 #endif
 }
 
-void mitk::SpacingSetFilter::SortGroupsByLocation()
+void mitk::SpacingSetFilter::SortSlicesByLocation()
 {
   for( std::vector< Group >::iterator iter = groupList.begin(); iter != groupList.end(); iter++ )
   {
-    std::sort( (*iter).includedSlices.begin(), (*iter).includedSlices.end(), LocationSort );
+    std::sort( (*iter).includedSlices.begin(), (*iter).includedSlices.end(), PositionSort );
   }
 }
 
-bool mitk::SpacingSetFilter::LocationSort( const Slice elem1, const Slice elem2 )
+bool mitk::SpacingSetFilter::PositionSort( const Slice elem1, const Slice elem2 )
 {
   if( Equal( elem1.origin, elem2.origin ) )
     return elem1.imageNumber < elem2.imageNumber;
@@ -404,11 +369,11 @@ void mitk::SpacingSetFilter::SortPossibleCombinations()
   //look at the begining of "RekCombinationSearch()", there the sort get used to break up unnecessary recursive steps
   for( unsigned int n = 0; n< groupList.size(); n++ )
   {
-    std::sort( groupList[n].possibleCombinations.begin(), groupList[n].possibleCombinations.end(), CombinationSort );
+    std::sort( groupList[n].possibleCombinations.begin(), groupList[n].possibleCombinations.end(), CombinationCountSort );
   }
 }
 
-bool mitk::SpacingSetFilter::CombinationSort( const std::set< Slice* > elem1, const std::set< Slice* > elem2 )
+bool mitk::SpacingSetFilter::CombinationCountSort( const std::set< Slice* > elem1, const std::set< Slice* > elem2 )
 {
   return elem1.size() > elem2.size();
 }
@@ -624,330 +589,81 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
       newResult.push_back( groupList[n].resultCombinations.front() );
 
     groupList[n].resultCombinations = newResult;
-  }
-#endif
-}
 
-void mitk::SpacingSetFilter::GenerateNodes()
-{
-#ifdef CHILI_PLUGIN_VERSION_CODE
-  for( unsigned int n = 0; n < groupList.size(); n++)
-  {
-    //TODO groupList[n].resultCombinations.size() > 1, thats mean that there are more than one combinations to create the image
-
-    for( std::vector < std::set< Slice* > >::iterator iter = groupList[n].resultCombinations.front().begin(); iter != groupList[n].resultCombinations.front().end(); iter ++ )
+    //generate mitk::Images
+    for( std::vector < std::set< Slice* > >::iterator combinationIter = groupList[n].resultCombinations.front().begin(); combinationIter != groupList[n].resultCombinations.front().end(); combinationIter ++ )
     {
-      Image::Pointer resultImage = Image::New();
-      unsigned int timeSteps;
-      unsigned int sliceSteps;
-      std::list< std::string > ListOfUIDs;
-      ListOfUIDs.clear();
+      //get all ipPicDescriptor
+      std::list<ipPicDescriptor*> usedPic;
+      usedPic.clear();
+      for( std::set< Slice* >::iterator picIter = combinationIter->begin(); picIter != combinationIter->end(); picIter++ )
+        usedPic.push_back( (*picIter)->currentPic );
 
-      if( groupList[n].dimension == 4 )
+      //get time, count
+      int timeSteps = 0, sliceSteps = 0;
+      std::set< Slice* >::iterator originIter = combinationIter->begin();
+      while( originIter != combinationIter->end() && Equal( (*combinationIter->begin())->origin, (*originIter)->origin ) )
       {
-        sliceSteps = (*iter->begin())->currentPic->n[2];
-        timeSteps = (*iter->begin())->currentPic->n[3];
-
-        resultImage->Initialize( groupList[n].includedSlices.front().currentPic );
-        resultImage->SetPicChannel( groupList[n].includedSlices.front().currentPic );
-
-        //get ImageInstanceUID
-        std::string SingleUID;
-        ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( groupList[n].includedSlices.front().currentPic, (char*)tagIMAGE_INSTANCE_UID );
-        if( missingImageTagQuery )
-          SingleUID = static_cast<char*>( missingImageTagQuery->value );
-        else
-        {
-          ipPicTSV_t *dicomHeader = ipPicQueryTag( groupList[n].includedSlices.front().currentPic, (char*)"SOURCE HEADER" );
-          void* data = NULL;
-          ipUInt4_t len = 0;
-          if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
-            SingleUID = static_cast<char*>( data );
-        }
-        ListOfUIDs.push_back( SingleUID );
+        timeSteps++;
+        originIter++;
       }
-      else
+      sliceSteps = combinationIter->size()/timeSteps;
+
+      //get spacing
+      Vector3D spacing;
+        //initialize
+      interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
+      pFetchSliceGeometryFromPic( (*combinationIter->begin())->currentPic, isg );
+      vtk2itk( isg->ps, spacing );
+      if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
+        spacing.Fill(1.0);
+      free( isg );
+        //get the not rounded spacing
+      std::list<Spacing> SpacingList;
+      std::set< Slice* >::iterator walkIter = combinationIter->begin();
+      walkIter++;
+      for( ; walkIter != combinationIter->end(); walkIter ++)
       {
-        //create mitk::Image
-        Vector3D rightVector, downVector, spacing;
-        Point3D origin;
-        ipPicDescriptor* header = ipPicCopyHeader( (*iter->begin())->currentPic, NULL );
-        timeSteps = 0;
-        std::set< Slice* >::iterator timeIter = (*iter).begin();
-        while( timeIter != (*iter).end() && Equal( (*iter->begin())->origin, (*timeIter)->origin ) )
+        std::set<Slice*>::iterator iterB4 = walkIter;
+        iterB4--;
+        Vector3D tempDistance = (*walkIter)->origin - (*iterB4)->origin;
+        spacing[2] = tempDistance.GetNorm();
+        //search for spacing
+        std::list<Spacing>::iterator searchIter = SpacingList.begin();
+        while( searchIter != SpacingList.end() )
         {
-          timeSteps++;
-          timeIter++;
-        }
-        sliceSteps = iter->size()/timeSteps;
-
-        if( groupList[n].dimension == 3 )
-        {
-          if( (*iter).size() == 1 )
-            header->dim = 3;
-          else
-            header->dim = 4;
-          header->n[2] = (*iter->begin())->currentPic->n[2];
-          sliceSteps = (*iter->begin())->currentPic->n[2];
-          header->n[3] = iter->size();
-        }
-        else
-        {
-          //2D
-          if( sliceSteps == 1 )
+          if( searchIter->spacing == spacing )
           {
-            if( timeSteps == 1 )
-            {
-              header->dim = 2;
-              header->n[2] = 0;
-              header->n[3] = 0;
-            }
-            else
-            {
-              //+t
-              header->dim = 4;
-              header->n[2] = 1;
-              header->n[3] = timeSteps;
-            }
+            searchIter->count++;
+            break;
           }
           else
-          {
-            //3D
-            if( timeSteps == 1 )
-            {
-              header->dim = 3;
-              header->n[2] = sliceSteps;
-              header->n[3] = 0;
-            }
-            else
-            {
-              //+t
-              header->dim = 4;
-              header->n[2] = sliceSteps;
-              header->n[3] = timeSteps;
-            }
-          }
+            searchIter++;
         }
-
-        if( groupList[n].dimension == 3 )
-          resultImage->Initialize( header, 1, -1, (*iter->begin())->currentPic->n[2] );
-        else
-          resultImage->Initialize( header, 1, -1, sliceSteps );
-
-        interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-        if( !pFetchSliceGeometryFromPic( (*iter->begin())->currentPic, isg ) )
+          //dont exist, create new entry
+        if( searchIter == SpacingList.end() )
         {
-          free( isg );
-          return;
+          Spacing newElement;
+          newElement.spacing = spacing;
+          newElement.count = 1;
+          SpacingList.push_back( newElement );
         }
-
-        //rightVector, downVector
-        vtk2itk( isg->u, rightVector );
-        vtk2itk( isg->v, downVector );
-        // its possible that a 2D-Image have no right- or down-Vector, but its not possible to initialize a [0,0,0] vector
-        if( rightVector[0] == 0 && rightVector[1] == 0 && rightVector[2] == 0 )
-          rightVector[0] = 1;
-        if( downVector[0] == 0 && downVector[1] == 0 && downVector[2] == 0 )
-          downVector[2] = -1;
-
-        //spacing
-        vtk2itk( isg->ps, spacing );
-        if( ( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 ) || spacing[2] == 0.01 )
-          spacing.Fill(1.0);
-
-        //get the most used spacing
-        if( (*iter).size() > 1 &&  groupList[n].dimension == 2 )
+      }
+        //get spacing
+      int count = 0;
+      for( std::list<Spacing>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+      {
+        if( searchIter->count > count )
         {
-          std::list<SpacingStruct> SpacingList;
-          std::set< Slice* >::iterator iterFirst = (*iter).begin();
-          std::set< Slice* >::iterator iterSecond = iterFirst;
-          iterSecond++;
-          Vector3D tmpSpacing;
-
-          for( ; iterSecond != (*iter).end(); iterSecond++ )
-          {
-            if( !Equal( (*iterSecond)->origin, (*iterFirst)->origin ) )
-            {
-              tmpSpacing = (*iterSecond)->origin - (*iterFirst)->origin;
-              spacing[2] = tmpSpacing.GetNorm();
-              //search for spacing
-              std::list<SpacingStruct>::iterator searchIter = SpacingList.begin();
-              while( searchIter != SpacingList.end() )
-              {
-                if( searchIter->spacing == spacing )
-                {
-                  searchIter->count++;
-                  break;
-                }
-                else
-                  searchIter++;
-              }
-              //if not exist, create new entry
-              if( searchIter == SpacingList.end() )
-              {
-                SpacingStruct newElement;
-                newElement.spacing = spacing;
-                newElement.count = 1;
-                SpacingList.push_back( newElement );
-              }
-              iterFirst = iterSecond;
-            }
-          }
-          //get maximum spacing
-          int count = 0;
-          for( std::list<SpacingStruct>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
-          {
-            if( searchIter->count > count )
-            {
-              spacing = searchIter->spacing;
-              count = searchIter->count;
-            }
-          }
+          spacing = searchIter->spacing;
+          count = searchIter->count;
         }
-        //origin
-        vtk2itk( isg->o, origin );
-
-        // set the timeBounds
-        ScalarType timeBounds[] = {0.0, 1.0};
-        // set the planeGeomtry
-        PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-
-        planegeometry->InitializeStandardPlane( resultImage->GetDimension(0), resultImage->GetDimension(1), rightVector, downVector, &spacing );
-        planegeometry->SetOrigin( origin );
-        planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID( groupList[n].referenceUID.c_str() ) );
-        planegeometry->SetTimeBounds( timeBounds );
-        // slicedGeometry
-        SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-        slicedGeometry->InitializeEvenlySpaced( planegeometry, resultImage->GetDimension(2) );
-        // timeSlicedGeometry
-        TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-        timeSliceGeometry->InitializeEvenlyTimed( slicedGeometry, resultImage->GetDimension(3) );
-        timeSliceGeometry->TransferItkToVtkTransform();
-
-        // Image->SetGeometry
-        resultImage->SetGeometry( timeSliceGeometry );
-
-        // add the slices to the created mitk::Image
-        unsigned int slice = 0;
-        unsigned int time = 0;
-        for( std::set< Slice* >::iterator it = (*iter).begin(); it != (*iter).end(); it++)
-        {
-          //get ImageInstanceUID
-          std::string SingleUID;
-          ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( (*it)->currentPic, (char*)tagIMAGE_INSTANCE_UID );
-          if( missingImageTagQuery )
-            SingleUID = static_cast<char*>( missingImageTagQuery->value );
-          else
-          {
-            ipPicTSV_t *dicomHeader = ipPicQueryTag( (*it)->currentPic, (char*)"SOURCE HEADER" );
-            void* data = NULL;
-            ipUInt4_t len = 0;
-            if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
-              SingleUID = static_cast<char*>( data );
-          }
-          ListOfUIDs.push_back( SingleUID );
-
-          //add to mitk::Image
-          if( groupList[n].dimension == 3 )
-            resultImage->SetPicVolume( (*it)->currentPic, slice );
-          else
-            resultImage->SetPicSlice( (*it)->currentPic, slice, time );
-
-          if( time < timeSteps-1 )
-            time ++;
-          else
-          {
-            time = 0;
-            slice ++;
-          }
-        }
-        free( isg );
       }
 
-      if( resultImage->IsInitialized() && resultImage.IsNotNull() )
-      {
-        DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-        node->SetData( resultImage );
-        DataTreeNodeFactory::SetDefaultImageProperties( node );
-
-        if( groupList[n].seriesDescription == "" )
-          groupList[n].seriesDescription = "no SeriesDescription";
-        node->SetProperty( "name", new StringProperty( groupList[n].seriesDescription ) );
-        node->SetProperty( "NumberOfSlices", new IntProperty( sliceSteps ) );
-        node->SetProperty( "NumberOfTimeSlices", new IntProperty( timeSteps ) );
-        if( m_SeriesOID != "" )
-          node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
-
-        mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( (*iter->begin())->currentPic );
-        for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
-        {
-          node->SetProperty( iter->first.c_str(), iter->second.first );
-        }
-
-        m_Output.push_back( node );
-        m_ImageInstanceUIDs.push_back( ListOfUIDs );
-      }
+      GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupList[n].seriesDescription );
     }
   }
 #endif
-}
-
-std::vector< std::list< std::string > > mitk::SpacingSetFilter::GetImageInstanceUIDs()
-{
-  return m_ImageInstanceUIDs;
-}
-
-const mitk::PropertyList::Pointer mitk::SpacingSetFilter::CreatePropertyListFromPicTags( ipPicDescriptor* imageToExtractTagsFrom )
-{
-  if( !imageToExtractTagsFrom || !imageToExtractTagsFrom->info || !imageToExtractTagsFrom->info->tags_head )
-    return NULL;
-
-  PropertyList::Pointer resultPropertyList = PropertyList::New();
-  _ipPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
-
-  // Extract ALL tags from the PIC header
-  while (currentTagNode)
-  {
-    ipPicTSV_t* currentTag = currentTagNode->tsv;
-
-    std::string propertyName = "CHILI: ";
-    propertyName += currentTag->tag;
-
-    //The currentTag->tag ends with a lot of ' ', so you find nothing if you search for the properties.
-    while( propertyName[ propertyName.length() -1 ] == ' ' )
-      propertyName.erase( propertyName.length() -1 );
-
-    switch( currentTag->type )
-    {
-      case ipPicASCII:
-      {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::StringProperty( static_cast<char*>( currentTag->value ) ) );
-        break;
-      }
-      case ipPicInt:
-      {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( *static_cast<int*>( currentTag->value ) ) );
-        break;
-      }
-      case ipPicUInt:
-      {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( (int)*( (char*)( currentTag->value ) ) ) );
-        break;
-      }
-      default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
-      {
-        //every PicDescriptor have the following tags wich not get imported, but they are not so important that we have to throw messages
-        if( propertyName != "CHILI: PIXEL SIZE" && propertyName != "CHILI: REAL PIXEL SIZE" && propertyName != "CHILI: ISG" && propertyName != "CHILI: SOURCE HEADER" && propertyName != "CHILI: PIXEL SPACING" )
-        {
-          std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "'( " << propertyName << " ) not handled in mitkSpacingSetFilter." << std::endl;
-        }
-        break;
-      }
-    }
-    // proceed to the next tag
-    currentTagNode = currentTagNode->next;
-  }
-  return resultPropertyList;
 }
 
 void mitk::SpacingSetFilter::ShowAllGroupsWithSlices()
@@ -1030,4 +746,3 @@ void mitk::SpacingSetFilter::ShowAllSlicesWithUsedSpacings()
     }
   }
 }
-

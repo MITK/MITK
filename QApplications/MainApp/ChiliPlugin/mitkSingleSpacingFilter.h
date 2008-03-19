@@ -29,7 +29,7 @@ namespace mitk {
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
   If you use them, be carefull with the parameter.
-  This class use QcPlugin::pFetchSliceGeometryFromPic(...) which is only available at chiliversion 3.8.
+  This filter need the CHILI-Version 3.10.
   */
 
 class SingleSpacingFilter : public PicDescriptorToNode
@@ -39,18 +39,7 @@ class SingleSpacingFilter : public PicDescriptorToNode
    mitkClassMacro( SingleSpacingFilter, PicDescriptorToNode );
    itkNewMacro( SingleSpacingFilter );
    /** destructor */
-   ~SingleSpacingFilter();
-
-    /*!
-    \brief Set a list of ipPicDescriptors and the SeriesOID as Input.
-    @param inputPicDescriptorList   These are the different slices, which get combined to volumes.
-    @param inputSeriesOID   The SeriesOID added to the Result-DataTreeNode and get used to Save (override, parent-child-relationship).
-    Both parameter have to be set.
-    How to get the SeriesOID?
-    If you load from lightbox use "lightbox->currentSeries()->oid;".
-    If you load from chili-database use "mitk::ChiliPlugin::GetSeriesInformation().OID;".
-    */
-    virtual void SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID );
+   virtual ~SingleSpacingFilter();
 
     /*!
     \brief Create multiple nodes (images).
@@ -58,24 +47,12 @@ class SingleSpacingFilter : public PicDescriptorToNode
     */
     virtual void Update();
 
-    /*!
-    \brief Use this to get the generated mitk::DataTreeNodes.
-    @returns A vector of mitk::DataTreeNodes.
-    */
-    virtual std::vector< DataTreeNode::Pointer > GetOutput();
-
-    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
-
   protected:
 
     /** constructor */
     SingleSpacingFilter();
 
-    /** input */
-    std::string m_SeriesOID;
-    std::list< ipPicDescriptor* > m_PicDescriptorList;
-
-    /** this struct combine all slices with the same origin */
+    /** This struct combine all slices with the same origin. */
     struct Position
     {
       Vector3D origin;
@@ -83,7 +60,7 @@ class SingleSpacingFilter : public PicDescriptorToNode
       std::vector< ipPicDescriptor* > includedPics;
     };
 
-    /** struct for a single group */
+    /** Struct for a single group. */
     struct Group
     {
       std::vector< Position > includedPositions;
@@ -93,34 +70,29 @@ class SingleSpacingFilter : public PicDescriptorToNode
       Vector3D pixelSize;
       Vector3D normalWithImageSize;
    };
+
+   /** all groups */
    std::vector< Group > m_GroupVector;
 
-    /** the spacing created between the PositionAtSpace */
+    /** This struct is used to calculate the most commonly used spacing. */
     struct Spacing
     {
       Vector3D spacing;
       int count;
     };
 
-    /** output */
-    std::vector< DataTreeNode::Pointer > m_Output;
-    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
-
-    /** function to put the input-PicDescriptors to struct Slice, PositionAtSpace and Group */
-    void SortSlicesToGroup();
-    /** sort the PositionAtSpace for every group by there location */
-    void SortGroupsAndSlices();
-
+    /** This function sort the ipPicDescriptor to groups and positions.  */
+    void SortPicsToGroup();
+    /** This function sort the positions by location and the ipPicDescriptor by imagenumber. */
+    void SortPositionsAndPics();
+    /** This function create mitk::Images until all groups and all ipPicDescriptor used. */
     void CreateResults();
+    /** This function calculate the most coherent slices, the most commonly used spacing, the minimum timeStep and delete the used positions. */
     void SearchParameter( unsigned int currentGroup );
-    void GenerateNodes( std::vector<Position*> usedPos, Vector3D spacing, unsigned int timeCount, unsigned int currentGroup );
 
-    /** helpfunctions */
+    /** help-functions */
     static bool PositionSort( const Position& elem1, const Position& elem2 );
-    static bool SliceSort( ipPicDescriptor* elem1, ipPicDescriptor* elem2 );
-
-    double Round( double number, unsigned int decimalPlaces );
-    const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
+    static bool PicSort( ipPicDescriptor* elem1, ipPicDescriptor* elem2 );
 };
 
 } // namespace mitk

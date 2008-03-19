@@ -55,15 +55,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtimer.h>
 #include <qobjectlist.h>
 #include <qprogressbar.h>
+#include <qsplitter.h>
 //XPM
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
 #include "chili_restart_mitk.xpm"
 //XML
 #include <tinyxml.h>
-
-#include <QmitkControlsRightFctLayoutTemplate.h>
-#include <qsplitter.h>
 
 QWidget* mitk::ChiliPlugin::s_Parent = NULL;
 /** Create event-logging object (ConferenceKit). */
@@ -212,6 +210,7 @@ void mitk::ChiliPlugin::CreateSampleApp()
   horzlayout->activate();
   app->show();
   app->SetDefaultWidgetSize();
+  app->viewReinitMultiWidget();
 
   if (!done)
   {

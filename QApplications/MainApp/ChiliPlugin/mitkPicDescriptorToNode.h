@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 
 #include <mitkDataTreeNode.h>
+#include <mitkPropertyList.h>
 #include <ipPic/ipPic.h>
 #include <list>
 
@@ -61,12 +62,32 @@ class PicDescriptorToNode : public itk::Object
     */
     virtual std::vector< DataTreeNode::Pointer > GetOutput();
 
+    /*!
+    \brief This function return the ImageInstanceUIDs of the used Slices.
+    @returns A vector of strings.
+    */
     virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
 
   protected:
 
     PicDescriptorToNode();
 
+    /** the input */
+    std::string m_SeriesOID;
+    std::list< ipPicDescriptor* > m_PicDescriptorList;
+
+    /** the results */
+    std::vector< DataTreeNode::Pointer > m_Output;
+    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
+
+    double Round( double number, unsigned int decimalPlaces );
+
+    /** Create a propertyList from the given PicDescriptor. Therefore all pic-tags get readed and added. */
+    const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
+
+    void GenerateData( std::list<ipPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription );
+
+    std::string GetImageInstanceUID( ipPicDescriptor* input );
 };
 
 } // namespace mitk

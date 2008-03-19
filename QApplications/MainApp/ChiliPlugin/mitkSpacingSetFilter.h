@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define SPACINGSETFILTER_H_HEADER_INCLUDED
 
 #include <mitkPicDescriptorToNode.h>
-#include <mitkPropertyList.h>
 #include <vector>
 #include <set>
 
@@ -31,7 +30,7 @@ namespace mitk {
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
   If you use them, be carefull with the parameter.
-  This class use QcPlugin::pFetchSliceGeometryFromPic(...) which is only available at chiliversion 3.8.
+  This filter need the CHILI-Version 3.10.
   */
 
 class SpacingSetFilter : public PicDescriptorToNode
@@ -44,37 +43,17 @@ class SpacingSetFilter : public PicDescriptorToNode
    virtual ~SpacingSetFilter();
 
     /*!
-    \brief Set a list of ipPicDescriptors and the SeriesOID as Input.
-    @param inputPicDescriptorList   These are the different slices, which get combined to volumes.
-    @param inputSeriesOID   The SeriesOID added to the Result-DataTreeNode and get used to Save (override, parent-child-relationship).
-    Both parameter have to be set.
-    How to get the SeriesOID?
-    If you load from lightbox use "lightbox->currentSeries()->oid;".
-    If you load from chili-database use "mitk::ChiliPlugin::GetSeriesInformation().OID;".
-    */
-    virtual void SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID );
-
-    /*!
     \brief Create multiple nodes (images).
-    Therefore the PicDescriptors seperated by different factors like spacing, time, pixelspacing, ... .
     This function is subdivided into several steps. For further information look at the protected-functions.
     */
     virtual void Update();
-
-    /*!
-    \brief Use this to get the generated mitk::DataTreeNodes.
-    @returns A vector of mitk::DataTreeNodes.
-    */
-    virtual std::vector< DataTreeNode::Pointer > GetOutput();
-
-    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
 
   protected:
 
     /** constructor */
     SpacingSetFilter();
 
-    /** struct for every single slice/point/picDescriptor */
+    /** Struct for single slices. */
     struct Slice
     {
       ipPicDescriptor* currentPic;
@@ -84,7 +63,7 @@ class SpacingSetFilter : public PicDescriptorToNode
       std::set< double > sliceUsedWithSpacing;
     };
 
-    /** struct for a single group */
+    /** Struct for a single group. */
     struct Group
     {
       std::vector< Slice > includedSlices;
@@ -97,54 +76,45 @@ class SpacingSetFilter : public PicDescriptorToNode
       std::vector< std::vector < std::set< Slice* > > > resultCombinations;
    };
 
-    /** the group-list */
+   /** all groups */
     std::vector< Group > groupList;
 
-    /** internal use */
-    std::vector< std::vector < std::set< Slice* > > > m_GroupResultCombinations;
-    std::vector< std::set< Slice* > >::iterator m_IterGroupEnd;
-    unsigned int m_TotalCombinationCount;
-
-    struct SpacingStruct
+    /** This struct is used to calculate the most commonly used spacing. */
+    struct Spacing
     {
       Vector3D spacing;
       int count;
     };
 
+    /** internal use */
+    std::vector< std::vector < std::set< Slice* > > > m_GroupResultCombinations;
+    std::vector< std::set< Slice* > >::iterator m_IterGroupEnd;
+    unsigned int m_TotalCombinationCount;
     std::set< Slice* > m_Set;
 
-    /** input */
-    std::list< ipPicDescriptor* > m_PicDescriptorList;
-    std::string m_SeriesOID;
-
-    /** output */
-    std::vector< DataTreeNode::Pointer > m_Output;
-    std::vector< std::list< std::string > > m_ImageInstanceUIDs;
-
-    /** function to put the input-PicDescriptors to struct slice and struct group */
-    void SortSlicesToGroup();
-    /** sort the included slices for every group by there slice-location, the smaler one get first */
-    void SortGroupsByLocation();
-    /** create all possible combinations of the included picdescriptors by the spacing, the number of slices have to be three or more */
+    /** This function sort the ipPicDescriptor to groups and slices.  */
+    void SortPicsToGroup();
+    /** This function sort the slices by location and imagenumber. */
+    void SortSlicesByLocation();
+    /** This function create all possible combinations between the ipPicDescriptors (with the same spacing). */
     void CreatePossibleCombinations();
-    /** sort the combinations by the number of included elements, the highest one get first */
+    /** This function sort the combinations by the number of included elements, the highest one get first. */
     void SortPossibleCombinations();
-    /** search the minimum number of combinations to represent all slices, therefore multitudes get used */
-    void SearchForMinimumCombination();
-    /** check the found combinations if they are timesliced */
+    /** This function check the combinations if they are timesliced. */
     void CheckForTimeSlicedCombinations();
-    /** generate the result - nodes */
-    void GenerateNodes();
+    /** This function search for the minimum number of combinations to represent all slices. */
+    void SearchForMinimumCombination();
+    /** This function generate all needed parameter to create the mitk::Images. */
+    void GenerateImages();
 
     /** helpfunctions */
-    static bool LocationSort ( const Slice elem1, const Slice elem2 );
-    static bool CombinationSort( const std::set< Slice* > elem1, const std::set< Slice* > elem2 );
-    double Round( double number, unsigned int decimalPlaces );
+    static bool PositionSort ( const Slice elem1, const Slice elem2 );
+    static bool CombinationCountSort( const std::set< Slice* > elem1, const std::set< Slice* > elem2 );
+
     void CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup );
     void searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup );
     bool EqualImageNumbers( std::vector< Slice >::iterator testIter );
     void RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, unsigned int remainingCombinations, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombinations );
-    const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
 
     /** debug-output */
     void ShowAllGroupsWithSlices();

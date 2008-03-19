@@ -178,6 +178,12 @@ public:
   //## @sa m_MapOfPropertyLists
   mitk::PropertyList* GetPropertyList(const mitk::BaseRenderer* renderer = NULL) const;
 
+  //##Documentation
+  //## @brief Set the PropertyList
+  //## @sa SetProperty
+  //## @sa m_PropertyList
+  void SetPropertyList(PropertyList *pList);
+
   //##ModelId=3EF189DB0111
   //##Documentation
   //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList 

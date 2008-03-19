@@ -184,28 +184,11 @@ void mitk::DataTreeNodeFactory::GenerateData()
         usedNewDTNF = true;
         mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();//this->GetOutput();
         node->SetData(baseData);
-        this->SetDefaultCommonProperties( node );
-
+        
         mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
         if(image.IsNotNull())
-        {
-          this->SetDefaultImageProperties(node);
-#ifdef MBI_INTERNAL
-          if ( this->FileNameEndsWith( ".pic" ) || this->FileNameEndsWith( ".pic.gz" ) || this->FileNameEndsWith( ".seq" ) )
-          {
-            if ( image->GetNumberOfChannels() > 1 )
-              this->SetDefaultUltraSoundProperties( node );
-          }
-          else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
-          {
-            if ( image->GetNumberOfChannels() > 1 )
-            {
-              this->SetDefaultUltraSoundProperties( node );
-              this->SetDefaultTusProperties( i, node );
-            }
-          }
-#endif // MBI_INTERNAL
-        }
+          SetDefaultImageProperties(node);
+       
         mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(node);
         mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
         if(surface.IsNotNull())
@@ -216,42 +199,13 @@ void mitk::DataTreeNodeFactory::GenerateData()
         if(pointset.IsNotNull())
           this->SetDefaultPointSetProperties(node);
 
-        node->SetVisibility(true);
+        this->SetDefaultCommonProperties( node );
+
         this->SetOutput(i, node);
       }
     }
-    /***********************************************************************************************************/
-    if(!usedNewDTNF)
-    { 
-      if ( ( m_FileName != "" ) && (m_Serie == false))
-      {
-#ifdef MBI_INTERNAL
-        if ( this->FileNameEndsWith( "HPSONOS.DB" ) || this->FileNameEndsWith( "hpsonos.db" ) )
-        {
-          std::cout << "reading HPSONOS" << endl;
-          this->ReadFileTypeHPSONOS();
-        }
-#ifdef USE_TUS_READER
-        else if ( this->FileNameEndsWith( ".TUS" ) || this->FileNameEndsWith( ".tus" ) )
-        {
-          std::cout << "reading tus" << endl;
-          this->ReadFileTypeTUS();
-        }
-#endif
-#ifdef HAVE_IPDICOM
-        else if ( this->FileNameEndsWith( ".IPDCM" ) || this->FileNameEndsWith( ".ipdcm" ) )
-        {
-          this->ReadFileTypeIPDCM();
-        }
-#endif /* HAVE_IPDICOM */
-#endif /* MBI_INTERNAL */
-      }
-      // part for series of data
-      else if ( m_FilePattern != "" && m_FilePrefix != "" )
-      {
-        this->ReadFileSeriesTypeITKImageSeriesReader();
-      }
-    }
+    if(!usedNewDTNF && !( m_FileName != "" ) && !(m_Serie == false))
+        ReadFileSeriesTypeITKImageSeriesReader();
   }
 }
 
@@ -296,274 +250,6 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
   else
     return std::string( "" );
 }
-
-#ifdef MBI_INTERNAL
-void mitk::DataTreeNodeFactory::ReadFileTypeHPSONOS()
-{
-  std::cout << "loading " << m_FileName << " as DSR ... " << std::endl;
-
-  this->ResizeOutputs( 2 );
-
-  mitk::DSRFileReader::Pointer reader;
-
-  reader = mitk::DSRFileReader::New();
-
-  reader->SetFileName( m_FileName.c_str() );
-
-  std::string m_dir = m_FileName.substr(m_FileName.length()-17,6);
-
-
-  mitk::ImageChannelSelector::Pointer channelSelector = mitk::ImageChannelSelector::New();
-  mitk::ImageChannelSelector::Pointer DopplerChannelSelector = mitk::ImageChannelSelector::New();
-
-  channelSelector->SetInput( reader->GetOutput() );
-  DopplerChannelSelector->SetInput( reader->GetOutput() );
-
-  reader->UpdateOutputInformation();
-
-  bool haveDoppler = false;
-  if ( reader->GetOutput()->IsValidChannel( 0 ) )
-  {
-    std::cout << "    have channel data 0 (backscatter) ... " << std::endl;
-  }
-
-  if ( reader->GetOutput()->IsValidChannel( 1 ) )
-  {
-    std::cout << "    have channel data 1 (doppler) ... " << std::endl;
-    haveDoppler = true;
-  }
-
-  mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
-  mitk::CylindricToCartesianFilter::Pointer cyl2cartDoppler = mitk::CylindricToCartesianFilter::New();
-
-  cyl2cart->SetTargetXSize( 128 );
-  cyl2cartDoppler->SetTargetXSize( 128 );
-
-  //the outside value must be the value interpreted as v=0. In most cases this is 128.
-  cyl2cartDoppler->SetOutsideValue( 128 );
-
-  //
-  // switch to Backscatter information
-  //
-  channelSelector->SetChannelNr( 0 );
-
-  mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
-
-  //
-  // insert original (in cylindrical coordinates) Backscatter information
-  //
-  mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
-  node->SetData( channelSelector->GetOutput() );
-  node->SetData( channelSelector->GetOutput() );
-  sliceSelector->SetInput( channelSelector->GetInput() );
-  mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "OriginalBackscatter" );
-  node->SetProperty( "ultrasound", ultrasoundProp );
-
-  mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( m_dir+"(OBS)" );
-  node->SetProperty( "name", nameProp );
-
-  //node->SetProperty( "layer", new mitk::IntProperty( -11 ) );
-  //mitk::LevelWindow levelwindow;
-  //levelwindow.SetAuto( sliceSelector->GetOutput() );
-  //node->SetLevelWindow( levelwindow, NULL );
-  node->SetVisibility( false, NULL );
-  //node->SetColor( 1.0, 1.0, 1.0, NULL );
-  node->Update();
-
-  SetDefaultImageProperties(node);
-
-  //
-  // insert transformed (in cartesian coordinates) Backscatter information
-  //
-  cyl2cart->SetInput( reader->GetOutput() );
-  node = this->GetOutput( 1 );
-  node->SetData( reader->GetOutput() );
-  node->SetData( cyl2cart->GetOutput() );
-  ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
-  node->SetProperty( "ultrasound", ultrasoundProp );
-  nameProp = new mitk::StringProperty( m_dir+"(TBS)" );
-  node->SetProperty( "name", nameProp );
-  //node->SetProperty( "layer", new mitk::IntProperty( -10 ) );
-
-  //node->SetLevelWindow( levelwindow, NULL );
-  //node->SetColor( 1.0, 1.0, 1.0, NULL );
-  node->Update();
-
-
-  SetDefaultImageProperties(node);
-
-  if ( haveDoppler )
-  {
-    this->ResizeOutputs( 4 );
-
-    //
-    // switch to Doppler information
-    //
-    DopplerChannelSelector->SetChannelNr( 1 );
-    //DopplerChannelSelector->Update();
-
-    //
-    // create a Doppler lookup table
-    // TODO: HP map must be provided by DSRFilereader, since it
-    // may be dependend on data ( baseline shift)
-    //
-    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-    LookupTableSource->SetUseDSRDopplerLookupTable();
-    LookupTableSource->Update();
-    mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( LookupTable );
-
-    int start = 128 - 1;
-    int end = 128 + 1;
-    for (int i=start; i<=end;i++)
-      LookupTableProp->GetLookupTable()->ChangeOpacity(i, 0);
-
-    //
-    // insert original (in cylindric coordinates) Doppler information
-    //
-    node = this->GetOutput( 2 );
-    node->SetData( DopplerChannelSelector->GetOutput() );
-    node->SetData( DopplerChannelSelector->GetOutput() );
-    ultrasoundProp = new mitk::StringProperty( "OriginalDoppler" );
-    node->SetProperty( "ultrasound", ultrasoundProp );
-    nameProp = new mitk::StringProperty( m_dir+"(OD)" );
-    node->SetProperty( "name", nameProp );
-    //node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
-
-    //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    //mitk::LevelWindow levelwindow;
-    //levelwindow.SetLevelWindow( 128, 255 );
-    //levWinProp->SetLevelWindow( levelwindow );
-    // set the overwrite LevelWindow
-    // if "levelwindow" is used if "levelwindow" is not available
-    // else "levelwindow" is used
-    // "levelwindow" is not affected by the slider
-    //node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
-
-    node->SetProperty( "LookupTable", LookupTableProp );
-    node->SetVisibility( false, NULL );
-    node->Update();
-
-    SetDefaultImageProperties(node);
-
-    //
-    // insert transformed (in cartesian coordinates) Doppler information
-    //
-    cyl2cartDoppler->SetInput( DopplerChannelSelector->GetOutput() );
-
-    node = this->GetOutput( 3 );
-    node->SetData( cyl2cartDoppler->GetOutput() );
-    node->SetData( cyl2cartDoppler->GetOutput() );
-    ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
-    node->SetProperty( "ultrasound", ultrasoundProp );
-    nameProp = new mitk::StringProperty( m_dir+"(TD)" );
-    node->SetProperty( "name", nameProp );
-    //node->SetProperty( "layer", new mitk::IntProperty( -5 ) );
-
-    // set the overwrite LevelWindow
-    // if "levelwindow" is used if "levelwindow" is not available
-    // else "levelwindow" is used
-    // "levelwindow" is not affected by the slider
-    //node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
-
-    node->SetProperty( "LookupTable", LookupTableProp );
-    node->Update();
-
-
-    SetDefaultImageProperties(node);
-  }
-  std::cout << "...finished!" << std::endl;
-}
-
-#ifdef USE_TUS_READER
-void mitk::DataTreeNodeFactory::ReadFileTypeTUS()
-{
-  unsigned int i,count;
-
-  mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
-  cout<<m_FileName<<endl;   
-  parser->LoadBehavior(m_FileName); 
-
-  //Parse die Tus-File and get BirdDataPfadliste+ HpsonoPfadListe
-  std::vector< std::string > BirdDataPfadListe = mitk::TrackedUSDataFileParser::GetBirdDataPfadListe();
-
-  std::vector< std::string > HpsonoPfadListe = mitk::TrackedUSDataFileParser::GetHpsonoPfadListe();
-  std::vector <std::string>::iterator it;
-
-  int OutputNumber=0;
-  i=0;// Laufvariable fr die internen Kan�eBilder aus DSRreader
-  count=0;// Laufvariable fr die BilderAnzahl
-  BirdDataFromFileReader Birdreader;
-
-  for ( it= HpsonoPfadListe.begin( );it != HpsonoPfadListe.end( );it++ )
-  {  
-    mitk::DataTreeNodeFactory::Pointer HPSonoReader=mitk::DataTreeNodeFactory::New();
-    std::string name=*it;
-
-    //Lese USBilder mittels ReadFileTypeHPSONOS()
-    HPSonoReader->SetFileName(name.c_str() );           
-    HPSonoReader->Update(); 
-
-    OutputNumber+=HPSonoReader->GetNumberOfOutputs(); // Aktualisiere Anzahl Bilder
-
-    this->ResizeOutputs(OutputNumber);
-
-    Birdreader.SetFilename(BirdDataPfadListe[count].c_str()); 
-    mitk::BirdData BD= Birdreader.GetBirdData();
-
-    //Set PositionProperty
-    mitk::Point3D PositionData= BD.GetPositionMean();
-    mitk::Point3dProperty::Pointer positionProp;
-    positionProp = new mitk::Point3dProperty(PositionData);
-    HPSonoReader->GetOutput(0)->SetProperty( "PositionData",positionProp );
-    HPSonoReader->GetOutput(1)->SetProperty( "PositionData",positionProp );
-
-    Birdreader.getRotationMatrix();
-
-    //Set RotationProperty
-    mitk::Point4D QuaternionData =BD.GetRotationMean();
-    mitk::Point4dProperty::Pointer quaternionProp;
-    quaternionProp = new mitk::Point4dProperty(QuaternionData);     
-    HPSonoReader->GetOutput(0)->SetProperty( "QuaternionData", quaternionProp );
-    HPSonoReader->GetOutput(1)->SetProperty( "QuaternionData", quaternionProp );
-
-    this->SetOutput(i,HPSonoReader->GetOutput(0));
-    this->SetOutput(i+1,HPSonoReader->GetOutput(1));
-
-    i+=2;
-    count++;
-  }
-}
-#endif //USE_TUS_READER
-
-#ifdef HAVE_IPDICOM
-void mitk::DataTreeNodeFactory::ReadFileTypeIPDCM()
-{
-  std::cout << "loading " << m_FileName << " as DICOM... " << std::endl;
-
-  mitk::DICOMFileReader::Pointer reader = mitk::DICOMFileReader::New();
-  reader->SetFileName( m_FileName.c_str() );
-  reader->Update();
-  mitk::DataTreeNode::Pointer node = this->GetOutput();
-  node->SetData( reader->GetOutput() );
-
-
-  SetDefaultImageProperties(node);
-
-
-  // add Level-Window property
-  mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( reader->GetOutput() );
-  node->SetLevelWindow( levelwindow, NULL );
-
-
-  std::cout << "...finished!" << std::endl;
-}
-
-
-#endif /* HAVE_IPDICOM */
-#endif // MBI_INTERNAL
-
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
@@ -729,23 +415,30 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     levelwindow.SetAuto( image );
     levWinProp->SetLevelWindow( levelwindow );
     node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+
+    // we adopt properties for the dataTreeNode if they are provided by our specific file i/o reader 
+    // in form of image properties
+    node->SetPropertyList(image->GetPropertyList()->Clone());
   }
 
   // add a default rainbow lookup table for color mapping
-  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-  vtkLut->SetHueRange(0.6667, 0.0);
-  vtkLut->SetTableRange(0.0, 20.0);
-  vtkLut->Build();
-  mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
-  mitkLutProp->SetLookupTable(mitkLut);
-  node->SetProperty( "LookupTable", mitkLutProp );
-  node->SetProperty( "binary", new mitk::BoolProperty( false ) );
-  
-  
+  if(!node->GetProperty("LookupTable"))
+  {
+    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+    vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+    vtkLut->SetHueRange(0.6667, 0.0);
+    vtkLut->SetTableRange(0.0, 20.0);
+    vtkLut->Build();
+    mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+    mitkLutProp->SetLookupTable(mitkLut);
+    node->SetProperty( "LookupTable", mitkLutProp );
+  }
+  if(!node->GetProperty("binary"))
+    node->SetProperty( "binary", new mitk::BoolProperty( false ) );
+ 
   // add a default transfer function
   mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-  if(image.IsNotNull())
+  if(image.IsNotNull() && !node->GetProperty("TransferFunction"))
   {
     float m_Min = image->GetScalarValueMin();
     float m_Max = image->GetScalarValueMax();
@@ -920,132 +613,23 @@ void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode:
 
 void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
 {
+  // path
   mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
   node->SetProperty( StringProperty::PATH, pathProp );
+  
+  // name
   mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
   if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))
   {
     nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutExtension( m_FileName ) );
     if (FileNameEndsWith( ".pic" ))
-    {
       m_FileName = m_FileName.substr( 0, m_FileName.length()-4 );
-    }
-  
+ 
     itksys::SystemTools::GetFilenameWithoutExtension( m_FileName );
-
     node->SetProperty( "name", nameProp );
   }
-}
-
-#ifdef MBI_INTERNAL
-void mitk::DataTreeNodeFactory::SetDefaultUltraSoundProperties(mitk::DataTreeNode::Pointer &node) 
-{
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNotNull())
-  {
-    mitk::ImageChannelSelector::Pointer morphologyChannelSelector = mitk::ImageChannelSelector::New();
-    mitk::ImageChannelSelector::Pointer dopplerChannelSelector = mitk::ImageChannelSelector::New();
-
-    morphologyChannelSelector->SetInput( image );
-    dopplerChannelSelector->SetInput( image );
-
-    // insert morphology
-    //    mitk::DataTreeNode::Pointer node = this->GetOutput( 0 );
-    node->SetData( morphologyChannelSelector->GetOutput() );
-    mitk::StringProperty::Pointer ultrasoundProp = new mitk::StringProperty( "TransformedBackscatter" );
-    node->SetProperty( "ultrasound", ultrasoundProp );
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (morphology)" );
-    node->SetProperty( "name", nameProp );
-
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetAuto( morphologyChannelSelector->GetOutput() );
-    node->SetVisibility( false, NULL );
-    node->Update();
-
-    SetDefaultImageProperties(node);
-
-    // now deal with Doppler
-    this->ResizeOutputs( 2 );
-    dopplerChannelSelector->SetChannelNr( 1 );
-
-    // create a Doppler lookup table
-    // TODO: map must depend on velocity meta information ( e.g., baseline shift)
-    mitk::USLookupTableSource::Pointer LookupTableSource = mitk::USLookupTableSource::New();
-    LookupTableSource->SetUseDSRDopplerLookupTable();
-    LookupTableSource->Update();
-    mitk::LookupTableSource::OutputTypePointer LookupTable = LookupTableSource->GetOutput();
-    mitk::LookupTableProperty::Pointer LookupTableProp = new mitk::LookupTableProperty( LookupTable );
-
-    int start = 128 - 1;
-    int end = 128 + 1;
-    for (int i=start; i<=end;i++)
-      LookupTableProp->GetLookupTable()->ChangeOpacity(i, 0);
-
-    // insert Doppler
-    node = this->GetOutput( 1 );
-    node->SetData( dopplerChannelSelector->GetOutput() );
-    SetDefaultImageProperties(node);
-
-    ultrasoundProp = new mitk::StringProperty( "TransformedDoppler" );
-    node->SetProperty( "ultrasound", ultrasoundProp );
-    nameProp = new mitk::StringProperty( this->GetBaseFileName()+" (Doppler)" );
-    node->SetProperty( "name", nameProp );
-    node->SetProperty( "layer", new mitk::IntProperty( -6 ) );
-
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
-    levelwindow.SetLevelWindow( 128, 255 );
-    levWinProp->SetLevelWindow( levelwindow );
-    // set the overwrite LevelWindow
-    // if "levelwindow" is used if "levelwindow" is not available
-    // else "levelwindow" is used
-    // "levelwindow" is not affected by the slider
-    node->GetPropertyList()->SetProperty( "levelWindow", levWinProp );
-
-    levWinProp = new mitk::LevelWindowProperty();
-    levWinProp->SetLevelWindow( levelwindow );
-    node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
-
-    node->SetProperty( "LookupTable", LookupTableProp );
-    node->SetVisibility( false, NULL );
-    node->Update();
-  }
-}
-
-void mitk::DataTreeNodeFactory::SetDefaultTusProperties(int count, mitk::DataTreeNode::Pointer &node) 
-{
-  mitk::TrackedUSDataFileParser* parser = new mitk::TrackedUSDataFileParser();
-  parser->LoadBehavior(m_FileName);
-
-  std::vector< std::string > BirdDataPfadListe = mitk::TrackedUSDataFileParser::GetBirdDataPfadListe();
-  std::vector< std::string > HpsonoPfadListe = mitk::TrackedUSDataFileParser::GetHpsonoPfadListe();
-  std::vector <std::string>::iterator it;
-
-  BirdDataFromFileReader Birdreader;
-
-  Birdreader.SetFilename(BirdDataPfadListe[count].c_str());
-  mitk::BirdData BD = Birdreader.GetBirdData();
-
-  mitk::DoublePoint3D pData=BD.GetPositionMean();
-  mitk::Point3D PositionData;
-  PositionData[0]=pData[0];
-  PositionData[1]=pData[1];
-  PositionData[2]=pData[2];
-
-  mitk::Point3dProperty::Pointer positionProp;
-  positionProp = new mitk::Point3dProperty(PositionData);
-  node->SetProperty( "PositionData",positionProp );
-
-  //Set RotationProperty
-  mitk::DoublePoint4D QData =BD.GetRotationMean();
-  mitk::Point4D QuaternionData;
-  QuaternionData[0]=QData[0];
-  QuaternionData[1]=QData[1];
-  QuaternionData[2]=QData[2];
-  QuaternionData[3]=QData[3];
-
-  mitk::Point4dProperty::Pointer quaternionProp;
-  quaternionProp = new mitk::Point4dProperty(QuaternionData);    
-  node->SetProperty( "QuaternionData", quaternionProp );
-}
   
-#endif // MBI_INTERNAL
+  // visibility
+  if(!node->GetProperty("visible"))
+    node->SetVisibility(true);
+}

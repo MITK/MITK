@@ -116,16 +116,6 @@ public:
   void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
 
   /**
-   * Sets default properties common to ultrasound content
-   */
-  void SetDefaultUltraSoundProperties(DataTreeNode::Pointer &node);
-
-  /**
-   * Sets default properties common to tus files
-   */
-  void SetDefaultTusProperties(int count, DataTreeNode::Pointer &node);
-
-  /**
    * if true -> loaded image is part of a serie
    */
   void SetImageSerie(bool serie);

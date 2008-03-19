@@ -210,6 +210,10 @@ mitk::PropertyList* mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer
 
   return propertyList;
 }
+void mitk::DataTreeNode::SetPropertyList(PropertyList *pList)
+{
+  m_PropertyList = pList;
+}
 
 //##ModelId=3EF189DB0111
 mitk::BaseProperty* mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const

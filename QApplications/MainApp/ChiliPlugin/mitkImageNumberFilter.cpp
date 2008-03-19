@@ -364,6 +364,7 @@ void mitk::ImageNumberFilter::SplitDummiVolumes()
 
 void mitk::ImageNumberFilter::GenerateImages()
 {
+#ifdef CHILI_PLUGIN_VERSION_CODE
   for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); groupIter != m_GroupList.end(); groupIter++ )
   {
     //get time, count
@@ -436,4 +437,5 @@ void mitk::ImageNumberFilter::GenerateImages()
 
     GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupIter->seriesDescription );
   }
+#endif
 }

@@ -260,6 +260,35 @@ void mitk::BaseData::SetPropertyList(PropertyList *pList)
   m_PropertyList = pList;
 }
 
+void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
+{
+  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  
+  assert(timeSlicedGeometry!=NULL);
+
+  mitk::Geometry3D* geometry;
+
+  unsigned int steps;
+
+  steps = timeSlicedGeometry->GetTimeSteps();
+
+  int timestep;
+
+  for(timestep = 0; timestep < steps; ++timestep)
+  {
+    geometry = GetGeometry(timestep);
+    if(geometry != NULL)
+    {
+      geometry->SetOrigin(origin);
+    }
+    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
+    {
+      GetTimeSlicedGeometry()->InitializeEvenlyTimed(geometry, steps);
+      break;
+    }
+  }
+}
+
 unsigned long mitk::BaseData::GetMTime() const
 {
   unsigned long time = Superclass::GetMTime();

@@ -186,6 +186,25 @@ public:
   //## during initialization.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
+  //##Documentation
+  //## @brief Convenience method for setting the origin of 
+  //## the SlicedGeometry3D instances of all time steps
+  //##
+  //## In case the SlicedGeometry3D is evenly spaced,
+  //## the origin of the first slice is set to \a origin.
+  //## \sa mitk::BaseData::SetOrigin
+  virtual void SetOrigin(const Point3D& origin);
+
+  //##Documentation
+  //## @brief Convenience method for setting the spacing of 
+  //## the SlicedGeometry3D instances of all time steps
+  virtual void SetSpacing(const float aSpacing[3]);
+
+  //##Documentation
+  //## @brief Convenience method for setting the spacing of 
+  //## the SlicedGeometry3D instances of all time steps
+  virtual void SetSpacing(mitk::Vector3D aSpacing);
+
 protected:
 
   SlicedData();

@@ -281,3 +281,72 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
     Superclass::SetGeometry(NULL);
   }
 }
+
+void mitk::SlicedData::SetSpacing(const float aSpacing[3])
+{
+  this->SetSpacing((mitk::Vector3D)aSpacing);
+}
+
+void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
+{
+  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  
+  assert(timeSlicedGeometry!=NULL);
+
+  mitk::SlicedGeometry3D* slicedGeometry;
+
+  unsigned int steps;
+
+  steps = timeSlicedGeometry->GetTimeSteps();
+
+  int timestep;
+
+  for(timestep = 0; timestep < steps; ++timestep)
+  {
+    slicedGeometry = GetSlicedGeometry(timestep);
+    if(slicedGeometry != NULL)
+    {
+      slicedGeometry->SetOrigin(origin);
+      if(slicedGeometry->GetEvenlySpaced())
+      {
+        mitk::Geometry2D* geometry2D = slicedGeometry->GetGeometry2D(0);
+        geometry2D->SetOrigin(origin);
+        slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
+      }
+    }
+    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
+    {
+      GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, steps);
+      break;
+    }
+  }
+}
+
+void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
+{
+  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  
+  assert(timeSlicedGeometry!=NULL);
+
+  mitk::SlicedGeometry3D* slicedGeometry;
+
+  unsigned int steps;
+
+  steps = timeSlicedGeometry->GetTimeSteps();
+
+  int timestep;
+
+  for(timestep = 0; timestep < steps; ++timestep)
+  {
+    slicedGeometry = GetSlicedGeometry(timestep);
+    if(slicedGeometry != NULL)
+    {
+      slicedGeometry->SetSpacing(aSpacing);
+    }
+    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
+    {
+      GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, steps);
+      break;
+    }
+  }
+}

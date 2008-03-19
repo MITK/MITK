@@ -395,13 +395,6 @@ public:
     this->Initialize();
   };
 
-  /**
-  * \brief set the images spacing
-  */
-  void SetSpacing(const float aSpacing[3]);
-
-  void SetSpacing(mitk::Vector3D aSpacing);
-
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e., 
   //## is (or can be) inside of the image

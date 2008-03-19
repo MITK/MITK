@@ -280,6 +280,18 @@ public:
 
   void SetProperty(const char *propertyKey, BaseProperty* property);
 
+  //##Documentation
+  //## @brief Convenience method for setting the origin of 
+  //## the Geometry3D instances of all time steps
+  //##
+  //## \warning Geometries contained in the Geometry3D will
+  //## \em not be changed, e.g. in case the Geometry3D is a 
+  //## SlicedGeometry3D the origin will \em not be propagated 
+  //## to the contained slices. The sub-class SlicedData
+  //## does this for the case that the SlicedGeometry3D is
+  //## evenly spaced.
+  virtual void SetOrigin(const Point3D& origin);
+
   /** \brief Get the process object that generated this data object.
    *
    * If there is no process object, then the data object has

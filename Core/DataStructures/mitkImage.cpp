@@ -950,18 +950,6 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
   m_Initialized = true;
 }
 
-void mitk::Image::SetSpacing(const float aSpacing[3])
-{
-  GetSlicedGeometry(0)->SetSpacing(aSpacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
-}
-
-void mitk::Image::SetSpacing(mitk::Vector3D aSpacing)
-{
-  GetSlicedGeometry(0)->SetSpacing(aSpacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(GetSlicedGeometry(0), m_Dimensions[3]);
-}
-
 //##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
 {

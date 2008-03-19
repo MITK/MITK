@@ -241,6 +241,101 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  //-----------------
+  // testing origin information and methods
+  std::cout << "Testing correctness of origin via GetGeometry()->GetOrigin(): ";
+  if( mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ";
+  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  mitk::FillVector3D(origin, 37.0, 17.92, 27.83);
+  std::cout << "Setting origin via SetOrigin(origin): ";
+  imgMem->SetOrigin(origin);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ";
+  if( mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ";
+  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ";
+  if( mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  //-----------------
+  // testing spacing information and methods
+  std::cout << "Testing correctness of spacing via GetGeometry()->GetSpacing(): ";
+  if( mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of spacing via GetTimeSlicedGeometry()->GetSpacing(): ";
+  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  mitk::FillVector3D(spacing, 7.0, 0.92, 1.83);
+  std::cout << "Setting spacing via SetSpacing(spacing): ";
+  imgMem->SetSpacing(spacing);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ";
+  if( mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ";
+  if( mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ";
+  if( mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing) == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

@@ -195,6 +195,7 @@ void QmitkMaterialShowcase::SetInterpolation( mitk::MaterialProperty::Interpolat
 void QmitkMaterialShowcase::mousePressEvent( QMouseEvent * e )
 {
     QWidget::mousePressEvent( e );
+    std::cout << "mouse press detected" << std::endl;
     emit Selected( this );  
 }
 

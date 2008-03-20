@@ -464,7 +464,7 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
 
       QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
       dialog.setPrompt("What organ did you just load?");
-      dialog.setSegmentationName( nodeName );
+      dialog.setSegmentationName( nodeName.c_str() );
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar

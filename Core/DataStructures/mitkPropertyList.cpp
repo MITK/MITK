@@ -328,3 +328,28 @@ void mitk::PropertyList::SetEnabled(const char *propertyKey,bool enabled)
     this->Modified();
   }
 }
+
+void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool replace)
+{
+  if (pList)
+  {
+    const PropertyMap* propertyMap = pList->GetMap();
+
+    for ( PropertyMap::const_iterator iter = propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
+          iter != propertyMap->end();
+          ++iter )
+    {
+      const std::string key = iter->first;
+      BaseProperty* value = iter->second.first;
+      if (replace)
+      {
+        ReplaceProperty( key.c_str(), value );
+      }
+      else
+      {
+        SetProperty( key.c_str(), value );
+      }
+    }
+  }
+}
+

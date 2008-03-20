@@ -111,6 +111,11 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
     void ReplaceProperty(const char* propertyKey, BaseProperty* property);
 
     /**
+     * @brief Set a property object in the list/map by reference.
+     */ 
+    void ConcatenatePropertyList(PropertyList *pList, bool replace = false);
+
+    /**
      * @brief Get the timestamp of the last change of the map or the last change of one of 
      * the properties store in the list (whichever is later).
      */

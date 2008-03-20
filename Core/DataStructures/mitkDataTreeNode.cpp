@@ -210,9 +210,10 @@ mitk::PropertyList* mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer
 
   return propertyList;
 }
-void mitk::DataTreeNode::SetPropertyList(PropertyList *pList)
+
+void mitk::DataTreeNode::ConcatenatePropertyList(PropertyList *pList, bool replace)
 {
-  m_PropertyList = pList;
+  m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
 //##ModelId=3EF189DB0111

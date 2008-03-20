@@ -418,7 +418,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
 
     // we adopt properties for the dataTreeNode if they are provided by our specific file i/o reader 
     // in form of image properties
-    node->SetPropertyList(image->GetPropertyList()->Clone());
+    node->ConcatenatePropertyList(image->GetPropertyList());
   }
 
   // add a default rainbow lookup table for color mapping

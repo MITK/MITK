@@ -179,10 +179,18 @@ public:
   mitk::PropertyList* GetPropertyList(const mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
-  //## @brief Set the PropertyList
+  //## @brief Add values from another PropertyList.
+  //##
+  //## Overwrites values in m_PropertyList only when possible (i.e. when types are compatible).
+  //## If you want to allow for object type changes (replacing a "visible":BoolProperty with "visible":IntProperty,
+  //## set the @param replace.
+  //##
+  //## @param replace true: if @param pList contains a property "visible" of type ColorProperty and our m_PropertyList also has a "visible" property of a different type (e.g. BoolProperty), change the type, i.e. replace the objects behind the pointer.
+  //##
   //## @sa SetProperty
+  //## @sa ReplaceProperty
   //## @sa m_PropertyList
-  void SetPropertyList(PropertyList *pList);
+  void ConcatenatePropertyList(PropertyList* pList, bool replace = false);
 
   //##ModelId=3EF189DB0111
   //##Documentation

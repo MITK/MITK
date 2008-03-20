@@ -268,13 +268,9 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
 
   mitk::Geometry3D* geometry;
 
-  int steps;
+  unsigned int steps = timeSlicedGeometry->GetTimeSteps();
 
-  steps = (int) timeSlicedGeometry->GetTimeSteps();
-
-  int timestep;
-
-  for(timestep = 0; timestep < steps; ++timestep)
+  for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
     geometry = GetGeometry(timestep);
     if(geometry != NULL)

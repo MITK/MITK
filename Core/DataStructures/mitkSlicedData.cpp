@@ -342,3 +342,4 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
     }
   }
 }
+

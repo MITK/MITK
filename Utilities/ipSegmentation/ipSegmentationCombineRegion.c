@@ -83,7 +83,8 @@ static Point2 *pt;		/* vertices */
 static int nact;		/* number of active edges */
 static Edge *active;		/* active edge list:edges crossing scanline y */
 
-int compare_ind(), compare_active();
+int compare_ind(const void* /*u*/, const void* /*v*/),                                \
+    compare_active(const void* /*u*/, const void* /*v*/);
 
 #define CONCAVE(TYPE, PIC, MSK, POINT, NVERT, WINDOW, VALUE, CMD)                     \
 {                                                                                     \
@@ -178,8 +179,19 @@ int i, y;
 }
 
 /* comparison routines for qsort */
-int compare_ind(u, v) int *u, *v; {return pt[*u].y <= pt[*v].y ? -1 : 1;}
-int compare_active(u, v) Edge *u, *v; {return u->x <= v->x ? -1 : 1;}
+int compare_ind(arg1, arg2) const void *arg1, *arg2;
+{
+  int* u = (int*)arg1;
+  int* v = (int*)arg2;
+  return pt[*u].y <= pt[*v].y ? -1 : 1;
+}
+
+int compare_active(arg1, arg2) const void *arg1, *arg2; 
+{
+  Edge* u = (Edge*)arg1;
+  Edge* v = (Edge*)arg2;
+  return u->x <= v->x ? -1 : 1;
+}
 
 int idx;
 Point2* pl;

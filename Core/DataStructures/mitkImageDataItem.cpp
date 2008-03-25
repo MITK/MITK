@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/ipFunc.h"
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data, bool manageMemory, size_t offset) : 
-  m_Data(NULL), m_ManageMemory(false), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false),
+  m_Data(NULL), m_ManageMemory(false), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
   m_Parent(&aParent)
 {
   m_PixelType = aParent.GetPixelType();
@@ -48,9 +48,10 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
   ipFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
 
+  m_Size = _ipPicSize(m_PicDescriptor);
   if(data != NULL)
   {
-    memcpy(m_Data, data, _ipPicSize(m_PicDescriptor));
+    memcpy(m_Data, data, m_Size);
     if(manageMemory)
     {
       delete [] (unsigned char*) data;
@@ -79,7 +80,7 @@ mitk::ImageDataItem::~ImageDataItem()
 }
 
 mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) : 
-  m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false),
+  m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0),
   m_Parent(NULL)
 {
   //const std::type_info & typeId=*type.GetTypeId();
@@ -92,9 +93,10 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   unsigned char i;
   for(i=dimension; i < _ipPicNDIM; ++i)
     m_PicDescriptor->n[i] = 1;
+  m_Size = _ipPicSize(m_PicDescriptor);
   if(m_Data == NULL)
   {
-    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( _ipPicSize(m_PicDescriptor) );
+    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
     m_ManageMemory = true;
   }
   m_PicDescriptor->data=m_Data;

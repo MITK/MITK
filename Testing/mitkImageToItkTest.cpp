@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
+#include "mitkReferenceCountWatcher.h"
 
 #include <fstream>
 
@@ -189,7 +190,7 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   if(result != EXIT_SUCCESS)
     return result;
 
-  std::cout << "Testing mitk::CastToItkImage: " << std::flush;
+  std::cout << "Testing mitk::CastToItkImage with casting (mitk int to itk float): " << std::flush;
   typedef itk::Image<float,3> ImageType;
   ImageType::Pointer itkImage;
   mitk::CastToItkImage( imgMem, itkImage );
@@ -207,6 +208,36 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   result = testImageToItkAndBack<4>(imgMem);
   if(result != EXIT_SUCCESS)
     return result;
+
+  std::cout << "Testing mitk::CastToItkImage again (mitk float to itk float): " << std::flush;
+  imgMem->Initialize(mitk::PixelType(typeid(float)), 40, *planegeometry);
+  mitk::CastToItkImage( imgMem, itkImage );
+  std::cout<<"[PASSED]"<<std::endl;
+
+  mitk::ImageDataItem::Pointer imageDataItem = imgMem->GetChannelData();
+  std::cout << "Testing destruction of original mitk::Image: " << std::flush;
+  imgMem = NULL;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count mitk::ImageDataItem, which is responsible for the memory still used within the itk::Image: " << std::flush;
+  if(imageDataItem->GetReferenceCount()-1 != 1) // 1 count by imageDataItem itself
+  {
+    std::cout<< imageDataItem->GetReferenceCount()-1 << " != 1. [FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing destruction of itk::Image: " << std::flush;
+  itkImage = NULL;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count mitk::ImageDataItem, which should now have been freed by itk::Image: " << std::flush;
+  if(imageDataItem->GetReferenceCount()-1 != 0) // 1 count by imageDataItem itself
+  {
+    std::cout<< imageDataItem->GetReferenceCount()-1 << " != 0. [FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

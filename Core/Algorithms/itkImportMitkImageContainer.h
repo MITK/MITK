@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __itkImportMitkImageContainer_h
 #define __itkImportMitkImageContainer_h
 
+#include <itkImportImageContainer.h>
 #include <mitkImageDataItem.h>
 
 namespace itk
@@ -38,7 +39,7 @@ namespace itk
  */
   
 template <typename TElementIdentifier, typename TElement>
-class ImportMitkImageContainer:  public Object
+class ImportMitkImageContainer:  public ImportImageContainer<TElementIdentifier, TElement>
 {
 public:
   /** Standard class typedefs. */
@@ -55,51 +56,13 @@ public:
   itkNewMacro(Self);
   
   /** Standard part of every itk Object. */
-  itkTypeMacro(ImportMitkImageContainer, Object);
+  itkTypeMacro(ImportMitkImageContainer, ImportImageContainer);
 
-  /** Get the pointer from which the image data is imported. */
-  TElement *GetImportPointer() {return m_ImportPointer;};
+  ///** Get the pointer from which the image data is imported. */
+  //TElement *GetImportPointer() {return m_ImportPointer;};
 
   /** \brief Set the mitk::ImageDataItem to be imported  */
   void SetImageDataItem(mitk::ImageDataItem* imageDataItem);
-
-  /** Index operator. This version can be an lvalue. */
-  TElement & operator[](const ElementIdentifier id)
-    { return m_ImportPointer[id]; };
-
-  /** Index operator. This version can only be an rvalue */
-  const TElement & operator[](const ElementIdentifier id) const
-    { return m_ImportPointer[id]; };
-
-  /** Return a pointer to the beginning of the buffer.  This is used by
-   * the image iterator class. */
-  TElement *GetBufferPointer()
-    { return m_ImportPointer; };
-  
-  /** Get the number of elements currently stored in the container. */
-  unsigned long Size(void) const
-    { return (unsigned long) m_Size; };
-
-  /** Tell the container to allocate enough memory to allow at least
-   * as many elements as the size given to be stored.  If new memory
-   * needs to be allocated, the contents of the old buffer are copied
-   * to the new area.  The old buffer is deleted if the original pointer
-   * was passed in using "LetContainerManageMemory"=true. The new buffer's
-   * memory management will be handled by the container from that point on.
-   *
-   * \sa SetImportPointer() */
-  void Reserve(ElementIdentifier num);
-  
-  /** Tell the container to try to minimize its memory usage for
-   * storage of the current number of elements.  If new memory is
-   * allocated, the contents of old buffer are copied to the new area.
-   * The previous buffer is deleted if the original pointer was in
-   * using "LetContainerManageMemory"=true.  The new buffer's memory
-   * management will be handled by the container from that point on. */
-  void Squeeze(void);
-  
-  /** Tell the container to release any of its allocated memory. */
-  void Initialize(void);
 
 protected:
   ImportMitkImageContainer();
@@ -115,12 +78,7 @@ private:
   ImportMitkImageContainer(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-  TElement            *m_ImportPointer;
-  TElementIdentifier   m_Size;
-  TElementIdentifier   m_Capacity;
-
   mitk::ImageDataItem::Pointer m_ImageDataItem;
-
 };
 
 } // end namespace itk

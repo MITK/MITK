@@ -88,7 +88,12 @@ public:
   }
 
   virtual void ConstructVtkImageData() const;
-  
+
+  unsigned long GetSize() const
+  {
+    return m_Size;
+  }
+
   virtual void Modified() const;
   
 protected:
@@ -103,6 +108,8 @@ protected:
   int m_Offset;
 
   bool m_IsComplete;
+
+  unsigned long m_Size;
   
 private:
   ImageDataItem::ConstPointer m_Parent;

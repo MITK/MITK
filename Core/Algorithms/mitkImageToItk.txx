@@ -20,8 +20,8 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #define IMAGETOITK_TXX_INCLUDED_C1C2FCD2
 
 #include "mitkImageToItk.h"
-#include "mitkImageDataItem.h"
 #include "mitkBaseProcess.h"
+#include "itkImportMitkImageContainer.h"
 #include <itkSmartPointerForwardReference.txx>
 
 
@@ -112,8 +112,7 @@ template<class TOutputImage>
   if (m_CopyMemFlag)
   {
     itkDebugMacro("copyMem ...");
-    
-    
+
     output->Allocate();
     
     memcpy( (PixelType *) output->GetBufferPointer(), m_ImageDataItem->GetData(), sizeof(PixelType)*noBytes);
@@ -122,15 +121,15 @@ template<class TOutputImage>
   else
   {
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportImageContainer< unsigned long, PixelType >   ImportContainerType;
+    typedef itk::ImportMitkImageContainer< unsigned long, PixelType >   ImportContainerType;
     typename ImportContainerType::Pointer import;
-    
+
     import = ImportContainerType::New();
     import->Initialize();
-    
+
     itkDebugMacro( << "size of container = " << import->Size() );
-    import->SetImportPointer( (PixelType*) m_ImageDataItem->GetData(),	noBytes, false);
-    
+    import->SetImageDataItem(m_ImageDataItem);
+
     output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
   }

@@ -114,6 +114,12 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
   m_DefaultLookupTable->Build();
   m_DefaultLookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
+
+
+  m_ImageMapperDeletedCommand = MemberCommandType::New();
+
+  m_ImageMapperDeletedCommand->SetCallbackFunction(
+    this, &Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback );
 }
 
 
@@ -132,7 +138,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 
   // Delete entries in m_ImageActors list one by one
   ActorList::iterator it;
-
+                                                                      
   for ( it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it )
   {
     it->second->Delete();
@@ -245,6 +251,25 @@ Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
   return size;
 }
 
+void
+Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback( 
+  itk::Object *caller, const itk::EventObject &event )
+{ 
+  ImageMapper2D *imageMapper = dynamic_cast< ImageMapper2D * >( caller );
+  if ( (imageMapper != NULL) )
+  {
+    if ( m_ImageActors.count( imageMapper ) > 0)
+    {
+      m_ImageActors[imageMapper]->Delete();
+      m_ImageActors.erase( imageMapper );
+    }
+    if ( m_LookupTableProperties.count( imageMapper ) > 0 )
+    {
+      m_LookupTableProperties[imageMapper].LookupTableSource->Delete();
+      m_LookupTableProperties.erase( imageMapper );
+    }
+  }
+}
 
 void 
 Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
@@ -290,7 +315,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
              surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() )
       )
     {
-      m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
+      //m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
       m_SurfaceCreator->PlaceByGeometryOn();
       surfacecreatorprop = new mitk::SmartPointerProperty( m_SurfaceCreator );
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
@@ -403,7 +428,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 // generate an actor, a lookup table and a texture object to
                 // render the image associated with the ImageMapper2D.
                 vtkActor *imageActor;
-                vtkDataSetMapper *dataSetMapper;
+                vtkDataSetMapper *dataSetMapper = NULL;
                 vtkLookupTable *lookupTable;
                 vtkTexture *texture;
                 if ( m_ImageActors.count( imageMapper ) == 0 )
@@ -428,12 +453,18 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
                   // Make imageActor the sole owner of the mapper and texture
                   // objects
-                  dataSetMapper->Delete();
-                  texture->Delete();
+                  lookupTable->UnRegister( NULL );
+                  dataSetMapper->UnRegister( NULL );
+                  texture->UnRegister( NULL );
                   
                   // Store the actor so that it may be accessed in following
                   // passes.
                   m_ImageActors[imageMapper] = imageActor;
+
+                  // Get informed when ImageMapper object is deleted, so that
+                  // the datastructures built here can be deleted as well
+                  imageMapper->AddObserver( 
+                    itk::DeleteEvent(), m_ImageMapperDeletedCommand );
                 }
                 else
                 {
@@ -478,6 +509,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                 if(rit->m_Image!=NULL)
                 {
                   rit->m_Image->Update();
+
                   texture->SetInput( rit->m_Image );
 
 
@@ -545,26 +577,18 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
                   {
                     // Note the values for the next pass (lutProperties is a 
                     // reference to the list entry!)
+                    if ( lutProperties.LookupTableSource != NULL )
+                    {
+                      lutProperties.LookupTableSource->Delete();
+                    }
                     lutProperties.LookupTableSource = lookupTableSource;
+                    lutProperties.LookupTableSource->Register( NULL );
                     lutProperties.windowMin = windowMin;
                     lutProperties.windowMax = windowMax;
                     
                     lookupTable->DeepCopy( lookupTableSource );
                     lookupTable->SetRange( windowMin, windowMax );
                   }
-
-
-                  // We have to do this before GenerateAllData() is called
-                  // since there may be no RendererInfo for renderer yet,
-                  // thus GenerateAllData won't update the (non-existing)
-                  // RendererInfo for renderer. By calling GetRendererInfo
-                  // a RendererInfo will be created for renderer (if it does not
-                  // exist yet).
-                  //const ImageMapper2D::RendererInfo *ri = 
-                  //  imageMapper->GetRendererInfo( planeRenderer );
-
-                  //imageMapper->GenerateAllData();
-
 
                   // Apply color property (of the node, not of the plane)
                   float rgb[3] = { 1.0, 1.0, 1.0 };

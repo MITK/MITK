@@ -113,6 +113,8 @@ protected:
 
   int FindPowerOfTwo( int i );
 
+  void ImageMapperDeletedCallback( itk::Object *caller, const itk::EventObject &event );
+
   /** \brief general PropAssembly to hold the entire scene */
   vtkAssembly *m_Prop3DAssembly;
 
@@ -168,6 +170,11 @@ protected:
 
   struct LookupTableProperties
   {
+    LookupTableProperties()
+    : LookupTableSource( NULL ),
+      windowMin( 0.0 ),
+      windowMax( 4096.0 )
+    {}
     vtkLookupTable *LookupTableSource;
     vtkFloatingPointType windowMin;
     vtkFloatingPointType windowMax;
@@ -181,9 +188,9 @@ protected:
 
   typedef std::multimap< int, vtkActor * > LayerSortedActorList;
 
-  /** \brief List holding the last update times for each ImageMapper. */
-  typedef std::map< mitk::ImageMapper2D *, int > LastUpdateTimeList;
-  LastUpdateTimeList m_LastTextureUpdateTimes;
+  // responsiblity to remove the observer upon its destruction
+  typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;
+  MemberCommandType::Pointer m_ImageMapperDeletedCommand;
 
 };
 } // namespace mitk

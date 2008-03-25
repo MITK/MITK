@@ -56,6 +56,7 @@ mitk::ImageMapper2D::ImageMapper2D()
 mitk::ImageMapper2D::~ImageMapper2D()
 {
   this->Clear();
+  this->InvokeEvent( itk::DeleteEvent() );
 }
 
 
@@ -507,6 +508,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     );
 
     rendererInfo.m_Reslicer->SetResliceTransform( composedResliceTransform );
+    composedResliceTransform->UnRegister( NULL ); // decrease RC
     
     // Set background level to BLACK instead of translucent, to avoid
     // boundary artifacts (see Geometry2DDataVtkMapper3D)
@@ -693,12 +695,19 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // 3. Store the result in a VTK image
   if ( imageIs2D )
   {
-    rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
+    if ( rendererInfo.m_Image == NULL )
+    {
+      rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
+    }
     rendererInfo.m_Image->DeepCopy( reslicedImage );
     rendererInfo.m_Image->Update();
   }
   else
   {
+    if ( rendererInfo.m_Image != NULL )
+    {
+      rendererInfo.m_Image->Delete();
+    }
     rendererInfo.m_Image = NULL;
   }
 
@@ -1033,8 +1042,14 @@ mitk::ImageMapper2D
 
 mitk::ImageMapper2D::RendererInfo
 ::RendererInfo()
-: m_RendererID(-1), m_iil4mitkImage(NULL), m_Renderer(NULL),
-  m_Pic(NULL), m_Image(NULL), m_ReferenceGeometry(NULL), 
+: m_RendererID(-1), 
+  m_iil4mitkImage(NULL), 
+  m_Renderer(NULL),
+  m_Pic(NULL), 
+  m_UnitSpacingImageFilter( NULL ),
+  m_Reslicer( NULL ),
+  m_Image(NULL),
+  m_ReferenceGeometry(NULL), 
   m_TextureInterpolation(true),
   m_ObserverID( 0 )
 {
@@ -1045,12 +1060,19 @@ mitk::ImageMapper2D::RendererInfo
 mitk::ImageMapper2D::RendererInfo
 ::~RendererInfo()
 {
-  Squeeze();
-  if (m_Renderer != NULL)
+  this->Squeeze();
+
+  if ( m_UnitSpacingImageFilter != NULL )
+  {
+    m_UnitSpacingImageFilter->Delete();
+  }
+  if ( m_Reslicer != NULL )
   {
     m_Reslicer->Delete();
-
-    m_UnitSpacingImageFilter->Delete();
+  }
+  if ( m_Image != NULL )
+  {
+    m_Image->Delete();
   }
 
   //delete m_iil4mitkImage;
@@ -1079,7 +1101,7 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
     ipPicFree(m_Pic);
     m_Pic = NULL;
   }
-  if(m_Image != NULL)
+  if ( m_Image != NULL )
   {
     m_Image->Delete();
     m_Image = NULL;

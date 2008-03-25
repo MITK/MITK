@@ -642,6 +642,7 @@ void mitk::Image::Initialize()
     timeSelector->SetInput(this);
     this->UnRegister();
   }
+  SetRequestedRegionToLargestPossibleRegion();
 }
 
 //##ModelId=3E102AE9004B

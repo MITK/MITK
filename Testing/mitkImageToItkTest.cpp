@@ -214,7 +214,7 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   mitk::CastToItkImage( imgMem, itkImage );
   std::cout<<"[PASSED]"<<std::endl;
 
-  mitk::ImageDataItem::Pointer imageDataItem = imgMem->GetChannelData();
+  mitk::ImageDataItem::Pointer imageDataItem = imgMem->GetChannelData().GetPointer();
   std::cout << "Testing destruction of original mitk::Image: " << std::flush;
   imgMem = NULL;
   std::cout<<"[PASSED]"<<std::endl;

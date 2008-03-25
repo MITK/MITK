@@ -25,7 +25,7 @@ namespace itk
 
 template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer<TElementIdentifier , TElement>
-::ImportMitkImageContainer() : ImportImageContainer()
+::ImportMitkImageContainer()
 {
 
 }

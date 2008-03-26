@@ -13,14 +13,27 @@ IF(DOT)
   ENDIF(USE_DOT)
 ENDIF(DOT)
 
-FOREACH(FUNC_DIR ${ALL_FUNCTIONALITY_DIRS})
-  SET(USERMANUAL_DIR ${FUNC_DIR}/UserManual)
-  IF(EXISTS ${USERMANUAL_DIR})
-    SET(FUNCTIONALITY_USER_MANUALS "${FUNCTIONALITY_USER_MANUALS} ${USERMANUAL_DIR}" )
-  ENDIF(EXISTS ${USERMANUAL_DIR})
-  SET(FUNCTIONALITY_DIRS "${FUNCTIONALITY_DIRS} ${FUNC_DIR}")
-ENDFOREACH(FUNC_DIR)
+# this is copied from MainApp's CMakeLists.txt and should be refactored out in a MACRO
+GET_DIRECTORY_PROPERTY(CACHE_VARS CACHE_VARIABLES)
 
+FOREACH(kit MITK MBIQM MBISB)
+  SET(${kit}_FUNCTIONALITY_NAMES_KNOWN "")
+
+FOREACH(entry ${CACHE_VARS})
+STRING(REGEX MATCH "^${kit}_KNOWN_FUNCTIONALITY_[A-Za-z0-9]+$" match ${entry})
+IF(match)
+  STRING(REGEX REPLACE "^${kit}_KNOWN_FUNCTIONALITY_" "" potential_func_name ${match})
+  # now check whether a functionality dir is set and exists
+  IF(${match})
+    IF(IS_DIRECTORY ${${match}}/UserManual)
+      IF(BUILD_${potential_func_name} OR BUILD_ALL_FUNCTIONALITIES)
+      SET(USERMANUAL_DIRS "${USERMANUAL_DIRS} ${${match}}/UserManual")
+      ENDIF(BUILD_${potential_func_name} OR BUILD_ALL_FUNCTIONALITIES)
+    ENDIF(IS_DIRECTORY ${${match}}/UserManual)
+  ENDIF(${match})
+ENDIF(match)
+ENDFOREACH(entry)
+ENDFOREACH(kit)
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 
 CONFIGURE_FILE(doxygen.conf.in

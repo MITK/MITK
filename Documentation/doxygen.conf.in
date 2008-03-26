@@ -72,7 +72,8 @@ RECURSIVE              = YES
 EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/vecmath/ \
-                         @MITK_SOURCE_DIR@/Testing/ 
+                         @MITK_SOURCE_DIR@/Testing/ \
+                         @MITK_SOURCE_DIR@/Q4mitk
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \
                          Register*
@@ -84,7 +85,7 @@ IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \
                          @MITK_SOURCE_DIR@/Core/DataStructures/ \
                          @MITK_SOURCE_DIR@ \
-                         @FUNCTIONALITY_USER_MANUALS@
+                         @USERMANUAL_DIRS@
 INPUT_FILTER           = 
 FILTER_SOURCE_FILES    = NO
 #---------------------------------------------------------------------------

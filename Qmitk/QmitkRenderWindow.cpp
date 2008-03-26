@@ -28,8 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::VtkPropRenderer* renderer)
-: QVTKWidget(parent, name), m_Renderer(renderer)
-
+: QVTKWidget(parent, name), 
+  m_Renderer(renderer),
+  m_ResendQtEvents(true)
 {
   if(m_Renderer.IsNull())
   {
@@ -65,6 +66,16 @@ QmitkRenderWindow::~QmitkRenderWindow()
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
 }
+  
+mitk::VtkPropRenderer* QmitkRenderWindow::GetRenderer() 
+{ 
+  return m_Renderer; 
+}
+  
+void QmitkRenderWindow::SetResendQtEvents(bool resend)
+{
+  m_ResendQtEvents = resend;
+}
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
 {
@@ -75,6 +86,8 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MousePressEvent(&event);
   }
+  
+  if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
@@ -86,6 +99,8 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
     mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->state(), Qt::Key_unknown, p);
     m_Renderer->MouseReleaseEvent(&event);
   }
+  
+  if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
@@ -108,6 +123,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   {
     mitk::RenderingManager::GetInstance()->UpdateCallback();
   }
+  
+  if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -132,6 +149,8 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   {
     stepper->Previous();
   }
+  
+  if (m_ResendQtEvents) we->ignore();
 }
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
@@ -145,6 +164,8 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     if(mke.isAccepted())
       ke->accept();
   }
+  
+  if (m_ResendQtEvents) ke->ignore();
 }
 
 void QmitkRenderWindow::InitRenderer()

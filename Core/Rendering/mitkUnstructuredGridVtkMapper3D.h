@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkVolume.h>
 #include <vtkDataSetTriangleFilter.h>
 
-#include <vtkDataSetMapper.h>
+#include "vtkUnstructuredGridMapper.h"
 #include <vtkUnstructuredGridVolumeRayCastMapper.h>
 
 #if (VTK_MAJOR_VERSION >= 5)
@@ -68,11 +68,13 @@ protected:
 
   vtkAssembly* m_Assembly;
   vtkActor* m_Actor;
+  vtkActor* m_ActorWireframe;
   vtkVolume* m_Volume;
   
   vtkDataSetTriangleFilter* m_VtkTriangleFilter;
 
-  vtkDataSetMapper* m_VtkDataSetMapper;
+  vtkUnstructuredGridMapper* m_VtkDataSetMapper;
+  vtkUnstructuredGridMapper* m_VtkDataSetMapper2;
 
   vtkUnstructuredGridVolumeRayCastMapper* m_VtkVolumeRayCastMapper;
   

@@ -38,6 +38,6 @@ SET(CPP_FILES
   mitkVtkPropRenderer.cpp
   mitkColoredRectangleRendering.cpp
   vtkMitkRectangleProp.cpp
-  
+  vtkUnstructuredGridMapper.cpp
 )
 

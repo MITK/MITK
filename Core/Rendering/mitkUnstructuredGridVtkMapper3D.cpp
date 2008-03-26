@@ -28,10 +28,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
 
+#include "mitkDataStorage.h"
+
 #include <vtkUnstructuredGrid.h>
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 #include <vtkProperty.h>
+
+#include <vtkPlanes.h>
 
 
 
@@ -50,12 +54,21 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
   
   m_Volume = vtkVolume::New();
   m_Actor = vtkActor::New();
+  m_ActorWireframe = vtkActor::New();
   
-  m_VtkDataSetMapper = vtkDataSetMapper::New();
+  m_VtkDataSetMapper = vtkUnstructuredGridMapper::New();
+  m_VtkDataSetMapper->SetResolveCoincidentTopologyToPolygonOffset();
+  m_VtkDataSetMapper->SetResolveCoincidentTopologyPolygonOffsetParameters(0,1);
   m_Actor->SetMapper(m_VtkDataSetMapper);
-
+  
+  m_VtkDataSetMapper2 = vtkUnstructuredGridMapper::New();
+  m_VtkDataSetMapper2->SetResolveCoincidentTopologyToPolygonOffset();
+  m_VtkDataSetMapper2->SetResolveCoincidentTopologyPolygonOffsetParameters(1,1);
+  m_ActorWireframe->SetMapper(m_VtkDataSetMapper2);
+  m_ActorWireframe->GetProperty()->SetRepresentationToWireframe();
 
   m_Assembly->AddPart(m_Actor);
+  m_Assembly->AddPart(m_ActorWireframe);
   m_Assembly->AddPart(m_Volume);
   m_Prop3D = m_Assembly;
   
@@ -64,7 +77,7 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
   m_VtkPTMapper = 0;
   m_VtkVolumeZSweepMapper = 0;
   #endif
-
+  
   //m_GenerateNormals = false;
 }
 
@@ -89,19 +102,30 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
   if (m_VtkDataSetMapper != 0)
     m_VtkDataSetMapper->Delete();
   
+  if (m_VtkDataSetMapper2 != 0)
+      m_VtkDataSetMapper2->Delete();
+  
   if(m_Prop3D != m_Assembly)
     m_Assembly->Delete();
   
   if (m_Actor != 0)
     m_Actor->Delete();
+  
+  if (m_ActorWireframe != 0)
+      m_ActorWireframe->Delete();
      
   if (m_Volume != 0)
     m_Volume->Delete();
+  
 }
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateData()
 {
   m_Assembly->VisibilityOn();
+  
+  m_ActorWireframe->GetProperty()->SetAmbient(1.0);
+  m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
+  m_ActorWireframe->GetProperty()->SetSpecular(0.0);
 }
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
@@ -143,7 +167,23 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
 
   m_VtkTriangleFilter->SetInput(grid);  
   m_VtkDataSetMapper->SetInput(grid);
-
+  m_VtkDataSetMapper2->SetInput(grid);
+  
+  mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+  bool clip = false;
+  node->GetBoolProperty("enable clipping", clip);
+  mitk::DataTreeNode::Pointer bbNode = mitk::DataStorage::GetInstance()->GetNamedDerivedNode("Clipping Bounding Object", node); 
+  if (clip && bbNode.IsNotNull())
+  {
+    m_VtkDataSetMapper->SetBoundingObject(dynamic_cast<mitk::BoundingObject*>(bbNode->GetData()));
+    m_VtkDataSetMapper2->SetBoundingObject(dynamic_cast<mitk::BoundingObject*>(bbNode->GetData()));
+  }
+  else
+  {
+    m_VtkDataSetMapper->SetBoundingObject(0);
+    m_VtkDataSetMapper2->SetBoundingObject(0);
+  }
+  
   //
   // apply properties read from the PropertyList
   //
@@ -174,48 +214,56 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
       property->SetOpacity( materialProperty->GetOpacity() );
       property->SetInterpolation( materialProperty->GetVtkInterpolation() );
       property->SetRepresentation( materialProperty->GetVtkRepresentation() );
+      
+      m_ActorWireframe->GetProperty()->SetOpacity(materialProperty->GetOpacity());
+      m_ActorWireframe->GetProperty()->SetColor( materialProperty->GetColor().GetDataPointer() );
     }
   }
-  else
+  
+  mitk::TransferFunctionProperty::Pointer transferFuncProp;
+  if (node->GetProperty(transferFuncProp, "TransferFunction", renderer))
   {
-    mitk::TransferFunctionProperty::Pointer transferFuncProp;
-    if (node->GetProperty(transferFuncProp, "TransferFunction", renderer))
-    {
-      mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
-      
-      volProp->SetColor(transferFunction->GetColorTransferFunction());
-      volProp->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());
-      
-      m_VtkDataSetMapper->SetLookupTable(transferFunction->GetColorTransferFunction());
+    mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
+    
+    volProp->SetColor(transferFunction->GetColorTransferFunction());
+    volProp->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());
+    
+    m_VtkDataSetMapper->SetLookupTable(transferFunction->GetColorTransferFunction());
+    m_VtkDataSetMapper2->SetLookupTable(transferFunction->GetColorTransferFunction());
+  }
+  
+  mitk::GridRepresentationProperty::Pointer gridRepProp;
+  if (node->GetProperty(gridRepProp, "grid representation", renderer))
+  {
+    mitk::GridRepresentationProperty::IdType type = gridRepProp->GetValueAsId();
+    bool isVolume = false;
+    switch (type) {
+      case mitk::GridRepresentationProperty::POINTS:
+        property->SetRepresentationToPoints();
+        break;
+      case mitk::GridRepresentationProperty::WIREFRAME:
+        property->SetRepresentationToWireframe();
+        break;
+      case mitk::GridRepresentationProperty::SURFACE:
+        property->SetRepresentationToSurface();
+        break;
+      case mitk::GridRepresentationProperty::VOLUME:
+        m_Assembly->RemovePart(m_Actor);
+        m_Assembly->RemovePart(m_ActorWireframe);
+        m_Assembly->AddPart(m_Volume);
+        isVolume = true;
+        break;
     }
     
-    mitk::GridRepresentationProperty::Pointer gridRepProp;
-    if (node->GetProperty(gridRepProp, "grid representation", renderer))
-    {
-      mitk::GridRepresentationProperty::IdType type = gridRepProp->GetValueAsId();
-      bool isVolume = false;
-      switch (type) {
-        case mitk::GridRepresentationProperty::POINTS:
-          property->SetRepresentationToPoints();
-          break;
-        case mitk::GridRepresentationProperty::WIREFRAME:
-          property->SetRepresentationToWireframe();
-          break;
-        case mitk::GridRepresentationProperty::SURFACE:
-          property->SetRepresentationToSurface();
-          break;
-        case mitk::GridRepresentationProperty::VOLUME:
-          m_Assembly->RemovePart(m_Actor);
-          m_Assembly->AddPart(m_Volume);
-          isVolume = true;
-          break;
-      }
-      
-      if (!isVolume) {
-        m_Assembly->RemovePart(m_Volume);
-        m_Assembly->AddPart(m_Actor);
-      }
+    if (!isVolume) {
+      m_Assembly->RemovePart(m_Volume);
+      m_Assembly->AddPart(m_Actor);
+      if (type == mitk::GridRepresentationProperty::SURFACE)
+        m_Assembly->AddPart(m_ActorWireframe);
+      else
+        m_Assembly->RemovePart(m_ActorWireframe);
     }
+    
     
   }
   

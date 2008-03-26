@@ -72,12 +72,15 @@ int main(int argc, char* argv[])
 
   //Part IV: Create windows and pass the tree to it
   // create toplevel widget with horizontal layout
+  QWidget toplevelWidget;
   QHBoxLayout layout;
   layout.setSpacing(2);
+  layout.setMargin(0);
+  toplevelWidget.setLayout(&layout);
   // Part IVa: 3D view
   // create a renderwindow
-  QmitkRenderWindow renderWindow();
-  layout.addWidget(renderWindow);
+  QmitkRenderWindow renderWindow(&toplevelWidget);
+  layout.addWidget(&renderWindow);
   // tell the renderwindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(&it);
   // use it as a 3D view
@@ -90,8 +93,8 @@ int main(int argc, char* argv[])
   // Part IVb: 2D view for slicing transversally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
-  QmitkSliceWidget view2();
-  layout.addWidget(view2);
+  QmitkSliceWidget view2(&toplevelWidget);
+  layout.addWidget(&view2);
   // tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2.SetData(&it);
@@ -102,8 +105,8 @@ int main(int argc, char* argv[])
   // Part IVc: 2D view for slicing sagitally
   // create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
-  QmitkSliceWidget view3();
-  layout.addWidget(view3);
+  QmitkSliceWidget view3(&toplevelWidget);
+  layout.addWidget(&view3);
   // tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
   view3.SetData(&it, mitk::SliceNavigationController::Sagittal);
@@ -116,9 +119,7 @@ int main(int argc, char* argv[])
   // *******************************************************
 
   //Part V: Qt-specific initialization
-  QWidget toplevelWidget;
-  topLevelWidget.setLayout(layout);
-  topLevelWidget.show();
+  toplevelWidget.show();
 
   // for testing
   #include "QtTesting.h"

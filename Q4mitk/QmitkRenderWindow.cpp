@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QKeyEvent>
 #include <QResizeEvent>
 
+#include "QmitkEventAdapter.h"
+
 #include "mitkDisplayPositionEvent.h"
 #include "QmitkRenderingManagerFactory.h"
 #include "mitkVtkLayerController.h"
@@ -32,14 +34,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkRenderer.h"
 
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::VtkPropRenderer* renderer)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
 : QVTKWidget(parent), m_Renderer(renderer)
 
 {
   if(m_Renderer.IsNull())
   {
-    std::string rendererName(name);
-    m_Renderer = new mitk::VtkPropRenderer( rendererName.c_str(), GetRenderWindow());
+    m_Renderer = new mitk::VtkPropRenderer( qPrintable(name), GetRenderWindow());
   }
 
   m_Renderer->InitRenderer(this->GetRenderWindow());
@@ -76,8 +77,11 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   QVTKWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
   {
-    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
-    mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->buttons() | me->modifiers(), Qt::Key_unknown, p);
+    mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
+    std::cout << "type: " << event.GetType() << std::endl;
+    std::cout << "button: " << event.GetButton() << std::endl;
+    std::cout << "state: " << event.GetButtonState() << std::endl;
+    
     m_Renderer->MousePressEvent(&event);
   }
 }
@@ -87,8 +91,11 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   QVTKWidget::mouseReleaseEvent(me);
   if (m_Renderer.IsNotNull()) 
   {
-    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
-    mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->buttons() | me->modifiers(), Qt::Key_unknown, p);
+    mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
+    std::cout << "type: " << event.GetType() << std::endl;
+    std::cout << "button: " << event.GetButton() << std::endl;
+    std::cout << "state: " << event.GetButtonState() << std::endl;
+    
     m_Renderer->MouseReleaseEvent(&event);
   }
 }
@@ -97,8 +104,11 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   QVTKWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
-    mitk::Point2D p; p[0]=me->x(); p[1]=me->y();
-    mitk::MouseEvent event(m_Renderer, me->type(), me->button(), me->buttons() | me->modifiers(), Qt::Key_unknown, p);
+    mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
+//    std::cout << "type: " << event.GetType() << std::endl;
+//    std::cout << "button: " << event.GetButton() << std::endl;
+//    std::cout << "state: " << event.GetButtonState() << std::endl;
+    
     m_Renderer->MouseMoveEvent(&event);
   }
 

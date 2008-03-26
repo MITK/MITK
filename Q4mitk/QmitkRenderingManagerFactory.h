@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
  * platform.
  * \ingroup Renderer
  */
-class QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
+class QMITK_EXPORT QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {
 public:
 

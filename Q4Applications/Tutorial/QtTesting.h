@@ -1,4 +1,4 @@
-#include <qobject.h>
+//#include <QObject>
 
 int QtTesting();
 

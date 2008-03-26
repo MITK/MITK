@@ -15,34 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
-#define QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
+#ifndef QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
+#define QMITKLEVELWINDOWRANGECHANGEDIALOG_H_
 
-#include "mitkCallbackFromGUIThread.h"
+#include "ui_QmitkLevelWindowRangeChange.h"
 
-#include <QObject>
+#include <QDialog>
 
-/*!
-  \brief Qt specific implementation of mitk::CallbackFromGUIThreadImplementation
-*/
-class QMITK_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
+#include <mitkCommon.h>
+
+class QMITK_EXPORT QmitkLevelWindowRangeChangeDialog : public QDialog, public Ui::QmitkLevelWindowRangeChange
 {
-
   Q_OBJECT
-
-  public:
-    
-    /// Change the current application cursor
-    virtual void CallThisFromGUIThread(itk::Command*, itk::EventObject*);
-
-    QmitkCallbackFromGUIThread();
-    virtual ~QmitkCallbackFromGUIThread();
-
-    virtual bool event( QEvent* e );
-
-  protected:
-  private:
-};
   
-#endif
+public:
+  
+  QmitkLevelWindowRangeChangeDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
 
+  int getLowerLimit();
+
+  int getUpperLimit();
+
+  void setLowerLimit( int rangeMin );
+
+  void setUpperLimit( int rangeMax );
+
+protected slots:
+  
+  void inputValidator();
+  
+};
+
+#endif /*QMITKLEVELWINDOWRANGECHANGEDIALOG_H_*/

@@ -34,11 +34,11 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
  */
-class QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
+class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
 {
 public:
  
-  QmitkRenderWindow(QWidget *parent = 0, const char *name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL);
+  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL);
   virtual ~QmitkRenderWindow();
 
   void InitRenderer();

@@ -26,7 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <queue>
 #include <iostream>
 
-class QmitkAbortEventFilter : public QObject
+#include <mitkCommon.h>
+
+class QMITK_EXPORT QmitkAbortEventFilter : public QObject
 {
 public:
 

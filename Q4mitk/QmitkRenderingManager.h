@@ -42,7 +42,7 @@ class QmitkRenderingManagerFactory;
  *
  * \ingroup Renderer
  */
-class QmitkRenderingManager : public QObject, public mitk::RenderingManager
+class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
   

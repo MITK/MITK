@@ -39,6 +39,7 @@ namespace mitk {
 
     /// sets the radius of the seeds.
     void SetRadius(int val){m_Radius=val;};
+    void SetCurrentDrawState(int val){m_CurrentDrawState = val;};
 
     itkSetMacro(Config, unsigned int);
     itkGetMacro(Config, unsigned int);
@@ -63,6 +64,7 @@ namespace mitk {
 
     int m_Radius;
     int m_DrawState;
+    int m_CurrentDrawState;
     unsigned int m_Config;     // determine whether 254,255 or smoothed float values are used.
   };
 

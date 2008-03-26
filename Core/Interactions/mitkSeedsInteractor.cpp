@@ -35,6 +35,7 @@ mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataTreeNode* da
 {
   m_Radius = 1;
   m_Config = 0; // default config 254, 255 are added for fore- and backgrund seeds
+  m_CurrentDrawState = 255;
 }
 
 mitk::SeedsInteractor::~SeedsInteractor()
@@ -59,7 +60,7 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
   {
   case mitk::AcINITFOREGROUND:
     {
-      if (m_Config == 0)      m_DrawState = 255;
+      if (m_Config == 0)      m_DrawState = m_CurrentDrawState;
       else                    m_DrawState = 1;
       ok = true;
       break;

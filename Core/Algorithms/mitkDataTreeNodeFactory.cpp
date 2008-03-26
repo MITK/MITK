@@ -496,8 +496,9 @@ void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::P
 
 void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "line width", new mitk::IntProperty(1) );
+  node->SetProperty( "line width", new mitk::IntProperty(1));
   node->SetProperty( "layer", new mitk::IntProperty(0));
+  node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer()));
   node->SetProperty( "grid representation", new mitk::GridRepresentationProperty);
   node->SetProperty( "grid volume mapper", new mitk::GridVolumeMapperProperty);
   node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );

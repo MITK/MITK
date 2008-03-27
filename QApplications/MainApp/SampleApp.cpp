@@ -86,7 +86,6 @@ void SampleApp::InitializeFunctionality()
     if (createFunction) 
     {
       QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
-      functionalityInstance->CreateFunctionalityOptionsList();
       qfm->AddFunctionality(functionalityInstance);
     }
 
@@ -96,7 +95,6 @@ void SampleApp::InitializeFunctionality()
       if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL )
       {
         QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
-        functionalityInstance->CreateFunctionalityOptionsList();
         qfm->AddFunctionality(functionalityInstance);
       }
     }

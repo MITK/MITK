@@ -46,10 +46,28 @@ public:
   virtual mitk::SliceNavigationController * GetSliceNavigationController(); 
   virtual mitk::CameraRotationController * GetCameraRotationController();
   virtual mitk::BaseController * GetController();
-  virtual mitk::VtkPropRenderer* GetRenderer() { return m_Renderer; }
+  virtual mitk::VtkPropRenderer* GetRenderer();
+
+  /**
+   * \brief Whether Qt events should be passed to parent (default: true)
+   *
+   * With introduction of the QVTKWidget the behaviour regarding Qt events changed. 
+   * QVTKWidget "accepts" Qt events like mouse clicks (i.e. set an "accepted" flag).
+   * When this flag is set, Qt fininshed handling of this event -- otherwise it is
+   * reached through to the widget's parent.
+   *
+   * This reaching through to the parent was implicitly required by QmitkMaterialWidget / QmitkMaterialShowCase.
+   *
+   * The default behaviour of QmitkRenderWindow is now to clear the "accepted" flag
+   * of Qt events after they were handled by QVTKWidget. This way parents can also
+   * handle events.
+   *
+   * If you don't want this behaviour, call SetResendQtEvents(true) on your render window.
+   */
+  virtual void SetResendQtEvents(bool resend);
   
-protected:
-    
+protected:    
+  
     // overloaded resize handler
     virtual void resizeEvent(QResizeEvent* event);
 
@@ -72,6 +90,8 @@ private:
   vtkMitkRenderProp*             m_RenderProp;
 
   bool                           m_InResize;
+
+  bool                           m_ResendQtEvents;
 
  
 

@@ -231,7 +231,10 @@ public:
 
   //##Documentation
   //## @brief Set the Geometry3D of the data, which will be referenced (not copied!).
-  //## Assumes the data object has only 1 time step ( is a 3D object )
+  //## Assumes the data object has only 1 time step ( is a 3D object ).
+  //##
+  //## For convenience (and historic) reasons, it is also possible to set a complete
+  //## mitk::TimeSlicedGeometry*, which will be referenced (not copied!). 
   //## 
   //## @warning This method will normally be called internally by the sub-class of BaseData 
   //## during initialization.

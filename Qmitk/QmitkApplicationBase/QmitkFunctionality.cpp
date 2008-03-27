@@ -32,6 +32,7 @@ QmitkBaseFunctionalityComponent(parent, name, dataIt), m_Available(false), m_Act
 {
   std::cout << "Instantiating QmitkFunctionality. QObject::name(): " << this->name() << std::endl;
   SetDataTree(dataIt);
+  m_Options = mitk::PropertyList::New();
 }
 
 QmitkFunctionality::~QmitkFunctionality()
@@ -145,11 +146,6 @@ void QmitkFunctionality::OptionsChanged(QWidget* itkNotUsed(optionDialog))
   // Read new values from your option dialog and update your functionality accordingly
 }
 
-void QmitkFunctionality::CreateFunctionalityOptionsList()
-{
-  m_Options = mitk::PropertyList::New();
-}
-
 mitk::PropertyList* QmitkFunctionality::GetFunctionalityOptionsList()
 {
   return m_Options.GetPointer();
@@ -160,9 +156,9 @@ void QmitkFunctionality::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
   if (pl == NULL)
     return;
 
-  /* if there is no option list, create it with default values */
+  /* if there is no option list, create an empty one */
   if (m_Options.IsNull())
-    this->CreateFunctionalityOptionsList();
+    m_Options = mitk::PropertyList::New();
 
   /* update existing options list with values of the new list */
   for (mitk::PropertyList::PropertyMap::const_iterator it = pl->GetMap()->begin(); it != pl->GetMap()->end(); it++)

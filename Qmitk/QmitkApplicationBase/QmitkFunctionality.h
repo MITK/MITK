@@ -245,16 +245,6 @@ public:
   this method returns!
   */
   virtual void AddToFunctionalityOptionsList(mitk::PropertyList*);
-  
-  /*!
-  \brief creates and initializes the m_Options PropertyList
-  Creates the m_Options PropertyList. Subclasses (Functionalities) should overwrite
-  this method, call QmitkFunctionality::CreateOptionsList() first and then fill the 
-  m_Options list with all functionality options with theirs default values.
-  During startup, the content of m_Options will be updated with values from MITKOptions.xml config file, 
-  if the file can be found.
-  */
-  virtual void CreateFunctionalityOptionsList();
 
   /**
    * Overrides the current application cursor with a wait cursor. 
@@ -303,7 +293,18 @@ protected:
 
   unsigned long m_ObserverTag;
   friend class QmitkFctMediator;
-
+  
+  /**
+  * \brief persistent PropertyList that holds options of the functionality
+  * 
+  * Each functionality has a PropertyList called m_Options which it can and should use to store options 
+  * like export folder, last used com port for tracking device, selected segmentation tool,...
+  * The content of m_Options is automatically saved on application termination and restored on the next
+  * application startup - providing persistence for functionalities. 
+  * The PropertyList is created in QmitkFunctionality constructor. All functionalities should add default values for 
+  * all the properties they use in their constructor. 
+  * E.g. GetFunctionalityOptionsList()->SetProperty("LastUsed", new mitk::StringProperty("EasyExampleSegmentationTool"));
+  */
   mitk::PropertyList::Pointer m_Options;
 };
 

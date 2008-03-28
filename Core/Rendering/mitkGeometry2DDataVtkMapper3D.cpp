@@ -253,7 +253,7 @@ Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
 
 void
 Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback( 
-  itk::Object *caller, const itk::EventObject &event )
+  itk::Object *caller, const itk::EventObject& /*event*/ )
 { 
   ImageMapper2D *imageMapper = dynamic_cast< ImageMapper2D * >( caller );
   if ( (imageMapper != NULL) )

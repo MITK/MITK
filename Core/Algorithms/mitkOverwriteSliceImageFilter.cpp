@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkUndoController.h"
 #include "mitkDiffImageApplier.h"
+#include "mitkImageTimeSelector.h"
 
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
@@ -30,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::OverwriteSliceImageFilter::OverwriteSliceImageFilter()
 :m_SliceIndex(0),
  m_SliceDimension(0),
+ m_TimeStep(0),
  m_Dimension0(0),
  m_Dimension1(1),
  m_CreateUndoInformation(false)
@@ -55,6 +57,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   //  - observer commands to know when the image is deleted (no further action then, perhaps even remove the operations from the undo stack)
   //
   Image::ConstPointer input = ImageToImageFilter::GetInput(0);
+  Image::ConstPointer input3D = input;
 
   Image::ConstPointer slice = m_SliceImage;
 
@@ -77,7 +80,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
       break;
   }
 
-  if ( slice->GetDimension() != 2 || input->GetDimension() != 3 ||
+  if ( slice->GetDimension() < 2 || input->GetDimension() > 4 ||
        slice->GetDimension(0) != input->GetDimension(m_Dimension0) ||
        slice->GetDimension(1) != input->GetDimension(m_Dimension1) ||
        m_SliceIndex >= input->GetDimension(m_SliceDimension)
@@ -86,7 +89,16 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
    itkExceptionMacro("Slice and image dimensions differ or slice index is too large. Sorry, cannot work like this.");
    return;
   }
-
+  
+  if ( input->GetDimension() == 4 )
+  {
+    ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput( input );
+    timeSelector->SetTimeNr( m_TimeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    input3D = timeSelector->GetOutput();
+  }
+ 
   if ( m_SliceDifferenceImage.IsNull() || 
        m_SliceDifferenceImage->GetDimension(0) != m_SliceImage->GetDimension(0) ||
        m_SliceDifferenceImage->GetDimension(1) != m_SliceImage->GetDimension(1) )
@@ -96,23 +108,24 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     m_SliceDifferenceImage->Initialize( pixelType, 2, m_SliceImage->GetDimensions() );
   }
 
+  //std::cout << "Overwriting slice " << m_SliceIndex << " in dimension " << m_SliceDimension << " at time step " << m_TimeStep << std::endl;
   // this will do a long long if/else to find out both pixel types
-  AccessFixedDimensionByItk( input, ItkImageSwitch, 3 );
+  AccessFixedDimensionByItk( input3D, ItkImageSwitch, 3 );
 
   SegmentationInterpolation* interpolator = SegmentationInterpolation::InterpolatorForImage( input );
   if (interpolator)
   {
     interpolator->BlockModified(true);
-    interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex );
+    interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
   }
 
   if ( m_CreateUndoInformation )
   {
     // create do/undo operations (we don't execute the doOp here, because it has already been executed during calculation of the diff image
-    ApplyDiffImageOperation* doOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex );
-    ApplyDiffImageOperation* undoOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex );
+    ApplyDiffImageOperation* doOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
+    ApplyDiffImageOperation* undoOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
     undoOp->SetFactor( -1.0 );
-    OperationEvent* undoStackItem = new OperationEvent( DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, this->EventDescription(m_SliceDimension, m_SliceIndex) );
+    OperationEvent* undoStackItem = new OperationEvent( DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, this->EventDescription(m_SliceDimension, m_SliceIndex, m_TimeStep) );
     UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
   }
 
@@ -207,7 +220,7 @@ void mitk::OverwriteSliceImageFilter::ItkImageProcessing( itk::Image<TPixel1,VIm
   }
 }
 
-std::string mitk::OverwriteSliceImageFilter::EventDescription( unsigned int sliceDimension, unsigned int sliceIndex )
+std::string mitk::OverwriteSliceImageFilter::EventDescription( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   std::stringstream s;
   
@@ -227,7 +240,7 @@ std::string mitk::OverwriteSliceImageFilter::EventDescription( unsigned int slic
       break;
   }
 
-  s << " " << sliceIndex << ")";
+  s << " " << sliceIndex << " " << timeStep << ")";
 
   return s.str();
 }

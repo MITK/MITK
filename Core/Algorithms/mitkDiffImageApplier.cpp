@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkRenderingManager.h"
 #include "mitkSegmentationInterpolation.h"
+#include "mitkImageTimeSelector.h"
 
 #include <itkImageSliceIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
@@ -40,7 +41,10 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
        && imageOperation->IsImageStillValid() ) // AND the image is not yet deleted
   {
     m_Image = imageOperation->GetImage();
+    Image::Pointer image3D = m_Image; // will be changed later in case of 3D+t
+
     m_SliceDifferenceImage = imageOperation->GetDiffImage();
+    m_TimeStep = imageOperation->GetTimeStep();
 
     m_Factor = imageOperation->GetFactor();
 
@@ -65,7 +69,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           break;
       }
 
-      if ( m_SliceDifferenceImage->GetDimension() != 2 || m_Image->GetDimension() != 3 ||
+      if ( m_SliceDifferenceImage->GetDimension() != 2 || (m_Image->GetDimension() < 3 || m_Image->GetDimension() > 4) ||
            m_SliceDifferenceImage->GetDimension(0) != m_Image->GetDimension(m_Dimension0) ||
            m_SliceDifferenceImage->GetDimension(1) != m_Image->GetDimension(m_Dimension1) ||
            m_SliceIndex >= m_Image->GetDimension(m_SliceDimension)
@@ -75,8 +79,17 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
        return;
       }
 
+      if ( m_Image->GetDimension() == 4 )
+      {
+        ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+        timeSelector->SetInput( m_Image );
+        timeSelector->SetTimeNr( m_TimeStep );
+        timeSelector->UpdateLargestPossibleRegion();
+        image3D = timeSelector->GetOutput();
+      }
+
        // this will do a long long if/else to find out both pixel types
-      AccessFixedDimensionByItk( m_Image, ItkImageSwitch2DDiff, 3 );
+      AccessFixedDimensionByItk( image3D, ItkImageSwitch2DDiff, 3 );
 
       if ( m_Factor == 1 || m_Factor == -1 )
       {
@@ -91,7 +104,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         if (interpolator)
         {
           interpolator->BlockModified(true);
-          interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex );
+          interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
         }
         
         m_Image->Modified();
@@ -118,15 +131,25 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
       // ...
       if (  m_SliceDifferenceImage->GetDimension(0) != m_Image->GetDimension(0) ||
             m_SliceDifferenceImage->GetDimension(1) != m_Image->GetDimension(1) ||
-            m_SliceDifferenceImage->GetDimension(2) != m_Image->GetDimension(2) 
+            m_SliceDifferenceImage->GetDimension(2) != m_Image->GetDimension(2) ||
+            m_TimeStep >= m_Image->GetDimension(3)
          )
         {
          itkExceptionMacro("Diff image size differs from original image size. Sorry, cannot work like this.");
          return;
         }
 
+      if ( m_Image->GetDimension() == 4 )
+      {
+        ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+        timeSelector->SetInput( m_Image );
+        timeSelector->SetTimeNr( m_TimeStep );
+        timeSelector->UpdateLargestPossibleRegion();
+        image3D = timeSelector->GetOutput();
+      }
+
       // this will do a long long if/else to find out both pixel types
-      AccessFixedDimensionByItk( m_Image, ItkImageSwitch3DDiff, 3 );
+      AccessFixedDimensionByItk( image3D, ItkImageSwitch3DDiff, 3 );
 
       if ( m_Factor == 1 || m_Factor == -1 )
       {
@@ -141,7 +164,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         if (interpolator)
         {
           interpolator->BlockModified(true);
-          interpolator->SetChangedVolume( m_SliceDifferenceImage );
+          interpolator->SetChangedVolume( m_SliceDifferenceImage, m_TimeStep );
         }
 
         m_Image->Modified();

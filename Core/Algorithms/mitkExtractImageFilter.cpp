@@ -19,12 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkITKImageImport.h"
+#include "mitkImageTimeSelector.h"
 
 #include <itkExtractImageFilter.h>
 
 mitk::ExtractImageFilter::ExtractImageFilter()
 :m_SliceIndex(0),
- m_SliceDimension(0)
+ m_SliceDimension(0),
+ m_TimeStep(0)
 {
 }
 
@@ -36,11 +38,19 @@ void mitk::ExtractImageFilter::GenerateData()
 {
    Image::ConstPointer input = ImageToImageFilter::GetInput(0);
 
-   if ( (input->GetDimension() != 3) && (input->GetDimension() != 2) )
+   if ( (input->GetDimension() > 4) || (input->GetDimension() < 2) )
    {
      //std::cerr << "mitk::ExtractImageFilter works only with 3D images, sorry." << std::endl;
      itkExceptionMacro("mitk::ExtractImageFilter works only with 3D images, sorry.");
      return;
+   }
+   else if (input->GetDimension() == 4)
+   {
+     ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+     timeSelector->SetInput( input );
+     timeSelector->SetTimeNr( m_TimeStep );
+     timeSelector->UpdateLargestPossibleRegion();
+     input = timeSelector->GetOutput();
    }
    else if (input->GetDimension() == 2)
    {

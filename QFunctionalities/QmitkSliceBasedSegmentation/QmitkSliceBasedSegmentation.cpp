@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkCalculateSegmentationVolume.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkImageTimeSelector.h"
 
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
@@ -277,6 +278,12 @@ void QmitkSliceBasedSegmentation::AutoCropSegmentation()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNotNull())
       {
+        if (image->GetDimension() == 4)
+        {
+          QMessageBox::information(NULL, "MITK", QString("Cropping 3D+t segmentations is not implemented. Sorry. Bug #1281"), QMessageBox::Ok);
+          continue;
+        }
+
         mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
         cropFilter->SetInput( image );
         cropFilter->SetBackgroundValue( 0 );
@@ -412,6 +419,12 @@ void QmitkSliceBasedSegmentation::CalculateVolumeForSegmentation()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNotNull())
       {
+        if (image->GetDimension() == 4)
+        {
+          QMessageBox::information(NULL, "MITK", QString("Volumetry for 3D+t data is not implemented. Sorry. Bug #1280"), QMessageBox::Ok);
+          continue;
+        }
+
         mitk::CalculateSegmentationVolume::Pointer volumeFilter = mitk::CalculateSegmentationVolume::New();
 
         // attach observer to get notified about result
@@ -547,13 +560,24 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateEmptySegmentation
   mitk::Image::Pointer segmentation = mitk::Image::New();
   segmentation->SetProperty( "organ type", new mitk::OrganTypeProperty( organType ) );
   segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
-  memset( segmentation->GetData(), 0, sizeof(SEGMENTATION_DATATYPE) * segmentation->GetDimension(0) * segmentation->GetDimension(1) * segmentation->GetDimension(2) );
 
-  if (image->GetGeometry() )
+  unsigned int byteSize = sizeof(SEGMENTATION_DATATYPE);
+  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
   {
-    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = image->GetGeometry()->Clone();
-    mitk::Geometry3D::Pointer originalGeometry = dynamic_cast<mitk::Geometry3D*>( originalGeometryAGF.GetPointer() );
+    byteSize *= segmentation->GetDimension(dim);
+  }
+  memset( segmentation->GetData(), 0, byteSize );
+
+  if (image->GetTimeSlicedGeometry() )
+  {
+    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = image->GetTimeSlicedGeometry()->Clone();
+    mitk::TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
     segmentation->SetGeometry( originalGeometry );
+  }
+  else
+  {
+    QMessageBox::information(NULL, "MITK", QString("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation."), QMessageBox::Ok);
+    return NULL;
   }
 
   return CreateSegmentationNode( segmentation, name, organType );
@@ -683,7 +707,16 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
         if (emptySegmentation)
         {
           // actually perform a thresholding and ask for an organ type
-          AccessFixedDimensionByItk_1( image, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentation->GetData()) );
+          for (unsigned int timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
+          {
+            mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+            timeSelector->SetInput( image );
+            timeSelector->SetTimeNr( timeStep );
+            timeSelector->UpdateLargestPossibleRegion();
+            mitk::Image::Pointer image3D = timeSelector->GetOutput();
+
+            AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentation->GetData()), timeStep );
+          }
 
           mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
@@ -702,11 +735,17 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThresholdSliderChange
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void QmitkSliceBasedSegmentation::ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation )
+void QmitkSliceBasedSegmentation::ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep )
 {
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( segmentation );
+  timeSelector->SetTimeNr( timeStep );
+  timeSelector->UpdateLargestPossibleRegion();
+  mitk::Image::Pointer segmentation3D = timeSelector->GetOutput();
+
   typedef itk::Image<SEGMENTATION_DATATYPE, 3> SegmentationType; // this is sure for new segmentations
   SegmentationType::Pointer itkSegmentation;
-  mitk::CastToItkImage( segmentation, itkSegmentation );
+  mitk::CastToItkImage( segmentation3D, itkSegmentation );
 
   // iterate over original and segmentation
   typedef itk::ImageRegionConstIterator< itk::Image<TPixel, VImageDimension> >     InputIteratorType;
@@ -822,12 +861,35 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
     {
       mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( referencenode->GetData() );
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+            
+      completeReport += QString("============= Gray value analysis of %1 ==================\n").arg(nodename.c_str());
+        
       if (image.IsNotNull() && refImage.IsNotNull() )
       {
-        completeReport += QString("============= Gray value analysis of %1 ====\n").arg(nodename.c_str());
-        AccessFixedDimensionByItk_2( refImage, ITKHistogramming, 3, image, completeReport );
-        completeReport += QString("============= End of %1 ====================\n\n\n").arg(nodename.c_str());
+        for (unsigned int timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
+        {
+          mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+          timeSelector->SetInput( refImage );
+          timeSelector->SetTimeNr( timeStep );
+          timeSelector->UpdateLargestPossibleRegion();
+          mitk::Image::Pointer refImage3D = timeSelector->GetOutput();
+
+          mitk::ImageTimeSelector::Pointer timeSelector2 = mitk::ImageTimeSelector::New();
+          timeSelector2->SetInput( image );
+          timeSelector2->SetTimeNr( timeStep );
+          timeSelector2->UpdateLargestPossibleRegion();
+          mitk::Image::Pointer image3D = timeSelector2->GetOutput();
+
+
+          if (image3D.IsNotNull() && refImage3D.IsNotNull() )
+          {
+            completeReport += QString("=== %1, time step %2 ===\n").arg(nodename.c_str()).arg(timeStep);
+            AccessFixedDimensionByItk_2( refImage3D, ITKHistogramming, 3, image3D, completeReport );
+          }
+        }
       }
+            
+      completeReport += QString("============= End of analysis for %1 =====================\n\n\n").arg(nodename.c_str());
     }
   }
 
@@ -839,7 +901,6 @@ void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
     dialog->show();
   }
 
-  // TODO (bug #1155): nice output in some graphical window (ready for copy to clipboard)
   // TODO (bug #874): remove these 5 buttons for segmentation operations. find some good interface for them and make them use less GUI space 
 }
 

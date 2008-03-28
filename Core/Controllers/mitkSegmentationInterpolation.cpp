@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageCast.h"
 #include "mitkExtractImageFilter.h"
+#include "mitkImageTimeSelector.h"
 
 #include "ipSegmentation.h"
 
@@ -76,11 +77,8 @@ void mitk::SegmentationInterpolation::BlockModified(bool block)
 
 void mitk::SegmentationInterpolation::SetSegmentationVolume( const Image* segmentation )
 {
-  // clear old information
-  for (unsigned int dim = 0; dim < 3; ++dim)
-  {
-    m_SegmentationCountInSlice[dim].clear();
-  }
+  // clear old information (remove all time steps
+  m_SegmentationCountInSlice.clear();
 
   // delete this from the list of interpolators
   InterpolatorMapType::iterator iter = s_InterpolatorForImage.find( segmentation );
@@ -90,9 +88,9 @@ void mitk::SegmentationInterpolation::SetSegmentationVolume( const Image* segmen
   }
 
   if (!segmentation) return;
-  if (!(segmentation->GetDimension() == 3)) 
+  if (segmentation->GetDimension() > 4 || segmentation->GetDimension() < 3) 
   {
-    itkExceptionMacro("SegmentationInterpolation needs a 3D-segmentation, not 2D or 3D+t or something else.");
+    itkExceptionMacro("SegmentationInterpolation needs a 3D-segmentation or 3D+t, not 2D.");
   }
 
   if (m_Segmentation != segmentation)
@@ -105,40 +103,55 @@ void mitk::SegmentationInterpolation::SetSegmentationVolume( const Image* segmen
 
   m_Segmentation = segmentation;
 
-  for (unsigned int dim = 0; dim < 3; ++dim)
+  m_SegmentationCountInSlice.resize( m_Segmentation->GetTimeSteps() );
+  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
   {
-    m_SegmentationCountInSlice[dim].clear();
-    m_SegmentationCountInSlice[dim].resize( m_Segmentation->GetDimension(dim) );
-    m_SegmentationCountInSlice[dim].assign( m_Segmentation->GetDimension(dim), 0 );
+    m_SegmentationCountInSlice[timeStep].resize(3);
+    for (unsigned int dim = 0; dim < 3; ++dim)
+    {
+      m_SegmentationCountInSlice[timeStep][dim].clear();
+      m_SegmentationCountInSlice[timeStep][dim].resize( m_Segmentation->GetDimension(dim) );
+      m_SegmentationCountInSlice[timeStep][dim].assign( m_Segmentation->GetDimension(dim), 0 );
+    }
   }
 
   s_InterpolatorForImage.insert( std::make_pair( m_Segmentation, this ) );
 
+  // for all timesteps
   // scan whole image
-  AccessFixedDimensionByItk_1( m_Segmentation, ScanWholeVolume, 3, m_Segmentation );
+  for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
+  {
+    ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput( m_Segmentation );
+    timeSelector->SetTimeNr( timeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    Image::Pointer segmentation3D = timeSelector->GetOutput();
+    AccessFixedDimensionByItk_2( segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep );
+  }
 
   //PrintStatus();
   
   Modified();
 }
 
-void mitk::SegmentationInterpolation::SetChangedVolume( const Image* sliceDiff )
+void mitk::SegmentationInterpolation::SetChangedVolume( const Image* sliceDiff, unsigned int timeStep )
 {
   if ( !sliceDiff ) return;
   if ( sliceDiff->GetDimension() != 3 ) return;
   
-  AccessFixedDimensionByItk( sliceDiff, ScanChangedVolume, 3 );
+  AccessFixedDimensionByItk_1( sliceDiff, ScanChangedVolume, 3, timeStep );
 
   //PrintStatus();
   Modified();
 }
 
 
-void mitk::SegmentationInterpolation::SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex )
+void mitk::SegmentationInterpolation::SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   if ( !sliceDiff ) return;
   if ( sliceDimension > 2 ) return;
-  if ( sliceIndex >= m_SegmentationCountInSlice[sliceDimension].size() ) return;
+  if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
+  if ( sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size() ) return;
 
   unsigned int dim0(0);
   unsigned int dim1(1);
@@ -158,7 +171,7 @@ void mitk::SegmentationInterpolation::SetChangedSlice( const Image* sliceDiff, u
   ipPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
   if (!rawSlice) return;
 
-  AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, rawSlice->data) );
+  AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice->data) );
   
   //PrintStatus();
   
@@ -169,20 +182,22 @@ template < typename DATATYPE >
 void mitk::SegmentationInterpolation::ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options )
 {
   DATATYPE* pixelData( (DATATYPE*)options.pixelData );
+  
+  unsigned int timeStep( options.timeStep );
 
   unsigned int sliceDimension( options.sliceDimension );
   unsigned int sliceIndex( options.sliceIndex );
 
   if ( sliceDimension > 2 ) return;
-  if ( sliceIndex >= m_SegmentationCountInSlice[sliceDimension].size() ) return;
+  if ( sliceIndex >= m_SegmentationCountInSlice[timeStep][sliceDimension].size() ) return;
   
   unsigned int dim0( options.dim0 );
   unsigned int dim1( options.dim1 );
 
   int numberOfPixels(0); // number of pixels in this slice that are not 0
 
-  unsigned int dim0max = m_SegmentationCountInSlice[dim0].size();
-  unsigned int dim1max = m_SegmentationCountInSlice[dim1].size();
+  unsigned int dim0max = m_SegmentationCountInSlice[timeStep][dim0].size();
+  unsigned int dim1max = m_SegmentationCountInSlice[timeStep][dim1].size();
 
   // scan the slice from two directions
   // and set the flags for the two dimensions of the slice
@@ -192,25 +207,25 @@ void mitk::SegmentationInterpolation::ScanChangedSlice( itk::Image<DATATYPE, 2>*
     {
       DATATYPE value = *(pixelData + u + v * dim0max);
 
-      assert ( (signed) m_SegmentationCountInSlice[dim0][u] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-      assert ( (signed) m_SegmentationCountInSlice[dim1][v] + (signed)value >= 0 );
+      assert ( (signed) m_SegmentationCountInSlice[timeStep][dim0][u] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
+      assert ( (signed) m_SegmentationCountInSlice[timeStep][dim1][v] + (signed)value >= 0 );
 
-      m_SegmentationCountInSlice[dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[dim0][u] + value ); 
-      m_SegmentationCountInSlice[dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[dim1][v] + value );
+      m_SegmentationCountInSlice[timeStep][dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim0][u] + value ); 
+      m_SegmentationCountInSlice[timeStep][dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim1][v] + value );
       numberOfPixels += static_cast<int>( value );
     }
   }
 
   // flag for the dimension of the slice itself 
-  assert ( (signed) m_SegmentationCountInSlice[sliceDimension][sliceIndex] + numberOfPixels >= 0 );
-  m_SegmentationCountInSlice[sliceDimension][sliceIndex] += numberOfPixels;
+  assert ( (signed) m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] + numberOfPixels >= 0 );
+  m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] += numberOfPixels;
   
-  //std::cout << "scan from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
+  //std::cout << "scan t=" << timeStep << " from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
 }
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VImageDimension>* diffImage )
+void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VImageDimension>* diffImage, unsigned int timeStep )
 {
   typedef itk::ImageSliceConstIteratorWithIndex< itk::Image<TPixel, VImageDimension> > IteratorType;
 
@@ -240,11 +255,11 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
 
         TPixel value = iter.Get();
 
-        assert ( (signed) m_SegmentationCountInSlice[0][x] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
-        assert ( (signed) m_SegmentationCountInSlice[1][y] + (signed)value >= 0 );
+        assert ( (signed) m_SegmentationCountInSlice[timeStep][0][x] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
+        assert ( (signed) m_SegmentationCountInSlice[timeStep][1][y] + (signed)value >= 0 );
 
-        m_SegmentationCountInSlice[0][x] = static_cast<unsigned int>( m_SegmentationCountInSlice[0][x] + value ); 
-        m_SegmentationCountInSlice[1][y] = static_cast<unsigned int>( m_SegmentationCountInSlice[1][y] + value );
+        m_SegmentationCountInSlice[timeStep][0][x] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][0][x] + value ); 
+        m_SegmentationCountInSlice[timeStep][1][y] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][1][y] + value );
   
         numberOfPixels += static_cast<int>( value );
         
@@ -252,8 +267,8 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
       }
       iter.NextLine();
     }
-    assert ( (signed) m_SegmentationCountInSlice[2][z] + numberOfPixels >= 0 );
-    m_SegmentationCountInSlice[2][z] += numberOfPixels;
+    assert ( (signed) m_SegmentationCountInSlice[timeStep][2][z] + numberOfPixels >= 0 );
+    m_SegmentationCountInSlice[timeStep][2][z] += numberOfPixels;
     numberOfPixels = 0;
 
     iter.NextSlice();
@@ -262,33 +277,36 @@ void mitk::SegmentationInterpolation::ScanChangedVolume( itk::Image<TPixel, VIma
 
     
 template < typename DATATYPE >
-void mitk::SegmentationInterpolation::ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume )
+void mitk::SegmentationInterpolation::ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep )
 {
   if (!volume) return;
+  if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
 
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    DATATYPE* rawVolume = static_cast<DATATYPE*>( const_cast<Image*>(volume)->GetData() ); // we again promise not to change anything, we'll just count
+    DATATYPE* rawVolume = static_cast<DATATYPE*>( const_cast<Image*>(volume)->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
     //DATATYPE* rawSlice = static_cast<DATATYPE*>( volume->GetSliceData(slice)->GetData() ); // TODO THIS wouldn't work. Did I mess up with some internal mitk::Image data structure?
     DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 
-    ScanChangedSlice<DATATYPE>( NULL, SetChangedSliceOptions(2, slice, 0, 1, rawSlice) );
+    ScanChangedSlice<DATATYPE>( NULL, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
   }
 }
 
 void mitk::SegmentationInterpolation::PrintStatus()
 {
-  std::cout << "Interpolator status: dimensions " 
-            << m_SegmentationCountInSlice[0].size() << " " 
-            << m_SegmentationCountInSlice[1].size() << " "
-            << m_SegmentationCountInSlice[2].size() << std::endl;
+  unsigned int timeStep(0); // if needed, put a loop over time steps around everyting, but beware, output will be long
+
+  std::cout << "Interpolator status (timestep 0): dimensions " 
+            << m_SegmentationCountInSlice[timeStep][0].size() << " " 
+            << m_SegmentationCountInSlice[timeStep][1].size() << " "
+            << m_SegmentationCountInSlice[timeStep][2].size() << std::endl;
     
-  std::cout << "Slice 0: " <<  m_SegmentationCountInSlice[2][0] << std::endl;
+  std::cout << "Slice 0: " <<  m_SegmentationCountInSlice[timeStep][2][0] << std::endl;
 
   // row "x"
-  for (unsigned int index = 0; index < m_SegmentationCountInSlice[0].size(); ++index)
+  for (unsigned int index = 0; index < m_SegmentationCountInSlice[timeStep][0].size(); ++index)
   {
-    if ( m_SegmentationCountInSlice[0][index] > 0 )
+    if ( m_SegmentationCountInSlice[timeStep][0][index] > 0 )
       std::cout << "O";
     else
       std::cout << ".";
@@ -296,20 +314,20 @@ void mitk::SegmentationInterpolation::PrintStatus()
   std::cout << std::endl;
  
   // rows "y" and "z" (diagonal)
-  for (unsigned int index = 1; index < m_SegmentationCountInSlice[1].size(); ++index)
+  for (unsigned int index = 1; index < m_SegmentationCountInSlice[timeStep][1].size(); ++index)
   {
-    if ( m_SegmentationCountInSlice[1][index] > 0 )
+    if ( m_SegmentationCountInSlice[timeStep][1][index] > 0 )
       std::cout << "O";
     else
       std::cout << ".";
 
-    if ( m_SegmentationCountInSlice[2].size() > index ) // if we also have a z value here, then print it, too
+    if ( m_SegmentationCountInSlice[timeStep][2].size() > index ) // if we also have a z value here, then print it, too
     {
       for (unsigned int indent = 1; indent < index; ++indent)
         std::cout << " ";
 
-      if ( m_SegmentationCountInSlice[2][index] > 0 )
-        std::cout << m_SegmentationCountInSlice[2][index];//"O";
+      if ( m_SegmentationCountInSlice[timeStep][2][index] > 0 )
+        std::cout << m_SegmentationCountInSlice[timeStep][2][index];//"O";
       else
         std::cout << ".";
     }
@@ -318,13 +336,13 @@ void mitk::SegmentationInterpolation::PrintStatus()
   }
 
   // z indices that are larger than the biggest y index
-  for (unsigned int index = m_SegmentationCountInSlice[1].size(); index < m_SegmentationCountInSlice[2].size(); ++index)
+  for (unsigned int index = m_SegmentationCountInSlice[timeStep][1].size(); index < m_SegmentationCountInSlice[timeStep][2].size(); ++index)
   {
     for (unsigned int indent = 0; indent < index; ++indent)
     std::cout << " ";
 
-    if ( m_SegmentationCountInSlice[2][index] > 0 )
-      std::cout << m_SegmentationCountInSlice[2][index];//"O";
+    if ( m_SegmentationCountInSlice[timeStep][2][index] > 0 )
+      std::cout << m_SegmentationCountInSlice[timeStep][2][index];//"O";
     else
       std::cout << ".";
     
@@ -332,16 +350,17 @@ void mitk::SegmentationInterpolation::PrintStatus()
   }
 }
 
-mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex )
+mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   if (m_Segmentation.IsNull()) return NULL;
 
+  if ( timeStep >= m_SegmentationCountInSlice.size() ) return NULL;
   if ( sliceDimension > 2 ) return NULL;
-  unsigned int upperLimit = m_SegmentationCountInSlice[sliceDimension].size();
+  unsigned int upperLimit = m_SegmentationCountInSlice[timeStep][sliceDimension].size();
   if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
   if ( sliceIndex < 1  ) return NULL;
 
-  if ( m_SegmentationCountInSlice[sliceDimension][sliceIndex] > 0 ) return NULL; // slice contains a segmentation, won't interpolate anything then
+  if ( m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0 ) return NULL; // slice contains a segmentation, won't interpolate anything then
 
   unsigned int lowerBound(0);
   unsigned int upperBound(0);
@@ -349,7 +368,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
 
   for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
   {
-    if ( m_SegmentationCountInSlice[sliceDimension][lowerBound] > 0 )
+    if ( m_SegmentationCountInSlice[timeStep][sliceDimension][lowerBound] > 0 )
     {
       bounds = true;
       break;
@@ -363,7 +382,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
   bounds = false;
   for (upperBound = sliceIndex + 1 ; upperBound < upperLimit; ++upperBound)
   {
-    if ( m_SegmentationCountInSlice[sliceDimension][upperBound] > 0 )
+    if ( m_SegmentationCountInSlice[timeStep][sliceDimension][upperBound] > 0 )
     {
       bounds = true;
       break;
@@ -373,7 +392,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
   if (!bounds) return NULL;
  
   // ok, we have found two neighboring slices with segmentations (and we made sure that the current slice does NOT contain anything
-  //std::cout << "Interpolate in dimension " << sliceDimension << ": estimate slice " << sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
+  //std::cout << "Interpolate in timestep " << timeStep << ", dimension " << sliceDimension << ": estimate slice " << sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
 
   mitk::Image::Pointer lowerMITKSlice;
   mitk::Image::Pointer upperMITKSlice;
@@ -385,6 +404,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
     extractor->SetInput( m_Segmentation );
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( lowerBound );
+    extractor->SetTimeStep( timeStep );
     extractor->Update();
     lowerMITKSlice = extractor->GetOutput();
     lowerMITKSlice->DisconnectPipeline(); // otherwise the next output of the filter will overwrite this pointer, too
@@ -393,6 +413,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
     extractor->SetInput( m_Segmentation );
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( sliceIndex );
+    extractor->SetTimeStep( timeStep );
     extractor->Update();
     resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
@@ -401,6 +422,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
     extractor->SetInput( m_Segmentation );
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( upperBound );
+    extractor->SetTimeStep( timeStep );
     extractor->Update();
     upperMITKSlice = extractor->GetOutput();
 

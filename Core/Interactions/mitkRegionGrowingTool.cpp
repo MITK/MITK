@@ -377,11 +377,13 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
               SegTool2D::DetermineAffectedImageSlice( dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() ), planeGeometry, affectedDimension, affectedSlice );
 
               OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-              slicewriter->SetInput( dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() ) );
+              Image::Pointer workingImage = dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() );
+              slicewriter->SetInput( workingImage );
               slicewriter->SetCreateUndoInformation( true );
               slicewriter->SetSliceImage( m_WorkingSlice );
               slicewriter->SetSliceDimension( affectedDimension );
               slicewriter->SetSliceIndex( affectedSlice );
+              slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
               slicewriter->Update();
             }
           }

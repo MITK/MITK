@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateNOT.h"
 
 #include "mitkRenderingManager.h"
@@ -143,7 +144,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   // update reference images
   mitk::NodePredicateDataType images("Image");
   mitk::NodePredicateDimension dim3(3);
-  mitk::NodePredicateAND image3D( images, dim3 );
+  mitk::NodePredicateDimension dim4(4);
+  mitk::NodePredicateOR dimension( dim3, dim4 );
+  mitk::NodePredicateAND image3D( images, dimension );
 
   mitk::NodePredicateProperty binary("binary", new mitk::BoolProperty(true));
   mitk::NodePredicateNOT notBinary( binary );

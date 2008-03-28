@@ -29,7 +29,7 @@ class QmitkStdMultiWidget;
 class QmitkSliceBasedSegmentationControls;
 
 /**
-  \brief 2D slice based segmentation.
+  \brief Slice based segmentation of 3D and 3D+t images.
   
   \sa QmitkToolSelectionBox  
   \sa QmitkToolReferenceDataSelectionBox   
@@ -44,7 +44,7 @@ class QmitkSliceBasedSegmentationControls;
   Implemented for the ReLiver application, requirements are from this project. 
   QmitkSliceBasedSegmentation is mainly a restructured replacement for ERISBase.
 
-  Provides a set of interactive tool for segmentation in 2D slices. 
+  Provides a set of interactive tool for segmentation in 2D slices (slices of 3D or 3D+t images).
   Technically it is based on mitk::ToolManager and the related classes mitk::Tool, QmitkToolSelectionBox, QmitkToolDataSelectionBox.
 
   Very slim implementation, most of the job is done by the widgets used in the GUI.
@@ -155,7 +155,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image, const std::string& name, const std::string& organType );
     
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>*, mitk::Image* );
+    void ITKThresholding( itk::Image<TPixel, VImageDimension>*, mitk::Image*, unsigned int timeStep );
     
     template <typename TPixel, unsigned int VImageDimension>
     void ITKHistogramming( itk::Image<TPixel, VImageDimension>*, mitk::Image*, QString& );

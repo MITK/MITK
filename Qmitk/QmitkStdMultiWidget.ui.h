@@ -893,7 +893,6 @@ void QmitkStdMultiWidget::ForceImmediateUpdate()
 
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 {
-  std::cout << "QmitkMultiWidget: grabbed mouse wheel event" << std::endl;
   emit WheelMoved( e );
 }
 

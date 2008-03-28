@@ -109,9 +109,11 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
 
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
+
+      \param timeStep Which time step is changed
     */
-    void SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex );
-    void SetChangedVolume( const Image* sliceDiff );
+    void SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
+    void SetChangedVolume( const Image* sliceDiff, unsigned int timeStep );
     
     /**
       \brief Generates an interpolated image for the given slice.
@@ -119,8 +121,10 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
 
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
+      
+      \param timeStep Which time step to use
     */
-    Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex );
+    Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
 
     void OnImageModified(const itk::EventObject&);
 
@@ -132,8 +136,8 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
     class MITK_CORE_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, void* pixels ) 
-          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), pixelData(pixels)
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels ) 
+          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
         {
         }
 
@@ -141,10 +145,13 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
         unsigned int sliceIndex;
         unsigned int dim0;
         unsigned int dim1;
+        unsigned int timeStep;
         void* pixelData;
     };
 
     typedef std::vector<unsigned int> DirtyVectorType;
+    //typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is used for implementation
+    typedef std::vector< std::vector<DirtyVectorType> > TimeResolvedDirtyVectorType;
     typedef std::map< const Image*, SegmentationInterpolation* > InterpolatorMapType;
 
     SegmentationInterpolation();// purposely hidden
@@ -155,10 +162,10 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
     void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
 
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>* );
+    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
     
     template < typename DATATYPE >
-    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume );
+    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
     
     void PrintStatus();
 
@@ -167,8 +174,10 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
 
       E.g. flags for transversal slices are stored in m_SegmentationCountInSlice[0][index].
+
+      Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
     */
-    DirtyVectorType m_SegmentationCountInSlice[3];
+    TimeResolvedDirtyVectorType m_SegmentationCountInSlice;
 
     static InterpolatorMapType s_InterpolatorForImage;
 

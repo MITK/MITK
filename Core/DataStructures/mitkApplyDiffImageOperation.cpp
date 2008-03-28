@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkCommand.h>
 
-mitk::ApplyDiffImageOperation::ApplyDiffImageOperation(OperationType operationType, Image* image, Image* diffImage, unsigned int sliceDimension, unsigned int sliceIndex)
+mitk::ApplyDiffImageOperation::ApplyDiffImageOperation(OperationType operationType, Image* image, Image* diffImage, unsigned int timeStep, unsigned int sliceDimension, unsigned int sliceIndex)
 : Operation(operationType),
   m_Image( image ),
   m_SliceIndex( sliceIndex ),
   m_SliceDimension( sliceDimension ),
+  m_TimeStep( timeStep ),
   m_Factor( 1.0 ),
   m_ImageStillValid( false ),
   m_DeleteTag( 0 )

@@ -56,18 +56,24 @@ class MITK_CORE_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
     itkNewMacro(OverwriteSliceImageFilter);
 
     /**
-      \brief Which slice to extract (first one has index 0).
+      \brief Which slice to overwrite (first one has index 0).
     */
     itkSetMacro(SliceIndex, unsigned int);
     itkGetConstMacro(SliceIndex, unsigned int);
 
     /**
-      \brief The orientation of the slice to be extracted.
+      \brief The orientation of the slice to overwrite.
 
       \param dim Number of the dimension which is constant for all pixels of the desired slices (e.g. 0 for transversal)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);
+    
+    /**
+      \brief Time step of the slice to overwrite
+    */
+    itkSetMacro(TimeStep, unsigned int);
+    itkGetConstMacro(TimeStep, unsigned int);
     
     itkSetMacro(CreateUndoInformation, bool);
     itkGetConstMacro(CreateUndoInformation, bool);
@@ -90,13 +96,14 @@ class MITK_CORE_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
     template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
     void ItkImageProcessing( itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
 
-    std::string EventDescription( unsigned int sliceDimension, unsigned int sliceIndex );
+    std::string EventDescription( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
 
     Image::ConstPointer m_SliceImage;
     Image::Pointer m_SliceDifferenceImage;
     
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;
+    unsigned int m_TimeStep;
     unsigned int m_Dimension0;
     unsigned int m_Dimension1;
 

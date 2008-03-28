@@ -148,6 +148,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
     slicewriter->SetSliceImage( temporarySlice );
     slicewriter->SetSliceDimension( affectedDimension );
     slicewriter->SetSliceIndex( affectedSlice );
+    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
 
     // 6. Make sure the result is drawn again --> is visible then. 

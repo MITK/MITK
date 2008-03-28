@@ -37,6 +37,7 @@ namespace mitk {
  * @ingroup Process
  *
  * @todo clean up, this is messy. bug #524
+ * @todo not able to handle 3D+t images. bug #1281
  * 
  */
 class MITK_CORE_EXPORT AutoCropImageFilter : public SubImageSelector

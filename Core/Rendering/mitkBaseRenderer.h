@@ -64,10 +64,10 @@ class CameraController;
 class MITK_CORE_EXPORT BaseRenderer : public itk::Object
 {
 public:
-  typedef std::map<vtkRenderWindow*,mitk::BaseRenderer*> BaseRendererMapType;
+  typedef std::map<vtkRenderWindow*,BaseRenderer*> BaseRendererMapType;
   static BaseRendererMapType baseRendererMap;
   
-  static mitk::BaseRenderer* GetInstance(vtkRenderWindow * renWin);
+  static BaseRenderer* GetInstance(vtkRenderWindow * renWin);
   static void AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer);
   static void RemoveInstance(vtkRenderWindow* renWin);
 
@@ -92,12 +92,12 @@ public:
   //##ModelId=3D6A1791038B
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.
-  virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
+  virtual void SetData(const DataTreeIteratorBase* iterator);
 
   //##ModelId=3E6423D20245
   //##Documentation
   //## @brief Get the DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
-  virtual mitk::DataTreeIteratorBase* GetData() const
+  virtual DataTreeIteratorBase* GetData() const
   {
     return m_DataTreeIterator.GetPointer();
   };
@@ -172,14 +172,14 @@ public:
   //## \sa m_WorldGeometry
   //## \sa m_TimeSlicedWorldGeometry
   //## \sa m_CurrentWorldGeometry2D
-  virtual void SetWorldGeometry(mitk::Geometry3D* geometry);
-  itkGetConstObjectMacro(WorldGeometry, mitk::Geometry3D);
+  virtual void SetWorldGeometry(Geometry3D* geometry);
+  itkGetConstObjectMacro(WorldGeometry, Geometry3D);
   //##Documentation
   //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-  itkGetConstObjectMacro(CurrentWorldGeometry, mitk::Geometry3D);
+  itkGetConstObjectMacro(CurrentWorldGeometry, Geometry3D);
   //##Documentation
   //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
-  itkGetConstObjectMacro(CurrentWorldGeometry2D, mitk::Geometry2D);
+  itkGetConstObjectMacro(CurrentWorldGeometry2D, Geometry2D);
 
   //##Documentation
   //## Calculates the bounds of the DataTree (if it contains any valid data), 
@@ -198,9 +198,9 @@ public:
   //##
   //## The DisplayGeometry describes which part of the Geometry2D m_CurrentWorldGeometry2D
   //## is displayed.
-  virtual void SetDisplayGeometry(mitk::DisplayGeometry* geometry2d);
-  itkGetConstObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
-  itkGetObjectMacro(DisplayGeometry, mitk::DisplayGeometry);
+  virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
+  itkGetConstObjectMacro(DisplayGeometry, DisplayGeometry);
+  itkGetObjectMacro(DisplayGeometry, DisplayGeometry);
 
   //##Documentation
   //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
@@ -224,13 +224,13 @@ public:
   //## Returns -1 or mitk::BaseData::m_TimeSteps if there
   //## is no data at the current time.
   //## \sa GetTimeStep, m_TimeStep
-  int GetTimeStep(mitk::BaseData* data) const;
+  int GetTimeStep(const BaseData* data) const;
 
   //##Documentation
   //## @brief Get the time in ms of the currently displayed content
   //##
   //## \sa GetTimeStep, m_TimeStep
-  mitk::ScalarType GetTime() const;
+  ScalarType GetTime() const;
 
   //##Documentation
   //## @brief SetWorldGeometry is called according to the geometrySliceEvent,
@@ -254,20 +254,20 @@ public:
 
   //##Documentation
   //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
-  itkGetObjectMacro(DisplayGeometryData, mitk::Geometry2DData);
+  itkGetObjectMacro(DisplayGeometryData, Geometry2DData);
   //##Documentation
   //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
-  itkGetObjectMacro(WorldGeometryData, mitk::Geometry2DData);
+  itkGetObjectMacro(WorldGeometryData, Geometry2DData);
 
   //##Documentation
   //## @brief Get a data tree node pointing to a data object containing the WorldGeometry (3D and 2D rendering)
-  itkGetObjectMacro(WorldGeometryNode, mitk::DataTreeNode);
+  itkGetObjectMacro(WorldGeometryNode, DataTreeNode);
   //##Documentation
   //## @brief Get a data tree node pointing to a data object containing the DisplayGeometry (for 2D rendering)
-  itkGetObjectMacro(DisplayGeometryNode, mitk::DataTreeNode);
+  itkGetObjectMacro(DisplayGeometryNode, DataTreeNode);
   //##Documentation
   //## @brief Get a data tree node pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
-  itkGetObjectMacro(CurrentWorldGeometry2DNode, mitk::DataTreeNode);
+  itkGetObjectMacro(CurrentWorldGeometry2DNode, DataTreeNode);
 
   //##Documentation
   //## @brief Get timestamp of last call of SetCurrentWorldGeometry2D
@@ -306,9 +306,9 @@ public:
   itkGetMacro(Size, int*);
 
   void SetCameraController(CameraController* cameraController);
-  itkGetObjectMacro(CameraController, mitk::CameraController);
-  itkGetObjectMacro(SliceNavigationController, mitk::SliceNavigationController);
-  itkGetObjectMacro(CameraRotationController, mitk::CameraRotationController);
+  itkGetObjectMacro(CameraController, CameraController);
+  itkGetObjectMacro(SliceNavigationController, SliceNavigationController);
+  itkGetObjectMacro(CameraRotationController, CameraRotationController);
 
   itkGetMacro(EmptyWorldGeometry, bool);
 
@@ -316,17 +316,17 @@ public:
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
-  virtual void MousePressEvent(mitk::MouseEvent*);
+  virtual void MousePressEvent(MouseEvent*);
   //##ModelId=3E6D5DD30372
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
-  virtual void MouseReleaseEvent(mitk::MouseEvent*);
+  virtual void MouseReleaseEvent(MouseEvent*);
   //##ModelId=3E6D5DD303C2
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
-  virtual void MouseMoveEvent(mitk::MouseEvent*);
+  virtual void MouseMoveEvent(MouseEvent*);
   //##Documentation
   //## @brief Wheel event dispatcher
   //## @note for internal use only. preliminary.
@@ -335,7 +335,7 @@ public:
   //##Documentation
   //## @brief Key event dispatcher
   //## @note for internal use only. preliminary.
-  virtual void KeyPressEvent(mitk::KeyEvent*);
+  virtual void KeyPressEvent(KeyEvent*);
 
   //##Documentation
   //## @brief get the name of the Renderer
@@ -385,7 +385,7 @@ protected:
   //##ModelId=3E330D6902E8
   //##Documentation
   //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
-  mitk::DataTreeIteratorClone m_DataTreeIterator;
+  DataTreeIteratorClone m_DataTreeIterator;
 
   //##ModelId=3E6423D20213
   //##Documentation
@@ -396,9 +396,9 @@ protected:
   //##Documentation
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
-  mitk::CameraController::Pointer           m_CameraController;
-  mitk::SliceNavigationController::Pointer  m_SliceNavigationController;
-  mitk::CameraRotationController::Pointer   m_CameraRotationController;
+  CameraController::Pointer           m_CameraController;
+  SliceNavigationController::Pointer  m_SliceNavigationController;
+  CameraRotationController::Pointer   m_CameraRotationController;
 
 
 
@@ -417,11 +417,11 @@ protected:
 
   //##Documentation
   //## @brief Sets m_CurrentWorldGeometry2D
-  virtual void SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d);
+  virtual void SetCurrentWorldGeometry2D(Geometry2D* geometry2d);
 
   //##Documentation
   //## @brief Sets m_CurrentWorldGeometry
-  virtual void SetCurrentWorldGeometry(mitk::Geometry3D* geometry);
+  virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
 
 private:
   //##Documentation

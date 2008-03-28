@@ -77,6 +77,21 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
+    void OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject&);
+
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
+    void OnSagittalTimeChanged(itk::Object* sender, const itk::EventObject&);
+
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
+    void OnFrontalTimeChanged(itk::Object* sender, const itk::EventObject&);
+ 
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
     void OnTransversalSliceChanged(const itk::EventObject&);
 
     /**
@@ -142,7 +157,7 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
       Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated ToolManager)
       should be interpolated. The actual work is then done by our SegmentationInterpolation object.
      */
-    void Interpolate( unsigned int sliceDimension, mitk::PlaneGeometry* plane );
+    void Interpolate( unsigned int sliceDimension, mitk::PlaneGeometry* plane, unsigned int timeStep );
 
     /**
       Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
@@ -159,6 +174,9 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
     unsigned int TSliceObserverTag;
     unsigned int SSliceObserverTag;
     unsigned int FSliceObserverTag;
+    unsigned int TTimeObserverTag;
+    unsigned int STimeObserverTag;
+    unsigned int FTimeObserverTag;
     unsigned int InterpolationInfoChangedObserverTag;
 
     QPushButton* m_BtnAcceptInterpolation;
@@ -169,6 +187,8 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
     mitk::Image* m_Segmentation;
     unsigned int m_LastSliceDimension;
     unsigned int m_LastSliceIndex;
+    
+    std::vector<unsigned int> m_TimeStep; // current time step of the render windows
 
     bool m_InterpolationEnabled;
 };

@@ -72,6 +72,7 @@ class MITK_CORE_EXPORT DiffImageApplier : public itk::Object, public OperationAc
     
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;
+    unsigned int m_TimeStep;
     unsigned int m_Dimension0;
     unsigned int m_Dimension1;
 

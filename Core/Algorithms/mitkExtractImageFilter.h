@@ -66,6 +66,12 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);
+    
+    /**
+      \brief Time step of the image to be extracted.
+     */
+    itkSetMacro(TimeStep, unsigned int);
+    itkGetConstMacro(TimeStep, unsigned int);
 
   protected:
 
@@ -79,6 +85,7 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
 
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;
+    unsigned int m_TimeStep;
 };
 
 } // namespace

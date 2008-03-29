@@ -167,7 +167,7 @@ void QmitkUserInputSimulation::MouseDrawCircle( QWidget* widget, int button, flo
 
   int firstDegree = -180;
   int lastDegree = 180;
-  int degreeStep = 10;
+  int degreeStep = 36;
   int secondLastDegree = lastDegree - degreeStep;
   float w = (float)widget->width() * relativeRadius;
   float h = (float)widget->height() * relativeRadius;

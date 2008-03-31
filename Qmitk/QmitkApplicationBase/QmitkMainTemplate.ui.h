@@ -1405,6 +1405,8 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 
 void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
 {
+  m_Options->PrepareXML_IO();
+  
   //create a XMLWriter
   mitk::XMLWriter xmlw(filename);
   // start tree

@@ -1395,6 +1395,10 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
       if (f != NULL)
         f->OptionsChanged(optionDialog->m_OptionWidgetStack->widget(i + 2));
     }
+
+    // save now
+    std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
+    filename += "/MITKOptions.xml";  SaveOptionsToFile( filename.c_str() );
   }
   delete optionDialog;
 }

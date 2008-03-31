@@ -71,6 +71,16 @@ bool QmitkSliceBasedSegmentation::TestYourself()
     std::cerr << "No possible reference image in scene. Won't apply test (l. " << __LINE__ << ")" << std::endl;
     return true;
   }
+  
+  {
+    mitk::Image* originalImage = dynamic_cast<mitk::Image*>( toolManager->GetReferenceData(0)->GetData() );
+    if (originalImage->GetDimension() != 3)
+    {
+      std::cerr << "Skipping test for non-3D image." << std::endl;
+      return true;
+    }
+  }
+
 
   // Test: click the "New segmentation" button, expect: new segmentation is selected afterwards
   std::cout << "Creating a new segmentation: " << std::flush;

@@ -72,6 +72,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
     return true;
   }
   
+#ifdef MITK_FAST_TESTING
   {
     mitk::Image* originalImage = dynamic_cast<mitk::Image*>( toolManager->GetReferenceData(0)->GetData() );
     if (originalImage->GetDimension() != 3)
@@ -80,6 +81,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
       return true;
     }
   }
+#endif
 
 
   // Test: click the "New segmentation" button, expect: new segmentation is selected afterwards

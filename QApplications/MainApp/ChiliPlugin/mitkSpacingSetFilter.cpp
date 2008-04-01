@@ -513,50 +513,61 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
 {
   for( unsigned int n = 0; n < groupList.size(); n++)
   {
-    std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].possibleCombinations.begin();
-    while( rootCombinationIter != groupList[n].possibleCombinations.end() )
+    if( groupList[n].resultCombinations.front().size() > 1 ) //TODO only one result is handled
     {
-      std::set< Slice* > timeSlicedVolume;
-      timeSlicedVolume.clear();
-
-      std::vector< std::set< Slice* > >::iterator searchCombinationIter = rootCombinationIter;
-      searchCombinationIter++;
-      while( searchCombinationIter != groupList[n].possibleCombinations.end() )
+      std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].resultCombinations.front().begin();
+      while( rootCombinationIter != groupList[n].resultCombinations.front().end() )
       {
-        if( (*rootCombinationIter).size() > 1 && (*rootCombinationIter).size() == (*searchCombinationIter).size() && Equal( (*(*rootCombinationIter).begin())->origin, (*(*searchCombinationIter).begin())->origin ) )  //the combinations have the same size and the same origin
+        std::set< Slice* > timeSlicedVolume;
+        timeSlicedVolume.clear();
+        timeSlicedVolume.insert( (*rootCombinationIter).begin(), (*rootCombinationIter).end() );
+
+        std::vector< std::set< Slice* > >::iterator searchCombinationIter = rootCombinationIter;
+        searchCombinationIter++;
+        while( searchCombinationIter != groupList[n].resultCombinations.front().end() )
         {
-          //calculate the spacing at the first combination
-          std::set< Slice* >::iterator spacingIter = (*rootCombinationIter).begin();
-          spacingIter++;
-          Vector3D tempDistance = (*spacingIter)->origin - (*(*rootCombinationIter).begin())->origin;
-          double referenceSpacingOne = Round( tempDistance.GetNorm(), 2 );
-          int imageNumberSpacingOne = (*spacingIter)->imageNumber - (*(*rootCombinationIter).begin())->imageNumber;
-
-          //calculate the spacing at the second combination
-          spacingIter = (*searchCombinationIter).begin();
-          spacingIter++;
-          tempDistance = (*spacingIter)->origin - (*(*searchCombinationIter).begin())->origin;
-          double referenceSpacingTwo = Round( tempDistance.GetNorm(), 2 );
-          int imageNumberSpacingTwo = (*spacingIter)->imageNumber - (*(*searchCombinationIter).begin())->imageNumber;
-
-          //if the spacings equal they are timesliced
-          if( referenceSpacingOne == referenceSpacingTwo && imageNumberSpacingOne == imageNumberSpacingTwo )
+          if( (*rootCombinationIter).size() == (*searchCombinationIter).size() && Equal( (*(*rootCombinationIter).begin())->origin, (*(*searchCombinationIter).begin())->origin ) )  //the combinations have the same size and the same origin
           {
-            for( std::set< Slice* >::iterator walkIter = (*searchCombinationIter).begin(); walkIter != (*searchCombinationIter).end(); walkIter++ )
-              timeSlicedVolume.insert( (*walkIter) );
-            searchCombinationIter = groupList[n].possibleCombinations.erase( searchCombinationIter );
+            if( (*rootCombinationIter).size() > 1 )  //3D
+            {
+              //calculate the spacing at the first combination
+              std::set< Slice* >::iterator spacingIter = (*rootCombinationIter).begin();
+              spacingIter++;
+              Vector3D tempDistance = (*spacingIter)->origin - (*(*rootCombinationIter).begin())->origin;
+              double referenceSpacingOne = Round( tempDistance.GetNorm(), 2 );
+              int imageNumberSpacingOne = (*spacingIter)->imageNumber - (*(*rootCombinationIter).begin())->imageNumber;
+
+              //calculate the spacing at the second combination
+              spacingIter = (*searchCombinationIter).begin();
+              spacingIter++;
+              tempDistance = (*spacingIter)->origin - (*(*searchCombinationIter).begin())->origin;
+              double referenceSpacingTwo = Round( tempDistance.GetNorm(), 2 );
+              int imageNumberSpacingTwo = (*spacingIter)->imageNumber - (*(*searchCombinationIter).begin())->imageNumber;
+
+              //equal spacings == timesliced
+              if( referenceSpacingOne == referenceSpacingTwo && imageNumberSpacingOne == imageNumberSpacingTwo )
+              {
+                timeSlicedVolume.insert( (*searchCombinationIter).begin(), (*searchCombinationIter).end() );
+                searchCombinationIter = groupList[n].resultCombinations.front().erase( searchCombinationIter );
+              }
+              else searchCombinationIter++;
+            }
+            else  //2D
+            {
+              timeSlicedVolume.insert( (*(*searchCombinationIter).begin()) );
+              searchCombinationIter = groupList[n].resultCombinations.front().erase( searchCombinationIter );
+            }
           }
           else searchCombinationIter++;
         }
-        else searchCombinationIter++;
+
+        if( timeSlicedVolume.size() > rootCombinationIter->size() )
+        {
+          groupList[n].resultCombinations.front().push_back( timeSlicedVolume );
+          rootCombinationIter = groupList[n].resultCombinations.front().erase( rootCombinationIter );
+        }
+        else rootCombinationIter++;
       }
-      if( !timeSlicedVolume.empty() )
-      {
-        for( std::set< Slice* >::iterator walkIter = (*rootCombinationIter).begin(); walkIter != (*rootCombinationIter).end(); walkIter++ )
-          timeSlicedVolume.insert( (*walkIter) );
-        rootCombinationIter = groupList[n].possibleCombinations.erase( rootCombinationIter );
-      }
-      else rootCombinationIter++;
     }
   }
 }
@@ -566,7 +577,7 @@ void mitk::SpacingSetFilter::GenerateImages()
   //generate mitk::Images
   for( unsigned int n = 0; n < groupList.size(); n++)
   {
-    for( std::vector < std::set< Slice* > >::iterator combinationIter = groupList[n].resultCombinations.front().begin(); combinationIter != groupList[n].resultCombinations.front().end(); combinationIter ++ )
+    for( std::vector < std::set< Slice* > >::iterator combinationIter = groupList[n].resultCombinations.front().begin(); combinationIter != groupList[n].resultCombinations.front().end(); combinationIter ++ )  //TODO only one result is handled
     {
       //get all ipPicDescriptor
       std::list<ipPicDescriptor*> usedPic;

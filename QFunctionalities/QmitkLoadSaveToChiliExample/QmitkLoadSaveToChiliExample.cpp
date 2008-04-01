@@ -248,26 +248,33 @@ void QmitkLoadSaveToChiliExample::SaveDataTree()
 
 void QmitkLoadSaveToChiliExample::SaveSingleNodes()
 {
-  QmitkDataTreeViewItem* entry = dynamic_cast<QmitkDataTreeViewItem*>( m_Controls->DataTreeView->selectedItem() );
-  if( entry != NULL )
+  QListViewItemIterator it( m_Controls->DataTreeView, QListViewItemIterator::Selected );
+  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
+  unsigned int count = 0;
+  while ( it.current() )
   {
-    mitk::DataTreeIteratorBase* selectedIterator = entry->GetDataTreeIterator();
-    if (selectedIterator != NULL)
+    QmitkDataTreeViewItem* entry = dynamic_cast<QmitkDataTreeViewItem*>( it.current() );
+    if( entry )
     {
-      mitk::DataTreeNode* node = selectedIterator->Get();
-      if (node != NULL )
+      mitk::DataTreeIteratorBase* selectedIterator = entry->GetDataTreeIterator();
+      if (selectedIterator != NULL)
       {
-        mitk::BaseProperty::Pointer testProperty = node->GetProperty( "helper object" );
-        if( testProperty.IsNull() || testProperty->GetValueAsString() == "0" )
+        mitk::DataTreeNode* node = selectedIterator->Get();
+        if (node != NULL )
         {
-          mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
-          resultset->InsertElement( 0, node );
-
-          m_Plugin->SaveToChili( mitk::DataStorage::SetOfObjects::ConstPointer( resultset ) );
+          mitk::BaseProperty::Pointer testProperty = node->GetProperty( "helper object" );
+          if( testProperty.IsNull() || testProperty->GetValueAsString() == "0" )
+          {
+            resultset->InsertElement( count, node );
+            count++;
+          }
         }
       }
     }
+    it++;
   }
+  if( count != 0 )
+    m_Plugin->SaveToChili( mitk::DataStorage::SetOfObjects::ConstPointer( resultset ) );
 }
 
 void QmitkLoadSaveToChiliExample::ChangeReaderType()

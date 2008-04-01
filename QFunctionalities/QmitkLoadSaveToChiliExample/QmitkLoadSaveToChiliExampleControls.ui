@@ -280,7 +280,7 @@
                                     <cstring>DataTreeView</cstring>
                                 </property>
                                 <property name="selectionMode">
-                                    <enum>Single</enum>
+                                    <enum>Multi</enum>
                                 </property>
                                 <property name="resizeMode">
                                     <enum>AllColumns</enum>

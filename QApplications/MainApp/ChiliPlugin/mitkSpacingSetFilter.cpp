@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK-Includes
 #include "mitkChiliMacros.h"
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
+
 // constructor
 mitk::SpacingSetFilter::SpacingSetFilter()
 {
@@ -46,19 +48,13 @@ void mitk::SpacingSetFilter::Update()
     SortPicsToGroup();
     SortSlicesByLocation();
     //ShowAllGroupsWithSlices();
-std::cout<<"1"<<std::endl;
     CreatePossibleCombinations();
     SortPossibleCombinations();
     //ShowAllPossibleCombinations();
-std::cout<<"2"<<std::endl;
-    CheckForTimeSlicedCombinations();
-    SortPossibleCombinations();
-    //ShowAllPossibleCombinations();
-std::cout<<"3"<<std::endl;
     //ShowAllSlicesWithUsedSpacings();
     SearchForMinimumCombination();
-std::cout<<"4"<<std::endl;
     //ShowAllResultCombinations();
+    CheckForTimeSlicedCombinations();
     GenerateImages();
   }
   else std::cout<<"SpacingSetFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
@@ -66,7 +62,6 @@ std::cout<<"4"<<std::endl;
 
 void mitk::SpacingSetFilter::SortPicsToGroup()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
     //check intersliceGeomtry
@@ -203,7 +198,6 @@ void mitk::SpacingSetFilter::SortPicsToGroup()
     }
   free( isg );
   }
-#endif
 }
 
 void mitk::SpacingSetFilter::SortSlicesByLocation()
@@ -224,7 +218,6 @@ bool mitk::SpacingSetFilter::PositionSort( const Slice elem1, const Slice elem2 
 
 void mitk::SpacingSetFilter::CreatePossibleCombinations()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   //every group
   for( unsigned int x = 0; x < groupList.size(); x++ )
   {
@@ -256,7 +249,6 @@ void mitk::SpacingSetFilter::CreatePossibleCombinations()
       }
     }
   }
-  #endif
 }
 
 void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup )
@@ -273,11 +265,11 @@ void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator b
       int imageNumberSpacing = walkIter->imageNumber - basis->imageNumber;
 
       bool search = true;
-      //if( EqualImageNumbers( basis ) )
-      //{
+      if( EqualImageNumbers( basis ) )
+      {
         if( find( basis->sliceUsedWithSpacing.begin(), basis->sliceUsedWithSpacing.end(), spacing ) != basis->sliceUsedWithSpacing.end() )
           search = false;
-      //}
+      }
 
       if( EqualImageNumbers( walkIter ) )
       {
@@ -320,14 +312,14 @@ void mitk::SpacingSetFilter::searchFollowingSlices( std::vector< Slice >::iterat
 
       if( currentSpacing == spacing && currentImageNumberSpacing == imageNumberSpacing )
       {
-        //if( find( walkIter->sliceUsedWithSpacing.begin(), walkIter->sliceUsedWithSpacing.end(), spacing ) == walkIter->sliceUsedWithSpacing.end() )
-        //{
+        if( find( walkIter->sliceUsedWithSpacing.begin(), walkIter->sliceUsedWithSpacing.end(), spacing ) == walkIter->sliceUsedWithSpacing.end() )
+        {
           m_Set.insert( &(*walkIter) );
           walkIter->sliceUsedWithSpacing.insert( spacing );
           referenceIter = walkIter;
           walkON = true;
           break;
-        //}
+        }
       }
       else
         if( currentSpacing > spacing )
@@ -369,54 +361,6 @@ bool mitk::SpacingSetFilter::EqualImageNumbers( std::vector< Slice >::iterator t
   return result;
 }
 
-void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
-{
-  for( unsigned int n = 0; n < groupList.size(); n++)
-  {
-    std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].possibleCombinations.begin();
-    while( rootCombinationIter != groupList[n].possibleCombinations.end() )
-    {
-      std::set< Slice* > timeSlicedVolume;
-      timeSlicedVolume.clear();
-      std::vector< std::set< Slice* > >::iterator searchCombinationIter = rootCombinationIter;
-      searchCombinationIter++;
-      while( searchCombinationIter != groupList[n].possibleCombinations.end() )
-      {
-        if( (*rootCombinationIter).size() > 1 && (*rootCombinationIter).size() == (*searchCombinationIter).size() )
-        {
-          std::set< Slice* >::iterator spacingIter = (*rootCombinationIter).begin();
-          spacingIter++;
-          Vector3D tempDistance = (*spacingIter)->origin - (*(*rootCombinationIter).begin())->origin;
-          double referenceSpacingOne = Round( tempDistance.GetNorm(), 2 );
-          int imageNumberSpacingOne = (*spacingIter)->imageNumber - (*(*rootCombinationIter).begin())->imageNumber;
-
-          spacingIter = (*searchCombinationIter).begin();
-          spacingIter++;
-          tempDistance = (*spacingIter)->origin - (*(*searchCombinationIter).begin())->origin;
-          double referenceSpacingTwo = Round( tempDistance.GetNorm(), 2 );
-          int imageNumberSpacingTwo = (*spacingIter)->imageNumber - (*(*searchCombinationIter).begin())->imageNumber;
-
-          if( referenceSpacingOne == referenceSpacingTwo && imageNumberSpacingOne == imageNumberSpacingTwo )
-          {
-            for( std::set< Slice* >::iterator walkIter = (*searchCombinationIter).begin(); walkIter != (*searchCombinationIter).end(); walkIter++ )
-              timeSlicedVolume.insert( (*walkIter) );
-            searchCombinationIter = groupList[n].possibleCombinations.erase( searchCombinationIter );
-          }
-          else searchCombinationIter++;
-        }
-        else searchCombinationIter++;
-      }
-      if( !timeSlicedVolume.empty() )
-      {
-        for( std::set< Slice* >::iterator walkIter = (*rootCombinationIter).begin(); walkIter != (*rootCombinationIter).end(); walkIter++ )
-          timeSlicedVolume.insert( (*walkIter) );
-        rootCombinationIter = groupList[n].possibleCombinations.erase( rootCombinationIter );
-      }
-      else rootCombinationIter++;
-    }
-  }
-}
-
 void mitk::SpacingSetFilter::SortPossibleCombinations()
 {
   //its very important to sort the combinations
@@ -435,7 +379,6 @@ bool mitk::SpacingSetFilter::CombinationCountSort( const std::set< Slice* > elem
 
 void mitk::SpacingSetFilter::SearchForMinimumCombination()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   for( unsigned int n = 0; n < groupList.size(); n++ )
   {
     //a not timesliced 2D-image have only one possibleCombination, so we use this as resultCombination
@@ -492,12 +435,10 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
       groupList[n].resultCombinations = m_GroupResultCombinations;
     }
   }
-#endif
 }
 
 void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), unsigned int mitkHideIfNoVersionCode(remainingCombinations), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombinations) )
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   //to found a combination which represent the whole, the single combinations get combined
   //the intersection created and if they empty, the two combinations combined to one
   //if the intersection not empty the two combinations included the same elements
@@ -566,7 +507,58 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
     iterBegin++;
     remainingCombinations--;
   }
-#endif
+}
+
+void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
+{
+  for( unsigned int n = 0; n < groupList.size(); n++)
+  {
+    std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].possibleCombinations.begin();
+    while( rootCombinationIter != groupList[n].possibleCombinations.end() )
+    {
+      std::set< Slice* > timeSlicedVolume;
+      timeSlicedVolume.clear();
+
+      std::vector< std::set< Slice* > >::iterator searchCombinationIter = rootCombinationIter;
+      searchCombinationIter++;
+      while( searchCombinationIter != groupList[n].possibleCombinations.end() )
+      {
+        if( (*rootCombinationIter).size() > 1 && (*rootCombinationIter).size() == (*searchCombinationIter).size() && Equal( (*(*rootCombinationIter).begin())->origin, (*(*searchCombinationIter).begin())->origin ) )  //the combinations have the same size and the same origin
+        {
+          //calculate the spacing at the first combination
+          std::set< Slice* >::iterator spacingIter = (*rootCombinationIter).begin();
+          spacingIter++;
+          Vector3D tempDistance = (*spacingIter)->origin - (*(*rootCombinationIter).begin())->origin;
+          double referenceSpacingOne = Round( tempDistance.GetNorm(), 2 );
+          int imageNumberSpacingOne = (*spacingIter)->imageNumber - (*(*rootCombinationIter).begin())->imageNumber;
+
+          //calculate the spacing at the second combination
+          spacingIter = (*searchCombinationIter).begin();
+          spacingIter++;
+          tempDistance = (*spacingIter)->origin - (*(*searchCombinationIter).begin())->origin;
+          double referenceSpacingTwo = Round( tempDistance.GetNorm(), 2 );
+          int imageNumberSpacingTwo = (*spacingIter)->imageNumber - (*(*searchCombinationIter).begin())->imageNumber;
+
+          //if the spacings equal they are timesliced
+          if( referenceSpacingOne == referenceSpacingTwo && imageNumberSpacingOne == imageNumberSpacingTwo )
+          {
+            for( std::set< Slice* >::iterator walkIter = (*searchCombinationIter).begin(); walkIter != (*searchCombinationIter).end(); walkIter++ )
+              timeSlicedVolume.insert( (*walkIter) );
+            searchCombinationIter = groupList[n].possibleCombinations.erase( searchCombinationIter );
+          }
+          else searchCombinationIter++;
+        }
+        else searchCombinationIter++;
+      }
+      if( !timeSlicedVolume.empty() )
+      {
+        for( std::set< Slice* >::iterator walkIter = (*rootCombinationIter).begin(); walkIter != (*rootCombinationIter).end(); walkIter++ )
+          timeSlicedVolume.insert( (*walkIter) );
+        rootCombinationIter = groupList[n].possibleCombinations.erase( rootCombinationIter );
+      }
+      else rootCombinationIter++;
+    }
+  }
 }
 
 void mitk::SpacingSetFilter::GenerateImages()
@@ -728,3 +720,5 @@ void mitk::SpacingSetFilter::ShowAllSlicesWithUsedSpacings()
     }
   }
 }
+
+#endif

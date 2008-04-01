@@ -158,6 +158,12 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     virtual bool IsPlugin();
 
     /*!
+    \brief Return true for CHILI 3.10 and higher.
+    @returns True for CHILI 3.10 and higher, false for CHILI 3.8.
+    */
+    virtual bool MinCHILIVersionUsed();
+
+    /*!
     \brief Return all parent-child-saved-volumes to a series.
     @param seriesOID   This parameter have to be set. All volume-entries to this seriesOID get searched.
     @returns All parent-child-saved-volumes with the overgiven seriesOID.

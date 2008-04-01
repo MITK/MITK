@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>244</width>
-            <height>866</height>
+            <height>922</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -312,6 +312,18 @@
                     </widget>
                 </vbox>
             </widget>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>warningLabel</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>&lt;b&gt;&lt;u&gt;WARNING&lt;/u&gt;&lt;/b&gt;: Your CHILI version&lt;br&gt;
+does not support this functionality.</string>
+            </property>
         </widget>
     </vbox>
 </widget>

@@ -29,7 +29,7 @@ namespace mitk {
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
   If you use them, be carefull with the parameter.
-  This class use QcPlugin::pFetchSliceGeometryFromPic(...) which is only available at chiliversion 3.8.
+  This filter need the CHILI-Version 3.10.
   */
 
 class StreamReader : public PicDescriptorToNode
@@ -39,18 +39,7 @@ class StreamReader : public PicDescriptorToNode
    mitkClassMacro( StreamReader, PicDescriptorToNode );
    itkNewMacro( StreamReader );
    /** destructor */
-   ~StreamReader();
-
-    /*!
-    \brief Set a list of ipPicDescriptors and the SeriesOID as Input.
-    @param inputPicDescriptorList   These are the different slices, which get combined to volumes.
-    @param inputSeriesOID   The SeriesOID added to the Result-DataTreeNode and get used to Save (override, parent-child-relationship).
-    Both parameter have to be set.
-    How to get the SeriesOID?
-    If you load from lightbox use "lightbox->currentSeries()->oid;".
-    If you load from chili-database use "mitk::ChiliPlugin::GetSeriesInformation().OID;".
-    */
-    virtual void SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID );
+   virtual ~StreamReader();
 
     virtual void SetSecondInput( interSliceGeometry_t* geometry, std::string seriesDescription );
 
@@ -60,27 +49,14 @@ class StreamReader : public PicDescriptorToNode
     */
     virtual void Update();
 
-    /*!
-    \brief Use this to get the generated mitk::DataTreeNodes.
-    @returns A vector of mitk::DataTreeNodes.
-    */
-    virtual std::vector< DataTreeNode::Pointer > GetOutput();
-
-    virtual std::vector< std::list< std::string > > GetImageInstanceUIDs();
-
   protected:
 
     /** constructor */
     StreamReader();
 
     /** input */
-    std::string m_SeriesOID;
     std::string m_SeriesDescription;
-    std::list< ipPicDescriptor* > m_PicDescriptorList;
     interSliceGeometry_t* m_Geometry;
-
-    /** output */
-    std::vector< DataTreeNode::Pointer > m_Output;
 };
 
 } // namespace mitk

@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "math.h"
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
+
 // constructor
 mitk::PicDescriptorToNode::PicDescriptorToNode()
 {
@@ -43,8 +45,9 @@ void mitk::PicDescriptorToNode::SetInput( std::list< ipPicDescriptor* > inputPic
 {
   m_SeriesOID = inputSeriesOID;
   m_PicDescriptorList = inputPicDescriptorList;
+  m_ImageInstanceUIDs.clear();
+  m_Output.clear();
 }
-
 
 // get-function
 std::vector< mitk::DataTreeNode::Pointer > mitk::PicDescriptorToNode::GetOutput()
@@ -141,7 +144,6 @@ std::string mitk::PicDescriptorToNode::GetImageInstanceUID( ipPicDescriptor* inp
 
 void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription )
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   Image::Pointer resultImage = Image::New();
   std::list< std::string > ListOfUIDs;
   ListOfUIDs.clear();
@@ -291,5 +293,6 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     m_Output.push_back( node );
     m_ImageInstanceUIDs.push_back( ListOfUIDs );
   }
-#endif
 }
+
+#endif

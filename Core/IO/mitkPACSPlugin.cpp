@@ -52,6 +52,13 @@ bool mitk::PACSPlugin::IsPlugin()
   return false;
 }
 
+/** DefaultImplementation */
+bool mitk::PACSPlugin::MinCHILIVersionUsed()
+{
+  return false;
+}
+
+/** DefaultImplementation */
 mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetSeriesRelationInformation( const std::string& )
 {
   PSRelationInformationList emptyResult;
@@ -59,6 +66,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetSeriesRelationI
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetStudyRelationInformation( const std::string& )
 {
   PSRelationInformationList emptyResult;
@@ -66,6 +74,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetStudyRelationIn
   return emptyResult;
 }
 
+/** DefaultImplementation */
 mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadParentChildElement( const std::string&, const std::string& )
 {
   return NULL;

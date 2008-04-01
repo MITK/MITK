@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK-Includes
 #include "mitkChiliMacros.h"
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
+
 //helpfunction to sort
 bool mitk::SingleSpacingFilter::PositionSort( const Position& elem1, const Position& elem2 )
 {
@@ -107,8 +109,7 @@ void mitk::SingleSpacingFilter::Update()
 
 void mitk::SingleSpacingFilter::SortPicsToGroup()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
-  for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
+for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
     //check intersliceGeomtry
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
@@ -255,23 +256,19 @@ void mitk::SingleSpacingFilter::SortPicsToGroup()
     }
   free( isg );
   }
-#endif
 }
 
 void mitk::SingleSpacingFilter::CreateResults()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   for( unsigned int x = 0; x < m_GroupVector.size(); x++)
   {
     while( !m_GroupVector[x].includedPositions.empty() )
       SearchParameter( x );
   }
-#endif
 }
 
 void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersionCode( currentGroup ) )
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   std::vector<Position*> usedPos;
   usedPos.clear();
   unsigned int timeCount = 0;
@@ -444,5 +441,6 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
     else std::cout<<"SingleSpacingFilter-WARNING: Logical Error. Groups dont match."<<std::endl;
   }
   while( deleteGroup != usedPos.begin() );
-#endif
 }
+
+#endif

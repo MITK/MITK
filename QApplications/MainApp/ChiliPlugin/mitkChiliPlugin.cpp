@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSpacingSetFilter.h"
 #include "mitkStreamReader.h"
 #include "QmitkChiliPluginSaveDialog.h"
-#include "mitkLightBoxImageReader.h"  //TODO entfernen wenn das neue Chili-Release installiert ist
+#include "mitkLightBoxImageReader.h"
 #include "mitkChiliMacros.h"
 //MITK
 #include <mitkCoreObjectFactory.h>
@@ -251,6 +251,15 @@ int mitk::ChiliPlugin::GetConferenceID()
 bool mitk::ChiliPlugin::IsPlugin()
 {
   return true;
+}
+
+bool mitk::ChiliPlugin::MinCHILIVersionUsed()
+{
+#ifdef CHILI_PLUGIN_VERSION_CODE
+  return true;
+#else
+  return false;
+#endif
 }
 
 /** STUDY-, PATIENT-, SERIES- AND TEXT-INFORMATIONS */
@@ -955,10 +964,6 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  //QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function." );
-  //return resultVector;
-
-  //TODO entfernen wenn das neue Chili-Release installiert ist
   QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
   LightBoxImageReader::Pointer reader = LightBoxImageReader::New();
   reader->SetLightBox( lightbox );
@@ -1688,6 +1693,11 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mit
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
   return;
 
+#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //entspricht < CHILI 3.12
+
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
+  return;
+
 #else
 
   if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
@@ -1768,6 +1778,11 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveAsNewSeries)." );
   return;
 
+#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //entspricht < CHILI 3.12
+
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveAsNewSeries)." );
+  return;
+
 #else
 
   if( m_tempDirectory.empty() || inputNodes->begin() == inputNodes->end() )
@@ -1811,6 +1826,11 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
 void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode(inputNodes), const std::string& mitkHideIfNoVersionCode(seriesOID), bool mitkHideIfNoVersionCode(overrideExistingSeries) )
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
+
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToSeries)." );
+  return;
+
+#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //entspricht < CHILI 3.12
 
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToSeries)." );
   return;
@@ -2005,19 +2025,16 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
                   continue;
               }
               else  //the SERIESOIDs are different
-                //textOID = dbGetNewOID();  // <= CHILI 3.10
-                textOID = pGetNewOID();  // > CHILI 3.10
+                textOID = pGetNewOID();
 
             }
             clearTextStruct( &text );
             clearSeriesStruct( &series );
-            //textOID = dbGetNewOID();  // <= CHILI 3.10
-            textOID = pGetNewOID();  // > CHILI 3.10
+            textOID = pGetNewOID();
 
           }
           else  //the Text-File saved first time
-            //textOID = dbGetNewOID();  // <= CHILI 3.10
-            textOID = pGetNewOID();  // > CHILI 3.10
+            textOID = pGetNewOID();
 
           //save Volume to Parent-Child-XML
           if( initParentChild && ( !currentVolumeLabel || !currentSeriesOID || ( currentSeriesOID && currentSeriesOID->GetValueAsString() != seriesOID ) ) )
@@ -2119,7 +2136,10 @@ bool mitk::ChiliPlugin::InitParentChild( const std::string& mitkHideIfNoVersionC
 {
 #ifndef CHILI_PLUGIN_VERSION_CODE
 
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (InitParentChild)." );
+  return false;
+
+#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //entspricht < CHILI 3.12
+
   return false;
 
 #else
@@ -2148,8 +2168,7 @@ bool mitk::ChiliPlugin::InitParentChild( const std::string& mitkHideIfNoVersionC
     TiXmlElement * relations = new TiXmlElement( "relations" );
     m_currentXmlDoc->LinkEndChild( relations );
     //create new text-oid
-    //m_ParentTextOID = dbGetNewOID();  // <= CHILI 3.10
-    m_ParentTextOID = pGetNewOID();  // > CHILI 3.10
+    m_ParentTextOID = pGetNewOID();
   }
   else  //file exist
   {

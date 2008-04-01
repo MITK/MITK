@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK-Includes
 #include "mitkChiliMacros.h"
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
+
 //help-functions
 bool mitk::ImageNumberFilter::NumberSort( const Slice elem1, const Slice elem2 )
 {
@@ -70,7 +72,6 @@ void mitk::ImageNumberFilter::Update()
 
 void mitk::ImageNumberFilter::SortPicsToGroup()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
     //check intersliceGeomtry
@@ -203,7 +204,6 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
     }
   free( isg );
   }
-#endif
 }
 
 void mitk::ImageNumberFilter::SortSlicesByImageNumber()
@@ -364,7 +364,6 @@ void mitk::ImageNumberFilter::SplitDummiVolumes()
 
 void mitk::ImageNumberFilter::GenerateImages()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); groupIter != m_GroupList.end(); groupIter++ )
   {
     //get time, count
@@ -437,5 +436,6 @@ void mitk::ImageNumberFilter::GenerateImages()
 
     GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupIter->seriesDescription );
   }
-#endif
 }
+
+#endif

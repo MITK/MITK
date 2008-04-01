@@ -17,28 +17,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkLoadSaveToChiliExample.h"
 #include "QmitkLoadSaveToChiliExampleControls.h"
-#include <qaction.h>
-#include "icon.xpm"
-#include "QmitkTreeNodeSelector.h"
-#include "QmitkStdMultiWidget.h"
 
-//PluginEvents
-#include "mitkChiliPluginEvents.h"
-//to add a new node
-#include "mitkDataTreeNodeFactory.h"
-//for the GUI
+//Qt
+#include <qaction.h>
+#include <qlabel.h>
 #include <qlistview.h>
 #include <qradiobutton.h>
 #include <qmessagebox.h>
-//predicates
+//MITK
+#include <mitkProperties.h>
 #include <mitkNodePredicateOR.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateProperty.h>
+#include "mitkChiliPluginEvents.h"
+#include "mitkDataTreeNodeFactory.h"
 
 #include <QmitkDataTreeViewItem.h>
+#include "QmitkStdMultiWidget.h"
+#include "QmitkTreeNodeSelector.h"
 
-#include <mitkProperties.h>
+#include "icon.xpm"
 
 QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it )
 : QmitkFunctionality( parent, name, it ),
@@ -49,7 +48,7 @@ QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const
   SetAvailability( true );
   // register to chili plugin as observer
   m_Plugin = mitk::PACSPlugin::GetInstance();
-  if( m_Plugin )
+  if( m_Plugin && m_Plugin->MinCHILIVersionUsed() )
   {
     itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::Pointer command = itk::ReceptorMemberCommand<QmitkLoadSaveToChiliExample>::New();
     command->SetCallbackFunction( this, &QmitkLoadSaveToChiliExample::PluginEventNewStudySelected );
@@ -75,6 +74,9 @@ QWidget * QmitkLoadSaveToChiliExample::CreateControlWidget( QWidget *parent )
   if( m_Controls == NULL )
   {
     m_Controls = new QmitkLoadSaveToChiliExampleControls( parent );
+     if( m_Plugin && m_Plugin->MinCHILIVersionUsed() )
+      m_Controls->warningLabel->hide();
+    else m_Controls->warningLabel->show();
     SetDataTreeIterator( GetDataTreeIterator() );
   }
   return m_Controls;

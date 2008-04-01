@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef WIN32
 extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
-//extern "C" char *dbGetNewOID( void );  // <= CHILI 3.10
 #endif
 
 class QcMITKTask;
@@ -70,6 +69,12 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     @returns True for Chili-Plugin, false for Standalone.
     */
     virtual bool IsPlugin();
+
+    /*!
+    \brief Return true for CHILI 3.10 and higher.
+    @returns True for CHILI 3.10 and higher, false for CHILI 3.8.
+    */
+    virtual bool MinCHILIVersionUsed();
 
     /*!
     \brief Return all parent-child-saved-volumes to a series.

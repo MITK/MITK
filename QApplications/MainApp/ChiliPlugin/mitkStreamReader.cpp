@@ -23,14 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 
+#ifdef CHILI_PLUGIN_VERSION_CODE
+
 // constructor
 mitk::StreamReader::StreamReader()
 {
-  m_SeriesOID = "";
   m_SeriesDescription = "";
-  m_PicDescriptorList.clear();
   m_Geometry = NULL;
-  m_Output.clear();
 }
 
 // destructor
@@ -38,30 +37,11 @@ mitk::StreamReader::~StreamReader()
 {
 }
 
-// set-function
-void mitk::StreamReader::SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
-{
-  m_SeriesOID = inputSeriesOID;
-  m_PicDescriptorList = inputPicDescriptorList;
-}
-
+// input-function
 void mitk::StreamReader::SetSecondInput( interSliceGeometry_t* geometry, std::string seriesDescription )
 {
   m_Geometry = geometry;
   m_SeriesDescription = seriesDescription;
-}
-
-// get-function
-std::vector< mitk::DataTreeNode::Pointer > mitk::StreamReader::GetOutput()
-{
-  return m_Output;
-}
-
-std::vector< std::list< std::string > > mitk::StreamReader::GetImageInstanceUIDs()
-{
-  std::vector< std::list< std::string > > imageInstanceUIDs;
-  imageInstanceUIDs.clear();
-  return imageInstanceUIDs;
 }
 
 // the "main"-function
@@ -71,8 +51,6 @@ void mitk::StreamReader::Update()
 
   if( m_SeriesOID != "" && !m_PicDescriptorList.empty() && m_Geometry != NULL )
   {
-    #ifdef CHILI_PLUGIN_VERSION_CODE
-
     Image::Pointer resultImage = Image::New();
     Point3D origin;
     Vector3D rightVector, downVector, spacing;
@@ -145,8 +123,8 @@ void mitk::StreamReader::Update()
 
       m_Output.push_back( node );
     }
-    #endif
   }
   else std::cout<<"StreamReader-WARNING: No SeriesOID, PicDescriptorList or Geometry set."<<std::endl;
 }
 
+#endif

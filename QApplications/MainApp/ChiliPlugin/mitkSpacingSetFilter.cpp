@@ -46,13 +46,20 @@ void mitk::SpacingSetFilter::Update()
     SortPicsToGroup();
     SortSlicesByLocation();
     //ShowAllGroupsWithSlices();
+std::cout<<"1"<<std::endl;
     CreatePossibleCombinations();
     SortPossibleCombinations();
     //ShowAllPossibleCombinations();
+std::cout<<"2"<<std::endl;
+    CheckForTimeSlicedCombinations();
+    SortPossibleCombinations();
+    //ShowAllPossibleCombinations();
+std::cout<<"3"<<std::endl;
     //ShowAllSlicesWithUsedSpacings();
     SearchForMinimumCombination();
+std::cout<<"4"<<std::endl;
     //ShowAllResultCombinations();
-    CheckForTimeSlicedCombinations();
+    GenerateImages();
   }
   else std::cout<<"SpacingSetFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
@@ -266,11 +273,11 @@ void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator b
       int imageNumberSpacing = walkIter->imageNumber - basis->imageNumber;
 
       bool search = true;
-      if( EqualImageNumbers( basis ) )
-      {
+      //if( EqualImageNumbers( basis ) )
+      //{
         if( find( basis->sliceUsedWithSpacing.begin(), basis->sliceUsedWithSpacing.end(), spacing ) != basis->sliceUsedWithSpacing.end() )
           search = false;
-      }
+      //}
 
       if( EqualImageNumbers( walkIter ) )
       {
@@ -313,14 +320,14 @@ void mitk::SpacingSetFilter::searchFollowingSlices( std::vector< Slice >::iterat
 
       if( currentSpacing == spacing && currentImageNumberSpacing == imageNumberSpacing )
       {
-        if( find( walkIter->sliceUsedWithSpacing.begin(), walkIter->sliceUsedWithSpacing.end(), spacing ) == walkIter->sliceUsedWithSpacing.end() )
-        {
+        //if( find( walkIter->sliceUsedWithSpacing.begin(), walkIter->sliceUsedWithSpacing.end(), spacing ) == walkIter->sliceUsedWithSpacing.end() )
+        //{
           m_Set.insert( &(*walkIter) );
           walkIter->sliceUsedWithSpacing.insert( spacing );
           referenceIter = walkIter;
           walkON = true;
           break;
-        }
+        //}
       }
       else
         if( currentSpacing > spacing )
@@ -360,6 +367,54 @@ bool mitk::SpacingSetFilter::EqualImageNumbers( std::vector< Slice >::iterator t
   }
 
   return result;
+}
+
+void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
+{
+  for( unsigned int n = 0; n < groupList.size(); n++)
+  {
+    std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].possibleCombinations.begin();
+    while( rootCombinationIter != groupList[n].possibleCombinations.end() )
+    {
+      std::set< Slice* > timeSlicedVolume;
+      timeSlicedVolume.clear();
+      std::vector< std::set< Slice* > >::iterator searchCombinationIter = rootCombinationIter;
+      searchCombinationIter++;
+      while( searchCombinationIter != groupList[n].possibleCombinations.end() )
+      {
+        if( (*rootCombinationIter).size() > 1 && (*rootCombinationIter).size() == (*searchCombinationIter).size() )
+        {
+          std::set< Slice* >::iterator spacingIter = (*rootCombinationIter).begin();
+          spacingIter++;
+          Vector3D tempDistance = (*spacingIter)->origin - (*(*rootCombinationIter).begin())->origin;
+          double referenceSpacingOne = Round( tempDistance.GetNorm(), 2 );
+          int imageNumberSpacingOne = (*spacingIter)->imageNumber - (*(*rootCombinationIter).begin())->imageNumber;
+
+          spacingIter = (*searchCombinationIter).begin();
+          spacingIter++;
+          tempDistance = (*spacingIter)->origin - (*(*searchCombinationIter).begin())->origin;
+          double referenceSpacingTwo = Round( tempDistance.GetNorm(), 2 );
+          int imageNumberSpacingTwo = (*spacingIter)->imageNumber - (*(*searchCombinationIter).begin())->imageNumber;
+
+          if( referenceSpacingOne == referenceSpacingTwo && imageNumberSpacingOne == imageNumberSpacingTwo )
+          {
+            for( std::set< Slice* >::iterator walkIter = (*searchCombinationIter).begin(); walkIter != (*searchCombinationIter).end(); walkIter++ )
+              timeSlicedVolume.insert( (*walkIter) );
+            searchCombinationIter = groupList[n].possibleCombinations.erase( searchCombinationIter );
+          }
+          else searchCombinationIter++;
+        }
+        else searchCombinationIter++;
+      }
+      if( !timeSlicedVolume.empty() )
+      {
+        for( std::set< Slice* >::iterator walkIter = (*rootCombinationIter).begin(); walkIter != (*rootCombinationIter).end(); walkIter++ )
+          timeSlicedVolume.insert( (*walkIter) );
+        rootCombinationIter = groupList[n].possibleCombinations.erase( rootCombinationIter );
+      }
+      else rootCombinationIter++;
+    }
+  }
 }
 
 void mitk::SpacingSetFilter::SortPossibleCombinations()
@@ -514,83 +569,11 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
 #endif
 }
 
-void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
+void mitk::SpacingSetFilter::GenerateImages()
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
-  //for every group
+  //generate mitk::Images
   for( unsigned int n = 0; n < groupList.size(); n++)
   {
-    std::vector< std::vector < std::set< Slice* > > > newResult;
-    newResult.clear();
-
-    //test if more than one result exist
-    if( groupList[n].resultCombinations.front().size() > 1 )
-    {
-      std::vector < std::set< Slice* > > singleCombination;
-      singleCombination.clear();
-      std::vector < std::set< Slice* > >::iterator last = groupList[n].resultCombinations.front().end();
-      last--;
-      //use all results
-      for( std::vector < std::set< Slice* > >::iterator root = groupList[n].resultCombinations.front().begin(); root != last; root ++ )
-      {
-        if( (*root).size() > 0 )
-        {
-          bool addCombination = false;
-          std::vector < std::set< Slice* > >::iterator next = root;
-          next++;
-          //test with following results
-          for( std::vector < std::set< Slice* > >::iterator walk = next; walk != groupList[n].resultCombinations.front().end(); walk ++ )
-          {
-            //timesliced combinations have the same size
-            if( (*root).size() == (*walk).size() )
-            {
-              std::set< Slice* >::iterator combinationOne = (*root).begin();
-              std::set< Slice* >::iterator combinationTwo = (*walk).begin();
-              unsigned x;
-              //check the single positions
-              for( x = 0; x < (*root).size(); x++ )
-              {
-                if( !Equal( (*combinationOne)->origin, (*combinationTwo)->origin ) )
-                  break;
-                combinationOne++;
-                combinationTwo++;
-              }
-              //found timesliced combinations
-              if( x == (*root).size() )
-              {
-                std::set< Slice* > tempUnion;
-                tempUnion.clear();
-                if( addCombination )
-                {
-                  set_union( (*walk).begin(), (*walk).end(), singleCombination.back().begin(), singleCombination.back().end(), inserter( tempUnion, tempUnion.begin() ) );
-
-                  singleCombination.pop_back();
-                  singleCombination.push_back( tempUnion );
-                }
-                else
-                {
-                  set_union( (*root).begin(), (*root).end(), (*walk).begin(), (*walk).end(), inserter( tempUnion, tempUnion.begin() ) );
-                  singleCombination.push_back( tempUnion );
-                }
-                addCombination = true;
-                (*walk).clear();
-              }
-            }
-          }
-          if( !addCombination )
-            singleCombination.push_back( *root );
-        }
-      }
-      if( (*last).size() > 0 )
-        singleCombination.push_back( *last );
-      newResult.push_back( singleCombination );
-    }
-    else
-      newResult.push_back( groupList[n].resultCombinations.front() );
-
-    groupList[n].resultCombinations = newResult;
-
-    //generate mitk::Images
     for( std::vector < std::set< Slice* > >::iterator combinationIter = groupList[n].resultCombinations.front().begin(); combinationIter != groupList[n].resultCombinations.front().end(); combinationIter ++ )
     {
       //get all ipPicDescriptor
@@ -663,7 +646,6 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
       GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupList[n].seriesDescription );
     }
   }
-#endif
 }
 
 void mitk::SpacingSetFilter::ShowAllGroupsWithSlices()

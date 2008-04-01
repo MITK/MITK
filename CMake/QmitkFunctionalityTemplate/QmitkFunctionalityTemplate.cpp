@@ -61,7 +61,7 @@ void @FUNCTIONALITY_NAME@::CreateConnections()
 QAction * @FUNCTIONALITY_NAME@::CreateAction(QActionGroup *parent)
 {
   QAction* action;
-  action = new QAction( tr( "ToolTip" ), QPixmap((const char**)icon_xpm), tr( "MenueEintrag" ), 0, parent, "@FUNCTIONALITY_NAME@" );
+  action = new QAction( tr( "@FUNCTIONALITY_NAME@ description" ), QPixmap((const char**)icon_xpm), tr( "@FUNCTIONALITY_NAME@ menu" ), 0, parent, "@FUNCTIONALITY_NAME@" );
   return action;
 }
 

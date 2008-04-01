@@ -251,6 +251,14 @@ IF(WIN32 AND NOT UNIX)
     INSTALL(FILES ${vtkdlllist} DESTINATION bin)
   ENDFOREACH(vtklib)
   
+  # install ITK _release_ dll , this will probably crash with a MITK debug version. Also this
+  # will fail if ITK starts using more than one directory for its libs.
+  FILE(GLOB itkdlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
+  FOREACH(itklib ${itkdlllist})
+    INSTALL(FILES ${itkdlllist} DESTINATION bin)
+  ENDFOREACH(itklib)
+   
+
   # include required mfc libraries
   INCLUDE(InstallRequiredSystemLibraries)
   # include CPack model once all variables are set

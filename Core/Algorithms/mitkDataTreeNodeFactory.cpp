@@ -83,19 +83,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGridVolumeMapperProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
-#ifdef MBI_INTERNAL
-#ifdef HAVE_IPDICOM
-#include "mitkDICOMFileReader.h"
-#endif // HAVE_IPDICOM 
-#include "mitkBirdDataFromFileReader.h"
-#include "mitkTrackedUSDataFileParser.h"
-#include "mitkUSLookupTableSource.h"
-#include "mitkCylindricToCartesianFilter.h"
-#include "mitkDSRFileReader.h"
-#include "mitkShapeModelFileReader.h"
-#endif // MBI_INTERNAL
-
-
 bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;		// default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()

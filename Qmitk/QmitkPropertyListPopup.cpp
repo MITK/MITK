@@ -276,6 +276,7 @@ void QmitkPropertyListPopup::onNameClicked()
       // user entered something and pressed OK
       nameProperty->SetValue( newName.ascii() );
       nameProperty->Modified();
+      emit propertyListChangesDone();
     } 
     else if (ok)
     { 

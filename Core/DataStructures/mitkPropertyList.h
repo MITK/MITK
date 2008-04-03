@@ -88,7 +88,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
     /**
      * @brief Get a property by its name. 
      */
-    mitk::BaseProperty* GetProperty(const char *propertyKey) const;
+    mitk::BaseProperty* GetProperty(const std::string& propertyKey) const;
 
     /**
      * @brief Set a property in the list/map by value.
@@ -98,7 +98,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
      * property - which would make sense if you want to change the type (bool, string) of the property
      * - call ReplaceProperty.
      */
-    void SetProperty(const char* propertyKey, BaseProperty* property);
+    void SetProperty(const std::string& propertyKey, BaseProperty* property);
 
     /**
      * @brief Set a property object in the list/map by reference.
@@ -108,7 +108,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
      * Another use is to share one and the same property object among several ProperyList/DataTreeNode objects, which
      * makes them appear synchronized.
      */
-    void ReplaceProperty(const char* propertyKey, BaseProperty* property);
+    void ReplaceProperty(const std::string& propertyKey, BaseProperty* property);
 
     /**
      * @brief Set a property object in the list/map by reference.
@@ -124,7 +124,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
     /**
      * @brief Remove a property from the list/map.
      */
-    bool DeleteProperty(const char* propertyKey);
+    bool DeleteProperty(const std::string& propertyKey);
 
     const PropertyMap* GetMap() const { return &m_Properties; }
 
@@ -138,8 +138,8 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
 
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
     virtual bool ReadXMLData( XMLReader& xmlReader );
-    virtual bool IsEnabled(const char *propertyKey);
-    virtual void SetEnabled(const char *propertyKey,bool enabled);
+    virtual bool IsEnabled(const std::string& propertyKey);
+    virtual void SetEnabled(const std::string& propertyKey,bool enabled);
 
     static const std::string XML_NODE_NAME;
 

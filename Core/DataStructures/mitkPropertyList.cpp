@@ -29,7 +29,7 @@ mitk::UIDGenerator mitk::PropertyList::m_UIDGenerator;
 std::map<std::string, mitk::BaseProperty*> mitk::PropertyList::m_AlreadyReadFromXML;
 std::map<mitk::BaseProperty*, std::string> mitk::PropertyList::m_AlreadyWrittenToXML;
 
-mitk::BaseProperty* mitk::PropertyList::GetProperty(const char *propertyKey) const
+mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyKey) const
 {
     PropertyMap::const_iterator it;
     
@@ -41,7 +41,7 @@ mitk::BaseProperty* mitk::PropertyList::GetProperty(const char *propertyKey) con
 }
 
 
-void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* property)
+void mitk::PropertyList::SetProperty(const std::string& propertyKey, BaseProperty* property)
 {
   if (!property) return;
   //make sure that BaseProperty*, which may have just been created and never been 
@@ -96,7 +96,7 @@ void mitk::PropertyList::SetProperty(const char* propertyKey, BaseProperty* prop
 }
 
 
-void mitk::PropertyList::ReplaceProperty(const char* propertyKey, BaseProperty* property)
+void mitk::PropertyList::ReplaceProperty(const std::string& propertyKey, BaseProperty* property)
 {
   if (!property) return;
 
@@ -154,7 +154,7 @@ unsigned long mitk::PropertyList::GetMTime() const
 }
 
 
-bool mitk::PropertyList::DeleteProperty(const char* propertyKey)
+bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 {
   PropertyMap::iterator it;  
   it=m_Properties.find( propertyKey );
@@ -305,7 +305,7 @@ const std::string& mitk::PropertyList::GetXMLNodeName() const
 }
 
 
-bool mitk::PropertyList::IsEnabled(const char *propertyKey) 
+bool mitk::PropertyList::IsEnabled(const std::string& propertyKey) 
 {
   PropertyMap::iterator it = m_Properties.find( propertyKey );
   if (it != m_Properties.end() && it->second.second) 
@@ -319,7 +319,7 @@ bool mitk::PropertyList::IsEnabled(const char *propertyKey)
 }
 
 
-void mitk::PropertyList::SetEnabled(const char *propertyKey,bool enabled) 
+void mitk::PropertyList::SetEnabled(const std::string& propertyKey,bool enabled) 
 {
   PropertyMap::iterator it = m_Properties.find( propertyKey );
   if (it != m_Properties.end() && it->second.second != enabled) 

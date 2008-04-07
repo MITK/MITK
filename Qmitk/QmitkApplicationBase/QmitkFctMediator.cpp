@@ -536,9 +536,9 @@ void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer opti
 
       // Read (or create) application property for this dialog bar; enable or
       // disable it accordingly; default is disabled
-      QString dialogBarStateName = "DialogBar " + dialogBar->GetCaption() + " active";
+			std::string dialogBarStateName = "DialogBar " + dialogBar->GetCaption() + " active";
 
-      mitk::BoolProperty *dialogBarState = dynamic_cast< mitk::BoolProperty* >(m_Options->GetProperty(dialogBarStateName.ascii()));
+      mitk::BoolProperty *dialogBarState = dynamic_cast< mitk::BoolProperty* >(m_Options->GetProperty(dialogBarStateName));
 
       bool enableDialogBar;
       if ( dialogBarState != NULL )
@@ -547,7 +547,7 @@ void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer opti
       }
       else
       {
-        m_Options->SetProperty( dialogBarStateName.ascii(), new mitk::BoolProperty( false ) );
+				m_Options->SetProperty( dialogBarStateName, new mitk::BoolProperty( false ) );
         enableDialogBar = false;
       }
 

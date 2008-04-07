@@ -49,7 +49,7 @@ QmitkDialogBar
   m_GroupBox->setColumnLayout( 0, Qt::Vertical );
   m_GroupBox->layout()->setSpacing( 6 );
   m_GroupBox->setMargin( 11 );
-  m_GroupBox->setTitle( m_Caption );
+  m_GroupBox->setTitle( QString(m_Caption.c_str()) );
 
   QWidget *dialogBar = this->CreateDialogBar( m_GroupBox );
 
@@ -94,14 +94,14 @@ QmitkDialogBar
   // Reflect new visible state in global preferences
   if ( m_GlobalOptions )
   {
-    QString dialogBarStateName = "DialogBar " + m_Caption + " active";
+		std::string dialogBarStateName = "DialogBar " + m_Caption + " active";
 
     m_GlobalOptions->SetProperty( 
       dialogBarStateName, new mitk::BoolProperty( visible ) );
   }
 }
 
-const QString &
+const std::string &
 QmitkDialogBar
 ::GetCaption() const
 {

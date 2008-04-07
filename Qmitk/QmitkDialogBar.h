@@ -70,7 +70,7 @@ public:
 
   virtual QAction *CreateAction( QObject *parent ) = 0;
 
-  virtual const QString &GetCaption() const;
+	virtual const std::string &GetCaption() const;
 
   QmitkStdMultiWidget *GetMultiWidget() const;
 
@@ -86,7 +86,7 @@ protected:
 
   QmitkStdMultiWidget *m_MultiWidget;
 
-  QString m_Caption;
+	std::string m_Caption;
 
 private:
   mitk::PropertyList::Pointer m_GlobalOptions;

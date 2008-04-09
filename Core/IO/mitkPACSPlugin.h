@@ -18,8 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 
+//ITK
 #include <itkObject.h>
-
+//MITK
 #include <mitkDataTree.h>
 #include <mitkDataStorage.h>
 
@@ -54,6 +55,14 @@ typedef enum
 class MITK_CORE_EXPORT PACSPlugin : public itk::Object
 {
   public:
+
+    /** This struct contain the plugin capabilities. */
+    struct PACSPluginCapability
+    {
+      bool isPlugin;
+      bool canLoad;
+      bool canSave;
+    };
 
     /** This struct contain all possible informations about the studies. */
     struct StudyInformation
@@ -127,16 +136,16 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<TextInformation> TextInformationList;
 
     struct PSRelationInformation
-     {
-       std::string label;
-       std::string id;
-       std::string oid;
-       std::list<std::string> parentLabel;
-       std::list<std::string> childLabel;
-       bool image;
-     };
+    {
+      std::string Label;
+      std::string ID;
+      std::string OID;
+      std::list<std::string> ParentLabel;
+      std::list<std::string> ChildLabel;
+      bool Image;
+    };
 
-     typedef std::list<PSRelationInformation> PSRelationInformationList;
+    typedef std::list<PSRelationInformation> PSRelationInformationList;
 
     /*!
     \brief Return a mitk::PACSPlugin-Instance as singleton.
@@ -152,16 +161,10 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     virtual int GetConferenceID();
 
     /*!
-    \brief Return true if the application run as plugin and false if the application run as standalone.
-    @returns True for Chili-Plugin, false for Standalone.
+    \brief This function return the Plugin-Capabilities like canSave, canWrite or isPlugin.
+    @returns Return the current CHILI-Plugin-Capabilities.
     */
-    virtual bool IsPlugin();
-
-    /*!
-    \brief Return true for CHILI 3.10 and higher.
-    @returns True for CHILI 3.10 and higher, false for CHILI 3.8.
-    */
-    virtual bool MinCHILIVersionUsed();
+    virtual PACSPluginCapability GetPluginCapabilities();
 
     /*!
     \brief Return all parent-child-saved-volumes to a series.
@@ -280,7 +283,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     @returns Multiple mitk::DataTreeNodes as vector.
     The seriesOID have to be set. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...).
     */
-    virtual std::vector<DataTreeNode::Pointer> LoadCompleteSeries( const std::string& seriesOID );
+    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesOID );
 
     /*!
     \brief Load all Images to a series.
@@ -288,7 +291,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     @returns Multiple mitk::DataTreeNodes as vector.
     The parameter have to be set. This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats should save, they get load from harddisk with the DataTreeNodeFactory.
     */
-    virtual std::vector<DataTreeNode::Pointer> LoadAllImagesFromSeries( const std::string& seriesOID );
+    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesOID );
 
     /*!
     \brief Load all Text-entries to a series.
@@ -297,7 +300,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     Important: Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ).
     The seriesOID have to be set.
     */
-    virtual std::vector<DataTreeNode::Pointer> LoadAllTextsFromSeries( const std::string& seriesOID );
+    virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesOID );
 
     /*!
     \brief Load one Text-files.
@@ -306,7 +309,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     To load a single text-file, you need more than the textOID, this function search for the missing attributes with qTextQuery(...) and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ).
     The textOID have to be set.
     */
-    virtual DataTreeNode::Pointer LoadOneText( const std::string& textOID );
+    virtual DataTreeNode::Pointer LoadSingleText( const std::string& textOID );
 
     /*!
     \brief Load one Text-files.
@@ -317,7 +320,12 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     This function load from database. The file get saved to harddisk and readed via factory. The file get deleted if it could read.
     All parameter have to be set.
     */
-    virtual DataTreeNode::Pointer LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
+    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
+
+    /*!
+    \brief The result of all Load-Functions are DataTreeNodes. If you put them to the DataStorage, the relations are missing. This function create the parent-child-relations between the DataTreeNodes how saved at the DataStorage.
+    */
+    virtual void SetRelationsToDataStorage();
 
     /*!
     \brief Save Images- and Texts-Files with User-Dialog to Chili via Fileupload.

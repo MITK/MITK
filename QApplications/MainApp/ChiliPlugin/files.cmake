@@ -1,6 +1,23 @@
 SET(CPP_FILES
-  mitkChiliPluginFactory.cpp
+  QcMITKTask.cpp
+  QmitkEventCollector.cpp
+  # CHILI-Plugin
   mitkChiliPlugin.cpp
+  mitkChiliPluginFactory.cpp
+  # sub-classes
+  mitkCHILIInformation.cpp
+  mitkLoadFromCHILI.cpp
+  mitkSaveToCHILI.cpp
+  mitkParentChild.cpp
+  # interfaces
+  mitkImageToPicDescriptor.cpp
+  mitkPicDescriptorToNode.cpp
+  # filter
+  mitkImageNumberFilter.cpp
+  mitkSingleSpacingFilter.cpp
+  mitkSpacingSetFilter.cpp
+  mitkStreamReader.cpp
+  mitkLightBoxImageReaderImpl.cpp
   # mitkConference/mitkChiliConferenceKitFactory.cpp
   mitkConference/mitkConferenceKit.cpp
   mitkConference/mitkConferenceKitFactory.cpp
@@ -10,16 +27,6 @@ SET(CPP_FILES
   # mitkConference/QmitkQChili3Conference.cpp
   mitkConference/TextLoggerConferenceKit.cpp
   mitkConference/TextLoggerConferenceKitFactory.cpp
-  mitkImageToPicDescriptor.cpp
-  mitkPicDescriptorToNode.cpp
-  mitkSingleSpacingFilter.cpp
-  mitkSpacingSetFilter.cpp
-  mitkStreamReader.cpp
-  mitkImageNumberFilter.cpp
-  QcMITKTask.cpp
-  QmitkEventCollector.cpp
-
-  mitkLightBoxImageReaderImpl.cpp
 )
 SET(MOC_H_FILES
   mitkChiliPlugin.h

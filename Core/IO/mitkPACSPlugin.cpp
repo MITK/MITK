@@ -47,15 +47,13 @@ int mitk::PACSPlugin::GetConferenceID()
 }
 
 /** DefaultImplementation */
-bool mitk::PACSPlugin::IsPlugin()
+mitk::PACSPlugin::PACSPluginCapability mitk::PACSPlugin::GetPluginCapabilities()
 {
-  return false;
-}
-
-/** DefaultImplementation */
-bool mitk::PACSPlugin::MinCHILIVersionUsed()
-{
-  return false;
+  PACSPluginCapability result;
+  result.isPlugin = false;
+  result.canLoad = false;
+  result.canSave = false;
+  return result;
 }
 
 /** DefaultImplementation */
@@ -156,7 +154,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbo
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadCompleteSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -164,7 +162,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadCompleteSeries( c
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllImagesFromSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -172,7 +170,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllImagesFromSeri
 }
 
 /** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllTextsFromSeries( const std::string& )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string& )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
@@ -180,15 +178,20 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadAllTextsFromSerie
 }
 
 /** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& )
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& )
 {
   return NULL;
 }
 
 /** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadOneText( const std::string& , const std::string& , const std::string& )
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& , const std::string& , const std::string& )
 {
   return NULL;
+}
+
+/** DefaultImplementation */
+void mitk::PACSPlugin::SetRelationsToDataStorage()
+{
 }
 
 /** DefaultImplementation */
@@ -197,12 +200,11 @@ void mitk::PACSPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer , const std::string& , int , const std::string& )
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer, const std::string& , int , const std::string& )
 {
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer  , const std::string& , bool )
+void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer, const std::string& , bool )
 {
 }
-

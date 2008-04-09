@@ -81,10 +81,13 @@ protected slots:
   void LoadFromStudyListView();
   void LoadFromPSListView();
   void ChangeReaderType();
+  void CheckPluginCapabilties();
 
 protected:
 
   mitk::PACSPlugin* m_Plugin;
+
+  unsigned long m_ObserverTag;
 
   struct MimeTypeStruct
   {

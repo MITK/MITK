@@ -321,8 +321,7 @@
                 <bool>true</bool>
             </property>
             <property name="text">
-                <string>&lt;b&gt;&lt;u&gt;WARNING&lt;/u&gt;&lt;/b&gt;: Your CHILI version&lt;br&gt;
-does not support this functionality.</string>
+                <string>&lt;b&gt;&lt;u&gt;WARNING&lt;/u&gt;&lt;/b&gt;: Your CHILI version does not support this part of the functionality.</string>
             </property>
         </widget>
     </vbox>

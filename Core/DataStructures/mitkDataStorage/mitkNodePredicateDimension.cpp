@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 
 
-mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension)
-: m_Dimension( dimension )
+mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, unsigned int pixelComponents)
+: m_Dimension( dimension ),
+  m_PixelComponents( pixelComponents )
 {
 }
 
@@ -39,7 +40,7 @@ bool mitk::NodePredicateDimension::CheckNode(const mitk::DataTreeNode* node) con
   mitk::Image *image = dynamic_cast<mitk::Image *>( node->GetData() );
   if (image != NULL)
   {
-    return (image->GetDimension() == m_Dimension);
+    return (image->GetDimension() == m_Dimension && image->GetPixelType().GetNumberOfComponents() == m_PixelComponents);
   }
    
   return false; 

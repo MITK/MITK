@@ -474,6 +474,15 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
       }
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (automaticNode->GetData());
+       
+      if (    image.IsNull()
+           || image->GetDimension() < 3
+           || image->GetDimension() > 4
+           || image->GetPixelType().GetNumberOfComponents() != 1 )
+      {
+        QMessageBox::information(NULL, "MITK", QString("Invalid segmentation. This program only supports monochrome 3D and 3D+t images."), QMessageBox::Ok);
+        return;
+      }
 
       QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
       dialog.setPrompt("What organ did you just load?");

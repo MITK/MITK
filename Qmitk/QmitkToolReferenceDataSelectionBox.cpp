@@ -143,8 +143,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
 {
   // update reference images
   mitk::NodePredicateDataType images("Image");
-  mitk::NodePredicateDimension dim3(3);
-  mitk::NodePredicateDimension dim4(4);
+  mitk::NodePredicateDimension dim3(3, 1);
+  mitk::NodePredicateDimension dim4(4, 1);
   mitk::NodePredicateOR dimension( dim3, dim4 );
   mitk::NodePredicateAND image3D( images, dimension );
 

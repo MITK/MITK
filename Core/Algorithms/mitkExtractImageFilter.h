@@ -77,6 +77,9 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
 
     ExtractImageFilter(); // purposely hidden
     virtual ~ExtractImageFilter();
+  
+    virtual void GenerateOutputInformation();
+    virtual void GenerateInputRequestedRegion();
 
     virtual void GenerateData();
 

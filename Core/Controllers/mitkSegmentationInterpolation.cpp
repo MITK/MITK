@@ -409,7 +409,6 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
     lowerMITKSlice = extractor->GetOutput();
     lowerMITKSlice->DisconnectPipeline(); // otherwise the next output of the filter will overwrite this pointer, too
     
-    extractor= ExtractImageFilter::New();
     extractor->SetInput( m_Segmentation );
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( sliceIndex );
@@ -418,7 +417,6 @@ mitk::Image::Pointer mitk::SegmentationInterpolation::Interpolate( unsigned int 
     resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
     
-    extractor= ExtractImageFilter::New();
     extractor->SetInput( m_Segmentation );
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( upperBound );

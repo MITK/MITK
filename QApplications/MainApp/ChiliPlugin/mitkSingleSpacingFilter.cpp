@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK-Includes
 #include "mitkChiliMacros.h"
 
+#include <algorithm>  //needed for "sort" (windows)
+
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
 //helpfunction to sort

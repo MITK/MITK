@@ -88,9 +88,9 @@ mitk::ChiliPlugin::ChiliPlugin()
     std::cout << "CHILIPlugin: Create and use directory "<< m_tempDirectory << std::endl;
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
-  m_ChiliInformation = mitk::CHILIInformation::New();
-  m_LoadFromCHILI = mitk::LoadFromCHILI::New();
-  m_SaveToCHILI = mitk::SaveToCHILI::New();
+  m_ChiliInformation = CHILIInformation::New();
+  m_LoadFromCHILI = LoadFromCHILI::New();
+  m_SaveToCHILI = SaveToCHILI::New();
 #endif
 }
 

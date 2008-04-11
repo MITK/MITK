@@ -623,20 +623,20 @@ void QmitkSliceBasedSegmentation::InitiateCreateNewSegmentationFromThreshold(boo
   if (toggled) // initiate thresholding
   {
     bool everythingFine(false);
-    mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-    if (node.IsNotNull())
+    m_NodeForThresholding = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
+    if (m_NodeForThresholding.IsNotNull())
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
       if (image.IsNotNull())
       {
         // initialize and a new node with the same image as our reference image
         // use the level window property of this image copy to display the result of a thresholding operation
         m_ThresholdFeedbackNode->SetData( image );
         int layer(0);
-        node->GetIntProperty("layer", layer);
+        m_NodeForThresholding->GetIntProperty("layer", layer);
         m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
          
-        mitk::DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, node );
+        mitk::DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, m_NodeForThresholding );
  
         m_Controls->sliderThreshold->setMinValue( static_cast<int>( image->GetScalarValueMin() ) );
         m_Controls->sliderThreshold->setMaxValue( static_cast<int>( image->GetScalarValueMax() ) );
@@ -674,10 +674,9 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
   m_Controls->btnNewFromThreshold->setOn(false);
 
   // only proceed if we still have a reference data object (otherwise the user quite messed up)
-  mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-  if (node.IsNotNull())
+  if (m_NodeForThresholding.IsNotNull())
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
     if (image.IsNotNull())
     {
       // ask about the name and organ type of the new segmentation
@@ -696,14 +695,17 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
           // actually perform a thresholding and ask for an organ type
           AccessFixedDimensionByItk_1( image, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentation->GetData()) );
 
-          mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+          mitk::DataStorage::GetInstance()->Add( emptySegmentation, m_NodeForThresholding ); // add as a child, because the segmentation "derives" from the original
 
           m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+          m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetReferenceData( m_NodeForThresholding );
         }
       }
     }
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  m_NodeForThresholding = NULL;
 }
 
 void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThresholdSliderChanged(int threshold)

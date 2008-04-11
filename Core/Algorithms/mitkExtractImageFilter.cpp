@@ -68,6 +68,35 @@ void mitk::ExtractImageFilter::GenerateData()
   }
 
    AccessFixedDimensionByItk( input, ItkImageProcessing, 3 );
+
+  // set a nice geometry for display and point transformations
+  Geometry3D* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
+  if (!inputImageGeometry)
+  {
+    std::cerr << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
+    return;
+  }
+
+  PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Transversal;
+
+  switch ( m_SliceDimension )
+  {
+    default:
+    case 2: 
+      orientation = PlaneGeometry::Transversal;
+      break;
+    case 1: 
+      orientation = PlaneGeometry::Frontal;
+      break;
+    case 0: 
+      orientation = PlaneGeometry::Sagittal;
+      break;
+   }
+ 
+  PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
+  planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex + 0.5 , true, false );
+  Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+  resultImage->SetGeometry( planeGeometry );
 }
     
 template<typename TPixel, unsigned int VImageDimension>
@@ -215,35 +244,6 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
 */
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
-
-  // set a nice geometry for display and point transformations
-  Geometry3D* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
-  if (!inputImageGeometry)
-  {
-    std::cerr << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
-    return;
-  }
-
-  PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Transversal;
-
-  switch ( sliceDimension )
-  {
-    default:
-    case 2: 
-      orientation = PlaneGeometry::Transversal;
-      break;
-    case 1: 
-      orientation = PlaneGeometry::Frontal;
-      break;
-    case 0: 
-      orientation = PlaneGeometry::Sagittal;
-      break;
-   }
- 
-  PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
-  planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex + 0.5 , true, false );
-  Image::Pointer resultImage = ImageToImageFilter::GetOutput();
-  resultImage->SetGeometry( planeGeometry );
 }
 
 

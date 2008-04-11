@@ -392,7 +392,7 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   QPopupMenu orientationPopup(this);
   orientationPopup.insertItem( "Transversal (red window)", 2 );
   orientationPopup.insertItem( "Sagittal (green window)", 0 );
-  orientationPopup.insertItem( "Frontal (blue window)", 1 );
+  orientationPopup.insertItem( "Coronal (blue window)", 1 );
 
   connect( &orientationPopup, SIGNAL(activated(int)), this, SLOT(OnAcceptAllPopupActivated(int)) );
 

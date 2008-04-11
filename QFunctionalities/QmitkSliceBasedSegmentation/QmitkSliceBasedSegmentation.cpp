@@ -461,6 +461,11 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
       }
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (automaticNode->GetData());
+      if ( image.IsNull() )
+      {
+        QMessageBox::information(NULL, "MITK", QString("The selected file does not contain a segmentation, sorry."), QMessageBox::Ok);
+        return;
+      }
 
       QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
       dialog.setPrompt("What organ did you just load?");
@@ -478,6 +483,12 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
         m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
       }
     }
+    else 
+    {
+      QMessageBox::information(NULL, "MITK", QString("The selected file does not contain a segmentation, sorry."), QMessageBox::Ok);
+      return;
+    }
+
   }
   catch( std::exception& e )
   {

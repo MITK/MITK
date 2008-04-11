@@ -291,6 +291,8 @@ mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
     if (newNode.IsNotNull())
     {
       mitk::Image::Pointer imageData = dynamic_cast<mitk::Image*> (newNode->GetData()) ;
+      if (imageData.IsNull()) return NULL;
+
       if (imageData->GetDimension(2) == 1)
       {
         //        std::string dir = itksys::SystemTools::GetFilenamePath( std::string(fileName.ascii()) )

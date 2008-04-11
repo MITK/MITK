@@ -91,6 +91,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent, const ch
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( btnOk );
   horizontalLayout->addWidget( btnCancel );
+
+  edtNewOrgan->setFocus();
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()

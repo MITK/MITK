@@ -366,6 +366,9 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
         goodCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
         /* tag = */ surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
+        itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer badCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
+        badCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
+        /* tag = */ surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
 
         surfaceFilter->SetPointerParameter("Input", image);
         surfaceFilter->SetPointerParameter("Group node", node);
@@ -375,15 +378,8 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         surfaceFilter->StartAlgorithm(); // starts thread
       }
     }
-    
-    mitk::ProgressBar::GetInstance()->Progress();
   }
    
-  if ( !nodes.empty() )
-  {
-    QMessageBox::information(NULL, "MITK", QString("Surface creation is started in a background task, it will take some time..."), QMessageBox::Ok);
-  }
-
   QApplication::restoreOverrideCursor();
 }
 
@@ -794,6 +790,7 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
 
 void QmitkSliceBasedSegmentation::OnSurfaceCalculationDone()
 {
+  mitk::ProgressBar::GetInstance()->Progress();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }        
 

@@ -62,7 +62,7 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
     /**
       \brief The orientation of the slice to be extracted.
 
-      \param dim Number of the dimension which is constant for all pixels of the desired slice (e.g. 0 for transversal)
+      \param dim Number of the dimension which is constant for all pixels of the desired slice (e.g. 2 for transversal)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);

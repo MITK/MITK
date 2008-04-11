@@ -40,8 +40,8 @@ void mitk::ExtractImageFilter::GenerateData()
 
    if ( (input->GetDimension() > 4) || (input->GetDimension() < 2) )
    {
-     //std::cerr << "mitk::ExtractImageFilter works only with 3D images, sorry." << std::endl;
-     itkExceptionMacro("mitk::ExtractImageFilter works only with 3D images, sorry.");
+     std::cerr << "mitk::ExtractImageFilter:GenerateData works only with 3D images, sorry." << std::endl;
+     itkExceptionMacro("mitk::ExtractImageFilter works only with 3D and 3D+t images, sorry.");
      return;
    }
    else if (input->GetDimension() == 4)
@@ -60,12 +60,12 @@ void mitk::ExtractImageFilter::GenerateData()
      return;
    }
 
-   if ( m_SliceDimension >= input->GetDimension() )
-   {
-     //std::cerr << "mitk::ExtractImageFilter:  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
-     itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
-     return;
-   }
+  if ( m_SliceDimension >= input->GetDimension() )
+  {
+    std::cerr << "mitk::ExtractImageFilter:GenerateData  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+    itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
+    return;
+  }
 
    AccessFixedDimensionByItk( input, ItkImageProcessing, 3 );
 }
@@ -128,6 +128,12 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
   ImageToImageFilter::InputImagePointer input = const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
   Image::Pointer output = this->GetOutput();
 
+  if (input->GetDimension() == 2)
+  {
+    input->SetRequestedRegionToLargestPossibleRegion();
+    return;
+  }
+
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();
   requestedRegion.SetIndex(0, 0);
@@ -156,20 +162,33 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
  */
 void mitk::ExtractImageFilter::GenerateOutputInformation()
 {
-  Image::Pointer output = this->GetOutput();
-  Image::ConstPointer input = this->GetInput();
-  if (input.IsNull()) return;
+ Image::Pointer output = this->GetOutput();
+ Image::ConstPointer input = this->GetInput();
+ if (input.IsNull()) return;
+
+ if ( m_SliceDimension >= input->GetDimension() && input->GetDimension() != 2 )
+ {
+   std::cerr << "mitk::ExtractImageFilter:GenerateOutputInformation  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+   itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
+   return;
+ }
+
+ unsigned int sliceDimension( m_SliceDimension );
+ if ( input->GetDimension() == 2)
+ {
+   sliceDimension = 2;
+ }
 
   unsigned int i(0);
   unsigned int tmpDimensions[2];
 
-  switch ( m_SliceDimension )
+  switch ( sliceDimension )
   {
     default:
     case 2: 
       // orientation = PlaneGeometry::Transversal;
       tmpDimensions[0] = input->GetDimension(0);
-      tmpDimensions[1] = input->GetDimension(10);
+      tmpDimensions[1] = input->GetDimension(1);
       break;
     case 1: 
       // orientation = PlaneGeometry::Frontal;
@@ -207,7 +226,7 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
 
   PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Transversal;
 
-  switch ( m_SliceDimension )
+  switch ( sliceDimension )
   {
     default:
     case 2: 

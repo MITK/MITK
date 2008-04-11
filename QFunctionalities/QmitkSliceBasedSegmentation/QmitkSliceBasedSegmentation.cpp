@@ -373,6 +373,9 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
         goodCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
         /* tag = */ surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
+        itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer badCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
+        badCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
+        /* tag = */ surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
 
         surfaceFilter->SetPointerParameter("Input", image);
         surfaceFilter->SetPointerParameter("Group node", node);
@@ -382,15 +385,8 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
         surfaceFilter->StartAlgorithm(); // starts thread
       }
     }
-    
-    mitk::ProgressBar::GetInstance()->Progress();
   }
    
-  if ( !nodes.empty() )
-  {
-    QMessageBox::information(NULL, "MITK", QString("Surface creation is started in a background task, it will take some time..."), QMessageBox::Ok);
-  }
-
   QApplication::restoreOverrideCursor();
 }
 
@@ -500,6 +496,12 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
         m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
       }
     }
+    else 
+    {
+      QMessageBox::information(NULL, "MITK", QString("The selected file does not contain a segmentation, sorry."), QMessageBox::Ok);
+      return;
+    }
+
   }
   catch( std::exception& e )
   {
@@ -645,20 +647,20 @@ void QmitkSliceBasedSegmentation::InitiateCreateNewSegmentationFromThreshold(boo
   if (toggled) // initiate thresholding
   {
     bool everythingFine(false);
-    mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-    if (node.IsNotNull())
+    m_NodeForThresholding = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
+    if (m_NodeForThresholding.IsNotNull())
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
       if (image.IsNotNull())
       {
         // initialize and a new node with the same image as our reference image
         // use the level window property of this image copy to display the result of a thresholding operation
         m_ThresholdFeedbackNode->SetData( image );
         int layer(0);
-        node->GetIntProperty("layer", layer);
+        m_NodeForThresholding->GetIntProperty("layer", layer);
         m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
          
-        mitk::DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, node );
+        mitk::DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, m_NodeForThresholding );
  
         m_Controls->sliderThreshold->setMinValue( static_cast<int>( image->GetScalarValueMin() ) );
         m_Controls->sliderThreshold->setMaxValue( static_cast<int>( image->GetScalarValueMax() ) );
@@ -696,10 +698,9 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
   m_Controls->btnNewFromThreshold->setOn(false);
 
   // only proceed if we still have a reference data object (otherwise the user quite messed up)
-  mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-  if (node.IsNotNull())
+  if (m_NodeForThresholding.IsNotNull())
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
     if (image.IsNotNull())
     {
       // ask about the name and organ type of the new segmentation
@@ -727,14 +728,17 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
             AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentation->GetData()), timeStep );
           }
 
-          mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+          mitk::DataStorage::GetInstance()->Add( emptySegmentation, m_NodeForThresholding ); // add as a child, because the segmentation "derives" from the original
 
           m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+          m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetReferenceData( m_NodeForThresholding );
         }
       }
     }
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  m_NodeForThresholding = NULL;
 }
 
 void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThresholdSliderChanged(int threshold)
@@ -829,6 +833,7 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
 
 void QmitkSliceBasedSegmentation::OnSurfaceCalculationDone()
 {
+  mitk::ProgressBar::GetInstance()->Progress();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }        
 

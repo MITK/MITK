@@ -609,11 +609,11 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
   if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))
   {
-    nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutExtension( m_FileName ) );
-    if (FileNameEndsWith( ".pic" ))
-      m_FileName = m_FileName.substr( 0, m_FileName.length()-4 );
- 
-    itksys::SystemTools::GetFilenameWithoutExtension( m_FileName );
+    if (FileNameEndsWith( ".gz" ))
+      m_FileName = m_FileName.substr( 0, m_FileName.length()-3 );
+    
+    nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
+
     node->SetProperty( "name", nameProp );
   }
   
@@ -621,3 +621,4 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   if(!node->GetProperty("visible"))
     node->SetVisibility(true);
 }
+

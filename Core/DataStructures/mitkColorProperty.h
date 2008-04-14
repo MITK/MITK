@@ -43,17 +43,25 @@ class MITK_CORE_EXPORT ColorProperty : public BaseProperty
 protected:
   //##ModelId=3E86A3B00061
   mitk::Color m_Color;
-public:
+  
   ColorProperty();
-  mitkClassMacro(ColorProperty, BaseProperty);
   
   ColorProperty(const float red, const float green, const float blue);
-  
+    
   //##ModelId=3E86A3450130
   ColorProperty(const float color[3]);
   
   //##ModelId=3ED9530801BD
   ColorProperty(const mitk::Color & color);
+    
+public:
+  
+  mitkClassMacro(ColorProperty, BaseProperty);
+  
+  itkNewMacro(ColorProperty);
+  mitkNewMacro1Param(ColorProperty, const float*);
+  mitkNewMacro1Param(ColorProperty, const mitk::Color&);
+  mitkNewMacro3Param(ColorProperty, const float, const float, const float);
   
   //##ModelId=3E86A345014E
   virtual ~ColorProperty();

@@ -54,7 +54,7 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   QVBoxLayout* vl = new QVBoxLayout(hl, QBoxLayout::TopToBottom);
  
   // string property
-  propstring = new mitk::StringProperty("Juhu");
+  propstring = mitk::StringProperty::New("Juhu");
  
   // base property view for the string
   baseview = new QmitkBasePropertyView( propstring, this );
@@ -69,14 +69,14 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   vl->addWidget(stringeditor);
 
   // color property
-  propcolor = new mitk::ColorProperty(0.5, 1.0, 0.25);
+  propcolor = mitk::ColorProperty::New(0.5, 1.0, 0.25);
 
   // color prop editor
   coloreditor = new QmitkColorPropertyEditor( propcolor, this );
   vl->addWidget(coloreditor);
 
   // bool property
-  propbool = new mitk::BoolProperty(true);
+  propbool = mitk::BoolProperty::New(true);
 
   // bool prop view
   boolview = new QmitkBoolPropertyView( propbool, this );
@@ -87,9 +87,9 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   vl->addWidget(booleditor);
   
   //propshort = new mitk::GenericProperty<short>(3);  // see comment below
-  propint = new mitk::IntProperty(4);
-  propfloat = new mitk::FloatProperty(4.5);
-  propdouble = new mitk::DoubleProperty(4.75);
+  propint = mitk::IntProperty::New(4);
+  propfloat = mitk::FloatProperty::New(4.5);
+  propdouble = mitk::DoubleProperty::New(4.75);
 
   // not possible because lack of: bool mitk::XMLReader::GetAttribute(std::basic_str, short int&)
   // this is nedded in DataStructures/mitkProperties/mitkGenericProperty.h, l. 86
@@ -127,7 +127,7 @@ PropertyViewTest::PropertyViewTest(bool stay, QWidget* parent, const char* name)
   vl->addWidget(numbereditor6);
  
   // percents
-  propfloat2 = new mitk::FloatProperty(0.43);
+  propfloat2 = mitk::FloatProperty::New(0.43);
   numberview5 = new QmitkNumberPropertyView( propfloat2, this );
   vl->addWidget(numberview5);
   
@@ -196,31 +196,31 @@ void PropertyViewTest::prepare_tree()
 /**/
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Opa"));
-//    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Opa"));
+//    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Set(node);
   }
 /**/
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Bruder"));
-    node->SetProperty("visible", new mitk::BoolProperty(false));
-    node->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
-    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Bruder"));
+    node->SetProperty("visible", mitk::BoolProperty::New(false));
+    node->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Ich"));
-    node->SetProperty("color", new mitk::ColorProperty(0.0,0.0,1.0));
-    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Ich"));
+    node->SetProperty("color", mitk::ColorProperty::New(0.0,0.0,1.0));
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Schwester"));
-    node->SetProperty("color", new mitk::ColorProperty(0.0,1.0,0.0));
-    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Schwester"));
+    node->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Add(node);
   }
 
@@ -228,15 +228,15 @@ void PropertyViewTest::prepare_tree()
   
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Sohn"));
-//    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Sohn"));
+//    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Add(node);
   }
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-    node->SetProperty("name", new mitk::StringProperty("Tochter"));
-    node->SetProperty("visible", new mitk::BoolProperty(false));
-    node->SetProperty("opacity", new mitk::FloatProperty(0.8));
+    node->SetProperty("name", mitk::StringProperty::New("Tochter"));
+    node->SetProperty("visible", mitk::BoolProperty::New(false));
+    node->SetProperty("opacity", mitk::FloatProperty::New(0.8));
     it.Add(node);
   }
 

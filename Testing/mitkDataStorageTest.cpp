@@ -63,37 +63,37 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   mitk::PixelType pt(typeid(int));
   image->Initialize( pt, 3, imageDimensions );
   n1->SetData(image);
-  n1->SetProperty("name", new mitk::StringProperty("Node 1 - Image Node"));
+  n1->SetProperty("name", mitk::StringProperty::New("Node 1 - Image Node"));
   mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();
 
 
   mitk::DataTreeNode::Pointer n2 = mitk::DataTreeNode::New();   // node with surface and name and color properties
   mitk::Surface::Pointer surface = mitk::Surface::New();
   n2->SetData(surface);
-  n2->SetProperty("name", new mitk::StringProperty("Node 2 - Surface Node"));
+  n2->SetProperty("name", mitk::StringProperty::New("Node 2 - Surface Node"));
   mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
   n2->SetColor(color);
-  n2->SetProperty("Resection Proposal 1", new mitk::GroupTagProperty());
+  n2->SetProperty("Resection Proposal 1", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents2 = mitk::DataStorage::SetOfObjects::New();
   parents2->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
 
 
   mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();   // node without data but with name property
-  n3->SetProperty("name", new mitk::StringProperty("Node 3 - Empty Node"));
-  n3->SetProperty("Resection Proposal 1", new mitk::GroupTagProperty());
-  n3->SetProperty("Resection Proposal 2", new mitk::GroupTagProperty());
+  n3->SetProperty("name", mitk::StringProperty::New("Node 3 - Empty Node"));
+  n3->SetProperty("Resection Proposal 1", mitk::GroupTagProperty::New());
+  n3->SetProperty("Resection Proposal 2", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents3 = mitk::DataStorage::SetOfObjects::New();
   parents3->InsertElement(0, n2);  // n2 is source of n3 
   
   mitk::DataTreeNode::Pointer n4 = mitk::DataTreeNode::New();   // node without data but with color property
   n4->SetColor(color);
-  n4->SetProperty("Resection Proposal 2", new mitk::GroupTagProperty());
+  n4->SetProperty("Resection Proposal 2", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents4 = mitk::DataStorage::SetOfObjects::New();
   parents4->InsertElement(0, n2); 
   parents4->InsertElement(1, n3);  // n2 and n3 are sources of n4 
 
   mitk::DataTreeNode::Pointer n5 = mitk::DataTreeNode::New();   // extra node
-  n5->SetProperty("name", new mitk::StringProperty("Node 5"));
+  n5->SetProperty("name", mitk::StringProperty::New("Node 5"));
 
   /* Get Data Storage for given tree */
   std::cout << "Get Data Storage for given tree : " << std::flush;
@@ -273,7 +273,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   std::cout << "Adding a node directly to the tree to test if the DataStorage can handle that." << std::endl;
   mitk::DataTreePreOrderIterator it(tree);
   mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();   // node with image and name property
-  treeNode->SetProperty("name", new mitk::StringProperty("TreeNode - not added by DataStorage"));  
+  treeNode->SetProperty("name", mitk::StringProperty::New("TreeNode - not added by DataStorage"));  
   it.Add(treeNode);
   /* Requesting all Objects again to check for new tree node */
   std::cout << "Requesting all Objects again to check for new tree node: " << std::flush;
@@ -318,8 +318,8 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   std::cout << "Requesting a named object: " << std::flush;
   try 
   {
-    mitk::StringProperty s("Node 2 - Surface Node");
-    mitk::NodePredicateProperty predicate("name", &s);
+    mitk::StringProperty::Pointer s(mitk::StringProperty::New("Node 2 - Surface Node"));
+    mitk::NodePredicateProperty predicate("name", s);
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     // delete nameProp;
     if ((all->Size() == 1) && (all->GetElement(0) == n2))  // check if correct object is in resultset
@@ -454,7 +454,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try 
   {
     mitk::NodePredicateDataType p1("Surface");
-    mitk::NodePredicateProperty p2("color", new mitk::ColorProperty(color));
+    mitk::NodePredicateProperty p2("color", mitk::ColorProperty::New(color));
     mitk::NodePredicateAND predicate;
     predicate.AddPredicate(p1);
     predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
@@ -480,7 +480,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try 
   {
     mitk::NodePredicateDataType p1("Image");
-    mitk::NodePredicateProperty p2("color", new mitk::ColorProperty(color));
+    mitk::NodePredicateProperty p2("color", mitk::ColorProperty::New(color));
     mitk::NodePredicateOR predicate;
     predicate.AddPredicate(p1);
     predicate.AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
@@ -508,7 +508,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   std::cout << "Requesting objects that do not meet a criteria: " << std::flush;
   try
   {
-    mitk::ColorProperty::Pointer cp = new mitk::ColorProperty(color);
+    mitk::ColorProperty::Pointer cp = mitk::ColorProperty::New(color);
     mitk::NodePredicateProperty proppred("color", cp);
     mitk::NodePredicateNOT predicate(proppred);
 
@@ -714,7 +714,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   std::cout << "Checking GroupTagProperty 1: " << std::flush;
   try
   {
-    mitk::GroupTagProperty::Pointer tp = new mitk::GroupTagProperty();
+    mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
     mitk::NodePredicateProperty pred("Resection Proposal 1", tp);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
@@ -740,7 +740,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   std::cout << "Checking GroupTagProperty 2: " << std::flush;
   try
   {
-    mitk::GroupTagProperty::Pointer tp = new mitk::GroupTagProperty();
+    mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
     mitk::NodePredicateProperty pred("Resection Proposal 2", tp);
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
@@ -1078,7 +1078,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
    
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
@@ -1115,7 +1115,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
    
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
@@ -1156,7 +1156,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
    
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
@@ -1202,16 +1202,16 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
     ds->Add(extra);
     
     mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
-    d1->SetProperty("name", new mitk::StringProperty("d1"));
+    d1->SetProperty("name", mitk::StringProperty::New("d1"));
     ds->Add(d1, extra);
     mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
-    d2->SetProperty("name", new mitk::StringProperty("d2"));    
+    d2->SetProperty("name", mitk::StringProperty::New("d2"));    
     ds->Add(d2, extra);
     
 
@@ -1257,7 +1257,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
     int refCountbeforeDS = watcher->GetReferenceCount();
@@ -1269,10 +1269,10 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
     ds->Add(extra, p);   // n1 and n2 are parents of extra
 
     mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
-    d1->SetProperty("name", new mitk::StringProperty("d1x"));
+    d1->SetProperty("name", mitk::StringProperty::New("d1x"));
     ds->Add(d1, extra);
     mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
-    d2->SetProperty("name", new mitk::StringProperty("d2x"));    
+    d2->SetProperty("name", mitk::StringProperty::New("d2x"));    
     ds->Add(d2, extra);
 
     if ( (ds->GetNamedNode("extra") != extra)
@@ -1321,7 +1321,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);
@@ -1351,7 +1351,7 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    extra->SetProperty("name", new mitk::StringProperty("extra"));
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);
     p->push_back(n3); 

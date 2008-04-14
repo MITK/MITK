@@ -1141,21 +1141,21 @@ mitk::ImageMapper2D::RendererInfo
 
 void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "opacity", new mitk::FloatProperty(1.0f), renderer, overwrite );
-  node->AddProperty( "color", new ColorProperty(1.0,1.0,1.0), renderer, overwrite );
-  node->AddProperty( "use color", new mitk::BoolProperty( true ), renderer, overwrite );
-  node->AddProperty( "binary", new mitk::BoolProperty( false ), renderer, overwrite );
-  node->AddProperty( "outline binary", new mitk::BoolProperty( false ), renderer, overwrite );
-  node->AddProperty( "texture interpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
-  node->AddProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty );
-  node->AddProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
+  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+  node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
+  node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
+  node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+  node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull())
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
       levelwindow.SetAuto( image );
       levWinProp->SetLevelWindow( levelwindow );
@@ -1169,7 +1169,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
       vtkLut->SetHueRange(0.6667, 0.0);
       vtkLut->SetTableRange(0.0, 20.0);
       vtkLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "LookupTable", mitkLutProp );
     }

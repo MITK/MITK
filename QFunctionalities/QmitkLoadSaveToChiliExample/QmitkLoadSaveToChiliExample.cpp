@@ -245,11 +245,11 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
 
 void QmitkLoadSaveToChiliExample::SaveDataTree()
 {
-  mitk::NodePredicateProperty w1( "name", new mitk::StringProperty("Widgets") );
-  mitk::NodePredicateProperty w2( "name", new mitk::StringProperty("widget1Plane") );
-  mitk::NodePredicateProperty w3( "name", new mitk::StringProperty("widget2Plane") );
-  mitk::NodePredicateProperty w4( "name", new mitk::StringProperty("widget3Plane") );
-  mitk::NodePredicateProperty w5( "helper object", new mitk::BoolProperty( true ) );
+  mitk::NodePredicateProperty w1( "name", mitk::StringProperty::New("Widgets") );
+  mitk::NodePredicateProperty w2( "name", mitk::StringProperty::New("widget1Plane") );
+  mitk::NodePredicateProperty w3( "name", mitk::StringProperty::New("widget2Plane") );
+  mitk::NodePredicateProperty w4( "name", mitk::StringProperty::New("widget3Plane") );
+  mitk::NodePredicateProperty w5( "helper object", mitk::BoolProperty::New( true ) );
   mitk::NodePredicateData w6( NULL );
   mitk::NodePredicateOR orpred;
   orpred.AddPredicate( w1 );

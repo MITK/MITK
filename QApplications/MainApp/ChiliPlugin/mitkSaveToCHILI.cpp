@@ -252,9 +252,9 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           //pCloseAssociation();
           //set the new SERIESOID as Property
           if( currentSeriesOID == "" )
-            (*nodeIter)->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+            (*nodeIter)->SetProperty( "SeriesOID", StringProperty::New( seriesOID ) );
           else
-            (*nodeIter)->ReplaceProperty( "SeriesOID", new StringProperty( seriesOID ) );
+            (*nodeIter)->ReplaceProperty( "SeriesOID", StringProperty::New( seriesOID ) );
         }
         else  //SAVE TEXT
         {
@@ -337,13 +337,13 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
                   std::cout << "SaveToCHILI (SaveToChili): Not able to  delete file: " << it->GetPointer()->GetFileName() << std::endl;
               //set the OID�s as Property
               if( currentSeriesOID == "" )
-                (*nodeIter)->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+                (*nodeIter)->SetProperty( "SeriesOID", StringProperty::New( seriesOID ) );
               else
-                (*nodeIter)->ReplaceProperty( "SeriesOID", new StringProperty( seriesOID ) );
+                (*nodeIter)->ReplaceProperty( "SeriesOID", StringProperty::New( seriesOID ) );
               if( !currentTextOID )
-                (*nodeIter)->SetProperty( "TextOID", new StringProperty( textOID ) );
+                (*nodeIter)->SetProperty( "TextOID", StringProperty::New( textOID ) );
               else
-                (*nodeIter)->ReplaceProperty( "TextOID", new StringProperty( textOID ) );
+                (*nodeIter)->ReplaceProperty( "TextOID", StringProperty::New( textOID ) );
             }
           }
         }

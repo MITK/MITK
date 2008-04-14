@@ -41,18 +41,18 @@ mitk::ExtrudedContourInteractor::ExtrudedContourInteractor(const char * type, mi
 {
   assert(m_DataTreeNode != NULL);
 
-  m_DataTreeNode->SetProperty( "representation", new mitk::VtkRepresentationProperty("surface") );
+  m_DataTreeNode->SetProperty( "representation", mitk::VtkRepresentationProperty::New("surface") );
 
   m_Contour = mitk::Contour::New();
 
   m_ContourNode = mitk::DataTreeNode::New();
   m_ContourNode->SetData(m_Contour);
 
-  m_ContourNode->SetProperty("layer", new mitk::IntProperty(100) );
-  m_ContourNode->SetProperty("name", new mitk::StringProperty("InteractiveFeedbackData") );
+  m_ContourNode->SetProperty("layer", mitk::IntProperty::New(100) );
+  m_ContourNode->SetProperty("name", mitk::StringProperty::New("InteractiveFeedbackData") );
   m_ContourNode->SetOpacity(1);
   m_ContourNode->SetColor(0.4,0.9,0.0);
-  m_ContourNode->SetProperty( "Width", new mitk::FloatProperty(2.0) );
+  m_ContourNode->SetProperty( "Width", mitk::FloatProperty::New(2.0) );
   m_Started = false;
 }
 

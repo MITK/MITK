@@ -41,25 +41,12 @@ public:
   
 
   mitkClassMacro( GridVolumeMapperProperty, EnumerationProperty );
+ 
+  itkNewMacro(GridVolumeMapperProperty);
   
-  /**
-   * Constructor. Sets the representation to a default value of Wireframe(1)
-   */
-  GridVolumeMapperProperty( );
+  mitkNewMacro1Param(GridVolumeMapperProperty, const IdType&);
   
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Wireframe(1)
-   * @param value the integer representation of the representation
-   */
-  GridVolumeMapperProperty( const IdType& value );
-  
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Wireframe(1)
-   * @param value the string representation of the representation
-   */
-  GridVolumeMapperProperty( const std::string& value );
+  mitkNewMacro1Param(GridVolumeMapperProperty, const std::string&);
   
   #if (VTK_MAJOR_VERSION >= 5)
   /**
@@ -81,6 +68,25 @@ public:
   
 protected:
 
+  /**
+   * Constructor. Sets the representation to a default value of Wireframe(1)
+   */
+  GridVolumeMapperProperty( );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Wireframe(1)
+   * @param value the integer representation of the representation
+   */
+  GridVolumeMapperProperty( const IdType& value );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Wireframe(1)
+   * @param value the string representation of the representation
+   */
+  GridVolumeMapperProperty( const std::string& value );
+  
   /**
    * this function is overridden as protected, so that the user may not add
    * additional invalid representation types.

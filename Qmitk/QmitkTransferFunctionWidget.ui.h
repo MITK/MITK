@@ -69,7 +69,7 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
         m_GradientOpacityCanvas->SetHistogram(tf->GetHistogram());
         m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
         UpdateMinMaxLabels();
-        node->SetProperty("TransferFunction", new mitk::TransferFunctionProperty(tf.GetPointer()));
+        node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
       } 
       else 
       {

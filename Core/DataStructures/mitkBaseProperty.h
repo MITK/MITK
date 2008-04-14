@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 
 #include <string>
+#include <itkObjectFactory.h>
 #include "mitkCommon.h"
 #include <mitkXMLIO.h>
 

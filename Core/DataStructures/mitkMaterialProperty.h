@@ -71,7 +71,12 @@ public:
      *             are forwarded. Please note, that if this node doesn't have the 
      *             needed properties associated, they will be added.
      */
-    MaterialProperty( mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+    static Pointer New(mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
+    {
+      Pointer smartPtr = MaterialProperty::New( node, renderer );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
 
     /**
      * Constructor. All values besides the given ones are set to defaults as 
@@ -84,8 +89,13 @@ public:
      *              are forwarded. Please note, that if this node doesn't have the 
      *              needed properties associated, they will be added.
      */
-    MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
-
+    static Pointer New( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
+    {
+      Pointer smartPtr = MaterialProperty::New(color, opacity, node, renderer );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
+    
     /**
      * Constructor. All values besides the given ones are set to defaults as 
      * described in the default constructor
@@ -98,8 +108,13 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the 
      *        needed properties associated, they will be added.
      */
-    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
-
+    static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
+    {
+      Pointer smartPtr = MaterialProperty::New(red, green, blue, opacity, node, renderer );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
+    
     /**
      * Constructor. All values besides the given ones are set to defaults as 
      * described in the default constructor
@@ -118,9 +133,14 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the 
      *        needed properties associated, they will be added.
      */
-    MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
-      vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
-
+    static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
+        vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
+    {
+      Pointer smartPtr = MaterialProperty::New(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
+    
     /**
      * Constructor. All values besides the given ones are set to defaults as 
      * described in the default constructor
@@ -139,19 +159,29 @@ public:
      *        are forwarded. Please note, that if this node doesn't have the 
      *        needed properties associated, they will be added.
      */
-    MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
-
+    static Pointer New( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
+    {
+      Pointer smartPtr = MaterialProperty::New(color, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
+    
     /**
      * Copy constructor
      */
-    MaterialProperty( const MaterialProperty& property );
+    mitkNewMacro1Param(MaterialProperty, const MaterialProperty&);
     
     /**
      * Copy constructor, provided for convinience. The values are copied from property
      * and afterwards the values provided for red green blue and opacity are written into the object.
      */
-    MaterialProperty( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "");
-
+    static Pointer New( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "" )
+    {
+      Pointer smartPtr = MaterialProperty::New(property, red, green, blue, opacity, name );
+      smartPtr->UnRegister();
+      return smartPtr;
+    }
+    
     virtual bool Assignable(const BaseProperty& other) const;
     virtual BaseProperty& operator=(const BaseProperty& other);
     
@@ -377,6 +407,97 @@ public:
     virtual bool ReadXMLData( XMLReader& xmlReader );
     
 protected:
+  
+  /**
+   * Constructor. Materials are set to the following default values:
+   * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
+   * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
+   * Gouraud, representation Surface.
+   * @param node optinally a data tree node may be defined to which the properties
+   *             are forwarded. Please note, that if this node doesn't have the 
+   *             needed properties associated, they will be added.
+   */
+  MaterialProperty( mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+
+  /**
+   * Constructor. All values besides the given ones are set to defaults as 
+   * described in the default constructor
+   * @param color the material color in RGB. Each RGB value should be in the
+   *              range [0..1]
+   * @param opacity the opacity of the material. 0.0 means fully transparent
+   *              and 1.0 means solid.
+   * @param node optinally a data tree node may be defined to which the properties
+   *              are forwarded. Please note, that if this node doesn't have the 
+   *              needed properties associated, they will be added.
+   */
+  MaterialProperty( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+
+  /**
+   * Constructor. All values besides the given ones are set to defaults as 
+   * described in the default constructor
+   * @param red the red component of the materials color (range [0..1])
+   * @param green the green component of the materials color (range [0..1])
+   * @param blue the blue component of the materials color (range [0..1])
+   * @param opacity the opacity of the material. 0.0 means fully transparent
+   *        and 1.0 means solid.
+   * @param node optionally a data tree node may be defined to which the properties
+   *        are forwarded. Please note, that if this node doesn't have the 
+   *        needed properties associated, they will be added.
+   */
+  MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+
+  /**
+   * Constructor. All values besides the given ones are set to defaults as 
+   * described in the default constructor
+   * @param red the red component of the materials color (range [0..1])
+   * @param green the green component of the materials color (range [0..1])
+   * @param blue the blue component of the materials color (range [0..1])
+   * @param colorCoefficient a scaling factor for the color coefficient which
+   *        will be multiplied with each color component (range [0..1]).
+   * @param specularCoefficient controls in combination with the specular power
+   *        how shiny the material will appear (range [0..1]).
+   * @param specularPower controls in combination with the specular coefficient
+   *        how shiny the material will appear (range [0..inf]).
+   * @param opacity the opacity of the material. 0.0 means fully transparent
+   *        and 1.0 means solid.
+   * @param node optionally a data tree node may be defined to which the properties
+   *        are forwarded. Please note, that if this node doesn't have the 
+   *        needed properties associated, they will be added.
+   */
+  MaterialProperty( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
+    vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+
+  /**
+   * Constructor. All values besides the given ones are set to defaults as 
+   * described in the default constructor
+   * 
+   * @param color the material color in RGB. Each RGB value should be in the
+   *        range [0..1]
+   * @param colorCoefficient a scaling factor for the color coefficient which
+   *        will be multiplied with each color component (range [0..1]).
+   * @param specularCoefficient controls in combination with the specular power
+   *        how shiny the material will appear (range [0..1]).
+   * @param specularPower controls in combination with the specular coefficient
+   *        how shiny the material will appear (range [0..inf]).
+   * @param opacity the opacity of the material. 0.0 means fully transparent
+   *        and 1.0 means solid.
+   * @param node optionally a data tree node may be defined to which the properties
+   *        are forwarded. Please note, that if this node doesn't have the 
+   *        needed properties associated, they will be added.
+   */
+  MaterialProperty( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = NULL, mitk::BaseRenderer* renderer = NULL );
+
+  /**
+   * Copy constructor
+   */
+  MaterialProperty( const MaterialProperty& property );
+  
+  /**
+   * Copy constructor, provided for convinience. The values are copied from property
+   * and afterwards the values provided for red green blue and opacity are written into the object.
+   */
+  MaterialProperty( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "");
+
 
     virtual void InitializeStandardValues();
 

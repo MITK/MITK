@@ -36,9 +36,9 @@ int mitkActionTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   //check properties
-  action->AddProperty("boolproperty", new mitk::BoolProperty(true));
-  action->AddProperty("intproperty", new mitk::IntProperty(10));
-  action->AddProperty("floatproperty", new mitk::FloatProperty(10.05));
+  action->AddProperty("boolproperty", mitk::BoolProperty::New(true));
+  action->AddProperty("intproperty", mitk::IntProperty::New(10));
+  action->AddProperty("floatproperty", mitk::FloatProperty::New(10.05));
   
   std::cout << "try adding property BOOL and read them: ";
   bool boolproperty = false;

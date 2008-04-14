@@ -649,14 +649,14 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 
 void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "line width", new mitk::IntProperty(2), renderer, overwrite );
-  node->AddProperty( "pointsize", new mitk::FloatProperty(1.0), renderer, overwrite);
-  node->AddProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
-  node->AddProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
-  node->AddProperty( "contour", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);
-  node->AddProperty( "contoursize", new mitk::FloatProperty(0.5), renderer, overwrite );
-  node->AddProperty( "close", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "show points", new mitk::BoolProperty(true), renderer, overwrite );
+  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
+  node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
+  node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
+  node->AddProperty( "contour", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
+  node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
+  node->AddProperty( "close", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

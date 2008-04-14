@@ -71,15 +71,15 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataTreeNode::New();
   mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_FeedbackNode );
-  m_FeedbackNode->SetProperty( "binary", new mitk::BoolProperty(true) );
-  m_FeedbackNode->SetProperty( "outline binary", new mitk::BoolProperty(true) );
-  m_FeedbackNode->SetProperty( "color", new mitk::ColorProperty(0.0, 1.0, 1.0) );
-  m_FeedbackNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
-  m_FeedbackNode->SetProperty( "layer", new mitk::IntProperty( 20 ) );
-  m_FeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
-  m_FeedbackNode->SetProperty( "name", new mitk::StringProperty("Interpolation feedback") );
-  m_FeedbackNode->SetProperty( "opacity", new mitk::FloatProperty(0.8) );
-  m_FeedbackNode->SetProperty( "helper object", new mitk::BoolProperty(true) );
+  m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  m_FeedbackNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
+  m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 1.0) );
+  m_FeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
+  m_FeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
+  m_FeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+  m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
+  m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
+  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 }
     
 void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkStdMultiWidget* multiWidget)

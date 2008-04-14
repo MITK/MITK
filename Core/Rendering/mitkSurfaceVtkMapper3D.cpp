@@ -288,20 +288,20 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "wireframe line width", new mitk::FloatProperty(1.0), renderer, overwrite );
-  node->AddProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node ), renderer, overwrite );
-  node->AddProperty( "scalar visibility", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "color mode", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "representation", new mitk::VtkRepresentationProperty, renderer, overwrite );
-  node->AddProperty( "interpolation", new mitk::VtkInterpolationProperty, renderer, overwrite );
-  node->AddProperty( "scalar mode", new mitk::VtkScalarModeProperty, renderer, overwrite );
+  node->AddProperty( "wireframe line width", mitk::FloatProperty::New(1.0), renderer, overwrite );
+  node->AddProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node ), renderer, overwrite );
+  node->AddProperty( "scalar visibility", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "color mode", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "representation", mitk::VtkRepresentationProperty::New(), renderer, overwrite );
+  node->AddProperty( "interpolation", mitk::VtkInterpolationProperty::New(), renderer, overwrite );
+  node->AddProperty( "scalar mode", mitk::VtkScalarModeProperty::New(), renderer, overwrite );
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
     if((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != NULL) && (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
     {
-      node->AddProperty( "scalar visibility", new mitk::BoolProperty(true), renderer, overwrite );
-      node->AddProperty( "color mode", new mitk::BoolProperty(true), renderer, overwrite );
+      node->AddProperty( "scalar visibility", mitk::BoolProperty::New(true), renderer, overwrite );
+      node->AddProperty( "color mode", mitk::BoolProperty::New(true), renderer, overwrite );
     }
   }
   Superclass::SetDefaultProperties(node, renderer, overwrite);

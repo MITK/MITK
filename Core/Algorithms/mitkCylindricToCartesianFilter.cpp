@@ -206,7 +206,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
       r=sqrt( (double) (xq*xq+yq*yq));
 
       //			float rtest=-(xy0-sqrt(xy0*xy0-yq*yq))-0.5;
-      rt=(ipInt2_t)(-(xy0-sqrt((double) (xy0*xy0-yq*yq)))-0.5);/*in rt steht der Index des Endes der zu überspringenden Punkte=>anfangen bei -rt+1!*/
+      rt=(ipInt2_t)(-(xy0-sqrt((double) (xy0*xy0-yq*yq)))-0.5);/*in rt steht der Index des Endes der zu ï¿½berspringenden Punkte=>anfangen bei -rt+1!*/
       //			if((x>=-rt) && (x<new_xsize+rt))
       {
         if(y!=xy0)
@@ -349,7 +349,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
     tp[2] = (int)(tmpDimensions[2]-tp[1] * scale-1);
     tp[0] = tmpDimensions[0]/2;
     tp[1] = tmpDimensions[0]/2;
-    mitk::Point3iProperty::Pointer pointProp = new mitk::Point3iProperty(tp);
+    mitk::Point3iProperty::Pointer pointProp = mitk::Point3iProperty::New(tp);
     output->SetProperty("ORIGIN", pointProp);
   }
   delete [] tmpDimensions;

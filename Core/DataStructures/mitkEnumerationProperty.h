@@ -51,6 +51,8 @@ class MITK_CORE_EXPORT EnumerationProperty : public BaseProperty
 public:
 
   mitkClassMacro( EnumerationProperty, BaseProperty );
+  
+  itkNewMacro(EnumerationProperty);
 
   /**
    * Represents the unique id which is asigned to each enumeration value
@@ -74,10 +76,6 @@ public:
    */
   typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
-  /**
-   * Default constructor. The current value of the enumeration is undefined.
-   */
-  EnumerationProperty();
 
   /**
    * Adds an enumeration value into the enumeration. The name and id provided
@@ -189,6 +187,13 @@ public:
   
   EnumIdsContainerType& GetEnumIds();
   EnumStringsContainerType& GetEnumStrings();
+  
+protected:
+  
+  /**
+   * Default constructor. The current value of the enumeration is undefined.
+   */
+  EnumerationProperty();
 
 private:
 

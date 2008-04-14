@@ -148,10 +148,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   mitk::NodePredicateOR dimension( dim3, dim4 );
   mitk::NodePredicateAND image3D( images, dimension );
 
-  mitk::NodePredicateProperty binary("binary", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty binary("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateNOT notBinary( binary );
 
-  mitk::NodePredicateProperty segmentation("segmentation", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty segmentation("segmentation", mitk::BoolProperty::New(true));
   mitk::NodePredicateNOT notSegmentation( segmentation );
   
   mitk::NodePredicateAND imageColorful( notBinary, notSegmentation );

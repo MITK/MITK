@@ -32,7 +32,7 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
     std::cout << "Instantiation" << std::endl;
 
   // instantiation
-    mitk::OrganTypeProperty::Pointer prop1 = new mitk::OrganTypeProperty;
+    mitk::OrganTypeProperty::Pointer prop1 = mitk::OrganTypeProperty::New();
     if (prop1.IsNotNull())
     {
       std::cout << "  (II) Instantiation works." << std::endl;
@@ -44,7 +44,7 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
       return EXIT_FAILURE;
     }
 
-    mitk::OrganTypeProperty::Pointer prop2 = new mitk::OrganTypeProperty;
+    mitk::OrganTypeProperty::Pointer prop2 = mitk::OrganTypeProperty::New();
     if (prop1.IsNotNull())
     {
       std::cout << "  (II) Instantiation still works." << std::endl;

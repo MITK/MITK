@@ -50,14 +50,10 @@ class GenericProperty : public BaseProperty
   public:
 
     mitkClassMacro(GenericProperty, BaseProperty);
+    itkNewMacro(GenericProperty<T>);
+    mitkNewMacro1Param(GenericProperty<T>, T);
     
     typedef T ValueType;
-
-    GenericProperty(T x) 
-    : m_Value(x) 
-    {
-    }
-   
 
     virtual ~GenericProperty() 
     {
@@ -127,7 +123,9 @@ class GenericProperty : public BaseProperty
     virtual bool ReadXMLData( XMLReader& xmlReader );
 
   protected:
-    GenericProperty() {} 
+    GenericProperty() {}
+    GenericProperty(T x) 
+       : m_Value(x) {}
     T m_Value;
 };
 
@@ -161,9 +159,12 @@ class MITK_CORE_EXPORT PropertyName: public GenericProperty< Type >        \
 {                                                         \
 public:                                                   \
   mitkClassMacro(PropertyName, GenericProperty< Type >);  \
-  PropertyName() { m_Value = DefaultValue; }                                       \
-  PropertyName(Type x) : GenericProperty<Type>(x) {}      \
+  itkNewMacro(PropertyName);                              \
+  mitkNewMacro1Param(PropertyName, Type);                 \
   virtual ~PropertyName() {}                              \
+protected:                                                \
+  PropertyName() { m_Value = DefaultValue; }              \
+  PropertyName(Type x) : GenericProperty<Type>(x) {}      \
 };
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */

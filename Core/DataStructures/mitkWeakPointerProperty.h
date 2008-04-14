@@ -35,10 +35,10 @@ class MITK_CORE_EXPORT WeakPointerProperty : public BaseProperty
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);
 
+    mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
+    
     //##ModelId=3ED94B4203C1
     virtual bool operator==(const BaseProperty& property) const;
-    //##ModelId=3ED94B7500F2
-    WeakPointerProperty(itk::Object* pointer);
 
     //##ModelId=3ED94B750111
     virtual ~WeakPointerProperty();
@@ -51,6 +51,9 @@ class MITK_CORE_EXPORT WeakPointerProperty : public BaseProperty
   protected:
     //##ModelId=3ED95309021C
     itk::WeakPointer<itk::Object> m_WeakPointer;
+    
+    //##ModelId=3ED94B7500F2
+    WeakPointerProperty(itk::Object* pointer);
 };
 
 } // namespace mitk

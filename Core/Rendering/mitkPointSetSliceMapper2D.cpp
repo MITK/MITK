@@ -66,27 +66,27 @@ void mitk::PointSetSliceMapper2D::GenerateData()
 
   if (!node->GetProperty(m_ScalarMode, "scalar mode"))
   {
-    m_ScalarMode = new mitk::VtkScalarModeProperty(0);
+    m_ScalarMode = mitk::VtkScalarModeProperty::New(0);
   }
 
   if (!node->GetProperty(m_ScalarVisibility, "scalar visibility"))
   {
-    m_ScalarVisibility = new mitk::BoolProperty(true);
+    m_ScalarVisibility = mitk::BoolProperty::New(true);
   }
   
   if (!node->GetProperty(m_Outline, "outline polygons"))
   {
-    m_Outline = new mitk::BoolProperty(false);
+    m_Outline = mitk::BoolProperty::New(false);
   }
   
   if (!node->GetProperty(m_Color, "color"))
   {
-    m_Color = new mitk::ColorProperty(1.0f, 1.0f, 1.0f);
+    m_Color = mitk::ColorProperty::New(1.0f, 1.0f, 1.0f);
   }
   
   if (!node->GetProperty(m_LineWidth, "line width"))
   {
-    m_LineWidth = new mitk::IntProperty(1);
+    m_LineWidth = mitk::IntProperty::New(1);
   }
 
 }

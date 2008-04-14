@@ -30,9 +30,9 @@ int TestGenericPropertyForDataType(typename T::ValueType testValue1, typename T:
 {
   std::cout << "Testing mitk::GenericProperty<" << type << ">(" << testValue1AsString << ", " << testValue2AsString << ") \n";
   
-  typename T::Pointer prop = new T();
-  typename T::Pointer prop2 = new T(testValue1);
-  typename T::Pointer prop3 = new T(testValue2);
+  typename T::Pointer prop(T::New());
+  typename T::Pointer prop2(T::New(testValue1));
+  typename T::Pointer prop3(T::New(testValue2));
   
   unsigned long tBefore = prop->GetMTime();
   prop->SetValue(testValue1);

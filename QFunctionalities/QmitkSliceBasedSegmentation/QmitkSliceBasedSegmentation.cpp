@@ -67,12 +67,12 @@ QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const 
 
   m_ThresholdFeedbackNode = mitk::DataTreeNode::New();
   mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_ThresholdFeedbackNode );
-  m_ThresholdFeedbackNode->SetProperty( "color", new mitk::ColorProperty(0.2, 1.0, 0.2) );
-  m_ThresholdFeedbackNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
-  m_ThresholdFeedbackNode->SetProperty( "layer", new mitk::IntProperty( 20 ) );
-  m_ThresholdFeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(100, 1) ) );
-  m_ThresholdFeedbackNode->SetProperty( "name", new mitk::StringProperty("Thresholding feedback") );
-  m_ThresholdFeedbackNode->SetProperty( "opacity", new mitk::FloatProperty(0.2) );
+  m_ThresholdFeedbackNode->SetProperty( "color", mitk::ColorProperty::New(0.2, 1.0, 0.2) );
+  m_ThresholdFeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
+  m_ThresholdFeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
+  m_ThresholdFeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(100, 1) ) );
+  m_ThresholdFeedbackNode->SetProperty( "name", mitk::StringProperty::New("Thresholding feedback") );
+  m_ThresholdFeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.2) );
 }
 
 QmitkSliceBasedSegmentation::~QmitkSliceBasedSegmentation()
@@ -569,7 +569,7 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateEmptySegmentation
   // actually create a new empty segmentation
   mitk::PixelType pixelType( typeid(SEGMENTATION_DATATYPE) );
   mitk::Image::Pointer segmentation = mitk::Image::New();
-  segmentation->SetProperty( "organ type", new mitk::OrganTypeProperty( organType ) );
+  segmentation->SetProperty( "organ type", mitk::OrganTypeProperty::New( organType ) );
   segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
 
   unsigned int byteSize = sizeof(SEGMENTATION_DATATYPE);
@@ -604,10 +604,10 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode(
   mitk::DataTreeNodeFactory::SetDefaultImageProperties ( segmentationNode );
 
   // name
-  segmentationNode->SetProperty( "name", new mitk::StringProperty( name ) );
+  segmentationNode->SetProperty( "name", mitk::StringProperty::New( name ) );
 
   // organ type
-  mitk::OrganTypeProperty::Pointer organTypeProperty = new mitk::OrganTypeProperty( organType );
+  mitk::OrganTypeProperty::Pointer organTypeProperty = mitk::OrganTypeProperty::New( organType );
   if ( !organTypeProperty->IsValidEnumerationValue( organType ) )
   {
     organTypeProperty->AddEnum( organType, organTypeProperty->Size() ); // add a new organ type
@@ -615,14 +615,14 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode(
   }
 
   // visualization properties
-  segmentationNode->SetProperty( "binary", new mitk::BoolProperty(true) );
+  segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
   segmentationNode->SetProperty( "color", mitk::DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
-  segmentationNode->SetProperty( "texture interpolation", new mitk::BoolProperty(false) );
-  segmentationNode->SetProperty( "layer", new mitk::IntProperty(10) );
-  segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0.5, 1) ) );
-  segmentationNode->SetProperty( "opacity", new mitk::FloatProperty(0.3) );
-  segmentationNode->SetProperty( "segmentation", new mitk::BoolProperty(true) );
-  segmentationNode->SetProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
+  segmentationNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
+  segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
+  segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0.5, 1) ) );
+  segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
+  segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
+  segmentationNode->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
 
   return segmentationNode;
 }
@@ -743,7 +743,7 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
 
 void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThresholdSliderChanged(int threshold)
 {
-  m_ThresholdFeedbackNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(threshold, 1) ) );
+  m_ThresholdFeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(threshold, 1) ) );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -809,7 +809,7 @@ void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
   {
-    node->SetProperty("texture interpolation", new mitk::BoolProperty(on));
+    node->SetProperty("texture interpolation", mitk::BoolProperty::New(on));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -37,16 +37,19 @@ protected:
     //##ModelId=3ED953090113
   LookupTable::Pointer m_LookupTable;
 
+  LookupTableProperty();
+
+  //##ModelId=3ED953090121
+  LookupTableProperty(const mitk::LookupTable::Pointer lut);
+
+  //##ModelId=3EF198D9012D
+  //    LookupTableProperty(const mitk::LookupTable& aLookupTable);
+  
 public:
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
-    LookupTableProperty();
-
-    //##ModelId=3ED953090121
-    LookupTableProperty(mitk::LookupTable::Pointer lut);
-
-    //##ModelId=3EF198D9012D
-//    LookupTableProperty(const mitk::LookupTable& aLookupTable);
+    itkNewMacro(LookupTableProperty);
+    mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
     //##ModelId=3ED953090122
     virtual ~LookupTableProperty();
@@ -57,7 +60,7 @@ public:
     itkGetObjectMacro(LookupTable, LookupTable );
 
     //##ModelId=3ED953090135
-    void SetLookupTable(mitk::LookupTable::Pointer aLookupTable);
+    void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
 
     virtual bool WriteXMLData(XMLWriter &xmlWriter);
 

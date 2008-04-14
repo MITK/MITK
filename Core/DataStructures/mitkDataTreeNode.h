@@ -358,7 +358,7 @@ public:
   {
     if (name == NULL)
       return;
-    this->SetProperty("name", new StringProperty(name));
+    this->SetProperty("name", StringProperty::New(name));
   }
 
   //##ModelId=3EF1941E01D6

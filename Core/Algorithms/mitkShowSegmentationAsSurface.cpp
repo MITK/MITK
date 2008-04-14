@@ -143,12 +143,12 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
       }
     }
   
-    m_Node->SetProperty("opacity", new FloatProperty(0.3) );
-    m_Node->SetProperty("line width", new IntProperty(1) );
-    m_Node->SetProperty("scalar visibility", new BoolProperty(false) );
+    m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
+    m_Node->SetProperty("line width", IntProperty::New(1) );
+    m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
     
     std::string uid = m_UIDGeneratorSurfaces.GetUID();
-    m_Node->SetProperty( "FILENAME", new StringProperty( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
+    m_Node->SetProperty( "FILENAME", StringProperty::New( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
     std::string groupNodesName ("surface");
     
     DataTreeNode* groupNode = GetGroupNode();
@@ -156,7 +156,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     {
       groupNode->GetName( groupNodesName );
     }
-    m_Node->SetProperty( "name", new StringProperty(groupNodesName) );
+    m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
    
     // synchronize this object's color with the parent's color
     //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
@@ -171,12 +171,12 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     DataTreeNode* groupNode = GetGroupNode();
     if (groupNode)
     {
-      groupNode->SetProperty( "Surface representation", new SmartPointerProperty(m_Node) );
+      groupNode->SetProperty( "Surface representation", SmartPointerProperty::New(m_Node) );
       BaseProperty* colorProp = groupNode->GetProperty("color");
       if (colorProp)
         m_Node->ReplaceProperty("color", colorProp);
       else
-        m_Node->SetProperty("color", new ColorProperty(1.0, 1.0, 0.0));
+        m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
   
       bool showResult(true);
       GetParameter("Show result", showResult );
@@ -195,7 +195,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
       if (visibleProp && syncVisibility)
         m_Node->ReplaceProperty("visible", visibleProp);
       else
-        m_Node->SetProperty("visible", new BoolProperty(showResult));
+        m_Node->SetProperty("visible", BoolProperty::New(showResult));
      }
     
     InsertBelowGroupNode(m_Node);

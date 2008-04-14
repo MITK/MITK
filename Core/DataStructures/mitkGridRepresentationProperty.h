@@ -37,24 +37,11 @@ public:
 
   mitkClassMacro( GridRepresentationProperty, EnumerationProperty );
   
-  /**
-   * Constructor. Sets the representation to a default value of Wireframe(1)
-   */
-  GridRepresentationProperty( );
+  itkNewMacro(GridRepresentationProperty);
   
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Wireframe(1)
-   * @param value the integer representation of the representation
-   */
-  GridRepresentationProperty( const IdType& value );
+  mitkNewMacro1Param(GridRepresentationProperty, const IdType& );
   
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Wireframe(1)
-   * @param value the string representation of the representation
-   */
-  GridRepresentationProperty( const std::string& value );
+  mitkNewMacro1Param(GridRepresentationProperty, const std::string& );
 
   /**
    * Sets the representation type to POINTS.
@@ -77,6 +64,26 @@ public:
   virtual void SetRepresentationToVolume();
   
 protected:
+
+  /**
+   * Constructor. Sets the representation to a default value of Wireframe(1)
+   */
+  GridRepresentationProperty( );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Wireframe(1)
+   * @param value the integer representation of the representation
+   */
+  GridRepresentationProperty( const IdType& value );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Wireframe(1)
+   * @param value the string representation of the representation
+   */
+  GridRepresentationProperty( const std::string& value );
+
 
   /**
    * this function is overridden as protected, so that the user may not add

@@ -38,24 +38,11 @@ public:
 
   mitkClassMacro( VtkScalarModeProperty, EnumerationProperty );
   
-  /**
-   * Constructor. Sets the representation to a default value of surface(2)
-   */
-  VtkScalarModeProperty( );
+  itkNewMacro(VtkScalarModeProperty);
   
-  /**
-   * \brief Sets the scalar mode to the given value. If it is not
-   * valid, the scalar mode is set to default (0).
-   * @param value the integer representation of the scalar mode
-   */
-  VtkScalarModeProperty( const IdType& value );
+  mitkNewMacro1Param(VtkScalarModeProperty, const IdType&);
   
-  /**
-   * \brief Sets the scalar mode to the given value. If it is not
-   * valid, the representation is set to default (0).
-   * @param value the string representation of the scalar mode
-   */
-  VtkScalarModeProperty( const std::string& value );
+  mitkNewMacro1Param(VtkScalarModeProperty, const std::string&);
   
   /**
    * Returns the current scalar mode value as defined by VTK constants.
@@ -74,6 +61,25 @@ public:
   virtual void SetScalarModeToCellFieldData();
   
 protected:
+  
+  /**
+   * Constructor. Sets the representation to a default value of surface(2)
+   */
+  VtkScalarModeProperty( );
+  
+  /**
+   * \brief Sets the scalar mode to the given value. If it is not
+   * valid, the scalar mode is set to default (0).
+   * @param value the integer representation of the scalar mode
+   */
+  VtkScalarModeProperty( const IdType& value );
+  
+  /**
+   * \brief Sets the scalar mode to the given value. If it is not
+   * valid, the representation is set to default (0).
+   * @param value the string representation of the scalar mode
+   */
+  VtkScalarModeProperty( const std::string& value );
 
   /**
    * this function is overridden as protected, so that the user may not add

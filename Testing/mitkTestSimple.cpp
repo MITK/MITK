@@ -46,7 +46,7 @@ void TestFunction()
 
   node = mitk::DataTreeNode::New();
   node->SetData(NULL);
-  Prop = new mitk::StringProperty("TestProp");
+  Prop = mitk::StringProperty::New("TestProp");
   node->SetProperty("stringPropTest",Prop);
   Prop = dynamic_cast<mitk::StringProperty *>(node->GetProperty("stringPropTest").GetPointer());
   BOOST_CHECK( Prop.IsNotNull() );
@@ -54,12 +54,12 @@ void TestFunction()
 
 
   int intPropValue = 6;
-  node->SetProperty("intProp", new mitk::IntProperty(intPropValue) );
+  node->SetProperty("intProp", mitk::IntProperty::New(intPropValue) );
   mitk::IntProperty::Pointer intProp = dynamic_cast<mitk::IntProperty *>(node->GetProperty("intProp").GetPointer());
   BOOST_CHECK( intProp.IsNotNull() );
   BOOST_CHECK( intProp->GetValue() == intPropValue);
   
-  node->SetProperty("boolProp", new mitk::BoolProperty(true) );
+  node->SetProperty("boolProp", mitk::BoolProperty::New(true) );
   mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty *>(node->GetProperty("boolProp").GetPointer());
   BOOST_CHECK(boolProp.IsNotNull() );
   BOOST_CHECK(boolProp->GetValue() == true);

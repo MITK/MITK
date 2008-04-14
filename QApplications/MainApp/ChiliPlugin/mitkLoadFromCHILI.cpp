@@ -183,7 +183,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
     {
       std::string result = m_ParentChild->GetLabel( ImageInstanceUIDs[x] );
       if( result != "" )
-        resultNodes[x]->SetProperty( "VolumeLabel", new StringProperty( result ) );
+        resultNodes[x]->SetProperty( "VolumeLabel", StringProperty::New( result ) );
     }
 
     if( deletePicDescriptor )  //delete the loaded ipPicDescriptors
@@ -226,7 +226,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
           DataTreeNode::Pointer node = factory->GetOutput( i );
           if ( ( node.IsNotNull() ) && ( node->GetData() != NULL )  )
           {
-            node->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+            node->SetProperty( "SeriesOID", StringProperty::New( seriesOID ) );
             resultNodes.push_back( node );
           }
         }
@@ -430,12 +430,12 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
             //get the FileExtension and cut them from the filename
             std::string fileNameWithoutExtension = fileName.substr( 0, fileName.find_last_of(".") );
             //set the filename without extension as name-property
-            resultNode->SetProperty( "name", new StringProperty( fileNameWithoutExtension ) );
-            resultNode->SetProperty( "TextOID", new StringProperty( textOID ) );
-            resultNode->SetProperty( "SeriesOID", new StringProperty( seriesOID ) );
+            resultNode->SetProperty( "name", StringProperty::New( fileNameWithoutExtension ) );
+            resultNode->SetProperty( "TextOID", StringProperty::New( textOID ) );
+            resultNode->SetProperty( "SeriesOID", StringProperty::New( seriesOID ) );
             //it should be possible to override all non-image-entries
-            resultNode->SetProperty( "CHILI: MANUFACTURER", new StringProperty( "MITK" ) );
-            resultNode->SetProperty( "CHILI: INSTITUTION NAME", new StringProperty( "DKFZ.MBI" ) );
+            resultNode->SetProperty( "CHILI: MANUFACTURER", StringProperty::New( "MITK" ) );
+            resultNode->SetProperty( "CHILI: INSTITUTION NAME", StringProperty::New( "DKFZ.MBI" ) );
             //check if volumes known at parent-child-xml
             PACSPlugin::StudyInformation currentStudy = PACSPlugin::GetInstance()->GetStudyInformation( seriesOID );
             PACSPlugin::PatientInformation currentPatient = PACSPlugin::GetInstance()->GetPatientInformation( seriesOID );
@@ -445,7 +445,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
             UID.push_back( textOID );
             std::string result = m_ParentChild->GetLabel( UID );
             if( result != "" )
-              resultNode->SetProperty( "VolumeLabel", new StringProperty( result ) );
+              resultNode->SetProperty( "VolumeLabel", StringProperty::New( result ) );
             if( remove(  pathAndFile.c_str() ) != 0 )
               std::cout << "LoadFromCHILI (LoadSingleText): Not able to  delete file: " << pathAndFile << std::endl;
           }
@@ -491,7 +491,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
         std::vector< std::list< std::string > > ImageInstanceUIDs = converterToNode->GetImageInstanceUIDs();
         std::string result = m_ParentChild->GetLabel( ImageInstanceUIDs[0] );
         if( result != "" )
-          tempResult[0]->SetProperty( "VolumeLabel", new StringProperty( result ) );
+          tempResult[0]->SetProperty( "VolumeLabel", StringProperty::New( result ) );
 
         return tempResult[0];
       }

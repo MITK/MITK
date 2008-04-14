@@ -187,9 +187,9 @@ void QmitkSingleTimeStepExporterComponent::AddSliceImage()
 
 				std::string timeSliceNodeName = "Slice_" + buffer.str();
 
-				timeSliceNode->SetProperty("timeSlice", new mitk::BoolProperty(true));
-				timeSliceNode->SetProperty("name", new mitk::StringProperty(timeSliceNodeName));
-				//timeSliceNode->SetProperty("name", new mitk::StringProperty("3DImage"));
+				timeSliceNode->SetProperty("timeSlice", mitk::BoolProperty::New(true));
+				timeSliceNode->SetProperty("name", mitk::StringProperty::New(timeSliceNodeName));
+				//timeSliceNode->SetProperty("name", mitk::StringProperty::New("3DImage"));
 
 				m_DataIt->Add(timeSliceNode);
 			}
@@ -198,8 +198,8 @@ void QmitkSingleTimeStepExporterComponent::AddSliceImage()
 				mitk::DataTreeNode::Pointer timeSliceNode = mitk::DataTreeNode::New(); 
 				timeSliceNode->SetData(m_ImageTimeSelector->GetOutput() );
 
-				timeSliceNode->SetProperty("timeSlice", new mitk::BoolProperty(true));
-				timeSliceNode->SetProperty("name", new mitk::StringProperty("timeSliceImage"));
+				timeSliceNode->SetProperty("timeSlice", mitk::BoolProperty::New(true));
+				timeSliceNode->SetProperty("name", mitk::StringProperty::New("timeSliceImage"));
 
 				m_DataIt->Add(timeSliceNode);
 				m_Stepper->SetSteps(0);

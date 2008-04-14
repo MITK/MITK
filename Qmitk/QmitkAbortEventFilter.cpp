@@ -180,7 +180,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
           try
           {
             mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
-            mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", new mitk::BoolProperty(true));
+            mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", mitk::BoolProperty::New(true));
             mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet = 
                 dataStorage->GetSubset( VolRenTurnedOn );
             if ( VolRenSet->Size() > 0 )

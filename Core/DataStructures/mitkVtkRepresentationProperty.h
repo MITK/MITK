@@ -34,25 +34,12 @@ class MITK_CORE_EXPORT VtkRepresentationProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( VtkRepresentationProperty, EnumerationProperty );
+ 
+  itkNewMacro(VtkRepresentationProperty);
   
-  /**
-   * Constructor. Sets the representation to a default value of Surface(2)
-   */
-  VtkRepresentationProperty( );
-  
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Surface(2)
-   * @param value the integer representation of the representation
-   */
-  VtkRepresentationProperty( const IdType& value );
-  
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Surface(2)
-   * @param value the string representation of the representation
-   */
-  VtkRepresentationProperty( const std::string& value );
+  mitkNewMacro1Param(VtkRepresentationProperty, const IdType&);
+ 
+  mitkNewMacro1Param(VtkRepresentationProperty, const std::string&);
   
   /**
    * Returns the current representation value as defined by VTK constants.
@@ -76,6 +63,25 @@ public:
   virtual void SetRepresentationToSurface();
   
 protected:
+  
+  /**
+   * Constructor. Sets the representation to a default value of Surface(2)
+   */
+  VtkRepresentationProperty( );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Surface(2)
+   * @param value the integer representation of the representation
+   */
+  VtkRepresentationProperty( const IdType& value );
+  
+  /**
+   * Constructor. Sets the representation to the given value. If it is not
+   * valid, the representation is set to Surface(2)
+   * @param value the string representation of the representation
+   */
+  VtkRepresentationProperty( const std::string& value );
 
   /**
    * this function is overridden as protected, so that the user may not add

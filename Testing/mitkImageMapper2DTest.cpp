@@ -51,7 +51,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Creating tree: ";
   mitk::DataTree* tree;
-  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hï¿½lt, wird tree sonst gelï¿½scht.
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
@@ -63,7 +63,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding level-window property: ";
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( image );
   levWinProp->SetLevelWindow( levelwindow );

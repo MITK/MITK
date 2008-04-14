@@ -51,7 +51,7 @@ void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm* itkNotUsed(oth
 void NonBlockingAlgorithm::SetPointerParameter(const char* parameter, BaseData* value)
 {
   m_ParameterListMutex->Lock();
-  m_Parameters->SetProperty(parameter, new SmartPointerProperty(value) );
+  m_Parameters->SetProperty(parameter, SmartPointerProperty::New(value) );
   m_ParameterListMutex->Unlock();
 }
 

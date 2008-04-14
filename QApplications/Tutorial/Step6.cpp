@@ -54,7 +54,7 @@ void Step6::Initialize()
   m_Seeds = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(m_Seeds);
-  pointSetNode->SetProperty("layer", new mitk::IntProperty(2));
+  pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
   it.Add(pointSetNode);
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
     mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)

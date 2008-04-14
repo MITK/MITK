@@ -36,10 +36,10 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6)
   step6->m_ResultNode = mitk::DataTreeHelper::AddItkImageToDataTree(regGrowFilter->GetOutput(), &it, "segmentation");
   step6->m_ResultImage = static_cast<mitk::Image*>(step6->m_ResultNode->GetData());
   // set some additional properties
-  step6->m_ResultNode->SetProperty("binary", new mitk::BoolProperty(true));
-  step6->m_ResultNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
-  step6->m_ResultNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
-  step6->m_ResultNode->SetProperty("layer", new mitk::IntProperty(1));
+  step6->m_ResultNode->SetProperty("binary", mitk::BoolProperty::New(true));
+  step6->m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+  step6->m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+  step6->m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
 }
 
 /**

@@ -399,11 +399,11 @@ void QmitkImageCropperComponent::CreateBoundingObject(int type)
 		m_CroppingObjectNode = mitk::DataTreeNode::New(); 
 		mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_CroppingObjectNode );
 		m_CroppingObjectNode->SetData( m_CroppingObject );
-		m_CroppingObjectNode->SetProperty( "name", new mitk::StringProperty( "CroppingObject" ) );
-		m_CroppingObjectNode->SetProperty( "color", new mitk::ColorProperty(1.0, 1.0, 0.0) );
-		m_CroppingObjectNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
-		m_CroppingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
-		m_CroppingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+		m_CroppingObjectNode->SetProperty( "name", mitk::StringProperty::New( "CroppingObject" ) );
+		m_CroppingObjectNode->SetProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 0.0) );
+		m_CroppingObjectNode->SetProperty( "opacity", mitk::FloatProperty::New(0.4) );
+		m_CroppingObjectNode->SetProperty( "layer", mitk::IntProperty::New(99) ); // arbitrary, copied from segmentation functionality
+		m_CroppingObjectNode->SetProperty( "selected",  mitk::BoolProperty::New(true) );
 		m_BoundingObjectExists = true;
 		//}
 		if(m_MitkImageIterator.GetPointer())

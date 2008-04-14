@@ -224,7 +224,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if(worldgeometry==NULL)
   {
-    GetDataTreeNode()->SetProperty("volumerendering",new mitk::BoolProperty(false));
+    GetDataTreeNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
     return;
   }
   
@@ -523,15 +523,15 @@ void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 
 void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "volumerendering", new mitk::BoolProperty( false ), renderer, overwrite );
-  node->AddProperty( "binary", new mitk::BoolProperty( false ), renderer, overwrite );
+  node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull())
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
       levelwindow.SetAuto( image );
       levWinProp->SetLevelWindow( levelwindow );
@@ -545,7 +545,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
       vtkLut->SetHueRange(0.6667, 0.0);
       vtkLut->SetTableRange(0.0, 20.0);
       vtkLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "LookupTable", mitkLutProp );
     }
@@ -565,7 +565,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
       tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
       tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
       tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);  
-      node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
+      node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
     }
   }
 

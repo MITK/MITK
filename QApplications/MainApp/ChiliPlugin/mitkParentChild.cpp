@@ -182,7 +182,7 @@ void mitk::ParentChild::AddEntry( DataTreeNode::Pointer node, std::list< std::st
         std::string volumeLabel = stringHelper.str();
         TiXmlElement * element = new TiXmlElement( "volume" );
         element->SetAttribute( "label", volumeLabel.c_str() );
-        node->SetProperty( "VolumeLabel", new StringProperty( volumeLabel ) );
+        node->SetProperty( "VolumeLabel", StringProperty::New( volumeLabel ) );
         element->SetAttribute( "id", volumeDescription.c_str() );
         element->SetAttribute( "seriesOID", seriesOID.c_str() );
 

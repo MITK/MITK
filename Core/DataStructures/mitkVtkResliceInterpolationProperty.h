@@ -37,19 +37,11 @@ public:
 
   mitkClassMacro( VtkResliceInterpolationProperty, EnumerationProperty );
 
-  /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
-   */
-  VtkResliceInterpolationProperty( );
+  itkNewMacro(VtkResliceInterpolationProperty);
   
-  /**
-   * Constructor. Sets reslice interpolation to the given value.
-   */
-  VtkResliceInterpolationProperty( const IdType& value );
+  mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType&);
   
-  /**
-   * Constructor. Sets reslice interpolation to the given value.
-   */
-  VtkResliceInterpolationProperty( const std::string& value );
+  mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string&);
   
   /**
    * Returns the current interpolation value as defined by VTK constants.
@@ -72,6 +64,20 @@ public:
   virtual void SetInterpolationToCubic();
   
 protected:
+  
+  /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
+   */
+  VtkResliceInterpolationProperty( );
+  
+  /**
+   * Constructor. Sets reslice interpolation to the given value.
+   */
+  VtkResliceInterpolationProperty( const IdType& value );
+  
+  /**
+   * Constructor. Sets reslice interpolation to the given value.
+   */
+  VtkResliceInterpolationProperty( const std::string& value );
 
   /**
    * this function is overridden as protected, so that the user may not add

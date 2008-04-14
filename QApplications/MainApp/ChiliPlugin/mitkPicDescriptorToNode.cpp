@@ -101,17 +101,17 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
     {
       case ipPicASCII:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::StringProperty( static_cast<char*>( currentTag->value ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( static_cast<char*>( currentTag->value ) ) );
         break;
       }
       case ipPicInt:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( *static_cast<int*>( currentTag->value ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
       }
       case ipPicUInt:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( (int)*( (char*)( currentTag->value ) ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
       default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
@@ -278,13 +278,13 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     DataTreeNodeFactory::SetDefaultImageProperties( node );
 
     if( m_SeriesOID != "" )
-      node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
+      node->SetProperty( "SeriesOID", StringProperty::New( m_SeriesOID ) );
     if( seriesDescription != "" )
-      node->SetProperty( "name", new StringProperty( seriesDescription ) );
+      node->SetProperty( "name", StringProperty::New( seriesDescription ) );
     else
-      node->SetProperty( "name", new StringProperty( "no SeriesDescription" ) );
-    node->SetProperty( "NumberOfSlices", new IntProperty( sliceSteps ) );
-    node->SetProperty( "NumberOfTimeSlices", new IntProperty( timeSteps ) );
+      node->SetProperty( "name", StringProperty::New( "no SeriesDescription" ) );
+    node->SetProperty( "NumberOfSlices", IntProperty::New( sliceSteps ) );
+    node->SetProperty( "NumberOfTimeSlices", IntProperty::New( timeSteps ) );
 
     mitk::PropertyList::Pointer tempPropertyList = CreatePropertyListFromPicTags( slices.front() );
     for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )

@@ -35,24 +35,11 @@ public:
 
   mitkClassMacro( VtkInterpolationProperty, EnumerationProperty );
   
-  /**
-   * Constructor. Sets the representation to a default value of surface(2)
-   */
-  VtkInterpolationProperty( );
+  itkNewMacro(VtkInterpolationProperty);
   
-  /**
-   * Constructor. Sets the interpolation to the given value. If it is not
-   * valid, the interpolation is set to gouraud(1)
-   * @param value the integer representation of the interpolation
-   */
-  VtkInterpolationProperty( const IdType& value );
-  
-  /**
-   * Constructor. Sets the interpolation to the given value. If it is not
-   * valid, the representation is set to gouraud(1)
-   * @param value the string representation of the interpolation
-   */
-  VtkInterpolationProperty( const std::string& value );
+  mitkNewMacro1Param(VtkInterpolationProperty, const IdType&);
+ 
+  mitkNewMacro1Param(VtkInterpolationProperty, const std::string&);
   
   /**
    * Returns the current interpolation value as defined by VTK constants.
@@ -76,6 +63,25 @@ public:
   virtual void SetInterpolationToPhong();
   
 protected:
+  
+  /**
+   * Constructor. Sets the representation to a default value of surface(2)
+   */
+  VtkInterpolationProperty( );
+  
+  /**
+   * Constructor. Sets the interpolation to the given value. If it is not
+   * valid, the interpolation is set to gouraud(1)
+   * @param value the integer representation of the interpolation
+   */
+  VtkInterpolationProperty( const IdType& value );
+  
+  /**
+   * Constructor. Sets the interpolation to the given value. If it is not
+   * valid, the representation is set to gouraud(1)
+   * @param value the string representation of the interpolation
+   */
+  VtkInterpolationProperty( const std::string& value );
 
   /**
    * this function is overridden as protected, so that the user may not add

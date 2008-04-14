@@ -74,14 +74,14 @@ QmitkPropertyListViewItem* QmitkPropertyListViewItem::CreateInstance(mitk::Prope
 
 void QmitkPropertyListViewItem::CheckBoxControlActivated(bool on)
 {
-  m_PropertyList->SetProperty(m_Name.c_str(), new mitk::BoolProperty(on));
+  m_PropertyList->SetProperty(m_Name.c_str(), mitk::BoolProperty::New(on));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 void QmitkPropertyListViewItem::StringControlActivated(const QString &text)
 {
-  m_PropertyList->SetProperty(m_Name.c_str(), new mitk::StringProperty(text.ascii()));
+  m_PropertyList->SetProperty(m_Name.c_str(), mitk::StringProperty::New(text.ascii()));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -95,7 +95,7 @@ void QmitkPropertyListViewItem::FloatControlActivated(const QString &text)
     mitk::FloatProperty* floatProp = dynamic_cast<mitk::FloatProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
     if (value != floatProp->GetValue())
     {
-      m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value));
+      m_PropertyList->SetProperty(m_Name.c_str(), mitk::FloatProperty::New(value));
     }
   }
   else
@@ -115,7 +115,7 @@ void QmitkPropertyListViewItem::IntControlActivated(const QString &text)
     mitk::IntProperty* intProp = dynamic_cast<mitk::IntProperty*>(m_PropertyList->GetProperty(m_Name.c_str()));
     if (value != intProp->GetValue())
     {
-      m_PropertyList->SetProperty(m_Name.c_str(), new mitk::IntProperty(value));
+      m_PropertyList->SetProperty(m_Name.c_str(), mitk::IntProperty::New(value));
     }
   }
   else
@@ -246,7 +246,7 @@ void QmitkPropertyListViewItem::ComboBoxItemActivated(const QString &item)
 
 void  QmitkPropertyListViewFloatSlider::SliderValueChanged(int value)
 {
-  m_PropertyList->SetProperty(m_Name.c_str(), new mitk::FloatProperty(value / 100.0f));
+  m_PropertyList->SetProperty(m_Name.c_str(), mitk::FloatProperty::New(value / 100.0f));
   UpdateView();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

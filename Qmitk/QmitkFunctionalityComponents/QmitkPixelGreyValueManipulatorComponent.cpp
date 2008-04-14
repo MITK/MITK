@@ -523,11 +523,11 @@ void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::Da
     m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
     mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( boundingNode );
     boundingNode->SetData( m_BoundingObject );
-    boundingNode->SetProperty( "name", new mitk::StringProperty(NAMEFORBOUNDINGOBJECT) );
-    boundingNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
-    boundingNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
-    boundingNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
-    boundingNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+    boundingNode->SetProperty( "name", mitk::StringProperty::New(NAMEFORBOUNDINGOBJECT) );
+    boundingNode->SetProperty( "color", mitk::ColorProperty::New(0.1, 0.57, 0.04) );
+    boundingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.4) );
+    boundingNode->SetProperty( "layer", mitk::IntProperty::New(99) ); // arbitrary, copied from segmentation functionality
+    boundingNode->SetProperty( "selected",  mitk::BoolProperty::New(true) );
 
     boundingNode->SetVisibility(true);
     mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
@@ -542,11 +542,11 @@ void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::Da
     //m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
     //mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_BoundingObjectNode );
     //m_BoundingObjectNode->SetData( m_BoundingObject );
-    //m_BoundingObjectNode->SetProperty( "name", new mitk::StringProperty( NAMEFORBOUNDINGOBJECT ) );
-    //m_BoundingObjectNode->SetProperty( "color", new mitk::ColorProperty(0.1, 0.57, 0.04) );
-    //m_BoundingObjectNode->SetProperty( "opacity", new mitk::FloatProperty(0.4) );
-    //m_BoundingObjectNode->SetProperty( "layer", new mitk::IntProperty(99) ); // arbitrary, copied from segmentation functionality
-    //m_BoundingObjectNode->SetProperty( "selected",  new mitk::BoolProperty(true) );
+    //m_BoundingObjectNode->SetProperty( "name", mitk::StringProperty::New( NAMEFORBOUNDINGOBJECT ) );
+    //m_BoundingObjectNode->SetProperty( "color", mitk::ColorProperty::New(0.1, 0.57, 0.04) );
+    //m_BoundingObjectNode->SetProperty( "opacity", mitk::FloatProperty::New(0.4) );
+    //m_BoundingObjectNode->SetProperty( "layer", mitk::IntProperty::New(99) ); // arbitrary, copied from segmentation functionality
+    //m_BoundingObjectNode->SetProperty( "selected",  mitk::BoolProperty::New(true) );
 
     //m_BoundingObjectNode->SetVisibility(true);
     //mitk::DataTreeIteratorClone iteratorBoundingObject = GetDataTreeIterator();
@@ -1541,7 +1541,7 @@ void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(typena
     m_PixelChangedImageNode = mitk::DataTreeNode::New();//m_GradientShiftedImageNode = mitk::DataTreeNode::New();
     m_PixelChangedImageNode->SetData(m_PixelChangedImage);
     mitk::DataTreeNodeFactory::SetDefaultImageProperties(m_PixelChangedImageNode);
-    m_PixelChangedImageNode->SetProperty("name", new mitk::StringProperty(sPName ) );
+    m_PixelChangedImageNode->SetProperty("name", mitk::StringProperty::New(sPName ) );
     m_PixelChangedImageNode->SetIntProperty("layer", 2);
     selectedIterator->Add(m_PixelChangedImageNode);
 }

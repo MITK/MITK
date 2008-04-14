@@ -42,7 +42,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent, const ch
   lstOrgans = new QListBox( this, "lstOrgans" );
   verticalLayout->addWidget( lstOrgans );
 
-  mitk::OrganTypeProperty::Pointer organTypes = new mitk::OrganTypeProperty();
+  mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
   for ( mitk::EnumerationProperty::EnumConstIterator iter = organTypes->Begin();
         iter != organTypes->End();
         ++iter )

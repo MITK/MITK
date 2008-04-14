@@ -40,13 +40,14 @@ class MITK_CORE_EXPORT OrganTypeProperty : public EnumerationProperty
     
     mitkClassMacro(OrganTypeProperty, EnumerationProperty);
     itkNewMacro(OrganTypeProperty);
+    mitkNewMacro1Param(OrganTypeProperty, const IdType&);
+    mitkNewMacro1Param(OrganTypeProperty, const std::string&);
 
+  protected:
     OrganTypeProperty();
     OrganTypeProperty( const IdType& value );
     OrganTypeProperty( const std::string& value );
-
-  protected:
-
+    
     virtual ~OrganTypeProperty();
     virtual void AddEnumerationTypes();
 };

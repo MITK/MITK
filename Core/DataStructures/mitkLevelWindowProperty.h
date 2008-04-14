@@ -36,14 +36,17 @@ protected:
     //##ModelId=3ED953090113
     LevelWindow m_LevWin;
 
-public:
-    mitkClassMacro(LevelWindowProperty, BaseProperty);
-
     //##ModelId=3ED953090121
     LevelWindowProperty();
 
     //##ModelId=3EF198D9012D
     LevelWindowProperty(const mitk::LevelWindow &levWin);
+        
+public:
+    mitkClassMacro(LevelWindowProperty, BaseProperty);
+
+    itkNewMacro(LevelWindowProperty);
+    mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow&);
 
     //##ModelId=3ED953090122
     virtual ~LevelWindowProperty();

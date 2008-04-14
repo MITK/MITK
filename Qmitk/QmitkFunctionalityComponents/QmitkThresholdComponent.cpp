@@ -270,13 +270,13 @@ void QmitkThresholdComponent::ShowThreshold(bool)
 	{
 		if(m_Active == true)
 		{
-			m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked())) );
+			m_ThresholdImageNode->SetProperty("visible", mitk::BoolProperty::New((m_ThresholdComponentGUI->GetThresholdFinderGroupBox()->isChecked())) );
 		}
 		else
 		{
 			if(m_ThresholdComponentGUI->GetDeleteImageIfDeactivatedCheckBox()->isChecked())
 			{
-				m_ThresholdImageNode->SetProperty("visible", new mitk::BoolProperty((false)) );
+				m_ThresholdImageNode->SetProperty("visible", mitk::BoolProperty::New((false)) );
 			}
 		}
 		mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -371,9 +371,9 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
 			if (m_Node)
 			{
 				m_ThresholdImageNode = mitk::DataTreeNode::New();
-				mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("Thresholdview image" );
+				mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("Thresholdview image" );
 				m_ThresholdImageNode->SetProperty( "name", nameProp );
-				mitk::BoolProperty::Pointer componentThresholdImageProp = new mitk::BoolProperty(true);
+				mitk::BoolProperty::Pointer componentThresholdImageProp = mitk::BoolProperty::New(true);
 				m_ThresholdImageNode->SetProperty( "isComponentThresholdImage", componentThresholdImageProp );
 
 				m_ThresholdImageNode->SetData(m_Node->GetData());
@@ -412,12 +412,12 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
 	if  
 		(segmentationNode.IsNotNull())
 	{
-		mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("TH segmentation" );
+		mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("TH segmentation" );
 		segmentationNode->SetProperty( "name", nameProp );
-		segmentationNode->GetPropertyList()->SetProperty("binary", new mitk::BoolProperty(true));
-		mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = new mitk::BoolProperty(true);
+		segmentationNode->GetPropertyList()->SetProperty("binary", mitk::BoolProperty::New(true));
+		mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = mitk::BoolProperty::New(true);
 		segmentationNode->SetProperty( "segmentation", thresholdBasedSegmentationProp );
-		segmentationNode->GetPropertyList()->SetProperty("layer",new mitk::IntProperty(1));
+		segmentationNode->GetPropertyList()->SetProperty("layer",mitk::IntProperty::New(1));
 		segmentationNode->SetColor(1.0,0.0,0.0);
 		segmentationNode->SetOpacity(.25);
 
@@ -494,13 +494,13 @@ mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode(
 
 	// visualization properties
 
-	segmentationNode->SetProperty( "binary", new mitk::BoolProperty(true) );
-	segmentationNode->SetProperty( "layer", new mitk::IntProperty(10) );
-	segmentationNode->SetProperty( "segmentation", new mitk::BoolProperty(true) );
-	segmentationNode->SetProperty( "opacity", new mitk::FloatProperty(0.3) );
+	segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+	segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
+	segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
+	segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
 
-	segmentationNode->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
-	segmentationNode->SetProperty( "color", new mitk::ColorProperty(0.0, 1.0, 0.0) );
+	segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+	segmentationNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 0.0) );
 
 	return segmentationNode;
 }

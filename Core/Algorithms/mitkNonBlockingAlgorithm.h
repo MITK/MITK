@@ -89,7 +89,7 @@ class MITK_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     {
       //std::cout << "SetParameter(" << parameter << ") " << typeid(T).name() << std::endl;
       //m_ParameterListMutex->Lock();
-      m_Parameters->SetProperty(parameter, new GenericProperty<T>(value) );
+      m_Parameters->SetProperty(parameter, GenericProperty<T>::New(value) );
       //m_ParameterListMutex->Unlock();
     }
 
@@ -99,7 +99,7 @@ class MITK_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     {
       //std::cout << this << "->SetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
       m_ParameterListMutex->Lock();
-      m_Parameters->SetProperty(parameter, new SmartPointerProperty(value.GetPointer()) );
+      m_Parameters->SetProperty(parameter, SmartPointerProperty::New(value.GetPointer()) );
       m_ParameterListMutex->Unlock();
     }
      //virtual void SetParameter( const char*, mitk::BaseProperty* ); // for "number of iterations", ...

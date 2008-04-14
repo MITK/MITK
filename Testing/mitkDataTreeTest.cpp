@@ -124,7 +124,7 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Creating tree: ";
   mitk::DataTree::Pointer tree;
-  tree=mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  tree=mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hï¿½lt, wird tree sonst gelï¿½scht.
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
@@ -145,7 +145,7 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating level-window property: ";
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::ReferenceCountWatcher::Pointer propertyWatcher = new mitk::ReferenceCountWatcher(levWinProp, "property");
   mitk::LevelWindow levelwindow;
   levelwindow.SetAuto( image );
@@ -351,7 +351,7 @@ int mitkDataTreeTest(int /*argc*/, char* /*argv*/[])
   /*------------------- Part4 -------------------*/
   // some iterator tests
   // start with new datatree
-  tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+  tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hï¿½lt, wird tree sonst gelï¿½scht.
   std::cout << "Now doing an iterator test. Create another node with another image: " << std::flush;
   mitk::DataTreeNode::Pointer node3 = mitk::DataTreeNode::New();
   mitk::ReferenceCountWatcher::Pointer node3Watcher = new mitk::ReferenceCountWatcher(node3, "node3");
@@ -478,7 +478,7 @@ int TreeDestructionTest(bool useClearMethod) {
     // start with new datatree
     mitk::DataTreeNode::Pointer node5 = mitk::DataTreeNode::New();
     mitk::ReferenceCountWatcher::Pointer node5Watcher = new mitk::ReferenceCountWatcher(node5, "node5");
-    mitk::DataTree::Pointer tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hält, wird tree sonst gelöscht.
+    mitk::DataTree::Pointer tree = mitk::DataTree::New(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree hï¿½lt, wird tree sonst gelï¿½scht.
     std::cout << "Now preparing to test desctruction of complete tree: " << std::endl;
     mitk::DataTreePreOrderIterator rootIt2(tree);
     mitk::DataTreeNode::Pointer nodeEmpty = mitk::DataTreeNode::New();

@@ -114,7 +114,7 @@ void QmitkVolumeVisualization::EnableRendering(bool state)
   {
     mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(item->GetNode());
     if (state && node) {
-      node->SetProperty("volumerendering",new mitk::BoolProperty(true));
+      node->SetProperty("volumerendering",mitk::BoolProperty::New(true));
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
       if (!image) return;
       image_ok = true;
@@ -123,7 +123,7 @@ void QmitkVolumeVisualization::EnableRendering(bool state)
     } 
     else if (!state && node) 
     {
-      node->SetProperty("volumerendering",new mitk::BoolProperty(false));
+      node->SetProperty("volumerendering",mitk::BoolProperty::New(false));
     }
   }
 }

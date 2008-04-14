@@ -30,7 +30,7 @@ bool TestXMLWriter()
   // first list
   mitk::DataTreeNode::Pointer list1 = mitk::DataTreeNode::New();
   // insert an IntProperty
-  mitk::IntProperty::Pointer intProp = new mitk::IntProperty(FIRST_VALUE);
+  mitk::IntProperty::Pointer intProp = mitk::IntProperty::New(FIRST_VALUE);
   list1->SetProperty("int", intProp);
   
   // second list
@@ -153,8 +153,8 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   else {
   std::cout << "[PASSED]" << std::endl;
   } 
-  mitk::BoolProperty::Pointer boolProp = new mitk::BoolProperty(false);
-  mitk::BoolProperty::Pointer boolProp2 = new mitk::BoolProperty(false);
+  mitk::BoolProperty::Pointer boolProp = mitk::BoolProperty::New(false);
+  mitk::BoolProperty::Pointer boolProp2 = mitk::BoolProperty::New(false);
   std::cout << "Testing BoolProperty ==: ";
   if (! (*boolProp2 == *boolProp) ) {
     
@@ -176,7 +176,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   
   std::cout << "Testing SetProperty() with changed property value: ";
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",new mitk::BoolProperty(true)); 
+  propList->SetProperty("test",mitk::BoolProperty::New(true)); 
   tAfter = propList->GetMTime();
   if (!  (tAfter > tBefore) ) {
     std::cout << "[FAILED]" << std::endl;
@@ -186,7 +186,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   
   std::cout << "Testing SetProperty() with unchanged property value: ";
   tBefore = propList->GetMTime();
-  propList->SetProperty("test",new mitk::BoolProperty(true)); 
+  propList->SetProperty("test",mitk::BoolProperty::New(true)); 
   tAfter = propList->GetMTime();
   if ( tBefore != tAfter ) {
     std::cout << "[FAILED]" << std::endl;
@@ -195,7 +195,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[PASSED]" << std::endl;
   
   std::cout << "Testing MTime correctness when changing property value: ";
-  boolProp = new mitk::BoolProperty(true);
+  boolProp = mitk::BoolProperty::New(true);
   propList->ReplaceProperty("test",boolProp); 
   tBefore = propList->GetMTime();
   boolProp->SetValue(true);
@@ -210,7 +210,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[PASSED]" << std::endl;
  
   std::cout << "Testing MTime correctness when calling SetProperty twice: ";
-  boolProp = new mitk::BoolProperty(true);
+  boolProp = mitk::BoolProperty::New(true);
   propList->SetProperty("test",boolProp); 
   tBefore = propList->GetMTime();
   propList->SetProperty("test",boolProp); 

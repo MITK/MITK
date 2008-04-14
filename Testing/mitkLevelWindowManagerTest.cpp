@@ -46,7 +46,7 @@ int mitkLevelWindowManagerTest(int, char* [])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing mitk::LevelWindowManager SetLevelWindowProperty ";
-  mitk::LevelWindowProperty* levelWindowProperty = new mitk::LevelWindowProperty();
+  mitk::LevelWindowProperty* levelWindowProperty = mitk::LevelWindowProperty::New();
 
   manager->SetLevelWindowProperty(levelWindowProperty);
   std::cout<<"[PASSED]"<<std::endl;

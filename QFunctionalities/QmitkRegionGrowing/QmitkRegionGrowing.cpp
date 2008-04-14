@@ -98,7 +98,7 @@ void QmitkRegionGrowing::Activated()
   {
     // new node and data item
     m_PointSetNode = mitk::DataTreeNode::New();
-	m_PointSetNode->GetPropertyList()->SetProperty("name", new mitk::StringProperty("Seedpoints for region growing")); 
+	m_PointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New("Seedpoints for region growing")); 
 	m_PointSet = mitk::PointSet::New();
     m_PointSetNode->SetData( m_PointSet );
 
@@ -222,12 +222,12 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
 
   // set some properties
   mitk::DataTreeNodeFactory::SetDefaultImageProperties( newNode );
-  newNode->SetProperty("binary", new mitk::BoolProperty(true));
-  newNode->SetProperty("name", new mitk::StringProperty("dumb segmentation"));
-  newNode->SetProperty("color", new mitk::ColorProperty(1.0,0.0,0.0));
-  //newNode->SetProperty("volumerendering", new mitk::BoolProperty(true));
-  newNode->SetProperty("layer", new mitk::IntProperty(1));
-  newNode->SetProperty("opacity", new mitk::FloatProperty(0.5));
+  newNode->SetProperty("binary", mitk::BoolProperty::New(true));
+  newNode->SetProperty("name", mitk::StringProperty::New("dumb segmentation"));
+  newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+  //newNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+  newNode->SetProperty("layer", mitk::IntProperty::New(1));
+  newNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
   // add result to data tree
   mitk::DataStorage::GetInstance()->Add( newNode );

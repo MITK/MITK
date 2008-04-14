@@ -145,7 +145,7 @@ const std::string& mitk::Mapper::GetXMLNodeName() const
 
 void mitk::Mapper::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "visible", new mitk::BoolProperty(true), renderer, overwrite );
-  node->AddProperty( "layer", new mitk::IntProperty(0), renderer, overwrite);
-  node->AddProperty( "name", new mitk::StringProperty("No Name!"), renderer, overwrite );
+  node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "layer", mitk::IntProperty::New(0), renderer, overwrite);
+  node->AddProperty( "name", mitk::StringProperty::New("No Name!"), renderer, overwrite );
 }

@@ -97,7 +97,7 @@ QmitkDialogBar
 		std::string dialogBarStateName = "DialogBar " + m_Caption + " active";
 
     m_GlobalOptions->SetProperty( 
-      dialogBarStateName, new mitk::BoolProperty( visible ) );
+      dialogBarStateName, mitk::BoolProperty::New( visible ) );
   }
 }
 

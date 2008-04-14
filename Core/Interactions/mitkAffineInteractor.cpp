@@ -105,14 +105,14 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       selected = dynamic_cast<mitk::BoolProperty*>(m_DataTreeNode->GetProperty("selected"));
 
       if ( selected.IsNull() ) {
-        selected = new mitk::BoolProperty();
+        selected = mitk::BoolProperty::New();
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
       color = dynamic_cast<mitk::ColorProperty*>(m_DataTreeNode->GetProperty("color"));
 
       if ( color.IsNull() ) {
-        color = new mitk::ColorProperty();
+        color = mitk::ColorProperty::New();
         m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
       }
 
@@ -125,16 +125,16 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       else
       {
         newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
-        selected = new mitk::BoolProperty(false);
+        selected = mitk::BoolProperty::New(false);
         color->SetColor(0.0, 0.0, 1.0);
 
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)
         {
-          color = (b->GetPositive())? new mitk::ColorProperty(0.0, 0.0, 1.0) : new mitk::ColorProperty(1.0, 0.0, 0.0);  // if deselected, a boundingobject is colored according to its positive/negative state
+          color = (b->GetPositive())? mitk::ColorProperty::New(0.0, 0.0, 1.0) : mitk::ColorProperty::New(1.0, 0.0, 0.0);  // if deselected, a boundingobject is colored according to its positive/negative state
         }
         else
-          color = new mitk::ColorProperty(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white
+          color = mitk::ColorProperty::New(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white
       }
 
       /* write new state (selected/not selected) to the property */      
@@ -149,7 +149,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       if (this->CheckSelected(worldPoint, timestep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, event);
-        m_DataTreeNode->GetPropertyList()->SetProperty("selected", new mitk::BoolProperty(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
+        m_DataTreeNode->GetPropertyList()->SetProperty("selected", mitk::BoolProperty::New(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
       }
       else  // if not selected, do nothing (don't deselect)
       {
@@ -285,7 +285,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
       if (b != NULL)
       {
-        m_DataTreeNode->GetPropertyList()->SetProperty("volume", new FloatProperty(b->GetVolume()));
+        m_DataTreeNode->GetPropertyList()->SetProperty("volume", FloatProperty::New(b->GetVolume()));
         //std::cout << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
       }
       ok = true;
@@ -307,7 +307,7 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint, int 
 {
   bool selected = false;
   if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
-    m_DataTreeNode->SetProperty("selected", new mitk::BoolProperty(false));  // create it
+    m_DataTreeNode->SetProperty("selected", mitk::BoolProperty::New(false));  // create it
 
   // check if mouseclick has hit the object
   mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());

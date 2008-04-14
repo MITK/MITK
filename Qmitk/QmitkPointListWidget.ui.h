@@ -175,11 +175,11 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   if ((*sop).IsNull())
   {
     //new layer property
-    mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
-    mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c[0],c[1],c[2]);
+    mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
+    mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
 
-    mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
-    mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
+    mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
+    mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
 
 
     //if necessary create a TreeNode, to connect the data to...
@@ -208,7 +208,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     dataTreeNode->SetProperty("contour",contour);
     dataTreeNode->SetProperty("close",close);
 
-    mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
+    mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
 
     //const char *c="";
     //if ( !strcmp(l.c_str(),c) )
@@ -257,13 +257,13 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     //new layer property
     std::cout << "creating polygon interactor ..." << std::endl;
 
-    mitk::IntProperty::Pointer layer = new mitk::IntProperty(1);
-    mitk::ColorProperty::Pointer color = new mitk::ColorProperty(c[0],c[1],c[2]);
+    mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
+    mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
 
-    //mitk::BoolProperty::Pointer contour = new mitk::BoolProperty(false);
-    //mitk::BoolProperty::Pointer close = new mitk::BoolProperty(true);
-    mitk::StringProperty::Pointer label = new mitk::StringProperty(l);
-    mitk::StringProperty::Pointer name = new mitk::StringProperty(l);
+    //mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
+    //mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
+    mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
+    mitk::StringProperty::Pointer name = mitk::StringProperty::New(l);
     //create a DataElement that holds the points
     mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
 

@@ -121,12 +121,12 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddVtkMeshToDataTree(vtkPolyDat
   mitk::DataTreeIteratorClone it=iterator;
 
   mitk::DataTreeNode::Pointer node = NULL;
-  mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
+  mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", mitk::StringProperty::New( str.c_str() ));
 
   if (subTree->IsAtEnd() || subTree->Get().IsNull() )
   {
     node=mitk::DataTreeNode::New();
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
+    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(str.c_str());
     node->SetProperty("name",nameProp);
     it->Add(node);
   }
@@ -138,7 +138,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddVtkMeshToDataTree(vtkPolyDat
   mitk::Surface::Pointer surface = mitk::Surface::New();
   surface->SetVtkPolyData(polys);
   node->SetData( surface );
-  node->SetProperty("layer", new mitk::IntProperty(1));
+  node->SetProperty("layer", mitk::IntProperty::New(1));
   node->SetVisibility(true,NULL);
 
   float meshColor[3] = {1.0,0.5,0.5};
@@ -157,12 +157,12 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(ipPicDesc
   image->SetPicVolume(pic);
 
   mitk::DataTreeNode::Pointer node = NULL;
-  mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
+  mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", mitk::StringProperty::New( str.c_str() ));
 
   if (subTree->IsAtEnd() || subTree->Get().IsNull() )
   {
     node=mitk::DataTreeNode::New();
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
+    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(str.c_str());
     node->SetProperty("name",nameProp);
     node->SetData(image);
     it->Add(node);
@@ -173,7 +173,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(ipPicDesc
     node->SetData(image);
   }
 
-  mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelWindow;
   levelWindow.SetAuto( image );
   levWinProp->SetLevelWindow(levelWindow);

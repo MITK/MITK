@@ -303,7 +303,7 @@ protected:
   * application startup - providing persistence for functionalities. 
   * The PropertyList is created in QmitkFunctionality constructor. All functionalities should add default values for 
   * all the properties they use in their constructor. 
-  * E.g. GetFunctionalityOptionsList()->SetProperty("LastUsed", new mitk::StringProperty("EasyExampleSegmentationTool"));
+  * E.g. GetFunctionalityOptionsList()->SetProperty("LastUsed", mitk::StringProperty::New("EasyExampleSegmentationTool"));
   */
   mitk::PropertyList::Pointer m_Options;
 };

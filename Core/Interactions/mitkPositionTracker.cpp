@@ -64,7 +64,7 @@ bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent c
       dtnode = dtit->Get();
       if ( dtnode->GetBoolProperty("inputdevice",isPointSet) && isPointSet)
       {
-//        mitk::StringProperty sp = new mitk::StringProperty(stateEvent->GetEvent()->GetSender()->GetName());
+//        mitk::StringProperty sp = mitk::StringProperty::New(stateEvent->GetEvent()->GetSender()->GetName());
           int mapperID = stateEvent->GetEvent()->GetSender()->GetMapperID();
           dtnode->SetIntProperty("BaseRendererMapperID",mapperID);
 

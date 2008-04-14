@@ -724,17 +724,17 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
     {
       case ipPicASCII:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::StringProperty( static_cast<char*>( currentTag->value ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( static_cast<char*>( currentTag->value ) ) );
         break;
       }
       case ipPicInt:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( *static_cast<int*>( currentTag->value ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
       }
       case ipPicUInt:
       {
-        resultPropertyList->SetProperty( propertyName.c_str(), new mitk::IntProperty( (int)*( (char*)( currentTag->value ) ) ) );
+        resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
       default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
@@ -750,7 +750,7 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
   BaseProperty::Pointer name = resultPropertyList->GetProperty( "CHILI: SERIES DESCRIPTION" );
   if( name )
   {
-    resultPropertyList->SetProperty( "name", new mitk::StringProperty( name->GetValueAsString() ) );
+    resultPropertyList->SetProperty( "name", mitk::StringProperty::New( name->GetValueAsString() ) );
   }
   else
   {
@@ -758,10 +758,10 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
     {
       if( m_LightBox->currentSeries()->description )
       {
-        resultPropertyList->SetProperty( "name", new StringProperty( std::string( m_LightBox->currentSeries()->description ) ) );
+        resultPropertyList->SetProperty( "name", StringProperty::New( std::string( m_LightBox->currentSeries()->description ) ) );
       }
       else
-        resultPropertyList->SetProperty( "name", new mitk::StringProperty( "unnamed" ) );
+        resultPropertyList->SetProperty( "name", mitk::StringProperty::New( "unnamed" ) );
     }
   }
   return resultPropertyList;

@@ -84,9 +84,9 @@ void QmitkMeasurement::AddDistanceMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", new mitk::BoolProperty(true));
-  pointSetNode->SetProperty("name", new mitk::StringProperty("distance"));
-  pointSetNode->SetProperty("show distances", new mitk::BoolProperty(true));
+  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
+  pointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
 
   m_DataTreeIterator->Add(pointSetNode);
 
@@ -100,9 +100,9 @@ void QmitkMeasurement::AddAngleMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", new mitk::BoolProperty(true));
-  pointSetNode->SetProperty("name", new mitk::StringProperty("angle"));
-  pointSetNode->SetProperty("show angles", new mitk::BoolProperty(true));
+  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
+  pointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
   m_DataTreeIterator->Add(pointSetNode);
 
@@ -116,10 +116,10 @@ void QmitkMeasurement::AddPathMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", new mitk::BoolProperty(true));
-  pointSetNode->SetProperty("name", new mitk::StringProperty("path"));
-  pointSetNode->SetProperty("show distances", new mitk::BoolProperty(true));
-  pointSetNode->SetProperty("show angles", new mitk::BoolProperty(true));
+  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
+  pointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
   m_DataTreeIterator->Add(pointSetNode);
 

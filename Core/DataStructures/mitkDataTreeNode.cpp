@@ -351,7 +351,7 @@ bool mitk::DataTreeNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::Ba
 void mitk::DataTreeNode::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
-  prop = new mitk::ColorProperty(color);
+  prop = mitk::ColorProperty::New(color);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
@@ -368,7 +368,7 @@ void mitk::DataTreeNode::SetColor(float red, float green, float blue, mitk::Base
 void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
-  prop = new mitk::ColorProperty(rgb);
+  prop = mitk::ColorProperty::New(rgb);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
@@ -381,14 +381,14 @@ void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* rendere
   if (prop && !defaultRendererUsed)
     prop->SetValue(visible);
   else
-    GetPropertyList(renderer)->SetProperty(propertyKey, new mitk::BoolProperty(visible));
+    GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(visible));
 }
 
 //##ModelId=3EF196880095
 void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::FloatProperty::Pointer prop;
-  prop = new mitk::FloatProperty(opacity);
+  prop = mitk::FloatProperty::New(opacity);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
@@ -396,14 +396,14 @@ void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer,
 void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::LevelWindowProperty::Pointer prop;
-  prop = new mitk::LevelWindowProperty(levelWindow);
+  prop = mitk::LevelWindowProperty::New(levelWindow);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
   mitk::IntProperty::Pointer prop;
-  prop = new mitk::IntProperty(intValue);
+  prop = mitk::IntProperty::New(intValue);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
@@ -569,7 +569,7 @@ bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader )
 
   // additional property settings prevent update problems
   // the advantage to manipulate the property path here is that you get the SourceFilePath from relative - negative is that the XML file contains old information
-  mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( xmlReader.GetSourceFilePath() );
+  mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( xmlReader.GetSourceFilePath() );
   this->SetProperty( StringProperty::PATH, pathProp );
   // fixes the update problem of colorProperty and materialProperty
   mitk::MaterialProperty::Pointer material = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty("material"));
@@ -612,7 +612,7 @@ void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer
 
   if ( selectedProperty == NULL ) 
   {
-    selectedProperty = new mitk::BoolProperty();
+    selectedProperty = mitk::BoolProperty::New();
     selectedProperty->SetValue(false);
     SetProperty("selected", selectedProperty, renderer);  
   }

@@ -179,7 +179,7 @@ void QmitkVolumetryWidget::CreateOverlayChild()
   {
     m_OverlayNode = mitk::DataTreeNode::New();
     mitk::DataTreeNodeFactory::SetDefaultImageProperties(m_OverlayNode);
-    mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("volume threshold overlay image" );
+    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("volume threshold overlay image" );
     m_OverlayNode->SetProperty( "reslice interpolation", m_Node->GetProperty("reslice interpolation") );
     m_OverlayNode->SetProperty( "name", nameProp );
     m_OverlayNode->SetData(m_Node->GetData());

@@ -146,7 +146,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   //adding this BaseRenderer to the List of all BaseRenderer
   mitk::GlobalInteraction::GetInstance()->AddFocusElement(this);
 
-  WeakPointerProperty::Pointer rendererProp = new WeakPointerProperty((itk::Object*)this);
+  WeakPointerProperty::Pointer rendererProp = WeakPointerProperty::New((itk::Object*)this);
 
   m_CurrentWorldGeometry2D = mitk::PlaneGeometry::New();
 
@@ -155,7 +155,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_CurrentWorldGeometry2DNode = mitk::DataTreeNode::New();
   m_CurrentWorldGeometry2DNode->SetData(m_CurrentWorldGeometry2DData);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("renderer", rendererProp);
-  m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("layer", new IntProperty(1000));
+  m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("layer", IntProperty::New(1000));
   m_CurrentWorldGeometry2DTransformTime = m_CurrentWorldGeometry2DNode->GetVtkTransform()->GetMTime();
 
   m_DisplayGeometry = mitk::DisplayGeometry::New();

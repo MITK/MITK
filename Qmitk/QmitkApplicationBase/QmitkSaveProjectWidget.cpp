@@ -241,7 +241,7 @@ void QmitkSaveProjectWidget::AddCheckBoxWrite(const mitk::DataTreeFilter::ItemLi
   {
     mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>(itemiter->GetNode());
     if (node) // could be, that node is NULL
-      node->SetProperty("write", new mitk::BoolProperty(true));
+      node->SetProperty("write", mitk::BoolProperty::New(true));
      
     if ( itemiter->HasChildren() )
     {

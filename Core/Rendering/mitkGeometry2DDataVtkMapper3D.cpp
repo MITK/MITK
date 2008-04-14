@@ -317,7 +317,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     {
       //m_SurfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
       m_SurfaceCreator->PlaceByGeometryOn();
-      surfacecreatorprop = new mitk::SmartPointerProperty( m_SurfaceCreator );
+      surfacecreatorprop = mitk::SmartPointerProperty::New( m_SurfaceCreator );
       GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }
 

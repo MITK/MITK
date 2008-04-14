@@ -38,11 +38,11 @@ mitk::ContourInteractor::ContourInteractor(const char * type, mitk::DataTreeNode
 {
   assert(m_DataTreeNode != NULL);
 
-  m_DataTreeNode->SetProperty("layer", new mitk::IntProperty(100) );
-  m_DataTreeNode->SetProperty("name", new mitk::StringProperty("InteractiveFeedbackData") );
+  m_DataTreeNode->SetProperty("layer", mitk::IntProperty::New(100) );
+  m_DataTreeNode->SetProperty("name", mitk::StringProperty::New("InteractiveFeedbackData") );
   m_DataTreeNode->SetOpacity(1);
   m_DataTreeNode->SetColor(0.4,0.9,0.0);
-  m_DataTreeNode->SetProperty( "Width", new mitk::FloatProperty(2.0) );
+  m_DataTreeNode->SetProperty( "Width", mitk::FloatProperty::New(2.0) );
   m_Started = false;
 }
 

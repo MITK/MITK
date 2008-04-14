@@ -130,18 +130,18 @@ class Test
   
           {
             mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-            node->SetProperty("name", new mitk::StringProperty("Ruut"));
+            node->SetProperty("name", mitk::StringProperty::New("Ruut"));
             it.Set(node);
           }
           {
             mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-            node->SetProperty("name", new mitk::StringProperty("Eins"));
-            node->SetProperty("visible", new mitk::BoolProperty(false));
+            node->SetProperty("name", mitk::StringProperty::New("Eins"));
+            node->SetProperty("visible", mitk::BoolProperty::New(false));
             it.Add(node);
           }
           {
             mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); node->SetData(image);
-            node->SetProperty("name", new mitk::StringProperty("Zwo"));
+            node->SetProperty("name", mitk::StringProperty::New("Zwo"));
             it.Add(node);
           }
           break;
@@ -755,7 +755,7 @@ int testDataStorageCompliance()
   }
   /* next, get a resultset of n2-n3 */
   std::cout << "Testing subset of DataStorage: ";
-  mitk::NodePredicateProperty p("color", new mitk::ColorProperty(color));
+  mitk::NodePredicateProperty p("color", mitk::ColorProperty::New(color));
   mitk::DataStorage::SetOfObjects::ConstPointer rs2 = ds->GetSubset(p);
   dTF->SetDataStorageResultset(rs2);
 

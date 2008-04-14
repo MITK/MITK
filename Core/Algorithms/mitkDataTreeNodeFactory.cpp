@@ -308,7 +308,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
       // set filename without path as string property
       std::string filename = std::string( this->GetBaseFilePrefix() );
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( seriesUID[ i ] );
+      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( seriesUID[ i ] );
       node->SetProperty( "name", nameProp );
 
     }
@@ -360,14 +360,14 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       mitk::DataTreeNode::Pointer node = this->GetOutput( i );
       node->SetData( image );
 
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty( m_FileName );
+      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( m_FileName );
       node->SetProperty( "name", nameProp );
 
       if ( image->GetPixelType().GetNumberOfComponents() == 1 )
       {
         SetDefaultImageProperties(node);
         // add level-window property
-        //mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+        //mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
         //mitk::LevelWindow levelwindow;
         //levelwindow.SetAuto( image );
         //levWinProp->SetLevelWindow( levelwindow );
@@ -384,12 +384,12 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 
 void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Pointer &node) 
 {
-  node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-  node->SetProperty( "use color", new mitk::BoolProperty( true ) );
-  node->SetProperty( "texture interpolation", new mitk::BoolProperty( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
-  node->SetProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty );
-  node->SetProperty( "layer", new mitk::IntProperty(0));
-  node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
+  node->SetProperty( "volumerendering", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "use color", mitk::BoolProperty::New( true ) );
+  node->SetProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
+  node->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+  node->SetProperty( "layer", mitk::IntProperty::New(0));
+  node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->SetOpacity(1.0f);
   node->SetColor(1.0,1.0,1.0);  
   node->SetVisibility(true);
@@ -397,7 +397,7 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull())
   {
-    mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
     levelwindow.SetAuto( image );
     levWinProp->SetLevelWindow( levelwindow );
@@ -416,12 +416,12 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     vtkLut->SetHueRange(0.6667, 0.0);
     vtkLut->SetTableRange(0.0, 20.0);
     vtkLut->Build();
-    mitk::LookupTableProperty::Pointer mitkLutProp = new mitk::LookupTableProperty();
+    mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
     mitkLutProp->SetLookupTable(mitkLut);
     node->SetProperty( "LookupTable", mitkLutProp );
   }
   if(!node->GetProperty("binary"))
-    node->SetProperty( "binary", new mitk::BoolProperty( false ) );
+    node->SetProperty( "binary", mitk::BoolProperty::New( false ) );
  
   // add a default transfer function
   mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
@@ -439,58 +439,58 @@ void mitk::DataTreeNodeFactory::SetDefaultImageProperties(mitk::DataTreeNode::Po
     tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
     tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
     tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);  
-    node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
+    node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
   }
 } 
 
 void mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(mitk::DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "line width", new mitk::IntProperty(2) );
-  node->SetProperty( "layer", new mitk::IntProperty(1)); // Normally, surfaces are supposed to overlay images (on layer 0).
-  node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
-  node->SetProperty( "scalar visibility", new mitk::BoolProperty(false) );
-  node->SetProperty( "color mode", new mitk::BoolProperty(false) );
-  node->SetProperty( "representation", new mitk::VtkRepresentationProperty );
-  node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
-  node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
+  node->SetProperty( "line width", mitk::IntProperty::New(2) );
+  node->SetProperty( "layer", mitk::IntProperty::New(1)); // Normally, surfaces are supposed to overlay images (on layer 0).
+  node->SetProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  node->SetProperty( "scalar visibility", mitk::BoolProperty::New(false) );
+  node->SetProperty( "color mode", mitk::BoolProperty::New(false) );
+  node->SetProperty( "representation", mitk::VtkRepresentationProperty::New() );
+  node->SetProperty( "interpolation", mitk::VtkInterpolationProperty::New() );
+  node->SetProperty( "scalar mode", mitk::VtkScalarModeProperty::New() );
   node->SetVisibility(true);
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
     if((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != 0) && (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
     {
-      node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
-      node->SetProperty( "color mode", new mitk::BoolProperty(true) );
+      node->SetProperty( "scalar visibility", mitk::BoolProperty::New(true) );
+      node->SetProperty( "color mode", mitk::BoolProperty::New(true) );
     }
   }
 }
 
 void mitk::DataTreeNodeFactory::SetDefaultSegmentationProperties(DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "volumerendering", new mitk::BoolProperty( false ) );
-  node->SetProperty( "use color", new mitk::BoolProperty( true ) );
-  node->SetProperty( "texture interpolation", new mitk::BoolProperty( false ) );
-  node->SetProperty( "reslice interpolation", new mitk::VtkResliceInterpolationProperty );
-  node->SetProperty( "layer", new mitk::IntProperty(1));
-  node->SetProperty( "in plane resample extent by geometry", new mitk::BoolProperty( false ) );
-  node->SetProperty( "binary", new mitk::BoolProperty(true) );
-  node->SetProperty( "segmentation", new mitk::BoolProperty(true) );
-  node->SetProperty( "levelwindow", new mitk::LevelWindowProperty( mitk::LevelWindow(0, 1) ) );
-  node->SetProperty( "color" , new mitk::ColorProperty( 1.0f, 0.0f, 0.0f ));
+  node->SetProperty( "volumerendering", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "use color", mitk::BoolProperty::New( true ) );
+  node->SetProperty( "texture interpolation", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+  node->SetProperty( "layer", mitk::IntProperty::New(1));
+  node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  node->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
+  node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+  node->SetProperty( "color" , mitk::ColorProperty::New( 1.0f, 0.0f, 0.0f ));
   node->SetOpacity(0.3f);
   node->SetVisibility(true);
 }
 
 void mitk::DataTreeNodeFactory::SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "line width", new mitk::IntProperty(1));
-  node->SetProperty( "layer", new mitk::IntProperty(0));
-  node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer()));
-  node->SetProperty( "grid representation", new mitk::GridRepresentationProperty);
-  node->SetProperty( "grid volume mapper", new mitk::GridVolumeMapperProperty);
-  node->SetProperty( "interpolation", new mitk::VtkInterpolationProperty );
-  node->SetProperty( "scalar visibility", new mitk::BoolProperty(true) );
-  node->SetProperty( "scalar mode", new mitk::VtkScalarModeProperty );
+  node->SetProperty( "line width", mitk::IntProperty::New(1));
+  node->SetProperty( "layer", mitk::IntProperty::New(0));
+  node->SetProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node.GetPointer()));
+  node->SetProperty( "grid representation", mitk::GridRepresentationProperty::New());
+  node->SetProperty( "grid volume mapper", mitk::GridVolumeMapperProperty::New());
+  node->SetProperty( "interpolation", mitk::VtkInterpolationProperty::New() );
+  node->SetProperty( "scalar visibility", mitk::BoolProperty::New(true) );
+  node->SetProperty( "scalar mode", mitk::VtkScalarModeProperty::New() );
   node->SetVisibility(true);
 }
 
@@ -573,28 +573,28 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     long int green = strtol( hexGreen.c_str(), NULL, 16 );
     long int blue  = strtol( hexBlue.c_str(), NULL, 16 );
 
-    return new ColorProperty( (float)red/ 255.0, (float)green/ 255.0, (float)blue/ 255.0 );
+    return ColorProperty::New( (float)red/ 255.0, (float)green/ 255.0, (float)blue/ 255.0 );
   }
   else
   {
     // a default color (green)
-    return new ColorProperty( 0.0, 1.0, 0.0 );
+    return ColorProperty::New( 0.0, 1.0, 0.0 );
   }
 
 }
 
 void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode::Pointer &node)
 {
-  node->SetProperty( "line width", new mitk::IntProperty(2) );
-  node->SetProperty( "layer", new mitk::IntProperty(1));
-  node->SetProperty( "pointsize", new mitk::FloatProperty(1.0));
-  node->SetProperty( "unselectedcolor", new mitk::ColorProperty(1.0f, 1.0f, 0.0f));//yellow
-  node->SetProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));//red
-  node->SetProperty( "contour", new mitk::BoolProperty(false) );
-  node->SetProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f));
-  node->SetProperty( "close", new mitk::BoolProperty(false) );
+  node->SetProperty( "line width", mitk::IntProperty::New(2) );
+  node->SetProperty( "layer", mitk::IntProperty::New(1));
+  node->SetProperty( "pointsize", mitk::FloatProperty::New(1.0));
+  node->SetProperty( "unselectedcolor", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f));//yellow
+  node->SetProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f));//red
+  node->SetProperty( "contour", mitk::BoolProperty::New(false) );
+  node->SetProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f));
+  node->SetProperty( "close", mitk::BoolProperty::New(false) );
 
-  //node->SetProperty( "material", new mitk::MaterialProperty( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
+  //node->SetProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetVisibility(true);
 }
 
@@ -602,7 +602,7 @@ void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode:
 void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
 {
   // path
-  mitk::StringProperty::Pointer pathProp = new mitk::StringProperty( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+  mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath( m_FileName ) );
   node->SetProperty( StringProperty::PATH, pathProp );
   
   // name
@@ -612,7 +612,7 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
     if (FileNameEndsWith( ".gz" ))
       m_FileName = m_FileName.substr( 0, m_FileName.length()-3 );
     
-    nameProp = new mitk::StringProperty( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
+    nameProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
 
     node->SetProperty( "name", nameProp );
   }

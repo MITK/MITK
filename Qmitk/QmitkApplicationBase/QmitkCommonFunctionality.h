@@ -102,7 +102,7 @@ namespace CommonFunctionality
       mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(node->GetPropertyList()->GetProperty("levelwindow"));
       if( levWinProp.IsNull() )
       {
-        levWinProp = new mitk::LevelWindowProperty();
+        levWinProp = mitk::LevelWindowProperty::New();
         node->GetPropertyList()->SetProperty("levelwindow", levWinProp);
       }
 
@@ -133,14 +133,14 @@ namespace CommonFunctionality
     image->SetVolume(itkImage->GetBufferPointer());
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", mitk::StringProperty::New( str.c_str() ));
 
     if (subTree->IsAtEnd() || subTree->Get().IsNull() )
     {
       node=mitk::DataTreeNode::New();
       node->SetData(image);
       mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
+      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(str.c_str());
       node->SetProperty("name",nameProp);
       it->Add(node);
     }
@@ -164,12 +164,12 @@ namespace CommonFunctionality
     mitk::DataTreeIteratorClone it=iterator;
 
     mitk::DataTreeNode::Pointer node = NULL;
-    mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( str.c_str() ));
+    mitk::DataTreeIteratorClone subTree = ((mitk::DataTree *) it->GetTree())->GetNext("name", mitk::StringProperty::New( str.c_str() ));
 
     if (subTree->IsAtEnd() || subTree->Get() == NULL )
     {
       node=mitk::DataTreeNode::New();
-      mitk::StringProperty::Pointer nameProp = new mitk::StringProperty(str.c_str());
+      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(str.c_str());
       node->SetProperty("name",nameProp);
       it->Add(node);
     }
@@ -187,7 +187,7 @@ namespace CommonFunctionality
     vtkPolyData* polys = vtkPolyData::New();
     surface->SetVtkPolyData(polys);
     node->SetData( surface );
-    node->SetProperty("layer", new mitk::IntProperty(1));
+    node->SetProperty("layer", mitk::IntProperty::New(1));
     node->SetVisibility(true,NULL);
 
     float meshColor[3] = {.5f,.5f,.5f};

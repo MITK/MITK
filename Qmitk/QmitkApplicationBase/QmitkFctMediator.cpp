@@ -547,7 +547,7 @@ void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer opti
       }
       else
       {
-				m_Options->SetProperty( dialogBarStateName, new mitk::BoolProperty( false ) );
+				m_Options->SetProperty( dialogBarStateName, mitk::BoolProperty::New( false ) );
         enableDialogBar = false;
       }
 

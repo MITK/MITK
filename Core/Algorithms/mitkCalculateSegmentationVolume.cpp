@@ -107,11 +107,11 @@ bool CalculateSegmentationVolume::ThreadedUpdateFunction()
   DataTreeNode* groupNode = GetGroupNode();
   if (groupNode)
   {
-    groupNode->SetProperty( "volume", new FloatProperty(volumeML) );
-    groupNode->SetProperty( "centerOfMass", new Vector3DProperty(m_CenterOfMass) );
-    groupNode->SetProperty( "boundingBoxMinimum", new Vector3DProperty(m_MinIndexOfBoundingBox) );
-    groupNode->SetProperty( "boundingBoxMaximum", new Vector3DProperty(m_MaxIndexOfBoundingBox) );
-    groupNode->SetProperty( "showVolume", new BoolProperty(true) );
+    groupNode->SetProperty( "volume", FloatProperty::New(volumeML) );
+    groupNode->SetProperty( "centerOfMass", Vector3DProperty::New(m_CenterOfMass) );
+    groupNode->SetProperty( "boundingBoxMinimum", Vector3DProperty::New(m_MinIndexOfBoundingBox) );
+    groupNode->SetProperty( "boundingBoxMaximum", Vector3DProperty::New(m_MaxIndexOfBoundingBox) );
+    groupNode->SetProperty( "showVolume", BoolProperty::New(true) );
   }
  
   return true;

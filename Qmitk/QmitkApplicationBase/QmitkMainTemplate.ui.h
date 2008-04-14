@@ -738,20 +738,20 @@ void QmitkMainTemplate::init()
   mitk::DataStorage::CreateInstance(m_Tree);
 
   m_Options = mitk::PropertyList::New();
-  m_Options->SetProperty( "Use gradient background", new mitk::BoolProperty(true) );
-  m_Options->SetProperty( "Gradient color 1", new mitk::ColorProperty( 0.0f, 0.1f, 0.3f ) );
-  m_Options->SetProperty( "Gradient color 2", new mitk::ColorProperty( 0.7f, 0.7f, 0.8f ) );
-  m_Options->SetProperty( "Background color", new mitk::ColorProperty(0.0f,0.0f,0.0f) );
-  m_Options->SetProperty( "HTML documentation path", new mitk::StringProperty("/local/ip++bin/Documentations/Doxygen/html/") );
-  m_Options->SetProperty( "Use dark palette", new mitk::BoolProperty(false) );
-  m_Options->SetProperty( "Department logo visible", new mitk::BoolProperty(false) );
-  m_Options->SetProperty( "Department logo path", new mitk::StringProperty("") );
-  m_Options->SetProperty( "Default value for texture interpolation", new mitk::BoolProperty(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
-  m_Options->SetProperty( "Default dataset path", new mitk::StringProperty("") );
+  m_Options->SetProperty( "Use gradient background", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Gradient color 1", mitk::ColorProperty::New( 0.0f, 0.1f, 0.3f ) );
+  m_Options->SetProperty( "Gradient color 2", mitk::ColorProperty::New( 0.7f, 0.7f, 0.8f ) );
+  m_Options->SetProperty( "Background color", mitk::ColorProperty::New(0.0f,0.0f,0.0f) );
+  m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New("/local/ip++bin/Documentations/Doxygen/html/") );
+  m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Department logo visible", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Department logo path", mitk::StringProperty::New("") );
+  m_Options->SetProperty( "Default value for texture interpolation", mitk::BoolProperty::New(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
+  m_Options->SetProperty( "Default dataset path", mitk::StringProperty::New("") );
   mitk::Point3D point;
   mitk::FillVector3D(point,0.0,0.0,0.0);
-  m_Options->SetProperty( "Startup window size", new mitk::Point3dProperty(point) );
-  m_Options->SetProperty( "Main Splitter ratio", new mitk::Point3dProperty(point) );
+  m_Options->SetProperty( "Startup window size", mitk::Point3dProperty::New(point) );
+  m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
 }
 
 /*!
@@ -883,7 +883,7 @@ void QmitkMainTemplate::Initialize()
   std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
   if (!optionsFile.empty())
     LoadOptionsFromFile(optionsFile.c_str());
-  m_Options->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty("MITKSampleApp") );
+  m_Options->SetProperty( "MITKSampleAppFunctionalityName", mitk::StringProperty::New("MITKSampleApp") );
 
   // initialize multiwidget with options
   // gradient background
@@ -1182,7 +1182,7 @@ void QmitkMainTemplate::destroy()
     mitk::FillVector3D(point,0.0,0.0,0.0);
   else
     mitk::FillVector3D(point,this->size().width(),this->size().height(),0.0);
-  m_Options->SetProperty( "Startup window size", new mitk::Point3dProperty(point) );
+  m_Options->SetProperty( "Startup window size", mitk::Point3dProperty::New(point) );
 
   //save Main Splitter ratio
   if(this->isMaximized())
@@ -1194,7 +1194,7 @@ void QmitkMainTemplate::destroy()
   if(fctwidget)
   {
     mitk::FillVector3D(point, fctwidget->MainSplitter->sizes()[0], fctwidget->MainSplitter->sizes()[1], 0.0);
-    m_Options->SetProperty( "Main Splitter ratio", new mitk::Point3dProperty(point) );
+    m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
   }
   
   // save now
@@ -1431,7 +1431,7 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
     mitk::PropertyList* fo = f->GetFunctionalityOptionsList();
     if (fo && !fo->IsEmpty())
     {
-      fo->SetProperty( "MITKSampleAppFunctionalityName", new mitk::StringProperty( f->GetFunctionalityName().ascii() ) );
+      fo->SetProperty( "MITKSampleAppFunctionalityName", mitk::StringProperty::New( f->GetFunctionalityName().ascii() ) );
 
       xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
       xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
@@ -1578,7 +1578,7 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
       mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
       node->SetData(m_ResultImage);
       mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
-      node->SetProperty("name", new mitk::StringProperty( fileName ));
+      node->SetProperty("name", mitk::StringProperty::New( fileName ));
       mitk::DataStorage::GetInstance()->Add(node);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       mitk::DataTreePreOrderIterator it(m_Tree);
@@ -1609,7 +1609,7 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
         mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
         node->SetData(m_ResultImage);
         mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
-        node->SetProperty("name", new mitk::StringProperty( fileNames.first().ascii() ));
+        node->SetProperty("name", mitk::StringProperty::New( fileNames.first().ascii() ));
         mitk::DataStorage::GetInstance()->Add(node);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         mitk::DataTreePreOrderIterator it(m_Tree);
@@ -1651,11 +1651,11 @@ void QmitkMainTemplate::fileCloseProject()
      and nodes that do not have a data object. This should free most of the used memory.
      If other nodes (with helper objects like the widget planes) should be kept, they have
      to be added here as a predicate. */
-  mitk::NodePredicateProperty w1("name", new mitk::StringProperty("Widgets"));        // keep helper objects
-  mitk::NodePredicateProperty w2("name", new mitk::StringProperty("widget1Plane"));
-  mitk::NodePredicateProperty w3("name", new mitk::StringProperty("widget2Plane"));
-  mitk::NodePredicateProperty w4("name", new mitk::StringProperty("widget3Plane"));
-  mitk::NodePredicateProperty dontsaveorclose("helper object", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty w1("name", mitk::StringProperty::New("Widgets"));        // keep helper objects
+  mitk::NodePredicateProperty w2("name", mitk::StringProperty::New("widget1Plane"));
+  mitk::NodePredicateProperty w3("name", mitk::StringProperty::New("widget2Plane"));
+  mitk::NodePredicateProperty w4("name", mitk::StringProperty::New("widget3Plane"));
+  mitk::NodePredicateProperty dontsaveorclose("helper object", mitk::BoolProperty::New(true));
   mitk::NodePredicateData w5(NULL);   // keep objects without data (e.g. root node of the tree!)
   mitk::NodePredicateOR orpred;
   orpred.AddPredicate(w1);

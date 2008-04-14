@@ -861,7 +861,7 @@ void QmitkSurfaceTransformerComponent::MirrorX()
     QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
     buffer << surfaceDataName.ascii();
     std::string surfaceNodeName = "Mirror_" + buffer.str();
-    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
+    m_SurfaceNode->SetProperty("name", mitk::StringProperty::New(surfaceNodeName));
   }
 }  
 
@@ -897,7 +897,7 @@ void QmitkSurfaceTransformerComponent::MirrorY()
     QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
     buffer << surfaceDataName.ascii();
     std::string surfaceNodeName = "Mirror_" + buffer.str();
-    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
+    m_SurfaceNode->SetProperty("name", mitk::StringProperty::New(surfaceNodeName));
   }
 } 
 
@@ -933,7 +933,7 @@ void QmitkSurfaceTransformerComponent::MirrorZ()
     QString surfaceDataName = m_SurfaceTransformerComponentGUI->GetTreeNodeSelector()->currentText();
     buffer << surfaceDataName.ascii();
     std::string surfaceNodeName = "Mirror_" + buffer.str();
-    m_SurfaceNode->SetProperty("name", new mitk::StringProperty(surfaceNodeName));
+    m_SurfaceNode->SetProperty("name", mitk::StringProperty::New(surfaceNodeName));
   }
 } 
 

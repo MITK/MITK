@@ -53,10 +53,10 @@ mitk::SegTool2D::SegTool2D(const char* type)
   m_FeedbackContour = Contour::New();
   m_FeedbackContourNode = DataTreeNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
-  m_FeedbackContourNode->SetProperty("name", new StringProperty("One of SegTool2D's feedback nodes"));
-  m_FeedbackContourNode->SetProperty("visible", new BoolProperty(true));
-  m_FeedbackContourNode->SetProperty("layer", new IntProperty(1000));
-  m_FeedbackContourNode->SetProperty("Width", new FloatProperty(1)); // uppercase! Slim line looks very accurate :-)
+  m_FeedbackContourNode->SetProperty("name", StringProperty::New("One of SegTool2D's feedback nodes"));
+  m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
+  m_FeedbackContourNode->SetProperty("Width", FloatProperty::New(1)); // uppercase! Slim line looks very accurate :-)
 
   // set explicitly visible=false for all 3D renderer (that exist already ...)
   const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
@@ -67,7 +67,7 @@ mitk::SegTool2D::SegTool2D(const char* type)
     if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
     //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
     {
-      m_FeedbackContourNode->SetProperty("visible", new BoolProperty(false), mitk::BaseRenderer::GetInstance((*iter)));
+      m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
     }
   }
 
@@ -80,12 +80,12 @@ mitk::SegTool2D::~SegTool2D()
 
 void mitk::SegTool2D::SetFeedbackContourColor( float r, float g, float b )
 {
-  m_FeedbackContourNode->SetProperty("color", new ColorProperty(r, g, b));
+  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(r, g, b));
 }
 
 void mitk::SegTool2D::SetFeedbackContourColorDefault()
 {
-  m_FeedbackContourNode->SetProperty("color", new ColorProperty(0.0/255.0, 255.0/255.0, 0.0/255.0));
+  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
 }
 
 bool mitk::SegTool2D::OnMousePressed (Action*, const StateEvent* stateEvent)

@@ -39,7 +39,7 @@ mitk::BaseProperty::Pointer mitk::PropertyManager::CreateDefaultProperty(std::st
   mitk::BaseProperty::Pointer newProperty(NULL);
   if ( name == "visible" )
   {
-    newProperty = new mitk::BoolProperty(true);
+    newProperty = mitk::BoolProperty::New(true);
   }
   else
   {

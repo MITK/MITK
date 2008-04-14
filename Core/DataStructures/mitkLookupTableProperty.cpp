@@ -24,9 +24,9 @@ mitk::LookupTableProperty::LookupTableProperty()
 }
 
 //##ModelId=3ED953090121
-mitk::LookupTableProperty::LookupTableProperty(mitk::LookupTable::Pointer lut)
+mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable::Pointer lut)
 {
-    std::cout << "created new mitk::LookupTableProperty..." << std::endl;
+    std::cout << "created mitk::LookupTableProperty::New..." << std::endl;
     this->SetLookupTable(lut);
 }
 
@@ -53,7 +53,7 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 }
 
 //##ModelId=3ED953090135
-void mitk::LookupTableProperty::SetLookupTable(mitk::LookupTable::Pointer aLookupTable)
+void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)
 {
 //    std::cout << "setting LUT property ... " << std::endl;
    

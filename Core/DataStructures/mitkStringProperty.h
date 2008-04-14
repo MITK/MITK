@@ -35,13 +35,18 @@ class MITK_CORE_EXPORT StringProperty : public BaseProperty
 protected:
     //##ModelId=3E3FDF21017D
     std::string m_Value;
+    
+    //##ModelId=3E3FF04F005F
+    StringProperty( const char* string = 0 );
+    StringProperty( const std::string&  s );
 
 public:
     mitkClassMacro(StringProperty, BaseProperty);
     typedef std::string ValueType;
-    //##ModelId=3E3FF04F005F
-    StringProperty( const char* string = NULL );
-    StringProperty( std::string  s );
+    
+    itkNewMacro(StringProperty);
+    mitkNewMacro1Param(StringProperty, const char*);
+    mitkNewMacro1Param(StringProperty, const std::string&)
     
     itkGetStringMacro(Value);
     itkSetStringMacro(Value);

@@ -419,7 +419,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           if(m_ShowAngles && counter > 1 ) // calculate and print the angle btw. two lines
           {
             std::stringstream buffer;
-            buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "°";
+            buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "ï¿½";
 
             Vector2D vec2d = pt2d-lastPt2d;
             vec2d.Normalize();
@@ -450,17 +450,17 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "line width", new mitk::IntProperty(2), renderer, overwrite );
-  node->AddProperty( "pointsize", new mitk::FloatProperty(1.0), renderer, overwrite);
-  node->AddProperty( "selectedcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
-  node->AddProperty( "color", new mitk::ColorProperty(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
-  node->AddProperty( "contour", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "contourcolor", new mitk::ColorProperty(1.0f, 0.0f, 0.0f), renderer, overwrite);
-  node->AddProperty( "close", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "show points", new mitk::BoolProperty(true), renderer, overwrite );
-  node->AddProperty( "show distances", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "distance decimal digits", new mitk::IntProperty(2), renderer, overwrite );
-  node->AddProperty( "show angles", new mitk::BoolProperty(false), renderer, overwrite );
-  node->AddProperty( "show distant lines", new mitk::BoolProperty(false), renderer, overwrite );
+  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
+  node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
+  node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
+  node->AddProperty( "contour", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
+  node->AddProperty( "close", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

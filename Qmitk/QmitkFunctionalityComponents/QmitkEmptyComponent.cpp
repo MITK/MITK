@@ -222,9 +222,9 @@ void QmitkEmptyComponent::CreateEmptyImageNode()
       if (m_Node)
       {
         m_EmptyImageNode = mitk::DataTreeNode::New();
-        mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("emtpy image" );
+        mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("emtpy image" );
         m_EmptyImageNode->SetProperty( "name", nameProp );
-        mitk::BoolProperty::Pointer emptyComponentImageProp = new mitk::BoolProperty(true);
+        mitk::BoolProperty::Pointer emptyComponentImageProp = mitk::BoolProperty::New(true);
         m_EmptyImageNode->SetProperty( "isEmptyComponentImage", emptyComponentImageProp );
 
         m_EmptyImageNode->SetData(m_Node->GetData());

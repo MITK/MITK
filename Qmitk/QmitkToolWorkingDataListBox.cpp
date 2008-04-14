@@ -366,8 +366,8 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
-  mitk::NodePredicateProperty isSegmentation("segmentation", new mitk::BoolProperty(true));
-  mitk::NodePredicateProperty isSegmentationMarker("segmentation marker", new mitk::BoolProperty(true));
+  mitk::NodePredicateProperty isSegmentation("segmentation", mitk::BoolProperty::New(true));
+  mitk::NodePredicateProperty isSegmentationMarker("segmentation marker", mitk::BoolProperty::New(true));
   mitk::NodePredicateOR combinedPredicate(isSegmentation, isSegmentationMarker);
 
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;

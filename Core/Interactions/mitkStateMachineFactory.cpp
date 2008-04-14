@@ -269,7 +269,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     bool value = ReadXMLBooleanAttribut( VALUE, atts );    
     std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), new BoolProperty( value ) );  
+    m_AktAction->AddProperty( name.c_str(), BoolProperty::New( value ) );  
   }  
 
   else if ( name == INT_PARAMETER )
@@ -279,7 +279,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     int value = ReadXMLIntegerAttribut( VALUE, atts );    
     std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), new IntProperty( value ) );  
+    m_AktAction->AddProperty( name.c_str(), IntProperty::New( value ) );  
   }
 
   else if ( name == FLOAT_PARAMETER )
@@ -289,7 +289,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     float value = ReadXMLIntegerAttribut( VALUE, atts ); 
     std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), new FloatProperty( value ) );    
+    m_AktAction->AddProperty( name.c_str(), FloatProperty::New( value ) );    
   }
 
   else if ( name == DOUBLE_PARAMETER )
@@ -299,7 +299,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     double value = ReadXMLDoubleAttribut( VALUE, atts );
     std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), new DoubleProperty( value ) );      
+    m_AktAction->AddProperty( name.c_str(), DoubleProperty::New( value ) );      
   }
 
   else if ( name == STRING_PARAMETER )
@@ -309,7 +309,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     std::string value = ReadXMLStringAttribut( VALUE, atts );
     std::string name = ReadXMLStringAttribut( NAME, atts );    
-    m_AktAction->AddProperty( name.c_str(), new StringProperty( value ) );        
+    m_AktAction->AddProperty( name.c_str(), StringProperty::New( value ) );        
   }
 }
 

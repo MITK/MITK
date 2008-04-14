@@ -115,11 +115,11 @@ void mitk::StreamReader::Update()
 
       if( m_SeriesDescription == "" )
         m_SeriesDescription = "no SeriesDescription";
-      node->SetProperty( "name", new StringProperty( m_SeriesDescription ) );
-      node->SetProperty( "NumberOfSlices", new IntProperty( 1 ) );
-      node->SetProperty( "NumberOfTimeSlices", new IntProperty( m_PicDescriptorList.size() ) );
+      node->SetProperty( "name", StringProperty::New( m_SeriesDescription ) );
+      node->SetProperty( "NumberOfSlices", IntProperty::New( 1 ) );
+      node->SetProperty( "NumberOfTimeSlices", IntProperty::New( m_PicDescriptorList.size() ) );
       if( m_SeriesOID != "" )
-        node->SetProperty( "SeriesOID", new StringProperty( m_SeriesOID ) );
+        node->SetProperty( "SeriesOID", StringProperty::New( m_SeriesOID ) );
 
       m_Output.push_back( node );
     }

@@ -295,7 +295,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
 
 std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
 {
-  mitk::BoolProperty* myProp = new mitk::BoolProperty(true);
+  mitk::BoolProperty* myProp = mitk::BoolProperty::New(true);
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
   mitk::NodePredicateProperty isVisible("visible", myProp);
   mitk::NodePredicateProperty isBinary("binary", myProp);

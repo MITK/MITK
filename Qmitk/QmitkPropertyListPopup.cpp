@@ -126,7 +126,7 @@ void QmitkPropertyListPopup::fillPopup()
     // opacity
     if ( mitk::FloatProperty* opacityProperty = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity")))
     {
-      m_OriginalOpacity = new mitk::FloatProperty( opacityProperty->GetValue() );
+      m_OriginalOpacity = mitk::FloatProperty::New( opacityProperty->GetValue() );
       QPopupMenu* opacityPopup = new QPopupMenu( m_PopupMenu );
    
       QmitkNumberPropertySlider* npe = new QmitkNumberPropertySlider( opacityProperty, opacityPopup );
@@ -231,7 +231,7 @@ bool QmitkPropertyListPopup::AddMaterialPopup()
   // normal material
   if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material"))) // normal "material"
   {
-    m_OriginalMaterial = new mitk::MaterialProperty( *materialProperty );
+    m_OriginalMaterial = mitk::MaterialProperty::New( *materialProperty );
     QPopupMenu* materialPopup = new QPopupMenu( m_PopupMenu );
   
     m_MaterialEditor = new QmitkMaterialEditor( m_PopupMenu );

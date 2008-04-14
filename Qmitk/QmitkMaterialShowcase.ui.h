@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkMaterialShowcase::init()
 {
     m_ShowcaseNumber = 0;
-    m_MaterialProperty = new mitk::MaterialProperty();
+    m_MaterialProperty = mitk::MaterialProperty::New();
     vtkSphereSource* sphereSource = vtkSphereSource::New();
     sphereSource->SetThetaResolution(25);
     sphereSource->SetPhiResolution(25);
@@ -86,7 +86,7 @@ void QmitkMaterialShowcase::destroy()
 
 void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* property )
 {
-    m_MaterialProperty = new mitk::MaterialProperty( *property );
+    m_MaterialProperty = mitk::MaterialProperty::New( *property );
     m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
     if ( m_MaterialProperty->GetName() != "" )
     {

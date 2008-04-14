@@ -239,7 +239,7 @@ void QmitkSeedPointSetComponent::CreatePointSetNode()
 
         m_PointSetNode = mitk::DataTreeNode::New();
         m_PointSetNode->SetData(m_Seeds);
-        mitk::ColorProperty::Pointer color = new mitk::ColorProperty(0.2, 0.0, 0.8);
+        mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(0.2, 0.0, 0.8);
         mitk::Point3D colorTwo; 
         mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
         m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode, 2);
@@ -247,9 +247,9 @@ void QmitkSeedPointSetComponent::CreatePointSetNode()
         m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction(&m_PointSetInteractor, &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
         m_PointSetNode->SetProperty("color",color);
         m_PointSetNode->SetIntProperty("layer", 101);
-        m_PointSetNode->SetProperty("name", new mitk::StringProperty(m_PointSetNodeName));
+        m_PointSetNode->SetProperty("name", mitk::StringProperty::New(m_PointSetNodeName));
 
-        m_PointSetNode->SetProperty( "SeedPoints", new mitk::BoolProperty(true));
+        m_PointSetNode->SetProperty( "SeedPoints", mitk::BoolProperty::New(true));
         m_DataTreeIterator.GetPointer()->Add(m_PointSetNode);
         //m_PointSetNodeExisting = true;
 

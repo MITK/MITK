@@ -32,19 +32,8 @@ namespace mitk {
     public:
       mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
-      /**
-       *
-       */
-      TransferFunctionProperty()
-        : BaseProperty()
-      {};
-
-      /**
-       *
-       */
-      TransferFunctionProperty( mitk::TransferFunction::Pointer value )
-        : BaseProperty(), m_Value( value )
-      {};
+      itkNewMacro(TransferFunctionProperty);
+      mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
       itkSetMacro(Value, mitk::TransferFunction::Pointer );
       itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
@@ -89,6 +78,14 @@ namespace mitk {
 
       protected:
         mitk::TransferFunction::Pointer m_Value;  
+        
+        TransferFunctionProperty()
+          : BaseProperty()
+        {};
+
+        TransferFunctionProperty( mitk::TransferFunction::Pointer value )
+          : BaseProperty(), m_Value( value )
+        {};
   };
 
 

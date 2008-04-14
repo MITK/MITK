@@ -23,13 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
 {
-  mitk::EnumerationProperty enumerationProperty;
+  mitk::EnumerationProperty::Pointer enumerationProperty(mitk::EnumerationProperty::New());
 
   std::cout << "Testing mitk::EnumerationProperty::AddEnum(...): ";
   bool success = true;
-  success = success && enumerationProperty.AddEnum( "first", 1 );
-  success = success && enumerationProperty.AddEnum( "second", 2 );
-  success = success && enumerationProperty.AddEnum( "third", 3 );
+  success = success && enumerationProperty->AddEnum( "first", 1 );
+  success = success && enumerationProperty->AddEnum( "second", 2 );
+  success = success && enumerationProperty->AddEnum( "third", 3 );
   if ( ! success )
   {
     std::cout << "[FAILED]" << std::endl;
@@ -45,7 +45,7 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::EnumerationProperty::Size(): " ;
-  if ( enumerationProperty.Size() != 3 )
+  if ( enumerationProperty->Size() != 3 )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -56,7 +56,7 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   }
 
   std::cout << "Testing mitk::EnumerationProperty::AddEnum() with invalid entries: ";
-  if ( enumerationProperty.AddEnum( "first", 0 ) )
+  if ( enumerationProperty->AddEnum( "first", 0 ) )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -71,17 +71,17 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::EnumerationProperty::SetValue(id): ";
-  if ( ! enumerationProperty.SetValue( 2 ) )
+  if ( ! enumerationProperty->SetValue( 2 ) )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( enumerationProperty.GetValueAsId() != 2 )
+  if ( enumerationProperty->GetValueAsId() != 2 )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( enumerationProperty.GetValueAsString() != "second" )
+  if ( enumerationProperty->GetValueAsString() != "second" )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -93,17 +93,17 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::EnumerationProperty::SetValue(name): ";
-  if ( ! enumerationProperty.SetValue( "third" ) )
+  if ( ! enumerationProperty->SetValue( "third" ) )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( enumerationProperty.GetValueAsId() != 3 )
+  if ( enumerationProperty->GetValueAsId() != 3 )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( enumerationProperty.GetValueAsString() != "third" )
+  if ( enumerationProperty->GetValueAsString() != "third" )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -115,7 +115,7 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::EnumerationProperty::SetValue(invalid id): ";
-  if ( enumerationProperty.SetValue( 100 ) )
+  if ( enumerationProperty->SetValue( 100 ) )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -123,7 +123,7 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Testing mitk::EnumerationProperty::SetValue(invalid name): ";
-  if ( enumerationProperty.SetValue( "madmax" ) )
+  if ( enumerationProperty->SetValue( "madmax" ) )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -136,19 +136,19 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::VtkInterpolationType::SetInterpolationToPhong(): ";
-  mitk::VtkInterpolationProperty vtkInterpolationProperty;
-  vtkInterpolationProperty.SetInterpolationToPhong();
-  if ( vtkInterpolationProperty.GetValueAsString() != "Phong" )
+  mitk::VtkInterpolationProperty::Pointer vtkInterpolationProperty(mitk::VtkInterpolationProperty::New());;
+  vtkInterpolationProperty->SetInterpolationToPhong();
+  if ( vtkInterpolationProperty->GetValueAsString() != "Phong" )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( vtkInterpolationProperty.GetValueAsId() != 2 )
+  if ( vtkInterpolationProperty->GetValueAsId() != 2 )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( vtkInterpolationProperty.GetVtkInterpolation() != VTK_PHONG )
+  if ( vtkInterpolationProperty->GetVtkInterpolation() != VTK_PHONG )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -160,19 +160,19 @@ int mitkEnumerationPropertyTest( int /*argc*/, char* /*argv*/[] )
   
   
   std::cout << "Testing mitk::VtkRepresentationType::SetRepresentationToWireframe(): ";
-  mitk::VtkRepresentationProperty vtkRepresentationProperty;
-  vtkRepresentationProperty.SetRepresentationToWireframe();
-  if ( vtkRepresentationProperty.GetValueAsString() != "Wireframe" )
+  mitk::VtkRepresentationProperty::Pointer vtkRepresentationProperty(mitk::VtkRepresentationProperty::New());
+  vtkRepresentationProperty->SetRepresentationToWireframe();
+  if ( vtkRepresentationProperty->GetValueAsString() != "Wireframe" )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( vtkRepresentationProperty.GetValueAsId() != 1 )
+  if ( vtkRepresentationProperty->GetValueAsId() != 1 )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  if ( vtkRepresentationProperty.GetVtkRepresentation() != VTK_WIREFRAME )
+  if ( vtkRepresentationProperty->GetVtkRepresentation() != VTK_WIREFRAME )
   {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;

@@ -648,19 +648,19 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
           iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
           connectivityNode->SetIntProperty("layer", layer+1);
           mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
-          connectivityNode->SetProperty("deprecated usePointDataForColouring", new mitk::BoolProperty(true));
-          connectivityNode->SetProperty("name", new mitk::StringProperty(connectivityNodeName) );
-          connectivityNode->SetProperty("ScalarsRangeMaximum", new mitk::FloatProperty(scalarsMax));
-          connectivityNode->SetProperty("ScalarsRangeMinimum", new mitk::FloatProperty(scalarsMin));
+          connectivityNode->SetProperty("deprecated usePointDataForColouring", mitk::BoolProperty::New(true));
+          connectivityNode->SetProperty("name", mitk::StringProperty::New(connectivityNodeName) );
+          connectivityNode->SetProperty("ScalarsRangeMaximum", mitk::FloatProperty::New(scalarsMax));
+          connectivityNode->SetProperty("ScalarsRangeMinimum", mitk::FloatProperty::New(scalarsMin));
           if(filterMode ==1)
           {
-            connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( true ));
+            connectivityNode->SetProperty( "scalar visibility", mitk::BoolProperty::New( true ));
           }
           else
           {
-            connectivityNode->SetProperty( "scalar visibility", new mitk::BoolProperty( false ));
+            connectivityNode->SetProperty( "scalar visibility", mitk::BoolProperty::New( false ));
           }
-          connectivityNode->SetProperty( "deprecated usePointDataForColouring", new mitk::BoolProperty(false) );
+          connectivityNode->SetProperty( "deprecated usePointDataForColouring", mitk::BoolProperty::New(false) );
 
           mitk::DataTreeIteratorClone iteratorConnectivity = m_DataTreeIterator;
 

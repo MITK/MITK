@@ -67,7 +67,7 @@ namespace mitk
       if((replaceByName) && (name != NULL))
       {
         mitk::DataTreeIteratorClone it=iterator;
-        mitk::DataTreeIteratorClone itByName = ((mitk::DataTree *) it->GetTree())->GetNext("name", new mitk::StringProperty( name ));
+        mitk::DataTreeIteratorClone itByName = ((mitk::DataTree *) it->GetTree())->GetNext("name", mitk::StringProperty::New( name ));
 
         if( (itByName->IsAtEnd() == false) && (itByName->Get().IsNotNull()) )
         {
@@ -81,12 +81,12 @@ namespace mitk
         node=mitk::DataTreeNode::New();
         node->SetData(mitkImage);
         if(name!=NULL)
-          node->SetProperty("name", new mitk::StringProperty(name));
+          node->SetProperty("name", mitk::StringProperty::New(name));
         mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
         iterator->Add(node);
       }
 
-      mitk::LevelWindowProperty::Pointer levWinProp = new mitk::LevelWindowProperty();
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
       levelwindow.SetAuto( mitkImage );
       levWinProp->SetLevelWindow( levelwindow );

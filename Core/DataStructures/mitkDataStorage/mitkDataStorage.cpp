@@ -123,7 +123,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
     throw 3;
 
   /* save node in tree */
-  node->SetProperty("IsDataStoreManaged", new mitk::BoolProperty(true));
+  node->SetProperty("IsDataStoreManaged", mitk::BoolProperty::New(true));
   mitk::DataTreeNode::ConstPointer parent;
   if ((parents != NULL) && (parents->Size() > 0))
     parent = parents->ElementAt(0);
@@ -342,8 +342,8 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
   if (name == NULL)
     return NULL;
 
-  mitk::StringProperty s(name);
-  mitk::NodePredicateProperty p("name", &s);
+  mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
+  mitk::NodePredicateProperty p("name", s);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(p);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
@@ -357,8 +357,8 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, con
   if (name == NULL)
     return NULL;
 
-  mitk::StringProperty s(name);
-  mitk::NodePredicateProperty p("name", &s);
+  mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
+  mitk::NodePredicateProperty p("name", s);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDerivations(sourceNode, &p, onlyDirectDerivations);
   if (rs->Size() >= 1)
     return rs->GetElement(0);

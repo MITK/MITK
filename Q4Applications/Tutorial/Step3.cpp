@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
       if(image.IsNotNull())
       {
         // set the property "volumerendering" to the Boolean value "true"
-        node->SetProperty("volumerendering", new mitk::BoolProperty(true));
+        node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
         
         // create a transfer function to assign optical properties (color and opacity) to grey-values of the data
         mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
         // set the piecewise opacity transfer function AddPoint(double x, double y)
         tf->GetScalarOpacityFunction()->AddPoint ( 0, 0 );
         tf->GetScalarOpacityFunction()->AddPoint ( tf->GetColorTransferFunction()->GetRange() [1], 1 );
-        node->SetProperty ( "TransferFunction", new mitk::TransferFunctionProperty ( tf.GetPointer() ) );
+        node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
       }
       
       

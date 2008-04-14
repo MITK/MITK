@@ -38,11 +38,11 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
   public:
     mitkClassMacro(SmartPointerProperty, BaseProperty);
 
+    itkNewMacro(SmartPointerProperty);
+    mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
+    
     //##ModelId=3ED94B4203C1
     virtual bool operator==(const BaseProperty&) const;
-
-    //##ModelId=3ED94B7500F2
-    SmartPointerProperty(itk::Object* = NULL);
 
     //##ModelId=3ED94B750111
     virtual ~SmartPointerProperty();
@@ -74,6 +74,9 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     static const char* XML_SMARTPOINTER_TARGET_KEY;
 
   protected:
+    
+    //##ModelId=3ED94B7500F2
+    SmartPointerProperty(itk::Object* = NULL);
 
     //##ModelId=3ED95309021C
     itk::Object::Pointer m_SmartPointer;

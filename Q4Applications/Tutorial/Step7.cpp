@@ -27,7 +27,7 @@ void Step7::StartRegionGrowing()
 
   if(m_ResultImage.IsNotNull())
   {
-    m_ResultNode->SetProperty("volumerendering", new mitk::BoolProperty(false));
+    m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(false));
 
     vtkMarchingCubes* surfaceCreator = vtkMarchingCubes::New();
     surfaceCreator->SetInput(m_ResultImage->GetVtkImageData());

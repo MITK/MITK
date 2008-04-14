@@ -34,13 +34,16 @@ namespace mitk {
 class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
 {
   public:
-    GroupTagProperty();
-    virtual ~GroupTagProperty();
-
     mitkClassMacro(GroupTagProperty, BaseProperty);
+    itkNewMacro(GroupTagProperty);
+    
+    virtual ~GroupTagProperty();
 
     virtual bool operator==(const BaseProperty& property) const;
     virtual bool Assignable(const BaseProperty& other) const;
+    
+  protected:
+    GroupTagProperty();
 };
 
 } // namespace mitk

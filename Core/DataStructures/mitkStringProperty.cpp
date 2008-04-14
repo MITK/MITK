@@ -31,7 +31,7 @@ mitk::StringProperty::StringProperty( const char* string )
 }
 
 //##ModelId=3E3FF04F005F
-mitk::StringProperty::StringProperty( std::string s )
+mitk::StringProperty::StringProperty( const std::string& s )
 : m_Value( s )
 {
 

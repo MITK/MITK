@@ -414,9 +414,10 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
 	{
 		mitk::StringProperty::Pointer nameProp = new mitk::StringProperty("TH segmentation" );
 		segmentationNode->SetProperty( "name", nameProp );
+		segmentationNode->GetPropertyList()->SetProperty("binary", new mitk::BoolProperty(true));
 		mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = new mitk::BoolProperty(true);
 		segmentationNode->SetProperty( "segmentation", thresholdBasedSegmentationProp );
-
+		segmentationNode->GetPropertyList()->SetProperty("layer",new mitk::IntProperty(1));
 		segmentationNode->SetColor(1.0,0.0,0.0);
 		segmentationNode->SetOpacity(.25);
 
@@ -440,18 +441,22 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
 
 
 			segmentationNode->SetData(m_ThresholdSegmentationImage);
-			mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
-			iteratorClone->GoToBegin();
-			while ( !iteratorClone->IsAtEnd() )
-			{
-				mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-				if (  node == m_Node )
-				{
-					iteratorClone->Add(segmentationNode);
-				}
-				++iteratorClone;
 
-			}
+			mitk::DataTreeNode* origNode = const_cast<mitk::DataTreeNode*>(m_ThresholdComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem()->GetNode());
+			mitk::DataStorage::GetInstance()->Add(segmentationNode, origNode);
+
+			//mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
+			//iteratorClone->GoToBegin();
+			//while ( !iteratorClone->IsAtEnd() )
+			//{
+			//	mitk::DataTreeNode::Pointer node = iteratorClone->Get();
+			//	if (  node == m_Node )
+			//	{
+			//		iteratorClone->Add(segmentationNode);
+			//	}
+			//	++iteratorClone;
+
+			//}
 		}
 	}
 

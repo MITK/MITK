@@ -68,7 +68,7 @@ float* tmGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
   float xPos = (float)(pos % line);
   float yPos = (float)(pos / line);
 
-  while ( SEGSET( pos+right[dir] ) && dir<4 ) dir++;
+  while ( dir<4 && SEGSET( pos+right[dir] ) ) dir++;
   if (dir==4) return result;  // no contour pixel
   
   bool finished = false;
@@ -132,11 +132,11 @@ float* tmGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
   float xPos = (float)(pos % line); // calculate x and y from the memory offset
   float yPos = (float)(pos / line);
 
-  while ( SEGSET( pos+right[dir] ) && dir<4 ) dir++;
+  while ( dir<4 && SEGSET( pos+right[dir] ) ) dir++;
   if (dir==4) {
     // check diagonal pixels:
     dir = 0;
-    while ( SEGSET( pos+right[dir]+straight[dir] ) && dir<4 ) dir++;
+    while ( dir<4 && SEGSET( pos+right[dir]+straight[dir] ) ) dir++;
     if (dir==4) return result;  // no contour pixel
     // chose next suitable neighbour:
     pos  += straight[dir];

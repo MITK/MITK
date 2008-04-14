@@ -76,7 +76,7 @@ bool mitk::MovieGenerator::WriteMovie()
     {
       if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();
       RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
-      glReadPixels( 5, 5, m_width-5, m_height-5, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
+      glReadPixels( 5, 5, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
       AddFrame( data );
       m_stepper->Next();
     }
@@ -106,7 +106,7 @@ bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
     GLbyte *data = new GLbyte[imgSize];
     
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
-    glReadPixels( 0, 0, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
+    glReadPixels( 5, 5, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void*)data );
     AddFrame( data );    
     delete[] data;  
   }

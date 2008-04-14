@@ -33,11 +33,14 @@ void mitk::MovieGeneratorWin32::SetFileName( const char *fileName )
 
 void mitk::MovieGeneratorWin32::InitBitmapHeader()
 {
-  if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();  // take the correct viewport!
-  GLint viewport[4]; // Where The Viewport Values Will Be Stored
-  glGetIntegerv( GL_VIEWPORT, viewport ); // Retrieves The Viewport Values (X, Y, Width, Height)
-  m_width = viewport[2];  m_width -= m_width % 4;
-  m_height = viewport[3];  m_height -= m_height % 4;
+  m_width  = m_renderer->GetRenderWindow()->GetSize()[0];  // changed from glGetIntegerv( GL_VIEWPORT, viewport );
+  m_height = m_renderer->GetRenderWindow()->GetSize()[1]; // due to sometimes strange dimensions
+  
+  m_width  -= 10;  //remove colored boarders around renderwindows 
+  m_height -= 10;
+   
+  m_width  -= m_width % 4; // some video codecs have prerequisites to the image dimensions
+  m_height -= m_height % 4;
 
   BITMAPINFOHEADER bih;
   bih.biSize = sizeof( BITMAPINFOHEADER );

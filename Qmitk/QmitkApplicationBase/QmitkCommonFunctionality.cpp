@@ -564,7 +564,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
 	double* renderWindowSize = new double[2];
 	renderWindowSize[0] = windowSize[0];
 	renderWindowSize[1] = windowSize[1];
-	double framesize = 2;
+	double framesize = 5;
 	double* viewport = new double[4];
 	viewport[0] = (double)(framesize/renderWindowSize[0]);
 	viewport[1] = (double)(framesize/renderWindowSize[1]);

@@ -32,23 +32,35 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**
-   * @brief Converts pixel data to surface data
-   *
-   * The resulting vtk-surface has the same size as the input image. The surface 
-   * can be generally smoothed by vtkDecimatePro reduce complexity of triangles 
-   * and vtkSmoothPolyDataFilter to relax the mesh. Both are enabled by default 
-   * and connected in the common way of pipelining in ITK. It's also possible
-   * to create time sliced surfaces.
-   *
-   * @ingroup ImageFilters
-   * @ingroup Process
-   */
+  /**
+  * @brief Converts pixel data to surface data by using a threshold
+  * The mitkImageToSurfaceFilter is used to create a new surface out of an mitk image. The filter
+  * uses a threshold to define the surface. It is based on the vtkMarchingCube algorithm. By default 
+  * a vtkPolyData surface based on an input threshold for the input image will be created. Optional 
+  * it is possible to reduce the number of triangles/polygones [SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro) and SetTargetReduction (float _arg)]
+  * or smooth the surface-data [SetSmooth(true), SetSmoothIteration(int smoothIteration) and SetSmoothRelaxation(float smoothRelaxation)].
+  *
+  * The resulting vtk-surface has the same size as the input image. The surface 
+  * can be generally smoothed by vtkDecimatePro reduce complexity of triangles 
+  * and vtkSmoothPolyDataFilter to relax the mesh. Both are enabled by default 
+  * and connected in the common way of pipelining in ITK. It's also possible
+  * to create time sliced surfaces.
+  *
+  * @ingroup ImageFilters
+  * @ingroup Process
+  */
 
   class MITK_CORE_EXPORT ImageToSurfaceFilter : public SurfaceSource
   {
     public:
 
-      enum DecimationType {NoDecimation,Decimate,DecimatePro};
+      /*
+	  * To decide whether a reduction of polygons in the created surface shall be 
+	  * done or not by using the vtkDecimatePro Filter. Till vtk 4.x an vtkDecimateFilter existed,
+	  * but was patented. So since vtk 5.x it was replaced by the (worser?) vtkDecimateProFilter 
+	  * Maybe another Filter will come soon.
+	  */
+      enum DecimationType {NoDecimation,DecimatePro};
 
       mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
       itkNewMacro(Self);
@@ -57,24 +69,30 @@ namespace mitk {
        * For each image time slice a surface will be created. This method is 
        * called by Update().
        */
+
       virtual void GenerateData();
+
+	  /**
+	  * Initializes the output information ( i.e. the geometry information ) of
+	  * the output of the filter 
+	  */ 
       virtual void GenerateOutputInformation();
 
       /**
-       * Returns a const reference to the input image (original)
+       * Returns a const reference to the input image (e.g. the original input image that ist used to create the surface)
        */
       const mitk::Image *GetInput(void);
 
       /**
-       * Set the source image for this filter class. input can be everey mitk 
-       * 3D or 3D+t image.
+       * Set the source image to create a surface for this filter class. As input every mitk 
+       * 3D or 3D+t image can be used.
        */
       virtual void SetInput(const mitk::Image *image);
 
       /**
-       * Set number of iterations of the Laplacian filter. not 
+       * Set the number of iterations that is used to smooth the surface. Used is the vtkSmoothPolydataFilter that uses the laplacian filter. The higher the number of iterations that stronger the smooth-result 
        *
-       * @param smoothIteration default 50
+       * @param As smoothIteration default in that case 50 was choosen. The VTK documentation recommends small relaxation factors and large numbers of iterations. 
        */
       void SetSmoothIteration(int smoothIteration);
 
@@ -83,16 +101,16 @@ namespace mitk {
        * smoothing. The VTK documentation recommends small relaxation factors 
        * and large numbers of iterations.
        *
-       * @param smoothRelaxation default 0.1
+       * @param As smoothRelaxation default in that case 0.1 was choosen. The VTK documentation recommends small relaxation factors and large numbers of iterations. 
        */
       void SetSmoothRelaxation(float smoothRelaxation);
 
 
       /**
-       * Set desired threshold for input image. The threshold referees to 
-       * vtkMarchingCube. For binary images use integer values use 1.0 to 
-       * separate fore- and background.
-       */
+	  * Threshold that is used to create the surface. All pixel in the input image that are higher than that 
+	  * value will be considered in the surface. The threshold referees to 
+	  * vtkMarchingCube. Default value is 1. See also SetThreshold (ScalarType _arg)
+      */
       itkSetMacro(Threshold, ScalarType);
 
       /**
@@ -120,29 +138,30 @@ namespace mitk {
 
       /** 
        * Get the state of decimation mode to reduce triangle in the
-       * surface represantation
+       * surface represantation. Modes can only be NoDecimation or DecimatePro
+	   * (till vtk 4.x also Decimate)
        * */
       itkGetConstMacro(Decimate,DecimationType);
       
       /**
        * Enable the decimation filter to reduce the number of triangles in the 
        * mesh and produce a good approximation to the original image. The filter
-       * has support for vtk-5 and earlier versions. Mor detailed information 
+       * has support for vtk-5 and earlier versions. More detailed information 
        * check the vtkDecimatePro and vtkDecimate.      
        * */
       itkSetMacro(Decimate,DecimationType);
 
       /**
        * Set desired TargetReduction of triangles in the range from 0.0 to 1.0. 
-       * The destroyed triangles is in relation with the size of data. For example 0.9 
+       * The destroyed triangles are in relation with the size of data. For example 0.9 
        * will reduce the data set to 10%.
        *
-       * @param TargetReduction float from 0.0 to 1.0
+       * @param Set a TargetReduction float-value from 0.0 to 1.0
        * */
       itkSetMacro(TargetReduction, float);
 
       /**
-       * Return reduction factor for VtkDecimatePro
+       * Returns the reduction factor for the VtkDecimatePro Decimation Filter as a float value
        */
       itkGetConstMacro(TargetReduction, float);
 
@@ -161,13 +180,28 @@ namespace mitk {
       }
 
     protected:
+		/**
+		* Constructor with the following default-parameters
+		* @param 
+		*   smooth surface: false
+		*   decimate polygons: NoDecimation
+		*   used threshold: 1.0,
+		*   targetReduction for decimation: 0.95f
+		*   Iterations to smooth: 50
+		*   relaxation to smooth: 0.1
+		* */
       ImageToSurfaceFilter();
+
+	  /**
+	  * Destructor
+	  * */
       virtual ~ImageToSurfaceFilter();
 
       /**
-       * With the given threshold vtkMarchingCube creates the surface. By default nothing 
-       * will be done. Optional its possible to reduce the number of triangles (vtkDecimat).
-       * or smooth the data (vtkSmoothPolyDataFilter).
+       * With the given threshold vtkMarchingCube creates the surface. By default nothing a
+       * vtkPolyData surface based on a threshold of the input image will be created. Optional 
+	   * it is possible to reduce the number of triangles/polygones [SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro) and SetTargetReduction (float _arg)]
+	   * or smooth the data [SetSmooth(true), SetSmoothIteration(int smoothIteration) and SetSmoothRelaxation(float smoothRelaxation)].
        * 
        * @param time selected slice or "0" for single
        * @param *vtkimage input image
@@ -176,11 +210,35 @@ namespace mitk {
        */
       void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
 
+	  /** 
+	  * Flag whether the created surface shall be smoothed or not (default is "false"). SetSmooth (bool _arg)
+	  * */
       bool m_Smooth;
+
+	  /** 
+	  * Decimation mode, default mode is "NoDecimation". See also SetDecimate (DecimationType _arg)
+	  * */
       DecimationType m_Decimate;
+
+	  /** 
+	  * Threshold that is used to create the surface. All pixel in the input image that are higher than that 
+	  * value will be considered in the surface. Default value is 1. See also SetThreshold (ScalarType _arg)
+	  * */
       ScalarType m_Threshold; 
+
+	  /** 
+	  * The Reduction factor of the Decimation Filter for the created surface. See also SetTargetReduction (float _arg)
+	  * */
       float m_TargetReduction;
+
+	  /** 
+	  * The Iteration value for the Smooth Filter of the created surface. See also SetSmoothIteration (int smoothIteration)
+	  * */
       int m_SmoothIteration;
+
+	  /** 
+	  * The Relaxation value for the Smooth Filter of the created surface. See also SetSmoothRelaxation (float smoothRelaxation)
+	  * */
       float m_SmoothRelaxation;
 
   };

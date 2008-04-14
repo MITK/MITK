@@ -215,7 +215,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   affectedSlice = ROUND( indexPoint[affectedDimension] );
 
   // check if this index is still within the image
-  if ( affectedSlice < 0 || affectedSlice > static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
+  if ( affectedSlice < 0 || affectedSlice >= static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
  
   return true;
 }
@@ -236,18 +236,26 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   int affectedSlice( -1 );
   if ( DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
-    // now we extract the correct slice from the volume, resulting in a 2D image
-    ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
-    extractor->SetInput( image );
-    extractor->SetSliceDimension( affectedDimension );
-    extractor->SetSliceIndex( affectedSlice );
-    extractor->SetTimeStep( timeStep );
-    extractor->Update();
+    try
+    {
+      // now we extract the correct slice from the volume, resulting in a 2D image
+      ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
+      extractor->SetInput( image );
+      extractor->SetSliceDimension( affectedDimension );
+      extractor->SetSliceIndex( affectedSlice );
+      extractor->SetTimeStep( timeStep );
+      extractor->Update();
 
-    // here we have a single slice that can be modified
-    Image::Pointer slice = extractor->GetOutput();
-    
-    return slice;
+      // here we have a single slice that can be modified
+      Image::Pointer slice = extractor->GetOutput();
+      
+      return slice;
+    }
+    catch(...)
+    {
+      // not working
+      return NULL;
+    }
   }
   else
   {

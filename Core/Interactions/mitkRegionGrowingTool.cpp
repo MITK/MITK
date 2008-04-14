@@ -376,6 +376,8 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
               SegTool2D::DetermineAffectedImageSlice( dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() ), planeGeometry, affectedDimension, affectedSlice );
 
+              ToolLogger::Logger(3) << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
+
               OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
               Image::Pointer workingImage = dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() );
               slicewriter->SetInput( workingImage );

@@ -204,7 +204,8 @@ static void __buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, QString &
       value.setNum(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
       value.setNum(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
     }
-    s+=value;
+    s += "; Pixelvalue: ";
+    s+= value;
   }
   else
   {
@@ -251,11 +252,11 @@ public:
           mitk::Point3D p = pointoperation->GetPoint();
           mitk::ScalarType time = pointoperation->GetTimeInMS();
 
-          s.sprintf("(%.2f,%.2f,%.2f) [mm]", p[0], p[1], p[2]);
+          s.sprintf("<%.2f,%.2f,%.2f> mm", p[0], p[1], p[2]);
           if(time>mitk::ScalarTypeNumericTraits::min())
           {
             QString tmp;
-            tmp.sprintf(" %.2f [ms]", time);
+            tmp.sprintf("; %.2f ms", time);
             s+=tmp;
           }
 
@@ -291,9 +292,9 @@ public:
 
             QString pixel;
             if(time>mitk::ScalarTypeNumericTraits::min())
-              pixel.sprintf(" (%.2f,%.2f,%.2f,%u) [pixel] ", p[0], p[1], p[2],timestep);
+              pixel.sprintf("; <%.2f,%.2f,%.2f,%u> pixel ", p[0], p[1], p[2],timestep);
             else
-              pixel.sprintf(" (%.2f,%.2f,%.2f) [pixel] ", p[0], p[1], p[2]);
+              pixel.sprintf("; <%.2f,%.2f,%.2f> pixel ", p[0], p[1], p[2]);
             s+=pixel;
 
             ipPicDescriptor* pic = image3D->GetPic();

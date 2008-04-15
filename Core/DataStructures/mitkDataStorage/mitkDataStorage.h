@@ -38,16 +38,25 @@ namespace mitk {
   //## The DataStorage provides data storage and management functionality.
   //## It handles a 'was created by' relation by associating each data object with a 
   //## set of source objects, that this object was created from. The DataStorage
-  //## class provides an observer mechanism to notify special agents of changes in the data
-  //## object that it manages. This can be used for example to automatically update an object
-  //## everytime one of its source objects changes (eg. update a surface created from 
-  //## a segmentation.
+  //## class does not yet provide an observer mechanism to notify on changes in the data
+  //## objects that it manages. This is planned for a future version.
+  //## Currently, DataStorage uses an underlying mitk::DataTree. Therefore a DataStorage object
+  //## must be initialized with a DataTree before it can be used by calling ->Initialize(myTree).
+  //## @warning DataStorage methods will raise exceptions if called before the DataStorage is initialized.
+  //##
+  //## All objects that are added to DataStorage get automatically added to the underlying tree. 
+  //## The tree can be used to get notifications on New/Delete events.
+  //## @warning Do not mix Adding/Removing objects with the DataStorage and DataTree methods.  
+  //## @warning The DataStorage does not automatically return all objects that are stored in the 
+  //##          DataTree. Use SetManageCompleteTree() to enable/disable management of objects that were
+  //##          added to the tree directly.  
   //## 
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT DataStorage : public itk::Object
   {
   public:
     mitkClassMacro(DataStorage, itk::Object);
+    //itkNewMacro(Self);
 
     static DataStorage* CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
     static DataStorage* GetInstance();    // Singleton pattern like access method
@@ -196,7 +205,7 @@ namespace mitk {
     itkBooleanMacro(ManageCompleteTree);
 
   protected:
-    itkNewMacro(Self);    // New Makro is protected, because we use Singleton pattern for DataStorage
+    itkNewMacro(Self);    // New Macro is protected, because we use Singleton pattern for DataStorage
 
     typedef std::map<mitk::DataTreeNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;
 

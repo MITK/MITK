@@ -30,6 +30,8 @@ namespace mitk {
   //## of mitk::DataStorage. By combining different predicate objects, the user can form complex
   //## queries like "give me all nodes that either contain a surface object or a binary segmentation 
   //## and that are tagged as Organtype == 'Liver'".
+  //## @warning NodePredicates should be created, used and thrown away, not stored as member variables 
+  //##          because they may hold (smart-)pointers to other objects (DataObject and Properties)
   //##
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT NodePredicateBase

@@ -22,13 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 
 namespace mitk {
- class BaseData;
+  class BaseData;
 
   //##Documentation
   //## @brief Predicate that evaluates if the given DataTreeNodes data object pointer equals a given pointer
   //##
   //## NodePredicateData(NULL) returns true if a DataTreeNode does not have a data object (e.g. ->GetData() returns NULL).
   //## This could return an unexpected number of nodes (e.g. the root node of the tree)
+  //## @warning NodePredicateData holds a weak pointer to a BaseData! NodePredicateData p(mitk::BaseData::New()); will not work.
+  //##          Intended use is: NodePredicateData p(myDataObject); result = myDataStorage->GetSubset(p); Then work with result, do not reuse p later.
+  //##          
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT NodePredicateData : public NodePredicateBase
   {

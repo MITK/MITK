@@ -295,7 +295,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)
 
 std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
 {
-  mitk::BoolProperty* myProp = mitk::BoolProperty::New(true);
+  mitk::BoolProperty::Pointer myProp = mitk::BoolProperty::New(true);
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
   mitk::NodePredicateProperty isVisible("visible", myProp);
   mitk::NodePredicateProperty isBinary("binary", myProp);
@@ -317,7 +317,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
     mitk::DataTreeNode* node = (*objectIter).GetPointer();
     resultVector.push_back( node );
   }
-  delete myProp;
+  //delete myProp;
   return resultVector; 
 }
 

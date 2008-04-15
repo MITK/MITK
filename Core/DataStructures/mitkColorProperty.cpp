@@ -87,11 +87,15 @@ mitk::BaseProperty& mitk::ColorProperty::operator=(const mitk::BaseProperty& oth
 //##ModelId=3E86A35F000B
 bool mitk::ColorProperty::operator==(const BaseProperty& property) const
 {
-    const Self *other = dynamic_cast<const Self*>(&property);
-
-    if(other==NULL) return false;
-
-    return other->m_Color==m_Color;
+  try
+  {
+    const Self& other = dynamic_cast<const Self&>(property);
+    return other.m_Color == m_Color;
+  }
+  catch (std::bad_cast&)
+  {
+    return false;
+  }
 }
 
 //##ModelId=3E86AABB0371

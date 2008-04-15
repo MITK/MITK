@@ -73,7 +73,7 @@ public:
      */
     static Pointer New(mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
     {
-      Pointer smartPtr = MaterialProperty::New( node, renderer );
+      Pointer smartPtr = new MaterialProperty( node, renderer );
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -91,7 +91,7 @@ public:
      */
     static Pointer New( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
     {
-      Pointer smartPtr = MaterialProperty::New(color, opacity, node, renderer );
+      Pointer smartPtr = new MaterialProperty(color, opacity, node, renderer );
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -110,7 +110,7 @@ public:
      */
     static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
     {
-      Pointer smartPtr = MaterialProperty::New(red, green, blue, opacity, node, renderer );
+      Pointer smartPtr = new MaterialProperty(red, green, blue, opacity, node, renderer );
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -136,7 +136,7 @@ public:
     static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient, 
         vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
     {
-      Pointer smartPtr = MaterialProperty::New(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
+      Pointer smartPtr = new MaterialProperty(red, green, blue, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -161,7 +161,7 @@ public:
      */
     static Pointer New( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
     {
-      Pointer smartPtr = MaterialProperty::New(color, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
+      Pointer smartPtr = new MaterialProperty(color, colorCoefficient, specularCoefficient, specularPower, opacity, node, renderer );
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -177,7 +177,7 @@ public:
      */
     static Pointer New( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "" )
     {
-      Pointer smartPtr = MaterialProperty::New(property, red, green, blue, opacity, name );
+      Pointer smartPtr = new MaterialProperty(property, red, green, blue, opacity, name );
       smartPtr->UnRegister();
       return smartPtr;
     }

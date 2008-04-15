@@ -25,9 +25,6 @@ const std::string mitk::BaseProperty::XML_NODE_NAME = "property";
 
 mitk::BaseProperty::BaseProperty() 
 {
-  m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();
 }
 
 mitk::BaseProperty::~BaseProperty()

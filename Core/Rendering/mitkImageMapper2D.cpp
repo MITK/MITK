@@ -159,6 +159,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   float segmentationVolume = -1.0;
   mitk::DataTreeNode *node = this->GetDataTreeNode();
   if ((node->GetBoolProperty("showVolume", shouldShowVolume)) &&
+      (shouldShowVolume) &&
       (node->GetFloatProperty("volume", segmentationVolume)) &&
       (segmentationVolume > 0))
   {
@@ -1149,6 +1150,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
   node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
+  node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull())

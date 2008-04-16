@@ -160,7 +160,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
   //get the needed study-, patient- and seriesinformation to save
   ImageToPicDescriptor::TagInformationList picTagList = GetNeededTagList( &study, &patient, &series );
 
-  ProgressBar::GetInstance()->AddStepsToDo( inputNodes.size() );
+  ProgressBar::GetInstance()->AddStepsToDo( inputNodes->size() );
   for( DataStorage::SetOfObjects::const_iterator nodeIter = inputNodes->begin(); nodeIter != inputNodes->end(); nodeIter++ )
   {
     if( (*nodeIter) )
@@ -322,7 +322,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           {
             if( it->GetPointer()->CanWrite( (*nodeIter) ) )
             {
-              ProgressBar::GetInstance()->AddStepsToDo();
+              ProgressBar::GetInstance()->AddStepsToDo(1);
               //create filename
               std::string fileName;
               if( (*nodeIter)->GetProperty( "name" )->GetValueAsString() != "" )

@@ -514,7 +514,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
         ipPicFree( (*imageIter) );
       m_ImageList.clear();
 
-      return resultNode;;
+      return resultNode;
     }
   }
   return NULL;

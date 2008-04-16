@@ -559,19 +559,26 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
 
   // new Version: 
   vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New();
-	// take screenshot of render window without the coloured frame of 2 pixels
-	int* windowSize = renderWindow->GetSize();
-	double* renderWindowSize = new double[2];
-	renderWindowSize[0] = windowSize[0];
-	renderWindowSize[1] = windowSize[1];
-	double framesize = 5;
-	double* viewport = new double[4];
-	viewport[0] = (double)(framesize/renderWindowSize[0]);
-	viewport[1] = (double)(framesize/renderWindowSize[1]);
-	viewport[2] = (double)((renderWindowSize[0]-framesize)/renderWindowSize[0]);
-	viewport[3] = (double)((renderWindowSize[1]-framesize)/renderWindowSize[1]);
-	wti->SetViewport(viewport);
-  vtkPNGWriter* pngWriter = vtkPNGWriter::New();
+  // take screenshot of render window without the coloured frame of 2 pixels
+  int* windowSize = renderWindow->GetSize();
+  double* renderWindowSize = new double[2];
+  renderWindowSize[0] = windowSize[0];
+  renderWindowSize[1] = windowSize[1];
+  double framesize = 5;
+  int desiredWidth = ((int)(renderWindowSize[0] - 2.0*framesize))/ 4 * 4;
+  int desiredHeight = ((int)(renderWindowSize[1] - 2.0*framesize))/ 4 * 4;
+  double* viewport = new double[4];
+         
+  viewport[0] = ((double)(windowSize[0] - desiredWidth)/2.0)/renderWindowSize[0];
+  viewport[2] = 1.0 - viewport[0];
+   
+  viewport[1] = ((double)(windowSize[1] - desiredHeight)/2.0)/renderWindowSize[1];
+  viewport[3] = 1.0 - viewport[1];
+#ifdef WIN32
+  // bug #1226
+  wti->SetViewport(viewport);
+#endif
+   vtkPNGWriter* pngWriter = vtkPNGWriter::New();
   
   //
   // if the provided filename is empty ask the user 

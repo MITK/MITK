@@ -190,7 +190,7 @@ mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string&
 }
 
 /** DefaultImplementation */
-void mitk::PACSPlugin::SetRelationsToDataStorage()
+void mitk::PACSPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> )
 {
 }
 

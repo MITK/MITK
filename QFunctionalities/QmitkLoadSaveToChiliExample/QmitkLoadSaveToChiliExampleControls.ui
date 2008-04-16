@@ -212,17 +212,6 @@
                             </widget>
                             <widget class="QRadioButton">
                                 <property name="name">
-                                    <cstring>SpacingFilter</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Spa&amp;cing-Set-Filter</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+C</string>
-                                </property>
-                            </widget>
-                            <widget class="QRadioButton">
-                                <property name="name">
                                     <cstring>SingleSpacingFilter</cstring>
                                 </property>
                                 <property name="enabled">
@@ -236,6 +225,17 @@
                                 </property>
                                 <property name="checked">
                                     <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton">
+                                <property name="name">
+                                    <cstring>SpacingFilter</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Spa&amp;cing-Set-Filter</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+C</string>
                                 </property>
                             </widget>
                         </vbox>

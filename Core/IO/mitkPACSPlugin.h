@@ -323,9 +323,10 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
 
     /*!
-    \brief The result of all Load-Functions are DataTreeNodes. If you put them to the DataStorage, the relations are missing. This function create the parent-child-relations between the DataTreeNodes how saved at the DataStorage.
+    \brief The result of all Load-Functions are DataTreeNodes. If you want to add them to the DataStorage with relations, use this function.
+    @param inputNodes   The DataTreeNodes to save.
     */
-    virtual void SetRelationsToDataStorage();
+    virtual void SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> inputNodes );
 
     /*!
     \brief Save Images- and Texts-Files with User-Dialog to Chili via Fileupload.

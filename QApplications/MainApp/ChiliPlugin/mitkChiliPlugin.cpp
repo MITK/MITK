@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkEventCollector.h>
 #include <QcMITKTask.h>
 #include <SampleApp.h>
+#include <mitkProgressBar.h>
 //QT
 #include <qlayout.h>
 #include <qapplication.h>
@@ -315,38 +316,36 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
   if( selectedLightbox )
   {
     m_InImporting = true;
-    std::vector<DataTreeNode::Pointer> resultNodes;
-    //dont use "LoadCompleteSeries( ... )", the Buttons called LightboxImportButtons, so use the LoadImagesFromLightbox-Function too
-    resultNodes = LoadImagesFromLightbox( selectedLightbox );  //load all images
+    //dont use "LoadCompleteSeries( ... )", the Buttons called LightboxImportButtons, so use the LoadImagesFromLightbox-Function
+    std::vector<DataTreeNode::Pointer> resultNodes = LoadImagesFromLightbox( selectedLightbox );
 
     if( resultNodes.size() > 8 )
     {
       if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected %1 distinct image volumes.\nDo you want to load all of them (might slow down MITK)?").arg(resultNodes.size()), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
       {
-        for( unsigned int n = 0; n < resultNodes.size(); n++ )
-          DataStorage::GetInstance()->Add( resultNodes[n] );
+        SetRelationsToDataStorage( resultNodes );
       }
       else
       {
         for( unsigned int n = 0; n < resultNodes.size(); n++ )
         {
-          mitk::BaseProperty::Pointer propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
+          BaseProperty::Pointer propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
           if( propertyImageNumber.IsNull() || ( propertyImageNumber.IsNotNull() && propertyImageNumber->GetValueAsString() != "1" ) )
-            DataStorage::GetInstance()->Add( resultNodes[n] );
+          {
+            std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+            tmpVec.clear();
+            tmpVec.push_back( resultNodes[n] );
+            SetRelationsToDataStorage( tmpVec );
+          }
         }
       }
     }
     else
-      for( unsigned int n = 0; n < resultNodes.size(); n++ )
-        DataStorage::GetInstance()->Add( resultNodes[n] );
+      SetRelationsToDataStorage( resultNodes );
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
     if( selectedLightbox->currentSeries() )
-    {
-      resultNodes = LoadTextsFromSeries( selectedLightbox->currentSeries()->oid );  //load all texts
-      for( unsigned int n = 0; n < resultNodes.size(); n++ )
-        DataStorage::GetInstance()->Add( resultNodes[n] );
-    }
+      SetRelationsToDataStorage( LoadTextsFromSeries( selectedLightbox->currentSeries()->oid ) );  //load all texts
 #endif
 
     // stupid, that this is still necessary
@@ -580,6 +579,69 @@ void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
   InvokeEvent( PluginLightBoxCountChanged() );
 }
 
+void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> inputNodes )
+{
+#ifndef CHILI_PLUGIN_VERSION_CODE
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
+#else
+  //es gibt zwei Möglichkeiten:
+  // - zum einen alles in die DataStorage hängen und anschließend die Beziehungen zwischen den Daten herstellen
+  // - zum anderen kann man während des Einfügens in die DataStorage die Beziehungen berücksichtigen.
+    // Das Problem dabei ist, dass dazu die Daten sortiert werden müssen (in der Form "PSRelationInformation"/"GetStudyRelationInformation()"). Diese Sortierung müsste unterscheiden, ob sich die Daten in der DataStorage befinden, oder gerade übergeben werden. Ebenfalls müssten die Daten die in der Beziehungen vorkommen, aber nicht übergeben werden bzw. nicht in der DataStorage sind, beachtet werden. Beim Einfügen der Daten müsste dann noch beachtet werden, ob die Beziehung beim Einfügen ("ADD()") erstellt werden kann, oder die Daten eingefügt und dann die Beziehung erstellt werden muss (Parent schon in DataStorage).
+  // -> Variante eins wird verwendet
+  if( !inputNodes.empty() )
+  {
+    //add nodes
+    for( unsigned int x = 0; x < inputNodes.size(); x++ )
+      if( inputNodes[x].IsNotNull() )
+        DataStorage::GetInstance()->Add( inputNodes[x] );
+
+    //create relations
+    PACSPlugin::PSRelationInformationList relationList = GetStudyRelationInformation();  //get information of current study
+    for( PACSPlugin::PSRelationInformationList::iterator relationIter = relationList.begin(); relationIter != relationList.end(); relationIter++ )
+    {
+      //search for current Label and OID at DataStorage
+      DataStorage::SetOfObjects::ConstPointer allNodes = DataStorage::GetInstance()->GetAll();
+      DataStorage::SetOfObjects::const_iterator parentNodeIter;
+
+      for( parentNodeIter = allNodes->begin(); parentNodeIter != allNodes->end(); parentNodeIter++ )  //search at "DataStorage"
+      {
+        if( ( (*parentNodeIter)->GetProperty( "SeriesOID" ) && (*parentNodeIter)->GetProperty( "VolumeLabel" ) ) && ( (*parentNodeIter)->GetProperty( "SeriesOID" )->GetValueAsString() == relationIter->OID && (*parentNodeIter)->GetProperty( "VolumeLabel" )->GetValueAsString() == relationIter->Label ) )
+          break;
+      }
+
+      if( parentNodeIter != allNodes->end() )
+      {
+        for( std::list<std::string>::iterator currentChildren = relationIter->ChildLabel.begin(); currentChildren != relationIter->ChildLabel.end(); currentChildren++ )  //use all children
+        {
+          //first we need the seriesOID additinaly
+          PACSPlugin::PSRelationInformationList::iterator tmpIter;
+          for( tmpIter = relationList.begin(); tmpIter != relationList.end(); tmpIter++ )
+            if( tmpIter->Label == (*currentChildren) )
+              break;
+          if( tmpIter != relationList.end() )
+          {
+            //search for child-Label and OID at DataStorage
+            DataStorage::SetOfObjects::const_iterator childNodeIter;
+
+            for( childNodeIter = allNodes->begin(); childNodeIter != allNodes->end(); childNodeIter++ )  //search at "DataStorage"
+            {
+              if( ( (*childNodeIter)->GetProperty( "SeriesOID" ) && (*childNodeIter)->GetProperty( "VolumeLabel" ) ) && ( (*childNodeIter)->GetProperty( "SeriesOID" )->GetValueAsString() == tmpIter->OID && (*childNodeIter)->GetProperty( "VolumeLabel" )->GetValueAsString() == tmpIter->Label ) )
+                break;
+            }
+
+            if( childNodeIter != allNodes->end() )  //add relation to DataStorage
+            {
+              //DataStorage::GetInstance()->???( parentIter, childIter ); //its possible, that the relation always exist and the function have to check for circle
+            }
+          }
+        }
+      }
+    }
+  }
+#endif
+}
+
 /** ---- CHILIInformation ---- */
 
 /** Return the studyinformation. If you dont set the seriesOID, you get the current selected study. If you want a specific study, set the OID. If no study could found, this function return StudyInformation.OID == "". */
@@ -700,7 +762,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetStudyRelationI
 
 /** Set the internal reader which used to combine slices.
 0 = ImageNumberFilter; 1 = SpacingSetFilter; 2 = SingleSpacingFilter */
-void mitk::ChiliPlugin::SetReaderType( unsigned int readerType )
+void mitk::ChiliPlugin::SetReaderType( unsigned int mitkHideIfNoVersionCode( readerType ) )
 {
 #ifdef CHILI_PLUGIN_VERSION_CODE
   m_LoadFromCHILI->SetReaderType( readerType );
@@ -728,14 +790,16 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
       DataTreeNode::Pointer node = DataTreeNode::New();
       node->SetData( image );
       DataTreeNodeFactory::SetDefaultImageProperties( node );
-      mitk::PropertyList::Pointer tempPropertyList = reader->GetImageTagsAsPropertyList();
-      for( mitk::PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
+      PropertyList::Pointer tempPropertyList = reader->GetImageTagsAsPropertyList();
+      for( PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
         node->SetProperty( iter->first.c_str(), iter->second.first );
       resultVector.push_back( node );
     }
 
 #else
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultVector = m_LoadFromCHILI->LoadImagesFromLightbox( this, lightbox, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
 #endif
 
     QApplication::restoreOverrideCursor();
@@ -756,7 +820,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadFromSeries( cons
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNodes = m_LoadFromCHILI->LoadFromSeries( this, seriesOID, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -777,7 +843,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesOID, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -798,7 +866,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries(
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNodes = m_LoadFromCHILI->LoadTextsFromSeries( this, seriesOID, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -818,7 +888,9 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
   if( m_tempDirectory != "" && textOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNode = m_LoadFromCHILI->LoadSingleText( this, textOID, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -829,7 +901,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
 /** This function load a single text-file. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk. */
 mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& mitkHideIfNoVersionCode(seriesOID), const std::string& mitkHideIfNoVersionCode(textOID), const std::string& mitkHideIfNoVersionCode(textPath) )
 {
-  mitk::DataTreeNode::Pointer resultNode = NULL;
+  DataTreeNode::Pointer resultNode = NULL;
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
@@ -838,7 +910,9 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
   if( m_tempDirectory != "" && seriesOID != "" && textOID != "" && textPath != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNode = m_LoadFromCHILI->LoadSingleText( this, seriesOID, textOID, textPath, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -849,7 +923,7 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
 /** This function load single elements from the parent-child-xml-file. */
 mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std::string& mitkHideIfNoVersionCode( seriesOID ), const std::string& mitkHideIfNoVersionCode( label ) )
 {
-  mitk::DataTreeNode::Pointer resultNode = NULL;
+  DataTreeNode::Pointer resultNode = NULL;
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
@@ -858,35 +932,14 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
   if( seriesOID != "" && label != "" && m_tempDirectory != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultNode = m_LoadFromCHILI->LoadParentChildElement( this, seriesOID, label, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
 #endif
   return resultNode;
-}
-
-void mitk::ChiliPlugin::SetRelationsToDataStorage()
-{
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-  //"info" = PACSPlugin::GetStudyRelationInformation();  //wichtig von der aktuell markierten studie
-  //for( iterator = "info".begin(); iterator != "info".end(); iterator++ )
-  //{
-  //  teste ob "Label" und "OID" (SeriesOID) zu einer DataTreeNode in der DataStorage passen (sind als Properties gespeichert: "SeriesOID", "VolumeLabel")
-  //  {
-  //    for( iterator2 = iterator->"ChildLabel".begin(); iterator2 != iterator->"ChildLabel".end(); iterator2++ )
-  //    {
-  //      suche in "info" nach "ChildLabel"  //die OID wird zu dem Label benötigt (Grund: befinden sich Daten aus verschiedenen Studien in der DataStorage, kann das VolumeLabel doppelt vorkommen. Daher muss immer das Label und die OID in Kombination geprüft werden)
-  //      teste ob "ChildLabel" und "OID" zu "ChildLabel" zu einer DataTreeNode in der DataStorage passen
-  //      {
-  //        erstelle beziehung zwischen den elementen
-  //      }
-  //    }
-  //  }
-  //}
-#endif
 }
 
 /** ---- SaveToCHILI ---- */
@@ -902,7 +955,9 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mit
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     m_SaveToCHILI->SaveToChili( this, inputNodes, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -921,7 +976,9 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && studyOID != "" && seriesDescription != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     m_SaveToCHILI->SaveAsNewSeries( this, inputNodes, studyOID, seriesNumber, seriesDescription, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 
@@ -940,7 +997,9 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     m_SaveToCHILI->SaveToSeries( this, inputNodes, seriesOID, overrideExistingSeries, m_tempDirectory );
+    ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
 

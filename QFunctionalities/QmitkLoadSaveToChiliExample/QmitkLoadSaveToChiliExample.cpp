@@ -60,8 +60,8 @@ QmitkLoadSaveToChiliExample::QmitkLoadSaveToChiliExample( QObject *parent, const
 
 QmitkLoadSaveToChiliExample::~QmitkLoadSaveToChiliExample()
 {
-  if( m_Plugin )
-    m_Plugin->RemoveObserver( m_ObserverTag );
+  if( mitk::PACSPlugin::GetInstance() )
+    mitk::PACSPlugin::GetInstance()->RemoveObserver( m_ObserverTag );
 }
 
 QWidget * QmitkLoadSaveToChiliExample::CreateMainWidget( QWidget *parent )
@@ -143,7 +143,8 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
       {
         QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
         if( entry )
-          AddNodesToDataTree( m_Plugin->LoadFromSeries( entry->GetChiliOID().ascii() ) );
+          //AddNodesToDataTree( m_Plugin->LoadFromSeries( entry->GetChiliOID().ascii() ) );
+          m_Plugin->SetRelationsToDataStorage( m_Plugin->LoadFromSeries( entry->GetChiliOID().ascii() ) );
         break;
       }
       case 1:  //load all known images or all text
@@ -156,9 +157,17 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
             mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( entry->GetChiliOID().ascii() );
             while( !getAllElements.empty() )
             {
-              mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), getAllElements.front().Label );
-              if( temp.IsNotNull() )
-                mitk::DataStorage::GetInstance()->Add( temp );
+              if( getAllElements.front().Image )
+              {
+                mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), getAllElements.front().Label );
+                if( temp.IsNotNull() )
+                {
+                  std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+                  tmpVec.clear();
+                  tmpVec.push_back( temp );
+                  m_Plugin->SetRelationsToDataStorage( tmpVec );
+                }
+              }
               getAllElements.pop_front();
             }
           }
@@ -168,7 +177,8 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           {
             QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
             if( entry )
-              AddNodesToDataTree( m_Plugin->LoadTextsFromSeries( entry->GetChiliOID().ascii() ) );
+              //AddNodesToDataTree( m_Plugin->LoadTextsFromSeries( entry->GetChiliOID().ascii() ) );
+              m_Plugin->SetRelationsToDataStorage( m_Plugin->LoadTextsFromSeries( entry->GetChiliOID().ascii() ) );
           }
         break;
       }
@@ -182,7 +192,12 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           {
             mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), entry->GetVolumeLabel().ascii() );
             if( temp.IsNotNull() )
-              mitk::DataStorage::GetInstance()->Add( temp );
+            {
+              std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+              tmpVec.clear();
+              tmpVec.push_back( temp );
+              m_Plugin->SetRelationsToDataStorage( tmpVec );
+            }
           }
           else
             if( parent->text( 0 ) == "Saved Text" )
@@ -190,12 +205,23 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
               QmitkPluginListViewItem* child = dynamic_cast<QmitkPluginListViewItem*>( entry->firstChild() );
               mitk::DataTreeNode::Pointer temp = m_Plugin->LoadSingleText( child->GetChiliOID().ascii() );
               if( temp.IsNotNull() )
-                mitk::DataStorage::GetInstance()->Add( temp );
+              {
+                std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+                tmpVec.clear();
+                tmpVec.push_back( temp );
+                m_Plugin->SetRelationsToDataStorage( tmpVec );
+              }
               while( child->nextSibling() != 0 )
               {
                 child = dynamic_cast<QmitkPluginListViewItem*>( child->nextSibling() );
                 temp = m_Plugin->LoadSingleText( child->GetChiliOID().ascii() );
-                mitk::DataStorage::GetInstance()->Add( temp );
+                if( temp.IsNotNull() )
+                {
+                  std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+                  tmpVec.clear();
+                  tmpVec.push_back( temp );
+                  m_Plugin->SetRelationsToDataStorage( tmpVec );
+                }
               }
             }
         }
@@ -208,7 +234,12 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         {
           mitk::DataTreeNode::Pointer temp = m_Plugin->LoadSingleText( entry->GetChiliOID().ascii() );
           if( temp.IsNotNull() )
-            mitk::DataStorage::GetInstance()->Add( temp );
+          {
+            std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+            tmpVec.clear();
+            tmpVec.push_back( temp );
+            m_Plugin->SetRelationsToDataStorage( tmpVec );
+          }
         }
         break;
       }
@@ -233,7 +264,10 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
       mitk::DataTreeNode::Pointer temp = m_Plugin->LoadParentChildElement( entry->GetChiliOID().ascii(), entry->GetVolumeLabel().ascii() );
       if( temp.IsNotNull() )
       {
-        mitk::DataStorage::GetInstance()->Add( temp );
+        std::vector<mitk::DataTreeNode::Pointer> tmpVec;
+        tmpVec.clear();
+        tmpVec.push_back( temp );
+        m_Plugin->SetRelationsToDataStorage( tmpVec );
 
         m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
         m_MultiWidget->Fit();
@@ -304,54 +338,6 @@ void QmitkLoadSaveToChiliExample::ChangeReaderType()
     else
       if( m_Controls->SingleSpacingFilter->isChecked() )
         m_Plugin->SetReaderType( 2 );
-}
-
-void QmitkLoadSaveToChiliExample::AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes)
-{
-  bool showAll = true;
-  bool askQuestion = false;
-
-  mitk::BaseProperty::Pointer propertyImageNumber;
-  mitk::BaseProperty::Pointer propertyTimeSlice;
-
-  for( unsigned int n = 0; n < resultNodes.size(); n++ )
-  {
-    if( resultNodes[n].IsNotNull() )
-    {
-      propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
-      propertyTimeSlice = resultNodes[n]->GetProperty( "NumberOfTimeSlices" );
-
-      if( propertyImageNumber.IsNotNull() && propertyTimeSlice.IsNotNull() )
-      {
-        if( propertyImageNumber->GetValueAsString() == "1" && propertyTimeSlice->GetValueAsString() == "1" )
-        {
-          if(askQuestion == false )
-            if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected 2D-ResultImages.\nYou can choose if you want to add them to the mitk::DataTree or not.\nMore Images makes the Application slower, so if you want to see the volume only, dont add them.\n\nDo you want to add all 2D-Images to the MITK::DataTree?"), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
-            {
-              showAll = true;
-              askQuestion = true;
-              mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
-            }
-            else
-            {
-              showAll = false;
-              askQuestion = true;
-            }
-          else
-            if( showAll == true ) mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
-        }
-        else  mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
-      }
-      else mitk::DataStorage::GetInstance()->Add( resultNodes[n] );
-    }
-  }
-  //set parent-child-relations
-  m_Plugin->SetRelationsToDataStorage();
-
-  //initialize the multiwidget (input changed)
-  m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
-  m_MultiWidget->Fit();
-  m_MultiWidget->ReInitializeStandardViews();
 }
 
 void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventObject& )

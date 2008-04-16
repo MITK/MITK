@@ -95,8 +95,6 @@ protected:
     QmitkPluginListViewItem* parentItem;
   };
 
-  void AddNodesToDataTree( std::vector<mitk::DataTreeNode::Pointer> resultNodes);
-
   void PluginEventNewStudySelected(const itk::EventObject&);
 
   void AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent );

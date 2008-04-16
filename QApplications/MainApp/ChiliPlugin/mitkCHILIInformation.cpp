@@ -158,6 +158,7 @@ mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation
       series = (*dupSeriesStruct( pCurrentSeries() ) );  //copy seriesstruct
     else
     {
+      clearSeriesStruct( &series );
       std::cout << "CHILIInformation (GetSeriesInformation): pCurrentSeries() failed. Abort." << std::endl;
       return resultInformation;
     }

@@ -485,28 +485,36 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
     }
     if( uids.front() == "Image" )
     {
+      DataTreeNode::Pointer resultNode = NULL;
       uids.pop_front();
       m_VolumeImageInstanceUIDs = uids;
       m_ImageList.clear();
       pIterateImages( instance, (char*)seriesOID.c_str(), NULL, &LoadFromCHILI::GlobalIterateLoadSinglePics, this );
 
-      if( m_ImageList.size() != uids.size() ) return NULL;
-
-      PicDescriptorToNode::Pointer converterToNode;
-      converterToNode = SingleSpacingFilter::New();
-      converterToNode->SetInput( m_ImageList, seriesOID );
-      converterToNode->Update();
-      std::vector<DataTreeNode::Pointer> tempResult = converterToNode->GetOutput();
-      if( !tempResult.empty() )
+      if( m_ImageList.size() == uids.size() )
       {
-        //check if volume alway known in parent-child-xml
-        std::vector< std::list< std::string > > ImageInstanceUIDs = converterToNode->GetImageInstanceUIDs();
-        std::string result = m_ParentChild->GetLabel( ImageInstanceUIDs[0] );
-        if( result != "" )
-          tempResult[0]->SetProperty( "VolumeLabel", StringProperty::New( result ) );
+        PicDescriptorToNode::Pointer converterToNode;
+        converterToNode = SingleSpacingFilter::New();
+        converterToNode->SetInput( m_ImageList, seriesOID );
+        converterToNode->Update();
+        std::vector<DataTreeNode::Pointer> tempResult = converterToNode->GetOutput();
+        if( !tempResult.empty() )
+        {
+          //check if volume alway known in parent-child-xml
+          std::vector< std::list< std::string > > ImageInstanceUIDs = converterToNode->GetImageInstanceUIDs();
+          std::string result = m_ParentChild->GetLabel( ImageInstanceUIDs[0] );
+          if( result != "" )
+            tempResult[0]->SetProperty( "VolumeLabel", StringProperty::New( result ) );
 
-        return tempResult[0];
+          resultNode = tempResult[0];
+        }
       }
+
+      for( std::list<ipPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+        ipPicFree( (*imageIter) );
+      m_ImageList.clear();
+
+      return resultNode;;
     }
   }
   return NULL;

@@ -281,7 +281,11 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
                 if( overrideExistingSeries )  //to override the OIDs have to be the same
                   textOID = currentTextOID->GetValueAsString().c_str();
                 else  //the Text exist in current series and entries should not be override
+                {
+                  clearTextStruct( &text );
+                  clearSeriesStruct( &series );
                   continue;
+                }
               }
               else  //the SERIESOIDs are different
                 textOID = pGetNewOID();

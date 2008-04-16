@@ -73,7 +73,6 @@ protected:
    * call this method but should call Print() instead. */
   void PrintSelf(std::ostream& os, Indent indent) const;
 
-  TElement* AllocateElements(ElementIdentifier size) const;
 private:
   ImportMitkImageContainer(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented

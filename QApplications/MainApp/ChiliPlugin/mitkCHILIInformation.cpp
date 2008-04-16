@@ -210,9 +210,9 @@ mitk::PACSPlugin::SeriesInformationList mitk::CHILIInformation::GetSeriesInforma
 
 ipBool_t mitk::CHILIInformation::GlobalIterateSeries( int /*rows*/, int /*row*/, series_t* series, void* user_data )
 {
-  mitk::CHILIInformation* callingObject = static_cast<mitk::CHILIInformation*>(user_data);
+  CHILIInformation* callingObject = static_cast<CHILIInformation*>(user_data);
   //create new element and fill
-  mitk::PACSPlugin::SeriesInformation newSeries;
+  PACSPlugin::SeriesInformation newSeries;
   newSeries.OID = series->oid;
   newSeries.InstanceUID = series->instanceUID;
   newSeries.Number = series->number;
@@ -276,7 +276,7 @@ mitk::PACSPlugin::TextInformationList mitk::CHILIInformation::GetTextInformation
 
 ipBool_t mitk::CHILIInformation::GlobalIterateText( int /*rows*/, int /*row*/, text_t *text, void *user_data )
 {
-  mitk::CHILIInformation* callingObject = static_cast<mitk::CHILIInformation*>(user_data);
+  CHILIInformation* callingObject = static_cast<CHILIInformation*>(user_data);
 
   //we hide the parent-child-relation-file -> should not load ;)
   std::string chiliDatabaseName = text->chiliText;

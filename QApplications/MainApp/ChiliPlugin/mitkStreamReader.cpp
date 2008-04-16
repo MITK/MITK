@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK-Includes
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
+#include "mitkProgressBar.h"
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
@@ -51,6 +52,7 @@ void mitk::StreamReader::Update()
 
   if( m_SeriesOID != "" && !m_PicDescriptorList.empty() && m_Geometry != NULL )
   {
+    ProgressBar::GetInstance()->AddStepsToDo( 3 );
     Image::Pointer resultImage = Image::New();
     Point3D origin;
     Vector3D rightVector, downVector, spacing;
@@ -97,6 +99,7 @@ void mitk::StreamReader::Update()
     timeSliceGeometry->TransferItkToVtkTransform();
     // Image->SetGeometry
     resultImage->SetGeometry( timeSliceGeometry );
+    ProgressBar::GetInstance()->Progress();
 
     // add the slices to the created mitk::Image
     unsigned int x = 0;
@@ -105,6 +108,7 @@ void mitk::StreamReader::Update()
       resultImage->SetPicSlice( (*iter), 0, x);
       x++;
     }
+    ProgressBar::GetInstance()->Progress();
 
     // if all okay create a node, add the NumberOfSlices, NumberOfTimeSlices, SeriesOID, name, data and all pic-tags as properties
     if( resultImage->IsInitialized() && resultImage.IsNotNull() )
@@ -123,6 +127,7 @@ void mitk::StreamReader::Update()
 
       m_Output.push_back( node );
     }
+    ProgressBar::GetInstance()->Progress();
   }
   else std::cout<<"StreamReader-WARNING: No SeriesOID, PicDescriptorList or Geometry set."<<std::endl;
 }

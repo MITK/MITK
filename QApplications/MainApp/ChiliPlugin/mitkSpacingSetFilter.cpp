@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipDicom/ipDicom.h>
 // MITK-Includes
 #include "mitkChiliMacros.h"
+#include "mitkProgressBar.h"
 
 #include <algorithm>  //needed for "sort" (windows)
 
@@ -47,17 +48,25 @@ void mitk::SpacingSetFilter::Update()
   m_ImageInstanceUIDs.clear();
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
+    ProgressBar::GetInstance()->AddStepsToDo( 7 );
     SortPicsToGroup();
+    ProgressBar::GetInstance()->Progress();
     SortSlicesByLocation();
+    ProgressBar::GetInstance()->Progress();
     //ShowAllGroupsWithSlices();
     CreatePossibleCombinations();
+    ProgressBar::GetInstance()->Progress();
     SortPossibleCombinations();
+    ProgressBar::GetInstance()->Progress();
     //ShowAllPossibleCombinations();
     //ShowAllSlicesWithUsedSpacings();
     SearchForMinimumCombination();
+    ProgressBar::GetInstance()->Progress();
     //ShowAllResultCombinations();
     CheckForTimeSlicedCombinations();
+    ProgressBar::GetInstance()->Progress();
     GenerateImages();
+    ProgressBar::GetInstance()->Progress();
   }
   else std::cout<<"SpacingSetFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
@@ -221,6 +230,7 @@ bool mitk::SpacingSetFilter::PositionSort( const Slice elem1, const Slice elem2 
 void mitk::SpacingSetFilter::CreatePossibleCombinations()
 {
   //every group
+  ProgressBar::GetInstance()->AddStepsToDo( groupList.size() );
   for( unsigned int x = 0; x < groupList.size(); x++ )
   {
     if( groupList[x].includedSlices.size() == 1 )
@@ -251,10 +261,12 @@ void mitk::SpacingSetFilter::CreatePossibleCombinations()
       }
     }
   }
+  ProgressBar::GetInstance()->Progress();
 }
 
 void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup )
 {
+  ProgressBar::GetInstance()->AddStepsToDo( 1 );
   std::vector< Slice >::iterator referenceIter = basis;
 
   for( std::vector< Slice >::iterator walkIter = basis; walkIter != currentGroup->includedSlices.end(); walkIter++ )
@@ -296,10 +308,12 @@ void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator b
       }
     }
   }
+  ProgressBar::GetInstance()->Progress();
 }
 
 void mitk::SpacingSetFilter::searchFollowingSlices( std::vector< Slice >::iterator basis, double spacing, int imageNumberSpacing, Group* currentGroup )
 {
+  ProgressBar::GetInstance()->AddStepsToDo( 1 );
   std::vector< Slice >::iterator referenceIter = basis;
   bool walkON = true;
   while( walkON )
@@ -328,6 +342,7 @@ void mitk::SpacingSetFilter::searchFollowingSlices( std::vector< Slice >::iterat
           break;
     }
   }
+  ProgressBar::GetInstance()->Progress();
 }
 
 bool mitk::SpacingSetFilter::EqualImageNumbers( std::vector< Slice >::iterator testIter )
@@ -381,6 +396,7 @@ bool mitk::SpacingSetFilter::CombinationCountSort( const std::set< Slice* > elem
 
 void mitk::SpacingSetFilter::SearchForMinimumCombination()
 {
+  ProgressBar::GetInstance()->AddStepsToDo( groupList.size() );
   for( unsigned int n = 0; n < groupList.size(); n++ )
   {
     //a not timesliced 2D-image have only one possibleCombination, so we use this as resultCombination
@@ -436,6 +452,7 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
       //the result get copied
       groupList[n].resultCombinations = m_GroupResultCombinations;
     }
+    ProgressBar::GetInstance()->Progress();
   }
 }
 
@@ -453,6 +470,7 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
   //remainingCombinations = number of remeaning combinations to check
   //m_TotalCombinationCount = number of
 
+  ProgressBar::GetInstance()->AddStepsToDo( 1 );
   iterBegin++;
   remainingCombinations--;
   while ( iterBegin != m_IterGroupEnd )
@@ -509,6 +527,7 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
     iterBegin++;
     remainingCombinations--;
   }
+  ProgressBar::GetInstance()->Progress();
 }
 
 void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()

@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkFileWriter.h"
 #include "QmitkChiliPluginSaveDialog.h"
+#include "mitkProgressBar.h"
+
 //Qt
 #include <qapplication.h>
 #include <qcursor.h>
@@ -134,7 +136,6 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
 {
   //CHILI-Version >= 3.12 ???
   #if CHILI_VERSION_CODE( 1, 1, 3 ) < CHILI_PLUGIN_VERSION_CODE
-
   study_t study;
   patient_t patient;
   series_t series;
@@ -159,6 +160,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
   //get the needed study-, patient- and seriesinformation to save
   ImageToPicDescriptor::TagInformationList picTagList = GetNeededTagList( &study, &patient, &series );
 
+  ProgressBar::GetInstance()->AddStepsToDo( inputNodes.size() );
   for( DataStorage::SetOfObjects::const_iterator nodeIter = inputNodes->begin(); nodeIter != inputNodes->end(); nodeIter++ )
   {
     if( (*nodeIter) )
@@ -225,9 +227,10 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           picTagList.pop_back();
 
           //save the single slices to CHILI
-          //pOpenAssociation();
+          pOpenAssociation();
 
           int count = 0;
+          ProgressBar::GetInstance()->AddStepsToDo( myPicDescriptorList.size() );
           while( !myPicDescriptorList.empty() )
           {
             std::ostringstream helpFileName;
@@ -247,9 +250,10 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
             else
               if( remove( pathAndFile.c_str() ) != 0 )
                 std::cout << "ChiliPlugin (SaveToChili): Not able to  delete file: " << pathAndFile << std::endl;
+            ProgressBar::GetInstance()->Progress();
           }
 
-          //pCloseAssociation();
+          pCloseAssociation();
           //set the new SERIESOID as Property
           if( currentSeriesOID == "" )
             (*nodeIter)->SetProperty( "SeriesOID", StringProperty::New( seriesOID ) );
@@ -314,6 +318,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           {
             if( it->GetPointer()->CanWrite( (*nodeIter) ) )
             {
+              ProgressBar::GetInstance()->AddStepsToDo();
               //create filename
               std::string fileName;
               if( (*nodeIter)->GetProperty( "name" )->GetValueAsString() != "" )
@@ -344,11 +349,13 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
                 (*nodeIter)->SetProperty( "TextOID", StringProperty::New( textOID ) );
               else
                 (*nodeIter)->ReplaceProperty( "TextOID", StringProperty::New( textOID ) );
+              ProgressBar::GetInstance()->Progress();
             }
           }
         }
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
   m_ParentChild->SaveRelationShip();
   clearStudyStruct( &study );

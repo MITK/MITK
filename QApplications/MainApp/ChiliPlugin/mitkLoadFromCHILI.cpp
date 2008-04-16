@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSpacingSetFilter.h"
 #include "mitkStreamReader.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkProgressBar.h"
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
@@ -64,6 +65,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromLigh
   m_UnknownImageFormatPath.clear();
 
   //read all frames from Lightbox
+  ProgressBar::GetInstance()->AddStepsToDo( lightbox->getFrames() );
   for( unsigned int n = 0; n < lightbox->getFrames(); n++ )
   {
     ipPicDescriptor* pic = lightbox->fetchPic(n);
@@ -78,6 +80,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromLigh
       else
         m_ImageList.push_back( pic );
     }
+    ProgressBar::GetInstance()->Progress();
   }
 
   return CreateNodesFromLists( instance, lightbox->currentSeries()->oid, false, tmpDirectory );
@@ -98,6 +101,7 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipP
   {
     if( dicomFindElement( (unsigned char*) tsv->value, 0x0028, 0x0008, &data, &len ) && data != NULL )
     {
+      ProgressBar::GetInstance()->AddStepsToDo( 2 );
       sscanf( (char *) data, "%d", &frameNumber );
 
       ipUInt4_t *offset_table;
@@ -111,6 +115,7 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipP
         newElement.imageList.push_back( cinePic );
       }
       free( offset_table );
+      ProgressBar::GetInstance()->Progress();
 
       //interSliceGeometry
       newElement.geometry = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
@@ -133,6 +138,7 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipP
         if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
           newElement.seriesDescription = (char*)data;
       }
+      ProgressBar::GetInstance()->Progress();
     }
   }
 #endif
@@ -271,6 +277,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeri
 
 ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, image_t* image, void* user_data )
 {
+  ProgressBar::GetInstance()->AddStepsToDo( 2 );
   LoadFromCHILI* callingObject = static_cast<LoadFromCHILI*>( user_data );
 
   //get the FileExtension
@@ -285,6 +292,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, im
   //save to harddisk
   ipInt4_t error;
   pFetchDataToFile( image->path, pathAndFile.c_str(), &error );
+  ProgressBar::GetInstance()->Progress();
   if( error != 0 )
     std::cout << "LoadFromCHILI (GlobalIterateLoadImage): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
   else
@@ -335,6 +343,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, im
         callingObject->m_UnknownImageFormatPath.push_back( pathAndFile );
     }
   }
+  ProgressBar::GetInstance()->Progress();
 
   return ipTrue; // true = next element; false = break iterate
 }
@@ -399,6 +408,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
 
 mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* instance, const std::string& seriesOID, const std::string& textOID, const std::string& textPath, const std::string& tmpDirectory )
 {
+  ProgressBar::GetInstance()->AddStepsToDo( 2 );
   DataTreeNode::Pointer resultNode = NULL;
   //get Filename and path to save to harddisk
   std::string fileName = textPath.substr( textPath.find_last_of("-") + 1 );
@@ -407,6 +417,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
   //Load File from DB
   ipInt4_t error;
   pFetchDataToFile( textPath.c_str(), pathAndFile.c_str(), &error );
+  ProgressBar::GetInstance()->Progress();
   if( error != 0 )
     std::cout << "LoadFromCHILI (LoadSingleText): ChiliError: " << error << ", while reading file (" << fileName << ") from Database." << std::endl;
   else
@@ -455,6 +466,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
         itkGenericOutputMacro( << "Exception during file open: " << ex );
     }
   }
+  ProgressBar::GetInstance()->Progress();
   return resultNode;
 }
 
@@ -502,6 +514,7 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
 
 ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row, image_t* image, void* user_data )
 {
+  ProgressBar::GetInstance()->AddStepsToDo( 2 );
   LoadFromCHILI* callingObject = static_cast<LoadFromCHILI*>( user_data );
 
   //if the current image_instance_UID exist in the m_SavedImageInstanceUIDs-list, this image get saved to the m_ImageList
@@ -519,6 +532,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
     //save to harddisk
     ipInt4_t error;
     pFetchDataToFile( image->path, pathAndFile.c_str(), &error );
+    ProgressBar::GetInstance()->Progress();
     if( error != 0 )
       std::cout << "LoadFromCHILI (GlobalIterateLoadImage): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
     else
@@ -569,6 +583,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
           callingObject->m_UnknownImageFormatPath.push_back( pathAndFile );
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
   return ipTrue; // true = next element; false = break iterate
 }

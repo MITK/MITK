@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipDicom/ipDicom.h>
 // MITK-Includes
 #include "mitkChiliMacros.h"
+#include "mitkProgressBar.h"
 
 #include <algorithm>  //needed for "sort" (windows)
 
@@ -102,9 +103,13 @@ void mitk::SingleSpacingFilter::Update()
 
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
+    ProgressBar::GetInstance()->AddStepsToDo( 3 );
     SortPicsToGroup();
+    ProgressBar::GetInstance()->Progress();
     SortPositionsAndPics();
+    ProgressBar::GetInstance()->Progress();
     CreateResults();
+    ProgressBar::GetInstance()->Progress();
   }
   else std::cout<<"SingleSpacingFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
@@ -304,6 +309,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
   }
   else  //3D or 3D+t
   {
+    ProgressBar::GetInstance()->AddStepsToDo( 3 );
     //search fot the most coherent slices with the same spacing
     std::vector< Position >::iterator iterEnd = m_GroupVector[currentGroup].includedPositions.end();
     iterEnd--;
@@ -353,6 +359,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
         }
       }
     }
+    ProgressBar::GetInstance()->Progress();
 
     //now search for the spacing between the slices
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
@@ -405,6 +412,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
       }
     }
   }
+  ProgressBar::GetInstance()->Progress();
 
   //create mitk::images
   std::list<ipPicDescriptor*> usedPic;
@@ -443,6 +451,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
     else std::cout<<"SingleSpacingFilter-WARNING: Logical Error. Groups dont match."<<std::endl;
   }
   while( deleteGroup != usedPos.begin() );
+  ProgressBar::GetInstance()->Progress();
 }
 
 #endif

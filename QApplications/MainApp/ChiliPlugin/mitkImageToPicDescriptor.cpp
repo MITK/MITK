@@ -17,13 +17,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToPicDescriptor.h"
 
+//CHILI
 #include <chili/isg.h>
 #include <chili/plugin.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPicTags.h>
-
+//MITK
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkImageSliceSelector.h"
+#include "mitkProgressBar.h"
 
 /** Helper class for property import from pic/dicom-headers. */
 class HeaderTagInfo
@@ -197,6 +199,7 @@ void mitk::ImageToPicDescriptor::Update()
   memcpy( isg.forUID, FrameOfReferenceUIDManager::GetFrameOfReferenceUID( slicedGeometry->GetFrameOfReferenceID() ), 128 );
   isg.psu = ipPicUtilMillimeter;
 
+  ProgressBar::GetInstance()->AddStepsToDo( maxSlice*maxTime );
   for( slice = maxSlice - 1; slice >= 0; --slice )  // Slices
   {
     resultSlice->SetSliceNr( slice );
@@ -327,6 +330,7 @@ void mitk::ImageToPicDescriptor::Update()
 
       // add slice to output
       m_Output.push_back( currentPicDescriptor );
+      ProgressBar::GetInstance()->Progress();
     }
   }
 }

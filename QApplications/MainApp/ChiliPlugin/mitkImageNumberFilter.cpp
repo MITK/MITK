@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipDicom/ipDicom.h>
 // MITK-Includes
 #include "mitkChiliMacros.h"
+#include "mitkProgressBar.h"
 
 #include <algorithm>  //needed for "sort" (windows)
 
@@ -62,12 +63,19 @@ void mitk::ImageNumberFilter::Update()
 
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
+    ProgressBar::GetInstance()->AddStepsToDo( 6 );
     SortPicsToGroup();
+    ProgressBar::GetInstance()->Progress();
     SortSlicesByImageNumber();
+    ProgressBar::GetInstance()->Progress();
     SeperateBySpacing();
+    ProgressBar::GetInstance()->Progress();
     SeperateByTime();
+    ProgressBar::GetInstance()->Progress();
     SplitDummiVolumes();
+    ProgressBar::GetInstance()->Progress();
     GenerateImages();
+    ProgressBar::GetInstance()->Progress();
   }
   else std::cout<<"ImageNumberFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
@@ -219,6 +227,7 @@ void mitk::ImageNumberFilter::SortSlicesByImageNumber()
 // separation on spacing and set minimum of timslices and slices
 void mitk::ImageNumberFilter::SeperateBySpacing()
 {
+  ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
     if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
@@ -241,6 +250,7 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
         std::vector< Slice >::iterator iterB4 = originIter;
         while( originIter != m_GroupList[n].includedSlices.end() )
         {
+          ProgressBar::GetInstance()->AddStepsToDo( 1 );
           if( Equal ( iterB4->origin, originIter->origin ) )
           {
             originIter++;
@@ -270,14 +280,17 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
               originIter = m_GroupList[n].includedSlices.end();
             }
           }
+          ProgressBar::GetInstance()->Progress();
         }
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
 }
 
 void mitk::ImageNumberFilter::SeperateByTime()
 {
+  ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
     if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
@@ -292,6 +305,7 @@ void mitk::ImageNumberFilter::SeperateByTime()
 
       for( ; walkIter != m_GroupList[n].includedSlices.end(); walkIter++ )
       {
+        ProgressBar::GetInstance()->AddStepsToDo( 1 );
         if( Equal ( tmpOrigin, walkIter->origin ) )
           timeSteps++;
         else
@@ -304,6 +318,7 @@ void mitk::ImageNumberFilter::SeperateByTime()
           }
         }
         tmpOrigin = walkIter->origin;
+        ProgressBar::GetInstance()->Progress();
       }
 
       if( differentTimeSliced )
@@ -339,6 +354,7 @@ void mitk::ImageNumberFilter::SeperateByTime()
         m_GroupList.push_back( newGroup );
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
 }
 

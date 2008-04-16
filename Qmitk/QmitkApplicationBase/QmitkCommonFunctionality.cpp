@@ -558,27 +558,31 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   //QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
 
   // new Version: 
+	//// take screenshot of render window without the coloured frame of 2 pixels by cropping the raw image data
   vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New();
-  // take screenshot of render window without the coloured frame of 2 pixels
-  int* windowSize = renderWindow->GetSize();
-  double* renderWindowSize = new double[2];
-  renderWindowSize[0] = windowSize[0];
-  renderWindowSize[1] = windowSize[1];
-  double framesize = 5;
-  int desiredWidth = ((int)(renderWindowSize[0] - 2.0*framesize))/ 4 * 4;
-  int desiredHeight = ((int)(renderWindowSize[1] - 2.0*framesize))/ 4 * 4;
-  double* viewport = new double[4];
-         
-  viewport[0] = ((double)(windowSize[0] - desiredWidth)/2.0)/renderWindowSize[0];
-  viewport[2] = 1.0 - viewport[0];
-   
-  viewport[1] = ((double)(windowSize[1] - desiredHeight)/2.0)/renderWindowSize[1];
-  viewport[3] = 1.0 - viewport[1];
-#ifdef WIN32
-  // bug #1226
-  wti->SetViewport(viewport);
-#endif
-   vtkPNGWriter* pngWriter = vtkPNGWriter::New();
+  wti->SetInput( renderWindow );
+	wti->Update();
+	vtkImageData* imageData = wti->GetOutput();
+	int framesize = 5;
+	int* windowSize = renderWindow->GetSize();
+	int numberOfScalarComponents = imageData->GetNumberOfScalarComponents();
+	vtkImageData* processedImageData = vtkImageData::New();
+	processedImageData->SetNumberOfScalarComponents(numberOfScalarComponents);
+	processedImageData->SetExtent(0,windowSize[0]-2*framesize-1,0,windowSize[1]-2*framesize-1,0,0);
+	processedImageData->SetScalarTypeToUnsignedChar();
+	for (int i=framesize; i<windowSize[0]-framesize; i++)
+	{
+		for (int j=framesize; j<windowSize[1]-framesize; j++)
+		{
+			for (int k=0; k<numberOfScalarComponents; k++)
+			{
+				processedImageData->SetScalarComponentFromDouble(i-framesize,j-framesize,0,k,imageData->GetScalarComponentAsDouble(i,j,0,k));
+			}
+		}
+	}
+
+	// write new image as *.png to file
+  vtkPNGWriter* pngWriter = vtkPNGWriter::New();
   
   //
   // if the provided filename is empty ask the user 
@@ -626,8 +630,8 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   // save the screenshot under the given filename
   //
 
-  wti->SetInput( renderWindow );
-  pngWriter->SetInput( wti->GetOutput() );
+  pngWriter->SetInput(processedImageData);
+  //pngWriter->SetInput( wti->GetOutput() );
   pngWriter->SetFileName( concreteFilename.c_str() );
   
   pngWriter->Write();
@@ -639,3 +643,4 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   pngWriter->Delete();
   return concreteFilename;  
 }
+

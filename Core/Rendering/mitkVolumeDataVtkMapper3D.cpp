@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkTransferFunctionProperty.h"
-
+#include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
@@ -52,6 +52,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageResample.h>
 #include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
+#include <vtkAssembly.h>
+
+#include <vtkCubeSource.h>
+#include <vtkPolyDataMapper.h>
+
 
 #include <itkMultiThreader.h>
 
@@ -105,7 +110,27 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   // For abort rendering mechanism
   m_VolumeLOD->AutomaticLODSelectionOff();
 
-  m_Prop3D = m_VolumeLOD;
+
+  m_BoundingBox = vtkCubeSource::New();
+  m_BoundingBox->SetXLength( 0.0 );
+  m_BoundingBox->SetYLength( 0.0 );
+  m_BoundingBox->SetZLength( 0.0 );
+  
+  m_BoundingBoxMapper = vtkPolyDataMapper::New();
+  m_BoundingBoxMapper->SetInput( m_BoundingBox->GetOutput() );
+
+  m_BoundingBoxActor = vtkActor::New();
+  m_BoundingBoxActor->SetMapper( m_BoundingBoxMapper );
+  m_BoundingBoxActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
+  m_BoundingBoxActor->GetProperty()->SetRepresentationToWireframe();
+
+
+  m_Prop3DAssembly = vtkAssembly::New();
+  m_Prop3DAssembly->AddPart( m_VolumeLOD );
+  m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
+
+
+  m_Prop3D = m_Prop3DAssembly;
   m_Prop3D->Register(NULL); 
   
   m_ImageCast = vtkImageShiftScale::New(); 
@@ -114,8 +139,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput());
-  m_UnitSpacingImageFilter->SetOutputSpacing(1.0,1.0,1.0);
- 
+  m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 ); 
 }
 
 
@@ -177,11 +201,46 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false 
     )
   {
-    //  FIXME: don't understand this 
-    if (m_Prop3D) {
-      //      std::cout << "visibility off" <<std::endl;
+    m_VolumeLOD->VisibilityOff(); 
 
-      m_Prop3D->VisibilityOff(); 
+    // Check if a bounding box should be displayed around the dataset
+    // (even if volume rendering is disabled)
+    bool hasBoundingBox = false;
+    this->GetDataTreeNode()->GetBoolProperty( "bounding box", hasBoundingBox );
+    
+    if ( !hasBoundingBox )
+    {
+      m_BoundingBoxActor->VisibilityOff();
+    }
+    else
+    {
+      m_BoundingBoxActor->VisibilityOn();
+
+      mitk::Image *input  = const_cast<mitk::Image *>(this->GetInput());
+      if ( (input!=NULL) && (input->IsInitialized()==true) )
+      {
+        const BoundingBox::BoundsArrayType &bounds =
+          input->GetTimeSlicedGeometry()->GetBounds();
+
+        m_BoundingBox->SetBounds( 
+          bounds[0], bounds[1],
+          bounds[2], bounds[3],
+          bounds[4], bounds[5] );
+
+        ColorProperty *colorProperty;
+        if ( this->GetDataTreeNode()->GetProperty(
+          colorProperty, "color" ) )
+        {
+          const mitk::Color &color = colorProperty->GetColor();
+          m_BoundingBoxActor->GetProperty()->SetColor( 
+            color[0], color[1], color[2] );
+        }
+        else
+        {
+          m_BoundingBoxActor->GetProperty()->SetColor( 
+            1.0, 1.0, 1.0 );
+        }
+      }
     }
     return;
   }
@@ -208,8 +267,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     //std::cout<<"Could not get current LOD "<<std::endl;
   }
   
-  if (m_Prop3D) {
-    m_Prop3D->VisibilityOn();
+  if (m_VolumeLOD) {
+    m_VolumeLOD->VisibilityOn();
   }
 
   mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());

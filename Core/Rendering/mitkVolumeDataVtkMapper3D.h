@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 
+class vtkAssembly;
 class vtkVolumeRayCastMapper;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkVolumeTextureMapper2D;
@@ -40,6 +41,9 @@ class vtkImageShiftScale;
 class vtkImageChangeInformation;
 class vtkLODProp3D;
 class vtkImageResample;
+class vtkCubeSource;
+class vtkPolyDataMapper;
+class vtkActor;
 
 
 namespace mitk {
@@ -79,7 +83,6 @@ protected:
   void SetClippingPlane(vtkRenderWindowInteractor* interactor);
   void DelClippingPlane();
 
-  vtkActor* m_Actor;
   vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter; 
   vtkVolumeProperty* m_VolumePropertyLow;
@@ -89,6 +92,12 @@ protected:
   vtkVolumeRayCastMapper* m_HiResMapper;
   vtkImageResample* m_Resampler; 
   vtkLODProp3D* m_VolumeLOD;
+
+  vtkCubeSource *m_BoundingBox;
+  vtkPolyDataMapper *m_BoundingBoxMapper;
+  vtkActor *m_BoundingBoxActor;
+
+  vtkAssembly *m_Prop3DAssembly;
 
   vtkPlane* m_ClippingPlane;
   vtkImplicitPlaneWidget* m_PlaneWidget;

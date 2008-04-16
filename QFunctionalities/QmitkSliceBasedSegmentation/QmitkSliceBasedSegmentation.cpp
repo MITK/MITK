@@ -352,7 +352,8 @@ void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
   }
 
   mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(nodes.size());
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(nodes.size()+2);
+  mitk::ProgressBar::GetInstance()->Progress(2);
 
   // for all selected nodes: try to crop the image
   for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();

@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**
-  /**
   * @brief Converts pixel data to surface data by using a threshold
   * The mitkImageToSurfaceFilter is used to create a new surface out of an mitk image. The filter
   * uses a threshold to define the surface. It is based on the vtkMarchingCube algorithm. By default 

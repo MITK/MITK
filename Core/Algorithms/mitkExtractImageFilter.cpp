@@ -208,7 +208,6 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
    sliceDimension = 2;
  }
 
-  unsigned int i(0);
   unsigned int tmpDimensions[2];
 
   switch ( sliceDimension )

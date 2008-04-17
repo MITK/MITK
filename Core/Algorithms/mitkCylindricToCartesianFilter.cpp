@@ -431,7 +431,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
       if(input->GetDimension(2)>1)
       {
 
-        ipPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        mitkIpPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         //	ipPicPut("1trf.pic",pic_transformed);	
       }
       else
@@ -441,7 +441,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
         doubleSlice->n[2]=2;
         doubleSlice->data=malloc(_ipPicSize(doubleSlice));
         memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _ipPicSize(doubleSlice)/2);
-        ipPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
+        mitkIpPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
         ipPicFree(doubleSlice);
       }
       output->SetPicVolume(pic_transformed, t, n);

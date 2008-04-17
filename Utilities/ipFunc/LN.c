@@ -103,12 +103,12 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
 
   /* check whether data are correct                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+    return ( mitkIpFuncERROR );
 
   /* check datatype of image                                                */
 
@@ -120,12 +120,12 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
               
        if ( ( pic_new != NULL ) && ( pic_new->data != NULL ) )
          {
-            ipPicFORALL_1 ( LN, pic_old, max_gv );
+            mitkIpPicFORALL_1 ( LN, pic_old, max_gv );
          }
        else 
          {
-            _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+            return ( mitkIpFuncERROR );
          }
     }
 
@@ -145,8 +145,8 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
             if ( pic_new->data == NULL )
               {
                  ipPicFree ( pic_new );
-                 _ipFuncSetErrno ( ipFuncMALLOC_ERROR );  
-                 return ( ipFuncERROR );
+                 _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );  
+                 return ( mitkIpFuncERROR );
               }
 
             /* transform integer image to unsigned integer image           */
@@ -175,13 +175,13 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
             else 
               {
                  ipPicFree ( pic_new );
-                 _ipFuncSetErrno ( ipFuncTYPE_ERROR ); 
-                 return ( ipFuncERROR );
+                 _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR ); 
+                 return ( mitkIpFuncERROR );
               }
 
             max_gv = max_gv - min_gv;
 
-            ipPicFORALL_1 ( LN, pic_new, max_gv );
+            mitkIpPicFORALL_1 ( LN, pic_new, max_gv );
 
             /* transform unsigned integer image to an integer image           */
 
@@ -213,8 +213,8 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
      }
    else
      {
-         _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-         return ( ipFuncERROR );
+         _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+         return ( mitkIpFuncERROR );
      }
 
     /* Copy Tags */

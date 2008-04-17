@@ -103,7 +103,7 @@
 
 ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
-  ipPicFile_t infile;
+  mitkIpPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;
@@ -127,9 +127,9 @@ ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, i
     }
 
   /* read infile */
-  ipPicFRead( &(tag_name[0]), 1, 4, infile );
+  mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
 
-  if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( pic == NULL )
         pic = _ipPicOldGetSlice( infile,
@@ -140,7 +140,7 @@ ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, i
                            pic,
                            slice );
       if( infile != stdin )
-        ipPicFClose( infile );
+        mitkIpPicFClose( infile );
       return( pic );
     }
 
@@ -156,20 +156,20 @@ ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, i
 
   ipPicClear( pic );
 
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
   skip = len -        3 * sizeof(ipUInt4_t)
              - pic->dim * sizeof(ipUInt4_t);
-  ipPicFSeek( infile, skip, SEEK_CUR );
+  mitkIpPicFSeek( infile, skip, SEEK_CUR );
 
   picsize = _ipPicSize(pic);
 
@@ -193,7 +193,7 @@ ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, i
 
   picsize = _ipPicSize(pic);
 
-  ipPicFSeek( infile, picsize * (slice - 1), SEEK_CUR );
+  mitkIpPicFSeek( infile, picsize * (slice - 1), SEEK_CUR );
 
   if( number > 1 )
     {
@@ -205,10 +205,10 @@ ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, i
 
   pic->data = malloc( picsize );
 
-  ipPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+  mitkIpPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
 
   if( infile != stdin )
-    ipPicFClose( infile );
+    mitkIpPicFClose( infile );
 
   return( pic );
 }

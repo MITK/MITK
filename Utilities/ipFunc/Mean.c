@@ -102,9 +102,9 @@ ipFloat8_t ipFuncMean ( ipPicDescriptor *pic )
 
   /* check data                                               */ 
 
-  if ( _ipFuncError ( pic ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
-  ipPicFORALL_1( MEAN, pic, mean )
+  mitkIpPicFORALL_1( MEAN, pic, mean )
 
   return( mean );
 }

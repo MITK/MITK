@@ -83,8 +83,8 @@ ipPicDescriptor *ipFuncWindowR ( ipPicDescriptor *pic_1,
 #define WINDR( type, pic, beg, end, size )                                         \
 {                                                                                  \
   ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
   offset = 0;                                                                      \
   for ( ind[7] = beg[7] ; ind[7] < end[7]; ind[7]++ )                              \
@@ -138,54 +138,54 @@ ipPicDescriptor *ipFuncWindowR ( ipPicDescriptor *pic_1,
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipInt4_t       i;                    /* loop index                              */
-  ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
+  ipUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_1 ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( pic_2 ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( pic_1->dim != pic_2->dim ) 
      {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
      }
   if ( pic_1->type != pic_2->type ) 
      {
-       _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       return ( mitkIpFuncERROR );
      }
   if ( pic_1->bpe != pic_2->bpe )
      {
-       _ipFuncSetErrno ( ipFuncSIZE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+       return ( mitkIpFuncERROR );
      }
   
   for ( i = 0; i < pic_1->dim; i++ )
     {
       if ( begin[i] < 0 || begin[i] > pic_1->n[i] ) 
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
       end[i] = begin[i] + pic_2->n[i];
       if ( end[i] > pic_1->n[i] )
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
     }
 
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_1->n[i-1];
   size[pic_1->dim] = 0;
 
 
-  for ( i = pic_1->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_1->dim; i < _mitkIpPicNDIM; i++ )
     {
        begin[i] = 0;
        end[i]   = 1;
@@ -198,7 +198,7 @@ ipPicDescriptor *ipFuncWindowR ( ipPicDescriptor *pic_1,
   else 
      pic_new = pic_1;
 
-  ipPicFORALL_3 ( WINDR, pic_2, begin, end, size );
+  mitkIpPicFORALL_3 ( WINDR, pic_2, begin, end, size );
 
   /* Copy Tags */
 

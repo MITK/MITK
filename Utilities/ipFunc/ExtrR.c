@@ -60,8 +60,8 @@
  *   @param begin      vector with the beginning coordinates of the window
  *   @param length        vector with the length of the window in each direction
  *
- *   @return ipFuncOK           if no error occured
- *   @return ipFuncERROR       if an error occured
+ *   @return mitkIpFuncOK           if no error occured
+ *   @return mitkIpFuncERROR       if an error occured
  *
  * AUTHOR & DATE
  */
@@ -95,7 +95,7 @@ ipUInt4_t  ipFuncExtrR  ( ipPicDescriptor *pic_old,
    if ( pic_help )
       error = ipFuncExtr ( pic_help, min, max );
    else 
-     return ( ipFuncERROR );
+     return ( mitkIpFuncERROR );
 
    ipPicFree ( pic_help );
 

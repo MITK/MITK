@@ -55,7 +55,7 @@ void mitk::PlaneCutFilter::GenerateData()
 
   if(m_Planes.IsNotNull())
   {
-    ipPicTypeMultiplex3(_planesSet, pic_result, input->GetGeometry(), m_Planes, m_BackgroundLevel);
+    mitkIpPicTypeMultiplex3(_planesSet, pic_result, input->GetGeometry(), m_Planes, m_BackgroundLevel);
   }
 
   output->Initialize(pic_result);

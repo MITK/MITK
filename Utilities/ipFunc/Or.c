@@ -101,36 +101,36 @@ ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,
 
   /* check whether images have the same size                            */
 
-  if ( _ipFuncError ( pic_1 ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( pic_2 ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_1->type != pic_2->type ) || ( pic_1->bpe != pic_2->bpe ) )
     {
-      _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+      _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
       return NULL;
     }
   if ( pic_1->dim == pic_2->dim )
-    for ( i = 0; i < _ipPicNDIM; i++ )
+    for ( i = 0; i < _mitkIpPicNDIM; i++ )
       {
         if ( pic_1->n[i] != pic_2->n[i] )
           {
-             _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+             _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
              return NULL;
           }
       }
   else 
     {
-       _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
        return NULL;
     }
 
   /* allocate new iumage                                                */
 
-  pic_new = _ipFuncMalloc ( pic_1, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to connect two images using AND                              */
 
-  ipPicFORALL_2 ( OR, pic_1, pic_2, pic_new ); 
+  mitkIpPicFORALL_2 ( OR, pic_1, pic_2, pic_new ); 
 
   /* Copy Tags */
 

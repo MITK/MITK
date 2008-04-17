@@ -60,8 +60,8 @@
  *  @param pic_old   pointer to the original image
  *  @param mask         pointer to the kernel
  *  @param kind         tells whether erosion or dilation is performed
- *                 0 (ipERO)  :   erosion
- *                 1 (ipDILA) :   dilation
+ *                 0 (mitkIpERO)  :   erosion
+ *                 1 (mitkIpDILA) :   dilation
  *  @param border      tells how the edge is transformed
  *  @arg @c     ipFuncBorderOld  :   original greyvalues
  *  @arg @c     ipFuncBorderZero :   edge is set to zero
@@ -116,8 +116,8 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
 {                                                                          \
   ipUInt4_t     i;                   /* loop index                      */ \
   ipUInt4_t     offset;              /* offset                          */ \
-  ipInt4_t      ind[_ipPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];     /* offset vector                   */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
                                                                            \
   /* transformation of image                                            */ \
                                                                            \
@@ -166,8 +166,8 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
 #define MORPH_G( type, pic_old, pic_new, m, beg, end, OP )                 \
 {                                                                          \
   ipUInt4_t     i;                   /* loop index                      */ \
-  ipInt4_t      ind[_ipPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];     /* offset vector                   */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
   type          help, help2;                                               \
                                                                            \
                                                                            \
@@ -229,9 +229,9 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
 {
   ipPicDescriptor *pic_new;        /* pointer to transformed image         */
   ipFuncMasc_t    *m;              /* compressed mask and belonging offsets*/
-  ipInt4_t        beg[_ipPicNDIM];
-  ipInt4_t        end[_ipPicNDIM];
-  ipUInt4_t       size[_ipPicNDIM];    /*                                  */  
+  ipInt4_t        beg[_mitkIpPicNDIM];
+  ipInt4_t        end[_mitkIpPicNDIM];
+  ipUInt4_t       size[_mitkIpPicNDIM];    /*                                  */  
   ipUInt4_t       no_gv;           /* number of different greyvalues       */
   ipUInt4_t       i;               /* loop index                           */
   ipUInt4_t       size_hist;       /* number of elements in histogram      */
@@ -240,19 +240,19 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
 
   /* check image data                                                      */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( mask ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( mask->dim > pic_old->dim ) 
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
   for ( i = 0; i < mask->dim; i++ )
     if ( mask->n[i] > pic_old->n[i] ) 
       {
-         _ipFuncSetErrno ( ipFuncDATA_ERROR );
-         return ( ipFuncERROR );
+         _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+         return ( mitkIpFuncERROR );
       }
 
   pic_new = NULL;
@@ -260,7 +260,7 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
   /* initialisation of vectors                                             */  
                                                                             
   size [0] = 1;                                                             
-  for ( i = 1; i < _ipPicNDIM; i++ )                                        
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )                                        
     size[i] = size[i-1] * pic_old->n[i-1];                                  
   size[pic_old->dim] = 0;                                                   
 
@@ -271,7 +271,7 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
     {
        free ( hist );
        ipPicFree ( pic_new );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* allocate and initialize pic_new                                       */
@@ -283,42 +283,42 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
        pic_new = ipPicCopyHeader ( pic_old, NULL );
        if ( pic_new == NULL )
          {
-            _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+            return ( mitkIpFuncERROR );
          }
        pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
        if ( pic_new->data == NULL )
          {
             ipPicFree ( pic_new );
-            _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+            return ( mitkIpFuncERROR );
          }
 
        if ( kind == ipFuncEroF ) 
          {
-            ipPicFORALL ( INIT, pic_new );                                       
+            mitkIpPicFORALL ( INIT, pic_new );                                       
          }
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
   if ( pic_new == NULL )  
     {  
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* check whether binary or greylevel image                               */
   
-  if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   ipFuncHist ( pic_old, min, max, &hist, &size_hist );
   if ( hist == NULL ) 
     {
        ipPicFree ( pic_new );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   i     = 0;
@@ -336,11 +336,11 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
     {
        if ( no_gv == 2 )                                /* binary image    */
          {
-            ipPicFORALL_5 ( MORPH_B, pic_old, pic_new, m, beg, end, ERO_B );
+            mitkIpPicFORALL_5 ( MORPH_B, pic_old, pic_new, m, beg, end, ERO_B );
          }
        else if ( no_gv > 2 )                            /* greylevel image */
          {
-            ipPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, ERO_G );
+            mitkIpPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, ERO_G );
          }
        else 
          {
@@ -348,7 +348,7 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
             free ( m->off_vekt );
             free ( m->mask_vekt );
             free ( m );
-            /*_ipFuncSetErrno ( ipFuncDATA_ERROR );*/
+            /*_ipFuncSetErrno ( mitkIpFuncDATA_ERROR );*/
             return ( pic_new );
          }
     }
@@ -356,11 +356,11 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
     {
        if ( no_gv == 2 )                                /* binary image    */
          {
-            ipPicFORALL_5 ( MORPH_B, pic_old, pic_new, m, beg, end, DILA_B );
+            mitkIpPicFORALL_5 ( MORPH_B, pic_old, pic_new, m, beg, end, DILA_B );
          }
        else if ( no_gv > 2 )                            /* greylevel image */
          {
-            ipPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, DILA_G );
+            mitkIpPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, DILA_G );
          }
        else 
          {
@@ -368,7 +368,7 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
             free ( m->off_vekt );
             free ( m->mask_vekt );
             free ( m );
-            /*_ipFuncSetErrno ( ipFuncDATA_ERROR );*/
+            /*_ipFuncSetErrno ( mitkIpFuncDATA_ERROR );*/
             return ( pic_new );
          }
     }
@@ -379,8 +379,8 @@ ipPicDescriptor *_ipFuncMorph ( ipPicDescriptor *pic_old,
        free ( m->off_vekt );
        free ( m->mask_vekt );
        free ( m );
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* free memory                                                           */

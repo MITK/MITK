@@ -107,8 +107,8 @@ ipPicDescriptor *ipFuncHitMiss ( ipPicDescriptor *pic_old,
        pic_masks = ipPicNew ();
        if ( pic_masks == NULL ) 
          {
-           _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+           return ( mitkIpFuncERROR );
          }
        pic_masks->dim  = 3;
        pic_masks->type = ipPicUInt;

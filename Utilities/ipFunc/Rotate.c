@@ -126,11 +126,11 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
 
 {
   ipPicDescriptor *pic_return;
-  ipUInt4_t *p_index[_ipPicNDIM];
-  ipUInt4_t index[_ipPicNDIM];
-  ipUInt4_t coeff_sum[_ipPicNDIM];
-  ipUInt1_t coefficient[_ipPicNDIM]; 
-  ipUInt4_t r_size[_ipPicNDIM];
+  ipUInt4_t *p_index[_mitkIpPicNDIM];
+  ipUInt4_t index[_mitkIpPicNDIM];
+  ipUInt4_t coeff_sum[_mitkIpPicNDIM];
+  ipUInt1_t coefficient[_mitkIpPicNDIM]; 
+  ipUInt4_t r_size[_mitkIpPicNDIM];
   ipUInt4_t r_offset,i;
   int  order_alloc = 0;
 
@@ -138,7 +138,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
   **
   */
   if( !pic ) return( NULL );
-  if( pic->dim < 2 || pic->dim > _ipPicNDIM ) return( NULL );
+  if( pic->dim < 2 || pic->dim > _mitkIpPicNDIM ) return( NULL );
 
   /*  take over image header structure and allocate memory */
   ipPicFree( pic_old );
@@ -156,7 +156,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
   ** init pic_return->n, pointer to index and calculated_coeff
   ** init coefficient matrix, r_size
   */
-  for( i = 0; i< _ipPicNDIM; i++ )
+  for( i = 0; i< _mitkIpPicNDIM; i++ )
     {
       pic_return->n[i] = pic->n[i];
       p_index[i] = &index[i];
@@ -177,7 +177,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
           return( NULL );
         }
       order_alloc = 1;
-      for( i=0; i<_ipPicNDIM; i++ )
+      for( i=0; i<_mitkIpPicNDIM; i++ )
           order[i] = i+1;
     }
   else
@@ -185,24 +185,24 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
       /*
       ** test if order correct
       */
-      int tt[_ipPicNDIM];
-      for( i=0; i<_ipPicNDIM; i++ ) tt[i] = 0;
+      int tt[_mitkIpPicNDIM];
+      for( i=0; i<_mitkIpPicNDIM; i++ ) tt[i] = 0;
       for( i=0; i< pic->dim; i++ ) 
         { 
           if( order[i] > 0 && order[i]<= (ipInt4_t) pic->dim )
             tt[ order[i]-1 ]++;
           else
-            i = _ipPicNDIM + 1;
+            i = _mitkIpPicNDIM + 1;
         }
       if( i == pic->dim )
         {
           for( i=0; i< pic->dim; i++ )
             {
               if( tt[i] != 1 )
-                i = _ipPicNDIM + 1;
+                i = _mitkIpPicNDIM + 1;
             }
         }
-      if( i > _ipPicNDIM  )
+      if( i > _mitkIpPicNDIM  )
         {
           ipPicFree( pic_return );
           return( NULL );
@@ -282,7 +282,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
   ** Makro for all for-loops and switches for all dimensions (1-8)
   ** FOR ALL: dimensions, indizes, data types
   */
-  ipPicFORALL_4( ipFuncFORALL, pic, pic_return, index, r_offset,
+  mitkIpPicFORALL_4( mitkIpFuncFORALL, pic, pic_return, index, r_offset,
             for( r_offset = COEFF_DEF( coeff_sum[0],0) , i=1; i<pic->dim; i++  )
                 r_offset += COEFF_DEF( coeff_sum[i],i ) * r_size[i]; 
           )
@@ -295,7 +295,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
 
   /* Copy Tags */
 
-  strncpy( pic_return->info->version, pic->info->version, _ipPicTAGLEN );
+  strncpy( pic_return->info->version, pic->info->version, _mitkIpPicTAGLEN );
   pic_return->info->tags_head = _ipPicCloneTags( pic->info->tags_head );
   pic_return->info->write_protect = pic->info->write_protect;
                         

@@ -96,7 +96,7 @@ ipPicDescriptor *ipPicNew( void )
 
       pic->info = malloc( sizeof(_ipPicInfo_t) );
 
-      strncpy( pic->info->version, ipPicVERSION, _ipPicTAGLEN );
+      strncpy( pic->info->version, mitkIpPicVERSION, _mitkIpPicTAGLEN );
 
       pic->info->tags_head = NULL;
 

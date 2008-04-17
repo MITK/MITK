@@ -2520,7 +2520,7 @@ endobj
 /Parent 156 0 R
 /Next 164 0 R
 /Dest [ 90 0 R /XYZ null 843 null  ]
-/Title (ipPicVersionMajor ipPicVersionMinor)
+/Title (mitkIpPicVersionMajor mitkIpPicVersionMinor)
 >>
 endobj
 164 0 obj
@@ -2529,7 +2529,7 @@ endobj
 /Parent 156 0 R
 /Next 165 0 R
 /Dest [ 93 0 R /XYZ null 843 null  ]
-/Title (ipPicDR)
+/Title (mitkIpPicDR)
 >>
 endobj
 165 0 obj

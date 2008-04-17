@@ -77,12 +77,12 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old );
   ipUInt4_t   i;                                                          \
   ipUInt4_t   no;                                                         \
   ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_ipPicNDIM];                                              \
+  ipInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
                                                                           \
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )                           \
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                           \
     n[i] = 1;                                                             \
                                                                           \
   no          = 0;                                                        \
@@ -127,38 +127,38 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old );
 ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old )            
 {
 
-  ipUInt4_t       index_vect[_ipPicNDIM]; /* loopindex-vector           */
-  ipInt4_t        n[_ipPicNDIM];          /* number of pixels in each   */
+  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
   ipUInt4_t       i;                      /* loop index                 */
   ipFloat8_t      *gravity;
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
  
   /* initialisation of vectors                                          */
 
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i];
   
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
-  for ( i = 0; i < _ipPicNDIM; i++ )
+  for ( i = 0; i < _mitkIpPicNDIM; i++ )
     index_vect[i] = 0;
 
   gravity = ( ipFloat8_t * ) malloc ( 8 * sizeof ( ipFloat8_t ) );
   if ( gravity == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
-  for ( i = 0; i < _ipPicNDIM; i++ )
+  for ( i = 0; i < _mitkIpPicNDIM; i++ )
     gravity[i] = 0.;
   
-  ipPicFORALL_1 ( GRAV, pic_old, index_vect ) 
+  mitkIpPicFORALL_1 ( GRAV, pic_old, index_vect ) 
 
   return gravity;
 }

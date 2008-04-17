@@ -98,15 +98,15 @@ ipPicDescriptor *_ipFuncMalloc ( ipPicDescriptor *pic_old,
         pic_return = ipPicCopyHeader ( pic_old, 0 );
         if ( pic_return == NULL )
           {
-             _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-             return ( ipFuncERROR );
+             _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+             return ( mitkIpFuncERROR );
           }
         pic_return->data = calloc ( _ipPicElements ( pic_old ), pic_old->bpe/8 );
         if ( pic_return->data == NULL )
           {
              ipPicFree ( pic_return );
-             _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-             return ( ipFuncERROR );
+             _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+             return ( mitkIpFuncERROR );
           }
      } 
    else 
@@ -124,14 +124,14 @@ ipPicDescriptor *_ipFuncMalloc ( ipPicDescriptor *pic_old,
         pic_return = ipPicCopyHeader ( pic_old, 0 );
         if ( pic_return == NULL )
           {
-             _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-             return ( ipFuncERROR );
+             _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+             return ( mitkIpFuncERROR );
           }
         pic_return->data = calloc ( _ipPicElements ( pic_old ), pic_old->bpe/8 );
         if ( pic_return->data == NULL )
           {
-             _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-             return ( ipFuncERROR );
+             _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+             return ( mitkIpFuncERROR );
           }
      } 
    

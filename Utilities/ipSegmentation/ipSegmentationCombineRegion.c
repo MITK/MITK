@@ -234,22 +234,22 @@ void ipMITKSegmentationCombineRegion   (ipPicDescriptor* segmentation, const ipI
     switch (operation) {
 
     case IPSEGMENTATION_OP:
-        //ipPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, OP )  ;
+        //mitkIpPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, OP )  ;
         CONCAVE(ipMITKSegmentationTYPE, segmentation, mask, pl, num, win, value, OP);
         break;
 
     case IPSEGMENTATION_AND:
-        //ipPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, AND )  ;
+        //mitkIpPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, AND )  ;
         CONCAVE(ipMITKSegmentationTYPE, segmentation, mask, pl, num, win, value, AND);
         break;
 
     case IPSEGMENTATION_OR:
-        //ipPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, OR )  ;
+        //mitkIpPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, OR )  ;
         CONCAVE(ipMITKSegmentationTYPE, segmentation, mask, pl, num, win, value, OR);
         break;
 
     case IPSEGMENTATION_XOR:
-        //ipPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, XOR )  ;
+        //mitkIpPicFORALL_6(CONCAVE, segmentation, mask, pl, num, win, value, XOR )  ;
         CONCAVE(ipMITKSegmentationTYPE, segmentation, mask, pl, num, win, value, XOR);
         break;
 

@@ -101,37 +101,37 @@ void ipFuncPError ( char *string )
 
    switch ( ipFuncErrno )
      {
-        case ipFuncOK :
+        case mitkIpFuncOK :
              err_string = "ipFunc: no error occured";
              break;
-        case ipFuncNOPIC_ERROR :
+        case mitkIpFuncNOPIC_ERROR :
              err_string = "no image";              
              break;
-        case ipFuncDIM_ERROR :
+        case mitkIpFuncDIM_ERROR :
              err_string = "ipFunc: incorrect dimension of image";
              break;
-        case ipFuncSIZE_ERROR :
+        case mitkIpFuncSIZE_ERROR :
              err_string = "ipFunc: incorrect image size";
              break;
-        case ipFuncFLAG_ERROR :
+        case mitkIpFuncFLAG_ERROR :
              err_string = "ipFunc: incorrect flag";
              break;
-        case ipFuncMALLOC_ERROR :
+        case mitkIpFuncMALLOC_ERROR :
              err_string = "ipFunc: no memory allocated";
              break;
-        case ipFuncPICNEW_ERROR :
+        case mitkIpFuncPICNEW_ERROR :
              err_string = "ipFunc: can't create pic_new";
              break;
-        case ipFuncTYPE_ERROR :
+        case mitkIpFuncTYPE_ERROR :
              err_string = "ipFunc: incorrect image data type ";
              break;
-        case ipFuncUNFIT_ERROR :
+        case mitkIpFuncUNFIT_ERROR :
              err_string = "ipFunc: image data sizeis don't correspond";
              break;
-        case ipFuncDIMMASC_ERROR :
+        case mitkIpFuncDIMMASC_ERROR :
              err_string = "ipFunc: incorrect mask dimension";
              break;
-        case ipFuncDATA_ERROR :
+        case mitkIpFuncDATA_ERROR :
              err_string = "ipFunc: incorrect value of parameter";
              break;
         default :

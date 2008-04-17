@@ -97,7 +97,7 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
   hist_cp =  calloc( size_hist + 1, sizeof( type ) );                    \
   if ( hist_cp == NULL )                                                 \
     {                                                                    \
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                            \
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                            \
        return ( NULL );                                                  \
     }                                                                    \
                                                                          \
@@ -112,8 +112,8 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
                                                                          \
   if ( kind == ipFuncMinMax )                                            \
     {                                                                    \
-      if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK )                  \
-        return ( ipFuncERROR );                                              \
+      if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK )                  \
+        return ( mitkIpFuncERROR );                                              \
     }                                                                    \
   else if ( kind == ipFuncTotal )                                        \
     {                                                                    \
@@ -122,10 +122,10 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
     }                                                                    \
   else                                                                   \
     {                                                                    \
-      _ipFuncSetErrno ( ipFuncFLAG_ERROR );                              \
+      _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );                              \
       free ( hist_cp );                                                  \
       free ( hist );                                                     \
-      return ( ipFuncERROR );                                                \
+      return ( mitkIpFuncERROR );                                                \
     }                                                                    \
                                                                          \
   /* transformation of histogram                                    */   \
@@ -169,16 +169,16 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
   
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                        */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK ) 
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
     {
        ipPicFree ( pic_new );
        return ( NULL );
@@ -205,13 +205,13 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
     {
        ipPicFree ( pic_new );
        free ( hist );
-       _ipFuncSetErrno ( ipFuncTYPE_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
        return ( NULL );
     }
 
   /* macro to change image (for all data types)                         */
 
-  ipPicFORALL_6 ( EQUAL, pic_old, pic_new, kind, factor, hist, help, size_hist );
+  mitkIpPicFORALL_6 ( EQUAL, pic_old, pic_new, kind, factor, hist, help, size_hist );
 
   free ( hist );
 

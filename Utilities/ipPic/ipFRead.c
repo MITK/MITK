@@ -129,11 +129,11 @@ ipBool_t _ipPicCanReadCompressed = ipFalse;
 #endif
 
 size_t
-ipPicFReadCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
+ipPicFReadCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
 {
   size_t bytes_return;
 
-  bytes_return = ipPicFRead( ptr, size, nitems, stream );
+  bytes_return = mitkIpPicFRead( ptr, size, nitems, stream );
 
   _ipCvtEndian( ptr, size*nitems, size );
 

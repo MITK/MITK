@@ -54,8 +54,8 @@
 #include <ipFunc.h>
 #endif
 
-#ifndef _ipFunc_h
-#define _ipFunc_h
+#ifndef _mitkIpFunc_h
+#define _mitkIpFunc_h
 
 /* function prototypes */
 
@@ -84,7 +84,7 @@ ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
                                  ipPicDescriptor *pic_return );
 
 ipPicDescriptor *ipFuncScale  ( ipPicDescriptor *pic_old,
-                                ipFloat8_t      sc_fact[_ipPicNDIM],
+                                ipFloat8_t      sc_fact[_mitkIpPicNDIM],
                                 ipFuncFlagI_t   sc_kind );
 
 ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
@@ -118,6 +118,6 @@ ipPicDescriptor *ipFuncDrawPoly( ipPicDescriptor *pic_old,
 #endif
 
 
-#endif /* _ipFunc_h */ 
+#endif /* _mitkIpFunc_h */ 
 /* DON'T ADD ANYTHING AFTER THIS #endif */
 

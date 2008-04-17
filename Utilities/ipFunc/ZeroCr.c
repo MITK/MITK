@@ -69,7 +69,7 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old ) ;
 
 #define ZERO( type, pic, size, off, n )                                  \
 {                                                                        \
-   ipUInt4_t        ind[_ipPicNDIM];                                     \
+   ipUInt4_t        ind[_mitkIpPicNDIM];                                     \
    ipUInt4_t        i, j;                                                \
    ipInt4_t         offset;                                              \
    type             help1, help2, help3, help;                           \
@@ -131,24 +131,24 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
 
   ipPicDescriptor *pic_new;           /* convoluted image               */
   ipUInt4_t       i, j;               /* loopindex                      */
-  ipInt4_t        size[_ipPicNDIM];
-  ipUInt4_t       n[_ipPicNDIM];
+  ipInt4_t        size[_mitkIpPicNDIM];
+  ipUInt4_t       n[_mitkIpPicNDIM];
   ipInt4_t        *off_vekt;          /* offset vector                  */
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* initialisation of vectors                                          */
   
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
                                                                           
   for ( i = 0; i < pic_old->dim; i++ )           
     n[i] = pic_old->n[i] - 1;                                              
                                                                           
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )                    
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                    
     n[i] = 2;                                                             
                                                                           
   /* allocate and calculate offset vector                               */
@@ -156,8 +156,8 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
   off_vekt = malloc ( 2 * pic_old->dim * sizeof ( ipInt4_t ) );
   if ( off_vekt == NULL ) 
     {  
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i < pic_old->dim; i++ )
@@ -174,24 +174,24 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
   if ( pic_new == NULL )
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );                
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
        free ( off_vekt );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
   pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe/8  );
   if ( pic_new->data == NULL )
     {
        free ( off_vekt );
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                
        free ( off_vekt );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
  
   /* macro to convolute an image (for all data types)                   */
 
-  ipPicFORALL_3 ( ZERO, pic_old, size, off_vekt, n );                    
+  mitkIpPicFORALL_3 ( ZERO, pic_old, size, off_vekt, n );                    
 
   free ( off_vekt );
 

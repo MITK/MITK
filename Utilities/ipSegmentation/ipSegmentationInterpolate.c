@@ -138,7 +138,7 @@ ipPicDescriptor*
 ipMITKSegmentationInterpolate (ipPicDescriptor* pPic1, ipPicDescriptor* pPic2, const ipFloat4_t ratio)
 {
     ipPicDescriptor *pic_out, *pic[2];         /* pointer to image data */
-    ipUInt4_t frame [_ipPicNDIM];              /* pointer for definition of frame-size */
+    ipUInt4_t frame [_mitkIpPicNDIM];              /* pointer for definition of frame-size */
     ipInt4_t x, y;
     ipUInt4_t i;                               /* loop counters */
     ipFloat4_t weight[] = {1.0f-ratio, ratio}; /* weights of the interpolants */ 

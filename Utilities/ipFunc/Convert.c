@@ -87,12 +87,12 @@ ipPicDescriptor *ipFuncConvert ( ipPicDescriptor *pic_old,
 
 #define CONV_1( type_old, pic_old, pic_new, min_gv, max_gv )             \
 {                                                                        \
-  ipPicFORALL_4( CONV_2, pic_new, pic_old, type_old, min_gv, max_gv )    \
+  mitkIpPicFORALL_4( CONV_2, pic_new, pic_old, type_old, min_gv, max_gv )    \
 }
  
 #define CONV_3( type_old, pic_old, pic_new )                             \
 {                                                                        \
-  ipPicFORALL_2( CONV_4, pic_new, pic_old, type_old )                    \
+  mitkIpPicFORALL_2( CONV_4, pic_new, pic_old, type_old )                    \
 }
  
 
@@ -147,32 +147,32 @@ ipPicDescriptor *ipFuncConvert ( ipPicDescriptor *pic_old,
 
   /* ckeck whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( ! ( ( type == ipPicFloat && ( bpe == 32 || bpe == 64 ) ) ||
            ( type == ipPicUInt  && ( bpe == 8 || bpe == 16 || bpe == 32 ) ) ||
            ( type == ipPicInt   && ( bpe == 8 || bpe == 16 || bpe == 32 ) )  ) )
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
            
   /* calculate max. and min. possible greyvalues for output image       */
 
-  if ( _ipFuncExtT ( type, bpe, &min_gv, &max_gv ) != ipFuncOK )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( type, bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+    return ( mitkIpFuncERROR );
 
   /* calculate extreme greyvalues in input image                        */
 
-  if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* allocate output image                                              */
 
   pic_new       = ipPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
   pic_new->type = type;
   pic_new->bpe  = bpe;
@@ -181,16 +181,16 @@ ipPicDescriptor *ipFuncConvert ( ipPicDescriptor *pic_old,
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to convert the picture (for all data types)                  */
 
   if ( ( min < min_gv ) || ( max > max_gv ) )
-    ipPicFORALL_3 ( CONV_1, pic_old, pic_new, min_gv, max_gv )
+    mitkIpPicFORALL_3 ( CONV_1, pic_old, pic_new, min_gv, max_gv )
   else 
-    ipPicFORALL_1 ( CONV_3, pic_old, pic_new )
+    mitkIpPicFORALL_1 ( CONV_3, pic_old, pic_new )
 
   ipFuncCopyTags(pic_new, pic_old);
   

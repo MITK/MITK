@@ -55,8 +55,8 @@
  *  COPYRIGHT (c) 1994 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 
-#ifndef _ipTypes_h
-#define _ipTypes_h
+#ifndef _mitkIpTypes_h
+#define _mitkIpTypes_h
 
 #if defined (__mips) || (_IBMR2) || (sun) || (__i386__) || (__convex__) || (__alpha) || (__hppa) || (WIN32) || (_WIN32) || defined (__PPC__) || defined (__x86_64__) || defined (__APPLE__)
   typedef    signed char  ipInt1_t;
@@ -125,5 +125,5 @@ typedef enum
     _ipTypeMAX
   } ipType_t;
 
-#endif  /* _ipTypes_h */
+#endif  /* _mitkIpTypes_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

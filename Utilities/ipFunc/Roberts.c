@@ -87,7 +87,7 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   ipUInt4_t       i;                /* loop index                      */ \
   ipUInt4_t       end;              /*                                 */ \
   ipUInt4_t       off_imag;         /* offset of pixels                */ \
-  ipUInt4_t       ind[_ipPicNDIM];  /* loop index vector               */ \
+  ipUInt4_t       ind[_mitkIpPicNDIM];  /* loop index vector               */ \
   type            help, help2;      /* used to calculate new greyvalue */ \
                                                                           \
   end = msize / 2;                                                        \
@@ -138,18 +138,18 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   ipInt4_t        offset;            /* used to calculate off_vekt       */
   ipUInt4_t       off_mask;          /* offset of mask elements          */
   ipUInt4_t       mask_size;         /* number of elements in mask       */
-  ipUInt4_t       ind[_ipPicNDIM];   /* loop index vector                */
-  ipUInt4_t       size[_ipPicNDIM];  /*                                  */
-  ipUInt4_t       n[_ipPicNDIM];     /* size of each dimension           */
+  ipUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
+  ipUInt4_t       size[_mitkIpPicNDIM];  /*                                  */
+  ipUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
   ipUInt4_t       i;                 /* loop index                       */
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_old->dim < dim_mask ) || ( dim_mask < 1 ) )
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of vectors                                           */
@@ -157,12 +157,12 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   for ( i = 0; i < dim_mask; i++ )
     n[i] = 2;
  
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
   size[0] = 1;
   ind[0]  = 0;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     {
       ind[i]  = 0;
       size[i] = size[i-1] * pic_old->n[i-1];
@@ -175,8 +175,8 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   off_mask  = 0;
   if ( off_vekt == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   switch ( dim_mask )
@@ -218,23 +218,23 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   else 
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new->data == NULL )
     {
        free ( off_vekt );
        ipPicFree ( pic_new ); 
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro                                                               */
@@ -242,10 +242,10 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i] - 1;
  
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
  
-  ipPicFORALL_4 ( ROBERTS, pic_old, mask_size, n, off_vekt, size );
+  mitkIpPicFORALL_4 ( ROBERTS, pic_old, mask_size, n, off_vekt, size );
 
   free ( off_vekt );
 

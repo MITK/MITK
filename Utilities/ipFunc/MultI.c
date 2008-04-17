@@ -81,7 +81,7 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
 
 #define MULTI( type_1, pic_1, pic_2, pic_new )                           \
 {                                                                        \
-  ipPicFORALL_3 ( MULTI2, pic_new, pic_1, pic_2, type_1 );               \
+  mitkIpPicFORALL_3 ( MULTI2, pic_new, pic_1, pic_2, type_1 );               \
 }                                                                        \
  
 
@@ -143,50 +143,50 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_1 ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( pic_2 ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* check whether images have the same size                            */
 
   if ( ( pic_1->type != pic_2->type ) || ( pic_1->bpe != pic_2->bpe ) )
     {
-      _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+      _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
       return NULL;
     }
   if ( pic_1->dim == pic_2->dim )
-    for ( i = 0; i < _ipPicNDIM; i++ )
+    for ( i = 0; i < _mitkIpPicNDIM; i++ )
       {
         if ( pic_1->n[i] != pic_2->n[i] )
           {
-             _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+             _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
              return NULL;
           }
       }
   else
     {
-       _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
        return NULL;
     }
 
 
   /* calculate max. and min. possible greyvalues for data type of images*/
 
-  if ( _ipFuncExtT ( pic_1->type, pic_1->bpe, &min_gv, &max_gv ) != ipFuncOK )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_1->type, pic_1->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+    return ( mitkIpFuncERROR );
 
   /* find out data type of new iamge                                    */
 
   if ( keep == ipFuncKeep )
     {
-       pic_new = _ipFuncMalloc ( pic_1, pic_return, ipOVERWRITE );     
-       if ( pic_new == NULL ) return ( ipFuncERROR );
+       pic_new = _ipFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
+       if ( pic_new == NULL ) return ( mitkIpFuncERROR );
     }
   else if ( keep == ipFuncNoKeep )
     {
        /* calculate max. and min. greyvalues of both images                  */
 
-       if ( ipFuncExtr ( pic_1, &min1, &max1 ) != ipFuncOK ) return ( ipFuncERROR );
-       if ( ipFuncExtr ( pic_2, &min2, &max2 ) != ipFuncOK ) return ( ipFuncERROR );
+       if ( ipFuncExtr ( pic_1, &min1, &max1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+       if ( ipFuncExtr ( pic_2, &min2, &max2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
        smax      = max1 * max2;
        smin      = min1 * min2;
@@ -245,20 +245,20 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
          }
        else 
          {     
-            _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+            return ( mitkIpFuncERROR );
          }
     }
   else
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
     
   if ( keep == ipFuncNoKeep )
@@ -266,16 +266,16 @@ ipPicDescriptor *ipFuncMultI ( ipPicDescriptor *pic_1,
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to invert the picture (for all data types)                   */
 
   if ( keep == ipFuncNoKeep )
-    ipPicFORALL_2 ( MULTI, pic_1, pic_2, pic_new )
+    mitkIpPicFORALL_2 ( MULTI, pic_1, pic_2, pic_new )
   else if ( keep == ipFuncKeep )
-    ipPicFORALL_2 ( MULTI3, pic_1, pic_2, pic_new )
+    mitkIpPicFORALL_2 ( MULTI3, pic_1, pic_2, pic_new )
 
   ipFuncCopyTags(pic_new, pic_1);
 

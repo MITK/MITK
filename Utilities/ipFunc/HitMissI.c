@@ -97,8 +97,8 @@
          ipPicFree ( mask_1 );                                                 \
          ipPicFree ( mask_2 );                                                 \
          ipPicFree ( pic_1 );                                                  \
-         _ipFuncSetErrno ( ipFuncUNFIT_ERROR );                                \
-         return ( ipFuncERROR );                                                   \
+         _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );                                \
+         return ( mitkIpFuncERROR );                                                   \
       }                                                                        \
                                                                                \
   /* compress masks                                                         */ \
@@ -115,27 +115,27 @@
   ipUInt4_t     end_m;                   /* loop index                      */ \
   ipUInt4_t     beg_m1;                  /*                                 */ \
   ipUInt4_t     beg_m2;                  /*                                 */ \
-  ipUInt4_t     size[_ipPicNDIM];        /*                                 */ \
-  ipInt4_t      ind[_ipPicNDIM];         /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];         /* offset vector                   */ \
+  ipUInt4_t     size[_mitkIpPicNDIM];        /*                                 */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];         /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];         /* offset vector                   */ \
   ipFloat8_t    max, min;                /* max and min possible greyvalue  */ \
                                                                                \
   /* initialisation of vectors                                              */ \
                                                                                \
   size [0] = 1;                                                                \
-  for ( i = 1; i < _ipPicNDIM; i++ )                                           \
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )                                           \
     size[i] = size[i-1] * pic_old->n[i-1];                                     \
   size[pic_old->dim] = 0;                                                      \
                                                                                \
                                                                                \
   /* calculate max. and min. possible greyvalues                            */ \
                                                                                \
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min, &max ) != ipFuncOK )        \
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min, &max ) != mitkIpFuncOK )        \
     {                                                                          \
        ipPicFree ( mask_1 );                                                   \
        ipPicFree ( mask_2 );                                                   \
        ipPicFree ( pic_1 );                                                    \
-       return ( ipFuncERROR );                                                     \
+       return ( mitkIpFuncERROR );                                                     \
     }                                                                          \
                                                                                \
   /* transformation of image                                                */ \
@@ -147,7 +147,7 @@
                                                                                \
        beg_m1 = 2 * j * end_m;                                                 \
        beg_m2 = beg_m1 + end_m;                                                \
-       ipPicFORALL_5 ( C_MASC, pic_masks, m1, m2, end_m, beg_m1, beg_m2 );     \
+       mitkIpPicFORALL_5 ( C_MASC, pic_masks, m1, m2, end_m, beg_m1, beg_m2 );     \
                                                                                \
        for ( ind[7] = beg[7]; ind[7] < end[7]; ind[7]++ )                      \
        {                                                                       \
@@ -222,16 +222,16 @@
    ipPicDescriptor *pic_1;           /* image after hit and miss              */ 
    ipPicDescriptor *mask_1;          /* hit mask                              */ 
    ipPicDescriptor *mask_2;          /* miss mask                             */ 
-   ipInt4_t        beg[_ipPicNDIM];  /*                                       */
-   ipInt4_t        end[_ipPicNDIM];  /*                                       */
+   ipInt4_t        beg[_mitkIpPicNDIM];  /*                                       */
+   ipInt4_t        end[_mitkIpPicNDIM];  /*                                       */
    ipFuncMasc_t    *m1, *m2;         /* compressed masks                      */
    ipUInt4_t       dim;              /* dimension of mask                     */
    ipUInt4_t       j;                /* loop variable                         */
 
    /* check image data and mask data                                          */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-   if ( _ipFuncError ( pic_masks ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+   if ( _ipFuncError ( pic_masks ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
    /* allocate memory for masks                                               */
 
@@ -240,30 +240,30 @@
    mask_1->dim = dim;                      
    if ( mask_1 == NULL ) 
      {
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
    mask_1->data = malloc ( _ipPicSize ( mask_1 ) );
    if ( mask_1->data == NULL )
      {
         ipPicFree ( mask_1 );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
    mask_2 = ipPicCopyHeader ( mask_1, NULL );
    if ( mask_2 == NULL )
      {
         ipPicFree ( mask_1 );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
    mask_2->data = malloc ( _ipPicSize ( mask_2 ) );
    if ( mask_2->data == NULL ) 
      {
         ipPicFree ( mask_1 );
         ipPicFree ( mask_2 );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* allocate images                                                         */
@@ -282,16 +282,16 @@
      {
         ipPicFree ( mask_1 );
         ipPicFree ( mask_2 );
-        _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+        return ( mitkIpFuncERROR );
      }
  
    if ( pic_1 == NULL )
      {
         ipPicFree ( mask_1 );
         ipPicFree ( mask_2 );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                 
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                 
+        return ( mitkIpFuncERROR );
      }
 
    if ( pic_1->data == NULL )
@@ -299,8 +299,8 @@
         ipPicFree ( mask_1 );
         ipPicFree ( mask_2 );
         ipPicFree ( pic_1 );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                 
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                 
+        return ( mitkIpFuncERROR );
      }
 
    pic_inv = ipFuncInv ( pic_old, NULL );
@@ -311,7 +311,7 @@
         ipPicFree ( pic_1 );
      }
 
-   ipPicFORALL_2 ( HITMISS, pic_old, pic_1, pic_inv );
+   mitkIpPicFORALL_2 ( HITMISS, pic_old, pic_1, pic_inv );
 
    ipPicFree ( pic_inv );
    ipPicFree ( mask_1 );

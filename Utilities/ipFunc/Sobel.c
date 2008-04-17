@@ -78,8 +78,8 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
 
 #define SOBEL( typ, pic, size, mask_anz, m )                             \
 {                                                                        \
-   ipInt4_t         ind[_ipPicNDIM];                                     \
-   ipInt4_t         n[_ipPicNDIM];                                       \
+   ipInt4_t         ind[_mitkIpPicNDIM];                                     \
+   ipInt4_t         n[_mitkIpPicNDIM];                                       \
    ipUInt4_t        i,j;                                                 \
    ipInt4_t         offset;                                              \
    ipInt4_t         *beg;                                                \
@@ -98,7 +98,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
   for ( i = 0; i < pic->dim; i++ )                                       \
     n[i] = pic->n[i] - 1;                                                \
                                                                          \
-  for ( i = pic->dim; i < _ipPicNDIM; i++ )                              \
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                              \
     n[i] = 2;                                                            \
                                                                          \
   /* calculate max. and min. possible greyvalues                      */ \
@@ -156,10 +156,10 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
   ipUInt4_t       i, j;               /* loopindex                      */
   ipUInt4_t       pos;
   ipUInt1_t       mask_anz;           /* number of masks                */ 
-  ipInt4_t        n[_ipPicNDIM];
-  ipInt4_t        ind[_ipPicNDIM];    /* vector of loop indices (image) */ 
+  ipInt4_t        n[_mitkIpPicNDIM];
+  ipInt4_t        ind[_mitkIpPicNDIM];    /* vector of loop indices (image) */ 
   ipFuncMasc_t    *m;                 /* length of mask and offsets     */
-  ipUInt4_t       size[_ipPicNDIM];                                    
+  ipUInt4_t       size[_mitkIpPicNDIM];                                    
   ipInt2_t        sobel2[] =          /* 2D Sobel mask                  */
                   {  1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  2,  1,  0,  0,  0, -1, -2, -1  };
@@ -190,11 +190,11 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_old->dim < dim_mask ) || ( dim_mask < 1 ) )
     {  
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of pic_mask                                         */
@@ -202,8 +202,8 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
   pic_mask = ipPicNew ();
   if ( pic_mask == NULL ) 
     {  
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicInt;
@@ -228,8 +228,8 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
     {  
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of vectors                                          */
@@ -237,7 +237,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
   for ( i = 0; i < dim_mask; i++ )
     n[i] = 2;                                  
  
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 0;
 
   /* allocate mask structure                                            */
@@ -247,7 +247,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
     {
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
   m->off_vekt  = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
@@ -256,7 +256,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
        free ( m );
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
   m->mask_vekt = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
@@ -265,7 +265,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
        free ( m->off_vekt );
        free ( m );
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
  
@@ -280,22 +280,22 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
        free ( m->off_vekt );
        free ( m );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );                
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
        free ( m->off_vekt );
        free ( m );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
  
   /* calculate offset vector for the compressed mask                    */
@@ -335,7 +335,7 @@ ipPicDescriptor *ipFuncSobel ( ipPicDescriptor *pic_old,
  
   /* macro for the sobel operator                                       */
 
-  ipPicFORALL_3 ( SOBEL, pic_old, size, mask_anz, m );                   
+  mitkIpPicFORALL_3 ( SOBEL, pic_old, size, mask_anz, m );                   
 
   pic_mask->data = NULL;
   ipPicFree ( pic_mask );

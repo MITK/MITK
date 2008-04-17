@@ -90,14 +90,14 @@ ipFuncShapeInterpolation (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ip
     }
     result->data = malloc (_ipPicSize (result)); 
     if (result->data == NULL) {
-	_ipFuncSetErrno (ipFuncMALLOC_ERROR);
+	_ipFuncSetErrno (mitkIpFuncMALLOC_ERROR);
 	ipPicFree (result);	
 	return NULL;
     }
     pic[0] = setup (pic1, threshold); 
     pic[1] = setup (pic2, threshold); 
 
-    ipPicFORALL_2(INTERPOLATE, result, pic[0], pic[1]);
+    mitkIpPicFORALL_2(INTERPOLATE, result, pic[0], pic[1]);
 
     ipPicFree(pic [0]);
     ipPicFree(pic [1]);
@@ -157,7 +157,7 @@ setup (ipPicDescriptor* pic_old, const ipFloat4_t threshold)
 
 	/* Set the image data to initial values */
 
-	ipPicFORALL_2(COPY, pic_old, pic, threshold);
+	mitkIpPicFORALL_2(COPY, pic_old, pic, threshold);
 	dst = (ipInt2_t *) pic->data + (1 + pic->n[0]);
 	for (y = 0; y < pic_old->n[1]; y++) {
 		for (x = 0; x < pic_old->n[0]; x++) {

@@ -54,8 +54,8 @@
  *  @param    &min   result variable: minimum   
  *  @param    &max   result variable: maximum  
  *  
- *  @return    ipFuncOK    no error occured
- *  @return    ipFuncERROR  an error occured
+ *  @return    mitkIpFuncOK    no error occured
+ *  @return    mitkIpFuncERROR  an error occured
  *
  * AUTHOR
  */
@@ -114,16 +114,16 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
 
   /* check data                                               */
 
-  if ( _ipFuncError ( pic ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* macro to calculate extreme values ( for all data types   */
 
-  ipPicFORALL_2( EXTR, pic, min_c, max_c)
+  mitkIpPicFORALL_2( EXTR, pic, min_c, max_c)
 
   *min = min_c;
   *max = max_c;
 
-  return( ipFuncOK );
+  return( mitkIpFuncOK );
 }
 #endif
 

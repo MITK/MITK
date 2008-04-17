@@ -55,8 +55,8 @@
  *    @param pic          pointer to the image 
  *    @param &max         result variable: mean greyvalue
  *  
- *  @return  ipFuncERROR    - if an error occured
- *  @return  ipFuncOK       - if no error occures
+ *  @return  mitkIpFuncERROR    - if an error occured
+ *  @return  mitkIpFuncOK       - if no error occures
  *
  * AUTHOR & DATE
  */
@@ -102,7 +102,7 @@ ipFloat8_t ipFuncVar ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if (  _ipPicElements ( pic ) == 1 ) 
     var = 0;
@@ -112,7 +112,7 @@ ipFloat8_t ipFuncVar ( ipPicDescriptor *pic )
 
        mean =  ipFuncMean ( pic );
 
-       ipPicFORALL_2( MEAN_2, pic, mean, mean_2 );   
+       mitkIpPicFORALL_2( MEAN_2, pic, mean, mean_2 );   
   
        var =  mean_2 / ( ipFloat8_t ) ( _ipPicElements ( pic ) - 1 );
     }

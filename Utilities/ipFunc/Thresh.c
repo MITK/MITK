@@ -107,30 +107,30 @@ ipPicDescriptor *ipFuncThresh ( ipPicDescriptor *pic_old,
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. or min possible greyvalue for datatype              */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv  ) == ipFuncERROR )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv  ) == mitkIpFuncERROR )
+    return ( mitkIpFuncERROR );
 
   /* test whether threshold is ok                                       */
 
   if ( threshold < min_gv || threshold > max_gv ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
 
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
        
   /* macro to invert the picture (for all data types)                   */
 
-  ipPicFORALL( THRESH, pic_old );
+  mitkIpPicFORALL( THRESH, pic_old );
 
   /* Copy Tags */
 

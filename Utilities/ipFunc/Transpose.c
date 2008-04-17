@@ -112,9 +112,9 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
 
 {
   ipPicDescriptor *pic_return;
-  ipUInt4_t size  [_ipPicNDIM];
-  ipUInt4_t r_size[_ipPicNDIM];
-  ipUInt4_t index [_ipPicNDIM];
+  ipUInt4_t size  [_mitkIpPicNDIM];
+  ipUInt4_t r_size[_mitkIpPicNDIM];
+  ipUInt4_t index [_mitkIpPicNDIM];
   ipUInt4_t **r_index;
   ipUInt4_t i;
   ipUInt4_t r_offset;
@@ -125,7 +125,7 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
   **
   */
   if( !pic ) return( NULL );
-  if ( pic->dim < 1 || pic->dim > _ipPicNDIM)
+  if ( pic->dim < 1 || pic->dim > _mitkIpPicNDIM)
     return (NULL);
 
 
@@ -201,7 +201,7 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
   /*
   ** fill size vectors for multiplication
   */
-  for( i=0; i<_ipPicNDIM; i++)
+  for( i=0; i<_mitkIpPicNDIM; i++)
     {
       size[i] = 0;
       r_size[i] = 0;
@@ -218,8 +218,8 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
   /*
   ** index vectors
   */
-  r_index = (ipUInt4_t **) malloc( _ipPicNDIM * sizeof( ipUInt4_t * ) );
-  for( i=0; i<_ipPicNDIM; i++)
+  r_index = (ipUInt4_t **) malloc( _mitkIpPicNDIM * sizeof( ipUInt4_t * ) );
+  for( i=0; i<_mitkIpPicNDIM; i++)
     r_index[i] = &( index[i] );
   for( i=0; i<pic->dim; i++ ) 
     r_index[i] = &( index[ ( permutations_vector[i] - 1 ) ]);
@@ -229,7 +229,7 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
   ** Makro for all for-loops and switches for all dimensions (1-8)
   ** FOR ALL: dimensions, indizes, data types
   */
-  ipPicFORALL_4( ipFuncFORALL, pic, pic_return, index, r_offset, 
+  mitkIpPicFORALL_4( mitkIpFuncFORALL, pic, pic_return, index, r_offset, 
             for( r_offset = *(r_index[0]), i=1; i<pic->dim; i++  )
               r_offset += *(r_index[i]) * r_size[i];
           )

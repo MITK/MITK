@@ -97,16 +97,16 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to invert the picture (for all data types)                   */
 
-  ipPicFORALL ( NOT, pic_old );
+  mitkIpPicFORALL ( NOT, pic_old );
 
   /* Copy Tags */
 

@@ -58,8 +58,8 @@
  *   end      - pointer to right lower corner
  *
  * RETURN VALUES
- *   ipFuncOK     - no error occured
- *   ipFuncERROR  - error occured (description of error in ipFuncErrno)
+ *   mitkIpFuncOK     - no error occured
+ *   mitkIpFuncERROR  - error occured (description of error in ipFuncErrno)
  *
  * UPDATES
  *   this version could only be used for 3D images, in later version 
@@ -141,7 +141,7 @@ ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
                          ipUInt4_t       **beg,
                          ipUInt4_t       **end )            
 {
-  ipUInt4_t       size[_ipPicNDIM];       /* size of each direction     */
+  ipUInt4_t       size[_mitkIpPicNDIM];       /* size of each direction     */
   ipUInt4_t       i;                      /* loop index                 */
   ipUInt4_t       *help_beg, *help_end;
   ipUInt4_t       order[] = { 0,  1,
@@ -149,12 +149,12 @@ ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    
   if ( pic_old->dim > 2 )   /* just in for the first version */
     {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialization of vectors */
@@ -170,7 +170,7 @@ ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
   *end = ( ipUInt4_t * ) malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
   help_end = *end;
 
-  ipPicFORALL_2 ( BOX, pic_old, help_beg, help_end );                      
+  mitkIpPicFORALL_2 ( BOX, pic_old, help_beg, help_end );                      
 
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 }

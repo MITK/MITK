@@ -58,8 +58,8 @@
  *  @param size_hist   pointer to the number of elements in the histogram
  *                ( result value )
  *
- *  @return @arg @c ipFuncERROR     - if an error occured
- *  @return @arg @c ipFuncOK        - if no error occured
+ *  @return @arg @c mitkIpFuncERROR     - if an error occured
+ *  @return @arg @c mitkIpFuncOK        - if no error occured
  *
  * AUTHOR & DATE
  */
@@ -117,31 +117,31 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( *min_gv == 0 && *max_gv == 0 )
     {
-       if ( ipFuncExtr ( pic_old, min_gv, max_gv ) != ipFuncOK ) 
+       if ( ipFuncExtr ( pic_old, min_gv, max_gv ) != mitkIpFuncOK ) 
 	{
 	printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
-	return ( ipFuncERROR );
+	return ( mitkIpFuncERROR );
 	}
     }
   else 
     {
        if ( *min_gv > *max_gv ) 
          {
-            _ipFuncSetErrno ( ipFuncDATA_ERROR );
+            _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
 	    printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
-            return ( ipFuncERROR );
+            return ( mitkIpFuncERROR );
          }
-       if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK ) return ( ipFuncERROR );
+       if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
        if ( *min_gv < min || *max_gv > max )
          {
 	    printf("ipFunc: Probleme mit dem von ipFunc Extrema berechnete Intervall\n");
 	    printf("ipFunc: Von Extrema: %f %f \n", *min_gv, *max_gv);
 	   /*
-            _ipFuncSetErrno ( ipFuncDATA_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+            return ( mitkIpFuncERROR );
 	   */
          }
     }
@@ -158,8 +158,8 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
   else 
     {
        printf("ipFunc: Probleme mit dem von ipFunc Extrema berechnete Intervall\n");
-       _ipFuncSetErrno (ipFuncTYPE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno (mitkIpFuncTYPE_ERROR );
+       return ( mitkIpFuncERROR );
     }
   
   /* allocate memory                                                    */
@@ -172,15 +172,15 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
   if ( hist_help == NULL ) 
     {
        printf("ipFunc: Probleme mit dem Allokieren von Platz\n");
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                    
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to calculate the histogram                                   */
 
-  ipPicFORALL_2 ( HIST, pic_old, help, factor );
+  mitkIpPicFORALL_2 ( HIST, pic_old, help, factor );
 
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 }
 #endif
 

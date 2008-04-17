@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 extern "C" 
 {
-size_t _ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream);
+size_t _ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
 }
 
 mitk::PicFileWriter::PicFileWriter()
@@ -160,7 +160,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     //return( -1 );
   }
 
-  if( ipPicEncryptionType(pic) != ' ' )
+  if( mitkIpPicEncryptionType(pic) != ' ' )
   {
     fprintf( stderr, "ipPicPut: warning: was encrypted !!!\n" );
   }
@@ -182,7 +182,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
       char buff[1024];
 
       sprintf( buff, "%s.gz", outfile_name );
-      outfile = (FILE*) ipPicFOpen( buff, "wb" ); // cast to prevent warning. 
+      outfile = (FILE*) mitkIpPicFOpen( buff, "wb" ); // cast to prevent warning. 
     }
     else
     */
@@ -202,27 +202,27 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
       + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
-  if( ipPicEncryptionType(pic) == ' ' )
-    ipPicFWrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  if( mitkIpPicEncryptionType(pic) == ' ' )
+    mitkIpPicFWrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
   else
-    ipPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
+    mitkIpPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
 
-  ipPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
-  ipPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  ipPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  ipPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
 
-  ipPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  mitkIpPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
-  _ipPicWriteTags( pic->info->tags_head, outfile, ipPicEncryptionType(pic) );
+  _ipPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
    // Removed due to linker problems when compiling
    // an mitk chili plugin using msvc: there appear
    // unsresolved external symbol errors to function
    // _ipPicGetWriteCompression()
   /*
   if( ipPicGetWriteCompression() )
-    pic->info->pixel_start_in_file = ipPicFTell( outfile );
+    pic->info->pixel_start_in_file = mitkIpPicFTell( outfile );
   else
   */
   pic->info->pixel_start_in_file = ftell( outfile );
@@ -244,14 +244,14 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     if( pic->type == ipPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_written += ipPicFWrite( data + ( block_nr * block_size ), 1, block_size, outfile );
-      bytes_written += ipPicFWrite( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
+        bytes_written += mitkIpPicFWrite( data + ( block_nr * block_size ), 1, block_size, outfile );
+      bytes_written += mitkIpPicFWrite( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
     }
     else
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_written += ipPicFWriteLE( data + ( block_nr * block_size ), 1, block_size, outfile );
-      bytes_written += ipPicFWriteLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
+        bytes_written += mitkIpPicFWriteLE( data + ( block_nr * block_size ), 1, block_size, outfile );
+      bytes_written += mitkIpPicFWriteLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, outfile );
     }
         
     if ( bytes_written != number_of_bytes )
@@ -270,7 +270,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     // _ipPicGetWriteCompression()
     /*    
     if( ipPicGetWriteCompression() )
-      ipPicFClose( outfile );
+      mitkIpPicFClose( outfile );
     else
     */
     fclose( outfile );

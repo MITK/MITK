@@ -66,8 +66,8 @@
  * REMARKS
  *  this function could just be used for 2D images
  *
- * @return ipFuncOK      when no error occured          
- * @return ipFuncERROR   when an error occured
+ * @return mitkIpFuncOK      when no error occured          
+ * @return mitkIpFuncERROR   when an error occured
  *
  * AUTHOR & DATE
  */
@@ -150,11 +150,11 @@ ipUInt4_t  ipFuncExtrROI ( ipPicDescriptor *pic_old,
 
    /* check image data                                                  */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    if ( pic_old->dim > 2 ) 
      {
-        _ipFuncSetErrno ( ipFuncDIM_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* calculate min. and max. coordiantes of ROI                        */
@@ -176,26 +176,26 @@ ipUInt4_t  ipFuncExtrROI ( ipPicDescriptor *pic_old,
    /* Expression is always false! 
    if ( min_x < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
    if ( max_x > pic_old->n[0] ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    /* Expression is always false!
    if ( min_y < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
    if ( max_y > pic_old->n[1] ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* allocate memory for a and b                                       */
@@ -238,19 +238,19 @@ ipUInt4_t  ipFuncExtrROI ( ipPicDescriptor *pic_old,
     {
        free ( a );
        free ( b );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to calculate mean                                             */
 
-  ipPicFORALL_1 ( ROI, pic_old, pic_help );                 
+  mitkIpPicFORALL_1 ( ROI, pic_old, pic_help );                 
 
 
   free ( a );
   free ( b );
   ipPicFree ( pic_help );
 
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 
 } 
 

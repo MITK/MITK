@@ -98,13 +98,13 @@
 ipPicDescriptor *
 ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
 {
-  ipPicFile_t infile;
+  mitkIpPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t dummy;
   ipUInt4_t len;
   ipUInt4_t dim;
-  ipUInt4_t n[_ipPicNDIM];
+  ipUInt4_t n[_mitkIpPicNDIM];
 
   ipUInt4_t to_read;
 
@@ -120,39 +120,39 @@ ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
     pic->info->write_protect = ipFalse;
 
   /* read infile */
-  ipPicFRead( &(tag_name[0]), 1, 4, infile );
+  mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
 
-  if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( infile != stdin )
-        ipPicFClose( infile );
+        mitkIpPicFClose( infile );
       return( pic );
     }
 
   if( pic == NULL )
     pic = ipPicNew();
 
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  /*strncpy( pic->info->version, tag_name, _ipPicTAGLEN );*/
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  /*strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );*/
 
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
+  mitkIpPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
 
 
   to_read = len -        3 * sizeof(ipUInt4_t)
                 -      dim * sizeof(ipUInt4_t);
 
-  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
+  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 
-  pic->info->pixel_start_in_file = ipPicFTell( infile );
+  pic->info->pixel_start_in_file = mitkIpPicFTell( infile );
 
   if( infile != stdin )
-    ipPicFClose( infile );
+    mitkIpPicFClose( infile );
 
   return( pic );
 }

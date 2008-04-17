@@ -71,7 +71,7 @@ ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
   clone = ipPicCopyHeader( pic,
                            NULL );
 
-  strncpy( clone->info->version, pic->info->version, _ipPicTAGLEN );
+  strncpy( clone->info->version, pic->info->version, _mitkIpPicTAGLEN );
 
   clone->info->tags_head = _ipPicCloneTags( pic->info->tags_head );
 
@@ -120,7 +120,7 @@ ipPicTSV_t *_ipPicCloneTag( ipPicTSV_t *source )
 
   new = malloc( sizeof(ipPicTSV_t) );
 
-  strncpy( new->tag, source->tag, _ipPicTAGLEN );
+  strncpy( new->tag, source->tag, _mitkIpPicTAGLEN );
 
   new->type = source->type;
   new->bpe = source->bpe;

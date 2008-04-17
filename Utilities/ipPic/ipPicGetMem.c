@@ -39,37 +39,37 @@ ipPicDescriptor *ipPicGetMem( ipUInt1_t *mem_pic )
   ipPicClear( pic );
   memcpy( &(pic->info->version), mem_ptr, sizeof(ipPicTag_t) );
   mem_ptr += sizeof(ipPicTag_t); 
-  if( strncmp( ipPicVERSION, pic->info->version, 4 ) != 0 )
+  if( strncmp( mitkIpPicVERSION, pic->info->version, 4 ) != 0 )
     {      
       ipPicFree( pic );
       return( NULL );
     }
 
   /*memcpy( &len,  mem_ptr, sizeof(ipUInt4_t) );*/
-  ipCpFromLE( mem_ptr, &len, sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+  mitkIpCpFromLE( mem_ptr, &len, sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);
 
   /*memcpy( &(pic->type),  mem_ptr, sizeof(ipUInt4_t) );*/
-  ipCpFromLE( mem_ptr, &(pic->type), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+  mitkIpCpFromLE( mem_ptr, &(pic->type), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);
 
   /*memcpy( &(pic->bpe),  mem_ptr, sizeof(ipUInt4_t) );*/
-  ipCpFromLE( mem_ptr, &(pic->bpe), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+  mitkIpCpFromLE( mem_ptr, &(pic->bpe), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);
 
   /*memcpy( &(pic->dim),  mem_ptr, sizeof(ipUInt4_t) );*/
-  ipCpFromLE( mem_ptr, &(pic->dim), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+  mitkIpCpFromLE( mem_ptr, &(pic->dim), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);
 
   /*memcpy( &(pic->n),  mem_ptr, pic->dim * sizeof(ipUInt4_t) );*/
-  ipCpFromLE( mem_ptr, &(pic->n), pic->dim*sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+  mitkIpCpFromLE( mem_ptr, &(pic->n), pic->dim*sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
   mem_ptr += pic->dim*sizeof(ipUInt4_t);
 
   to_read = len -        3 * sizeof(ipUInt4_t)
                 - pic->dim * sizeof(ipUInt4_t);
   pic->info->tags_head = _ipPicReadTagsMem( pic->info->tags_head, 
 					    to_read, &mem_ptr,
-                                            ipPicEncryptionType(pic) );
+                                            mitkIpPicEncryptionType(pic) );
 
   pic->info->write_protect = ipFalse;
   pic->data = malloc( _ipPicSize(pic) );
@@ -79,7 +79,7 @@ ipPicDescriptor *ipPicGetMem( ipUInt1_t *mem_pic )
   */
   
   /*memcpy( pic->data,  mem_ptr, pic->bpe/8*_ipPicElements(pic) );*/
-  ipCpFromLE( mem_ptr, pic->data, _ipPicSize(pic), pic->bpe/8 );
+  mitkIpCpFromLE( mem_ptr, pic->data, _ipPicSize(pic), pic->bpe/8 );
 
   return( pic );
 }
@@ -95,28 +95,28 @@ _ipPicReadTagsMem( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read,
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
-      memcpy( tsv->tag, *mem_ptr, _ipPicTAGLEN );
-      tsv->tag[_ipPicTAGLEN] = '\0';
-      *mem_ptr += _ipPicTAGLEN;
+      memcpy( tsv->tag, *mem_ptr, _mitkIpPicTAGLEN );
+      tsv->tag[_mitkIpPicTAGLEN] = '\0';
+      *mem_ptr += _mitkIpPicTAGLEN;
 
       /*memcpy( &len,  *mem_ptr, sizeof(ipUInt4_t) );*/
-      ipCpFromLE( *mem_ptr, &len, sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+      mitkIpCpFromLE( *mem_ptr, &len, sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
       *mem_ptr += sizeof(ipUInt4_t);
 
       /*memcpy( &(tsv->type), *mem_ptr, sizeof(ipUInt4_t) );*/
-      ipCpFromLE( *mem_ptr, &(tsv->type), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+      mitkIpCpFromLE( *mem_ptr, &(tsv->type), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
       *mem_ptr += sizeof(ipUInt4_t);
 
       /*memcpy( &(tsv->bpe), *mem_ptr, sizeof(ipUInt4_t) );*/
-      ipCpFromLE( *mem_ptr, &(tsv->bpe), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+      mitkIpCpFromLE( *mem_ptr, &(tsv->bpe), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
       *mem_ptr += sizeof(ipUInt4_t);
 
       /*memcpy( &(tsv->dim), *mem_ptr, sizeof(ipUInt4_t) );*/
-      ipCpFromLE( *mem_ptr, &(tsv->dim), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+      mitkIpCpFromLE( *mem_ptr, &(tsv->dim), sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
       *mem_ptr += sizeof(ipUInt4_t);
 
       /*memcpy( &(tsv->n), *mem_ptr, tsv->dim*sizeof(ipUInt4_t) );*/
-      ipCpFromLE( *mem_ptr, &(tsv->n), tsv->dim*sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
+      mitkIpCpFromLE( *mem_ptr, &(tsv->n), tsv->dim*sizeof(ipUInt4_t), sizeof(ipUInt4_t) );
       *mem_ptr += tsv->dim*sizeof(ipUInt4_t);
 
       if( tsv->type == ipPicTSV )
@@ -144,7 +144,7 @@ _ipPicReadTagsMem( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read,
             tsv->value = malloc( elements * tsv->bpe / 8 );
 
 	  /*memcpy( tsv->value,  *mem_ptr, tsv->bpe/8*_ipPicTSVElements(tsv) );*/
-          ipCpFromLE( *mem_ptr, tsv->value, _ipPicTSVSize(tsv), tsv->bpe/8 );
+          mitkIpCpFromLE( *mem_ptr, tsv->value, _ipPicTSVSize(tsv), tsv->bpe/8 );
 	  *mem_ptr += tsv->bpe/8*_ipPicTSVElements(tsv);
 	  
           if( tsv->type == ipPicASCII )
@@ -157,7 +157,7 @@ _ipPicReadTagsMem( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read,
              if( tsv->type == ipPicNonUniform )
                {
                   sprintf( tsv->tag, "*** ENCRYPTED ***" );
-                  tsv->tag[_ipPicTAGLEN] = '\0';
+                  tsv->tag[_mitkIpPicTAGLEN] = '\0';
                }
   
              if( tsv->value )

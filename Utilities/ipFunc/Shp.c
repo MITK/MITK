@@ -108,17 +108,17 @@ ipPicDescriptor *ipFuncShp ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim < dim_mask || dim_mask < 2 ) 
     {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( /* mask_nr < 0 || */ mask_nr > 2 ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of pic_mask                                         */
@@ -126,8 +126,8 @@ ipPicDescriptor *ipFuncShp ( ipPicDescriptor *pic_old,
   pic_mask = ipPicNew ();
   if ( pic_mask == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicInt;
@@ -148,8 +148,8 @@ ipPicDescriptor *ipFuncShp ( ipPicDescriptor *pic_old,
     {
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* function to convolve  image with mask                              */

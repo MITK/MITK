@@ -66,12 +66,12 @@
 #include "ipFuncP.h"
 
 ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
-                               ipFloat8_t      sc_fact[_ipPicNDIM],
+                               ipFloat8_t      sc_fact[_mitkIpPicNDIM],
                                ipFuncFlagI_t   sc_kind ) ;
 #ifndef DOXYGEN_IGNORE
  
 ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
-                               ipFloat8_t      sc_fact[_ipPicNDIM],
+                               ipFloat8_t      sc_fact[_mitkIpPicNDIM],
                                ipFuncFlagI_t   sc_kind ) 
 {
 
@@ -89,7 +89,7 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
 	  is_color=1;
   }
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if(is_color)
 	  pic_old->bpe=24;
@@ -99,8 +99,8 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
   pic_new = ipPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* copy scaling information to header of pic_new            */
@@ -124,8 +124,8 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
   else
     {
       ipPicFree ( pic_new );
-      _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-      return ( ipFuncERROR );
+      _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+      return ( mitkIpFuncERROR );
     }
 
   /* Copy Tags */

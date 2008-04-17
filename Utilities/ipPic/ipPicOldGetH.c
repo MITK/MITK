@@ -102,22 +102,22 @@ ipPicDescriptor * _ipPicOldGetHeader( FILE *infile, ipPicDescriptor *pic )
   /*unsigned char *text;*/
 
   /* read infile */
-  ipFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  ipFReadLE( &(old_pic.n1), sizeof(ipUInt4_t),old_pic.rank, infile );
+  mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t),old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  ipFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       /*text = (unsigned char *)malloc( old_pic.ltxt );
-      ipFReadLE( text, 1, old_pic.ltxt, infile );*/
+      mitkIpFReadLE( text, 1, old_pic.ltxt, infile );*/
       fseek( infile, old_pic.ltxt, SEEK_CUR );
     }
 

@@ -164,7 +164,7 @@ ipPicPutMem( ipPicDescriptor *pic, int *mem_size )
     return( NULL );
 
   mem_ptr = mem_pic;
-  memcpy( mem_ptr, ipPicVERSION, sizeof(ipPicTag_t) );
+  memcpy( mem_ptr, mitkIpPicVERSION, sizeof(ipPicTag_t) );
   mem_ptr += sizeof(ipPicTag_t);
   memcpy( mem_ptr, &len, sizeof(ipUInt4_t) );
   mem_ptr += sizeof(ipUInt4_t);

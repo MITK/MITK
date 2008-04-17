@@ -58,8 +58,8 @@
  *  @param pic_old     pointer to the original image
  *  @param mask       pointer to the kernel
  *  @param kind       tells whether opening or closing is performed
- *  @arg  @c      0 (ipOPEN)  :   opening
- *  @arg @c       1 (ipCLOSE) :   closing 
+ *  @arg  @c      0 (mitkIpOPEN)  :   opening
+ *  @arg @c       1 (mitkIpCLOSE) :   closing 
  *  @param border   tells how the edge is transformed
  *  @arg @c       ipFuncBorderOld  :   original greyvalues
  *  @arg @c       ipFuncBorderZero :   edge is set to zero
@@ -107,18 +107,18 @@ ipPicDescriptor *_ipFuncOpCl  ( ipPicDescriptor *pic_old,
 
   /* check image data                                                      */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( mask ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( mask->dim > pic_old->dim ) 
     { 
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   for ( i = 0; i < mask->dim; i++ )
     if ( mask->n[i] > pic_old->n[i] ) 
       { 
-         _ipFuncSetErrno ( ipFuncSIZE_ERROR );
-         return ( ipFuncERROR );
+         _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+         return ( mitkIpFuncERROR );
       }
 
   /* check whether opening or closing operation should be performed       */
@@ -143,8 +143,8 @@ ipPicDescriptor *_ipFuncOpCl  ( ipPicDescriptor *pic_old,
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
   ipPicFree ( pic_new1 );
 

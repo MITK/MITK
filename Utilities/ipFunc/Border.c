@@ -85,10 +85,10 @@ ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
 #define BORDER( type, pic, size )                                                  \
 {                                                                                  \
   ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      anf[_ipPicNDIM];  /*                                           */ \
-  ipUInt4_t      end[_ipPicNDIM];  /*                                           */ \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      anf[_mitkIpPicNDIM];  /*                                           */ \
+  ipUInt4_t      end[_mitkIpPicNDIM];  /*                                           */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
                                                                                    \
   for ( i = 0; i < pic->dim; i++ )                                                 \
@@ -96,7 +96,7 @@ ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
        anf[i] = 0;                                                                 \
        end[i] = pic->n[i];                                                         \
     }                                                                              \
-  for ( i = pic->dim; i < _ipPicNDIM; i++ )                                        \
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                                        \
     {                                                                              \
        anf[i] = 0;                                                                 \
        end[i] = 1;                                                                 \
@@ -189,46 +189,46 @@ ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipUInt4_t       i;                   /* loop index                              */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whEther data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( mask ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim != mask->dim ) 
     { 
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i < pic_old->dim; i++ )
     {
        if ( pic_old->n[i] <= mask->n[i]  ) 
          { 
-            _ipFuncSetErrno ( ipFuncUNFIT_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+            return ( mitkIpFuncERROR );
          }
     }
 
 
   /* create a new picture, copy the header, allocate memory             */
 
-/*  pic_new = _ipFuncMalloc ( pic_old, pic_rtn, ipOVERWRITE );*/
+/*  pic_new = _ipFuncMalloc ( pic_old, pic_rtn, mitkIpOVERWRITE );*/
   if ( pic_rtn == NULL )
      pic_new = ipPicClone ( pic_old );
   else 
      pic_new = pic_old;
 
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
   size[pic_old->dim] = 0;
 
-  ipPicFORALL_1 ( BORDER, pic_old, size )    
+  mitkIpPicFORALL_1 ( BORDER, pic_old, size )    
 
   /* Copy Tags */
 

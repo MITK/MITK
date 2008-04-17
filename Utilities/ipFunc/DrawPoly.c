@@ -269,15 +269,15 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 
    /* check data                                                        */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    if ( pic_old->dim > 2 ) 
      {
-        _ipFuncSetErrno ( ipFuncDIM_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
-   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
-     return ( ipFuncERROR );
+   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+     return ( mitkIpFuncERROR );
 
    /* calculate min. and max. coordiantes of ROI                        */
 
@@ -298,29 +298,29 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    /* Expression is always false.
    if ( min_x < 0 ) 
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_x > pic_old->n[0] ) 
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
 
    /* Expression is always false.
    if ( min_y < 0 ) 
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_y > pic_old->n[1] ) 
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
 
    /* allocate memory for a and b                                       */
@@ -328,15 +328,15 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    a = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !a )
      {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
      }
    b = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !b )
      {
        free ( a );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
      }
 
    /* Geraden zwischen zwei benachbarten Punkten berechnen              */
@@ -376,11 +376,11 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
      {
         free ( a );
         free ( b );
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
-   ipPicFORALL_4 ( DRAW, pic_help, a, b, pol_x, pol_y );
+   mitkIpPicFORALL_4 ( DRAW, pic_help, a, b, pol_x, pol_y );
 
    free ( a );
    free ( b );

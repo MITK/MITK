@@ -373,28 +373,28 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
       }
     } else
 	if (mask ()) {
-		ipPicFORALL(MASK_INTENSITIES, _pic);
+		mitkIpPicFORALL(MASK_INTENSITIES, _pic);
 	} else 
 	if (binary ()) {
-		ipPicFORALL(BINARY_INTENSITIES, _pic);
+		mitkIpPicFORALL(BINARY_INTENSITIES, _pic);
 	} else {
 #ifdef USE_MMX
-		if (ipPicDR(_pic->type, _pic->bpe) == ipPicDR(ipPicInt, 16)) {
+		if (mitkIpPicDR(_pic->type, _pic->bpe) == mitkIpPicDR(ipPicInt, 16)) {
 			unsigned char* d = dst;
 			unsigned char* s = src;
 			if (w / 16) {
 				extrema (dst, (short *) src, w, (short) _min, (short) _max);
 			}
 			if (w % 16) {
-	        		ipPicFORALL(LIMIT_INTENSITIES, _pic);
+	        		mitkIpPicFORALL(LIMIT_INTENSITIES, _pic);
 				dst = d;
 				src = s;
 			}
 		} else {
-	        	ipPicFORALL(LIMIT_INTENSITIES, _pic);
+	        	mitkIpPicFORALL(LIMIT_INTENSITIES, _pic);
 		}
 #else
-	        ipPicFORALL(LIMIT_INTENSITIES, _pic);
+	        mitkIpPicFORALL(LIMIT_INTENSITIES, _pic);
 #endif
 	}
 

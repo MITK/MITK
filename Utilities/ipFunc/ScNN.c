@@ -79,8 +79,8 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 
 #define SCNN4ALL( type, pic_old, pic_new, size, weights, n, shift, step )\
 {                                                                        \
-   size_t           ind[_ipPicNDIM];      /* loop index vector         */\
-   size_t           offset[_ipPicNDIM];   /* offset vector             */\
+   size_t           ind[_mitkIpPicNDIM];      /* loop index vector         */\
+   size_t           offset[_mitkIpPicNDIM];   /* offset vector             */\
    size_t           i;                    /* loop index                */\
    size_t           off_new;              /* offset of scaled image    */\
    size_t           off_orig;             /* offset of orig. image     */\
@@ -158,9 +158,9 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 {
 
   ipUInt4_t       i;               /* loopindex                      */
-  ipUInt4_t       n[_ipPicNDIM];      /* no. of pixels in each dimension*/
-  ipFloat8_t      weights[_ipPicNDIM];
-  ipUInt4_t       size[_ipPicNDIM];                                    
+  ipUInt4_t       n[_mitkIpPicNDIM];      /* no. of pixels in each dimension*/
+  ipFloat8_t      weights[_mitkIpPicNDIM];
+  ipUInt4_t       size[_mitkIpPicNDIM];                                    
   char            is_color=0;
 
 
@@ -172,12 +172,12 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 	  pic_old->bpe=pic_new->bpe=8;
   }
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( pic_new ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim != pic_new->dim ) 
     {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of vectors                                          */
@@ -185,18 +185,18 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
   for ( i = 0; i < pic_new->dim; i++ )                                    
     n[i] = pic_new->n[i];                                                 
                                                                           
-  for ( i = pic_new->dim; i < _ipPicNDIM; i++ )                           
+  for ( i = pic_new->dim; i < _mitkIpPicNDIM; i++ )                           
     n[i] = 1;
 
   size[0] = 1*(is_color!=0?3:1);
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
 
   for ( i = 0; i < pic_old->dim; i++ )
     weights[i] = ( ipFloat8_t ) ( pic_old->n[i] - 1 ) / 
                  ( ipFloat8_t ) ( pic_new->n[i] - 1 );
  
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     weights[i] = 0.;
   
   /* add header information for pic_new and allocate memory             */
@@ -208,18 +208,18 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                   
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                   
+       return ( mitkIpFuncERROR );
     }
  
   /* macro to scale an image                                            */
   if(is_color==0)
   {
-	  ipPicFORALL_4 ( SCNN, pic_old, pic_new, size, weights, n ); 
+	  mitkIpPicFORALL_4 ( SCNN, pic_old, pic_new, size, weights, n ); 
   }
   else
   {
-	  ipPicFORALL_4 ( SCNNCOLOR, pic_old, pic_new, size, weights, n ); 
+	  mitkIpPicFORALL_4 ( SCNNCOLOR, pic_old, pic_new, size, weights, n ); 
 	  pic_old->bpe=pic_new->bpe=24;
   }
 

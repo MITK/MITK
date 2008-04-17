@@ -167,8 +167,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc RegGrow infile outfile beg_seed1...beg_seedn end_seed1...end_seedn border_label region_label std_dev_factor(double!!) kind(0=show border,1=show region)\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
-		length = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		length = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -537,7 +537,7 @@ main (int argc, char **argv)
             printf("      bilinear              :   6 \n" ); 
 			exit(1);
 		}
-		sc  = malloc ( _ipPicNDIM * sizeof ( ipFloat8_t ) );
+		sc  = malloc ( _mitkIpPicNDIM * sizeof ( ipFloat8_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%lf", &sc[i] );
@@ -557,7 +557,7 @@ main (int argc, char **argv)
 			printf("  perm_1 ... perm_n must be a permutation vector, e.g., 4 2 1 3 \n" );
 			exit(1);
 		}
-		perm  = malloc ( _ipPicNDIM * sizeof ( ipFloat8_t ) );
+		perm  = malloc ( _mitkIpPicNDIM * sizeof ( ipFloat8_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &perm[i] );
@@ -961,7 +961,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc BorderX infile outfile edge1...edgen value\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &begin[i] );
@@ -986,7 +986,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Edge infile outfile edge1...edgen value\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &begin[i] );
@@ -1008,7 +1008,7 @@ main (int argc, char **argv)
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
 		pic_hlp = ipPicGet ( mask_name, NULL );
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[5+i], "%d", &begin[i] );
@@ -1025,8 +1025,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Rotate infile outfile grad1...gradn order1...ordern \n" );
 			exit ( 1 );
 		}
-		grad   = malloc ( _ipPicNDIM * sizeof ( int ) );
-		order  = malloc ( _ipPicNDIM * sizeof ( int ) );
+		grad   = malloc ( _mitkIpPicNDIM * sizeof ( int ) );
+		order  = malloc ( _mitkIpPicNDIM * sizeof ( int ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &grad[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1044,8 +1044,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Window infile outfile beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
-		length = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		length = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1255,7 +1255,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc SDevR infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1272,7 +1272,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc VarC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1289,7 +1289,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc MeanC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1306,7 +1306,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc ExtrC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _ipPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			scanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );

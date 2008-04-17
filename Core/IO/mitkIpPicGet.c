@@ -240,18 +240,18 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   }
 
   /* read infile */
-  ipFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  ipFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
+  mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  ipFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       fseek( infile, old_pic.ltxt, SEEK_CUR );
@@ -287,8 +287,8 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   
   data = (ipUInt1_t*) pic->data;
   for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-    bytes_read += ipPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
-  bytes_read += ipPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+    bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
+  bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
     
   if ( bytes_read != number_of_bytes )
     fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), bytes_read, feof(infile) );
@@ -343,18 +343,18 @@ _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *st
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
-      ipPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
-      strncpy( tsv->tag, tag_name, _ipPicTAGLEN );
-      tsv->tag[_ipPicTAGLEN] = '\0';
+      mitkIpPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
+      strncpy( tsv->tag, tag_name, _mitkIpPicTAGLEN );
+      tsv->tag[_mitkIpPicTAGLEN] = '\0';
 
-      ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
+      mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
 
-      ipPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
-      ipPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      ipPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
+      mitkIpPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
+      mitkIpPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
+      mitkIpPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
 
 
-      ipPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
+      mitkIpPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
 
       if( tsv->type == ipPicTSV )
         {
@@ -384,7 +384,7 @@ assert( elements * tsv->bpe / 8 == len
           else
             tsv->value = malloc( elements * tsv->bpe / 8 );
 
-          ipPicFReadLE( tsv->value, tsv->bpe / 8, elements, stream );
+          mitkIpPicFReadLE( tsv->value, tsv->bpe / 8, elements, stream );
 
           if( tsv->type == ipPicASCII )
             ((char *)(tsv->value))[elements] = '\0';
@@ -396,7 +396,7 @@ assert( elements * tsv->bpe / 8 == len
               if( tsv->type == ipPicNonUniform )
                 {
                   sprintf( tsv->tag, "*** ENCRYPTED ***" );
-                  tsv->tag[_ipPicTAGLEN] = '\0';
+                  tsv->tag[_mitkIpPicTAGLEN] = '\0';
                 }
 
               free( tsv->value );
@@ -420,13 +420,13 @@ assert( elements * tsv->bpe / 8 == len
 ipPicDescriptor *
 MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
 {
-  ipPicFile_t infile;
+  mitkIpPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t dummy;
   ipUInt4_t len;
   ipUInt4_t dim;
-  ipUInt4_t n[_ipPicNDIM];
+  ipUInt4_t n[_mitkIpPicNDIM];
 
   ipUInt4_t to_read;
 
@@ -442,39 +442,39 @@ MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
     pic->info->write_protect = ipFalse;
 
   /* read infile */
-  ipPicFRead( &(tag_name[0]), 1, 4, infile );
+  mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
 
-  if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( infile != stdin )
-        ipPicFClose( infile );
+        mitkIpPicFClose( infile );
       return( pic );
     }
 
   if( pic == NULL )
     pic = ipPicNew();
 
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  /*strncpy( pic->info->version, tag_name, _ipPicTAGLEN );*/
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  /*strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );*/
 
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
+  mitkIpPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
 
 
   to_read = len -        3 * sizeof(ipUInt4_t)
                 -      dim * sizeof(ipUInt4_t);
 
-  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
+  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 
-  pic->info->pixel_start_in_file = ipPicFTell( infile );
+  pic->info->pixel_start_in_file = mitkIpPicFTell( infile );
 
   if( infile != stdin )
-    ipPicFClose( infile );
+    mitkIpPicFClose( infile );
 
   return( pic );
 }
@@ -482,7 +482,7 @@ MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
 ipPicDescriptor *
 MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
 {
-  ipPicFile_t infile;
+  mitkIpPicFile_t infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;
@@ -510,14 +510,14 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
     }
 
   /* read infile */
-  ipPicFRead( tag_name, 1, 4, infile );
+  mitkIpPicFRead( tag_name, 1, 4, infile );
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
       fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
       return( NULL );
     }
-  else if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  else if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
 #ifndef CHILIPLUGIN
       if( pic == NULL )
@@ -527,7 +527,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
         _MITKipPicOldGet( infile,
                       pic );
       if( infile != stdin )
-        ipPicFClose( infile );
+        mitkIpPicFClose( infile );
 #else
       return NULL;
 #endif
@@ -550,24 +550,24 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
     pic->info->tags_head = NULL;
   }
 
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
 
   to_read = len -        3 * sizeof(ipUInt4_t)
                 - pic->dim * sizeof(ipUInt4_t);
 #if 0
-  ipPicFSeek( infile, to_read, SEEK_CUR );
+  mitkIpPicFSeek( infile, to_read, SEEK_CUR );
 #else
-  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, ipPicEncryptionType(pic) );
+  pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 #endif
 
   pic->info->write_protect = ipFalse;
@@ -587,7 +587,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
 #endif
     }
 
-  pic->info->pixel_start_in_file = ipPicFTell( infile );
+  pic->info->pixel_start_in_file = mitkIpPicFTell( infile );
   /*
    * data is read in blocks of size 'block_size' to prevent from
    * errors due to large file sizes (>=2GB)
@@ -606,26 +606,26 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
   if( pic->type == ipPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_read += ipPicFRead( data + ( block_nr * block_size ), 1, block_size, infile );
-      bytes_read += ipPicFRead( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+        bytes_read += mitkIpPicFRead( data + ( block_nr * block_size ), 1, block_size, infile );
+      bytes_read += mitkIpPicFRead( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
     }
   else
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_read += ipPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
-      bytes_read += ipPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+        bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
+      bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
     }
     
   if ( bytes_read != number_of_bytes )
   {
-    fprintf( stderr, "Error while reading, only %lu bytes were read! Eof indicator is %u.\n", bytes_read, ipPicFEOF(infile) );
+    fprintf( stderr, "Error while reading, only %lu bytes were read! Eof indicator is %u.\n", bytes_read, mitkIpPicFEOF(infile) );
 #ifndef USE_ZLIB
     fprintf( stderr, "(ferror indicates %u).\n", ferror(infile));    
 #endif
   }
 
   if( infile != stdin )
-    ipPicFClose( infile );
+    mitkIpPicFClose( infile );
 
 #ifdef WIN
   GlobalUnlock( pic->hdata );

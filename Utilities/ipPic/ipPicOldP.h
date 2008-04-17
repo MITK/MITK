@@ -72,8 +72,8 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 
-#ifndef _ipPicOldP_h
-#define _ipPicOldP_h
+#ifndef _mitkIpPicOldP_h
+#define _mitkIpPicOldP_h
 
 typedef struct
   {
@@ -94,5 +94,5 @@ typedef struct
               ntxt,
               ltxt;
   } _ipPicOldHeader;
-#endif    /* ifdef _ipPicOldP_h */
+#endif    /* ifdef _mitkIpPicOldP_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

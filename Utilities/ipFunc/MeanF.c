@@ -100,16 +100,16 @@ ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim < dim_mask || dim_mask < 1 )
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( len_mask % 2 != 1 ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );   
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );   
     }
 
   /* initialize mask                                                     */
@@ -118,8 +118,8 @@ ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
   
   if ( pic_mask == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicFloat;
@@ -132,8 +132,8 @@ ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
   if ( pic_mask->data == NULL )
     {
        ipPicFree ( pic_mask->data );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   no_elem        = _ipPicElements ( pic_mask );

@@ -62,8 +62,8 @@
  *  eigen_val   - eigenvalues of the tensor of inertia
  *
  * RETURN VALUES
- *  ipFuncOK        - no error occured
- *  ipFuncERROR     - an error occured              
+ *  mitkIpFuncOK        - no error occured
+ *  mitkIpFuncERROR     - an error occured              
  *
  * UPDATES
  *   update of Manu's program to calculate axis of inertia. It's a
@@ -90,12 +90,12 @@
   ipUInt4_t   i;                                                          \
   ipUInt4_t   no;                                                         \
   ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_ipPicNDIM];                                              \
+  ipInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
                                                                           \
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )                           \
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                           \
     n[i] = 1;                                                             \
                                                                           \
   offset_refl = 0;                                                        \
@@ -144,8 +144,8 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
                          ipFloat8_t     **eigen_val )            
 {
 
-  ipUInt4_t       index_vect[_ipPicNDIM]; /* loopindex-vector           */
-  ipInt4_t        n[_ipPicNDIM];          /* number of pixels in each   */
+  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
   ipUInt4_t       i, j;                   /* loop index                 */
   ipFloat8_t      *gravity;               /* center of gravity          */
@@ -158,17 +158,17 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
 
   /* check data  */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
  
   /* initialisation of vectors  */
 
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i];
   
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
-  for ( i = 0; i < _ipPicNDIM; i++ )
+  for ( i = 0; i < _mitkIpPicNDIM; i++ )
     index_vect[i] = 0;
 
   /* memory allocation */
@@ -176,71 +176,71 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   gravity = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( gravity == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
   dist    = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( dist == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
  
   s_diag  = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( s_diag == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );    
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
  
   s = ( ipFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( s == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
  
   tt = m_get ( pic_old->dim, pic_old->dim );
   if ( tt == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
        free ( s );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   ev = m_get ( pic_old->dim, pic_old->dim );
   if ( ev == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
        free ( s );
        M_FREE ( tt );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   ew = v_get ( pic_old->dim-1 );
   if ( ew == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
        free ( s );
        M_FREE ( tt );
        M_FREE ( ev );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate center of gravity  */
@@ -259,7 +259,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
 
   /* preparation for calculating the tensor of inertia */
 
-  ipPicFORALL_4 ( GRAV, pic_old, index_vect, s, s_diag, dist ) 
+  mitkIpPicFORALL_4 ( GRAV, pic_old, index_vect, s, s_diag, dist ) 
 
   /* calculate tensor of inertia  */
 
@@ -301,6 +301,6 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   free ( s_diag );
   free ( gravity );
 
-  return ipFuncOK;   
+  return mitkIpFuncOK;   
 }
 #endif

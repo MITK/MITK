@@ -60,8 +60,8 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 
-#ifndef _ipPicAnnotation_h
-#define _ipPicAnnotation_h
+#ifndef _mitkIpPicAnnotation_h
+#define _mitkIpPicAnnotation_h
 
 typedef enum
   {
@@ -83,6 +83,6 @@ typedef struct
                      char *text;
   } ipPicAnnotation_t;
 
-#endif  /* _ipPicAnnotation_h */
+#endif  /* _mitkIpPicAnnotation_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */
 

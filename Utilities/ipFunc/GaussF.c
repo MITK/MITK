@@ -92,8 +92,8 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
 {
   ipPicDescriptor *pic_new;          /* pointer to new image structure   */
   ipPicDescriptor *pic_mask;         /* pointer to mask                  */
-  ipUInt4_t       n[_ipPicNDIM];     /* size of each dimension           */
-  ipUInt4_t       ind[_ipPicNDIM];   /* loop index vector                */
+  ipUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
+  ipUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
   ipUInt4_t       i, k;              /* loop index                       */
   ipUInt4_t       no_elem;           /* number of mask elements          */
   ipUInt4_t       offset;            /* offset of pixels                 */
@@ -104,16 +104,16 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim < dim_mask || dim_mask < 1 )
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( len_mask % 2 != 1 )
     {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate binomial coefficient                                      */
@@ -121,8 +121,8 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
   bin       = malloc ( len_mask * sizeof ( ipUInt4_t ) );
   if ( bin == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   nn        = len_mask;
@@ -145,8 +145,8 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
   if ( pic_mask == NULL )
     {
        free ( bin );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicFloat;
@@ -161,15 +161,15 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
     {
        free ( bin );
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialize vectors                                                  */
 
   for ( i = 0; i < pic_mask->dim; i++ )
     n[i] = len_mask;
-  for ( i = pic_mask->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_mask->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
   /* calculate mask                                                      */

@@ -102,7 +102,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
 
   curt = 0.0;
   if (  _ipPicElements ( pic ) != 1 ) 
@@ -111,7 +111,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
        mean =  ipFuncMean ( pic );
 	   std = ipFuncSDev( pic );
 
-       ipPicFORALL_2( CURTOSIS, pic, mean,  curt );   
+       mitkIpPicFORALL_2( CURTOSIS, pic, mean,  curt );   
   
        curt =   curt / ((( ipFloat8_t )(_ipPicElements ( pic ) - 1 )) *std*std*std*std) -3;
     }

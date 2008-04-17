@@ -96,7 +96,7 @@ ipFloat8_t ipFuncSDevC  ( ipPicDescriptor *pic_old,
 
    var = ipFuncVarC ( pic_old, center, radius );
 
-   if ( var < 0 ) return ( ipFuncERROR );
+   if ( var < 0 ) return ( mitkIpFuncERROR );
 
    s_dev = sqrt ( var ); 
 

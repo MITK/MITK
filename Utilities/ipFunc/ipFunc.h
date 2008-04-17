@@ -114,8 +114,8 @@
  * makefile for Sun Solaris.
 */
 
-#ifndef _ipFunc_h
-#define _ipFunc_h
+#ifndef _mitkIpFunc_h
+#define _mitkIpFunc_h
 
 /* include files */
 
@@ -143,26 +143,26 @@
 
 /* definition of constants */
 
-#define ipFuncERROR 0
-#define ipFuncOK 1 
-#define ipFuncNOPIC_ERROR 2
-#define ipFuncDIM_ERROR 3
-#define ipFuncSIZE_ERROR 4
-#define ipFuncFLAG_ERROR 5
-#define ipFuncMALLOC_ERROR 6
-#define ipFuncPICNEW_ERROR 7
-#define ipFuncTYPE_ERROR 8
-#define ipFuncUNFIT_ERROR 9
-#define ipFuncDIMMASC_ERROR 10
-#define ipFuncDATA_ERROR 11
-#define ipFunc_ERROR 12
-#define ipERO 0
-#define ipDILA 1
-#define ipOPEN 0
-#define ipCLOSE 1
-#define ipREFLECT 0
-#define ipNOREFLECT 1
-#define ipOVERWRITE 1
+#define mitkIpFuncERROR 0
+#define mitkIpFuncOK 1 
+#define mitkIpFuncNOPIC_ERROR 2
+#define mitkIpFuncDIM_ERROR 3
+#define mitkIpFuncSIZE_ERROR 4
+#define mitkIpFuncFLAG_ERROR 5
+#define mitkIpFuncMALLOC_ERROR 6
+#define mitkIpFuncPICNEW_ERROR 7
+#define mitkIpFuncTYPE_ERROR 8
+#define mitkIpFuncUNFIT_ERROR 9
+#define mitkIpFuncDIMMASC_ERROR 10
+#define mitkIpFuncDATA_ERROR 11
+#define mitkIpFunc_ERROR 12
+#define mitkIpERO 0
+#define mitkIpDILA 1
+#define mitkIpOPEN 0
+#define mitkIpCLOSE 1
+#define mitkIpREFLECT 0
+#define mitkIpNOREFLECT 1
+#define mitkIpOVERWRITE 1
 
 /* type definitions */
 
@@ -412,7 +412,7 @@ ipPicDescriptor *ipFuncHitMiss( ipPicDescriptor *pic_old,
                                 ipFuncFlagI_t    border );
 
 ipPicDescriptor *ipFuncScale  ( ipPicDescriptor *pic_old,
-                                ipFloat8_t      sc_fact[_ipPicNDIM],
+                                ipFloat8_t      sc_fact[_mitkIpPicNDIM],
                                 ipFuncFlagI_t   sc_kind );
 
 ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
@@ -582,6 +582,6 @@ char            *ipFuncMakePicName ( char *pic_name, char *extension );
 #endif
 
 
-#endif /* _ipFunc_h */ 
+#endif /* _mitkIpFunc_h */ 
 /* DON'T ADD ANYTHING AFTER THIS #endif */
 

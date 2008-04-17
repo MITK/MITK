@@ -98,14 +98,14 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
                                   [off[0] - off_vekt[i]] + help )        
 #define RANK( typ, pic, begin, no_elem, size, rank )                               \
 {                                                                                  \
-  ipUInt4_t      n[_ipPicNDIM];    /* size of each dimension                    */ \
+  ipUInt4_t      n[_mitkIpPicNDIM];    /* size of each dimension                    */ \
   ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      *hist;            /* greyvalue histogram                       */ \
   ipUInt4_t      sum;              /* used to calculate rank                    */ \
   ipUInt4_t      end;              /* number of elements that change            */ \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
   ipUInt4_t      beg;              /* beginning of the loops                    */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
   ipFloat8_t     min_gv, max_gv;   /* min./max. possible greyvalues             */ \
   ipFloat8_t     help, factor;                                                     \
   ipUInt4_t      hist_size;                                                        \
@@ -113,9 +113,9 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
   /* initialize vectors                                                         */ \
                                                                                    \
   beg    = ( ipUInt4_t ) begin;                                                    \
-  for ( i = 0; i < _ipPicNDIM; i++ ) off[i] = 0;                                   \
+  for ( i = 0; i < _mitkIpPicNDIM; i++ ) off[i] = 0;                                   \
   for ( i = 0; i < pic->dim; i++ ) n[i] = pic->n[i] - beg;                         \
-  for ( i = pic->dim; i < _ipPicNDIM; i++ )                                        \
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                                        \
     {                                                                              \
        n[i]    = 1 + beg;                                                          \
        size[i] = 0;                                                                \
@@ -123,11 +123,11 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
                                                                                    \
   /* calculate max. and min. possible greyvalues                                */ \
                                                                                    \
-  if ( ipFuncExtr( pic, &min_gv, &max_gv ) == ipFuncERROR )                            \
+  if ( ipFuncExtr( pic, &min_gv, &max_gv ) == mitkIpFuncERROR )                            \
     {                                                                              \
        free ( off_vekt );                                                          \
        ipPicFree ( pic_new );                                                      \
-       return ( ipFuncERROR );                                                         \
+       return ( mitkIpFuncERROR );                                                         \
     }                                                                              \
                                                                                    \
   /* allocate memory for histogram and calculate variables which are needed for */ \
@@ -143,8 +143,8 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
     {                                                                              \
        free ( off_vekt );                                                          \
        ipPicFree ( pic_new );                                                      \
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );                                      \
-       return ( ipFuncERROR );                                                         \
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                                      \
+       return ( mitkIpFuncERROR );                                                         \
     }                                                                              \
  */                                                                                \
   /* transform pixels                                                           */ \
@@ -219,11 +219,11 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipInt4_t       i;                    /* loop index                              */
   ipInt4_t       offset;               /* offset of image                         */
-  ipInt4_t       ind[_ipPicNDIM];      /* loop index vector                       */
+  ipInt4_t       ind[_mitkIpPicNDIM];      /* loop index vector                       */
   ipInt4_t       *off_vekt;            /* pointer to offset vector                */
   ipInt4_t       begin;                /* 0.5 * mask_size                         */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
-  ipInt4_t       n[_ipPicNDIM];        /* size of each dimension                  */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
+  ipInt4_t       n[_mitkIpPicNDIM];        /* size of each dimension                  */
   ipUInt4_t      no_elem;              /* number of elements in mask              */
   ipUInt4_t      len;                  /* length of offset vector                 */
 
@@ -235,27 +235,27 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( mask_dim < 1 || mask_dim > pic_old->dim )  
     { 
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( rank > no_elem ) 
     { 
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( mask_size % 2 != 1 ) 
     { 
-       _ipFuncSetErrno ( ipFuncSIZE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
 
   len = 0;
@@ -263,7 +263,7 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
 
   for ( i = 0; i < mask_dim; i++ )
     n[i] = begin + 1;
-  for ( i = mask_dim; i < _ipPicNDIM; i++ )
+  for ( i = mask_dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1 - begin;
   
   /* allocate image structure                                                     */
@@ -277,14 +277,14 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* allocate offset vector                                                       */
@@ -292,8 +292,8 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
   off_vekt = malloc ( no_elem * sizeof ( ipUInt4_t ) );
   if ( off_vekt == NULL )
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate offset vector                                                      */
@@ -314,7 +314,7 @@ ipPicDescriptor *ipFuncRank ( ipPicDescriptor *pic_old,
                      len++;
                   }
   if ( rank == 0 ) rank = no_elem / 2 + 1;
-  ipPicFORALL_4 ( RANK, pic_old, begin, no_elem, size, rank );
+  mitkIpPicFORALL_4 ( RANK, pic_old, begin, no_elem, size, rank );
       
   free ( off_vekt );
 

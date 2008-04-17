@@ -56,8 +56,8 @@
  *  @param gv_low    lower end of range
  *  @param gv_up     upper end of range
  *
- *  @return ipFuncOK   when greyvalues are in specified range
- *  @return ipFuncERROR  when greyvalues are not in specigfied range or an error 
+ *  @return mitkIpFuncOK   when greyvalues are in specified range
+ *  @return mitkIpFuncERROR  when greyvalues are not in specigfied range or an error 
  *              occured
  *
  * USES
@@ -94,19 +94,19 @@ ipUInt4_t  ipFuncRange ( ipPicDescriptor *pic_old,
 
   /* check image data                                                       */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( gv_low > gv_up )
     { 
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( ipFuncExtr ( pic_old, &min, &max) == ipFuncERROR ) return ( ipFuncERROR );
+  if ( ipFuncExtr ( pic_old, &min, &max) == mitkIpFuncERROR ) return ( mitkIpFuncERROR );
 
-  if ( min > gv_low || max < gv_up ) return ( ipFuncOK );
-  else return ( ipFuncERROR );
+  if ( min > gv_low || max < gv_up ) return ( mitkIpFuncOK );
+  else return ( mitkIpFuncERROR );
 
 }
 #endif

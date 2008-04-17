@@ -96,20 +96,20 @@ _ipPicTagsElement_t *
 _ipPicFindTag( _ipPicTagsElement_t *head, const char *tag )
 {
   int i;
-  char name[_ipPicTAGLEN+1];
+  char name[_mitkIpPicTAGLEN+1];
   _ipPicTagsElement_t *current;
 
   if( !tag )
     return( NULL );
 
-  sprintf( name, "%.*s", _ipPicTAGLEN, tag );
-  for( i=strlen(name); i<_ipPicTAGLEN; i++ )
+  sprintf( name, "%.*s", _mitkIpPicTAGLEN, tag );
+  for( i=strlen(name); i<_mitkIpPicTAGLEN; i++ )
     name[i] = ' ';
 
   current = head;
   while( current != NULL )
     {
-      if( strncmp( current->tsv->tag, name, _ipPicTAGLEN) == 0 )
+      if( strncmp( current->tsv->tag, name, _mitkIpPicTAGLEN) == 0 )
         return( current );
 
       current = current->next;

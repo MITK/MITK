@@ -194,23 +194,23 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   ipUInt4_t       *a_sort;       /* pointer to list of sorted anchest. */
   ipUInt4_t       no_label;      /* number of labels                   */
   ipUInt4_t       new_label;     /*                                    */
-  ipUInt4_t       size[_ipPicNDIM];
+  ipUInt4_t       size[_mitkIpPicNDIM];
   ipFloat8_t      min, max;      /* extreme greyvalues in image        */
   
   /* check image data                                                  */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate extreme greyvalues in image                             */
-  if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* check whether image is binary                                     */
   /*
   ipFuncHist ( pic_old, min, max, &hist, &size_hist );
   if ( hist == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   i     = 0;
@@ -224,8 +224,8 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   if ( no_gv != 2 ) 
     {
        free ( hist );
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
   */
 
@@ -237,13 +237,13 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
   if ( pic_new == NULL )
     {
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
     }
 
   /* preparation of image                                              */
 
-  ipPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipInt2_t );
+  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipInt2_t );
 
   if(no_label>SHRT_MAX)
   {
@@ -254,10 +254,10 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 	  pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
 	  if ( pic_new == NULL )
 		{
-			_ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-			return ( ipFuncERROR );
+			_ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+			return ( mitkIpFuncERROR );
 		}
-	  ipPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipUInt4_t );
+	  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipUInt4_t );
   }
 
   /* allocation and initialisation of vectors                          */
@@ -266,16 +266,16 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   if ( a == NULL ) 
     {
         ipPicFree ( pic_new );
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
     }
   a_new  = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a_new == NULL )
     {
         free ( a );
         ipPicFree ( pic_new );
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
     }
   a_sort = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a_sort == NULL )
@@ -283,8 +283,8 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
         free ( a );
         free ( a_new );
         ipPicFree ( pic_new );
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i <= no_label; i++ ) 
@@ -297,12 +297,12 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   size[0] = 1;
   for ( i = 1; i <= pic_old->dim; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
-  for ( i = pic_old->dim + 1; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim + 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[pic_old->dim];
 
   /* change anchestor list                                             */
 
-  ipPicFORALL_4 ( LABEL2, pic_new, a, a_new, a_sort, size );
+  mitkIpPicFORALL_4 ( LABEL2, pic_new, a, a_new, a_sort, size );
 
   /* replace anchestors with new anchestors                            */
 
@@ -336,7 +336,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
   /* renumber pixels with new labels                                  */
 
-  ipPicFORALL_2 ( LABEL3, pic_new, a, a_sort );
+  mitkIpPicFORALL_2 ( LABEL3, pic_new, a, a_sort );
 
   /**no_lab = no_label;*/
 

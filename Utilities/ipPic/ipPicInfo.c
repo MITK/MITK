@@ -81,7 +81,7 @@ void _ipPicInfo( FILE *stream, ipPicDescriptor *pic, ipUInt4_t flags )
 {
   ipUInt4_t i;
 
-  fprintf( stream, "%.*s\n", _ipPicTAGLEN, pic->info->version );
+  fprintf( stream, "%.*s\n", _mitkIpPicTAGLEN, pic->info->version );
   fprintf( stream, "--------------------\n" );
 
   fprintf( stream, "type: %s [%i]\n", ipPicTypeName(pic->type), pic->type );
@@ -121,8 +121,8 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
   current = head;
   while( current != NULL )
     {
-      fprintf( stream, "%s%.*s\n", indent, _ipPicTAGLEN, current->tsv->tag );
-      if( !(flags & _ipPicInfoSHORT) )
+      fprintf( stream, "%s%.*s\n", indent, _mitkIpPicTAGLEN, current->tsv->tag );
+      if( !(flags & _mitkIpPicInfoSHORT) )
         {
           fprintf( stream, "%s  type: %s [%i]\n", indent,
                            ipPicTypeName(current->tsv->type), current->tsv->type );

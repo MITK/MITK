@@ -169,7 +169,7 @@ int main( int argc, char *argv[] )
   scan_error = FALSE;
 
   show_extrema = FALSE;
-  flags = _ipPicInfoNORMAL;
+  flags = _mitkIpPicInfoNORMAL;
 
   n = 1;
   while( n < argc )
@@ -181,7 +181,7 @@ int main( int argc, char *argv[] )
               show_extrema = TRUE;
               break;
 	    case 's':
-              flags |= _ipPicInfoSHORT;
+              flags |= _mitkIpPicInfoSHORT;
               break;
 	    case 'h':
 	    case 'H':
@@ -241,7 +241,7 @@ int main( int argc, char *argv[] )
   printf( "\n" );
   printf( "%s\n",picfile_name );
 
-  printf(  "%.*s\n", _ipPicTAGLEN, pic->info->version );
+  printf(  "%.*s\n", _mitkIpPicTAGLEN, pic->info->version );
   printf(  "--------------------\n" );
 
   printf(  "type: %s [%i]\n", ipPicTypeName(pic->type), pic->type );
@@ -271,33 +271,33 @@ int main( int argc, char *argv[] )
       pic = ipPicGet( picfile_name,
                       pic );
 
-      switch( ipPicDR( pic->type, pic->bpe ) )
+      switch( mitkIpPicDR( pic->type, pic->bpe ) )
         {
-          case ipPicDR( ipPicUInt, 8 ):
+          case mitkIpPicDR( ipPicUInt, 8 ):
             {
               MIN_MAX( min_i, max_i, ipUInt1_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case ipPicDR( ipPicInt, 16 ):
+          case mitkIpPicDR( ipPicInt, 16 ):
             {
               MIN_MAX( min_i, max_i, ipInt2_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case ipPicDR( ipPicInt, 32 ):
+          case mitkIpPicDR( ipPicInt, 32 ):
             {
               MIN_MAX( min_i, max_i, ipInt4_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case ipPicDR( ipPicFloat, 32 ):
+          case mitkIpPicDR( ipPicFloat, 32 ):
             {
               MIN_MAX( min_f, max_f, ipFloat4_t );
               printf( "min: %f, max: %f\n", min_f, max_f );
             }
             break;
-          case ipPicDR( ipPicFloat, 64 ):
+          case mitkIpPicDR( ipPicFloat, 64 ):
             {
               MIN_MAX( min_f, max_f, ipFloat8_t );
               printf( "min: %f, max: %f\n", min_f, max_f );

@@ -82,10 +82,10 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
 #define GRAD( type, pic, pic_new, pic_mask, m, beg, end, dim_mask )        \
 {                                                                          \
   ipUInt4_t     i, j;                /* loop index                      */ \
-  ipUInt4_t     size[_ipPicNDIM];    /*                                 */ \
-  ipInt4_t      ind[_ipPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];     /* offset vector                   */ \
-  ipUInt4_t     begin[_ipPicNDIM];                                         \
+  ipUInt4_t     size[_mitkIpPicNDIM];    /*                                 */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
+  ipUInt4_t     begin[_mitkIpPicNDIM];                                         \
   ipFloat8_t    help, help2;                                               \
                                                                            \
   /* initialisation of vectors                                          */ \
@@ -93,7 +93,7 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
   size [0] = 1;                                                            \
   for ( i = 1; i < pic->dim; i++ )                                         \
     size[i] = size[i-1] * pic_old->n[i-1];                                 \
-  for ( i = pic->dim; i < _ipPicNDIM; i++ )                                \
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                                \
     size[i] = 0;                                                           \
                                                                            \
   begin[0] =  0;                                                           \
@@ -169,25 +169,25 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
   ipUInt4_t       off_mask;           /* loopindex                      */
   ipFuncMasc_t    *m;                 /* compressed mask                */
   ipInt4_t        offset;                 
-  ipInt4_t        beg[_ipPicNDIM];
-  ipInt4_t        end[_ipPicNDIM];
-  ipInt4_t        ind[_ipPicNDIM];
-  ipUInt4_t       size[_ipPicNDIM];
-  ipInt4_t        n[_ipPicNDIM];
+  ipInt4_t        beg[_mitkIpPicNDIM];
+  ipInt4_t        end[_mitkIpPicNDIM];
+  ipInt4_t        ind[_mitkIpPicNDIM];
+  ipUInt4_t       size[_mitkIpPicNDIM];
+  ipInt4_t        n[_mitkIpPicNDIM];
   ipFloat8_t      sum;
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( dim_mask > 4 ) || ( dim_mask < 1 ) )
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( pic_old->dim < dim_mask ) 
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* create a new picture, copy the header, allocate memory             */
@@ -201,20 +201,20 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new->data == NULL )
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of pic_mask                                         */
@@ -223,8 +223,8 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
   if ( pic_mask == NULL ) 
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicInt;
@@ -244,8 +244,8 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
     {
        pic_mask->data = NULL;
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of vectors                                          */
@@ -253,7 +253,7 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
 
   for ( i = 0; i < dim_mask; i++ )
     n[i] = pic_mask->n[i] / 2 + 1;
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 0;
 
   for ( i = 0; i < dim_mask; i++ )
@@ -262,12 +262,12 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
        beg[i] = ( ( pic_mask->n[i] % 2 ) == 1 ) ?
                 ( pic_mask->n[i] / 2 ) : ( pic_mask->n[i] / 2 - 1 );        
     }
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     beg[i] = 0;
 
   for ( i = dim_mask; i < pic_old->dim; i++ )        
     end[i] = pic_old->n[i];        
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )        
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )        
     end[i] = beg[i] + 1;
 
   size [0] = 1;                                                             
@@ -283,8 +283,8 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
        ipPicFree ( pic_new );
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   m->off_vekt  = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
   if ( m->off_vekt == NULL ) 
@@ -293,8 +293,8 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
        pic_mask->data = NULL;
        ipPicFree ( pic_mask );
        free ( m );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   m->mask_vekt = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
   if ( m->mask_vekt == NULL )
@@ -304,8 +304,8 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
        ipPicFree ( pic_mask );
        free ( m->off_vekt );
        free ( m );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate offset vector for the compressed mask                    */
@@ -344,7 +344,7 @@ ipPicDescriptor *ipFuncGrad ( ipPicDescriptor *pic_old,
   
   sum = sum /  ( 2 * dim_mask );
 
-  ipPicFORALL_6 ( GRAD, pic_old, pic_new, pic_mask, m, beg, end, dim_mask );
+  mitkIpPicFORALL_6 ( GRAD, pic_old, pic_new, pic_mask, m, beg, end, dim_mask );
 
   free ( m->off_vekt );
   free ( m->mask_vekt );

@@ -116,8 +116,8 @@ ipPicDescriptor *_ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    pic_help = ipPicCopyHeader ( pic_old, NULL );
    if ( pic_help == NULL )
      {
-        _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        return ( mitkIpFuncERROR );
      }
    pic_help->type = ipPicUInt;
    pic_help->bpe  = 8;
@@ -125,8 +125,8 @@ ipPicDescriptor *_ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    if ( pic_help->data == NULL )
      {
         ipPicFree ( pic_help );
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* draw polygon to pic_help                                          */

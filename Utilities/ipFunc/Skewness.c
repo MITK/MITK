@@ -103,7 +103,7 @@ ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
 
   if (  _ipPicElements ( pic ) == 1 ) var = 0;
   else
@@ -112,7 +112,7 @@ ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic )
        mean =  ipFuncMean ( pic );
 	   std = ipFuncSDev( pic );
 
-       ipPicFORALL_2( SKEWNESS, pic, mean,  skew );   
+       mitkIpPicFORALL_2( SKEWNESS, pic, mean,  skew );   
   
        var =   skew / (( ipFloat8_t ) (( _ipPicElements ( pic ) - 1 ) *std*std*std));
     }

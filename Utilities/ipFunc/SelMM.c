@@ -121,33 +121,33 @@ ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == ipFuncERROR )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR )
+    return ( mitkIpFuncERROR );
 
   /* check whether data are correct                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( gv_low >= gv_up )  
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
   if ( min_gv > gv_low || max_gv < gv_up ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* allocate memory for the transformed image                              */
 
-   pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );
-   if ( pic_new == NULL ) return ( ipFuncERROR );
+   pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
+   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to transform the image                                           */
 
-  ipPicFORALL_4 ( SELECT, pic_old, gv_low, gv_up, min_gv, max_gv );
+  mitkIpPicFORALL_4 ( SELECT, pic_old, gv_low, gv_up, min_gv, max_gv );
 
   ipFuncCopyTags(pic_new, pic_old);
   

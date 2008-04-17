@@ -92,13 +92,13 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
 
   /* check whether image data are ok                                    */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                        */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == ipFuncERROR ) 
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR ) 
     {
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate greylevel histogram                                      */
@@ -106,7 +106,7 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
   ipFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
   if ( hist == 0 ) 
     {
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* factor to calculate the greyvalue belonging to an histogram index  */
@@ -118,8 +118,8 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
   else 
     {
        free ( hist );
-       _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* find median                                                        */

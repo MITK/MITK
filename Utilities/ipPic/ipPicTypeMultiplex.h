@@ -11,10 +11,10 @@
  *					Die Anzahl der Parameter ist auf 16 beschränkt. 
  *					
  *					Aufruf einer Methode mit zwei Parametern ohne Rückgabewert:
- *					ipPicTypeMultiplex2( funktionsname, parameter1, Parameter2 );
+ *					mitkIpPicTypeMultiplex2( funktionsname, parameter1, Parameter2 );
  *
  *					Aufruf einer Methode mit einem Parameter und mit Rückgabewert:
- *					ipPicTypeMultiplexR1( funktionsname, rückgabewert, parameter );
+ *					mitkIpPicTypeMultiplexR1( funktionsname, rückgabewert, parameter );
  *
  *					R gibt an, dass die Methode einen Rückgabewert liefert.
  *					Die Zahl bestimmt die Anzahl der Parameter
@@ -42,7 +42,7 @@
 #include "ipPic.h"
 //#include <complex>
 
-#define ipPicTypeMultiplex0( function, pic )										\
+#define mitkIpPicTypeMultiplex0( function, pic )										\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {	\
 	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {							\
@@ -69,7 +69,7 @@
 }
 
 
-#define ipPicTypeMultiplex1( function, pic, param1 )										\
+#define mitkIpPicTypeMultiplex1( function, pic, param1 )										\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {	\
 	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {							\
@@ -102,7 +102,7 @@
 	}
 */
 
-#define ipPicTypeMultiplex2( function, pic, param1, param2 )								\
+#define mitkIpPicTypeMultiplex2( function, pic, param1, param2 )								\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
 		function<char>( pic, param1, param2 );											\
@@ -133,7 +133,7 @@
 		function<std::complex<double> >( pic, param1, param2 );							\
 	}																				
 */
-#define ipPicTypeMultiplex3( function, pic, param1, param2, param3 )						\
+#define mitkIpPicTypeMultiplex3( function, pic, param1, param2, param3 )						\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
 		function<char>( pic, param1, param2, param3 );									\
@@ -163,7 +163,7 @@
 		function<std::complex<double> >( pic, param1, param2, param3 );					\
 	}																				*/
 
-#define ipPicTypeMultiplex4( function, pic, param1, param2, param3, param4 )				\
+#define mitkIpPicTypeMultiplex4( function, pic, param1, param2, param3, param4 )				\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
 		function<char>( pic, param1, param2, param3, param4 );							\
@@ -194,7 +194,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4 );			\
 	}*/
 
-#define ipPicTypeMultiplex5( function, pic, param1, param2, param3, param4, param5 )		\
+#define mitkIpPicTypeMultiplex5( function, pic, param1, param2, param3, param4, param5 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
 		function<char>( pic, param1, param2, param3, param4, param5 );					\
@@ -224,7 +224,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5 );	\
 	}																				
 */																				
-#define ipPicTypeMultiplex6( function, pic, param1, param2, param3, param4, param5, param6 )		\
+#define mitkIpPicTypeMultiplex6( function, pic, param1, param2, param3, param4, param5, param6 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6 );					\
@@ -254,7 +254,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex7( function, pic, param1, param2, param3, param4, param5, param6, param7 )		\
+#define mitkIpPicTypeMultiplex7( function, pic, param1, param2, param3, param4, param5, param6, param7 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7 );					\
@@ -284,7 +284,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex7( function, pic, param1, param2, param3, param4, param5, param6, param7 )		\
+#define mitkIpPicTypeMultiplex7( function, pic, param1, param2, param3, param4, param5, param6, param7 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7 );					\
@@ -314,7 +314,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex8( function, pic, param1, param2, param3, param4, param5, param6, param7, param8)		\
+#define mitkIpPicTypeMultiplex8( function, pic, param1, param2, param3, param4, param5, param6, param7, param8)		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8);					\
@@ -344,7 +344,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex9( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9)		\
+#define mitkIpPicTypeMultiplex9( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9)		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8, param9);					\
@@ -374,7 +374,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex10( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10)		\
+#define mitkIpPicTypeMultiplex10( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10)		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10);					\
@@ -404,7 +404,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 		function<std::complex<double> >( pic, param1, param2, param3, param4, param5, param6 );	\
 	}				*/
 
-#define ipPicTypeMultiplex16( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, param16 )		\
+#define mitkIpPicTypeMultiplex16( function, pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, param16 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, param16 );					\
@@ -437,7 +437,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
  * mit Rückgabewert
  */
 
-#define ipPicTypeMultiplexR0( function, pic, returnValue )								\
+#define mitkIpPicTypeMultiplexR0( function, pic, returnValue )								\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {			\
 	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
@@ -463,7 +463,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR1( function, pic, returnValue, param1 )								\
+#define mitkIpPicTypeMultiplexR1( function, pic, returnValue, param1 )								\
 {																					\
   	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {			\
 	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {									\
@@ -489,7 +489,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR2( function, pic, returnValue, param1, param2 )						\
+#define mitkIpPicTypeMultiplexR2( function, pic, returnValue, param1, param2 )						\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		returnValue = function<char>( pic, param1, param2 );										\
@@ -514,7 +514,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR3( function, pic, returnValue, param1, param2, param3 )				\
+#define mitkIpPicTypeMultiplexR3( function, pic, returnValue, param1, param2, param3 )				\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		returnValue = function<char>( pic, param1, param2, param3 );								\
@@ -539,7 +539,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR4( function, pic, returnValue, param1, param2, param3, param4 )		\
+#define mitkIpPicTypeMultiplexR4( function, pic, returnValue, param1, param2, param3, param4 )		\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {											\
 		returnValue = function<char>( pic, param1, param2, param3, param4 );						\
@@ -564,7 +564,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR5( function, pic, returnValue, param1, param2, param3, param4, param5 )	\
+#define mitkIpPicTypeMultiplexR5( function, pic, returnValue, param1, param2, param3, param4, param5 )	\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {												\
 		returnValue = function<char>( pic, param1, param2, param3, param4, param5 );					\
@@ -589,7 +589,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	} 																				\
 }
 																				
-#define ipPicTypeMultiplexR6( function, pic, returnValue, param1, param2, param3, param4, param5, param6 )	\
+#define mitkIpPicTypeMultiplexR6( function, pic, returnValue, param1, param2, param3, param4, param5, param6 )	\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {														\
 		returnValue = function<char>( pic, param1, param2, param3, param4, param5, param6 );					\
@@ -614,7 +614,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	} 																				\
 }
 
-#define ipPicTypeMultiplexR7( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7 )	\
+#define mitkIpPicTypeMultiplexR7( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7 )	\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {														\
 		returnValue = function<char>( pic, param1, param2, param3, param4, param5, param6, param7 );					\
@@ -639,7 +639,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR8( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7, param8 )	\
+#define mitkIpPicTypeMultiplexR8( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7, param8 )	\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {														\
 		returnValue = function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8 );					\
@@ -664,7 +664,7 @@ else if ( pic->type == ipPicComplex && pic->bpe == 64 ) {						\
 	}																				\
 }
 
-#define ipPicTypeMultiplexR9( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7, param8, param9 )	\
+#define mitkIpPicTypeMultiplexR9( function, pic, returnValue, param1, param2, param3, param4, param5, param6, param7, param8, param9 )	\
 {																					\
 	if ( pic->type == ipPicInt && pic->bpe == 8 ) {														\
 		returnValue = function<char>( pic, param1, param2, param3, param4, param5, param6, param7, param8, param9 );					\

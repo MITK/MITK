@@ -308,7 +308,7 @@ public:
                 mitk::itk2vtk(p, pi);
                 if(pic->bpe!=24)
                 {
-                  ipPicTypeMultiplex2(__buildstring, pic, pi, s);
+                  mitkIpPicTypeMultiplex2(__buildstring, pic, pi, s);
                 }
                 else
                   __buildstring(pic, pi, s, (unsigned char) 1);

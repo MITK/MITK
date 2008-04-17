@@ -133,7 +133,7 @@ ipFWriteCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 }
 
 size_t
-_ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream)
+_ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream)
 {
   size_t bytes_return;
 
@@ -148,14 +148,14 @@ _ipPicFWrite( const void *ptr, size_t size, size_t nitems, ipPicFile_t stream)
 }
 
 size_t
-ipPicFWriteCvt( void *ptr, size_t size, size_t nitems, ipPicFile_t stream )
+ipPicFWriteCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
 {
   size_t bytes_return;
 
   void *buff;
   buff = malloc( size * nitems );
   _ipCpCvtEndian( ptr, buff, size*nitems, size );
-  bytes_return = ipPicFWrite( buff, size, nitems, stream);
+  bytes_return = mitkIpPicFWrite( buff, size, nitems, stream);
   free( buff );
 
   return( bytes_return );

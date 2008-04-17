@@ -54,8 +54,8 @@
  *
  *   @param pic   pointer to the image           
  *
- *   @return ipFuncOK     - if data are correct              
- *   @return ipFuncERROR  - if data aren't correct
+ *   @return mitkIpFuncOK     - if data are correct              
+ *   @return mitkIpFuncERROR  - if data aren't correct
  *
  * AUTHOR & DATE
  */
@@ -87,16 +87,16 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
 
   if ( !pic ) 
     {
-      _ipFuncSetErrno ( ipFuncNOPIC_ERROR );
-      return ( ipFuncERROR );
+      _ipFuncSetErrno ( mitkIpFuncNOPIC_ERROR );
+      return ( mitkIpFuncERROR );
     }
 
   /* is dimension correct ?                                          */
 
-  if ( pic->dim < 1 || pic->dim > _ipPicNDIM )
+  if ( pic->dim < 1 || pic->dim > _mitkIpPicNDIM )
     {
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* is size correct ?                                               */
@@ -104,10 +104,10 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
   for ( i = 0; i < pic->dim; i++ )
     if ( pic->n[i] < 1 )
       {
-         _ipFuncSetErrno ( ipFuncSIZE_ERROR );
-         return ( ipFuncERROR );
+         _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+         return ( mitkIpFuncERROR );
       }
-  for ( i = pic->dim; i < _ipPicNDIM; i++ ) 
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ ) 
     pic->n[i] = 0;
    
   /* is image data type correct ?                                     */
@@ -116,25 +116,25 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
     {
        if ( pic->bpe != 8 && pic->bpe != 16 && pic->bpe != 32 )
          {
-           _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+           return ( mitkIpFuncERROR );
          }
     }
   else if ( pic->type == ipPicFloat )
     {
        if ( pic->bpe != 32 && pic->bpe != 64 )
          {
-            _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+            return ( mitkIpFuncERROR );
          }
     }
   else 
     {
-      _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-      return ( ipFuncERROR );
+      _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+      return ( mitkIpFuncERROR );
     }
   
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 }
 #endif
 

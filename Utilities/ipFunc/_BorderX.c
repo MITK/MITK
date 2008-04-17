@@ -106,9 +106,9 @@
 #define BORDER( type, pic, size, value )                                           \
 {                                                                                  \
   ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      anf[_ipPicNDIM];  /*                                           */ \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      anf[_mitkIpPicNDIM];  /*                                           */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
                                                                                    \
   for ( i = 0; i < pic->dim; i++ )                                                 \
@@ -116,7 +116,7 @@
        anf[i] = 0;                                                                 \
        end[i] = pic->n[i];                                                         \
     }                                                                              \
-  for ( i = pic->dim; i < _ipPicNDIM; i++ )                                        \
+  for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                                        \
     {                                                                              \
        anf[i] = 0;                                                                 \
        end[i] = 1;                                                                 \
@@ -209,23 +209,23 @@ ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
 {
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipUInt4_t       i;                   /* loop index                              */
-  ipUInt4_t      end[_ipPicNDIM];      /* end of image                            */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
+  ipUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
   ipFloat8_t     max_gv, min_gv;
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   pic_new = ipPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   else 
     {
-       for ( i = pic_new->dim; i < _ipPicNDIM; i++ ) 
+       for ( i = pic_new->dim; i < _mitkIpPicNDIM; i++ ) 
          pic_new->n[i] = 0;
 
        for ( i = 0; i < pic_old->dim; i++ )
@@ -233,33 +233,33 @@ ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
        pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe/8 );
        if ( pic_new->data == NULL )
          {
-            _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
+            _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
             ipPicFree ( pic_new );
-            return  ( ipFuncERROR );
+            return  ( mitkIpFuncERROR );
          }
     }
 
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( ( value > max_gv ) ||  ( value < min_gv ) )
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
     
 
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_new->n[i-1];
   size[pic_new->dim] = 0;
 
-  ipPicFORALL_2 ( BORDER, pic_new, size, value )    
+  mitkIpPicFORALL_2 ( BORDER, pic_new, size, value )    
 
   return ( pic_new );
 }

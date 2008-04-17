@@ -109,14 +109,14 @@ ipPicDescriptor *ipFuncFrame ( ipPicDescriptor *pic_old,
   ipPicDescriptor *pic_new;            /* pointer to transformed image            */
 
   pic_new = _ipFuncBorderX ( pic_old, edge, value );
-  if ( ipFuncErrno > ipFuncOK )
-    return ( ipFuncERROR );
+  if ( ipFuncErrno > mitkIpFuncOK )
+    return ( mitkIpFuncERROR );
   else 
     pic_new = ipFuncWindowR ( pic_new, pic_old, edge, ipFuncNoKeep );
 
   /* Copy Tags */
 
-  strncpy( pic_new->info->version, pic_old->info->version, _ipPicTAGLEN );
+  strncpy( pic_new->info->version, pic_old->info->version, _mitkIpPicTAGLEN );
   pic_new->info->tags_head = _ipPicCloneTags( pic_old->info->tags_head );
   pic_new->info->write_protect = pic_old->info->write_protect;
 

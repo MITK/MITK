@@ -55,8 +55,8 @@
  *  @param  beg pointer to left upper corner
  *  @param  end pointer to right lower corner
  *
- *  @return @arg @c ipFuncOK no error occured
- *  @arg @c ipFuncERROR error occured (description of error in ipFuncErrno)
+ *  @return @arg @c mitkIpFuncOK no error occured
+ *  @arg @c mitkIpFuncERROR error occured (description of error in ipFuncErrno)
  *
  * @warning  this version could only be used for 2D and 3D images, in  
  *            later version it should be possible to use it for every dimension
@@ -82,22 +82,22 @@ ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
   if ( pic_old->dim == 2 )
     {
        _ipFuncBox2d ( pic_old, beg, end );
-       if ( ipFuncErrno > ipFuncOK )
-          return ( ipFuncERROR );
+       if ( ipFuncErrno > mitkIpFuncOK )
+          return ( mitkIpFuncERROR );
     }
   else if ( pic_old->dim == 3 )
     {
        _ipFuncBox3d ( pic_old, beg, end );
-       if ( ipFuncErrno > ipFuncOK )
-          return ( ipFuncERROR );
+       if ( ipFuncErrno > mitkIpFuncOK )
+          return ( mitkIpFuncERROR );
     }
   else 
     { 
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 }
 
 #endif

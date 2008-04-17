@@ -78,8 +78,8 @@ _ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv )
   _ipPicTagsElement_t *new;
   _ipPicTagsElement_t *current;
 
-  tsv->tag[_ipPicTAGLEN] = '\0';
-  for( i=strlen(tsv->tag); i<_ipPicTAGLEN; i++ )
+  tsv->tag[_mitkIpPicTAGLEN] = '\0';
+  for( i=strlen(tsv->tag); i<_mitkIpPicTAGLEN; i++ )
     tsv->tag[i] = ' ';
 
   new = malloc( sizeof(_ipPicTagsElement_t) );

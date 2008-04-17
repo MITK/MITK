@@ -120,34 +120,34 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. or min possible greyvalue for datatype              */
 
   if ( kind == ipFuncTotal )
     {
-       if ( _ipFuncExtT( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
-         return ( ipFuncERROR );
+       if ( _ipFuncExtT( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+         return ( mitkIpFuncERROR );
     }
   else if ( kind == ipFuncMinMax )
     {
-       if ( ipFuncExtr ( pic_old, &min_gv, &max_gv ) != ipFuncOK )
-         return ( ipFuncERROR );
+       if ( ipFuncExtr ( pic_old, &min_gv, &max_gv ) != mitkIpFuncOK )
+         return ( mitkIpFuncERROR );
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
        
   /* macro to invert the picture (for all data types)                   */
 
-  ipPicFORALL_2( EXP, pic_old, min_gv, max_gv );
+  mitkIpPicFORALL_2( EXP, pic_old, min_gv, max_gv );
 
   /* Copy Tags */
 

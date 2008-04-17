@@ -128,12 +128,12 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
   if ( pic_new != pic_old )
     {
        memcpy ( pic_new->data, pic_old->data, _ipPicElements ( pic_old ) * pic_old->bpe /8 );
@@ -153,45 +153,45 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
         beg[0] = 0; 	    end[0] = pic_old->n[0];
         beg[1] = 0; 	    end[1] = MIN ( box.y0, box.y1 );
      /* printf ( "1.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_3 ( RECT, pic_new, beg, end, value );
+        mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
         beg[0] = ( box.y0 < box.y1 ) ? box.x1 : 0;
         end[0] = ( box.y0 < box.y1 ) ? pic_old->n[0] : box.x0;
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "2.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_3 ( RECT, pic_new, beg, end, value );
+        mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
         beg[0] = box.x0;    end[0] = box.x1; 
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "1.Dreieck:  beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_6 ( TRI, pic_new, beg, end, value, a, b, KL );
+        mitkIpPicFORALL_6 ( TRI, pic_new, beg, end, value, a, b, KL );
     }
   else if ( over == ipFuncBeneath )
     {
         beg[0] = 0;                          end[0] = pic_old->n[0];
         beg[1] = MAX ( box.y0, box.y1 ); end[1] = pic_old->n[1];
 /*      printf ( "1.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_3 ( RECT, pic_new, beg, end, value );
+        mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
         beg[0] = ( box.y0 < box.y1 ) ? 0 : box.x1;
         end[0] = ( box.y0 < box.y1 ) ? box.x0 : pic_old->n[0]; 
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "2.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_3 ( RECT, pic_new, beg, end, value );
+        mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
         beg[0] = box.x0;    end[0] = box.x1; 
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "1.Dreieck:  beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
-        ipPicFORALL_6 ( TRI, pic_new, beg, end, value, a, b, GR );
+        mitkIpPicFORALL_6 ( TRI, pic_new, beg, end, value, a, b, GR );
     }
   else
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );   
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );   
     }
 
   /* Copy Tags */

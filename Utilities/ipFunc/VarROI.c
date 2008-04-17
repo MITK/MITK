@@ -142,11 +142,11 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
 
    /* check image data                                                  */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    if ( pic_old->dim > 2 )
      {
-        _ipFuncSetErrno ( ipFuncDIM_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* calculate min. and max. coordiantes of ROI                        */
@@ -168,29 +168,29 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
    /* Expression is always false. 
    if ( min_x < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_x > pic_old->n[0] ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* Expression is always false.
    if ( min_y < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_y > pic_old->n[1] ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* allocate memory for a and b                                       */
@@ -198,14 +198,14 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
    a = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !a )
      { 
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
    b = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !b )
      { 
-        _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        return ( mitkIpFuncERROR );
      }
   
    /* Geraden zwischen zwei benachbarten Punkten berechnen              */
@@ -247,10 +247,10 @@ ipFloat8_t ipFuncVarROI  ( ipPicDescriptor *pic_old,
     { 
        free ( a );
        free ( b );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
-  ipPicFORALL_4 ( ROI, pic_old, pic_help, sum, sum2, count );
+  mitkIpPicFORALL_4 ( ROI, pic_old, pic_help, sum, sum2, count );
 
   if ( count == 1 )
     var = 0;

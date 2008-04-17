@@ -62,8 +62,8 @@
  *               of the circle
  *  @param radius  radius of the circle                   
  *
- *  @return ipFuncOK       - if no error occured
- *  @return ipFuncERROR    - if an error occured
+ *  @return mitkIpFuncOK       - if no error occured
+ *  @return mitkIpFuncERROR    - if an error occured
  *
  * AUTHOR & DATE
  */
@@ -93,9 +93,9 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 {                                                                                  \
   ipUInt4_t      i;                /* loop index                                */ \
   ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
-  ipUInt4_t      dist[_ipPicNDIM]; /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      dist[_mitkIpPicNDIM]; /* used to calculate offset of image pixels  */ \
   ipFloat8_t     help;                                                             \
                                                                                    \
   offset = 0;                                                                      \
@@ -167,18 +167,18 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 {
   ipInt4_t       help;
   ipUInt4_t       i;                   /* loop index                              */
-  ipUInt4_t      end[_ipPicNDIM];      /* end of window                           */
-  ipUInt4_t      begin[_ipPicNDIM];    /* beginning of window                     */
-  ipUInt4_t      centr[_ipPicNDIM];    /* beginning of window                     */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
+  ipUInt4_t      end[_mitkIpPicNDIM];      /* end of window                           */
+  ipUInt4_t      begin[_mitkIpPicNDIM];    /* beginning of window                     */
+  ipUInt4_t      centr[_mitkIpPicNDIM];    /* beginning of window                     */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( radius <= 0 ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i < pic_old->dim; i++ )
@@ -186,16 +186,16 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
       help = center[i] - radius;
       if ( help < 0 )
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
       else begin[i] = ( ipUInt4_t )help;
 
       help = center[i] + radius;
       if ( (ipUInt4_t) help > pic_old->n[i] )
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
       else end[i] = ( ipUInt4_t )help + 1;
       centr[i] = center[i];
@@ -204,11 +204,11 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
   size[pic_old->dim] = 0;
 
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     {
        centr[i]  = 0;
        begin[i]  = 0;
@@ -217,9 +217,9 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 
   /* allocate image structure                                                     */
 
-  ipPicFORALL_5  ( EXTR, pic_old, begin, end, size, centr, radius );
+  mitkIpPicFORALL_5  ( EXTR, pic_old, begin, end, size, centr, radius );
   
-  return ( ipFuncOK );    
+  return ( mitkIpFuncOK );    
 }
 
 #endif

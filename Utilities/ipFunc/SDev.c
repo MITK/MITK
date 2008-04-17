@@ -77,7 +77,7 @@ ipFloat8_t ipFuncSDev ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   s_der = sqrt ( ipFuncVar ( pic ) );
   

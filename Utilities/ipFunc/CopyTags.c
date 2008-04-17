@@ -65,7 +65,7 @@ void ipFuncCopyTags(ipPicDescriptor *pic_new, ipPicDescriptor *pic_old)
  
    if(pic_new!=NULL)
    {
-		strncpy( pic_new->info->version, pic_old->info->version, _ipPicTAGLEN );
+		strncpy( pic_new->info->version, pic_old->info->version, _mitkIpPicTAGLEN );
 		pic_new->info->tags_head = _ipPicCloneTags( pic_old->info->tags_head );
 		pic_new->info->write_protect = pic_old->info->write_protect;     
    }

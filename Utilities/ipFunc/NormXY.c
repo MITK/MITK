@@ -113,35 +113,35 @@ ipPicDescriptor *ipFuncNormXY ( ipPicDescriptor *pic_old,
 
   /* check whether data are ok                                          */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate extreme grevalues of the image                           */
 
-  if ( ipFuncExtr ( pic_old, &min, &max ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max and min. possible greyvalues                         */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK ) 
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
+    return ( mitkIpFuncERROR );
 
   /* check data                                                         */
 
   if ( max == min )
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( low >= up ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( low < min_gv || up > max_gv ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* test whether normalisation is necessary                            */
@@ -151,12 +151,12 @@ ipPicDescriptor *ipFuncNormXY ( ipPicDescriptor *pic_old,
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );     
-  if ( pic_new == NULL ) return ( ipFuncERROR );
+  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to invert the picture (for all data types)                   */
 
-  ipPicFORALL_4( NORM, pic_old, min, max, low, up );
+  mitkIpPicFORALL_4( NORM, pic_old, min, max, low, up );
 
   /* Copy Tags */
 

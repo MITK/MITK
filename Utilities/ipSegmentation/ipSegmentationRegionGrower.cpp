@@ -204,7 +204,7 @@ ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativ
     ipMITKSegmentationUndoSave (segBuffer);
   }
 
-  ipPicTypeMultiplexR9( tmGrowRegion4N, src, result, startOfs, relativeBounds, lowerBound, upperBound, maxIterations, segBuffer, contourOfs, startCol, histBuffer );
+  mitkIpPicTypeMultiplexR9( tmGrowRegion4N, src, result, startOfs, relativeBounds, lowerBound, upperBound, maxIterations, segBuffer, contourOfs, startCol, histBuffer );
   return result;
 }
 
@@ -219,6 +219,6 @@ ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativ
     ipMITKSegmentationUndoSave (segBuffer);
   }
 
-  ipPicTypeMultiplexR9( tmGrowRegion4N, src, result, startOfs, relativeBounds, lowerBound, upperBound, maxIterations, segBuffer, contourOfs, startCol, histBuffer );
+  mitkIpPicTypeMultiplexR9( tmGrowRegion4N, src, result, startOfs, relativeBounds, lowerBound, upperBound, maxIterations, segBuffer, contourOfs, startCol, histBuffer );
   return result;
 }

@@ -79,15 +79,15 @@ ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
   ipUInt4_t        i;             /* loop index               */
   ipPicDescriptor  *pic_new;      /* pointer to scaled image  */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
                                         
   /* allocate pic_new                                         */
 
   pic_new = ipPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* copy scaling information to header of pic_new            */
@@ -105,8 +105,8 @@ ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
   else
     {
       ipPicFree ( pic_new );
-      _ipFuncSetErrno ( ipFuncFLAG_ERROR );  
-      return ( ipFuncERROR );
+      _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );  
+      return ( mitkIpFuncERROR );
     }
 
   /* Copy Tags */

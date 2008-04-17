@@ -54,8 +54,8 @@
 #include <ipFunc.h>
 #endif
 
-#ifndef _ipFunc_h
-#define _ipFunc_h
+#ifndef _mitkIpFunc_h
+#define _mitkIpFunc_h
 
 /* function prototypes */
 
@@ -81,6 +81,6 @@ void            ipFuncPError   ( char            *string );
 #endif
 
 
-#endif /* _ipFunc_h */ 
+#endif /* _mitkIpFunc_h */ 
 /* DON'T ADD ANYTHING AFTER THIS #endif */
 

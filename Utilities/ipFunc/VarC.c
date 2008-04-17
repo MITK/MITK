@@ -82,9 +82,9 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
 
 #define VAR( type, pic, beg, end, size, center, radius )                           \
 {                                                                                  \
-  ipUInt4_t      ind[_ipPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_ipPicNDIM];  /* used to calculate offset of image pixels  */ \
-  ipUInt4_t      dist[_ipPicNDIM]; /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
+  ipUInt4_t      dist[_mitkIpPicNDIM]; /* used to calculate offset of image pixels  */ \
                                                                                    \
   for ( ind[7] = beg[7] ; ind[7] < end[7]; ind[7]++ )                              \
   {                                                                                \
@@ -152,19 +152,19 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
   ipFloat8_t     mean2;
   ipFloat8_t     var;   
   ipUInt4_t      count;
-  ipUInt4_t      end[_ipPicNDIM];      /* end of window                           */
-  ipUInt4_t      begin[_ipPicNDIM];    /* beginning of window                     */
-  ipUInt4_t      centr[_ipPicNDIM];    /* beginning of window                     */
-  ipUInt4_t      size[_ipPicNDIM];     /*                                         */
+  ipUInt4_t      end[_mitkIpPicNDIM];      /* end of window                           */
+  ipUInt4_t      begin[_mitkIpPicNDIM];    /* beginning of window                     */
+  ipUInt4_t      centr[_mitkIpPicNDIM];    /* beginning of window                     */
+  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( radius <= 0 ) 
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   for ( i = 0; i < pic_old->dim; i++ )
@@ -172,8 +172,8 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
       help = center[i] - radius;
       if ( help < 0 )
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
         
       else begin[i] = help;
@@ -181,8 +181,8 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
       help = center[i] + radius;
       if ( (ipUInt4_t) help > pic_old->n[i] )
         {
-           _ipFuncSetErrno ( ipFuncDATA_ERROR );
-           return ( ipFuncERROR );
+           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           return ( mitkIpFuncERROR );
         }
        
       else end[i] = help + 1;
@@ -193,11 +193,11 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
   /* initialize vectors and variables                                             */
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
   size[pic_old->dim] = 0;
 
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     {
        centr[i]  = 0;
        begin[i]  = 0;
@@ -210,7 +210,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
   mean2 = 0;
   count = 0;
 
-  ipPicFORALL_5  ( VAR, pic_old, begin, end, size, centr, radius );
+  mitkIpPicFORALL_5  ( VAR, pic_old, begin, end, size, centr, radius );
 
   if ( count == 1 )
     var = 0;

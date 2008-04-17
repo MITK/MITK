@@ -104,12 +104,12 @@ ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,
 
    /* check image data                                                        */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
    /* calculate max and min possible greyvalues                               */
 
-   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
-     return ( ipFuncERROR );
+   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+     return ( mitkIpFuncERROR );
    /* calculate lower and upper greyvalue of range with level and window      */
 
    gv_low = level - 0.5 * window;

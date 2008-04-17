@@ -56,8 +56,8 @@
  *  @param max_gv  max. possible greyvalue
  *  @param min_gv   min. possible greyvalue
  *
- *  @return ipFuncERROR  if an error occured
- *  @return ipFuncOK   when no error occured 
+ *  @return mitkIpFuncERROR  if an error occured
+ *  @return mitkIpFuncOK   when no error occured 
  *
  * AUTHOR & DATE
  */
@@ -137,10 +137,10 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
-  return ( ipFuncOK );
+  return ( mitkIpFuncOK );
 }
 #endif

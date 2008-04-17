@@ -79,22 +79,22 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 
 #define SCBL4ALL( type, pic_old, pic_new, size, scale, n, shift, step, RND )  \
 {                                                                        \
-   ipFloat8_t       factor[_ipPicNDIM];   /*                           */\
-   ipFloat8_t       help1[_ipPicNDIM];    /*                           */\
-   size_t           help2[_ipPicNDIM];    /*                           */\
-   size_t           offset[_ipPicNDIM];   /* offset vector             */\
-   ipFloat8_t       weights[_ipPicNDIM*2];/*                           */\
+   ipFloat8_t       factor[_mitkIpPicNDIM];   /*                           */\
+   ipFloat8_t       help1[_mitkIpPicNDIM];    /*                           */\
+   size_t           help2[_mitkIpPicNDIM];    /*                           */\
+   size_t           offset[_mitkIpPicNDIM];   /* offset vector             */\
+   ipFloat8_t       weights[_mitkIpPicNDIM*2];/*                           */\
    size_t           i;                    /* loop index                */\
    size_t           off_new;              /* offset of scaled image    */\
    size_t           off_weights;          /* offset of orig. image     */\
-   size_t           ind_o[_ipPicNDIM];    /* loop index (outer loops)  */\
-   size_t           ind_i[_ipPicNDIM];    /* loop index (inner loops)  */\
-   size_t           n_i[_ipPicNDIM];      /* loop index (inner loops)  */\
+   size_t           ind_o[_mitkIpPicNDIM];    /* loop index (outer loops)  */\
+   size_t           ind_i[_mitkIpPicNDIM];    /* loop index (inner loops)  */\
+   size_t           n_i[_mitkIpPicNDIM];      /* loop index (inner loops)  */\
    size_t           pic_elements;         /* number of elements of pic_old */ \
    type             help;                                                \
    /* initialize vectors                                               */\
                                                                          \
-   for ( i = 0; i < _ipPicNDIM; i++ )                                    \
+   for ( i = 0; i < _mitkIpPicNDIM; i++ )                                    \
      {                                                                   \
         ind_o[i] = 0;                                                    \
         ind_i[i] = 0;                                                    \
@@ -107,7 +107,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
    for ( i = 0; i < pic_new->dim; i++ )                                  \
      n_i[i] = 2;                                                         \
                                                                          \
-   for ( i = pic_new->dim; i < _ipPicNDIM; i++ )                         \
+   for ( i = pic_new->dim; i < _mitkIpPicNDIM; i++ )                         \
      n_i[i] = 1;                                                         \
                                                                          \
    pic_elements = _ipPicElements(pic_old)*step;                          \
@@ -184,14 +184,14 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                                                          \
                        for ( ind_i[7] = 0; ind_i[7] < n_i[7]; ind_i[7]++)\
                        {                                                 \
-                         factor[7] = weights[ind_i[7]*_ipPicNDIM+7];     \
+                         factor[7] = weights[ind_i[7]*_mitkIpPicNDIM+7];     \
                          offset[7] = ( size_t )help2[7] +             \
                                      ind_i[7] * size[7];                 \
                                                                          \
                          for ( ind_i[6] = 0; ind_i[6] < n_i[6];          \
                                              ind_i[6]++ )                \
                          {                                               \
-                           factor[6] = weights[ind_i[6]*_ipPicNDIM+6] *  \
+                           factor[6] = weights[ind_i[6]*_mitkIpPicNDIM+6] *  \
                                        factor[7];                        \
                            offset[6] = ( size_t )help2[6] +           \
                                        ind_i[6] * size[6] + offset[7];   \
@@ -199,7 +199,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                            for ( ind_i[5] = 0; ind_i[5] < n_i[5];        \
                                                ind_i[5]++ )              \
                            {                                             \
-                             factor[5] = weights[ind_i[5]*_ipPicNDIM+5] *\
+                             factor[5] = weights[ind_i[5]*_mitkIpPicNDIM+5] *\
                                          factor[6];                      \
                              offset[5] = ( size_t )help2[5] +         \
                                          ind_i[5] * size[5] + offset[6]; \
@@ -207,7 +207,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                              for ( ind_i[4] = 0; ind_i[4] < n_i[4];      \
                                                  ind_i[4]++ )            \
                              {                                           \
-                               factor[4] = weights[ind_i[4]*_ipPicNDIM+4]*\
+                               factor[4] = weights[ind_i[4]*_mitkIpPicNDIM+4]*\
                                            factor[5];                    \
                                offset[4] = ( size_t )help2[4] +       \
                                            ind_i[4] * size[4] + offset[5];\
@@ -215,7 +215,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                for ( ind_i[3] = 0; ind_i[3] < n_i[3];    \
                                                    ind_i[3]++ )          \
                                {                                         \
-                                 factor[3] = weights[ind_i[3]*_ipPicNDIM+3]*\
+                                 factor[3] = weights[ind_i[3]*_mitkIpPicNDIM+3]*\
                                              factor[4];                  \
                                  offset[3] = ( size_t )help2[3] +     \
                                              ind_i[3] * size[3] + offset[4];\
@@ -223,7 +223,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                  for ( ind_i[2] = 0; ind_i[2] < n_i[2];  \
                                        ind_i[2]++ )                      \
                                  {                                       \
-                                   factor[2] = weights[ind_i[2]*_ipPicNDIM + 2]*\
+                                   factor[2] = weights[ind_i[2]*_mitkIpPicNDIM + 2]*\
                                                factor[3];                \
                                    offset[2] = ( size_t )help2[2] +   \
                                                ind_i[2] * size[2] +      \
@@ -232,7 +232,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                    for ( ind_i[1] = 0; ind_i[1] < n_i[1];\
                                          ind_i[1]++ )                    \
                                    {                                     \
-                                     factor[1] = weights[ind_i[1]*_ipPicNDIM+1] *\
+                                     factor[1] = weights[ind_i[1]*_mitkIpPicNDIM+1] *\
                                                  factor[2];              \
                                      offset[1] = ( size_t )help2[1] + \
                                                  ind_i[1] * size[1] +    \
@@ -245,7 +245,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
                                                    ind_i[0] * size[0] +  \
                                                    offset[1])*(( size_t )step)+shift;\
                                        if(pic_elements<=offset[0]) continue; \
-                                       factor[0] = weights[ind_i[0]*_ipPicNDIM] * \
+                                       factor[0] = weights[ind_i[0]*_mitkIpPicNDIM] * \
                                                    factor[1];            \
                                        help = help + factor[0] *         \
                                               ((( type * ) pic_old->data )\
@@ -299,10 +299,10 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 {
 
   ipUInt4_t       i;                  /* loopindex                      */
-  ipUInt4_t        n[_ipPicNDIM];     /* no. of pixels in each dimension*/
-  ipFloat8_t      scale[_ipPicNDIM];  /* scaling factors                */
-  ipUInt4_t       size[_ipPicNDIM];                                    
-  ipUInt4_t       sizeo[_ipPicNDIM];                                    
+  ipUInt4_t        n[_mitkIpPicNDIM];     /* no. of pixels in each dimension*/
+  ipFloat8_t      scale[_mitkIpPicNDIM];  /* scaling factors                */
+  ipUInt4_t       size[_mitkIpPicNDIM];                                    
+  ipUInt4_t       sizeo[_mitkIpPicNDIM];                                    
   char            is_color=0;
 
 
@@ -314,12 +314,12 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 	  pic_old->bpe=pic_new->bpe=8;
   }
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
-  if ( _ipFuncError ( pic_new ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _ipFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim != pic_new->dim )
     {  
-       _ipFuncSetErrno ( ipFuncDIM_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of vectors                                          */
@@ -330,15 +330,15 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 //	  else
 //		  n[i] = pic_new->n[i]-1;
                                                                           
-  for ( i = pic_new->dim; i < _ipPicNDIM; i++ )                           
+  for ( i = pic_new->dim; i < _mitkIpPicNDIM; i++ )                           
     n[i] = 0;                                                            
 
   sizeo[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     sizeo[i] = sizeo[i-1] * pic_new->n[i-1];
 
   size[0] = 1;
-  for ( i = 1; i < _ipPicNDIM; i++ )
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
 
   /* calculate scaling factors                                          */
@@ -347,7 +347,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
     scale[i] = ( ipFloat8_t ) ( pic_old->n[i] - 1 ) / 
                ( ipFloat8_t ) ( pic_new->n[i] - 1 );
  
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     scale[i] = 1.;
   
   /* add header information for pic_new and allocate memory             */
@@ -357,15 +357,15 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
   pic_new->data = malloc ( _ipPicSize ( pic_new ) );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
  
   /* macro to scale an image ( for all data types )s)                   */
@@ -374,22 +374,22 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
   {
 	if(is_color==0)
 	{
-		ipPicFORALL_4 ( SCBL, pic_old, pic_new, size, scale, n ); 
+		mitkIpPicFORALL_4 ( SCBL, pic_old, pic_new, size, scale, n ); 
 	}
 	else
 	{
- 		ipPicFORALL_4 ( SCBLCOLOR, pic_old, pic_new, size, scale, n ); 
+ 		mitkIpPicFORALL_4 ( SCBLCOLOR, pic_old, pic_new, size, scale, n ); 
 	}
   }
   else
   {
 	if(is_color==0)
 	{
-		ipPicFORALL_4 ( SCBL_INT, pic_old, pic_new, size, scale, n ); 
+		mitkIpPicFORALL_4 ( SCBL_INT, pic_old, pic_new, size, scale, n ); 
 	}
 	else
 	{
- 		ipPicFORALL_4 ( SCBLCOLOR_INT, pic_old, pic_new, size, scale, n ); 
+ 		mitkIpPicFORALL_4 ( SCBLCOLOR_INT, pic_old, pic_new, size, scale, n ); 
 	}
   }
 

@@ -78,15 +78,15 @@ void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
         + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
-  fwrite( ipPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  fwrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
 
-  ipFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
-  ipFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  ipFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  ipFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
 
-  ipFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  mitkIpFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
   if( outfile != stdout )
     fclose( outfile );

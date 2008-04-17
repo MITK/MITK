@@ -80,7 +80,7 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
 
 #define SUBC( type_1, pic_1, pic_new, value )                            \
 {                                                                        \
-  ipPicFORALL_3 ( SUBC2, pic_new, pic_1, type_1, value );                \
+  mitkIpPicFORALL_3 ( SUBC2, pic_new, pic_1, type_1, value );                \
 }                                                                        \
  
 #define SUBC2( type_n, pic_new, pic_1, type_1, value )                   \
@@ -135,7 +135,7 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* check value                                                        */
 
@@ -143,27 +143,27 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
   /*
   else if ( value == 0. )
     {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
     }
   */
   /* calculate max. and min. possible greyvalues for data type of images*/
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != ipFuncOK )
-    return ( ipFuncERROR );
+  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+    return ( mitkIpFuncERROR );
 
   /* find out data type of new iamge                                    */
 
   if ( keep == ipFuncKeep )
     {
-       pic_new = _ipFuncMalloc ( pic_old, pic_return, ipOVERWRITE );
-       if ( pic_new == NULL ) return ( ipFuncERROR );
+       pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
+       if ( pic_new == NULL ) return ( mitkIpFuncERROR );
     }
   else if ( keep == ipFuncNoKeep )
     {
        /* calculate max. and min. greyvalues of both images             */
 
-       if ( ipFuncExtr ( pic_old, &min1, &max1 ) != ipFuncOK ) return ( ipFuncERROR );
+       if ( ipFuncExtr ( pic_old, &min1, &max1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
        smax      = max1 - value;
        smin      = min1 - value;
@@ -216,21 +216,21 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
          }
        else 
          {     
-            _ipFuncSetErrno ( ipFuncTYPE_ERROR );
-            return ( ipFuncERROR );
+            _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+            return ( mitkIpFuncERROR );
          }
        
     }
   else 
     {
-       _ipFuncSetErrno ( ipFuncFLAG_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
     
   if ( keep == ipFuncNoKeep )
@@ -238,16 +238,16 @@ ipPicDescriptor *ipFuncSubC ( ipPicDescriptor *pic_old,
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to invert the picture (for all data types)                   */
 
   if ( keep == ipFuncNoKeep )
-    ipPicFORALL_2 ( SUBC, pic_old, pic_new, value )
+    mitkIpPicFORALL_2 ( SUBC, pic_old, pic_new, value )
   if ( keep == ipFuncKeep )
-    ipPicFORALL_2 ( SUBC3, pic_old, pic_new, value )
+    mitkIpPicFORALL_2 ( SUBC3, pic_old, pic_new, value )
 
   /* Copy Tags */
 

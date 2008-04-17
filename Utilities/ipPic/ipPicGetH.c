@@ -98,7 +98,7 @@
 ipPicDescriptor *
 ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
 {
-  ipPicFile_t  infile;
+  mitkIpPicFile_t  infile;
 
   ipPicTag_t tag_name;
   ipUInt4_t len;
@@ -112,14 +112,14 @@ ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
     }
 
   /* read infile */
-  ipPicFRead( &(tag_name[0]), 1, 4, infile );
+  mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
       fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
       return( NULL );
     }
-  else if( strncmp( ipPicVERSION, tag_name, 4 ) != 0 )
+  else if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( pic == NULL )
         pic = _ipPicOldGetHeader( infile,
@@ -128,7 +128,7 @@ ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
         _ipPicOldGetHeader( infile,
                             pic );
       if( infile != stdin )
-        ipPicFClose( infile );
+        mitkIpPicFClose( infile );
       return( pic );
     }
 
@@ -139,20 +139,20 @@ ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
 
   pic->info->write_protect = ipTrue;
 
-  ipPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
-  strncpy( pic->info->version, tag_name, _ipPicTAGLEN );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  ipPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ipPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
 
-  ipPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
 
 
   if( infile != stdin )
-    ipPicFClose( infile );
+    mitkIpPicFClose( infile );
 
   return( pic );
 }

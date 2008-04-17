@@ -74,12 +74,12 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis );
 {                                                                         \
   ipUInt4_t   i;                                                          \
   ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_ipPicNDIM];                                              \
+  ipInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
                                                                           \
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )                           \
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                           \
     n[i] = 1;                                                             \
                                                                           \
   offset_refl = 0;                                                        \
@@ -123,21 +123,21 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
 {
 
   ipPicDescriptor *pic_new;               /* inverted picture           */
-  ipUInt4_t       index_vect[_ipPicNDIM]; /* loopindex-vector           */
-  ipUInt4_t       length_vect[_ipPicNDIM];
-  ipUInt4_t       axis_vect[_ipPicNDIM];               
-  ipInt4_t        n[_ipPicNDIM];          /* number of pixels in each   */
+  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  ipUInt4_t       length_vect[_mitkIpPicNDIM];
+  ipUInt4_t       axis_vect[_mitkIpPicNDIM];               
+  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
   ipUInt4_t       i, j;                   /* loop index                 */
   ipUInt4_t       offset_orig;
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( axis < 1 || axis > pic_old->dim ) 
      {
-       _ipFuncSetErrno ( ipFuncDATA_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       return ( mitkIpFuncERROR );
      }
  
   /* initialisation of vectors                                          */
@@ -145,11 +145,11 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i];
   
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
  
-  for ( i = 0; i < _ipPicNDIM; i++ )
+  for ( i = 0; i < _mitkIpPicNDIM; i++ )
   {
     index_vect[i] = 0;
     axis_vect[i] = 0;
@@ -174,19 +174,19 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
   pic_new = ipPicCopyHeader ( pic_old, 0 );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
   pic_new->data = malloc ( _ipPicSize ( pic_new ) );
   if ( pic_new->data == NULL )
     {
        ipPicFree ( pic_new );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to reflect image (for all image data types)                  */
-  ipPicFORALL_4 ( ForLoop, pic_old, pic_new, index_vect, offset_orig, 
+  mitkIpPicFORALL_4 ( ForLoop, pic_old, pic_new, index_vect, offset_orig, 
                   offset_orig = 0;
                   for ( i = 0; i < pic_old->dim; i++ )
                   {

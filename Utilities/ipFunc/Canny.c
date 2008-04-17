@@ -90,17 +90,17 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
 #define CANNY0( type_o, pic_old, pic_help1, pic_help2, pic_help3, m )     \
 {                                                                         \
-  ipPicFORALL_5( CANNY1, pic_help1, pic_old, pic_help2, pic_help3, m, type_o );\
+  mitkIpPicFORALL_5( CANNY1, pic_help1, pic_old, pic_help2, pic_help3, m, type_o );\
 }
 
 #define CANNY1( type_h, pic_help1, pic_old, pic_help2, pic_help3, m, type_o )\
 {                                                                          \
   ipUInt4_t     i, j;                /* loop index                      */ \
   ipUInt4_t     len_m;                                                     \
-  ipInt4_t      ind[_ipPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];     /* offset vector                   */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
   ipUInt4_t     off_m;               /* offset in mask                  */ \
-  ipFloat8_t    help[_ipPicNDIM];                                          \
+  ipFloat8_t    help[_mitkIpPicNDIM];                                          \
   ipFloat8_t    help2;                                                     \
                                                                            \
                                                                            \
@@ -165,10 +165,10 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 {                                                                          \
   ipUInt4_t     i, j;                /* loop index                      */ \
   ipUInt4_t     len_m;                                                     \
-  ipInt4_t      ind[_ipPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_ipPicNDIM];     /* offset vector                   */ \
+  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
   ipUInt4_t     off_m;               /* offset in mask                  */ \
-  ipFloat8_t    help[_ipPicNDIM];                                          \
+  ipFloat8_t    help[_mitkIpPicNDIM];                                          \
   ipFloat8_t    help2;                                                     \
                                                                            \
                                                                            \
@@ -265,28 +265,28 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
   ipUInt4_t       off_mask;           /* loopindex                      */
   ipFuncMasc_t    *m;                 /* compressed mask                */
   ipInt4_t        offset;                 
-  ipInt4_t        beg[_ipPicNDIM];
-  ipInt4_t        end[_ipPicNDIM];
-  ipInt4_t        ind[_ipPicNDIM];
-  ipUInt4_t       size[_ipPicNDIM];
-  ipInt4_t        n[_ipPicNDIM];
-  ipUInt4_t       off_p[_ipPicNDIM];  /* offsets to calculate help1     */
+  ipInt4_t        beg[_mitkIpPicNDIM];
+  ipInt4_t        end[_mitkIpPicNDIM];
+  ipInt4_t        ind[_mitkIpPicNDIM];
+  ipUInt4_t       size[_mitkIpPicNDIM];
+  ipInt4_t        n[_mitkIpPicNDIM];
+  ipUInt4_t       off_p[_mitkIpPicNDIM];  /* offsets to calculate help1     */
   ipUInt4_t       offset_h;           /* offset in pic_help1            */
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( ( dim_mask < 1 ) || ( dim_mask > 4 ) )
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   if ( pic_old->dim < dim_mask ) 
     {
-       _ipFuncSetErrno ( ipFuncDIMMASC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* initialisation of pic_mask                                         */
@@ -294,8 +294,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
   pic_mask = ipPicNew ();
   if ( pic_mask == NULL ) 
     {
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_mask->type = ipPicInt;
@@ -317,14 +317,14 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
   size [0] = 1;                                                             
   for ( i = 1; i < pic_old->dim; i++ )                                          
     size[i] = size[i-1] * pic_old->n[i-1];                                  
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )                                 
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                                 
     size[i] = 0;                                                            
 
   offset_h = size[pic_old->dim-1] * pic_old->n[pic_old->dim-1];
 
   for ( i = 0; i < dim_mask; i++ )
     n[i] = pic_mask->n[i] / 2 + 1;
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 0;
 
   for ( i = 0; i < dim_mask; i++ )
@@ -334,12 +334,12 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
                 ( pic_mask->n[i] / 2 ) : ( pic_mask->n[i] / 2 - 1 );        
        off_p[i] = i * offset_h;
     }
-  for ( i = dim_mask; i < _ipPicNDIM; i++ )
+  for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     beg[i] = 0;
 
   for ( i = dim_mask; i < pic_old->dim; i++ )        
     end[i] = pic_old->n[i];        
-  for ( i = pic_old->dim; i < _ipPicNDIM; i++ )        
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )        
     end[i] = beg[i] + 1;
 
   /* create a new picture, copy the header, allocate memory             */
@@ -349,8 +349,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
     {
        pic_mask->data = NULL;
        ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
   if ( pic_old->type == ipPicUInt || pic_old->type == ipPicInt ) 
     {
@@ -362,8 +362,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
     {
        pic_mask->data = NULL;
        ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   pic_help1 = ipPicCopyHeader ( pic_help2, NULL );
@@ -373,8 +373,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help2);
        pic_mask->data = NULL;
        ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
   pic_help1->dim = pic_help2->dim + 1;
   pic_help1->n[pic_help1->dim-1] = dim_mask;
@@ -385,8 +385,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help2);
        pic_mask->data = NULL;
        ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   
   pic_help3 = ipPicCopyHeader ( pic_help2, NULL );
@@ -398,8 +398,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help1 );
        pic_help2->data = NULL;
        ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( ipFuncPICNEW_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       return ( mitkIpFuncERROR );
     }
   pic_help3->data = calloc ( _ipPicElements ( pic_help3 ), pic_help3->bpe / 8 );
   if ( pic_help3->data == NULL ) 
@@ -410,8 +410,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help1 );
        pic_help2->data = NULL;
        ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* allocate mask-structure                                            */
@@ -425,8 +425,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help1 );
        pic_help2->data = NULL;
        ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   m->off_vekt  = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
   if ( m->off_vekt == NULL ) 
@@ -440,8 +440,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        pic_help3->data = NULL;
        ipPicFree ( pic_help3 );
        free ( m );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
   m->mask_vekt = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
   if ( m->mask_vekt == NULL ) 
@@ -456,8 +456,8 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
        ipPicFree ( pic_help3 );
        free ( m->off_vekt );
        free ( m );
-       _ipFuncSetErrno ( ipFuncMALLOC_ERROR );
-       return ( ipFuncERROR );
+       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* calculate offset vector for the compressed mask                    */
@@ -498,16 +498,16 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
   /* calculate second derivation                                       */
 
-  ipPicFORALL_4 ( CANNY0, pic_new, pic_help1, pic_help2, pic_help3, m );       
+  mitkIpPicFORALL_4 ( CANNY0, pic_new, pic_help1, pic_help2, pic_help3, m );       
   /* project second derivation to gradient                             */
 
-  ipPicFORALL_3 ( CANNY2, pic_help2, pic_help3, pic_help1, m );
+  mitkIpPicFORALL_3 ( CANNY2, pic_help2, pic_help3, pic_help1, m );
 
   /* zero crossing                                                     */
 
   pic_help4 = ipFuncZeroCr ( pic_help3 );
  
-  ipPicFORALL_2 ( CANNY3, pic_help2, pic_help4, threshold );
+  mitkIpPicFORALL_2 ( CANNY3, pic_help2, pic_help4, threshold );
 
   /* free memory                                                       */
 

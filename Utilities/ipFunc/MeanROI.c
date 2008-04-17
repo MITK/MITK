@@ -141,11 +141,11 @@ ipFloat8_t ipFuncMeanROI ( ipPicDescriptor *pic_old,
 
    /* check image data                                                  */
 
-   if ( _ipFuncError ( pic_old ) != ipFuncOK ) return ( ipFuncERROR );
+   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    if ( pic_old->dim > 2 ) 
      {
-        _ipFuncSetErrno ( ipFuncDIM_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* calculate min. and max. coordiantes of ROI                        */
@@ -168,29 +168,29 @@ ipFloat8_t ipFuncMeanROI ( ipPicDescriptor *pic_old,
    /* Expression is always false.
    if ( min_x < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_x > pic_old->n[0] )
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
     /* Expression is always false.
    if ( min_y < 0 ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_y > pic_old->n[1] ) 
      {
-        _ipFuncSetErrno ( ipFuncDATA_ERROR );
-        return ( ipFuncERROR );
+        _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+        return ( mitkIpFuncERROR );
      }
 
    /* allocate memory for a and b                                       */
@@ -233,12 +233,12 @@ ipFloat8_t ipFuncMeanROI ( ipPicDescriptor *pic_old,
     {
        free ( a );
        free ( b );
-       return ( ipFuncERROR );
+       return ( mitkIpFuncERROR );
     }
 
   /* macro to calculate mean                                             */
 
-  ipPicFORALL_3 ( ROI, pic_old, pic_help, sum, count );
+  mitkIpPicFORALL_3 ( ROI, pic_old, pic_help, sum, count );
 
   mean = sum / count;
 

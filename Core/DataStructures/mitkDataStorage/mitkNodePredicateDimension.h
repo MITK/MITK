@@ -36,7 +36,7 @@ namespace mitk {
   public:
     //##Documentation
     //## @brief Standard Constructor
-    NodePredicateDimension(unsigned int dimension, unsigned int pixelComponents = 1);
+    NodePredicateDimension(unsigned int dimension, int pixelComponents = 1);
       //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateDimension();
@@ -47,7 +47,7 @@ namespace mitk {
 
   protected:
     unsigned int m_Dimension;
-    unsigned int m_PixelComponents;
+    int m_PixelComponents;
   };
 } // namespace mitk
 

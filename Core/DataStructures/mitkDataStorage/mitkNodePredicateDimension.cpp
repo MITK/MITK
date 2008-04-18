@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 
 
-mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, unsigned int pixelComponents)
+mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, int pixelComponents)
 : m_Dimension( dimension ),
   m_PixelComponents( pixelComponents )
 {
@@ -45,3 +45,4 @@ bool mitk::NodePredicateDimension::CheckNode(const mitk::DataTreeNode* node) con
    
   return false; 
 }
+

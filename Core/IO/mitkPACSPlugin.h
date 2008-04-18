@@ -260,6 +260,8 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     */
     virtual void SetReaderType( unsigned int readerType = 0 );
 
+    virtual void SendAbortFilterEvent();
+
     /*!
     \brief This function load a single parent-child-volume.
     @param seriesOID   This parameter specify the parent-child-volume.

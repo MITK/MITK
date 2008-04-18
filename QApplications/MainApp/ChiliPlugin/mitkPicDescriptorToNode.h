@@ -72,6 +72,11 @@ class PicDescriptorToNode : public itk::Object
 
     PicDescriptorToNode();
 
+    bool m_Abort;
+    unsigned long m_ObserverTag;
+
+    void Abort(const itk::EventObject&);
+
     /** the input */
     std::string m_SeriesOID;
     std::list< ipPicDescriptor* > m_PicDescriptorList;

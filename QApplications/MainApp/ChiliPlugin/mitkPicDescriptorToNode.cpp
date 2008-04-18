@@ -23,21 +23,33 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
 //MITK-Includes
+#include "mitkPACSPlugin.h"
+#include "mitkChiliPluginEvents.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "math.h"
+
+#include <itkCommand.h>
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
 // constructor
 mitk::PicDescriptorToNode::PicDescriptorToNode()
 {
+  if( mitk::PACSPlugin::GetInstance() )
+  {
+    itk::ReceptorMemberCommand<PicDescriptorToNode>::Pointer command = itk::ReceptorMemberCommand<PicDescriptorToNode>::New();
+    command->SetCallbackFunction( this, &PicDescriptorToNode::Abort );
+    m_ObserverTag = mitk::PACSPlugin::GetInstance()->AddObserver( mitk::PluginAbortFilter(), command );
+  }
 }
 
 // destructor
 mitk::PicDescriptorToNode::~PicDescriptorToNode()
 {
+  if( mitk::PACSPlugin::GetInstance() )
+    mitk::PACSPlugin::GetInstance()->RemoveObserver( m_ObserverTag );
 }
 
 // set-function
@@ -63,6 +75,12 @@ std::vector< std::list< std::string > > mitk::PicDescriptorToNode::GetImageInsta
 // the "main"-function
 void mitk::PicDescriptorToNode::Update()
 {
+}
+
+// stop the filter
+void mitk::PicDescriptorToNode::Abort( const itk::EventObject& )
+{
+  m_Abort = true;
 }
 
 // function to round

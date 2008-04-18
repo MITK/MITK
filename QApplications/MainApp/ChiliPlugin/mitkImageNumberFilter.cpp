@@ -60,6 +60,7 @@ void mitk::ImageNumberFilter::Update()
   m_Output.clear();
   m_GroupList.clear();
   m_ImageInstanceUIDs.clear();
+  m_Abort = false;
 
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
@@ -84,6 +85,7 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
 {
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
+    if( m_Abort ) return;
     //check intersliceGeomtry
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
     if( !pFetchSliceGeometryFromPic( (*currentPic), isg ) )
@@ -230,6 +232,11 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress( m_GroupList.size() - n );
+      return;
+    }
     if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
     {
       int currentCount = 0;  //used to split list
@@ -293,6 +300,11 @@ void mitk::ImageNumberFilter::SeperateByTime()
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress( m_GroupList.size() - n );
+      return;
+    }
     if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
     {
       bool differentTimeSliced = false;
@@ -362,6 +374,7 @@ void mitk::ImageNumberFilter::SplitDummiVolumes()
 {
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
+    if( m_Abort ) return;
     if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() == 2 )
     {
       if( !Equal( m_GroupList[n].includedSlices.front().origin, m_GroupList[n].includedSlices.back().origin ) )  // 2D+t ?
@@ -384,6 +397,7 @@ void mitk::ImageNumberFilter::GenerateImages()
 {
   for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); groupIter != m_GroupList.end(); groupIter++ )
   {
+    if( m_Abort ) return;
     //get time, count
     int timeSteps = 0, sliceSteps = 0;
     std::vector< Slice >::iterator originIter = groupIter->includedSlices.begin();
@@ -396,45 +410,47 @@ void mitk::ImageNumberFilter::GenerateImages()
 
     //get spacing
     Vector3D spacing;
-      //initialize
+    //initialize
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
     pFetchSliceGeometryFromPic( groupIter->includedSlices.begin()->currentPic, isg );
     vtk2itk( isg->ps, spacing );
     if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
       spacing.Fill(1.0);
     free( isg );
-      //get the not rounded spacing
+    //get the not rounded spacing
     std::list<Spacing> SpacingList;
+    SpacingList.clear();
     std::vector< Slice >::iterator walkIter = groupIter->includedSlices.begin();
     walkIter++;
     for( ; walkIter != groupIter->includedSlices.end(); walkIter ++)
     {
       std::vector<Slice>::iterator iterB4 = walkIter;
       iterB4--;
-      Vector3D tempDistance = walkIter->origin - iterB4->origin;
-      spacing[2] = tempDistance.GetNorm();
+      if( !Equal( walkIter->origin, iterB4->origin ) )
+      {
+        Vector3D tempDistance = walkIter->origin - iterB4->origin;
+        spacing[2] = tempDistance.GetNorm();
         //search for spacing
-      std::list<Spacing>::iterator searchIter = SpacingList.begin();
-      while( searchIter != SpacingList.end() )
-      {
-        if( searchIter->spacing == spacing )
+        std::list<Spacing>::iterator searchIter = SpacingList.begin();
+        for( ; searchIter != SpacingList.end(); searchIter++ )
         {
-          searchIter->count++;
-          break;
+          if( Equal( searchIter->spacing, spacing) )
+          {
+            searchIter->count++;
+            break;
+          }
         }
-        else
-          searchIter++;
-      }
         //dont exist, create new entry
-      if( searchIter == SpacingList.end() )
-      {
-        Spacing newElement;
-        newElement.spacing = spacing;
-        newElement.count = 1;
-        SpacingList.push_back( newElement );
+        if( searchIter == SpacingList.end() )
+        {
+          Spacing newElement;
+          newElement.spacing = spacing;
+          newElement.count = 1;
+          SpacingList.push_back( newElement );
+        }
       }
     }
-      //get spacing
+    //get spacing
     int count = 0;
     for( std::list<Spacing>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
     {

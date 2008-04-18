@@ -146,6 +146,11 @@ void mitk::PACSPlugin::SetReaderType( unsigned int )
 }
 
 /** DefaultImplementation */
+void mitk::PACSPlugin::SendAbortFilterEvent()
+{
+}
+
+/** DefaultImplementation */
 std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( QcLightbox* )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;

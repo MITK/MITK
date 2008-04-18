@@ -97,9 +97,15 @@ void QmitkLoadSaveToChiliExample::CreateConnections()
     connect( ( QObject* )( m_Controls->ImageNumberFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
     connect( ( QObject* )( m_Controls->SingleSpacingFilter ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( ChangeReaderType() ) );
+    connect( ( QObject* )( m_Controls->Abort ), SIGNAL( clicked() ), ( QObject* ) this, SLOT( AbortFilter() ) );
 
     connect( ( QObject* )( m_Controls->tabWidget ), SIGNAL( currentChanged ( QWidget * ) ), ( QObject* ) this, SLOT( CheckPluginCapabilties() ) );
   }
+}
+
+void QmitkLoadSaveToChiliExample::AbortFilter()
+{
+  m_Plugin->SendAbortFilterEvent();
 }
 
 void QmitkLoadSaveToChiliExample::CheckPluginCapabilties()

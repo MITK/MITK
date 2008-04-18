@@ -27,6 +27,7 @@ namespace mitk
 itkEventMacro( PluginEvent, itk::AnyEvent );
 itkEventMacro( PluginStudySelected, PluginEvent );
 itkEventMacro( PluginLightBoxCountChanged, PluginEvent );
+itkEventMacro( PluginAbortFilter, PluginEvent );
 
 }
 

@@ -82,6 +82,7 @@ protected slots:
   void LoadFromPSListView();
   void ChangeReaderType();
   void CheckPluginCapabilties();
+  void AbortFilter();
 
 protected:
 

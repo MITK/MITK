@@ -538,6 +538,12 @@ void mitk::ChiliPlugin::studySelected( study_t* /*study*/ )
   SendStudySelectedEvent();
 }
 
+/** Throw an event, to stop the filter. */
+void mitk::ChiliPlugin::SendAbortFilterEvent()
+{
+  InvokeEvent( PluginAbortFilter() );
+}
+
 /** Event if the lightbox get tiles (from QcPlugin). */
 void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager* /*lbm*/, int tiles )
 {

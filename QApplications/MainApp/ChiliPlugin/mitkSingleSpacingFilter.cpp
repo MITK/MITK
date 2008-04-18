@@ -100,16 +100,17 @@ void mitk::SingleSpacingFilter::Update()
   m_GroupVector.clear();
   m_Output.clear();
   m_ImageInstanceUIDs.clear();
+  m_Abort = false;
 
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
-    ProgressBar::GetInstance()->AddStepsToDo( 3 );
+    ProgressBar::GetInstance()->AddStepsToDo( 30 );
     SortPicsToGroup();
-    ProgressBar::GetInstance()->Progress();
+    ProgressBar::GetInstance()->Progress( 10 );
     SortPositionsAndPics();
-    ProgressBar::GetInstance()->Progress();
+    ProgressBar::GetInstance()->Progress( 10 );
     CreateResults();
-    ProgressBar::GetInstance()->Progress();
+    ProgressBar::GetInstance()->Progress( 10 );
   }
   else std::cout<<"SingleSpacingFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
 }
@@ -118,6 +119,7 @@ void mitk::SingleSpacingFilter::SortPicsToGroup()
 {
 for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
+    if( m_Abort ) return;
     //check intersliceGeomtry
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
     if( !pFetchSliceGeometryFromPic( (*currentPic), isg ) )
@@ -270,7 +272,10 @@ void mitk::SingleSpacingFilter::CreateResults()
   for( unsigned int x = 0; x < m_GroupVector.size(); x++)
   {
     while( !m_GroupVector[x].includedPositions.empty() )
+    {
+      if( m_Abort ) return;
       SearchParameter( x );
+    }
   }
 }
 
@@ -309,7 +314,7 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
   }
   else  //3D or 3D+t
   {
-    ProgressBar::GetInstance()->AddStepsToDo( 3 );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
     //search fot the most coherent slices with the same spacing
     std::vector< Position >::iterator iterEnd = m_GroupVector[currentGroup].includedPositions.end();
     iterEnd--;
@@ -318,6 +323,11 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
     {
       for( std::vector< Position >::iterator iterWalk = iterRoot; iterWalk != m_GroupVector[currentGroup].includedPositions.end(); iterWalk++ )
       {
+        if( m_Abort )
+        {
+          ProgressBar::GetInstance()->Progress( 2 );
+          return;
+        }
         if( !Equal( iterWalk->origin, iterRoot->origin ) )
         {
           std::vector<Position*> tempUsedPos;
@@ -411,8 +421,8 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
         count = searchIter->count;
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
-  ProgressBar::GetInstance()->Progress();
 
   //create mitk::images
   std::list<ipPicDescriptor*> usedPic;
@@ -451,7 +461,6 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
     else std::cout<<"SingleSpacingFilter-WARNING: Logical Error. Groups dont match."<<std::endl;
   }
   while( deleteGroup != usedPos.begin() );
-  ProgressBar::GetInstance()->Progress();
 }
 
 #endif

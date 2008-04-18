@@ -46,6 +46,8 @@ void mitk::SpacingSetFilter::Update()
   m_Output.clear();
   groupList.clear();
   m_ImageInstanceUIDs.clear();
+  m_Abort = false;
+
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
     ProgressBar::GetInstance()->AddStepsToDo( 7 );
@@ -75,6 +77,7 @@ void mitk::SpacingSetFilter::SortPicsToGroup()
 {
   for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
+    if( m_Abort ) return;
     //check intersliceGeomtry
     interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
     if( !pFetchSliceGeometryFromPic( (*currentPic), isg ) )
@@ -247,6 +250,11 @@ void mitk::SpacingSetFilter::CreatePossibleCombinations()
         lastIter--;
         for( std::vector< Slice >::iterator walkIter = groupList[x].includedSlices.begin(); walkIter != lastIter; walkIter++ )
         {
+          if( m_Abort )
+          {
+            ProgressBar::GetInstance()->Progress( groupList.size() - x );
+            return;
+          }
           //add the current slice as single possibleCombination
           m_Set.clear();
           m_Set.insert( &(*walkIter) );
@@ -260,8 +268,8 @@ void mitk::SpacingSetFilter::CreatePossibleCombinations()
         groupList[x].possibleCombinations.push_back( m_Set );
       }
     }
+    ProgressBar::GetInstance()->Progress();
   }
-  ProgressBar::GetInstance()->Progress();
 }
 
 void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator basis, Group* currentGroup )
@@ -271,6 +279,11 @@ void mitk::SpacingSetFilter::CalculateSpacings( std::vector< Slice >::iterator b
 
   for( std::vector< Slice >::iterator walkIter = basis; walkIter != currentGroup->includedSlices.end(); walkIter++ )
   {
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress();
+      return;
+    }
     if( !Equal( walkIter->origin, referenceIter->origin ) )
     {
       //calculate spacing and image-number-spacing
@@ -321,6 +334,11 @@ void mitk::SpacingSetFilter::searchFollowingSlices( std::vector< Slice >::iterat
     walkON = false;
     for( std::vector< Slice >::iterator walkIter = referenceIter; walkIter != currentGroup->includedSlices.end(); walkIter++ )
     {
+      if( m_Abort )
+      {
+        ProgressBar::GetInstance()->Progress();
+        return;
+      }
       //calculate spacing and image-number-spacing
       Vector3D tempDistance = walkIter->origin - referenceIter->origin;
       double currentSpacing = Round( tempDistance.GetNorm(), 2 );
@@ -399,6 +417,11 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
   ProgressBar::GetInstance()->AddStepsToDo( groupList.size() );
   for( unsigned int n = 0; n < groupList.size(); n++ )
   {
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress( groupList.size() - n );
+      return;
+    }
     //a not timesliced 2D-image have only one possibleCombination, so we use this as resultCombination
     if( groupList[n].possibleCombinations.size() == 1 )
     {
@@ -427,6 +450,12 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
       {
         //the possible combinations sorted, from combinations with lots of elements to combinations with less elements
         //if the mulitplication from the current minimal-needed-combination-count with the current combination-element-count is lower then the count of all needed slices, there is no possibility to create a result wich include all slices and we can break up
+        if( m_Abort )
+        {
+          ProgressBar::GetInstance()->Progress( groupList.size() - n );
+          return;
+        }
+
         if( m_GroupResultCombinations.size() != 0 && ( ( ( (*iterBegin).size() ) * ( m_GroupResultCombinations.front().size() ) ) < m_TotalCombinationCount ) )
           break;
 
@@ -475,6 +504,11 @@ void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice*
   remainingCombinations--;
   while ( iterBegin != m_IterGroupEnd )
   {
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress();
+      return;
+    }
     //if we have found a result, we should not combine more combinationens than the result included
     if( m_GroupResultCombinations.size() != 0 && resultCombinations.size() >= m_GroupResultCombinations.front().size() )
       return;
@@ -539,6 +573,7 @@ void mitk::SpacingSetFilter::CheckForTimeSlicedCombinations()
       std::vector< std::set< Slice* > >::iterator rootCombinationIter = groupList[n].resultCombinations.front().begin();
       while( rootCombinationIter != groupList[n].resultCombinations.front().end() )
       {
+        if( m_Abort ) return;
         std::set< Slice* > timeSlicedVolume;
         timeSlicedVolume.clear();
         timeSlicedVolume.insert( (*rootCombinationIter).begin(), (*rootCombinationIter).end() );
@@ -600,6 +635,7 @@ void mitk::SpacingSetFilter::GenerateImages()
   {
     for( std::vector < std::set< Slice* > >::iterator combinationIter = groupList[n].resultCombinations.front().begin(); combinationIter != groupList[n].resultCombinations.front().end(); combinationIter ++ )  //TODO only one result is handled
     {
+      if( m_Abort ) return;
       //get all ipPicDescriptor
       std::list<ipPicDescriptor*> usedPic;
       usedPic.clear();
@@ -633,27 +669,28 @@ void mitk::SpacingSetFilter::GenerateImages()
       {
         std::set<Slice*>::iterator iterB4 = walkIter;
         iterB4--;
-        Vector3D tempDistance = (*walkIter)->origin - (*iterB4)->origin;
-        spacing[2] = tempDistance.GetNorm();
-        //search for spacing
-        std::list<Spacing>::iterator searchIter = SpacingList.begin();
-        while( searchIter != SpacingList.end() )
+        if( !Equal( (*walkIter)->origin, (*iterB4)->origin ) )
         {
-          if( searchIter->spacing == spacing )
+          Vector3D tempDistance = (*walkIter)->origin - (*iterB4)->origin;
+          spacing[2] = tempDistance.GetNorm();
+          //search for spacing
+          std::list<Spacing>::iterator searchIter = SpacingList.begin();
+          for( ; searchIter != SpacingList.end(); searchIter++ )
           {
-            searchIter->count++;
-            break;
+            if( Equal( searchIter->spacing, spacing) )
+            {
+              searchIter->count++;
+              break;
+            }
           }
-          else
-            searchIter++;
-        }
           //dont exist, create new entry
-        if( searchIter == SpacingList.end() )
-        {
-          Spacing newElement;
-          newElement.spacing = spacing;
-          newElement.count = 1;
-          SpacingList.push_back( newElement );
+          if( searchIter == SpacingList.end() )
+          {
+            Spacing newElement;
+            newElement.spacing = spacing;
+            newElement.count = 1;
+            SpacingList.push_back( newElement );
+          }
         }
       }
         //get spacing

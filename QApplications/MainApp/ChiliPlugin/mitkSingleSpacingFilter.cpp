@@ -387,27 +387,28 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
     {
       std::vector<Position*>::iterator iterB4 = walkIter;
       iterB4--;
-      Vector3D tempDistance = (*walkIter)->origin - (*iterB4)->origin;
-      spacing[2] = tempDistance.GetNorm();
-      //search for spacing
-      std::list<Spacing>::iterator searchIter = SpacingList.begin();
-      while( searchIter != SpacingList.end() )
+      if( !Equal( (*walkIter)->origin, (*iterB4)->origin ) )
       {
-        if( searchIter->spacing == spacing )
+        Vector3D tempDistance = (*walkIter)->origin - (*iterB4)->origin;
+        spacing[2] = tempDistance.GetNorm();
+        //search for spacing
+        std::list<Spacing>::iterator searchIter = SpacingList.begin();
+        for( ; searchIter != SpacingList.end(); searchIter++ )
         {
-          searchIter->count++;
-          break;
+          if( Equal( searchIter->spacing, spacing) )
+          {
+            searchIter->count++;
+            break;
+          }
         }
-        else
-          searchIter++;
-      }
-      //dont exist, create new entry
-      if( searchIter == SpacingList.end() )
-      {
-        Spacing newElement;
-        newElement.spacing = spacing;
-        newElement.count = 1;
-        SpacingList.push_back( newElement );
+        //dont exist, create new entry
+        if( searchIter == SpacingList.end() )
+        {
+          Spacing newElement;
+          newElement.spacing = spacing;
+          newElement.count = 1;
+          SpacingList.push_back( newElement );
+        }
       }
     }
 

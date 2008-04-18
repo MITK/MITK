@@ -53,7 +53,7 @@ ADD_CUSTOM_TARGET(doc
 
 # make sure the main app is built already so we get documentation for 
 # the Qt generated files 
-IF(USE_QT)
+IF(DESIRED_QT_VERSION EQUAL 3)
 ADD_DEPENDENCIES(doc MainApp)
-ENDIF(USE_QT)
+ENDIF(DESIRED_QT_VERSION EQUAL 3)
 

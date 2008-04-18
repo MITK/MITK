@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: Cherry Application Plugin
+Bundle-SymbolicName: org.opencherry.application
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.opencherry.osgi
+Bundle-LazyStart: false

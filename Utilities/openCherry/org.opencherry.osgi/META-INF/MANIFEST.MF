@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: OSGi System Bundle
+Bundle-SymbolicName: org.opencherry.osgi
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: cherry::SystemBundleActivator
+Cherry-SystemBundle: true

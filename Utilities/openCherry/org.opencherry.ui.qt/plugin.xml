@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension point="org.opencherry.ui.workbench">
+      <workbench 
+         id="org.opencherry.ui.qtworkbench"
+         name="Qt Workbench"
+         class="cherry::QtWorkbench" />
+   </extension>
+ 
+   <extension point="org.opencherry.ui.views"> 
+      <category 
+         id="org.opencherry.views.general" 
+         name="General"/> 
+      <view 
+         id="org.opencherry.views.logview" 
+         name="Log View" 
+         category="org.opencherry.views.general" 
+         class="cherry::LogView" />
+   </extension> 
+</plugin>

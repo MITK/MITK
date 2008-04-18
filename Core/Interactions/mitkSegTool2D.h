@@ -19,16 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSegTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "mitkSegTool3D.h"
-
-#include "mitkContour.h"
+#include "mitkTool.h"
 #include "mitkImage.h"
-#include "mitkDataTreeNode.h"
 
 #include "mitkStateEvent.h"
 #include "mitkPositionEvent.h"
-
-#include "mitkImageCast.h"
 
 namespace mitk
 {
@@ -39,8 +34,6 @@ class BaseRenderer;
   \brief Abstract base class for segmentation tools.
 
   \sa Tool
-  \sa SegTool3D
-  \sa Contour
 
   \ingroup Interaction
   \ingroup Reliver
@@ -49,8 +42,6 @@ class BaseRenderer;
   all kind of 2D segmentation tools. At the moment these are:
    - Determination of the slice where the user paints upon (DetermineAffectedImageSlice)
    - Projection of a 3D contour onto a 2D plane/slice
-   - Providing a feedback contour that might be added or removed from the visible scene (SetFeedbackContourVisible).
-   - Filling of a contour into a 2D slice
 
    SegTool2D tries to structure the interaction a bit. If you pass "PressMoveRelease" as the interaction type
    of your derived tool, you might implement the methods OnMousePressed, OnMouseMoved, and OnMouseReleased. 
@@ -60,11 +51,11 @@ class BaseRenderer;
 
   $Author$
 */
-class MITK_CORE_EXPORT SegTool2D : public SegTool3D
+class MITK_CORE_EXPORT SegTool2D : public Tool
 {
   public:
     
-    mitkClassMacro(SegTool2D, SegTool3D);
+    mitkClassMacro(SegTool2D, Tool);
 
   protected:
 
@@ -76,14 +67,6 @@ class MITK_CORE_EXPORT SegTool2D : public SegTool3D
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
     virtual bool OnInvertLogic  (Action*, const StateEvent*);
-
-    Contour* GetFeedbackContour();
-    void SetFeedbackContour(Contour&);
-    void SetFeedbackContourVisible(bool);
-
-    /// Provide values from 0.0 (black) to 1.0 (full color)
-    void SetFeedbackContourColor( float r, float g, float b );
-    void SetFeedbackContourColorDefault();
 
     /**
       \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index corrdinates) is meant by the plane.
@@ -114,41 +97,10 @@ class MITK_CORE_EXPORT SegTool2D : public SegTool3D
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
-    /**
-      \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
-
-      \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    Contour::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation = false, bool constrainToInside = true);
-
-    /**
-      \brief Projects a slice index coordinates of a contour back into world coordinates.
-      
-      \param correctionForIpSegmentation substracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
-    */
-    Contour::Pointer BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool correctionForIpSegmentation = false);
-
-
-    /**
-      \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
-      Will not copy the whole filledContourSlice, but only set those pixels in originalSlice to overwritevalue, where the corresponding pixel
-      in filledContourSlice is non-zero.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue = 1 );
-
-    /**
-      \brief Fill a contour in a 2D slice with a specified pixel value.
-    */
-    void FillContourInSlice( Contour* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
-
     void SliceBasedSegmentationBugMessage( const std::string& message );
  
   private:
 
-    Contour::Pointer      m_FeedbackContour;
-    DataTreeNode::Pointer m_FeedbackContourNode;
-    bool                  m_FeedbackContourVisible;
     BaseRenderer*         m_LastEventSender;
     unsigned int          m_LastEventSlice;
 };

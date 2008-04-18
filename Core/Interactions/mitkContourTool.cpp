@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
-:SegTool2D("PressMoveReleaseWithCTRLInversion"),
+:FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue)
 {
 }
@@ -48,16 +48,16 @@ void mitk::ContourTool::Deactivated()
 */
 bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  if (!SegTool2D::OnMousePressed( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMousePressed( action, stateEvent )) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = SegTool2D::GetFeedbackContour();
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
   contour->AddVertex( positionEvent->GetWorldPosition() );
   
-  SegTool2D::SetFeedbackContourVisible(true);
+  FeedbackContourTool::SetFeedbackContourVisible(true);
 
   return true;
 }
@@ -67,12 +67,12 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 */
 bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if (!SegTool2D::OnMouseMoved( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMouseMoved( action, stateEvent )) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = SegTool2D::GetFeedbackContour();
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -87,7 +87,7 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
 bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
-  SegTool2D::SetFeedbackContourVisible(false);
+  FeedbackContourTool::SetFeedbackContourVisible(false);
   
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -95,7 +95,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
-  if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
 
   DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -106,10 +106,10 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
+  if ( FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
     // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-    Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+    Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
     if ( slice.IsNull() )
     {
@@ -117,12 +117,12 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
       return false;
     }
 
-    Contour* feedbackContour( SegTool2D::GetFeedbackContour() );
-    Contour::Pointer projectedContour = SegTool2D::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
+    Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+    Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
                                                                                                                    // false: don't constrain the contour to the image's inside
     if (projectedContour.IsNull()) return false;
 
-    SegTool2D::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+    FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
 
     // 5. Write the modified 2D working data slice back into the image
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
@@ -141,7 +141,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   }
   else
   {
-    SliceBasedSegmentationBugMessage( "SegTool2D could not determine which slice of the image you are drawing on." );
+    SliceBasedSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
   }
 
   return true;
@@ -152,18 +152,18 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 */
 bool mitk::ContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
-  if (!SegTool2D::OnInvertLogic(action, stateEvent)) return false;
+  if (!FeedbackContourTool::OnInvertLogic(action, stateEvent)) return false;
 
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)
   {
     m_PaintingPixelValue = 0;
-    SegTool2D::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
   }
   else if (m_PaintingPixelValue == 0)
   {
     m_PaintingPixelValue = 1;
-    SegTool2D::SetFeedbackContourColorDefault();
+    FeedbackContourTool::SetFeedbackContourColorDefault();
   }
 
   return true;

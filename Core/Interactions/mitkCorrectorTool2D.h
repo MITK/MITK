@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "mitkSegTool2D.h"
+#include "mitkFeedbackContourTool.h"
 
 #include "ipSegmentation.h"
 
@@ -31,7 +31,7 @@ class Image;
 /**
   \brief Corrector tool for 2D binary segmentations
 
-  \sa SegTool2D
+  \sa FeedbackContourTool
   \sa ExtractImageFilter
   \sa OverwriteSliceImageFilter
   
@@ -46,11 +46,11 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT CorrectorTool2D : public SegTool2D
+class MITK_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
 {
   public:
     
-    mitkClassMacro(CorrectorTool2D, SegTool2D);
+    mitkClassMacro(CorrectorTool2D, FeedbackContourTool);
     itkNewMacro(CorrectorTool2D);
 
     virtual const char** GetXPM() const;

@@ -31,7 +31,7 @@ namespace mitk
   \ingroup Interaction
   \ingroup Reliver
 
-  Fills a visible contour (from SegTool2D) during mouse dragging. When the mouse button
+  Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
   is released, SubstractContourTool tries to extract a slice from the working image and fill in
   the (filled) contour as a binary image. All inside pixels are set to 0.
   

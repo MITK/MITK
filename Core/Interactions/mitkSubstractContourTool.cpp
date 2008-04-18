@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::SubstractContourTool::SubstractContourTool()
 :ContourTool(0)
 {
-  SegTool2D::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 }
 
 mitk::SubstractContourTool::~SubstractContourTool()

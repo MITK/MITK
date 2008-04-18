@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include "mitkSegTool2D.h"
+#include "mitkFeedbackContourTool.h"
 
 namespace mitk
 {
@@ -29,7 +29,7 @@ class Image;
 /**
   \brief Fills or erases a 2D region
 
-  \sa SegTool2D
+  \sa FeedbackContourTool
   \sa ExtractImageFilter
   \sa OverwriteSliceImageFilter
   
@@ -43,11 +43,11 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT SetRegionTool : public SegTool2D
+class MITK_CORE_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
     
-    mitkClassMacro(SetRegionTool, SegTool2D);
+    mitkClassMacro(SetRegionTool, FeedbackContourTool);
 
   protected:
    

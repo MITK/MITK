@@ -21,6 +21,7 @@ SET(CPP_FILES
   mitkEventDescription.cpp
   mitkEventMapper.cpp
   mitkExtrudedContourInteractor.cpp
+  mitkFeedbackContourTool.cpp
   mitkFillRegionTool.cpp
   #mitkFillRegionToolFactory.cpp
   mitkGlobalInteraction.cpp
@@ -40,7 +41,6 @@ SET(CPP_FILES
   #mitkRegionGrowingToolFactory.cpp
   mitkSeedsInteractor.cpp
   mitkSegTool2D.cpp
-  mitkSegTool3D.cpp
   mitkSetRegionTool.cpp
   mitkSocketClient.cpp
   mitkState.cpp

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkRegionGrowingTool_h_Included
 #define mitkRegionGrowingTool_h_Included
 
-#include "mitkSegTool2D.h"
+#include "mitkFeedbackContourTool.h"
 
 struct ipPicDescriptor;
 
@@ -28,7 +28,7 @@ namespace mitk
 /**
   \brief A slice based region growing tool.
 
-  \sa SegTool2D
+  \sa FeedbackContourTool
 
   \ingroup Interaction
   \ingroup Reliver
@@ -51,11 +51,11 @@ namespace mitk
 
   $Author$
 */
-class MITK_CORE_EXPORT RegionGrowingTool : public SegTool2D
+class MITK_CORE_EXPORT RegionGrowingTool : public FeedbackContourTool
 {
   public:
     
-    mitkClassMacro(RegionGrowingTool, SegTool2D);
+    mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
     itkNewMacro(RegionGrowingTool);
 
     virtual const char** GetXPM() const;

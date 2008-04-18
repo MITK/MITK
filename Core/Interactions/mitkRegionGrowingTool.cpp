@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 mitk::RegionGrowingTool::RegionGrowingTool()
-:SegTool2D("PressMoveRelease"),
+:FeedbackContourTool("PressMoveRelease"),
  m_LowerThreshold(200),
  m_UpperThreshold(200),
  m_InitialLowerThreshold(200),
@@ -84,9 +84,9 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
   //ToolLogger::SetVerboseness(3);
 
   ToolLogger::Logger(1) << "OnMousePressed" << std::endl;
-  if (SegTool2D::OnMousePressed( action, stateEvent ))
+  if (FeedbackContourTool::OnMousePressed( action, stateEvent ))
   {
-    ToolLogger::Logger(2) << "OnMousePressed: SegTool2D says ok" << std::endl;
+    ToolLogger::Logger(2) << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
 
     // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
     const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -94,8 +94,8 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
     {
       ToolLogger::Logger(2) << "OnMousePressed: got positionEvent" << std::endl;
       
-      m_ReferenceSlice = SegTool2D::GetAffectedReferenceSlice( positionEvent );
-      m_WorkingSlice   = SegTool2D::GetAffectedWorkingSlice( positionEvent );
+      m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+      m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
 
       if ( m_WorkingSlice.IsNotNull() ) // can't do anything without the segmentation
       {
@@ -208,10 +208,10 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       free(cutContour.deleteCurve); // perhaps visualize this for fun?
       free(cutContour.onGradient);
 
-      Contour::Pointer contourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( m_WorkingSlice, contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
+      Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice, contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
 
-      SegTool2D::SetFeedbackContour( *contourInWorldCoordinates );
-      SegTool2D::SetFeedbackContourVisible(true);
+      FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
+      FeedbackContourTool::SetFeedbackContourVisible(true);
       mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       m_FillFeedbackContour = true;
     }
@@ -292,7 +292,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       ipMITKSegmentationFree( result);
 
       // display the contour
-      SegTool2D::SetFeedbackContourVisible(true);
+      FeedbackContourTool::SetFeedbackContourVisible(true);
       mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
         
       m_FillFeedbackContour = true;
@@ -309,7 +309,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 */
 bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if (SegTool2D::OnMouseMoved( action, stateEvent ))
+  if (FeedbackContourTool::OnMouseMoved( action, stateEvent ))
   {
     if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice ) 
     {
@@ -346,7 +346,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
 */
 bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
-  if (SegTool2D::OnMouseReleased( action, stateEvent ))
+  if (FeedbackContourTool::OnMouseReleased( action, stateEvent ))
   {
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
     if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
@@ -361,20 +361,20 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         if (m_FillFeedbackContour)
         {
           // 3. use contour to fill a region in our working slice
-          Contour* feedbackContour( SegTool2D::GetFeedbackContour() );
+          Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
           if (feedbackContour)
           {
-            Contour::Pointer projectedContour = SegTool2D::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
+            Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
                                                                                                                                     // false: don't constrain the contour to the image's inside
             if (projectedContour.IsNotNull())
             {
-              SegTool2D::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue );
+              FeedbackContourTool::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue );
 
               // 4. write working slice back into image volume
               int affectedDimension( -1 );
               int affectedSlice( -1 );
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-              SegTool2D::DetermineAffectedImageSlice( dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() ), planeGeometry, affectedDimension, affectedSlice );
+              FeedbackContourTool::DetermineAffectedImageSlice( dynamic_cast<Image*>( m_ToolManager->GetReferenceData(0)->GetData() ), planeGeometry, affectedDimension, affectedSlice );
 
               ToolLogger::Logger(3) << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
@@ -391,7 +391,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
           }
         }
         
-        SegTool2D::SetFeedbackContourVisible(false);
+        FeedbackContourTool::SetFeedbackContourVisible(false);
         mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       }
     }
@@ -433,7 +433,7 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
   {
     Contour::Pointer dummyContour = Contour::New();
     dummyContour->Initialize();
-    SegTool2D::SetFeedbackContour( *dummyContour );
+    FeedbackContourTool::SetFeedbackContour( *dummyContour );
     return NULL;
   }
 
@@ -507,9 +507,9 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
 
     free(contourPoints);
 
-    Contour::Pointer contourInWorldCoordinates = SegTool2D::BackProjectContourFrom2DSlice( m_ReferenceSlice, contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
+    Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice, contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
 
-    SegTool2D::SetFeedbackContour( *contourInWorldCoordinates );
+    FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
   }
 
   // 5. Result HAS TO BE freed by caller, contains the binary region growing result

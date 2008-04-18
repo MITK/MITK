@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCorrectorTool2D.xpm"
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
-:SegTool2D("PressMoveRelease"),
+:FeedbackContourTool("PressMoveRelease"),
  m_PaintingPixelValue(paintingPixelValue)
 {
   GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
@@ -57,28 +57,28 @@ void mitk::CorrectorTool2D::Deactivated()
 
 bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  if (!SegTool2D::OnMousePressed( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMousePressed( action, stateEvent )) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = SegTool2D::GetFeedbackContour();
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
   contour->AddVertex( positionEvent->GetWorldPosition() );
   
-  SegTool2D::SetFeedbackContourVisible(true);
+  FeedbackContourTool::SetFeedbackContourVisible(true);
 
   return true;
 }
 
 bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
-  if (!SegTool2D::OnMouseMoved( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMouseMoved( action, stateEvent )) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = SegTool2D::GetFeedbackContour();
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -90,7 +90,7 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
 bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
-  SegTool2D::SetFeedbackContourVisible(false);
+  FeedbackContourTool::SetFeedbackContourVisible(false);
   
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -98,7 +98,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
   
-  if (!SegTool2D::OnMouseReleased( action, stateEvent )) return false;
+  if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
 
   DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -109,10 +109,10 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
+  if ( FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
     // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-    m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+    m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
     if ( m_WorkingSlice.IsNull() )
     {
@@ -157,7 +157,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   }
   else
   {
-    SliceBasedSegmentationBugMessage( "SegTool2D could not determine which slice of the image you are drawing on." );
+    SliceBasedSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
   }
 
   return true;
@@ -198,8 +198,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   std::vector<TSegData> segData;
   segData.reserve( 16 );
     
-  Contour* feedbackContour( SegTool2D::GetFeedbackContour() );
-  Contour::Pointer projectedContour = SegTool2D::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, true, false ); 
+  Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+  Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, true, false ); 
       
   if (projectedContour.IsNull()) 
   {
@@ -361,7 +361,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
     free(contourPoints);
     
-    SegTool2D::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingSlice );
+    FeedbackContourTool::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingSlice );
   }
   
   delete[] _ofsArray;

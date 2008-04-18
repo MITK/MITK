@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkContourTool_h_Included
 
 #include "mitkCommon.h"
-#include "mitkSegTool2D.h"
+#include "mitkFeedbackContourTool.h"
 
 namespace mitk
 {
@@ -29,14 +29,14 @@ class Image;
 /**
   \brief Simple contour filling tool.
 
-  \sa SegTool2D
+  \sa FeedbackContourTool
   \sa ExtractImageFilter
   \sa OverwriteSliceImageFilter
   
   \ingroup Interaction
   \ingroup Reliver
 
-  Fills a visible contour (from SegTool2D) during mouse dragging. When the mouse button
+  Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
   is released, ContourTool tries to extract a slice from the working image and fill in
   the (filled) contour as a binary image.
 
@@ -47,11 +47,11 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT ContourTool : public SegTool2D
+class MITK_CORE_EXPORT ContourTool : public FeedbackContourTool
 {
   public:
     
-    mitkClassMacro(ContourTool, SegTool2D);
+    mitkClassMacro(ContourTool, FeedbackContourTool);
 
   protected:
    

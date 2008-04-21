@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkConfig.h"
 
 typedef unsigned int MapperSlotId;
+#ifndef MITK_UNMANGLE_IPPIC
+#define ipPicDescriptor mitkIpPicDescriptor
+#endif
 
 #define mitkClassMacro(className,SuperClassName) \
 	typedef className				Self; \

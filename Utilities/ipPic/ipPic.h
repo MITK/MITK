@@ -218,15 +218,11 @@
 
 #include <mitkConfig.h>
 
-#if defined ( MITK_CHILI_PLUGIN ) && ( ! defined ( MITK_IPPIC_COMPILE ) )
-
-#include MITK_CHILI_PLUGIN_SDK_IPTYPES_H
-#include MITK_CHILI_PLUGIN_SDK_IPPIC_H
-
-#else
+#include "mitkIpPicMangle.h"
 
 #ifndef _mitkIpPic_h
 #define _mitkIpPic_h
+
 
 #ifndef NO_DEBUG
 #  define mitkIpPicDEBUG
@@ -896,6 +892,10 @@ extern const char *ipPicTypeName( ipUInt4_t type );
 #if defined(__cplusplus) || defined(c_plusplus)
 }
 #endif
-#endif  /* MITK_CHILI_PLUGIN */
+
+
 #endif  /* _mitkIpPic_h */
-/* DON'T ADD ANYTHING AFTER THIS #endif */
+
+#ifdef MITK_UNMANGLE_IPPIC
+#include "mitkIpPicUnmangle.h"
+#endif

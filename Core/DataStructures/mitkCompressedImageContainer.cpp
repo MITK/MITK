@@ -18,12 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCompressedImageContainer.h"
 #include "itkSmartPointerForwardReference.txx"
 
-#ifdef MITK_CHILI_PLUGIN
-  #include "zlib.h"
-#else
-  // make sure "our" zlib is used
-  #include "itk_zlib.h"
-#endif
+#include "itk_zlib.h"
 
 #include <stdlib.h>
 

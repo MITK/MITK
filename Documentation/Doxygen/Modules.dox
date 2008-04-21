@@ -50,14 +50,6 @@
 */
 
 /**
-  \defgroup Adaptor Adaptor Classes
-  \ingroup ProcessAdaptor
-
-  \brief This subcategory includes adaptor classes for the integration of algorithms from 
-  other toolkits (currently vtk, itk)..
-*/
-
-/**
   \defgroup InteractionUndo Interaction and Undo Classes
 
   \brief This category includes classes that support the developer to create 

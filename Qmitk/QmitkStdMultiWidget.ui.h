@@ -84,6 +84,16 @@ void QmitkStdMultiWidget::init()
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 
+  // Set default view directions for SNCs
+  mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Transversal );
+  mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Sagittal );
+  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Frontal );
+  mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Original );
+
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();
   // @TODO next line causes sure memory leak
@@ -118,6 +128,11 @@ void QmitkStdMultiWidget::init()
   mitkWidget1->GetSliceNavigationController()
     ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
+  // Set TimeNavigationController to RenderingManager 
+  // (which uses it internally for views initialization!)
+  mitk::RenderingManager::GetInstance()->SetTimeNavigationController(
+    timeNavigationController );
+
   //reverse connection between sliceNavigationControllers and timeNavigationController
   mitkWidget1->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
@@ -142,16 +157,6 @@ void QmitkStdMultiWidget::init()
   m_GradientBackground1->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
   m_GradientBackground1->Disable();
-  
-  m_GradientBackground2 = mitk::GradientBackground::New();
-  m_GradientBackground2->SetRenderWindow( 
-    mitkWidget2->GetRenderWindow() );
-  m_GradientBackground2->Disable();
-  
-  m_GradientBackground3 = mitk::GradientBackground::New();
-  m_GradientBackground3->SetRenderWindow( 
-    mitkWidget3->GetRenderWindow() );
-  m_GradientBackground3->Disable();
   
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
@@ -717,162 +722,21 @@ void QmitkStdMultiWidget::DisableStandardLevelWindow()
 }
 
 
+// CAUTION: Legacy code for enabling Qt-signal-controlled view initialization.
+// Use RenderingManager::InitializeViews() instead.
 bool QmitkStdMultiWidget::InitializeStandardViews(
   mitk::DataTreeIteratorBase * it)
 {
-  bool boundingBoxInitialized = false;
-
-  mitk::SliceNavigationController* sliceNavigatorTransversal =
-    mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal = 
-    mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal = 
-    mitkWidget3->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorWidget4 = 
-    mitkWidget4->GetSliceNavigationController();
-
-  sliceNavigatorTransversal->SetViewDirection(
-    mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(
-    mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(
-    mitk::SliceNavigationController::Frontal);
-  sliceNavigatorWidget4->SetViewDirection(
-    mitk::SliceNavigationController::Original);
-
-  if ( it==NULL )
-  {
-    sliceNavigatorTransversal->Update();
-    sliceNavigatorSagittal->Update();
-    sliceNavigatorFrontal->Update();
-    timeNavigationController->Update();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else
-  {
-    mitk::Geometry3D::Pointer geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(it, NULL, "includeInBoundingBox");
-    if ( geometry.IsNotNull() )
-    {
-      //lets see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-      if ( timebounds[1]<mitk::ScalarTypeNumericTraits::max() )
-      {
-        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-
-        mitk::TimeSlicedGeometry::Pointer timegeometry = 
-          mitk::TimeSlicedGeometry::New();
-        timegeometry->InitializeEvenlyTimed(geometry, (unsigned int) duration);
-        timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
-
-        timebounds[1] = timebounds[0]+1.0f;
-        geometry->SetTimeBounds(timebounds);
-
-        geometry=timegeometry;
-      }
-
-      double diagonalLength  = const_cast<mitk::BoundingBox*>(
-        geometry->GetBoundingBox())->GetDiagonalLength2();
-
-      if ( (diagonalLength > mitk::eps) && (diagonalLength < mitk::large) )
-      {
-        boundingBoxInitialized=true;
-        
-        // steppers are set so that the cross is centered in the image
-        sliceNavigatorTransversal->SetInputWorldGeometry(geometry.GetPointer());
-        sliceNavigatorTransversal->Update();
-        sliceNavigatorTransversal->GetSlice()->SetPos( 
-          sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
-
-        sliceNavigatorSagittal->SetInputWorldGeometry(geometry.GetPointer());
-        sliceNavigatorSagittal->Update();
-        sliceNavigatorSagittal->GetSlice()->SetPos( 
-          sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
-
-        sliceNavigatorFrontal->SetInputWorldGeometry(geometry.GetPointer());
-        sliceNavigatorFrontal->Update();
-        sliceNavigatorFrontal->GetSlice()->SetPos( 
-          sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
-
-        sliceNavigatorWidget4->SetInputWorldGeometry(geometry.GetPointer());
-        sliceNavigatorWidget4->Update();
-
-        timeNavigationController->SetInputWorldGeometry(geometry.GetPointer());
-        timeNavigationController->Update();
-
-        // Tell observers that views are initialized now
-        emit ViewsInitialized();
-
-        this->Fit();
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-    }
-  }
-  return boundingBoxInitialized;
+  return mitk::RenderingManager::GetInstance()->InitializeViews( it );
 }
 
 
+// CAUTION: Legacy code for enabling Qt-signal-controlled view initialization.
+// Use RenderingManager::InitializeViews() instead.
 bool QmitkStdMultiWidget
 ::InitializeStandardViews( const mitk::Geometry3D * geometry )
 {
-  bool boundingBoxInitialized = false;
-
-  mitk::SliceNavigationController* sliceNavigatorTransversal =
-    mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal =
-    mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal =
-    mitkWidget3->GetSliceNavigationController();
-
-  sliceNavigatorTransversal->SetViewDirection(
-    mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(
-    mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(
-    mitk::SliceNavigationController::Frontal);
-
-  if ( (geometry==NULL) || (const_cast<mitk::BoundingBox*>(
-    geometry->GetBoundingBox())->GetDiagonalLength2()<mitk::eps) )
-  {
-    sliceNavigatorTransversal->Update();
-    sliceNavigatorSagittal->Update();
-    sliceNavigatorFrontal->Update();
-    timeNavigationController->Update();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else
-  {
-    mitk::Geometry3D::Pointer clonedgeometry = 
-      static_cast<mitk::Geometry3D*>(geometry->Clone().GetPointer());
-
-    // steppers are set so that the cross is centered in the image
-    sliceNavigatorTransversal->SetInputWorldGeometry(
-      clonedgeometry.GetPointer());
-    sliceNavigatorTransversal->Update();
-    sliceNavigatorTransversal->GetSlice()->SetPos( 
-      sliceNavigatorTransversal->GetSlice()->GetSteps()/2 );
-
-    sliceNavigatorSagittal->SetInputWorldGeometry(
-      clonedgeometry.GetPointer());
-    sliceNavigatorSagittal->Update();
-    sliceNavigatorSagittal->GetSlice()->SetPos( 
-      sliceNavigatorSagittal->GetSlice()->GetSteps()/2 );
-
-    sliceNavigatorFrontal->SetInputWorldGeometry(
-      clonedgeometry.GetPointer());
-    sliceNavigatorFrontal->Update();
-    sliceNavigatorFrontal->GetSlice()->SetPos( 
-      sliceNavigatorFrontal->GetSlice()->GetSteps()/2 );
-
-    timeNavigationController->SetInputWorldGeometry(
-      clonedgeometry.GetPointer());
-    timeNavigationController->Update();
-    this->Fit();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-    boundingBoxInitialized=true;
-  }
-
-  return boundingBoxInitialized;
+  return mitk::RenderingManager::GetInstance()->InitializeViews( geometry );
 }
 
 void QmitkStdMultiWidget::RequestUpdate()
@@ -899,30 +763,6 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
 {
   return m_MoveAndZoomInteractor.GetPointer();
-}
-
-void QmitkStdMultiWidget::ReInitializeStandardViews()
-{
-  mitk::SliceNavigationController* sliceNavigatorTransversal = 
-    mitkWidget1->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorSagittal = 
-    mitkWidget2->GetSliceNavigationController();
-  mitk::SliceNavigationController* sliceNavigatorFrontal = 
-    mitkWidget3->GetSliceNavigationController();
-
-  sliceNavigatorTransversal->SetViewDirection(
-    mitk::SliceNavigationController::Transversal);
-  sliceNavigatorSagittal->SetViewDirection(
-    mitk::SliceNavigationController::Sagittal);
-  sliceNavigatorFrontal->SetViewDirection(
-    mitk::SliceNavigationController::Frontal);
-
-  sliceNavigatorTransversal->Update();
-  sliceNavigatorSagittal->Update();
-  sliceNavigatorFrontal->Update();
-  timeNavigationController->Update();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
@@ -1308,7 +1148,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     gi->AddListener( mitkWidget3->GetSliceNavigationController() );
     gi->AddListener( mitkWidget4->GetSliceNavigationController() );
 
-    this->ReInitializeStandardViews();
+    mitk::RenderingManager::GetInstance()->InitializeViews();
     break;
 
   case PLANE_MODE_ROTATION:

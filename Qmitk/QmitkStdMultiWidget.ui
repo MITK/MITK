@@ -236,7 +236,6 @@
     <slot returnType="bool">InitializeStandardViews( mitk::DataTreeIteratorBase * it )</slot>
     <slot returnType="bool">InitializeStandardViews( const mitk::Geometry3D * geometry )</slot>
     <slot>wheelEvent( QWheelEvent * e )</slot>
-    <slot>ReInitializeStandardViews()</slot>
     <slot>EnsureDisplayContainsPoint( mitk::DisplayGeometry * displayGeometry, const mitk::Point3D &amp; p )</slot>
     <slot>MoveCrossToPosition( const mitk::Point3D &amp; newPosition )</slot>
     <slot>EnableNavigationControllerEventListening()</slot>
@@ -276,11 +275,4 @@
     <function returnType="mitk::SlicesSwiveller *">GetSlicesSwiveller() const</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>QmitkRenderWindow.h</includehint>
-    <includehint>QmitkRenderWindow.h</includehint>
-    <includehint>QmitkRenderWindow.h</includehint>
-    <includehint>QmitkRenderWindow.h</includehint>
-    <includehint>QmitkLevelWindowWidget.h</includehint>
-</includehints>
 </UI>

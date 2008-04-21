@@ -89,6 +89,8 @@ class TMessageCommand : public MessageCommand
     bool operator==(const MessageCommand* c)
     {
       const TMessageCommand<R>* cmd = dynamic_cast<const TMessageCommand<R>* >(c);
+      if (!cmd) return false;
+
       if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;
@@ -126,6 +128,8 @@ class TMessageCommand1 : public MessageCommand1<T>
     bool operator==(const MessageCommand1<T>* c)
     {
       const TMessageCommand1<R,T>* cmd = dynamic_cast<const TMessageCommand1<R,T>* >(c);
+      if (!cmd) return false;
+
       if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;
@@ -162,6 +166,8 @@ class TMessageCommand2 : public MessageCommand2<T,U>
     bool operator==(const MessageCommand2<T,U>* c)
     {
       const TMessageCommand2<R,T,U>* cmd = dynamic_cast<const TMessageCommand2<R,T,U>* >(c);
+      if (!cmd) return false;
+
       if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;

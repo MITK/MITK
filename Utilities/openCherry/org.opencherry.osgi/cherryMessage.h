@@ -46,7 +46,7 @@ class MessageCommand1
     {
     }
     
-    virtual void Execute(T& t) = 0;
+    virtual void Execute(T t) = 0;
     virtual bool operator==(const MessageCommand1* cmd) = 0;
 };
 
@@ -59,7 +59,7 @@ class MessageCommand2
     {
     }
     
-    virtual void Execute(T& t, U& u) = 0;
+    virtual void Execute(T t, U u) = 0;
     virtual bool operator==(const MessageCommand2* cmd) = 0;
 };
 
@@ -89,7 +89,7 @@ class TMessageCommand : public MessageCommand
     bool operator==(const MessageCommand* c)
     {
       const TMessageCommand<R>* cmd = dynamic_cast<const TMessageCommand<R>* >(c);
-      if (this->m_Object != cmd->m_Object) return false;
+      if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;
     }
@@ -107,7 +107,7 @@ class TMessageCommand1 : public MessageCommand1<T>
 
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
-    TMessageCommand1(R* object, void(R::*memberFunctionPointer)(T&))
+    TMessageCommand1(R* object, void(R::*memberFunctionPointer)(T))
     :m_Object(object), 
     m_MemberFunctionPointer(memberFunctionPointer)
     {
@@ -118,7 +118,7 @@ class TMessageCommand1 : public MessageCommand1<T>
     }
 
     // override function "Call"
-    virtual void Execute(T& t)
+    virtual void Execute(T t)
     { 
       return (m_Object->*m_MemberFunctionPointer)(t);    // execute member function
     }
@@ -126,14 +126,14 @@ class TMessageCommand1 : public MessageCommand1<T>
     bool operator==(const MessageCommand1<T>* c)
     {
       const TMessageCommand1<R,T>* cmd = dynamic_cast<const TMessageCommand1<R,T>* >(c);
-      if (this->m_Object != cmd->m_Object) return false;
+      if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;
     }
 
   private:
     R* m_Object;                            // pointer to object
-    void (R::*m_MemberFunctionPointer)(T&);   // pointer to member function
+    void (R::*m_MemberFunctionPointer)(T);   // pointer to member function
 }; 
 
 template <class R, typename T, typename U> 
@@ -143,7 +143,7 @@ class TMessageCommand2 : public MessageCommand2<T,U>
 
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
-    TMessageCommand2(R* object, void(R::*memberFunctionPointer)(T&, U&))
+    TMessageCommand2(R* object, void(R::*memberFunctionPointer)(T, U))
     :m_Object(object), 
     m_MemberFunctionPointer(memberFunctionPointer)
     {
@@ -154,7 +154,7 @@ class TMessageCommand2 : public MessageCommand2<T,U>
     }
 
     // override function "Call"
-    virtual void Execute(T& t, U& u)
+    virtual void Execute(T t, U u)
     { 
       return (m_Object->*m_MemberFunctionPointer)(t,u);             // execute member function
     }
@@ -162,14 +162,14 @@ class TMessageCommand2 : public MessageCommand2<T,U>
     bool operator==(const MessageCommand2<T,U>* c)
     {
       const TMessageCommand2<R,T,U>* cmd = dynamic_cast<const TMessageCommand2<R,T,U>* >(c);
-      if (this->m_Object != cmd->m_Object) return false;
+      if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
       if (this->m_MemberFunctionPointer != cmd->m_MemberFunctionPointer) return false;
       return true;
     }
 
   private:
     R* m_Object;                            // pointer to object
-    void (R::*m_MemberFunctionPointer)(T&, U&);   // pointer to member function
+    void (R::*m_MemberFunctionPointer)(T, U);   // pointer to member function
 }; 
 
 // message without parameters (pure signals)
@@ -180,7 +180,7 @@ class CHERRY_API Message
     typedef Message Self; 
     
     template <class R>
-    void AddListener( R* const receiver, void(R::*fnptr)() )
+    void AddListener( R* const receiver, void(R::*fnptr)() ) const
     {
       TMessageCommand<R>* msgCmd = new TMessageCommand<R>(receiver, fnptr);
       for (typename ListenerList::iterator iter = m_Listeners.begin();
@@ -196,7 +196,7 @@ class CHERRY_API Message
     }
 
     template <class R>
-    void RemoveListener( R* receiver, void(R::*fnptr)() )
+    void RemoveListener( R* receiver, void(R::*fnptr)() ) const
     {
       // remove handler
       TMessageCommand<R> msgCmd(receiver, fnptr);
@@ -233,7 +233,7 @@ class CHERRY_API Message
     
     typedef std::vector<MessageCommand* > ListenerList;
     
-    ListenerList m_Listeners;
+    mutable ListenerList m_Listeners;
  
 };
 
@@ -247,7 +247,7 @@ class CHERRY_API Message1
     typedef Message1 Self; 
     
     template <class R>
-    void AddListener( R* const receiver, void(R::*fnptr)(T&) )
+    void AddListener( R* const receiver, void(R::*fnptr)(T) ) const
     {
       TMessageCommand1<R,T>* msgCmd = new TMessageCommand1<R, T>(receiver, fnptr);
       for (typename ListenerList::iterator iter = m_Listeners.begin();
@@ -263,7 +263,7 @@ class CHERRY_API Message1
     }
 
     template <class R>
-    void RemoveListener( R* receiver, void(R::*fnptr)(T&) )
+    void RemoveListener( R* receiver, void(R::*fnptr)(T) ) const
     {
       // remove handler
       TMessageCommand1<R,T> msgCmd(receiver, fnptr);
@@ -280,7 +280,7 @@ class CHERRY_API Message1
       }
     }
 
-    void Send(T& t)
+    void Send(T t)
     {
       for ( typename ListenerList::iterator iter = m_Listeners.begin();
             iter != m_Listeners.end();
@@ -300,7 +300,7 @@ class CHERRY_API Message1
     
     typedef std::vector<MessageCommand1<T>* > ListenerList;
     
-    ListenerList m_Listeners;
+    mutable ListenerList m_Listeners;
  
 };
 
@@ -314,7 +314,7 @@ class CHERRY_API Message2
     typedef Message2 Self; 
     
     template <class R>
-    void AddListener( R* receiver, void(R::*fnptr)(T&,U&) )
+    void AddListener( R* receiver, void(R::*fnptr)(T,U) ) const
     {
       TMessageCommand2<R,T,U>* msgCmd = new TMessageCommand2<R, T, U>(receiver, fnptr);
       for (typename ListenerList::iterator iter = m_Listeners.begin();
@@ -330,7 +330,7 @@ class CHERRY_API Message2
     }
 
     template <class R>
-    void RemoveListener( R* receiver, void(R::*fnptr)(T&,U&) )
+    void RemoveListener( R* receiver, void(R::*fnptr)(T,U) ) const
     {
       // remove handler
       TMessageCommand2<R,T,U> msgCmd(receiver, fnptr);
@@ -347,7 +347,7 @@ class CHERRY_API Message2
       }
     }
 
-    void Send(T& t, U& u)
+    void Send(T t, U u)
     {
       for ( typename ListenerList::iterator iter = m_Listeners.begin();
             iter != m_Listeners.end();
@@ -358,11 +358,17 @@ class CHERRY_API Message2
       }
     }
 
+    void operator()(T t, U u)
+    {
+      this->Send(t, u);
+    }
+
+
   protected:
     
     typedef std::vector<MessageCommand2<T,U>* > ListenerList;
     
-    ListenerList m_Listeners;
+    mutable ListenerList m_Listeners;
   
 };
 

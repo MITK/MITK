@@ -34,19 +34,22 @@ RenderingManager::Pointer RenderingManager::s_Instance = 0;
 RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 
 
-RenderingManager::RenderingManager()
+RenderingManager
+::RenderingManager()
 : m_UpdatePending( false ), 
   m_CurrentLOD( 0 ),
   m_MaxLOD( 3 ),
   m_NumberOf3DRW( 0 ),
-  m_ClippingPlaneEnabled( false )
+  m_ClippingPlaneEnabled( false ),
+  m_TimeNavigationController( NULL )
 {
   m_ShadingEnabled.assign(3, false);
   m_ShadingValues.assign(4, 0.0);
 }
 
 
-RenderingManager::~RenderingManager()
+RenderingManager
+::~RenderingManager()
 {
 
 }
@@ -296,6 +299,30 @@ RenderingManager
   }
 
   this->CheckUpdatePending();
+}
+
+
+void 
+RenderingManager
+::SetTimeNavigationController( SliceNavigationController *snc )
+{
+  m_TimeNavigationController = snc;
+}
+
+
+const SliceNavigationController *
+RenderingManager
+::GetTimeNavigationController() const
+{
+  return m_TimeNavigationController;
+}
+
+
+SliceNavigationController *
+RenderingManager
+::GetTimeNavigationController()
+{
+  return m_TimeNavigationController;
 }
 
 

@@ -569,7 +569,7 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
     }
   }
 
-  m_StandardViewsInitialized = m_MultiWidget->InitializeStandardViews(&it);
+  m_StandardViewsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews( &it );
   m_MultiWidget->RequestUpdate();
   m_MultiWidget->Fit();
   m_StandardViewsInitialized = true;
@@ -594,8 +594,7 @@ void QmitkMainTemplate::fileOpenProject()
     {
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Load(&it, filename);
-      m_MultiWidget->InitializeStandardViews(&it);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->InitializeViews( &it );
     }
     catch ( itk::ExceptionObject & ex )
     {
@@ -613,8 +612,7 @@ void QmitkMainTemplate::fileOpenProject()
 
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTree::Load( &it, fileName.ascii() );
-      m_MultiWidget->InitializeStandardViews(&it);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->InitializeViews( &it );
       m_ProjectFileName = fileName;
     }
     catch ( itk::ExceptionObject & ex )
@@ -1271,7 +1269,7 @@ void QmitkMainTemplate::editRedo()
 void QmitkMainTemplate::viewReinitMultiWidget()
 {
   mitk::DataTreePreOrderIterator it(m_Tree);
-  m_MultiWidget->InitializeStandardViews( &it );
+  mitk::RenderingManager::GetInstance()->InitializeViews( &it );
 }
 
 void QmitkMainTemplate::helpContents()
@@ -1575,14 +1573,14 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
 
   if (m_ResultImage.IsNotNull())
   {
-      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-      node->SetData(m_ResultImage);
-      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
-      node->SetProperty("name", mitk::StringProperty::New( fileName ));
-      mitk::DataStorage::GetInstance()->Add(node);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
+    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+    node->SetData(m_ResultImage);
+    mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
+    node->SetProperty("name", mitk::StringProperty::New( fileName ));
+    mitk::DataStorage::GetInstance()->Add(node);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataTreePreOrderIterator it(m_Tree);
+    mitk::RenderingManager::GetInstance()->InitializeViews( &it );
   }
 
 }
@@ -1606,14 +1604,14 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
 
     if (m_ResultImage.IsNotNull())
     {
-        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-        node->SetData(m_ResultImage);
-        mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
-        node->SetProperty("name", mitk::StringProperty::New( fileNames.first().ascii() ));
-        mitk::DataStorage::GetInstance()->Add(node);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        mitk::DataTreePreOrderIterator it(m_Tree);
-        m_MultiWidget->InitializeStandardViews(&it);  // otherwise it is not seen
+      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+      node->SetData(m_ResultImage);
+      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
+      node->SetProperty("name", mitk::StringProperty::New( fileNames.first().ascii() ));
+      mitk::DataStorage::GetInstance()->Add(node);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::DataTreePreOrderIterator it(m_Tree);
+      mitk::RenderingManager::GetInstance()->InitializeViews( &it );
     }
   }
 

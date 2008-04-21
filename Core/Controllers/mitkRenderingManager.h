@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
 #include "mitkCommon.h"
+#include "mitkDataTree.h"
+
 #include <string>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -31,6 +33,8 @@ namespace mitk
 
 class RenderingManager;
 class RenderingManagerFactory;
+class Geometry3D;
+class SliceNavigationController;
 
 /**
  * \brief Manager for coordinating the rendering process.
@@ -132,7 +136,34 @@ public:
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
   void ForceImmediateUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
+
   
+  /** Initializes the windows specified by requestType to the geometry of the
+   * given DataTreeNode. PLATFORM SPECIFIC. */
+  virtual bool InitializeViews( DataTreeIteratorBase *dataIt, 
+    unsigned int requestType = REQUEST_UPDATE_ALL ) { return false; };
+
+  /** Initializes the windows specified by requestType to the given
+   * geometry. PLATFORM SPECIFIC. */
+  virtual bool InitializeViews( const Geometry3D *geometry,
+    unsigned int requestType = REQUEST_UPDATE_ALL ) { return false; };
+
+  /** Initializes the windows to the default viewing direction
+   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
+  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL )
+    { return false; };
+
+  /** Sets the (global) SliceNavigationController responsible for 
+   * time-slicing. */
+  void SetTimeNavigationController( SliceNavigationController *snc );
+
+  /** Gets the (global) SliceNavigationController responsible for 
+   * time-slicing. */
+  const SliceNavigationController *GetTimeNavigationController() const;
+  
+  /** Gets the (global) SliceNavigationController responsible for 
+   * time-slicing. */
+  SliceNavigationController *GetTimeNavigationController();
 
   virtual ~RenderingManager();
 
@@ -218,11 +249,16 @@ protected:
   RenderWindowList m_RenderWindowList;
   RenderWindowVector m_AllRenderWindows;
 
+  SliceNavigationController *m_TimeNavigationController;
+
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;
 
 };
+
+itkEventMacro( RenderingManagerEvent, itk::AnyEvent );
+itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
 
 /**

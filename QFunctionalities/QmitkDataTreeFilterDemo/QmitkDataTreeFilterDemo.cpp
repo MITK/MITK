@@ -172,8 +172,8 @@ void QmitkDataTreeFilterDemo::onComboBoxItemSelected(const mitk::DataTreeFilter:
     if (node && node->GetData())
     {
       // reinit multi-widget for the selected image
-      m_MultiWidget->InitializeStandardViews( node->GetData()->GetTimeSlicedGeometry() ); 
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->InitializeViews(
+        node->GetData()->GetTimeSlicedGeometry() );
     }
   }
 }

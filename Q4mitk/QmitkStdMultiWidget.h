@@ -123,8 +123,6 @@ public slots:
   
   void wheelEvent( QWheelEvent * e );
   
-  void ReInitializeStandardViews();
-  
   void EnsureDisplayContainsPoint(
     mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
   

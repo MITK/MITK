@@ -172,6 +172,21 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkGetMacro(ViewDirection, ViewDirection);
 
     /**
+     * \brief Set the default view direction
+     *
+     * This is used to re-initialize the view direction of the SNC to the
+     * default value with SetViewDirectionToDefault()
+     * 
+     * \sa ViewDirection
+     * \sa Update(ViewDirection viewDirection, bool top = true,
+     *     bool frontside = true, bool rotated = false)
+     */
+    itkSetMacro(DefaultViewDirection, ViewDirection);
+    itkGetMacro(DefaultViewDirection, ViewDirection);
+
+    virtual void SetViewDirectionToDefault();
+
+    /**
      * \brief Do the actual creation and send it to the connected 
      * observers (renderers)
      * 
@@ -424,6 +439,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
+    ViewDirection m_DefaultViewDirection;
 
     mitk::RenderingManager::Pointer m_RenderingManager;
 

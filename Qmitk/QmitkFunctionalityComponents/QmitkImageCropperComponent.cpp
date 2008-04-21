@@ -189,7 +189,7 @@ void QmitkImageCropperComponent::ImageSelected(const mitk::DataTreeFilter::Item 
 
 		//AddBoundingObjectToNode( m_MitkImageIterator );
 		m_MitkImageIterator->Get()->SetVisibility(true);
-		m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+		mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
 		//mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 	}
 
@@ -296,7 +296,7 @@ void QmitkImageCropperComponent::ExecuteOperation (mitk::Operation *operation)
 			RemoveBoundingObjectFromNode();
 			opExchangeNodes* op = static_cast<opExchangeNodes*>(operation);
 			op->GetNode()->SetData(op->GetNewData());
-			m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+			mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
 			mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 			break;
 		}
@@ -414,7 +414,7 @@ void QmitkImageCropperComponent::CreateBoundingObject(int type)
 		{
 			AddBoundingObjectToNode( m_MitkImageIterator );
 			m_MitkImageIterator->Get()->SetVisibility(true);
-			m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+			mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
 		}
 	}
 }

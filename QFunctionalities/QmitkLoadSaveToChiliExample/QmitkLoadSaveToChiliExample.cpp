@@ -254,9 +254,9 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
         break;
       }
     }
-    m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+    mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDataTreeIterator() );
     m_MultiWidget->Fit();
-    m_MultiWidget->ReInitializeStandardViews();
+    mitk::RenderingManager::GetInstance()->InitializeViews();
   }
 }
 
@@ -275,9 +275,9 @@ void QmitkLoadSaveToChiliExample::LoadFromPSListView()
         tmpVec.push_back( temp );
         m_Plugin->SetRelationsToDataStorage( tmpVec );
 
-        m_MultiWidget->InitializeStandardViews( this->GetDataTreeIterator() );
+        mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDataTreeIterator() );
         m_MultiWidget->Fit();
-        m_MultiWidget->ReInitializeStandardViews();
+        mitk::RenderingManager::GetInstance()->InitializeViews();
       }
     }
   }

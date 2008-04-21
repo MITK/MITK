@@ -31,7 +31,7 @@ void Step8::SetupWidgets()
   multiWidget->SetData(&it);
   // initialize views as transversal, sagittal, coronar (from
   // top-left to bottom)
-  multiWidget->InitializeStandardViews(&it);
+  mitk::RenderingManager::GetInstance()->InitializeViews(&it);
   // initialize bottom-right view as 3D view
   multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
   // enable standard handler for levelwindow-slider

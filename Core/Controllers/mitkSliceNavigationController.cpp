@@ -47,6 +47,7 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_InputWorldGeometry( NULL ),
   m_CreatedWorldGeometry( NULL ), 
   m_ViewDirection( Transversal ),
+  m_DefaultViewDirection( Transversal ),
   m_Renderer( NULL ),
   m_Top( false ),
   m_FrontSide( false ),
@@ -111,6 +112,12 @@ SliceNavigationController::GetRenderingManager() const
   if(renderingManager == NULL)
     return mitk::RenderingManager::GetInstance();
   return renderingManager;
+}
+
+
+void SliceNavigationController::SetViewDirectionToDefault()
+{
+  m_ViewDirection = m_DefaultViewDirection;
 }
 
 void SliceNavigationController::Update()

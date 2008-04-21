@@ -105,7 +105,8 @@ QAction * QmitkSimpleExampleFunctionality::CreateAction(QActionGroup *parent)
 
 void QmitkSimpleExampleFunctionality::initNavigators()
 {
-  m_NavigatorsInitialized = multiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+  m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()
+    ->InitializeViews(m_DataTreeIterator.GetPointer());
 }
 
 void QmitkSimpleExampleFunctionality::generateMovie()
@@ -136,7 +137,7 @@ void QmitkSimpleExampleFunctionality::Activated()
  
   //if(m_NavigatorsInitialized)
   //{
-  //  multiWidget->ReInitializeStandardViews();
+  //  mitk::RenderingManager::GetInstance()->InitializeViews();
   //}
 }
 

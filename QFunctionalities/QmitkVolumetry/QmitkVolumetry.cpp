@@ -141,7 +141,8 @@ void QmitkVolumetry::Deactivated()
 
 void QmitkVolumetry::InitializeStandardViews(mitk::BaseData::Pointer data)
 {
-  m_MultiWidget->InitializeStandardViews( data->GetGeometry() );
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    data->GetGeometry() );
 }
 
 

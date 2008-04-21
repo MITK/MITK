@@ -179,7 +179,8 @@ void QmitkDataManagerControls::ReInitButton_clicked()
       mitk::BaseData::Pointer basedata = node->GetData();
       if (basedata.IsNotNull())
       {
-        emit InitializeStandardViews( basedata->GetTimeSlicedGeometry() );
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+          basedata->GetTimeSlicedGeometry() );
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
@@ -447,7 +448,8 @@ void QmitkDataManagerControls::GlobalReInit_clicked()
 {
   if(m_DataTreeIterator.IsNotNull())
   {
-    emit InitializeStandardViews( m_DataTreeIterator.GetPointer() );
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+      m_DataTreeIterator.GetPointer() );
   }
 }
 

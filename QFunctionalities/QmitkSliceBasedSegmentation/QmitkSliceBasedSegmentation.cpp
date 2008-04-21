@@ -798,7 +798,7 @@ void QmitkSliceBasedSegmentation::ReinitializeToImage()
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())
     {
-      m_MultiWidget->InitializeStandardViews( basedata->GetTimeSlicedGeometry() );
+      mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry() );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 

@@ -105,5 +105,5 @@ void QmitkViewInitialization::Apply()
 
 void QmitkViewInitialization::ResetAll()
 {
-  m_MultiWidget->ReInitializeStandardViews();
+  mitk::RenderingManager::GetInstance()->InitializeViews();
 }

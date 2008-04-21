@@ -155,7 +155,7 @@ void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
       RemoveBoundingObjectFromNode();
       opExchangeNodes* op = static_cast<opExchangeNodes*>(operation);
       op->GetNode()->SetData(op->GetNewData());
-      m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+      mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
@@ -177,7 +177,7 @@ void QmitkImageCropper::ImageSelectionChanged()
     AddBoundingObjectToNode( m_IteratorToImageToCrop );
 
     m_IteratorToImageToCrop->Get()->SetVisibility(true);
-    m_MultiWidget->InitializeStandardViews(m_DataTreeIterator.GetPointer());
+    mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     m_Controls->m_NewBoxButton->setEnabled(false);
   }

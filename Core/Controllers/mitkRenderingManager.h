@@ -141,17 +141,16 @@ public:
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataTreeNode. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( DataTreeIteratorBase *dataIt, 
-    unsigned int requestType = REQUEST_UPDATE_ALL ) { return false; };
+    unsigned int requestType = REQUEST_UPDATE_ALL );
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( const Geometry3D *geometry,
-    unsigned int requestType = REQUEST_UPDATE_ALL ) { return false; };
+    unsigned int requestType = REQUEST_UPDATE_ALL );
 
   /** Initializes the windows to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
-  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL )
-    { return false; };
+  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
 
   /** Sets the (global) SliceNavigationController responsible for 
    * time-slicing. */

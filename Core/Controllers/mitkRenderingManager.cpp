@@ -302,6 +302,30 @@ RenderingManager
 }
 
 
+bool 
+RenderingManager
+::InitializeViews( DataTreeIteratorBase * /*dataIt*/, unsigned int /*requestType*/ )
+{ 
+  return false; 
+}
+
+
+bool 
+RenderingManager
+::InitializeViews( const Geometry3D * /*geometry*/, unsigned int /*requestType*/ )
+{ 
+  return false; 
+}
+
+
+bool 
+RenderingManager
+::InitializeViews( unsigned int /*requestType*/ )
+{ 
+  return false; 
+}
+
+  
 void 
 RenderingManager
 ::SetTimeNavigationController( SliceNavigationController *snc )

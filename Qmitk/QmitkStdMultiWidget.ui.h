@@ -158,11 +158,22 @@ void QmitkStdMultiWidget::init()
     mitkWidget1->GetRenderWindow() );
   m_GradientBackground1->Disable();
   
+  m_GradientBackground2 = mitk::GradientBackground::New();
+  m_GradientBackground2->SetRenderWindow(
+    mitkWidget2->GetRenderWindow() );
+  m_GradientBackground2->Disable();
+
+  m_GradientBackground3 = mitk::GradientBackground::New();
+  m_GradientBackground3->SetRenderWindow(
+    mitkWidget3->GetRenderWindow() );
+  m_GradientBackground3->Disable();
+
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
   m_GradientBackground4->SetGradientColors(0.0,0.1,0.3,0.7,0.7,0.8);
   m_GradientBackground4->Enable();
+
   // setup the department logo rendering
   m_LogoRendering1 = mitk::LogoRendering::New();
   m_LogoRendering1->SetRenderWindow(

@@ -21,6 +21,8 @@ RenderWindows represent the rendering target: an area of the user interface into
 
 \section vtkVisualizationRenderer Encapsulating VTK Rendering Mechanisms
 
+\warning Parts of the following may be deprecated. Please read section on \ref Rendering.
+
 As a framework, MITK aims at making use of the visualization capabilities of VTK as much as possible. For the application developer building on top of MITK, the way of how to utilize specific VTK features should be straightforward and familiar. Therefore, most of the MITK rendering components closely resemble or integrate corresponding VTK components.
 
 Just like VTK, MITK defines Renderers and Mappers. These classes do not derive from their VTK counterparts, but integrate them and have similar scopes of responsibility. While the VTK rendering mechanism is mainly focused on establishing a pipeline of rendering components (data, filters, mappers, and renderers), MITK has a central DataTree and provides convenient ways of rendering different items of the tree according to their type. Internally, the VTK rendering pipeline is used as well in most cases, though it is more hidden from the application developer who merely makes use of existing rendering capabilities.

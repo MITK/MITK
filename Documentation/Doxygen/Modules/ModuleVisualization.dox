@@ -13,12 +13,13 @@ interface to the graphics library (e.g., OpenGL, vtk).
 Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree 
 and asks the mappers of the data objects to render the data into the renderwindow it is associated to.
 
+More details can be found in the section on \ref Rendering. 
+
 \subsection inthisgroupVisualization What belongs into this group 
 \section implementVisualization Practical issues
 
 \section futureVisualization Plans for the future 
 - Abort mechanism
-- all mappers based on vtk
 - level-of-detail rendering mechanism
 - allow multiple renderers per renderwindow
 - modified detection mechanism: 

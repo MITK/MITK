@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkVector.h"
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 namespace mitk {
 

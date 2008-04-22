@@ -41,7 +41,7 @@
 
 #include <stdio.h>
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 _ipEndian_t _ipEndian( void )
 {

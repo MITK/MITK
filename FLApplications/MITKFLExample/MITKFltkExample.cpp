@@ -6,7 +6,7 @@
 #include <Fl/Fl_File_Chooser.h>
 #include "FLmitkRenderWindow/FLmitkRenderWindow.h"
 
-// #include "ipPic.h"
+// #include "mitkIpPic.h"
 #include "mitkPicFileReader.h"
 #include "mitkDataTree.h"
 #include "mitkStringProperty.h"

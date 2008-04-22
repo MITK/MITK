@@ -75,7 +75,7 @@
   static char *what = { "@(#)ipPicNewTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipPicTSV *ipPicNewTag( )
 { 

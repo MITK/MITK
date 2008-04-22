@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageAccessByItk.h>
 #include <mitkPicFileReader.h>
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 #include <vtkWindowToImageFilter.h>
 #include <vtkRenderWindow.h>

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IPSEGMENTATION_H
 #define IPSEGMENTATION_H
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C"

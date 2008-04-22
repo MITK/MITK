@@ -109,7 +109,7 @@
 #include <io.h>
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 size_t
 ipFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream )

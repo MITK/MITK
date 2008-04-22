@@ -81,7 +81,7 @@
   static char *what = { "@(#)ipPicNew\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipPicDescriptor *ipPicNew( void )
 {

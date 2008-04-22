@@ -4,7 +4,7 @@
 #include <Xm/PushB.h>
 #include <Xm/Frame.h>
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 #include <pic/Pic.h>
 

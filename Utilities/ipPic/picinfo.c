@@ -109,7 +109,7 @@
 /*
 ** ip includefiles
 */
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /*
 ** typedefs

@@ -52,7 +52,7 @@
   static char *what = { "@(#)_ipPicTSVSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
  /**  calculates the size of the TSV's value in bytes
  *  @param tsv	the tsv

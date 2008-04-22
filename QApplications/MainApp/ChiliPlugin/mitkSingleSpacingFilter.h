@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
+  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
 
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
@@ -57,7 +57,7 @@ class SingleSpacingFilter : public PicDescriptorToNode
     {
       Vector3D origin;
       Vector3D normal;
-      std::vector< ipPicDescriptor* > includedPics;
+      std::vector< mitkIpPicDescriptor* > includedPics;
     };
 
     /** Struct for a single group. */
@@ -81,18 +81,18 @@ class SingleSpacingFilter : public PicDescriptorToNode
       int count;
     };
 
-    /** This function sort the ipPicDescriptor to groups and positions.  */
+    /** This function sort the mitkIpPicDescriptor to groups and positions.  */
     void SortPicsToGroup();
-    /** This function sort the positions by location and the ipPicDescriptor by imagenumber. */
+    /** This function sort the positions by location and the mitkIpPicDescriptor by imagenumber. */
     void SortPositionsAndPics();
-    /** This function create mitk::Images until all groups and all ipPicDescriptor used. */
+    /** This function create mitk::Images until all groups and all mitkIpPicDescriptor used. */
     void CreateResults();
     /** This function calculate the most coherent slices, the most commonly used spacing, the minimum timeStep and delete the used positions. */
     void SearchParameter( unsigned int currentGroup );
 
     /** help-functions */
     static bool PositionSort( const Position& elem1, const Position& elem2 );
-    static bool PicSort( ipPicDescriptor* elem1, ipPicDescriptor* elem2 );
+    static bool PicSort( mitkIpPicDescriptor* elem1, mitkIpPicDescriptor* elem2 );
 };
 
 } // namespace mitk

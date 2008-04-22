@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSliceSelector.h"
 #include "mitkProgressBar.h"
 
+#include <mitkIpPicUnmangle.h>
+
 /** Helper class for property import from pic/dicom-headers. */
 class HeaderTagInfo
 {
@@ -149,7 +151,7 @@ void mitk::ImageToPicDescriptor::SetLevelWindow( LevelWindow levelWindow )
   m_LevelWindowInitialized = true;
 }
 
-/** Set the tagList. "useSavedPicTags" decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the ipPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one. This function have to be use, otherwise update dont work.*/
+/** Set the tagList. "useSavedPicTags" decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the mitkIpPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one. This function have to be use, otherwise update dont work.*/
 void mitk::ImageToPicDescriptor::SetTagList( TagInformationList inputTags, bool useSavedPicTags )
 {
   m_TagList = inputTags;
@@ -164,7 +166,7 @@ void mitk::ImageToPicDescriptor::SetImageNumber( int imageNumber )
   m_ImageNumberInitialized = true;
 }
 
-/** This function separate a mitk::image into a list of ipPicDescriptor. If no input set before, the function create an empty output. */
+/** This function separate a mitk::image into a list of mitkIpPicDescriptor. If no input set before, the function create an empty output. */
 void mitk::ImageToPicDescriptor::Update()
 {
   m_Output.clear();
@@ -208,7 +210,10 @@ void mitk::ImageToPicDescriptor::Update()
       resultSlice->SetTimeNr( time );
       resultSlice->Update();
       // get current slice
-      currentPicDescriptor = ipPicClone( resultSlice->GetOutput()->GetPic() );  // if you dont do, you change the mitk::image
+      ipPicDescriptor* chiliPicDescriptor = reinterpret_cast<ipPicDescriptor*>(resultSlice->GetOutput()->GetPic());
+      currentPicDescriptor = ipPicClone( chiliPicDescriptor );
+
+      if( !currentPicDescriptor ) continue;
 
       if( !m_UseSavedPicTags )
       {

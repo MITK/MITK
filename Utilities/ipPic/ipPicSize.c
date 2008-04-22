@@ -52,7 +52,7 @@
   static char *what = { "@(#)_ipPicSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /** calculates the size of the image data
  *  @param pic pointer to image

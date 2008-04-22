@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSliceSelector.h"
 
 #include <ipFunc/ipFunc.h>
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 #include <algorithm>
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)

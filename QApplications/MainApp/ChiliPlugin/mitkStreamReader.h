@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
+  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
 
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.

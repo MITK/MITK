@@ -17,11 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLoadFromCHILI.h"
 
+#include <mitkIpPicUnmangle.h>
 //CHILI
 #include <chili/plugin.h>
 #include <chili/qclightbox.h>
+#include <ipPic/ipPic.h>  //ipPicDescriptor
+#include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>  //read DICOM-Files
-#include <ipPic/ipPicTags.h>  //ipPicTags
 //MITK
 #include "mitkPicDescriptorToNode.h"
 #include "mitkImageNumberFilter.h"
@@ -29,7 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSpacingSetFilter.h"
 #include "mitkStreamReader.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkIpPic.h"
 #include "mitkProgressBar.h"
+
+#include <mitkIpPicUnmangle.h>
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
@@ -71,32 +76,37 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromLigh
     ipPicDescriptor* pic = lightbox->fetchPic(n);
     if( pic )
     {
-      if( pic->dim == 1 )
+      mitkIpPicDescriptor* mitkPic = reinterpret_cast<mitkIpPicDescriptor*>(pic);
+      mitkIpPicDescriptor* currentPic = mitkIpPicClone( mitkPic );
+      if( currentPic )
       {
-        StreamImageStruct newElement = LoadStreamImage( pic );
-        if( !newElement.imageList.empty() )
-          m_StreamImageList.push_back( newElement );
+        if( currentPic->dim == 1 )
+        {
+          StreamImageStruct newElement = LoadStreamImage( mitkPic );
+          if( !newElement.imageList.empty() )
+            m_StreamImageList.push_back( newElement );
+        }
+        else
+          m_ImageList.push_back( mitkPic );
       }
-      else
-        m_ImageList.push_back( pic );
     }
     ProgressBar::GetInstance()->Progress();
   }
 
-  return CreateNodesFromLists( instance, lightbox->currentSeries()->oid, false, tmpDirectory );
+  return CreateNodesFromLists( instance, lightbox->currentSeries()->oid, tmpDirectory );
 }
 
-mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipPicDescriptor* pic)
+mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mitkIpPicDescriptor* pic)
 {
   StreamImageStruct newElement;
   newElement.imageList.clear();
 
 #ifndef WIN32
   unsigned int frameNumber;
-  ipPicTSV_t *tsv;
+  mitkIpPicTSV_t *tsv;
   void* data = NULL;
   ipUInt4_t len = 0;
-  tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
+  tsv = mitkIpPicQueryTag( pic, (char*)"SOURCE HEADER" );
   if( tsv )
   {
     if( dicomFindElement( (unsigned char*) tsv->value, 0x0028, 0x0008, &data, &len ) && data != NULL )
@@ -111,30 +121,31 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipP
 
       for( unsigned int i = 0; i < frameNumber; i++ )
       {
-        ipPicDescriptor* cinePic = ipPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
+        mitkIpPicDescriptor* cinePic = mitkIpPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
         newElement.imageList.push_back( cinePic );
       }
       free( offset_table );
       ProgressBar::GetInstance()->Progress();
 
       //interSliceGeometry
-      newElement.geometry = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-      if( !pFetchSliceGeometryFromPic( pic, newElement.geometry ) )
+      ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(pic);
+      newElement.geometry = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
+      if( !chiliPic || !pFetchSliceGeometryFromPic( chiliPic, newElement.geometry ) )
       {
         std::cout<<"Not able to load interSliceGeometry!"<<std::endl;
         free( newElement.geometry );
       }
 
       //SeriesDescription
-      ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( pic, (char*)tagSERIES_DESCRIPTION );
+      mitkIpPicTSV_t* seriesDescriptionTag = mitkIpPicQueryTag( pic, (char*)tagSERIES_DESCRIPTION );
       if( seriesDescriptionTag )
         newElement.seriesDescription = static_cast<char*>( seriesDescriptionTag->value );
       if( newElement.seriesDescription == "" )
       {
-        ipPicTSV_t *tsv;
+        mitkIpPicTSV_t *tsv;
         void* data = NULL;
         ipUInt4_t len = 0;
-        tsv = ipPicQueryTag( pic, (char*)"SOURCE HEADER" );
+        tsv = mitkIpPicQueryTag( pic, (char*)"SOURCE HEADER" );
         if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
           newElement.seriesDescription = (char*)data;
       }
@@ -145,7 +156,7 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( ipP
   return newElement;
 }
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLists( QcPlugin* instance, const std::string& seriesOID, bool deletePicDescriptor, const std::string& tmpDirectory )
+std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLists( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory )
 {  //hint: text-files handled seperate
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -192,12 +203,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
         resultNodes[x]->SetProperty( "VolumeLabel", StringProperty::New( result ) );
     }
 
-    if( deletePicDescriptor )  //delete the loaded ipPicDescriptors
-    {
-      for( std::list<ipPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
-        ipPicFree( (*imageIter) );
-      m_ImageList.clear();
-    }
+    for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+      mitkIpPicFree( (*imageIter) );
+    m_ImageList.clear();
   }
 
   if( !m_StreamImageList.empty() )
@@ -210,9 +218,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
       streamReader->Update();
       resultNodes.push_back( streamReader->GetOutput()[0] );
 
-      //delete the ipPicDescriptors and interSliceGeometry
-      for( std::list<ipPicDescriptor*>::iterator imageIter = m_StreamImageList.front().imageList.begin(); imageIter != m_StreamImageList.front().imageList.end(); imageIter++ )
-        ipPicFree( (*imageIter) );
+      //delete the mitkIpPicDescriptors and interSliceGeometry
+      for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_StreamImageList.front().imageList.begin(); imageIter != m_StreamImageList.front().imageList.end(); imageIter++ )
+        mitkIpPicFree( (*imageIter) );
       free( m_StreamImageList.front().geometry );
       m_StreamImageList.pop_front();
     }
@@ -272,7 +280,7 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeri
   m_tmpDirectory = tmpDirectory;
   pIterateImages( instance, (char*)seriesOID.c_str(), NULL, &LoadFromCHILI::GlobalIterateLoadImages, this );
 
-  return CreateNodesFromLists( instance, seriesOID, true, tmpDirectory );
+  return CreateNodesFromLists( instance, seriesOID, tmpDirectory );
 }
 
 ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, image_t* image, void* user_data )
@@ -299,7 +307,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, im
   {
     if( fileExtension == "pic" )
     {
-      ipPicDescriptor *pic = ipPicGet( (char*)pathAndFile.c_str(), NULL );
+      mitkIpPicDescriptor *pic = mitkIpPicGet( (char*)pathAndFile.c_str(), NULL );
       if( pic )
       {
         if( pic->dim == 1 )  //load cine-pics
@@ -308,7 +316,7 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, im
           if( !newElement.imageList.empty() )
             callingObject->m_StreamImageList.push_back( newElement );
         }
-        else  //load ipPicDescriptors
+        else  //load mitkIpPicDescriptors
           callingObject->m_ImageList.push_back( pic );
 
         if( remove(  pathAndFile.c_str() ) != 0 )
@@ -328,11 +336,13 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, im
 
         if( header && dcimage )
         {
-          //ipPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );
+          //mitkIpPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );
           ipPicDescriptor *pic = _dicomToPic( header, header_size, dcimage, image_size, ipFalse, ipTrue, ipTrue);
-          if( pic )
+          mitkIpPicDescriptor *currentPic = mitkIpPicClone( reinterpret_cast<mitkIpPicDescriptor*>(pic) );
+          ipPicFree( pic );
+          if( currentPic )
           {
-            callingObject->m_ImageList.push_back( pic );
+            callingObject->m_ImageList.push_back( currentPic );
             if( remove(  pathAndFile.c_str() ) != 0 )
               std::cout << "LoadFromCHILI (GlobalIterateLoadImage): Not able to  delete file: "<< pathAndFile << std::endl;
           }
@@ -509,9 +519,8 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
           resultNode = tempResult[0];
         }
       }
-
-      for( std::list<ipPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
-        ipPicFree( (*imageIter) );
+      for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+        mitkIpPicFree( (*imageIter) );
       m_ImageList.clear();
 
       return resultNode;
@@ -542,12 +551,12 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
     pFetchDataToFile( image->path, pathAndFile.c_str(), &error );
     ProgressBar::GetInstance()->Progress();
     if( error != 0 )
-      std::cout << "LoadFromCHILI (GlobalIterateLoadImage): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
+      std::cout << "LoadFromCHILI (GlobalIterateLoadSinglePics): ChiliError: " << error << ", while reading file (" << image->path << ") from Database." << std::endl;
     else
     {
       if( fileExtension == "pic" )
       {
-        ipPicDescriptor *pic = ipPicGet( (char*)pathAndFile.c_str(), NULL );
+        mitkIpPicDescriptor *pic = mitkIpPicGet( (char*)pathAndFile.c_str(), NULL );
         if( pic )
         {
           if( pic->dim == 1 )  //load cine-pics
@@ -556,11 +565,11 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
             if( !newElement.imageList.empty() )
               callingObject->m_StreamImageList.push_back( newElement );
           }
-          else  //load ipPicDescriptors
+          else  //load mitkIpPicDescriptors
             callingObject->m_ImageList.push_back( pic );
 
           if( remove(  pathAndFile.c_str() ) != 0 )
-            std::cout << "LoadFromCHILI (GlobalIterateLoadImage): Not able to  delete file: "<< pathAndFile << std::endl;
+            std::cout << "LoadFromCHILI (GlobalIterateLoadSinglePics): Not able to  delete file: "<< pathAndFile << std::endl;
         }
       }
       else
@@ -576,16 +585,18 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
 
           if( header && dcimage )
           {
-            //ipPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );
+            //mitkIpPicDescriptor *pic = dicomToPic( header, header_size, image, image_size );
             ipPicDescriptor *pic = _dicomToPic( header, header_size, dcimage, image_size, ipFalse, ipTrue, ipTrue);
-            if( pic )
+            mitkIpPicDescriptor *currentPic = mitkIpPicClone( reinterpret_cast<mitkIpPicDescriptor*>(pic) );
+            ipPicFree( pic );
+            if( currentPic )
             {
-              callingObject->m_ImageList.push_back( pic );
+              callingObject->m_ImageList.push_back( currentPic );
               if( remove(  pathAndFile.c_str() ) != 0 )
-                std::cout << "LoadFromCHILI (GlobalIterateLoadImage): Not able to  delete file: "<< pathAndFile << std::endl;
+                std::cout << "LoadFromCHILI (GlobalIterateLoadSinglePics): Not able to  delete file: "<< pathAndFile << std::endl;
             }
           }
-          else std::cout<< "LoadFromCHILI (GlobalIterateLoadImage): Could not get header or image." <<std::endl;
+          else std::cout<< "LoadFromCHILI (GlobalIterateLoadSinglePics): Could not get header or image." <<std::endl;
         }
         else
           callingObject->m_UnknownImageFormatPath.push_back( pathAndFile );

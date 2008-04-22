@@ -48,7 +48,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 #include "ipPicAnnotation.h"
 
 int main( int argc, char *argv[] )

@@ -93,7 +93,7 @@
   static char *what = { "@(#)ipPicGetHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipPicDescriptor *
 ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )

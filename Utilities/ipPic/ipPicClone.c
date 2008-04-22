@@ -51,7 +51,7 @@
   static char *what = { "@(#)ipPicClone\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /**
  * creates the clone of a pic

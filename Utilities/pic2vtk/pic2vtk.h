@@ -2,7 +2,7 @@
 #define Pic2vtk_h
 
 #include <vtkImageReader.h>
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 /** @file
  *	DKFZ - Heidelberg

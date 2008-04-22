@@ -53,7 +53,7 @@
   static char *what = { "@(#)ipPicCopyHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /** copys the header from a pic into a new pic
  *

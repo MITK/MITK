@@ -18,11 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED
 
-// class mitkChiliPlugin inherit from
-#include <mitkPACSPlugin.h>
-#include <chili/plugin.h>
 // class QIDToolButton inherit from
 #include <qtoolbutton.h>
+
+#include <mitkIpPicUnmangle.h>
+// class mitkChiliPlugin inherit from
+#include <chili/plugin.h>
+
+#include <mitkIpPic.h>
+#include <mitkPACSPlugin.h>
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
 
@@ -31,6 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
   #include "mitkSaveToCHILI.h"
 
 #endif
+
+#include "mitkIpPicUnmangle.h"
+
 
 class QcMITKTask;
 class QHBoxLayout;

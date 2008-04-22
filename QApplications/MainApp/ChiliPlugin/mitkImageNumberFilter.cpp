@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 // CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
-#include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
+#include <ipPic/ipPicTags.h>
 // MITK-Includes
 #include "mitkChiliMacros.h"
 #include "mitkProgressBar.h"
+#include <mitkIpPicUnmangle.h>
 
 #include <algorithm>  //needed for "sort" (windows)
 
@@ -83,12 +84,13 @@ void mitk::ImageNumberFilter::Update()
 
 void mitk::ImageNumberFilter::SortPicsToGroup()
 {
-  for( std::list< ipPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
+  for( std::list< mitkIpPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
   {
     if( m_Abort ) return;
     //check intersliceGeomtry
-    interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-    if( !pFetchSliceGeometryFromPic( (*currentPic), isg ) )
+    ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>((*currentPic));
+    interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
+    if( !chiliPic || !pFetchSliceGeometryFromPic( chiliPic, isg ) )
     {
       //PicDescriptor without a geometry not able to sort in a volume
       std::cout<<"ImageNumberFilter-WARNING: Found image without SliceGeometry. Image ignored."<<std::endl;
@@ -108,15 +110,15 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
     newSlice.normal[1] = Round( ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) ), 2);
     newSlice.normal[2] = Round( ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) ), 2);
     //set imageNumber
-    ipPicTSV_t* imagenumberTag = ipPicQueryTag( newSlice.currentPic, (char*)tagIMAGE_NUMBER );
-    if( imagenumberTag && imagenumberTag->type == ipPicInt )
+    mitkIpPicTSV_t* imagenumberTag = mitkIpPicQueryTag( newSlice.currentPic, (char*)tagIMAGE_NUMBER );
+    if( imagenumberTag && imagenumberTag->type == mitkIpPicInt )
       newSlice.imageNumber = *( (int*)(imagenumberTag->value) );
     else
     {
-      ipPicTSV_t *tsv;
+      mitkIpPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( newSlice.currentPic, (char*)"SOURCE HEADER" );
+      tsv = mitkIpPicQueryTag( newSlice.currentPic, (char*)"SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
@@ -133,15 +135,15 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
     vtk2itk( isg->ps, currentPixelSize );
     //seriesDescription
     std::string currentSeriesDescription;
-    ipPicTSV_t* seriesDescriptionTag = ipPicQueryTag( (*currentPic), (char*)tagSERIES_DESCRIPTION );
+    mitkIpPicTSV_t* seriesDescriptionTag = mitkIpPicQueryTag( (*currentPic), (char*)tagSERIES_DESCRIPTION );
     if( seriesDescriptionTag )
       currentSeriesDescription = static_cast<char*>( seriesDescriptionTag->value );
     else
     {
-      ipPicTSV_t *tsv;
+      mitkIpPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = ipPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
+      tsv = mitkIpPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
       if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
         if( data != NULL )
           currentSeriesDescription = (char*)data;
@@ -411,8 +413,9 @@ void mitk::ImageNumberFilter::GenerateImages()
     //get spacing
     Vector3D spacing;
     //initialize
-    interSliceGeometry_t* isg = (interSliceGeometry_t*) malloc ( sizeof(interSliceGeometry_t) );
-    pFetchSliceGeometryFromPic( groupIter->includedSlices.begin()->currentPic, isg );
+    ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(groupIter->includedSlices.begin()->currentPic);
+    interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
+    pFetchSliceGeometryFromPic( chiliPic, isg );
     vtk2itk( isg->ps, spacing );
     if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
       spacing.Fill(1.0);
@@ -461,9 +464,9 @@ void mitk::ImageNumberFilter::GenerateImages()
       }
     }
 
-    //get all ipPicDescriptor
+    //get all mitkIpPicDescriptor
     std::sort( groupIter->includedSlices.begin(), groupIter->includedSlices.end(),PositionSort );
-    std::list<ipPicDescriptor*> usedPic;
+    std::list<mitkIpPicDescriptor*> usedPic;
     usedPic.clear();
     for( std::vector< Slice >::iterator picIter = groupIter->includedSlices.begin(); picIter != groupIter->includedSlices.end(); picIter++ )
       usedPic.push_back( picIter->currentPic );

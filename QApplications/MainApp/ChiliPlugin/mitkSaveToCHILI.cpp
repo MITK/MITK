@@ -17,15 +17,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSaveToCHILI.h"
 
+#include <mitkIpPicUnmangle.h>
 //CHILI
 #include <chili/plugin.h>
-#include <ipPic/ipPicTags.h>  //ipPicTags
+#include <ipPic/ipPicTags.h>
+#include <ipPic/ipPic.h>
 //MITK
 #include "mitkPACSPlugin.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkFileWriter.h"
 #include "QmitkChiliPluginSaveDialog.h"
 #include "mitkProgressBar.h"
+#include <mitkIpPicUnmangle.h>
 
 //Qt
 #include <qapplication.h>

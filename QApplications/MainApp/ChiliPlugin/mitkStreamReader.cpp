@@ -56,8 +56,8 @@ void mitk::StreamReader::Update()
     Image::Pointer resultImage = Image::New();
     Point3D origin;
     Vector3D rightVector, downVector, spacing;
-    ipPicDescriptor* header;
-    header = ipPicCopyHeader( m_PicDescriptorList.front(), NULL );
+    mitkIpPicDescriptor* header;
+    header = mitkIpPicCopyHeader( m_PicDescriptorList.front(), NULL );
 
     //2D+t
     header->dim = 4;
@@ -103,7 +103,7 @@ void mitk::StreamReader::Update()
 
     // add the slices to the created mitk::Image
     unsigned int x = 0;
-    for( std::list< ipPicDescriptor* >::iterator iter = m_PicDescriptorList.begin(); iter != m_PicDescriptorList.end(); iter++)
+    for( std::list< mitkIpPicDescriptor* >::iterator iter = m_PicDescriptorList.begin(); iter != m_PicDescriptorList.end(); iter++)
     {
       resultImage->SetPicSlice( (*iter), 0, x);
       x++;

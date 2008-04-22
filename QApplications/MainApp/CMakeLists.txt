@@ -170,11 +170,7 @@ FOREACH(testdataitem ${testdatalist})
 
 ENDFOREACH(testdataitem)
 
-IF(MITK_CHILI_PLUGIN)
-   ADD_SUBDIRECTORY(ChiliPlugin)
-ENDIF(MITK_CHILI_PLUGIN)
-
-
+ADD_SUBDIRECTORY(ChiliPlugin)
 
 INSTALL(TARGETS MainApp
    RUNTIME DESTINATION bin

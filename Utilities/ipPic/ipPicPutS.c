@@ -96,7 +96,7 @@
   static char *what = { "@(#)ipPicPutSlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {

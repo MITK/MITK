@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 
+#define ipPicType_t mitkIpPicType_t
 
 /** Collects all kind of QT events.
  * To collect events like like Actions to include in your application use.

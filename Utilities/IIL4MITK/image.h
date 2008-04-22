@@ -1,7 +1,7 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 #include "texture.h"
 #include "item.h"
 #include <vector>

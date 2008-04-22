@@ -1,7 +1,7 @@
 #ifndef _PIC_IMAGE_H_
 #define _PIC_IMAGE_H_
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 #include "image.h"
 
 /*!

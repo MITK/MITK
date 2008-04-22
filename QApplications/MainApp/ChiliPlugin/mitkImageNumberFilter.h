@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
+  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
 
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
@@ -55,7 +55,7 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** Struct for single slices. */
     struct Slice
     {
-      ipPicDescriptor* currentPic;
+      mitkIpPicDescriptor* currentPic;
       Vector3D origin;
       Vector3D normal;
       int imageNumber;
@@ -82,15 +82,15 @@ class ImageNumberFilter : public PicDescriptorToNode
       int count;
     };
 
-    /** This function sort the ipPicDescriptor to groups and slices.  */
+    /** This function sort the mitkIpPicDescriptor to groups and slices.  */
     void SortPicsToGroup();
     /** This function sort the slices by imagenumber and location. */
     void SortSlicesByImageNumber();
-    /** This function seperate ipPicDescriptors with different spacings. */
+    /** This function seperate mitkIpPicDescriptors with different spacings. */
     void SeperateBySpacing();
-    /** This function seperate ipPicDescriptors with different time-count. */
+    /** This function seperate mitkIpPicDescriptors with different time-count. */
     void SeperateByTime();
-    /** This function seperate two ipPicDescriptors. Three or more slices represent a volume. */
+    /** This function seperate two mitkIpPicDescriptors. Three or more slices represent a volume. */
     void SplitDummiVolumes();
     /** This function generate all needed parameter to create the mitk::Images. */
     void GenerateImages();

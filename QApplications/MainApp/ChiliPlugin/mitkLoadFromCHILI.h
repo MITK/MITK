@@ -20,15 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 //CHILI
 #include <chili/isg.h>  //geometry
-#include <ipPic/ipPic.h>  //ipPicDescriptor
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 //MITK
 #include "mitkDataTree.h"
 #include "mitkParentChild.h"
 #include "mitkPACSPlugin.h"
+#include "mitkIpPic.h"
 
 #ifndef WIN32  //TODO this function integrated to plugin.h at CHILI-Version 3.14 (current 3.12); at this time it ist possible to use this function for suse and windows -> change code
-extern "C" ipPicDescriptor *ipPicDecompressJPEG( ipPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, ipPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
+extern "C" mitkIpPicDescriptor *mitkIpPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
+
+//extern "C" mitkIpPicDescriptor *mitkIpPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );
 #endif
 
 class QcLightbox;
@@ -75,12 +77,12 @@ class LoadFromCHILI: public itk::Object
 
     struct StreamImageStruct
     {
-      std::list<ipPicDescriptor*> imageList;
+      std::list<mitkIpPicDescriptor*> imageList;
       interSliceGeometry_t* geometry;
       std::string seriesDescription;
     };
 
-    std::list<ipPicDescriptor*> m_ImageList;
+    std::list<mitkIpPicDescriptor*> m_ImageList;
     std::list<StreamImageStruct> m_StreamImageList;
     std::list<std::string> m_UnknownImageFormatPath;
 
@@ -90,9 +92,9 @@ class LoadFromCHILI: public itk::Object
     unsigned int m_UsedReader;
     ParentChild::Pointer m_ParentChild;
 
-    StreamImageStruct LoadStreamImage( ipPicDescriptor* pic);
+    StreamImageStruct LoadStreamImage( mitkIpPicDescriptor* pic);
 
-    std::vector<DataTreeNode::Pointer> CreateNodesFromLists( QcPlugin* instance, const std::string& seriesOID, bool deletePicDescriptor, const std::string& tmpDirectory );
+    std::vector<DataTreeNode::Pointer> CreateNodesFromLists( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
 
     static ipBool_t GlobalIterateLoadImages( int rows, int row, image_t* image, void* user_data );
     static ipBool_t GlobalIterateLoadSinglePics( int rows, int row, image_t* image, void* user_data );

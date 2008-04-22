@@ -18,17 +18,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLightBoxImageReaderImpl.h"
 #include "QmitkLightBoxReaderDialog.h"
 
-#include <mitkProperties.h>
-#include "mitkPlaneGeometry.h"
-#include "mitkFrameOfReferenceUIDManager.h"
-
-#include <itkImageFileReader.h>
-
+#include <mitkIpPicUnmangle.h>
+//CHILI
 #include <chili/qclightbox.h>
 #include <chili/isg.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPicTags.h>
 #include <ipPic/ipPic.h>
+//MITK
+#include "mitkProperties.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkFrameOfReferenceUIDManager.h"
+#include "mitkIpPic.h"
+//ITK
+#include "itkImageFileReader.h"
+#include <mitkIpPicUnmangle.h>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -118,7 +122,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
 
   int numberOfImages = 0, numberOfTimePoints = 0; // numberOfSlicesInCurrentTimePoint = 0;
   unsigned int position;
-  //ipPicDescriptor*  pic2 = NULL;
+  //mitkIpPicDescriptor*  pic2 = NULL;
   interSliceGeometry_t *isg;
   Point3D originCurrentSlice;
   Point3D originLastSlice;
@@ -167,7 +171,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
         {
           /*if (numberOfTimePoints==1 && number==1)
           {
-          tsv=ipPicQueryTag(pic2,(char*)"SOURCE HEADER");
+          tsv=mitkIpPicQueryTag(pic2,(char*)"SOURCE HEADER");
           dicomFindElement((unsigned char*) tsv->value, 0x0008, 0x0033, &data, &len);
           sscanf( (char *) data, "%f", &imagetime );
           }*/
@@ -237,7 +241,8 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
   itkDebugMacro( <<"copy header" );
   RealPosition = GetRealPosition( 0, m_ImageNumbers );
   ipPicDescriptor *originalHeader = m_LightBox->fetchHeader( RealPosition );
-  ipPicDescriptor *header = ipPicCopyHeader( originalHeader, NULL );
+  mitkIpPicDescriptor *mitkHeader = reinterpret_cast<mitkIpPicDescriptor*>(originalHeader);
+  mitkIpPicDescriptor *header = mitkIpPicCopyHeader( mitkHeader, NULL );
 
   //@FIXME: was ist, wenn die Bilder nicht alle gleich gross sind?
   if( numberOfImages>1 )
@@ -297,7 +302,7 @@ void mitk::LightBoxImageReaderImpl::GenerateOutputInformation()
     planegeometry->SetOrigin( origin );
     planegeometry->SetFrameOfReferenceID( FrameOfReferenceUIDManager::AddFrameOfReferenceUID(interSliceGeometry->forUID) );
 
-    ipPicTSV_t *tsv = ipPicQueryTag( originalHeader, (char*)"SOURCE HEADER" );
+    mitkIpPicTSV_t *tsv = mitkIpPicQueryTag( mitkHeader, (char*)"SOURCE HEADER" );
 
     void* data; 
     ipUInt4_t len;
@@ -393,8 +398,8 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
 
   int numberOfImages = 0, time = 0, time1 = 0, time2 = 0;
   unsigned int position;
-  ipPicDescriptor*  pic0 = NULL;
-  ipPicDescriptor*  pic = NULL;
+  mitkIpPicDescriptor*  pic0 = NULL;
+  mitkIpPicDescriptor*  pic = NULL;
   interSliceGeometry_t* isg0;
   interSliceGeometry_t* isg;
   Point3D origin1;
@@ -407,7 +412,8 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
   int zDim = ( output->GetDimension()>2?output->GetDimensions()[2]:1 );
   itkDebugMacro( <<" zdim is "<<zDim );
   RealPosition = GetRealPosition( 0, m_ImageNumbers );
-  pic0 = m_LightBox->fetchPic( RealPosition );// pFetchImage (m_LightBox, position);
+  ipPicDescriptor* chiliPic = m_LightBox->fetchPic( RealPosition );// pFetchImage (m_LightBox, position);
+  pic0 = reinterpret_cast<mitkIpPicDescriptor*>(chiliPic);
   isg0 = m_LightBox->fetchDicomGeometry( RealPosition );
   if( isg0!=NULL )
   {
@@ -439,7 +445,8 @@ void mitk::LightBoxImageReaderImpl::GenerateData()
         return;
       }
 
-      pic = m_LightBox->fetchPic( RealPosition );
+      chiliPic = m_LightBox->fetchPic( RealPosition );
+      pic = reinterpret_cast<mitkIpPicDescriptor*>(chiliPic);
       isg = m_LightBox->fetchDicomGeometry( RealPosition );
       if( isg != NULL )
       {
@@ -590,8 +597,8 @@ bool mitk::LightBoxImageReaderImpl::ImageNumberLesser ( const LocalImageInfo& el
 
 void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers )
 {
-  ipPicDescriptor*  pic = NULL;
-  ipPicTSV_t *tsv;
+  mitkIpPicDescriptor*  pic = NULL;
+  mitkIpPicTSV_t *tsv;
   void* data;
   ipUInt4_t len;
   int imageNumber;
@@ -604,13 +611,14 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
   {
     info.pos = position;
 
-    pic = m_LightBox->fetchHeader(position);
+    ipPicDescriptor* chiliPic = m_LightBox->fetchHeader(position);
+    pic = reinterpret_cast<mitkIpPicDescriptor*>(chiliPic);
     if( !pic )
     {
       std::cout << "****** LightBoxImageReaderImpl::SortImage(): pic is NULL" << std::endl;
       continue;
     }
-    tsv=ipPicQueryTag(pic,(char*)"SOURCE HEADER");
+    tsv=mitkIpPicQueryTag(pic,(char*)"SOURCE HEADER");
     if( tsv )
     {
       bool ok = dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len );
@@ -621,8 +629,8 @@ void mitk::LightBoxImageReaderImpl::SortImage( LocalImageInfoArray& imageNumbers
       }
       else
       {
-        ipPicTSV_t* imagenumberTag = ipPicQueryTag( pic, (char*)tagIMAGE_NUMBER );
-        if( imagenumberTag && imagenumberTag->type == ipPicInt )
+        mitkIpPicTSV_t* imagenumberTag = mitkIpPicQueryTag( pic, (char*)tagIMAGE_NUMBER );
+        if( imagenumberTag && imagenumberTag->type == mitkIpPicInt )
         {
           info.imageNumber = *( (int*)(imagenumberTag->value) );
         }
@@ -707,37 +715,38 @@ const mitk::PropertyList::Pointer mitk::LightBoxImageReaderImpl::GetImageTagsAsP
 
   PropertyList::Pointer resultPropertyList = PropertyList::New();
 
-  ipPicDescriptor* imageToExtractTagsFrom = m_LightBox->fetchHeader(0); // TODO set this to the right descriptor
+  ipPicDescriptor* chiliPic = m_LightBox->fetchHeader(0);
+  mitkIpPicDescriptor* imageToExtractTagsFrom = reinterpret_cast<mitkIpPicDescriptor*>(chiliPic);
   if (!imageToExtractTagsFrom || !imageToExtractTagsFrom->info || !imageToExtractTagsFrom->info->tags_head) return NULL;
 
   // Extract ALL tags from the PIC header
-  _ipPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
+  _mitkIpPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
 
   while( currentTagNode )
   {
-    ipPicTSV_t* currentTag = currentTagNode->tsv;
+    mitkIpPicTSV_t* currentTag = currentTagNode->tsv;
 
     std::string propertyName = "CHILI: ";
     propertyName += currentTag->tag;
 
     switch( currentTag->type )
     {
-      case ipPicASCII:
+      case mitkIpPicASCII:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( static_cast<char*>( currentTag->value ) ) );
         break;
       }
-      case ipPicInt:
+      case mitkIpPicInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
       }
-      case ipPicUInt:
+      case mitkIpPicUInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
-      default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
+      default:  //mitkIpPicUnknown, mitkIpPicBool, mitkIpPicFloat, mitkIpPicNonUniform, mitkIpPicTSV, _mitkIpPicTypeMax
       {
         std::cout << "WARNING: Type of PIC-Tag '" << currentTag->type << "' not handled in LightBoxImageReader." << std::endl;
         break;

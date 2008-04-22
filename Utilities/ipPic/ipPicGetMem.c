@@ -23,7 +23,7 @@
   static char *what = { "@(#)ipPicGetMem\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipPicDescriptor *ipPicGetMem( ipUInt1_t *mem_pic )
 {

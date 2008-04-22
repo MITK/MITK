@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriter.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 
 namespace mitk

@@ -52,7 +52,7 @@
   static char *what = { "@(#)_ipPicTSVElements\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
  /**  calculates the number of elements in the TSV's value
  * @param tsv	the tsv

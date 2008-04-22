@@ -39,7 +39,7 @@ static char *what[] = {
 #include <string.h>
 #include <fcntl.h>
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 
 #ifndef FILENAME_MAX

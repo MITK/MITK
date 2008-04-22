@@ -108,7 +108,7 @@
   static char *what = { "@(#)ipPicPut\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 extern size_t
 _ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);

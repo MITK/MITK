@@ -35,6 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QcMITKTask.h>
 #include <SampleApp.h>
 #include <mitkProgressBar.h>
+#include <mitkRenderingManager.h>
+
+#include <mitkIpPicUnmangle.h>
 //QT
 #include <qlayout.h>
 #include <qapplication.h>

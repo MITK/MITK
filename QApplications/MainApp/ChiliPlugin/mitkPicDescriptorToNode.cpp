@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkPicDescriptorToNode.h"
 
 // CHILI-Includes
 #include <chili/isg.h>
@@ -23,13 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
 //MITK-Includes
+#define ipPicDescriptor mitkIpPicDescriptor
+#include "mitkPicDescriptorToNode.h"
 #include "mitkPACSPlugin.h"
 #include "mitkChiliPluginEvents.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "math.h"
-
+#undef ipPicDescriptor
 #include <itkCommand.h>
 
 #ifdef CHILI_PLUGIN_VERSION_CODE
@@ -53,7 +54,7 @@ mitk::PicDescriptorToNode::~PicDescriptorToNode()
 }
 
 // set-function
-void mitk::PicDescriptorToNode::SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
+void mitk::PicDescriptorToNode::SetInput( std::list< mitkIpPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID )
 {
   m_SeriesOID = inputSeriesOID;
   m_PicDescriptorList = inputPicDescriptorList;
@@ -95,18 +96,18 @@ double mitk::PicDescriptorToNode::Round(double number, unsigned int decimalPlace
   return x;
 }
 
-const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListFromPicTags( ipPicDescriptor* imageToExtractTagsFrom )
+const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListFromPicTags( mitkIpPicDescriptor* imageToExtractTagsFrom )
 {
   if( !imageToExtractTagsFrom || !imageToExtractTagsFrom->info || !imageToExtractTagsFrom->info->tags_head )
     return NULL;
 
   PropertyList::Pointer resultPropertyList = PropertyList::New();
-  _ipPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
+  _mitkIpPicTagsElement_t* currentTagNode = imageToExtractTagsFrom->info->tags_head;
 
   // Extract ALL tags from the PIC header
   while (currentTagNode)
   {
-    ipPicTSV_t* currentTag = currentTagNode->tsv;
+    mitkIpPicTSV_t* currentTag = currentTagNode->tsv;
 
     std::string propertyName = "CHILI: ";
     propertyName += currentTag->tag;
@@ -117,22 +118,22 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
 
     switch( currentTag->type )
     {
-      case ipPicASCII:
+      case mitkIpPicASCII:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( static_cast<char*>( currentTag->value ) ) );
         break;
       }
-      case ipPicInt:
+      case mitkIpPicInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
       }
-      case ipPicUInt:
+      case mitkIpPicUInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
-      default:  //ipPicUnknown, ipPicBool, ipPicFloat, ipPicNonUniform, ipPicTSV, _ipPicTypeMax
+      default:  //mitkIpPicUnknown, mitkIpPicBool, mitkIpPicFloat, mitkIpPicNonUniform, mitkIpPicTSV, _mitkIpPicTypeMax
       {
         break;
       }
@@ -143,15 +144,15 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
   return resultPropertyList;
 }
 
-std::string mitk::PicDescriptorToNode::GetImageInstanceUID( ipPicDescriptor* input )
+std::string mitk::PicDescriptorToNode::GetImageInstanceUID( mitkIpPicDescriptor* input )
 {
   std::string singleUID = "";
-  ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( input, (char*)tagIMAGE_INSTANCE_UID );
+  mitkIpPicTSV_t* missingImageTagQuery = mitkIpPicQueryTag( input, (char*)tagIMAGE_INSTANCE_UID );
   if( missingImageTagQuery )
     singleUID = static_cast<char*>( missingImageTagQuery->value );
   else
   {
-    ipPicTSV_t *dicomHeader = ipPicQueryTag( input, (char*)"SOURCE HEADER" );
+    mitkIpPicTSV_t *dicomHeader = mitkIpPicQueryTag( input, (char*)"SOURCE HEADER" );
     void* data = NULL;
     ipUInt4_t len = 0;
     if( dicomHeader && dicomFindElement( (unsigned char*) dicomHeader->value, 0x0008, 0x0018, &data, &len ) && data != NULL )
@@ -160,7 +161,7 @@ std::string mitk::PicDescriptorToNode::GetImageInstanceUID( ipPicDescriptor* inp
   return singleUID;
 }
 
-void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription )
+void mitk::PicDescriptorToNode::GenerateData( std::list<mitkIpPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription )
 {
   Image::Pointer resultImage = Image::New();
   std::list< std::string > ListOfUIDs;
@@ -188,7 +189,7 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     }
     else
     {
-      ipPicDescriptor* header = ipPicCopyHeader( slices.front(), NULL );
+      mitkIpPicDescriptor* header = mitkIpPicCopyHeader( slices.front(), NULL );
 
       if( sliceSteps == 1 )  //2D
       {
@@ -224,8 +225,9 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     }
 
     //get interslicegeometry
+    ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(slices.front());
     interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
-    if( !pFetchSliceGeometryFromPic( slices.front(), isg ) )
+    if( !chiliPic || !pFetchSliceGeometryFromPic( chiliPic, isg ) )
     {
       free( isg );
       return;
@@ -266,7 +268,7 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     if( slices.front()->dim == 3 )
     {
       int time = 0;
-      for( std::list<ipPicDescriptor*>::iterator picIter = slices.begin(); picIter != slices.end(); picIter++ )
+      for( std::list<mitkIpPicDescriptor*>::iterator picIter = slices.begin(); picIter != slices.end(); picIter++ )
       {
         resultImage->SetPicVolume( (*picIter), time );
         ListOfUIDs.push_back( GetImageInstanceUID( (*picIter) ) );
@@ -275,7 +277,7 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<ipPicDescriptor*> slices
     }
     else
     {
-      std::list<ipPicDescriptor*>::iterator currentSlice = slices.begin();
+      std::list<mitkIpPicDescriptor*>::iterator currentSlice = slices.begin();
       for( int s = 0; s < sliceSteps; s++ )
       {
         for( int t = 0; t < timeSteps; t++ )

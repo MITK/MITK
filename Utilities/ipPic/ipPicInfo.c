@@ -52,7 +52,7 @@
   static char *what = { "@(#)_ipPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /** prints information about an ipPicDescriptor
  *

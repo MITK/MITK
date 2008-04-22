@@ -53,7 +53,7 @@
   static char *what = { "@(#)ipPicPutHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
 {

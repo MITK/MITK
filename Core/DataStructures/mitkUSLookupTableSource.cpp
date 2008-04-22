@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkUSLookupTableSource.h"
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 #include <vtkLookupTable.h>
 #include <fstream>
 

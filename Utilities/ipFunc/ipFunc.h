@@ -132,7 +132,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 /* 
    Diese Datei wird in der ipFuncP.h includet
    #include <meschach/matrix2.h>

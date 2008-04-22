@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
+  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
 
   WARNING:
   This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
@@ -56,7 +56,7 @@ class SpacingSetFilter : public PicDescriptorToNode
     /** Struct for single slices. */
     struct Slice
     {
-      ipPicDescriptor* currentPic;
+      mitkIpPicDescriptor* currentPic;
       Vector3D origin;
       Vector3D normal;
       int imageNumber;
@@ -92,11 +92,11 @@ class SpacingSetFilter : public PicDescriptorToNode
     unsigned int m_TotalCombinationCount;
     std::set< Slice* > m_Set;
 
-    /** This function sort the ipPicDescriptor to groups and slices.  */
+    /** This function sort the mitkIpPicDescriptor to groups and slices.  */
     void SortPicsToGroup();
     /** This function sort the slices by location and imagenumber. */
     void SortSlicesByLocation();
-    /** This function create all possible combinations between the ipPicDescriptors (with the same spacing). */
+    /** This function create all possible combinations between the mitkIpPicDescriptors (with the same spacing). */
     void CreatePossibleCombinations();
     /** This function sort the combinations by the number of included elements, the highest one get first. */
     void SortPossibleCombinations();

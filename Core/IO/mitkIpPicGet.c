@@ -142,7 +142,7 @@
  */
 
 #ifdef CHILIPLUGIN
-#include <ipPic.h>
+#include <mitkIpPic.h>
 
 ipPicDescriptor * 
 MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic )
@@ -188,7 +188,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
 
 #else
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 #ifdef DOS
 #include "ipPicOP.h"
 #else

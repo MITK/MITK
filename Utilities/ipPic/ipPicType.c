@@ -53,7 +53,7 @@
   static char *what = { "@(#)ipPicType\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 /** initialisation of an array that maps the 
  *  ipPicType_t types to printable strings

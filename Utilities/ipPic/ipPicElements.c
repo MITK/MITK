@@ -53,7 +53,7 @@
   static char *what = { "@(#)_ipPicElements\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipUInt4_t _ipPicElements( ipPicDescriptor *pic )
 {

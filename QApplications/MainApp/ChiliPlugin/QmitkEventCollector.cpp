@@ -37,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlistview.h>
 #include <qwidget.h>
 #include <qwidgetlist.h>
+#include <mitkCommon.h>
 #include <QmitkSliderLevelWindowWidget.h>
 #include <mitkLevelWindow.h>
 

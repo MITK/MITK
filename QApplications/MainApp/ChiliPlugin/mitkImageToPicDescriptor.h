@@ -18,10 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 #define IMAGETOPICDESCRIPTOR_H_HEADER_INCLUDED
 
+#include <mitkIpPicUnmangle.h>
+//CHILI
+#include <ipPic/ipPic.h>
+//MITK
+#include <mitkImage.h>
+#include <mitkIpPic.h>
+//ITK
+#include <mitkIpPicUnmangle.h>
 #include <itkObject.h>
 
-#include <mitkImage.h>
-#include <ipPic/ipPic.h>
 #include <list>
 
 namespace mitk {
@@ -60,7 +66,7 @@ class ImageToPicDescriptor : public itk::Object
     /*!
     \brief This function set a TagInformaitionList and a bool variable.
     @param inputTags   This list provides information about the study, patient and series. This tags are the minimun which needed to save.
-    @param useSavedPicTags   This bool attribute decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the ipPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one.
+    @param useSavedPicTags   This bool attribute decided if the picDescriptor create new slices (false), or override existing slices (true). To override existing slices all pic-tags have to be the same. So the tags dont get changed. If you want to create new slices, the new slices needed the current Date, Time, ImageInstanceUID, ... . With false all this tags created and added to the mitkIpPicDescriptors. But therefore the Patient-, Study- and Series-Information needed. This provide the inputTags. The mitkChiliPlugin have a function to create the needed one.
     This function have to be use, otherwise update dont work.
     */
     void SetTagList( TagInformationList inputTags, bool useSavedPicTags );
@@ -81,14 +87,14 @@ class ImageToPicDescriptor : public itk::Object
     void SetImageNumber( int imageNumber );
 
     /*!
-    \brief This function separate a mitk::image into a list of ipPicDescriptor.
+    \brief This function separate a mitk::image into a list of mitkIpPicDescriptor.
     If no input set before, the function create an empty output.
     */
     void Update();
 
     /*!
     \brief Return the generated Output.
-    @returns The list of ipPicDescriptors.
+    @returns The list of mitkIpPicDescriptors.
     */
     std::list< ipPicDescriptor* > GetOutput();
 

@@ -39,7 +39,7 @@
 #ifndef IP_PIC_TYPE_MULTIPLEX_H
 #define IP_PIC_TYPE_MULTIPLEX_H
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 //#include <complex>
 
 #define mitkIpPicTypeMultiplex0( function, pic )										\

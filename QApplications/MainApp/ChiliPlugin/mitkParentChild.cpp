@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkParentChild.h"
 
+#include <mitkIpPicUnmangle.h>
+
 //CHILI
 #include <chili/plugin.h>
 //MITK

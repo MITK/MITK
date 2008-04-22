@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 
 void ipMITKSegmentationFree (ipPicDescriptor* segmentation)
 {

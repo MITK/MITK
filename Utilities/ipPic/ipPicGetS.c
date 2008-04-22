@@ -99,7 +99,7 @@
   static char *what = { "@(#)ipPicGetSlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 ipPicDescriptor *ipPicGetSlice( const char *infile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {

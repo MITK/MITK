@@ -91,7 +91,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 #ifdef USE_ZLIB
 ipBool_t _ipPicCanWriteCompressed = ipTrue;

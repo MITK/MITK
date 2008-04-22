@@ -20,15 +20,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkObject.h>
 
+#define ipPicDescriptor mitkIpPicDescriptor
 #include <mitkDataTreeNode.h>
 #include <mitkPropertyList.h>
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
+#undef ipPicDescriptor
 #include <list>
+#include <mitkIpPicUnmangle.h>
 
 namespace mitk {
 
   /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of ipPicDescriptors.
+  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
   */
 
 class PicDescriptorToNode : public itk::Object
@@ -41,7 +44,7 @@ class PicDescriptorToNode : public itk::Object
    virtual ~PicDescriptorToNode();
 
     /*!
-    \brief Set a list of ipPicDescriptors and the SeriesOID as Input.
+    \brief Set a list of mitkIpPicDescriptors and the SeriesOID as Input.
     @param inputPicDescriptorList   These are the different slices, which get combined to volumes.
     @param inputSeriesOID   The SeriesOID added to the Result-DataTreeNode and get used to Save (override, parent-child-relationship).
     Both parameter have to be set.
@@ -49,7 +52,7 @@ class PicDescriptorToNode : public itk::Object
     If you load from lightbox use "lightbox->currentSeries()->oid;".
     If you load from chili-database use "mitk::ChiliPlugin::GetSeriesInformation().OID;".
     */
-    virtual void SetInput( std::list< ipPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID );
+    virtual void SetInput( std::list< mitkIpPicDescriptor* > inputPicDescriptorList, std::string inputSeriesOID );
 
     /*!
     \brief Create multiple nodes (images).
@@ -79,7 +82,7 @@ class PicDescriptorToNode : public itk::Object
 
     /** the input */
     std::string m_SeriesOID;
-    std::list< ipPicDescriptor* > m_PicDescriptorList;
+    std::list< mitkIpPicDescriptor* > m_PicDescriptorList;
 
     /** the results */
     std::vector< DataTreeNode::Pointer > m_Output;
@@ -88,11 +91,11 @@ class PicDescriptorToNode : public itk::Object
     double Round( double number, unsigned int decimalPlaces );
 
     /** Create a propertyList from the given PicDescriptor. Therefore all pic-tags get readed and added. */
-    const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( ipPicDescriptor* );
+    const mitk::PropertyList::Pointer CreatePropertyListFromPicTags( mitkIpPicDescriptor* );
 
-    void GenerateData( std::list<ipPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription );
+    void GenerateData( std::list<mitkIpPicDescriptor*> slices, int sliceSteps, int timeSteps, Vector3D spacing, std::string seriesDescription );
 
-    std::string GetImageInstanceUID( ipPicDescriptor* input );
+    std::string GetImageInstanceUID( mitkIpPicDescriptor* input );
 };
 
 } // namespace mitk

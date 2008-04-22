@@ -111,7 +111,7 @@
   static char *what = { "@(#)ipPicGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
-#include "ipPic.h"
+#include "mitkIpPic.h"
 
 mitkIpPicFile_t
 _ipPicOpenPicFileIn( const char *path )

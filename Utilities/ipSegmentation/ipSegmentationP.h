@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IPSEGMENTATIONP_H
 #define IPSEGMENTATIONP_H
 
-#include <ipPic/ipPic.h>
+#include <mitkIpPic.h>
 #include "ipSegmentationError.h"
 
 #ifndef IPSEGMENTATION_H

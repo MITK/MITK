@@ -350,9 +350,7 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 
     // stupid, that this is still necessary
     DataTreePreOrderIterator treeiter( app->GetTree() );
-    app->GetMultiWidget()->InitializeStandardViews( &treeiter );
-    app->GetMultiWidget()->Fit();
-    app->GetMultiWidget()->ReInitializeStandardViews();
+    RenderingManager::GetInstance()->InitializeViews( &treeiter  );
     RenderingManager::GetInstance()->RequestUpdateAll();
     qApp->processEvents();
     m_InImporting = false;

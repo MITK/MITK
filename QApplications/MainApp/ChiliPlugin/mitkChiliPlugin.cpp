@@ -230,7 +230,7 @@ QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
   {
     QTimer* timer = new QTimer(realPluginInstance);
     connect( timer, SIGNAL(timeout()), realPluginInstance, SLOT(CreateSampleApp()) );
-    timer->start(4000, true);
+    timer->start(600, true);
 
     done = true;
   }

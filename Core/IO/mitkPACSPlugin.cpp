@@ -57,17 +57,17 @@ mitk::PACSPlugin::PACSPluginCapability mitk::PACSPlugin::GetPluginCapabilities()
 }
 
 /** DefaultImplementation */
-mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetSeriesRelationInformation( const std::string& )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::PACSPlugin::GetSeriesRelationInformation( const std::string& )
 {
-  PSRelationInformationList emptyResult;
+  ParentChildRelationInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }
 
 /** DefaultImplementation */
-mitk::PACSPlugin::PSRelationInformationList mitk::PACSPlugin::GetStudyRelationInformation( const std::string& )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::PACSPlugin::GetStudyRelationInformation( const std::string& )
 {
-  PSRelationInformationList emptyResult;
+  ParentChildRelationInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }

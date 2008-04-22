@@ -45,9 +45,9 @@ class ParentChild: public itk::Object
 
     std::list<std::string> GetSlices( const std::string& label, const std::string& seriesOID );
 
-    PACSPlugin::PSRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
+    PACSPlugin::ParentChildRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
 
-    PACSPlugin::PSRelationInformationList GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory );
+    PACSPlugin::ParentChildRelationInformationList GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory );
 
     mitkClassMacro( ParentChild, itk::Object );
     itkNewMacro( ParentChild );

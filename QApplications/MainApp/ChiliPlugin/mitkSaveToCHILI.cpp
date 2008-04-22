@@ -297,15 +297,6 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           else  //the Text-File saved first time
             textOID = pGetNewOID();
 
-          //save Volume to Parent-Child-XML
-          if( currentVolumeLabel == "" || currentSeriesOID == "" || currentSeriesOID != seriesOID )
-          {
-            std::list<std::string> inputList;
-            inputList.clear();
-            inputList.push_back( textOID );
-            m_ParentChild->AddEntry( (*nodeIter), inputList, seriesOID );
-          }
-
           //search for possible Writer
           std::list<FileWriter::Pointer> possibleWriter;
           std::list<LightObject::Pointer> allObjects = itk::ObjectFactoryBase::CreateAllInstance( "IOWriter" );
@@ -322,6 +313,15 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           {
             if( it->GetPointer()->CanWrite( (*nodeIter) ) )
             {
+              //save Volume to Parent-Child-XML
+              if( currentVolumeLabel == "" || currentSeriesOID == "" || currentSeriesOID != seriesOID )
+              {
+                std::list<std::string> inputList;
+                inputList.clear();
+                inputList.push_back( textOID );
+                m_ParentChild->AddEntry( (*nodeIter), inputList, seriesOID );
+              }
+
               ProgressBar::GetInstance()->AddStepsToDo(1);
               //create filename
               std::string fileName;

@@ -135,17 +135,18 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /** There can be lots of texts to one series, so we need a list. */
     typedef std::list<TextInformation> TextInformationList;
 
-    struct PSRelationInformation
+    /** The "parentchild.xml"-file is used to fill this struct. */
+    struct ParentChildRelationInformation
     {
-      std::string Label;
-      std::string ID;
-      std::string OID;
+      std::string Label;  //automatically generated string (distinct)
+      std::string ID;  //the file/node - name (ambiguous)
+      std::string OID;  //the seriesOID
       std::list<std::string> ParentLabel;
       std::list<std::string> ChildLabel;
       bool Image;
     };
 
-    typedef std::list<PSRelationInformation> PSRelationInformationList;
+    typedef std::list<ParentChildRelationInformation> ParentChildRelationInformationList;
 
     /*!
     \brief Return a mitk::PACSPlugin-Instance as singleton.
@@ -173,7 +174,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     Return an empty list if no entrie found.
     IMPORTANT: This function dont set the attributes "childLabel" and "parentLabel".
     */
-    virtual PSRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
+    virtual ParentChildRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
 
     /*!
     \brief Return all parent-child-saved-volumen to a study.
@@ -181,7 +182,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     @returns All parent-child-saved-volumes.
     Return an empty list if no entrie found.
     */
-    virtual PSRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
+    virtual ParentChildRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
 
     /*!
     \brief Return the studyinformation to a series.

@@ -160,7 +160,7 @@ void QmitkLoadSaveToChiliExample::LoadFromStudyListView()
           QmitkPluginListViewItem* entry = dynamic_cast<QmitkPluginListViewItem*>( m_Controls->studyContent->selectedItem() );
           if( entry )
           {
-            mitk::PACSPlugin::PSRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( entry->GetChiliOID().ascii() );
+            mitk::PACSPlugin::ParentChildRelationInformationList getAllElements = m_Plugin->GetSeriesRelationInformation( entry->GetChiliOID().ascii() );
             while( !getAllElements.empty() )
             {
               if( getAllElements.front().Image )
@@ -354,7 +354,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
   if( m_Plugin->GetPluginCapabilities().canLoad )
   {
     mitk::PACSPlugin::SeriesInformationList tempSeriesList = m_Plugin->GetSeriesInformationList();
-    mitk::PACSPlugin::PSRelationInformationList tempRelationList = m_Plugin->GetStudyRelationInformation();
+    mitk::PACSPlugin::ParentChildRelationInformationList tempRelationList = m_Plugin->GetStudyRelationInformation();
 
     //fill the studyInformation-view
     for( std::list<mitk::PACSPlugin::SeriesInformation>::iterator iter = tempSeriesList.begin(); iter != tempSeriesList.end(); iter++ )
@@ -375,14 +375,14 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
       new QmitkPluginListViewItem( "", "", seriesParent , seriesNumber.str().c_str() );
 
       //add volumes which are saved in the parent-child-relation
-      mitk::PACSPlugin::PSRelationInformationList elementList = m_Plugin->GetSeriesRelationInformation( iter->OID );
+      mitk::PACSPlugin::ParentChildRelationInformationList elementList = m_Plugin->GetSeriesRelationInformation( iter->OID );
       if( !elementList.empty() )
       {
         QmitkPluginListViewItem* psVolumes = NULL;
 
         while( !elementList.empty() )
         {
-          mitk::PACSPlugin::PSRelationInformation singleElement = elementList.front();
+          mitk::PACSPlugin::ParentChildRelationInformation singleElement = elementList.front();
           if( singleElement.Image )  //only images should add
           {
             if( psVolumes == NULL )  //no images added before
@@ -440,7 +440,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
     }
 
     //fill the parent-child-view
-    for( mitk::PACSPlugin::PSRelationInformationList::iterator relationIter = tempRelationList.begin(); relationIter != tempRelationList.end(); relationIter ++)
+    for( mitk::PACSPlugin::ParentChildRelationInformationList::iterator relationIter = tempRelationList.begin(); relationIter != tempRelationList.end(); relationIter ++)
     {
       if( relationIter->ParentLabel.empty() )
       {
@@ -450,10 +450,10 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
         for( std::list<std::string>::iterator childIter = relationIter->ChildLabel.begin(); childIter != relationIter->ChildLabel.end(); childIter++ )
         {
           //search element
-          for( mitk::PACSPlugin::PSRelationInformationList::iterator searchIter = tempRelationList.begin(); searchIter != tempRelationList.end(); searchIter++ )
+          for( mitk::PACSPlugin::ParentChildRelationInformationList::iterator searchIter = tempRelationList.begin(); searchIter != tempRelationList.end(); searchIter++ )
           {
             if( (*childIter) == searchIter->Label )
-              AddElementsToPSContent( (*searchIter), tempRelationList, newParent );
+              AddElementsToPCContent( (*searchIter), tempRelationList, newParent );
           }
         }
       }
@@ -461,7 +461,7 @@ void QmitkLoadSaveToChiliExample::PluginEventNewStudySelected( const itk::EventO
   }
 }
 
-void QmitkLoadSaveToChiliExample::AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent )
+void QmitkLoadSaveToChiliExample::AddElementsToPCContent( mitk::PACSPlugin::ParentChildRelationInformation singleElement, mitk::PACSPlugin::ParentChildRelationInformationList elementList, QListViewItem* parent )
 {
   //create element
   QmitkPluginListViewItem* newParent = new QmitkPluginListViewItem( singleElement.OID.c_str(), singleElement.Label.c_str(), parent, singleElement.ID.c_str() );
@@ -470,10 +470,10 @@ void QmitkLoadSaveToChiliExample::AddElementsToPSContent( mitk::PACSPlugin::PSRe
   for( std::list<std::string>::iterator childIter = singleElement.ChildLabel.begin(); childIter != singleElement.ChildLabel.end(); childIter++ )
   {
     //search element
-    for( mitk::PACSPlugin::PSRelationInformationList::iterator searchIter = elementList.begin(); searchIter != elementList.end(); searchIter++ )
+    for( mitk::PACSPlugin::ParentChildRelationInformationList::iterator searchIter = elementList.begin(); searchIter != elementList.end(); searchIter++ )
     {
       if( (*childIter) == searchIter->Label )
-        AddElementsToPSContent( (*searchIter), elementList, newParent );
+        AddElementsToPCContent( (*searchIter), elementList, newParent );
     }
   }
 }

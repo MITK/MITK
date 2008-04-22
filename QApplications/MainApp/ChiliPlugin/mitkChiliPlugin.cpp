@@ -601,8 +601,8 @@ void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Poi
         DataStorage::GetInstance()->Add( inputNodes[x] );
 
     //create relations
-    PACSPlugin::PSRelationInformationList relationList = GetStudyRelationInformation();  //get information of current study
-    for( PACSPlugin::PSRelationInformationList::iterator relationIter = relationList.begin(); relationIter != relationList.end(); relationIter++ )
+    PACSPlugin::ParentChildRelationInformationList relationList = GetStudyRelationInformation();  //get information of current study
+    for( PACSPlugin::ParentChildRelationInformationList::iterator relationIter = relationList.begin(); relationIter != relationList.end(); relationIter++ )
     {
       //search for current Label and OID at DataStorage
       DataStorage::SetOfObjects::ConstPointer allNodes = DataStorage::GetInstance()->GetAll();
@@ -619,7 +619,7 @@ void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Poi
         for( std::list<std::string>::iterator currentChildren = relationIter->ChildLabel.begin(); currentChildren != relationIter->ChildLabel.end(); currentChildren++ )  //use all children
         {
           //first we need the seriesOID additinaly
-          PACSPlugin::PSRelationInformationList::iterator tmpIter;
+          PACSPlugin::ParentChildRelationInformationList::iterator tmpIter;
           for( tmpIter = relationList.begin(); tmpIter != relationList.end(); tmpIter++ )
             if( tmpIter->Label == (*currentChildren) )
               break;
@@ -636,7 +636,7 @@ void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Poi
 
             if( childNodeIter != allNodes->end() )  //add relation to DataStorage
             {
-              //DataStorage::GetInstance()->???( parentIter, childIter ); //its possible, that the relation always exist and the function have to check for circle
+              //DataStorage::GetInstance()->reparent( childIter,parentIter ); //its possible, that the relation always exist and the function have to check for circle
             }
           }
         }
@@ -735,9 +735,9 @@ mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList(
 /** ---- LoadFromCHILI ---- */
 
 /** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given seriesOID */
-mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetSeriesRelationInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetSeriesRelationInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
 {
-  PSRelationInformationList resultInformation;
+  ParentChildRelationInformationList resultInformation;
   resultInformation.clear();
 
 #ifndef CHILI_PLUGIN_VERSION_CODE
@@ -750,9 +750,9 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetSeriesRelation
 }
 
 /** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given studyOID */
-mitk::PACSPlugin::PSRelationInformationList mitk::ChiliPlugin::GetStudyRelationInformation( const std::string& mitkHideIfNoVersionCode( studyOID ) )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetStudyRelationInformation( const std::string& mitkHideIfNoVersionCode( studyOID ) )
 {
-  PSRelationInformationList resultInformation;
+  ParentChildRelationInformationList resultInformation;
   resultInformation.clear();
 
 #ifndef CHILI_PLUGIN_VERSION_CODE

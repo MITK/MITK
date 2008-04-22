@@ -77,7 +77,7 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     Return an empty list if no entrie found.
     IMPORTANT: This function dont set the attributes "childLabel" and "parentLabel".
     */
-    virtual PSRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
+    virtual ParentChildRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
 
     /*!
     \brief Return all parent-child-saved-volumen to a study.
@@ -85,7 +85,7 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     @returns All parent-child-saved-volumes.
     Return an empty list if no entrie found.
     */
-    virtual PSRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
+    virtual ParentChildRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
 
     /*!
     \brief Return the studyinformation to a series.

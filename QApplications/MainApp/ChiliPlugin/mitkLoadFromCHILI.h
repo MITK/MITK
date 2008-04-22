@@ -56,9 +56,9 @@ class LoadFromCHILI: public itk::Object
 
     DataTreeNode::Pointer LoadParentChildElement( QcPlugin* instance, const std::string& seriesOID, const std::string& label, const std::string& tmpDirectory );
 
-    PACSPlugin::PSRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
+    PACSPlugin::ParentChildRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
 
-    PACSPlugin::PSRelationInformationList GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory );
+    PACSPlugin::ParentChildRelationInformationList GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory );
 
     mitkClassMacro( LoadFromCHILI, itk::Object );
     itkNewMacro( LoadFromCHILI );

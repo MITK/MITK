@@ -495,9 +495,9 @@ std::list<std::string> mitk::ParentChild::GetSlices( const std::string& label, c
   return result;
 }
 
-mitk::PACSPlugin::PSRelationInformationList mitk::ParentChild::GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory )
 {
-  PACSPlugin::PSRelationInformationList result;
+  PACSPlugin::ParentChildRelationInformationList result;
   result.clear();
 
   //init the right parent-child-xml-file
@@ -535,7 +535,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ParentChild::GetSeriesRelation
         if( oid == seriesOID )  //if the saved oid equal the searched one
         {
           //save element
-          PACSPlugin::PSRelationInformation newElement;
+          PACSPlugin::ParentChildRelationInformation newElement;
           newElement.Label = label;
           newElement.ID = id;
           newElement.OID = oid;
@@ -557,9 +557,9 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ParentChild::GetSeriesRelation
   return result;
 }
 
-mitk::PACSPlugin::PSRelationInformationList mitk::ParentChild::GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory )
 {
-  PACSPlugin::PSRelationInformationList result;
+  PACSPlugin::ParentChildRelationInformationList result;
   result.clear();
 
   if( studyOID == "" )
@@ -612,7 +612,7 @@ mitk::PACSPlugin::PSRelationInformationList mitk::ParentChild::GetStudyRelationI
         }
 
         //save element
-        PACSPlugin::PSRelationInformation newElement;
+        PACSPlugin::ParentChildRelationInformation newElement;
         newElement.Label = label;
         newElement.ID = id;
         newElement.OID = oid;

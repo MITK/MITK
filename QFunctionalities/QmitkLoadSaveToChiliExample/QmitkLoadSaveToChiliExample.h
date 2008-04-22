@@ -98,7 +98,7 @@ protected:
 
   void PluginEventNewStudySelected(const itk::EventObject&);
 
-  void AddElementsToPSContent( mitk::PACSPlugin::PSRelationInformation singleElement, mitk::PACSPlugin::PSRelationInformationList elementList, QListViewItem* parent );
+  void AddElementsToPCContent( mitk::PACSPlugin::ParentChildRelationInformation singleElement, mitk::PACSPlugin::ParentChildRelationInformationList elementList, QListViewItem* parent );
 
   void SetDataTreeIterator(mitk::DataTreeIteratorBase* it);
 

@@ -43,12 +43,12 @@ mitk::LoadFromCHILI::~LoadFromCHILI()
 {
 }
 
-mitk::PACSPlugin::PSRelationInformationList mitk::LoadFromCHILI::GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::LoadFromCHILI::GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory )
 {
   return m_ParentChild->GetSeriesRelationInformation( instance, seriesOID, tmpDirectory );
 }
 
-mitk::PACSPlugin::PSRelationInformationList mitk::LoadFromCHILI::GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::LoadFromCHILI::GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory )
 {
   return m_ParentChild->GetStudyRelationInformation( instance, studyOID, tmpDirectory );
 }

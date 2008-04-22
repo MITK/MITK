@@ -198,7 +198,7 @@ IF(WIN32 AND NOT UNIX)
   
   #STATEMACHINE XML
   INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Interactions/StateMachine.xml DESTINATION bin)
-  INSTALL(FILES ${PROJECT_SOURCE_DIR}/Confi/mitkLevelWindowPresets.xml DESTINATION bin)
+  INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml DESTINATION bin)
  
   #VTK DLLs install target
   FILE(GLOB vtkdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)

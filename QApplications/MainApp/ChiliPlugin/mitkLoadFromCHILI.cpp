@@ -17,13 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLoadFromCHILI.h"
 
-#include <mitkIpPicUnmangle.h>
-//CHILI
-#include <chili/plugin.h>
-#include <chili/qclightbox.h>
-#include <ipPic/ipPic.h>  //ipPicDescriptor
-#include <ipPic/ipPicTags.h>
-#include <ipDicom/ipDicom.h>  //read DICOM-Files
 //MITK
 #include "mitkPicDescriptorToNode.h"
 #include "mitkImageNumberFilter.h"
@@ -33,10 +26,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkIpPic.h"
 #include "mitkProgressBar.h"
-
-#include <mitkIpPicUnmangle.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
+#include "mitkIpPicUnmangle.h"
+//CHILI
+#include <chili/plugin.h>
+#include <chili/qclightbox.h>
+#include <ipPic/ipPic.h>  //ipPicDescriptor
+#include <ipPic/ipPicTags.h>
+#include <ipDicom/ipDicom.h>  //read DICOM-Files
 
 mitk::LoadFromCHILI::LoadFromCHILI()
 {
@@ -82,12 +78,12 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromLigh
       {
         if( currentPic->dim == 1 )
         {
-          StreamImageStruct newElement = LoadStreamImage( mitkPic );
+          StreamImageStruct newElement = LoadStreamImage( currentPic );
           if( !newElement.imageList.empty() )
             m_StreamImageList.push_back( newElement );
         }
         else
-          m_ImageList.push_back( mitkPic );
+          m_ImageList.push_back( currentPic );
       }
     }
     ProgressBar::GetInstance()->Progress();
@@ -606,5 +602,3 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
   }
   return ipTrue; // true = next element; false = break iterate
 }
-
-#endif

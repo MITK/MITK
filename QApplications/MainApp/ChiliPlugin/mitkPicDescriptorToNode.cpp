@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 // CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
@@ -32,8 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "math.h"
 #undef ipPicDescriptor
 #include <itkCommand.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 // constructor
 mitk::PicDescriptorToNode::PicDescriptorToNode()
@@ -314,5 +311,3 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<mitkIpPicDescriptor*> sl
     m_ImageInstanceUIDs.push_back( ListOfUIDs );
   }
 }
-
-#endif

@@ -28,8 +28,8 @@ namespace mitk {
     public:
     mitkClassMacro(mitk::ChiliPluginFactory,itk::ObjectFactoryBase)
 
-      /** Class methods used to interface with the registered factories. */
-      virtual const char* GetITKSourceVersion() const;
+    /** Class methods used to interface with the registered factories. */
+    virtual const char* GetITKSourceVersion() const;
     virtual const char* GetDescription() const;
 
     /** Method for class instantiation. */
@@ -52,7 +52,6 @@ namespace mitk {
     private:
     ChiliPluginFactory(const Self&); //purposely not implemented
     void operator=(const Self&); //purposely not implemented
-
   };
 }
 

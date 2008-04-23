@@ -17,20 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSpacingSetFilter.h"
 
+// MITK-Includes
+#include "mitkProgressBar.h"
+#include "mitkIpPicUnmangle.h"
 // CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
-// MITK-Includes
-#include "mitkChiliMacros.h"
-#include "mitkProgressBar.h"
-
-#include <mitkIpPicUnmangle.h>
 
 #include <algorithm>  //needed for "sort" (windows)
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 // constructor
 mitk::SpacingSetFilter::SpacingSetFilter()
@@ -488,7 +484,7 @@ void mitk::SpacingSetFilter::SearchForMinimumCombination()
   }
 }
 
-void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator mitkHideIfNoVersionCode(iterBegin), unsigned int mitkHideIfNoVersionCode(remainingCombinations), std::set< Slice* > mitkHideIfNoVersionCode(currentCombination), std::vector< std::set< Slice* > > mitkHideIfNoVersionCode(resultCombinations) )
+void mitk::SpacingSetFilter::RekCombinationSearch( std::vector< std::set< Slice* > >::iterator iterBegin, unsigned int remainingCombinations, std::set< Slice* > currentCombination, std::vector< std::set< Slice* > > resultCombinations)
 {
   //to found a combination which represent the whole, the single combinations get combined
   //the intersection created and if they empty, the two combinations combined to one
@@ -794,5 +790,3 @@ void mitk::SpacingSetFilter::ShowAllSlicesWithUsedSpacings()
     }
   }
 }
-
-#endif

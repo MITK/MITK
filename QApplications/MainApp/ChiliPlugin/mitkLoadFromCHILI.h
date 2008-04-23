@@ -18,19 +18,17 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLOADFROMCHILI_H_HEADER_INCLUDED
 #define MITKLOADFROMCHILI_H_HEADER_INCLUDED
 
-//CHILI
-#include <chili/isg.h>  //geometry
-#include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 //MITK
 #include "mitkDataTree.h"
 #include "mitkParentChild.h"
 #include "mitkPACSPlugin.h"
 #include "mitkIpPic.h"
+//CHILI
+#include <chili/isg.h>  //geometry
+#include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 
 #ifndef WIN32  //TODO this function integrated to plugin.h at CHILI-Version 3.14 (current 3.12); at this time it ist possible to use this function for suse and windows -> change code
 extern "C" mitkIpPicDescriptor *mitkIpPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
-
-//extern "C" mitkIpPicDescriptor *mitkIpPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );
 #endif
 
 class QcLightbox;

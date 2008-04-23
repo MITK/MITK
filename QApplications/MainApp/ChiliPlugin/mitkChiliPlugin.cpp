@@ -21,10 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 #include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
 //MITK-Plugin
-#include "mitkChiliMacros.h"
 #include "mitkChiliPluginEvents.h"
 #include "mitkChiliPluginFactory.h"
-#include "mitkLightBoxImageReader.h"
 //teleconference
 #include <mitkConferenceToken.h>
 #include <mitkConferenceEventMapper.h>
@@ -36,7 +34,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <SampleApp.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
-
 #include <mitkIpPicUnmangle.h>
 //QT
 #include <qlayout.h>
@@ -91,11 +88,9 @@ mitk::ChiliPlugin::ChiliPlugin()
   else
     std::cout << "CHILIPlugin: Create and use directory "<< m_tempDirectory << std::endl;
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
   m_ChiliInformation = CHILIInformation::New();
   m_LoadFromCHILI = LoadFromCHILI::New();
   m_SaveToCHILI = SaveToCHILI::New();
-#endif
 }
 
 /** Destructor */
@@ -252,16 +247,11 @@ mitk::PACSPlugin::PACSPluginCapability mitk::ChiliPlugin::GetPluginCapabilities(
 {
   PACSPluginCapability result;
   result.isPlugin = true;
-  #ifndef CHILI_PLUGIN_VERSION_CODE
-    result.canLoad = false;
-    result.canSave = false;
+  result.canLoad = true;
+  #if CHILI_VERSION_CODE( 1, 1, 3 ) < CHILI_PLUGIN_VERSION_CODE //min. CHILI 3.12
+    result.canSave = true;
   #else
-    result.canLoad = true;
-    #if CHILI_VERSION_CODE( 1, 1, 3 ) < CHILI_PLUGIN_VERSION_CODE //min. CHILI 3.12
-      result.canSave = true;
-    #else
-      result.canSave = false;
-    #endif
+    result.canSave = false;
   #endif
   return result;
 }
@@ -346,10 +336,8 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     else
       SetRelationsToDataStorage( resultNodes );
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
     if( selectedLightbox->currentSeries() )
       SetRelationsToDataStorage( LoadTextsFromSeries( selectedLightbox->currentSeries()->oid ) );  //load all texts
-#endif
 
     // stupid, that this is still necessary
     DataTreePreOrderIterator treeiter( app->GetTree() );
@@ -588,9 +576,6 @@ void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
 
 void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> inputNodes )
 {
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
   //es gibt zwei Möglichkeiten:
   // - zum einen alles in die DataStorage hängen und anschließend die Beziehungen zwischen den Daten herstellen
   // - zum anderen kann man während des Einfügens in die DataStorage die Beziehungen berücksichtigen.
@@ -646,134 +631,91 @@ void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Poi
       }
     }
   }
-#endif
 }
 
 /** ---- CHILIInformation ---- */
 
 /** Return the studyinformation. If you dont set the seriesOID, you get the current selected study. If you want a specific study, set the OID. If no study could found, this function return StudyInformation.OID == "". */
-mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesOID )
 {
   StudyInformation resultInformation;
   resultInformation.OID = "";
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your CHILI version does not support this function (GetStudyInformation)." );
-#else
   resultInformation = m_ChiliInformation->GetStudyInformation( this, seriesOID );
-#endif
   return resultInformation;
 }
 
 /** Return the patientinformation. If you dont set the seriesOID, you get the current selected patient. If you want a specific patient, set the OID. If no patient could found, this function return PatientInformation.OID == "". */
-mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesOID )
 {
   PatientInformation resultInformation;
   resultInformation.OID = "";
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetPatientInformation)." );
-#else
   resultInformation = m_ChiliInformation->GetPatientInformation( this, seriesOID );
-#endif
   return resultInformation;
 }
 
 /** Return the seriesinformation. If you dont set the seriesOID, you get the current selected series. If you want a specific series, set the OID. If no series could found, this function return SeriesInformation.OID == "". */
-mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesOID )
 {
   SeriesInformation resultInformation;
   resultInformation.OID = "";
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetSeriesInformation)." );
-#else
   resultInformation = m_ChiliInformation->GetSeriesInformation( this, seriesOID );
-#endif
   return resultInformation;
 }
 
 /** Return the seriesinformationlist. If you dont set the studyOID, you get the seriesList of the current selected study. If you want a list of a specific study, set the OID. If no series could found, this function returns an empty list. */
-mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& mitkHideIfNoVersionCode( studyOID ) )
+mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& studyOID )
 {
   SeriesInformationList resultInformation;
   resultInformation.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetSeriesInformationList)." );
-#else
   resultInformation = m_ChiliInformation->GetSeriesInformationList( this, studyOID );
-#endif
   return resultInformation;
 }
 
 /** Return the textinformation. You have to set the textOID to get the information. If no text could found, this function return TextInformation.OID == "". */
-mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& mitkHideIfNoVersionCode( textOID ) )
+mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& textOID )
 {
   TextInformation resultInformation;
   resultInformation.OID = "";
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetTextInformation)." );
-#else
   resultInformation = m_ChiliInformation->GetTextInformation( this, textOID );
-#endif
   return resultInformation;
 }
 
 /** Return a list of all textinformation. You have to set the seriesOID to get the textList. If no texts could found, this function returns an empty list. This function dont return the text which used to save and load the parent-child-relationship. */
-mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& seriesOID )
 {
   TextInformationList resultInformation;
   resultInformation.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (GetTextInformation)." );
-#else
   resultInformation = m_ChiliInformation->GetTextInformationList( this, seriesOID );
-#endif
   return resultInformation;
 }
 
 /** ---- LoadFromCHILI ---- */
 
 /** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given seriesOID */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetSeriesRelationInformation( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetSeriesRelationInformation( const std::string& seriesOID )
 {
   ParentChildRelationInformationList resultInformation;
   resultInformation.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your CHILI version does not support this function (GetSeriesRelationInformation)." );
-#else
   if( seriesOID != "" && m_tempDirectory != "" )
     resultInformation = m_LoadFromCHILI->GetSeriesRelationInformation( this, seriesOID, m_tempDirectory );
-#endif
   return resultInformation;
 }
 
 /** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given studyOID */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetStudyRelationInformation( const std::string& mitkHideIfNoVersionCode( studyOID ) )
+mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetStudyRelationInformation( const std::string& studyOID )
 {
   ParentChildRelationInformationList resultInformation;
   resultInformation.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your CHILI version does not support this function (GetStudyInformation)." );
-#else
   if( m_tempDirectory != "" )
     resultInformation = m_LoadFromCHILI->GetStudyRelationInformation( this, studyOID, m_tempDirectory );
-#endif
   return resultInformation;
 }
 
 /** Set the internal reader which used to combine slices.
 0 = ImageNumberFilter; 1 = SpacingSetFilter; 2 = SingleSpacingFilter */
-void mitk::ChiliPlugin::SetReaderType( unsigned int mitkHideIfNoVersionCode( readerType ) )
+void mitk::ChiliPlugin::SetReaderType( unsigned int readerType )
 {
-#ifdef CHILI_PLUGIN_VERSION_CODE
   m_LoadFromCHILI->SetReaderType( readerType );
-#endif
 }
 
 /** Load all images from the given lightbox. If no lightbox set, the current lightbox get used. Chili dont support text-access via lightbox. If you want to load them, use LoadAllTextsFromSeries(...). The slices get combined with the internal set ReaderType. */
@@ -784,46 +726,19 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
   if( lightbox != NULL && m_tempDirectory != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-
-    //use LightboxImageReader
-    LightBoxImageReader::Pointer reader = LightBoxImageReader::New();
-    reader->SetLightBox( lightbox );
-    Image::Pointer image = reader->GetOutput();
-    image->Update();
-    if( image->IsInitialized() )  //create node
-    {
-      DataTreeNode::Pointer node = DataTreeNode::New();
-      node->SetData( image );
-      DataTreeNodeFactory::SetDefaultImageProperties( node );
-      PropertyList::Pointer tempPropertyList = reader->GetImageTagsAsPropertyList();
-      for( PropertyList::PropertyMap::const_iterator iter = tempPropertyList->GetMap()->begin(); iter != tempPropertyList->GetMap()->end(); iter++ )
-        node->SetProperty( iter->first.c_str(), iter->second.first );
-      resultVector.push_back( node );
-    }
-
-#else
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
     resultVector = m_LoadFromCHILI->LoadImagesFromLightbox( this, lightbox, m_tempDirectory );
     ProgressBar::GetInstance()->Progress( 2 );
-#endif
-
     QApplication::restoreOverrideCursor();
   }
   return resultVector;
 }
 
 /** Load all image- and text-files from series. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadFromSeries( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadFromSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadCompleteSeries)." );
-#else
-
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -832,21 +747,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadFromSeries( cons
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNodes;
 }
 
 /** This function load all images from series, therefore the FileDownload get used. Warning: CHILI use the original server-file-format. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats saved, they get load with the DataTreeNodeFactory. */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -855,21 +763,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNodes;
 }
 
 /** This function load all text-files from the series. Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries( const std::string& mitkHideIfNoVersionCode( seriesOID ) )
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries( const std::string& seriesOID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-
   if( m_tempDirectory != "" && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -878,20 +779,13 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries(
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNodes;
 }
 
 /** To load a single text-file, you need more than the textOID, this function search for the missing attributes and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ). */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& mitkHideIfNoVersionCode( textOID ) )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& textOID )
 {
   DataTreeNode::Pointer resultNode = NULL;
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-
   if( m_tempDirectory != "" && textOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -900,20 +794,13 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNode;
 }
 
 /** This function load a single text-file. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk. */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& mitkHideIfNoVersionCode(seriesOID), const std::string& mitkHideIfNoVersionCode(textOID), const std::string& mitkHideIfNoVersionCode(textPath) )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath)
 {
   DataTreeNode::Pointer resultNode = NULL;
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-
   if( m_tempDirectory != "" && seriesOID != "" && textOID != "" && textPath != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -922,20 +809,13 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNode;
 }
 
 /** This function load single elements from the parent-child-xml-file. */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std::string& mitkHideIfNoVersionCode( seriesOID ), const std::string& mitkHideIfNoVersionCode( label ) )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std::string& seriesOID, const std::string& label )
 {
   DataTreeNode::Pointer resultNode = NULL;
-
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (LoadAllImagesFromSeries)." );
-#else
-
   if( seriesOID != "" && label != "" && m_tempDirectory != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -944,19 +824,15 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
-#endif
   return resultNode;
 }
 
 /** ---- SaveToCHILI ---- */
 
 /** This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... . Then SaveAsNewSeries(...) or SaveToSeries(...) get used. */
-void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode( inputNodes ) )
+void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
 {
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
+#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
 #else
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() )
@@ -967,19 +843,15 @@ void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer mit
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
 #endif
 }
 
 /** This function create a new series and use the function SaveToSeries() . No dialog is used. */
-void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode( inputNodes ), const std::string& mitkHideIfNoVersionCode( studyOID ), int mitkHideIfNoVersionCode( seriesNumber), const std::string& mitkHideIfNoVersionCode( seriesDescription ) )
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& studyOID, int seriesNumber, const std::string& seriesDescription )
 {
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
+#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
 #else
-
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && studyOID != "" && seriesDescription != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -988,19 +860,15 @@ void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
 #endif
 }
 
 /** This function save the nodes to via FileUpload to chili. */
-void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mitkHideIfNoVersionCode( inputNodes ), const std::string& mitkHideIfNoVersionCode( seriesOID ), bool mitkHideIfNoVersionCode( overrideExistingSeries ) )
+void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesOID, bool overrideExistingSeries )
 {
-#ifndef CHILI_PLUGIN_VERSION_CODE
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#elif CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
+#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
   QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
 #else
-
   if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && seriesOID != "" )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
@@ -1009,7 +877,6 @@ void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer mi
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-
 #endif
 }
 

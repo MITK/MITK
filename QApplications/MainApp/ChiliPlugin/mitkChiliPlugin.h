@@ -25,18 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 // class mitkChiliPlugin inherit from
 #include <chili/plugin.h>
 
+//MITK
 #include <mitkIpPic.h>
 #include <mitkPACSPlugin.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
-
-  #include "mitkCHILIInformation.h"
-  #include "mitkLoadFromCHILI.h"
-  #include "mitkSaveToCHILI.h"
-
-#endif
-
-#include "mitkIpPicUnmangle.h"
+#include "mitkCHILIInformation.h"
+#include "mitkLoadFromCHILI.h"
+#include "mitkSaveToCHILI.h"
 
 
 class QcMITKTask;
@@ -313,13 +307,9 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
 
   private:
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
-
     CHILIInformation::Pointer m_ChiliInformation;
     LoadFromCHILI::Pointer m_LoadFromCHILI;
     SaveToCHILI::Pointer m_SaveToCHILI;
-
-#endif
 
     /** the application */
     SampleApp* app;

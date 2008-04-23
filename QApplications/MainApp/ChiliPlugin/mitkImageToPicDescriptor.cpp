@@ -26,8 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkProgressBar.h"
-
-#include <mitkIpPicUnmangle.h>
+#include "mitkIpPicUnmangle.h"
 
 /** Helper class for property import from pic/dicom-headers. */
 class HeaderTagInfo

@@ -16,15 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkChiliPluginFactory.h"
+
+//ITK
 #include "itkCreateObjectFunction.h"
 #include "itkVersion.h"
-
+//MITK
 #include "mitkPACSPlugin.h"
 #include "mitkChiliPlugin.h"
-//TODO entfernen wenn das neue Chili-Release installiert ist
-#include "mitkLightBoxImageReader.h"
-#include "mitkLightBoxImageReaderImpl.h"
-
 
 namespace mitk
 {
@@ -63,13 +61,6 @@ ChiliPluginFactory::ChiliPluginFactory()
                          "MITK Chili Plugin",
                          1,
                          mitk::CreateChiliObjectFunction<mitk::ChiliPlugin>::New());
-
-//TODO entfernen wenn das neue Chili-Release installiert ist
-  this->RegisterOverride(typeid(mitk::LightBoxImageReader).name(),
-                         typeid(mitk::LightBoxImageReaderImpl).name(),
-                         "MITK Chili Plugin Lightbox Reader",
-                         1,
-                         mitk::CreateChiliObjectFunction<mitk::LightBoxImageReaderImpl>::New());
 }
 
 ChiliPluginFactory::~ChiliPluginFactory()
@@ -87,4 +78,3 @@ const char* ChiliPluginFactory::GetDescription() const
 }
 
 } // end namespace mitk
-

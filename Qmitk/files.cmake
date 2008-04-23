@@ -38,7 +38,6 @@ SET(CPP_FILES
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
-  QmitkLightBoxReaderDialog.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMessageBoxHelper.cpp
   QmitkNewSegmentationDialog.cpp
@@ -158,7 +157,6 @@ SET(MOC_H_FILES
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
-  QmitkLightBoxReaderDialog.h
   QmitkLineEditLevelWindowWidget.h
   QmitkMessageBoxHelper.h
   QmitkNewSegmentationDialog.h

@@ -17,7 +17,6 @@ SET(CPP_FILES
   mitkSingleSpacingFilter.cpp
   mitkSpacingSetFilter.cpp
   mitkStreamReader.cpp
-  mitkLightBoxImageReaderImpl.cpp
   # mitkConference/mitkChiliConferenceKitFactory.cpp
   mitkConference/mitkConferenceKit.cpp
   mitkConference/mitkConferenceKitFactory.cpp

@@ -28,13 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFileWriter.h"
 #include "QmitkChiliPluginSaveDialog.h"
 #include "mitkProgressBar.h"
-#include <mitkIpPicUnmangle.h>
-
+#include "mitkIpPicUnmangle.h"
 //Qt
 #include <qapplication.h>
 #include <qcursor.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 mitk::SaveToCHILI::SaveToCHILI()
 {
@@ -439,5 +436,3 @@ ipBool_t mitk::SaveToCHILI::GlobalIterateImagesForImageNumber( int /*rows*/, int
     callingObject->m_MaximumImageNumber = image->number;
   return ipTrue; // true = next element; false = break iterate
 }
-
-#endif

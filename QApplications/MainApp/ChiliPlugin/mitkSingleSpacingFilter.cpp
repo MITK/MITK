@@ -17,20 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSingleSpacingFilter.h"
 
+// MITK-Includes
+#include "mitkProgressBar.h"
+#include "mitkIpPicUnmangle.h"
 // CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
 #include <ipPic/ipPicTags.h>
 #include <ipDicom/ipDicom.h>
-// MITK-Includes
-#include "mitkChiliMacros.h"
-#include "mitkProgressBar.h"
-
-#include <mitkIpPicUnmangle.h>
 
 #include <algorithm>  //needed for "sort" (windows)
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 //helpfunction to sort
 bool mitk::SingleSpacingFilter::PositionSort( const Position& elem1, const Position& elem2 )
@@ -282,7 +278,7 @@ void mitk::SingleSpacingFilter::CreateResults()
   }
 }
 
-void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersionCode( currentGroup ) )
+void mitk::SingleSpacingFilter::SearchParameter( unsigned int currentGroup )
 {
   std::vector<Position*> usedPos;
   usedPos.clear();
@@ -469,5 +465,3 @@ void mitk::SingleSpacingFilter::SearchParameter( unsigned int mitkHideIfNoVersio
   }
   while( deleteGroup != usedPos.begin() );
 }
-
-#endif

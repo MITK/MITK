@@ -10,7 +10,6 @@ SET(CPP_FILES
   mitkItkImageFileIOFactory.cpp
   mitkItkImageFileReader.cpp
   mitkItkImageWrite.cpp
-  mitkLightBoxImageReader.cpp
   mitkObjFileIOFactory.cpp
   mitkObjFileReader.cpp
   mitkPACSPlugin.cpp

@@ -17,17 +17,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkParentChild.h"
 
-#include <mitkIpPicUnmangle.h>
-
-//CHILI
-#include <chili/plugin.h>
 //MITK
 #include "mitkDataStorage.h"
 #include "mitkImageToPicDescriptor.h"
+#include "mitkIpPicUnmangle.h"
+//CHILI
+#include <chili/plugin.h>
 //XML
 #include <tinyxml.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 mitk::ParentChild::ParentChild()
 {
@@ -646,5 +643,3 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudy
   }
   return result;
 }
-
-#endif

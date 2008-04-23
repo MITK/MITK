@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkProgressBar.h"
 
-#ifdef CHILI_PLUGIN_VERSION_CODE
-
 // constructor
 mitk::StreamReader::StreamReader()
 {
@@ -131,5 +129,3 @@ void mitk::StreamReader::Update()
   }
   else std::cout<<"StreamReader-WARNING: No SeriesOID, PicDescriptorList or Geometry set."<<std::endl;
 }
-
-#endif

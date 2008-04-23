@@ -17,19 +17,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageNumberFilter.h"
 
+// MITK-Includes
+#include "mitkProgressBar.h"
+#include "mitkIpPicUnmangle.h"
+
 // CHILI-Includes
 #include <chili/isg.h>
 #include <chili/plugin.h>
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPicTags.h>
-// MITK-Includes
-#include "mitkChiliMacros.h"
-#include "mitkProgressBar.h"
-#include <mitkIpPicUnmangle.h>
 
 #include <algorithm>  //needed for "sort" (windows)
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 //help-functions
 bool mitk::ImageNumberFilter::NumberSort( const Slice elem1, const Slice elem2 )
@@ -474,5 +472,3 @@ void mitk::ImageNumberFilter::GenerateImages()
     GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupIter->seriesDescription );
   }
 }
-
-#endif

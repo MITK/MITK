@@ -17,11 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCHILIInformation.h"
 
+//MITK
 #include <mitkIpPicUnmangle.h>
 //CHILI
 #include <chili/plugin.h>
-
-#ifdef CHILI_PLUGIN_VERSION_CODE
 
 mitk::CHILIInformation::CHILIInformation()
 {
@@ -299,5 +298,3 @@ ipBool_t mitk::CHILIInformation::GlobalIterateText( int /*rows*/, int /*row*/, t
   }
   return ipTrue; // true = next element; false = break iterate
 }
-
-#endif

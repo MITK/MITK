@@ -23,6 +23,7 @@ ELSE(POCO_INCLUDE_DIR)
       ${POCO_PATH}/Util/include
       ${POCO_PATH}/XML/include
     )
+    LINK_DIRECTORIES(${POCO_PATH}/lib)
   ENDIF(POCO_PATH)
 ENDIF(POCO_INCLUDE_DIR)
 

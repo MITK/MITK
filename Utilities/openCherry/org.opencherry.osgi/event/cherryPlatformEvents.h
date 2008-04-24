@@ -28,11 +28,11 @@ namespace cherry {
 
 struct CHERRY_API PlatformEvents
 {
-  Message1<const PlatformEvent> platformStarted;
-  Message1<const PlatformEvent> platformError;
-  Message1<const PlatformEvent> platformWarning;
+  Message1<const PlatformEvent&> platformStarted;
+  Message1<const PlatformEvent&> platformError;
+  Message1<const PlatformEvent&> platformWarning;
   
-  Message1<const PlatformEvent> logged;
+  Message1<const PlatformEvent&> logged;
 };
 
 }

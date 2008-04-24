@@ -45,15 +45,11 @@ struct CHERRY_API IWorkbenchPartReference : public Object {
      */
     virtual SmartPointer<IWorkbenchPart> GetPart(bool restore) = 0;
 
-    /**
-     * @see IWorkbenchPart#getTitle
-     */
-    virtual std::string GetTitle() = 0;
 
     /**
      * @see IWorkbenchPart#getTitleImage
      */
-    virtual void* GetTitleImage() = 0;
+    //virtual void* GetTitleImage() = 0;
 
     /**
      * @see IWorkbenchPart#getTitleToolTip

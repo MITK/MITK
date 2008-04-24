@@ -347,7 +347,7 @@ struct CHERRY_API IWorkbenchPage : public Object { //, public IPartService, publ
    *            the editor input
    * @return an editor with input equals to <code>input</code>
    */
-  virtual IEditorPart::Pointer FindEditor(IEditorInput input);
+  virtual IEditorPart::Pointer FindEditor(IEditorInput::Pointer input);
 
   /**
    * Returns an array of editor references that match the given input and/or
@@ -370,7 +370,7 @@ struct CHERRY_API IWorkbenchPage : public Object { //, public IPartService, publ
    * @see #MATCH_ID
    * @since 3.2
    */
-  virtual std::vector<IEditorReference::Pointer> FindEditors(IEditorInput input, const std::string& editorId,
+  virtual std::vector<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const std::string& editorId,
       int matchFlags);
 
   /**

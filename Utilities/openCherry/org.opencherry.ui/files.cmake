@@ -1,8 +1,9 @@
 SET(CPP_FILES
   manifest.cpp
   cherryAbstractUIPlugin.cpp
+  cherryEditorPart.cpp
+  cherryIEditorRegistry.cpp
   cherryISources.cpp
-  cherryIWorkbench.cpp
   cherryIWorkbenchPage.cpp
   cherryPlatformUI.cpp
   cherryUIException.cpp
@@ -18,10 +19,23 @@ SET(HANDLERS_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  cherryEditorDescriptor.cpp
+  #cherryEditorManager.cpp
+  #cherryEditorRegistry.cpp
+  cherryEditorRegistryReader.cpp
+  cherryEditorSite.cpp
+  cherryFileEditorMapping.cpp
+  #cherryPartSite.cpp
+  cherryPartTester.cpp
   cherryRegistryReader.cpp
   cherryViewDescriptor.cpp
+  cherryViewFactory.cpp
+  cherryViewReference.cpp
   cherryViewRegistry.cpp
   cherryViewRegistryReader.cpp
+  cherryViewSite.cpp
+  #cherryWorkbenchPage.cpp
+  cherryWorkbenchPartReference.cpp
   cherryWorkbenchPlugin.cpp
   cherryWorkbenchRegistryConstants.cpp
 )

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryHandlerUtil.h"
 
 #include "../cherryUIException.h"
-#include "../cherryIWorkbench.h"
+#include "../cherryWorkbench.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIViewDescriptor.h"
 #include "../cherryPlatformUI.h"
@@ -78,7 +78,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
     return;
   }
 
-  IShowViewDialog::Pointer dialog = PlatformUI::GetWorkbench()->CreateDialog(IWorkbench::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
+  IShowViewDialog::Pointer dialog = PlatformUI::GetWorkbench().Cast<Workbench>()->CreateDialog(Workbench::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
   if (dialog.IsNull()) return;
   
   int returnCode = dialog->Exec();

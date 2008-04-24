@@ -18,6 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCHPARTREFERENCE_H_
 #define CHERRYWORKBENCHPARTREFERENCE_H_
 
+#include "../cherryIWorkbenchPartReference.h"
+#include "../cherryIWorkbenchPart.h"
+#include "../cherryIPartPane.h"
+
 namespace cherry {
 
 class WorkbenchPartReference : virtual public IWorkbenchPartReference {
@@ -88,34 +92,32 @@ public: static int STATE_DISPOSED; // = 3
      */
 private: int state;
    
-protected: IWorkbenchPart::Ptr part;
+protected: IWorkbenchPart::Pointer part;
+
+protected: IPartPane::Pointer pane;
 
 private: std::string id;
 
-protected: PartPane pane;
-
 private: bool pinned;
-    
-private: std::string title;
 
 private: std::string tooltip;
 
     /**
      * Stores the current Image for this part reference. Lazily created. Null if not allocated.
      */
-private: Image image;
+//private: Image image;
     
-private: ImageDescriptor defaultImageDescriptor;
+//private: ImageDescriptor defaultImageDescriptor;
     
     /**
      * Stores the current image descriptor for the part. 
      */
-private: ImageDescriptor imageDescriptor;
+//private: ImageDescriptor imageDescriptor;
 
     /**
      * API listener list
      */
-private: ListenerList propChangeListeners;
+//private: ListenerList propChangeListeners;
 
     /**
      * Internal listener list. Listens to the INTERNAL_PROPERTY_* property change events that are not yet API.
@@ -123,7 +125,7 @@ private: ListenerList propChangeListeners;
      */
 //private: ListenerList internalPropChangeListeners = new ListenerList();
     
-private: ListenerList partChangeListeners = new ListenerList();
+//private: ListenerList partChangeListeners = new ListenerList();
     
 private: std::string partName;
 
@@ -134,9 +136,9 @@ private: std::string contentDescription;
     /**
      * Used to remember which events have been queued.
      */
-private: BitSet queuedEvents;
+//private: BitSet queuedEvents;
 
-private: bool queueEvents;
+//private: bool queueEvents;
 
 //private: static DisposeListener prematureDisposeListener = new DisposeListener() {
 //        public void widgetDisposed(DisposeEvent e) {
@@ -174,13 +176,11 @@ protected: virtual void CheckReference();
      */
 //private: virtual void DeferEvents(bool shouldQueue);
 
-protected: virtual void SetTitle(const std::string& newTitle);
-
 protected: virtual void SetPartName(const std::string& newPartName);
 
 protected: virtual void SetContentDescription(const std::string& newContentDescription);
 
-protected: virtual void SetImageDescriptor(ImageDescriptor descriptor);
+//protected: virtual void SetImageDescriptor(ImageDescriptor descriptor);
     
 protected: virtual void SetToolTip(const std::string& newToolTip);
 
@@ -191,18 +191,18 @@ protected: virtual void SetToolTip(const std::string& newToolTip);
     /**
      * Refreshes all cached values with the values from the real part 
      */
-protected: virtual void refreshFromPart();
+protected: virtual void RefreshFromPart();
     
-protected: virtual ImageDescriptor computeImageDescriptor();
+//protected: virtual ImageDescriptor ComputeImageDescriptor();
 
-public: virtual void init(const std::string& id, const  std::string& title, const std::string& tooltip,
-            ImageDescriptor desc, const std::string& paneName, const std::string& contentDescription);
+public: virtual void Init(const std::string& id, const std::string& tooltip,
+            /*ImageDescriptor desc,*/ const std::string& paneName, const std::string& contentDescription);
 
     /**
      * Releases any references maintained by this part reference
      * when its actual part becomes known (not called when it is disposed).
      */
-protected: virtual void releaseReferences();
+protected: virtual void ReleaseReferences();
 
 //protected: virtual void addInternalPropertyListener(IPropertyListener listener);
     
@@ -220,18 +220,18 @@ protected: virtual void releaseReferences();
      */
 //public: virtual void removePropertyListener(IPropertyListener listener);
 
-public: const std::string& getId();
+public: std::string GetId();
 
-public: virtual const std::string& getTitleToolTip();
+public: virtual std::string GetTitleToolTip();
 
-protected: const std::string& getRawToolTip();
+protected: std::string GetRawToolTip();
 
     /**
      * Returns the pane name for the part
      * 
      * @return the pane name for the part
      */
-public: virtual const std::string& getPartName();
+public: virtual std::string GetPartName();
     
     /**
      * Gets the part name directly from the associated workbench part,
@@ -239,16 +239,16 @@ public: virtual const std::string& getPartName();
      * 
      * @return
      */
-protected: const std::string& getRawPartName();
+protected: std::string GetRawPartName();
 
-protected: virtual const std::string& computePartName();
+protected: virtual std::string ComputePartName();
 
     /**
      * Returns the content description for this part.
      * 
      * @return the pane name for the part
      */
-public: virtual const std::string& getContentDescription();
+public: virtual std::string GetContentDescription();
 
     /**
      * Computes a new content description for the part. Subclasses may override to change the
@@ -256,67 +256,47 @@ public: virtual const std::string& getContentDescription();
      * 
      * @return the new content description for the part
      */
-protected: virtual const std::string& computeContentDescription();
+protected: virtual std::string ComputeContentDescription();
 
     /**
      * Returns the content description as set directly by the part, or the empty string if none
      * 
      * @return the unmodified content description from the part (or the empty string if none)
      */
-protected: const std::string& getRawContentDescription();
+protected: std::string GetRawContentDescription();
 
-public: virtual bool isDirty();
+public: virtual bool IsDirty();
 
-public: virtual const std::string& getTitle();
-
-    /**
-     * Computes a new title for the part. Subclasses may override to change the default behavior.
-     * 
-     * @return the title for the part
-     */
-protected: virtual const std::string& computeTitle();
-
-    /**
-     * Returns the unmodified title for the part, or the empty string if none
-     * 
-     * @return the unmodified title, as set by the IWorkbenchPart. Returns the empty string if none.
-     */
-protected: const std::string& getRawTitle();
-
-public: virtual Image getTitleImage();
+//public: virtual Image GetTitleImage();
     
-public: virtual ImageDescriptor getTitleImageDescriptor();
+//public: virtual ImageDescriptor GetTitleImageDescriptor();
     
 //    /* package */ virtual void fireVisibilityChange();
 
 //    /* package */ virtual void fireZoomChange();
     
-public: virtual bool getVisible();
+public: virtual bool GetVisible();
     
-public: virtual void setVisible(bool isVisible);
+public: virtual void SetVisible(bool isVisible);
     
 //protected: virtual void firePropertyChange(int id);
     
 //private: virtual void immediateFirePropertyChange(int id);
 
-public: IWorkbenchPart::ConstPtr getPart(bool restore);
+public: IWorkbenchPart::Pointer GetPart(bool restore);
     
-protected: virtual IWorkbenchPart::Ptr createPart() = 0;
-        
-protected: virtual PartPane createPane() = 0;
+protected: virtual IWorkbenchPart::Pointer CreatePart() = 0;
+
+protected: virtual IPartPane::Pointer CreatePane() = 0;
     
     /**
-     * Returns the part pane for this part reference. Does not return null. Should not be called
-     * if the reference has been disposed.
-     * 
-     * TODO: clean up all code that has any possibility of calling this on a disposed reference
-     * and make this method throw an exception if anyone else attempts to do so.
+     * Returns the part pane for this part reference. Does not return null. 
      * 
      * @return
      */
-public: PartPane getPane();
+public: IPartPane::Pointer GetPane();
 
-public: void dispose();
+public: void Dispose();
 
   /**
    * Clears all of the listeners in a listener list. TODO Bug 117519 Remove
@@ -330,16 +310,16 @@ public: void dispose();
     /**
      * 
      */
-protected: virtual void doDisposePart();
+protected: virtual void DoDisposePart();
 
-public: virtual void setPinned(bool newPinned);
+public: virtual void SetPinned(bool newPinned);
     
-public: virtual bool isPinned();
+public: virtual bool IsPinned();
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
      */
-public: virtual const std::string& getPartProperty(const std::string& key);
+public: virtual std::string GetPartProperty(const std::string& key);
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#addPartPropertyListener(org.eclipse.jface.util.IPropertyChangeListener)

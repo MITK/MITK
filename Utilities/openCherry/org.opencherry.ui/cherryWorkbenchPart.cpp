@@ -123,12 +123,12 @@ IWorkbenchPartSite::Pointer WorkbenchPart::GetSite()
   return this->m_PartSite;
 }
 
-const std::string& WorkbenchPart::GetPartName() 
+std::string WorkbenchPart::GetPartName() 
 {
   return this->m_PartName;
 }
 
-const std::string& WorkbenchPart::GetContentDescription() 
+std::string WorkbenchPart::GetContentDescription() 
 {
   return this->m_ContentDescription;
 }
@@ -143,7 +143,7 @@ void* WorkbenchPart::GetTitleImage()
   //return GetDefaultImage();
 }
 
-const std::string& WorkbenchPart::GetTitleToolTip() 
+std::string WorkbenchPart::GetTitleToolTip() 
 {
   return this->m_ToolTip;
 }

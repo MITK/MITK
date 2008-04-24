@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "org.opencherry.osgi/cherryIBundleActivator.h"
 #include "cherryQtUIPlugin.h"
 
-#include "org.opencherry.ui/cherryIWorkbench.h"
+#include "org.opencherry.ui/cherryWorkbench.h"
 #include "cherryQtWorkbench.h"
 
 #include "org.opencherry.ui/cherryIViewPart.h"
@@ -30,7 +30,7 @@ POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
   POCO_EXPORT_CLASS(cherry::QtUIPlugin)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIWorkbench, cherry::IWorkbench)
+POCO_BEGIN_NAMED_MANIFEST(cherryWorkbench, cherry::Workbench)
   POCO_EXPORT_CLASS(cherry::QtWorkbench)
 POCO_END_MANIFEST
 

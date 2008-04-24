@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+const std::string Workbench::DIALOG_ID_SHOW_VIEW = "org.opencherry.ui.dialogs.showview";
+
+
 Workbench::Workbench()
 {
   m_ViewRegistry = new ViewRegistry();

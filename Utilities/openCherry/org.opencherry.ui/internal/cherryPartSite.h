@@ -18,7 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPARTSITE_H_
 #define CHERRYPARTSITE_H_
 
+#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+
+#include "../cherryIWorkbenchPartSite.h"
+#include "../cherryIWorkbenchPartReference.h"
+
 namespace cherry {
+
+class IWorkbenchPart;
+class IWorkbenchPage;
+class IWorkbenchWindow;
 
 /**
  * <code>PartSite</code> is the general implementation for an
@@ -40,7 +49,7 @@ namespace cherry {
  * <li>the site is activated, causing the actions to become visible </li>
  * </ol>
  */
-class PartSite : public IWorkbenchPartSite {
+class PartSite : public virtual IWorkbenchPartSite {
 
   /**
    * This is a helper method for the register context menu functionality. It
@@ -64,27 +73,27 @@ class PartSite : public IWorkbenchPartSite {
    * @see IWorkbenchPartSite#registerContextMenu(MenuManager,
    *      ISelectionProvider)
    */
-public: static void RegisterContextMenu(const std::string& menuId,
-      const MenuManager menuManager,
-      const ISelectionProvider selectionProvider,
-      bool includeEditorInput, IWorkbenchPart::ConstPtr part,
-      const Collection menuExtenders);
+//public: static void RegisterContextMenu(const std::string& menuId,
+//      const MenuManager menuManager,
+//      const ISelectionProvider selectionProvider,
+//      bool includeEditorInput, IWorkbenchPart::ConstPointer part,
+//      const Collection menuExtenders);
 
 private:
   
-  IWorkbenchPartReference partReference;
-  IWorkbenchPart part;
-  IWorkbenchPage page;
-  String extensionID;
-  String pluginID;
-  String extensionName;
-  ISelectionProvider selectionProvider;
-  SubActionBars actionBars;
-  KeyBindingService keyBindingService;
-  ArrayList menuExtenders;
-  WorkbenchSiteProgressService progressService;
+  IWorkbenchPartReference::Pointer partReference;
+  SmartPointer<IWorkbenchPart> part;
+  SmartPointer<IWorkbenchPage> page;
+  std::string extensionID;
+  std::string pluginID;
+  std::string extensionName;
+  //ISelectionProvider selectionProvider;
+  //SubActionBars actionBars;
+  //KeyBindingService keyBindingService;
+  //ArrayList menuExtenders;
+  //WorkbenchSiteProgressService progressService;
 
-protected: const ServiceLocator serviceLocator;
+//protected: const ServiceLocator serviceLocator;
 
   /**
    * Build the part site.
@@ -96,8 +105,8 @@ protected: const ServiceLocator serviceLocator;
    * @param page
    *            the page it belongs to
    */
-public: PartSite(IWorkbenchPartReference::Ptr ref, IWorkbenchPart::Ptr part,
-      IWorkbenchPage::Ptr page);
+public: PartSite(IWorkbenchPartReference::Pointer ref, SmartPointer<IWorkbenchPart> part,
+      SmartPointer<IWorkbenchPage> page);
 
   /**
    * Initialize the local services.
@@ -115,7 +124,7 @@ public: ~PartSite();
    * action bars are shared among this editor and other editors of the same
    * type.
    */
-public: virtual IActionBars GetActionBars();
+//public: virtual IActionBars GetActionBars();
 
   /**
    * Returns the part registry extension ID.
@@ -129,22 +138,17 @@ public: virtual std::string GetId();
    * 
    * @return the page containing this part
    */
-public: virtual IWorkbenchPage* GetPage();
-
-  /**
-   * Gets the part pane.
-   */
-public: virtual PartPane GetPane();
+public: virtual SmartPointer<IWorkbenchPage> GetPage();
 
   /**
    * Returns the part.
    */
-public: virtual IWorkbenchPart::Ptr GetPart();
+public: virtual SmartPointer<IWorkbenchPart> GetPart();
 
   /**
    * Returns the part reference.
    */
-public: virtual IWorkbenchPartReference::Ptr GetPartReference();
+public: virtual IWorkbenchPartReference::Pointer GetPartReference();
 
   /**
    * Returns the part registry plugin ID. It cannot be <code>null</code>.
@@ -161,50 +165,44 @@ public: virtual std::string GetRegisteredName();
   /**
    * Returns the selection provider for a part.
    */
-public: virtual ISelectionProvider GetSelectionProvider();
+//public: virtual ISelectionProvider GetSelectionProvider();
 
-  /**
-   * Returns the shell containing this part.
-   * 
-   * @return the shell containing this part
-   */
-public: virtual Shell GetShell();
 
   /**
    * Returns the workbench window containing this part.
    * 
    * @return the workbench window containing this part
    */
-public: virtual IWorkbenchWindow* GetWorkbenchWindow();
+public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
 
   /**
    * Register a popup menu for extension.
    */
-public: virtual void RegisterContextMenu(const std::string& menuID, 
-      MenuManager menuMgr,
-      ISelectionProvider selProvider);
+//public: virtual void RegisterContextMenu(const std::string& menuID, 
+//      MenuManager menuMgr,
+//      ISelectionProvider selProvider);
 
   /**
    * Register a popup menu with the default id for extension.
    */
-public: virtual void RegisterContextMenu(MenuManager menuMgr,
-      ISelectionProvider selProvider);
+//public: virtual void RegisterContextMenu(MenuManager menuMgr,
+//      ISelectionProvider selProvider);
 
   // getContextMenuIds() added by Dan Rubel (dan_rubel@instantiations.com)
   /**
    * Get the registered popup menu identifiers
    */
-public: virtual void GetContextMenuIds(std::vector<std::string>& menuIds);
+//public: virtual void GetContextMenuIds(std::vector<std::string>& menuIds);
 
   /**
    * Sets the action bars for the part.
    */
-public: virtual void SetActionBars(SubActionBars bars);
+//public: virtual void SetActionBars(SubActionBars bars);
 
   /**
    * Sets the configuration element for a part.
    */
-public: virtual void SetConfigurationElement(IConfigurationElement::Ptr configElement);
+public: virtual void SetConfigurationElement(IConfigurationElement::Pointer configElement);
 
 protected: virtual void SetPluginId(const std::string& pluginId);
 
@@ -219,7 +217,7 @@ protected: virtual void SetId(const std::string& id);
   /**
    * Sets the part.
    */
-public: virtual void SetPart(IWorkbenchPart::Ptr newPart);
+public: virtual void SetPart(SmartPointer<IWorkbenchPart> newPart);
 
   /**
    * Sets the registered name for this part.
@@ -232,14 +230,14 @@ protected: virtual void SetRegisteredName(const std::string& name);
   /**
    * Set the selection provider for a part.
    */
-public: virtual void SetSelectionProvider(ISelectionProvider provider);
+//public: virtual void SetSelectionProvider(ISelectionProvider provider);
 
   /*
    * @see IWorkbenchPartSite#getKeyBindingService()
    * 
    * TODO deprecated: use IHandlerService instead
    */
-public: virtual  IKeyBindingService GetKeyBindingService();
+//public: virtual  IKeyBindingService GetKeyBindingService();
 
 protected: virtual std::string GetInitialScopeId();
 
@@ -249,7 +247,7 @@ protected: virtual std::string GetInitialScopeId();
    * @param adapter
    * @return
    */
-public: Object GetAdapter(Class adapter);
+public: Object::Pointer GetAdapter(const std::type_info& adapter);
 
 public: virtual void ActivateActionBars(bool forceVisibility);
 
@@ -260,11 +258,11 @@ public: virtual void DeactivateActionBars(bool forceHide);
    * 
    * @return WorkbenchSiteProgressService
    */
-public: virtual WorkbenchSiteProgressService GetSiteProgressService();
+//public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-public: Object GetService(const Class key);
+//public: Object GetService(const Class key);
 
-public: bool HasService(const Class key);
+//public: bool HasService(const Class key);
 
   /**
    * Prints out the identifier, the plug-in identifier and the registered

@@ -25,6 +25,7 @@ namespace cherry {
 class IPartService;
 class ISelectionService;
 class IWorkbenchPage;
+class IWorkbench;
 
 struct CHERRY_API IWorkbenchWindow : public Object
 {
@@ -32,6 +33,8 @@ struct CHERRY_API IWorkbenchWindow : public Object
   cherryClassMacro(IWorkbenchWindow);
   
   virtual SmartPointer<IWorkbenchPage> GetActivePage() = 0;
+  
+  virtual SmartPointer<IWorkbench> GetWorkbench() = 0;
   
   virtual IPartService* GetPartService() = 0;
   

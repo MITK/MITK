@@ -15,71 +15,79 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include "cherryWorkbenchPartReference.h"
+
+#include <org.opencherry.osgi/cherryPlatformException.h>
+
+#include "cherryWorkbenchPlugin.h"
+#include "../cherryIWorkbenchPartSite.h"
+#include "../cherryIEditorPart.h"
+
 namespace cherry {
 
     /**
      * Internal property ID: Indicates that the underlying part was created
      */
-static const int WorkbenchPartReference::INTERNAL_PROPERTY_OPENED = 0x211;
+ const int WorkbenchPartReference::INTERNAL_PROPERTY_OPENED = 0x211;
     
     /**
      * Internal property ID: Indicates that the underlying part was destroyed
      */
-static const int WorkbenchPartReference::INTERNAL_PROPERTY_CLOSED = 0x212;
+ const int WorkbenchPartReference::INTERNAL_PROPERTY_CLOSED = 0x212;
 
     /**
      * Internal property ID: Indicates that the result of IEditorReference.isPinned()
      */
-static const int WorkbenchPartReference::INTERNAL_PROPERTY_PINNED = 0x213;
+ const int WorkbenchPartReference::INTERNAL_PROPERTY_PINNED = 0x213;
 
     /**
      * Internal property ID: Indicates that the result of getVisible() has changed
      */
-static const int WorkbenchPartReference::INTERNAL_PROPERTY_VISIBLE = 0x214;
+ const int WorkbenchPartReference::INTERNAL_PROPERTY_VISIBLE = 0x214;
 
     /**
      * Internal property ID: Indicates that the result of isZoomed() has changed
      */
-//static const int WorkbenchPartReference::INTERNAL_PROPERTY_ZOOMED = 0x215;
+// const int WorkbenchPartReference::INTERNAL_PROPERTY_ZOOMED = 0x215;
 
     /**
      * Internal property ID: Indicates that the part has an active child and the
      * active child has changed. (fired by PartStack)
      */
-static const int WorkbenchPartReference::INTERNAL_PROPERTY_ACTIVE_CHILD_CHANGED = 0x216;
+ const int WorkbenchPartReference::INTERNAL_PROPERTY_ACTIVE_CHILD_CHANGED = 0x216;
 
     /**
      * Internal property ID: Indicates that changed in the min / max
      * state has changed
      */
-//static final int WorkbenchPartReference::INTERNAL_PROPERTY_MAXIMIZED = 0x217;
+// final int WorkbenchPartReference::INTERNAL_PROPERTY_MAXIMIZED = 0x217;
 
     // State constants //////////////////////////////
     
     /**
      * State constant indicating that the part is not created yet
      */
-static int WorkbenchPartReference::STATE_LAZY = 0;
+ int WorkbenchPartReference::STATE_LAZY = 0;
      
     /**
      * State constant indicating that the part is in the process of being created
      */
-static int WorkbenchPartReference::STATE_CREATION_IN_PROGRESS = 1;
+ int WorkbenchPartReference::STATE_CREATION_IN_PROGRESS = 1;
     
     /**
      * State constant indicating that the part has been created
      */
-static int WorkbenchPartReference::STATE_CREATED = 2;
+ int WorkbenchPartReference::STATE_CREATED = 2;
     
     /**
      * State constant indicating that the reference has been disposed (the reference shouldn't be
      * used anymore)
      */
-static int WorkbenchPartReference::STATE_DISPOSED = 3;
+ int WorkbenchPartReference::STATE_DISPOSED = 3;
   
 
 
-//private: static DisposeListener prematureDisposeListener = new DisposeListener() {
+//private:  DisposeListener prematureDisposeListener = new DisposeListener() {
 //        public void widgetDisposed(DisposeEvent e) {
 //            WorkbenchPlugin.log(new RuntimeException("Widget disposed too early!")); //$NON-NLS-1$
 //        }    
@@ -101,7 +109,7 @@ static int WorkbenchPartReference::STATE_DISPOSED = 3;
 //    };
     
 WorkbenchPartReference::WorkbenchPartReference()
-: queueEvents(false), pinned(false), state(STATE_LAZY) {
+: state(STATE_LAZY), pinned(false) {
         //no-op
     }
     
@@ -111,7 +119,7 @@ bool WorkbenchPartReference::IsDisposed() {
     
 void WorkbenchPartReference::CheckReference() {
         if (state == STATE_DISPOSED) {
-            throw new RuntimeException("Error: IWorkbenchPartReference disposed"); //$NON-NLS-1$
+            throw Poco::RuntimeException("Error: IWorkbenchPartReference disposed"); //$NON-NLS-1$
         }
     }
     
@@ -136,141 +144,124 @@ void WorkbenchPartReference::CheckReference() {
 //        }
 //    }
 
-void WorkbenchPartReference::SetTitle(const std::string& newTitle) {
-        if (Util.equals(title, newTitle)) {
-            return;
-        }
-
-        title = newTitle;
-        firePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-    }
-
 void WorkbenchPartReference::SetPartName(const std::string& newPartName) {
-        if (Util.equals(partName, newPartName)) {
+        if (partName == newPartName) {
             return;
         }
 
         partName = newPartName;
-        firePropertyChange(IWorkbenchPartConstants.PROP_PART_NAME);
+        //firePropertyChange(IWorkbenchPartConstants.PROP_PART_NAME);
     }
 
 void WorkbenchPartReference::SetContentDescription(const std::string& newContentDescription) {
-        if (Util.equals(contentDescription, newContentDescription)) {
+        if (contentDescription == newContentDescription) {
             return;
         }
 
         contentDescription = newContentDescription;
-        firePropertyChange(IWorkbenchPartConstants.PROP_CONTENT_DESCRIPTION);
+        //firePropertyChange(IWorkbenchPartConstants.PROP_CONTENT_DESCRIPTION);
     }
 
-void WorkbenchPartReference::SetImageDescriptor(ImageDescriptor descriptor) {
-        if (Util.equals(imageDescriptor, descriptor)) {
-            return;
-        }
-
-        Image oldImage = image;
-        ImageDescriptor oldDescriptor = imageDescriptor;
-        image = null;
-        imageDescriptor = descriptor;
-        
-        // Don't queue events triggered by image changes. We'll dispose the image
-        // immediately after firing the event, so we need to fire it right away.
-        immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-        if (queueEvents) {
-            // If there's a PROP_TITLE event queued, remove it from the queue because
-            // we've just fired it.
-            queuedEvents.clear(IWorkbenchPartConstants.PROP_TITLE);
-        }
-        
-        // If we had allocated the old image, deallocate it now (AFTER we fire the property change 
-        // -- listeners may need to clean up references to the old image)
-        if (oldImage != null) {
-            JFaceResources.getResources().destroy(oldDescriptor);
-        }
-    }
+//void WorkbenchPartReference::SetImageDescriptor(ImageDescriptor descriptor) {
+//        if (Util.equals(imageDescriptor, descriptor)) {
+//            return;
+//        }
+//
+//        Image oldImage = image;
+//        ImageDescriptor oldDescriptor = imageDescriptor;
+//        image = null;
+//        imageDescriptor = descriptor;
+//        
+//        // Don't queue events triggered by image changes. We'll dispose the image
+//        // immediately after firing the event, so we need to fire it right away.
+//        immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
+//        if (queueEvents) {
+//            // If there's a PROP_TITLE event queued, remove it from the queue because
+//            // we've just fired it.
+//            queuedEvents.clear(IWorkbenchPartConstants.PROP_TITLE);
+//        }
+//        
+//        // If we had allocated the old image, deallocate it now (AFTER we fire the property change 
+//        // -- listeners may need to clean up references to the old image)
+//        if (oldImage != null) {
+//            JFaceResources.getResources().destroy(oldDescriptor);
+//        }
+//    }
     
 void WorkbenchPartReference::SetToolTip(const std::string& newToolTip) {
-        if (Util.equals(tooltip, newToolTip)) {
+        if (tooltip == newToolTip) {
             return;
         }
 
         tooltip = newToolTip;
-        firePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
+        //firePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
     }
 
-void WorkbenchPartReference::partPropertyChanged(Object source, int propId) {
-
-        // We handle these properties directly (some of them may be transformed
-        // before firing events to workbench listeners)
-        if (propId == IWorkbenchPartConstants.PROP_CONTENT_DESCRIPTION
-                || propId == IWorkbenchPartConstants.PROP_PART_NAME
-                || propId == IWorkbenchPartConstants.PROP_TITLE) {
-
-            refreshFromPart();
-        } else {
-            // Any other properties are just reported to listeners verbatim
-            firePropertyChange(propId);
-        }
-        
-        // Let the model manager know as well
-        if (propId == IWorkbenchPartConstants.PROP_DIRTY) {
-          IWorkbenchPart actualPart = getPart(false);
-          if (actualPart != null) {
-        SaveablesList modelManager = (SaveablesList) actualPart.getSite().getService(ISaveablesLifecycleListener.class);
-            modelManager.dirtyChanged(actualPart);
-          }
-        }
-    }
+//void WorkbenchPartReference::partPropertyChanged(Object source, int propId) {
+//
+//        // We handle these properties directly (some of them may be transformed
+//        // before firing events to workbench listeners)
+//        if (propId == IWorkbenchPartConstants.PROP_CONTENT_DESCRIPTION
+//                || propId == IWorkbenchPartConstants.PROP_PART_NAME
+//                || propId == IWorkbenchPartConstants.PROP_TITLE) {
+//
+//            refreshFromPart();
+//        } else {
+//            // Any other properties are just reported to listeners verbatim
+//            firePropertyChange(propId);
+//        }
+//        
+//        // Let the model manager know as well
+//        if (propId == IWorkbenchPartConstants.PROP_DIRTY) {
+//          IWorkbenchPart actualPart = getPart(false);
+//          if (actualPart != null) {
+//        SaveablesList modelManager = (SaveablesList) actualPart.getSite().getService(ISaveablesLifecycleListener.class);
+//            modelManager.dirtyChanged(actualPart);
+//          }
+//        }
+//    }
     
-void WorkbenchPartReference::partPropertyChanged(PropertyChangeEvent event) {
-      firePartPropertyChange(event);
-    }
+//void WorkbenchPartReference::partPropertyChanged(PropertyChangeEvent event) {
+//      firePartPropertyChange(event);
+//    }
 
     /**
      * Refreshes all cached values with the values from the real part 
      */
-void WorkbenchPartReference::refreshFromPart() {
-        deferEvents(true);
+void WorkbenchPartReference::RefreshFromPart() {
+        //deferEvents(true);
 
-        setPartName(computePartName());
-        setTitle(computeTitle());
-        setContentDescription(computeContentDescription());
-        setToolTip(getRawToolTip());
-        setImageDescriptor(computeImageDescriptor());
+        SetPartName(ComputePartName());
+        SetContentDescription(ComputeContentDescription());
+        SetToolTip(GetRawToolTip());
+        //SetImageDescriptor(ComputeImageDescriptor());
 
-        deferEvents(false);
+        //deferEvents(false);
     }
     
-ImageDescriptor WorkbenchPartReference::computeImageDescriptor() {
-        if (part != null) {
-            return ImageDescriptor.createFromImage(part.getTitleImage(), Display.getCurrent());
-        }
-        return defaultImageDescriptor;
-    }
+//ImageDescriptor WorkbenchPartReference::ComputeImageDescriptor() {
+//        if (part != null) {
+//            return ImageDescriptor.createFromImage(part.getTitleImage(), Display.getCurrent());
+//        }
+//        return defaultImageDescriptor;
+//    }
 
-void WorkbenchPartReference::init(const std::string& id, const  std::string& title, const std::string& tooltip,
-            ImageDescriptor desc, const std::string& paneName, const std::string& contentDescription) {
-        Assert.isNotNull(id);
-        Assert.isNotNull(title);
-        Assert.isNotNull(tooltip);
-        Assert.isNotNull(desc);
-        Assert.isNotNull(paneName);
-        Assert.isNotNull(contentDescription);
-        
-        this.id = id;
-        this.title = title;
-        this.tooltip = tooltip;
-        this.partName = paneName;
-        this.contentDescription = contentDescription;
-        this.defaultImageDescriptor = desc;
-        this.imageDescriptor = computeImageDescriptor();
+void WorkbenchPartReference::Init(const std::string& id, const std::string& tooltip,
+            /*ImageDescriptor desc,*/ const std::string& paneName, const std::string& contentDescription) {
+                
+        this->id = id;
+        this->tooltip = tooltip;
+        this->partName = paneName;
+        this->contentDescription = contentDescription;
+        //this->defaultImageDescriptor = desc;
+        //this->imageDescriptor = computeImageDescriptor();
     }
 
     /**
      * Releases any references maintained by this part reference
      * when its actual part becomes known (not called when it is disposed).
      */
-void WorkbenchPartReference::releaseReferences() {
+void WorkbenchPartReference::ReleaseReferences() {
 
     }
 
@@ -314,22 +305,22 @@ void WorkbenchPartReference::releaseReferences() {
 //        propChangeListeners.remove(listener);
 //    }
 
-const std::string& WorkbenchPartReference::getId() {
-        if (part != null) {
-            IWorkbenchPartSite site = part.getSite();
-            if (site != null) {
-        return site.getId();
+std::string WorkbenchPartReference::GetId() {
+        if (!part.IsNull()) {
+            IWorkbenchPartSite::Pointer site = part->GetSite();
+            if (!site.IsNull()) {
+        return site->GetId();
       }
         }
-        return Util.safeString(id);
+        return id;
     }
 
-const std::string& WorkbenchPartReference::getTitleToolTip() {
-        return Util.safeString(tooltip);
+std::string WorkbenchPartReference::GetTitleToolTip() {
+        return tooltip;
     }
 
-const std::string& WorkbenchPartReference::getRawToolTip() {
-        return Util.safeString(part.getTitleToolTip());
+std::string WorkbenchPartReference::GetRawToolTip() {
+        return part->GetTitleToolTip();
     }
 
     /**
@@ -337,8 +328,8 @@ const std::string& WorkbenchPartReference::getRawToolTip() {
      * 
      * @return the pane name for the part
      */
-const std::string& WorkbenchPartReference::getPartName() {
-        return Util.safeString(partName);
+std::string WorkbenchPartReference::GetPartName() {
+        return partName;
     }
     
     /**
@@ -347,20 +338,13 @@ const std::string& WorkbenchPartReference::getPartName() {
      * 
      * @return
      */
-const std::string& WorkbenchPartReference::getRawPartName() {
-        String result = ""; //$NON-NLS-1$
-
-        if (part instanceof IWorkbenchPart2) {
-            IWorkbenchPart2 part2 = (IWorkbenchPart2) part;
-
-            result = Util.safeString(part2.getPartName());
-        }
-
-        return result;
+std::string WorkbenchPartReference::GetRawPartName() {
+        return part->GetPartName();
+        
     }
 
-const std::string& WorkbenchPartReference::computePartName() {
-        return getRawPartName();
+std::string WorkbenchPartReference::ComputePartName() {
+        return this->GetRawPartName();
     }
 
     /**
@@ -368,8 +352,8 @@ const std::string& WorkbenchPartReference::computePartName() {
      * 
      * @return the pane name for the part
      */
-const std::string& WorkbenchPartReference::getContentDescription() {
-        return Util.safeString(contentDescription);
+std::string WorkbenchPartReference::GetContentDescription() {
+        return contentDescription;
     }
 
     /**
@@ -378,8 +362,8 @@ const std::string& WorkbenchPartReference::getContentDescription() {
      * 
      * @return the new content description for the part
      */
-const std::string& WorkbenchPartReference::computeContentDescription() {
-        return getRawContentDescription();
+std::string WorkbenchPartReference::ComputeContentDescription() {
+        return this->GetRawContentDescription();
     }
 
     /**
@@ -387,63 +371,37 @@ const std::string& WorkbenchPartReference::computeContentDescription() {
      * 
      * @return the unmodified content description from the part (or the empty string if none)
      */
-const std::string& WorkbenchPartReference::getRawContentDescription() {
-        if (part instanceof IWorkbenchPart2) {
-            IWorkbenchPart2 part2 = (IWorkbenchPart2) part;
-
-            return part2.getContentDescription();
-        }
-
-        return ""; //$NON-NLS-1$        
+std::string WorkbenchPartReference::GetRawContentDescription() {
+        return part->GetContentDescription();
+                
     }
 
-bool WorkbenchPartReference::isDirty() {
-        if (!(part instanceof ISaveablePart)) {
+bool WorkbenchPartReference::IsDirty() {
+    if (part.Cast<IEditorPart>().IsNull()) {
       return false;
     }
-        return ((ISaveablePart) part).isDirty();
-    }
+    return part.Cast<IEditorPart>()->IsDirty();
+}
 
-const std::string& WorkbenchPartReference::getTitle() {
-        return Util.safeString(title);
-    }
 
-    /**
-     * Computes a new title for the part. Subclasses may override to change the default behavior.
-     * 
-     * @return the title for the part
-     */
-const std::string& WorkbenchPartReference::computeTitle() {
-        return getRawTitle();
-    }
-
-    /**
-     * Returns the unmodified title for the part, or the empty string if none
-     * 
-     * @return the unmodified title, as set by the IWorkbenchPart. Returns the empty string if none.
-     */
-const std::string& WorkbenchPartReference::getRawTitle() {
-        return Util.safeString(part.getTitle());
-    }
-
-Image WorkbenchPartReference::getTitleImage() {
-        if (isDisposed()) {
-            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
-        }
-        
-        if (image == null) {        
-            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-        }
-        return image;
-    }
+//Image WorkbenchPartReference::GetTitleImage() {
+//        if (isDisposed()) {
+//            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+//        }
+//        
+//        if (image == null) {        
+//            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+//        }
+//        return image;
+//    }
     
-ImageDescriptor WorkbenchPartReference::getTitleImageDescriptor() {
-        if (isDisposed()) {
-            return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
-        }
-        
-        return imageDescriptor;
-    }
+//ImageDescriptor WorkbenchPartReference::GetTitleImageDescriptor() {
+//        if (isDisposed()) {
+//            return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
+//        }
+//        
+//        return imageDescriptor;
+//    }
     
 //    /* package */ void fireVisibilityChange() {
 //        fireInternalPropertyChange(INTERNAL_PROPERTY_VISIBLE);
@@ -453,18 +411,18 @@ ImageDescriptor WorkbenchPartReference::getTitleImageDescriptor() {
 //        fireInternalPropertyChange(INTERNAL_PROPERTY_ZOOMED);
 //    }
     
-bool WorkbenchPartReference::getVisible() {
-        if (isDisposed()) {
+bool WorkbenchPartReference::GetVisible() {
+        if (this->IsDisposed()) {
             return false;
         }
-        return getPane().getVisible();
+        return this->GetPane()->GetVisible();
     }
     
-void WorkbenchPartReference::setVisible(bool isVisible) {
-        if (isDisposed()) {
+void WorkbenchPartReference::SetVisible(bool isVisible) {
+        if (this->IsDisposed()) {
             return;
         }
-        getPane().setVisible(isVisible);
+        this->GetPane()->SetVisible(isVisible);
     }
     
 //protected: void firePropertyChange(int id) {
@@ -487,51 +445,54 @@ void WorkbenchPartReference::setVisible(bool isVisible) {
 //        fireInternalPropertyChange(id);
 //    }
 
-IWorkbenchPart::ConstPtr WorkbenchPartReference::getPart(bool restore) {
-        if (isDisposed()) {
-            return null;
+IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore) {
+        if (this->IsDisposed()) {
+            return 0;
         }
         
-        if (part == null && restore) {
+        if (part.IsNull() && restore) {
             
             if (state == STATE_CREATION_IN_PROGRESS) {
-                IStatus result = WorkbenchPlugin.getStatus(
-                        new PartInitException(NLS.bind("Warning: Detected recursive attempt by part {0} to create itself (this is probably, but not necessarily, a bug)",  //$NON-NLS-1$
-                                getId())));
-                WorkbenchPlugin.log(result);
-                return null;
+//                IStatus result = WorkbenchPlugin.getStatus(
+//                        new PartInitException(NLS.bind("Warning: Detected recursive attempt by part {0} to create itself (this is probably, but not necessarily, a bug)",  //$NON-NLS-1$
+//                                getId())));
+                WorkbenchPlugin::Log("Warning: Detected recursive attempt by part " + GetId() + " to create itself (this is probably, but not necessarily, a bug)");
+                return 0;
             }
             
             try {
                 state = STATE_CREATION_IN_PROGRESS;
                 
-                IWorkbenchPart newPart = createPart();
-                if (newPart != null) {
+                IWorkbenchPart::Pointer newPart = this->CreatePart();
+                if (!newPart.IsNull()) {
                     part = newPart;
                     // Add a dispose listener to the part. This dispose listener does nothing but log an exception
                     // if the part's widgets get disposed unexpectedly. The workbench part reference is the only
                     // object that should dispose this control, and it will remove the listener before it does so.
-                    getPane().getControl().addDisposeListener(prematureDisposeListener);
-                    part.addPropertyListener(propertyChangeListener);
-                    if (part instanceof IWorkbenchPart3) {
-                      ((IWorkbenchPart3)part).addPartPropertyListener(partPropertyChangeListener);
-                    }
+                    //this->GetPane().getControl().addDisposeListener(prematureDisposeListener);
+                    //part.addPropertyListener(propertyChangeListener);
+                    //if (part instanceof IWorkbenchPart3) {
+                    //  ((IWorkbenchPart3)part).addPartPropertyListener(partPropertyChangeListener);
+                    //}
 
-                    refreshFromPart();
-                    releaseReferences();
+                    this->RefreshFromPart();
+                    this->ReleaseReferences();
                     
-                    fireInternalPropertyChange(INTERNAL_PROPERTY_OPENED);
+                    //fireInternalPropertyChange(INTERNAL_PROPERTY_OPENED);
                     
-                    ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
-                    if (sizeProvider != null) {
+                    //ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
+                    //if (sizeProvider != null) {
                         // If this part has a preferred size, indicate that the preferred size may have changed at this point
-                        if (sizeProvider.getSizeFlags(true) != 0 || sizeProvider.getSizeFlags(false) != 0) {
-                            fireInternalPropertyChange(IWorkbenchPartConstants.PROP_PREFERRED_SIZE);
-                        }
-                    }
+                        //if (sizeProvider.getSizeFlags(true) != 0 || sizeProvider.getSizeFlags(false) != 0) {
+                        //    fireInternalPropertyChange(IWorkbenchPartConstants.PROP_PREFERRED_SIZE);
+                        //}
+                    //}
                 }
-            } finally {
+                
                 state = STATE_CREATED;
+            } catch (std::exception e) {
+                state = STATE_CREATED;
+                throw e; 
             }
         }        
         
@@ -548,68 +509,66 @@ IWorkbenchPart::ConstPtr WorkbenchPartReference::getPart(bool restore) {
      * 
      * @return
      */
-PartPane WorkbenchPartReference::getPane() {
+IPartPane::Pointer WorkbenchPartReference::GetPane() {
         
         // Note: we should never call this if the reference has already been disposed, since it
         // may cause a PartPane to be created and leaked.
-        if (pane == null) {
-            pane = createPane();
+        if (pane.IsNull()) {
+            pane = this->CreatePane();
         }
         return pane;
     }
 
-void WorkbenchPartReference::dispose() {
+void WorkbenchPartReference::Dispose() {
         
-        if (isDisposed()) {
+        if (this->IsDisposed()) {
             return;
         }
         
         // Store the current title, tooltip, etc. so that anyone that they can be returned to
         // anyone that held on to the disposed reference.
-        partName = getPartName();
-        contentDescription = getContentDescription();
-        tooltip = getTitleToolTip();
-        title = getTitle();
+        partName = GetPartName();
+        contentDescription = GetContentDescription();
+        tooltip = GetTitleToolTip();
         
         if (state == STATE_CREATION_IN_PROGRESS) {
-            IStatus result = WorkbenchPlugin.getStatus(
-                    new PartInitException(NLS.bind("Warning: Blocked recursive attempt by part {0} to dispose itself during creation",  //$NON-NLS-1$
-                            getId())));
-            WorkbenchPlugin.log(result);
+//            IStatus result = WorkbenchPlugin.getStatus(
+//                    new PartInitException(NLS.bind("Warning: Blocked recursive attempt by part {0} to dispose itself during creation",  //$NON-NLS-1$
+//                            getId())));
+            WorkbenchPlugin::Log("Warning: Blocked recursive attempt by part" + GetId() + " to dispose itself during creation");
             return;
         }
         
       // Disposing the pane disposes the part's widgets. The part's widgets need to be disposed before the part itself.
-        if (pane != null) {
-            // Remove the dispose listener since this is the correct place for the widgets to get disposed
-            Control targetControl = getPane().getControl(); 
-            if (targetControl != null) {
-                targetControl.removeDisposeListener(prematureDisposeListener);
-            }
-            pane.dispose();
-        }
+//        if (pane != null) {
+//            // Remove the dispose listener since this is the correct place for the widgets to get disposed
+//            Control targetControl = getPane().getControl(); 
+//            if (targetControl != null) {
+//                targetControl.removeDisposeListener(prematureDisposeListener);
+//            }
+//            pane.dispose();
+//        }
         
-        doDisposePart();
    
-        if (pane != null) {
-          pane.removeContributions();
+        if (!pane.IsNull()) {
+          //pane.removeContributions();
         }
         
-        clearListenerList(internalPropChangeListeners);
-        clearListenerList(partChangeListeners);
-        Image oldImage = image;
-        ImageDescriptor oldDescriptor = imageDescriptor;
-        image = null;
+        //clearListenerList(internalPropChangeListeners);
+        //clearListenerList(partChangeListeners);
+        //Image oldImage = image;
+        //ImageDescriptor oldDescriptor = imageDescriptor;
+        //image = null;
         
         state = STATE_DISPOSED;
-        imageDescriptor = ImageDescriptor.getMissingImageDescriptor();
-        defaultImageDescriptor = ImageDescriptor.getMissingImageDescriptor();
-        immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-        clearListenerList(propChangeListeners);
+        //imageDescriptor = ImageDescriptor.getMissingImageDescriptor();
+        //defaultImageDescriptor = ImageDescriptor.getMissingImageDescriptor();
+        //immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
+        //clearListenerList(propChangeListeners);
         
-        if (oldImage != null) {
-            JFaceResources.getResources().destroy(oldDescriptor);
-        }
+        //if (oldImage != null) {
+        //    JFaceResources.getResources().destroy(oldDescriptor);
+        //}
     }
 
   /**
@@ -626,28 +585,9 @@ void WorkbenchPartReference::dispose() {
 //    }
 //  }
 
-    /**
-     * 
-     */
-void WorkbenchPartReference::doDisposePart() {
-        if (part != null) {
-            fireInternalPropertyChange(INTERNAL_PROPERTY_CLOSED);
-            // Don't let exceptions in client code bring us down. Log them and continue.
-            try {
-                part.removePropertyListener(propertyChangeListener);
-                if (part instanceof IWorkbenchPart3) {
-                  ((IWorkbenchPart3)part).removePartPropertyListener(partPropertyChangeListener);
-                }
-                part.dispose();
-            } catch (Exception e) {
-                WorkbenchPlugin.log(e);
-            }
-            part = null;
-        }
-    }
 
-void WorkbenchPartReference::setPinned(bool newPinned) {
-        if (isDisposed()) {
+void WorkbenchPartReference::SetPinned(bool newPinned) {
+        if (IsDisposed()) {
             return;
         }
 
@@ -657,28 +597,28 @@ void WorkbenchPartReference::setPinned(bool newPinned) {
         
         pinned = newPinned;
         
-        setImageDescriptor(computeImageDescriptor());
+        //SetImageDescriptor(computeImageDescriptor());
         
-        fireInternalPropertyChange(INTERNAL_PROPERTY_PINNED);
+        //fireInternalPropertyChange(INTERNAL_PROPERTY_PINNED);
     }
     
-bool WorkbenchPartReference::isPinned() {
+bool WorkbenchPartReference::IsPinned() {
         return pinned;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
      */
-const std::string& WorkbenchPartReference::getPartProperty(const std::string& key) {
-    if (part != null) {
-      if (part instanceof IWorkbenchPart3) {
-        return ((IWorkbenchPart3) part).getPartProperty(key);
-      }
-    } else {
-      return (String)propertyCache.get(key);
-    }
-    return null;
-  }
+//std::string WorkbenchPartReference::GetPartProperty(const std::string& key) {
+//    if (part != null) {
+//      if (part instanceof IWorkbenchPart3) {
+//        return ((IWorkbenchPart3) part).getPartProperty(key);
+//      }
+//    } else {
+//      return (String)propertyCache.get(key);
+//    }
+//    return null;
+//  }
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#addPartPropertyListener(org.eclipse.jface.util.IPropertyChangeListener)

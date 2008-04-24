@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryDll.h"
 
+
+namespace cherry {
+
 class MessageCommand
 {
   public:
@@ -34,8 +37,6 @@ class MessageCommand
     virtual bool operator==(const MessageCommand* cmd) = 0;
 };
 
-
-namespace cherry {
 
 template <typename T> 
 class MessageCommand1

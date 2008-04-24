@@ -33,6 +33,8 @@ public:
   
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
   IDialog::Pointer CreateDialog(const std::string& dialogid);
+  IViewPart::Pointer CreateErrorViewPart(const std::string& partName, Poco::Exception exc);
+  IViewPane::Pointer CreateViewPane();
   
   ~QtWorkbench();
   
@@ -42,7 +44,7 @@ protected:
 private:
   
   QtWorkbenchWindow::Pointer m_QtWindow;
- 
+  
 };
 
 } // namespace cherry

@@ -18,15 +18,24 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchWindow.h"
 
 #include "cherryIWorkbenchPage.h"
+#include "cherryIWorkbench.h"
+
+#include "cherryPlatformUI.h"
 
 namespace cherry
 {
 
-SmartPointer<IWorkbenchPage> WorkbenchWindow::GetActivePage()
+IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()
 {
   // TODO: return the active WorkbenchPage
   return SmartPointer<IWorkbenchPage>();
 }
+
+IWorkbench::Pointer WorkbenchWindow::GetWorkbench()
+{
+  return PlatformUI::GetWorkbench();
+}
+
 
 IPartService* WorkbenchWindow::GetPartService()
 {

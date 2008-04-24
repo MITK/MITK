@@ -8,6 +8,7 @@ SET(CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  cherryQtViewPane.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
 )

@@ -19,27 +19,60 @@ PURPOSE.  See the above copyright notices for more information.
 #define IWORKBENCHPARTSITE_H_
 
 
-#include "org.opencherry.osgi/cherryMacros.h"
+#include "cherryIWorkbenchSite.h"
 
 namespace cherry {
 
 struct IWorkbenchPart;
 
-struct CHERRY_API IWorkbenchPartSite : public Object
+/**
+ * The primary interface between a workbench part and the workbench.
+ * <p>
+ * This interface is not intended to be implemented or extended by clients.
+ * </p>
+ * @noimplement This interface is not intended to be implemented by clients.
+ */
+struct CHERRY_API IWorkbenchPartSite : public IWorkbenchSite
 {
   
   cherryClassMacro(IWorkbenchPartSite);
-      
+  
+  /**
+   * Returns the part registry extension id for this workbench site's part.
+   * <p>
+   * The name comes from the <code>id</code> attribute in the configuration
+   * element.
+   * </p>
+   *
+   * @return the registry extension id
+   */
   virtual std::string GetId() = 0;
+  
+  /**
+   * Returns the part associated with this site 
+   *
+   * @return the part associated with this site
+   */
   virtual SmartPointer<IWorkbenchPart> GetPart() = 0;
+  
+  /**
+   * Returns the unique identifier of the plug-in that defines this workbench
+   * site's part.
+   *
+   * @return the unique identifier of the declaring plug-in
+   */
   virtual std::string GetPluginId() = 0;
+  
+  /**
+   * Returns the registered name for this workbench site's part.
+   * <p>
+   * The name comes from the <code>name</code> attribute in the configuration
+   * element.
+   * </p>
+   *
+   * @return the part name
+   */
   virtual std::string GetRegisteredName() = 0;
-  
-  // ISelectionProvider GetSelectionProvider() = 0;
-  // void SetSelectionProvider(ISelectionProvider provider) = 0;
-  
-  // void RegisterContextMenu(MenuManager menuManager, ISelectionProvider selectionProvider) = 0;
-  // void RegisterContextMenu(QString menuId, MenuManager menuManager, ISelectionProvider selectionProvider) = 0;
   
 };
 

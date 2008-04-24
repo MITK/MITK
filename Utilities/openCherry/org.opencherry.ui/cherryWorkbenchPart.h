@@ -30,6 +30,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+/**
+ * Abstract base implementation of all workbench parts.
+ * <p>
+ * This class is not intended to be subclassed by clients outside this
+ * package; clients should instead subclass <code>ViewPart</code> or
+ * <code>EditorPart</code>.
+ * </p>
+ * 
+ * @see org.eclipse.ui.part.ViewPart
+ * @see org.eclipse.ui.part.EditorPart
+ * @noextend This class is not intended to be subclassed by clients.
+ */
 class CHERRY_API WorkbenchPart : public virtual IWorkbenchPart
 {
   
@@ -168,7 +180,7 @@ public:
    * Parts should call setPartName to change their part name. 
    * </p>
    */
-  const std::string& GetPartName();
+  std::string GetPartName();
 
   /**
    * {@inheritDoc}
@@ -177,7 +189,7 @@ public:
    * Parts should call setContentDescription to change their content description. 
    * </p>
    */
-  const std::string& GetContentDescription();
+  std::string GetContentDescription();
 
 
   /* (non-Javadoc)
@@ -190,7 +202,7 @@ public:
    *
    * @return the tool tip text
    */
-  const std::string& GetTitleToolTip();
+  std::string GetTitleToolTip();
   
 };
 

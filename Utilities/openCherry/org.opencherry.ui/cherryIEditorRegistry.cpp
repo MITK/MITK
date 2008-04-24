@@ -15,10 +15,16 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "cherryIWorkbench.h"
+#include "cherryIEditorRegistry.h"
 
-namespace cherry {
+namespace cherry
+{
 
-const std::string IWorkbench::DIALOG_ID_SHOW_VIEW = "org.opencherry.ui.dialogs.showview";
+const int IEditorRegistry::PROP_CONTENTS = 0x01;
+const std::string IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID =
+    "org.opencherry.ui.systemExternalEditor"; //$NON-NLS-1$
+const std::string IEditorRegistry::SYSTEM_INPLACE_EDITOR_ID =
+    "org.opencherry.ui.systemInPlaceEditor"; //$NON-NLS-1$
+
 
 }

@@ -18,6 +18,19 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCHPAGE_H_
 #define CHERRYWORKBENCHPAGE_H_
 
+#include <org.opencherry.core.runtime/cherryIAdaptable.h>
+#include <org.opencherry.osgi/service/cherryIExtensionPoint.h>
+
+#include "../cherryIWorkbenchPage.h"
+#include "../cherryWorkbenchWindow.h"
+#include "../cherryIWorkbenchPartReference.h"
+#include "../cherryIPerspectiveDescriptor.h"
+#include "../cherryIReusableEditor.h"
+
+#include "cherryWorkbenchPartReference.h"
+#include "cherryEditorManager.h"
+#include "cherryViewFactory.h"
+
 namespace cherry {
 
 /**
@@ -32,321 +45,117 @@ protected:
   
   WorkbenchWindow::Pointer window;
 
+  friend class ViewFactory;
   
 private:
   
-    IAdaptable input;
+  /**
+       * Manages editor contributions and action set part associations.
+       */
+      class ActionSwitcher {
+      private:
+        IWorkbenchPart::Pointer activePart;
 
-    Composite composite;
+          IEditorPart::Pointer topEditor;
+
+          /**
+           * Updates the contributions given the new part as the active part.
+           * 
+           * @param newPart
+           *            the new active part, may be <code>null</code>
+           */
+      public: void UpdateActivePart(IWorkbenchPart::Pointer newPart);
+
+          /**
+           * Updates the contributions given the new part as the topEditor.
+           * 
+           * @param newEditor
+           *            the new top editor, may be <code>null</code>
+           */
+      public: void UpdateTopEditor(IEditorPart::Pointer newEditor);
+
+          /**
+           * Activates the contributions of the given part. If <code>enable</code>
+           * is <code>true</code> the contributions are visible and enabled,
+           * otherwise they are disabled.
+           * 
+           * @param part
+           *            the part whose contributions are to be activated
+           * @param enable
+           *            <code>true</code> the contributions are to be enabled,
+           *            not just visible.
+           */
+      private: void ActivateContributions(IWorkbenchPart::Pointer part, bool enable);
+
+          /**
+           * Deactivates the contributions of the given part. If <code>remove</code>
+           * is <code>true</code> the contributions are removed, otherwise they
+           * are disabled.
+           * 
+           * @param part
+           *            the part whose contributions are to be deactivated
+           * @param remove
+           *            <code>true</code> the contributions are to be removed,
+           *            not just disabled.
+           */
+      private: void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
+
+      };
+  
+  
+    IAdaptable* input;
+
+    //Composite composite;
     
     //Could be delete. This information is in the active part list;
-    ActivationList activationList = new ActivationList();
+    //ActivationList activationList = new ActivationList();
 
     EditorManager editorMgr;
 
-    EditorAreaHelper editorPresentation;
+    //EditorAreaHelper editorPresentation;
 
-    ListenerList propertyChangeListeners = new ListenerList();
+    //ListenerList propertyChangeListeners = new ListenerList();
 
-    PageSelectionService selectionService = new PageSelectionService(
-            this);
+    //PageSelectionService selectionService = new PageSelectionService(
+    //        this);
 
-    WorkbenchPagePartList partList = new WorkbenchPagePartList(selectionService);
+    //WorkbenchPagePartList partList = new WorkbenchPagePartList(selectionService);
 
-    IActionBars actionBars;
+    //IActionBars actionBars;
     
     ViewFactory viewFactory;
 
-    PerspectiveList perspList = new PerspectiveList();
+    //PerspectiveList perspList = new PerspectiveList();
 
-    PerspectiveDescriptor deferredActivePersp;
+    //PerspectiveDescriptor deferredActivePersp;
 
-    NavigationHistory navigationHistory = new NavigationHistory(this);
+    //NavigationHistory navigationHistory = new NavigationHistory(this);
     
    
     /**
      * If we're in the process of activating a part, this points to the new part.
      * Otherwise, this is null.
      */
-    IWorkbenchPartReference partBeingActivated = null;
+    IWorkbenchPartReference::Pointer partBeingActivated;
     
     /**
      * Contains a list of perspectives that may be dirty due to plugin 
      * installation and removal. 
      */
-    Set dirtyPerspectives = new HashSet();
+    //Set dirtyPerspectives = new HashSet();
     
-    ActionSwitcher actionSwitcher = new ActionSwitcher();
+    ActionSwitcher actionSwitcher;
 
-   IExtensionTracker tracker;
+   //IExtensionTracker tracker;
     
     // Deferral count... delays disposing parts and sending certain events if nonzero
-    int deferCount = 0;
+    int deferCount;
     // Parts waiting to be disposed
-    List pendingDisposals = new ArrayList();
+    std::vector<IWorkbenchPart::Pointer> pendingDisposals;
     
-   String aggregateWorkingSetId;
 
-   IExtensionPoint::Point GetPerspectiveExtensionPoint();
-
-    /**
-     * Manages editor contributions and action set part associations.
-     */
-    class ActionSwitcher {
-    private:
-      IWorkbenchPart activePart;
-
-        IEditorPart topEditor;
-
-        ArrayList oldActionSets = new ArrayList();
-
-        /**
-         * Updates the contributions given the new part as the active part.
-         * 
-         * @param newPart
-         *            the new active part, may be <code>null</code>
-         */
-    public: void updateActivePart(IWorkbenchPart newPart) {
-            if (activePart == newPart) {
-        return;
-      }
-
-            boolean isNewPartAnEditor = newPart instanceof IEditorPart;
-            if (isNewPartAnEditor) {
-                String oldId = null;
-                if (topEditor != null) {
-          oldId = topEditor.getSite().getId();
-        }
-                String newId = newPart.getSite().getId();
-
-                // if the active part is an editor and the new editor
-                // is the same kind of editor, then we don't have to do
-                // anything
-                if (activePart == topEditor && newId.equals(oldId)) {
-                  activePart = newPart;
-                  topEditor = (IEditorPart) newPart;
-                    return;
-                }
-
-                // remove the contributions of the old editor
-                // if it is a different kind of editor
-                if (oldId != null && !oldId.equals(newId)) {
-          deactivateContributions(topEditor, true);
-        }
-
-                // if a view was the active part, disable its contributions
-                if (activePart != null && activePart != topEditor) {
-          deactivateContributions(activePart, true);
-        }
-
-                // show (and enable) the contributions of the new editor
-                // if it is a different kind of editor or if the
-                // old active part was a view
-                if (!newId.equals(oldId) || activePart != topEditor) {
-          activateContributions(newPart, true);
-        }
-
-            } else if (newPart == null) {
-                if (activePart != null) {
-          // remove all contributions
-                    deactivateContributions(activePart, true);
-        }
-            } else {
-                // new part is a view
-
-                // if old active part is a view, remove all contributions,
-                // but if old part is an editor only disable
-                if (activePart != null) {
-          deactivateContributions(activePart,
-                            activePart instanceof IViewPart);
-        }
-
-                activateContributions(newPart, true);
-            }
-
-            ArrayList newActionSets = null;
-            if (isNewPartAnEditor
-                    || (activePart == topEditor && newPart == null)) {
-        newActionSets = calculateActionSets(newPart, null);
-      } else {
-        newActionSets = calculateActionSets(newPart, topEditor);
-      }
-
-            if (!updateActionSets(newActionSets)) {
-        updateActionBars();
-      }
-
-            if (isNewPartAnEditor) {
-                topEditor = (IEditorPart) newPart;
-            } else if (activePart == topEditor && newPart == null) {
-                // since we removed all the contributions, we clear the top
-                // editor
-                topEditor = null;
-            }
-
-            activePart = newPart;
-        }
-
-        /**
-         * Updates the contributions given the new part as the topEditor.
-         * 
-         * @param newEditor
-         *            the new top editor, may be <code>null</code>
-         */
-    public: void updateTopEditor(IEditorPart newEditor) {
-            if (topEditor == newEditor) {
-        return;
-      }
-
-            if (activePart == topEditor) {
-              updateActivePart(newEditor);
-              return;
-            }
-            
-            String oldId = null;
-            if (topEditor != null) {
-        oldId = topEditor.getSite().getId();
-      }
-            String newId = null;
-            if (newEditor != null) {
-        newId = newEditor.getSite().getId();
-      }
-            if (oldId == null ? newId == null : oldId.equals(newId)) {
-                // we don't have to change anything
-                topEditor = newEditor;
-                return;
-            }
-
-            // Remove the contributions of the old editor
-            if (topEditor != null) {
-        deactivateContributions(topEditor, true);
-      }
-
-            // Show (disabled) the contributions of the new editor
-            if (newEditor != null) {
-        activateContributions(newEditor, false);
-      }
-
-            ArrayList newActionSets = calculateActionSets(activePart, newEditor);
-            if (!updateActionSets(newActionSets)) {
-        updateActionBars();
-      }
-
-            topEditor = newEditor;
-        }
-
-        /**
-         * Activates the contributions of the given part. If <code>enable</code>
-         * is <code>true</code> the contributions are visible and enabled,
-         * otherwise they are disabled.
-         * 
-         * @param part
-         *            the part whose contributions are to be activated
-         * @param enable
-         *            <code>true</code> the contributions are to be enabled,
-         *            not just visible.
-         */
-    private: void activateContributions(IWorkbenchPart part, boolean enable) {
-            PartSite site = (PartSite) part.getSite();
-            site.activateActionBars(enable);
-        }
-
-        /**
-         * Deactivates the contributions of the given part. If <code>remove</code>
-         * is <code>true</code> the contributions are removed, otherwise they
-         * are disabled.
-         * 
-         * @param part
-         *            the part whose contributions are to be deactivated
-         * @param remove
-         *            <code>true</code> the contributions are to be removed,
-         *            not just disabled.
-         */
-    private: void deactivateContributions(IWorkbenchPart part, boolean remove) {
-            PartSite site = (PartSite) part.getSite();
-            site.deactivateActionBars(remove);
-        }
-
-        /**
-         * Calculates the action sets to show for the given part and editor
-         * 
-         * @param part
-         *            the active part, may be <code>null</code>
-         * @param editor
-         *            the current editor, may be <code>null</code>, may be
-         *            the active part
-         * @return the new action sets
-         */
-    private: ArrayList calculateActionSets(IWorkbenchPart part,
-                IEditorPart editor) {
-            ArrayList newActionSets = new ArrayList();
-            if (part != null) {
-                IActionSetDescriptor[] partActionSets = WorkbenchPlugin
-                        .getDefault().getActionSetRegistry().getActionSetsFor(
-                                part.getSite().getId());
-                for (int i = 0; i < partActionSets.length; i++) {
-                    newActionSets.add(partActionSets[i]);
-                }
-            }
-            if (editor != null && editor != part) {
-                IActionSetDescriptor[] editorActionSets = WorkbenchPlugin
-                        .getDefault().getActionSetRegistry().getActionSetsFor(
-                                editor.getSite().getId());
-                for (int i = 0; i < editorActionSets.length; i++) {
-                    newActionSets.add(editorActionSets[i]);
-                }
-            }
-            return newActionSets;
-        }
-
-        /**
-         * Updates the actions we are showing for the active part and current
-         * editor.
-         * 
-         * @param newActionSets
-         *            the action sets to show
-         * @return <code>true</code> if the action sets changed
-         */
-    private: bool UpdateActionSets(ArrayList newActionSets) {
-      if (oldActionSets.equals(newActionSets)) {
-        return false;
-      }
-
-      IContextService service = (IContextService) window
-          .getService(IContextService.class);
-      try {
-        service.activateContext(ContextAuthority.DEFER_EVENTS);
-
-        // show the new
-        for (int i = 0; i < newActionSets.size(); i++) {
-          actionSets.showAction((IActionSetDescriptor) newActionSets
-              .get(i));
-        }
-
-        // hide the old
-        for (int i = 0; i < oldActionSets.size(); i++) {
-          actionSets.hideAction((IActionSetDescriptor) oldActionSets
-              .get(i));
-        }
-
-        oldActionSets = newActionSets;
-
-      } finally {
-        service.activateContext(ContextAuthority.SEND_EVENTS);
-      }
-      Perspective persp = getActivePerspective();
-      if (persp == null) {
-        return false;
-      }
-
-      window.updateActionSets(); // this calls updateActionBars
-      window.firePerspectiveChanged(WorkbenchPage.this, getPerspective(),
-          CHANGE_ACTION_SET_SHOW);
-      return true;
-    }
-
-    };
-
+   IExtensionPoint* GetPerspectiveExtensionPoint();
+   
     
 public:
   
@@ -362,7 +171,7 @@ public:
    * @throws WorkbenchException
    *             on null layout id
    */
-   WorkbenchPage(WorkbenchWindow::Pointer w, const std::string& layoutID, IAdaptable input);
+   WorkbenchPage(WorkbenchWindow::Pointer w, const std::string& layoutID, IAdaptable* input);
 
     /**
      * Constructs a page. <code>restoreState(IMemento)</code> should be
@@ -374,7 +183,7 @@ public:
      *            the page input
      * @throws WorkbenchException 
      */
-    WorkbenchPage(WorkbenchWindow::Pointer w, IAdaptable input);
+    WorkbenchPage(WorkbenchWindow::Pointer w, IAdaptable* input);
 
     /**
      * Activates a part. The part will be brought to the front and given focus.
@@ -421,31 +230,24 @@ private: void ActivatePart(const IWorkbenchPart::ConstPointer part);
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-public: void AddSelectionListener(ISelectionListener listener);
+//public: void AddSelectionListener(ISelectionListener listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-public: void AddSelectionListener(const std::string& partId, ISelectionListener listener);
+//public: void AddSelectionListener(const std::string& partId, ISelectionListener listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-public: void AddPostSelectionListener(ISelectionListener listener);
+//public: void AddPostSelectionListener(ISelectionListener listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-public: void AddPostSelectionListener(const std::string partId,
-            ISelectionListener listener);
+//public: void AddPostSelectionListener(const std::string partId,
+//            ISelectionListener listener);
     
-private: ILayoutContainer GetContainer(IWorkbenchPart::Pointer part);
-
-private: ILayoutContainer GetContainer(IWorkbenchPartReference::Pointer part);
-    
-private: PartPane GetPane(IWorkbenchPart::Pointer part);
-    
-private: PartPane GetPane(IWorkbenchPartReference::Pointer part);
     
     /**
      * Brings a part to the front of its stack. Does not update the active part or
@@ -571,7 +373,7 @@ public: bool CloseEditor(IEditorPart::Pointer editor, bool save);
     /**
      * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
      */
-public: void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts, bool closePage);
+//public: void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts, bool closePage);
 
     /**
    * Closes the specified perspective. If last perspective, then entire page
@@ -585,12 +387,12 @@ public: void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool savePar
    *            parspectives)
    */
     /* package */
-protected: void ClosePerspective(Perspective::Pointer persp, bool saveParts, bool closePage);
+//protected: void ClosePerspective(Perspective::Pointer persp, bool saveParts, bool closePage);
   
     /**
      * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
      */
-public: void CloseAllPerspectives(bool saveEditors, bool closePage);
+//public: void CloseAllPerspectives(bool saveEditors, bool closePage);
 
     /**
      * Creates the client composite.
@@ -603,19 +405,19 @@ private: void CreateClientComposite();
      * @param desc the perspective descriptor
      * @param notify whether to fire a perspective opened event
      */
-private: Perspective::Pointer CreatePerspective(PerspectiveDescriptor::Pointer desc, bool notify);
+//private: Perspective::Pointer CreatePerspective(PerspectiveDescriptor::Pointer desc, bool notify);
 
     /**
      * This is called by child objects after a part has been added to the page.
      * The page will in turn notify its listeners. 
      */
-    /* package */protected: void PartAdded(WorkbenchPartReference ref);
+    /* package */protected: void PartAdded(WorkbenchPartReference::Pointer ref);
     
     /**
      * This is called by child objects after a part has been added to the page.
      * The part will be queued for disposal after all listeners have been notified
      */
-    /* package */protected: void PartRemoved(WorkbenchPartReference ref);
+    /* package */protected: void PartRemoved(WorkbenchPartReference::Pointer ref);
     
 private: void DisposePart(WorkbenchPartReference::Pointer ref);
     
@@ -645,17 +447,17 @@ public: void Dispose();
      * @param persp the perspective descriptor
      * @param notify whether to fire a perspective closed event
      */
-private: void DisposePerspective(Perspective::Pointer persp, bool notify);
+//private: void DisposePerspective(Perspective::Pointer persp, bool notify);
 
     /**
      * Returns the first view manager with given ID.
      */
-public: Perspective::Pointer FindPerspective(IPerspectiveDescriptor::Pointer desc);
+//public: Perspective::Pointer FindPerspective(IPerspectiveDescriptor::Pointer desc);
 
     /**
      * See IWorkbenchPage@findView.
      */
-public: IViewPart::Pointer FindView(const stds::string& id);
+public: IViewPart::Pointer FindView(const std::string& id);
 
     /*
      * (non-Javadoc)
@@ -723,19 +525,16 @@ public: IWorkbenchPartReference::Pointer GetActivePartReference();
      * Returns the active perspective for the page, <code>null</code> if
      * none.
      */
-public: Perspective::Pointer GetActivePerspective();
+//public: Perspective::Pointer GetActivePerspective();
 
-    /**
-     * Returns the client composite.
-     */
-public: Composite GetClientComposite();
+
 
     //  for dynamic UI - change access from private to protected
     // for testing purposes only, changed from protected to public
     /**
      * Answer the editor manager for this window.
      */
-protected: EditorManager GetEditorManager();
+protected: EditorManager* GetEditorManager();
 
     /**
      * See IWorkbenchPage.
@@ -744,7 +543,7 @@ public: std::vector<IEditorPart::Pointer> GetEditors();
 
 public: std::vector<IEditorPart::Pointer> GetDirtyEditors();
   
-public: std::vector<ISaveablePart> GetDirtyParts();
+public: std::vector<IWorkbenchPart::Pointer> GetDirtyParts();
   
     /**
      * See IWorkbenchPage.
@@ -754,12 +553,12 @@ public: IEditorPart::Pointer FindEditor(IEditorInput* input);
     /**
      * See IWorkbenchPage.
      */
-public: std::vector<IEditorReference> FindEditors(IEditorInput* input, const std::string& editorId, int matchFlags);
+public: std::vector<IEditorReference::Pointer> FindEditors(IEditorInput* input, const std::string& editorId, int matchFlags);
     
     /**
      * See IWorkbenchPage.
      */
-public: std::vector<IEditorReference> GetEditorReferences();
+public: std::vector<IEditorReference::Pointer> GetEditorReferences();
 
     /**
      * @see IWorkbenchPage
@@ -775,23 +574,23 @@ public: std::string GetLabel();
     /**
      * Returns the perspective.
      */
-public: IPerspectiveDescriptor::Pointer GetPerspective();
+//public: IPerspectiveDescriptor::Pointer GetPerspective();
 
     /*
      * (non-Javadoc) Method declared on ISelectionService
      */
-public: ISelection::Pointer GetSelection();
+//public: ISelection::Pointer GetSelection();
 
     /*
      * (non-Javadoc) Method declared on ISelectionService
      */
-public: ISelection::Pointer GetSelection(const std::string& partId);
+//public: ISelection::Pointer GetSelection(const std::string& partId);
 
 
     /*
      * Returns the view factory.
      */
-public: ViewFactory::Pointer GetViewFactory();
+public: ViewFactory* GetViewFactory();
 
     /**
      * See IWorkbenchPage.
@@ -810,7 +609,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
    * @return an array of view parts
    * @since 3.1
    */
-  /*package*/ protected: std::vector<IViewPart::Pointer> GetViews(Perspective::Pointer persp, bool restore);
+//  /*package*/ protected: std::vector<IViewPart::Pointer> GetViews(Perspective::Pointer persp, bool restore);
 
     /**
      * See IWorkbenchPage.
@@ -1060,7 +859,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * perspective for that descriptor. If activeDescriptor is null active the
      * old perspective.
      */
-  public: IStatus RestoreState(IMemento* memento,
+  public: /*IStatus*/bool RestoreState(IMemento::Pointer memento,
             const IPerspectiveDescriptor::ConstPointer activeDescriptor);
 
     /**
@@ -1079,7 +878,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /*
      * Saves the workbench part.
      */
-  protected: bool SavePart(ISaveablePart* saveable, IWorkbenchPart::Pointer part,
+  protected: bool SavePart(/*ISaveablePart* saveable,*/ IWorkbenchPart::Pointer part,
             bool confirm);
 
     /**
@@ -1106,7 +905,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /**
      * Save the state of the page.
      */
-  public: IStatus SaveState(IMemento* memento);
+  public: /*IStatus*/bool SaveState(IMemento::Pointer memento);
     
   private: std::string GetId(IWorkbenchPart::Pointer part);
     
@@ -1127,13 +926,13 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * Keeps the active part if possible. Updates the window menubar and
      * toolbar if necessary.
      */
-  private: void SetPerspective(Perspective::Pointer newPersp);
+//  private: void SetPerspective(Perspective::Pointer newPersp);
 
     
   /*
      * Update visibility state of all views.
      */
-  private: void UpdateVisibility(Perspective::Pointer oldPersp, Perspective::Pointer newPersp);
+//  private: void UpdateVisibility(Perspective::Pointer oldPersp, Perspective::Pointer newPersp);
 
     /**
      * Sets the perspective.
@@ -1148,7 +947,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * propogate certain types of events to the page part listeners.
      * @return the part service for this page.
      */
-  public: PartService* GetPartService();
+//  public: PartService* GetPartService();
 
     /**
      * Restore the toolbar layout for the active perspective.
@@ -1194,7 +993,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * @return all open Perspective objects
      * @since 3.1
      */
-    /*package*/protected: std::vector<Perspective::Pointer> GetOpenInternalPerspectives();
+//    /*package*/protected: std::vector<Perspective::Pointer> GetOpenInternalPerspectives();
   
   /**
    * Checks perspectives in the order they were activiated
@@ -1205,7 +1004,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
    * @return the first sorted perspespective containing the part
    * @since 3.1
    */
-  /*package*/protected: Perspective::Pointer GetFirstPerspectiveWithView(IViewPart::Pointer part);
+//  /*package*/protected: Perspective::Pointer GetFirstPerspectiveWithView(IViewPart::Pointer part);
 
     /**
      * Returns the perspectives in activation order (oldest first).
@@ -1227,497 +1026,496 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
   public: IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part);
 
-  private: class ActivationList {
-        //List of parts in the activation order (oldest first)
-        List parts = new ArrayList();
-
-        /*
-         * Add/Move the active part to end of the list;
-         */
-        void setActive(IWorkbenchPart part) {
-            if (parts.size() <= 0) {
-        return;
-      }
-      IWorkbenchPartReference ref = getReference(part);
-      if (ref != null) {
-        if (ref == parts.get(parts.size() - 1)) {
-          return;
-        }
-        parts.remove(ref);
-        parts.add(ref);
-      }
-        }
-        
-        /*
-     * Ensures that the given part appears AFTER any other part in the same
-     * container.
-     */
-        void bringToTop(IWorkbenchPartReference ref) {
-            ILayoutContainer targetContainer = getContainer(ref);
-            
-            int newIndex = lastIndexOfContainer(targetContainer);
-            
-            //New index can be -1 if there is no last index
-            if (newIndex >= 0 && ref == parts.get(newIndex)) 
-        return;
-      
-            parts.remove(ref);
-            if(newIndex >= 0)
-              parts.add(newIndex, ref);
-            else
-              parts.add(ref);
-        }
-        
-        /*
-         * Returns the last (most recent) index of the given container in the activation list, or returns
-         * -1 if the given container does not appear in the activation list.
-         */
-        int lastIndexOfContainer(ILayoutContainer container) {
-            for (int i = parts.size() - 1; i >= 0; i--) {
-                IWorkbenchPartReference ref = (IWorkbenchPartReference)parts.get(i);
-
-                ILayoutContainer cnt = getContainer(ref);
-                if (cnt == container) {
-                    return i; 
-                }
-            }
-            
-            return -1;
-        }
-
-        /*
-         * Add/Move the active part to end of the list;
-         */
-        void setActive(IWorkbenchPartReference ref) {
-            setActive(ref.getPart(true));
-        }
-
-        /*
-         * Add the active part to the beginning of the list.
-         */
-        void add(IWorkbenchPartReference ref) {
-            if (parts.indexOf(ref) >= 0) {
-        return;
-      }
-
-            IWorkbenchPart part = ref.getPart(false);
-            if (part != null) {
-                PartPane pane = ((PartSite) part.getSite()).getPane();
-                if (pane instanceof MultiEditorInnerPane) {
-                    MultiEditorInnerPane innerPane = (MultiEditorInnerPane) pane;
-                    add(innerPane.getParentPane().getPartReference());
-                    return;
-                }
-            }
-            parts.add(0, ref);
-        }
-
-        /*
-         * Return the active part. Filter fast views.
-         */
-        IWorkbenchPart getActive() {
-            if (parts.isEmpty()) {
-        return null;
-      }
-            return getActive(parts.size() - 1);
-        }
-
-        /*
-         * Return the previously active part. Filter fast views.
-         */
-        IWorkbenchPart getPreviouslyActive() {
-            if (parts.size() < 2) {
-        return null;
-      }
-            return getActive(parts.size() - 2);
-        }
-
-  private: IWorkbenchPart getActive(int start) {
-            IWorkbenchPartReference ref = getActiveReference(start, false);
-            
-            if (ref == null) {
-                return null;
-            }
-            
-            return ref.getPart(true);
-        }
-        
-  public: IWorkbenchPartReference getActiveReference(boolean editorsOnly) {
-            return getActiveReference(parts.size() - 1, editorsOnly);
-        }
-        
-  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly) {
-            // First look for parts that aren't obscured by the current zoom state
-            IWorkbenchPartReference nonObscured = getActiveReference(start, editorsOnly, true);
-            
-            if (nonObscured != null) {
-                return nonObscured;
-            }
-            
-            // Now try all the rest of the parts
-            return getActiveReference(start, editorsOnly, false);
-        }
-        
-        /*
-         * Find a part in the list starting from the end and filter
-         * and views from other perspectives. Will filter fast views
-         * unless 'includeActiveFastViews' is true;
-         */
-  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly, boolean skipPartsObscuredByZoom) {
-            IWorkbenchPartReference[] views = getViewReferences();
-            for (int i = start; i >= 0; i--) {
-                WorkbenchPartReference ref = (WorkbenchPartReference) parts
-                        .get(i);
-
-                if (editorsOnly && !(ref instanceof IEditorReference)) {
-                    continue;
-                }
-                
-                // Skip parts whose containers have disabled auto-focus
-                PartPane pane = ref.getPane();
-
-                if (pane != null) {
-                    if (!pane.allowsAutoFocus()) {
-                        continue;
-                    }
-                    
-                    if (skipPartsObscuredByZoom) {
-                        if (pane.isObscuredByZoom()) {
-                            continue;
-                        }
-                    }
-                }
-
-                // Skip fastviews (unless overridden)
-                if (ref instanceof IViewReference) {
-                    if (ref == getActiveFastView() || !((IViewReference) ref).isFastView()) {
-                        for (int j = 0; j < views.length; j++) {
-                            if (views[j] == ref) {
-                                return ref;
-                            }
-                        }
-                    }
-                } else {
-                    return ref;
-                }
-            }
-            return null;
-        }
-
-        /*
-         * Retuns the index of the part within the activation list. The higher
-         * the index, the more recently it was used.
-         */
-        int indexOf(IWorkbenchPart part) {
-          IWorkbenchPartReference ref = getReference(part);
-          if (ref == null) {
-            return -1;
-          }
-            return parts.indexOf(ref);
-        }
-
-        /*
-         * Returns the index of the part reference within the activation list.  
-         * The higher the index, the more recent it was used.
-         */
-        int indexOf(IWorkbenchPartReference ref) {
-            return parts.indexOf(ref);
-        }
-
-        /*
-         * Remove a part from the list
-         */
-        boolean remove(IWorkbenchPartReference ref) {
-            return parts.remove(ref);
-        }
-
-        /*
-         * Returns the editors in activation order (oldest first).
-         */
-  private: IEditorReference[] getEditors() {
-            ArrayList editors = new ArrayList(parts.size());
-            for (Iterator i = parts.iterator(); i.hasNext();) {
-                IWorkbenchPartReference part = (IWorkbenchPartReference) i
-                        .next();
-                if (part instanceof IEditorReference) {
-                    editors.add(part);
-                }
-            }
-            return (IEditorReference[]) editors
-                    .toArray(new IEditorReference[editors.size()]);
-        }
-
-        /*
-         * Return a list with all parts (editors and views).
-         */
-        private: IWorkbenchPartReference[] getParts() {
-            IWorkbenchPartReference[] views = getViewReferences();
-            ArrayList resultList = new ArrayList(parts.size());
-            for (Iterator iterator = parts.iterator(); iterator.hasNext();) {
-                IWorkbenchPartReference ref = (IWorkbenchPartReference) iterator
-                        .next();
-                if (ref instanceof IViewReference) {
-                    //Filter views from other perspectives
-                    for (int i = 0; i < views.length; i++) {
-                        if (views[i] == ref) {
-                            resultList.add(ref);
-                            break;
-                        }
-                    }
-                } else {
-                    resultList.add(ref);
-                }
-            }
-            IWorkbenchPartReference[] result = new IWorkbenchPartReference[resultList
-                    .size()];
-            return (IWorkbenchPartReference[]) resultList.toArray(result);
-        }
-
-        /*
-         * Returns the topmost editor on the stack, or null if none.
-         */
-        IEditorPart getTopEditor() {
-            IEditorReference editor = (IEditorReference)getActiveReference(parts.size() - 1, true);
-            
-            if (editor == null) {
-                return null;
-            }
-            
-            return editor.getEditor(true);
-        }
-    };
+//  private: class ActivationList {
+//        //List of parts in the activation order (oldest first)
+//        List parts = new ArrayList();
+//
+//        /*
+//         * Add/Move the active part to end of the list;
+//         */
+//        void setActive(IWorkbenchPart part) {
+//            if (parts.size() <= 0) {
+//        return;
+//      }
+//      IWorkbenchPartReference ref = getReference(part);
+//      if (ref != null) {
+//        if (ref == parts.get(parts.size() - 1)) {
+//          return;
+//        }
+//        parts.remove(ref);
+//        parts.add(ref);
+//      }
+//        }
+//        
+//        /*
+//     * Ensures that the given part appears AFTER any other part in the same
+//     * container.
+//     */
+//        void bringToTop(IWorkbenchPartReference ref) {
+//            ILayoutContainer targetContainer = getContainer(ref);
+//            
+//            int newIndex = lastIndexOfContainer(targetContainer);
+//            
+//            //New index can be -1 if there is no last index
+//            if (newIndex >= 0 && ref == parts.get(newIndex)) 
+//        return;
+//      
+//            parts.remove(ref);
+//            if(newIndex >= 0)
+//              parts.add(newIndex, ref);
+//            else
+//              parts.add(ref);
+//        }
+//        
+//        /*
+//         * Returns the last (most recent) index of the given container in the activation list, or returns
+//         * -1 if the given container does not appear in the activation list.
+//         */
+//        int lastIndexOfContainer(ILayoutContainer container) {
+//            for (int i = parts.size() - 1; i >= 0; i--) {
+//                IWorkbenchPartReference ref = (IWorkbenchPartReference)parts.get(i);
+//
+//                ILayoutContainer cnt = getContainer(ref);
+//                if (cnt == container) {
+//                    return i; 
+//                }
+//            }
+//            
+//            return -1;
+//        }
+//
+//        /*
+//         * Add/Move the active part to end of the list;
+//         */
+//        void setActive(IWorkbenchPartReference ref) {
+//            setActive(ref.getPart(true));
+//        }
+//
+//        /*
+//         * Add the active part to the beginning of the list.
+//         */
+//        void add(IWorkbenchPartReference ref) {
+//            if (parts.indexOf(ref) >= 0) {
+//        return;
+//      }
+//
+//            IWorkbenchPart part = ref.getPart(false);
+//            if (part != null) {
+//                PartPane pane = ((PartSite) part.getSite()).getPane();
+//                if (pane instanceof MultiEditorInnerPane) {
+//                    MultiEditorInnerPane innerPane = (MultiEditorInnerPane) pane;
+//                    add(innerPane.getParentPane().getPartReference());
+//                    return;
+//                }
+//            }
+//            parts.add(0, ref);
+//        }
+//
+//        /*
+//         * Return the active part. Filter fast views.
+//         */
+//        IWorkbenchPart getActive() {
+//            if (parts.isEmpty()) {
+//        return null;
+//      }
+//            return getActive(parts.size() - 1);
+//        }
+//
+//        /*
+//         * Return the previously active part. Filter fast views.
+//         */
+//        IWorkbenchPart getPreviouslyActive() {
+//            if (parts.size() < 2) {
+//        return null;
+//      }
+//            return getActive(parts.size() - 2);
+//        }
+//
+//  private: IWorkbenchPart getActive(int start) {
+//            IWorkbenchPartReference ref = getActiveReference(start, false);
+//            
+//            if (ref == null) {
+//                return null;
+//            }
+//            
+//            return ref.getPart(true);
+//        }
+//        
+//  public: IWorkbenchPartReference getActiveReference(boolean editorsOnly) {
+//            return getActiveReference(parts.size() - 1, editorsOnly);
+//        }
+//        
+//  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly) {
+//            // First look for parts that aren't obscured by the current zoom state
+//            IWorkbenchPartReference nonObscured = getActiveReference(start, editorsOnly, true);
+//            
+//            if (nonObscured != null) {
+//                return nonObscured;
+//            }
+//            
+//            // Now try all the rest of the parts
+//            return getActiveReference(start, editorsOnly, false);
+//        }
+//        
+//        /*
+//         * Find a part in the list starting from the end and filter
+//         * and views from other perspectives. Will filter fast views
+//         * unless 'includeActiveFastViews' is true;
+//         */
+//  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly, boolean skipPartsObscuredByZoom) {
+//            IWorkbenchPartReference[] views = getViewReferences();
+//            for (int i = start; i >= 0; i--) {
+//                WorkbenchPartReference ref = (WorkbenchPartReference) parts
+//                        .get(i);
+//
+//                if (editorsOnly && !(ref instanceof IEditorReference)) {
+//                    continue;
+//                }
+//                
+//                // Skip parts whose containers have disabled auto-focus
+//                PartPane pane = ref.getPane();
+//
+//                if (pane != null) {
+//                    if (!pane.allowsAutoFocus()) {
+//                        continue;
+//                    }
+//                    
+//                    if (skipPartsObscuredByZoom) {
+//                        if (pane.isObscuredByZoom()) {
+//                            continue;
+//                        }
+//                    }
+//                }
+//
+//                // Skip fastviews (unless overridden)
+//                if (ref instanceof IViewReference) {
+//                    if (ref == getActiveFastView() || !((IViewReference) ref).isFastView()) {
+//                        for (int j = 0; j < views.length; j++) {
+//                            if (views[j] == ref) {
+//                                return ref;
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    return ref;
+//                }
+//            }
+//            return null;
+//        }
+//
+//        /*
+//         * Retuns the index of the part within the activation list. The higher
+//         * the index, the more recently it was used.
+//         */
+//        int indexOf(IWorkbenchPart part) {
+//          IWorkbenchPartReference ref = getReference(part);
+//          if (ref == null) {
+//            return -1;
+//          }
+//            return parts.indexOf(ref);
+//        }
+//
+//        /*
+//         * Returns the index of the part reference within the activation list.  
+//         * The higher the index, the more recent it was used.
+//         */
+//        int indexOf(IWorkbenchPartReference ref) {
+//            return parts.indexOf(ref);
+//        }
+//
+//        /*
+//         * Remove a part from the list
+//         */
+//        boolean remove(IWorkbenchPartReference ref) {
+//            return parts.remove(ref);
+//        }
+//
+//        /*
+//         * Returns the editors in activation order (oldest first).
+//         */
+//  private: IEditorReference[] getEditors() {
+//            ArrayList editors = new ArrayList(parts.size());
+//            for (Iterator i = parts.iterator(); i.hasNext();) {
+//                IWorkbenchPartReference part = (IWorkbenchPartReference) i
+//                        .next();
+//                if (part instanceof IEditorReference) {
+//                    editors.add(part);
+//                }
+//            }
+//            return (IEditorReference[]) editors
+//                    .toArray(new IEditorReference[editors.size()]);
+//        }
+//
+//        /*
+//         * Return a list with all parts (editors and views).
+//         */
+//        private: IWorkbenchPartReference[] getParts() {
+//            IWorkbenchPartReference[] views = getViewReferences();
+//            ArrayList resultList = new ArrayList(parts.size());
+//            for (Iterator iterator = parts.iterator(); iterator.hasNext();) {
+//                IWorkbenchPartReference ref = (IWorkbenchPartReference) iterator
+//                        .next();
+//                if (ref instanceof IViewReference) {
+//                    //Filter views from other perspectives
+//                    for (int i = 0; i < views.length; i++) {
+//                        if (views[i] == ref) {
+//                            resultList.add(ref);
+//                            break;
+//                        }
+//                    }
+//                } else {
+//                    resultList.add(ref);
+//                }
+//            }
+//            IWorkbenchPartReference[] result = new IWorkbenchPartReference[resultList
+//                    .size()];
+//            return (IWorkbenchPartReference[]) resultList.toArray(result);
+//        }
+//
+//        /*
+//         * Returns the topmost editor on the stack, or null if none.
+//         */
+//        IEditorPart getTopEditor() {
+//            IEditorReference editor = (IEditorReference)getActiveReference(parts.size() - 1, true);
+//            
+//            if (editor == null) {
+//                return null;
+//            }
+//            
+//            return editor.getEditor(true);
+//        }
+//    };
 
     /**
      * Helper class to keep track of all opened perspective. Both the opened
      * and used order is kept.
      */
-  private: class PerspectiveList {
-        /**
-         * List of perspectives in the order they were opened;
-         */
-  private: List openedList;
-
-        /**
-         * List of perspectives in the order they were used. Last element is
-         * the most recently used, and first element is the least recently
-         * used.
-         */
-  private: List usedList;
-
-        /**
-         * The perspective explicitly set as being the active one
-         */
-  private: Perspective active;
-
-        /**
-         * Creates an empty instance of the perspective list
-         */
-  public: PerspectiveList() {
-            openedList = new ArrayList();
-            usedList = new ArrayList();
-        }
-
-        /**
-         * Update the order of the perspectives in the opened list
-         *
-         * @param perspective
-         * @param newLoc
-         */
-  public: void reorder(IPerspectiveDescriptor perspective, int newLoc) {
-      int oldLocation = 0;
-      Perspective movedPerspective = null;
-      for (Iterator iterator = openedList.iterator(); iterator.hasNext();) {
-        Perspective openPerspective = (Perspective) iterator.next();
-        if (openPerspective.getDesc().equals(perspective)) {
-          oldLocation = openedList.indexOf(openPerspective);
-          movedPerspective = openPerspective;
-        }
-      }
-      
-      if (oldLocation == newLoc) {
-        return;
-      }
-      
-      openedList.remove(oldLocation);
-      openedList.add(newLoc, movedPerspective);
-      
-    }
-
-    /**
-     * Return all perspectives in the order they were activated.
-     * 
-     * @return an array of perspectives sorted by activation order, least
-     *         recently activated perspective last.
-     */
-  public: Perspective[] getSortedPerspectives() {
-            Perspective[] result = new Perspective[usedList.size()];
-            return (Perspective[]) usedList.toArray(result);
-        }
-
-        /**
-         * Adds a perspective to the list. No check is done for a duplicate when
-         * adding.
-         * @param perspective the perspective to add
-         * @return boolean <code>true</code> if the perspective was added
-         */
-  public: boolean add(Perspective perspective) {
-            openedList.add(perspective);
-            usedList.add(0, perspective);
-            //It will be moved to top only when activated.
-            return true;
-        }
-
-        /**
-         * Returns an iterator on the perspective list in the order they were
-         * opened.
-         */
-  public: Iterator iterator() {
-            return openedList.iterator();
-        }
-
-        /**
-         * Returns an array with all opened perspectives
-         */
-  public: Perspective[] getOpenedPerspectives() {
-            Perspective[] result = new Perspective[openedList.size()];
-            return (Perspective[]) openedList.toArray(result);
-        }
-
-        /**
-         * Removes a perspective from the list.
-         */
-  public: boolean remove(Perspective perspective) {
-            if (active == perspective) {
-                updateActionSets(active, null);
-                active = null;
-            }
-            usedList.remove(perspective);
-            return openedList.remove(perspective);
-        }
-
-        /**
-         * Swap the opened order of old perspective with the new perspective.
-         */
-  public: void swap(Perspective oldPerspective, Perspective newPerspective) {
-            int oldIndex = openedList.indexOf(oldPerspective);
-            int newIndex = openedList.indexOf(newPerspective);
-
-            if (oldIndex < 0 || newIndex < 0) {
-        return;
-      }
-
-            openedList.set(oldIndex, newPerspective);
-            openedList.set(newIndex, oldPerspective);
-        }
-
-        /**
-         * Returns whether the list contains any perspectives
-         */
-  public: boolean isEmpty() {
-            return openedList.isEmpty();
-        }
-
-        /**
-         * Returns the most recently used perspective in the list.
-         */
-  public: Perspective getActive() {
-            return active;
-        }
-
-        /**
-         * Returns the next most recently used perspective in the list.
-         */
-  public: Perspective getNextActive() {
-            if (active == null) {
-                if (usedList.isEmpty()) {
-          return null;
-        } else {
-          return (Perspective) usedList.get(usedList.size() - 1);
-        }
-            } else {
-                if (usedList.size() < 2) {
-          return null;
-        } else {
-          return (Perspective) usedList.get(usedList.size() - 2);
-        }
-            }
-        }
-
-        /**
-         * Returns the number of perspectives opened
-         */
-  public: int size() {
-            return openedList.size();
-        }
-
-        /**
-         * Marks the specified perspective as the most recently used one in the
-         * list.
-         */
-  public: void setActive(Perspective perspective) {
-            if (perspective == active) {
-        return;
-      }
-
-            updateActionSets(active, perspective);
-            active = perspective;
-
-            if (perspective != null) {
-                usedList.remove(perspective);
-                usedList.add(perspective);
-            }
-        }
-        
-  private: void updateActionSets(Perspective oldPersp, Perspective newPersp) {
-      // Update action sets
-
-      IContextService service = (IContextService) window
-          .getService(IContextService.class);
-      try {
-        service.activateContext(ContextAuthority.DEFER_EVENTS);
-        if (newPersp != null) {
-          IActionSetDescriptor[] newAlwaysOn = newPersp
-              .getAlwaysOnActionSets();
-          for (int i = 0; i < newAlwaysOn.length; i++) {
-            IActionSetDescriptor descriptor = newAlwaysOn[i];
-
-            actionSets.showAction(descriptor);
-          }
-
-          IActionSetDescriptor[] newAlwaysOff = newPersp
-              .getAlwaysOffActionSets();
-          for (int i = 0; i < newAlwaysOff.length; i++) {
-            IActionSetDescriptor descriptor = newAlwaysOff[i];
-
-            actionSets.maskAction(descriptor);
-          }
-        }
-
-        if (oldPersp != null) {
-          IActionSetDescriptor[] newAlwaysOn = oldPersp
-              .getAlwaysOnActionSets();
-          for (int i = 0; i < newAlwaysOn.length; i++) {
-            IActionSetDescriptor descriptor = newAlwaysOn[i];
-
-            actionSets.hideAction(descriptor);
-          }
-
-          IActionSetDescriptor[] newAlwaysOff = oldPersp
-              .getAlwaysOffActionSets();
-          for (int i = 0; i < newAlwaysOff.length; i++) {
-            IActionSetDescriptor descriptor = newAlwaysOff[i];
-
-            actionSets.unmaskAction(descriptor);
-          }
-        }
-      } finally {
-        service.activateContext(ContextAuthority.SEND_EVENTS);
-      }
-    }
-    };
+//  private: class PerspectiveList {
+//        /**
+//         * List of perspectives in the order they were opened;
+//         */
+//  private: List openedList;
+//
+//        /**
+//         * List of perspectives in the order they were used. Last element is
+//         * the most recently used, and first element is the least recently
+//         * used.
+//         */
+//  private: List usedList;
+//
+//        /**
+//         * The perspective explicitly set as being the active one
+//         */
+//  private: Perspective active;
+//
+//        /**
+//         * Creates an empty instance of the perspective list
+//         */
+//  public: PerspectiveList() {
+//          
+//        }
+//
+//        /**
+//         * Update the order of the perspectives in the opened list
+//         *
+//         * @param perspective
+//         * @param newLoc
+//         */
+//  public: void reorder(IPerspectiveDescriptor::Pointer perspective, int newLoc) {
+//      int oldLocation = 0;
+//      Perspective movedPerspective = null;
+//      for (Iterator iterator = openedList.iterator(); iterator.hasNext();) {
+//        Perspective openPerspective = (Perspective) iterator.next();
+//        if (openPerspective.getDesc().equals(perspective)) {
+//          oldLocation = openedList.indexOf(openPerspective);
+//          movedPerspective = openPerspective;
+//        }
+//      }
+//      
+//      if (oldLocation == newLoc) {
+//        return;
+//      }
+//      
+//      openedList.remove(oldLocation);
+//      openedList.add(newLoc, movedPerspective);
+//      
+//    }
+//
+//    /**
+//     * Return all perspectives in the order they were activated.
+//     * 
+//     * @return an array of perspectives sorted by activation order, least
+//     *         recently activated perspective last.
+//     */
+//  public: Perspective[] getSortedPerspectives() {
+//            Perspective[] result = new Perspective[usedList.size()];
+//            return (Perspective[]) usedList.toArray(result);
+//        }
+//
+//        /**
+//         * Adds a perspective to the list. No check is done for a duplicate when
+//         * adding.
+//         * @param perspective the perspective to add
+//         * @return boolean <code>true</code> if the perspective was added
+//         */
+//  public: boolean add(Perspective perspective) {
+//            openedList.add(perspective);
+//            usedList.add(0, perspective);
+//            //It will be moved to top only when activated.
+//            return true;
+//        }
+//
+//        /**
+//         * Returns an iterator on the perspective list in the order they were
+//         * opened.
+//         */
+//  public: Iterator iterator() {
+//            return openedList.iterator();
+//        }
+//
+//        /**
+//         * Returns an array with all opened perspectives
+//         */
+//  public: Perspective[] getOpenedPerspectives() {
+//            Perspective[] result = new Perspective[openedList.size()];
+//            return (Perspective[]) openedList.toArray(result);
+//        }
+//
+//        /**
+//         * Removes a perspective from the list.
+//         */
+//  public: boolean remove(Perspective perspective) {
+//            if (active == perspective) {
+//                updateActionSets(active, null);
+//                active = null;
+//            }
+//            usedList.remove(perspective);
+//            return openedList.remove(perspective);
+//        }
+//
+//        /**
+//         * Swap the opened order of old perspective with the new perspective.
+//         */
+//  public: void swap(Perspective oldPerspective, Perspective newPerspective) {
+//            int oldIndex = openedList.indexOf(oldPerspective);
+//            int newIndex = openedList.indexOf(newPerspective);
+//
+//            if (oldIndex < 0 || newIndex < 0) {
+//        return;
+//      }
+//
+//            openedList.set(oldIndex, newPerspective);
+//            openedList.set(newIndex, oldPerspective);
+//        }
+//
+//        /**
+//         * Returns whether the list contains any perspectives
+//         */
+//  public: boolean isEmpty() {
+//            return openedList.isEmpty();
+//        }
+//
+//        /**
+//         * Returns the most recently used perspective in the list.
+//         */
+//  public: Perspective getActive() {
+//            return active;
+//        }
+//
+//        /**
+//         * Returns the next most recently used perspective in the list.
+//         */
+//  public: Perspective getNextActive() {
+//            if (active == null) {
+//                if (usedList.isEmpty()) {
+//          return null;
+//        } else {
+//          return (Perspective) usedList.get(usedList.size() - 1);
+//        }
+//            } else {
+//                if (usedList.size() < 2) {
+//          return null;
+//        } else {
+//          return (Perspective) usedList.get(usedList.size() - 2);
+//        }
+//            }
+//        }
+//
+//        /**
+//         * Returns the number of perspectives opened
+//         */
+//  public: int size() {
+//            return openedList.size();
+//        }
+//
+//        /**
+//         * Marks the specified perspective as the most recently used one in the
+//         * list.
+//         */
+//  public: void setActive(Perspective perspective) {
+//            if (perspective == active) {
+//        return;
+//      }
+//
+//            updateActionSets(active, perspective);
+//            active = perspective;
+//
+//            if (perspective != null) {
+//                usedList.remove(perspective);
+//                usedList.add(perspective);
+//            }
+//        }
+//        
+//  private: void updateActionSets(Perspective oldPersp, Perspective newPersp) {
+//      // Update action sets
+//
+//      IContextService service = (IContextService) window
+//          .getService(IContextService.class);
+//      try {
+//        service.activateContext(ContextAuthority.DEFER_EVENTS);
+//        if (newPersp != null) {
+//          IActionSetDescriptor[] newAlwaysOn = newPersp
+//              .getAlwaysOnActionSets();
+//          for (int i = 0; i < newAlwaysOn.length; i++) {
+//            IActionSetDescriptor descriptor = newAlwaysOn[i];
+//
+//            actionSets.showAction(descriptor);
+//          }
+//
+//          IActionSetDescriptor[] newAlwaysOff = newPersp
+//              .getAlwaysOffActionSets();
+//          for (int i = 0; i < newAlwaysOff.length; i++) {
+//            IActionSetDescriptor descriptor = newAlwaysOff[i];
+//
+//            actionSets.maskAction(descriptor);
+//          }
+//        }
+//
+//        if (oldPersp != null) {
+//          IActionSetDescriptor[] newAlwaysOn = oldPersp
+//              .getAlwaysOnActionSets();
+//          for (int i = 0; i < newAlwaysOn.length; i++) {
+//            IActionSetDescriptor descriptor = newAlwaysOn[i];
+//
+//            actionSets.hideAction(descriptor);
+//          }
+//
+//          IActionSetDescriptor[] newAlwaysOff = oldPersp
+//              .getAlwaysOffActionSets();
+//          for (int i = 0; i < newAlwaysOff.length; i++) {
+//            IActionSetDescriptor descriptor = newAlwaysOff[i];
+//
+//            actionSets.unmaskAction(descriptor);
+//          }
+//        }
+//      } finally {
+//        service.activateContext(ContextAuthority.SEND_EVENTS);
+//      }
+//    }
+//    };
 
     // for dynamic UI
-  protected: void AddPerspective(Perspective::Pointer persp);
+//  protected: void AddPerspective(Perspective::Pointer persp);
 
     /**
    * Find the stack of view references stacked with this view part.
@@ -1727,14 +1525,14 @@ public: std::vector<IViewPart::Pointer> GetViews();
    * @return the stack of references
    * @since 3.0
    */
-  private: std::vector<IViewReference::Pointer> GetViewReferenceStack(IViewPart::Pointer part);
+ // private: std::vector<IViewReference::Pointer> GetViewReferenceStack(IViewPart::Pointer part);
 
     /*
      * (non-Javadoc)
      * 
      * @see org.eclipse.ui.IWorkbenchPage#getViewStack(org.eclipse.ui.IViewPart)
      */
-  public: std::vector<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
+//  public: std::vector<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
 
     /**
      * Allow for programmatically resizing a part.
@@ -1751,27 +1549,27 @@ public: std::vector<IViewPart::Pointer> GetViews();
   public: void ResizeView(IViewPart::Pointer part, int width, int height);
 
     // provides sash information for the given pane
-  private: class SashInfo {
-  private:
-    LayoutPartSash right;
+//  private: class SashInfo {
+//  private:
+//    LayoutPartSash right;
+//
+//        LayoutPartSash left;
+//
+//        LayoutPartSash top;
+//
+//        LayoutPartSash bottom;
+//
+//        LayoutTreeNode rightNode;
+//
+//        LayoutTreeNode leftNode;
+//
+//        LayoutTreeNode topNode;
+//
+//        LayoutTreeNode bottomNode;
+//    };
 
-        LayoutPartSash left;
-
-        LayoutPartSash top;
-
-        LayoutPartSash bottom;
-
-        LayoutTreeNode rightNode;
-
-        LayoutTreeNode leftNode;
-
-        LayoutTreeNode topNode;
-
-        LayoutTreeNode bottomNode;
-    };
-
-  private: void FindSashParts(LayoutTree tree, PartPane::Sashes sashes,
-            SashInfo info);
+//  private: void FindSashParts(LayoutTree tree, PartPane::Sashes sashes,
+//            SashInfo info);
   
   /**
    * Returns all parts that are owned by this page
@@ -1797,7 +1595,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPage#getExtensionTracker()
    */
-  public: IExtensionTracker GetExtensionTracker();
+  //public: IExtensionTracker GetExtensionTracker();
 
     /*
      * (non-Javadoc)

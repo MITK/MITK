@@ -18,14 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIMEMENTO_H_
 #define CHERRYIMEMENTO_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include <org.opencherry.osgi/cherryMacros.h>
 
 #include <string>
 
 namespace cherry {
 
-struct CHERRY_API IMemento
+struct CHERRY_API IMemento : public Object
 {
+  cherryClassMacro(IMemento)
+  
   virtual int GetInt(std::string key) = 0;
   
   virtual ~IMemento() {};

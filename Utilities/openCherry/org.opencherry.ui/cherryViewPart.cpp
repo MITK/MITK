@@ -1,31 +1,33 @@
 /*=========================================================================
  
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
  
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
  
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
  
-=========================================================================*/
-
+ =========================================================================*/
 
 #include "cherryViewPart.h"
 
-namespace cherry {
+#include <Poco/Exception.h>
+
+namespace cherry
+{
 
 ViewPart::ViewPart()
 {
 
 }
-  
-void ViewPart::Init(IWorkbenchPartSite::Pointer site, IMemento* /*memento*/) 
+
+void ViewPart::Init(IViewSite::Pointer site, IMemento::Pointer /*memento*/)
 {
   /*
    * Initializes this view with the given view site.  A memento is passed to
@@ -40,10 +42,22 @@ void ViewPart::Init(IWorkbenchPartSite::Pointer site, IMemento* /*memento*/)
   this->SetSite(site);
 }
 
-void ViewPart::SaveState(IMemento* /*memento*/) 
+void ViewPart::SaveState(IMemento::Pointer /*memento*/)
 {
   // do nothing
 }
 
-}  // namespace cherry
+void ViewPart::CheckSite(IWorkbenchPartSite::Pointer site)
+{
+  WorkbenchPart::CheckSite(site);
+  if (site.Cast<IViewSite>().IsNull())
+    throw Poco::AssertionViolationException("The site for a view must be an IViewSite"); //$NON-NLS-1$
+}
+
+IViewSite::Pointer ViewPart::GetViewSite()
+{
+  return this->GetSite().Cast<IViewSite>();
+}
+
+} // namespace cherry
 

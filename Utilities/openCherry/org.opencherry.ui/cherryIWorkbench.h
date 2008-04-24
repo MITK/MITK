@@ -29,8 +29,6 @@ namespace cherry {
 struct CHERRY_API IWorkbench : public Object {
   
   cherryClassMacro(IWorkbench);
-  
-  static const std::string DIALOG_ID_SHOW_VIEW; // = "org.opencherry.ui.dialogs.showview";
     
   virtual ~IWorkbench() {}
   
@@ -41,14 +39,6 @@ struct CHERRY_API IWorkbench : public Object {
   
   
   virtual void ShowPerspective(const std::string& perspectiveId) = 0;
-  
-  virtual IDialog::Pointer CreateDialog(const std::string& id) = 0;
-  
-protected:
-  
-  friend class PlatformUI;
-  
-  virtual void Run() = 0;
   
 };
 

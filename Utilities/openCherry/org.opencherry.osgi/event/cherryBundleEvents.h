@@ -28,17 +28,17 @@ namespace cherry {
 
 struct CHERRY_API BundleEvents
 {
-  Message1<const BundleEvent> bundleInstalled;
-  Message1<const BundleEvent> bundleLoaded;
-  Message1<const BundleEvent> bundleResolved;
-  Message1<const BundleEvent> bundleResolving;
-  Message1<const BundleEvent> bundleStarted;
-  Message1<const BundleEvent> bundleStarting;
-  Message1<const BundleEvent> bundleStopped;
-  Message1<const BundleEvent> bundleStopping;
-  Message1<const BundleEvent> bundleUninstalled;
-  Message1<const BundleEvent> bundleUninstalling;
-  Message1<const BundleEvent> bundleUnloaded;
+  Message1<const BundleEvent&> bundleInstalled;
+  Message1<const BundleEvent&> bundleLoaded;
+  Message1<const BundleEvent&> bundleResolved;
+  Message1<const BundleEvent&> bundleResolving;
+  Message1<const BundleEvent&> bundleStarted;
+  Message1<const BundleEvent&> bundleStarting;
+  Message1<const BundleEvent&> bundleStopped;
+  Message1<const BundleEvent&> bundleStopping;
+  Message1<const BundleEvent&> bundleUninstalled;
+  Message1<const BundleEvent&> bundleUninstalling;
+  Message1<const BundleEvent&> bundleUnloaded;
 };
 
 } // namespace cherry

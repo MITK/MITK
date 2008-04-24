@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYPLATFORMUI_H_
 
 #include <org.opencherry.osgi/cherryDll.h>
-#include "cherryIWorkbench.h"
+#include "cherryWorkbench.h"
 
 namespace cherry {
 
@@ -38,7 +38,7 @@ public:
   static bool IsWorkbenchRunning();
   
 private:
-  static IWorkbench::Pointer m_Workbench;
+  static Workbench::Pointer m_Workbench;
 };
 
 }

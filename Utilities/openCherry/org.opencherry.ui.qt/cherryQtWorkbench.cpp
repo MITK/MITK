@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryQtWorkbench.h"
 
 #include "internal/cherryQtShowViewDialog.h"
+#include "internal/cherryQtViewPane.h"
+
 #include <org.opencherry.ui/cherryPlatformUI.h>
 
 namespace cherry {
@@ -46,6 +48,16 @@ QtWorkbench::CreateDialog(const std::string& dialogid)
     return new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry());
   else
     return IDialog::Pointer(0);
+}
+
+IViewPart::Pointer QtWorkbench::CreateErrorViewPart(const std::string& partName, Poco::Exception exc)
+{
+  return 0;
+}
+
+IViewPane::Pointer QtWorkbench::CreateViewPane()
+{
+  return new QtViewPane("", m_QtWindow);
 }
 
 }  // namespace cherry

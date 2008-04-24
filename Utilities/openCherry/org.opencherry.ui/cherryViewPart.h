@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <org.opencherry.osgi/cherryDll.h>
 
 #include "cherryIViewPart.h"
-#include "cherryIWorkbenchPartSite.h"
+#include "cherryIViewSite.h"
 #include "cherryWorkbenchPart.h"
 
 #include "cherryIMemento.h"
@@ -74,13 +74,27 @@ class CHERRY_API ViewPart : public WorkbenchPart, public IViewPart
 protected:
   ViewPart();
       
+  /**
+   * Checks that the given site is valid for this type of part.
+   * The site for a view must be an <code>IViewSite</code>.
+   * 
+   * @param site the site to check
+   * @since 3.1
+   */
+  void CheckSite(IWorkbenchPartSite::Pointer site);
+  
 public:
  
   cherryClassMacro(ViewPart);
   
-  void Init(IWorkbenchPartSite::Pointer site, IMemento* memento = 0);
+  void Init(IViewSite::Pointer site, IMemento::Pointer memento = 0);
 
-  void SaveState(IMemento* memento);
+  void SaveState(IMemento::Pointer memento);
+  
+  /* 
+   * Method declared on IViewPart.
+   */
+  IViewSite::Pointer GetViewSite();
 
 };
 

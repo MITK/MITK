@@ -20,7 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/cherryDll.h>
 
+#include <org.opencherry.ui/cherryIViewPart.h>
+#include <org.opencherry.ui/cherryIViewPane.h>
+
 #include "cherryIWorkbench.h"
+#include "cherryIWorkbenchPartReference.h"
+#include <Poco/Exception.h>
 
 namespace cherry {
 
@@ -33,6 +38,8 @@ public:
  
   cherryClassMacro(Workbench);
   
+  static const std::string DIALOG_ID_SHOW_VIEW; // = "org.opencherry.ui.dialogs.showview";
+  
   Workbench();
   virtual ~Workbench();
   
@@ -41,6 +48,19 @@ public:
   
   
   void ShowPerspective(const std::string& perspectiveId);
+  
+
+  virtual IDialog::Pointer CreateDialog(const std::string& id) = 0;
+  
+  virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName, Poco::Exception exc) = 0;
+  
+  virtual IViewPane::Pointer CreateViewPane() = 0;
+  
+protected:
+  
+  friend class PlatformUI;
+  
+  virtual void Run() = 0;
   
 private:
   

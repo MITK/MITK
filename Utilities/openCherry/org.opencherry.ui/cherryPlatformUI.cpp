@@ -31,7 +31,7 @@ const std::string PlatformUI::PLUGIN_ID = "org.opencherry.ui";
 const std::string PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID + ".workbench";
 const std::string PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID + ".views";
 
-IWorkbench::Pointer PlatformUI::m_Workbench(0);
+Workbench::Pointer PlatformUI::m_Workbench(0);
 
 int
 PlatformUI::CreateAndRunWorkbench()
@@ -43,7 +43,7 @@ PlatformUI::CreateAndRunWorkbench()
   {
     if (extensions[i]->GetName() == "workbench")
     {
-      m_Workbench = extensions[i]->CreateExecutableExtension<cherry::IWorkbench>("cherryIWorkbench", "class");
+      m_Workbench = extensions[i]->CreateExecutableExtension<cherry::Workbench>("cherryWorkbench", "class");
       m_Workbench->Run();
       return 0;
     }

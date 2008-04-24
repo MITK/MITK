@@ -20,7 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryIWorkbenchWindow.h"
 
+#include "cherryIWorkbenchWindow.h"
+
 namespace cherry {
+
+class IWorkbench;
+class IWorkbenchPage;
+class IPartService;
+class ISelectionService;
 
 class CHERRY_API WorkbenchWindow : public IWorkbenchWindow
 {
@@ -28,6 +35,8 @@ public:
   cherryClassMacro(WorkbenchWindow);
   
   SmartPointer<IWorkbenchPage> GetActivePage();
+  
+  SmartPointer<IWorkbench> GetWorkbench();
     
   IPartService* GetPartService();
     

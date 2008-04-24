@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IWorkbenchPart;
-class IWorkbenchPage;
+struct IWorkbenchPart;
+struct IWorkbenchPage;
 
 /**
  * Implements a reference to a IWorkbenchPart.

@@ -37,16 +37,11 @@ Plugin::GetBundle()
   return m_Bundle;
 }
   
-Poco::Logger& 
-Plugin::GetLog()
-{
-  
-}
   
 Poco::Path* 
 Plugin::GetStatePath()
 {
-  
+  return 0;
 }
 
 }

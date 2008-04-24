@@ -44,6 +44,12 @@ BundleLoader::~BundleLoader()
   
 }
 
+Poco::Logger&
+BundleLoader::GetLogger() const
+{
+  return m_Logger;
+}
+
 IBundleContext::Pointer
 BundleLoader::GetContextForBundle(IBundle::ConstPointer bundle)
 {

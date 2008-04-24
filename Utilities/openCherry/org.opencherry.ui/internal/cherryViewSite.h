@@ -25,9 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 class WorkbenchPage;
-class IViewReference;
-class IViewPart;
-class IViewDescriptor;
+struct IViewReference;
+struct IViewPart;
+struct IViewDescriptor;
 
 /**
  * A view container manages the services for a view.

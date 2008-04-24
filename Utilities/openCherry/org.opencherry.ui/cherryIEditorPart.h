@@ -23,8 +23,8 @@
 namespace cherry
 {
 
-class IEditorInput;
-class IEditorSite;
+struct IEditorInput;
+struct IEditorSite;
 
 /**
  * An editor is a visual component within a workbench page. It is

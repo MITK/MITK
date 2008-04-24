@@ -62,7 +62,7 @@ private:
   BundleMap m_BundleMap;
   BundleEvents m_BundleEvents;
   CodeCache* m_CodeCache;
-  Poco::Logger& m_Logger;
+  mutable Poco::Logger& m_Logger;
   
   Bundle::Pointer m_SystemBundle;
   
@@ -89,6 +89,8 @@ public:
   Poco::Path GetPathForLibrary(const std::string& libraryName);
   Poco::Path GetLibraryPathFor(IBundle* bundle);
   std::string GetContributionsPathFor(IBundle* bundle);
+  
+  Poco::Logger& GetLogger() const;
   
   void ResolveBundle(IBundle* bundle);
   void ResolveAllBundles();

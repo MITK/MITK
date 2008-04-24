@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 class WorkbenchPage;
-class IViewRegistry;
+struct IViewRegistry;
 
 /**
  * The ViewFactory is used to control the creation and disposal of views.  

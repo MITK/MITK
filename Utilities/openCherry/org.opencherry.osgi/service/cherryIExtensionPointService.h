@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IBundle;
+struct IBundle;
 
 struct CHERRY_API IExtensionPointService : public Service
 {

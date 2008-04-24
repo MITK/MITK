@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IBundleContext;
+struct IBundleContext;
 
 struct CHERRY_API IBundleActivator
 {

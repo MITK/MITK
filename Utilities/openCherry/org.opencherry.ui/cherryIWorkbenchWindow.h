@@ -22,10 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IPartService;
-class ISelectionService;
-class IWorkbenchPage;
-class IWorkbench;
+struct IPartService;
+struct ISelectionService;
+struct IWorkbenchPage;
+struct IWorkbench;
 
 struct CHERRY_API IWorkbenchWindow : public Object
 {

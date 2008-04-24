@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-class IEditorPart;
-class IMemento;
+struct IEditorPart;
+struct IMemento;
 
 /**
  * @see IEditorDescriptor

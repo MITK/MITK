@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class InstanceofExpression : public Expression {
+struct InstanceofExpression : public Expression {
 	
 private:
   

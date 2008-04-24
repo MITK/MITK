@@ -28,11 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IterateExpression : public CompositeExpression {
+struct IterateExpression : public CompositeExpression {
 	
 private:
   
-  class IteratePool : public IEvaluationContext {
+  struct IteratePool : public IEvaluationContext {
 		
   private:
     std::vector<ExpressionVariable::Pointer>::iterator fIterator;

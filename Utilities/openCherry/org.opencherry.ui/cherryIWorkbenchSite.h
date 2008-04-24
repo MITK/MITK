@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IWorkbenchPage;
-class ISelectionProvider;
-class IWorkbenchWindow;
+struct IWorkbenchPage;
+struct ISelectionProvider;
+struct IWorkbenchWindow;
 
 /**
  * The common interface between the workbench and its parts, including pages

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Logger.h"
 #include "Poco/Path.h"
 
-class IBundle;
+struct IBundle;
 class BundleLoader;
 
 namespace cherry {
@@ -38,11 +38,11 @@ public:
   void Stop(IBundleContext::Pointer context);
   
   IBundle* GetBundle();
-  Poco::Logger& GetLog();
+  //Poco::Logger& GetLog();
   
   Poco::Path* GetStatePath();
   
-private:
+protected:
   
   friend class BundleLoader;
   

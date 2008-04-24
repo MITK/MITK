@@ -25,9 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IWorkbenchPart;
-class IWorkbenchPage;
-class IWorkbenchWindow;
+struct IWorkbenchPart;
+struct IWorkbenchPage;
+struct IWorkbenchWindow;
 
 /**
  * <code>PartSite</code> is the general implementation for an

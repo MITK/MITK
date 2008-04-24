@@ -69,7 +69,7 @@ BundleContext::ListBundles(std::vector<IBundle::Pointer>& /*bundles*/) const
 Poco::Logger& 
 BundleContext::GetLogger() const
 {
-  
+  return m_BundleLoader.GetLogger();
 }
   
 Poco::Path

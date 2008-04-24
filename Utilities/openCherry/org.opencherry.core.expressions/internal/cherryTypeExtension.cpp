@@ -25,7 +25,7 @@ namespace cherry {
 
 
 TypeExtension::TypeExtension(ExpressionVariable::ExtTypeInfo typeInfo)
- : fExtendersLoaded(false), fExtendsLoaded(false), fTypeInfo(typeInfo) {
+ : fTypeInfo(typeInfo), fExtendersLoaded(false), fExtendsLoaded(false) {
  
 }
 

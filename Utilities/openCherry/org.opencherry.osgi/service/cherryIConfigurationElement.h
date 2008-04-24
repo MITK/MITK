@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class IExtension;
+struct IExtension;
 
 struct CHERRY_API IConfigurationElement : public Object
 {

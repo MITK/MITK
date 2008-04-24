@@ -28,12 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-class IWorkbenchPart;
-class IWorkbenchWindow;
+struct IWorkbenchPart;
+struct IWorkbenchWindow;
 class WorkbenchWindow;
 class WorkbenchPage;
 class EditorSite;
-class IEditorRegistry;
+struct IEditorRegistry;
 
 /**
  * Manage a group of element editors. Prevent the creation of two editors on the

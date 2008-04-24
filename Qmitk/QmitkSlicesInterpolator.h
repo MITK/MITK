@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkSlicesInterpolator_h_Included
 #define QmitkSlicesInterpolator_h_Included
 
-#include <qvbox.h>
-
 #include "mitkSliceNavigationController.h"
 #include "mitkSegmentationInterpolation.h"
 #include "mitkDataTreeNode.h"
+
+#include <qvbox.h>
 
 namespace mitk
 {
@@ -72,7 +72,7 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
     */
-    void OnToolManagerWorkingDataModified(const itk::EventObject&);
+    void OnToolManagerWorkingDataModified();
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -170,7 +170,6 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
     mitk::ToolManager* m_ToolManager;
     bool m_Initialized;
 
-    unsigned int DataObserverTag;
     unsigned int TSliceObserverTag;
     unsigned int SSliceObserverTag;
     unsigned int FSliceObserverTag;

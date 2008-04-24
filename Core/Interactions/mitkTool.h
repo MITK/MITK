@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
 #include "mitkToolFactoryMacro.h"
+#include "mitkMessage.h"
+#include "mitkDataTreeNode.h"
 
 #include <iostream>
 #include <string>
@@ -62,13 +64,23 @@ class ToolManager;
 
   \warning Only to be instantiated by mitk::ToolManager (because SetToolManager has to be called). All other uses are unsupported.
 
-  \TODO create a good set of default tool events with and without parameters and way to easily add new events
-
   $Author$
 */
 class MITK_CORE_EXPORT Tool : public StateMachine
 {
   public:
+
+    typedef unsigned char DefaultSegmentationDataType;
+
+    /**
+     * \brief To send error messages (to be shown by some GUI)
+     */
+    Message1<std::string> ErrorMessage;
+    
+    /**
+     * \brief To send general messages (to be shown by some GUI)
+     */
+    Message1<std::string> GeneralMessage;
 
     mitkClassMacro(Tool, StateMachine);
 
@@ -180,6 +192,9 @@ class MITK_CORE_EXPORT Tool : public StateMachine
     */
     virtual void Deactivated();
 
+    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName );
+    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organType, const std::string& organName );
+
     Tool(); // purposely hidden
     Tool( const char*); // purposely hidden
     virtual ~Tool();
@@ -190,5 +205,4 @@ class MITK_CORE_EXPORT Tool : public StateMachine
 } // namespace
 
 #endif
-
 

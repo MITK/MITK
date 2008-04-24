@@ -19,11 +19,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderingManagerFactory.h"
 #include "QmitkRenderingManager.h"
 
+/** bug #1333: CoreObjectFactory-like system for Qt dependent classes **/
+#include "QmitkBinaryThresholdToolGUI.h"
+#include "QmitkCalculateGrayValueStatisticsToolGUI.h"
+
 QmitkRenderingManagerFactory
 ::QmitkRenderingManagerFactory()
 {
   mitk::RenderingManager::SetFactory( this );
 
+  /** bug #1333: CoreObjectFactory-like system for Qt dependent classes **/
+  itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
+  itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
 }
 
 QmitkRenderingManagerFactory
@@ -39,3 +46,4 @@ QmitkRenderingManagerFactory
   mitk::RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
   return smartPtr;
 }
+

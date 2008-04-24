@@ -1,5 +1,5 @@
 /* XPM */
-static const char * btnCropImage_xpm[] = {
+static const char * mitkAutoCropTool_xpm[] = {
 "20 20 7 1",
 " 	c None",
 ".	c #000000",

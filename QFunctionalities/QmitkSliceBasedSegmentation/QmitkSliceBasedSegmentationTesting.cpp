@@ -156,8 +156,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
   if (originalImage && originalImage->GetDimension() == 3)
   {
     // TODO allow cropping of 3D+t images (bug 1281)
-    std::cout << "Cropping active segmentation: " << std::flush;
-    QmitkUserInputSimulation::MouseClick(    m_Controls->btnAutoCropSegmentation, Qt::LeftButton );
+    // TODO test postprocessing tools ??
   }
   
   // Test: click the "Delete segmentation" button, expect: no segmentations selected afterwards

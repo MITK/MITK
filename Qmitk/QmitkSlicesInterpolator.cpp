@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkSelectableGLWidget.h"
-#include "mitkToolManager.h"
 
+#include "mitkToolManager.h"
 #include "mitkDataStorage.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
@@ -91,7 +91,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
     // remove old observers
     if (m_ToolManager)
     {
-      m_ToolManager->RemoveObserver( DataObserverTag );
+      m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
     }
 
     if (m_MultiWidget)
@@ -115,12 +115,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   QVBox::setEnabled( node != NULL );
 
   // react whenever the set of selected segmentation changes
-  {
-  itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
-  DataObserverTag = m_ToolManager->AddObserver( mitk::ToolWorkingDataChangedEvent(), command );
-  }
-
+  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
   mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
@@ -175,7 +170,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 {
 }
 
-void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified(const itk::EventObject&)
+void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   OnInterpolationActivated( m_InterpolationEnabled ); // re-initialize if needed
 }

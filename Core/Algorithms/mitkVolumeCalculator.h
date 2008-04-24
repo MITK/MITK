@@ -28,43 +28,44 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-
-  //##Documentation
-  //## @brief Provides an easy way to calculate the volume of a mitk::Image
-  //## The given volume is in milliliters. There is also a method to get the raw voxel count.
+  /**
+   * @brief Calculates the volume of a mitk::Image.
+   * The given volume is in milliliters or as a voxel count.
+   * Voxels are counted if their gray value is above a threshold (see SetThreshold), the default threshold is 0.
+   *
+   * The filter works for 2D, 3D and 3D+t. In the 3D+t case a vector of volumes is provided (see GetVolumes()).
+   */
   class MITK_CORE_EXPORT VolumeCalculator : public itk::Object
   {
   public:
     mitkClassMacro(VolumeCalculator,itk::Object);
 
     itkNewMacro(Self);
-    itkSetMacro(Image,mitk::Image::ConstPointer);
+    itkSetObjectMacro(Image,Image);
     itkSetMacro(Threshold,int);
-    // TODO: calculate if needed in GetHistogram()
-    void ComputeVolume();
     itkGetMacro(Volume,float);
     itkGetMacro(VoxelCount,unsigned long int);
-    std::vector<float> GetVolumes() {
-      return m_Volumes;
-    }
-  protected:
-    VolumeCalculator();
+   
+    std::vector<float> GetVolumes();
+    void ComputeVolume();
 
+  protected:
+    
+    VolumeCalculator();
     virtual ~VolumeCalculator();
 
     template < typename TPixel, unsigned int VImageDimension >
     void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage);
 
-    mitk::Image::ConstPointer m_Image;
-    int m_Threshold;
-    float m_Volume;
-    unsigned long int m_VoxelCount;
-    std::vector<float> m_Volumes;
-    mitk::ImageTimeSelector::Pointer m_TimeSelector;
+    Image::ConstPointer        m_Image;
+    int                        m_Threshold;
+    float                      m_Volume;
+    unsigned long int          m_VoxelCount;
+    std::vector<float>         m_Volumes;
+    ImageTimeSelector::Pointer m_TimeSelector;
   };
 
 } // namespace mitk
 
 #endif /* VOLUME_CALCULATOR_H_HEADER_INCLUDED */
-
 

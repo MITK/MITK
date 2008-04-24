@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnGrayValueStatistics_xpm[] = {
+static const char * mitkCalculateGrayValueStatisticsTool_xpm[] = {
 "18 12 8 1",
 " 	c None",
 ".	c #000000",

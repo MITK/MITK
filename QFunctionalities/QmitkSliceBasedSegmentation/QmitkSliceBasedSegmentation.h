@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingConfig.h" // IMPORTANT: this defines or undefines BUILD_TESTING !
 
 #include <string>
-#include <itkImage.h>
 
 class QmitkStdMultiWidget;
 class QmitkSliceBasedSegmentationControls;
@@ -93,9 +92,8 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     */
     virtual void Deactivated();
 
-    void OnSurfaceCalculationDone(); // for command object (observer)
-
-    void OnVolumeCalculationDone(); // for command object (observer)
+    void OnNodePropertiesChanged();
+    void OnNewNodesGenerated();
 
 #ifdef BUILD_TESTING
     /**
@@ -136,14 +134,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     void CreateNewSegmentation();
     void LoadSegmentation();
     void DeleteSegmentation();
-    void AutoCropSegmentation();
-    void CreateSurfaceFromSegmentation();
-    void CalculateVolumeForSegmentation();
-    void CalculateStatisticsVolumeForSegmentation();
     void SaveSegmentation();
-    void InitiateCreateNewSegmentationFromThreshold(bool toggled);
-    void CreateNewSegmentationFromThreshold();
-    void CreateNewSegmentationFromThresholdSliderChanged(int threshold);
     void SetReferenceImagePixelSmoothing(bool on);
 
     void OnToolSelected(int id);
@@ -151,15 +142,10 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
 
   protected:
 
+    /** TODO bug #1342: should be more central, clearly not in functionality **/
     mitk::DataTreeNode::Pointer CreateEmptySegmentationNode( mitk::Image* image, const std::string& organType, const std::string name );
     mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image, const std::string& name, const std::string& organType );
     
-    template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>*, mitk::Image*, unsigned int timeStep );
-    
-    template <typename TPixel, unsigned int VImageDimension>
-    void ITKHistogramming( itk::Image<TPixel, VImageDimension>*, mitk::Image*, QString& );
-
     /**
       \brief Main widget showing the scene
     */
@@ -169,12 +155,6 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
       \brief This functionality's GUI
     */
     QmitkSliceBasedSegmentationControls * m_Controls;
-
-    mitk::DataTreeNode::Pointer m_ThresholdFeedbackNode;
-    mitk::DataTreeNode::Pointer m_NodeForThresholding;
-
-    unsigned int m_NumberOfVolumeCalculationThreads;
-
 };
 #endif // !defined(QmitkSliceBasedSegmentation_H__INCLUDED)
 

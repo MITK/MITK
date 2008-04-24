@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkToolReferenceDataSelectionBox_h_Included
 #define QmitkToolReferenceDataSelectionBox_h_Included
 
-#include <qvbox.h>
-
 #include "mitkToolManager.h"
 #include "mitkDataTreeFilter.h"
+
+#include <qvbox.h>
 
 class QmitkDataTreeComboBox;
 
@@ -53,16 +53,12 @@ class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
 
     void Initialize(mitk::DataTreeBase*); // just needed because combobox relies on data tree
 
-    /**
-     TODO this is not a nice place for this function (bug 735)
-    */
-    void SetToolGroups(const char* toolGroups = 0);
     void UpdateDataDisplay();
 
     mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
-    void OnToolManagerReferenceDataModified(const itk::EventObject&);
+    void OnToolManagerReferenceDataModified();
 
   signals:
 
@@ -83,8 +79,6 @@ class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
     mitk::ToolManager::Pointer m_ToolManager;
 
     QmitkDataTreeComboBox* m_ReferenceDataSelectionBox;
-
-    unsigned long m_ToolReferenceDataChangedObserverTag;
 
     bool m_SelfCall;
 };

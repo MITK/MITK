@@ -14,6 +14,8 @@ SET(CPP_FILES
   QmitkBaseAlgorithmComponent.cpp
   QmitkBaseComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
+  QmitkBinaryThresholdToolGUI.cpp
+  QmitkCalculateGrayValueStatisticsToolGUI.cpp
   QmitkCallbackFromGUIThread.cpp
   QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
@@ -25,16 +27,16 @@ SET(CPP_FILES
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.cpp
   QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
-  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.cpp
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.cpp
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.cpp
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
   QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
-  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
@@ -72,6 +74,8 @@ SET(CPP_FILES
   QmitkSocketClient.cpp
   QmitkStatusBar.cpp
   QmitkStepperAdapter.cpp
+  QmitkToolGUI.cpp
+  QmitkToolGUIArea.cpp
   QmitkToolReferenceDataSelectionBox.cpp  
   QmitkToolSelectionBox.cpp  
   QmitkToolWorkingDataListBox.cpp  
@@ -96,16 +100,16 @@ SET(UI_FILES
   QmitkApplicationBase/QmitkTreeNodeSelector.ui
   QmitkFunctionalityComponentContainerGUI.ui
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponentGUI.ui
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponentGUI.ui
   QmitkFunctionalityComponents/QmitkImageCropperComponentGUI.ui
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSeedPointSetComponentGUI.ui
-  QmitkFunctionalityComponents/QmitkDisplayPointSetComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponentGUI.ui
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponentGUI.ui
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponentGUI.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentGUI.ui
-  #QmitkFunctionalityComponents/QmitkSTLConverterComponentGUI.ui
   QmitkLevelWindowPresetDefinition.ui
   QmitkLevelWindowRangeChange.ui
   QmitkLevelWindowWidget.ui
@@ -134,8 +138,10 @@ SET(MOC_H_FILES
   QmitkApplicationBase/QmitkSaveProjectWidget.h
   QmitkBaseComponent.h
   QmitkBaseFunctionalityComponent.h
+  QmitkBinaryThresholdToolGUI.h
   QmitkCallbackFromGUIThread.h
   QmitkChiliPluginSaveDialog.h
+  QmitkCalculateGrayValueStatisticsToolGUI.h
   QmitkColorTransferFunctionCanvas.h
   QmitkCopyToClipBoardDialog.h
   QmitkDialogBar.h
@@ -144,16 +150,16 @@ SET(MOC_H_FILES
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
+  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.h
   QmitkFunctionalityComponents/QmitkImageCropperComponent.h
   QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
   QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
-  QmitkFunctionalityComponents/QmitkDisplayPointSetComponent.h
   QmitkFunctionalityComponents/QmitkSingleTimeStepExporterComponent.h
   QmitkFunctionalityComponents/QmitkSliceSliderNavigationComponent.h
+  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
   QmitkFunctionalityComponents/QmitkThresholdComponent.h
-  #QmitkFunctionalityComponents/QmitkSTLConverterComponent.h
   QmitkHelpBrowser.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
@@ -184,6 +190,8 @@ SET(MOC_H_FILES
   QmitkSliderLevelWindowWidget.h
   QmitkSocketClient.h
   QmitkStepperAdapter.h
+  QmitkToolGUI.h
+  QmitkToolGUIArea.h
   QmitkToolReferenceDataSelectionBox.h  
   QmitkToolSelectionBox.h  
   QmitkToolWorkingDataListBox.h  

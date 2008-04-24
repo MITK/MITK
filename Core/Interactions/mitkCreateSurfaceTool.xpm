@@ -1,5 +1,5 @@
 /* XPM */
-static const char * btnCreateSurface_xpm[] = {
+static const char * mitkCreateSurfaceTool_xpm[] = {
 "18 18 88 1",
 " 	c None",
 ".	c #202020",

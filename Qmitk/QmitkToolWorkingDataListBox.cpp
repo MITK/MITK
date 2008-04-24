@@ -29,8 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qapplication.h>
 #include <qheader.h>
 
-#include <itkCommand.h>
-
 #include <algorithm>
 #include <sstream>
 
@@ -70,20 +68,9 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
   
   connect( this, SIGNAL(selectionChanged()),
            this, SLOT(OnWorkingDataSelectionChanged()) );
-
-  {
-  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
-  m_ToolWorkingDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolWorkingDataChangedEvent(), command );
-  }
-
-  {
-  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
-  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
-  }
-
-
+  
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
 }
 
 QmitkToolWorkingDataListBox::~QmitkToolWorkingDataListBox()
@@ -97,23 +84,13 @@ mitk::ToolManager* QmitkToolWorkingDataListBox::GetToolManager()
 
 void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->RemoveObserver( m_ToolWorkingDataChangedObserverTag );
-  m_ToolManager->RemoveObserver( m_ToolReferenceDataChangedObserverTag );
+  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
 
   m_ToolManager = &newManager;
 
-  {
-  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
-  m_ToolWorkingDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolWorkingDataChangedEvent(), command );
-  }
-
-  {
-  itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolWorkingDataListBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
-  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
-  }
-
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
 
   UpdateDataDisplay();
 }
@@ -141,7 +118,7 @@ void QmitkToolWorkingDataListBox::OnWorkingDataSelectionChanged()
   m_SelfCall = false;
 }
 
-void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified(const itk::EventObject&)
+void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified()
 {
   UpdateNodeVisibility();
 
@@ -154,7 +131,7 @@ void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified(const itk::Ev
   UpdateDataDisplay();
 }
 
-void QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified(const itk::EventObject&)
+void QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified()
 {
   if ( m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData )
   {

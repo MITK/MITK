@@ -28,9 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 
-#include <itkCommand.h>
- 
-
 QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent, const char* name)
 :QVBox(parent, name),
  m_SelfCall(false)
@@ -42,13 +39,7 @@ QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* 
   connect( m_ReferenceDataSelectionBox, SIGNAL(activated(const mitk::DataTreeFilter::Item*)),
            this, SLOT(OnReferenceDataSelected(const mitk::DataTreeFilter::Item*)) );
 
-  {
-  itk::ReceptorMemberCommand<QmitkToolReferenceDataSelectionBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolReferenceDataSelectionBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
-  }
-
-
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
 
 QmitkToolReferenceDataSelectionBox::~QmitkToolReferenceDataSelectionBox()
@@ -62,12 +53,6 @@ void QmitkToolReferenceDataSelectionBox::Initialize(mitk::DataTreeBase* tree )
   UpdateDataDisplay();
 }
     
-void QmitkToolReferenceDataSelectionBox::SetToolGroups(const char* toolGroups)
-{
-  mitk::ToolManager::Pointer newManager = mitk::ToolManager::New(toolGroups);
-  this->SetToolManager( *newManager );
-}
-
 mitk::ToolManager* QmitkToolReferenceDataSelectionBox::GetToolManager()
 {
   return m_ToolManager;
@@ -75,15 +60,11 @@ mitk::ToolManager* QmitkToolReferenceDataSelectionBox::GetToolManager()
 
 void QmitkToolReferenceDataSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->RemoveObserver( m_ToolReferenceDataChangedObserverTag );
+  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 
   m_ToolManager = &newManager;
 
-  {
-  itk::ReceptorMemberCommand<QmitkToolReferenceDataSelectionBox>::Pointer command = itk::ReceptorMemberCommand<QmitkToolReferenceDataSelectionBox>::New();
-  command->SetCallbackFunction( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolReferenceDataChangedObserverTag = m_ToolManager->AddObserver( mitk::ToolReferenceDataChangedEvent(), command );
-  }
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 
   UpdateDataDisplay();
 }
@@ -129,7 +110,7 @@ void QmitkToolReferenceDataSelectionBox::EnsureOnlyReferenceImageIsVisibile()
 
 }
 
-void QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified(const itk::EventObject&)
+void QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified()
 {
   if (m_SelfCall) return;
 
@@ -154,9 +135,14 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   mitk::NodePredicateProperty segmentation("segmentation", mitk::BoolProperty::New(true));
   mitk::NodePredicateNOT notSegmentation( segmentation );
   
+  mitk::NodePredicateProperty helper("helper object", mitk::BoolProperty::New(true));
+  mitk::NodePredicateNOT notHelper( helper );
+  
   mitk::NodePredicateAND imageColorful( notBinary, notSegmentation );
   
-  mitk::NodePredicateAND completePredicate( image3D, imageColorful );
+  mitk::NodePredicateAND imageColorfulNotHelper( imageColorful, notHelper );
+  
+  mitk::NodePredicateAND completePredicate( image3D, imageColorfulNotHelper );
 
   mitk::DataStorage::SetOfObjects::ConstPointer sceneImages = mitk::DataStorage::GetInstance()->GetSubset( completePredicate );
   return sceneImages;

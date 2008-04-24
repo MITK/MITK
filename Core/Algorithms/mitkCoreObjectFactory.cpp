@@ -92,6 +92,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCorrectorTool2D.h"
 #include "mitkFillRegionTool.h"
 #include "mitkEraseRegionTool.h"
+#include "mitkAutoCropTool.h"
+#include "mitkCalculateVolumetryTool.h"
+#include "mitkCreateSurfaceTool.h"
+#include "mitkBinaryThresholdTool.h"
+#include "mitkCalculateGrayValueStatisticsTool.h"
 
 
 #include "mitkUnstructuredGrid.h"
@@ -247,7 +252,12 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( CorrectorTool2DFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( FillRegionToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( EraseRegionToolFactory::New() );
-
+    
+    itk::ObjectFactoryBase::RegisterFactory( AutoCropToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( CalculateVolumetryToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( CreateSurfaceToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( BinaryThresholdToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( CalculateGrayValueStatisticsToolFactory::New() );
 
     alreadyDone = true;
   }
@@ -408,3 +418,4 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
 void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
 
 }
+

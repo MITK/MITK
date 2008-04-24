@@ -79,8 +79,8 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
     mitk::ToolManager::DataVectorType GetSelectedNodes();
     mitk::DataTreeNode* GetSelectedNode();
     
-    void OnToolManagerWorkingDataModified(const itk::EventObject&);
-    void OnToolManagerReferenceDataModified(const itk::EventObject&);
+    void OnToolManagerWorkingDataModified();
+    void OnToolManagerReferenceDataModified();
 
     // \param columns Comma separated list of key:title pairs please. E.g. 'SetAdditionalColumns( "name:Name,volume:Vol." )'
     void SetAdditionalColumns(const std::string& columns);
@@ -117,9 +117,6 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
 
     ItemNodeMapType m_Node;
     ColumnsList m_AdditionalColumns;
-    
-    unsigned long m_ToolWorkingDataChangedObserverTag;
-    unsigned long m_ToolReferenceDataChangedObserverTag;
     
     bool m_ShowOnlySelected;
     

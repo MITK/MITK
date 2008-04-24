@@ -16,6 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTool.h"
+#include "mitkDataTreeNodeFactory.h"
+#include "mitkOrganTypeProperty.h"
+#include "mitkProperties.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkVtkResliceInterpolationProperty.h"
+
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)
@@ -99,5 +105,71 @@ unsigned int mitk::Tool::ToolLogger::GetVerboseness()
 void mitk::Tool::ToolLogger::SetVerboseness( unsigned int verboseness )
 {
   s_Verboseness = verboseness;
+}
+
+mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName )
+{
+  // we NEED a reference image for size etc.
+  if (!original) return NULL;
+
+  // actually create a new empty segmentation
+  PixelType pixelType( typeid(DefaultSegmentationDataType) );
+  Image::Pointer segmentation = Image::New();
+  segmentation->SetProperty( "organ type", OrganTypeProperty::New( organType ) );
+  segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );
+
+  unsigned int byteSize = sizeof(DefaultSegmentationDataType);
+  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
+  {
+    byteSize *= segmentation->GetDimension(dim);
+  }
+  memset( segmentation->GetData(), 0, byteSize );
+
+  if (original->GetTimeSlicedGeometry() )
+  {
+    AffineGeometryFrame3D::Pointer originalGeometryAGF = original->GetTimeSlicedGeometry()->Clone();
+    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+    segmentation->SetGeometry( originalGeometry );
+  }
+  else
+  {
+    Tool::ErrorMessage("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.");
+    return NULL;
+  }
+
+  return CreateSegmentationNode( segmentation, organType, organName );
+}
+
+mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organType, const std::string& organName )
+{
+  if (!image) return NULL;
+
+  // decorate the datatreenode with some properties
+  DataTreeNode::Pointer segmentationNode = DataTreeNode::New();
+  segmentationNode->SetData( image );
+  DataTreeNodeFactory::SetDefaultImageProperties ( segmentationNode );
+
+  // name
+  segmentationNode->SetProperty( "name", StringProperty::New( organName ) );
+
+  // organ type
+  OrganTypeProperty::Pointer organTypeProperty = OrganTypeProperty::New( organType );
+  if ( !organTypeProperty->IsValidEnumerationValue( organType ) )
+  {
+    organTypeProperty->AddEnum( organType, organTypeProperty->Size() ); // add a new organ type
+    organTypeProperty->SetValue( organType );
+  }
+
+  // visualization properties
+  segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
+  segmentationNode->SetProperty( "color", DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
+  segmentationNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
+  segmentationNode->SetProperty( "layer", IntProperty::New(10) );
+  segmentationNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(0.5, 1) ) );
+  segmentationNode->SetProperty( "opacity", FloatProperty::New(0.3) );
+  segmentationNode->SetProperty( "segmentation", BoolProperty::New(true) );
+  segmentationNode->SetProperty( "reslice interpolation", VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
+
+  return segmentationNode;
 }
 

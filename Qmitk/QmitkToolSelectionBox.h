@@ -18,9 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkQmitkToolSelectionBox_h_Included
 #define QmitkQmitkToolSelectionBox_h_Included
 
-#include "qbuttongroup.h"
+#include "QmitkToolGUIArea.h"
 
 #include "mitkToolManager.h"
+
+#include <qbuttongroup.h>
+
+#include <map>
+
+class QmitkToolGUI;
 
 /**
   \brief Display the tool selection state of a mitk::ToolManager
@@ -50,18 +56,28 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
   Q_OBJECT
 
   public:
+ 
+    enum EnabledMode { EnabledWithReferenceAndWorkingData, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
     
     QmitkToolSelectionBox(QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkToolSelectionBox();
 
     mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
+    
+    /**
+      You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
+      as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is a match,
+      the tool is displayed. Effectively, you can provide a human readable list like "default, lymphnodevolumetry, oldERISstuff".
+    */
+    void SetDisplayedToolGroups(const std::string& toolGroups = 0);
 
-    void OnToolManagerToolModified(const itk::EventObject&);
-    void OnToolManagerReferenceDataModified(const itk::EventObject&);
-    void OnToolManagerWorkingDataModified(const itk::EventObject&);
+    void OnToolManagerToolModified();
+    void OnToolManagerReferenceDataModified();
+    void OnToolManagerWorkingDataModified();
 
-    void SetAlwaysEnabled(bool alwaysEnabled);
+    void OnToolErrorMessage(std::string s);
+    void OnGeneralToolMessage(std::string s);
 
   signals:
 
@@ -73,6 +89,13 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
   public slots:
 
     virtual void setEnabled( bool );
+    virtual void SetEnabledMode(EnabledMode mode);
+
+    virtual void SetLayoutColumns(int);
+    virtual void SetShowNames(bool);
+    virtual void SetGenerateAccelerators(bool);
+
+    virtual void SetToolGUIArea( QWidget* parentWidget );
   
   protected slots:
 
@@ -82,19 +105,29 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
   protected:
 
     void RecreateButtons();
+    void SetOrUnsetButtonForActiveTool();
 
     mitk::ToolManager::Pointer m_ToolManager;
 
     bool m_SelfCall;
     
-    unsigned long m_ToolSelectedObserverTag;
-    unsigned long m_ToolReferenceDataChangedObserverTag;
-    unsigned long m_ToolWorkingDataChangedObserverTag;
-
     bool m_Enabled;
 
-    bool m_AlwaysEnabledOverride;
-    
+    std::string m_DisplayedGroups;
+
+    /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
+    std::map<int,int> m_ButtonIDForToolID;
+    /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
+    std::map<int,int> m_ToolIDForButtonID;
+
+    int  m_LayoutColumns;
+    bool m_ShowNames;
+    bool m_GenerateAccelerators;
+
+    QWidget* m_ToolGUIWidget;
+    QmitkToolGUI* m_LastToolGUI;
+
+    EnabledMode m_EnabledMode;
 };
 
 #endif

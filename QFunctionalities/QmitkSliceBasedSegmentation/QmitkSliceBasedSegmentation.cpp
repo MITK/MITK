@@ -26,53 +26,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
-#include "QmitkCopyToClipBoardDialog.h"
 
 #include "mitkToolManager.h"
-#include "mitkProgressBar.h"
-#include "mitkAutoCropImageFilter.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkOrganTypeProperty.h"
-#include "mitkImageCast.h"
-#include "mitkShowSegmentationAsSurface.h"
-#include "mitkCalculateSegmentationVolume.h"
 #include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkImageTimeSelector.h"
-
-#include <itkImageRegionIterator.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkMapContainer.h>
 
 #include <qaction.h>
 #include <qapplication.h>
-#include <qcursor.h>
 #include <qmessagebox.h>
-#include <qslider.h>
 #include <qcheckbox.h>
-
-#include <limits>
-
-#define SEGMENTATION_DATATYPE unsigned char
 
 QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it), 
   m_MultiWidget(mitkStdMultiWidget), 
-  m_Controls(NULL),
-  m_NumberOfVolumeCalculationThreads(0)
+  m_Controls(NULL)
 {
   SetAvailability(true);
-
-  m_ThresholdFeedbackNode = mitk::DataTreeNode::New();
-  mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_ThresholdFeedbackNode );
-  m_ThresholdFeedbackNode->SetProperty( "color", mitk::ColorProperty::New(0.2, 1.0, 0.2) );
-  m_ThresholdFeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
-  m_ThresholdFeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
-  m_ThresholdFeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(100, 1) ) );
-  m_ThresholdFeedbackNode->SetProperty( "name", mitk::StringProperty::New("Thresholding feedback") );
-  m_ThresholdFeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.2) );
 }
 
 QmitkSliceBasedSegmentation::~QmitkSliceBasedSegmentation()
@@ -93,8 +66,6 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
   if (m_Controls == NULL)
   {
     m_Controls = new QmitkSliceBasedSegmentationControls(parent); // creates a tool manager
-    m_Controls->btnAcceptThreshold->hide(); // hide initially
-    m_Controls->sliderThreshold->hide();
 
     mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
 
@@ -106,10 +77,42 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
     m_Controls->m_ToolWorkingDataListBox->SetAdditionalColumns("volume:Vol. [ml]");
 
     m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
+    m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
+
+    m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
+    m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);
+    m_Controls->m_AutoSegmentationToolSelectionBox->setFrameStyle( QFrame::NoFrame );
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetToolGUIArea( m_Controls->m_AutoSegmentationToolGUIContainer );
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
+
+    m_Controls->m_PostProcessingToolSelectionBox->setTitle("");
+    m_Controls->m_PostProcessingToolSelectionBox->setInsideMargin(0);
+    m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::NoFrame );
+    m_Controls->m_PostProcessingToolSelectionBox->SetLayoutColumns(1);
+    m_Controls->m_PostProcessingToolSelectionBox->SetToolManager( *toolManager );
+    m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing"); // show only tools which are marked with "segmentationProcessing"
+    m_Controls->m_PostProcessingToolSelectionBox->SetToolGUIArea( m_Controls->m_PostProcessingToolGUIContainer );
 
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
+
+    toolManager->NodePropertiesChanged.AddListener( this, &QmitkSliceBasedSegmentation::OnNodePropertiesChanged );
+    toolManager->NewNodesGenerated.AddListener( this, &QmitkSliceBasedSegmentation::OnNewNodesGenerated );
   }
   return m_Controls;
+}
+    
+void QmitkSliceBasedSegmentation::OnNodePropertiesChanged()
+{
+  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+}
+  
+void QmitkSliceBasedSegmentation::OnNewNodesGenerated()
+{
+  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSliceBasedSegmentation::CreateConnections()
@@ -120,13 +123,6 @@ void QmitkSliceBasedSegmentation::CreateConnections()
     connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
     connect( m_Controls->btnLoadSegmentation, SIGNAL(clicked()), this, SLOT(LoadSegmentation()) );
     connect( m_Controls->btnDeleteSegmentation, SIGNAL(clicked()), this, SLOT(DeleteSegmentation()) );
-    connect( m_Controls->btnAutoCropSegmentation, SIGNAL(clicked()), this, SLOT(AutoCropSegmentation()) );
-    connect( m_Controls->btnCreateSurface, SIGNAL(clicked()), this, SLOT(CreateSurfaceFromSegmentation()) );
-    connect( m_Controls->btnVolumetry, SIGNAL(clicked()), this, SLOT(CalculateVolumeForSegmentation()) );
-    connect( m_Controls->btnGrayValueStatistics, SIGNAL(clicked()), this, SLOT(CalculateStatisticsVolumeForSegmentation()) );
-    connect( m_Controls->btnNewFromThreshold, SIGNAL(toggled(bool)), this, SLOT(InitiateCreateNewSegmentationFromThreshold(bool)) );
-    connect( m_Controls->sliderThreshold, SIGNAL(valueChanged(int)), this, SLOT(CreateNewSegmentationFromThresholdSliderChanged(int)) );
-    connect( m_Controls->btnAcceptThreshold, SIGNAL(clicked()), this, SLOT(CreateNewSegmentationFromThreshold()) );
     connect( m_Controls->btnSaveSegmentation, SIGNAL(clicked()), this, SLOT(SaveSegmentation()) );
     connect( m_Controls->m_ToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
     connect( m_Controls->grpInterpolation, SIGNAL(toggled(bool)), m_Controls->m_SlicesInterpolator, SLOT(EnableInterpolation(bool)) );
@@ -158,6 +154,7 @@ void QmitkSliceBasedSegmentation::Activated()
   m_MultiWidget->SetWidgetPlanesVisibility(false);
 
   m_Controls->m_ToolSelectionBox->setEnabled( true );
+  m_Controls->m_PostProcessingToolSelectionBox->setEnabled( true );
     
   m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( qApp );
 }
@@ -167,6 +164,7 @@ void QmitkSliceBasedSegmentation::Deactivated()
   QmitkFunctionality::Deactivated();
   
   m_Controls->m_ToolSelectionBox->setEnabled( false );
+  m_Controls->m_PostProcessingToolSelectionBox->setEnabled( false );
   
   m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( NULL );
 }
@@ -248,204 +246,6 @@ void QmitkSliceBasedSegmentation::DeleteSegmentation()
   toolManager->SetWorkingData(NULL); // unselect everything
       
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSliceBasedSegmentation::AutoCropSegmentation()
-{
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-  QString problemBaeren;
-
-  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
-  if (!toolManager) 
-  {
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(nodes.size());
-
-  // for all selected nodes: try to crop the image
-  for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
-        nodeiter != nodes.end();
-        ++nodeiter )
-  {
-    mitk::DataTreeNode::Pointer node = *nodeiter;
-
-    if (node.IsNotNull())
-    {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-      if (image.IsNotNull())
-      {
-        if (image->GetDimension() == 4)
-        {
-          QMessageBox::information(NULL, "MITK", QString("Cropping 3D+t segmentations is not implemented. Sorry. Bug #1281"), QMessageBox::Ok);
-          continue;
-        }
-
-        mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
-        cropFilter->SetInput( image );
-        cropFilter->SetBackgroundValue( 0 );
-        try
-        {
-          cropFilter->Update();
-
-          image = cropFilter->GetOutput();
-          if (image.IsNotNull())
-          {
-            node->SetData( image );
-          }
-          else
-          {
-            std::string nodeName;
-            problemBaeren += " ";
-            if ( node->GetName( nodeName ) )
-            {
-              problemBaeren += nodeName.c_str();
-            }
-            else
-            {
-              problemBaeren += "(no name)";
-            }
-          }
-        }
-        catch(...)
-        {
-          std::string nodeName;
-          problemBaeren += " ";
-          if ( node->GetName( nodeName ) )
-          {
-            problemBaeren += nodeName.c_str();
-          }
-          else
-          {
-            problemBaeren += "(no name)";
-          }
-        }
-      }
-    }
-    
-    mitk::ProgressBar::GetInstance()->Progress();
-  }
-
-  // report possible errors
-  if (!problemBaeren.isEmpty())
-  {
-#ifndef BUILD_TESTING
-    QMessageBox::information(NULL, "MITK", QString("Could not crop these images:\n") + problemBaeren, QMessageBox::Ok);
-#endif
-  }
-
-  QApplication::restoreOverrideCursor();
-}
-    
-void QmitkSliceBasedSegmentation::CreateSurfaceFromSegmentation()
-{
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
-  if (!toolManager) 
-  {
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(nodes.size()+2);
-  mitk::ProgressBar::GetInstance()->Progress(2);
-
-  // for all selected nodes: try to crop the image
-  for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
-        nodeiter != nodes.end();
-        ++nodeiter )
-  {
-    mitk::DataTreeNode::Pointer node = *nodeiter;
-
-    if (node.IsNotNull())
-    {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-      if (image.IsNotNull())
-      {
-        // create threaded surface algorithm object
-        mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
-
-        // attach observer to get notified about result
-        itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
-        goodCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
-        /* tag = */ surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
-        itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer badCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
-        badCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnSurfaceCalculationDone);
-        /* tag = */ surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
-
-        surfaceFilter->SetPointerParameter("Input", image);
-        surfaceFilter->SetPointerParameter("Group node", node);
-        surfaceFilter->SetParameter("Show result", true );
-        surfaceFilter->SetParameter("Sync visibility", false );
-        
-        surfaceFilter->StartAlgorithm(); // starts thread
-      }
-    }
-  }
-   
-  QApplication::restoreOverrideCursor();
-}
-
-void QmitkSliceBasedSegmentation::CalculateVolumeForSegmentation()
-{
-  QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-
-  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
-  if (!toolManager) 
-  {
-    QApplication::restoreOverrideCursor();
-    return;
-  }
-
-  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-
-  // for all selected nodes: try to crop the image
-  for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
-        nodeiter != nodes.end();
-        ++nodeiter )
-  {
-    mitk::DataTreeNode::Pointer node = *nodeiter;
-
-    if (node.IsNotNull())
-    {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-      if (image.IsNotNull())
-      {
-        if (image->GetDimension() == 4)
-        {
-          QMessageBox::information(NULL, "MITK", QString("Volumetry for 3D+t data is not implemented. Sorry. Bug #1280"), QMessageBox::Ok);
-          continue;
-        }
-
-        mitk::CalculateSegmentationVolume::Pointer volumeFilter = mitk::CalculateSegmentationVolume::New();
-
-        // attach observer to get notified about result
-        itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSliceBasedSegmentation>::New();
-        goodCommand->SetCallbackFunction(this, &QmitkSliceBasedSegmentation::OnVolumeCalculationDone);
-        /* tag = */ volumeFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
-
-        volumeFilter->SetPointerParameter("Input", image);
-        volumeFilter->SetPointerParameter("Group node", node);
-
-        if ( m_Controls->btnVolumetry->isEnabled() )
-        {
-          m_Controls->btnVolumetry->setTextLabel("Calculating...");
-          m_Controls->btnVolumetry->setEnabled(false);
-        }
-
-
-        ++m_NumberOfVolumeCalculationThreads;
-        volumeFilter->StartAlgorithm();
-      }
-    }
-  }
-    
-  QApplication::restoreOverrideCursor();
 }
 
 void QmitkSliceBasedSegmentation::LoadSegmentation()
@@ -562,18 +362,19 @@ void QmitkSliceBasedSegmentation::SaveSegmentation()
   }
 }
 
+/** TODO bug #1342: should be more central, clearly not in functionality **/
 mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateEmptySegmentationNode( mitk::Image* image, const std::string& organType, const std::string name )
 {
   // we NEED a reference image for size etc.
   if (!image) return NULL;
 
   // actually create a new empty segmentation
-  mitk::PixelType pixelType( typeid(SEGMENTATION_DATATYPE) );
+  mitk::PixelType pixelType( typeid(mitk::Tool::DefaultSegmentationDataType) );
   mitk::Image::Pointer segmentation = mitk::Image::New();
   segmentation->SetProperty( "organ type", mitk::OrganTypeProperty::New( organType ) );
   segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
 
-  unsigned int byteSize = sizeof(SEGMENTATION_DATATYPE);
+  unsigned int byteSize = sizeof(mitk::Tool::DefaultSegmentationDataType);
   for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
   {
     byteSize *= segmentation->GetDimension(dim);
@@ -595,6 +396,7 @@ mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateEmptySegmentation
   return CreateSegmentationNode( segmentation, name, organType );
 }
 
+/** TODO bug #1342: should be more central, clearly not in functionality **/
 mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode( mitk::Image* image, const std::string& name, const std::string& organType )
 {
   if (!image) return NULL;
@@ -640,156 +442,6 @@ void QmitkSliceBasedSegmentation::OnToolSelected(int id)
   }
 }
 
-void QmitkSliceBasedSegmentation::InitiateCreateNewSegmentationFromThreshold(bool toggled)
-{
-  m_Controls->btnAcceptThreshold->setShown(toggled);
-  m_Controls->sliderThreshold->setShown(toggled);
-
-  if (toggled) // initiate thresholding
-  {
-    bool everythingFine(false);
-    m_NodeForThresholding = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-    if (m_NodeForThresholding.IsNotNull())
-    {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
-      if (image.IsNotNull())
-      {
-        // initialize and a new node with the same image as our reference image
-        // use the level window property of this image copy to display the result of a thresholding operation
-        m_ThresholdFeedbackNode->SetData( image );
-        int layer(0);
-        m_NodeForThresholding->GetIntProperty("layer", layer);
-        m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
-         
-        mitk::DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, m_NodeForThresholding );
- 
-        m_Controls->sliderThreshold->setMinValue( static_cast<int>( image->GetScalarValueMin() ) );
-        m_Controls->sliderThreshold->setMaxValue( static_cast<int>( image->GetScalarValueMax() ) );
-  
-        mitk::LevelWindowProperty::Pointer lwp = dynamic_cast<mitk::LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
-        if (lwp)
-        {
-          m_Controls->sliderThreshold->setValue( static_cast<int>( lwp->GetLevelWindow().GetLevel() ) );
-        }
-        else
-        {
-          m_Controls->sliderThreshold->setValue( (m_Controls->sliderThreshold->maxValue() + m_Controls->sliderThreshold->minValue()) / 2 );
-        }
-
-        everythingFine = true;
-      }
-    }
-
-    if (!everythingFine)
-    {
-      m_Controls->btnNewFromThreshold->setOn(false);
-    }
-  }
-  else
-  {
-    mitk::DataStorage::GetInstance()->Remove( m_ThresholdFeedbackNode );
-    m_ThresholdFeedbackNode->SetData( NULL );
-  }
-        
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThreshold()
-{
-  m_Controls->btnNewFromThreshold->setOn(false);
-
-  // only proceed if we still have a reference data object (otherwise the user quite messed up)
-  if (m_NodeForThresholding.IsNotNull())
-  {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeForThresholding->GetData() );
-    if (image.IsNotNull())
-    {
-      // ask about the name and organ type of the new segmentation
-      QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
-      dialog.setPrompt("What did you just segment?");
-      int dialogReturnValue = dialog.exec();
-
-      if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
-      {
-        // ask the user about an organ type and name, add this information to the image's (!) propertylist
-        // create a new image of the same dimensions and smallest possible pixel type
-        mitk::DataTreeNode::Pointer emptySegmentation = CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
-
-        if (emptySegmentation)
-        {
-          // actually perform a thresholding and ask for an organ type
-          for (unsigned int timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
-          {
-            mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-            timeSelector->SetInput( image );
-            timeSelector->SetTimeNr( timeStep );
-            timeSelector->UpdateLargestPossibleRegion();
-            mitk::Image::Pointer image3D = timeSelector->GetOutput();
-
-            AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentation->GetData()), timeStep );
-          }
-
-          mitk::DataStorage::GetInstance()->Add( emptySegmentation, m_NodeForThresholding ); // add as a child, because the segmentation "derives" from the original
-
-          m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
-          m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetReferenceData( m_NodeForThresholding );
-        }
-      }
-    }
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  m_NodeForThresholding = NULL;
-}
-
-void QmitkSliceBasedSegmentation::CreateNewSegmentationFromThresholdSliderChanged(int threshold)
-{
-  m_ThresholdFeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(threshold, 1) ) );
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void QmitkSliceBasedSegmentation::ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep )
-{
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput( segmentation );
-  timeSelector->SetTimeNr( timeStep );
-  timeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer segmentation3D = timeSelector->GetOutput();
-
-  typedef itk::Image<SEGMENTATION_DATATYPE, 3> SegmentationType; // this is sure for new segmentations
-  SegmentationType::Pointer itkSegmentation;
-  mitk::CastToItkImage( segmentation3D, itkSegmentation );
-
-  // iterate over original and segmentation
-  typedef itk::ImageRegionConstIterator< itk::Image<TPixel, VImageDimension> >     InputIteratorType;
-  typedef itk::ImageRegionIterator< SegmentationType >     SegmentationIteratorType;
-
-  InputIteratorType inputIterator( originalImage, originalImage->GetLargestPossibleRegion() );
-  SegmentationIteratorType outputIterator( itkSegmentation, itkSegmentation->GetLargestPossibleRegion() );
-
-  inputIterator.GoToBegin();
-  outputIterator.GoToBegin();
-
-  int threshold = m_Controls->sliderThreshold->value();
-
-  while (!outputIterator.IsAtEnd())
-  {
-    if ( (signed)inputIterator.Get() >= threshold )
-    {
-      outputIterator.Set( 1 );
-    }
-    else
-    {
-      outputIterator.Set( 0 );
-    }
-
-    ++inputIterator;
-    ++outputIterator;
-  }
-
-}
-
 void QmitkSliceBasedSegmentation::ReinitializeToImage()
 {
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
@@ -831,236 +483,4 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
     }
  }
 }
-
-void QmitkSliceBasedSegmentation::OnSurfaceCalculationDone()
-{
-  mitk::ProgressBar::GetInstance()->Progress();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}        
-
-void QmitkSliceBasedSegmentation::OnVolumeCalculationDone()
-{
-  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  --m_NumberOfVolumeCalculationThreads;
-
-  if (m_NumberOfVolumeCalculationThreads == 0)
-  {
-    m_Controls->btnVolumetry->setTextLabel("Volumetry");
-    m_Controls->btnVolumetry->setEnabled(true);
-  }
-}
-
-void QmitkSliceBasedSegmentation::CalculateStatisticsVolumeForSegmentation()
-{
-  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
-  if (!toolManager) return;
-
-  mitk::DataTreeNode* referencenode = toolManager->GetReferenceData(0);
-  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
-
-  QString completeReport;
-
-  // for all selected nodes: try to crop the image
-  for ( mitk::ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
-        nodeiter != nodes.end();
-        ++nodeiter )
-  {
-    mitk::DataTreeNode::Pointer node = *nodeiter;
-    if (!node) continue;
-
-    std::string nodename("structure");
-    node->GetName(nodename);
-
-    if (node.IsNotNull())
-    {
-      mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( referencenode->GetData() );
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-            
-      completeReport += QString("============= Gray value analysis of %1 ==================\n").arg(nodename.c_str());
-        
-      if (image.IsNotNull() && refImage.IsNotNull() )
-      {
-        for (unsigned int timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
-        {
-          mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-          timeSelector->SetInput( refImage );
-          timeSelector->SetTimeNr( timeStep );
-          timeSelector->UpdateLargestPossibleRegion();
-          mitk::Image::Pointer refImage3D = timeSelector->GetOutput();
-
-          mitk::ImageTimeSelector::Pointer timeSelector2 = mitk::ImageTimeSelector::New();
-          timeSelector2->SetInput( image );
-          timeSelector2->SetTimeNr( timeStep );
-          timeSelector2->UpdateLargestPossibleRegion();
-          mitk::Image::Pointer image3D = timeSelector2->GetOutput();
-
-
-          if (image3D.IsNotNull() && refImage3D.IsNotNull() )
-          {
-            completeReport += QString("=== %1, time step %2 ===\n").arg(nodename.c_str()).arg(timeStep);
-            AccessFixedDimensionByItk_2( refImage3D, ITKHistogramming, 3, image3D, completeReport );
-          }
-        }
-      }
-            
-      completeReport += QString("============= End of analysis for %1 =====================\n\n\n").arg(nodename.c_str());
-    }
-  }
-
-  if(completeReport.isEmpty() == false)
-  {
-    std::cout << completeReport.ascii() << std::endl;
-
-    QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog(completeReport, NULL);
-    dialog->show();
-  }
-
-  // TODO (bug #874): remove these 5 buttons for segmentation operations. find some good interface for them and make them use less GUI space 
-}
-
-#define ROUND_P(x) ((int)((x)+0.5))
-    
-template <typename TPixel, unsigned int VImageDimension>
-void QmitkSliceBasedSegmentation::ITKHistogramming( itk::Image<TPixel, VImageDimension>* referenceImage, mitk::Image* segmentation, QString& report )
-{
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<SEGMENTATION_DATATYPE, VImageDimension> SegmentationType;
-
-  typename SegmentationType::Pointer segmentationItk;
-  mitk::CastToItkImage( segmentation, segmentationItk );
-  
-  // generate histogram
-
-  typename SegmentationType::RegionType segmentationRegion = segmentationItk->GetLargestPossibleRegion();
-
-  segmentationRegion.Crop( referenceImage->GetLargestPossibleRegion() );
-    
-  itk::ImageRegionConstIteratorWithIndex< SegmentationType > segmentationIterator( segmentationItk, segmentationRegion);
-  itk::ImageRegionConstIteratorWithIndex< ImageType >        referenceIterator( referenceImage, segmentationRegion);
-
-  segmentationIterator.GoToBegin();
-  referenceIterator.GoToBegin();
-    
-  typedef itk::MapContainer<TPixel, long int> HistogramType;
-  TPixel minimum = std::numeric_limits<TPixel>::max();
-  TPixel maximum = std::numeric_limits<TPixel>::min();
-  HistogramType histogram;
-    
-  double mean(0.0);
-  double sd(0.0);
-  double voxelCount(0.0);
-
-  // first pass for mean, min, max, histogram values
-  while ( !segmentationIterator.IsAtEnd() )
-  {
-    itk::Point< float, 3 > pt;
-    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
-
-    typename ImageType::IndexType ind;
-    itk::ContinuousIndex<float, 3> contInd;
-    if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
-    {
-      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
-      
-      referenceIterator.SetIndex( ind );
-
-      if ( segmentationIterator.Get() > 0 )
-      {
-        ++histogram[referenceIterator.Get()];
-        if (referenceIterator.Get() < minimum) minimum = referenceIterator.Get();
-        if (referenceIterator.Get() > maximum) maximum = referenceIterator.Get();
-      
-        mean =   (mean * ( static_cast<double>(voxelCount) / static_cast<double>(voxelCount+1) ) )  // 3 points:   old center * 2/3 + currentPoint * 1/3;
-           + static_cast<double>(referenceIterator.Get() ) / static_cast<double>(voxelCount+1);
-
-        voxelCount += 1.0;
-      }
-    }
-
-    ++segmentationIterator;
-  }
-
-  // second pass for SD
-  segmentationIterator.GoToBegin();
-  referenceIterator.GoToBegin();
-  while ( !segmentationIterator.IsAtEnd() )
-  {
-    itk::Point< float, 3 > pt;
-    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
-
-    typename ImageType::IndexType ind;
-    itk::ContinuousIndex<float, 3> contInd;
-    if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
-    {
-      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
-      
-      referenceIterator.SetIndex( ind );
-
-      if ( segmentationIterator.Get() > 0 )
-      {
-        sd += ((static_cast<double>(referenceIterator.Get() ) - mean)*(static_cast<double>(referenceIterator.Get() ) - mean));
-      }
-    }
-
-    ++segmentationIterator;
-  }
-
-  sd /= static_cast<double>(voxelCount - 1);
-  sd = sqrt( sd );
-
-  // evaluate histogram, generate quantiles
-
-  long int totalCount(0);
-
-  for ( typename HistogramType::iterator iter = histogram.begin();
-        iter != histogram.end();
-        ++iter )
-  {
-    totalCount += iter->second;
-  }
-
-  TPixel histogramQuantileValues[102];
-
-  double quantiles[102];
-  for (unsigned int i = 0; i < 102; ++i) quantiles[i] = static_cast<double>(i) / 100.0; quantiles[102-1] = 2.0;
-
-  for (unsigned int i = 0; i < 102; ++i) histogramQuantileValues[i] = 0;
-
-  int currentQuantile(0);
-
-  double relativeCurrentCount(0.0);
-
-  for ( typename HistogramType::iterator iter = histogram.begin();
-        iter != histogram.end();
-        ++iter )
-  {
-    TPixel grayvalue = iter->first;
-    long int count = iter->second;
-
-    double relativeCount = static_cast<double>(count) / static_cast<double>(totalCount);
-
-    relativeCurrentCount += relativeCount;
-
-    while ( relativeCurrentCount >= quantiles[currentQuantile] )
-    {
-      histogramQuantileValues[currentQuantile] = grayvalue;
-      ++currentQuantile;
-    }
-  }
-
-  // report histogram values
-  
-  report += QString("      Minimum: %1\n  5% quantile: %2\n 25% quantile: %3\n 50% quantile: %4\n 75% quantile: %5\n 95% quantile: %6\n      Maximum: %7\n          Mean:%8\n            SD:%9\n")
-               .arg(minimum)
-               .arg(histogramQuantileValues[5])
-               .arg(histogramQuantileValues[25])
-               .arg(histogramQuantileValues[50])
-               .arg(histogramQuantileValues[75])
-               .arg(histogramQuantileValues[95])
-               .arg(maximum)
-               .arg(mean)
-               .arg(sd);
-}
-
 

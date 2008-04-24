@@ -17,9 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkStatusBar.h"
-#include <qstatusbar.h>
-#include <mitkStatusBar.h>
+
 #include <qmainwindow.h>
+#include <qstatusbar.h>
+#include <qapplication.h>
+
+#include <mitkStatusBar.h>
+
 #include <itkObjectFactory.h>
 
 
@@ -30,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkStatusBar::DisplayText(const char* t)
 {
   m_StatusBar->message(t);
+  // TODO bug #1357
+  //qApp->processEvents(); // produces crashes!
 }
 
 /**
@@ -38,6 +44,8 @@ void QmitkStatusBar::DisplayText(const char* t)
 void QmitkStatusBar::DisplayText(const char* t, int ms)
 {
   m_StatusBar->message(t, ms);
+  // TODO bug #1357
+  //qApp->processEvents(); // produces crashes!
 }
 
 /**
@@ -47,6 +55,8 @@ void QmitkStatusBar::Clear()
 {
   if (m_StatusBar != NULL)
     m_StatusBar->clear();
+  // TODO bug #1357
+  //qApp->processEvents(); // produces crashes!
 }
 
 /**
@@ -69,3 +79,4 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 QmitkStatusBar::~QmitkStatusBar()
 {
 }
+

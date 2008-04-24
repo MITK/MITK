@@ -29,11 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-itkEventMacro( ToolManagerEvent, itk::AnyEvent );
-itkEventMacro( ToolSelectedEvent, ToolManagerEvent );
-itkEventMacro( ToolReferenceDataChangedEvent, ToolManagerEvent );
-itkEventMacro( ToolWorkingDataChangedEvent, ToolManagerEvent );
-
 class Image;
 class PlaneGeometry;
 
@@ -72,7 +67,7 @@ class PlaneGeometry;
       In "normal" settings, the functionality does not need to care about that if it uses a QmitkToolSelectionBox, which does exactly that when it is 
       enabled/disabled.
 
-  \li There is a set of events that are sent by ToolManager. At the moment these are:
+  \li There is a set of events that are sent by ToolManager. At the moment these are TODO update documentation:
       - mitk::ToolReferenceDataChangedEvent whenever somebody calls SetReferenceData. Most of the time this actually means that the data has changed, but
         there might be cases where the same data is passed to SetReferenceData a second time, so don't rely on the assumption that something actually changed.
       - mitk::ToolSelectedEvent is sent when a (truly) different tool was activated. In reaction to this event you can ask for the active Tool using
@@ -92,10 +87,19 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
     typedef std::vector<Tool::ConstPointer>    ToolVectorTypeConst;
     typedef std::vector<DataTreeNode*> DataVectorType; // has to be observed for delete events!
     typedef std::map<DataTreeNode*, unsigned long> NodeTagMapType;
+
+    Message NodePropertiesChanged;
+    Message NewNodesGenerated;
+
+    Message ActiveToolChanged;
+    Message ReferenceDataChanged;
+    Message WorkingDataChanged;
+
+    Message1<std::string> ToolErrorMessage;
+    Message1<std::string> GeneralToolMessage;
     
     mitkClassMacro(ToolManager, itk::Object);
     itkNewMacro(ToolManager);
-    mitkNewMacro1Param(ToolManager, const char*);
 
     /**
       \brief Gives you a list of all tools. 
@@ -189,6 +193,14 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
     void OnOneOfTheWorkingDataDeletedConst(const itk::Object* caller, const itk::EventObject& e);
     void OnOneOfTheWorkingDataDeleted           (itk::Object* caller, const itk::EventObject& e);
 
+    /*
+     \brief Connected to tool's messages
+
+     This method just resends error messages coming from any of the tools. This way clients (GUIs) only have to observe one message.
+     */
+    void OnToolErrorMessage(std::string s);
+    void OnGeneralToolMessage(std::string s);
+
   protected:
 
     /**
@@ -196,7 +208,7 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
       as a string. This constructor will try to find the tool's group inside the supplied string \param groups. If there is a match,
       the tool is accepted. Effectively, you can provide a human readable list like "default, lymphnodevolumetry, oldERISstuff".
     */
-    ToolManager(const char* groups = "default"); // purposely hidden
+    ToolManager(); // purposely hidden
     virtual ~ToolManager();
 
     ToolVectorType m_Tools;
@@ -216,5 +228,4 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
 } // namespace
 
 #endif
-
 

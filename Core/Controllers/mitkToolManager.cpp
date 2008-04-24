@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 
-mitk::ToolManager::ToolManager(const char* groups)
+mitk::ToolManager::ToolManager()
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
  m_RegisteredClients(0)
@@ -34,12 +34,6 @@ mitk::ToolManager::ToolManager(const char* groups)
   // get a list of all known mitk::Tools
   std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 
-  std::string allowedGroups;
-  if (groups != NULL)
-  {
-    allowedGroups = groups;
-  }
-
   // remember these tools
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
         iter != thingsThatClaimToBeATool.end();
@@ -48,12 +42,9 @@ mitk::ToolManager::ToolManager(const char* groups)
     if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
     {
       tool->SetToolManager(this); // important to call right after instantiation
-      if ( (groups == NULL) || ( allowedGroups.find( tool->GetGroup() ) != std::string::npos ) ||
-                               ( allowedGroups.find( tool->GetName() ) != std::string::npos ) 
-                               )
-      {
-        m_Tools.push_back( tool );
-      }
+      tool->ErrorMessage.AddListener(   this, &ToolManager::OnToolErrorMessage );
+      tool->GeneralMessage.AddListener( this, &ToolManager::OnGeneralToolMessage );
+      m_Tools.push_back( tool );
     }
   }
 
@@ -63,6 +54,17 @@ mitk::ToolManager::ToolManager(const char* groups)
 mitk::ToolManager::~ToolManager()
 {
 }
+
+void mitk::ToolManager::OnToolErrorMessage(std::string s)
+{
+  this->ToolErrorMessage(s);
+}
+
+void mitk::ToolManager::OnGeneralToolMessage(std::string s)
+{
+  this->GeneralToolMessage(s);
+}
+
 
 const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
 {
@@ -92,28 +94,46 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
 
 bool mitk::ToolManager::ActivateTool(int id)
 {
+  //std::cout << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
-  if (m_ActiveTool)
+  static int nextTool = -1;
+  nextTool = id;
+  //std::cout << "ToolManager::ActivateTool("<<id<<"): nextTool = "<<nextTool<<std::endl;
+
+  static bool inActivateTool = false;
+  if (inActivateTool) 
   {
-    m_ActiveTool->Deactivated();
-    mitk::GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+    //std::cout << "ToolManager::ActivateTool("<<id<<"): already inside ActivateTool somehow, returning now "<<std::endl;
+    return true;
   }
-
-  m_ActiveTool = GetToolById( id );
-  m_ActiveToolID = m_ActiveTool ? id : -1; // current ID if tool is valid, otherwise -1
-
-  if (m_ActiveTool)
+  inActivateTool = true;
+ 
+  while ( nextTool != m_ActiveToolID )
   {
-    if (m_RegisteredClients)
+    //std::cout <<"ToolManager::ActivateTool: nextTool = " << nextTool << " (active tool = " << m_ActiveToolID<<")"<<std::endl;
+    if (m_ActiveTool)
     {
-      m_ActiveTool->Activated();
-      mitk::GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+      m_ActiveTool->Deactivated();
+      mitk::GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+    }
+
+    m_ActiveTool = GetToolById( nextTool );
+    m_ActiveToolID = m_ActiveTool ? nextTool : -1; // current ID if tool is valid, otherwise -1
+
+    ActiveToolChanged.Send();
+
+    if (m_ActiveTool)
+    {
+      if (m_RegisteredClients)
+      {
+        m_ActiveTool->Activated();
+        mitk::GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+      }
     }
   }
 
-  InvokeEvent( ToolSelectedEvent() );
-
+  inActivateTool = false;
   return (m_ActiveTool != NULL);
 }
 
@@ -146,7 +166,7 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
       m_ReferenceDataObserverTags.insert( std::pair<DataTreeNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
     }
 
-    InvokeEvent( ToolReferenceDataChangedEvent() );
+    ReferenceDataChanged.Send();
   }
 }
 
@@ -214,7 +234,7 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
       m_WorkingDataObserverTags.insert( std::pair<DataTreeNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
     }
 
-    InvokeEvent( ToolWorkingDataChangedEvent() );
+    WorkingDataChanged.Send();
   }
 }
 
@@ -329,5 +349,4 @@ void mitk::ToolManager::UnregisterClient()
     }
   }
 }
-
 

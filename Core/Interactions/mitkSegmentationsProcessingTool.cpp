@@ -86,7 +86,7 @@ void mitk::SegmentationsProcessingTool::StartProcessingAllData()
 {
 }
 
-bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData( DataTreeNode* node )
+bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData( DataTreeNode* )
 {
   return true;
 }

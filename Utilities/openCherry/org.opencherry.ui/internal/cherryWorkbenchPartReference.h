@@ -307,10 +307,6 @@ public: void Dispose();
    */
 //private: void clearListenerList(const ListenerList list);
 
-    /**
-     * 
-     */
-protected: virtual void DoDisposePart();
 
 public: virtual void SetPinned(bool newPinned);
     
@@ -319,7 +315,7 @@ public: virtual bool IsPinned();
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
      */
-public: virtual std::string GetPartProperty(const std::string& key);
+//public: virtual std::string GetPartProperty(const std::string& key);
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartReference#addPartPropertyListener(org.eclipse.jface.util.IPropertyChangeListener)

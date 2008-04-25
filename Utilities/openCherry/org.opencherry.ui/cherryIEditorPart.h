@@ -67,7 +67,6 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
 { //, ISaveablePart {
 
   cherryClassMacro(IEditorPart)
-  ;
 
   virtual ~IEditorPart()
   {
@@ -133,7 +132,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    *   saving, and <code>false</code> if they have not changed since the last
    *   save
    */
-  virtual bool IsDirty();
+  virtual bool IsDirty() = 0;
 
   /**
    * Returns whether the "Save As" operation is supported by this part.
@@ -141,7 +140,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    * @return <code>true</code> if "Save As" is supported, and <code>false</code>
    *  if not supported
    */
-  virtual bool IsSaveAsAllowed();
+  virtual bool IsSaveAsAllowed() = 0;
 
   /**
    * Returns whether the contents of this part should be saved when the part
@@ -150,7 +149,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    * @return <code>true</code> if the contents of the part should be saved on
    *   close, and <code>false</code> if the contents are expendable
    */
-  virtual bool IsSaveOnCloseNeeded();
+  virtual bool IsSaveOnCloseNeeded() = 0;
 
   /**
    * Returns the input for this editor.  If this value changes the part must 

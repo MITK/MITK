@@ -43,7 +43,7 @@ class CodeCache;
  * Intentionally no CHERRY_OSGI macro. This class belongs into "internal" but
  * needs to stay here.
  */
-class BundleLoader
+class CHERRY_OSGI BundleLoader
 {
 
 private:

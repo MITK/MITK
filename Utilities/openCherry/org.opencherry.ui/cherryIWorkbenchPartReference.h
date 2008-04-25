@@ -61,7 +61,7 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
     /**
      * @see IWorkbenchPartSite#getId
      */
-    virtual std::string GetId();
+    virtual std::string GetId() = 0;
 
     /**
      * @see IWorkbenchPart#addPropertyListener

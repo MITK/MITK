@@ -40,7 +40,7 @@ class CodeCache;
 class BundleLoader;
 class PlatformLogChannel;
 
-class InternalPlatform
+class CHERRY_OSGI InternalPlatform
 {
 private:
   

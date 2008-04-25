@@ -72,7 +72,7 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
 void ViewReference::DoDisposePart()
 {
   IViewPart::Pointer view = part.Cast<IViewPart>();
-  WorkbenchPartReference::DoDisposePart();
+  //WorkbenchPartReference::DoDisposePart();
   if (!view.IsNull())
   {
     // Free action bars, pane, etc.

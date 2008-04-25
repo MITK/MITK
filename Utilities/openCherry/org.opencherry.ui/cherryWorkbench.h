@@ -48,7 +48,7 @@ public:
   void ShowPerspective(const std::string& perspectiveId);
   
 
-  virtual IDialog::Pointer CreateDialog(const std::string& id) = 0;
+  virtual IDialog::Pointer CreateStandardDialog(const std::string& id) = 0;
   
   virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName, Poco::Exception exc) = 0;
   

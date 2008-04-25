@@ -78,7 +78,7 @@ namespace cherry {
  * @see IAdaptable
  * @see IAdapterFactory
  */
-struct CHERRY_RUNTIME IAdapterManager : public Object {
+struct IAdapterManager : public Object {
 
   cherryClassMacro(IAdapterManager)
   
@@ -87,20 +87,20 @@ struct CHERRY_RUNTIME IAdapterManager : public Object {
    * was found. 
    * @since org.eclipse.equinox.common 3.3
    */
-  static const int NONE;
+  static CHERRY_RUNTIME const int NONE;
 
   /**
    * This value can be returned to indicate that an adapter factory was found, 
    * but has not been loaded.
    * @since org.eclipse.equinox.common 3.3
    */
-  static const int NOT_LOADED;
+  static CHERRY_RUNTIME const int NOT_LOADED;
 
   /**
    * This value can be returned to indicate that an adapter factory is loaded.
    * @since org.eclipse.equinox.common 3.3
    */
-  static const int LOADED;
+  static CHERRY_RUNTIME const int LOADED;
 
   /**
    * Returns the types that can be obtained by converting <code>adaptableClass</code> 

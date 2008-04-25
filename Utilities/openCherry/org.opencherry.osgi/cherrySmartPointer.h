@@ -35,7 +35,7 @@ namespace cherry {
  *
  */
 template <class TObjectType>
-class CHERRY_OSGI SmartPointer 
+class SmartPointer 
 {
 public:
   typedef TObjectType ObjectType;

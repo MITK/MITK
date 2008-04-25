@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_RUNTIME ExpressionVariable : public Object
+struct ExpressionVariable : public Object
 {
   cherryClassMacro(ExpressionVariable)
   

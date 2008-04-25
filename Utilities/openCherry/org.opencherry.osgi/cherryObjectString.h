@@ -22,15 +22,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
+#ifdef org_opencherry_osgi_EXPORTS
+  #define EXPORT_TEMPLATE
+#else
+  #define EXPORT_TEMPLATE extern
+#endif
+
 namespace cherry {
 
-class CHERRY_OSGI ObjectString : public std::string, public Object
+//EXPORT_TEMPLATE template class CHERRY_OSGI std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
+
+class ObjectString : std::string, public Object
 {
 public:
   cherryClassMacro(ObjectString);
   
   ObjectString() {}
   ObjectString(const std::string& s) : std::string(s) {}
+
+  ~ObjectString() {}
 };
 
 }

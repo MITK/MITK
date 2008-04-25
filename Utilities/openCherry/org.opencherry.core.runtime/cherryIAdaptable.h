@@ -46,7 +46,7 @@ namespace cherry {
  * @see IAdapterManager
  * @see PlatformObject
  */
-struct CHERRY_RUNTIME IAdaptable {
+struct IAdaptable {
   /**
    * Returns an object which is an instance of the given class
    * associated with this object. Returns <code>null</code> if

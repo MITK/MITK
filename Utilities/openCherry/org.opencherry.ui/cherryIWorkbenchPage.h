@@ -207,7 +207,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @param part
    *            the part to activate
    */
-  virtual void Activate(IWorkbenchPart::Pointer part);
+  virtual void Activate(IWorkbenchPart::Pointer part) = 0;
 
   /**
    * Adds a property change listener.
@@ -226,7 +226,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @param part
    *            the part to bring forward
    */
-  virtual void BringToTop(IWorkbenchPart::Pointer part);
+  virtual void BringToTop(IWorkbenchPart::Pointer part) = 0;
 
   /**
    * Closes this workbench page. If this page is the active one, this honor is
@@ -239,7 +239,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return <code>true</code> if the page was successfully closed, and
    *         <code>false</code> if it is still open
    */
-  virtual bool Close();
+  virtual bool Close() = 0;
 
   /**
    * Closes all of the editors belonging to this workbench page.
@@ -254,7 +254,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return <code>true</code> if all editors were successfully closed, and
    *         <code>false</code> if at least one is still open
    */
-  virtual bool CloseAllEditors(bool save);
+  virtual bool CloseAllEditors(bool save) = 0;
 
   /**
    * Closes the given <code>Array</code> of editor references. The editors
@@ -275,7 +275,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *         <code>false</code> if the editors are still open
    * @since 3.0
    */
-  virtual bool CloseEditors(const std::vector<IEditorReference::Pointer>& editorRefs, bool save);
+  virtual bool CloseEditors(const std::vector<IEditorReference::Pointer>& editorRefs, bool save) = 0;
 
   /**
    * Closes the given editor. The editor must belong to this workbench page.
@@ -293,7 +293,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return <code>true</code> if the editor was successfully closed, and
    *         <code>false</code> if the editor is still open
    */
-  virtual bool CloseEditor(IEditorPart::Pointer editor, bool save);
+  virtual bool CloseEditor(IEditorPart::Pointer editor, bool save) = 0;
 
   /**
    * Returns the view in this page with the specified id. There is at most one
@@ -303,7 +303,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            the id of the view extension to use
    * @return the view, or <code>null</code> if none is found
    */
-  virtual IViewPart::Pointer FindView(const std::string& viewId);
+  virtual IViewPart::Pointer FindView(const std::string& viewId) = 0;
 
   /**
    * Returns the view reference with the specified id.
@@ -313,7 +313,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return the view reference, or <code>null</code> if none is found
    * @since 3.0
    */
-  virtual IViewReference::Pointer FindViewReference(const std::string& viewId);
+  virtual IViewReference::Pointer FindViewReference(const std::string& viewId) = 0;
 
   /**
    * Returns the view reference with the specified id and secondary id.
@@ -326,7 +326,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return the view reference, or <code>null</code> if none is found
    * @since 3.0
    */
-  virtual IViewReference::Pointer FindViewReference(const std::string& viewId, const std::string& secondaryId);
+  virtual IViewReference::Pointer FindViewReference(const std::string& viewId, const std::string& secondaryId) = 0;
 
   /**
    * Returns the active editor open in this page.
@@ -337,7 +337,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @return the active editor, or <code>null</code> if no editor is active
    */
-  virtual IEditorPart::Pointer GetActiveEditor();
+  virtual IEditorPart::Pointer GetActiveEditor() = 0;
 
   /**
    * Returns the editor with the specified input. Returns null if there is no
@@ -347,7 +347,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            the editor input
    * @return an editor with input equals to <code>input</code>
    */
-  virtual IEditorPart::Pointer FindEditor(IEditorInput::Pointer input);
+  virtual IEditorPart::Pointer FindEditor(IEditorInput::Pointer input) = 0;
 
   /**
    * Returns an array of editor references that match the given input and/or
@@ -371,7 +371,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @since 3.2
    */
   virtual std::vector<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const std::string& editorId,
-      int matchFlags);
+      int matchFlags) = 0;
 
   /**
    * Returns a list of the editors open in this page.
@@ -384,7 +384,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @deprecated use #getEditorReferences() instead
    */
-  virtual std::vector<IEditorPart::Pointer> GetEditors();
+  virtual std::vector<IEditorPart::Pointer> GetEditors() = 0;
 
   /**
    * Returns an array of references to open editors in this page.
@@ -395,14 +395,14 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @return a list of open editors
    */
-  virtual std::vector<IEditorReference::Pointer> GetEditorReferences();
+  virtual std::vector<IEditorReference::Pointer> GetEditorReferences() = 0;
 
   /**
    * Returns a list of dirty editors in this page.
    * 
    * @return a list of dirty editors
    */
-  virtual std::vector<IEditorPart::Pointer> GetDirtyEditors();
+  virtual std::vector<IEditorPart::Pointer> GetDirtyEditors() = 0;
 
   /**
    * Returns the input for this page.
@@ -417,7 +417,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @return the page label
    */
-  virtual std::string GetLabel();
+  virtual std::string GetLabel() = 0;
 
   /**
    * Returns the current perspective descriptor for this page, or
@@ -438,7 +438,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @return a list of references to visible views
    */
-  virtual std::vector<IViewReference::Pointer> GetViewReferences();
+  virtual std::vector<IViewReference::Pointer> GetViewReferences() = 0;
 
   /**
    * Returns a list of the views visible on this page.
@@ -451,14 +451,14 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * 
    * @deprecated use #getViewReferences() instead.
    */
-  virtual std::vector<IViewPart::Pointer> GetViews();
+  virtual std::vector<IViewPart::Pointer> GetViews() = 0;
 
   /**
    * Returns the workbench window of this page.
    * 
    * @return the workbench window
    */
-  virtual IWorkbenchWindow::Pointer GetWorkbenchWindow();
+  virtual IWorkbenchWindow::Pointer GetWorkbenchWindow() = 0;
 
   /**
    * Hides the given view. The view must belong to this page.
@@ -466,7 +466,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @param view
    *            the view to hide
    */
-  virtual void HideView(IViewPart::Pointer view);
+  virtual void HideView(IViewPart::Pointer view) = 0;
 
   /**
    * Hides the given view that belongs to the reference, if any.
@@ -475,7 +475,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            the references whos view is to be hidden
    * @since 3.0
    */
-  virtual void HideView(IViewReference::Pointer view);
+  virtual void HideView(IViewReference::Pointer view) = 0;
 
   /**
    * Returns whether the specified part is visible.
@@ -484,7 +484,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            the part to test
    * @return boolean <code>true</code> if part is visible
    */
-  virtual bool IsPartVisible(IWorkbenchPart::Pointer part);
+  virtual bool IsPartVisible(IWorkbenchPart::Pointer part) = 0;
 
   /**
    * Reuses the specified editor by setting its new input.
@@ -525,7 +525,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @exception PartInitException
    *                if the editor could not be created or initialized
    */
-  virtual IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorId);
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorId) = 0;
 
   /**
    * Opens an editor on the given input.
@@ -552,7 +552,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @exception PartInitException if the editor could not be created or initialized
    */
   virtual IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorId,
-      bool activate);
+      bool activate) = 0;
 
   /**
    * Opens an editor on the given input.
@@ -586,7 +586,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @since 3.2
    */
   virtual IEditorPart::Pointer OpenEditor(const IEditorInput* input,
-      const std::string& editorId, bool activate, int matchFlags);
+      const std::string& editorId, bool activate, int matchFlags) = 0;
 
   /**
    * Removes the property change listener.
@@ -607,7 +607,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * <code>setPerspective()</code>.
    * </p>
    */
-  virtual void ResetPerspective();
+  virtual void ResetPerspective() = 0;
 
   /**
    * Saves the contents of all dirty editors belonging to this workbench page.
@@ -628,7 +628,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *         <code>false</code> if the operation was canceled by the user or
    *         an error occurred while saving
    */
-  virtual bool SaveAllEditors(bool confirm);
+  virtual bool SaveAllEditors(bool confirm) = 0;
 
   /**
    * Saves the contents of the given editor if dirty. If not, this method
@@ -650,14 +650,14 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return <code>true</code> if the command succeeded, and
    *         <code>false</code> if the editor was not saved
    */
-  virtual bool SaveEditor(IEditorPart::Pointer editor, bool confirm);
+  virtual bool SaveEditor(IEditorPart::Pointer editor, bool confirm) = 0;
 
   /**
    * Saves the visible views, their layout, and the visible action sets for
    * this page to the current perspective descriptor. The contents of the
    * current perspective descriptor are overwritten.
    */
-  virtual void SavePerspective();
+  virtual void SavePerspective() = 0;
 
   /**
    * Saves the visible views, their layout, and the visible action sets for
@@ -717,7 +717,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @exception PartInitException
    *                if the view could not be initialized
    */
-  virtual IViewPart::Pointer ShowView(const std::string& viewId);
+  virtual IViewPart::Pointer ShowView(const std::string& viewId) = 0;
 
   /**
    * Shows a view in this page with the given id and secondary id. The
@@ -749,7 +749,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *                if the supplied mode is not valid
    * @since 3.0
    */
-  virtual IViewPart::Pointer ShowView(const std::string& viewId, const std::string& secondaryId, int mode);
+  virtual IViewPart::Pointer ShowView(const std::string& viewId, const std::string& secondaryId, int mode) = 0;
 
   /**
    * Returns <code>true</code> if the editor is pinned and should not be
@@ -759,7 +759,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            the editor to test
    * @return boolean whether the editor is pinned
    */
-  virtual bool IsEditorPinned(IEditorPart::Pointer editor);
+  virtual bool IsEditorPinned(IEditorPart::Pointer editor) = 0;
 
   /**
    * Returns the perspective shortcuts associated with the current
@@ -769,7 +769,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return an array of perspective identifiers
    * @since 3.1
    */
-  virtual std::vector<std::string> GetPerspectiveShortcuts();
+  virtual std::vector<std::string> GetPerspectiveShortcuts() = 0;
 
   /**
    * Returns the show view shortcuts associated with the current perspective.
@@ -779,7 +779,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return an array of view identifiers
    * @since 3.1
    */
-  virtual std::vector<std::string> GetShowViewShortcuts();
+  virtual std::vector<std::string> GetShowViewShortcuts() = 0;
 
   /**
    * Returns the descriptors for the perspectives that are open in this page,
@@ -830,7 +830,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *            whether the page itself should be closed
    * @since 3.1
    */
-  virtual void CloseAllPerspectives(bool saveEditors, bool closePage);
+  virtual void CloseAllPerspectives(bool saveEditors, bool closePage) = 0;
 
   /**
    * Find the part reference for the given part. A convenience method to
@@ -842,7 +842,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    *         reference can be found.
    * @since 3.2
    */
-  virtual IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part);
+  virtual IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part) = 0;
 };
 
 }  // namespace cherry

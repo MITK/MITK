@@ -42,7 +42,7 @@ QtWorkbench::Run()
 }
 
 IDialog::Pointer
-QtWorkbench::CreateDialog(const std::string& dialogid)
+QtWorkbench::CreateStandardDialog(const std::string& dialogid)
 {
   if (dialogid == DIALOG_ID_SHOW_VIEW)
     return new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry());

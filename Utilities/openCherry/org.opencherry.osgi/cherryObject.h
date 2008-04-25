@@ -49,11 +49,13 @@ public:
   Indent GetNextIndent();
 
   /** Print out the Indentation. Basically output a bunch of spaces.  */
-  friend std::ostream& operator<<(std::ostream& os, const Indent& o); 
+  friend CHERRY_OSGI std::ostream& operator<<(std::ostream& os, const Indent& o); 
 
 private:
   int m_Indent;
 };
+
+//CHERRY_OSGI std::ostream& operator<<(std::ostream& os, const Indent& o);
 
 
 /** \class Object

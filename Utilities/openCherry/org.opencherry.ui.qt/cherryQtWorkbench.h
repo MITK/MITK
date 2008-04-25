@@ -33,7 +33,7 @@ public:
   cherryClassMacro(QtWorkbench);
   
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
-  IDialog::Pointer CreateDialog(const std::string& dialogid);
+  IDialog::Pointer CreateStandardDialog(const std::string& dialogid);
   IViewPart::Pointer CreateErrorViewPart(const std::string& partName, Poco::Exception exc);
   IViewPane::Pointer CreateViewPane();
   

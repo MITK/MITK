@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class CHERRY_OSGI ObjectVector : public Object, public std::vector<Object::Pointer>
+class ObjectVector : public Object, public std::vector<Object::Pointer>
 {
 public:
   cherryClassMacro(ObjectVector);

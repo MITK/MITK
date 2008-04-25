@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const int ISources::ISources::WORKBENCH = 0;
+const int ISources::WORKBENCH = 0;
 
  const int ISources::LEGACY_LEGACY = 1;
 

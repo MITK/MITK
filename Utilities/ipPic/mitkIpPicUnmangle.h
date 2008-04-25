@@ -4,6 +4,7 @@
 #undef ipErrorStr
 #undef ipFReadCvt
 #undef ipFWriteCvt
+#undef _ipFWrite
 #undef write_compressed
 #undef _ipCpCvtEndian
 #undef _ipCvtEndian

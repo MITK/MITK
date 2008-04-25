@@ -17,7 +17,9 @@
 #define ipErrorStr mitkIpErrorStr
 #define ipFReadCvt mitkIpFReadCvt
 #define ipFWriteCvt mitkIpFWriteCvt
+#define _ipFWrite _mitkIpFWrite
 #define write_compressed mitk_write_compressed
+
 
 #define _ipCpCvtEndian _mitkIpCpCvtEndian
 #define _ipCvtEndian _mitkIpCvtEndian

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org.opencherry.core.runtime_EXPORTS)
+  #if defined(org_opencherry_core_runtime_EXPORTS)
     #define CHERRY_RUNTIME __declspec(dllexport)
   #else
     #define CHERRY_RUNTIME __declspec(dllimport)  

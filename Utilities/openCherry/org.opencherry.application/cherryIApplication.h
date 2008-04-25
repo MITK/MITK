@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIAPPLICATION_H_
 #define CHERRYIAPPLICATION_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryApplicationDll.h"
 
 namespace cherry {
 
-struct CHERRY_API IApplication {
+struct CHERRY_APPLICATION IApplication {
   
   virtual ~IApplication() {}
   

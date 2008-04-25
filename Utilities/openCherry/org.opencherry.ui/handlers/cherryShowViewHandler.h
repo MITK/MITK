@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <org.opencherry.core.commands/cherryExecutionEvent.h>
 
 #include "../cherryIWorkbenchWindow.h"
+#include "../cherryUiDll.h"
 
 namespace cherry
 {
@@ -32,7 +33,7 @@ namespace cherry
  * 
  * @since 3.1
  */
-class CHERRY_API ShowViewHandler : public AbstractHandler
+class CHERRY_UI ShowViewHandler : public AbstractHandler
 {
 
 public:

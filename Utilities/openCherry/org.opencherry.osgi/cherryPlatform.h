@@ -154,7 +154,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 
 #include "event/cherryPlatformEvents.h"
 #include "service/cherryServiceRegistry.h"
@@ -164,7 +164,7 @@ namespace cherry {
 
 using namespace Poco;
 
-class CHERRY_API Platform
+class CHERRY_OSGI Platform
 {
 public:
   static int OS_FREE_BSD;

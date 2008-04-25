@@ -18,14 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSERVICE_H_
 #define CHERRYSERVICE_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 #include "../cherryMacros.h"
 
 #include <typeinfo>
 
 namespace cherry {
 
-class CHERRY_API Service : public Object
+class CHERRY_OSGI Service : public Object
 {
   
 public:

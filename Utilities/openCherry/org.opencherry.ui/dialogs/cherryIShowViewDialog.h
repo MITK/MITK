@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IShowViewDialog : public IDialog
+struct CHERRY_UI IShowViewDialog : public IDialog
 {
   cherryClassMacro(IShowViewDialog);
   

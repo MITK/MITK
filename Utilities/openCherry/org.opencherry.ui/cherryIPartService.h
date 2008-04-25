@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPARTSERVICE_H_
 #define CHERRYIPARTSERVICE_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 namespace cherry {
 
@@ -31,7 +31,7 @@ namespace cherry {
  *
  * @see IWorkbenchPage
  */
-struct CHERRY_API IPartService {
+struct CHERRY_UI IPartService {
 
     /**
      * Adds the given listener for part lifecycle events.

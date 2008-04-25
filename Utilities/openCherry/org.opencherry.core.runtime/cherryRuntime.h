@@ -20,11 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryRuntimeDll.h"
 
 namespace cherry {
 
-struct CHERRY_API Runtime
+struct CHERRY_RUNTIME Runtime
 {
   static const std::string ADAPTER_SERVICE_ID;
 };

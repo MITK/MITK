@@ -31,7 +31,7 @@ struct IBundleStorage;
 struct IBundleActivator;
 class  BundleEvents;
 
-struct CHERRY_API IBundle : public Object
+struct CHERRY_OSGI IBundle : public Object
 {
   
 public:

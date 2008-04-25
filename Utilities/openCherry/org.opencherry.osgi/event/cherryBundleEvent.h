@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYBUNDLEEVENT_H_
 #define CHERRYBUNDLEEVENT_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "../cherrySmartPointer.h"
 
@@ -26,7 +26,7 @@ namespace cherry {
 
 struct IBundle;
 
-class CHERRY_API BundleEvent
+class CHERRY_OSGI BundleEvent
 { 
 public:
   enum EventKind { EV_BUNDLE_INSTALLED, EV_BUNDLE_LOADED, EV_BUNDLE_RESOLVING,

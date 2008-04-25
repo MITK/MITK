@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPARTLISTENER_H_
 #define CHERRYIPARTLISTENER_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 namespace cherry {
 
@@ -30,7 +30,7 @@ namespace cherry {
  *
  * @see IPartService#AddPartListener(IPartListener)
  */
-struct CHERRY_API IPartListener {
+struct CHERRY_UI IPartListener {
 
     /**
      * Notifies this listener that the given part has been activated.

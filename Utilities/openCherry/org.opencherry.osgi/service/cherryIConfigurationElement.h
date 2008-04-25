@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIEXTENSIONELEMENT_H_
 
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "../cherryBundleLoader.h"
 #include "../cherryPlatformException.h"
@@ -31,7 +31,7 @@ namespace cherry {
 
 struct IExtension;
 
-struct CHERRY_API IConfigurationElement : public Object
+struct CHERRY_OSGI IConfigurationElement : public Object
 {
   
   cherryClassMacro(IConfigurationElement);

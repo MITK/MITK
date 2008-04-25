@@ -18,11 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSAMPLEAPPLICATION_H_
 #define CHERRYSAMPLEAPPLICATION_H_
 
-#include "org.opencherry.application/cherryIApplication.h"
+#include <org.opencherry.application/cherryIApplication.h>
+
+#include "cherryQtWorkbenchDll.h"
 
 namespace cherry {
 
-class CHERRY_API QtWorkbenchApplication : public IApplication
+class CHERRY_QTWORKBENCH QtWorkbenchApplication : public IApplication
 {
 public:
   int Run();

@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 
 #include <org.opencherry.osgi/cherryMacros.h>
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+
+#include "cherryExpressionsDll.h"
 
 namespace cherry {
 
@@ -39,7 +41,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-struct CHERRY_API IEvaluationContext : public Object {
+struct CHERRY_EXPRESSIONS IEvaluationContext : public Object {
 
   cherryClassMacro(IEvaluationContext);
   

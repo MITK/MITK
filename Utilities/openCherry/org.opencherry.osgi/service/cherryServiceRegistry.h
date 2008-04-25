@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSERVICEREGISTRY_H_
 #define CHERRYSERVICEREGISTRY_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "cherryService.h"
 
@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class CHERRY_API ServiceRegistry
+class CHERRY_OSGI ServiceRegistry
 {
 private:
   std::map<const std::string, Service::Pointer> m_ServiceMap;

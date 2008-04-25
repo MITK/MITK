@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIEDITORREGISTRY_H_
 #define MITKIEDITORREGISTRY_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
-
 #include <string>
 #include <vector>
 
@@ -52,7 +50,7 @@ namespace cherry {
  * @see org.eclipse.ui.IWorkbench#getEditorRegistry()
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IEditorRegistry {
+struct CHERRY_UI IEditorRegistry {
   
     /**
      * The property identifier for the contents of this registry.

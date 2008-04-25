@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPLUGIN_H_
 #define CHERRYPLUGIN_H_
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 
 #include "cherryIBundleActivator.h"
 #include "cherryIBundleContext.h"
@@ -31,7 +31,7 @@ class BundleLoader;
 
 namespace cherry {
 
-class CHERRY_API Plugin : public IBundleActivator
+class CHERRY_OSGI Plugin : public IBundleActivator
 {
 public:
   void Start(IBundleContext::Pointer context);

@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYVIEWPART_H_
 #define CHERRYVIEWPART_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
-
 #include "cherryIViewPart.h"
 #include "cherryIViewSite.h"
 #include "cherryWorkbenchPart.h"
@@ -68,7 +66,7 @@ namespace cherry {
  * </ul>
  * </p>
  */
-class CHERRY_API ViewPart : public WorkbenchPart, public IViewPart
+class CHERRY_UI ViewPart : public WorkbenchPart, public IViewPart
 {
   
 protected:

@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTWORKBENCH_H_
 #define CHERRYQTWORKBENCH_H_
 
-#include "org.opencherry.ui/cherryWorkbench.h"
+#include <org.opencherry.ui/cherryWorkbench.h>
 
 #include "cherryQtWorkbenchWindow.h"
+#include "cherryUiQtDll.h"
 
 namespace cherry {
 
-class CHERRY_API QtWorkbench : public Workbench
+class CHERRY_UI_QT QtWorkbench : public Workbench
 {
   
 public:

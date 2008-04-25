@@ -27,11 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <org.opencherry.ui/cherryIViewDescriptor.h>
 #include <org.opencherry.ui/cherryWorkbenchWindow.h>
 
+#include "cherryUiQtDll.h"
+
 namespace cherry {
 
 class QtShowViewAction;
 
-class CHERRY_API QtWorkbenchWindow : public QMainWindow, public WorkbenchWindow
+class CHERRY_UI_QT QtWorkbenchWindow : public QMainWindow, public WorkbenchWindow
 {
   Q_OBJECT
 

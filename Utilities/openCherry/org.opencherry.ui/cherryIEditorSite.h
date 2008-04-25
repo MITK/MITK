@@ -30,7 +30,7 @@ namespace cherry {
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IEditorSite : public virtual IWorkbenchPartSite {
+struct CHERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
   
   cherryClassMacro(IEditorSite);
   

@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include <org.opencherry.osgi/cherryPlatform.h>
 
-#include "Poco/Hash.h"
+#include <Poco/Hash.h>
 
 namespace cherry {
 

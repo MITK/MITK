@@ -43,7 +43,7 @@ namespace cherry {
  * 
  * @since 3.0 
  */
-class CHERRY_API ExpressionConverter {
+class CHERRY_EXPRESSIONS ExpressionConverter {
   
 private:
   std::vector<ElementHandler::Pointer> fHandlers;

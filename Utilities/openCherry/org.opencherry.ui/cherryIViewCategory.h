@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IViewCategory : public Object
+struct CHERRY_UI IViewCategory : public Object
 {
   cherryClassMacro(IViewCategory)
   

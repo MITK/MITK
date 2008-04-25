@@ -18,7 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYICOUNTABLE_H_
 #define CHERRYICOUNTABLE_H_
 
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+#include <org.opencherry.osgi/cherryMacros.h>
+
+#include "cherryExpressionsDll.h"
 
 namespace cherry {
 
@@ -31,7 +34,7 @@ namespace cherry {
  * 
  * @since 3.3
  */
-struct CHERRY_API ICountable : public ExpressionVariable {
+struct CHERRY_EXPRESSIONS ICountable : public ExpressionVariable {
   
   cherryClassMacro(ICountable)
 

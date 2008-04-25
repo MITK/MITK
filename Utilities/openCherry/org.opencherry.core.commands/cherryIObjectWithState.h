@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIOBJECTWITHSTATE_H_
 #define CHERRYIOBJECTWITHSTATE_H_
 
+#include "cherryCommandsDll.h"
 #include "cherryState.h"
 
 #include <vector>
@@ -36,7 +37,7 @@ namespace cherry {
  * @see AbstractHandlerWithState
  * @since 3.2
  */
-struct CHERRY_API IObjectWithState {
+struct CHERRY_COMMANDS IObjectWithState {
 
   /**
    * Adds state to this object.

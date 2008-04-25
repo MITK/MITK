@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIPARAMETER_H_
 
 #include <org.opencherry.osgi/cherryMacros.h>
+#include "cherryCommandsDll.h"
 
 #include <map>
 
@@ -34,7 +35,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-struct CHERRY_API IParameter : public Object {
+struct CHERRY_COMMANDS IParameter : public Object {
 
   cherryClassMacro(IParameter);
   

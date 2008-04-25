@@ -19,6 +19,7 @@
 #define CHERRYIEDITORINPUT_H_
 
 #include <org.opencherry.osgi/cherryMacros.h>
+#include "cherryUiDll.h"
 
 namespace cherry
 {
@@ -58,7 +59,7 @@ namespace cherry
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)
  */
-struct CHERRY_API IEditorInput : public Object // public IAdaptable
+struct CHERRY_UI IEditorInput : public Object // public IAdaptable
 {
   cherryClassMacro(IEditorInput)
 

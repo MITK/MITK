@@ -15,17 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYDLL_H_
-#define CHERRYDLL_H_
-
-//
-// Ensure that CHERRY_DLL is default unless CHERRY_STATIC is defined
-//
-#if defined(_WIN32) && defined(_DLL)
-  #if !defined(CHERRY_DLL) && !defined(CHERRY_STATIC)
-    #define CHERRY_DLL
-  #endif
-#endif
+#ifndef CHERRYCOMMANDSDLL_H_
+#define CHERRYCOMMANDSDLL_H_
 
 
 //
@@ -36,17 +27,17 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(CHERRY_DLL)
-  #if defined(CHERRY_EXPORTS)
-    #define CHERRY_API __declspec(dllexport)
+#if defined(_WIN32) && !defined(CHERRY_STATIC)
+  #if defined(org.opencherry.core.commands_EXPORTS)
+    #define CHERRY_COMMANDS __declspec(dllexport)
   #else
-    #define CHERRY_API __declspec(dllimport)  
+    #define CHERRY_COMMANDS __declspec(dllimport)  
   #endif
 #endif
 
 
-#if !defined(CHERRY_API)
-  #define CHERRY_API
+#if !defined(CHERRY_COMMANDS)
+  #define CHERRY_COMMANDS
 #endif
 
-#endif /*CHERRYDLL_H_*/
+#endif /*CHERRYCOMMANDSDLL_H_*/

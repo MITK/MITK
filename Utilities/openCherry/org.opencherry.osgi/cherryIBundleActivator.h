@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIBUNDLEACTIVATOR_
 #define CHERRYIBUNDLEACTIVATOR_
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 
 #include "cherrySmartPointer.h"
 
@@ -26,7 +26,7 @@ namespace cherry {
 
 struct IBundleContext;
 
-struct CHERRY_API IBundleActivator
+struct CHERRY_OSGI IBundleActivator
 {
   virtual void Start(SmartPointer<IBundleContext> context) = 0;
   virtual void Stop(SmartPointer<IBundleContext> context) = 0;

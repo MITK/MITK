@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYABSTRACTUIPLUGIN_H_
 #define CHERRYABSTRACTUIPLUGIN_H_
 
-#include "org.opencherry.osgi/cherryPlugin.h"
+#include <org.opencherry.osgi/cherryPlugin.h>
 
 #include "cherryIWorkbench.h"
 
@@ -95,7 +95,7 @@ namespace cherry {
  * See the description on {@link Plugin}.
  * </p>
  */
-class CHERRY_API AbstractUIPlugin : public Plugin {
+class CHERRY_UI AbstractUIPlugin : public Plugin {
 
 private:
   

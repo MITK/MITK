@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPLATFORMEVENT_H_
 #define CHERRYPLATFORMEVENT_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "../cherryIBundle.h"
 
@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class CHERRY_API PlatformEvent
+class CHERRY_OSGI PlatformEvent
 {
 public:
   enum EventKind { EV_PLATFORM_STARTED, EV_PLATFORM_ERROR, EV_PLATFORM_WARNING,

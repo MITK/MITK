@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIVIEWREGISTRY_H_
 #define CHERRYIVIEWREGISTRY_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 #include "cherryIViewDescriptor.h"
 #include "cherryIViewCategory.h"
@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IViewRegistry
+struct CHERRY_UI IViewRegistry
 {
   
   virtual IViewDescriptor::Pointer Find(const std::string& id) const = 0;

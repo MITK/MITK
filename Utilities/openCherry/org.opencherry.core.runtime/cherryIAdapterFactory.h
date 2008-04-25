@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIADAPTERFACTORY_H_
 #define CHERRYIADAPTERFACTORY_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryRuntimeDll.h"
 
 #include <vector>
 #include <typeinfo>
@@ -38,7 +38,7 @@ namespace cherry {
  * @see IAdapterManager
  * @see IAdaptable
  */
-struct CHERRY_API IAdapterFactory {
+struct CHERRY_RUNTIME IAdapterFactory {
   /**
    * Returns an object which is an instance of the given class
    * associated with the given object. Returns <code>null</code> if

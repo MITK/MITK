@@ -44,7 +44,7 @@ namespace cherry {
  * @see IEditorRegistry#getFileEditorMappings
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IFileEditorMapping : public Object {
+struct CHERRY_UI IFileEditorMapping : public Object {
   
   cherryClassMacro(IFileEditorMapping)
   

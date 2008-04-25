@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IViewPane : public IPartPane {
+struct CHERRY_UI IViewPane : public IPartPane {
   
   cherryClassMacro(IViewPane)
   

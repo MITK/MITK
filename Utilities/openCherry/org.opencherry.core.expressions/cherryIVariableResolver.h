@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIVARIABLERESOLVER_H_
 #define CHERRYIVARIABLERESOLVER_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryExpressionsDll.h"
 
 namespace cherry {
 
@@ -30,7 +30,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-struct CHERRY_API IVariableResolver {
+struct CHERRY_EXPRESSIONS IVariableResolver {
 
   virtual ~IVariableResolver();
   

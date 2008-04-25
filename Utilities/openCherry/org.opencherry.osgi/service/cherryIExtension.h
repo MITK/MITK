@@ -30,7 +30,7 @@ namespace cherry {
  * This interface is not intended to be implemented by clients.
  * 
  */
-struct CHERRY_API IExtension {
+struct CHERRY_OSGI IExtension {
   
   /**
    * Returns all configuration elements declared by this extension.

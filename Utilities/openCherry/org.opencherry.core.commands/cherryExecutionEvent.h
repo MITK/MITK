@@ -41,7 +41,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-class CHERRY_API ExecutionEvent : public Object {
+class CHERRY_COMMANDS ExecutionEvent : public Object {
 
 public:
   

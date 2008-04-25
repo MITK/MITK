@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEXTENSIONPOINT_H_
 #define CHERRYIEXTENSIONPOINT_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "cherryIExtension.h"
 
@@ -28,7 +28,7 @@ namespace cherry {
 
 struct IBundle;
 
-struct CHERRY_API IExtensionPoint
+struct CHERRY_OSGI IExtensionPoint
 {
 
 public:

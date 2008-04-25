@@ -18,9 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEXPRESSIONVARIABLE_H_
 #define CHERRYIEXPRESSIONVARIABLE_H_
 
-#include "Poco/Hash.h"
+#include <Poco/Hash.h>
 
-#include "org.opencherry.osgi/cherryMacros.h"
+#include <org.opencherry.osgi/cherryMacros.h>
+
+#include "cherryRuntimeDll.h"
 
 #include <typeinfo>
 #include <string>
@@ -30,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API ExpressionVariable : public Object
+struct CHERRY_RUNTIME ExpressionVariable : public Object
 {
   cherryClassMacro(ExpressionVariable)
   

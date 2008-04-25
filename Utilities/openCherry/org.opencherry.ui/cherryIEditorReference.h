@@ -33,7 +33,7 @@ namespace cherry {
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct CHERRY_API IEditorReference : public IWorkbenchPartReference {
+struct CHERRY_UI IEditorReference : public IWorkbenchPartReference {
   
   cherryClassMacro(IEditorReference);
   

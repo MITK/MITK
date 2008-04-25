@@ -21,10 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryExpressionInfo.h"
 #include "cherryIEvaluationContext.h"
 #include "cherryEvaluationResult.h"
+#include "cherryExpressionsDll.h"
 
-#include "org.opencherry.osgi/cherryMacros.h"
-
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include <org.opencherry.osgi/cherryMacros.h>
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
 
 #include <string>
 
@@ -42,7 +42,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-class CHERRY_API Expression : public Object {
+class CHERRY_EXPRESSIONS Expression : public Object {
   
   
 public:

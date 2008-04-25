@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/cherryMacros.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
-struct CHERRY_API ISelection : public Object
+struct CHERRY_UI ISelection : public Object
 {
   cherryClassMacro(ISelection);
   

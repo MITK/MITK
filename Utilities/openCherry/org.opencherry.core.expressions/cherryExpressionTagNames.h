@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryExpressionsDll.h"
 
 namespace cherry {
 
@@ -30,7 +30,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-class CHERRY_API ExpressionTagNames {
+class CHERRY_EXPRESSIONS ExpressionTagNames {
 
 public:
   

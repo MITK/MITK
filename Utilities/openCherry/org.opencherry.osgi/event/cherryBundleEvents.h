@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYBUNDLEEVENTS_H_
 #define CHERRYBUNDLEEVENTS_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "../cherryMessage.h"
 
@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API BundleEvents
+struct CHERRY_OSGI BundleEvents
 {
   Message1<const BundleEvent&> bundleInstalled;
   Message1<const BundleEvent&> bundleLoaded;

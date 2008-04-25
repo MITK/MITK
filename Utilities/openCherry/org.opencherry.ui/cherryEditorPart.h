@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYEDITORPART_H_
 #define CHERRYEDITORPART_H_
 
+#include "cherryUiDll.h"
 #include "cherryIEditorPart.h"
 #include "cherryIEditorInput.h"
 #include "cherryIEditorSite.h"
@@ -71,7 +72,7 @@ namespace cherry {
  * </ul>
  * </p>
  */
-class CHERRY_API EditorPart : public WorkbenchPart , public IEditorPart {
+class CHERRY_UI EditorPart : public WorkbenchPart , public IEditorPart {
 
 public:
   cherryClassMacro(EditorPart);

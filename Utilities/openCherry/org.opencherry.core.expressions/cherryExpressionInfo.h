@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <typeinfo>
 #include <set>
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryExpressionsDll.h"
 
 namespace cherry {
 
@@ -37,7 +37,7 @@ namespace cherry {
  * 
  * @since 3.2
  */
-class CHERRY_API ExpressionInfo {
+class CHERRY_EXPRESSIONS ExpressionInfo {
 
 private:
   bool fHasDefaultVariableAccess;

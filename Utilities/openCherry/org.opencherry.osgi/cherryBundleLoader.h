@@ -40,7 +40,7 @@ namespace cherry {
 class CodeCache;
 
 /**
- * Intentionally no CHERRY_API macro. This class belongs into "internal" but
+ * Intentionally no CHERRY_OSGI macro. This class belongs into "internal" but
  * needs to stay here.
  */
 class BundleLoader

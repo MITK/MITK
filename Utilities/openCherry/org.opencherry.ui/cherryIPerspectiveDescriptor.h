@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/cherryMacros.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
 /**
@@ -54,7 +56,7 @@ namespace cherry {
  * @see IPerspectiveRegistry
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IPerspectiveDescriptor : public Object {
+struct CHERRY_UI IPerspectiveDescriptor : public Object {
   
   cherryClassMacro(IPerspectiveDescriptor)
   

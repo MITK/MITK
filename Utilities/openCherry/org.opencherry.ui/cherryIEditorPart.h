@@ -63,7 +63,7 @@ struct IEditorSite;
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
  * @see org.eclipse.ui.part.EditorPart
  */
-struct CHERRY_API IEditorPart : public virtual IWorkbenchPart
+struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
 { //, ISaveablePart {
 
   cherryClassMacro(IEditorPart)

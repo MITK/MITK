@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEDITORDESCRIPTOR_H_
 #define CHERRYIEDITORDESCRIPTOR_H_
 
+#include "cherryUiDll.h"
 #include "cherryIWorkbenchPartDescriptor.h"
 #include "cherryIEditorMatchingStrategy.h"
 
@@ -42,7 +43,7 @@ namespace cherry
  * @see IEditorRegistry
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IEditorDescriptor : public IWorkbenchPartDescriptor
+struct CHERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
 {
 
   cherryClassMacro(IEditorDescriptor)

@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIADAPTERMANAGER_H_
 #define CHERRYIADAPTERMANAGER_H_
 
-#include "org.opencherry.osgi/cherryMacros.h"
+#include <org.opencherry.osgi/cherryMacros.h>
 
+#include "cherryRuntimeDll.h"
 #include "cherryExpressionVariables.h"
-
 #include "cherryIAdapterFactory.h"
 
 #include <typeinfo>
@@ -78,7 +78,7 @@ namespace cherry {
  * @see IAdaptable
  * @see IAdapterFactory
  */
-struct CHERRY_API IAdapterManager : public Object {
+struct CHERRY_RUNTIME IAdapterManager : public Object {
 
   cherryClassMacro(IAdapterManager)
   

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYABSTRACTHANDLER_H_
 
 #include "cherryIHandler.h"
+#include "cherryCommandsDll.h"
 
 namespace cherry {
 
@@ -35,7 +36,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-class CHERRY_API AbstractHandler : public IHandler { // ,public EventManager {
+class CHERRY_COMMANDS AbstractHandler : public IHandler { // ,public EventManager {
 
 public:
   cherryClassMacro(AbstractHandler)

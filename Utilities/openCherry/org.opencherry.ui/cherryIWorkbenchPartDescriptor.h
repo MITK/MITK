@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIWORKBENCHPARTDESCRIPTOR_H_
 #define CHERRYIWORKBENCHPARTDESCRIPTOR_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 #include "org.opencherry.osgi/cherryMacros.h"
 
@@ -34,7 +34,7 @@ namespace cherry
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct CHERRY_API IWorkbenchPartDescriptor : public Object
+struct CHERRY_UI IWorkbenchPartDescriptor : public Object
 {
 
   cherryClassMacro(IWorkbenchPartDescriptor);

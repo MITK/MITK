@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIHANDLER_H_
 
 #include <org.opencherry.osgi/cherryMacros.h>
-
+#include "cherryCommandsDll.h"
 
 namespace cherry {
 
@@ -35,7 +35,7 @@ class ExecutionEvent;
  * @see AbstractHandler
  * @since 3.1
  */
-struct CHERRY_API IHandler : public Object {
+struct CHERRY_COMMANDS IHandler : public Object {
   
   cherryClassMacro(IHandler)
   

@@ -18,16 +18,17 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYUIEXCEPTIONS_H_
 #define CHERRYUIEXCEPTIONS_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
-#include "Poco/Exception.h"
+#include "cherryUiDll.h"
+
+#include <Poco/Exception.h>
 
 namespace cherry {
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, UIException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(CHERRY_UI, UIException, Poco::RuntimeException);
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, WorkbenchException, UIException);
+POCO_DECLARE_EXCEPTION(CHERRY_UI, WorkbenchException, UIException);
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, PartInitException, WorkbenchException);
+POCO_DECLARE_EXCEPTION(CHERRY_UI, PartInitException, WorkbenchException);
 
 }
 

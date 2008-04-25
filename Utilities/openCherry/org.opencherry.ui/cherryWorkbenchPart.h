@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __CHERRY_WORKBENCH_PART_H__
 #define __CHERRY_WORKBENCH_PART_H__
 
-#include <org.opencherry.osgi/cherryDll.h>
-
 #include "cherryIWorkbenchPart.h"
 #include "cherryIWorkbenchPartSite.h"
 
@@ -42,7 +40,7 @@ namespace cherry {
  * @see org.eclipse.ui.part.EditorPart
  * @noextend This class is not intended to be subclassed by clients.
  */
-class CHERRY_API WorkbenchPart : public virtual IWorkbenchPart
+class CHERRY_UI WorkbenchPart : public virtual IWorkbenchPart
 {
   
 public:

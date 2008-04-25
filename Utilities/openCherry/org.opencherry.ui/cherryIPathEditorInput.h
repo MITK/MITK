@@ -43,7 +43,7 @@ namespace cherry {
  * @see org.eclipse.core.runtime.IPath
  * @since 3.0
  */
-struct CHERRY_API IPathEditorInput : public IEditorInput {
+struct CHERRY_UI IPathEditorInput : public IEditorInput {
   
   cherryClassMacro(IPathEditorInput)
   

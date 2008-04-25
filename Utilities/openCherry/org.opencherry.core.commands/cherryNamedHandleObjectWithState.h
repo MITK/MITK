@@ -37,7 +37,7 @@ namespace cherry {
  * 
  * @since 3.2
  */
-class CHERRY_API NamedHandleObjectWithState : public NamedHandleObject, public IObjectWithState {
+class CHERRY_COMMANDS NamedHandleObjectWithState : public NamedHandleObject, public IObjectWithState {
 
 public:
   

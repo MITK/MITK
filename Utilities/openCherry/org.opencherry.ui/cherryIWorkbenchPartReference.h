@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/cherryMacros.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
 struct IWorkbenchPart;
@@ -33,7 +35,7 @@ struct IWorkbenchPage;
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct CHERRY_API IWorkbenchPartReference : public Object {
+struct CHERRY_UI IWorkbenchPartReference : public Object {
   
   cherryClassMacro(IWorkbenchPartReference);
   

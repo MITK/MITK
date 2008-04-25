@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPROPERTYTESTER_H_
 #define CHERRYIPROPERTYTESTER_H_
 
-#include "org.opencherry.osgi/cherryMacros.h"
+#include <org.opencherry.osgi/cherryMacros.h>
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
 
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include "cherryExpressionsDll.h"
 
-#include "Poco/Any.h"
+#include <Poco/Any.h>
 
 #include <string>
 #include <vector>
@@ -39,7 +40,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-struct CHERRY_API IPropertyTester : public Object {
+struct CHERRY_EXPRESSIONS IPropertyTester : public Object {
   
   cherryClassMacro(IPropertyTester)
 

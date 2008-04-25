@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPLATFORMEVENTS_H_
 #define CHERRYPLATFORMEVENTS_H_
 
-#include "../cherryDll.h"
+#include "../cherryOSGiDll.h"
 
 #include "../cherryMessage.h"
 
@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API PlatformEvents
+struct CHERRY_OSGI PlatformEvents
 {
   Message1<const PlatformEvent&> platformStarted;
   Message1<const PlatformEvent&> platformError;

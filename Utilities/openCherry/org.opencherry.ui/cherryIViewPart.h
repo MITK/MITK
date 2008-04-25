@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIVIEWPART_H_
 #define CHERRYIVIEWPART_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 #include "org.opencherry.osgi/cherryMacros.h"
 
 #include "cherryIMemento.h"
@@ -68,7 +68,7 @@ namespace cherry {
  * @see org.eclipse.ui.part.ViewPart
  * @see ISizeProvider
  */
-struct CHERRY_API IViewPart : public virtual IWorkbenchPart {
+struct CHERRY_UI IViewPart : public virtual IWorkbenchPart {
   
   cherryClassMacro(IViewPart)
   

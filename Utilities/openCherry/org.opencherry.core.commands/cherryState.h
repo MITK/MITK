@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYSTATE_H_
 
 #include <org.opencherry.osgi/cherryMacros.h>
+#include "cherryCommandsDll.h"
 
 namespace cherry {
 
@@ -40,7 +41,7 @@ namespace cherry {
  * 
  * @since 3.2
  */
-class CHERRY_API State : public Object { // extends EventManager {
+class CHERRY_COMMANDS State : public Object { // extends EventManager {
 
 public:
   

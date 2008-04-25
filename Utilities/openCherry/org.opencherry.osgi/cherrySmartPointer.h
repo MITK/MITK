@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 
 namespace cherry {
 
@@ -35,7 +35,7 @@ namespace cherry {
  *
  */
 template <class TObjectType>
-class CHERRY_API SmartPointer 
+class CHERRY_OSGI SmartPointer 
 {
 public:
   typedef TObjectType ObjectType;

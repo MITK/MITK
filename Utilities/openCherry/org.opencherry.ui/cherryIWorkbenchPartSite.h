@@ -32,7 +32,7 @@ struct IWorkbenchPart;
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_API IWorkbenchPartSite : public IWorkbenchSite
+struct CHERRY_UI IWorkbenchPartSite : public IWorkbenchSite
 {
   
   cherryClassMacro(IWorkbenchPartSite);

@@ -29,7 +29,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-class CHERRY_API NamedHandleObject : public HandleObject {
+class CHERRY_COMMANDS NamedHandleObject : public HandleObject {
 
 public:
   

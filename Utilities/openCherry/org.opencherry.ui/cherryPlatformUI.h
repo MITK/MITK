@@ -18,12 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPLATFORMUI_H_
 #define CHERRYPLATFORMUI_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 #include "cherryWorkbench.h"
 
 namespace cherry {
 
-class CHERRY_API PlatformUI
+class CHERRY_UI PlatformUI
 {
 public:
   

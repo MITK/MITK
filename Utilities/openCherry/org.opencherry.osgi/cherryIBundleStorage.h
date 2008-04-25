@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IBundleStorage : public Object
+struct CHERRY_OSGI IBundleStorage : public Object
 {
   cherryClassMacro(IBundleStorage);
   

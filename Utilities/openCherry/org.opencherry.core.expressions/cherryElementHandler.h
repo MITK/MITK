@@ -18,14 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYELEMENTHANDLER_H_
 #define CHERRYELEMENTHANDLER_H_
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include <Poco/DOM/Element.h>
+
+#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <org.opencherry.osgi/cherryMacros.h>
+
 #include "cherryExpression.h"
+#include "cherryExpressionsDll.h"
+
 #include "internal/cherryCompositeExpression.h"
-
-#include "Poco/DOM/Element.h"
-
-#include "org.opencherry.osgi/cherryObject.h"
-#include "org.opencherry.osgi/cherryMacros.h"
 
 namespace cherry {
 
@@ -40,7 +41,7 @@ class ExpressionConverter;
  * </p>
  * @since 3.0 
  */
-class CHERRY_API ElementHandler : public Object {
+class CHERRY_EXPRESSIONS ElementHandler : public Object {
   
 public:
   

@@ -18,7 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIITERABLE_H_
 #define CHERRYIITERABLE_H_
 
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+#include <org.opencherry.osgi/cherryMacros.h>
+
+#include "cherryExpressionsDll.h"
 
 #include <vector>
 
@@ -33,7 +36,7 @@ namespace cherry {
  * 
  * @since 3.3
  */
-struct CHERRY_API IIterable : public ExpressionVariable {
+struct CHERRY_EXPRESSIONS IIterable : public ExpressionVariable {
 
   cherryClassMacro(IIterable)
   

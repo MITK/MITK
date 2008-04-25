@@ -57,7 +57,7 @@ class ExecutionEvent;
  * 
  * @since 3.1
  */
-class CHERRY_API Command : public NamedHandleObjectWithState { // implements Comparable {
+class CHERRY_COMMANDS Command : public NamedHandleObjectWithState { // implements Comparable {
 
 public:
   
@@ -115,7 +115,7 @@ private:
    * may be <code>null</code> if there are no parameters, or if the command
    * is undefined. It may also be empty.
    */
-  std::vector<IParameter> parameters;
+  std::vector<IParameter::Pointer> parameters;
 
   /**
    * The type of the return value of this command. This value may be

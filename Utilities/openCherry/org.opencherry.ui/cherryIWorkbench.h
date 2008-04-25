@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-struct CHERRY_API IWorkbench : public Object {
+struct CHERRY_UI IWorkbench : public Object {
   
   cherryClassMacro(IWorkbench);
     

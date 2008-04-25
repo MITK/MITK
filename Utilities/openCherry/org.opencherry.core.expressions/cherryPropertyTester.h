@@ -18,9 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPROPERTYTESTER_H_
 #define CHERRYPROPERTYTESTER_H_
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
 
 #include "internal/cherryPropertyTesterDescriptor.h"
+
+#include "cherryExpressionsDll.h"
 
 #include <string>
 
@@ -70,7 +72,7 @@ namespace cherry {
  * </p>
  * @since 3.0 
  */
-class CHERRY_API PropertyTester : public IPropertyTester 
+class CHERRY_EXPRESSIONS PropertyTester : public IPropertyTester 
 {
   
 private:

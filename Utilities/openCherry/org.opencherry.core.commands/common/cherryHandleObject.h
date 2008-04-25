@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYHANDLEOBJECT_H_
 
 #include <org.opencherry.osgi/cherryMacros.h>
+#include "../cherryCommandsDll.h"
 
 namespace cherry {
 
@@ -46,7 +47,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-class CHERRY_API HandleObject : public Object { // extends EventManager implements IIdentifiable {
+class CHERRY_COMMANDS HandleObject : public Object { // extends EventManager implements IIdentifiable {
 
 public:
   

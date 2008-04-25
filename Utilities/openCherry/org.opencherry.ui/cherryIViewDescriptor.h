@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIVIEWDESCRIPTOR_H_
 #define CHERRYIVIEWDESCRIPTOR_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 #include "cherryIWorkbenchPartDescriptor.h"
 #include "cherryIViewPart.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
-#include "org.opencherry.core.runtime/cherryIAdaptable.h"
+#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <org.opencherry.core.runtime/cherryIAdaptable.h>
 
 #include <string>
 #include <vector>
@@ -45,7 +45,7 @@ namespace cherry
  * 
  * @see org.opencherry.ui.IViewRegistry
  */
-struct CHERRY_API IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
+struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
 
   cherryClassMacro(IViewDescriptor);

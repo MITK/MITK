@@ -29,7 +29,7 @@ namespace cherry {
 struct BundleEvents;
 struct IBundle;
 
-struct CHERRY_API IBundleContext : public Object
+struct CHERRY_OSGI IBundleContext : public Object
 {
   
   cherryClassMacro(IBundleContext);

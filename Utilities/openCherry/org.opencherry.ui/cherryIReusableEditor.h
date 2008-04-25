@@ -30,7 +30,7 @@ namespace cherry {
  * the workbench may change its contents instead of 
  * opening a new editor.
  */
-struct CHERRY_API IReusableEditor : public IEditorPart {
+struct CHERRY_UI IReusableEditor : public IEditorPart {
   
   cherryClassMacro(IReusableEditor)
   

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYISELECTIONLISTENER_H_
 #define CHERRYISELECTIONLISTENER_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 namespace cherry {
 
@@ -32,7 +32,7 @@ namespace cherry {
  * @see ISelectionService#AddSelectionListener(std::string, ISelectionListener::Ptr)
  * @see org.opencherry.ui.INullSelectionListener
  */
-struct CHERRY_API ISelectionListener {
+struct CHERRY_UI ISelectionListener {
     /**
      * Notifies this listener that the selection has changed.
      * <p>

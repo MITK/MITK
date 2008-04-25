@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSTARTER_H_
 #define CHERRYSTARTER_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryApplicationDll.h"
 
 namespace cherry {
 
-class CHERRY_API Starter
+class CHERRY_APPLICATION Starter
 {
 
 public:

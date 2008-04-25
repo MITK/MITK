@@ -29,7 +29,7 @@ struct IWorkbenchPage;
 struct IPartService;
 struct ISelectionService;
 
-class CHERRY_API WorkbenchWindow : public IWorkbenchWindow
+class CHERRY_UI WorkbenchWindow : public IWorkbenchWindow
 {
 public:
   cherryClassMacro(WorkbenchWindow);

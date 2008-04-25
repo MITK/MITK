@@ -34,7 +34,7 @@ namespace cherry {
  * 
  * @since 3.1
  */
-struct CHERRY_API IEditorMatchingStrategy : public Object {
+struct CHERRY_UI IEditorMatchingStrategy : public Object {
     
   cherryClassMacro(IEditorMatchingStrategy)
   

@@ -58,7 +58,7 @@ namespace cherry {
  * @see IEditorPart
  * @see IViewPart
  */
-struct CHERRY_API IWorkbenchPage : public Object { //, public IPartService, public ISelectionService {
+struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, public ISelectionService {
   
   cherryClassMacro(IWorkbenchPage);
   

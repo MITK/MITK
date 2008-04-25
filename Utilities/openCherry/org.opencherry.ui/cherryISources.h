@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYISOURCES_H_
 
 #include <string>
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 namespace cherry {
 
@@ -67,7 +67,7 @@ namespace cherry {
  * @see org.eclipse.ui.ISourceProvider
  * @since 3.1
  */
-struct CHERRY_API ISources {
+struct CHERRY_UI ISources {
 
   /**
    * The priority given to default handlers and handlers that are active

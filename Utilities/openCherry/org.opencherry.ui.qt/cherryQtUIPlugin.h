@@ -18,14 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYUIPLUGIN_H_
 #define CHERRYUIPLUGIN_H_
 
-#include "org.opencherry.osgi/cherryPlugin.h"
+#include <org.opencherry.osgi/cherryPlugin.h>
 
 #include "internal/cherryQtPlatformLogModel.h"
 
+#include "cherryUiQtDll.h"
 
 namespace cherry {
 
-class CHERRY_API QtUIPlugin : public Plugin
+class CHERRY_UI_QT QtUIPlugin : public Plugin
 {
 public:
   

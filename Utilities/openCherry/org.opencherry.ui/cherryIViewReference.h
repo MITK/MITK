@@ -29,7 +29,7 @@ namespace cherry {
  * This interface is not intended to be implemented by clients.
  * </p>
  */
-struct CHERRY_API IViewReference : virtual public IWorkbenchPartReference {
+struct CHERRY_UI IViewReference : virtual public IWorkbenchPartReference {
 
   cherryClassMacro(IViewReference);
   

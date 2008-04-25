@@ -20,12 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/cherryMacros.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
 /**
  * The container for workbench parts.
  */
-struct CHERRY_API IPartPane : public Object {
+struct CHERRY_UI IPartPane : public Object {
   
   cherryClassMacro(IPartPane)
   

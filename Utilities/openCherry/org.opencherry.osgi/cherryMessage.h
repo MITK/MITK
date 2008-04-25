@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 
 
 namespace cherry {
@@ -180,7 +180,7 @@ class TMessageCommand2 : public MessageCommand2<T,U>
 }; 
 
 // message without parameters (pure signals)
-class CHERRY_API Message
+class CHERRY_OSGI Message
 { 
   public: 
     
@@ -247,7 +247,7 @@ class CHERRY_API Message
 
 // message with 1 parameter
 template <typename T>
-class CHERRY_API Message1
+class CHERRY_OSGI Message1
 { 
   public: 
     
@@ -314,7 +314,7 @@ class CHERRY_API Message1
 
 // message with 2 parameters
 template <typename T, typename U>
-class CHERRY_API Message2
+class CHERRY_OSGI Message2
 { 
   public: 
     

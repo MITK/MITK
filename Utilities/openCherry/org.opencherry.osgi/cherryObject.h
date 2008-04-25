@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Mutex.h>
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 #include "cherrySmartPointer.h"
 
 namespace cherry {
 
 
-class CHERRY_API Indent
+class CHERRY_OSGI Indent
 {
 public:
   /** Standard class typedefs. */
@@ -64,7 +64,7 @@ private:
  * implements reference counting and the API for object printing.
  *
  */
-class CHERRY_API Object 
+class CHERRY_OSGI Object 
 {
 public:
   /** Standard clas typedefs. */

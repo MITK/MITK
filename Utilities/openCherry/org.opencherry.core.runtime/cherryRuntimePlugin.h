@@ -18,14 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYRUNTIMEACTIVATOR_H_
 #define CHERRYRUNTIMEACTIVATOR_H_
 
-#include "org.opencherry.osgi/cherryPlugin.h"
-#include "org.opencherry.osgi/cherryIBundleContext.h"
+#include <org.opencherry.osgi/cherryPlugin.h>
+#include <org.opencherry.osgi/cherryIBundleContext.h>
+#include <org.opencherry.osgi/event/cherryPlatformEvent.h>
 
-#include "org.opencherry.osgi/event/cherryPlatformEvent.h"
+#include "cherryRuntimeDll.h"
 
 namespace cherry {
 
-class CHERRY_API RuntimePlugin : public Plugin
+class CHERRY_RUNTIME RuntimePlugin : public Plugin
 {
 public:
   

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYISELECTIONSERVICE_H_
 #define CHERRYISELECTIONSERVICE_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiDll.h"
 
 namespace cherry {
 
@@ -35,7 +35,7 @@ namespace cherry {
  * @see org.eclipse.ui.ISelectionListener
  * @see org.eclipse.ui.INullSelectionListener
  */
-struct CHERRY_API ISelectionService {
+struct CHERRY_UI ISelectionService {
   
     /**
      * Adds the given selection listener.

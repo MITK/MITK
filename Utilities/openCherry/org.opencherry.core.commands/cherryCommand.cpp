@@ -69,7 +69,7 @@ std::string Command::DEBUG_HANDLERS_COMMAND_ID = null;
   }
 
   void Command::Define(const std::string& name, const std::string& description,
-      /*final Category category,*/ const std::vector<IParameter>& parameters,
+      /*final Category category,*/ const std::vector<IParameter::Pointer>& parameters,
       ParameterType::Pointer returnType = 0, const std::string& helpContextId = "") {
     if (name == null) {
       throw new NullPointerException(
@@ -179,7 +179,7 @@ std::string Command::DEBUG_HANDLERS_COMMAND_ID = null;
     return null;
   }
 
-  std::vector<IParameter> Command::GetParameters() {
+  std::vector<IParameter::Pointer> Command::GetParameters() {
     if (!isDefined()) {
       throw new NotDefinedException(
           "Cannot get the parameters from an undefined command. " //$NON-NLS-1$

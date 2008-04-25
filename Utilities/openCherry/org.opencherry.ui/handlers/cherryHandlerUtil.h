@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <org.opencherry.osgi/cherryObjectVector.h>
 #include <org.opencherry.osgi/cherryObjectString.h>
 
+#include "../cherryUiDll.h"
 #include "../cherryIWorkbenchPart.h"
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryISelection.h"
@@ -37,7 +38,7 @@ namespace cherry {
  * 
  * @since 3.3
  */
-class CHERRY_API HandlerUtil {
+class CHERRY_UI HandlerUtil {
   
 private:
   

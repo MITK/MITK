@@ -18,8 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IWORKBENCHPART_H_
 #define IWORKBENCHPART_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
-#include "org.opencherry.osgi/cherryMacros.h"
+#include "cherryUiDll.h"
+
+#include <org.opencherry.osgi/cherryMacros.h>
 
 
 namespace cherry {
@@ -103,7 +104,7 @@ struct IWorkbenchPartSite;
  * @see IViewPart
  * @see IEditorPart
  */
-struct CHERRY_API IWorkbenchPart : public Object { // public IAdaptable {
+struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
 
   cherryClassMacro(IWorkbenchPart)
   

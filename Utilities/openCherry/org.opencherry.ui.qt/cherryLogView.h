@@ -20,11 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtGui/QWidget>
 
-#include "org.opencherry.ui/cherryViewPart.h"
+#include <org.opencherry.ui/cherryViewPart.h>
+
+#include "cherryUiQtDll.h"
 
 namespace cherry {
   
-class CHERRY_API LogView : public ViewPart
+class CHERRY_UI_QT LogView : public ViewPart
 {
 public:
   void* CreatePartControl(void* parent);

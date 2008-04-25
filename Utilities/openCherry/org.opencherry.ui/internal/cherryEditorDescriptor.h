@@ -31,7 +31,7 @@ struct IMemento;
 /**
  * @see IEditorDescriptor
  */
-class CHERRY_API EditorDescriptor : public IEditorDescriptor
+class CHERRY_UI EditorDescriptor : public IEditorDescriptor
 { //, Serializable, IPluginContribution {
 
 public:

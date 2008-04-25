@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCH_H_
 #define CHERRYWORKBENCH_H_
 
-#include <org.opencherry.osgi/cherryDll.h>
-
 #include <org.opencherry.ui/cherryIViewPart.h>
 #include <org.opencherry.ui/cherryIViewPane.h>
 
@@ -31,7 +29,7 @@ namespace cherry {
 
 class ViewRegistry;
 
-class CHERRY_API Workbench : public IWorkbench
+class CHERRY_UI Workbench : public IWorkbench
 {
   
 public:

@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtGui/QWidget>
 
-#include <org.opencherry.osgi/cherryDll.h>
+#include "cherryUiQtDll.h"
 
 #include "ui_cherryQtLogView.h"
 
 namespace cherry {
 
-class CHERRY_API QtLogView : public QWidget
+class CHERRY_UI_QT QtLogView : public QWidget
 {
 
 public:

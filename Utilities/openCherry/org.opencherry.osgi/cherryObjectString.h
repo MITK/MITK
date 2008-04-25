@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-class CHERRY_API ObjectString : public std::string, public Object
+class CHERRY_OSGI ObjectString : public std::string, public Object
 {
 public:
   cherryClassMacro(ObjectString);

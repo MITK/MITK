@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryIEvaluationContext.h"
 #include "cherryIVariableResolver.h"
+#include "cherryExpressionsDll.h"
 
 #include "Poco/Any.h"
 
@@ -37,7 +38,7 @@ namespace cherry {
  * 
  * @since 3.0
  */
-class CHERRY_API EvaluationContext : public IEvaluationContext 
+class CHERRY_EXPRESSIONS EvaluationContext : public IEvaluationContext 
 {
 
 private:

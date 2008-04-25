@@ -18,22 +18,22 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPLATFORMEXCEPTION_H_
 #define CHERRYPLATFORMEXCEPTION_H_
 
-#include "cherryDll.h"
+#include "cherryOSGiDll.h"
 #include "Poco/Exception.h"
 
 namespace cherry {
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, PlatformException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, PlatformException, Poco::RuntimeException);
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, ManifestException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, BundleException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, BundleStateException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, BundleVersionConflictException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, BundleLoadException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, BundleResolveException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, ManifestException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleStateException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleVersionConflictException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleLoadException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleResolveException, PlatformException);
 
-POCO_DECLARE_EXCEPTION(CHERRY_API, CoreException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_API, InvalidServiceObjectException, CoreException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, CoreException, PlatformException);
+POCO_DECLARE_EXCEPTION(CHERRY_OSGI, InvalidServiceObjectException, CoreException);
 
 }
 

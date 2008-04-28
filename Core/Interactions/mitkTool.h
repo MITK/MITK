@@ -73,6 +73,11 @@ class MITK_CORE_EXPORT Tool : public StateMachine
     typedef unsigned char DefaultSegmentationDataType;
 
     /**
+     * \brief To let GUI process new events (e.g. qApp->processEvents() )
+     */
+    Message GUIProcessEventsMessage;
+ 
+    /**
      * \brief To send error messages (to be shown by some GUI)
      */
     Message1<std::string> ErrorMessage;

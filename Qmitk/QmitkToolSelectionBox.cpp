@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtooltip.h>
 #include <qmessagebox.h>
 #include <qlayout.h>
+#include <qapplication.h>
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, const char* name)
 :QButtonGroup("Tools", parent, name),
@@ -360,6 +361,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       m_ButtonIDForToolID[currentToolID] = currentButtonID;
       m_ToolIDForButtonID[currentButtonID] = currentToolID;
   
+      tool->GUIProcessEventsMessage.AddListener( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
       tool->ErrorMessage.AddListener( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
       tool->GeneralMessage.AddListener( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
 
@@ -368,6 +370,11 @@ void QmitkToolSelectionBox::RecreateButtons()
       
     ++currentToolID;
   }
+}
+
+void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
+{
+  qApp->processEvents();
 }
 
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)

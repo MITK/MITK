@@ -76,6 +76,7 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
     void OnToolManagerReferenceDataModified();
     void OnToolManagerWorkingDataModified();
 
+    void OnToolGUIProcessEventsMessage();
     void OnToolErrorMessage(std::string s);
     void OnGeneralToolMessage(std::string s);
 

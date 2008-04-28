@@ -362,6 +362,19 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   resultImage->Initialize( pic );
   resultImage->SetSpacing( spacingVector );
   resultImage->SetPicVolume( pic );
+
+  ipPicFree(pic);
+  
+  /*unsigned int dimensions[2];
+  dimensions[0] = (unsigned int)extent[0]; dimensions[1] = (unsigned int)extent[1];
+  Vector3D spacingVector;
+  FillVector3D(spacingVector, mmPerPixel[0], mmPerPixel[1], 1.0);
+
+  mitk::Image::Pointer resultImage = this->GetOutput();
+  resultImage->Initialize(m_Reslicer->GetOutput());
+  resultImage->Initialize(inputImage->GetPixelType(), 2, dimensions);
+  resultImage->SetSpacing(spacingVector);
+  resultImage->SetSlice(m_Reslicer->GetOutput());*/
 }
 
 
@@ -421,6 +434,7 @@ bool mitk::ExtractDirectedPlaneImageFilter
   transform->Concatenate( boundingGeometry->GetVtkTransform() );
 
   transform->TransformPoints( points, newPoints );
+  transform->Delete();
 
   bounds[0] = bounds[2] = 10000000.0;
   bounds[1] = bounds[3] = -10000000.0;
@@ -442,7 +456,6 @@ bool mitk::ExtractDirectedPlaneImageFilter
   // clean up vtk data
   points->Delete();
   newPoints->Delete();
-  transform->Delete();
 
   if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
     || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )

@@ -158,14 +158,20 @@ void BaseXMLWriter::SetSpace( int space )
 
 const char* BaseXMLWriter::ConvertString( const char* string ) const
 {
-  static std::char_traits<char>::char_type buffer[255];
-  int length = std::char_traits<char>::length( string );
-  std::char_traits<char>::copy ( buffer, string, length + 1 );
+  typedef std::char_traits<char> CharType;
+  static CharType::char_type buffer[255];
+  int length = CharType::length( string );
+#ifdef _MSC_VER >= 1400
+  CharType::_Copy_s( buffer, CharType::length( buffer ), string, length + 1 );
+#else 
+  CharType::copy( buffer, string, length + 1 );
+#endif
+
   const char* pos = buffer;
   
   while ( pos != NULL ) 
   {
-    pos = std::char_traits<char>::find ( buffer, length , '<');
+    pos = CharType::find ( buffer, length , '<');
 
     if( pos != NULL )
       *(const_cast<char*>(pos)) = '{';
@@ -175,7 +181,7 @@ const char* BaseXMLWriter::ConvertString( const char* string ) const
   
   while ( pos != NULL ) 
   {
-    pos = std::char_traits<char>::find ( buffer, length , '>');
+    pos = CharType::find ( buffer, length , '>');
 
     if( pos != NULL )
       *(const_cast<char*>(pos)) = '}';

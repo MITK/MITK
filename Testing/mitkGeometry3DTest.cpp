@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
 
+#include "mitkRotationOperation.h"
+#include "mitkInteractionConst.h"
+
 #include <fstream>
 
 bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
@@ -117,6 +120,17 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing a rotation of the geometry: ";
+  double angle = 35.0;
+  mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
+  mitk::Point3D center = geometry3d->GetCenter();
+  mitk::RotationOperation* op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
+  geometry3d->ExecuteOperation(op);
+
+  // Todo: Find a meaningful way to test rotation success
+  delete op;
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;

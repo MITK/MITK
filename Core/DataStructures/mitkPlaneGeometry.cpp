@@ -741,12 +741,14 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
 
   default:
     Superclass::ExecuteOperation( operation );
+    vtktransform->Delete();
     return;
   }
 
   m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
   TransferVtkToItkTransform();
   this->Modified();
+  vtktransform->Delete();
 }
 
 

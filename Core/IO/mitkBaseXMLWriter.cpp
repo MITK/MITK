@@ -17,11 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseXMLWriter.h"
 
-#include <fstream>
-#include <string>
-#include <stack>
 #include <stdio.h>
-#include <sstream>
 #include <stdlib.h>
 
 namespace mitk {
@@ -156,38 +152,25 @@ void BaseXMLWriter::SetSpace( int space )
 }
 
 
-const char* BaseXMLWriter::ConvertString( const char* string ) const
+std::string BaseXMLWriter::ConvertString( const std::string& s ) const
 {
-  typedef std::char_traits<char> CharType;
-  static CharType::char_type buffer[255];
-  int length = CharType::length( string );
-#ifdef _MSC_VER >= 1400
-  CharType::_Copy_s( buffer, CharType::length( buffer ), string, length + 1 );
-#else 
-  CharType::copy( buffer, string, length + 1 );
-#endif
+  std::string workString(s);
 
-  const char* pos = buffer;
-  
-  while ( pos != NULL ) 
+  std::string::size_type index = workString.find('<');
+  while ( index != std::string::npos )
   {
-    pos = CharType::find ( buffer, length , '<');
-
-    if( pos != NULL )
-      *(const_cast<char*>(pos)) = '{';
+    workString[index] = '{';
+    index = workString.find('<', index);
   }
 
-  pos = buffer;
-  
-  while ( pos != NULL ) 
+  index = workString.find('>');
+  while ( index != std::string::npos )
   {
-    pos = CharType::find ( buffer, length , '>');
-
-    if( pos != NULL )
-      *(const_cast<char*>(pos)) = '}';
+    workString[index] = '}';
+    index = workString.find('>', index);
   }
 
-  return buffer;
+  return workString;
 }
 
 

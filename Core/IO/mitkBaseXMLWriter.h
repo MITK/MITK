@@ -38,6 +38,9 @@ namespace mitk{
   //##
   //## The XMLIO class manages the writing and reading of the data.
   //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
+  //## 
+  //## \TODO Remove this class and mitk::XMLReader (cleanly) and grab 300g Milka chocolate from D. Maleike.
+  //##
   //## @ingroup IO
   class MITK_CORE_EXPORT BaseXMLWriter {
     
@@ -112,7 +115,7 @@ namespace mitk{
 protected:
 
     /// replaces characters "<" and ">" with "{" and "}"
-    const char* ConvertString( const char* string ) const;
+    std::string ConvertString( const std::string& s ) const;
     const char* m_XMLPathAndFilename;
   };
 }

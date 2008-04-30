@@ -17,17 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGeometry3D.h"
-#include "mitkItkMatrixHack.h"
 #include "mitkMatrixConvert.h"
-#include "mitkOperation.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkStatusBar.h"
 #include "mitkXMLWriter.h"
 #include "mitkXMLReader.h"
-
-#include <float.h>
 
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
@@ -38,7 +34,7 @@ const std::string mitk::Geometry3D::OBJECT_TO_NODE_TRANSFORM = "OBJECT_TO_NODE_T
 const std::string mitk::Geometry3D::INDEX_TO_NODE_TRANSFORM = "INDEX_TO_NODE_TRANSFORM";
 const std::string mitk::Geometry3D::INDEX_TO_WORLD_TRANSFORM = "INDEX_TO_WORLD_TRANSFORM";
 
-// Standard Constructor for the new makro. sets the geometry to 3 dimensions
+// Standard constructor for the New() macro. Sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D()
   : m_ParametricBoundingBox(NULL),
     m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0)

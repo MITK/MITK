@@ -43,14 +43,14 @@ namespace mitk {
 
     //##Documentation
     //## @brief Adds a child predicate
-    virtual void AddPredicate(mitk::NodePredicateBase& p);
+    virtual void AddPredicate(const NodePredicateBase& p);
 
     //##Documentation
     //## @brief Removes a child predicate
-    virtual void RemovePredicate(mitk::NodePredicateBase& p);
+    virtual void RemovePredicate(const NodePredicateBase& p);
 
   protected:
-    typedef std::list<mitk::NodePredicateBase*> ChildPredicates;
+    typedef std::list<const NodePredicateBase*> ChildPredicates;
     //##Documentation
     //## @brief list of child predicates
     ChildPredicates m_ChildPredicates;
@@ -59,3 +59,4 @@ namespace mitk {
 } // namespace mitk
 
 #endif /* MITKNODEPREDICATECOMPOSITEBASE_H_HEADER_INCLUDED_ */
+

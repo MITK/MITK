@@ -317,55 +317,55 @@ void QmitkToolSelectionBox::RecreateButtons()
                                         ( m_DisplayedGroups.find( tool->GetName() ) != std::string::npos ) 
        )
     {
-      QToolButton* button = new QToolButton(this);
+    QToolButton* button = new QToolButton(this);
 
-      if (m_LayoutColumns == 1)
-      {
-        button->setTextPosition( QToolButton::BesideIcon );
-      }
-      else
-      {
-        button->setTextPosition( QToolButton::BelowIcon );
-      }
+    if (m_LayoutColumns == 1)
+    {
+      button->setTextPosition( QToolButton::BesideIcon );
+    }
+    else
+    {
+      button->setTextPosition( QToolButton::BelowIcon );
+    }
 
-      button->setToggleButton( true );
+    button->setToggleButton( true );
 
-      QString label;
-      if (m_GenerateAccelerators)
-      {
-        label += "&";
-      }
-      label += tool->GetName();
-      QString tooltip = tool->GetName();
+    QString label;
+    if (m_GenerateAccelerators)
+    {
+      label += "&";
+    }
+    label += tool->GetName();
+    QString tooltip = tool->GetName();
 
-      if ( m_ShowNames )
-      {
-        button->setUsesTextLabel(true);
-        button->setTextLabel( label );              // a label
-        QToolTip::add( button, tooltip );
-        
-        QFont currentFont = button->font();
-        currentFont.setBold(false);
-        button->setFont( currentFont );
-      }
+    if ( m_ShowNames )
+    {
+      button->setUsesTextLabel(true);
+      button->setTextLabel( label );              // a label
+      QToolTip::add( button, tooltip );
+      
+      QFont currentFont = button->font();
+      currentFont.setBold(false);
+      button->setFont( currentFont );
+    }
 
-      button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
+    button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
 
-      if (m_GenerateAccelerators)
-      {
-        QString firstLetter = QString( tool->GetName() );
-        firstLetter.truncate( 1 );
-        button->setAccel( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
-      }
+    if (m_GenerateAccelerators)
+    {
+      QString firstLetter = QString( tool->GetName() );
+      firstLetter.truncate( 1 );
+      button->setAccel( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
+    }
 
-      m_ButtonIDForToolID[currentToolID] = currentButtonID;
-      m_ToolIDForButtonID[currentButtonID] = currentToolID;
-  
-      tool->GUIProcessEventsMessage.AddListener( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
-      tool->ErrorMessage.AddListener( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
-      tool->GeneralMessage.AddListener( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
+    m_ButtonIDForToolID[currentToolID] = currentButtonID;
+    m_ToolIDForButtonID[currentButtonID] = currentToolID;
 
-      ++currentButtonID;
+    tool->GUIProcessEventsMessage.AddListener( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
+    tool->ErrorMessage.AddListener( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
+    tool->GeneralMessage.AddListener( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
+
+    ++currentButtonID;
     }
       
     ++currentToolID;
@@ -390,9 +390,12 @@ void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
     
 void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups)
 {
-  m_DisplayedGroups = toolGroups;
-  RecreateButtons();
-  SetOrUnsetButtonForActiveTool();
+  if (m_DisplayedGroups != toolGroups)
+  {
+    m_DisplayedGroups = toolGroups;
+    RecreateButtons();
+    SetOrUnsetButtonForActiveTool();
+  }
 }
 
 void QmitkToolSelectionBox::SetLayoutColumns(int columns)

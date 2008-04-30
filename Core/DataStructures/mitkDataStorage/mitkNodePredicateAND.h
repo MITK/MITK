@@ -41,13 +41,14 @@ namespace mitk {
       virtual ~NodePredicateAND();
       //##Documentation
       //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
-      NodePredicateAND(mitk::NodePredicateBase& p1, mitk::NodePredicateBase& p2);
+      NodePredicateAND(const NodePredicateBase& p1, const NodePredicateBase& p2);
 
       //##Documentation
       //## @brief Checks, if the node fulfills all of the subpredicates conditions
-      virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+      virtual bool CheckNode(const DataTreeNode* node) const;
     };
 
 } // namespace mitk
 
 #endif /* MITKNODEPREDICATEAND_H_HEADER_INCLUDED_ */
+

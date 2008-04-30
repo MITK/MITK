@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)
-:StateMachine(type)
+: StateMachine(type),
+  m_IsSegmentationPredicate("segmentation", BoolProperty::New(true))
 {
 }
 
@@ -76,6 +77,11 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
   }
 
   return object;
+}
+
+const mitk::NodePredicateBase& mitk::Tool::GetDataPreference() const
+{
+  return m_IsSegmentationPredicate;
 }
 
 //--------------------------------------------------------------------------------

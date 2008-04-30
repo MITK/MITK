@@ -25,7 +25,7 @@ mitk::NodePredicateOR::NodePredicateOR()
 {
 }
 
-mitk::NodePredicateOR::NodePredicateOR(mitk::NodePredicateBase& p1, mitk::NodePredicateBase& p2)
+mitk::NodePredicateOR::NodePredicateOR(const NodePredicateBase& p1, const NodePredicateBase& p2)
 : NodePredicateCompositeBase()
 {
   this->AddPredicate(p1);
@@ -37,7 +37,7 @@ mitk::NodePredicateOR::~NodePredicateOR()
 }
 
 
-bool mitk::NodePredicateOR::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateOR::CheckNode(const DataTreeNode* node) const
 {
   if (m_ChildPredicates.empty())
     throw 1;  // Insert Exception Handling here

@@ -48,6 +48,18 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
   Q_OBJECT
 
   public:
+
+    /**
+     * \brief What kind of items should be displayed.
+     *
+     * Every mitk::Tool holds a NodePredicateBase object, telling the kind of data that this
+     * tool will successfully work with. There are two ways that this list box deals with
+     * these predicates.
+     *
+     *   DEFAULT is: list data if ANY one of the displayed tools' predicate matches.
+     * Other option: list data if ALL one of the displayed tools' predicate matches
+     */
+    enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
     
     QmitkToolWorkingDataListBox(QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkToolWorkingDataListBox();
@@ -70,20 +82,80 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
       */
     void SetShowOnlySelected(bool);
 
+    /**
+      \brief Can be called to trigger an update of the list contents.
+     */
     void UpdateDataDisplay();
     
+    /**
+      \brief Returns the associated mitk::ToolManager.
+      */
     mitk::ToolManager* GetToolManager();
+
+    /**
+      \brief Tell this object to listen to another ToolManager.
+      */
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
+    /**
+     * \brief A list of all displayed DataTreeNode objects.
+     * This method might be convenient for program modules that want to display
+     * additional information about these nodes, like a total volume of all segmentations, etc.
+     */
     mitk::ToolManager::DataVectorType GetAllNodes( bool onlyDerivedFromOriginal = true );
+
+    /**
+     * \brief A list of all selected DataTreeNode objects.
+     * This method might be convenient for program modules that want to display
+     * additional information about these nodes, like a total volume of all segmentations, etc.
+     */
     mitk::ToolManager::DataVectorType GetSelectedNodes();
+
+    /**
+     * \brief Like GetSelectedNodes(), but will only return one object.
+     * Will only return what QListView gives as selected object (documentation says nothing is returned if list is in Single selection mode).
+     */
     mitk::DataTreeNode* GetSelectedNode();
     
+    /**
+     * \brief Callback function, no need to call it.
+     * This is used to observe and react to changes in the mitk::ToolManager object.
+     */
     void OnToolManagerWorkingDataModified();
+    
+    /**
+     * \brief Callback function, no need to call it.
+     * This is used to observe and react to changes in the mitk::ToolManager object.
+     */
     void OnToolManagerReferenceDataModified();
 
-    // \param columns Comma separated list of key:title pairs please. E.g. 'SetAdditionalColumns( "name:Name,volume:Vol." )'
+    /**
+     * \brief Enhance the list with additional columns.
+     *
+     * Currently only used for volume display. Might not be suited for other properties.
+     *
+     * \param columns Comma separated list of key:title pairs please. E.g. 'SetAdditionalColumns( "name:Name,volume:Vol." )'
+     */
     void SetAdditionalColumns(const std::string& columns);
+
+    /**
+     * \brief How the list contents is determined.
+     * 
+     * See also documentation of DisplayMode.
+     *
+     * \sa DisplayMode
+     */
+    void SetDisplayMode( DisplayMode mode );
+
+    /**
+     * \brief No brief description.
+     *
+     * Should be called to restrict the number of tools that are
+     * evaluated to build up the list. Default is to ask all tools for their predicate, by
+     * setting the 'groups' string this can be restricted to certain groups of tools
+     * or single tools.
+     */
+    void SetToolGroupsForFiltering(const std::string& groups);
 
   signals:
 
@@ -125,6 +197,9 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
     QObject* m_LastKeyFilterObject;
 
     mitk::DataTreeNode* m_LastSelectedReferenceData;
+
+    DisplayMode m_DisplayMode;
+    std::string m_ToolGroupsForFiltering;
 };
  
 #endif

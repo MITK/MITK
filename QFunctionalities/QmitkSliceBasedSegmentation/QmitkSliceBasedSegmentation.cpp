@@ -75,6 +75,7 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
 
     m_Controls->m_ToolWorkingDataListBox->SetToolManager( *toolManager );
     m_Controls->m_ToolWorkingDataListBox->SetAdditionalColumns("volume:Vol. [ml]");
+    m_Controls->m_ToolWorkingDataListBox->SetToolGroupsForFiltering("default segmentationProcessing");
 
     m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
     m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);

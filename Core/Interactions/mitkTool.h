@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolFactoryMacro.h"
 #include "mitkMessage.h"
 #include "mitkDataTreeNode.h"
+#include "mitkNodePredicateProperty.h"
 
 #include <iostream>
 #include <string>
@@ -135,6 +136,8 @@ class MITK_CORE_EXPORT Tool : public StateMachine
      */
     virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
 
+    virtual const NodePredicateBase& GetDataPreference() const;
+
   protected:
     
     friend class ToolManager;
@@ -205,6 +208,11 @@ class MITK_CORE_EXPORT Tool : public StateMachine
     virtual ~Tool();
 
     ToolManager* m_ToolManager;
+
+  private:
+
+    NodePredicateProperty m_IsSegmentationPredicate;
+
 };
 
 } // namespace

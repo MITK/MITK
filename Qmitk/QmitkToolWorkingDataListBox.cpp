@@ -34,8 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
-#include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateOR.h"
+#include "mitkNodePredicateAND.h"
  
 class QmitkToolWorkingDataListBoxUpdateDataEvent : public QCustomEvent
 {
@@ -52,7 +52,9 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
  m_ShowOnlySelected(true),
  m_SelfCall(false),
  m_LastKeyFilterObject(NULL),
- m_LastSelectedReferenceData(NULL)
+ m_LastSelectedReferenceData(NULL),
+ m_DisplayMode( ListDataIfAnyToolMatches ),
+ m_ToolGroupsForFiltering(std::string())
 {
   m_ToolManager = mitk::ToolManager::New(); // this widget should be placeable from designer so it can't take other than the defaul parameters
 
@@ -343,18 +345,74 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
-  mitk::NodePredicateProperty isSegmentation("segmentation", mitk::BoolProperty::New(true));
-  mitk::NodePredicateProperty isSegmentationMarker("segmentation marker", mitk::BoolProperty::New(true));
-  mitk::NodePredicateOR combinedPredicate(isSegmentation, isSegmentationMarker);
+  /** 
+   * Build up predicate:
+   *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
+   *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
+   *    \sa SetDisplayMode
+   */
 
+  static std::vector< const mitk::NodePredicateBase* > m_Predicates;
+  static const mitk::NodePredicateBase* completePredicate = NULL;
+  bool rebuildNeeded = true;
+  if (rebuildNeeded)
+  {
+    for ( std::vector< const mitk::NodePredicateBase* >::iterator iter = m_Predicates.begin();
+          iter != m_Predicates.end();
+          ++iter )
+    {
+      delete *iter;
+    }
+
+    m_Predicates.clear();
+    completePredicate = NULL;
+
+    const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
+
+    for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
+          iter != allTools.end();
+          ++iter )
+    {
+      const mitk::Tool* tool = *iter;
+
+      if ( (m_ToolGroupsForFiltering.empty()) || ( m_ToolGroupsForFiltering.find( tool->GetGroup() ) != std::string::npos ) ||
+                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos ) 
+         )
+      {
+        if (completePredicate)
+        {
+          if ( m_DisplayMode == ListDataIfAnyToolMatches )
+          {
+              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetDataPreference() ) );
+          }
+          else
+          {
+              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetDataPreference() ) );
+          }
+          completePredicate = m_Predicates.back();
+        }
+        else
+        {
+          completePredicate = &tool->GetDataPreference();
+        }
+      }
+    }
+  }
+
+  // TODO delete all m_Predicates
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
- 
+
+  /** 
+   * Two modes here:
+   *  - display only nodes below reference data from ToolManager (onlyDerivedFromOriginal == true)
+   *  - display everything matching the predicate (else)
+   */
   if ( onlyDerivedFromOriginal )
   {
     mitk::DataTreeNode* sourceNode( m_ToolManager->GetReferenceData(0) );
     if (sourceNode)
     {
-      allObjects = dataStorage->GetDerivations( sourceNode, &combinedPredicate, false );
+      allObjects = dataStorage->GetDerivations( sourceNode, completePredicate, false );
     }
     else
     {
@@ -363,7 +421,14 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
   }
   else
   {
-    allObjects = dataStorage->GetSubset( combinedPredicate );
+    if (completePredicate)
+    {
+      allObjects = dataStorage->GetSubset( *completePredicate );
+    }
+    else
+    {
+      allObjects = dataStorage->GetAll();
+    }
   }
 
   mitk::ToolManager::DataVectorType resultVector;
@@ -604,5 +669,11 @@ void QmitkToolWorkingDataListBox::InstallKeyFilterOn( QObject* object )
   m_LastKeyFilterObject = object;
 
   object->installEventFilter( this );
+}
+
+void QmitkToolWorkingDataListBox::SetToolGroupsForFiltering(const std::string& groups)
+{
+  m_ToolGroupsForFiltering = groups;
+  UpdateDataDisplay();
 }
 

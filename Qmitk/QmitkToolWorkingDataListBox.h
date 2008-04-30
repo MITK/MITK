@@ -157,6 +157,11 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
      */
     void SetToolGroupsForFiltering(const std::string& groups);
 
+    /**
+     * \brief Wheter to show all segmentations or just those derived from reference data.
+     */
+    void SetDisplayOnlyDerivedNodes(bool on);
+
   signals:
 
     void WorkingNodeSelected(const mitk::DataTreeNode*);
@@ -200,6 +205,8 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
 
     DisplayMode m_DisplayMode;
     std::string m_ToolGroupsForFiltering;
+
+    bool m_DisplayOnlyDerivedNodes;
 };
  
 #endif

@@ -54,7 +54,8 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
  m_LastKeyFilterObject(NULL),
  m_LastSelectedReferenceData(NULL),
  m_DisplayMode( ListDataIfAnyToolMatches ),
- m_ToolGroupsForFiltering(std::string())
+ m_ToolGroupsForFiltering(std::string()),
+ m_DisplayOnlyDerivedNodes(true)
 {
   m_ToolManager = mitk::ToolManager::New(); // this widget should be placeable from designer so it can't take other than the defaul parameters
 
@@ -201,7 +202,7 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
   }
     
   // rebuild contents
-  mitk::ToolManager::DataVectorType allObjects = GetAllNodes();
+  mitk::ToolManager::DataVectorType allObjects = GetAllNodes( m_DisplayOnlyDerivedNodes );
   unsigned int laufendeNummer(1);
   QListViewItem* lastItem(NULL);
   for ( mitk::ToolManager::DataVectorType::const_iterator objectIter = allObjects.begin();
@@ -612,7 +613,7 @@ bool QmitkToolWorkingDataListBox::eventFilter( QObject *o, QEvent *e )
       if ( k->key() > Qt::Key_0 )
         figuredOutIndex = k->key() - Qt::Key_1;
 
-      mitk::ToolManager::DataVectorType allSegmentations = GetAllNodes(); // find the index in our list and activate it
+      mitk::ToolManager::DataVectorType allSegmentations = GetAllNodes( m_DisplayOnlyDerivedNodes ); // find the index in our list and activate it
       {
         try
         {
@@ -675,5 +676,14 @@ void QmitkToolWorkingDataListBox::SetToolGroupsForFiltering(const std::string& g
 {
   m_ToolGroupsForFiltering = groups;
   UpdateDataDisplay();
+}
+
+void QmitkToolWorkingDataListBox::SetDisplayOnlyDerivedNodes(bool on)
+{
+  if ( m_DisplayOnlyDerivedNodes != on )
+  {
+    m_DisplayOnlyDerivedNodes = on;
+    UpdateDataDisplay();
+  }
 }
 

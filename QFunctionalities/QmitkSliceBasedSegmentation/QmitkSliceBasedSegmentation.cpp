@@ -74,33 +74,34 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
     m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataTreeIterator->GetTree() );
 
     m_Controls->m_ToolWorkingDataListBox->SetToolManager( *toolManager );
-    m_Controls->m_ToolWorkingDataListBox->SetAdditionalColumns("volume:Vol. [ml]");
-    m_Controls->m_ToolWorkingDataListBox->SetToolGroupsForFiltering("default segmentationProcessing");
+    m_Controls->m_ToolWorkingDataListBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
+    m_Controls->m_ToolWorkingDataListBox->SetToolGroupsForFiltering("default segmentationProcessing");  // for determination of what tools should be asked for their data preference
+    //m_Controls->m_ToolWorkingDataListBox->SetDisplayOnlyDerivedNodes(false);                            // show only segmentations derived from the original image
 
     m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
     m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
 
     m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
-    m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);
+    m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);                 // TODO these 'no border' settings could be moved into the widget
     m_Controls->m_AutoSegmentationToolSelectionBox->setFrameStyle( QFrame::NoFrame );
     m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
     m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );
-    m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");         // display only tools of group "autoSegmentation"
     m_Controls->m_AutoSegmentationToolSelectionBox->SetToolGUIArea( m_Controls->m_AutoSegmentationToolGUIContainer );
-    m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
+    m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );  // be enabled whenever there is a reference data object selected
 
     m_Controls->m_PostProcessingToolSelectionBox->setTitle("");
     m_Controls->m_PostProcessingToolSelectionBox->setInsideMargin(0);
     m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::NoFrame );
     m_Controls->m_PostProcessingToolSelectionBox->SetLayoutColumns(1);
     m_Controls->m_PostProcessingToolSelectionBox->SetToolManager( *toolManager );
-    m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing"); // show only tools which are marked with "segmentationProcessing"
+    m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing");    // show only tools which are marked with "segmentationProcessing"
     m_Controls->m_PostProcessingToolSelectionBox->SetToolGUIArea( m_Controls->m_PostProcessingToolGUIContainer );
 
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
 
-    toolManager->NodePropertiesChanged.AddListener( this, &QmitkSliceBasedSegmentation::OnNodePropertiesChanged );
-    toolManager->NewNodesGenerated.AddListener( this, &QmitkSliceBasedSegmentation::OnNewNodesGenerated );
+    toolManager->NodePropertiesChanged.AddListener( this, &QmitkSliceBasedSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
+    toolManager->NewNodesGenerated.AddListener( this, &QmitkSliceBasedSegmentation::OnNewNodesGenerated );          // update the list of segmentations
   }
   return m_Controls;
 }

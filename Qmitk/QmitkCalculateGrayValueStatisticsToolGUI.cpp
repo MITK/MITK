@@ -59,7 +59,7 @@ void QmitkCalculateGrayValueStatisticsToolGUI::OnCalculationsDone()
     std::cout << report << std::endl;
 
     // one for window users
-    QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog( report, NULL);
+    QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog( report.c_str(), NULL);
     dialog->show();
   }
 }

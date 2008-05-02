@@ -216,7 +216,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 
-#include <mitkConfig.h>
+#define USE_ITKZLIB
 
 #include "mitkIpPicMangle.h"
 

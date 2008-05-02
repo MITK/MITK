@@ -37,8 +37,14 @@ ENDIF(EXISTS ${MBI_DART_WORKDIR}/notes.txt)
 IF(EXISTS ${ITK_DIR}/ITKConfig.cmake)
   INCLUDE(${ITK_DIR}/ITKConfig.cmake)
 ENDIF(EXISTS ${ITK_DIR}/ITKConfig.cmake)
-IF(EXISTS ${VTK_DIR}/VTKConfig.cmake)
-  INCLUDE(${VTK_DIR}/VTKConfig.cmake)
+
+IF(EXISTS ${VTK_DIR}/VTKConfig.cmake) 
+   # this second check is necessary since sometimes on the very first
+   # CMake run VTKConfig exists but VTKConfigQt doesn't exist yet, breaking the
+   # configure step
+   IF(EXISTS ${VTK_DIR}/VTKConfigQt.cmake)
+     INCLUDE(${VTK_DIR}/VTKConfig.cmake)
+   ENDIF(EXISTS ${VTK_DIR}/VTKConfigQt.cmake)
 ENDIF(EXISTS ${VTK_DIR}/VTKConfig.cmake)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

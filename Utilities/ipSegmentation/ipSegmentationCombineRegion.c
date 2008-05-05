@@ -193,11 +193,11 @@ int compare_active(arg1, arg2) const void *arg1, *arg2;
   return u->x <= v->x ? -1 : 1;
 }
 
-int idx;
-Point2* pl;
 
 void ipMITKSegmentationCombineRegion   (ipPicDescriptor* segmentation, const ipInt4_t* const points, const int num, ipPicDescriptor* mask, const int operation, int value)
 {
+    int idx;
+    Point2* pl;
     Window *win;
     ipPicTSV_t* tag;
 

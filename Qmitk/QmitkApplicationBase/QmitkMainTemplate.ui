@@ -1162,6 +1162,7 @@
     <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
     <variable>mitk::DataTree::Pointer m_Tree;</variable>
     <variable>bool m_StandardViewsInitialized;</variable>
+    <variable access="private">bool m_NoMITKOptions;</variable>
     <variable access="private">bool m_FineUndoEnabled;</variable>
     <variable access="public">mitk::PropertyList::Pointer m_Options;</variable>
     <variable>QString m_ProjectFileName;</variable>

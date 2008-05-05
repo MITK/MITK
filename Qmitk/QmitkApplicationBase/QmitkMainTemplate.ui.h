@@ -713,6 +713,7 @@ void QmitkMainTemplate::init()
   m_FineUndoEnabled = true;
   m_StandardPalette = QApplication::palette();
   m_FirstFileOpen = true;
+  m_NoMITKOptions = false;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -878,9 +879,14 @@ void QmitkMainTemplate::Initialize()
   this->InitializeFunctionality();
 
   // loading application options
-  std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
-  if (!optionsFile.empty())
-    LoadOptionsFromFile(optionsFile.c_str());
+  if (! m_NoMITKOptions ) 
+  {
+    std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
+    if (!optionsFile.empty()) 
+    {
+      LoadOptionsFromFile(optionsFile.c_str());
+    }
+  }
   m_Options->SetProperty( "MITKSampleAppFunctionalityName", mitk::StringProperty::New("MITKSampleApp") );
 
   // initialize multiwidget with options
@@ -1029,6 +1035,10 @@ void QmitkMainTemplate::parseCommandLine()
       break;
     }
     if (strcmp(qApp->argv()[i], "-statemachineDebug")==0) {
+      break;
+    }
+    if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
+      m_NoMITKOptions = true;
       break;
     }
     fileOpen(qApp->argv()[i]);
@@ -1195,9 +1205,13 @@ void QmitkMainTemplate::destroy()
     m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
   }
   
-  // save now
-  std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
-  filename += "/MITKOptions.xml";  SaveOptionsToFile( filename.c_str() );
+  if (! m_NoMITKOptions) 
+  {
+    // save options now
+    std::string filename( mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() );
+    filename += "/MITKOptions.xml";  
+    SaveOptionsToFile( filename.c_str() );
+  }
 
   delete qfm;
 #ifdef MBI_INTERNAL

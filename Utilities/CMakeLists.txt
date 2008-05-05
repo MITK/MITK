@@ -5,6 +5,7 @@ SUPPRESS_VC8_DEPRECATED_WARNINGS()
 # most stuff of these uses itk_zlib.h (via ipPic.h)
 FIND_PACKAGE(ITK)
 INCLUDE_DIRECTORIES(${ITK_INCLUDE_DIRS})
+LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 
 # some legacy util files include in the old style with prefixed directory, 
 # like #include <ipPic/ipPic.h>

@@ -123,15 +123,15 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   }
 #endif
 
-  static std::time_t previousFunctionalitiesTime = std::time(NULL);
+  static time_t previousFunctionalitiesTime = time(NULL);
 
   // activate next functionality
   int nextId = m_QmitkFctMediator->GetActiveFunctionalityId()+1;
   QmitkFunctionality * nextFunctionality = m_QmitkFctMediator->GetFunctionalityById(nextId);
   if(nextFunctionality != NULL)
   {
-    std::time_t nowTime = std::time(NULL);
-    double timeDiff = std::difftime( nowTime, previousFunctionalitiesTime );
+    time_t nowTime = time(NULL);
+    double timeDiff = difftime( nowTime, previousFunctionalitiesTime );
     previousFunctionalitiesTime = nowTime;
     std::cout << "+" << static_cast<int>(timeDiff) << "s Activating \"" << nextFunctionality->className() <<"\" "<< std::flush;
     m_CloseMessagesTimer.start(3000,false); // close message boxes if RaiseFunctionality doesn't return
@@ -140,8 +140,8 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   }
   else
   {
-    std::time_t nowTime = std::time(NULL);
-    double timeDiff = std::difftime( nowTime, previousFunctionalitiesTime );
+    time_t nowTime = time(NULL);
+    double timeDiff = difftime( nowTime, previousFunctionalitiesTime );
     previousFunctionalitiesTime = nowTime;
     std::cout << "+" << static_cast<int>(timeDiff) << "s for last functionalit." << std::endl;
     m_CloseMessagesTimer.stop();

@@ -1509,7 +1509,7 @@ private:
         meshSource->AddPoint( pnt2 ) );
     }
     else {
-      vnl_vector_fixed<double, 3> v1, v2, res, pv;
+      vnl_vector_fixed<typename MeshType::CoordRepType, 3> v1, v2, res, pv;
       v1 = (pnt1-pnt0).Get_vnl_vector();  
       v2 = (pnt2-pnt0).Get_vnl_vector();
       res = vnl_cross_3d( v1, v2 );

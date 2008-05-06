@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <stdlib.h>
 #include <iostream>
-#include <ctime>
+#include <time.h>
 
 #include <mitkTestingConfig.h>
 

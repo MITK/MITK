@@ -1993,6 +1993,117 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="pointselectorinteractor">
+    <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="17" Y_POS="23" WIDTH="100" HEIGHT="50">
+      <transition NAME="addPoint" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="10">
+          <!--AcADDPOINT-->
+        </action>
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="checkpicked" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+    </state>
+    <state NAME="selected" ID="1" X_POS="663" Y_POS="89" WIDTH="100" HEIGHT="50">
+      <transition NAME="deselect all and add point" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="10">
+          <!--AcADDPOINT-->
+        </action>
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="remove" NEXT_STATE_ID="5" EVENT_ID="12">
+        <action ID="1500">
+          <!--AcCHECKGREATERONE-->
+        </action>
+      </transition>
+      <transition NAME="checkSamePick" NEXT_STATE_ID="3" EVENT_ID="1">
+        <action ID="34">
+          <!--AcCHECKSELECTED-->
+          <intParameter NAME="precision" VALUE="4" />
+        </action>
+      </transition>
+      <transition NAME="deselect all" NEXT_STATE_ID="0" EVENT_ID="2000">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkpicked" ID="2" X_POS="385" Y_POS="221" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003" />
+      <transition NAME="EIDYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="1101">
+          <!--AcMODESELECT-->
+        </action>
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkStillPicked" ID="3" X_POS="417" Y_POS="497" WIDTH="100" HEIGHT="50">
+      <transition NAME="EIDNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="72">
+          <!--AcDESELECTALL-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+      <transition NAME="EIDYes" NEXT_STATE_ID="4" EVENT_ID="1004">
+        <action ID="8">
+          <!--AcINITMOVEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="moves" ID="4" X_POS="799" Y_POS="483" WIDTH="100" HEIGHT="50">
+      <transition NAME="mousemove" NEXT_STATE_ID="4" EVENT_ID="530">
+        <action ID="91">
+          <!--AcMOVESELECTED-->
+        </action>
+      </transition>
+      <transition NAME="finishmove" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42">
+          <!--AcFINISHMOVEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkGreaterOne" ID="5" X_POS="416" Y_POS="344" WIDTH="100" HEIGHT="50">
+      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+        <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+        </action>
+      </transition>
+      <transition NAME="StNo" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="100">
+          <!--AcREMOVEPOINT-->
+        </action>
+        <action ID="1100">
+          <!--AcMODEDESELECT-->
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="polygoninteractor">
     <!-- Behaviour of a Polygon -->
     <state NAME="unselected" ID="0" START_STATE="TRUE" X_POS="195" Y_POS="98" WIDTH="100" HEIGHT="50">

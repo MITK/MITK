@@ -33,6 +33,7 @@ SET(CPP_FILES
   mitkInteractor.cpp
   mitkLineInteractor.cpp
   mitkPointInteractor.cpp
+  mitkPointSelectorInteractor.cpp
   mitkPointSetInteractor.cpp
   mitkPointSnapInteractor.cpp
   mitkPolygonInteractor.cpp

@@ -27,7 +27,24 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief Create Planes perpendicular to lines containted in a Mesh
+//## @brief Create Planes perpendicular to lines containted in a Mesh. The planes data is generated as one SlicedGeometry3D data. 
+//## To create the planes as input a
+//## mitk::mesh (for example a pointSet) and as geometry hint a geometry (for example from the original image) must be given.
+//##
+//##	mitk::Mesh::Pointer mesh = mitk::Mesh::New();
+//##	mesh->SetMesh(pointSet->GetPointSet());
+//##	mitk::Image* currentImage = dynamic_cast<mitk::Image*> (mitk::DataStorage::GetInstance()->GetNamedNode(IMAGE)->GetData());
+//##	const mitk::Geometry3D* imagegeometry = currentImage->GetUpdatedGeometry();
+//##	mitk::PlanesPerpendicularToLinesFilter::Pointer perpendicularPlanes = mitk::PlanesPerpendicularToLinesFilter::New();
+//##	perpendicularPlanes->SetInput(mesh);
+//##	perpendicularPlanes->SetUseAllPoints(true);
+//##	perpendicularPlanes->SetFrameGeometry(imagegeometry);
+//##	perpendicularPlanes->Update();
+//##
+//## To get one single plane out of these use SlicedGeometry3D->GetGeometry2D(int slicenumber).
+
+
+
 //## @ingroup Process
 class MITK_CORE_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
 {
@@ -41,6 +58,7 @@ public:
 
   const mitk::Mesh *GetInput(void);
 
+  //## @brief Set the input mesh that is used to create the planes.
   virtual void SetInput(const mitk::Mesh *image);
 
   //##Documentation
@@ -62,12 +80,18 @@ public:
   //## of their indices form the line.
   //## Default is @a false.
   itkGetConstMacro(UseAllPoints, bool);
+
+  //##Documentation
+  //## @brief Set if all points of the mesh shall be used (true) or the cells (false)
+  //## Default is @a false.
   itkSetMacro(UseAllPoints, bool);
   itkBooleanMacro(UseAllPoints);
 
   //##Documentation
   //## @brief Set an explicit frame of the created sliced geometry
   //##
+  //## Set an explicit framegeometry for the created sliced geometry. This framegeometry is
+  //## used as geometry for all created planes. 
   //## Uses the IndexToWorldTransform and bounding box of the
   //## provided geometry.
   //## \sa CalculateFrameGeometry
@@ -78,6 +102,11 @@ protected:
 
   virtual ~PlanesPerpendicularToLinesFilter();
 
+  //## @brief Creates the plane at point curr
+  //##
+  //## Creates the plane at point curr. To create this plane, the last point must
+  //## must be renowned.
+  //## \sa SetPlane
   void CreatePlane(const Point3D& curr);
 
   //## @brief Plane to be used as an example of the planes to move

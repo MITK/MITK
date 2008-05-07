@@ -139,6 +139,11 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
     void SetAdditionalColumns(const std::string& columns);
 
     /**
+     * \brief Set the title of the first column (default "Segmentation")
+     */
+    void SetFirstColumnTitle(const QString& title);
+
+    /**
      * \brief How the list contents is determined.
      * 
      * See also documentation of DisplayMode.

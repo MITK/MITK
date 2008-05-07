@@ -85,6 +85,11 @@ mitk::ToolManager* QmitkToolWorkingDataListBox::GetToolManager()
   return m_ToolManager;
 }
 
+void QmitkToolWorkingDataListBox::SetFirstColumnTitle(const QString& title)
+{
+  QListView::setColumnText(1, title);
+}
+
 void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
   m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );

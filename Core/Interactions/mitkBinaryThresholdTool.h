@@ -52,8 +52,6 @@ class MITK_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
     
     virtual void Activated();
     virtual void Deactivated();
-    
-    virtual void OnToolManagerReferenceDataModified();
 
     virtual void SetThresholdValue(int value);
     virtual void AcceptCurrentThresholdValue(const std::string& organType, const std::string& organName);

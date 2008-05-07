@@ -29,7 +29,7 @@ mitk::ToolManager::ToolManager()
  m_ActiveToolID(-1),
  m_RegisteredClients(0)
 {
-  mitk::CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
+  CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
 
   // get a list of all known mitk::Tools
   std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
@@ -53,6 +53,11 @@ mitk::ToolManager::ToolManager()
 
 mitk::ToolManager::~ToolManager()
 {
+  if (m_ActiveTool)
+  {
+    m_ActiveTool->Deactivated();
+    GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+  }
 }
 
 void mitk::ToolManager::OnToolErrorMessage(std::string s)
@@ -115,7 +120,7 @@ bool mitk::ToolManager::ActivateTool(int id)
     if (m_ActiveTool)
     {
       m_ActiveTool->Deactivated();
-      mitk::GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
     }
 
     m_ActiveTool = GetToolById( nextTool );
@@ -128,7 +133,7 @@ bool mitk::ToolManager::ActivateTool(int id)
       if (m_RegisteredClients)
       {
         m_ActiveTool->Activated();
-        mitk::GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+        GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
       }
     }
   }
@@ -329,7 +334,7 @@ void mitk::ToolManager::RegisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Activated();
-      mitk::GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
+      GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
     }
   }
   
@@ -345,7 +350,7 @@ void mitk::ToolManager::UnregisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Deactivated();
-      mitk::GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+      GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
     }
   }
 }

@@ -663,6 +663,25 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="PressMoveReleaseAndPointSetting">
+    <state NAME="neutral" ID="1" START_STATE="TRUE">
+      <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="Shift+press" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="10" />
+      </transition>
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
+      </transition>
+      <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="ENTF" NEXT_STATE_ID="1" EVENT_ID="12">
+        <action ID="100" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="PressMoveReleaseWithCTRLInversion">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">

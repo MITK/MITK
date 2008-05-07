@@ -119,6 +119,22 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
     */
     bool ActivateTool(int id);
 
+    template <class T>
+    int GetToolIdByToolType()
+    {
+      int id = 0;
+      for ( ToolVectorType::iterator iter = m_Tools.begin();
+            iter != m_Tools.end();
+            ++iter, ++id )
+      {
+        if ( dynamic_cast<T*>(iter->GetPointer()) )
+        {
+          return id;
+        }
+      }
+      return -1;
+    }
+
     /**
       \return -1 for "No tool is active"
     */

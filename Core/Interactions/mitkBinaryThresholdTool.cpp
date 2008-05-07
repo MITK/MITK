@@ -94,10 +94,6 @@ void mitk::BinaryThresholdTool::Deactivated()
   m_ThresholdFeedbackNode->SetData(NULL);
 }
     
-void mitk::BinaryThresholdTool::OnToolManagerReferenceDataModified()
-{
-}
-
 void mitk::BinaryThresholdTool::SetThresholdValue(int value)
 {
   if (m_ThresholdFeedbackNode.IsNotNull())

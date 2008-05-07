@@ -185,7 +185,7 @@ class MITK_CORE_EXPORT Tool : public StateMachine
     };
 
     void SetToolManager(ToolManager*);
-    
+
     /**
      \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
      

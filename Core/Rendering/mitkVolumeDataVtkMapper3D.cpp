@@ -130,7 +130,11 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
 
 
-  m_Prop3D = m_Prop3DAssembly;
+  // BoundingBox rendering is not working due to problem with assembly
+  // transformation; see bug #454
+  //m_Prop3D = m_Prop3DAssembly;
+
+  m_Prop3D = m_VolumeLOD;
   m_Prop3D->Register(NULL); 
   
   m_ImageCast = vtkImageShiftScale::New(); 

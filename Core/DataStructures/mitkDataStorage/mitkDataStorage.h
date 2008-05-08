@@ -30,6 +30,7 @@ namespace mitk {
 
   class NodePredicateBase;
   class DataTreeNode;
+  class BaseRenderer;
   
 
   //##Documentation
@@ -205,6 +206,9 @@ namespace mitk {
     itkBooleanMacro(ManageCompleteTree);
 
   protected:
+
+    friend class BaseRenderer;
+
     itkNewMacro(Self);    // New Macro is protected, because we use Singleton pattern for DataStorage
 
     typedef std::map<mitk::DataTreeNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;

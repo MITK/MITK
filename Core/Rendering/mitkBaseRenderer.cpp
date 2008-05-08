@@ -41,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+#include "mitkDataStorage.h"
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -220,6 +221,20 @@ void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
       m_DataTreeIterator = NULL;
     Modified();
   }
+}
+
+void mitk::BaseRenderer::SetData(DataStorage* storage)
+{
+  if (storage != NULL)
+  {
+    DataTreePreOrderIterator poi( storage->m_DataTree );
+    m_DataTreeIterator = poi;
+  }
+  else
+  {
+    m_DataTreeIterator = NULL;
+  }
+  Modified();
 }
 
 //##ModelId=3E330C4D0395

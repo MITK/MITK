@@ -40,6 +40,7 @@ namespace mitk {
 class SliceNavigationController;
 class CameraRotationController;
 class CameraController;
+class DataStorage;
 
 //##ModelId=3C6E9AA90306
 //##Documentation
@@ -93,6 +94,7 @@ public:
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.
   virtual void SetData(const DataTreeIteratorBase* iterator);
+  virtual void SetData(DataStorage* storage);
 
   //##ModelId=3E6423D20245
   //##Documentation

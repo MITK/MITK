@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef RegisterQmitkClassesHIncluded
 #define RegisterQmitkClassesHIncluded
 
-void RegisterQmitkClasses();
+#include "mitkCommon.h"
+
+QMITK_EXPORT void RegisterQmitkClasses();
 
 #endif
 

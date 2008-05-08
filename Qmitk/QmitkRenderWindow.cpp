@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 #include <qlayout.h>
 #include "mitkDisplayPositionEvent.h"
-#include "QmitkRenderingManagerFactory.h"
 #include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
@@ -220,17 +219,3 @@ mitk::BaseController * QmitkRenderWindow::GetController()
   }
 }
 
-// Create and register RenderingManagerFactory for this platform.
-QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
-
-//We have to put this in a file containing a class that is directly used
-//somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 
-//it is removed by the linker. 
-//#include "VtkQRenderWindowInteractor.h"
-//VtkQRenderWindowInteractorFactory vtkQRenderWindowInteractorFactory;
-
-#include "QmitkApplicationCursor.h"
-QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance
-
-#include "QmitkCallbackFromGUIThread.h"
-QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;

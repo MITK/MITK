@@ -2,6 +2,7 @@ SET(CPP_FILES
   popupactionhistory.cpp
   popupundoredo.cpp
   qclickablelabel.cpp
+  RegisterQmitkClasses.cpp
   QmitkAbortEventFilter.cpp
   QmitkAlgorithmFunctionalityComponent.cpp
   QmitkApplicationBase/QmitkApplicationCursor.cpp

@@ -59,7 +59,7 @@ namespace mitk {
    * The desired type is given as a template parameter, the constructor takes no other parameters.
    */
   template <class T>
-  class MITK_CORE_EXPORT TNodePredicateDataType : public NodePredicateBase
+  class TNodePredicateDataType : public NodePredicateBase
   {
   public:
     

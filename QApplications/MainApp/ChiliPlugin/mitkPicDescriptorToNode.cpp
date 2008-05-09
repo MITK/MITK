@@ -116,11 +116,17 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
     switch( currentTag->type )
     {
       case mitkIpPicASCII:
-      {
-        resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( static_cast<char*>( currentTag->value ) ) );
-        break;
-      }
-      case mitkIpPicInt:
+        { 
+          size_t tagLen = currentTag->n[0];
+          char* stringValue = (char*)malloc(tagLen + 1);
+          memcpy(stringValue,currentTag->value,tagLen);
+          stringValue[tagLen]= '\0';
+          resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( stringValue ) );
+          free(stringValue);
+          break;
+        }
+	  /* this code does not work. mitkIpPicInt and mitkIpPicUInt can have different sizes.
+	  case mitkIpPicInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
@@ -130,6 +136,7 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
+	  */
       default:  //mitkIpPicUnknown, mitkIpPicBool, mitkIpPicFloat, mitkIpPicNonUniform, mitkIpPicTSV, _mitkIpPicTypeMax
       {
         break;

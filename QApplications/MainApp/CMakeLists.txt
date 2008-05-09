@@ -143,8 +143,6 @@ ELSE(FACTORY_CLASS)
   )
 ENDIF(FACTORY_CLASS)
 
-ENDIF(FACTORY_CLASS)
-
 CONFIGURE_FILE(RegisterFunctionalityCalls.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/RegisterFunctionalityCalls.cpp @ONLY)
 # CONFIGURE_FILE(RegisterFunctionalityCalls.h.in RegisterFunctionalityCalls.h @ONLY)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})

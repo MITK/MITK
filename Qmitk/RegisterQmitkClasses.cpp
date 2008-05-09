@@ -39,6 +39,8 @@ void RegisterQmitkClasses()
   static QmitkRenderingManagerFactory qmitkRenderingManagerFactory;
   static QmitkApplicationCursor globalQmitkApplicationCursor; // create one instance
   static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
+
+  alreadyDone = true;
   }
 }
 

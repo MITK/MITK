@@ -903,7 +903,7 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   mitk::PositionEvent event( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()), 0, 0, 0, 
     mitk::Key_unknown, p2d, newPosition );
   mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
-  mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
+  mitk::StateEvent stateEvent2(mitk::EIDLEFTMOUSERELEASE, &event);
 
   switch ( m_PlaneMode )
   {

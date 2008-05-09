@@ -200,7 +200,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
     }
 
     for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+    {
       mitkIpPicFree( (*imageIter) );
+    }
     m_ImageList.clear();
   }
 
@@ -216,7 +218,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
 
       //delete the mitkIpPicDescriptors and interSliceGeometry
       for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_StreamImageList.front().imageList.begin(); imageIter != m_StreamImageList.front().imageList.end(); imageIter++ )
+      {
         mitkIpPicFree( (*imageIter) );
+      }
       free( m_StreamImageList.front().geometry );
       m_StreamImageList.pop_front();
     }
@@ -516,7 +520,9 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadParentChildElement( QcPlugi
         }
       }
       for( std::list<mitkIpPicDescriptor*>::iterator imageIter = m_ImageList.begin(); imageIter != m_ImageList.end(); imageIter++ )
+      {
         mitkIpPicFree( (*imageIter) );
+      }
       m_ImageList.clear();
 
       return resultNode;

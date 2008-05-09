@@ -779,6 +779,9 @@ typedef struct
     _ipPicTagsElement_t *tags_head;
                ipBool_t  write_protect;
                    long  pixel_start_in_file;
+ struct ipPicDescriptor *lender;              /* lender of image data    */
+              ipUInt4_t  borrower;            /* borrower of image data  */ 
+              ipUInt4_t  ref;                 /* reference counter       */
   } _ipPicInfo_t;
 
 typedef struct ipPicDescriptor

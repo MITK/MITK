@@ -102,6 +102,9 @@ ipPicDescriptor *ipPicNew( void )
 
       pic->info->write_protect = ipFalse;
       pic->info->pixel_start_in_file = 0;
+      pic->info->lender = 0;
+      pic->info->borrower = 0;
+      pic->info->ref = 1;
     }
 
   return( pic );

@@ -47,6 +47,7 @@ namespace mitk {
 class Geometry2DData;
 class BaseRenderer;
 class ImageMapper2D;
+class DataStorage;
 
 /**
  *  \brief Vtk-based mapper to display a Geometry2D in a 3D window
@@ -77,7 +78,8 @@ public:
    * \brief All images found when traversing the (sub-) tree starting at
    * \a iterator which are resliced by an ImageMapper2D will be mapped.
    */
-  virtual void SetDataIteratorForTexture(const mitk::DataTreeIteratorBase *iterator);
+  virtual void SetDataIteratorForTexture(const DataTreeIteratorBase *iterator);
+  virtual void SetDataIteratorForTexture(DataStorage* storage);
 
 protected:
   Geometry2DDataVtkMapper3D();

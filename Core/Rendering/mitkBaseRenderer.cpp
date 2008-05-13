@@ -228,13 +228,8 @@ void mitk::BaseRenderer::SetData(DataStorage* storage)
   if (storage != NULL)
   {
     DataTreePreOrderIterator poi( storage->m_DataTree );
-    m_DataTreeIterator = poi;
+    this->SetData( &poi );
   }
-  else
-  {
-    m_DataTreeIterator = NULL;
-  }
-  Modified();
 }
 
 //##ModelId=3E330C4D0395

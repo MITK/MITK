@@ -66,7 +66,7 @@ public:
   virtual void MakeCurrent();
 
   // Data handling
-  void SetData(const mitk::DataTreeIteratorBase* iterator);
+  virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
   virtual void Update(mitk::DataTreeNode* datatreenode);
   virtual void SetMapperID(const MapperSlotId mapperId);

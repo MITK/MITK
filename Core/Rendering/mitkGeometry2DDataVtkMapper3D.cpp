@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSmartPointerProperty.h"
 #include "mitkWeakPointerProperty.h"
 #include "mitkVtkRepresentationProperty.h"
+#include "mitkDataStorage.h"
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -184,6 +185,17 @@ Geometry2DDataVtkMapper3D
   {
     m_DataTreeIterator = iterator;
     this->Modified();
+  }
+}
+
+void 
+Geometry2DDataVtkMapper3D
+::SetDataIteratorForTexture(mitk::DataStorage* storage)
+{
+  if (storage != NULL)
+  {
+    DataTreePreOrderIterator poi( storage->m_DataTree );
+    this->SetDataIteratorForTexture( &poi );
   }
 }
 
@@ -620,7 +632,7 @@ Geometry2DDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
         ++it;
       }
     }
-
+              
 
     // Add all image actors to the assembly, sorted according to 
     // layer property

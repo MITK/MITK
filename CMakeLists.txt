@@ -26,6 +26,9 @@ IF(NOT MITK_DIR)
 SET(MITK_DIR ${CMAKE_CURRENT_BINARY_DIR})
 ENDIF(NOT MITK_DIR)
 
+# some targets in Utilities also depend on Qt. Use this option
+# to decide if they should be build
+OPTION(USE_QT "Use Trolltech's Qt library" ON)
 
 ADD_SUBDIRECTORY(Utilities) 
 
@@ -123,8 +126,6 @@ IF(BUILD_TESTING)
 ENABLE_TESTING()
 ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
-
-OPTION(USE_QT "Use Trolltech's Qt library" ON)
 
 IF(USE_QT)
   SET(QT_MT_REQUIRED 1)

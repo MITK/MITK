@@ -62,6 +62,21 @@ protected:
 
   virtual void StopTimer();
 
+
+  /** Initializes the windows specified by requestType to the geometry of the
+   * given DataTreeNode. */
+  virtual bool InitializeViews( mitk::DataTreeIteratorBase *dataIt, 
+    unsigned int requestType = REQUEST_UPDATE_ALL );
+
+  /** Initializes the windows specified by requestType to the given
+   * geometry. */
+  virtual bool InitializeViews( const mitk::Geometry3D * geometry,
+    unsigned int requestType = REQUEST_UPDATE_ALL );
+
+  /** Initializes the windows to the default viewing direction
+   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
+  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
+
 private:
 
   QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
@@ -69,7 +84,7 @@ private:
   friend class QmitkRenderingManagerFactory;
 };
 
-class QmitkRenderingManagerInternal : public QObject
+class QMITK_EXPORT QmitkRenderingManagerInternal : public QObject
 {
   Q_OBJECT
 

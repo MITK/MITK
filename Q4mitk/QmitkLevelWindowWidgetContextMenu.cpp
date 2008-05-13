@@ -99,6 +99,7 @@ void QmitkLevelWindowWidgetContextMenu::useAllGreyvaluesFromImage()
 {
   m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(), true, false);
   m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLevelWindowWidgetContextMenu::setDefaultLevelWindow()

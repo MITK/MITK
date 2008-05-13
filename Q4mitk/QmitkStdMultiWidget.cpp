@@ -73,6 +73,16 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 
+  // Set default view directions for SNCs
+  mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Transversal );
+  mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Sagittal );
+  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Frontal );
+  mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
+    mitk::SliceNavigationController::Original );
+
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();
   // @TODO next line causes sure memory leak
@@ -106,6 +116,11 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
     mitkWidget4->GetSliceNavigationController(), false);
   mitkWidget1->GetSliceNavigationController()
     ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+
+  // Set TimeNavigationController to RenderingManager 
+  // (which uses it internally for views initialization!)
+  mitk::RenderingManager::GetInstance()->SetTimeNavigationController(
+    timeNavigationController );
 
   //reverse connection between sliceNavigationControllers and timeNavigationController
   mitkWidget1->GetSliceNavigationController()
@@ -147,6 +162,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
     mitkWidget4->GetRenderWindow() );
   m_GradientBackground4->SetGradientColors(0.0,0.1,0.3,0.7,0.7,0.8);
   m_GradientBackground4->Enable();
+
   // setup the department logo rendering
   m_LogoRendering1 = mitk::LogoRendering::New();
   m_LogoRendering1->SetRenderWindow(
@@ -788,7 +804,6 @@ bool QmitkStdMultiWidget
   return mitk::RenderingManager::GetInstance()->InitializeViews( geometry );
 }
 
-
 void QmitkStdMultiWidget::RequestUpdate()
 {
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitkWidget1->GetRenderWindow());
@@ -942,7 +957,7 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   mitk::PositionEvent event( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()), 0, 0, 0, 
     mitk::Key_unknown, p2d, newPosition );
   mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
-  mitk::StateEvent stateEvent2(mitk::EIDRIGHTMOUSEBTN, &event);
+  mitk::StateEvent stateEvent2(mitk::EIDLEFTMOUSERELEASE, &event);
 
   switch ( m_PlaneMode )
   {

@@ -31,7 +31,7 @@ namespace mitk {
   class NodePredicateBase;
   class DataTreeNode;
   class BaseRenderer;
-  
+  class Geometry2DDataVtkMapper3D;
 
   //##Documentation
   //## @brief Data management class that handles 'was created by' relations
@@ -208,6 +208,7 @@ namespace mitk {
   protected:
 
     friend class BaseRenderer;
+    friend class Geometry2DDataVtkMapper3D;
 
     itkNewMacro(Self);    // New Macro is protected, because we use Singleton pattern for DataStorage
 

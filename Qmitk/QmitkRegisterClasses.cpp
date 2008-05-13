@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "RegisterQmitkClasses.h"
+#include "QmitkRegisterClasses.h"
 
 #include "QmitkApplicationCursor.h"
 #include "QmitkCallbackFromGUIThread.h"
@@ -24,12 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-void RegisterQmitkClasses()
+void QmitkRegisterClasses()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    std::cout << "RegisterQmitkClasses()" << std::endl;
+    std::cout << "QmitkRegisterClasses()" << std::endl;
 
   //We have to put this in a file containing a class that is directly used
   //somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 

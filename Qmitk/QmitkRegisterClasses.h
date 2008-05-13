@@ -16,12 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef RegisterQmitkClassesHIncluded
-#define RegisterQmitkClassesHIncluded
+#ifndef QmitkRegisterClassesHIncluded
+#define QmitkRegisterClassesHIncluded
 
 #include "mitkCommon.h"
 
-QMITK_EXPORT void RegisterQmitkClasses();
+QMITK_EXPORT void QmitkRegisterClasses();
 
 #endif
 

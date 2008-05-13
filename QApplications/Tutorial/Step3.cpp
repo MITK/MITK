@@ -1,13 +1,16 @@
-#include <QmitkRenderWindow.h>
 
-#include <mitkDataTreeNodeFactory.h>
-#include <mitkDataStorage.h>
-#include <mitkProperties.h>
-#include <mitkTransferFunction.h>
-#include <mitkTransferFunctionProperty.h>
+#include "QmitkRegisterClasses.h"
+#include "QmitkRenderWindow.h"
+
+#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataStorage.h"
+#include "mitkProperties.h"
+#include "mitkTransferFunction.h"
+#include "mitkTransferFunctionProperty.h"
+#include "mitkRenderingManager.h"
+
 #include <itksys/SystemTools.hxx>
 #include <qapplication.h>
-#include <mitkRenderingManager.h>
 #include <qhbox.h>
 
 //##Documentation
@@ -29,6 +32,9 @@ int main(int argc, char* argv[])
     fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
   }
+
+  // Register Qmitk-dependent global instances
+  QmitkRegisterClasses();
 
   //Part I: Basic initialization
   // create a tree

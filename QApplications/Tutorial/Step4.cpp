@@ -1,3 +1,5 @@
+
+#include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
@@ -33,6 +35,9 @@ int main(int argc, char* argv[])
     fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
   }
+
+  // Register Qmitk-dependent global instances
+  QmitkRegisterClasses();
 
   //Part I: Basic initialization
   // create a tree

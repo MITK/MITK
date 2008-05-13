@@ -3,11 +3,6 @@
 #
 #   PLUGIN_NAME: Name of the plugin. If not set it will be set to the directory name
 # 
-# The following ones will be generated if not set
-#   
-#   ADD_FUNC_CODE: Name of a file which contains the AddFuncName() definition
-#   ADD_FUNC_HEADER: Name of a file which contains the AddFuncName() declaration
-#   ADD_FUNC_CALL: File which contains just the call to the above function 
 MACRO(CREATE_PLUGIN PLUGIN_NAME)
   SUPPRESS_VC8_DEPRECATED_WARNINGS()
   IF(NOT PLUGIN_NAME)
@@ -57,4 +52,22 @@ MACRO(CREATE_PLUGIN PLUGIN_NAME)
   ENDIF(BUILD_${PLUGIN_NAME} OR BUILD_ALL_PLUGINS)
   #SET(${KITNAME}_KNOWN_PLUGIN_${PLUGIN_NAME} ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "Directory of ${KITNAME} plugin ${PLUGIN_NAME}." FORCE)
 ENDMACRO(CREATE_PLUGIN)
+
+
+# Macro to set specific Qt options, calls CREATE_PLUGIN at the end
+MACRO(CREATE_QT_PLUGIN PLUGIN_NAME)
+  
+  IF(USE_QT AND DESIRED_QT_VERSION EQUAL 4)
+    INCLUDE_DIRECTORIES(${QT_INCLUDES})
+    ADD_DEFINITIONS(${QT_DEFINITIONS})
+  
+    SET(PLUGIN_REQUIRED_LIBS
+      ${PLUGIN_REQUIRED_LIBS}
+      ${QT_LIBRARIES}
+    )
+  
+    CREATE_PLUGIN(${PLUGIN_NAME})
+  ENDIF(USE_QT AND DESIRED_QT_VERSION EQUAL 4)
+  
+ENDMACRO(CREATE_QT_PLUGIN)
 

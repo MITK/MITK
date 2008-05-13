@@ -1,9 +1,5 @@
-INCLUDE_DIRECTORIES(${Q${KITNAME}_INCLUDE_DIRS})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
 SET(PLUGIN_REQUIRED_LIBS 
-  org_opencherry_ui
-  ${QT_LIBRARIES}  
+  org_opencherry_ui  
 )
 
-CREATE_PLUGIN(org.opencherry.ui.qt)
+CREATE_QT_PLUGIN(org.opencherry.ui.qt)

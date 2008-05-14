@@ -29,6 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionalityTesting.h>
 #include <sstream>
 
+#include "MITKSplashScreen_xpm.h" // qembed --images MITKSplashScreen.png > MITKSplashScreen_xpm.h
+#include "QmitkSplashScreen.h"
+#include <qtimer.h>
+
 /*
 * BUG: ATI-grafics-cards are slow in building up display lists in case of displaying transparent surfaces.
 * Activating GlobalImmediateModeRendering in vtk solves this problem.
@@ -61,9 +65,22 @@ int main(int argc, char* argv[])
     }
 
     QApplication a( argc, argv );
+
+    // popup a splash screen
+    bool showSplashScreen(false);
+    QmitkSplashScreen* splasher(NULL);
+    if (showSplashScreen)
+    {
+      QImage icon = qembed_findImage("MITKSplashScreen");
+      QPixmap pixmap(icon);
+      splasher = new QmitkSplashScreen( pixmap );
+      a.processEvents();
+    }
+
     SampleApp mainWindow(NULL, "mainwindow",Qt::WType_TopLevel,testingParameter);
     mainWindow.setCaption( caption.str().c_str() );
     a.setMainWidget(&mainWindow);
+
 #ifdef USEDARKPALETTE
     std::cout << "changing palette ..." << std::endl;
     QPalette p( QColor( 64,64,64), QColor(64,64,64));
@@ -79,6 +96,11 @@ int main(int argc, char* argv[])
 
     // reinit views after mainwindow and fctwidget initialization
     mainWindow.viewReinitMultiWidget();
+
+    if (showSplashScreen)
+    {
+      QTimer::singleShot(5000, splasher, SLOT(close()) );
+    }
 
     if(enableFunctionalityTesting)
     {

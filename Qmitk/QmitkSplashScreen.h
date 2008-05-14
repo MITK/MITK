@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkSplashScreen_h_Included
 #define QmitkSplashScreen_h_Included
 
+#include "mitkCommon.h"
 #include <qwidget.h>
 
 /**
@@ -26,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   Should inform the user that this is not a commerical product and not for patient treatment.
 */
-class QmitkSplashScreen : public QWidget
+class QMITK_EXPORT QmitkSplashScreen : public QWidget
 {
   Q_OBJECT
 

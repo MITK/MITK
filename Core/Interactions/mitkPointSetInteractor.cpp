@@ -963,7 +963,8 @@ bool mitk::PointSetInteractor
   default:
     return Superclass::ExecuteAction( action, stateEvent );
   }
-
+  // indicate modification of data tree node
+  m_DataTreeNode->Modified();
   return ok;
 }
 

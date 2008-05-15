@@ -2,6 +2,7 @@ SET(CPP_FILES
  QmitkAbortEventFilter.cpp
  QmitkApplicationCursor.cpp
  QmitkCallbackFromGUIThread.cpp
+ QmitkRegisterClasses.cpp
  QmitkRenderingManager.cpp
  QmitkRenderingManagerFactory.cpp
  QmitkRenderWindow.cpp

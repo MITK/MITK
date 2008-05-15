@@ -1,3 +1,5 @@
+
+#include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
 #include <mitkDataTreeNodeFactory.h>
@@ -17,24 +19,34 @@ int main(int argc, char* argv[])
 
   if(argc<2)
   {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", 
+      itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
   }
 
-  //Part I: Basic initialization
-  // create a tree
+  // Register Qmitk-dependent global instances
+  QmitkRegisterClasses();
+
+  //*************************************************************************
+  // Part I: Basic initialization
+  //*************************************************************************
+
+  // Create a tree
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
-  // create an iterator on the tree
+  
+  // Create an iterator on the tree
   mitk::DataTreePreOrderIterator it(tree);
 
-  //Part II: Create some data by reading files
+  //*************************************************************************
+  // Part II: Create some data by reading files
+  //*************************************************************************
   int i;
   for(i=1; i<argc; ++i)
   {
-    // for testing
+    // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // create a DataTreeNodeFactory to read a data format supported
+    // Create a DataTreeNodeFactory to read a data format supported
     // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
     mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
     const char * filename = argv[i];
@@ -42,7 +54,10 @@ int main(int argc, char* argv[])
     {
       nodeReader->SetFileName(filename);
       nodeReader->Update();
-      //Part III: Put the data into the tree
+      //*********************************************************************
+      // Part III: Put the data into the tree
+      //*********************************************************************
+
       // Since the DataTreeNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
       it.Add(nodeReader->GetOutput());
@@ -54,14 +69,28 @@ int main(int argc, char* argv[])
     }
   }
 
-  //Part IV: Create window and pass the tree to it
-  // create a renderwindow
+  //*************************************************************************
+  // Part IV: Create window and pass the tree to it
+  //*************************************************************************
+  
+  // Create a RenderWindow
   QmitkRenderWindow renderWindow;
-  // tell the renderwindow which (part of) the tree to render
+  
+  // Tell the RenderWindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(&it);
 
-  //Part V: Qt-specific initialization
+  // Initialize the RenderWindow
+  mitk::RenderingManager::GetInstance()->InitializeViews( &it );
+
+  // Select a slice
+  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 4 );
+
+
+  //*************************************************************************
+  // Part V: Qt-specific initialization
+  //*************************************************************************
   renderWindow.show();
+  renderWindow.resize( 256, 256 );
 
   // for testing
   #include "QtTesting.h"

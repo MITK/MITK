@@ -1,4 +1,6 @@
-#include <Step6.h>
+#include "Step6.h"
+#include "QmitkRegisterClasses.h"
+
 
 #include <QApplication>
 #include <itksys/SystemTools.hxx>
@@ -12,6 +14,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  // Register Qmitk-dependent global instances
+  QmitkRegisterClasses();
+  
   Step6 mainWidget(argc, argv, NULL);
   mainWidget.Initialize();
   mainWidget.show();

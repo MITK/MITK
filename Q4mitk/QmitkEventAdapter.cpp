@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkEventAdapter.h"
 #include <mitkInteractionConst.h>
 
+#include <QPoint>
+#include <QCursor>
+
 mitk::MouseEvent 
 QmitkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mouseEvent)
 {
@@ -55,4 +58,22 @@ QmitkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mous
                              state, mitk::Key_none, p);
   
   return mitkEvent;
+}
+
+mitk::KeyEvent 
+QmitkEventAdapter::AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& cp)
+{
+  int key = keyEvent->key();
+  
+  // Those keycodes changed in Qt 4
+  if (key >= 0x01000000 && key <= 0x01000060)
+    key -= (0x01000000 - 0x1000);
+  else if(key >= 0x01001120 && key <= 0x01001262)
+    key -= 0x01000000;
+  
+  mitk::KeyEvent mke(keyEvent->type(), key, keyEvent->modifiers(),
+      keyEvent->text().toStdString(), keyEvent->isAutoRepeat(),
+      keyEvent->count(), cp.x(), cp.y(), QCursor::pos().x(), QCursor::pos().y());
+  
+  return mke;
 }

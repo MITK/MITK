@@ -70,22 +70,29 @@ void Step6::StartRegionGrowing()
 
 void Step6::Load(int argc, char* argv[])
 {
-  //Part I: Basic initialization
-  // create a tree
+  //*************************************************************************
+  // Part I: Basic initialization
+  //*************************************************************************
+
+  // Create a tree
   m_Tree=mitk::DataTree::New();
-  // create an iterator on the tree
+
+  // Create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
-  // create DataStorageInstance
+
+  // Create DataStorageInstance
   mitk::DataStorage::CreateInstance(m_Tree);
 
-  //Part II: Create some data by reading files
+  //*************************************************************************
+  // Part II: Create some data by reading files
+  //*************************************************************************
   int i;
   for(i=1; i<argc; ++i)
   {
-    // for testing
+    // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // create a DataTreeNodeFactory to read a data format supported
+    // Create a DataTreeNodeFactory to read a data format supported
     // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
     mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
     const char * filename = argv[i];
@@ -93,7 +100,10 @@ void Step6::Load(int argc, char* argv[])
     {
       nodeReader->SetFileName(filename);
       nodeReader->Update();
-      //Part III: Put the data into the tree
+      //*********************************************************************
+      // Part III: Put the data into the tree
+      //*********************************************************************
+
       // Since the DataTreeNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
@@ -113,46 +123,68 @@ void Step6::Load(int argc, char* argv[])
 
 void Step6::SetupWidgets()
 {
-  // create an iterator on the tree
+  // Create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
 
-  //Part I: Create windows and pass the tree to it
-  // create toplevel widget with vertical layout
+  //*************************************************************************
+  // Part I: Create windows and pass the tree to it
+  //*************************************************************************
+
+  // Create toplevel widget with vertical layout
   m_TopLevelWidget = new QVBox(this);
-  // create viewParent widget with horizontal layout
+
+  // Create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);
   viewParent->setSpacing(2);
+
+  //*************************************************************************
   // Part Ia: 3D view
-  // create a renderwindow
+  //*************************************************************************
+
+  // Create a renderwindow
   QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);
-  // tell the renderwindow which (part of) the tree to render
+
+  // Tell the renderwindow which (part of) the tree to render
   renderWindow->GetRenderer()->SetData(&it);
-  // use it as a 3D view
+
+  // Use it as a 3D view
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
+  //*************************************************************************
   // Part Ib: 2D view for slicing transversally
-  // create QmitkSliceWidget, which is based on the class
+  //*************************************************************************
+
+  // Create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
-  // tell the QmitkSliceWidget which (part of) the tree to render.
+
+  // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2->SetData(&it);
+
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
   it.Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
+  //*************************************************************************
   // Part Ic: 2D view for slicing sagitally
-  // create QmitkSliceWidget, which is based on the class
+  //*************************************************************************
+
+  // Create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view3=new QmitkSliceWidget(viewParent);
-  // tell the QmitkSliceWidget which (part of) the tree to render
+
+  // Tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
   view3->SetData(&it, mitk::SliceNavigationController::Sagittal);
+
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
   it.Add(view3->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
+  //*************************************************************************
   // Part II: handle updates: To avoid unnecessary updates, we have to
+  //*************************************************************************
   // define when to update. The RenderingManager serves this purpose, and
   // each RenderWindow has to be registered to it.
   /*mitk::RenderingManager *renderingManager =

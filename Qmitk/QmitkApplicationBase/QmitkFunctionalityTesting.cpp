@@ -110,7 +110,7 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   if (activeFunctionality)
   {
     std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
-    if ( activeFunctionality->TestYourself() )
+    if ( activeFunctionality->TestYourself() == EXIT_SUCCESS )
     {
       std::cout<<"[PASSED]"<<std::endl;
     }
@@ -143,7 +143,7 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
     time_t nowTime = time(NULL);
     double timeDiff = difftime( nowTime, previousFunctionalitiesTime );
     previousFunctionalitiesTime = nowTime;
-    std::cout << "+" << static_cast<int>(timeDiff) << "s for last functionalit." << std::endl;
+    std::cout << "+" << static_cast<int>(timeDiff) << "s for last functionality." << std::endl;
     m_CloseMessagesTimer.stop();
     qApp->quit();
   }
@@ -176,12 +176,12 @@ int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
     {
       std::cout << *iter << std::endl;
     }
-    std::cout<<"Test done [FAILED]"<<std::endl;
+    std::cout<<"Functionality Test done [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   else
   {
-    std::cout<<"Test done [PASSED]"<<std::endl;
+    std::cout<<"Functionality Test done [PASSED]"<<std::endl;
     return EXIT_SUCCESS;
   }
 }

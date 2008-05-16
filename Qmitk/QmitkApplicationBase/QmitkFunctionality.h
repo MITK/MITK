@@ -272,8 +272,9 @@ public:
     * 
     * You should put any testing code that might be useful in here. When this code is
     * activated, the functionality has just been activated with some kind of data in the DataTree.
+    * To indicate a successful test, return EXIT_SUCCESS, else return EXIT_FAILURE
     */
-  virtual bool TestYourself();
+  virtual int TestYourself();
 
 signals:
   void Signal_dummy();

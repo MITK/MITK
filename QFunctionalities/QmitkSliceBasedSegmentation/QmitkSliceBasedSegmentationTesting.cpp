@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**
  * \brief Test entry point
  */
-bool QmitkSliceBasedSegmentation::TestYourself()
+int QmitkSliceBasedSegmentation::TestYourself()
 {
   std::cout << std::endl;
   time_t randomInit = std::time(0);
@@ -63,13 +63,13 @@ bool QmitkSliceBasedSegmentation::TestYourself()
   if (!toolManager) 
   {
     std::cerr << "Couldn't get a ToolManager object (l. " << __LINE__ << ")" << std::endl;
-    return false;
+    return EXIT_FAILURE;
   }
 
   if ( toolManager->GetReferenceData(0) == NULL )
   {
     std::cerr << "No possible reference image in scene. Won't apply test (l. " << __LINE__ << ")" << std::endl;
-    return true;
+    return EXIT_SUCCESS;
   }
   
 #ifdef MITK_FAST_TESTING
@@ -78,7 +78,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
     if (originalImage->GetDimension() != 3)
     {
       std::cerr << "Skipping test for non-3D image." << std::endl;
-      return true;
+      return EXIT_SUCCESS;
     }
   }
 #endif
@@ -97,7 +97,7 @@ bool QmitkSliceBasedSegmentation::TestYourself()
   if ( !toolManager->GetWorkingData(0) )
   {
     std::cerr << "Segmentation was perhaps generated after clicking on 'New', but no segmentation was selected as active (l. " << __LINE__ << ")" << std::endl;
-    return false;
+    return EXIT_FAILURE;
   }
   else
   {
@@ -108,27 +108,27 @@ bool QmitkSliceBasedSegmentation::TestYourself()
     if ( name.find( "testname" ) == std::string::npos )
     {
       std::cerr << "New segmentation name is wrong (expected '...testname')." << std::endl;
-      return false;
+      return EXIT_FAILURE;
     }
 
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( segmentationNode->GetData() );
     if ( image.IsNull() )
     {
       std::cerr << "New segmentation is no image!" << std::endl;
-      return false;
+      return EXIT_FAILURE;
     }
 
     mitk::OrganTypeProperty::Pointer organTypeProperty = dynamic_cast<mitk::OrganTypeProperty*>( image->GetProperty("organ type").GetPointer() );
     if ( organTypeProperty.IsNull() )
     {
       std::cerr << "New segmentation has no organ type associated." << std::endl;
-      return false;
+      return EXIT_FAILURE;
     }
 
     if ( ! (*(image->GetPixelType().GetTypeId()) == typeid(unsigned char)) )
     {
       std::cerr << "New segmentation data type is wrong (should be unsigned char)." << std::endl;
-      return false;
+      return EXIT_FAILURE;
     }
 
   }
@@ -139,18 +139,18 @@ bool QmitkSliceBasedSegmentation::TestYourself()
   if ( !m_Controls->m_ToolSelectionBox->isEnabled() )
   {
     std::cerr << "Tools should be enabled after creating a new segmentation (l. " << __LINE__ << ")" << std::endl;
-    return false;
+    return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
  
 #ifndef MITK_FAST_TESTING
   // test if interpolation does not crash
   // THIS FIRST, because the drawing area is still clear here
-  if (!TestInterpolation()) return false;
+  if (!TestInterpolation()) return EXIT_FAILURE;
 #endif
 
   // Test: test all the tools
-  if (!TestAllTools()) return false;
+  if (!TestAllTools()) return EXIT_FAILURE;
   
   mitk::Image* originalImage = dynamic_cast<mitk::Image*>( toolManager->GetWorkingData(0) );
   if (originalImage && originalImage->GetDimension() == 3)
@@ -170,14 +170,14 @@ bool QmitkSliceBasedSegmentation::TestYourself()
   if ( toolManager->GetWorkingData(0) )
   {
     std::cerr << "Segmentation was perhaps deleted, but something is still selected as active segmentation (l. " << __LINE__ << ")" << std::endl;
-    return false;
+    return EXIT_FAILURE;
   }
   std::cout << "[PASSED]" << std::endl;
   
   // done
   std::cout << "Whole functionality testing [PASSED]" << std::endl;
 
-  return true;
+  return EXIT_SUCCESS;
 }
 
 bool QmitkSliceBasedSegmentation::TestAllTools()

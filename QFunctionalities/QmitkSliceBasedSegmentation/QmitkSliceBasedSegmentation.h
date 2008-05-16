@@ -99,7 +99,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     /**
       \brief Testing entry point
     */
-    virtual bool TestYourself();
+    virtual int TestYourself();
 
     /**
        \brief helper method for testing

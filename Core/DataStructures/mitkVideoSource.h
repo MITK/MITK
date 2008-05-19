@@ -53,6 +53,15 @@ namespace mitk
       int GetImageWidth(){return m_CaptureWidth;}
       int GetImageHeight(){return m_CaptureHeight;}
 
+      void EnableRotation(bool enable= true)
+      {m_RotationEnabled = enable;};
+
+      void SetRotationAngle(double rotationAngle)
+      {m_RotationAngle = rotationAngle;};
+      
+      double GetRotationAngle()
+      {return m_RotationAngle;};
+
     protected:
       VideoSource();
 	    virtual ~VideoSource();  
@@ -60,6 +69,16 @@ namespace mitk
       unsigned char * m_CurrentVideoTexture;
       int m_CaptureWidth, m_CaptureHeight;
       bool m_CapturingInProcess;
+      
+      /**
+      * Angle for rotating the video image
+      **/
+      double m_RotationAngle;
+      
+      /**
+      * Flag to enable or disable video rotation used for performance enhancement.
+      **/
+      bool m_RotationEnabled;
    
  
   };

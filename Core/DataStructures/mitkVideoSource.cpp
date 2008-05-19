@@ -24,6 +24,8 @@ mitk::VideoSource::VideoSource()
   m_CaptureHeight = 576;
   m_CapturingInProcess = false;
   m_CurrentVideoTexture = NULL;
+  m_RotationAngle = 0.0;
+  m_RotationEnabled = false;
 }
 
 mitk::VideoSource::~VideoSource()

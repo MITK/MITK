@@ -21,11 +21,15 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton.h>
 
 //##Documentation
 //## @brief Start region-grower at interactively added points
 Step6::Step6( int argc, char* argv[], QWidget *parent )
-  : QWidget ( parent ), m_FirstImage(NULL), m_ResultImage(NULL), m_ResultNode(NULL)
+: QWidget( parent ), m_FirstImage(NULL), m_ResultImage(NULL), 
+  m_ResultNode(NULL)
 {
   // create the tree: this is now a member
   m_Tree=mitk::DataTree::New();
@@ -40,26 +44,58 @@ void Step6::Initialize()
 {
   // setup the widgets as in the previous steps, but with an additional
   // QVBox for a button to start the segmentation
-  SetupWidgets();
+  this->SetupWidgets();
+
+  // Create controlsParent widget with horizontal layout
+  QWidget *controlsParent = new QWidget(this);
+  this->layout()->addWidget( controlsParent);
+
+  QHBoxLayout* hlayout = new QHBoxLayout( controlsParent );
+  hlayout->setSpacing(2);
+
+  QLabel *labelThresholdMin = 
+    new QLabel( "Lower Threshold:", controlsParent );
+  hlayout->addWidget( labelThresholdMin );
+
+  m_LineEditThresholdMin = new QLineEdit( "-1000", controlsParent );
+  hlayout->addWidget( m_LineEditThresholdMin );
+
+  QLabel *labelThresholdMax =
+    new QLabel( "Upper Threshold:", controlsParent );
+  hlayout->addWidget( labelThresholdMax );
+  
+  m_LineEditThresholdMax = new QLineEdit( "-400", controlsParent );
+  hlayout->addWidget( m_LineEditThresholdMax );
 
   // create button to start the segmentation and connect its clicked()
   // signal to method StartRegionGrowing
-  QPushButton* startButton = new QPushButton("start region growing", this);
-  this->layout()->addWidget(startButton);
+  QPushButton* startButton = new QPushButton( "start region growing", controlsParent );
+  hlayout->addWidget( startButton );
+
   connect(startButton, SIGNAL(clicked()), this, SLOT(StartRegionGrowing()));
   if(m_FirstImage.IsNull()) startButton->setEnabled(false);
 
   // as in Step5, create PointSet (now as a member m_Seeds) and
   // associate a interactor to it
-  mitk::DataTreePreOrderIterator it(m_Tree);
+  mitk::DataTreePreOrderIterator it( m_Tree );
   m_Seeds = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
-  pointSetNode->SetData(m_Seeds);
-  pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
+  pointSetNode->SetData( m_Seeds );
+  pointSetNode->SetProperty( "layer", mitk::IntProperty::New(2) );
   it.Add(pointSetNode);
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
+    mitk::PointSetInteractor::New( "pointsetinteractor", pointSetNode )
   );
+}
+
+int Step6::GetThresholdMin()
+{
+  return m_LineEditThresholdMin->text().toInt();
+}
+
+int Step6::GetThresholdMax()
+{
+  return m_LineEditThresholdMax->text().toInt();
 }
 
 void Step6::StartRegionGrowing()
@@ -128,14 +164,15 @@ void Step6::SetupWidgets()
   mitk::DataTreePreOrderIterator it(m_Tree);
 
   //*************************************************************************
-  //Part I: Create windows and pass the tree to it
+  // Part I: Create windows and pass the tree to it
   //*************************************************************************
   
   // Create toplevel widget with vertical layout
   QVBoxLayout* vlayout = new QVBoxLayout(this);
   vlayout->setMargin(0);
   vlayout->setSpacing(2);
-  // create viewParent widget with horizontal layout
+  
+  // Create viewParent widget with horizontal layout
   QWidget* viewParent = new QWidget(this);
   vlayout->addWidget(viewParent);
   

@@ -9,6 +9,9 @@
 #include <itkImage.h>
 
 #ifndef DOXYGEN_IGNORE
+
+class QLineEdit;
+
 class Step6 : public QMainWindow
 {
   Q_OBJECT
@@ -17,6 +20,9 @@ public:
   ~Step6() {};
 
   virtual void Initialize();
+
+  virtual int GetThresholdMin();
+  virtual int GetThresholdMax();
 
 protected:
   void Load(int argc, char* argv[]);
@@ -31,7 +37,11 @@ protected:
 
   mitk::Image::Pointer m_ResultImage;
   mitk::DataTreeNode::Pointer m_ResultNode;
-  QWidget* m_TopLevelWidget;
+  QWidget *m_TopLevelWidget;
+
+  QLineEdit *m_LineEditThresholdMin;
+  QLineEdit *m_LineEditThresholdMax;
+
 protected slots:
   virtual void StartRegionGrowing();
 };

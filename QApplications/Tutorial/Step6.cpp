@@ -12,20 +12,24 @@
 #include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
 
-#include <itkConfidenceConnectedImageFilter.h>
 #include "mitkImageAccessByItk.h"
 #include "mitkDataTreeHelper.h"
 
 #include "mitkRenderingManager.h"
 
+
 #include <qhbox.h>
 #include <qvbox.h>
+#include <qlayout.h>
+#include <qlabel.h>
+#include <qlineedit.h>
 #include <qpushbutton.h>
 
 //##Documentation
 //## @brief Start region-grower at interactively added points
-Step6::Step6( int argc, char* argv[], QWidget *parent, const char *name )
-  : QMainWindow ( parent, name ), m_FirstImage(NULL), m_ResultImage(NULL), m_ResultNode(NULL)
+Step6::Step6( int argc, char *argv[], QWidget *parent, const char *name )
+: QMainWindow ( parent, name ), m_FirstImage(NULL), m_ResultImage(NULL),
+  m_ResultNode(NULL)
 {
   // create the tree: this is now a member
   m_Tree=mitk::DataTree::New();
@@ -40,11 +44,29 @@ void Step6::Initialize()
 {
   // setup the widgets as in the previous steps, but with an additional
   // QVBox for a button to start the segmentation
-  SetupWidgets();
+  this->SetupWidgets();
+
+  //QBoxLayout *boxLayout = new QHBoxLayout( m_TopLevelWidget );
+  //boxLayout->setAutoAdd( true );
+
+  // Create line edits for setting lower and upper segmentation thresholds
+  QHBox *segmentationBox = new QHBox( m_TopLevelWidget );
+  segmentationBox->setSpacing( 2 );
+
+  QLabel *labelThresholdMin = 
+    new QLabel( "Lower Threshold:", segmentationBox );
+
+  m_LineEditThresholdMin = new QLineEdit( "-1000", segmentationBox );
+
+  QLabel *labelThresholdMax =
+    new QLabel( "Upper Threshold:", segmentationBox);
+  
+  m_LineEditThresholdMax = new QLineEdit( "-400", segmentationBox );
 
   // create button to start the segmentation and connect its clicked()
   // signal to method StartRegionGrowing
-  QPushButton* startButton = new QPushButton("start region growing", m_TopLevelWidget, "start button");
+  QPushButton *startButton = new QPushButton(
+    "start region growing", segmentationBox, "start button" );
   connect(startButton, SIGNAL(clicked()), this, SLOT(StartRegionGrowing()));
   if(m_FirstImage.IsNull()) startButton->setEnabled(false);
 
@@ -59,6 +81,16 @@ void Step6::Initialize()
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
     mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
+}
+
+int Step6::GetThresholdMin()
+{
+  return m_LineEditThresholdMin->text().toInt();
+}
+
+int Step6::GetThresholdMax()
+{
+  return m_LineEditThresholdMax->text().toInt();
 }
 
 void Step6::StartRegionGrowing()
@@ -131,7 +163,9 @@ void Step6::SetupWidgets()
   //*************************************************************************
 
   // Create toplevel widget with vertical layout
-  m_TopLevelWidget = new QVBox(this);
+  QVBox *w = new QVBox( this );
+  w->setSpacing( 2 );
+  m_TopLevelWidget = w;
 
   // Create viewParent widget with horizontal layout
   QHBox* viewParent = new QHBox(m_TopLevelWidget);

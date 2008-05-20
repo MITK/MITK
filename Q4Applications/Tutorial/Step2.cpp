@@ -2,7 +2,7 @@
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataTreeNodeFactory.h>
+#include "mitkDataTreeNodeFactory.h"
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
     mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
     const char * filename = argv[i];
-    try
+    try          
     {
       nodeReader->SetFileName(filename);
       nodeReader->Update();
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   mitk::RenderingManager::GetInstance()->InitializeViews( &it );
 
   // Select a slice
-  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 4 );
+  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 0 );
 
 
   //*************************************************************************

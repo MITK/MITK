@@ -31,7 +31,6 @@ If you use Windows, then you just start the CMake GUI and enter the location of 
 CMake will create a Visual Studio solution in the root of your binary tree.
 
 Essential variables to configure are ITK_DIR and VTK_DIR. The demo application can only be built with Qt3, Qt4 is not supported yet. 
-If you 
 
 \note "Installing" MITK via cmake (or using "make install") is not yet supported. You can find the application in <tt>&lt;binary_dir&gt;/mitk/bin</tt> and the libraries in <tt>&lt;binary_dir&gt;/mitk/lib</tt>.
 

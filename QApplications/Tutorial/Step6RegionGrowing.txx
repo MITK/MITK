@@ -20,9 +20,9 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   mitk::Geometry3D* geometry = step6->m_FirstImage->GetGeometry();
 
   // create itk::CurvatureFlowImageFilter for smoothing and set itkImage as input
-  typedef typename itk::CurvatureFlowImageFilter< ImageType, InternalImageType > 
+  typedef itk::CurvatureFlowImageFilter< ImageType, InternalImageType > 
     CurvatureFlowFilter;
-  CurvatureFlowFilter::Pointer smoothingFilter = CurvatureFlowFilter::New();
+  typename CurvatureFlowFilter::Pointer smoothingFilter = CurvatureFlowFilter::New();
   
   smoothingFilter->SetInput( itkImage );
   smoothingFilter->SetNumberOfIterations( 4 );

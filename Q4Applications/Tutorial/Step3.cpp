@@ -113,11 +113,11 @@ int main(int argc, char* argv[])
 
         // Set the color transfer function AddRGBPoint(double x, double r, double g, double b)
         tf->GetColorTransferFunction()->AddRGBPoint( 0.0, 1.0, 0.0, 0.0 );
-        tf->GetColorTransferFunction()->AddRGBPoint( 2048.0, 1.0, 1.0, 0.0 );
+        tf->GetColorTransferFunction()->AddRGBPoint( 768.0, 1.0, 1.0, 0.0 );
 
         // Set the piecewise opacity transfer function AddPoint(double x, double y)
-        tf->GetScalarOpacityFunction()->AddPoint ( 512.0, 0.0 );
-        tf->GetScalarOpacityFunction()->AddPoint ( 1024.0, 1.0 );
+        tf->GetScalarOpacityFunction()->AddPoint ( 64.0, 0.0 );
+        tf->GetScalarOpacityFunction()->AddPoint ( 768.0, 1.0 );
 
         tf->GetGradientOpacityFunction()->AddPoint ( 0.0, 1.0 );
         tf->GetGradientOpacityFunction()->AddPoint ( 2048.0, 1.0 );

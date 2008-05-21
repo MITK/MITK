@@ -43,10 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 int main(int argc, char* argv[])
 {
-  /*
   try
   {
-  */
     // Add directory in which the application executable resides as search directory
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(itksys::SystemTools::GetFilenamePath(argv[0]).c_str()); 
     //
@@ -113,7 +111,6 @@ int main(int argc, char* argv[])
     {
       return a.exec();
     }
-  /*
   }
   catch (const std::bad_alloc& e)
   {
@@ -130,5 +127,4 @@ int main(int argc, char* argv[])
     std::cout << "MITK MainApp caught something like an exception..." << std::endl;
     return EXIT_FAILURE;
   }  
-  */
 } 

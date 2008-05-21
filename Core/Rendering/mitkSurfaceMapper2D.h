@@ -27,7 +27,8 @@ class vtkCutter;
 class vtkPlane;
 class vtkLookupTable;
 class vtkLinearTransform;
-
+class vtkPKdTree;
+class vtkStripper;
 
 namespace mitk {
 
@@ -35,11 +36,16 @@ class BaseRenderer;
 class Geometry2D;
 class DisplayGeometry;
 
-//##Documentation
-//## @brief OpenGL-based mapper to display a Geometry2D in a 2D window
-//## OpenGL-based mapper to display a Geometry2D in a 2D window. The result is
-//## normally a line. An important usage of this class is to show the
-//## orientation of the slices displayed in other 2D windows.
+/**
+ * @brief OpenGL-based mapper to display a Geometry2D in a 2D window 
+ * OpenGL-based mapper to display a Geometry2D in a 2D window. 
+ *
+ * The result is normally a line. An important usage of this class 
+ * is to show the orientation of the slices displayed in other 2D windows.
+ * In not-so-common cases the result of mapping is NOT a line but an arbitrary cut
+ * between a 2D geometry (e.g. a curved planed like mitk::ThinPlateSplineCurvedGeometry)
+ * and another curved plane.
+ */
 class MITK_CORE_EXPORT SurfaceMapper2D : public GLMapper2D
 {
 public:
@@ -47,29 +53,45 @@ public:
 
   itkNewMacro(Self);
 
-  const mitk::Surface * GetInput(void);
+  const Surface* GetInput(void);
 
-  virtual void Paint(BaseRenderer * renderer);
+  virtual void Paint(BaseRenderer* renderer);
 
-  //##Documentation
-  //## @brief The Surface to map can be explicitly set by this method. If
-  //## it is set, it is used instead of the data stored in the DataTreeNode.
-  //## 
-  //## This enables to use the mapper also internally from other mappers.
+  /**
+   * @brief The Surface to map can be explicitly set by this method. 
+   *
+   * If it is set, it is used instead of the data stored in the DataTreeNode.
+   * This enables to use the mapper also internally from other mappers.
+   */
   itkSetConstObjectMacro(Surface, Surface);
-  //##Documentation
-  //## @brief Get the Surface set explicitly.
-  //##
-  //## @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
-  //## @sa SetSurface
+
+  /**
+   * @brief Get the Surface set explicitly.
+   *
+   * @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
+   * @sa SetSurface
+   */
   itkGetConstObjectMacro(Surface, Surface);
 
-  /// \brief overwritten to initialize lookup table for point scalar data
- void SetDataTreeNode( DataTreeNode::Pointer node );
+  /**
+   *\brief Overwritten to initialize lookup table for point scalar data
+   */
+  void SetDataTreeNode( DataTreeNode::Pointer node );
 
-  void PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform * vtktransform, vtkLookupTable *lut = NULL);
+  /**
+   * \brief Generate OpenGL primitives for the VTK contour held in contour.
+   */
+  void PaintCells(BaseRenderer* renderer, vtkPolyData* contour, 
+                  const Geometry2D* worldGeometry, 
+                  const DisplayGeometry* displayGeometry, 
+                  vtkLinearTransform* vtktransform, 
+                  vtkLookupTable* lut = NULL,
+                  vtkPolyData* original3DObject = NULL);
 
-  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+
+  virtual void ApplyProperties(BaseRenderer* renderer);
+
 protected:
 
   SurfaceMapper2D();
@@ -79,13 +101,20 @@ protected:
   vtkPlane*  m_Plane;
   vtkCutter* m_Cutter;
 
-  mitk::Surface::ConstPointer m_Surface;
+  Surface::ConstPointer m_Surface;
 
-  vtkLookupTable *m_LUT;
+  vtkLookupTable* m_LUT;
   
   int m_LineWidth;
 
+  vtkPKdTree* m_PointLocator;
+  
+  vtkStripper* m_Stripper;
+
+  bool m_DrawNormals;
 };
 
 } // namespace mitk
+
 #endif /* MITKSURFACEDATAMAPPER2D_H_HEADER_INCLUDED_C10EB2E8 */
+

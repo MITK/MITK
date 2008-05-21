@@ -23,7 +23,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPushButton.h>
+#include <QPushButton>
 
 //##Documentation
 //## @brief Start region-grower at interactively added points

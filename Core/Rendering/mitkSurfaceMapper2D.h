@@ -112,6 +112,12 @@ protected:
   vtkStripper* m_Stripper;
 
   bool m_DrawNormals;
+
+  float m_FrontSideColor[4];
+  float m_BackSideColor[4];
+  float m_LineColor[4];
+  float m_FrontNormalLengthInPixels;
+  float m_BackNormalLengthInPixels;
 };
 
 } // namespace mitk

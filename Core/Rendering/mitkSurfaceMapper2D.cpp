@@ -50,8 +50,28 @@ mitk::SurfaceMapper2D::SurfaceMapper2D()
   m_LUT( vtkLookupTable::New() ),
   m_PointLocator( vtkPKdTree::New() ),
   m_Stripper( vtkStripper::New() ),
-  m_DrawNormals(false)
+  m_DrawNormals(false),
+  m_FrontNormalLengthInPixels(10.0),
+  m_BackNormalLengthInPixels(10.0)
 {
+  // default for normals on front side = green
+  m_FrontSideColor[0] = 0.0;
+  m_FrontSideColor[1] = 1.0;
+  m_FrontSideColor[2] = 0.0;
+  m_FrontSideColor[3] = 1.0;
+  
+  // default for normals on back side = red
+  m_BackSideColor[0] = 1.0;
+  m_BackSideColor[1] = 0.0;
+  m_BackSideColor[2] = 0.0;
+  m_BackSideColor[3] = 1.0;
+
+  // default for line color = yellow
+  m_LineColor[0] = 1.0;
+  m_LineColor[1] = 1.0;
+  m_LineColor[2] = 0.0;
+  m_LineColor[3] = 1.0;
+
   m_Cutter->SetCutFunction(m_Plane);
   m_Cutter->GenerateValues(1,0,1);
 
@@ -324,12 +344,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   glLineWidth( m_LineWidth );
   glBegin (GL_LINES);
 
-  // check for color and opacity property, use it for rendering if it exists
-  float lineColor[4]={1.0f,1.0f,1.0f,1.0f};
-  GetColor(lineColor, renderer);
-  GetOpacity(lineColor[3], renderer);
-  
-  glColor4fv(lineColor);
+  glColor4fv(m_LineColor);
 
   double distanceSinceLastNormal(0.0);
 
@@ -430,21 +445,25 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
               displayGeometry->WorldToDisplay(tip2D, tip2D);
 
               // calculate 2D vector from point to point+normal, normalize it to standard length
-              Vector2D tipVectorGL = tip2D - p2d;
-              tipVectorGL.Normalize();
-              tipVectorGL *= 10.0;
+              Vector2D tipVectorGLFront = tip2D - p2d;
+              tipVectorGLFront.Normalize();
+              tipVectorGLFront *= m_FrontNormalLengthInPixels;
+              
+              Vector2D tipVectorGLBack = p2d - tip2D;
+              tipVectorGLBack.Normalize();
+              tipVectorGLBack *= m_BackNormalLengthInPixels;
 
-              Point2D tipPoint2D = p2d + tipVectorGL;
-              Point2D backTipPoint2D = p2d - tipVectorGL;
+              Point2D tipPoint2D = p2d + tipVectorGLFront;
+              Point2D backTipPoint2D = p2d + tipVectorGLBack;
               
               // draw normalized mapped normal vector
-              glColor3f(1.0,0.0,0.0); // red backside
+              glColor4f(m_BackSideColor[0], m_BackSideColor[1], m_BackSideColor[2], m_BackSideColor[3]); // red backside
               glVertex2f(p2d[0], p2d[1]);
               glVertex2f(tipPoint2D[0], tipPoint2D[1]);
-              glColor3f(0.0,1.0,0.0); // green frontside
+              glColor4f(m_FrontSideColor[0], m_FrontSideColor[1], m_FrontSideColor[2], m_FrontSideColor[3]); // green backside
               glVertex2f(p2d[0], p2d[1]);
               glVertex2f(backTipPoint2D[0], backTipPoint2D[1]);
-              glColor4fv(lineColor); // back to line color
+              glColor4fv(m_LineColor); // back to line color
             }
           }
         }
@@ -462,6 +481,10 @@ void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk:
   node->AddProperty( "line width", IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
   node->AddProperty( "draw normals", BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "front normal color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
+  node->AddProperty( "back normal color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
+  node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
+  node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
@@ -470,5 +493,22 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   Superclass::ApplyProperties(renderer);
 
   GetDataTreeNode()->GetBoolProperty("draw normals", m_DrawNormals, renderer);
-}
+   
+  // check for color and opacity properties, use it for rendering if they exists
+  GetColor(m_LineColor, renderer /*, "color" */); 
+  GetOpacity(m_LineColor[3], renderer /*, "color" */);
+
+  GetColor(m_FrontSideColor, renderer, "front normal color");
+  GetOpacity(m_FrontSideColor[3], renderer);
+
+  GetColor(m_BackSideColor, renderer, "back normal color");
+  GetOpacity(m_BackSideColor[3], renderer);
+  
+  if (DataTreeNode* node = GetDataTreeNode())
+  {
+    node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
+    node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+  }
+  
+ }
 

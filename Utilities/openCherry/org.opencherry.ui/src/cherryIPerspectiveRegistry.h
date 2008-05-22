@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * The workbench's global registry of perspectives. 
  * <p>
  * This registry contains a descriptor for each perspectives in the workbench.

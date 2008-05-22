@@ -28,6 +28,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Shows the given view. If no view is specified in the parameters, then this
  * opens the view selection dialog.
  * 

@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Some common utilities for working with handlers in Platform UI.
  * <p>
  * <b>Note</b>: this class should not be instantiated or extended by clients.

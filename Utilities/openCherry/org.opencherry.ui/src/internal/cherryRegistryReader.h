@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Template implementation of a registry reader that creates objects
  * representing registry contents. Typically, an extension
  * contains one element, but this reader handles multiple

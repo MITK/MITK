@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * The container for workbench parts.
  */
 struct CHERRY_UI IPartPane : public Object {

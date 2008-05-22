@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Registry of editors known to the workbench.
  * <p>
  * An editor can be created in one of two ways:

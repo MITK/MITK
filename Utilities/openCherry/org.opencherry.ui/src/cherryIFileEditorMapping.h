@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * An association between a file name/extension and a list of known editors for 
  * files of that type.
  * <p>

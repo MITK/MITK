@@ -26,6 +26,8 @@ namespace cherry {
 struct IWorkbenchPart;
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * The primary interface between a workbench part and the workbench.
  * <p>
  * This interface is not intended to be implemented or extended by clients.

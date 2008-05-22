@@ -29,6 +29,8 @@ struct IEditorPart;
 struct IMemento;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * @see IEditorDescriptor
  */
 class CHERRY_UI EditorDescriptor : public IEditorDescriptor

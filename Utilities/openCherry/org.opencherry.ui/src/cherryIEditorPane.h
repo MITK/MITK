@@ -22,6 +22,10 @@
 
 namespace cherry {
 
+/**
+ * \ingroup org_opencherry_ui
+ * 
+ */
 struct CHERRY_UI IEditorPane : public IPartPane
 {
   

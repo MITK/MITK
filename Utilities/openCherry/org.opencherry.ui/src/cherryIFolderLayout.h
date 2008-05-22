@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * An <code>IFolderLayout</code> is used to define the initial views within a folder.
  * The folder itself is contained within an <code>IPageLayout</code>.
  * <p>

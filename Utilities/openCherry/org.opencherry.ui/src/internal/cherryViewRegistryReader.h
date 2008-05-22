@@ -26,6 +26,8 @@ namespace cherry
 class ViewRegistry;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A strategy to read view extensions from the registry.
  */
 class ViewRegistryReader : public RegistryReader

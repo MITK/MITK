@@ -28,6 +28,8 @@ struct IWorkbenchPart;
 struct IWorkbenchPage;
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Implements a reference to a IWorkbenchPart.
  * The IWorkbenchPart will not be instanciated until the part 
  * becomes visible or the API getPart is sent with true;

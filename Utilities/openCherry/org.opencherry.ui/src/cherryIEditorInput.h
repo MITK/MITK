@@ -25,6 +25,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * <code>IEditorInput</code> is a light weight descriptor of editor input,
  * like a file name but more abstract. It is not a model. It is a description of
  * the model source for an <code>IEditorPart</code>.

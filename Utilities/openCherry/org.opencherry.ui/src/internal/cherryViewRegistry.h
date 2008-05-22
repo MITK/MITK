@@ -36,6 +36,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * The central manager for view descriptors.
  */
 class ViewRegistry : public IViewRegistry

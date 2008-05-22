@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * PerspectiveDescriptor.
  * <p>
  * A PerspectiveDesciptor has 3 states:

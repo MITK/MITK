@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Abstract base implementation of all workbench parts.
  * <p>
  * This class is not intended to be subclassed by clients outside this

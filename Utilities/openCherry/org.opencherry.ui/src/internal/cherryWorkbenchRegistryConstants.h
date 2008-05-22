@@ -21,7 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 namespace cherry {
+
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Interface containing various registry constants (tag and attribute names).
  * 
  */

@@ -28,6 +28,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Description of a workbench part. The part descriptor contains 
  * the information needed to create part instances.
  * <p>

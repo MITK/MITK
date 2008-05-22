@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Interface for listening to selection changes.
  * <p>
  * This interface may be implemented by clients.

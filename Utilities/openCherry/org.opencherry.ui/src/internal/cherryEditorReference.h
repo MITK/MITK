@@ -33,6 +33,10 @@ class EditorManager;
 class EditorDescriptor;
 class IWorkbenchPage;
 
+/**
+ * \ingroup org_opencherry_ui_internal
+ * 
+ */
 class EditorReference : public WorkbenchPartReference, public IEditorReference
 {
 

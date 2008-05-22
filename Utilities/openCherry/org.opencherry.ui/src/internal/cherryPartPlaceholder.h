@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A PlaceHolder is a non-visible stand-in for a layout part.
  */
 class PartPlaceholder : public LayoutPart {

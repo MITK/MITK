@@ -40,6 +40,8 @@ namespace cherry {
 class PerspectiveHelper;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A collection of views and editors in a workbench.
  */
 class WorkbenchPage : public IWorkbenchPage {

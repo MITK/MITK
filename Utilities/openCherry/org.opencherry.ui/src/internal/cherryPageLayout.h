@@ -27,6 +27,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * This factory is used to define the initial layout of a part sash container.
  * <p>
  * Design notes: The design of <code>IPageLayout</code> is a reflection of 

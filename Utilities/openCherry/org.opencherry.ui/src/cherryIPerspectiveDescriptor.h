@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A perspective descriptor describes a perspective in an
  * <code>IPerspectiveRegistry</code>.  
  * <p>

@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Implements the common behavior for stacks of Panes (ie: EditorStack and ViewStack)
  * This layout container has PartPanes as children and belongs to a PartSashContainer.
  * 

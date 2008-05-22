@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * This class represents the TOP of the workbench UI world
  * A plugin class is effectively an application wrapper
  * for a plugin & its classes. This class should be thought

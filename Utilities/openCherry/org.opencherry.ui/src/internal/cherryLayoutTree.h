@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Implementation of a tree where the node is allways a sash
  * and it allways has two chidren. If a children is removed
  * the sash, ie the node, is removed as well and its other children

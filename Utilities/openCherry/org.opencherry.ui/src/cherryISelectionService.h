@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A selection service tracks the selection within an object.
  * <p>
  * A listener that wants to be notified when the selection becomes

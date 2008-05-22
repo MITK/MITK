@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A page layout defines the initial layout for a perspective within a page 
  * in a workbench window.
  * <p>

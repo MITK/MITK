@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Abstract base class for plug-ins that integrate with the Eclipse platform UI.
  * <p>
  * Subclasses obtain the following capabilities:

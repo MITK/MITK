@@ -24,12 +24,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+/**
+ * \ingroup org_opencherry_ui
+ * @{
+ */
+
 POCO_DECLARE_EXCEPTION(CHERRY_UI, UIException, Poco::RuntimeException);
 
 POCO_DECLARE_EXCEPTION(CHERRY_UI, WorkbenchException, UIException);
 
 POCO_DECLARE_EXCEPTION(CHERRY_UI, PartInitException, WorkbenchException);
 
+/*@}*/
 }
 
 #endif /*CHERRYUIEXCEPTIONS_H_*/

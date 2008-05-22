@@ -31,6 +31,8 @@ struct IWorkbenchWindow;
 struct IPartPane;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * <code>PartSite</code> is the general implementation for an
  * <code>IWorkbenchPartSite</code>. A site maintains the context for a part,
  * including the part, its pane, active contributions, selection provider, etc.

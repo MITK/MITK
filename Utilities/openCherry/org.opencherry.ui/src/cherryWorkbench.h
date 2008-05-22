@@ -31,6 +31,10 @@ namespace cherry {
 class ViewRegistry;
 class EditorRegistry;
 
+/**
+ * \ingroup org_opencherry_ui
+ * 
+ */
 class CHERRY_UI Workbench : public IWorkbench
 {
   

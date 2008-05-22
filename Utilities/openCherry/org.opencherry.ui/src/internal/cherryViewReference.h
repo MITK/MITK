@@ -28,7 +28,10 @@ namespace cherry {
 class ViewFactory;
 struct IWorkbenchPage;
 
-
+/**
+ * \ingroup org_opencherry_ui_internal
+ * 
+ */
 class ViewReference : public WorkbenchPartReference, public IViewReference {
 
   

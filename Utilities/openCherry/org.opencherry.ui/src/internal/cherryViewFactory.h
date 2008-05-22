@@ -34,6 +34,8 @@ class WorkbenchPage;
 struct IViewRegistry;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * The ViewFactory is used to control the creation and disposal of views.  
  * It implements a reference counting strategy so that one view can be shared
  * by more than one client.

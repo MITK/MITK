@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Represents the layout info for a view or placeholder in an {@link IPageLayout}.
  * <p>
  * This interface is not intended to be implemented by clients.

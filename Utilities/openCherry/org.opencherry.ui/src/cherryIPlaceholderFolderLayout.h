@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * An <code>IPlaceholderFolderLayout</code> is used to define the initial
  * view placeholders within a folder. 
  * The folder itself is contained within an <code>IPageLayout</code>.

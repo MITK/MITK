@@ -26,6 +26,8 @@ namespace cherry
 class EditorRegistry;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * This class is used to read resource editor registry descriptors from
  * the platform registry.
  */

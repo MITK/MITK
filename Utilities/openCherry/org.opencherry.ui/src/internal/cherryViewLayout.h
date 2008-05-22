@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Implementation of IViewLayout.
  * This is an API facade on the internal ViewLayoutRec.
  *  

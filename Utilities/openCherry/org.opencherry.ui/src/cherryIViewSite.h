@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * The primary interface between a view part and the workbench.
  * <p>
  * The workbench exposes its implemention of view part sites via this interface,

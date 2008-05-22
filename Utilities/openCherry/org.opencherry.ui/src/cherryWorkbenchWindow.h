@@ -29,6 +29,10 @@ struct IWorkbenchPage;
 struct IPartService;
 struct ISelectionService;
 
+/**
+ * \ingroup org_opencherry_ui
+ * 
+ */
 class CHERRY_UI WorkbenchWindow : public IWorkbenchWindow
 {
 public:

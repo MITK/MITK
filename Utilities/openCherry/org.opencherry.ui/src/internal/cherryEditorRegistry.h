@@ -36,6 +36,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Provides access to the collection of defined editors for resource types.
  */
 class EditorRegistry : public IEditorRegistry

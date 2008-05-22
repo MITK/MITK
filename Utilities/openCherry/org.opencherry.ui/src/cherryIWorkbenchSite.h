@@ -29,6 +29,8 @@ struct ISelectionProvider;
 struct IWorkbenchWindow;
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * The common interface between the workbench and its parts, including pages
  * within parts.
  * <p>

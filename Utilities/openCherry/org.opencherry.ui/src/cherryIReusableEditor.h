@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Interface for reusable editors. 
  * 
  * An editors may support changing its input so that 

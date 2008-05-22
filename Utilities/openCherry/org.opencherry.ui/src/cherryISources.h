@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * <p>
  * A source is type of event change that can occur within the workbench. For
  * example, the active workbench window can change, so it is considered a

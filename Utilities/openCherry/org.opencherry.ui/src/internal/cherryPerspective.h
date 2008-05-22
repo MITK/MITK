@@ -40,7 +40,10 @@ namespace cherry {
 class ViewFactory;
 class PerspectiveHelper;
 
-
+/**
+ * \ingroup org_opencherry_ui_internal
+ * 
+ */
 class Perspective : public Object {
   
 public:

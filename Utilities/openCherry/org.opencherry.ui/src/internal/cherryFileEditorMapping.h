@@ -29,6 +29,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Implementation of IFileEditorMapping.
  * 
  */

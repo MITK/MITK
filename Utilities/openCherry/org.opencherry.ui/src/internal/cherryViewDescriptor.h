@@ -29,6 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+/**
+ * \ingroup org_opencherry_ui_internal
+ * 
+ */
 class ViewDescriptor : public IViewDescriptor
 {
 private:

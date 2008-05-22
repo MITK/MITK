@@ -29,6 +29,10 @@ class IEditorPart;
 class IEditorReference;
 class PageSelectionService;
 
+/**
+ * \ingroup org_opencherry_ui_internal
+ * 
+ */
 class WorkbenchPagePartList {
     
 private:

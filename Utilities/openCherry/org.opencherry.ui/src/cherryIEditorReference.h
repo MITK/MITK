@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Implements a reference to a editor.
  * The IEditorPart will not be instanciated until
  * the editor becomes visible or the API getEditor

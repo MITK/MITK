@@ -27,6 +27,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * This layout is used to define the initial set of placeholders
  * in a placeholder.
  * <p>

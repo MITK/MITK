@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Defines a reference to an IViewPart.
  * <p>
  * This interface is not intended to be implemented by clients.

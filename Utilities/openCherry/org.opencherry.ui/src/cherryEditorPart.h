@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Abstract base implementation of all workbench editors.
  * <p>
  * This class should be subclassed by clients wishing to define new editors.

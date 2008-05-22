@@ -29,6 +29,8 @@ struct IWorkbenchPartSite;
 
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A workbench part is a visual component within a workbench page.  There
  * are two subtypes: view and editor, as defined by <code>IViewPart</code> and
  * <code>IEditorPart</code>.  

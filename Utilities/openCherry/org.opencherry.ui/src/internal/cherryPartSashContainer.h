@@ -22,6 +22,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Abstract container that groups various layout
  * parts (possibly other containers) together as
  * a unit. Manages the placement and size of these

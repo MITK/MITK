@@ -26,6 +26,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * Description of an editor in the workbench editor registry. The
  * editor descriptor contains the information needed to create editor instances.
  * <p>

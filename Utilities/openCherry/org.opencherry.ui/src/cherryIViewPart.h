@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A view is a visual component within a workbench page. It is typically used to
  * navigate a hierarchy of information (like the workspace), open an editor, or
  * display properties for the active editor. Modifications made in a view are

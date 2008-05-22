@@ -42,6 +42,8 @@ struct IEditorRegistry;
 struct IEditorAreaHelper;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Manage a group of element editors. Prevent the creation of two editors on the
  * same element.
  * 

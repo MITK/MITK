@@ -33,6 +33,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * This is a view descriptor. It provides a "description" of a given
  * given view so that the view can later be constructed.
  * <p>

@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * A part service tracks the creation and activation of parts within a
  * workbench page.
  * <p>

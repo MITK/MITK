@@ -30,6 +30,8 @@ struct IViewPart;
 struct IViewDescriptor;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A view container manages the services for a view.
  */
 class ViewSite : public PartSite, public IViewSite {

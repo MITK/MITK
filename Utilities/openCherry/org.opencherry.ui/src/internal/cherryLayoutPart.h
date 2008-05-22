@@ -27,6 +27,8 @@ namespace cherry {
 struct ILayoutContainer;
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A presentation part is used to build the presentation for the
  * workbench.  Common subclasses are pane and folder.
  */

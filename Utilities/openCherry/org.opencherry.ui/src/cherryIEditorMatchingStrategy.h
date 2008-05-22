@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * An editor matching strategy allows editor extensions to provide their own
  * algorithm for matching the input of an open editor of that type to a 
  * given editor input.  This is used to find a matching editor during

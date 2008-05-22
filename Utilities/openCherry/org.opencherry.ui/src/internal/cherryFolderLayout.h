@@ -29,6 +29,8 @@ class PageLayout;
 
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * This layout is used to define the initial set of views and placeholders
  * in a folder.
  * <p>

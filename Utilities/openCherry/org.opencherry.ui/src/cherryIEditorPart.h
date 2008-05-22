@@ -27,6 +27,8 @@ struct IEditorInput;
 struct IEditorSite;
 
 /**
+ * \ingroup org_opencherry_ui
+ * 
  * An editor is a visual component within a workbench page. It is
  * typically used to edit or browse a document or input object. The input 
  * is identified using an <code>IEditorInput</code>.  Modifications made 

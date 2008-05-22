@@ -25,6 +25,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * A ReferenceCounter is used to reference counting objects.
  * Each object is identified by a unique ID.  Together they form
  * an ID - value pair. An object is added to the counter by calling

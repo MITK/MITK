@@ -25,6 +25,8 @@ namespace cherry
 {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * Category provides for hierarchical grouping of elements
  * registered in the registry. One extension normally defines
  * a category, and other reference it via its ID.

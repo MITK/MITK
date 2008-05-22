@@ -31,6 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <list>
 
+/**
+ * \ingroup org_opencherry_ui
+ * 
+ */
 namespace cherry {
 
 /**

@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
+ * \ingroup org_opencherry_ui_internal
+ * 
  * An editor container manages the services for an editor.
  */
 class EditorSite : public PartSite, public IEditorSite {

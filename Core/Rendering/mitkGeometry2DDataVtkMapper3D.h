@@ -27,11 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSystemIncludes.h>
 
 class vtkActor;
-class vtkArrowSource;
-class vtkAppendPolyData;
-class vtkTexture;
-class vtkImageMapToWindowLevelColors;
-class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkDataSetMapper;
 class vtkLookupTable;
@@ -39,8 +34,7 @@ class vtkAssembly;
 class vtkFeatureEdges;
 class vtkTubeFilter;
 class vtkTransformPolyDataFilter;
-class vtkTransform;
-class vtkTextActor;
+class vtkHedgeHog;
 
 namespace mitk {
 
@@ -51,8 +45,24 @@ class DataStorage;
 
 /**
  *  \brief Vtk-based mapper to display a Geometry2D in a 3D window
- * 
  *  \ingroup Mapper
+ *
+ *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given Geometry2D instance. 
+ *  Geometry2D may either contain a common flat plane or a curved plane (ThinPlateSplineCurvedGeometry).
+ *
+ *  The vtkPolyData object is then decorated by a colored tube on the edges and by image textures if possible
+ *  (currently this requires that there is a 2D render window rendering the same geometry as this mapper).
+ *
+ * Properties that influence rendering are:
+ *
+ *   - \b "color": (ColorProperty) Color of the tubed frame.
+ *   - \b "xresolution": (FloatProperty) Resolution (=number of tiles) in x direction. Only relevant for ThinPlateSplineCurvedGeometry
+ *   - \b "yresolution": (FloatProperty) Resolution (=number of tiles) in y direction. Only relevant for ThinPlateSplineCurvedGeometry
+ *   - \b "draw normals 3D": (BoolProperty) If true, a vtkHedgeHog is used to display normals for the generated surface object. Useful to distinguish front and back of a plane.
+ *   - \b "invert normals": (BoolProperty) Inverts front/back for display.
+ *   - \b "front normal color": (ColorProperty) Color for normals display on front side of the plane
+ *   - \b "back normal color": (ColorProperty) Color for normals display on back side of the plane
+ *
  */
 class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {
@@ -72,7 +82,7 @@ public:
   /**
    *  \brief Get the Geometry2DData to map
    */
-  virtual const mitk::Geometry2DData *GetInput();
+  virtual const Geometry2DData *GetInput();
 
   /**
    * \brief All images found when traversing the (sub-) tree starting at
@@ -82,11 +92,12 @@ public:
   virtual void SetDataIteratorForTexture(DataStorage* storage);
 
 protected:
+
   Geometry2DDataVtkMapper3D();
 
   virtual ~Geometry2DDataVtkMapper3D();
 
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
+  virtual void GenerateData(BaseRenderer* renderer);
 
   /*
    * \brief Construct an extended lookup table from the given one.
@@ -123,11 +134,11 @@ protected:
   /** \brief PropAssembly to hold the planes */
   vtkAssembly *m_ImageAssembly;
 
-  mitk::Geometry2DDataToSurfaceFilter::Pointer m_SurfaceCreator;
+  Geometry2DDataToSurfaceFilter::Pointer m_SurfaceCreator;
 
-  mitk::BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
+  BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
 
-  mitk::BoundingBox::PointsContainer::Pointer m_SurfaceCreatorPointsContainer;
+  BoundingBox::PointsContainer::Pointer m_SurfaceCreatorPointsContainer;
 
   /** \brief Edge extractor for tube-shaped frame */
   vtkFeatureEdges *m_Edges;
@@ -144,20 +155,38 @@ protected:
   /** \brief Actor for the tube-shaped frame */
   vtkActor *m_EdgeActor;
 
-  /** direction arrow display objects */
-  vtkArrowSource* m_DirectionSource;
-  vtkTransformPolyDataFilter* m_DirectionTransformer;
-  vtkAppendPolyData* m_DirectionAppender;
-  vtkTransform* m_DirectionTransform;
-
   /** \brief Mapper for black plane background */
   vtkDataSetMapper *m_BackgroundMapper;
 
   /** \brief Actor for black plane background */
   vtkActor *m_BackgroundActor;
+  
+  /** \brief Transforms the suface before applying the glyph filter */
+  vtkTransformPolyDataFilter *m_NormalsTransformer;
+
+  /** \brief Mapper for normals representation (thin lines) */
+  vtkPolyDataMapper* m_FrontNormalsMapper;
+  vtkPolyDataMapper* m_BackNormalsMapper;
+
+  /** \brief  Generates lines for surface normals */
+  vtkHedgeHog* m_FrontHedgeHog;
+  vtkHedgeHog* m_BackHedgeHog;
+  
+  /** \brief Actor to hold the normals arrows */
+  vtkActor* m_FrontNormalsActor;
+  vtkActor* m_BackNormalsActor;
+
+  /** \brief Whether or not to display normals */
+  bool m_DisplayNormals;
+
+  /** \brief Whether or not to invert normals */
+  bool m_InvertNormals;
+
+  /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
+  bool m_NormalsActorAdded;
 
 
-  mitk::DataTreeIteratorClone m_DataTreeIterator;
+  DataTreeIteratorClone m_DataTreeIterator;
 
 
   /** A default grayscale lookup-table, used for reference */
@@ -167,7 +196,7 @@ protected:
   /** \brief List holding the vtkActor to map the image into 3D for each 
    * ImageMapper 
    */
-  typedef std::map< mitk::ImageMapper2D *, vtkActor * > ActorList;
+  typedef std::map< ImageMapper2D *, vtkActor * > ActorList;
   ActorList m_ImageActors;
 
   struct LookupTableProperties
@@ -182,7 +211,7 @@ protected:
     vtkFloatingPointType windowMax;
   };
 
-  typedef std::map< mitk::ImageMapper2D *, LookupTableProperties > 
+  typedef std::map< ImageMapper2D *, LookupTableProperties > 
     LookupTablePropertiesList;
 
   /** \brief List holding some lookup table properties of the previous pass */
@@ -195,5 +224,8 @@ protected:
   MemberCommandType::Pointer m_ImageMapperDeletedCommand;
 
 };
+
 } // namespace mitk
+
 #endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */
+

@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTableProperty.h"
 
 #include <vtkPolyData.h>
-#include <vtkPolyDataSource.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
 #include <vtkPoints.h>
@@ -251,7 +250,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
         }
         else
         {
-          //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "plane plane" into a "curved plane"?
+          //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "flat plane" into a "curved plane"?
           return;
           // set up vtkPlane according to worldGeometry
           point=const_cast<BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
@@ -480,7 +479,8 @@ void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk:
 {
   node->AddProperty( "line width", IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
-  node->AddProperty( "draw normals", BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "draw normals 2D", BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "invert normals", BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "front normal color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
   node->AddProperty( "back normal color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
   node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
@@ -492,23 +492,45 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   Superclass::ApplyProperties(renderer);
 
-  GetDataTreeNode()->GetBoolProperty("draw normals", m_DrawNormals, renderer);
+  GetDataTreeNode()->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
    
   // check for color and opacity properties, use it for rendering if they exists
   GetColor(m_LineColor, renderer /*, "color" */); 
   GetOpacity(m_LineColor[3], renderer /*, "color" */);
-
-  GetColor(m_FrontSideColor, renderer, "front normal color");
-  GetOpacity(m_FrontSideColor[3], renderer);
-
-  GetColor(m_BackSideColor, renderer, "back normal color");
-  GetOpacity(m_BackSideColor[3], renderer);
   
+  bool invertNormals(false);
   if (DataTreeNode* node = GetDataTreeNode())
   {
-    node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
-    node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+    node->GetBoolProperty("invert normals", invertNormals, renderer);
   }
-  
- }
+
+  if (!invertNormals)
+  {
+    GetColor(m_FrontSideColor, renderer, "front normal color");
+    GetOpacity(m_FrontSideColor[3], renderer);
+
+    GetColor(m_BackSideColor, renderer, "back normal color");
+    GetOpacity(m_BackSideColor[3], renderer);
+    
+    if (DataTreeNode* node = GetDataTreeNode())
+    {
+      node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
+      node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+    }
+  }
+  else
+  {
+    GetColor(m_FrontSideColor, renderer, "back normal color");
+    GetOpacity(m_FrontSideColor[3], renderer);
+
+    GetColor(m_BackSideColor, renderer, "front normal color");
+    GetOpacity(m_BackSideColor[3], renderer);
+    
+    if (DataTreeNode* node = GetDataTreeNode())
+    {
+      node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
+      node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+    }
+  }
+}
 

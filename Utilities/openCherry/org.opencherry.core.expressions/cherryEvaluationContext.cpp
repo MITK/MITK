@@ -22,8 +22,7 @@ namespace cherry {
 EvaluationContext::EvaluationContext(IEvaluationContext* parent, 
                                      ExpressionVariable::Pointer defaultVariable) 
 {
-  if (defaultVariable.IsNull())
-    throw Poco::AssertionViolationException("Default variable must not be empty");
+  poco_assert(defaultVariable.IsNotNull());
 
   fParent = parent;
   fDefaultVariable = defaultVariable;
@@ -34,11 +33,9 @@ EvaluationContext::EvaluationContext(IEvaluationContext* parent,
     ExpressionVariable::Pointer defaultVariable, 
     std::vector<IVariableResolver*> resolvers) 
 {
-  if (defaultVariable.IsNull())
-    throw Poco::AssertionViolationException("Default variable must not be empty");
+  poco_assert(defaultVariable.IsNotNull());
     
-  if (resolvers.size() == 0)
-    throw Poco::AssertionViolationException("resolvers is empty");
+  poco_assert(resolvers.size() != 0);
   
   fParent= parent;
   fDefaultVariable= defaultVariable;
@@ -81,11 +78,8 @@ EvaluationContext::GetAllowPluginActivation()
 void 
 EvaluationContext::AddVariable(const std::string& name, ExpressionVariable::Pointer value) 
 {
-  if (name.size() == 0)
-    throw Poco::AssertionViolationException("name must not be empty");
-  
-  if (value.IsNull())
-    throw Poco::AssertionViolationException("value must not be empty");
+  poco_assert(name.size() != 0);
+  poco_assert(value.IsNotNull());
   
   fVariables[name] = value;
 }
@@ -93,8 +87,7 @@ EvaluationContext::AddVariable(const std::string& name, ExpressionVariable::Poin
 ExpressionVariable::Pointer 
 EvaluationContext::RemoveVariable(const std::string& name) 
 {
-  if (name.size() == 0)
-    throw Poco::AssertionViolationException("name must not be empty");
+  poco_assert(name.size() != 0);
   
   ExpressionVariable::Pointer elem(fVariables[name]);
   fVariables.erase(name);
@@ -104,8 +97,7 @@ EvaluationContext::RemoveVariable(const std::string& name)
 ExpressionVariable::Pointer 
 EvaluationContext::GetVariable(const std::string& name) 
 {
-  if (name.size() == 0)
-    throw Poco::AssertionViolationException("name must not be empty");
+  poco_assert(name.size() != 0);
   
   ExpressionVariable::Pointer result;
   

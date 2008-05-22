@@ -109,7 +109,7 @@ PropertyTesterDescriptor::Instantiate()
 bool
 PropertyTesterDescriptor::Test(ExpressionVariable::Pointer receiver, const std::string& method, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue)
 {
-  throw Poco::AssertionViolationException("Method should never be called");
+  poco_bugcheck_msg("Method should never be called");
   return false;
 }
 

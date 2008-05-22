@@ -34,8 +34,11 @@ public:
   
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
   IDialog::Pointer CreateStandardDialog(const std::string& dialogid);
-  IViewPart::Pointer CreateErrorViewPart(const std::string& partName, Poco::Exception exc);
+  IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "");
+  IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "");
+  
   IViewPane::Pointer CreateViewPane();
+  IEditorPane::Pointer CreateEditorPane();
   
   ~QtWorkbench();
   

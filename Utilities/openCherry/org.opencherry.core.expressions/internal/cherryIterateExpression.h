@@ -44,8 +44,7 @@ private:
     
     IteratePool(IEvaluationContext* parent, std::vector<ExpressionVariable::Pointer>::iterator begin, std::vector<ExpressionVariable::Pointer>::iterator end)
     {
-			if (parent == 0)
-			  throw Poco::AssertionViolationException("parent evaluation context must not be 0");
+			poco_check_ptr(parent);
 			
 			fParent= parent;
 			fIterator = begin;

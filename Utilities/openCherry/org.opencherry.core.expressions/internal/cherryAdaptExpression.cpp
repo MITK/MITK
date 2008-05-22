@@ -17,16 +17,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryAdaptExpression.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.core.runtime/cherryRuntime.h"
-#include "org.opencherry.core.runtime/cherryIAdapterManager.h"
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include <org.opencherry.osgi/cherryPlatform.h>
+#include <org.opencherry.core.runtime/cherryRuntime.h>
+#include <org.opencherry.core.runtime/cherryIAdapterManager.h>
+#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
 
 #include "cherryExpressions.h"
 #include "cherryDefaultVariable.h"
 
-#include "Poco/Hash.h"
-#include "Poco/Exception.h"
+#include <Poco/Hash.h>
+#include <Poco/Exception.h>
+#include <Poco/Bugcheck.h>
 
 namespace cherry {
 
@@ -52,8 +53,7 @@ AdaptExpression::AdaptExpression(Poco::XML::Node* /*element*/)
 
 AdaptExpression::AdaptExpression(const std::string& typeName) 
 {
-  if (typeName.size() == 0)
-    throw Poco::AssertionViolationException("typename must not be empty");
+  poco_assert(typeName.size() != 0);
   fTypeName= typeName;
 }
 

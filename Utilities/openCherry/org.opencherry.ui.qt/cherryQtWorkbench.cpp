@@ -50,7 +50,12 @@ QtWorkbench::CreateStandardDialog(const std::string& dialogid)
     return IDialog::Pointer(0);
 }
 
-IViewPart::Pointer QtWorkbench::CreateErrorViewPart(const std::string& partName, Poco::Exception exc)
+IViewPart::Pointer QtWorkbench::CreateErrorViewPart(const std::string& partName, const std::string& msg)
+{
+  return 0;
+}
+
+IEditorPart::Pointer QtWorkbench::CreateErrorEditorPart(const std::string& partName, const std::string& msg)
 {
   return 0;
 }
@@ -58,6 +63,11 @@ IViewPart::Pointer QtWorkbench::CreateErrorViewPart(const std::string& partName,
 IViewPane::Pointer QtWorkbench::CreateViewPane()
 {
   return new QtViewPane("", m_QtWindow);
+}
+
+IEditorPane::Pointer QtWorkbench::CreateEditorPane()
+{
+  return 0;
 }
 
 }  // namespace cherry

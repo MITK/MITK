@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include "Poco/Hash.h"
-#include "Poco/Exception.h"
+#include <Poco/Hash.h>
+#include <Poco/Exception.h>
+#include <Poco/Bugcheck.h>
 
 namespace cherry {
 
@@ -28,8 +29,7 @@ const intptr_t EqualsExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry
 
 
 EqualsExpression::EqualsExpression(ExpressionVariable::Pointer expectedValue) {
-  if (expectedValue.IsNull())
-    throw Poco::AssertionViolationException("expectedValue must not be empty");
+  poco_assert(expectedValue.IsNotNull());
   
   fExpectedValue = expectedValue;
 }

@@ -15,11 +15,32 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "Poco/ClassLibrary.h"
+#include "cherryPartPlaceholder.h"
 
-#include <org.opencherry.osgi/cherryIBundleActivator.h>
-#include "src/internal/cherryWorkbenchPlugin.h"
+namespace cherry
+{
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::WorkbenchPlugin)
-POCO_END_MANIFEST
+const std::string PartPlaceholder::WILD_CARD = "*"; //$NON-NLS-1$
+
+PartPlaceholder::PartPlaceholder(const std::string& id) :
+  LayoutPart(id)
+{
+
+}
+
+void* PartPlaceholder::CreateControl(void* parent)
+{
+  // do nothing
+}
+
+void* PartPlaceholder::GetControl()
+{
+  return 0;
+}
+
+bool PartPlaceholder::HasWildCard()
+{
+  return this->GetID().find_first_of(WILD_CARD) != std::string::npos;
+}
+
+}

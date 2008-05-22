@@ -15,11 +15,38 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "Poco/ClassLibrary.h"
+#include "cherryNullEditorInput.h"
 
-#include <org.opencherry.osgi/cherryIBundleActivator.h>
-#include "src/internal/cherryWorkbenchPlugin.h"
+namespace cherry
+{
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::WorkbenchPlugin)
-POCO_END_MANIFEST
+NullEditorInput::NullEditorInput()
+{
+}
+
+NullEditorInput::NullEditorInput(EditorReference::Pointer editorReference)
+{
+  //poco_assert(editorReference.IsNotNull());
+  this->editorReference = editorReference;
+}
+
+bool NullEditorInput::Exists()
+{
+  return false;
+}
+
+std::string NullEditorInput::GetName()
+{
+  if (editorReference.IsNotNull())
+    return editorReference->GetName();
+  return ""; //$NON-NLS-1$
+}
+
+std::string NullEditorInput::GetToolTipText()
+{
+  if (editorReference.IsNotNull())
+    return editorReference->GetTitleToolTip();
+  return ""; //$NON-NLS-1$
+}
+
+}

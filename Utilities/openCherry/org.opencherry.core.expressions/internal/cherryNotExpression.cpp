@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryNotExpression.h"
 
-#include "Poco/Exception.h"
+#include <Poco/Exception.h>
 
 namespace cherry {
 
@@ -25,8 +25,7 @@ const intptr_t NotExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::
 
 NotExpression::NotExpression(Expression::Pointer expression)
 {
-  if (expression.IsNull())
-    throw Poco::AssertionViolationException("expression must not be null");
+  poco_assert(expression.IsNotNull());
   
   fExpression= expression;
 }

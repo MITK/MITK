@@ -101,7 +101,8 @@ EvaluationResult::ToString()
   case 2:
     return "not_loaded";
   default:
-    throw Poco::AssertionViolationException();
+    poco_bugcheck();
+    return "";
   }
 }
 

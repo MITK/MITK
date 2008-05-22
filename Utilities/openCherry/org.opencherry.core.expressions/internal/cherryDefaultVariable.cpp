@@ -17,13 +17,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryDefaultVariable.h"
 
+#include <Poco/Bugcheck.h>
+
 namespace cherry {
 
 DefaultVariable::DefaultVariable(IEvaluationContext* parent,
     ExpressionVariable::Pointer defaultVariable)
 {
-  if (parent == 0)
-    throw Poco::AssertionViolationException("parent evaluation context must not be 0");
+  poco_check_ptr(parent);
 
   fParent= parent;
 

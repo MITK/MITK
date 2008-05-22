@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryProperty.h"
 
-#include "Poco/Hash.h"
+#include <Poco/Hash.h>
+#include <Poco/Bugcheck.h>
 
 namespace cherry {
 
@@ -29,8 +30,7 @@ Property::Property(ExpressionVariable::Pointer type,
  
  void 
  Property::SetPropertyTester(IPropertyTester* tester) {
-   if (tester == 0)
-     throw Poco::AssertionViolationException("Property tester must not be 0");
+   poco_check_ptr(tester);
    
    fTester= tester;
  }

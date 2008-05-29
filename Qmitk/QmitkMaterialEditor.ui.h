@@ -212,7 +212,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
 {
     assert ( materialProperty != NULL );
     ClearMaterialProperties();
-    mitk::MaterialProperty* internalProperty;
+    mitk::MaterialProperty::Pointer internalProperty;
     if (m_Inline)
     {
       internalProperty = materialProperty;
@@ -241,8 +241,8 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Poi
     ClearMaterialProperties();     
     for ( unsigned int i = 0 ; i < materialPropertyVectorContainer->size() ; ++i )
     {
-        mitk::MaterialProperty* materialProperty = materialPropertyVectorContainer->GetElement( i );
-        mitk::MaterialProperty* internalProperty = mitk::MaterialProperty::New( *materialProperty );
+        mitk::MaterialProperty::Pointer materialProperty = materialPropertyVectorContainer->GetElement( i );
+        mitk::MaterialProperty::Pointer internalProperty = mitk::MaterialProperty::New( *materialProperty );
         internalProperty->SetDataTreeNode( NULL );
         internalProperty->SetRenderer( NULL );
         m_MaterialProperties->push_back( mitk::MaterialProperty::New( *materialProperty ) );

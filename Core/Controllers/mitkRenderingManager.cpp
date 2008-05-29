@@ -325,6 +325,32 @@ RenderingManager
   return false; 
 }
 
+bool 
+RenderingManager
+::InitializeView( vtkRenderWindow * /*renderWindow*/, 
+  DataTreeIteratorBase * /*dataIt*/,
+  bool /*initializeGlobalTimeSNC*/ )
+{
+  return false;
+}
+
+bool 
+RenderingManager
+::InitializeView( vtkRenderWindow * /*renderWindow*/,
+  const Geometry3D * /*geometry*/,
+  bool /*initializeGlobalTimeSNC*/ )
+{
+  return false;
+}
+
+  
+bool 
+RenderingManager
+::InitializeView( vtkRenderWindow * /*renderWindow*/ )
+{
+  return false;
+}
+
   
 void 
 RenderingManager

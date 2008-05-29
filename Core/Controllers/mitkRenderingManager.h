@@ -152,6 +152,23 @@ public:
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
 
+  /** Initializes the specified window to the geometry of the given
+   * DataTreeNode. Set "initializeGlobalTimeSNC" to true in order to use this
+   * geometry as global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow,
+    DataTreeIteratorBase *dataIt, bool initializeGlobalTimeSNC = false );
+
+  /** Initializes the specified window to the given geometry. Set 
+   * "initializeGlobalTimeSNC" to true in order to use this geometry as 
+   * global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow,
+    const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+
+  /** Initializes the specified window to the default viewing direction
+   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow );
+
+
   /** Sets the (global) SliceNavigationController responsible for 
    * time-slicing. */
   void SetTimeNavigationController( SliceNavigationController *snc );

@@ -65,6 +65,10 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, const char* name)
 
 QmitkToolSelectionBox::~QmitkToolSelectionBox()
 {
+  m_ToolManager->ActiveToolChanged.RemoveListener( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
+  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+
 }
 
 void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
@@ -150,6 +154,12 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   {
     delete m_LastToolGUI; // will hopefully notify parent and layouts
     m_LastToolGUI = NULL;
+        
+    QLayout* layout = m_ToolGUIWidget->layout();
+    if (layout)
+    {
+      layout->activate();
+    }
   }
 
   QToolButton* toolButton(NULL);

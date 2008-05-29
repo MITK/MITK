@@ -389,17 +389,17 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetDataPreference() ) );
+              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetWorkingDataPreference() ) );
           }
           else
           {
-              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetDataPreference() ) );
+              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetWorkingDataPreference() ) );
           }
           completePredicate = m_Predicates.back();
         }
         else
         {
-          completePredicate = &tool->GetDataPreference();
+          completePredicate = &tool->GetWorkingDataPreference();
         }
       }
     }
@@ -688,6 +688,15 @@ void QmitkToolWorkingDataListBox::SetDisplayOnlyDerivedNodes(bool on)
   if ( m_DisplayOnlyDerivedNodes != on )
   {
     m_DisplayOnlyDerivedNodes = on;
+    UpdateDataDisplay();
+  }
+}
+
+void QmitkToolWorkingDataListBox::SetDisplayMode( QmitkToolWorkingDataListBox::DisplayMode mode )
+{
+  if (m_DisplayMode != mode)
+  {
+    m_DisplayMode = mode;
     UpdateDataDisplay();
   }
 }

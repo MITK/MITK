@@ -26,7 +26,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Tool::Tool(const char* type)
 : StateMachine(type),
-  m_IsSegmentationPredicate("segmentation", BoolProperty::New(true))
+  // for working image
+  m_IsSegmentationPredicate("segmentation", BoolProperty::New(true)),
+  // for reference images
+  m_PredicateImages("Image"),
+  m_PredicateDim3(3, 1),
+  m_PredicateDim4(4, 1),
+  m_PredicateDimension( m_PredicateDim3, m_PredicateDim4 ),
+  m_PredicateImage3D( m_PredicateImages, m_PredicateDimension ),
+
+  m_PredicateBinary("binary", BoolProperty::New(true)),
+  m_PredicateNotBinary( m_PredicateBinary ),
+
+  m_PredicateSegmentation("segmentation", BoolProperty::New(true)),
+  m_PredicateNotSegmentation( m_PredicateSegmentation ),
+  
+  m_PredicateHelper("helper object", BoolProperty::New(true)),
+  m_PredicateNotHelper( m_PredicateHelper ),
+  
+  m_PredicateImageColorful( m_PredicateNotBinary, m_PredicateNotSegmentation ),
+
+  m_PredicateImageColorfulNotHelper( m_PredicateImageColorful, m_PredicateNotHelper ),
+  
+  m_PredicateReference( m_PredicateImage3D, m_PredicateImageColorfulNotHelper )
 {
 }
 
@@ -79,7 +101,13 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
   return object;
 }
 
-const mitk::NodePredicateBase& mitk::Tool::GetDataPreference() const
+const mitk::NodePredicateBase& mitk::Tool::GetReferenceDataPreference() const
+{
+  return m_PredicateReference;
+}
+
+
+const mitk::NodePredicateBase& mitk::Tool::GetWorkingDataPreference() const
 {
   return m_IsSegmentationPredicate;
 }

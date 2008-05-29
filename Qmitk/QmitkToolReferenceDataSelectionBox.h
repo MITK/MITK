@@ -47,7 +47,19 @@ class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
   Q_OBJECT
 
   public:
-    
+
+    /**
+     * \brief What kind of items should be displayed.
+     *
+     * Every mitk::Tool holds a NodePredicateBase object, telling the kind of data that this
+     * tool will successfully work with. There are two ways that this list box deals with
+     * these predicates.
+     *
+     *   DEFAULT is: list data if ANY one of the displayed tools' predicate matches.
+     * Other option: list data if ALL one of the displayed tools' predicate matches
+     */
+    enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
+     
     QmitkToolReferenceDataSelectionBox(QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkToolReferenceDataSelectionBox();
 
@@ -59,6 +71,26 @@ class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
     void OnToolManagerReferenceDataModified();
+
+    /**
+     * \brief No brief description.
+     *
+     * Should be called to restrict the number of tools that are
+     * evaluated to build up the list. Default is to ask all tools for their predicate, by
+     * setting the 'groups' string this can be restricted to certain groups of tools
+     * or single tools.
+     */
+    void SetToolGroupsForFiltering(const std::string& groups);
+
+    /**
+     * \brief How the list contents is determined.
+     * 
+     * See also documentation of DisplayMode.
+     *
+     * \sa DisplayMode
+     */
+    void SetDisplayMode( DisplayMode mode );
+
 
   signals:
 
@@ -81,6 +113,9 @@ class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QVBox
     QmitkDataTreeComboBox* m_ReferenceDataSelectionBox;
 
     bool m_SelfCall;
+
+    DisplayMode m_DisplayMode;
+    std::string m_ToolGroupsForFiltering;
 };
 
 #endif

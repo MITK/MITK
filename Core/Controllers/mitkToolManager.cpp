@@ -57,6 +57,11 @@ mitk::ToolManager::~ToolManager()
   {
     m_ActiveTool->Deactivated();
     GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
+    
+    m_ActiveTool = NULL;
+    m_ActiveToolID = -1; // no tool active
+
+    ActiveToolChanged.Send();
   }
 }
 

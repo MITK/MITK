@@ -27,6 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMessage.h"
 #include "mitkDataTreeNode.h"
 #include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateDimension.h"
+#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateOR.h"
+#include "mitkNodePredicateNOT.h"
 
 #include <iostream>
 #include <string>
@@ -136,7 +141,8 @@ class MITK_CORE_EXPORT Tool : public StateMachine
      */
     virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
 
-    virtual const NodePredicateBase& GetDataPreference() const;
+    virtual const NodePredicateBase& GetReferenceDataPreference() const;
+    virtual const NodePredicateBase& GetWorkingDataPreference() const;
 
   protected:
     
@@ -184,7 +190,7 @@ class MITK_CORE_EXPORT Tool : public StateMachine
         static NullStream s_NullStream;
     };
 
-    void SetToolManager(ToolManager*);
+    virtual void SetToolManager(ToolManager*);
 
     /**
      \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
@@ -211,8 +217,30 @@ class MITK_CORE_EXPORT Tool : public StateMachine
 
   private:
 
+    // for working data
     NodePredicateProperty m_IsSegmentationPredicate;
 
+    // for reference data
+    NodePredicateDataType m_PredicateImages;
+    NodePredicateDimension m_PredicateDim3;
+    NodePredicateDimension m_PredicateDim4;
+    NodePredicateOR m_PredicateDimension;
+    NodePredicateAND m_PredicateImage3D;
+
+    NodePredicateProperty m_PredicateBinary;
+    NodePredicateNOT m_PredicateNotBinary;
+
+    NodePredicateProperty m_PredicateSegmentation;
+    NodePredicateNOT m_PredicateNotSegmentation;
+    
+    NodePredicateProperty m_PredicateHelper;
+    NodePredicateNOT m_PredicateNotHelper;
+    
+    NodePredicateAND m_PredicateImageColorful;
+   
+    NodePredicateAND m_PredicateImageColorfulNotHelper;
+    
+    NodePredicateAND m_PredicateReference;
 };
 
 } // namespace

@@ -1,4 +1,5 @@
 PROJECT(MITK)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # only configure dart here if not already configured in the 
 # parent directory

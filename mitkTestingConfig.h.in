@@ -4,4 +4,5 @@
 */
 #cmakedefine BUILD_TESTING
 #cmakedefine MITK_FAST_TESTING
+#define MITK_TEST_OUTPUT_DIR "@MITK_TEST_OUTPUT_DIR@"
 

@@ -608,9 +608,9 @@ const std::string& mitk::DataTreeNode::GetXMLNodeName() const
 
 void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)
 {
-  mitk::BoolProperty* selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected"));
+  mitk::BoolProperty::Pointer selectedProperty = dynamic_cast<mitk::BoolProperty*>(GetProperty("selected"));
 
-  if ( selectedProperty == NULL ) 
+  if ( selectedProperty.IsNull() ) 
   {
     selectedProperty = mitk::BoolProperty::New();
     selectedProperty->SetValue(false);

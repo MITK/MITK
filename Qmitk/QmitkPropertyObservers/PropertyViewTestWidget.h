@@ -76,13 +76,13 @@ class QMITK_EXPORT PropertyViewTest : public QWidget
    QmitkNumberPropertyEditor* numbereditor7;
    QmitkNumberPropertyEditor* numbereditor8;
    
-   mitk::BoolProperty* propbool;
-   mitk::StringProperty* propstring;
-   mitk::ColorProperty* propcolor;
-   mitk::FloatProperty* propfloat;
-   mitk::FloatProperty* propfloat2;
-   mitk::DoubleProperty* propdouble;
-   mitk::IntProperty* propint;
+   mitk::BoolProperty::Pointer propbool;
+   mitk::StringProperty::Pointer propstring;
+   mitk::ColorProperty::Pointer propcolor;
+   mitk::FloatProperty::Pointer propfloat;
+   mitk::FloatProperty::Pointer propfloat2;
+   mitk::DoubleProperty::Pointer propdouble;
+   mitk::IntProperty::Pointer propint;
    //mitk::GenericProperty<short>* propshort;
 
    mitk::DataTree::Pointer data_tree;

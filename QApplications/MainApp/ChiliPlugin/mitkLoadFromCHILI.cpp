@@ -117,7 +117,7 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mit
 
       for( unsigned int i = 0; i < frameNumber; i++ )
       {
-        mitkIpPicDescriptor* cinePic = mitkIpPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
+        mitkIpPicDescriptor* cinePic = ipPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
         newElement.imageList.push_back( cinePic );
       }
       free( offset_table );

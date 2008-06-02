@@ -183,7 +183,7 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
 
 	//for reading on the points, Id's etc
 	mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet();
-	mitk::PointSet::PointsContainer *itkPoints = itkPointSet->GetPoints();
+	//mitk::PointSet::PointsContainer *itkPoints = itkPointSet->GetPoints();
 
 	/*Each case must watch the type of the event!*/
 	switch (action->GetActionId())

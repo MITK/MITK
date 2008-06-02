@@ -429,7 +429,7 @@ unsigned int mitk::SaveToCHILI::GetMaximumImageNumber( QcPlugin* instance, const
   return m_MaximumImageNumber;
 }
 
-ipBool_t mitk::SaveToCHILI::GlobalIterateImagesForImageNumber( int /*rows*/, int row, image_t* image, void* user_data )
+ipBool_t mitk::SaveToCHILI::GlobalIterateImagesForImageNumber( int /*rows*/, int /*row*/, image_t* image, void* user_data )
 {
   SaveToCHILI* callingObject = static_cast<SaveToCHILI*>( user_data );
   if( image->number > callingObject->m_MaximumImageNumber )

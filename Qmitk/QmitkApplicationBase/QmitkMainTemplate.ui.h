@@ -30,6 +30,17 @@ PURPOSE.  See the above copyright notices for more information.
 
   Base application that is used by most MITK applications.
 
+  \section Command line parsing
+
+  -testing: automatically switch functionalities for GUI testing
+
+  -testEmptyNode: create an additional empty mitk::DataTreeNode
+  
+  -testEmptyImage, -testEmptyPointSet, -testEmptySurface: create an additional mitk::DataTreeNode 
+  containing the specified BaseData just created with New() without any initializations.
+
+  -noMITKOptions: do not read user-specific options on startup
+  
   \section QmitkMainTemplateHelpBrowser Help window
 	
   \subsection QmitkMainTemplateHelpBrowserSub1 Which help file is displayed

@@ -53,15 +53,6 @@ public:
   virtual void DoMonitorRendering();
   virtual void DoFinishAbortRendering();
 
-protected:
-  itkFactorylessNewMacro(Self);
-
-  QmitkRenderingManager();
-
-  virtual void RestartTimer();
-
-  virtual void StopTimer();
-
 
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataTreeNode. */
@@ -77,7 +68,35 @@ protected:
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
 
+  /** Initializes the specified window to the geometry of the given
+   * DataTreeNode. PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow,
+    mitk::DataTreeIteratorBase *dataIt, bool initializeGlobalTimeSNC = false );
+
+  /** Initializes the specified window to the given geometry.
+   * PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow,
+    const mitk::Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+
+  /** Initializes the specified window to the default viewing direction
+   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
+  virtual bool InitializeView( vtkRenderWindow *renderWindow );
+
+
+protected:
+  itkFactorylessNewMacro(Self);
+
+  QmitkRenderingManager();
+
+  virtual void RestartTimer();
+
+  virtual void StopTimer();
+
+
 private:
+  void InternalViewInitialization( 
+    mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
+    bool boundingBoxInitialized, int mapperID );
 
   QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
 

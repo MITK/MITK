@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "cherryQtWorkbenchWindow.h"
+#include "cherryQtSimpleWorkbenchWindow.h"
 
-#include "org.opencherry.ui/cherryIViewRegistry.h"
+#include "org.opencherry.ui/src/cherryIViewRegistry.h"
 
-#include "org.opencherry.ui/cherryPlatformUI.h"
+#include "org.opencherry.ui/src/cherryPlatformUI.h"
 
 #include <QtGui/QMenuBar>
 #include <QtGui/QDockWidget>
@@ -29,6 +29,8 @@ namespace cherry {
 
 QtWorkbenchWindow::QtWorkbenchWindow()
 {
+  m_WorkbenchPage = new WorkbenchPage(this, "", 0);
+  
   IViewRegistry* viewRegistry = PlatformUI::GetWorkbench()->GetViewRegistry();
   const std::vector<IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
   
@@ -39,7 +41,7 @@ QtWorkbenchWindow::QtWorkbenchWindow()
   {
     QtShowViewAction* viewAction = new QtShowViewAction(this, *iter);
     m_ViewActions.push_back(viewAction);
-    m_ViewMenu->addAction(viewAction->GetQtAction());
+    m_ViewMenu->addAction(viewAction);
   }
   
   menuBar()->addSeparator();
@@ -63,40 +65,9 @@ QtWorkbenchWindow::~QtWorkbenchWindow()
   }
 }
 
-
-QtShowViewAction::QtShowViewAction(QtWorkbenchWindow* workbench, IViewDescriptor::Pointer descriptor)
+IWorkbenchPage::Pointer QtWorkbenchWindow::GetActivePage()
 {
-  m_Workbench = workbench;
-  m_Descriptor = descriptor;
-  m_Dock = 0;
-  
-  m_Action = new QAction(descriptor->GetLabel().c_str(), workbench);
-  workbench->connect(m_Action, SIGNAL(triggered()), this, SLOT(ShowView()));
-}
-
-QtShowViewAction::~QtShowViewAction()
-{
-  delete m_Action;
-  if (m_Dock != 0) delete m_Dock;
-}
-    
-QAction*
-QtShowViewAction::GetQtAction()
-{
-  return m_Action;
-}
-    
-void
-QtShowViewAction::ShowView()
-{
-  if (m_Dock == 0)
-  {
-    m_Dock = new QDockWidget(m_Descriptor->GetLabel().c_str(), m_Workbench);
-    QWidget* controls = static_cast<QWidget*>(m_Descriptor->CreateView()->CreatePartControl(m_Dock));
-    m_Dock->setWidget(controls);
-    m_Workbench->addDockWidget(Qt::RightDockWidgetArea, m_Dock);
-  }
-  m_Dock->show();
+  return m_WorkbenchPage;
 }
 
 }

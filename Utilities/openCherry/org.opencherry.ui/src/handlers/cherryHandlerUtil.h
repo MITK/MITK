@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryISelection.h"
 #include "../cherryIWorkbenchWindow.h"
 
+#include "../cherryISources.h"
+
 namespace cherry {
 
 /**

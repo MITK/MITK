@@ -79,7 +79,7 @@ private:
   void AssertInitialized();
   
   void ParseArguments();
-  
+  void ParseConfigFile();
   
 public:
   virtual ~InternalPlatform();

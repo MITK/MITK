@@ -45,7 +45,7 @@ void PartTester::TestEditor(IEditorPart* part)
   part->IsSaveOnCloseNeeded();
 }
 
-void PartTester::TestEditorInput(IEditorInput* input)
+void PartTester::TestEditorInput(IEditorInput* /*input*/)
 {
 
   //input.getAdapter(Object.class);

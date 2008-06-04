@@ -17,8 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryInternalPlatform.h"
 
-#include "Poco/Exception.h"
-#include "Poco/File.h"
+#include <Poco/Exception.h>
+#include <Poco/File.h>
+#include <Poco/FileStream.h>
+#include <Poco/AutoPtr.h>
+#include <Poco/Util/PropertyFileConfiguration.h>
+#include <Poco/StringTokenizer.h>
 
 #include <iostream>
 
@@ -62,7 +66,8 @@ void InternalPlatform::GetRawArguments(int& argc, char**& argv)
 
 bool InternalPlatform::HasArgument(const std::string& arg) const
 {
-  return m_ArgMap.find(arg) != m_ArgMap.end();
+  std::map<std::string, std::string>::const_iterator iter = m_ArgMap.find(arg);
+  return (iter != m_ArgMap.end() && iter->second != "");
 }
   
 const std::string& 
@@ -77,17 +82,59 @@ ServiceRegistry& InternalPlatform::GetServiceRegistry()
   return m_ServiceRegistry;
 }
 
+void InternalPlatform::ParseConfigFile()
+{
+  Poco::Path appPath = *(this->GetInstallPath());
+  std::cout << "Application dir: " << appPath.toString() << std::endl;
+  Poco::Path configPath(appPath, "config.ini");
+  std::cout << "Configuration file: " << configPath.toString() << std::endl;
+  
+  Poco::File configFile(configPath);
+  if (!configFile.exists() || !configFile.isFile())
+  {
+    std::cout << "Could not open configuration file. Aborting.\n";
+    exit(1);
+  }
+  
+  Poco::FileInputStream configStream(configFile.path());
+  
+  Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config(new Poco::Util::PropertyFileConfiguration(configStream));
+
+  if (config->getString(Platform::ARG_HOME, "") == "")
+  {
+    std::cout << "You must set the " << Platform::ARG_HOME << " property in your configuration file.\n";
+    exit(1);
+  }
+  
+  m_ArgMap[Platform::ARG_APPLICATION] = config->getString(Platform::ARG_APPLICATION, "");
+  m_ArgMap[Platform::ARG_CLEAN] = config->hasProperty(Platform::ARG_CLEAN) ? "1" : "";
+  m_ArgMap[Platform::ARG_HOME] = config->getString(Platform::ARG_HOME, "");
+  
+  Poco::Path cachePath(appPath);
+  cachePath.pushDirectory("Plugins");
+  m_ArgMap[Platform::ARG_PLUGIN_CACHE] = config->getString(Platform::ARG_PLUGIN_CACHE, cachePath.toString());
+  
+  m_ArgMap[Platform::ARG_PLUGIN_DIRS] = config->getString(Platform::ARG_PLUGIN_DIRS, "");
+}
+
 void InternalPlatform::ParseArguments()
 {
+  std::string argPrefix = "-";
   std::string arg;
   for (int i = 1; i < m_Argc; ++i)
   {
     arg = m_Argv[i];
-    if (arg == Platform::ARG_CLEAN)
-      m_ArgMap[Platform::ARG_CLEAN] = "";
-    
-    if (arg == Platform::ARG_APPLICATION)
+    if (arg == argPrefix + Platform::ARG_CLEAN)
+      m_ArgMap[Platform::ARG_CLEAN] = "1";
+    else if (arg == argPrefix + Platform::ARG_APPLICATION)
       m_ArgMap[Platform::ARG_APPLICATION] = m_Argv[++i];
+    else if (arg == argPrefix + Platform::ARG_HOME)
+      m_ArgMap[Platform::ARG_HOME] = m_Argv[++i];
+    else if (arg == argPrefix + Platform::ARG_PLUGIN_CACHE)
+      m_ArgMap[Platform::ARG_PLUGIN_CACHE] = m_Argv[++i];
+    else if (arg == argPrefix + Platform::ARG_PLUGIN_DIRS)
+      m_ArgMap[Platform::ARG_PLUGIN_DIRS] = m_Argv[++i];
+    
   }
 }
 
@@ -99,47 +146,67 @@ void InternalPlatform::Initialize(int& argc, char** argv)
   m_Argc = argc;
   m_Argv = argv;
   
+  this->ParseConfigFile();
   this->ParseArguments();
   
   m_PlatformLogChannel = new PlatformLogChannel("/tmp/.cherryLog");
   m_PlatformLogger = &Poco::Logger::create("", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
   
-  Poco::Path cachePath(*(this->GetInstallPath()));
-  cachePath.pushDirectory("bin");
-  cachePath.pushDirectory("Plugins");
-  m_CodeCache = new CodeCache(cachePath.toString());
+  m_CodeCache = new CodeCache(m_ArgMap[Platform::ARG_PLUGIN_CACHE]);
   m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
   
- 
+  
   m_Initialized = true;
   
   // Clear the CodeCache
   if (this->HasArgument(Platform::ARG_CLEAN))
     m_CodeCache->Clear();
   
-  // go through the plugins
-  Poco::Path pluginPath(*(this->GetInstallPath()));
-  pluginPath.pushDirectory("Utilities/openCherry");
+  // assemble a list of base plugin-directories (which contain
+  // the real plugins as directories)
+  std::vector<std::string> pluginBaseDirs;
   
-  std::cout << "Plugin dir. is: " << pluginPath.toString() << std::endl;
-  Poco::File pluginDir(pluginPath);
+  // openCherry base dir is always in the list
+  pluginBaseDirs.push_back(m_ArgMap[Platform::ARG_HOME]);
   
-  std::vector<std::string> pluginList;
-  pluginDir.list(pluginList);
+  Poco::StringTokenizer tokenizer(m_ArgMap[Platform::ARG_PLUGIN_DIRS], ",",
+                                  Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+  
+  for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
+       token != tokenizer.end(); ++token)
+  {
+    pluginBaseDirs.push_back(*token);
+  }
   
   std::vector<Poco::Path> pluginPaths;
-  std::vector<std::string>::iterator iter;
-  for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
+  for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
+       pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
   {
-    pluginPath.pushDirectory(*iter);
+    std::cout << "Plugin base directory: " << *pluginBaseDir;
+    Poco::File pluginDir(*pluginBaseDir);
     
-    Poco::File file(pluginPath);
-    if (file.exists() && file.isDirectory())
+    if (!pluginDir.exists() || !pluginDir.isDirectory())
     {
-      pluginPaths.push_back(pluginPath);
+      std::cout << " not a direcotry or does not exist. SKIPPED.\n";
+      continue;
     }
+    else std::cout << std::endl;
     
-    pluginPath.popDirectory();
+    std::vector<std::string> pluginList;
+    pluginDir.list(pluginList);
+    
+    std::vector<std::string>::iterator iter;
+    for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
+    {
+      Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
+      pluginPath.pushDirectory(*iter);
+      
+      Poco::File file(pluginPath);
+      if (file.exists() && file.isDirectory())
+      {
+        pluginPaths.push_back(pluginPath);
+      }
+    }
   }
   
   std::vector<Poco::Path>::iterator pathIter;
@@ -220,8 +287,10 @@ const Path* InternalPlatform::GetInstallPath()
   Poco::Mutex::ScopedLock lock(m_Mutex);
   if (m_InstallPath == 0)
   {
-    m_InstallPath = new Path(true);
-    m_InstallPath->assign(Path("../").absolute());
+    m_InstallPath = new Path(m_Argv[0]);
+    m_InstallPath->makeAbsolute();
+    m_InstallPath->makeDirectory();
+    m_InstallPath->popDirectory();
   }
   
   return m_InstallPath;

@@ -15,24 +15,39 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYIVIEWPANE_H_
-#define CHERRYIVIEWPANE_H_
+#include "cherryQtErrorView.h"
 
-#include "cherryIPartPane.h"
+#include <QDockWidget>
 
-namespace cherry {
+namespace cherry
+{
 
-/**
- * \ingroup org_opencherry_ui
- * 
- */
-struct CHERRY_UI IViewPane : public IPartPane {
+QtErrorView::QtErrorView()
+ : m_Label(0)
+{
   
-  cherryClassMacro(IViewPane)
-  
-  
-};
-
 }
 
-#endif /*CHERRYIVIEWPANE_H_*/
+void* QtErrorView::CreatePartControl(void* parent)
+{
+  QDockWidget* dock = static_cast<QDockWidget*>(parent);
+  m_Label = new QLabel(dock);
+  m_Label->setText(m_ErrorMsg);
+  dock->setWidget(m_Label);
+  
+  return m_Label;
+}
+ 
+void QtErrorView::SetFocus()
+{
+  m_Label->setFocus();
+}
+
+void QtErrorView::SetErrorMsg(const std::string& msg)
+{
+  m_ErrorMsg = msg.c_str();
+  if (m_Label != 0)
+    m_Label->setText(m_ErrorMsg);
+}
+
+}

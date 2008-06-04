@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
   
 #define cherryClassMacro(className) \
   typedef className       Self; \
-  typedef SmartPointer<Self> Pointer; \
-  typedef SmartPointer<const Self>  ConstPointer; \
+  typedef cherry::SmartPointer<Self> Pointer; \
+  typedef cherry::SmartPointer<const Self>  ConstPointer; \
   virtual const char* GetNameOfClass() const \
   { return #className; }\
   

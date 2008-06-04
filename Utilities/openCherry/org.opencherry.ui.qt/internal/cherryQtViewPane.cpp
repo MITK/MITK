@@ -17,27 +17,96 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtViewPane.h"
 
+#include <QVBoxLayout>
+
 namespace cherry {
 
-QtViewPane::QtViewPane(const QString& title, QWidget* parent, Qt::WindowFlags flags )
- : QDockWidget(title, parent, flags)
+QtViewPane::QtViewPane(IWorkbenchPartReference::Pointer partReference,
+    WorkbenchPage::Pointer workbenchPage)
+ : PartPane(partReference, workbenchPage)
 {
   
 }
 
-void* QtViewPane::GetControl()
+QtViewPane::~QtViewPane()
 {
-  return this;
+  
 }
 
-bool QtViewPane::GetVisible()
+void QtViewPane::SetControlEnabled(bool enabled)
 {
-  return this->QDockWidget::isVisible();
+  m_DockWidget->setEnabled(enabled); 
 }
 
-void QtViewPane::SetVisible(bool visible)
+void QtViewPane::CreateControl(void* parent)
 {
-  this->QDockWidget::setVisible(visible);
+  if (this->GetControl() != 0) {
+    return;
+  }
+
+  //partReference.addPropertyListener(this);
+  //partReference.addPartPropertyListener(this);
+  
+  // Create view form.  
+  m_DockWidget = new QDockWidget(static_cast<QWidget*>(parent));
+  
+  // the part should never be visible by default.  It will be made visible 
+  // by activation.  This allows us to have views appear in tabs without 
+  // becoming active by default.
+  //m_DockWidget->setVisible(false);
+  //control.moveAbove(null);
+  
+  // Create a title bar.
+  this->CreateTitleBar();
+
+  
+  // When the pane or any child gains focus, notify the workbench.
+  //control.addListener(SWT.Activate, this);
+
+  //control.addTraverseListener(traverseListener);
+  
+  control = m_DockWidget;
+}
+
+void QtViewPane::CreateTitleBar()
+{
+  m_DockWidget->setWindowTitle(this->GetPartReference()->GetPartName().c_str());
+  m_DockWidget->setToolTip(this->GetPartReference()->GetTitleToolTip().c_str());
+}
+
+void QtViewPane::DoHide()
+{
+  
+}
+
+Rectangle QtViewPane::GetBounds()
+{
+  return Rectangle();
+}
+
+void QtViewPane::MoveAbove(void* refControl)
+{
+  
+}
+
+void QtViewPane::ShowFocus(bool inFocus)
+{
+  
+}
+
+bool QtViewPane::IsCloseable()
+{
+  return true;
+}
+
+bool QtViewPane::GetControlVisible()
+{
+  return m_DockWidget->isVisible();
+}
+
+void QtViewPane::SetControlVisible(bool visible)
+{
+  m_DockWidget->setVisible(visible);
 }
 
 }

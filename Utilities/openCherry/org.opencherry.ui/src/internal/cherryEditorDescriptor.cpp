@@ -177,7 +177,7 @@ bool EditorDescriptor::IsOpenExternal()
   return this->GetOpenMode() == OPEN_EXTERNAL;
 }
 
-bool EditorDescriptor::LoadValues(IMemento* memento)
+bool EditorDescriptor::LoadValues(IMemento::Pointer memento)
 {
 //  editorName = memento.getString(IWorkbenchConstants.TAG_LABEL);
 //  imageFilename = memento.getString(IWorkbenchConstants.TAG_IMAGE);
@@ -235,7 +235,7 @@ bool EditorDescriptor::LoadValues(IMemento* memento)
   return true;
 }
 
-void EditorDescriptor::SaveValues(IMemento* memento)
+void EditorDescriptor::SaveValues(IMemento::Pointer memento)
 {
 //  memento.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
 //  memento.putString(IWorkbenchConstants.TAG_IMAGE, getImageFilename());

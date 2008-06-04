@@ -23,7 +23,7 @@
 #include "../cherryIEditorInput.h"
 #include "../cherryIMemento.h"
 #include "../cherryIWorkbenchPart.h"
-#include "../cherryIPartPane.h"
+#include "../cherryPartPane.h"
 #include "../cherryIEditorPart.h"
 
 namespace cherry
@@ -117,7 +117,7 @@ private:
   void InitListenersAndHandlers();
 
 protected:
-  IPartPane::Pointer CreatePane();
+  PartPane::Pointer CreatePane();
 
   /**
    * This method is called when there should be a change in the editor pin

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 namespace cherry {
 
@@ -87,7 +88,14 @@ CodeCache::UnInstallLibrary(const std::string& name)
 Poco::Path
 CodeCache::GetPathFor(const std::string& name)
 {
-  return Poco::Path(m_CachePath.path(), name + Poco::SharedLibrary::suffix()).toString();
+  // We instructed cmake to replace "." with "_" in library names
+  // since they are also used for defines (for Windows dll import/export
+  // stuff) and . is bad in identifiers.
+  // Hence we must replace all "." with "_" here too
+  std::string libName(name);
+  std::replace(libName.begin(), libName.end(), '.', '_');
+  libName += Poco::SharedLibrary::suffix();
+  return Poco::Path(m_CachePath.path(), libName).toString();
 }
 
 }

@@ -245,7 +245,7 @@ void BundleLoader::ReadContributions(IBundle* bundle)
   }
   catch (Poco::FileNotFoundException exc)
   {
-    std::cout << exc.displayText() << std::endl;
+    //std::cout << exc.displayText() << std::endl;
   }
 }
 

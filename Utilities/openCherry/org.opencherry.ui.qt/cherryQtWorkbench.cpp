@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "internal/cherryQtShowViewDialog.h"
 #include "internal/cherryQtViewPane.h"
+#include "internal/cherryQtErrorView.h"
 
-#include <org.opencherry.ui/cherryPlatformUI.h>
+#include <org.opencherry.ui/src/cherryPlatformUI.h>
 
 namespace cherry {
 
@@ -52,7 +53,9 @@ QtWorkbench::CreateStandardDialog(const std::string& dialogid)
 
 IViewPart::Pointer QtWorkbench::CreateErrorViewPart(const std::string& partName, const std::string& msg)
 {
-  return 0;
+  QtErrorView::Pointer view = new QtErrorView();
+  view->SetErrorMsg(msg);
+  return view;
 }
 
 IEditorPart::Pointer QtWorkbench::CreateErrorEditorPart(const std::string& partName, const std::string& msg)
@@ -60,14 +63,30 @@ IEditorPart::Pointer QtWorkbench::CreateErrorEditorPart(const std::string& partN
   return 0;
 }
 
-IViewPane::Pointer QtWorkbench::CreateViewPane()
+PartPane::Pointer QtWorkbench::CreateViewPane(IWorkbenchPartReference::Pointer partReference,
+    WorkbenchPage::Pointer workbenchPage)
 {
-  return new QtViewPane("", m_QtWindow);
+  return new QtViewPane(partReference, workbenchPage);
 }
 
-IEditorPane::Pointer QtWorkbench::CreateEditorPane()
+PartPane::Pointer QtWorkbench::CreateEditorPane()
 {
   return 0;
+}
+
+IEditorAreaHelper* QtWorkbench::CreateEditorPresentation()
+{
+  return 0;
+}
+
+void* QtWorkbench::CreateWorkbenchPageControl()
+{
+  return m_QtWindow;
+}
+
+void QtWorkbench::AddViewPane(PartPane::Pointer pane)
+{
+  m_QtWindow->addDockWidget(Qt::RightDockWidgetArea, static_cast<QDockWidget*>(pane->GetControl()));
 }
 
 }  // namespace cherry

@@ -32,7 +32,7 @@ struct ILayoutContainer;
  * A presentation part is used to build the presentation for the
  * workbench.  Common subclasses are pane and folder.
  */
-class LayoutPart : public Object {
+class LayoutPart : virtual public Object {
   
 public:
   

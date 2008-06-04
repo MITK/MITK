@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTWORKBENCH_H_
 #define CHERRYQTWORKBENCH_H_
 
-#include <org.opencherry.ui/cherryWorkbench.h>
+#include <org.opencherry.ui/src/cherryWorkbench.h>
 
-#include "cherryQtWorkbenchWindow.h"
+#include "cherryQtSimpleWorkbenchWindow.h"
 #include "cherryUiQtDll.h"
 
 namespace cherry {
@@ -37,8 +37,15 @@ public:
   IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "");
   IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "");
   
-  IViewPane::Pointer CreateViewPane();
-  IEditorPane::Pointer CreateEditorPane();
+  PartPane::Pointer CreateViewPane(IWorkbenchPartReference::Pointer partReference,
+      WorkbenchPage::Pointer workbenchPage);
+  PartPane::Pointer CreateEditorPane();
+  
+  IEditorAreaHelper* CreateEditorPresentation();
+  
+  void* CreateWorkbenchPageControl();
+  
+  void AddViewPane(PartPane::Pointer pane);
   
   ~QtWorkbench();
   

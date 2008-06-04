@@ -31,12 +31,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchPartReference.h"
 #include "cherryEditorManager.h"
 #include "cherryViewFactory.h"
-#include "cherryIPartPane.h"
+
 
 #include <list>
 
 namespace cherry {
 
+class PartPane;
 class PerspectiveHelper;
 
 /**
@@ -113,14 +114,14 @@ private:
   
     IAdaptable* input;
 
-    //Composite composite;
+    void* composite;
     
     //Could be delete. This information is in the active part list;
     //ActivationList activationList = new ActivationList();
 
     EditorManager* editorMgr;
 
-    //EditorAreaHelper editorPresentation;
+    IEditorAreaHelper* editorPresentation;
 
     //ListenerList propertyChangeListeners = new ListenerList();
 
@@ -258,9 +259,9 @@ private: void ActivatePart(const IWorkbenchPart::Pointer part);
 //public: void AddPostSelectionListener(const std::string partId,
 //            ISelectionListener listener);
     
-private: IPartPane::Pointer GetPane(IWorkbenchPart::Pointer part);
+private: SmartPointer<PartPane> GetPane(IWorkbenchPart::Pointer part);
 
-private: IPartPane::Pointer GetPane(IWorkbenchPartReference::Pointer part);
+private: SmartPointer<PartPane> GetPane(IWorkbenchPartReference::Pointer part);
     
     /**
      * Brings a part to the front of its stack. Does not update the active part or
@@ -536,14 +537,17 @@ public: IWorkbenchPartReference::Pointer GetActivePartReference();
      */
 //public: Perspective::Pointer GetActivePerspective();
 
-
+   /**
+     * Returns the client composite.
+     */
+public: void* GetClientComposite();
 
     //  for dynamic UI - change access from private to protected
     // for testing purposes only, changed from protected to public
     /**
      * Answer the editor manager for this window.
      */
-protected: EditorManager* GetEditorManager();
+public: EditorManager* GetEditorManager();
 
 /**
      * Answer the perspective presentation.
@@ -567,12 +571,12 @@ public: std::vector<IWorkbenchPart::Pointer> GetDirtyParts();
     /**
      * See IWorkbenchPage.
      */
-public: IEditorPart::Pointer FindEditor(IEditorInput* input);
+public: IEditorPart::Pointer FindEditor(IEditorInput::Pointer input);
 
     /**
      * See IWorkbenchPage.
      */
-public: std::vector<IEditorReference::Pointer> FindEditors(IEditorInput* input, const std::string& editorId, int matchFlags);
+public: std::vector<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const std::string& editorId, int matchFlags);
     
     /**
      * See IWorkbenchPage.
@@ -1630,6 +1634,8 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
   public: std::vector<std::string> GetShowViewShortcuts();
     
+  void CloseAllPerspectives(bool saveEditors, bool closePage);
+  
     /**
    * @since 3.1
    */

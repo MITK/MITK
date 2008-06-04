@@ -28,7 +28,9 @@ namespace cherry {
  * \ingroup org_opencherry_ui_internal
  * 
  */
-struct ILayoutContainer {
+struct ILayoutContainer : virtual public Object {
+  
+  cherryClassMacro(ILayoutContainer);
   
   virtual ~ILayoutContainer() {}
   

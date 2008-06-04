@@ -4,17 +4,22 @@ SET(CPP_FILES
   cherryQtLogView.cpp
   cherryQtUIPlugin.cpp
   cherryQtWorkbench.cpp
-  cherryQtWorkbenchWindow.cpp
+  #cherryQtWorkbenchWindow.cpp
+  cherryQtSimpleWorkbenchWindow.cpp
 )
 
 SET(INTERNAL_CPP_FILES
+  cherryQtErrorView.cpp
+  cherryQtShowViewAction.cpp
   cherryQtViewPane.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
 )
 
 SET(MOC_H_FILES
-  cherryQtWorkbenchWindow.h
+  cherryQtSimpleWorkbenchWindow.h
+  internal/cherryQtShowViewAction.h
+  internal/cherryQtViewPane.h
 )
 
 SET(UI_FILES

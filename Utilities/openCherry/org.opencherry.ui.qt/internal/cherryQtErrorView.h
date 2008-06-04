@@ -15,25 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "Poco/ClassLibrary.h"
+#ifndef CHERRYQTERRORVIEW_H_
+#define CHERRYQTERRORVIEW_H_
 
-#include "org.opencherry.osgi/cherryIBundleActivator.h"
-#include "cherryQtUIPlugin.h"
+#include <org.opencherry.ui/src/cherryViewPart.h>
 
-#include "org.opencherry.ui/src/cherryWorkbench.h"
-#include "cherryQtWorkbench.h"
+#include <QLabel>
+#include <QString>
 
-#include "org.opencherry.ui/src/cherryIViewPart.h"
-#include "cherryLogView.h"
+namespace cherry {
+  
+class QtErrorView : public ViewPart
+{
+  
+public:
+  
+  cherryClassMacro(QtErrorView);
+  
+  QtErrorView();
+  
+  void SetErrorMsg(const std::string& msg);
+  void* CreatePartControl(void* parent);
+  void SetFocus();
+ 
+private:
+  
+  QString m_ErrorMsg;
+  QLabel* m_Label;
+};
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::QtUIPlugin)
-POCO_END_MANIFEST
+} // namespace cherry
 
-POCO_BEGIN_NAMED_MANIFEST(cherryWorkbench, cherry::Workbench)
-  POCO_EXPORT_CLASS(cherry::QtWorkbench)
-POCO_END_MANIFEST
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(cherry::LogView)
-POCO_END_MANIFEST
+#endif /*CHERRYQTERRORVIEW_H_*/

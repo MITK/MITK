@@ -15,23 +15,23 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYQTWORKBENCHWINDOW_H_
-#define CHERRYQTWORKBENCHWINDOW_H_
+#ifndef CHERRYQTSIMPLEWORKBENCHWINDOW_H_
+#define CHERRYQTSIMPLEWORKBENCHWINDOW_H_
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QAction>
-#include <QtGui/QTabWidget>
+#include <QMainWindow>
+#include <QTabWidget>
 
 #include <vector>
 
-#include <org.opencherry.ui/cherryIViewDescriptor.h>
-#include <org.opencherry.ui/cherryWorkbenchWindow.h>
+#include <org.opencherry.ui/src/cherryIViewDescriptor.h>
+#include <org.opencherry.ui/src/cherryWorkbenchWindow.h>
+#include <org.opencherry.ui/src/internal/cherryWorkbenchPage.h>
 
 #include "cherryUiQtDll.h"
+#include "internal/cherryQtShowViewAction.h"
 
 namespace cherry {
 
-class QtShowViewAction;
 
 class CHERRY_UI_QT QtWorkbenchWindow : public QMainWindow, public WorkbenchWindow
 {
@@ -44,36 +44,20 @@ public:
   QtWorkbenchWindow();
   ~QtWorkbenchWindow();
   
+  IWorkbenchPage::Pointer GetActivePage();
+  
 private:
   QMenu* m_ViewMenu;
   QMenu* m_HelpMenu;
   QTabWidget* m_EditorTabs;
   
   std::vector<QtShowViewAction*> m_ViewActions;
+  
+  // WARNING: using internal UI class
+  WorkbenchPage::Pointer m_WorkbenchPage;
 };
 
 
-class QtShowViewAction : public QObject {
-   Q_OBJECT
-   
- public:
-   QtShowViewAction(QtWorkbenchWindow* workbench, IViewDescriptor::Pointer descriptor);
-   ~QtShowViewAction();
-   
-   QAction* GetQtAction();
-   QDockWidget* GetDockWidget();
- 
- private slots:
-   void ShowView();
-   
- private:
-   QtWorkbenchWindow* m_Workbench;
-   QAction* m_Action;
-   IViewDescriptor::Pointer m_Descriptor;
-   
-   QDockWidget* m_Dock;
- };
-
 }
 
-#endif /*CHERRYQTWORKBENCHWINDOW_H_*/
+#endif /*CHERRYQTSIMPLEWORKBENCHWINDOW_H_*/

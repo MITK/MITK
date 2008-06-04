@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QDialog>
 
-#include <org.opencherry.ui/cherryIViewRegistry.h>
-#include <org.opencherry.ui/dialogs/cherryIShowViewDialog.h>
+#include <org.opencherry.ui/src/cherryIViewRegistry.h>
+#include <org.opencherry.ui/src/dialogs/cherryIShowViewDialog.h>
 
 #include "ui_cherryQtShowViewDialog.h"
 

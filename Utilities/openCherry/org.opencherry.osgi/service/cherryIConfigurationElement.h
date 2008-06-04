@@ -45,7 +45,18 @@ public:
   {
     std::string className;
     if (this->GetAttribute(propertyName, className))
-      return m_ClassLoader->LoadClass<C>(m_Contributor, base, className);
+    {
+      try
+      {
+        C* cl = m_ClassLoader->LoadClass<C>(m_Contributor, base, className);
+        return cl;
+      }
+      catch (Poco::Exception* e)
+      {
+        std::cout << "Error loading class: " << e->displayText() << std::endl;
+        exit(1);
+      }
+    }
     
     throw CoreException("Missing attribute", propertyName);
   }

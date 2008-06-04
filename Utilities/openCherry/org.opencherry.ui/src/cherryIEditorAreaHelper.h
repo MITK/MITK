@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEDITORAREAHELPER_H_
 #define CHERRYIEDITORAREAHELPER_H_
 
+#include "internal/cherryLayoutPart.h"
+
 namespace cherry {
 
 /**
@@ -40,7 +42,11 @@ struct IEditorAreaHelper {
      */
     virtual void CloseEditor(IEditorPart::Pointer part) = 0;
 
-
+    /**
+      * Returns the editor area.
+      */
+    virtual LayoutPart::Pointer GetLayoutPart() = 0;
+    
     /**
      * Returns the active editor in this perspective.  If the editors appear
      * in a workbook this will be the visible editor.  If the editors are

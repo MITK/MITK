@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYVIEWDESCRIPTOR_H_
 #define CHERRYVIEWDESCRIPTOR_H_
 
-#include "cherryIViewPart.h"
+#include "../cherryIViewPart.h"
 #include "../cherryIViewDescriptor.h"
 
 #include "org.opencherry.osgi/service/cherryIConfigurationElement.h"

@@ -135,7 +135,7 @@ void EditorReference::InitListenersAndHandlers()
   //this->manager->CheckCreatePinEditorShortcutKeyHandler();
 }
 
-IPartPane::Pointer EditorReference::CreatePane()
+PartPane::Pointer EditorReference::CreatePane()
 {
   //return new EditorPane(this, this.manager.page, this.manager.editorPresentation.getActiveWorkbook());
   return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateEditorPane();
@@ -320,9 +320,9 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
       input = new NullEditorInput(this);
     }
 
-    IEditorPane::Pointer pane = this->GetPane().Cast<IEditorPane>();
+    PartPane::Pointer pane = this->GetPane();
 
-    //pane->CreateControl((Composite) manager.page.getEditorPresentation().getLayoutPart().getControl());
+    pane->CreateControl(manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
     EditorSite::Pointer site = new EditorSite(this, part, manager->page, descr);
 
@@ -459,7 +459,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
       throw PartInitException("Invalid editor descriptor for id " + editorID);
     }
     // Create a pane for this part
-    IPartPane::Pointer pane = this->GetPane();
+    PartPane::Pointer pane = this->GetPane();
 
     //pane->CreateControl((Composite) manager.page.getEditorPresentation().getLayoutPart().getControl());
 
@@ -510,9 +510,9 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     input = new NullEditorInput(this);
   }
 
-  IEditorPane::Pointer pane = this->GetPane().Cast<IEditorPane>();
+  PartPane::Pointer pane = this->GetPane();
 
-  //pane->CreateControl((Composite) manager.page.getEditorPresentation().getLayoutPart().getControl());
+  pane->CreateControl(manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
   EditorSite::Pointer site = new EditorSite(this, part, manager->page, descr);
 

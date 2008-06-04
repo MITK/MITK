@@ -18,27 +18,41 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTPARTPANE_H_
 #define CHERRYQTPARTPANE_H_
 
-#include <org.opencherry.ui/cherryIViewPane.h>
+#include <org.opencherry.ui/src/cherryPartPane.h>
+#include <org.opencherry.ui/src/cherryRectangle.h>
 
 #include <QtGui/QDockWidget>
 #include <QtCore/QString>
 
 namespace cherry {
 
-class QtViewPane : public QDockWidget, public IViewPane
+class QtViewPane : public PartPane
 {
-  Q_OBJECT
   
 public:
   
-  QtViewPane(const QString& title, QWidget* parent = 0, Qt::WindowFlags flags = 0 );
+  cherryClassMacro(QtViewPane);
   
-  void* GetControl();
+  QtViewPane(IWorkbenchPartReference::Pointer partReference,
+              WorkbenchPage::Pointer workbenchPage);
   
-  bool GetVisible();
-  void SetVisible(bool visible);
+  virtual ~QtViewPane();
   
+  void CreateControl(void* parent);
+  void SetControlEnabled(bool enabled);
+  void CreateTitleBar();
+  void DoHide();
+  Rectangle GetBounds();
+  void MoveAbove(void* refControl);
+  void ShowFocus(bool inFocus);
+  bool IsCloseable();
   
+  bool GetControlVisible();
+  void SetControlVisible(bool visible);
+  
+private:
+  
+  QDockWidget* m_DockWidget;
 };
 
 }

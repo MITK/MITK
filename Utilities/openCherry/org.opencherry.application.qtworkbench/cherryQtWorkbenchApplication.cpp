@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryQtWorkbenchApplication.h"
 
 #include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.ui/cherryPlatformUI.h"
+#include "org.opencherry.ui/src/cherryPlatformUI.h"
 
 #include <QtGui/QApplication>
 

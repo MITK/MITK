@@ -1,0 +1,21 @@
+MACRO(FIND_POCO)
+
+FIND_PATH(POCO_PATH poco DOC "Base directory of the POCO library")
+FIND_PATH(POCO_INCLUDE_DIR Poco DOC "Base include directory of the POCO library.")
+
+IF(POCO_INCLUDE_DIR)
+  SET(POCO_INCLUDE_DIRS
+   ${POCO_INCLUDE_DIR}
+  )
+ELSE(POCO_INCLUDE_DIR)
+  IF(POCO_PATH)
+    SET(POCO_INCLUDE_DIRS
+      ${POCO_PATH}/Foundation/include
+      ${POCO_PATH}/Util/include
+      ${POCO_PATH}/XML/include
+    )
+    LINK_DIRECTORIES(${POCO_PATH}/lib)
+  ENDIF(POCO_PATH)
+ENDIF(POCO_INCLUDE_DIR)
+
+ENDMACRO(FIND_POCO)

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYEDITORDESCRIPTOR_H_
 
 #include "../cherryIEditorDescriptor.h"
+#include "../cherryIMemento.h"
 
 #include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
 
@@ -26,7 +27,6 @@ namespace cherry
 {
 
 struct IEditorPart;
-struct IMemento;
 
 /**
  * \ingroup org_opencherry_ui_internal
@@ -308,12 +308,12 @@ public: bool IsOpenExternal();
    * 
    * @return <code>true</code> if the values are valid, <code>false</code> otherwise
    */
-protected: bool LoadValues(IMemento* memento);
+protected: bool LoadValues(IMemento::Pointer memento);
 
   /**
    * Save the object values in a IMemento
    */
-protected: void SaveValues(IMemento* memento);
+protected: void SaveValues(IMemento::Pointer memento);
 
   /**
    * Return the open mode of this editor.

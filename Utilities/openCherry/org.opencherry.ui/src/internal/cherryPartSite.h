@@ -28,7 +28,7 @@ namespace cherry {
 struct IWorkbenchPart;
 struct IWorkbenchPage;
 struct IWorkbenchWindow;
-struct IPartPane;
+struct PartPane;
 
 /**
  * \ingroup org_opencherry_ui_internal
@@ -54,6 +54,9 @@ struct IPartPane;
  */
 class PartSite : public virtual IWorkbenchPartSite {
 
+public:
+  cherryClassMacro(PartSite);
+  
   /**
    * This is a helper method for the register context menu functionality. It
    * is provided so that different implementations of the
@@ -146,7 +149,7 @@ public: virtual SmartPointer<IWorkbenchPage> GetPage();
   /**
    * Gets the part pane.
    */
-public: SmartPointer<IPartPane> GetPane();
+public: SmartPointer<PartPane> GetPane();
 
   /**
    * Returns the part.
@@ -257,9 +260,9 @@ protected: virtual std::string GetInitialScopeId();
    */
 public: Object::Pointer GetAdapter(const std::type_info& adapter);
 
-public: virtual void ActivateActionBars(bool forceVisibility);
+//public: virtual void ActivateActionBars(bool forceVisibility);
 
-public: virtual void DeactivateActionBars(bool forceHide);
+//public: virtual void DeactivateActionBars(bool forceHide);
 
   /**
    * Get a progress service for the receiver.

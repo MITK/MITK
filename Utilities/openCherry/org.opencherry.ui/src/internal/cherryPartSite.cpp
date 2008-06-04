@@ -1,30 +1,31 @@
 /*=========================================================================
  
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
  
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
  
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
  
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryPartSite.h"
 
 #include "../cherryIWorkbenchPart.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIWorkbenchWindow.h"
-#include "../cherryIPartPane.h"
+#include "../cherryPartPane.h"
 
 #include "cherryWorkbenchPartReference.h"
 
-namespace cherry {
+namespace cherry
+{
 
 //void 
 //PartSite::RegisterContextMenu(const std::string& menuId,
@@ -55,83 +56,87 @@ namespace cherry {
 //    }
 //  }
 
-PartSite::PartSite(IWorkbenchPartReference::Pointer ref, IWorkbenchPart::Pointer _part,
-      IWorkbenchPage::Pointer _page)
-: partReference(ref), part(_part), page(_page)
+PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
+    IWorkbenchPart::Pointer _part, IWorkbenchPage::Pointer _page) :
+  partReference(ref), part(_part), page(_page)
 {
-    
-    extensionID = "org.opencherry.ui.UnknownID"; //$NON-NLS-1$
-    extensionName = "Unknown Name"; //$NON-NLS-1$
 
-    // Initialize the service locator.
-    //final IServiceLocator parentServiceLocator = page.getWorkbenchWindow();
-    //IServiceLocatorCreator slc = (IServiceLocatorCreator) parentServiceLocator
-    //    .getService(IServiceLocatorCreator.class);
-    //this.serviceLocator = (ServiceLocator) slc.createServiceLocator(
-    //    parentServiceLocator, null);
+  extensionID = "org.opencherry.ui.UnknownID"; //$NON-NLS-1$
+  extensionName = "Unknown Name"; //$NON-NLS-1$
 
-    //initializeDefaultServices();
-  }
+  // Initialize the service locator.
+  //final IServiceLocator parentServiceLocator = page.getWorkbenchWindow();
+  //IServiceLocatorCreator slc = (IServiceLocatorCreator) parentServiceLocator
+  //    .getService(IServiceLocatorCreator.class);
+  //this.serviceLocator = (ServiceLocator) slc.createServiceLocator(
+  //    parentServiceLocator, null);
 
-void 
-PartSite::InitializeDefaultServices() {
-//    serviceLocator.registerService(IWorkbenchPartSite.class, this);
-//    final Expression defaultExpression = new ActivePartExpression(part);
-//
-//    final IContextService parentContextService = (IContextService) serviceLocator
-//        .getService(IContextService.class);
-//    final IContextService contextService = new SlaveContextService(
-//        parentContextService, defaultExpression);
-//    serviceLocator.registerService(IContextService.class, contextService);
-//
-//    final ICommandService parentCommandService = (ICommandService) serviceLocator
-//        .getService(ICommandService.class);
-//    final ICommandService commandService = new SlaveCommandService(
-//        parentCommandService, IServiceScopes.PARTSITE_SCOPE,
-//        this);
-//    serviceLocator.registerService(ICommandService.class, commandService);
-  }
+  //initializeDefaultServices();
+}
 
- 
+PartSite::~PartSite()
+{
+
+}
+
+void PartSite::InitializeDefaultServices()
+{
+  //    serviceLocator.registerService(IWorkbenchPartSite.class, this);
+  //    final Expression defaultExpression = new ActivePartExpression(part);
+  //
+  //    final IContextService parentContextService = (IContextService) serviceLocator
+  //        .getService(IContextService.class);
+  //    final IContextService contextService = new SlaveContextService(
+  //        parentContextService, defaultExpression);
+  //    serviceLocator.registerService(IContextService.class, contextService);
+  //
+  //    final ICommandService parentCommandService = (ICommandService) serviceLocator
+  //        .getService(ICommandService.class);
+  //    final ICommandService commandService = new SlaveCommandService(
+  //        parentCommandService, IServiceScopes.PARTSITE_SCOPE,
+  //        this);
+  //    serviceLocator.registerService(ICommandService.class, commandService);
+}
+
 //IActionBars 
 //PartSite::GetActionBars() {
 //    return actionBars;
 //  }
 
-std::string
-PartSite::GetId() {
-    return extensionID;
-  }
+std::string PartSite::GetId()
+{
+  return extensionID;
+}
 
-IWorkbenchPage::Pointer
-PartSite::GetPage() {
-    return page;
-  }
+IWorkbenchPage::Pointer PartSite::GetPage()
+{
+  return page;
+}
 
-IPartPane::Pointer 
-PartSite::GetPane() {
-    return partReference.Cast<WorkbenchPartReference>()->GetPane();
-  }
+PartPane::Pointer PartSite::GetPane()
+{
+  return partReference.Cast<WorkbenchPartReference>()->GetPane();
+}
 
-IWorkbenchPart::Pointer 
-PartSite::GetPart() {
-    return part;
-  }
+IWorkbenchPart::Pointer PartSite::GetPart()
+{
+  return part;
+}
 
-IWorkbenchPartReference::Pointer 
-PartSite::GetPartReference() {
-    return partReference;
-  }
+IWorkbenchPartReference::Pointer PartSite::GetPartReference()
+{
+  return partReference;
+}
 
- std::string 
- PartSite::GetPluginId() {
-    return pluginID;
-  }
+std::string PartSite::GetPluginId()
+{
+  return pluginID;
+}
 
-std::string 
-PartSite::GetRegisteredName() {
-    return extensionName;
-  }
+std::string PartSite::GetRegisteredName()
+{
+  return extensionName;
+}
 
 //ISelectionProvider 
 //PartSite::GetSelectionProvider() {
@@ -139,10 +144,10 @@ PartSite::GetRegisteredName() {
 //  }
 
 
- IWorkbenchWindow::Pointer
- PartSite::GetWorkbenchWindow() {
-    return page->GetWorkbenchWindow();
-  }
+IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
+{
+  return page->GetWorkbenchWindow();
+}
 
 // void 
 // PartSite::RegisterContextMenu(const std::string& menuID, 
@@ -180,53 +185,55 @@ PartSite::GetRegisteredName() {
 //    actionBars = bars;
 //  }
 
-void 
-PartSite::SetConfigurationElement(IConfigurationElement::Pointer configElement) {
+void PartSite::SetConfigurationElement(
+    IConfigurationElement::Pointer configElement)
+{
 
-    // Get extension ID.
-    configElement->GetAttribute("id", extensionID); //$NON-NLS-1$
+  // Get extension ID.
+  configElement->GetAttribute("id", extensionID); //$NON-NLS-1$
 
-    // Get plugin ID.
-    pluginID = configElement->GetContributor();
+  // Get plugin ID.
+  pluginID = configElement->GetContributor();
 
-    // Get extension name.
-    std::string name;
-    configElement->GetAttribute("name", name); //$NON-NLS-1$
-    if (name != "") {
-      extensionName = name;
-    }
-  }
-
-void 
-PartSite::SetPluginId(const std::string& pluginId) {
-    this->pluginID = pluginId;
-  }
-
-void 
-PartSite::SetId(const std::string& id) {
-    extensionID = id;
-  }
-
-void 
-PartSite::SetPart(IWorkbenchPart::Pointer newPart) {
-    part = newPart;
-  }
-
-void 
-PartSite::SetRegisteredName(const std::string& name) {
+  // Get extension name.
+  std::string name;
+  configElement->GetAttribute("name", name); //$NON-NLS-1$
+  if (name != "")
+  {
     extensionName = name;
   }
+}
+
+void PartSite::SetPluginId(const std::string& pluginId)
+{
+  this->pluginID = pluginId;
+}
+
+void PartSite::SetId(const std::string& id)
+{
+  extensionID = id;
+}
+
+void PartSite::SetPart(IWorkbenchPart::Pointer newPart)
+{
+  part = newPart;
+}
+
+void PartSite::SetRegisteredName(const std::string& name)
+{
+  extensionName = name;
+}
 
 //void 
 //PartSite::SetSelectionProvider(ISelectionProvider provider) {
 //    selectionProvider = provider;
 //  }
 
-  /*
-   * @see IWorkbenchPartSite#getKeyBindingService()
-   * 
-   * TODO deprecated: use IHandlerService instead
-   */
+/*
+ * @see IWorkbenchPartSite#getKeyBindingService()
+ * 
+ * TODO deprecated: use IHandlerService instead
+ */
 //IKeyBindingService 
 //PartSite::GetKeyBindingService() {
 //    if (keyBindingService == null) {
@@ -264,25 +271,25 @@ PartSite::SetRegisteredName(const std::string& name) {
 //    return keyBindingService;
 //  }
 
-std::string 
-PartSite::GetInitialScopeId() {
-    return "";
-  }
+std::string PartSite::GetInitialScopeId()
+{
+  return "";
+}
 
-Object::Pointer
-PartSite::GetAdapter(const std::type_info& adapter) {
+Object::Pointer PartSite::GetAdapter(const std::type_info& /*adapter*/)
+{
 
-//    if (IWorkbenchSiteProgressService.class == adapter) {
-//      return getSiteProgressService();
-//    }
-//    
-//    if (IWorkbenchPartTestable.class == adapter) {
-//      return new WorkbenchPartTestable(this);
-//    }
-//
-//    return Platform.getAdapterManager().getAdapter(this, adapter);
+  //    if (IWorkbenchSiteProgressService.class == adapter) {
+  //      return getSiteProgressService();
+  //    }
+  //    
+  //    if (IWorkbenchPartTestable.class == adapter) {
+  //      return new WorkbenchPartTestable(this);
+  //    }
+  //
+  //    return Platform.getAdapterManager().getAdapter(this, adapter);
   return 0;
-  }
+}
 
 //void 
 //PartSite::ActivateActionBars(bool forceVisibility) {
@@ -316,12 +323,12 @@ PartSite::GetAdapter(const std::type_info& adapter) {
 //    return serviceLocator.hasService(key);
 //  }
 
-std::string 
-PartSite::ToString() {
-    std::string buffer = "PartSite(id=" + this->GetId() + ",pluginId=" +
-    this->GetPluginId() + ",registeredName=" + this->GetRegisteredName()
-    + ")";
-    return buffer;
-  }
+std::string PartSite::ToString()
+{
+  std::string buffer = "PartSite(id=" + this->GetId() + ",pluginId="
+      + this->GetPluginId() + ",registeredName=" + this->GetRegisteredName()
+      + ")";
+  return buffer;
+}
 
-}  // namespace cherry
+} // namespace cherry

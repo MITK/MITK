@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPartSite.h"
 #include "cherryEditorDescriptor.h"
-#include "cherryIEditorPart.h"
+#include "../cherryIEditorPart.h"
 #include "cherryWorkbenchPage.h"
 #include "../cherryIEditorSite.h"
 #include "../cherryIEditorReference.h"

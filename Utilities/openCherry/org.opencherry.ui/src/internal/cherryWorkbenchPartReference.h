@@ -20,9 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryIWorkbenchPart.h"
-#include "../cherryIPartPane.h"
 
 namespace cherry {
+
+class PartPane;
 
 /**
  * \ingroup org_opencherry_ui_internal
@@ -98,7 +99,7 @@ private: int state;
    
 protected: IWorkbenchPart::Pointer part;
 
-protected: IPartPane::Pointer pane;
+protected: SmartPointer<PartPane> pane;
 
 private: std::string id;
 
@@ -286,14 +287,14 @@ public: IWorkbenchPart::Pointer GetPart(bool restore);
     
 protected: virtual IWorkbenchPart::Pointer CreatePart() = 0;
 
-protected: virtual IPartPane::Pointer CreatePane() = 0;
+protected: virtual SmartPointer<PartPane> CreatePane() = 0;
     
     /**
      * Returns the part pane for this part reference. Does not return null. 
      * 
      * @return
      */
-public: IPartPane::Pointer GetPane();
+public: SmartPointer<PartPane> GetPane();
 
 public: void Dispose();
 
@@ -329,6 +330,11 @@ public: virtual bool IsPinned();
 //protected: virtual void firePartPropertyChange(PropertyChangeEvent event);
     
 //protected: virtual void createPartProperties(IWorkbenchPart3 workbenchPart);
+
+public: int ComputePreferredSize(bool width, int availableParallel,
+            int availablePerpendicular, int preferredResult);
+
+public: int GetSizeFlags(bool width);
         
 };
 

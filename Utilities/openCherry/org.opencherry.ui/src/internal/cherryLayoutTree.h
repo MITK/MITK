@@ -18,7 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYLAYOUTTREE_H_
 #define CHERRYLAYOUTTREE_H_
 
+#include "cherryRectangle.h"
+
 namespace cherry {
+
+class LayoutTreeNode;
 
 /**
  * \ingroup org_opencherry_ui_internal
@@ -51,7 +55,7 @@ private:
       int cachedMaximumHeight = SWT.DEFAULT;
       
       bool forceLayout = true;
-      Rectangle currentBounds = new Rectangle(0,0,0,0);
+      Rectangle currentBounds;
     
     // Cached size flags
       bool sizeFlagsDirty = true;
@@ -71,7 +75,7 @@ public:
     /**
      * Initialize this tree with its part.
      */
-      LayoutTree(LayoutPart part) {
+      LayoutTree(LayoutPart::Pointer part) {
         this.part = part;
     }
 
@@ -79,7 +83,7 @@ public:
      * Add the relation ship between the children in the list
      * and returns the left children.
      */
-      LayoutPart computeRelation(ArrayList relations) {
+     virtual LayoutPart::Pointer ComputeRelation(std::list<PartSashContainer::RelationshipInfo> relations) {
         return part;
     }
 
@@ -89,21 +93,21 @@ public:
      * @param toFind
      * @return
      */
-      LayoutPart findPart(Point toFind) {
+     virtual LayoutPart::Pointer FindPart(int x, int y) {
         return part;
     }
     
     /**
      * Dispose all Sashs in this tree
      */
-      void disposeSashes() {
+     virtual void DisposeSashes() {
     }
     
     /**
      * Find a LayoutPart in the tree and return its sub-tree. Returns
      * null if the child is not found.
      */
-      LayoutTree find(LayoutPart child) {
+     virtual LayoutTree* Find(LayoutPart::Pointer child) {
         if (part != child) {
       return null;
     }
@@ -115,7 +119,7 @@ public:
      * sashes around this tree and set them
      * in <code>sashes</code>
      */
-      void findSashes(PartPane.Sashes sashes) {
+     virtual void FindSashes(PartPane::Sashes sashes) {
         if (getParent() == null) {
       return;
     }
@@ -125,7 +129,7 @@ public:
     /**
      * Find the part that is in the bottom rigth possition.
      */
-      LayoutPart findBottomRight() {
+     virtual LayoutPart::Pointer FindBottomRight() {
         return part;
     }
     
@@ -133,7 +137,7 @@ public:
      * Find a sash in the tree and return its sub-tree. Returns
      * null if the sash is not found.
      */
-      LayoutTreeNode findSash(LayoutPartSash sash) {
+     virtual LayoutTreeNode* FindSash(LayoutPartSash::Pointer sash) {
         return null;
     }
 
@@ -141,7 +145,7 @@ public:
      * Return the bounds of this tree which is the rectangle that
      * contains all Controls in this tree.
      */
-      final Rectangle getBounds() {
+      Rectangle GetBounds() {
         return Geometry.copy(currentBounds);
     }
     
@@ -154,7 +158,7 @@ public:
      * @return a - b, or INFINITE if a == INFINITE
      * @since 3.1
      */
-      static int subtract(int a, int b) {
+      static int Subtract(int a, int b) {
         Assert.isTrue(b >= 0 && b < INFINITE);
         
       return add(a, -b);
@@ -168,7 +172,7 @@ public:
      * @return a + b, or INFINITE if a or b are positive infinity
      * @since 3.1
      */
-      static int add(int a, int b) {
+      static int Add(int a, int b) {
       if (a == INFINITE || b == INFINITE) {
         return INFINITE;
       }
@@ -185,7 +189,7 @@ public:
      * @param toCheck integer to validate
      * @since 3.1
      */
-      static void assertValidSize(int toCheck) {
+      static void AssertValidSize(int toCheck) {
       Assert.isTrue(toCheck >= 0 && (toCheck == INFINITE || toCheck < INFINITE / 2));
     }
     
@@ -198,7 +202,7 @@ public:
      * 
      * @see LayoutPart#computePreferredSize(boolean, int, int, int)
      */
-      final int computePreferredSize(boolean width, int availableParallel, int availablePerpendicular, int preferredParallel) {
+      int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) {
       assertValidSize(availableParallel);
       assertValidSize(availablePerpendicular);
       assertValidSize(preferredParallel);
@@ -238,7 +242,7 @@ protected:
    * @param b indicates whether the caller wants the flags for computing widths (=true) or heights (=false)
    * @return a bitwise combiniation of flags with the same meaning as StackPresentation.getSizeFlags(boolean)
    */
-  int doGetSizeFlags(boolean width) {
+  virtual int DoGetSizeFlags(bool width) {
     return part.getSizeFlags(width);
   }
 
@@ -249,7 +253,7 @@ protected:
    * 
    * @since 3.1
    */
-  int doComputePreferredSize(boolean width, int availableParallel, int availablePerpendicular, int preferredParallel) {
+  virtual int DoComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) {
       int result = Math.min(availableParallel, 
           part.computePreferredSize(width, availableParallel, availablePerpendicular, preferredParallel));
 
@@ -272,7 +276,7 @@ public:
    * 
    * @see LayoutPart#computePreferredSize(boolean, int, int, int)
    */
-      final int computeMinimumSize(boolean width, int availablePerpendicular) {
+    virtual int ComputeMinimumSize(bool width, int availablePerpendicular) {
       assertValidSize(availablePerpendicular);
       
       // Optimization: if this subtree has no minimum size, then always return 0 as its
@@ -330,20 +334,20 @@ public:
      * 
      * @since 3.1
      */
-      static void printCacheStatistics() {
+      static void PrintCacheStatistics() {
       System.out.println("minimize cache " + minCacheHits + " / " + (minCacheHits + minCacheMisses) + " hits " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           minCacheHits * 100 / (minCacheHits + minCacheMisses) + "%"); //$NON-NLS-1$
       System.out.println("maximize cache " + maxCacheHits + " / " + (maxCacheHits + maxCacheMisses) + " hits" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           maxCacheHits * 100 / (maxCacheHits + maxCacheMisses) + "%"); //$NON-NLS-1$
     }
     
-    int doComputeMinimumSize(boolean width, int availablePerpendicular) {
+   virtual int DoComputeMinimumSize(boolean width, int availablePerpendicular) {
     int result = doComputePreferredSize(width, INFINITE, availablePerpendicular, 0);
     assertValidSize(result);
     return result;
   }
 
-      final int computeMaximumSize(boolean width, int availablePerpendicular) {
+      int ComputeMaximumSize(boolean width, int availablePerpendicular) {
       assertValidSize(availablePerpendicular);
       
       // Optimization: if this subtree has no maximum size, then always return INFINITE as its
@@ -394,7 +398,7 @@ public:
     }
     
 protected:
-  int doComputeMaximumSize(boolean width, int availablePerpendicular) {        
+  virtual int DoComputeMaximumSize(bool width, int availablePerpendicular) {        
       return doComputePreferredSize(width, INFINITE, availablePerpendicular, INFINITE);
     }
    
@@ -403,7 +407,7 @@ public:
     /**
      * Called to flush any cached information in this tree and its parents.
      */
-    void flushNode() {
+    virtual void FlushNode() {
         
         // Clear cached sizes
         cachedMinimumWidthHint = SWT.DEFAULT;
@@ -431,7 +435,7 @@ public:
      * 
      * @since 3.1
      */
-      void flushChildren() {
+     virtual void FlushChildren() {
         flushNode();
     }
     
@@ -441,7 +445,7 @@ public:
      * 
      * @since 3.1
      */
-      final void flushCache() {
+      void FlushCache() {
         flushNode();
         
       if (parent != null) {
@@ -449,7 +453,7 @@ public:
       }        
     }
     
-      final int getSizeFlags(boolean width) {
+      int GetSizeFlags(bool width) {
         if (sizeFlagsDirty) {
             widthSizeFlags = doGetSizeFlags(true);
             heightSizeFlags = doGetSizeFlags(false);
@@ -462,7 +466,7 @@ public:
     /**
      * Returns the parent of this tree or null if it is the root.
      */
-      LayoutTreeNode getParent() {
+     virtual LayoutTreeNode* GetParent() {
         return parent;
     }
 
@@ -470,8 +474,8 @@ public:
      * Inserts a new child on the tree. The child will be placed beside 
      * the <code>relative</code> child. Returns the new root of the tree.
      */
-      LayoutTree insert(LayoutPart child, boolean left,
-            LayoutPartSash sash, LayoutPart relative) {
+     virtual LayoutTree* Insert(LayoutPart::Pointer child, bool left,
+            LayoutPartSash::Pointer sash, LayoutPart::Pointer relative) {
         LayoutTree relativeChild = find(relative);
         LayoutTreeNode node = new LayoutTreeNode(sash);
         if (relativeChild == null) {
@@ -496,7 +500,7 @@ public:
      * Returns true if this tree can be compressed and expanded.
      * @return true if springy
      */
-      boolean isCompressible() {
+     virtual bool IsCompressible() {
         //Added for bug 19524
         return part.isCompressible();
     }
@@ -504,14 +508,14 @@ public:
     /**
      * Returns true if this tree has visible parts otherwise returns false.
      */
-      boolean isVisible() {
+     virtual bool IsVisible() {
         return !(part instanceof PartPlaceholder);
     }
 
     /**
      * Recompute the ratios in this tree.
      */
-      void recomputeRatio() {
+     virtual void RecomputeRatio() {
     }
 
     /**
@@ -519,7 +523,7 @@ public:
      * The other child of its parent is placed on the parent's parent.
      * Returns the new root of the tree.
      */
-      LayoutTree remove(LayoutPart child) {
+     virtual LayoutTree* Remove(LayoutPart::Pointer child) {
         LayoutTree tree = find(child);
         if (tree == null) {
       return this;
@@ -545,7 +549,7 @@ public:
      * 
      * @param bounds new bounds of the tree
      */
-      final void setBounds(Rectangle bounds) {
+      void SetBounds(const Rectangle& bounds) {
         if (!bounds.equals(currentBounds) || forceLayout) {
             currentBounds = Geometry.copy(bounds);
             
@@ -559,7 +563,7 @@ protected:
     /**
      * Resize the parts on this tree to fit in <code>bounds</code>.
      */
-    void doSetBounds(Rectangle bounds) {
+    virtual void DoSetBounds(const Rectangle& bounds) {
         part.setBounds(bounds);
     }
 
@@ -568,14 +572,14 @@ public:
     /**
      * Set the parent of this tree.
      */
-    void setParent(LayoutTreeNode parent) {
+    virtual void SetParent(LayoutTreeNode* parent) {
         this.parent = parent;
     }
 
     /**
      * Set the part of this leaf
      */
-    void setPart(LayoutPart part) {
+    virtual void SetPart(LayoutPart::Pointer part) {
         this.part = part;
         flushCache();
     }
@@ -583,7 +587,7 @@ public:
     /**
      * Returns a string representation of this object.
      */
-      String toString() {
+     virtual std::string ToString() {
         return "(" + part.toString() + ")";//$NON-NLS-2$//$NON-NLS-1$
     }
 
@@ -594,7 +598,7 @@ public:
      * @param parent
      * @since 3.1
      */
-      void createControl(Composite parent) {        
+     virtual void CreateControl(void* parent) {        
     }
         
     /**
@@ -610,7 +614,7 @@ public:
      * 
      * @param buf
      */
-      void describeLayout(StringBuffer buf) {
+     virtual void DescribeLayout(std::string& buf) {
         part.describeLayout(buf);
     }
 
@@ -625,7 +629,7 @@ public:
      * @return
      * @since 3.1
      */
-      final boolean hasSizeFlag(boolean width, int flag) {        
+      boolan HasSizeFlag(bool width, int flag) {        
         return (getSizeFlags(width) & flag) != 0;
     }
 

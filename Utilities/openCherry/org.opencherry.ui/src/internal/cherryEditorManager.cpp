@@ -783,11 +783,11 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     {
       // Get the list of dirty editors and views. If it is
       // empty just return.
-      std::vector<IWorkbenchPart::Pointer> parts(page->GetDirtyParts());
-      if (parts.empty())
-      {
-        return true;
-      }
+      //std::vector<IWorkbenchPart::Pointer> parts(page->GetDirtyParts());
+      //if (parts.empty())
+      //{
+      //  return true;
+      //}
       // saveAll below expects a mutable list
 //      List dirtyParts = new ArrayList(parts.length);
 //      for (int i = 0; i < parts.length; i++)
@@ -796,7 +796,8 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //      }
 
       // If confirmation is required ..
-      return this->SaveAll(parts, confirm, closing, addNonPartSources, window);
+      //return this->SaveAll(parts, confirm, closing, addNonPartSources, window);
+      return false;
     }
 
     bool EditorManager::SaveAll(

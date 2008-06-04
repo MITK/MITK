@@ -34,7 +34,7 @@ namespace cherry {
  * This class should be subclassed by clients wishing to define new editors.
  * The name of the subclass should be given as the <code>"class"</code> 
  * attribute in a <code>editor</code> extension contributed to the workbench's
- * view extension point (named <code>"org.eclipse.ui.editors"</code>).
+ * editor extension point (named <code>"org.mitk.ui.editors"</code>).
  * For example, the plug-in's XML markup might contain:
  * <pre>
  * &LT;extension point="org.eclipse.ui.editors"&GT;

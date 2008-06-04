@@ -15,38 +15,39 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYIPARTPANE_H_
-#define CHERRYIPARTPANE_H_
+#ifndef CHERRYQTSHOWVIEWACTION_H_
+#define CHERRYQTSHOWVIEWACTION_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <QAction>
 
-#include "cherryUiDll.h"
+#include <org.opencherry.ui/src/cherryIWorkbenchWindow.h>
+#include <org.opencherry.ui/src/cherryIViewDescriptor.h>
 
-namespace cherry {
+namespace cherry
+{
 
-/**
- * \ingroup org_opencherry_ui
- * 
- * The container for workbench parts.
- */
-struct CHERRY_UI IPartPane : public Object {
+class QtShowViewAction : public QAction {
+   Q_OBJECT
+   
+private:
   
-  cherryClassMacro(IPartPane)
+  IWorkbenchWindow::Pointer m_Window;
+
+  IViewDescriptor::Pointer m_Desc;
   
-  virtual ~IPartPane() {}
   
-  /**
-   * Returns the GUI-dependent container control
-   * for the part widgets. This is passed to
-   * IWorkbenchPart::CreatePartControl(void*)
-   */
-  virtual void* GetControl() = 0;
+public:
   
-  virtual bool GetVisible() = 0;
-  virtual void SetVisible(bool visible) = 0;
+  QtShowViewAction(IWorkbenchWindow::Pointer window, IViewDescriptor::Pointer desc) ;
+
+protected slots:
   
-};
+     /**
+      * Implementation of method defined on <code>IAction</code>.
+      */
+     void Run();
+ };
 
 }
 
-#endif /*CHERRYIPARTPANE_H_*/
+#endif /*CHERRYQTSHOWVIEWACTION_H_*/

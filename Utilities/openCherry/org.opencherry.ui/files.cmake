@@ -1,11 +1,13 @@
-SET(SRC_FILES
+SET(SRC_CPP_FILES
   cherryAbstractUIPlugin.cpp
   cherryEditorPart.cpp
   cherryIEditorRegistry.cpp
   cherryIPageLayout.cpp
   cherryISources.cpp
   cherryIWorkbenchPage.cpp
+  cherryPartPane.cpp
   cherryPlatformUI.cpp
+  cherryRectangle.cpp
   cherryUIException.cpp
   cherryViewPart.cpp
   cherryWorkbench.cpp
@@ -26,8 +28,10 @@ SET(INTERNAL_CPP_FILES
   cherryEditorRegistryReader.cpp
   cherryEditorSite.cpp
   cherryFileEditorMapping.cpp
-  cherryFolderLayout.cpp
+  #cherryFolderLayout.cpp
   #cherryLayoutPart.cpp
+  #cherryLayoutTree.cpp
+  #cherryLayoutTreeNode.cpp
   cherryNullEditorInput.cpp
   #cherryPageLayout.cpp
   #cherryPartPlaceholder.cpp
@@ -44,6 +48,7 @@ SET(INTERNAL_CPP_FILES
   cherryViewRegistryReader.cpp
   cherryViewSite.cpp
   #cherryWorkbenchPage.cpp
+  cherryDummyWorkbenchPage.cpp
   #cherryWorkbenchPagePartList.cpp
   cherryWorkbenchPartReference.cpp
   cherryWorkbenchPlugin.cpp

@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYWORKBENCH_H_
 
 #include "cherryIViewPart.h"
-#include "cherryIViewPane.h"
-#include "cherryIEditorPane.h"
+#include "cherryPartPane.h"
 
 #include "cherryIWorkbench.h"
 #include "cherryIWorkbenchPartReference.h"
+#include "cherryIEditorAreaHelper.h"
+
 #include <Poco/Exception.h>
 
 namespace cherry {
@@ -53,14 +54,21 @@ public:
   
   void ShowPerspective(const std::string& perspectiveId);
   
+  virtual IEditorAreaHelper* CreateEditorPresentation() = 0;
 
   virtual IDialog::Pointer CreateStandardDialog(const std::string& id) = 0;
   
   virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "") = 0;
   virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "") = 0;
   
-  virtual IViewPane::Pointer CreateViewPane() = 0;
-  virtual IEditorPane::Pointer CreateEditorPane() = 0;
+  virtual PartPane::Pointer CreateViewPane(IWorkbenchPartReference::Pointer partReference,
+      WorkbenchPage::Pointer workbenchPage) = 0;
+  virtual PartPane::Pointer CreateEditorPane() = 0;
+  
+  virtual void* CreateWorkbenchPageControl() = 0;
+  
+  // Hack for DummyWorkbenchPage
+  virtual void AddViewPane(PartPane::Pointer pane) = 0;
   
 protected:
   

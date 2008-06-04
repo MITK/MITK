@@ -228,9 +228,9 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   return result;
 }
 
-IPartPane::Pointer ViewReference::CreatePane()
+PartPane::Pointer ViewReference::CreatePane()
 {
-  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateViewPane();
+  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateViewPane(this, this->factory->GetWorkbenchPage());
 }
 
 IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
@@ -251,10 +251,10 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
   }
 
   // Create the part pane
-  IPartPane::Pointer pane = this->GetPane();
+  PartPane::Pointer pane = this->GetPane();
 
   // Create the pane's top-level control
-  //pane.createControl(factory.page.getClientComposite());
+  pane->CreateControl(factory->GetWorkbenchPage()->GetClientComposite());
 
   std::string label = desc->GetLabel(); // debugging only
 

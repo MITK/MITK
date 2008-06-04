@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-static const std::string ID_SEP = ":"; //$NON-NLS-1$
+const std::string ViewFactory::ID_SEP = ":"; //$NON-NLS-1$
 
 std::string ViewFactory::GetKey(const std::string& id,
     const std::string& secondaryId)

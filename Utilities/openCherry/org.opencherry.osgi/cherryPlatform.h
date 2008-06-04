@@ -198,6 +198,9 @@ public:
   
   static std::string ARG_CLEAN;
   static std::string ARG_APPLICATION;
+  static std::string ARG_HOME;
+  static std::string ARG_PLUGIN_CACHE;
+  static std::string ARG_PLUGIN_DIRS;
   
   static IExtensionPointService* GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();

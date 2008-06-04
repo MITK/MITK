@@ -106,7 +106,12 @@ ExtensionPointService::AddContribution(std::istream& istr,
     if (attr == 0) continue;
     
     std::string xp = attr->nodeValue();
-    std::cout << "Extension found for: " << xp << std::endl;
+    std::cout << "Extension found for extension-point: " << xp << std::endl;
+    if (m_ExtensionPointMap[xp].IsNull())
+    {
+      std::cout << "Extension-point unknown, extension skipped.\n";
+      continue;
+    }
     
     Extension::Pointer extension(new Extension(contributor));
     extension->SetExtensionPointIdentifier(xp);

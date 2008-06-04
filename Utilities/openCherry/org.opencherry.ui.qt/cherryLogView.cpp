@@ -19,13 +19,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtLogView.h"
 
-#include <QtGui/QPushButton>
+#include <QDockWidget>
 
 namespace cherry {
 
 void* LogView::CreatePartControl(void* parent)
 {
-  return new QtLogView(static_cast<QWidget*>(parent));
+  QtLogView* logView = new QtLogView(static_cast<QWidget*>(parent));
+  static_cast<QDockWidget*>(parent)->setWidget(logView);
+  
+  return logView;
 }
 
 void LogView::SetFocus()

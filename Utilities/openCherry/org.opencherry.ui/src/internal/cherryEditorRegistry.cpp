@@ -29,6 +29,11 @@ namespace cherry
 const std::string EditorRegistry::EMPTY_EDITOR_ID =
     "org.opencherry.ui.internal.emptyEditorTab"; //$NON-NLS-1$
 
+std::map<std::string, FileEditorMapping::Pointer>
+EditorRegistry::EditorMap::defaultMap;
+
+std::map<std::string, FileEditorMapping::Pointer>
+EditorRegistry::EditorMap::map;
 
 EditorRegistry::RelatedRegistry::RelatedRegistry(EditorRegistry* reg)
 : editorRegistry(reg)

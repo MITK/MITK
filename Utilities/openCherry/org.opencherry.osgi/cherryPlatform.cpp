@@ -54,8 +54,11 @@ int Platform::ARCH_SPARC = CHERRY_ARCH_SPARC;
 int Platform::ARCH_AMD64 = CHERRY_ARCH_AMD64;
 int Platform::ARCH_ARM = CHERRY_ARCH_ARM;
 
-std::string Platform::ARG_CLEAN = "-clean";
-std::string Platform::ARG_APPLICATION = "-application";
+std::string Platform::ARG_CLEAN = "openCherry.clean";
+std::string Platform::ARG_APPLICATION = "openCherry.application";
+std::string Platform::ARG_HOME = "openCherry.home";
+std::string Platform::ARG_PLUGIN_CACHE = "openCherry.plugin_cache_dir";
+std::string Platform::ARG_PLUGIN_DIRS = "openCherry.plugin_dirs";
 
 const Path* Platform::GetConfigurationPath()
 {

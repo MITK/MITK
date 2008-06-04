@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryWorkbenchPartReference.h"
 #include "../cherryIViewReference.h"
+#include "../cherryPartPane.h"
 
 namespace cherry {
 
@@ -92,7 +93,7 @@ public: virtual IViewPart::Pointer GetView(bool restore);
    */
 protected: IWorkbenchPart::Pointer CreatePart();
 
-protected: IPartPane::Pointer CreatePane();
+protected: PartPane::Pointer CreatePane();
 
 private: IWorkbenchPart::Pointer CreatePartHelper();
 

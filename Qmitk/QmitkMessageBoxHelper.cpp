@@ -62,11 +62,15 @@ public:
 
       std::cout << "look, look" << std::endl;
 
+      qApp->lock();
       m_FoundWidget = m_MessageBoxHelper->FindTopLevelWindow( m_ClassName.ascii() );
 
       if (m_FoundWidget)
       {
         std::cout << "Found dialog after " << totalSeconds << "s" << std::endl;
+
+        connect( m_FoundWidget, SIGNAL(destroyed()), this, SLOT(OnFoundWidgetDestroyed()));
+        qApp->unlock();
 
         m_MessageBoxHelper->SetFoundDialog( m_FoundWidget );
         itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
@@ -74,6 +78,8 @@ public:
         mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
         return;
       }
+      
+      qApp->unlock();
     }
 
     std::cout << "Could not find dialog" << std::endl;
@@ -82,6 +88,14 @@ public:
     itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
     command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogNotFound);
     mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
+  }
+        
+  void OnFoundWidgetDestroyed()
+  {
+    if (m_MessageBoxHelper)
+    {
+      m_MessageBoxHelper->SetFoundDialog( NULL );
+    }
   }
 
   void StopThread()

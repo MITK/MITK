@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qapplication.h>
 #include <qwidgetlist.h>
+#include <qwidget.h>
 #include <qobjectlist.h>
 #include <qmessagebox.h>
 #include <qpushbutton.h>
@@ -69,7 +70,7 @@ public:
       {
         std::cout << "Found dialog after " << totalSeconds << "s" << std::endl;
 
-        connect( m_FoundWidget, SIGNAL(destroyed()), this, SLOT(OnFoundWidgetDestroyed()));
+        QObject::connect( m_FoundWidget, SIGNAL(destroyed()), m_MessageBoxHelper, SLOT(OnFoundWidgetDestroyed()));
         qApp->unlock();
 
         m_MessageBoxHelper->SetFoundDialog( m_FoundWidget );
@@ -89,14 +90,6 @@ public:
     command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogNotFound);
     mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
   }
-        
-  void OnFoundWidgetDestroyed()
-  {
-    if (m_MessageBoxHelper)
-    {
-      m_MessageBoxHelper->SetFoundDialog( NULL );
-    }
-  }
 
   void StopThread()
   {
@@ -106,6 +99,7 @@ public:
   }
 
 private:
+
   QString m_ClassName;
   int m_MaxWaitSeconds;
   QmitkMessageBoxHelper* m_MessageBoxHelper;
@@ -282,5 +276,11 @@ QWidget* QmitkMessageBoxHelper::FindDialogItem(const char* widgetName, QWidget* 
   delete childList;
   return NULL;
 }
+
+void QmitkMessageBoxHelper::OnFoundWidgetDestroyed()
+{
+  SetFoundDialog( NULL );
+}
+
 
 

@@ -50,6 +50,7 @@ class QMITK_EXPORT QmitkMessageBoxHelper : public QObject
   public slots:
 
     void SetFoundDialog(QWidget*);
+    void OnFoundWidgetDestroyed();
 
     void CloseMessageBoxes(unsigned int whichButton = 0, unsigned int delay = 1000);
     void CloseMessageBoxesNow();

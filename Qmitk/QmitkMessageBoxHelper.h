@@ -29,6 +29,8 @@ class QmitkMessageBoxHelperDialogWaitThread;
 
 /**
   * \brief Test helper class for closing message boxes.
+  *
+  * \TODO cleanup!
   */
 class QMITK_EXPORT QmitkMessageBoxHelper : public QObject
 {
@@ -38,8 +40,8 @@ class QMITK_EXPORT QmitkMessageBoxHelper : public QObject
 
     QmitkMessageBoxHelper(QObject* parent, const char* name = NULL);
 
-    void DialogFound(const itk::EventObject&);
-    void DialogNotFound(const itk::EventObject&);
+    void DialogFound();
+    void DialogNotFound();
 
     QWidget* FindDialogItem(const char* widgetName, QWidget* parent);
   signals:
@@ -67,16 +69,27 @@ class QMITK_EXPORT QmitkMessageBoxHelper : public QObject
      */
     void StopWaitForDialogAndCallback();
 
+  protected slots:
+
+    void OnLookForDialogTimeout();
+
   protected:
 
     friend class QmitkMessageBoxHelperDialogWaitThread;
 
     QTimer m_Timer;
+    QTimer m_LookForDialogTimer;
+
     unsigned int m_WhichButton;
 
     QmitkMessageBoxHelperDialogWaitThread* m_DialogWaitingThread;
 
-    QWidget* m_FoundDialog;
+    QWidget* m_FoundWidget;
+
+    QString m_ClassName;
+
+    int m_NumberOfLooks;
+    int m_MaxNumberOfLooks;
 };
 
 #endif

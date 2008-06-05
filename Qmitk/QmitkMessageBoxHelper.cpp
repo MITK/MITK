@@ -24,99 +24,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobjectlist.h>
 #include <qmessagebox.h>
 #include <qpushbutton.h>
-#include <qthread.h>
 
 #include <iostream>
-
-#include "mitkCallbackFromGUIThread.h"
-#include <itkCommand.h>
-
-// helper class, runs a thread for preprocessing of a selected image/organ/appearance combination
-class QmitkMessageBoxHelperDialogWaitThread :public QThread
-{
-public:
-
-  QmitkMessageBoxHelperDialogWaitThread(QmitkMessageBoxHelper* helper, const char* classname, int maxWaitSeconds)
-    :m_ClassName( classname ),
-     m_MaxWaitSeconds( maxWaitSeconds ),
-     m_MessageBoxHelper( helper ),
-     m_FoundWidget(NULL),
-     m_Stop(false)
-  {
-  }
-
-  virtual void run()
-  {
-    float totalSeconds(0.0);
-
-    while (totalSeconds < m_MaxWaitSeconds)
-    {
-      m_Mutex.lock();
-      if (m_Stop)
-      {
-        m_Mutex.unlock();
-        return;
-      }
-      m_Mutex.unlock();
-      usleep( 500000 ); // _micro_ seconds
-      totalSeconds += 0.5;
-
-      std::cout << "look, look" << std::endl;
-
-      qApp->lock();
-      m_FoundWidget = m_MessageBoxHelper->FindTopLevelWindow( m_ClassName.ascii() );
-
-      if (m_FoundWidget)
-      {
-        std::cout << "Found dialog after " << totalSeconds << "s" << std::endl;
-
-        QObject::connect( m_FoundWidget, SIGNAL(destroyed()), m_MessageBoxHelper, SLOT(OnFoundWidgetDestroyed()));
-        qApp->unlock();
-
-        m_MessageBoxHelper->SetFoundDialog( m_FoundWidget );
-        itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
-        command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogFound);
-        mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
-        return;
-      }
-      
-      qApp->unlock();
-    }
-
-    std::cout << "Could not find dialog" << std::endl;
-
-    m_MessageBoxHelper->SetFoundDialog( NULL );
-    itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::Pointer command = itk::ReceptorMemberCommand<QmitkMessageBoxHelper>::New();
-    command->SetCallbackFunction(m_MessageBoxHelper, &QmitkMessageBoxHelper::DialogNotFound);
-    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
-  }
-
-  void StopThread()
-  {
-    m_Mutex.lock();
-    m_Stop = true;
-    m_Mutex.unlock();
-  }
-
-private:
-
-  QString m_ClassName;
-  int m_MaxWaitSeconds;
-  QmitkMessageBoxHelper* m_MessageBoxHelper;
-  QWidget* m_FoundWidget;
-  QMutex m_Mutex;
-  bool m_Stop;
-};
-
-
 
 QmitkMessageBoxHelper::QmitkMessageBoxHelper(QObject* parent, const char* name)
 :QObject(parent, name),
  m_WhichButton(0),
- m_DialogWaitingThread(NULL),
- m_FoundDialog(NULL)
+ m_FoundWidget(NULL),
+ m_NumberOfLooks(0),
+ m_MaxNumberOfLooks(10)
 {
   QObject::connect( &m_Timer, SIGNAL(timeout()), this, SLOT(CloseMessageBoxesNow()) );
+  QObject::connect( &m_LookForDialogTimer, SIGNAL(timeout()), this, SLOT(OnLookForDialogTimeout()) );
 }
 
 void QmitkMessageBoxHelper::CloseMessageBoxes(unsigned int whichButton, unsigned int delay)
@@ -201,54 +120,33 @@ QWidget* QmitkMessageBoxHelper::FindTopLevelWindow( const char* classname )
 
 void QmitkMessageBoxHelper::WaitForDialogAndCallback( const char* classname, int maxWaitSeconds )
 {
-  if (m_DialogWaitingThread)
-  {
-    m_DialogWaitingThread->wait();
-    delete m_DialogWaitingThread;
-  }
-
-  m_DialogWaitingThread = new QmitkMessageBoxHelperDialogWaitThread( this, classname, maxWaitSeconds );
-  
-  m_DialogWaitingThread->start( QThread::LowPriority ); 
+  // start timer for 
+  m_NumberOfLooks = 0;
+  m_MaxNumberOfLooks = maxWaitSeconds * 2; // * 2 because we look every 1/2 second
+  m_ClassName = classname;
+  m_LookForDialogTimer.start(500);        // look every 1/2 second (500 ms)
 }
 
 void QmitkMessageBoxHelper::StopWaitForDialogAndCallback()
 {
-  if(m_DialogWaitingThread)
-  {
-    m_DialogWaitingThread->StopThread();
-  }
+  m_LookForDialogTimer.stop();
 }
 
 void QmitkMessageBoxHelper::SetFoundDialog( QWidget* widget )
 {
-  m_FoundDialog = widget;
+  m_FoundWidget = widget;
 }
 
-void QmitkMessageBoxHelper::DialogFound(const itk::EventObject&)
+void QmitkMessageBoxHelper::DialogFound()
 {
-  std::cout << "Found dialog (" << m_FoundDialog << ")" << std::endl;
+  std::cout << "Found dialog (" << m_FoundWidget << ")" << std::endl;
 
-  emit DialogFound( m_FoundDialog );
-
-  if (m_DialogWaitingThread)
-  {
-    m_DialogWaitingThread->wait();
-    delete m_DialogWaitingThread;
-  }
-  m_DialogWaitingThread = NULL;
+  emit DialogFound( m_FoundWidget );
 }
 
-void QmitkMessageBoxHelper::DialogNotFound(const itk::EventObject&)
+void QmitkMessageBoxHelper::DialogNotFound()
 {
   emit DialogFound( NULL );
-  
-  if (m_DialogWaitingThread)
-  {
-    m_DialogWaitingThread->wait();
-    delete m_DialogWaitingThread;
-  }
-  m_DialogWaitingThread = NULL;
 }
 
 QWidget* QmitkMessageBoxHelper::FindDialogItem(const char* widgetName, QWidget* parent)
@@ -282,5 +180,33 @@ void QmitkMessageBoxHelper::OnFoundWidgetDestroyed()
   SetFoundDialog( NULL );
 }
 
+void QmitkMessageBoxHelper::OnLookForDialogTimeout()
+{
+  std::cout << "look, look" << std::endl;
+
+  ++m_NumberOfLooks;
+
+  if (m_NumberOfLooks < m_MaxNumberOfLooks)
+  {
+    m_FoundWidget = FindTopLevelWindow( m_ClassName.ascii() );
+
+    if (m_FoundWidget)
+    {
+      std::cout << "Found dialog after " << (float)m_NumberOfLooks / 2.0  << "s" << std::endl;
+
+      QObject::connect( m_FoundWidget, SIGNAL(destroyed()), this, SLOT(OnFoundWidgetDestroyed()));
+
+      m_LookForDialogTimer.stop();
+      DialogFound();
+    }
+  }
+  else
+  {
+    std::cout << "Could not find dialog" << std::endl;
+
+    m_LookForDialogTimer.stop();
+    DialogNotFound();
+  }
+}
 
 

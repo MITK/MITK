@@ -94,9 +94,8 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
   ipUInt4_t       size_m[_mitkIpPicNDIM];                                    \
   ipInt4_t        ind[_mitkIpPicNDIM];   /* loop index vector             */ \
   ipInt4_t        ind_m[_mitkIpPicNDIM]; /* loop index vector             */ \
-  ipUInt4_t       n[_mitkIpPicNDIM];                                         \
                                                                          \
-  /* initialisation of vectors                                        */ \
+  /* initialization of vectors                                        */ \
                                                                          \
   size_m[0]  = 1;                                                        \
   size[0]    = 1;                                                        \
@@ -106,7 +105,7 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
        size[i]    = size[i-1] * pic->n[i-1];                             \
     }                                                                    \
                                                                          \
-  /* callculate offsets from actual pixel for each mask element       */ \
+  /* calculate offsets from actual pixel for each mask element       */ \
                                                                          \
   if ( kind == ipFuncNoReflect )                                         \
     {                                                                    \
@@ -174,7 +173,7 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
                                 ipInt4_t        beg[_mitkIpPicNDIM],  
                                 ipInt4_t        end[_mitkIpPicNDIM] ) 
 {
-  ipUInt4_t       i, j;               /* loopindex                      */
+  ipUInt4_t       i;                  /* loop index                     */
   ipFuncMasc_t    *m;                 /* length of mask and offsets     */
   ipUInt4_t       size[_mitkIpPicNDIM];
 
@@ -184,7 +183,7 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
   if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
-  /* initialisation of vectors                                          */
+  /* initialization of vectors                                          */
   
   for ( i = 0; i < mask->dim; i++ )
     {

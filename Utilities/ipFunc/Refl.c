@@ -123,12 +123,12 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
 {
 
   ipPicDescriptor *pic_new;               /* inverted picture           */
-  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loop index vector           */
   ipUInt4_t       length_vect[_mitkIpPicNDIM];
   ipUInt4_t       axis_vect[_mitkIpPicNDIM];               
   ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       i, j;                   /* loop index                 */
+  ipUInt4_t       i;                      /* loop index                 */
   ipUInt4_t       offset_orig;
 
   /* check data                                                         */

@@ -130,8 +130,6 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
 {                                                                              \
   ipInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
   ipInt4_t     off[_mitkIpPicNDIM];    /* used to calculate offset vector       */ \
-  ipUInt4_t    offset;             /* offset of pixel                       */ \
-  ipUInt4_t    i;                  /* loop index                            */ \
   ipFloat8_t   sum;                /* sum of greyvalues in seed region      */ \
   ipFloat8_t   saq;                /* sum of deviation squares              */ \
   ipFloat8_t   diff;               /* used to calculate saq                 */ \
@@ -227,7 +225,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
 {                                                                              \
   ipInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
   ipUInt4_t    off[_mitkIpPicNDIM];    /* used to calculate offset              */ \
-  ipFloat8_t   diff;               /* diiference betwenn pixel and mean     */ \
+  ipFloat8_t   diff;               /* difference between pixel and mean     */ \
                                                                                \
   /* find pixels in seed region which are accepted                          */ \
                                                                                \
@@ -373,25 +371,24 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
                                  ipUInt4_t       kind ) 
 {
   ipPicDescriptor *pic_new;           /* pointer to new image                */
-  ipUInt4_t        i, j, k;           /* loop index                          */
-  ipBool_t         found;             /* found flag                          */
+  ipUInt4_t        i;                     /* loop index                          */
   ipInt4_t         ind[_mitkIpPicNDIM];   /* loop index vector                   */
   ipInt4_t         beg[_mitkIpPicNDIM];   /* beginning and end of seed region    */
   ipInt4_t         end[_mitkIpPicNDIM];   /* for each dimension                  */
   ipUInt4_t        size[_mitkIpPicNDIM];  /*                                     */
   ipInt4_t         off[_mitkIpPicNDIM];   /* used to calculate offsets           */
-  ipInt4_t         offset, offset_v;  /* offsets                             */
+  ipInt4_t         offset_v;              /* offset                              */
   ipInt4_t         *off_vekt;         /* offsets of all neighbour pixels     */
   ipUInt4_t        no_neigh;          /* number of neighbour pixels          */
   
   /* parameters of seed region                                               */
 
   ipFloat8_t       mean;              /* mean of greyvalues in seed region   */
-  ipFloat8_t       std_dev;           /* standard deviation                  */
+  /*ipFloat8_t       std_dev; */          /* standard deviation                  */
   ipFloat8_t       std_win;           /* value for growing criteria          */
-  ipFloat8_t       sum;               /* sum of greyvalues in seed region    */
-  ipFloat8_t       diff;              /* difference between greyvalue, mean  */
-  ipFloat8_t       saq;               /* sum of deviation squares            */
+  /*ipFloat8_t       sum; */              /* sum of greyvalues in seed region    */
+  /*ipFloat8_t       diff; */            /* difference between greyvalue, mean  */
+  /*ipFloat8_t       saq; */              /* sum of deviation squares            */
   ipUInt4_t        size_seed;         /* number of pixels in seed region     */
 
   /* variables for region growing                                            */

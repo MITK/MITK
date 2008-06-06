@@ -83,8 +83,31 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
   #if ( VTK_MAJOR_VERSION >= 5 )
     m_TextRenderer->SetErase(0);
   #endif
- 
+}
 
+/*!
+\brief Destructs the VtkPropRenderer.
+*/
+mitk::VtkPropRenderer::~VtkPropRenderer()
+{
+  if(m_LightKit != NULL)
+    m_LightKit->Delete();
+
+  if(m_VtkRenderer!=NULL)
+  {
+    m_CameraController = NULL;
+
+    m_VtkRenderer->Delete();
+  }
+  else
+    m_CameraController = NULL;
+
+  if(m_WorldPointPicker != NULL)
+    m_WorldPointPicker->Delete();
+  if(m_PointPicker != NULL)
+    m_PointPicker->Delete();
+  if(m_TextRenderer != NULL)
+    m_TextRenderer->Delete();
 }
 
 void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
@@ -372,20 +395,6 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 
   m_LastUpdateTime = 0;
 
-}
-
-/*!
-\brief Destructs the VtkPropRenderer.
-*/
-mitk::VtkPropRenderer::~VtkPropRenderer()
-{
-  if(m_VtkRenderer!=NULL)
-  {
-     m_CameraController = NULL;
-     m_VtkRenderer->Delete();
-  }
-  else
-    m_CameraController = NULL;
 }
 
 /*!

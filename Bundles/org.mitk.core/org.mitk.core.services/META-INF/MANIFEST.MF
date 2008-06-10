@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: MITK Core Plugin
+Bundle-SymbolicName: org.mitk.core.services
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: mitk::CoreServicesPlugin
+Require-Bundle: org.opencherry.osgi

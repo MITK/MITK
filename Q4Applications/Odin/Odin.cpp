@@ -1,4 +1,4 @@
-#include <org.opencherry.application/cherryStarter.h>
+#include <org.opencherry.osgi/application/cherryStarter.h>
 
 int main(int argc, char** argv)
 {

@@ -729,31 +729,31 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /**
      * See IWorkbenchPage.
      */
-  public: void ReuseEditor(IReusableEditor::Pointer editor, IEditorInput* input);
+  public: void ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input);
 
     /**
      * See IWorkbenchPage.
      */
-  public: IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorID);
+  public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorID);
 
     /**
      * See IWorkbenchPage.
      */
-  public: IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorID,
+  public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorID,
       bool activate);
   
     /**
      * See IWorkbenchPage.
      */
-  public: IEditorPart::Pointer OpenEditor(const IEditorInput* input,
+  public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
             const std::string& editorID, bool activate, int matchFlags);
   
     /**
      * This is not public API but for use internally.  editorState can be <code>null</code>.
      */
-  public: IEditorPart::Pointer OpenEditor(const IEditorInput* input,
+  public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
             const std::string& editorID, bool activate, int matchFlags,
-            IMemento::ConstPointer editorState);
+            IMemento::Pointer editorState);
 
     
     /*
@@ -761,37 +761,37 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * Opens a new editor using the given input and descriptor. (Normally, editors are opened using
      * an editor ID and an input.)
      */
-  public: IEditorPart::Pointer OpenEditorFromDescriptor(const IEditorInput* input,
+  public: IEditorPart::Pointer OpenEditorFromDescriptor(IEditorInput::Pointer input,
         const IEditorDescriptor::ConstPointer editorDescriptor, bool activate,
-        const IMemento* editorState);
+        IMemento::Pointer editorState);
     
     /**
      * @see #openEditor(IEditorInput, String, boolean, int)
    */
-  private: IEditorPart::Pointer BusyOpenEditor(IEditorInput* input, const std::string& editorID,
-            bool activate, int matchFlags, IMemento* editorState);
+  private: IEditorPart::Pointer BusyOpenEditor(IEditorInput::Pointer input, const std::string& editorID,
+            bool activate, int matchFlags, IMemento::Pointer editorState);
 
     /*
      * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
      * See openEditorFromDescriptor().
      */
-  private: IEditorPart::Pointer BusyOpenEditorFromDescriptor(IEditorInput* input, EditorDescriptor::Pointer editorDescriptor,
-        bool activate, IMemento* editorState);
+  private: IEditorPart::Pointer BusyOpenEditorFromDescriptor(IEditorInput::Pointer input, EditorDescriptor::ConstPointer editorDescriptor,
+        bool activate, IMemento::Pointer editorState);
     
     /**
      * Do not call this method.  Use <code>busyOpenEditor</code>.
      * 
      * @see IWorkbenchPage#openEditor(IEditorInput, String, boolean)
      */
-  protected: IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput* input,
-            const std::string& editorID, bool activate,  int matchFlags, IMemento* editorState);
+  protected: IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput::Pointer input,
+            const std::string& editorID, bool activate,  int matchFlags, IMemento::Pointer editorState);
     
     /*
      * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
      * See openEditorFromDescriptor().
      */
-  private: IEditorPart::Pointer BusyOpenEditorFromDescriptorBatched(IEditorInput* input,
-            EditorDescriptor::Pointer editorDescriptor, bool activate, IMemento* editorState);
+  private: IEditorPart::Pointer BusyOpenEditorFromDescriptorBatched(IEditorInput::Pointer input,
+            EditorDescriptor::Pointer editorDescriptor, bool activate, IMemento::Pointer editorState);
     
   public: void OpenEmptyTab();
 

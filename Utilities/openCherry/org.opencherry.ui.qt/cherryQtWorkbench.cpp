@@ -17,16 +17,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtWorkbench.h"
 
+#include <QApplication>
+
 #include "internal/cherryQtShowViewDialog.h"
 #include "internal/cherryQtViewPane.h"
+#include "internal/cherryQtEditorPane.h"
 #include "internal/cherryQtErrorView.h"
 
+#include <org.opencherry.osgi/cherryPlatform.h>
 #include <org.opencherry.ui/src/cherryPlatformUI.h>
 
 namespace cherry {
 
+QtWorkbench::QtWorkbench()
+ : m_EditorPresentation(0)
+{
+  
+}
+
 QtWorkbench::~QtWorkbench()
 {
+  if (m_EditorPresentation != 0) delete m_EditorPresentation;
 }
 
 IWorkbenchWindow::Pointer QtWorkbench::GetActiveWorkbenchWindow()
@@ -34,12 +45,50 @@ IWorkbenchWindow::Pointer QtWorkbench::GetActiveWorkbenchWindow()
   return m_QtWindow;
 }
 
-void
-QtWorkbench::Run()
+bool QtWorkbench::Init() 
+{    
+  return Workbench::Init();
+}
+
+int
+QtWorkbench::RunUI()
+{
+  int argc;
+  char** argv;
+  Platform::GetRawApplicationArgs(argc, argv);
+  
+  QApplication qtApp(argc, argv);
+  
+  // initialize workbench and restore or open one window
+  bool initOK = this->Init();
+  
+  // let the advisor run its start up code
+  if (initOK) {
+    advisor->PostStartup(); // may trigger a close/restart
+  }
+
+
+  //TODO start eager plug-ins
+  //startPlugins();
+    
+  //addStartupRegistryListener();
+  
+  // spin Qt event loop
+  qtApp.exec();
+  
+  return PlatformUI::RETURN_OK;
+}
+
+void QtWorkbench::OpenFirstTimeWindow()
 {
   m_QtWindow = new QtWorkbenchWindow();
-    
+  m_QtWindow->Init();
   m_QtWindow->show();
+}
+
+IWorkbenchWindow::Pointer QtWorkbench::RestoreWorkbenchWindow(IMemento::Pointer memento)
+{
+  return 0;
 }
 
 IDialog::Pointer
@@ -66,17 +115,23 @@ IEditorPart::Pointer QtWorkbench::CreateErrorEditorPart(const std::string& partN
 PartPane::Pointer QtWorkbench::CreateViewPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage::Pointer workbenchPage)
 {
-  return new QtViewPane(partReference, workbenchPage);
+  PartPane::Pointer pane = new QtViewPane(partReference, workbenchPage);
+  return pane;
 }
 
-PartPane::Pointer QtWorkbench::CreateEditorPane()
+PartPane::Pointer QtWorkbench::CreateEditorPane(IWorkbenchPartReference::Pointer partReference,
+    WorkbenchPage::Pointer workbenchPage)
 {
-  return 0;
+  PartPane::Pointer pane = new QtEditorPane(partReference, workbenchPage);
+  return pane;
 }
 
-IEditorAreaHelper* QtWorkbench::CreateEditorPresentation()
+IEditorAreaHelper* QtWorkbench::CreateEditorPresentation(IWorkbenchPage::Pointer page)
 {
-  return 0;
+  if (m_EditorPresentation == 0)
+    m_EditorPresentation = new QtSimpleEditorAreaHelper(page);
+  
+  return m_EditorPresentation;
 }
 
 void* QtWorkbench::CreateWorkbenchPageControl()

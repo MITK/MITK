@@ -34,6 +34,10 @@ SET(CPP_FILES
   cherryPlatform.cpp
   cherryPlatformException.cpp
   cherryPlugin.cpp
+  
+  # application
+  application/cherryIApplication.cpp
+  application/cherryStarter.cpp
 )
 
 

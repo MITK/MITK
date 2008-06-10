@@ -30,7 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "event/cherryBundleEvents.h"
 #include "cherryIBundleActivator.h"
-#include "cherryIBundleContext.h"
 
 #include "internal/cherryBundle.h"
 #include "internal/cherrySystemBundle.h"
@@ -38,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 class CodeCache;
+struct IBundleContext;
 
 /**
  * Intentionally no CHERRY_OSGI macro. This class belongs into "internal" but
@@ -54,7 +54,7 @@ private:
     Bundle::Pointer m_Bundle;
     ActivatorClassLoaderPtr m_ClassLoader;
     std::map<std::string, Poco::Any*> m_ClassLoaderMap;
-    IBundleContext::Pointer m_Context;
+    SmartPointer<IBundleContext> m_Context;
   };
   
   typedef std::map<std::string, BundleInfo> BundleMap;
@@ -77,7 +77,7 @@ public:
   BundleLoader(CodeCache* codeCache, Poco::Logger& logger); //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
   virtual ~BundleLoader();
   
-  IBundleContext::Pointer GetContextForBundle(IBundle::ConstPointer bundle);
+  SmartPointer<IBundleContext> GetContextForBundle(IBundle::ConstPointer bundle);
   Bundle::Pointer CreateBundle(const Poco::Path& path);
   
   BundleEvents& GetEvents();

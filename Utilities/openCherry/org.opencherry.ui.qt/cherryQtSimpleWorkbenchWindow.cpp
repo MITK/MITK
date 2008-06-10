@@ -29,30 +29,22 @@ namespace cherry {
 
 QtWorkbenchWindow::QtWorkbenchWindow()
 {
+  // set the shell style
+  //this->setWindowFlags(this->GetWindowConfigurer()->GetShellStyle());
+  
   m_WorkbenchPage = new WorkbenchPage(this, "", 0);
   
-  IViewRegistry* viewRegistry = PlatformUI::GetWorkbench()->GetViewRegistry();
-  const std::vector<IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
-  
-  m_ViewMenu = menuBar()->addMenu("Show &View");
-  
-  std::vector<IViewDescriptor::Pointer>::const_iterator iter;
-  for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
-  {
-    QtShowViewAction* viewAction = new QtShowViewAction(this, *iter);
-    m_ViewActions.push_back(viewAction);
-    m_ViewMenu->addAction(viewAction);
-  }
-  
-  menuBar()->addSeparator();
-  
-  m_HelpMenu = menuBar()->addMenu("&Help");
-  
-  //m_HelpMenu->addAction(aboutAction);
-  
-  
-  m_EditorTabs = new QTabWidget(this);
-  this->setCentralWidget(m_EditorTabs);
+  Point size = this->GetInitialSize();
+  this->resize(size.x, size.y);
+}
+
+void* QtWorkbenchWindow::GetMenuManager()
+{
+  return menuBar();
+}
+
+void QtWorkbenchWindow::CreateDefaultContents(void* shell)
+{
   
 }
 

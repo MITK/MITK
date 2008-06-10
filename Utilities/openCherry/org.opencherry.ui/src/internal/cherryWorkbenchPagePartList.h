@@ -133,21 +133,21 @@ protected:
   
   void FirePartOpened(SmartPointer<IWorkbenchPartReference> part);
 
-    void FirePartClosed(SmartPointer<IWorkbenchPartReference> part);
+  void FirePartClosed(SmartPointer<IWorkbenchPartReference> part);
 
-    void FirePartAdded(SmartPointer<IWorkbenchPartReference> part);
+  void FirePartAdded(SmartPointer<IWorkbenchPartReference> part);
 
-    void FirePartRemoved(SmartPointer<IWorkbenchPartReference> part);
+  void FirePartRemoved(SmartPointer<IWorkbenchPartReference> part);
 
-    void FireActiveEditorChanged(SmartPointer<IWorkbenchPartReference> ref);
+  void FireActiveEditorChanged(SmartPointer<IWorkbenchPartReference> ref);
 
-    void FireActivePartChanged(SmartPointer<IWorkbenchPartReference> oldRef, SmartPointer<IWorkbenchPartReference> newRef);
-    
-    void FirePartHidden(SmartPointer<IWorkbenchPartReference> ref);
+  void FireActivePartChanged(SmartPointer<IWorkbenchPartReference> oldRef, SmartPointer<IWorkbenchPartReference> newRef);
+  
+  void FirePartHidden(SmartPointer<IWorkbenchPartReference> ref);
 
-    void FirePartVisible(SmartPointer<IWorkbenchPartReference> ref);
-    
-    void FirePartInputChanged(SmartPointer<IWorkbenchPartReference> ref);
+  void FirePartVisible(SmartPointer<IWorkbenchPartReference> ref);
+  
+  void FirePartInputChanged(SmartPointer<IWorkbenchPartReference> ref);
 
     
 public:

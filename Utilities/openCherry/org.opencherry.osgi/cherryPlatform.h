@@ -158,11 +158,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "event/cherryPlatformEvents.h"
 #include "service/cherryServiceRegistry.h"
-#include "service/cherryIExtensionPointService.h"
 
 namespace cherry {
 
 using namespace Poco;
+
+class IExtensionPointService;
 
 class CHERRY_OSGI Platform
 {

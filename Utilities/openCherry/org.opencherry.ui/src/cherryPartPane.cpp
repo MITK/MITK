@@ -22,7 +22,7 @@ namespace cherry
 
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage::Pointer workbenchPage)
- : inLayout(true)
+ : control(0), inLayout(true)
 {
   //super(partReference.getId());
   this->partReference = partReference;

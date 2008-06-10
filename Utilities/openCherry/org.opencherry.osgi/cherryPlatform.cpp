@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "cherryPlatform.h"
+#include "service/cherryIExtensionPointService.h"
 #include "internal/cherryInternalPlatform.h"
 
 namespace cherry {

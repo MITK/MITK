@@ -187,12 +187,48 @@ void WorkbenchPage::UpdateActivePart()
 
 void WorkbenchPage::MakeActive(IWorkbenchPartReference::Pointer ref)
 {
-
+  if (ref.IsNull()) 
+  {
+    this->SetActivePart(0);
+  } 
+  else 
+  {
+    IWorkbenchPart::Pointer newActive = ref->GetPart(true);
+    if (newActive.IsNull())
+    {
+      this->SetActivePart(0);
+    }
+    else 
+    {
+      this->Activate(newActive);
+    }
+  }
 }
 
 void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
 {
-
+  if (ref == this->GetActiveEditorReference()) 
+  {
+    return;
+  }
+          
+  IEditorPart::Pointer part = 0;
+  if (ref.IsNotNull())
+    part = ref->GetEditor(true);
+  
+  if (part.IsNotNull()) {
+      editorMgr->SetVisibleEditor(ref, false);
+      //navigationHistory.markEditor(part);
+  }
+  
+//  actionSwitcher.updateTopEditor(part);
+//
+//  if (ref != null) {
+//      activationList.bringToTop(getReference(part));
+//  }
+//  
+//  partList.setActiveEditor(ref);
+  
 }
 
 bool WorkbenchPage::CloseEditors(
@@ -263,7 +299,9 @@ void WorkbenchPage::AttachView(IViewReference::Pointer ref)
 
 WorkbenchPage::~WorkbenchPage()
 {
-
+  if (viewFactory != 0) delete viewFactory;
+  if (editorMgr != 0) delete editorMgr;
+  if (editorPresentation != 0) delete editorPresentation;
 }
 
 IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
@@ -305,25 +343,18 @@ IWorkbenchPartReference::Pointer WorkbenchPage::GetActivePartReference()
 
 void* WorkbenchPage::GetClientComposite()
 {
+  if (composite == 0)
+    this->CreateClientComposite();
+  
   return composite;
 }
 
 EditorManager* WorkbenchPage::GetEditorManager()
 {
-  return 0;
-}
+  if (editorMgr == 0)
+    editorMgr = new EditorManager(window, this, this->GetEditorPresentation());
 
-PerspectiveHelper* GetPerspectivePresentation()
-{
-  return 0;
-}
-
-/**
- * Answer the editor presentation.
- */
-IEditorAreaHelper* GetEditorPresentation()
-{
-  return 0;
+  return editorMgr;
 }
 
 std::vector<IEditorPart::Pointer> WorkbenchPage::GetEditors()
@@ -368,6 +399,9 @@ std::list<IEditorReference::Pointer> WorkbenchPage::GetEditorReferences()
 
 IEditorAreaHelper* WorkbenchPage::GetEditorPresentation()
 {
+  if (editorPresentation == 0)
+    editorPresentation = this->GetWorkbenchWindow()->GetWorkbench().Cast<Workbench>()->CreateEditorPresentation(this);
+  
   return editorPresentation;
 }
 
@@ -414,7 +448,7 @@ std::vector<IViewPart::Pointer> WorkbenchPage::GetViews()
  */
 IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow()
 {
-  return 0;
+  return window;
 }
 
 /*
@@ -449,9 +483,9 @@ void WorkbenchPage::Init(WorkbenchWindow::Pointer w,
   deferCount = 0;
   
   // Create presentation.
-  this->CreateClientComposite();
-  editorPresentation = window->GetWorkbench().Cast<Workbench>()->CreateEditorPresentation();
-  //editorMgr = new EditorManager(window, this, editorPresentation);
+  composite = 0;
+  editorPresentation = 0;
+  editorMgr = 0;
 }
 
 bool WorkbenchPage::IsPartVisible(IWorkbenchPart::Pointer part)
@@ -501,71 +535,116 @@ void WorkbenchPage::OnDeactivate()
 }
 
 void WorkbenchPage::ReuseEditor(IReusableEditor::Pointer editor,
-    IEditorInput* input)
+    IEditorInput::Pointer input)
 {
 
 }
 
-IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
     const std::string& editorID)
 {
-  return 0;
+  return this->OpenEditor(input, editorID, true, MATCH_INPUT);
 }
 
-IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
     const std::string& editorID, bool activate)
 {
-  return 0;
+  return this->OpenEditor(input, editorID, activate, MATCH_INPUT);
 }
 
-IEditorPart::Pointer WorkbenchPage::OpenEditor(const IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
     const std::string& editorID, bool activate, int matchFlags)
 {
-  return 0;
+  return this->OpenEditor(input, editorID, activate, matchFlags, 0);
 }
 
-IEditorPart::Pointer WorkbenchPage::OpenEditor(const IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
     const std::string& editorID, bool activate, int matchFlags,
-    IMemento::ConstPointer editorState)
+    IMemento::Pointer editorState)
 {
-  return 0;
+  if (input.IsNull()) {
+    throw Poco::InvalidArgumentException();
+  }
+
+  IEditorPart::Pointer result;
+                          
+  result = this->BusyOpenEditor(input, editorID,
+                                activate, matchFlags, editorState);
+                          
+  return result;
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditorFromDescriptor(
-    const IEditorInput* input,
-    const IEditorDescriptor::ConstPointer editorDescriptor, bool activate,
-    const IMemento* editorState)
+    IEditorInput::Pointer input,
+    IEditorDescriptor::ConstPointer editorDescriptor, bool activate,
+    IMemento::Pointer editorState)
 {
-  return 0;
+  if (input.IsNull() || editorDescriptor.Cast<const EditorDescriptor>().IsNull()) {
+     throw Poco::InvalidArgumentException();
+  }
+      
+  IEditorPart::Pointer result = this->BusyOpenEditorFromDescriptor(input, 
+                editorDescriptor.Cast<const EditorDescriptor>(),
+                activate, editorState);
+         
+  return result;
 }
 
-/**
- * @see #openEditor(IEditorInput, String, boolean, int)
- */
-IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
     const std::string& editorID, bool activate, int matchFlags,
-    IMemento* editorState)
+    IMemento::Pointer editorState)
 {
-  return 0;
+  // If an editor already exists for the input, use it.
+  IEditorPart::Pointer editor;
+  // Reuse an existing open editor, unless we are in "new editor tab management" mode
+//  editor = getEditorManager().findEditor(editorID, input, ((TabBehaviour)Tweaklets.get(TabBehaviour.KEY)).getReuseEditorMatchFlags(matchFlags));
+//  if (editor != null) {
+//      
+//    // do the IShowEditorInput notification before showing the editor
+//    // to reduce flicker
+//    if (editor instanceof IShowEditorInput) {
+//        ((IShowEditorInput) editor).showEditorInput(input);
+//    }
+//    showEditor(activate, editor);
+//    return editor;
+//      
+//  }
+
+
+  // Otherwise, create a new one. This may cause the new editor to
+  // become the visible (i.e top) editor.
+  IEditorReference::Pointer ref;
+  ref = this->GetEditorManager()->OpenEditor(editorID, input, true, editorState);
+  if (ref.IsNotNull()) {
+      editor = ref->GetEditor(true);
+  }
+
+  if (editor.IsNotNull()) {
+    this->SetEditorAreaVisible(true);
+    if (activate) this->Activate(editor); 
+    else this->BringToTop(editor);
+  }
+
+  return editor;
 }
 
 IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptor(
-    IEditorInput* input, EditorDescriptor::Pointer editorDescriptor,
-    bool activate, IMemento* editorState)
+    IEditorInput::Pointer input, EditorDescriptor::ConstPointer editorDescriptor,
+    bool activate, IMemento::Pointer editorState)
 {
   return 0;
 }
 
-IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(IEditorInput* input,
+IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(IEditorInput::Pointer input,
     const std::string& editorID, bool activate, int matchFlags,
-    IMemento* editorState)
+    IMemento::Pointer editorState)
 {
   return 0;
 }
 
 IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptorBatched(
-    IEditorInput* input, EditorDescriptor::Pointer editorDescriptor,
-    bool activate, IMemento* editorState)
+    IEditorInput::Pointer input, EditorDescriptor::Pointer editorDescriptor,
+    bool activate, IMemento::Pointer editorState)
 {
   return 0;
 }
@@ -577,7 +656,15 @@ void WorkbenchPage::OpenEmptyTab()
 
 void WorkbenchPage::ShowEditor(bool activate, IEditorPart::Pointer editor)
 {
-
+  this->SetEditorAreaVisible(true);
+  if (activate)
+  {
+    this->Activate(editor);
+  }
+  else
+  {
+    this->BringToTop(editor);
+  }
 }
 
 bool WorkbenchPage::IsEditorPinned(IEditorPart::Pointer editor)
@@ -643,40 +730,67 @@ std::string WorkbenchPage::GetId(IWorkbenchPartReference::Pointer ref)
 
 void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
 {
-   IWorkbenchPartReference::Pointer partref = this->GetReference(newPart);
-   IWorkbenchPartReference::Pointer realPartRef = 0;
-   if (newPart.IsNotNull())
-   {
-     IWorkbenchPartSite::Pointer site = newPart->GetSite();
-     if (site.Cast<PartSite>().IsNotNull())
-     {
-       realPartRef = site.Cast<PartSite>()->GetPane()->GetPartReference();
-     }
-   }
+  // Optimize it.
+  if (this->GetActivePart() == newPart) {
+      return;
+  }
+  
+  if (partBeingActivated.IsNotNull()) {
+      if (partBeingActivated->GetPart(false) != newPart) {
+          WorkbenchPlugin::Log(PlatformException("WARNING: Prevented recursive attempt to activate part "
+              + this->GetId(newPart) + " while still in the middle of activating part "
+              + this->GetId(partBeingActivated)));
+      }
+      return;
+  }
 
-   partBeingActivated = realPartRef;
+  //No need to change the history if the active editor is becoming the
+  // active part
+  
+  try 
+  {
+    IWorkbenchPartReference::Pointer partref = this->GetReference(newPart);
+    IWorkbenchPartReference::Pointer realPartRef = 0;
+    if (newPart.IsNotNull()) 
+    {
+      IWorkbenchPartSite::Pointer site = newPart->GetSite();
+      if (site.Cast<PartSite>().IsNotNull()) 
+      {
+        realPartRef = site.Cast<PartSite>()->GetPane()->GetPartReference();
+      }
+    }
 
-   // Deactivate old part
-//   IWorkbenchPart oldPart = getActivePart();
-//   if (oldPart != null)
-//   {
-//     deactivatePart(oldPart);
-//   }
+    partBeingActivated = realPartRef;
 
-   // Set active part.
-   if (newPart.IsNotNull())
-   {
-     //activationList.setActive(newPart);
-     if (newPart.Cast<IEditorPart>().IsNotNull())
-     {
-       this->MakeActiveEditor(realPartRef.Cast<IEditorReference>());
-     }
-   }
-   this->ActivatePart(newPart);
-
-   //actionSwitcher.updateActivePart(newPart);
-
-   //partList.setActivePart(partref);
+    // Deactivate old part
+    IWorkbenchPart::Pointer oldPart = this->GetActivePart();
+    if (oldPart.IsNotNull()) 
+    {
+      this->DeactivatePart(oldPart);
+    }
+      
+    // Set active part.
+    if (newPart.IsNotNull()) 
+    {
+      //activationList.setActive(newPart);
+      if (newPart.Cast<IEditorPart>().IsNotNull()) 
+      {
+        IEditorReference::Pointer editorRef = realPartRef.Cast<IEditorReference>(); 
+        this->MakeActiveEditor(editorRef);
+      }
+    }
+    this->ActivatePart(newPart);
+      
+    //partList.setActivePart(partref);
+  } 
+  catch (std::exception* e)
+  {
+    partBeingActivated = 0;
+    throw *e;
+  }
+  
+  partBeingActivated = 0;
+  
 }
 
 void WorkbenchPage::SetEditorAreaVisible(bool showEditorArea)

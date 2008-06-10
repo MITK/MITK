@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __CHERRY_BUNDLE_LOADER_TXX__
 
 #include <iostream>
+#include "cherryIBundleContext.h"
 
 namespace cherry {
 

@@ -276,6 +276,7 @@ public:
    */
 private:
   IEditorReference::Pointer FindReusableEditor(EditorDescriptor::Pointer desc);
+
   /**
    * @param editorId
    *            the editor part id

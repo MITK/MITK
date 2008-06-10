@@ -15,21 +15,13 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYIAPPLICATION_H_
-#define CHERRYIAPPLICATION_H_
+#include "cherryIApplication.h"
 
-#include "cherryApplicationDll.h"
+namespace cherry
+{
 
-namespace cherry {
-
-struct CHERRY_APPLICATION IApplication {
-  
-  virtual ~IApplication() {}
-  
-  virtual int Run() = 0;
-  
-};
+const int IApplication::EXIT_OK = 0;
+const int IApplication::EXIT_RESTART = 23;
+const int IApplication::EXIT_RELAUNCH = 24;
 
 }
-
-#endif /*CHERRYIAPPLICATION_H_*/

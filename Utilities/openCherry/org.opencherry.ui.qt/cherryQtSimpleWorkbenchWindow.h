@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYQTSIMPLEWORKBENCHWINDOW_H_
 
 #include <QMainWindow>
-#include <QTabWidget>
 
 #include <vector>
 
@@ -46,10 +45,13 @@ public:
   
   IWorkbenchPage::Pointer GetActivePage();
   
+  void* GetMenuManager();
+  
+protected:
+  
+  void CreateDefaultContents(void* shell);
+  
 private:
-  QMenu* m_ViewMenu;
-  QMenu* m_HelpMenu;
-  QTabWidget* m_EditorTabs;
   
   std::vector<QtShowViewAction*> m_ViewActions;
   

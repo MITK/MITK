@@ -9,11 +9,13 @@ SET(CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  cherryQtEditorPane.cpp
   cherryQtErrorView.cpp
   cherryQtShowViewAction.cpp
   cherryQtViewPane.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
+  cherryQtSimpleEditorAreaHelper.cpp
 )
 
 SET(MOC_H_FILES

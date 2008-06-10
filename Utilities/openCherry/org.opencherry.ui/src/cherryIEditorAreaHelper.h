@@ -20,6 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "internal/cherryLayoutPart.h"
 
+#include "cherryIEditorReference.h"
+#include "cherryIEditorPart.h"
+
+#include <vector>
+
 namespace cherry {
 
 /**

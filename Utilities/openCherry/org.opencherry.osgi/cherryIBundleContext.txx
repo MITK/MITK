@@ -15,21 +15,20 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYSAMPLEAPPLICATION_H_
-#define CHERRYSAMPLEAPPLICATION_H_
+#ifndef CHERRYIBUNDLECONTEXT_TXX_
+#define CHERRYIBUNDLECONTEXT_TXX_
 
-#include <org.opencherry.application/cherryIApplication.h>
+#include "cherryPlatform.h"
 
-#include "cherryQtWorkbenchDll.h"
-
-namespace cherry {
-
-class CHERRY_QTWORKBENCH QtWorkbenchApplication : public IApplication
+namespace cherry
 {
-public:
-  int Run();
-};
+
+template<class S>
+SmartPointer<S> IBundleContext::GetService(const std::string& id) const 
+{
+  return Platform::GetServiceRegistry().GetServiceById<S>(id);
+}
 
 }
 
-#endif /*CHERRYSAMPLEAPPLICATION_H_*/
+#endif /*CHERRYIBUNDLECONTEXT_TXX_*/

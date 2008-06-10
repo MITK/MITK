@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Path.h"
 #include "Poco/Logger.h"
 
+#include "service/cherryService.h"
 
 namespace cherry {
 
@@ -52,7 +53,10 @@ struct CHERRY_OSGI IBundleContext : public Object
  
   virtual Poco::Path GetPersistentDirectory() const = 0;
   
-  // ServiceRegistry& GetRegistry() const;
+  template<class S>
+  SmartPointer<S> GetService(const std::string& id) const;
+  
+  virtual void RegisterService(const std::string& id, Service::Pointer service) const = 0;
   
   virtual SmartPointer<IBundle> GetThisBundle() const = 0;
   
@@ -61,5 +65,7 @@ struct CHERRY_OSGI IBundleContext : public Object
 };
 
 }  // namespace cherry
+
+#include "cherryIBundleContext.txx"
 
 #endif /*CHERRYIBUNDLECONTEXT_H_*/

@@ -31,10 +31,15 @@ const std::string PlatformUI::PLUGIN_ID = "org.opencherry.ui";
 const std::string PlatformUI::XP_WORKBENCH = PlatformUI::PLUGIN_ID + ".workbench";
 const std::string PlatformUI::XP_VIEWS = PlatformUI::PLUGIN_ID + ".views";
 
+const int PlatformUI::RETURN_OK = 0;
+const int PlatformUI::RETURN_RESTART = 1;
+const int PlatformUI::RETURN_UNSTARTABLE = 2;
+const int PlatformUI::RETURN_EMERGENCY_CLOSE = 3;
+
 Workbench::Pointer PlatformUI::m_Workbench(0);
 
 int
-PlatformUI::CreateAndRunWorkbench()
+PlatformUI::CreateAndRunWorkbench(WorkbenchAdvisor* advisor)
 {
   std::vector<IConfigurationElement::Pointer> extensions(
     Platform::GetExtensionPointService()->GetConfigurationElementsFor(PlatformUI::XP_WORKBENCH));
@@ -43,9 +48,10 @@ PlatformUI::CreateAndRunWorkbench()
   {
     if (extensions[i]->GetName() == "workbench")
     {
+      
       m_Workbench = extensions[i]->CreateExecutableExtension<cherry::Workbench>("cherryWorkbench", "class");
-      m_Workbench->Run();
-      return 0;
+      m_Workbench->InternalInit(advisor);
+      return m_Workbench->RunUI();
     }
   }
   

@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+const std::string Starter::XP_APPLICATIONS = "org.opencherry.osgi.applications";
+
 int Starter::Run(int argc, char**& argv)
 {
   // startup the internal platform
@@ -39,7 +41,7 @@ int Starter::Run(int argc, char**& argv)
   // run the application
   IExtensionPointService* service = platform->GetExtensionPointService();
   IConfigurationElement::vector extensions(
-    service->GetConfigurationElementsFor("org.opencherry.core.runtime.applications"));
+    service->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
   IConfigurationElement::vector::iterator iter;
   
   for (iter = extensions.begin(); iter != extensions.end();)
@@ -97,10 +99,10 @@ int Starter::Run(int argc, char**& argv)
   }
   else
   {
-    app->Run();
+    return app->Start();
   }
       
-  return 0;
+  return 1;
 }
 
 }

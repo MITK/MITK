@@ -138,7 +138,7 @@ void EditorReference::InitListenersAndHandlers()
 PartPane::Pointer EditorReference::CreatePane()
 {
   //return new EditorPane(this, this.manager.page, this.manager.editorPresentation.getActiveWorkbook());
-  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateEditorPane();
+  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateEditorPane(this, this->manager->page);
 }
 
 void EditorReference::PinStatusUpdated()

@@ -51,7 +51,7 @@ public:
  
   Poco::Path GetPersistentDirectory() const;
   
-  // ServiceRegistry& GetRegistry() const;
+  void RegisterService(const std::string& id, Service::Pointer service) const;
   
   SmartPointer<IBundle> GetThisBundle() const;
   

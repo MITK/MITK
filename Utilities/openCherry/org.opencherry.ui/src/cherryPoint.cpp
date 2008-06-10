@@ -15,21 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYSTARTER_H_
-#define CHERRYSTARTER_H_
+#include "cherryPoint.h"
 
-#include "cherryApplicationDll.h"
+#include <sstream>
 
-namespace cherry {
-
-class CHERRY_APPLICATION Starter
+namespace cherry
 {
 
-public:
-  static int Run(int argc, char**& argv);
-  
-};
-
+Point::Point(int x, int y)
+{
+  this->x = x;
+  this->y = y;
 }
 
-#endif /*CHERRYSTARTER_H_*/
+bool Point::operator==(const Point& p) const
+{
+  if (&p == this) return true;
+  return (p.x == x) && (p.y == y);
+}
+
+int Point::HashCode()
+{
+  return x ^ y;
+}
+
+std::string Point::ToString()
+{
+  std::stringstream str;
+  str << "Point {" << x << ", " << y << "}";
+  return str.str();
+}
+
+}

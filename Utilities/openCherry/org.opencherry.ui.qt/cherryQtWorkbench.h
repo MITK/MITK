@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.ui/src/cherryWorkbench.h>
 
+#include "internal/cherryQtSimpleEditorAreaHelper.h"
+
 #include "cherryQtSimpleWorkbenchWindow.h"
 #include "cherryUiQtDll.h"
 
@@ -32,6 +34,9 @@ public:
   
   cherryClassMacro(QtWorkbench);
   
+  QtWorkbench();
+  ~QtWorkbench();
+  
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
   IDialog::Pointer CreateStandardDialog(const std::string& dialogid);
   IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "");
@@ -39,22 +44,37 @@ public:
   
   PartPane::Pointer CreateViewPane(IWorkbenchPartReference::Pointer partReference,
       WorkbenchPage::Pointer workbenchPage);
-  PartPane::Pointer CreateEditorPane();
+  PartPane::Pointer CreateEditorPane(IWorkbenchPartReference::Pointer partReference,
+      WorkbenchPage::Pointer workbenchPage);
   
-  IEditorAreaHelper* CreateEditorPresentation();
+  IEditorAreaHelper* CreateEditorPresentation(IWorkbenchPage::Pointer page);
   
   void* CreateWorkbenchPageControl();
   
   void AddViewPane(PartPane::Pointer pane);
   
-  ~QtWorkbench();
   
 protected:
-  void Run();
+  
+  int RunUI();
+  
+  void OpenFirstTimeWindow();
+  
+  /**
+   * Initializes the workbench 
+   * 
+   * @return true if init succeeded.
+   */
+  bool Init();
+  
+  IWorkbenchWindow::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento);
+  
   
 private:
   
   QtWorkbenchWindow::Pointer m_QtWindow;
+  
+  QtSimpleEditorAreaHelper* m_EditorPresentation;
   
 };
 

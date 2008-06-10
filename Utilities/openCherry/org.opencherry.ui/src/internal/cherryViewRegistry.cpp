@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include <org.opencherry.osgi/service/cherryIExtensionPointService.h>
+
 #include "cherryViewRegistry.h"
 
 #include "../cherryPlatformUI.h"

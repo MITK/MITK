@@ -15,30 +15,26 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "cherryQtWorkbenchApplication.h"
+#ifndef CHERRYSTARTER_H_
+#define CHERRYSTARTER_H_
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.ui/src/cherryPlatformUI.h"
+#include "../cherryOSGiDll.h"
 
-#include <QtGui/QApplication>
-
-#include <iostream>
+#include <string>
 
 namespace cherry {
 
-int
-QtWorkbenchApplication::Run()
+class CHERRY_OSGI Starter
 {
-  //std::cout << "Running sample application\n";
-  int argc;
-  char** argv;
-  Platform::GetRawApplicationArgs(argc, argv);
-  std::cout << "argc = " << argc << ", argv = " << argv << std::endl;
-  std::cout << "argv[0] = " << argv[0] << std::endl;
-  QApplication app(argc, argv);
-  PlatformUI::CreateAndRunWorkbench();
-  return app.exec();
+
+public:
   
-}
+  static const std::string XP_APPLICATIONS;
+  
+  static int Run(int argc, char**& argv);
+  
+};
 
 }
+
+#endif /*CHERRYSTARTER_H_*/

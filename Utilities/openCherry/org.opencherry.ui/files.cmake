@@ -7,12 +7,18 @@ SET(SRC_CPP_FILES
   cherryIWorkbenchPage.cpp
   cherryPartPane.cpp
   cherryPlatformUI.cpp
+  cherryPoint.cpp
   cherryRectangle.cpp
   cherryUIException.cpp
   cherryViewPart.cpp
   cherryWorkbench.cpp
   cherryWorkbenchPart.cpp
   cherryWorkbenchWindow.cpp
+  
+  #application
+  application/cherryActionBarAdvisor.cpp
+  application/cherryWorkbenchAdvisor.cpp
+  application/cherryWorkbenchWindowAdvisor.cpp
 )
 
 SET(HANDLERS_CPP_FILES
@@ -49,10 +55,12 @@ SET(INTERNAL_CPP_FILES
   cherryViewSite.cpp
   #cherryWorkbenchPage.cpp
   cherryDummyWorkbenchPage.cpp
+  cherryWorkbenchConfigurer.cpp
   #cherryWorkbenchPagePartList.cpp
   cherryWorkbenchPartReference.cpp
   cherryWorkbenchPlugin.cpp
   cherryWorkbenchRegistryConstants.cpp
+  cherryWorkbenchWindowConfigurer.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

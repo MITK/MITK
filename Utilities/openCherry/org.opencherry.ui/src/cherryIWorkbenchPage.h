@@ -530,7 +530,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @exception PartInitException
    *                if the editor could not be created or initialized
    */
-  virtual IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorId) = 0;
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorId) = 0;
 
   /**
    * Opens an editor on the given input.
@@ -556,7 +556,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @return an open editor, or <code>null</code> if an external editor was opened
    * @exception PartInitException if the editor could not be created or initialized
    */
-  virtual IEditorPart::Pointer OpenEditor(IEditorInput* input, const std::string& editorId,
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorId,
       bool activate) = 0;
 
   /**
@@ -590,7 +590,7 @@ struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, publi
    * @see #MATCH_ID
    * @since 3.2
    */
-  virtual IEditorPart::Pointer OpenEditor(const IEditorInput* input,
+  virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const std::string& editorId, bool activate, int matchFlags) = 0;
 
   /**

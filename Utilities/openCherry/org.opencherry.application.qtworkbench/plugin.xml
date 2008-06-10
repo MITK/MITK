@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
-<plugin>
-   <extension point="org.opencherry.core.runtime.applications">
-     <application id="org.opencherry.application.qtworkbench">
-       <run class="cherry::QtWorkbenchApplication"/>
-     </application>
-   </extension>
-</plugin>

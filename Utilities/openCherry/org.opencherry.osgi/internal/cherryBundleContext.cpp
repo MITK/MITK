@@ -41,6 +41,11 @@ bool BundleContext::operator==(const Object* o) const
   
   return false;
 }
+
+void BundleContext::RegisterService(const std::string& id, Service::Pointer service) const
+{
+  Platform::GetServiceRegistry().RegisterService(id, service);
+}
   
 IBundleContext::Pointer
 BundleContext::GetContextForBundle(IBundle::ConstPointer bundle) const

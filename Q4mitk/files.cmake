@@ -1,4 +1,5 @@
 SET(CPP_FILES
+ qclickablelabel.cpp
  QmitkAbortEventFilter.cpp
  QmitkApplicationCursor.cpp
  QmitkCallbackFromGUIThread.cpp
@@ -9,6 +10,7 @@ SET(CPP_FILES
  
  QmitkEventAdapter.cpp
  
+ QmitkStandardViews.cpp
  QmitkStepperAdapter.cpp
  QmitkLineEditLevelWindowWidget.cpp
  QmitkSliderLevelWindowWidget.cpp
@@ -21,10 +23,15 @@ SET(CPP_FILES
  QmitkStdMultiWidget.cpp
 )
 
+QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
+
+
 SET(MOC_H_FILES
+ qclickablelabel.h
  QmitkCallbackFromGUIThread.h
  QmitkRenderingManager.h
  
+ QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkLineEditLevelWindowWidget.h
  QmitkSliderLevelWindowWidget.h

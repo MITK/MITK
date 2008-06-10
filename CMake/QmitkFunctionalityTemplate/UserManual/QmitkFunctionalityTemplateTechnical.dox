@@ -1,0 +1,14 @@
+/**
+
+\page @FUNCTIONALITY_NAME@TechnicalPage Technical design of @FUNCTIONALITY_NAME@
+
+\section @FUNCTIONALITY_NAME@TechnicalPage2 Introduction
+
+@FUNCTIONALITY_NAME@ does X with the help of >
+
+\section @FUNCTIONALITY_NAME@TechnicalPage3 Classes involved
+
+Desribe all classes that are used by @FUNCTIONALITY_NAME@ and how they work together
+
+
+**/

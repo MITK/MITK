@@ -1,0 +1,27 @@
+/**
+\page @FUNCTIONALITY_NAME@ The X Functionality
+
+Available sections:
+  - \ref @FUNCTIONALITY_NAME@UserManualOverview 
+  - \ref @FUNCTIONALITY_NAME@UserManualDetails 
+  
+\section @FUNCTIONALITY_NAME@Overview Overview
+
+  This functionality allows you to ...
+  The controls section is divided into X areas:
+
+  \li In the upper area, you ...
+     
+  
+\section @FUNCTIONALITY_NAME@UserManualDetails Details
+
+\subsection Subsection1
+
+  more detailed description
+
+
+\subsection Subsection2
+
+  details about another aspect
+
+*/

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define @FUNCTIONALITY_NAME@_H__INCLUDED
 
 #include "QmitkFunctionality.h"
+#include "mitkTestingConfig.h"
 
 class QmitkStdMultiWidget;
 class @FUNCTIONALITY_NAME@Controls;
@@ -48,7 +49,7 @@ class @FUNCTIONALITY_NAME@ : public QmitkFunctionality
   virtual ~@FUNCTIONALITY_NAME@();
 
   /*!  
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
+  \brief method for creating the widget containing the application controls, like sliders, buttons etc.  
   */  
   virtual QWidget * CreateControlWidget(QWidget *parent);
 
@@ -68,6 +69,16 @@ class @FUNCTIONALITY_NAME@ : public QmitkFunctionality
   virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
+
+#ifdef BUILD_TESTING
+  /**
+  \brief This method performs an automated functionality test. 
+  
+  Will be called by testing subsystem. Do not call it yourself!
+  The method should be implemented in its own cpp file 'QmitkMyFunctionalityTesting.cpp'.
+  */
+  virtual int TestYourself();
+#endif
 
 protected slots:  
   void TreeChanged();
@@ -89,7 +100,7 @@ protected:
   QmitkStdMultiWidget * m_MultiWidget;
 
   /*!  
-  * controls containing sliders for scrolling through the slices  
+  * controls for the functionality. Sliders, Buttons, TreenodeSelectors,...  
   */  
   @FUNCTIONALITY_NAME@Controls * m_Controls;
 

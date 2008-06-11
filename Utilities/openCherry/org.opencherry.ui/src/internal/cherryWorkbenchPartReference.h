@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCHPARTREFERENCE_H_
 #define CHERRYWORKBENCHPARTREFERENCE_H_
 
+#include <org.opencherry.osgi/cherryMessage.h>
+
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryIWorkbenchPart.h"
 
@@ -30,6 +32,8 @@ class PartPane;
  * 
  */
 class WorkbenchPartReference : virtual public IWorkbenchPartReference {
+  
+public: cherryClassMacro(WorkbenchPartReference);
 
     /**
      * Internal property ID: Indicates that the underlying part was created
@@ -128,7 +132,8 @@ private: std::string tooltip;
      * Internal listener list. Listens to the INTERNAL_PROPERTY_* property change events that are not yet API.
      * TODO: Make these properties API in 3.2
      */
-//private: ListenerList internalPropChangeListeners = new ListenerList();
+public: typedef Message2<WorkbenchPartReference::Pointer, int> PropChangeEvent;
+private: PropChangeEvent internalPropChangeEvent;
     
 //private: ListenerList partChangeListeners = new ListenerList();
     
@@ -204,11 +209,9 @@ public: virtual void Init(const std::string& id, const std::string& tooltip,
             /*ImageDescriptor desc,*/ const std::string& paneName, const std::string& contentDescription);
 
 
-//protected: virtual void addInternalPropertyListener(IPropertyListener listener);
+public: PropChangeEvent& GetInternalPropertyEvent();
     
-//protected: virtual void removeInternalPropertyListener(IPropertyListener listener);
-
-//protected: virtual void fireInternalPropertyChange(int id);
+protected: void FireInternalPropertyChange(int id);
     
     /**
      * @see IWorkbenchPart

@@ -32,6 +32,16 @@
 namespace cherry
 {
 
+void WorkbenchPage::AddPartListener(IPartListener::Pointer l)
+{
+  partList.GetPartService()->AddPartListener(l);
+}
+
+void WorkbenchPage::RemovePartListener(IPartListener::Pointer l)
+{
+  partList.GetPartService()->RemovePartListener(l);
+}
+
 void WorkbenchPage::ActionSwitcher::UpdateActivePart(
     IWorkbenchPart::Pointer newPart)
 {
@@ -120,7 +130,16 @@ bool WorkbenchPage::InternalBringToTop(IWorkbenchPartReference::Pointer part)
 
 void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
 {
-
+  IWorkbenchPartReference::Pointer ref = this->GetReference(part);
+ 
+  if (ref.Cast<IEditorReference>().IsNotNull())
+  {
+    this->MakeActiveEditor(ref.Cast<IEditorReference>());
+  }
+  else
+  {
+    this->MakeActive(ref);
+  } 
 }
 
 IViewPart::Pointer WorkbenchPage::BusyShowView(const std::string& viewID,
@@ -227,7 +246,7 @@ void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
 //      activationList.bringToTop(getReference(part));
 //  }
 //  
-//  partList.setActiveEditor(ref);
+  partList.SetActiveEditor(ref);
   
 }
 
@@ -274,12 +293,12 @@ void WorkbenchPage::PartAdded(WorkbenchPartReference::Pointer ref)
 
 void WorkbenchPage::PartRemoved(WorkbenchPartReference::Pointer ref)
 {
-
+  this->DisposePart(ref);
 }
 
 void WorkbenchPage::DisposePart(WorkbenchPartReference::Pointer ref)
 {
-
+  partList.RemovePart(ref);
 }
 
 void WorkbenchPage::DeactivatePart(IWorkbenchPart::Pointer part)
@@ -323,22 +342,22 @@ IViewReference::Pointer WorkbenchPage::FindViewReference(
 
 IEditorPart::Pointer WorkbenchPage::GetActiveEditor()
 {
-  return 0;
+  return partList.GetActiveEditor();
 }
 
 IEditorReference::Pointer WorkbenchPage::GetActiveEditorReference()
 {
-  return 0;
+  return partList.GetActiveEditorReference();
 }
 
 IWorkbenchPart::Pointer WorkbenchPage::GetActivePart()
 {
-  return 0;
+  return partList.GetActivePart();
 }
 
 IWorkbenchPartReference::Pointer WorkbenchPage::GetActivePartReference()
 {
-  return 0;
+  return partList.GetActivePartReference();
 }
 
 void* WorkbenchPage::GetClientComposite()
@@ -781,7 +800,7 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
     }
     this->ActivatePart(newPart);
       
-    //partList.setActivePart(partref);
+    partList.SetActivePart(partref);
   } 
   catch (std::exception* e)
   {
@@ -791,6 +810,11 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
   
   partBeingActivated = 0;
   
+}
+
+IPartService::PartEvents& WorkbenchPage::GetPartEvents()
+{
+  return partList.GetPartService()->GetPartEvents();
 }
 
 void WorkbenchPage::SetEditorAreaVisible(bool showEditorArea)

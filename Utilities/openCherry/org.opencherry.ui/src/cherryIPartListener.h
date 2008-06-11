@@ -18,7 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPARTLISTENER_H_
 #define CHERRYIPARTLISTENER_H_
 
+#include <org.opencherry.osgi/cherryMacros.h>
+
 #include "cherryUiDll.h"
+#include "cherryIWorkbenchPartReference.h"
 
 namespace cherry {
 
@@ -32,7 +35,9 @@ namespace cherry {
  *
  * @see IPartService#AddPartListener(IPartListener)
  */
-struct CHERRY_UI IPartListener {
+struct CHERRY_UI IPartListener : public virtual Object {
+  
+  cherryClassMacro(IPartListener);
 
     /**
      * Notifies this listener that the given part has been activated.
@@ -40,7 +45,7 @@ struct CHERRY_UI IPartListener {
      * @param partRef the part that was activated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartActivated(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartActivated(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part has been brought to the top.
@@ -55,7 +60,7 @@ struct CHERRY_UI IPartListener {
      * @param partRef the part that was surfaced
      * @see IWorkbenchPage#bringToTop
      */
-    virtual void PartBroughtToTop(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartBroughtToTop(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part has been closed.
@@ -68,7 +73,7 @@ struct CHERRY_UI IPartListener {
      * @param partRef the part that was closed
      * @see IWorkbenchPage#hideView
      */
-    virtual void PartClosed(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartClosed(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part has been deactivated.
@@ -76,7 +81,7 @@ struct CHERRY_UI IPartListener {
      * @param partRef the part that was deactivated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartDeactivated(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartDeactivated(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part has been opened.
@@ -89,28 +94,28 @@ struct CHERRY_UI IPartListener {
      * @param partRef the part that was opened
      * @see IWorkbenchPage#showView
      */
-    virtual void PartOpened(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartOpened(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part is hidden or obscured by another part.
      *
      * @param partRef the part that is hidden or obscured by another part
      */
-    virtual void PartHidden(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartHidden(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part is visible.
      *
      * @param partRef the part that is visible
      */
-    virtual void PartVisible(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartVisible(IWorkbenchPartReference::Pointer partRef) = 0;
 
     /**
      * Notifies this listener that the given part's input was changed.
      *
      * @param partRef the part whose input was changed
      */
-    virtual void PartInputChanged(IWorkbenchPartReference::Ptr partRef) = 0;
+    virtual void PartInputChanged(IWorkbenchPartReference::Pointer partRef) = 0;
 };
 
 }  // namespace cherry

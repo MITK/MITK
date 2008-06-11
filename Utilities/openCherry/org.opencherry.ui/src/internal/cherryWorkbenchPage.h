@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIReusableEditor.h"
 #include "../cherryIEditorAreaHelper.h"
 
+#include "cherryWorkbenchPagePartList.h"
 #include "cherryWorkbenchPartReference.h"
 #include "cherryEditorManager.h"
 #include "cherryViewFactory.h"
@@ -128,7 +129,7 @@ private:
     //PageSelectionService selectionService = new PageSelectionService(
     //        this);
 
-    //WorkbenchPagePartList partList = new WorkbenchPagePartList(selectionService);
+    WorkbenchPagePartList partList; // = new WorkbenchPagePartList(selectionService);
 
     //IActionBars actionBars;
     
@@ -213,30 +214,8 @@ private: void ActivatePart(const IWorkbenchPart::Pointer part);
     /**
      * Adds an IPartListener to the part service.
      */
-//public: void AddPartListener(IPartListener l) {
-//        partList.getPartService().addPartListener(l);
-//    }
+public: void AddPartListener(IPartListener::Pointer l);
 
-    /**
-     * Adds an IPartListener to the part service.
-     */
-//public: void AddPartListener(IPartListener2 l) {
-//        partList.getPartService().addPartListener(l);
-//    }
-
-    /**
-     * Implements IWorkbenchPage
-     * 
-     * @see org.eclipse.ui.IWorkbenchPage#addPropertyChangeListener(IPropertyChangeListener)
-     * @since 2.0
-     * @deprecated individual views should store a working set if needed and
-     *             register a property change listener directly with the
-     *             working set manager to receive notification when the view
-     *             working set is removed.
-     */
-//public: void AddPropertyChangeListener(IPropertyChangeListener listener) {
-//        propertyChangeListeners.add(listener);
-//    }
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
@@ -806,30 +785,8 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /**
      * Removes an IPartListener from the part service.
      */
-//  public: void RemovePartListener(IPartListener l) {
-//        partList.getPartService().removePartListener(l);
-//    }
+  public: void RemovePartListener(IPartListener::Pointer l);
 
-    /**
-     * Removes an IPartListener from the part service.
-     */
-//  public: void RemovePartListener(IPartListener2 l) {
-//        partList.getPartService().removePartListener(l);
-//    }
-
-    /**
-     * Implements IWorkbenchPage
-     * 
-     * @see org.eclipse.ui.IWorkbenchPage#removePropertyChangeListener(IPropertyChangeListener)
-     * @since 2.0
-     * @deprecated individual views should store a working set if needed and
-     *             register a property change listener directly with the
-     *             working set manager to receive notification when the view
-     *             working set is removed.
-     */
-//  public: void RemovePropertyChangeListener(IPropertyChangeListener listener) {
-//        propertyChangeListeners.remove(listener);
-//    }
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
@@ -966,11 +923,12 @@ public: std::vector<IViewPart::Pointer> GetViews();
   public: void SetPerspective(const IPerspectiveDescriptor::ConstPointer desc);
     
     /**
-     * Allow access to the part service for this page ... used internally to
-     * propogate certain types of events to the page part listeners.
-     * @return the part service for this page.
+     * Can be used to get hold of a IPartService::PartEvents object
+     * and register for individual part events.
+     * 
+     * @return the part events for this page.
      */
-//  public: PartService* GetPartService();
+  public: IPartService::PartEvents& GetPartEvents();
 
     /**
      * Restore the toolbar layout for the active perspective.

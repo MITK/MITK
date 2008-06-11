@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryBundleLoader.h"
 #include "../cherryPlatformException.h"
 
+#include "cherryIExecutableExtension.h"
+
 #include <vector>
 #include <string>
 
@@ -49,6 +51,14 @@ public:
       try
       {
         C* cl = m_ClassLoader->LoadClass<C>(m_Contributor, base, className);
+        
+        // check if we have extension adapter and initialize
+        if (dynamic_cast<IExecutableExtension*>(cl) != 0) {
+          // make the call even if the initialization string is null
+          dynamic_cast<IExecutableExtension*>(cl)->SetInitializationData(this, propertyName, 0);
+          
+        }
+        
         return cl;
       }
       catch (Poco::Exception* e)

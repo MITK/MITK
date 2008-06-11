@@ -236,6 +236,15 @@ void WorkbenchPartReference::SetToolTip(const std::string& newToolTip)
 //      firePartPropertyChange(event);
 //    }
 
+WorkbenchPartReference::PropChangeEvent& WorkbenchPartReference::GetInternalPropertyEvent()
+{
+  return internalPropChangeEvent;
+}
+
+void WorkbenchPartReference::FireInternalPropertyChange(int id) {
+  internalPropChangeEvent(this, id);
+}
+
 /**
  * Refreshes all cached values with the values from the real part 
  */

@@ -148,4 +148,31 @@ std::string WorkbenchPart::GetTitleToolTip()
   return this->m_ToolTip;
 }
 
+
+void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
+            const std::string& propertyName, Object::Pointer data) 
+{
+  // Save config element.
+  m_ConfigElement = cfig;
+
+  // Part name and title.  
+  cfig->GetAttribute("name", m_PartName);
+  m_Title = m_PartName;
+
+  // Icon.
+  //String strIcon = cfig.getAttribute("icon");//$NON-NLS-1$
+  //if (strIcon == null) {
+  //  return;
+  //}
+
+  //imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
+  //        configElement.getNamespace(), strIcon);
+
+  //if (imageDescriptor == null) {
+  //  return;
+  //}
+
+  //titleImage = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+}
+
 } // namespace cherry

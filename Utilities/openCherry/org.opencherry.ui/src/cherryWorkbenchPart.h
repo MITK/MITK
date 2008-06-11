@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtGui/QIcon>
 #include <QtGui/QWidget>
 
+#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <org.opencherry.osgi/service/cherryIExecutableExtension.h>
 
 namespace cherry {
 
@@ -42,7 +44,8 @@ namespace cherry {
  * @see org.eclipse.ui.part.EditorPart
  * @noextend This class is not intended to be subclassed by clients.
  */
-class CHERRY_UI WorkbenchPart : public virtual IWorkbenchPart
+class CHERRY_UI WorkbenchPart : public virtual IWorkbenchPart, 
+                                public IExecutableExtension
 {
   
 public:
@@ -54,7 +57,7 @@ private:
   void* m_TitleImage;
   std::string m_ToolTip;
 
-  //IConfigurationElement::Pointer m_ConfigElement;
+  IConfigurationElement::Pointer m_ConfigElement;
   IWorkbenchPartSite::Pointer m_PartSite;
   std::string m_PartName;
   std::string m_ContentDescription;
@@ -72,10 +75,10 @@ protected:
     *
     * @return the configuration element for this part
     */
-//  IConfigurationElement* GetConfigurationElement() 
-//  {
-//    return m_ConfigElement;
-//  }
+  IConfigurationElement::Pointer GetConfigurationElement() 
+  {
+    return m_ConfigElement;
+  }
   
   /**
     * Returns the default title image.
@@ -145,6 +148,21 @@ protected:
 
 
 public:
+  
+  /**
+   * {@inheritDoc}
+   * The <code>WorkbenchPart</code> implementation of this
+   * <code>IExecutableExtension</code> records the configuration element in
+   * and internal state variable (accessible via <code>getConfigElement</code>).
+   * It also loads the title image, if one is specified in the configuration element.
+   * Subclasses may extend.
+   * 
+   * Should not be called by clients. It is called by the core plugin when creating
+   * this executable extension.
+   */
+  void SetInitializationData(IConfigurationElement::Pointer cfig,
+          const std::string& propertyName, Object::Pointer data);
+  
   /* 
    * Creates the Qt controls for this workbench part.
    * <p>

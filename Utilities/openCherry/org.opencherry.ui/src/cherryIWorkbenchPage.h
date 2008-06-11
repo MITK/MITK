@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIEditorPart.h"
 #include "cherryIViewPart.h"
 #include "cherryIEditorInput.h"
+#include "cherryIPartService.h"
 
 #include "cherryIWorkbenchWindow.h"
 
@@ -63,7 +64,7 @@ namespace cherry {
  * @see IEditorPart
  * @see IViewPart
  */
-struct CHERRY_UI IWorkbenchPage : public Object { //, public IPartService, public ISelectionService {
+struct CHERRY_UI IWorkbenchPage : public IPartService, public Object { //, public IPartService, public ISelectionService {
   
   cherryClassMacro(IWorkbenchPage);
   

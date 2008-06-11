@@ -20,6 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "cherryIWorkbenchPart.h"
+#include "cherryIWorkbenchPartReference.h"
+#include "cherryIPartListener.h"
+
+#include <org.opencherry.osgi/cherryMessage.h>
+
 namespace cherry {
 
 /**
@@ -34,21 +40,51 @@ namespace cherry {
  * @see IWorkbenchPage
  */
 struct CHERRY_UI IPartService {
+  
+  struct PartEvents {
+    
+    typedef Message1<IWorkbenchPartReference::Pointer> PartEvent;
+    
+    PartEvent partActivated;
+    PartEvent partBroughtToTop;
+    PartEvent partClosed;
+    PartEvent partDeactivated;
+    PartEvent partOpened;
+    PartEvent partHidden;
+    PartEvent partVisible;
+    PartEvent partInputChanged;
+  };
+  
+  
+  /**
+   * Returns the PartEvents object containing all possible events.
+   * This is used to register for individual events, instead of
+   * adding a whole class implementing IPartObserver.
+   * 
+   * @return the PartEvents object containing all possible events
+   */
+  virtual PartEvents& GetPartEvents() = 0;
 
-    /**
-     * Adds the given listener for part lifecycle events.
-     * Has no effect if an identical listener is already registered.
-     *
-     * @param listener a part listener
-     */
-    virtual void AddPartListener(IPartListener::Ptr listener) = 0;
+  /**
+   * Adds the given observer for part lifecycle events.
+   * Has no effect if an identical listener is already registered.
+   * <p>
+   * <b>Note:</b> listeners should be removed when no longer necessary. If
+   * not, they will be removed when the IServiceLocator used to acquire this
+   * service is disposed.
+   * </p>
+   *
+   * @param listener a part listener
+   * @see #removePartListener(IPartListener)
+   */
+    virtual void AddPartListener(IPartListener::Pointer listener) = 0;
 
     /**
      * Returns the active part.
      *
      * @return the active part, or <code>null</code> if no part is currently active
      */
-    virtual IWorkbenchPart::Ptr GetActivePart() = 0;
+    virtual IWorkbenchPart::Pointer GetActivePart() = 0;
 
     /**
      * Returns the active part reference.
@@ -56,7 +92,7 @@ struct CHERRY_UI IPartService {
      * @return the active part reference, or <code>null</code> if no part
      * is currently active
      */
-    virtual IWorkbenchPartReference::Ptr GetActivePartReference() = 0;
+    virtual IWorkbenchPartReference::Pointer GetActivePartReference() = 0;
 
     /**
      * Removes the given part listener.
@@ -64,7 +100,7 @@ struct CHERRY_UI IPartService {
      *
      * @param listener a part listener
      */
-    virtual void RemovePartListener(IPartListener::Ptr listener) = 0;
+    virtual void RemovePartListener(IPartListener::Pointer listener) = 0;
 
 };
 

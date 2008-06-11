@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
   cherryIPageLayout.cpp
   cherryISources.cpp
   cherryIWorkbenchPage.cpp
+  cherryIWorkbenchPartConstants.cpp
   cherryPartPane.cpp
   cherryPlatformUI.cpp
   cherryPoint.cpp
@@ -40,7 +41,9 @@ SET(INTERNAL_CPP_FILES
   #cherryLayoutTreeNode.cpp
   cherryNullEditorInput.cpp
   #cherryPageLayout.cpp
+  cherryPartList.cpp
   #cherryPartPlaceholder.cpp
+  cherryPartService.cpp
   cherryPartSite.cpp
   cherryPartTester.cpp
   #cherryPerspective.cpp
@@ -56,7 +59,7 @@ SET(INTERNAL_CPP_FILES
   #cherryWorkbenchPage.cpp
   cherryDummyWorkbenchPage.cpp
   cherryWorkbenchConfigurer.cpp
-  #cherryWorkbenchPagePartList.cpp
+  cherryWorkbenchPagePartList.cpp
   cherryWorkbenchPartReference.cpp
   cherryWorkbenchPlugin.cpp
   cherryWorkbenchRegistryConstants.cpp

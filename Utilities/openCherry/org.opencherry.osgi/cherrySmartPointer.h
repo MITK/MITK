@@ -91,10 +91,18 @@ public:
   template <typename R>
   bool operator == ( R r ) const
     { return (m_Pointer == static_cast<const ObjectType*>(r) ); }
+  
+  template <typename R>
+  bool operator == ( SmartPointer<R> r ) const
+    { return (m_Pointer == static_cast<const ObjectType*>(r.GetPointer()) ); }
 
   template <typename R>
   bool operator != ( R r ) const
     { return (m_Pointer != static_cast<const ObjectType*>(r) ); }
+  
+  template <typename R >
+  bool operator != ( SmartPointer<R> r ) const
+    { return (m_Pointer != static_cast<const ObjectType*>(r.GetPointer()) ); }
   
   /** Template comparison operators using operator==. */
   template <typename R>

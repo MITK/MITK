@@ -45,7 +45,7 @@ ImportMitkImageContainer< TElementIdentifier , TElement >
 {
   m_ImageDataItem = imageDataItem;
   
-  SetImportPointer( (TElement*) m_ImageDataItem->GetData(), m_ImageDataItem->GetSize(), false);
+  SetImportPointer( (TElement*) m_ImageDataItem->GetData(), m_ImageDataItem->GetSize()/sizeof(Element), false);
 
   this->Modified();
 }

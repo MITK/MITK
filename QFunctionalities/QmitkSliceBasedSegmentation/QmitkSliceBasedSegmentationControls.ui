@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>232</width>
-            <height>362</height>
+            <height>444</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -73,7 +73,27 @@
                         <string>Reorientate view on image</string>
                     </property>
                 </widget>
-                <widget class="QCheckBox" row="1" column="0">
+                <widget class="QmitkToolGUIArea" row="4" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>m_AutoSegmentationToolGUIContainer</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QmitkToolSelectionBox" row="3" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>m_AutoSegmentationToolSelectionBox</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
                     <property name="name">
                         <cstring>chkPixelSmoothing</cstring>
                     </property>
@@ -89,24 +109,25 @@
                         <string>Whether or not the pixels should be smoothed</string>
                     </property>
                 </widget>
-                <widget class="QmitkToolSelectionBox" row="4" column="0" rowspan="1" colspan="2">
+                <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
                     <property name="name">
-                        <cstring>m_AutoSegmentationToolSelectionBox</cstring>
+                        <cstring>lblAlignmentWarning</cstring>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
+                    <property name="paletteForegroundColor">
+                        <color>
+                            <red>255</red>
+                            <green>0</green>
+                            <blue>255</blue>
+                        </color>
                     </property>
-                </widget>
-                <widget class="QmitkToolGUIArea" row="5" column="0" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>m_AutoSegmentationToolGUIContainer</cstring>
+                    <property name="text">
+                        <string>Image is not aligned!</string>
                     </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
+                    <property name="alignment">
+                        <set>AlignCenter</set>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Press the small button right of the selection box!</string>
                     </property>
                 </widget>
             </grid>
@@ -418,8 +439,8 @@
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
     <includehint>QmitkToolReferenceDataSelectionBox.h</includehint>
-    <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolGUIArea.h</includehint>
+    <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolWorkingDataListBox.h</includehint>
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>

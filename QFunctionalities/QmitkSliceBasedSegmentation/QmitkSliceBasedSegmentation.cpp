@@ -34,8 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkOrganTypeProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkSegTool2D.h"
 
 #include <qaction.h>
+#include <qlabel.h>
 #include <qapplication.h>
 #include <qmessagebox.h>
 #include <qcheckbox.h>
@@ -70,6 +72,8 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
     mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
 
     assert ( toolManager );
+
+    m_Controls->lblAlignmentWarning->hide();
 
     m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataTreeIterator->GetTree() );
 
@@ -454,6 +458,7 @@ void QmitkSliceBasedSegmentation::ReinitializeToImage()
     {
       mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry() );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      m_Controls->lblAlignmentWarning->hide();
     }
 
   }
@@ -471,8 +476,11 @@ void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
 
 void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
 {
- if (node)
- {
+  bool wrongAlignment(false);
+
+  if (node)
+  {
+    // set pixel smoothing checkbox accordingly
     bool on(false);
     if (node->GetBoolProperty("texture interpolation", on))
     {
@@ -483,6 +491,74 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
     {
       m_Controls->chkPixelSmoothing->setEnabled(false);
     }
- }
+
+    // check, wheter image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+    if (image.IsNotNull())
+    {
+      QmitkRenderWindow* renderWindow = m_MultiWidget->GetRenderWindow1();
+
+      if (renderWindow)
+      {
+        // for all 2D renderwindows of m_MultiWidget check alignment
+        mitk::PlaneGeometry::ConstPointer displayPlane 
+                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+        if (displayPlane.IsNotNull())
+        {
+          int affectedDimension(-1);
+          int affectedSlice(-1);
+          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+          {
+            wrongAlignment = true;
+          }
+        }
+      }
+      
+      renderWindow = m_MultiWidget->GetRenderWindow2();
+
+      if (renderWindow)
+      {
+        // for all 2D renderwindows of m_MultiWidget check alignment
+        mitk::PlaneGeometry::ConstPointer displayPlane 
+                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+        if (displayPlane.IsNotNull())
+        {
+          int affectedDimension(-1);
+          int affectedSlice(-1);
+          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+          {
+            wrongAlignment = true;
+          }
+        }
+      }
+      
+      renderWindow = m_MultiWidget->GetRenderWindow3();
+
+      if (renderWindow)
+      {
+        // for all 2D renderwindows of m_MultiWidget check alignment
+        mitk::PlaneGeometry::ConstPointer displayPlane 
+                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+        if (displayPlane.IsNotNull())
+        {
+          int affectedDimension(-1);
+          int affectedSlice(-1);
+          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+          {
+            wrongAlignment = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (wrongAlignment)
+  {
+    m_Controls->lblAlignmentWarning->show();
+  }
+  else
+  {
+    m_Controls->lblAlignmentWarning->hide();
+  }
 }
 

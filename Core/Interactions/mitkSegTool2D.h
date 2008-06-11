@@ -57,6 +57,16 @@ class MITK_CORE_EXPORT SegTool2D : public Tool
     
     mitkClassMacro(SegTool2D, Tool);
 
+    /**
+      \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index corrdinates) is meant by the plane.
+
+      \return false, if no slice direction seems right (e.g. rotated planes)
+      \param affectedDimension The image dimension, which is constant for all points in the plane, e.g. Transversal --> 2
+      \param affectedSlice The index of the image slice
+    */
+    static bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
+
+
   protected:
 
     SegTool2D(); // purposely hidden
@@ -67,15 +77,6 @@ class MITK_CORE_EXPORT SegTool2D : public Tool
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
     virtual bool OnInvertLogic  (Action*, const StateEvent*);
-
-    /**
-      \brief Calculates for a given Image and PlaneGeometry, which slice of the image (in index corrdinates) is meant by the plane.
-
-      \return false, if no slice direction seems right (e.g. rotated planes)
-      \param affectedDimension The image dimension, which is constant for all points in the plane, e.g. Transversal --> 2
-      \param affectedSlice The index of the image slice
-    */
-    bool DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice );
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.

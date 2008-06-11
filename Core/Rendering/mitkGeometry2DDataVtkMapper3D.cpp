@@ -135,6 +135,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_EdgeMapper->Delete();
   m_EdgeTransformer->Delete();
   m_Edges->Delete();
+  m_NormalsTransformer->Delete();
   m_EdgeActor->Delete();
   m_BackgroundMapper->Delete();
   m_BackgroundActor->Delete();

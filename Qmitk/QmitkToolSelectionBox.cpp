@@ -152,6 +152,12 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   // delete old GUI (if any)
   if ( m_LastToolGUI && m_ToolGUIWidget )
   {
+    if (m_ToolGUIWidget->layout())
+    {
+      m_ToolGUIWidget->layout()->remove(m_LastToolGUI);
+    }
+
+    m_LastToolGUI->reparent(NULL, QPoint(0,0));
     delete m_LastToolGUI; // will hopefully notify parent and layouts
     m_LastToolGUI = NULL;
         

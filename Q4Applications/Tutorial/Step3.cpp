@@ -93,7 +93,6 @@ int main(int argc, char* argv[])
         // Set the property "volumerendering" to the Boolean value "true"
         node->SetProperty("volumerendering", mitk::BoolProperty::New(true));
 
-        /** AUTO-INITIALIZATION OF TF DISABLED (SEE bug #1191)
         // Create a transfer function to assign optical properties (color and opacity) to grey-values of the data
         mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
         tf->InitializeByMitkImage ( image );
@@ -105,22 +104,6 @@ int main(int argc, char* argv[])
         // Set the piecewise opacity transfer function AddPoint(double x, double y)
         tf->GetScalarOpacityFunction()->AddPoint ( 0, 0 );
         tf->GetScalarOpacityFunction()->AddPoint ( tf->GetColorTransferFunction()->GetRange() [1], 1 );
-        */
-
-        /** USE MANUAL INITIALIZATION INSTEAD */
-        // Create a transfer function to assign optical properties (color and opacity) to grey-values of the data
-        mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-
-        // Set the color transfer function AddRGBPoint(double x, double r, double g, double b)
-        tf->GetColorTransferFunction()->AddRGBPoint( 0.0, 1.0, 0.0, 0.0 );
-        tf->GetColorTransferFunction()->AddRGBPoint( 768.0, 1.0, 1.0, 0.0 );
-
-        // Set the piecewise opacity transfer function AddPoint(double x, double y)
-        tf->GetScalarOpacityFunction()->AddPoint ( 64.0, 0.0 );
-        tf->GetScalarOpacityFunction()->AddPoint ( 768.0, 1.0 );
-
-        tf->GetGradientOpacityFunction()->AddPoint ( 0.0, 1.0 );
-        tf->GetGradientOpacityFunction()->AddPoint ( 2048.0, 1.0 );
 
         node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
       }

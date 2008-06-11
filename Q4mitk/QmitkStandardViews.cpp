@@ -20,19 +20,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QPixmap>
 #include <qclickablelabel.h>
 
 QmitkStandardViews::QmitkStandardViews( QWidget* parent, Qt::WindowFlags f )
 :QWidget(parent, f)
 {
-  QHBoxLayout *layout = new QHBoxLayout(this);
-
+  QVBoxLayout *vlayout = new QVBoxLayout(this);
+  QWidget *labelContainer = new QWidget(this);
+  vlayout->addStretch(1);
+  vlayout->addWidget(labelContainer);
+  vlayout->addStretch(1);
+  
+  QHBoxLayout *hlayout = new QHBoxLayout(labelContainer);
+  
   // find embedded picture
   QPixmap pixmap(":QmitkStandardViews.png");
   
   // set picture for label
-  m_ClickablePicture = new QClickableLabel(this);
+  m_ClickablePicture = new QClickableLabel(labelContainer);
 
   // set hotspots specific for this image
   m_ClickablePicture->setPixmap( pixmap );
@@ -57,9 +64,9 @@ QmitkStandardViews::QmitkStandardViews( QWidget* parent, Qt::WindowFlags f )
 
   connect( m_ClickablePicture, SIGNAL( mouseReleased(const QString&)), this, SLOT(hotspotClicked(const QString&)) );
 
-  layout->addStretch(1);
-  layout->addWidget( m_ClickablePicture );
-  layout->addStretch(1);
+  hlayout->addStretch(1);
+  hlayout->addWidget( m_ClickablePicture );
+  hlayout->addStretch(1);
 }
 
 

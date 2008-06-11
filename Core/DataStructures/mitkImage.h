@@ -559,6 +559,10 @@ protected:
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
+  if(mitkoutputimage.IsNull())
+  {
+    mitkoutputimage = mitk::Image::New();
+  }
   mitkoutputimage->InitializeByItk(itkimage.GetPointer());
   mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
 }
@@ -574,6 +578,10 @@ void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk:
 template <typename ItkOutputImageType> 
 void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
 {
+  if(mitkoutputimage.IsNull())
+  {
+    mitkoutputimage = mitk::Image::New();
+  }
   mitkoutputimage->InitializeByItk(itkimage);
   mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
 }

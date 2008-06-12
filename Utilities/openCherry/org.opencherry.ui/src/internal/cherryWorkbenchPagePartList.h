@@ -18,7 +18,7 @@
 #ifndef CHERRYWORKBENCHPAGEPARTLIST_H_
 #define CHERRYWORKBENCHPAGEPARTLIST_H_
 
-#include <org.opencherry.osgi/cherrySmartPointer.h>
+#include <cherrySmartPointer.h>
 
 #include "cherryPartList.h"
 #include "cherryPartService.h"

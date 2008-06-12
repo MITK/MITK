@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <org.opencherry.osgi/service/cherryIExtensionPointService.h>
+#include <service/cherryIExtensionPointService.h>
 
 #include "cherryEditorRegistry.h"
 

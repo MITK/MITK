@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYHANDLERUTIL_H_
 #define CHERRYHANDLERUTIL_H_
 
-#include <org.opencherry.core.commands/cherryExecutionEvent.h>
-#include <org.opencherry.osgi/cherryObjectVector.h>
-#include <org.opencherry.osgi/cherryObjectString.h>
+#include <cherryExecutionEvent.h>
+#include <cherryObjectVector.h>
+#include <cherryObjectString.h>
 
 #include "../cherryUiDll.h"
 #include "../cherryIWorkbenchPart.h"

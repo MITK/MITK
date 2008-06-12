@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIADAPTERMANAGER_H_
 #define CHERRYIADAPTERMANAGER_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryRuntimeDll.h"
 #include "cherryExpressionVariables.h"
@@ -81,6 +81,8 @@ namespace cherry {
 struct IAdapterManager : public Object {
 
   cherryClassMacro(IAdapterManager)
+  
+  virtual ~IAdapterManager() {}
   
   /**
    * This value can be returned to indicate that no applicable adapter factory 
@@ -176,7 +178,7 @@ struct IAdapterManager : public Object {
    * given type
    * @since 3.0
    */
-  virtual ExpressionVariable::Pointer GetAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterTypeName);
+  virtual ExpressionVariable::Pointer GetAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterTypeName) = 0;
 
   /**
    * Returns whether there is an adapter factory registered that may be able

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtGui/QWidget>
 
-#include <org.opencherry.ui/src/cherryViewPart.h>
+#include <cherryViewPart.h>
 
 #include "cherryUiQtDll.h"
 

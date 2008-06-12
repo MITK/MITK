@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtSimpleEditorAreaHelper.h"
 
-#include <org.opencherry.ui/src/cherryIEditorSite.h>
-#include <org.opencherry.ui/src/internal/cherryPartSite.h>
-#include <org.opencherry.ui/src/internal/cherryEditorReference.h>
-#include <org.opencherry.ui/src/internal/cherryWorkbenchPage.h>
+#include <cherryIEditorSite.h>
+#include <internal/cherryPartSite.h>
+#include <internal/cherryEditorReference.h>
+#include <internal/cherryWorkbenchPage.h>
 
 #include "../cherryQtSimpleWorkbenchWindow.h"
 

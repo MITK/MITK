@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPROPERTYTESTER_H_
 #define CHERRYPROPERTYTESTER_H_
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <service/cherryIConfigurationElement.h>
 
 #include "internal/cherryPropertyTesterDescriptor.h"
 

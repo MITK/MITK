@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <org.opencherry.osgi/service/cherryIExtensionPointService.h>
+#include <service/cherryIExtensionPointService.h>
 
 #include "cherryViewRegistry.h"
 
@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchRegistryConstants.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "cherryPlatform.h"
 
 namespace cherry
 {

@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryExpression.h"
 #include "cherryTypeExtensionManager.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include "service/cherryIConfigurationElement.h"
+#include "cherryExpressionVariables.h"
 
 #include "Poco/DOM/Element.h"
 

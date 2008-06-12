@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryWorkbenchRegistryConstants.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "cherryPlatform.h"
 
 #include <Poco/String.h>
 

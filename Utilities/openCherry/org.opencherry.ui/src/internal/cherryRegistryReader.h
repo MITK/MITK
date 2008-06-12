@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYREGISTRYREADER_H_
 #define CHERRYREGISTRYREADER_H_
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
-#include "org.opencherry.osgi/service/cherryIExtension.h"
+#include "service/cherryIConfigurationElement.h"
+#include "service/cherryIExtension.h"
 
 namespace cherry {
 

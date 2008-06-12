@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSTATE_H_
 #define CHERRYSTATE_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 #include "cherryCommandsDll.h"
 
 namespace cherry {

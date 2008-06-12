@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPropertyTester.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "cherryPlatform.h"
 
 namespace cherry
 {

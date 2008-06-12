@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTERRORVIEW_H_
 #define CHERRYQTERRORVIEW_H_
 
-#include <org.opencherry.ui/src/cherryViewPart.h>
+#include <cherryViewPart.h>
 
 #include <QLabel>
 #include <QString>

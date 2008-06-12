@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTEDITORAREAHELPER_H_
 #define CHERRYQTEDITORAREAHELPER_H_
 
-#include <org.opencherry.ui/src/cherryIEditorAreaHelper.h>
-#include <org.opencherry.ui/src/cherryPartPane.h>
+#include <cherryIEditorAreaHelper.h>
+#include <cherryPartPane.h>
 
 #include <list>
 #include <QTabWidget>

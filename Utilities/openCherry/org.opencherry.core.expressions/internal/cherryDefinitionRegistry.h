@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryExpression.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include "service/cherryIConfigurationElement.h"
 
 #include <map>
 

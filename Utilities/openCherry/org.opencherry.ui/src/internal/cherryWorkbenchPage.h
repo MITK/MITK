@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCHPAGE_H_
 #define CHERRYWORKBENCHPAGE_H_
 
-#include <org.opencherry.core.runtime/cherryIAdaptable.h>
-#include <org.opencherry.osgi/service/cherryIExtensionPoint.h>
+#include <cherryIAdaptable.h>
+#include <service/cherryIExtensionPoint.h>
 
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryWorkbenchWindow.h"

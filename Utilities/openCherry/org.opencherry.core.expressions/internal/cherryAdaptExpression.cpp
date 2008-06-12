@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryAdaptExpression.h"
 
-#include <org.opencherry.osgi/cherryPlatform.h>
-#include <org.opencherry.core.runtime/cherryRuntime.h>
-#include <org.opencherry.core.runtime/cherryIAdapterManager.h>
-#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+#include <cherryPlatform.h>
+#include <cherryRuntime.h>
+#include <cherryIAdapterManager.h>
+#include <cherryExpressionVariables.h>
 
 #include "cherryExpressions.h"
 #include "cherryDefaultVariable.h"

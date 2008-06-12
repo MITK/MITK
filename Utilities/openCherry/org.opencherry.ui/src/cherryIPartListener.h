@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPARTLISTENER_H_
 #define CHERRYIPARTLISTENER_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryUiDll.h"
 #include "cherryIWorkbenchPartReference.h"

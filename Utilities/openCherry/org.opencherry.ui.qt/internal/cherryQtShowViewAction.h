@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QAction>
 
-#include <org.opencherry.ui/src/cherryIWorkbenchWindow.h>
-#include <org.opencherry.ui/src/cherryIViewDescriptor.h>
+#include <cherryIWorkbenchWindow.h>
+#include <cherryIViewDescriptor.h>
 
 namespace cherry
 {

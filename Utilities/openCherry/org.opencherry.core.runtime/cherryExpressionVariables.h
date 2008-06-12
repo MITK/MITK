@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Hash.h>
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryRuntimeDll.h"
 

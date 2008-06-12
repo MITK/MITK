@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchPartDescriptor.h"
 #include "cherryIViewPart.h"
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
-#include <org.opencherry.core.runtime/cherryIAdaptable.h>
+#include <service/cherryIConfigurationElement.h>
+#include <cherryIAdaptable.h>
 
 #include <string>
 #include <vector>

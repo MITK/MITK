@@ -23,7 +23,7 @@
 #include "../cherryPlatformUI.h"
 #include "../cherryPartPane.h"
 
-#include <org.opencherry.osgi/cherryPlatform.h>
+#include <cherryPlatform.h>
 
 namespace cherry
 {

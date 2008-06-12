@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPropertyTesterDescriptor.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/cherryPlatformException.h"
+#include "cherryPlatform.h"
+#include "cherryPlatformException.h"
 
 #include "Poco/String.h"
 

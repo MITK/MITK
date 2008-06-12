@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Any.h"
 #include "Poco/DOM/Element.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include "service/cherryIConfigurationElement.h"
 
 #include "../cherryExpression.h"
 #include "../cherryIIterable.h"

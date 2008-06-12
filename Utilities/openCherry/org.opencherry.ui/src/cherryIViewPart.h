@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIVIEWPART_H_
 
 #include "cherryUiDll.h"
-#include "org.opencherry.osgi/cherryMacros.h"
+#include "cherryMacros.h"
 
 #include "cherryIMemento.h"
 #include "cherryIWorkbenchPart.h"

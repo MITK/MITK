@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryUiDll.h"
 
 #include "../cherryIMemento.h"
-#include <org.opencherry.core.runtime/cherryIAdaptable.h>
+#include <cherryIAdaptable.h>
 
 #include "cherryWorkbenchWindowAdvisor.h"
 #include "cherryIWorkbenchConfigurer.h"

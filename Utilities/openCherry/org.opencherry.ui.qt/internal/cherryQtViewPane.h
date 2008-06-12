@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTPARTPANE_H_
 #define CHERRYQTPARTPANE_H_
 
-#include <org.opencherry.ui/src/cherryPartPane.h>
-#include <org.opencherry.ui/src/cherryRectangle.h>
+#include <cherryPartPane.h>
+#include <cherryRectangle.h>
 
 #include <QtGui/QDockWidget>
 #include <QtCore/QString>

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYADAPTERMANAGER_H_
 #define CHERRYADAPTERMANAGER_H_
 
-#include "org.opencherry.osgi/service/Service.h"
+#include "service/Service.h"
 
 #include "../cherryIAdapterManager.h"
 #include "../cherryIAdapterFactory.h"

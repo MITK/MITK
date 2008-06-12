@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPERSPECTIVEDESCRIPTOR_H_
 #define CHERRYIPERSPECTIVEDESCRIPTOR_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryUiDll.h"
 

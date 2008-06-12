@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTWORKBENCH_H_
 #define CHERRYQTWORKBENCH_H_
 
-#include <org.opencherry.ui/src/cherryWorkbench.h>
+#include <cherryWorkbench.h>
 
 #include "internal/cherryQtSimpleEditorAreaHelper.h"
 

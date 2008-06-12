@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryProperty.h"
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <service/cherryIConfigurationElement.h>
 
 #include <string>
 #include <typeinfo>

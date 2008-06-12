@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "cherryPlatform.h"
 
 namespace cherry {
 

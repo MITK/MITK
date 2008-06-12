@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QDateTime>
 
-#include "org.opencherry.osgi/event/cherryPlatformEvent.h"
+#include "event/cherryPlatformEvent.h"
 
 #include <vector>
 

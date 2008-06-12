@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPROPERTYTESTER_H_
 #define CHERRYIPROPERTYTESTER_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
-#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+#include <cherryMacros.h>
+#include <cherryExpressionVariables.h>
 
 #include "cherryExpressionsDll.h"
 

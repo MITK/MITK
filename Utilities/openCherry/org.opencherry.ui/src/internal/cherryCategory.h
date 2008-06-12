@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYCATEGORY_H_
 #define CHERRYCATEGORY_H_
 
-#include <org.opencherry.core.runtime/cherryIAdaptable.h>
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryIAdaptable.h>
+#include <cherryMacros.h>
 
 namespace cherry
 {

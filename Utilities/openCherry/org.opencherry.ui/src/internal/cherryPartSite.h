@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPARTSITE_H_
 #define CHERRYPARTSITE_H_
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <service/cherryIConfigurationElement.h>
 
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIWorkbenchPartReference.h"

@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYRUNTIMEACTIVATOR_H_
 #define CHERRYRUNTIMEACTIVATOR_H_
 
-#include <org.opencherry.osgi/cherryPlugin.h>
-#include <org.opencherry.osgi/cherryIBundleContext.h>
-#include <org.opencherry.osgi/event/cherryPlatformEvent.h>
+#include <cherryPlugin.h>
+#include <cherryIBundleContext.h>
+#include <event/cherryPlatformEvent.h>
 
 #include "cherryRuntimeDll.h"
 

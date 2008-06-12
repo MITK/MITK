@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryViewDescriptor.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
-#include "org.opencherry.osgi/cherryPlatformException.h"
+#include "service/cherryIConfigurationElement.h"
+#include "cherryPlatformException.h"
 
 #include "cherryRegistryReader.h"
 #include "cherryWorkbenchRegistryConstants.h"

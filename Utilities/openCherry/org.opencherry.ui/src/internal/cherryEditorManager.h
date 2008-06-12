@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYEDITORMANAGER_H_
 #define CHERRYEDITORMANAGER_H_
 
-#include <org.opencherry.osgi/cherrySmartPointer.h>
+#include <cherrySmartPointer.h>
 
 #include "../cherryIEditorPart.h"
 #include "../cherryIEditorReference.h"

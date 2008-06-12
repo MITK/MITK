@@ -17,7 +17,7 @@
 
 #include "cherryViewReference.h"
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <service/cherryIConfigurationElement.h>
 
 #include "../cherryUIException.h"
 #include "../cherryWorkbench.h"

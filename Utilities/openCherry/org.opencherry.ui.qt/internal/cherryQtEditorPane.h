@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTEDITORPANE_H_
 #define CHERRYQTEDITORPANE_H_
 
-#include <org.opencherry.ui/src/cherryPartPane.h>
+#include <cherryPartPane.h>
 
 #include <QWidget>
 

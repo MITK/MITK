@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIVIEWLAYOUT_H_
 #define CHERRYIVIEWLAYOUT_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 namespace cherry {
 

@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/DOM/Element.h>
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <service/cherryIConfigurationElement.h>
+#include <cherryMacros.h>
 
 #include "cherryExpression.h"
 #include "cherryExpressionsDll.h"

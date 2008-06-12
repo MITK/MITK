@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressionConverter.h"
 
-#include "org.opencherry.osgi/cherryPlatformException.h"
+#include "cherryPlatformException.h"
 
 #include "Poco/DOM/Node.h"
 

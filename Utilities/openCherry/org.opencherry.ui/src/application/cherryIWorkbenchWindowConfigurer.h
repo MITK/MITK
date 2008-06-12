@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIWORKBENCHWINDOWCONFIGURER_H_
 #define CHERRYIWORKBENCHWINDOWCONFIGURER_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "../cherryUiDll.h"
 

@@ -26,6 +26,7 @@ namespace cherry {
 const std::string ReferenceExpression::ATT_DEFINITION_ID= "definitionId"; 
 const intptr_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::ReferenceExpression");
 
+DefinitionRegistry ReferenceExpression::fgDefinitionRegistry = DefinitionRegistry();
 
 DefinitionRegistry& 
 ReferenceExpression::GetDefinitionRegistry()

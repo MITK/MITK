@@ -26,8 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../dialogs/cherryIShowViewDialog.h"
 
-#include <org.opencherry.osgi/cherryObjectString.h>
-#include <org.opencherry.core.commands/common/cherryCommandExceptions.h>
+#include <cherryObjectString.h>
+#include <common/cherryCommandExceptions.h>
 
 #include <vector>
 

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryViewDescriptor.h"
 #include "cherryViewRegistryReader.h"
 
-#include "org.opencherry.osgi/service/cherryIExtensionPoint.h"
+#include "service/cherryIExtensionPoint.h"
 
 #include <vector>
 #include <string>

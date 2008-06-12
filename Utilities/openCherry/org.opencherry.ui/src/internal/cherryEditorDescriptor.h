@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIEditorDescriptor.h"
 #include "../cherryIMemento.h"
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
+#include <service/cherryIConfigurationElement.h>
 
 namespace cherry
 {

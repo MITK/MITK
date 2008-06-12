@@ -17,11 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryStarter.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "../cherryPlatform.h"
 
-#include "org.opencherry.osgi/internal/cherryInternalPlatform.h"
-#include "org.opencherry.osgi/service/cherryIExtensionPointService.h"
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include "../internal/cherryInternalPlatform.h"
+#include "../service/cherryIExtensionPointService.h"
+#include "../service/cherryIConfigurationElement.h"
 
 #include "cherryIApplication.h"
 

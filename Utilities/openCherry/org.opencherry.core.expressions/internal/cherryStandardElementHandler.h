@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSTANDARDELEMENTHANDLER_H_
 #define CHERRYSTANDARDELEMENTHANDLER_H_
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include "service/cherryIConfigurationElement.h"
 
 #include "../cherryExpression.h"
 #include "../cherryElementHandler.h"

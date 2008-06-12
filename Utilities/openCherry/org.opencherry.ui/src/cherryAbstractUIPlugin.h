@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYABSTRACTUIPLUGIN_H_
 #define CHERRYABSTRACTUIPLUGIN_H_
 
-#include <org.opencherry.osgi/cherryPlugin.h>
+#include <cherryPlugin.h>
 
 #include "cherryIWorkbench.h"
 

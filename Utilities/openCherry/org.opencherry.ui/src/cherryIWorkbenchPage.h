@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIWORKBENCHPAGE_H_
 #define CHERRYIWORKBENCHPAGE_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryIEditorReference.h"
 #include "cherryIViewReference.h"

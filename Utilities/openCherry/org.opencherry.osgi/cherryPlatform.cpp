@@ -151,7 +151,7 @@ const Path* Platform::GetUserPath()
   return InternalPlatform::GetInstance()->GetUserPath();
 }
 
-std::string GetProperty(const std::string& /*key*/)
+std::string Platform::GetProperty(const std::string& /*key*/)
 {
   return "";
 }

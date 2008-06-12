@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtPlatformLogModel.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/event/cherryPlatformEvents.h"
-#include "org.opencherry.osgi/event/cherryPlatformEvent.h"
+#include "cherryPlatform.h"
+#include "event/cherryPlatformEvents.h"
+#include "event/cherryPlatformEvent.h"
 
 #include "Poco/Delegate.h"
 #include "Poco/Message.h"

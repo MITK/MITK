@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtSimpleWorkbenchWindow.h"
 
-#include "org.opencherry.ui/src/cherryIViewRegistry.h"
+#include "cherryIViewRegistry.h"
 
-#include "org.opencherry.ui/src/cherryPlatformUI.h"
+#include "cherryPlatformUI.h"
 
 #include <QtGui/QMenuBar>
 #include <QtGui/QDockWidget>

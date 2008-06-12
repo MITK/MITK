@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtGui/QIcon>
 #include <QtGui/QWidget>
 
-#include <org.opencherry.osgi/service/cherryIConfigurationElement.h>
-#include <org.opencherry.osgi/service/cherryIExecutableExtension.h>
+#include <service/cherryIConfigurationElement.h>
+#include <service/cherryIExecutableExtension.h>
 
 namespace cherry {
 

@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <vector>
 
-#include <org.opencherry.osgi/cherryMacros.h>
-#include <org.opencherry.core.runtime/cherryExpressionVariables.h>
+#include <cherryMacros.h>
+#include <cherryExpressionVariables.h>
 
 #include "cherryExpressionsDll.h"
 

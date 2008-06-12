@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYVIEWFACTORY_H_
 #define CHERRYVIEWFACTORY_H_
 
-#include <org.opencherry.osgi/cherrySmartPointer.h>
+#include <cherrySmartPointer.h>
 
 #include "../cherryIMemento.h"
 #include "../cherryIViewReference.h"

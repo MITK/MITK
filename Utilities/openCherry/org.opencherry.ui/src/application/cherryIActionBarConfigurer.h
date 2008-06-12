@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIACTIONBARCONFIGURER_H_
 #define CHERRYIACTIONBARCONFIGURER_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "../cherryUiDll.h"
 

@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPlatformUI.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
-#include "org.opencherry.osgi/service/cherryIExtensionPointService.h"
+#include "cherryPlatform.h"
+#include "service/cherryIConfigurationElement.h"
+#include "service/cherryIExtensionPointService.h"
 
 #include "cherryUIException.h"
 

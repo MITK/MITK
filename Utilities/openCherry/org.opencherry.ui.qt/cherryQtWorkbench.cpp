@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/cherryQtEditorPane.h"
 #include "internal/cherryQtErrorView.h"
 
-#include <org.opencherry.osgi/cherryPlatform.h>
-#include <org.opencherry.ui/src/cherryPlatformUI.h>
+#include <cherryPlatform.h>
+#include <cherryPlatformUI.h>
 
 namespace cherry {
 

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryExpressionInfo.h"
 #include "../cherryIEvaluationContext.h"
 
-#include "org.opencherry.osgi/service/cherryIConfigurationElement.h"
+#include "service/cherryIConfigurationElement.h"
 
 #include "Poco/DOM/Element.h"
 

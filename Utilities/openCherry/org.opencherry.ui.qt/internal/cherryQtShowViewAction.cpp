@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtShowViewAction.h"
 
-#include <org.opencherry.ui/src/cherryIWorkbenchPage.h>
-#include <org.opencherry.ui/src/cherryUIException.h>
+#include <cherryIWorkbenchPage.h>
+#include <cherryUIException.h>
 
 #include "../cherryQtSimpleWorkbenchWindow.h"
 

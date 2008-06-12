@@ -32,6 +32,11 @@ Expression::Expression()
   fHashCode = HASH_CODE_NOT_COMPUTED;
 }
 
+Expression::~Expression()
+{
+  
+}
+
 bool Expression::Equals(std::vector<Expression::Pointer>& leftArray,
     std::vector<Expression::Pointer>& rightArray)
 {

@@ -17,11 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/cherryPlatformException.h"
-#include "org.opencherry.osgi/service/cherryServiceRegistry.h"
+#include "cherryPlatform.h"
+#include "cherryPlatformException.h"
+#include "service/cherryServiceRegistry.h"
 
-#include "org.opencherry.core.runtime/cherryIAdapterManager.h"
+#include "cherryIAdapterManager.h"
 
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-  const bool TRACING = true;
+  const bool Expressions::TRACING = true;
 
   Expressions::Expressions()
   {

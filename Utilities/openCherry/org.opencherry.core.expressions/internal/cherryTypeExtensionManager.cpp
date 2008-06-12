@@ -21,14 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPropertyTesterDescriptor.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/service/cherryIExtensionPointService.h"
+#include "cherryPlatform.h"
+#include "service/cherryIExtensionPointService.h"
 
 #include <ctime>
 
 namespace cherry {
 
-  static const std::string TYPE= "type"; //$NON-NLS-1$
+  const std::string TypeExtensionManager::TYPE= "type"; //$NON-NLS-1$
 
   TypeExtensionManager::TypeExtensionManager(const std::string& extensionPoint)
   : fExtensionPoint(extensionPoint)

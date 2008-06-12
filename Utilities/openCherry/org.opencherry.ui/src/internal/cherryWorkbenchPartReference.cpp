@@ -17,7 +17,7 @@
 
 #include "cherryWorkbenchPartReference.h"
 
-#include <org.opencherry.osgi/cherryPlatformException.h>
+#include <cherryPlatformException.h>
 
 #include "cherryWorkbenchPlugin.h"
 #include "../cherryIWorkbenchPartSite.h"

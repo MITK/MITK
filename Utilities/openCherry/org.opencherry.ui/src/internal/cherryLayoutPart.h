@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYLAYOUTPART_H_
 #define CHERRYLAYOUTPART_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "../cherryIWorkbenchWindow.h"
 

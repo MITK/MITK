@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Exception.h>
 
-#include <org.opencherry.osgi/cherryObjectString.h>
+#include <cherryObjectString.h>
 
 #include "../cherryIEditorSite.h"
 #include "../cherryIViewSite.h"

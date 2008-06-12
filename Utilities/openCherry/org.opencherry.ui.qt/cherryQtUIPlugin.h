@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYUIPLUGIN_H_
 #define CHERRYUIPLUGIN_H_
 
-#include <org.opencherry.osgi/cherryPlugin.h>
+#include <cherryPlugin.h>
 
 #include "internal/cherryQtPlatformLogModel.h"
 

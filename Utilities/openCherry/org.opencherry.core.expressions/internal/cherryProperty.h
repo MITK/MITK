@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIPropertyTester.h"
 
-#include "org.opencherry.core.runtime/cherryExpressionVariables.h"
+#include "cherryExpressionVariables.h"
 
 #include "Poco/SharedPtr.h"
 #include "Poco/Any.h"

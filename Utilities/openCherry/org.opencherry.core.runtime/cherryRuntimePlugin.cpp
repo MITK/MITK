@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryRuntimePlugin.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/service/cherryIExtensionPointService.h"
-#include "org.opencherry.osgi/event/cherryPlatformEvents.h"
+#include "cherryPlatform.h"
+#include "service/cherryIExtensionPointService.h"
+#include "event/cherryPlatformEvents.h"
 
 #include "Poco/Delegate.h"
 

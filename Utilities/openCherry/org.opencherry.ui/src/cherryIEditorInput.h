@@ -18,7 +18,7 @@
 #ifndef CHERRYIEDITORINPUT_H_
 #define CHERRYIEDITORINPUT_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 #include "cherryUiDll.h"
 
 namespace cherry

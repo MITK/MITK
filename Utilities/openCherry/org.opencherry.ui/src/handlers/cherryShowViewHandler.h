@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYSHOWVIEWHANDLER_H_
 #define CHERRYSHOWVIEWHANDLER_H_
 
-#include <org.opencherry.core.commands/cherryAbstractHandler.h>
-#include <org.opencherry.core.commands/cherryExecutionEvent.h>
+#include <cherryAbstractHandler.h>
+#include <cherryExecutionEvent.h>
 
 #include "../cherryIWorkbenchWindow.h"
 #include "../cherryUiDll.h"

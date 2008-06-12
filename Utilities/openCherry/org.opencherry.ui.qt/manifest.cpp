@@ -17,13 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/ClassLibrary.h"
 
-#include "org.opencherry.osgi/cherryIBundleActivator.h"
+#include <cherryIBundleActivator.h>
 #include "cherryQtUIPlugin.h"
 
-#include "org.opencherry.ui/src/cherryWorkbench.h"
+#include <cherryWorkbench.h>
 #include "cherryQtWorkbench.h"
 
-#include "org.opencherry.ui/src/cherryIViewPart.h"
+#include <cherryIViewPart.h>
 #include "cherryLogView.h"
 
 POCO_BEGIN_MANIFEST(cherry::IBundleActivator)

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEDITORMATCHINGSTRATEGY_H_
 #define CHERRYIEDITORMATCHINGSTRATEGY_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryIEditorReference.h"
 #include "cherryIEditorInput.h"

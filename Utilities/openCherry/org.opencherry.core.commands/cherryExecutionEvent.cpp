@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "common/cherryCommandExceptions.h"
 
-#include <org.opencherry.osgi/cherryObjectString.h>
+#include <cherryObjectString.h>
 
 namespace cherry
 {

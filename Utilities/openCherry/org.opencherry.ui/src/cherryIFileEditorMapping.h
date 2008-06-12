@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIFILEEDITORMAPPING_H_
 #define CHERRYIFILEEDITORMAPPING_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 #include "cherryIEditorDescriptor.h"
 

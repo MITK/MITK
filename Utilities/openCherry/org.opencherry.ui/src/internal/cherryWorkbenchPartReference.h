@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYWORKBENCHPARTREFERENCE_H_
 #define CHERRYWORKBENCHPARTREFERENCE_H_
 
-#include <org.opencherry.osgi/cherryMessage.h>
+#include <cherryMessage.h>
 
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryIWorkbenchPart.h"

@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryExpressionConverter.h"
 
-#include "org.opencherry.osgi/cherryPlatform.h"
-#include "org.opencherry.osgi/cherryPlatformException.h"
-#include "org.opencherry.osgi/service/cherryIExtensionPointService.h"
+#include "cherryPlatform.h"
+#include "cherryPlatformException.h"
+#include "service/cherryIExtensionPointService.h"
 
 namespace cherry {
 

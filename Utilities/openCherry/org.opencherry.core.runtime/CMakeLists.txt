@@ -1,4 +1,6 @@
-SET(PLUGIN_REQUIRED_LIBS org_opencherry_osgi)
+SET(PLUGIN_DEPENDS_ON 
+  org.opencherry.osgi
+)
 
-CREATE_PLUGIN(org.opencherry.core.runtime)
+CREATE_PLUGIN()
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchPartReference.h"
 #include "cherryIPartListener.h"
 
-#include <org.opencherry.osgi/cherryMessage.h>
+#include <cherryMessage.h>
 
 namespace cherry {
 

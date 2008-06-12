@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Path.h>
 
-#include "org.opencherry.osgi/service/cherryIExtensionPoint.h"
-#include "org.opencherry.osgi/cherryPlatform.h"
+#include "service/cherryIExtensionPoint.h"
+#include "cherryPlatform.h"
 
 #include "../cherryAbstractUIPlugin.h"
 #include "../cherryPlatformUI.h"

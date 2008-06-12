@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 
-#include <org.opencherry.ui/src/cherryIViewDescriptor.h>
-#include <org.opencherry.ui/src/cherryWorkbenchWindow.h>
-#include <org.opencherry.ui/src/internal/cherryWorkbenchPage.h>
+#include <cherryIViewDescriptor.h>
+#include <cherryWorkbenchWindow.h>
+#include <internal/cherryWorkbenchPage.h>
 
 #include "cherryUiQtDll.h"
 #include "internal/cherryQtShowViewAction.h"

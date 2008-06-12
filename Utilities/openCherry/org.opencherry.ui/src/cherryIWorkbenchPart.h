@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 
 
 namespace cherry {

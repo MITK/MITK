@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPLACEHOLDERFOLDERLAYOUT_H_
 #define CHERRYIPLACEHOLDERFOLDERLAYOUT_H_
 
-#include <org.opencherry.osgi/cherryMacros.h>
+#include <cherryMacros.h>
 #include "cherryUiDll.h"
 
 namespace cherry {

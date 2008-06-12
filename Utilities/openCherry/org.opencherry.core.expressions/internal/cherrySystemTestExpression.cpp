@@ -19,13 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include <org.opencherry.osgi/cherryPlatform.h>
+#include <cherryPlatform.h>
 
 #include <Poco/Hash.h>
 
 namespace cherry {
 
-static const std::string ATT_PROPERTY= "property"; //$NON-NLS-1$
+const std::string SystemTestExpression::ATT_PROPERTY= "property"; 
 
 const intptr_t SystemTestExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::SystemTestExpression");
 
@@ -54,7 +54,7 @@ SystemTestExpression::SystemTestExpression(const std::string& property, const st
 EvaluationResult
 SystemTestExpression::Evaluate(IEvaluationContext* context)
 {
-  std::string str= Platform::GetProperty(fProperty);
+  std::string str = Platform::GetProperty(fProperty);
   if (str.size() == 0)
     return EvaluationResult::FALSE;
   

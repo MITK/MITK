@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 const char* mitk::StringProperty::PATH = "path";
 
-//##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( const char* string ) 
 : m_Value()
 {
@@ -30,20 +29,19 @@ mitk::StringProperty::StringProperty( const char* string )
     m_Value = string;
 }
 
-//##ModelId=3E3FF04F005F
 mitk::StringProperty::StringProperty( const std::string& s )
 : m_Value( s )
 {
 
 }
-//##ModelId=3E3FF04F00E1
+
 bool mitk::StringProperty::operator==(const BaseProperty& property ) const 
-{	
-    const Self *other = dynamic_cast<const Self*>(&property);
+{
+  const Self *other = dynamic_cast<const Self*>(&property);
 
-    if(other==NULL) return false;
+  if(other==NULL) return false;
 
-    return other->m_Value==m_Value;
+  return other->m_Value==m_Value;
 }
 
 std::string mitk::StringProperty::GetValueAsString() const 
@@ -60,6 +58,40 @@ bool mitk::StringProperty::WriteXMLData( XMLWriter& xmlWriter )
 bool mitk::StringProperty::ReadXMLData( XMLReader& xmlReader )
 {
   xmlReader.GetAttribute( VALUE, m_Value );
-  //std::cout << "StringProperty: " << m_Value << std::endl;
   return true;
 }
+
+bool mitk::StringProperty::Assignable(const BaseProperty& other) const
+{
+  try
+  {
+    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away!
+    return true;
+  }
+  catch (std::bad_cast)
+  {
+  }
+  return false;
+}
+
+mitk::BaseProperty& mitk::StringProperty::operator=(const BaseProperty& other)
+{
+  try
+  {
+    const Self& otherProp( dynamic_cast<const Self&>(other) );
+
+    if (this->m_Value != otherProp.m_Value)
+    {
+      this->m_Value = otherProp.m_Value;
+      this->Modified();
+    }
+  }
+  catch (std::bad_cast)
+  {
+    // nothing to do then
+  }
+
+  return *this;
+}
+
+

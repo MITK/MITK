@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 class vtkProp;
 class vtkProp3D;
 class vtkActor;
+class vtkProp3DCollection;
 
 namespace mitk {
 
@@ -42,7 +43,8 @@ class MITK_CORE_EXPORT BaseVtkMapper3D : public Mapper3D
 public:
   mitkClassMacro(BaseVtkMapper3D, Mapper3D);
 
-  virtual vtkProp* GetProp();
+  virtual vtkProp *GetProp();
+  virtual vtkProp *GetLabelProp();
 
   void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
   void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
@@ -74,7 +76,8 @@ protected:
   Geometry3D::Pointer m_Geometry;
   LevelWindow m_LevelWindow;
 
-  vtkProp3D* m_Prop3D;
+  vtkProp3D *m_Prop3D;
+  vtkProp3DCollection *m_LabelActorCollection;
 };
 
 } // namespace mitk

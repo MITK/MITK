@@ -19,78 +19,156 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
+#include "mitkAnnotationProperty.h"
+
 #include <vtkProp3D.h>
 #include <vtkLODProp3D.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
+#include <vtkPropAssembly.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProp3DCollection.h>
 
-mitk::BaseVtkMapper3D::BaseVtkMapper3D() : m_Prop3D(NULL)
+
+namespace mitk
+{
+
+BaseVtkMapper3D::BaseVtkMapper3D() : m_Prop3D(NULL)
 {
   //vtkMapper::GlobalImmediateModeRenderingOn();
+
+  m_LabelActorCollection = vtkProp3DCollection::New();
 }
 
-mitk::BaseVtkMapper3D::~BaseVtkMapper3D()
+
+BaseVtkMapper3D::~BaseVtkMapper3D()
 {
   if(m_Prop3D)
     m_Prop3D->Delete();
+
+  m_LabelActorCollection->Delete();
 }
 
-vtkProp* mitk::BaseVtkMapper3D::GetProp()
+
+vtkProp *BaseVtkMapper3D::GetProp()
 {
   return m_Prop3D;
 }
 
-void mitk::BaseVtkMapper3D::UpdateVtkTransform()
+
+vtkProp *BaseVtkMapper3D::GetLabelProp()
+{
+  //return m_LabelActor;
+  return NULL;
+}
+
+
+void BaseVtkMapper3D::UpdateVtkTransform()
 {
   vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
   m_Prop3D->SetUserTransform(vtktransform);
 }
 
-void mitk::BaseVtkMapper3D::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
+
+void BaseVtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false) 
+  if ( IsVisible(renderer)==false ) 
     return;
   
-  if(GetProp()->GetVisibility())
-    GetProp()->RenderOpaqueGeometry(renderer->GetVtkRenderer());
+  if ( GetProp()->GetVisibility() )
+    GetProp()->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+
+  m_LabelActorCollection->InitTraversal();
+  vtkProp3D *labelActor;
+  for ( m_LabelActorCollection->InitTraversal(); 
+        (labelActor = m_LabelActorCollection->GetNextProp3D()); )
+  {
+    if ( labelActor->GetVisibility() )
+      labelActor->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+  }
 }
 
-void mitk::BaseVtkMapper3D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
+void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false) 
     return;
   
  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
   {
-    if(  dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->
+    if(  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
                                            GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
-         dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->
+         dynamic_cast<BoolProperty*>(GetDataTreeNode()->
                                            GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false)    
        return;
   }*/
   
-   if(GetProp()->GetVisibility())
+  if ( GetProp()->GetVisibility() )
     GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
 }
 
-void mitk::BaseVtkMapper3D::MitkRenderOverlay(mitk::BaseRenderer* renderer)
+
+void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false) 
+  if ( IsVisible(renderer)==false ) 
     return;
   
-  if(GetProp()->GetVisibility())
+  if ( GetProp()->GetVisibility() )
     GetProp()->RenderOverlay(renderer->GetVtkRenderer());
 }
 
-void mitk::BaseVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+
+void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 {
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
   // check for color prop and use it for rendering if it exists
-  GetColor(rgba, renderer);
+  this->GetColor(rgba, renderer);
   // check for opacity prop and use it for rendering if it exists
-  GetOpacity(rgba[3], renderer);
+  this->GetOpacity(rgba[3], renderer);
+
+  // Combine renderer-specific and universal properties into one list
+  PropertyList::Pointer propertyList = PropertyList::New();
+  propertyList->ConcatenatePropertyList(
+    this->GetDataTreeNode()->GetPropertyList( renderer ) );
+  propertyList->ConcatenatePropertyList(
+    this->GetDataTreeNode()->GetPropertyList( NULL ) );
+
+  const PropertyList::PropertyMap *propertyMap =
+    propertyList->GetMap();
+  
+  // Add annotations to assembly, if any
+  m_LabelActorCollection->RemoveAllItems();
+  
+  PropertyList::PropertyMap::const_iterator it;
+  for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
+  {
+    AnnotationProperty *annotationProperty =
+      dynamic_cast< AnnotationProperty * >( (*it).second.first.GetPointer() );
+
+    if ( annotationProperty != NULL )
+    {
+      vtkVectorText *labelText = vtkVectorText::New();
+      vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
+      labelMapper->SetInput( labelText->GetOutput() );
+
+      vtkFollower *labelFollower = vtkFollower::New();
+      labelFollower->SetMapper( labelMapper );
+      labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+
+      labelFollower->SetScale( 10.0, 10.0, 10.0 );
+
+      labelText->SetText( annotationProperty->GetLabel() );
+
+      const Point3D &pos = annotationProperty->GetPosition();
+      labelFollower->SetPosition( pos[0], pos[1], pos[2] );
+
+      m_LabelActorCollection->AddItem( labelFollower );
+    }
+  }
+
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
@@ -101,3 +179,5 @@ void mitk::BaseVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer*
   actor->GetProperty()->SetOpacity(rgba[3]);
 #endif
 }
+
+} // namespace

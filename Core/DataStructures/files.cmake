@@ -9,6 +9,7 @@ SET(CPP_FILES
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
   mitkCellOperation.cpp
+  mitkClippingProperty.cpp
   mitkColorConversions.cpp
   mitkColorProperty.cpp
   mitkColorSequence.cpp

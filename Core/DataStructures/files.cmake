@@ -1,6 +1,7 @@
 SET(CPP_FILES  
   mitkAbstractTransformGeometry.cpp
   mitkAffineTransformationOperation.cpp
+  mitkAnnotationProperty.cpp
   mitkApplicationCursor.cpp
   mitkApplyDiffImageOperation.cpp
   mitkBaseData.cpp

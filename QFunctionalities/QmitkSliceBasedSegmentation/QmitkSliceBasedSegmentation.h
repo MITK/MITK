@@ -142,9 +142,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
 
   protected:
 
-    /** TODO bug #1342: should be more central, clearly not in functionality **/
-    mitk::DataTreeNode::Pointer CreateEmptySegmentationNode( mitk::Image* image, const std::string& organType, const std::string name );
-    mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image, const std::string& name, const std::string& organType );
+    void CheckImageAlignment(mitk::Image* image);
     
     /**
       \brief Main widget showing the scene

@@ -143,6 +143,10 @@ class MITK_CORE_EXPORT Tool : public StateMachine
 
     virtual const NodePredicateBase& GetReferenceDataPreference() const;
     virtual const NodePredicateBase& GetWorkingDataPreference() const;
+    
+    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName );
+    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organType, const std::string& organName );
+
 
   protected:
     
@@ -205,9 +209,6 @@ class MITK_CORE_EXPORT Tool : public StateMachine
      Derived tools should call their parents implementation.
     */
     virtual void Deactivated();
-
-    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName );
-    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organType, const std::string& organName );
 
     Tool(); // purposely hidden
     Tool( const char*); // purposely hidden

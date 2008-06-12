@@ -192,13 +192,19 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentation()
 
       // ask the user about an organ type and name, add this information to the image's (!) propertylist
       // create a new image of the same dimensions and smallest possible pixel type
-      mitk::DataTreeNode::Pointer emptySegmentation = CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
+      mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+      mitk::Tool* firstTool = toolManager->GetToolById(0);
+      if (firstTool)
+      {
+        mitk::DataTreeNode::Pointer emptySegmentation = 
+          firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
-      if (!emptySegmentation) return; // could be aborted by user
+        if (!emptySegmentation) return; // could be aborted by user
 
-      mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+        mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-      m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+        m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+      }
     }
   }
   
@@ -294,13 +300,19 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
 
       if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
       {
-        mitk::DataTreeNode::Pointer segmentationNode = CreateSegmentationNode( image, dialog.GetSegmentationName(), dialog.GetOrganType() );
+        mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+        mitk::Tool* firstTool = toolManager->GetToolById(0);
+        if (firstTool)
+        {
+          mitk::DataTreeNode::Pointer segmentationNode = 
+            firstTool->CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
-        mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-        mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
+          mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
+          mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
 
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+          m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+        }
       }
     }
     else 
@@ -368,74 +380,6 @@ void QmitkSliceBasedSegmentation::SaveSegmentation()
   }
 }
 
-/** TODO bug #1342: should be more central, clearly not in functionality **/
-mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateEmptySegmentationNode( mitk::Image* image, const std::string& organType, const std::string name )
-{
-  // we NEED a reference image for size etc.
-  if (!image) return NULL;
-
-  // actually create a new empty segmentation
-  mitk::PixelType pixelType( typeid(mitk::Tool::DefaultSegmentationDataType) );
-  mitk::Image::Pointer segmentation = mitk::Image::New();
-  segmentation->SetProperty( "organ type", mitk::OrganTypeProperty::New( organType ) );
-  segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
-
-  unsigned int byteSize = sizeof(mitk::Tool::DefaultSegmentationDataType);
-  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
-  {
-    byteSize *= segmentation->GetDimension(dim);
-  }
-  memset( segmentation->GetData(), 0, byteSize );
-
-  if (image->GetTimeSlicedGeometry() )
-  {
-    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = image->GetTimeSlicedGeometry()->Clone();
-    mitk::TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
-    segmentation->SetGeometry( originalGeometry );
-  }
-  else
-  {
-    QMessageBox::information(NULL, "MITK", QString("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation."), QMessageBox::Ok);
-    return NULL;
-  }
-
-  return CreateSegmentationNode( segmentation, name, organType );
-}
-
-/** TODO bug #1342: should be more central, clearly not in functionality **/
-mitk::DataTreeNode::Pointer QmitkSliceBasedSegmentation::CreateSegmentationNode( mitk::Image* image, const std::string& name, const std::string& organType )
-{
-  if (!image) return NULL;
-
-  // decorate the datatreenode with some properties
-  mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
-  segmentationNode->SetData( image );
-  mitk::DataTreeNodeFactory::SetDefaultImageProperties ( segmentationNode );
-
-  // name
-  segmentationNode->SetProperty( "name", mitk::StringProperty::New( name ) );
-
-  // organ type
-  mitk::OrganTypeProperty::Pointer organTypeProperty = mitk::OrganTypeProperty::New( organType );
-  if ( !organTypeProperty->IsValidEnumerationValue( organType ) )
-  {
-    organTypeProperty->AddEnum( organType, organTypeProperty->Size() ); // add a new organ type
-    organTypeProperty->SetValue( organType );
-  }
-
-  // visualization properties
-  segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-  segmentationNode->SetProperty( "color", mitk::DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
-  segmentationNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
-  segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
-  segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0.5, 1) ) );
-  segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
-  segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
-  segmentationNode->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
-
-  return segmentationNode;
-}
-
 void QmitkSliceBasedSegmentation::OnToolSelected(int id)
 {
   if (id >= 0)
@@ -474,10 +418,79 @@ void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
   }
 }
 
-void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
+void QmitkSliceBasedSegmentation::CheckImageAlignment(mitk::Image* image)
 {
   bool wrongAlignment(false);
 
+  if (image)
+  {
+    QmitkRenderWindow* renderWindow = m_MultiWidget->GetRenderWindow1();
+
+    if (renderWindow)
+    {
+      // for all 2D renderwindows of m_MultiWidget check alignment
+      mitk::PlaneGeometry::ConstPointer displayPlane 
+        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+      if (displayPlane.IsNotNull())
+      {
+        int affectedDimension(-1);
+        int affectedSlice(-1);
+        if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+        {
+          wrongAlignment = true;
+        }
+      }
+    }
+
+    renderWindow = m_MultiWidget->GetRenderWindow2();
+
+    if (renderWindow)
+    {
+      // for all 2D renderwindows of m_MultiWidget check alignment
+      mitk::PlaneGeometry::ConstPointer displayPlane 
+        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+      if (displayPlane.IsNotNull())
+      {
+        int affectedDimension(-1);
+        int affectedSlice(-1);
+        if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+        {
+          wrongAlignment = true;
+        }
+      }
+    }
+
+    renderWindow = m_MultiWidget->GetRenderWindow3();
+
+    if (renderWindow)
+    {
+      // for all 2D renderwindows of m_MultiWidget check alignment
+      mitk::PlaneGeometry::ConstPointer displayPlane 
+        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
+      if (displayPlane.IsNotNull())
+      {
+        int affectedDimension(-1);
+        int affectedSlice(-1);
+        if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
+        {
+          wrongAlignment = true;
+        }
+      }
+    }
+  }
+
+  if (wrongAlignment)
+  {
+    m_Controls->lblAlignmentWarning->show();
+  }
+  else
+  {
+    m_Controls->lblAlignmentWarning->hide();
+  }
+}
+
+void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
+{
   if (node)
   {
     // set pixel smoothing checkbox accordingly
@@ -494,71 +507,7 @@ void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNo
 
     // check, wheter image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-    if (image.IsNotNull())
-    {
-      QmitkRenderWindow* renderWindow = m_MultiWidget->GetRenderWindow1();
-
-      if (renderWindow)
-      {
-        // for all 2D renderwindows of m_MultiWidget check alignment
-        mitk::PlaneGeometry::ConstPointer displayPlane 
-                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
-        if (displayPlane.IsNotNull())
-        {
-          int affectedDimension(-1);
-          int affectedSlice(-1);
-          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
-          {
-            wrongAlignment = true;
-          }
-        }
-      }
-      
-      renderWindow = m_MultiWidget->GetRenderWindow2();
-
-      if (renderWindow)
-      {
-        // for all 2D renderwindows of m_MultiWidget check alignment
-        mitk::PlaneGeometry::ConstPointer displayPlane 
-                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
-        if (displayPlane.IsNotNull())
-        {
-          int affectedDimension(-1);
-          int affectedSlice(-1);
-          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
-          {
-            wrongAlignment = true;
-          }
-        }
-      }
-      
-      renderWindow = m_MultiWidget->GetRenderWindow3();
-
-      if (renderWindow)
-      {
-        // for all 2D renderwindows of m_MultiWidget check alignment
-        mitk::PlaneGeometry::ConstPointer displayPlane 
-                                        = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
-        if (displayPlane.IsNotNull())
-        {
-          int affectedDimension(-1);
-          int affectedSlice(-1);
-          if ( ! mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice ) )
-          {
-            wrongAlignment = true;
-          }
-        }
-      }
-    }
-  }
-
-  if (wrongAlignment)
-  {
-    m_Controls->lblAlignmentWarning->show();
-  }
-  else
-  {
-    m_Controls->lblAlignmentWarning->hide();
+    CheckImageAlignment(image);
   }
 }
 

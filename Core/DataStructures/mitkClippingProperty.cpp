@@ -30,15 +30,29 @@ const char* ClippingProperty::NORMAL = "NORMAL";
 
 
 ClippingProperty::ClippingProperty()
+: m_ClippingEnabled( false )
 {
 }
 
 
 ClippingProperty::ClippingProperty( 
   const Point3D &origin, const Vector3D &normal )
-: m_Origin( origin ),
+: m_ClippingEnabled( true ),
+  m_Origin( origin ),
   m_Normal( normal )
 {
+}
+
+
+bool ClippingProperty::GetClippingEnabled() const
+{
+  return m_ClippingEnabled;
+}
+
+
+void ClippingProperty::SetClippingEnabled( bool enabled )
+{
+  m_ClippingEnabled = enabled;
 }
 
 

@@ -45,6 +45,9 @@ public:
   mitkNewMacro2Param( ClippingProperty, 
     const Point3D &, const Vector3D & );
   
+  bool GetClippingEnabled() const;
+  void SetClippingEnabled( bool enabled );
+  
   const Point3D &GetOrigin() const;
   void SetOrigin( const Point3D &origin );
 
@@ -65,6 +68,8 @@ protected:
   static const char *ORIGIN;
   static const char *NORMAL;
 
+  bool m_ClippingEnabled;
+  
   Point3D m_Origin;
   Vector3D m_Normal;
   

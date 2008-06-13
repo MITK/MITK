@@ -138,7 +138,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   //now fill selected and unselected pointList
   //get size of Points in Property
   ScalarType pointSize = 2;
-  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("pointsize"));
+  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
   if ( pointSizeProp.IsNotNull() )
     pointSize = pointSizeProp->GetValue();
 
@@ -367,6 +367,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   }
 
     //apply props
+  Superclass::ApplyProperties( m_ContourActor, NULL );
   this->ApplyProperties(NULL);
 
 }
@@ -374,7 +375,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
 void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  
+  Superclass::ApplyProperties( m_ContourActor, renderer );
   this->ApplyProperties(renderer);
   
   if(IsVisible(renderer)==false)
@@ -618,11 +619,11 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 
     //check for property contoursize. If not present, then take pointsize
     ScalarType radius = 0.5;
-    mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("contoursize"), renderer);
+    mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize") );
 
     //if no property could be found, then use pointsize
     if (contourSizeProp.IsNull())
-      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("pointsize"), renderer);
+      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize") );
 
     //take whatever was usefull
     if (contourSizeProp.IsNotNull())

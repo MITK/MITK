@@ -181,3 +181,4 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 }
 
 } // namespace
+

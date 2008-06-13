@@ -103,3 +103,4 @@ bool ClippingProperty::ReadXMLData( XMLReader &xmlReader )
 
 
 } // namespace
+

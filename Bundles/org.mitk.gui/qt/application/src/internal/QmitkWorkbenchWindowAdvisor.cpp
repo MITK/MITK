@@ -15,18 +15,19 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#include "QmitkWorkbenchWindowAdvisor.h"
+#include "QmitkActionBarAdvisor.h"
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
+ : cherry::WorkbenchWindowAdvisor(configurer)
+{
+  
+}
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+cherry::ActionBarAdvisor::Pointer 
+QmitkWorkbenchWindowAdvisor::CreateActionBarAdvisor(
+    cherry::IActionBarConfigurer::Pointer configurer)
+{
+  cherry::ActionBarAdvisor::Pointer actionBarAdvisor = new QmitkActionBarAdvisor(configurer);
+  return actionBarAdvisor;
+}

@@ -1,12 +1,13 @@
 SET(SRC_CPP_FILES
-  QmitkDataManagerView.cpp
+  mitkDataStorageEditorInput.cpp
 )
 
 SET(INTERNAL_CPP_FILES
- 
+  
 )
 
-SET(CPP_FILES manifest.cpp)
+
+#SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

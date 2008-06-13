@@ -15,18 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#include "cherryQtViewPart.h"
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+namespace cherry
+{
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+void QtViewPart::CreatePartControl(void* parent)
+{
+  this->CreateQtPartControl(static_cast<QWidget*>(parent));
+}
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+}

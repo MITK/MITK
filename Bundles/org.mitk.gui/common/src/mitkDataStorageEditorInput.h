@@ -15,18 +15,34 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef MITKDATASTORAGEEDITORINPUT_H_
+#define MITKDATASTORAGEEDITORINPUT_H_
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <cherryIEditorInput.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+#include <mitkIDataStorageReference.h>
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+namespace mitk
+{
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+class DataStorageEditorInput : public cherry::IEditorInput
+{
+public:
+  cherryClassMacro(DataStorageEditorInput);
+  
+  bool Exists() const;
+  std::string GetName() const;
+  std::string GetToolTipText() const;
+  
+  IDataStorageReference::Pointer GetDataStorageReference();
+  
+  bool operator==(const cherry::IEditorInput*) const;
+  
+private:
+  
+  IDataStorageReference::Pointer m_DataStorageRef;
+};
+
+}
+
+#endif /*MITKDATASTORAGEEDITORINPUT_H_*/

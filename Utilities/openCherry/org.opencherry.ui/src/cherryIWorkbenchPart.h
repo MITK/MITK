@@ -130,7 +130,7 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
     //virtual void AddPropertyListener(IPropertyListener listener) = 0;
 
     /**
-     * Creates the SWT controls for this workbench part.
+     * Creates the controls for this workbench part.
      * <p>
      * Clients should not call this method (the workbench calls this method when
      * it needs to, which may be never).
@@ -149,7 +149,7 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
      *
      * @param parent the parent control
      */
-    virtual void* CreatePartControl(void* parent) = 0;
+    virtual void CreatePartControl(void* parent) = 0;
 
     /**
      * Returns the site for this workbench part. The site can be

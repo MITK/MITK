@@ -35,7 +35,7 @@ QtViewPane::~QtViewPane()
 
 void QtViewPane::SetControlEnabled(bool enabled)
 {
-  m_DockWidget->setEnabled(enabled); 
+  m_Control->setEnabled(enabled); 
 }
 
 void QtViewPane::CreateControl(void* parent)
@@ -49,6 +49,8 @@ void QtViewPane::CreateControl(void* parent)
   
   // Create view form.  
   m_DockWidget = new QDockWidget(static_cast<QWidget*>(parent));
+  m_Control = new QWidget(m_DockWidget);
+  m_DockWidget->setWidget(m_Control);
   
   // the part should never be visible by default.  It will be made visible 
   // by activation.  This allows us to have views appear in tabs without 
@@ -65,7 +67,7 @@ void QtViewPane::CreateControl(void* parent)
 
   //control.addTraverseListener(traverseListener);
   
-  control = m_DockWidget;
+  control = m_Control;
 }
 
 void QtViewPane::CreateTitleBar()
@@ -101,12 +103,12 @@ bool QtViewPane::IsCloseable()
 
 bool QtViewPane::GetControlVisible()
 {
-  return m_DockWidget->isVisible();
+  return m_Control->isVisible();
 }
 
 void QtViewPane::SetControlVisible(bool visible)
 {
-  m_DockWidget->setVisible(visible);
+  m_Control->setVisible(visible);
 }
 
 }

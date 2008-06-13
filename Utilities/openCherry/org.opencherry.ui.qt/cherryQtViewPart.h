@@ -15,18 +15,32 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef CHERRYQTVIEWPART_H_
+#define CHERRYQTVIEWPART_H_
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <cherryViewPart.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+#include "cherryUiQtDll.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+#include <QWidget>
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+namespace cherry
+{
+
+class CHERRY_UI_QT QtViewPart : public ViewPart
+{
+  
+public:
+  
+  cherryClassMacro(QtViewPart);
+  
+  void CreatePartControl(void* parent);
+  
+protected:
+  
+  virtual void CreateQtPartControl(QWidget* parent) = 0;
+};
+
+}
+
+#endif /*CHERRYQTVIEWPART_H_*/

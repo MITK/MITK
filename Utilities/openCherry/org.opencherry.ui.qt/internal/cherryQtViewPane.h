@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryPartPane.h>
 #include <cherryRectangle.h>
 
-#include <QtGui/QDockWidget>
-#include <QtCore/QString>
+#include <QDockWidget>
+#include <QString>
 
 namespace cherry {
 
@@ -53,6 +53,7 @@ public:
 private:
   
   QDockWidget* m_DockWidget;
+  QWidget* m_Control;
 };
 
 }

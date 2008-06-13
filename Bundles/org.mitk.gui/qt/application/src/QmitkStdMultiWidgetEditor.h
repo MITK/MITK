@@ -15,27 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYQTERRORVIEW_H_
-#define CHERRYQTERRORVIEW_H_
+#ifndef QMITKSTDMULTIWIDGETEDITOR_H_
+#define QMITKSTDMULTIWIDGETEDITOR_H_
 
-#include <cherryQtViewPart.h>
+#include <cherryQtEditorPart.h>
 
-#include <QLabel>
-#include <QString>
+#include <QmitkStdMultiWidget.h>
 
-namespace cherry {
-  
-class QtErrorView : public QtViewPart
+#include "mitkQtAppDll.h"
+
+class MITK_QT_APP QmitkStdMultiWidgetEditor : public cherry::QtEditorPart
 {
-  
 public:
+  cherryClassMacro(QmitkStdMultiWidgetEditor);
   
-  cherryClassMacro(QtErrorView);
+  static const std::string EDITOR_ID;
   
-  QtErrorView();
+  QmitkStdMultiWidgetEditor();
+  ~QmitkStdMultiWidgetEditor();
   
-  void SetErrorMsg(const std::string& msg);
+  QmitkStdMultiWidget* GetStdMultiWidget();
+  
+  void Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input);
+ 
   void SetFocus();
+  
+  void DoSave() {}
+  void DoSaveAs() {}
+  bool IsDirty() { return false; }
+  bool IsSaveAsAllowed() { return false; }
  
 protected:
   
@@ -43,10 +51,7 @@ protected:
   
 private:
   
-  QString m_ErrorMsg;
-  QLabel* m_Label;
+  QmitkStdMultiWidget* m_StdMultiWidget;
 };
 
-} // namespace cherry
-
-#endif /*CHERRYQTERRORVIEW_H_*/
+#endif /*QMITKSTDMULTIWIDGETEDITOR_H_*/

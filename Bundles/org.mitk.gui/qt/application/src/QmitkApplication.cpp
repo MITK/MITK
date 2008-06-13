@@ -15,18 +15,22 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#include "QmitkApplication.h"
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <cherryPlatformUI.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+#include "internal/QmitkWorkbenchAdvisor.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+int QmitkApplication::Start()
+{
+  int code = cherry::PlatformUI::CreateAndRunWorkbench(new QmitkWorkbenchAdvisor());
+  
+  // exit the application with an appropriate return code
+  return code == cherry::PlatformUI::RETURN_RESTART
+              ? EXIT_RESTART : EXIT_OK;
+}
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+void QmitkApplication::Stop()
+{
+  
+}

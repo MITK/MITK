@@ -15,18 +15,29 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef QMITKFILEOPENACTION_H_
+#define QMITKFILEOPENACTION_H_
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <QAction>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+#include <cherryQtSimpleWorkbenchWindow.h>
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+class QmitkFileOpenAction : public QAction
+{
+  Q_OBJECT
+  
+public:
+  
+  QmitkFileOpenAction(cherry::QtWorkbenchWindow::Pointer window);
+  
+protected slots:
+  
+  void Run();
+  
+private:
+  
+  cherry::QtWorkbenchWindow::Pointer m_Window;
+};
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+
+#endif /*QMITKFILEOPENACTION_H_*/

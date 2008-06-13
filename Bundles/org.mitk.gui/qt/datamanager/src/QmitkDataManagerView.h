@@ -1,19 +1,25 @@
-#ifndef MITKDATAMANAGERVIEW_H_
-#define MITKDATAMANAGERVIEW_H_
+#ifndef QMITKDATAMANAGERVIEW_H_
+#define QMITKDATAMANAGERVIEW_H_
 
-#include <cherryViewPart.h>
+#include <cherryQtViewPart.h>
 #include <cherryIPartListener.h>
 
-#include "QmitkStandardViews.h"
+#include <QmitkStandardViews.h>
 
-class mitkDataManagerView : public cherry::ViewPart
+#include "mitkQtDataManagerDll.h"
+
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public cherry::QtViewPart
 {
   
 public:
-  void* CreatePartControl(void* parent);
+  
   void SetFocus();
   
-  ~mitkDataManagerView();
+  ~QmitkDataManagerView();
+  
+protected:
+  
+  void CreateQtPartControl(QWidget* parent);
   
 private:
   
@@ -34,7 +40,7 @@ private:
   
     void SetStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef);
     void SetStdMultiWidget(cherry::IWorkbenchPart::Pointer partRef);
-    void ClearMultiWidget();
+    void ClearStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef);
     
   private: 
     QmitkStandardViews* m_StandardViewsWidget;
@@ -45,4 +51,4 @@ private:
  
 };
 
-#endif /*MITKDATAMANAGERVIEW_H_*/
+#endif /*QMITKDATAMANAGERVIEW_H_*/

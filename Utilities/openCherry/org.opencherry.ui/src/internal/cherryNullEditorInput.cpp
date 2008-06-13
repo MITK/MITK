@@ -30,23 +30,31 @@ NullEditorInput::NullEditorInput(EditorReference::Pointer editorReference)
   this->editorReference = editorReference;
 }
 
-bool NullEditorInput::Exists()
+bool NullEditorInput::Exists() const
 {
   return false;
 }
 
-std::string NullEditorInput::GetName()
+std::string NullEditorInput::GetName() const
 {
   if (editorReference.IsNotNull())
     return editorReference->GetName();
   return ""; //$NON-NLS-1$
 }
 
-std::string NullEditorInput::GetToolTipText()
+std::string NullEditorInput::GetToolTipText() const
 {
   if (editorReference.IsNotNull())
     return editorReference->GetTitleToolTip();
   return ""; //$NON-NLS-1$
+}
+
+bool NullEditorInput::operator==(const IEditorInput* o) const
+{
+  const NullEditorInput* input = dynamic_cast<const NullEditorInput*>(o);
+  if (input == 0) return false;
+  
+  return true;
 }
 
 }

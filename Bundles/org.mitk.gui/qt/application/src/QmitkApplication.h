@@ -15,18 +15,19 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef QMITKAPPLICATION_H_
+#define QMITKAPPLICATION_H_
 
 #include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+#include "mitkQtAppDll.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+class MITK_QT_APP QmitkApplication : public cherry::IApplication
+{
+public:
+  
+  int Start();
+  void Stop();
+};
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+#endif /*QMITKAPPLICATION_H_*/

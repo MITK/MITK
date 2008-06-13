@@ -1,27 +1,22 @@
-#include "mitkDataManagerView.h"
+#include "QmitkDataManagerView.h"
 
 #include <QPushButton>
 #include <QDockWidget>
+#include <QHBoxLayout>
 
 #include "QmitkStdMultiWidget.h"
 
-#include <mitkStdMultiWidgetEditor.h>
+#include <QmitkStdMultiWidgetEditor.h>
 
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
 
-void* mitkDataManagerView::CreatePartControl(void* parent)
+void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
-  QDockWidget* dock = static_cast<QDockWidget*>(parent);
-  /*
-  QPushButton* button = new QPushButton("Hi", static_cast<QWidget*>(parent));
-  dock->setWidget(button);
-  return button;
-  */
-  
-  
-  QmitkStandardViews* stdViews = new QmitkStandardViews(dock);
-  dock->setWidget( stdViews );
+  QHBoxLayout* layout = new QHBoxLayout(parent);
+  layout->setContentsMargins(0,0,0,0);
+  QmitkStandardViews* stdViews = new QmitkStandardViews(parent);
+  layout->addWidget(stdViews);
   
   m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
   this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
@@ -31,20 +26,19 @@ void* mitkDataManagerView::CreatePartControl(void* parent)
   
   m_MultiWidgetListener->SetStdMultiWidget(editor);
   
-  return stdViews;
 }
   
-void mitkDataManagerView::SetFocus()
+void QmitkDataManagerView::SetFocus()
 {
   
 }
 
-mitkDataManagerView::~mitkDataManagerView()
+QmitkDataManagerView::~QmitkDataManagerView()
 {
   this->GetSite()->GetPage()->RemovePartListener(m_MultiWidgetListener);
 }
 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::StdMultiWidgetListener(QmitkStandardViews* standardViews)
 : m_StandardViewsWidget(standardViews)
 {
@@ -52,7 +46,7 @@ StdMultiWidgetListener::StdMultiWidgetListener(QmitkStandardViews* standardViews
 }
     
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartActivated(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartActivated\n";
@@ -60,7 +54,7 @@ StdMultiWidgetListener::PartActivated(cherry::IWorkbenchPartReference::Pointer p
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartBroughtToTop(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartBroughtToTop\n";
@@ -68,38 +62,38 @@ StdMultiWidgetListener::PartBroughtToTop(cherry::IWorkbenchPartReference::Pointe
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartClosed(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartClosed\n";
-  this->ClearMultiWidget();
+  this->ClearStdMultiWidget(partRef);
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartDeactivated\n";
-  this->ClearMultiWidget();
+  this->ClearStdMultiWidget(partRef);
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartOpened(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartOpened\n";
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartHidden(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartHidden\n";
-  this->ClearMultiWidget();
+  this->ClearStdMultiWidget(partRef);
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartVisible(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartVisible\n";
@@ -107,14 +101,14 @@ StdMultiWidgetListener::PartVisible(cherry::IWorkbenchPartReference::Pointer par
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::PartInputChanged(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartInputChanged\n";
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   if (partRef.IsNull()) return;
@@ -124,16 +118,16 @@ StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPartReference::Point
 }
 
 void 
-mitkDataManagerView::
+QmitkDataManagerView::
 StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPart::Pointer part)
 {
   if (part.IsNull()) return;
   
   QmitkStdMultiWidget* multiWidget = 0;
-  if (part.Cast<mitkStdMultiWidgetEditor>().IsNotNull())
+  if (part.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
     std::cout << "getting multi-widget...\n";
-    multiWidget = part.Cast<mitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+    multiWidget = part.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
   
   if (multiWidget != 0)
@@ -144,8 +138,11 @@ StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPart::Pointer part)
 }
 
 void 
-mitkDataManagerView::
-StdMultiWidgetListener::ClearMultiWidget()
+QmitkDataManagerView::
+StdMultiWidgetListener::ClearStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
 {
-  m_StandardViewsWidget->SetCameraController(0);
+  if (partRef.IsNull()) return;
+  
+  if (partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
+    m_StandardViewsWidget->SetCameraController(0);
 }

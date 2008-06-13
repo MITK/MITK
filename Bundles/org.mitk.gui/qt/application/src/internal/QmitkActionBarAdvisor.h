@@ -15,18 +15,20 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef QMITKACTIONBARADVISOR_H_
+#define QMITKACTIONBARADVISOR_H_
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <application/cherryQtActionBarAdvisor.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+class QmitkActionBarAdvisor : public cherry::QtActionBarAdvisor
+{
+public:
+  
+  QmitkActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
+  
+protected:
+  
+  void FillQtMenuBar(QMenuBar* menuBar);
+};
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+#endif /*QMITKACTIONBARADVISOR_H_*/

@@ -164,7 +164,7 @@ public:
           const std::string& propertyName, Object::Pointer data);
   
   /* 
-   * Creates the Qt controls for this workbench part.
+   * Creates the controls for this workbench part.
    * <p>
    * Subclasses must implement this method.  For a detailed description of the
    * requirements see <code>IWorkbenchPart</code>
@@ -173,7 +173,7 @@ public:
    * @param parent the parent control
    * @see IWorkbenchPart
    */
-  virtual void* CreatePartControl(void* parent) = 0;
+  virtual void CreatePartControl(void* parent) = 0;
   
   /* (non-Javadoc)
      * Asks this part to take focus within the workbench.

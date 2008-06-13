@@ -15,18 +15,21 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef QMITKWORKBENCHADVISOR_H_
+#define QMITKWORKBENCHADVISOR_H_
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+#include <application/cherryWorkbenchAdvisor.h>
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+class QmitkWorkbenchAdvisor : public cherry::WorkbenchAdvisor
+{
+public:
+  
+  void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
+  
+  cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
+        cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+  
+  std::string GetInitialWindowPerspectiveId();
+};
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
-
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+#endif /*QMITKWORKBENCHADVISOR_H_*/

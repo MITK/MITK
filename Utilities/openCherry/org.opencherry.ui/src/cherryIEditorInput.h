@@ -31,8 +31,9 @@ namespace cherry
  * like a file name but more abstract. It is not a model. It is a description of
  * the model source for an <code>IEditorPart</code>.
  * <p>
- * Clients implementing this editor input interface should override
- * <code>Object.equals(Object)</code> to answer true for two inputs that are
+ * Clients implementing this editor input interface must override
+ * <code>IEditorInput#operator==(const IEditorInput*)</code> to answer true 
+ * for two inputs that are
  * the same. The <code>IWorbenchPage.openEditor</code> APIs are dependent on
  * this to find an editor with the same input.
  * </p>
@@ -76,7 +77,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * @return <code>true</code> if the editor input exists;
    *         <code>false</code> otherwise
    */
-  virtual bool Exists() = 0;
+  virtual bool Exists() const = 0;
 
   /**
    * Returns the image descriptor for this input.
@@ -105,7 +106,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * 
    * @return the name string; never <code>null</code>;
    */
-  virtual std::string GetName() = 0;
+  virtual std::string GetName() const = 0;
 
   /**
    * Returns an object that can be used to save the state of this editor
@@ -125,7 +126,13 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * 
    * @return the tool tip text; never <code>null</code>.
    */
-  virtual std::string GetToolTipText() = 0;
+  virtual std::string GetToolTipText() const = 0;
+  
+  /**
+   * Returns true if two editor inputs are the same
+   * 
+   */
+  virtual bool operator==(const IEditorInput* o) const = 0;
 };
 
 }

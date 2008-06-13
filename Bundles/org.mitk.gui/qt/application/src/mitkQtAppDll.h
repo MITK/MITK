@@ -15,29 +15,27 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYUIDLL_H_
-#define CHERRYUIDLL_H_
-
+#ifndef MITKQTAPPDLL_H_
+#define MITKQTAPPDLL_H_
 
 //
 // The following block is the standard way of creating macros which make exporting 
-// from a DLL simpler. All files within this DLL are compiled with the org_opencherry_ui_EXPORTS
+// from a DLL simpler. All files within this DLL are compiled with the org_mitk_gui_qt_application_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see 
-// CHERRY_UI functions as being imported from a DLL, wheras this DLL sees symbols
+// MITK_QT_APP functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org_opencherry_ui_EXPORTS)
-    #define CHERRY_UI __declspec(dllexport)
+  #if defined(org_mitk_gui_qt_application_EXPORTS)
+    #define MITK_QT_APP __declspec(dllexport)
   #else
-    #define CHERRY_UI __declspec(dllimport)  
+    #define MITK_QT_APP __declspec(dllimport)  
   #endif
 #endif
 
-
-#if !defined(CHERRY_UI)
-  #define CHERRY_UI
+#if !defined(MITK_QT_APP)
+  #define MITK_QT_APP
 #endif
 
-#endif /*CHERRYUIDLL_H_*/
+#endif /*MITKQTAPPDLL_H_*/

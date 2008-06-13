@@ -20,17 +20,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QtGui/QWidget>
 
-#include <cherryViewPart.h>
+#include <cherryQtViewPart.h>
 
 #include "cherryUiQtDll.h"
 
 namespace cherry {
   
-class CHERRY_UI_QT LogView : public ViewPart
+class CHERRY_UI_QT LogView : public QtViewPart
 {
 public:
-  void* CreatePartControl(void* parent);
+  
   void SetFocus();
+  
+protected:
+  
+  void CreateQtPartControl(QWidget* parent);
  
 };
 

@@ -1,4 +1,21 @@
-#include "mitkStdMultiWidgetEditor.h"
+/*=========================================================================
+ 
+Program:   openCherry Platform
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
+#include "QmitkStdMultiWidgetEditor.h"
 
 #include <cherryUIException.h>
 
@@ -6,45 +23,44 @@
 
 #include <mitkGlobalInteraction.h>
 
-#include "mitkDataStorageEditorInput.h"
+#include <mitkDataStorageEditorInput.h>
 
-const std::string mitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
+const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
-mitkStdMultiWidgetEditor::mitkStdMultiWidgetEditor()
+QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
  : m_StdMultiWidget(0)
 {
   
 }
 
-mitkStdMultiWidgetEditor::~mitkStdMultiWidgetEditor()
+QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
   if (m_StdMultiWidget != 0)
     delete m_StdMultiWidget;
 }
 
-QmitkStdMultiWidget* mitkStdMultiWidgetEditor::GetStdMultiWidget()
+QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()
 {
   return m_StdMultiWidget;
 }
 
-void mitkStdMultiWidgetEditor::Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input)
+void QmitkStdMultiWidgetEditor::Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input)
 {
-  if (input.Cast<mitkDataStorageEditorInput>().IsNull())
+  if (input.Cast<mitk::DataStorageEditorInput>().IsNull())
      throw cherry::PartInitException("Invalid Input: Must be IFileEditorInput");
   
   this->SetSite(site);
   this->SetInput(input);
 }
 
-void* mitkStdMultiWidgetEditor::CreatePartControl(void* parent)
+void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 {
   if (m_StdMultiWidget == 0)
   {
-    QWidget* qtParent = static_cast<QWidget*>(parent);
-    m_StdMultiWidget = new QmitkStdMultiWidget(qtParent);
-    qtParent->layout()->addWidget(m_StdMultiWidget);
+    m_StdMultiWidget = new QmitkStdMultiWidget(parent);
+    parent->layout()->addWidget(m_StdMultiWidget);
     
-    mitk::DataTree::Pointer dataTree = this->GetEditorInput().Cast<mitkDataStorageEditorInput>()
+    mitk::DataTree::Pointer dataTree = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
       ->GetDataStorageReference()->GetDataTree();
     
     // Create an iterator on the tree
@@ -75,10 +91,9 @@ void* mitkStdMultiWidgetEditor::CreatePartControl(void* parent)
       );
   }
   
-  return m_StdMultiWidget;
 }
   
-void mitkStdMultiWidgetEditor::SetFocus()
+void QmitkStdMultiWidgetEditor::SetFocus()
 {
   if (m_StdMultiWidget != 0)
     m_StdMultiWidget->setFocus();

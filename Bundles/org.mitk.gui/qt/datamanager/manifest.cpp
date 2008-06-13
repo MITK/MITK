@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include <cherryIViewPart.h>
-#include "src/mitkDataManagerView.h"
+#include "src/QmitkDataManagerView.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(mitkDataManagerView)
+  POCO_EXPORT_CLASS(QmitkDataManagerView)
 POCO_END_MANIFEST

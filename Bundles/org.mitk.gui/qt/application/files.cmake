@@ -1,18 +1,17 @@
 SET(SRC_CPP_FILES
-  mitkDataStorageEditorInput.cpp
-  mitkQtApplication.cpp
-  mitkStdMultiWidgetEditor.cpp
+  QmitkApplication.cpp
+  QmitkStdMultiWidgetEditor.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  mitkQtActionBarAdvisor.cpp
-  mitkQtFileOpenAction.cpp
-  mitkQtWorkbenchAdvisor.cpp
-  mitkQtWorkbenchWindowAdvisor.cpp
+  QmitkActionBarAdvisor.cpp
+  QmitkFileOpenAction.cpp
+  QmitkWorkbenchAdvisor.cpp
+  QmitkWorkbenchWindowAdvisor.cpp
 )
 
 SET(MOC_H_FILES
-  src/internal/mitkQtFileOpenAction.h
+  src/internal/QmitkFileOpenAction.h
 )
 
 SET(CPP_FILES manifest.cpp)

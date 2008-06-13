@@ -141,7 +141,9 @@ void* QtWorkbench::CreateWorkbenchPageControl()
 
 void QtWorkbench::AddViewPane(PartPane::Pointer pane)
 {
-  m_QtWindow->addDockWidget(Qt::RightDockWidgetArea, static_cast<QDockWidget*>(pane->GetControl()));
+  // temporary hack with dock widgets.
+  QWidget* control = static_cast<QWidget*>(pane->GetControl());
+  m_QtWindow->addDockWidget(Qt::RightDockWidgetArea, dynamic_cast<QDockWidget*>(control->parent()));
 }
 
 }  // namespace cherry

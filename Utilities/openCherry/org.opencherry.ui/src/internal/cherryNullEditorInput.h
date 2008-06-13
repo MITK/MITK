@@ -49,7 +49,7 @@ public:
     /* (non-Javadoc)
      * @see org.eclipse.ui.IEditorInput#exists()
      */
-   bool Exists();
+   bool Exists() const;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
@@ -61,12 +61,14 @@ public:
     /* (non-Javadoc)
      * @see org.eclipse.ui.IEditorInput#getName()
      */
-    std::string GetName();
+    std::string GetName() const;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IEditorInput#getToolTipText()
      */
-    std::string GetToolTipText();
+    std::string GetToolTipText() const;
+    
+    bool operator==(const IEditorInput* o) const;
 
 };
 

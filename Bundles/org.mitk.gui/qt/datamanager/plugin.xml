@@ -9,6 +9,6 @@
       id="org.mitk.views.datamanager" 
       name="Datamanager" 
       category="org.mitk.views.general" 
-      class="mitkDataManagerView" />
+      class="QmitkDataManagerView" />
   </extension>
 </plugin>

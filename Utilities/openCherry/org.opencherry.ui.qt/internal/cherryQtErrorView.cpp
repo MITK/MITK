@@ -28,14 +28,10 @@ QtErrorView::QtErrorView()
   
 }
 
-void* QtErrorView::CreatePartControl(void* parent)
+void QtErrorView::CreateQtPartControl(QWidget* parent)
 {
-  QDockWidget* dock = static_cast<QDockWidget*>(parent);
-  m_Label = new QLabel(dock);
+  m_Label = new QLabel(parent);
   m_Label->setText(m_ErrorMsg);
-  dock->setWidget(m_Label);
-  
-  return m_Label;
 }
  
 void QtErrorView::SetFocus()

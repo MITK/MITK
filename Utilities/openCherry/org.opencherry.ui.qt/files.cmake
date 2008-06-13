@@ -1,11 +1,16 @@
 SET(CPP_FILES
   manifest.cpp
   cherryLogView.cpp
+  cherryQtEditorPart.cpp
   cherryQtLogView.cpp
   cherryQtUIPlugin.cpp
+  cherryQtViewPart.cpp
   cherryQtWorkbench.cpp
   #cherryQtWorkbenchWindow.cpp
   cherryQtSimpleWorkbenchWindow.cpp
+  
+  # application
+  application/cherryQtActionBarAdvisor.cpp
 )
 
 SET(INTERNAL_CPP_FILES

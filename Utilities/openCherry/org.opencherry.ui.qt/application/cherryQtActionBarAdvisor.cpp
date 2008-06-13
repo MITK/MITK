@@ -15,18 +15,25 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#include "cherryQtActionBarAdvisor.h"
 
-#include <application/cherryIApplication.h>
-#include <cherryIEditorPart.h>
+namespace cherry
+{
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkStdMultiWidgetEditor.h"
+QtActionBarAdvisor::QtActionBarAdvisor(IActionBarConfigurer::Pointer configurer)
+ : ActionBarAdvisor(configurer)
+{
+  
+}
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+void QtActionBarAdvisor::FillMenuBar(void* menuBar)
+{
+  this->FillQtMenuBar(static_cast<QMenuBar*>(menuBar));
+}
+  
+void QtActionBarAdvisor::FillQtMenuBar(QMenuBar* menuBar)
+{
+  // do nothing
+}
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
-POCO_END_MANIFEST
+}

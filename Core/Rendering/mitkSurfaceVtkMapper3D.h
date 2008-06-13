@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkPolyDataNormals;
+class vtkPlaneCollection;
 
 namespace mitk {
 
@@ -91,9 +92,11 @@ protected:
 
   vtkActor* m_Actor;
 
-  vtkPolyDataMapper* m_VtkPolyDataMapper;
+  vtkPolyDataMapper *m_VtkPolyDataMapper;
 
-  vtkPolyDataNormals* m_VtkPolyDataNormals;
+  vtkPolyDataNormals *m_VtkPolyDataNormals;
+
+  vtkPlaneCollection *m_ClippingPlaneCollection;
 
   //enable ImmediateModeRendering for the vtkMapper
   int m_ImmediateModeRenderingOn;

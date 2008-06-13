@@ -25,12 +25,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
+#include "mitkClippingProperty.h"
+
+
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPointData.h>
+#include <vtkPlaneCollection.h>
+
 
 //##ModelId=3E70F60301D5
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
@@ -50,6 +55,8 @@ mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
   m_Prop3D = m_Actor;
 
   m_GenerateNormals = false;
+
+  m_ClippingPlaneCollection = vtkPlaneCollection::New();
 }
 
 //##ModelId=3E70F60301F5
@@ -59,7 +66,9 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
   m_VtkPolyDataNormals->Delete();
 
   if(m_Prop3D != m_Actor)
-    m_Actor->Delete();
+    m_Actor->Delete();                                  
+
+  m_ClippingPlaneCollection->Delete();
 }
 
 //##ModelId=3EF19FA803BF
@@ -284,6 +293,45 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     m_Actor->GetProperty()->SetSpecularPower (50);
     //m_Actor->GetProperty()->SetInterpolationToPhong();
   }
+
+
+  // Combine renderer-specific and universal properties into one list
+  PropertyList::Pointer propertyList = PropertyList::New();
+  propertyList->ConcatenatePropertyList(
+    this->GetDataTreeNode()->GetPropertyList( renderer ) );
+  propertyList->ConcatenatePropertyList(
+    this->GetDataTreeNode()->GetPropertyList( NULL ) );
+
+  const PropertyList::PropertyMap *propertyMap =
+    propertyList->GetMap();
+
+  // Add clipping planes (if any)
+  m_ClippingPlaneCollection->RemoveAllItems();
+  
+  PropertyList::PropertyMap::const_iterator it;
+  for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
+  {
+    ClippingProperty *clippingProperty =
+      dynamic_cast< ClippingProperty * >( (*it).second.first.GetPointer() );
+
+    if ( (clippingProperty != NULL)
+      && (clippingProperty->GetClippingEnabled()) )
+    {
+      const Point3D &origin = clippingProperty->GetOrigin();
+      const Vector3D &normal = clippingProperty->GetNormal();
+
+      vtkPlane *clippingPlane = vtkPlane::New();
+      clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
+      clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
+
+      m_ClippingPlaneCollection->AddItem( clippingPlane );
+
+      clippingPlane->UnRegister( NULL );
+    }
+  }
+
+  m_VtkPolyDataMapper->SetClippingPlanes( m_ClippingPlaneCollection );
+
 }
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)

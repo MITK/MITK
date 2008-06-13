@@ -81,15 +81,6 @@ void BaseVtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   
   if ( GetProp()->GetVisibility() )
     GetProp()->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-
-  m_LabelActorCollection->InitTraversal();
-  vtkProp3D *labelActor;
-  for ( m_LabelActorCollection->InitTraversal(); 
-        (labelActor = m_LabelActorCollection->GetNextProp3D()); )
-  {
-    if ( labelActor->GetVisibility() )
-      labelActor->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
 }
 
 void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
@@ -118,6 +109,16 @@ void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
   
   if ( GetProp()->GetVisibility() )
     GetProp()->RenderOverlay(renderer->GetVtkRenderer());
+
+  // Render annotations as overlay
+  m_LabelActorCollection->InitTraversal();
+  vtkProp3D *labelActor;
+  for ( m_LabelActorCollection->InitTraversal(); 
+        (labelActor = m_LabelActorCollection->GetNextProp3D()); )
+  {
+    if ( labelActor->GetVisibility() )
+      labelActor->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+  }
 }
 
 
@@ -139,33 +140,45 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
   const PropertyList::PropertyMap *propertyMap =
     propertyList->GetMap();
   
-  // Add annotations to assembly, if any
-  m_LabelActorCollection->RemoveAllItems();
-  
-  PropertyList::PropertyMap::const_iterator it;
-  for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
+  // Add annotations to assembly, if any (camera (renderer) must be present)
+  if ( renderer != NULL )
   {
-    AnnotationProperty *annotationProperty =
-      dynamic_cast< AnnotationProperty * >( (*it).second.first.GetPointer() );
-
-    if ( annotationProperty != NULL )
+    m_LabelActorCollection->RemoveAllItems();
+    
+    PropertyList::PropertyMap::const_iterator it;
+    for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
     {
-      vtkVectorText *labelText = vtkVectorText::New();
-      vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
-      labelMapper->SetInput( labelText->GetOutput() );
+      AnnotationProperty *annotationProperty =
+        dynamic_cast< AnnotationProperty * >( (*it).second.first.GetPointer() );
 
-      vtkFollower *labelFollower = vtkFollower::New();
-      labelFollower->SetMapper( labelMapper );
-      labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+      if ( annotationProperty != NULL )
+      {
+        vtkVectorText *labelText = vtkVectorText::New();
+        vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
+        labelMapper->SetInput( labelText->GetOutput() );
 
-      labelFollower->SetScale( 10.0, 10.0, 10.0 );
+        vtkFollower *labelFollower = vtkFollower::New();
+        labelFollower->SetMapper( labelMapper );
+        labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
 
-      labelText->SetText( annotationProperty->GetLabel() );
+        labelFollower->SetScale( 2.0, 2.0, 2.0 );
 
-      const Point3D &pos = annotationProperty->GetPosition();
-      labelFollower->SetPosition( pos[0], pos[1], pos[2] );
+        labelText->SetText( annotationProperty->GetLabel() );
 
-      m_LabelActorCollection->AddItem( labelFollower );
+        const Point3D &pos = annotationProperty->GetPosition();
+
+        Geometry3D *geometry = m_DataTreeNode->GetData()->GetGeometry();
+
+        Point3D transformedPos;
+        geometry->IndexToWorld( pos, transformedPos );
+
+        labelFollower->SetPosition( transformedPos[0], transformedPos[1], transformedPos[2] );
+
+        //labelFollower->SetUserTransform(
+        //  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform() );
+
+        m_LabelActorCollection->AddItem( labelFollower );
+      }
     }
   }
 

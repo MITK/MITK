@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeContainerBase.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$

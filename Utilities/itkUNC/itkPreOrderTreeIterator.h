@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkPreOrderTreeIterator.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -112,7 +112,7 @@ PreOrderTreeIterator<TTreeType>::FindNextNode() const
   TreeNodeType* child = this->m_Position;
   TreeNodeType* parent = dynamic_cast<TreeNodeType*>(this->m_Position->GetParent());
 
-  // Subtree
+  // Are we a subtree? Then we are done.
   if( parent && parent->ChildPosition( this->m_Root ) >= 0 )
   {
     return NULL;

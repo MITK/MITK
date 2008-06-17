@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeNode.txx,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -36,11 +36,11 @@ TreeNode<TValueType>::~TreeNode()
     {
     m_Parent->Remove(this);
     }
-
-  for ( size_t i=m_Children.size() ; i > 0; i-- )
-  {
-     m_Children[i-1]->SetParent(NULL);
-  }
+    
+ for ( size_t i=m_Children.size() ; i > 0; i-- )
+   {
+   m_Children[i-1]->SetParent(NULL);
+   }
   m_Children.clear();
   m_Parent = NULL;
   m_Data = 0;

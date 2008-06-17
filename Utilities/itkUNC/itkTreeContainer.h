@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeContainer.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -120,7 +120,7 @@ protected:
 
 } // namespace itk
 
-
+// Define instantiation macro for this template.
 #define ITK_TEMPLATE_TreeContainer(_, EXPORT, x, y) namespace itk { \
   _(1(class EXPORT TreeContainer< ITK_TEMPLATE_1 x >)) \
   namespace Templates { typedef TreeContainer< ITK_TEMPLATE_1 x > \
@@ -132,7 +132,7 @@ protected:
 #endif
 
 #if ITK_TEMPLATE_TXX
-#include "itkTreeContainer.txx"
+# include "itkTreeContainer.txx"
 #endif
 
 #endif

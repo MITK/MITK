@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkPostOrderTreeIterator.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -27,10 +27,11 @@ class PostOrderTreeIterator : public TreeIteratorBase<TTreeType>
 public:
    
   /** Typedefs */
-  typedef TreeIteratorBase<TTreeType>  Superclass;
-  typedef TTreeType TreeType;
-  typedef typename TTreeType::ValueType ValueType;
-  typedef typename Superclass::TreeNodeType TreeNodeType;
+  typedef PostOrderTreeIterator               Self;
+  typedef TreeIteratorBase<TTreeType>         Superclass;
+  typedef TTreeType                           TreeType;
+  typedef typename TTreeType::ValueType       ValueType;
+  typedef typename Superclass::TreeNodeType   TreeNodeType;
 
   /** Constructor */
   PostOrderTreeIterator(TreeType* tree);

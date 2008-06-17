@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeNode.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -105,7 +105,7 @@ public:
 #if !defined(CABLE_CONFIGURATION)
   virtual ChildrenListType* GetChildren( unsigned int depth=0, char * name=NULL) const;
 #endif
-  
+
   /** Get the internal list of children */
 #if !defined(CABLE_CONFIGURATION)
   virtual ChildrenListType& GetChildrenList() {return m_Children;}
@@ -140,7 +140,7 @@ private:
 #endif
 
 #if ITK_TEMPLATE_TXX
-#include "itkTreeNode.txx"
+# include "itkTreeNode.txx"
 #endif
 
 

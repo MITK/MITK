@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeIteratorClone.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -42,9 +42,10 @@ public:
   TreeIteratorClone (const TreeIteratorClone<ObjectType> &p):
     m_Pointer(0)
     { 
-    if(p.m_Pointer!=NULL)
+
+    if(p.m_Pointer != NULL)
       {
-      m_Pointer=p.m_Pointer->Clone();
+      m_Pointer = p.m_Pointer->Clone();
       }
     }
   

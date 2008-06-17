@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeIteratorBase.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -44,9 +44,9 @@ class TreeIteratorBase
 public: 
   
   /** Typedefs */
-  typedef TreeIteratorBase<TTreeType> Self;
-  typedef typename TTreeType::ValueType ValueType;
-  typedef typename TTreeType::TreeNodeType TreeNodeType;
+  typedef TreeIteratorBase                    Self;
+  typedef typename TTreeType::ValueType       ValueType;
+  typedef typename TTreeType::TreeNodeType    TreeNodeType;
 
   /** Add an element to the tree */
   virtual bool Add(ValueType element);
@@ -171,7 +171,6 @@ public:
   Self &
   operator++()
   {
-    assert( !IsAtEnd() );
     this->Next();
     return *this;
   }
@@ -183,7 +182,7 @@ public:
     this->Next();
   }
   /** operator = */
-  virtual Self& operator=(Self& iterator) 
+  const Self & operator=(const Self& iterator) 
     {
     m_Position = iterator.m_Position; 
     m_Begin  = iterator.m_Begin;
@@ -193,7 +192,7 @@ public:
     return *this;
     }
 
-   virtual ~TreeIteratorBase() {}
+  virtual ~TreeIteratorBase() {}
 protected:
 
   /** Constructors */
@@ -212,7 +211,7 @@ protected:
 
 } //end namespace itk
 
-
+// Define instantiation macro for this template.
 #define ITK_TEMPLATE_TreeIteratorBase(_, EXPORT, x, y) namespace itk { \
   _(1(class EXPORT TreeIteratorBase< ITK_TEMPLATE_1 x >)) \
   namespace Templates { typedef TreeIteratorBase< ITK_TEMPLATE_1 x > \
@@ -224,7 +223,7 @@ protected:
 #endif
 
 #if ITK_TEMPLATE_TXX
-#include "itkTreeIteratorBase.txx"
+# include "itkTreeIteratorBase.txx"
 #endif
 
 #endif

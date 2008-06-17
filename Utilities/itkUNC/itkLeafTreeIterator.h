@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkLeafTreeIterator.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -28,10 +28,11 @@ class LeafTreeIterator : public TreeIteratorBase<TTreeType>
 public:
 
   /** Typedefs*/
-  typedef TreeIteratorBase<TTreeType> Superclass;
-  typedef TTreeType TreeType;
-  typedef typename TreeType::ValueType ValueType;
-  typedef TreeNode<ValueType>  TreeNodeType;
+  typedef LeafTreeIterator                Self;
+  typedef TreeIteratorBase<TTreeType>     Superclass;
+  typedef TTreeType                       TreeType;
+  typedef typename TreeType::ValueType    ValueType;
+  typedef TreeNode<ValueType>             TreeNodeType;
 
   /** Constructor */
   LeafTreeIterator( const TreeType* tree );
@@ -118,7 +119,7 @@ LeafTreeIterator<TTreeType>::Next()
 
 /** Find the next node given the position */
 template <class TTreeType>
-const typename Le  afTreeIterator<TTreeType>::TreeNodeType* 
+const typename LeafTreeIterator<TTreeType>::TreeNodeType* 
 LeafTreeIterator<TTreeType>::FindNextNode() const 
 {
   PreOrderTreeIterator<TTreeType> it(this->m_Tree,this->m_Position); 

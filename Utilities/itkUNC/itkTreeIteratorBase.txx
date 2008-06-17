@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkTreeIteratorBase.txx,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -475,7 +475,7 @@ TreeIteratorBase<TTreeType>::Remove()
   else if (m_Root == m_Position)
     {
     m_Root = NULL;
-    m_Tree->SetRoot(NULL); // this won't do anything if root is already != NULL  ==> root cannot be removed
+    m_Tree->SetRoot((TreeNodeType*)NULL); // this won't do anything if root is already != NULL  ==> root cannot be removed
     }
     
   m_Position->SetParent(NULL); // we don't have a parent anymore

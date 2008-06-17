@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkLevelOrderTreeIterator.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -18,6 +18,7 @@
 #define __itkLevelOrderTreeIterator_h
 
 #include <queue>
+#include <climits>
 #include <itkTreeIteratorBase.h>
 
 namespace itk{
@@ -28,11 +29,11 @@ class LevelOrderTreeIterator : public TreeIteratorBase<TTreeType>
 public:
 
   /** Typedefs */
-  typedef TreeIteratorBase<TTreeType> Superclass; 
-  typedef typename Superclass::Self Self;
-  typedef TTreeType TreeType;
-  typedef typename TTreeType::ValueType ValueType;
-  typedef typename Superclass::TreeNodeType TreeNodeType;
+  typedef LevelOrderTreeIterator                Self;
+  typedef TreeIteratorBase<TTreeType>           Superclass; 
+  typedef TTreeType                             TreeType;
+  typedef typename TTreeType::ValueType         ValueType;
+  typedef typename Superclass::TreeNodeType     TreeNodeType;
 
   /** Constructors */
   LevelOrderTreeIterator( TreeType* tree, int endLevel = INT_MAX, const TreeNodeType* start = NULL);
@@ -56,15 +57,14 @@ public:
   TreeIteratorBase<TTreeType>* Clone();
 
   /** operator = */
-  Self& operator=(Superclass& iterator) 
+  const Self & operator=(const Self & iterator) 
     {
-    Superclass::operator=(iterator);
-    LevelOrderTreeIterator<TTreeType>& it = static_cast<LevelOrderTreeIterator<TTreeType>&>(iterator);
-    m_StartLevel = it.m_StartLevel;
-    m_EndLevel = it.m_EndLevel;
-    m_Queue = it.m_Queue;
+    this->Superclass::operator=(iterator);
+    m_StartLevel = iterator.m_StartLevel;
+    m_EndLevel = iterator.m_EndLevel;
+    m_Queue = iterator.m_Queue;
     return *this;
-  }
+    }
 
 
 protected:
@@ -163,7 +163,7 @@ LevelOrderTreeIterator<TTreeType>::Next()
   return this->m_Position->Get();
 }
 
-/** Const Next */
+/** Get the start Level */
 template <class TTreeType>
 int LevelOrderTreeIterator<TTreeType>::GetStartLevel() const
 {

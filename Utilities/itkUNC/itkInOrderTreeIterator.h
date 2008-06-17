@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
+  Module:    $RCSfile: itkInOrderTreeIterator.h,v $
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -27,10 +27,11 @@ class InOrderTreeIterator : public TreeIteratorBase<TTreeType>
 public:
 
   /** Typedefs */
-  typedef TreeIteratorBase<TTreeType>  Superclass;
-  typedef TTreeType TreeType;
-  typedef typename TTreeType::ValueType ValueType;
-  typedef typename Superclass::TreeNodeType TreeNodeType;
+  typedef InOrderTreeIterator                 Self;
+  typedef TreeIteratorBase<TTreeType>         Superclass;
+  typedef TTreeType                           TreeType;
+  typedef typename TTreeType::ValueType       ValueType;
+  typedef typename Superclass::TreeNodeType   TreeNodeType;
 
   /** Constructors */
   InOrderTreeIterator( TreeType& start );
@@ -127,17 +128,17 @@ InOrderTreeIterator<TTreeType>::FindNextNode() const
   TreeNodeType* child = this->m_Position;
   TreeNodeType* parent = this->m_Position->GetParent();
 
-  int ChildPosition = parent->ChildPosition( child );
+  int childPosition = parent->ChildPosition( child );
   int lastChildPosition = parent->CountChildren() - 1;
 
-  while ( ChildPosition < lastChildPosition ) 
+  while ( childPosition < lastChildPosition ) 
     {
-    TreeNodeType* help = parent->GetChild( ChildPosition + 1 );
+    TreeNodeType* help = parent->GetChild( childPosition + 1 );
     if ( help != NULL )
       {
       return help;
       }
-    ChildPosition++;
+    childPosition++;
     }
 
   while ( parent->HasParent() )
@@ -150,12 +151,12 @@ InOrderTreeIterator<TTreeType>::FindNextNode() const
       {
       return NULL;
       }
-    ChildPosition = parent->ChildPosition(child);
+    childPosition = parent->ChildPosition(child);
     lastChildPosition = parent->CountChildren() - 1;
 
-    while ( ChildPosition < lastChildPosition ) 
+    while ( childPosition < lastChildPosition ) 
       {
-      TreeNodeType* help = parent->GetChild( ChildPosition + 1 );
+      TreeNodeType* help = parent->GetChild( childPosition + 1 );
       if ( help != NULL )
         {
         return help;

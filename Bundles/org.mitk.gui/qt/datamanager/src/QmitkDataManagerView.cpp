@@ -21,10 +21,25 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
   this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
   
-  cherry::IWorkbenchPart::Pointer editor = 
+  cherry::IEditorPart::Pointer editor = 
       this->GetSite()->GetPage()->GetActiveEditor();
   
-  m_MultiWidgetListener->SetStdMultiWidget(editor);
+  // To get hold of the DataStorage hold by the MultiWidget editor, 
+  // you can do the following:
+  //
+  // cherry::IEditorInput::Pointer input = editor->GetEditorInput();
+  // if (input.Cast<DataStorageEditorInput>().IsNotNull())
+  // {
+  //   IDataStorageReference::Pointer dataStorageRef = input.Cast<DataStorageEditorInput>()->GetDataStorageReference();
+  //   DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
+  //   ...
+  // }
+  
+  // If you do not have a part instance to do GetSite(), you can call
+  // cherry::PlatforumUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()
+  // in order to get an IWorkbenchPage object
+  
+  m_MultiWidgetListener->SetStdMultiWidget(editor.Cast<IWorkbenchPart>());
   
 }
   

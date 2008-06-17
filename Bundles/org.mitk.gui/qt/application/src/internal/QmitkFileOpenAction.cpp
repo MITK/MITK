@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeFactory.h>
 
 #include <mitkDataStorageEditorInput.h>
+#include <cherryIEditorPart.h>
 
 #include "../QmitkStdMultiWidgetEditor.h"
 
@@ -40,17 +41,29 @@ void QmitkFileOpenAction::Run()
 {
   QFileDialog dialog(m_Window);
   dialog.setFileMode(QFileDialog::ExistingFiles);
-  dialog.setFilter("Images (*.pic *.pic.gz)");
+  QStringList filters;
+  filters << "Images (*.pic *.pic.gz)" << "All Files (*.*)";
+  dialog.setFilters(filters);
   QStringList fileNames;
   if (dialog.exec())
     fileNames = dialog.selectedFiles();
   
   if (fileNames.empty()) return;
-  
-  mitk::DataStorageEditorInput::Pointer editorInput = new mitk::DataStorageEditorInput();
-  
-  mitk::DataStorage::Pointer dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
-  
+
+  mitk::DataStorageEditorInput::Pointer editorInput;
+  mitk::DataStorage::Pointer dataStorage;
+  QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
+  cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
+  {
+    editorInput = new mitk::DataStorageEditorInput();  
+    dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
+  }
+  else
+  {
+    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
+    dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
+  }
   
   for (QStringList::Iterator fileName = fileNames.begin();
        fileName != fileNames.end(); ++fileName)
@@ -66,11 +79,16 @@ void QmitkFileOpenAction::Run()
     {
       
     }
-  
   }
   
-  m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-  
-  
+  if (multiWidgetEditor.IsNull())
+  {
+    cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
+  }
+  else
+  {
+    multiWidgetEditor->GetStdMultiWidget()->ForceImmediateUpdate();
+  }
 }
 

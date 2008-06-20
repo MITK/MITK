@@ -89,7 +89,7 @@ QmitkDataManagerView::
 StdMultiWidgetListener::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartDeactivated\n";
-  this->ClearStdMultiWidget(partRef);
+  //this->ClearStdMultiWidget(partRef);
 }
 
 void 

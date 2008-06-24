@@ -98,7 +98,12 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   }*/
   
   if ( GetProp()->GetVisibility() )
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=3)  )
+    GetProp()->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+#else
     GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+#endif
+
 }
 
 

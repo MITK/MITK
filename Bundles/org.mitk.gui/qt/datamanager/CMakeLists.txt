@@ -3,6 +3,8 @@ SET(PLUGIN_DEPENDS_ON
   org.opencherry.ui
   org.opencherry.ui.qt
   
+  org.mitk.core.services
+  org.mitk.gui.common
   org.mitk.gui.qt.application
 )
 

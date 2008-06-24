@@ -2,9 +2,13 @@
 
 #include <QPushButton>
 #include <QDockWidget>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
+
+#include <mitkDataStorageEditorInput.h>
+#include <mitkIDataStorageReference.h>
 
 #include "QmitkStdMultiWidget.h"
+#include "QmitkDataTreeComboBox.h"
 
 #include <QmitkStdMultiWidgetEditor.h>
 
@@ -13,13 +17,8 @@
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
-  QHBoxLayout* layout = new QHBoxLayout(parent);
+  QVBoxLayout* layout = new QVBoxLayout(parent);
   layout->setContentsMargins(0,0,0,0);
-  QmitkStandardViews* stdViews = new QmitkStandardViews(parent);
-  layout->addWidget(stdViews);
-  
-  m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
-  this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
   
   cherry::IEditorPart::Pointer editor = 
       this->GetSite()->GetPage()->GetActiveEditor();
@@ -28,9 +27,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // you can do the following:
   //
   // cherry::IEditorInput::Pointer input = editor->GetEditorInput();
-  // if (input.Cast<DataStorageEditorInput>().IsNotNull())
+  // if (input.Cast<mitk::DataStorageEditorInput>().IsNotNull())
   // {
-  //   IDataStorageReference::Pointer dataStorageRef = input.Cast<DataStorageEditorInput>()->GetDataStorageReference();
+  //   mitk::IDataStorageReference::Pointer dataStorageRef = input.Cast<DataStorageEditorInput>()->GetDataStorageReference();
   //   DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
   //   ...
   // }
@@ -38,8 +37,29 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // If you do not have a part instance to do GetSite(), you can call
   // cherry::PlatforumUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()
   // in order to get an IWorkbenchPage object
+
   
+  mitk::DataTree::Pointer dataTree;
+  
+  if (editor.IsNotNull())
+  {
+    cherry::IEditorInput::Pointer input = editor->GetEditorInput();
+    if (input.Cast<mitk::DataStorageEditorInput>().IsNotNull())
+    {
+      mitk::IDataStorageReference::Pointer dataStorageRef = input.Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference();
+      dataTree = dataStorageRef->GetDataTree();
+    }
+  }
+  
+  QmitkDataTreeComboBox* comboBox = new QmitkDataTreeComboBox(dataTree, parent);
+  layout->addWidget(comboBox);
+    
+  QmitkStandardViews* stdViews = new QmitkStandardViews(parent);
+  layout->addWidget(stdViews);
+  
+  m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
   m_MultiWidgetListener->SetStdMultiWidget(editor.Cast<IWorkbenchPart>());
+  this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
   
 }
   

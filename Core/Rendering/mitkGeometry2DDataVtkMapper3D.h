@@ -58,10 +58,11 @@ class DataStorage;
  *   - \b "color": (ColorProperty) Color of the tubed frame.
  *   - \b "xresolution": (FloatProperty) Resolution (=number of tiles) in x direction. Only relevant for ThinPlateSplineCurvedGeometry
  *   - \b "yresolution": (FloatProperty) Resolution (=number of tiles) in y direction. Only relevant for ThinPlateSplineCurvedGeometry
- *   - \b "draw normals 3D": (BoolProperty) If true, a vtkHedgeHog is used to display normals for the generated surface object. Useful to distinguish front and back of a plane.
+ *   - \b "draw normals 3D": (BoolProperty) If true, a vtkHedgeHog is used to display normals for the generated surface object. Useful to distinguish front and back of a plane. Hedgehogs are colored according to "front color" and "back color"
+ *   - \b "color two sides": (BoolProperty) If true, front and back side of the plane are colored differently ("front color" and "back color")
  *   - \b "invert normals": (BoolProperty) Inverts front/back for display.
- *   - \b "front normal color": (ColorProperty) Color for normals display on front side of the plane
- *   - \b "back normal color": (ColorProperty) Color for normals display on back side of the plane
+ *   - \b "front color": (ColorProperty) Color for front side of the plane
+ *   - \b "back color": (ColorProperty) Color for back side of the plane
  *
  */
 class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
@@ -178,6 +179,9 @@ protected:
 
   /** \brief Whether or not to display normals */
   bool m_DisplayNormals;
+  
+  /** \brief Whether to color front and back */
+  bool m_ColorTwoSides;
 
   /** \brief Whether or not to invert normals */
   bool m_InvertNormals;

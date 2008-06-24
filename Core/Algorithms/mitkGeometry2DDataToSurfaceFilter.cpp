@@ -356,7 +356,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
     m_PlaneClipper->SetInput( m_VtkTransformPlaneFilter->GetOutput() );
     m_PlaneClipper->SetClipFunction( m_Box );
-    m_PlaneClipper->GenerateClippedOutputOn();
+    m_PlaneClipper->GenerateClippedOutputOff(); // important to NOT generate normals data for clipped part
     m_PlaneClipper->InsideOutOn();
     m_PlaneClipper->SetValue( 0.0 );
 

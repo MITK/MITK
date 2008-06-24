@@ -70,9 +70,9 @@ class DisplayGeometry;
  *   - \b "ScalarsRangeMaximum": (FloatProperty) Range of the lookup table
  *   - \b "draw normals 2D": (BoolProperty) If true, normals are drawn (if present in vtkPolyData)
  *   - \b "invert normals": (BoolProperty) Inverts front/back for display.
- *   - \b "front normal color": (ColorProperty) Color for normals display on front side of the plane
+ *   - \b "front color": (ColorProperty) Color for normals display on front side of the plane
  *   - \b "front normal length (px)": (FloatProperty) Length of the front side normals in pixels.
- *   - \b "back normal color": (ColorProperty) Color for normals display on back side of the plane
+ *   - \b "back color": (ColorProperty) Color for normals display on back side of the plane
  *   - \b "back normal length (px)": (FloatProperty) Length of the back side normals in pixels.
  *
  */

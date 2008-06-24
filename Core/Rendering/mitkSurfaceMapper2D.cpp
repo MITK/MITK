@@ -481,8 +481,8 @@ void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk:
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
   node->AddProperty( "draw normals 2D", BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "invert normals", BoolProperty::New(false), renderer, overwrite );
-  node->AddProperty( "front normal color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
-  node->AddProperty( "back normal color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
+  node->AddProperty( "front color", ColorProperty::New(0.0, 1.0, 0.0), renderer, overwrite );
+  node->AddProperty( "back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
   node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
   node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
@@ -506,10 +506,10 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
   if (!invertNormals)
   {
-    GetColor(m_FrontSideColor, renderer, "front normal color");
+    GetColor(m_FrontSideColor, renderer, "front color");
     GetOpacity(m_FrontSideColor[3], renderer);
 
-    GetColor(m_BackSideColor, renderer, "back normal color");
+    GetColor(m_BackSideColor, renderer, "back color");
     GetOpacity(m_BackSideColor[3], renderer);
     
     if (DataTreeNode* node = GetDataTreeNode())
@@ -520,10 +520,10 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   }
   else
   {
-    GetColor(m_FrontSideColor, renderer, "back normal color");
+    GetColor(m_FrontSideColor, renderer, "back color");
     GetOpacity(m_FrontSideColor[3], renderer);
 
-    GetColor(m_BackSideColor, renderer, "front normal color");
+    GetColor(m_BackSideColor, renderer, "front color");
     GetOpacity(m_BackSideColor[3], renderer);
     
     if (DataTreeNode* node = GetDataTreeNode())

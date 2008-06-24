@@ -46,6 +46,7 @@ namespace mitk
 
 Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 : m_DisplayNormals(false),
+  m_ColorTwoSides(false),
   m_InvertNormals(true),
   m_NormalsActorAdded(false),
   m_DataTreeIterator(NULL)
@@ -91,6 +92,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
   m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
   m_BackgroundActor->SetMapper( m_BackgroundMapper );
+  m_BackgroundActor->SetBackfaceProperty( m_BackgroundActor->MakeProperty() );
+  m_BackgroundActor->GetBackfaceProperty()->SetColor( 0.0, 0.0, 0.0 );
 
   m_FrontHedgeHog = vtkHedgeHog::New();
   m_BackHedgeHog  = vtkHedgeHog::New();
@@ -408,40 +411,53 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     // add a graphical representation of the surface normals if requested
     DataTreeNode* node = this->GetDataTreeNode();
     node->GetBoolProperty("draw normals 3D", m_DisplayNormals, renderer);
+    node->GetBoolProperty("color two sides", m_ColorTwoSides, renderer);
     node->GetBoolProperty("invert normals", m_InvertNormals, renderer);
 
-    if ( m_DisplayNormals )
+    if ( m_DisplayNormals || m_ColorTwoSides )
     {
-      m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
-      m_NormalsTransformer->SetTransform( 
-        node->GetVtkTransform(this->GetTimestep()) );
-
-      m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
-      m_FrontHedgeHog->SetVectorModeToUseNormal();
-      m_FrontHedgeHog->SetScaleFactor( m_InvertNormals ? 1.0 : -1.0 );
-
-      m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
-      m_BackHedgeHog->SetVectorModeToUseNormal();
-      m_BackHedgeHog->SetScaleFactor( m_InvertNormals ? -1.0 : 1.0 );
-
       float frontColor[3] = { 0.0, 1.0, 0.0 };
-      node->GetColor( frontColor, renderer, "front normal color" );
-      m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
-      
+      node->GetColor( frontColor, renderer, "front color" );
       float backColor[3] = { 0.0, 1.0, 0.0 };
-      node->GetColor( backColor, renderer, "back normal color" );
-      m_BackNormalsActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+      node->GetColor( backColor, renderer, "back color" );
 
-      if ( !m_NormalsActorAdded )
+      if ( m_DisplayNormals )
       {
-        m_Prop3DAssembly->AddPart( m_FrontNormalsActor );
-        m_Prop3DAssembly->AddPart( m_BackNormalsActor );
-        m_NormalsActorAdded = true;
+
+        m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
+        m_NormalsTransformer->SetTransform( 
+          node->GetVtkTransform(this->GetTimestep()) );
+
+        m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+        m_FrontHedgeHog->SetVectorModeToUseNormal();
+        m_FrontHedgeHog->SetScaleFactor( m_InvertNormals ? 1.0 : -1.0 );
+        
+        m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+
+        m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+        m_BackHedgeHog->SetVectorModeToUseNormal();
+        m_BackHedgeHog->SetScaleFactor( m_InvertNormals ? -1.0 : 1.0 );
+
+        m_BackNormalsActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+
+        if ( !m_NormalsActorAdded && false )
+        {
+          m_Prop3DAssembly->AddPart( m_FrontNormalsActor );
+          m_Prop3DAssembly->AddPart( m_BackNormalsActor );
+          m_NormalsActorAdded = true;
+        }
       }
+
+      if ( m_ColorTwoSides )
+      {
+        m_BackgroundActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+        m_BackgroundActor->GetBackfaceProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+      }
+
     }
-    else // !m_DisplayNormals
+    else if ( !m_DisplayNormals )
     {
-      if (m_NormalsActorAdded)
+      if (m_NormalsActorAdded && false )
       {
         m_Prop3DAssembly->RemovePart( m_FrontNormalsActor );
         m_Prop3DAssembly->RemovePart( m_BackNormalsActor );

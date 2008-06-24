@@ -50,7 +50,6 @@ class GenericProperty : public BaseProperty
   public:
 
     mitkClassMacro(GenericProperty, BaseProperty);
-    itkNewMacro(Self);
     mitkNewMacro1Param(GenericProperty<T>, T);
     
     typedef T ValueType;

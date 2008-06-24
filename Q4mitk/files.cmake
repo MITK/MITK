@@ -1,4 +1,18 @@
 SET(CPP_FILES
+
+ QmitkPropertyObservers/QmitkBasePropertyView.cpp
+ QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkBoolPropertyView.cpp
+ QmitkPropertyObservers/QmitkColorPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkColorPropertyView.cpp
+ QmitkPropertyObservers/QmitkDataTreeComboBox.cpp
+ QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkNumberPropertyView.cpp
+ QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
+ QmitkPropertyObservers/QmitkStringPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
+ QmitkPropertyObservers/QmitkStringPropertyView.cpp
+
  qclickablelabel.cpp
  QmitkAbortEventFilter.cpp
  QmitkApplicationCursor.cpp
@@ -27,6 +41,20 @@ QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
 
 
 SET(MOC_H_FILES
+
+ QmitkPropertyObservers/QmitkBasePropertyView.h
+ QmitkPropertyObservers/QmitkBoolPropertyEditor.h
+ QmitkPropertyObservers/QmitkBoolPropertyView.h
+ QmitkPropertyObservers/QmitkColorPropertyEditor.h
+ QmitkPropertyObservers/QmitkColorPropertyView.h
+ QmitkPropertyObservers/QmitkDataTreeComboBox.h
+ QmitkPropertyObservers/QmitkNumberPropertyEditor.h
+ QmitkPropertyObservers/QmitkNumberPropertyView.h
+ QmitkPropertyObservers/QmitkPropertyViewFactory.h
+ QmitkPropertyObservers/QmitkStringPropertyEditor.h
+ QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
+ QmitkPropertyObservers/QmitkStringPropertyView.h
+
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
  QmitkRenderingManager.h

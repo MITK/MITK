@@ -152,11 +152,16 @@ IF(USE_QT)
     FOREACH(dir QmitkPropertyObservers) 
       SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk/${dir})
     ENDFOREACH(dir)
-    SUBDIRS(Q4mitk Q4Applications)
+    ADD_SUBDIRECTORY(Q4mitk)
   ENDIF(DESIRED_QT_VERSION EQUAL 3)
 ENDIF(USE_QT)
 
 ADD_SUBDIRECTORY(Bundles)
+
+# Q4Applications depends on cmake variables set in the Bundles
+IF(DESIRED_QT_VERSION EQUAL 4)
+  ADD_SUBDIRECTORY(Q4Applications)
+ENDIF(DESIRED_QT_VERSION EQUAL 4)
 
 ADD_SUBDIRECTORY(Documentation)
 #### mitkConfig.h ####

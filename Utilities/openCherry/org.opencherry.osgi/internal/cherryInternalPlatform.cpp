@@ -100,15 +100,15 @@ void InternalPlatform::ParseConfigFile()
   
   Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config(new Poco::Util::PropertyFileConfiguration(configStream));
 
-  if (config->getString(Platform::ARG_HOME, "") == "")
-  {
-    std::cout << "You must set the " << Platform::ARG_HOME << " property in your configuration file.\n";
-    exit(1);
-  }
+//  if (config->getString(Platform::ARG_HOME, "") == "")
+//  {
+//    std::cout << "You must set the " << Platform::ARG_HOME << " property in your configuration file.\n";
+//    exit(1);
+//  }
   
   m_ArgMap[Platform::ARG_APPLICATION] = config->getString(Platform::ARG_APPLICATION, "");
   m_ArgMap[Platform::ARG_CLEAN] = config->hasProperty(Platform::ARG_CLEAN) ? "1" : "";
-  m_ArgMap[Platform::ARG_HOME] = config->getString(Platform::ARG_HOME, "");
+  //m_ArgMap[Platform::ARG_HOME] = config->getString(Platform::ARG_HOME, "");
   
   Poco::Path cachePath(appPath);
   cachePath.pushDirectory("Plugins");
@@ -128,8 +128,8 @@ void InternalPlatform::ParseArguments()
       m_ArgMap[Platform::ARG_CLEAN] = "1";
     else if (arg == argPrefix + Platform::ARG_APPLICATION)
       m_ArgMap[Platform::ARG_APPLICATION] = m_Argv[++i];
-    else if (arg == argPrefix + Platform::ARG_HOME)
-      m_ArgMap[Platform::ARG_HOME] = m_Argv[++i];
+    //else if (arg == argPrefix + Platform::ARG_HOME)
+    //  m_ArgMap[Platform::ARG_HOME] = m_Argv[++i];
     else if (arg == argPrefix + Platform::ARG_PLUGIN_CACHE)
       m_ArgMap[Platform::ARG_PLUGIN_CACHE] = m_Argv[++i];
     else if (arg == argPrefix + Platform::ARG_PLUGIN_DIRS)
@@ -166,10 +166,7 @@ void InternalPlatform::Initialize(int& argc, char** argv)
   // the real plugins as directories)
   std::vector<std::string> pluginBaseDirs;
   
-  // openCherry base dir is always in the list
-  pluginBaseDirs.push_back(m_ArgMap[Platform::ARG_HOME]);
-  
-  Poco::StringTokenizer tokenizer(m_ArgMap[Platform::ARG_PLUGIN_DIRS], ",",
+  Poco::StringTokenizer tokenizer(m_ArgMap[Platform::ARG_PLUGIN_DIRS], ";",
                                   Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
   
   for (Poco::StringTokenizer::Iterator token = tokenizer.begin();

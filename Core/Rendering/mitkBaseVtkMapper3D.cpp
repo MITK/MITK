@@ -166,7 +166,8 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
         labelFollower->SetMapper( labelMapper );
         labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
 
-        labelFollower->SetScale( 2.0, 2.0, 2.0 );
+        labelFollower->SetScale( 2.5, 2.5, 2.5 );
+        labelFollower->GetProperty()->SetColor( 1.0, 0.2, 0.1 );
 
         labelText->SetText( annotationProperty->GetLabel() );
 

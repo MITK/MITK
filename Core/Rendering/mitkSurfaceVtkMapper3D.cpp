@@ -330,8 +330,14 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     }
   }
 
-  m_VtkPolyDataMapper->SetClippingPlanes( m_ClippingPlaneCollection );
-
+  if ( m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
+  {
+    m_VtkPolyDataMapper->SetClippingPlanes( m_ClippingPlaneCollection );
+  }
+  else
+  {
+    m_VtkPolyDataMapper->RemoveAllClippingPlanes();
+  }
 }
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)

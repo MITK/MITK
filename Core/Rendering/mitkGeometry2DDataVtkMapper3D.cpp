@@ -440,7 +440,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
         m_BackNormalsActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
 
-        if ( !m_NormalsActorAdded && false )
+        if ( !m_NormalsActorAdded )
         {
           m_Prop3DAssembly->AddPart( m_FrontNormalsActor );
           m_Prop3DAssembly->AddPart( m_BackNormalsActor );
@@ -450,14 +450,22 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
       if ( m_ColorTwoSides )
       {
-        m_BackgroundActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
-        m_BackgroundActor->GetBackfaceProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+        if ( !m_InvertNormals )
+        {
+          m_BackgroundActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+          m_BackgroundActor->GetBackfaceProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+        }
+        else
+        {
+          m_BackgroundActor->GetBackfaceProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+          m_BackgroundActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+        }
       }
 
     }
     else if ( !m_DisplayNormals )
     {
-      if (m_NormalsActorAdded && false )
+      if ( m_NormalsActorAdded )
       {
         m_Prop3DAssembly->RemovePart( m_FrontNormalsActor );
         m_Prop3DAssembly->RemovePart( m_BackNormalsActor );

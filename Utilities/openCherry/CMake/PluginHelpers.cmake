@@ -33,6 +33,22 @@ MACRO(FIND_PLUGIN_SRC_PATH pluginpath pluginname)
 
 ENDMACRO(FIND_PLUGIN_SRC_PATH)
 
+# sets pluginpath to the absolut path of the plugins binary output directory
+#
+# pluginname: the unique plugin id (i.e. org.opencherry.osgi)
+#
+MACRO(FIND_PLUGIN_BIN_PATH pluginpath pluginname)
+  
+  FOREACH(plugindir ${OPENCHERRY_PLUGIN_BINARY_DIRS})
+    IF(EXISTS ${plugindir}/${ARGV1})
+      SET(${pluginpath} ${plugindir}/${ARGV1})
+    ENDIF(EXISTS ${plugindir}/${ARGV1})
+  ENDFOREACH(plugindir ${OPENCHERRY_PLUGIN_BINARY_DIRS})
+  
+  #MESSAGE(STATUS "Found plugin bin dir: ${${pluginpath}}")
+
+ENDMACRO(FIND_PLUGIN_BIN_PATH)
+
 
 # Recursively searches for plugins (i.e. directories containing a
 # META-INF/MANIFEST.MF file). The macro adds the found directories
@@ -95,6 +111,13 @@ ENDFOREACH(plugin_dir)
 
 ENDMACRO(COLLECT_PLUGINS)
 
+MACRO(PLUGIN_ADD_LINK_DIRECTORIES)
+  FOREACH(plugin_dependency ${PLUGIN_DEPENDS_ON})
+    FIND_PLUGIN_BIN_PATH(plugin_binpath ${plugin_dependency})
+    MESSAGE(STATUS "ADDING LINK DIRECTORY: ${plugin_binpath}/bin")
+    LINK_DIRECTORIES(${plugin_binpath}/bin)
+  ENDFOREACH(plugin_dependency)
+ENDMACRO(PLUGIN_ADD_LINK_DIRECTORIES)
 
 # Creates the current plugin.
 # This macro should be called from the plugins CMakeLists.txt file. The plugin
@@ -107,6 +130,8 @@ ENDMACRO(COLLECT_PLUGINS)
 MACRO(CREATE_PLUGIN)
   SUPPRESS_VC8_DEPRECATED_WARNINGS()
   CREATE_PLUGIN_NAME(PLUGIN_NAME ${PLUGINS_SOURCE_BASE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+  
+  MESSAGE(STATUS "Creating plugin ${PLUGIN_NAME}")
   
   STRING(REPLACE . _ PLUGIN_TARGET ${PLUGIN_NAME})
   
@@ -140,6 +165,11 @@ MACRO(CREATE_PLUGIN)
     MESSAGE(STATUS "ADDING INCLUDE DIR FOR DEPENDENCY ${plugin_dependency}: ${plugin_include_path}")
     INCLUDE_DIRECTORIES(${plugin_include_path})
   ENDFOREACH(plugin_dependency)
+  
+  # set link directories
+  # this is needed for external projects where cmake does not know about
+  # the libraries this plugin depends on
+  PLUGIN_ADD_LINK_DIRECTORIES()
 
 
   SET(PLUGIN_CPP_LIST ${PLUGIN_CPP})
@@ -168,14 +198,14 @@ ENDMACRO(CREATE_PLUGIN)
 # Macro to set specific Qt options, calls CREATE_PLUGIN at the end
 MACRO(CREATE_QT_PLUGIN)
   
-  IF(USE_QT AND DESIRED_QT_VERSION EQUAL 4)
+  IF(QT4_FOUND)
     INCLUDE_DIRECTORIES(${QT_INCLUDES})
     ADD_DEFINITIONS(${QT_DEFINITIONS})
   
     CREATE_PLUGIN()
   
     TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${QT_LIBRARIES})
-  ENDIF(USE_QT AND DESIRED_QT_VERSION EQUAL 4)
+  ENDIF(QT4_FOUND)
   
 ENDMACRO(CREATE_QT_PLUGIN)
 

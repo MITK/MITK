@@ -32,6 +32,18 @@ PURPOSE.  See the above copyright notices for more information.
 #define GL_BGR GL_BGR_EXT
 #endif
 
+mitk::MovieGenerator::MovieGenerator()
+:m_stepper(NULL),
+m_renderer(NULL),
+m_width(0),
+m_height(0),
+m_initialized(false),
+m_FrameRate(20)
+{ 
+  m_fileName[0]  =  0;
+}
+
+
 mitk::MovieGenerator::Pointer mitk::MovieGenerator::New() 
 {
   Pointer smartPtr;

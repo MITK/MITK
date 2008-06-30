@@ -48,7 +48,7 @@ public:
   //!  uses given stepper and filename  to create a movie from the active OpenGL context    
   virtual bool WriteMovie();
   
-  //!  alternativ way, which does not use a stepper; 
+  //!  alternative way, which does not use a stepper; 
   //   it adds a single frame to a movie each time the function is called
   //   Initialization is done with first function call; Renderer and Filename have to be set up properly before.
   virtual bool WriteCurrentFrameToMovie();
@@ -62,14 +62,8 @@ public:
 protected:
 
   //!  default  constructor
-  MovieGenerator() { 
-    m_fileName[0]  =  0;
-    m_stepper  =  0;
-    m_renderer = 0;
-    m_width  =  0;
-    m_height = 0;
-    m_FrameRate = 20;
-  }
+  MovieGenerator();
+
 
   //!  called directly  before the first frame is  added, determines  movie  size from  renderer
   virtual bool InitGenerator() = 0;

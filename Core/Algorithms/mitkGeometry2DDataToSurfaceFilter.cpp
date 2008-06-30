@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
 #include <vtkPlane.h>
+#include <vtkPPolyDataNormals.h>
 #include <vtkCutter.h>
 #include <vtkStripper.h>
 #include <vtkTriangleFilter.h>
@@ -55,6 +56,7 @@ mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
   m_PlaneCutter = vtkCutter::New();
   m_PlaneStripper = vtkStripper::New();
   m_PlanePolyData = vtkPolyData::New();
+  m_NormalsUpdater = vtkPPolyDataNormals::New();
   m_PlaneTriangler = vtkTriangleFilter::New();
   m_TextureMapToPlane = vtkTextureMapToPlane::New();
 
@@ -78,6 +80,7 @@ mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
   m_PlaneCutter->Delete();
   m_PlaneStripper->Delete();
   m_PlanePolyData->Delete();
+  m_NormalsUpdater->Delete();
   m_PlaneTriangler->Delete();
   m_TextureMapToPlane->Delete();
 
@@ -363,7 +366,13 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     planeSurface = m_PlaneClipper->GetOutput();
   }
 
-  output->SetVtkPolyData( planeSurface );
+  m_NormalsUpdater->SetInput( planeSurface );
+  m_NormalsUpdater->AutoOrientNormalsOn(); // that's the trick! Brings consistency between 
+                                          //  normals direction and front/back faces direction (see bug 1440)
+  m_NormalsUpdater->ComputePointNormalsOn();
+  m_NormalsUpdater->Update();
+
+  output->SetVtkPolyData( m_NormalsUpdater->GetOutput() );
   output->CalculateBoundingBox();
 }
 

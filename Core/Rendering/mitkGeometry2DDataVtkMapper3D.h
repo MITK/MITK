@@ -157,13 +157,13 @@ protected:
   vtkActor *m_EdgeActor;
 
   /** \brief Mapper for black plane background */
-  vtkDataSetMapper *m_BackgroundMapper;
+  vtkPolyDataMapper *m_BackgroundMapper;
 
   /** \brief Actor for black plane background */
   vtkActor *m_BackgroundActor;
   
   /** \brief Transforms the suface before applying the glyph filter */
-  vtkTransformPolyDataFilter *m_NormalsTransformer;
+  vtkTransformPolyDataFilter* m_NormalsTransformer;
 
   /** \brief Mapper for normals representation (thin lines) */
   vtkPolyDataMapper* m_FrontNormalsMapper;

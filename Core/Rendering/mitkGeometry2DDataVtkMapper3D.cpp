@@ -61,7 +61,7 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeTransformer = vtkTransformPolyDataFilter::New();
   m_NormalsTransformer = vtkTransformPolyDataFilter::New();
   m_EdgeActor = vtkActor::New();
-  m_BackgroundMapper = vtkDataSetMapper::New();
+  m_BackgroundMapper = vtkPolyDataMapper::New();
   m_BackgroundActor = vtkActor::New();
   m_Prop3DAssembly = vtkAssembly::New();
   m_ImageAssembly = vtkAssembly::New();
@@ -72,7 +72,7 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   // (though empty) input
   vtkPolyData *emptyPolyData = vtkPolyData::New();
   m_Edges->SetInput( emptyPolyData );
-  emptyPolyData->Delete(); // decrease reference count
+  emptyPolyData->Delete(); 
 
   m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
 
@@ -86,6 +86,7 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
   m_EdgeActor->SetMapper( m_EdgeMapper );
 
+  m_BackgroundMapper->SetInput(emptyPolyData);
   m_BackgroundMapper->ImmediateModeRenderingOn();
 
   m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
@@ -416,14 +417,13 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
     if ( m_DisplayNormals || m_ColorTwoSides )
     {
-      float frontColor[3] = { 0.0, 1.0, 0.0 };
+      float frontColor[3] = { 0.0, 0.0, 1.0 };
       node->GetColor( frontColor, renderer, "front color" );
-      float backColor[3] = { 0.0, 1.0, 0.0 };
+      float backColor[3] = { 1.0, 0.0, 0.0 };
       node->GetColor( backColor, renderer, "back color" );
 
       if ( m_DisplayNormals )
       {
-
         m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
         m_NormalsTransformer->SetTransform( 
           node->GetVtkTransform(this->GetTimestep()) );
@@ -452,13 +452,13 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       {
         if ( !m_InvertNormals )
         {
-          m_BackgroundActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
-          m_BackgroundActor->GetBackfaceProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+          m_BackgroundActor->GetBackfaceProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+          m_BackgroundActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
         }
         else
         {
-          m_BackgroundActor->GetBackfaceProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
-          m_BackgroundActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
+          m_BackgroundActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
+          m_BackgroundActor->GetBackfaceProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
         }
       }
 
@@ -475,7 +475,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 
     // Add black background for all images (which may be transparent)
-    m_BackgroundMapper->SetInput( m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
+    m_BackgroundMapper->SetInput( surface->GetVtkPolyData() );
     m_ImageAssembly->AddPart( m_BackgroundActor );
 
 
@@ -570,10 +570,9 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                 // switching between planar and curved geometries)
                 if ( dataSetMapper != NULL )
                 {
-                  if ( dataSetMapper->GetInput() != m_SurfaceCreator->GetOutput()->GetVtkPolyData() )
+                  if ( dataSetMapper->GetInput() != surface->GetVtkPolyData() )
                   {
-                    dataSetMapper->SetInput( 
-                      m_SurfaceCreator->GetOutput()->GetVtkPolyData() );
+                    dataSetMapper->SetInput( surface->GetVtkPolyData() );
                   }
                 }
 

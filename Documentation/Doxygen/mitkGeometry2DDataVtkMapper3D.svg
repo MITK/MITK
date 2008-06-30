@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="mitkGeometry2DDataVtkMapper3D.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="EmptyDiamondL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="EmptyDiamondL"
+       style="overflow:visible">
+      <path
+         id="path3544"
+         d="M 0,-7.0710768 L -7.0710894,0 L 0,7.0710589 L 7.0710462,0 L 0,-7.0710768 z "
+         style="fill-rule:evenodd;fill:#FFFFFF;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.8)" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyDiamondM"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="EmptyDiamondM"
+       style="overflow:visible">
+      <path
+         id="path3547"
+         d="M 0,-7.0710768 L -7.0710894,0 L 0,7.0710589 L 7.0710462,0 L 0,-7.0710768 z "
+         style="fill-rule:evenodd;fill:#FFFFFF;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.4)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="317.59567"
+     inkscape:cy="777.53119"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="992"
+     inkscape:window-x="1280"
+     inkscape:window-y="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:#eef4d7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2565"
+       width="980"
+       height="118.57144"
+       x="-77.14286"
+       y="-70.494942" />
+    <rect
+       y="553.79077"
+       x="-77.14286"
+       height="248.57144"
+       width="980"
+       id="rect2563"
+       style="opacity:1;fill:#eef4d7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       style="opacity:1;fill:#f4e3d7;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2561"
+       width="980"
+       height="541.42859"
+       x="-77.14286"
+       y="39.505039" />
+    <g
+       id="g3358"
+       transform="translate(186.98471,187.10505)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:7.25819445;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3348"
+         width="213.91446"
+         height="48.249432"
+         x="-18.063812"
+         y="424.16626" />
+      <text
+         id="text2383"
+         y="443.61276"
+         x="88.496689"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="443.61276"
+           x="88.496689"
+           id="tspan2385"
+           sodipodi:role="line">Geometry2DDataToSurfaceFilter</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan2387"
+           y="459.86276"
+           x="88.496689"
+           sodipodi:role="line">m_SurfaceCreator</tspan></text>
+    </g>
+    <g
+       id="g3352"
+       transform="translate(276.88829,206.07113)">
+      <rect
+         y="490.80478"
+         x="-105.97864"
+         height="48.312527"
+         width="209.93694"
+         id="rect3350"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:7.1950984;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="-1.3465958"
+         y="510.12094"
+         id="text2417"><tspan
+           sodipodi:role="line"
+           id="tspan2419"
+           x="-1.3465958"
+           y="510.12094"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">BoundingBox</tspan><tspan
+           sodipodi:role="line"
+           x="-1.3465958"
+           y="526.37097"
+           id="tspan2421"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_SurfaceCreatorBoudingBox</tspan></text>
+    </g>
+    <g
+       id="g3364"
+       transform="translate(277.89843,21.666871)">
+      <rect
+         y="380.19693"
+         x="103.63186"
+         height="49.31501"
+         width="152.35057"
+         id="rect3346"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.19261456;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text2423"
+         y="400.09369"
+         x="179.32155"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           id="tspan2443"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="400.09369"
+           x="179.32155"
+           sodipodi:role="line">vtkPolyDataMapper</tspan><tspan
+           id="tspan2447"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="416.34369"
+           x="179.32155"
+           sodipodi:role="line">m_BackgroundMapper</tspan></text>
+    </g>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2433"
+       style="fill:black;fill-opacity:1;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;font-family:Bitstream Vera Sans;font-style:normal;font-weight:normal;font-size:12px"><flowRegion
+         id="flowRegion2435"><rect
+           id="rect2437"
+           width="126.26907"
+           height="23.233509"
+           x="271.73105"
+           y="195.75282" /></flowRegion><flowPara
+         id="flowPara2439" /></flowRoot>    <g
+       id="g3370"
+       transform="translate(235.47203,-6.4703354)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.99956226;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3344"
+         width="142.44211"
+         height="49.508064"
+         x="151.0125"
+         y="322.5217" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="221.74796"
+         y="342.43564"
+         id="text2449"><tspan
+           sodipodi:role="line"
+           x="221.74796"
+           y="342.43564"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan2453">vtkActor</tspan><tspan
+           id="tspan2457"
+           sodipodi:role="line"
+           x="221.74796"
+           y="358.68564"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_BackgroundActor</tspan></text>
+    </g>
+    <g
+       id="g3394"
+       transform="translate(-11.575637,-28.787526)">
+      <rect
+         y="103.37691"
+         x="274.30948"
+         height="49.39138"
+         width="148.38634"
+         id="rect3330"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.11624622;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text2459"
+         y="123.23251"
+         x="348.21066"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="123.23251"
+           x="348.21066"
+           sodipodi:role="line"
+           id="tspan2463">vtkAssembly</tspan><tspan
+           id="tspan2467"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="139.48251"
+           x="348.21066"
+           sodipodi:role="line">m_Prop3DAssembly</tspan></text>
+    </g>
+    <g
+       id="g3418"
+       transform="translate(14.372343,67.242164)">
+      <rect
+         y="252.26248"
+         x="575.72803"
+         height="48.605118"
+         width="192.04678"
+         id="rect3338"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.90250826;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="671.6308"
+         y="271.88681"
+         id="text2473"><tspan
+           sodipodi:role="line"
+           x="671.6308"
+           y="271.88681"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan2477">vtkTransformPolyDataFilter</tspan><tspan
+           id="tspan2481"
+           sodipodi:role="line"
+           x="671.6308"
+           y="288.13681"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_NormalsTransformer</tspan></text>
+    </g>
+    <g
+       id="g3424"
+       transform="translate(-38.155626,96.482667)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.83975649;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3340"
+         width="134.52069"
+         height="49.66787"
+         x="657.01904"
+         y="304.25906" />
+      <text
+         id="text2483"
+         y="324.2529"
+         x="724.29846"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="324.2529"
+           x="724.29846"
+           sodipodi:role="line"
+           id="tspan2487">vtkHedgehog</tspan><tspan
+           id="tspan2491"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="340.5029"
+           x="724.29846"
+           sodipodi:role="line">m_FrontHedgeHog</tspan></text>
+    </g>
+    <g
+       id="g3412"
+       transform="translate(97.204839,23.859585)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.30514336;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3336"
+         width="158.29897"
+         height="49.202484"
+         x="509.76944"
+         y="213.578" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="588.43335"
+         y="233.42168"
+         id="text2493"><tspan
+           sodipodi:role="line"
+           x="588.43335"
+           y="233.42168"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan2497">vtkPolyDataMapper</tspan><tspan
+           id="tspan2501"
+           sodipodi:role="line"
+           x="588.43335"
+           y="249.67168"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_FrontNormalsMapper</tspan></text>
+    </g>
+    <g
+       id="g3406"
+       transform="translate(177.00687,-5.3808898)">
+      <rect
+         y="160.93631"
+         x="435.91458"
+         height="49.429985"
+         width="146.40463"
+         id="rect3334"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.07764149;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text2503"
+         y="180.89374"
+         x="508.63129"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           id="tspan2505"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="180.89374"
+           x="508.63129"
+           sodipodi:role="line">vtkActor</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="197.14374"
+           x="508.63129"
+           sodipodi:role="line"
+           id="tspan2507">m_FrontNormalsActor</tspan></text>
+    </g>
+    <g
+       id="g2594">
+      <rect
+         style="fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.32697296;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3328"
+         width="110.78981"
+         height="50.180653"
+         x="-14.914435"
+         y="161.24098" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="39.994865"
+         y="181.49123"
+         id="text2509"><tspan
+           id="tspan2513"
+           sodipodi:role="line"
+           x="39.994865"
+           y="181.49123"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">vtkActor</tspan><tspan
+           id="tspan2517"
+           sodipodi:role="line"
+           x="39.994865"
+           y="197.74123"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_EdgeActor</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:20.25797844px;font-style:normal;font-weight:normal;text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="-57.51273"
+       y="52.628078"
+       id="text2581"><tspan
+         id="tspan2583"
+         sodipodi:role="line"
+         x="-57.51273"
+         y="52.628078"
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold" /><tspan
+         id="tspan2585"
+         sodipodi:role="line"
+         x="-57.51273"
+         y="80.06076"
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold">Inside this mapper</tspan></text>
+    <g
+       id="g3388"
+       transform="translate(-11.575629,-15.482435)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.99956226;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect3332"
+         width="142.44211"
+         height="49.508064"
+         x="277.28159"
+         y="169.98865" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="348.21063"
+         y="189.90259"
+         id="text2519"><tspan
+           id="tspan2521"
+           sodipodi:role="line"
+           x="348.21063"
+           y="189.90259"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">vtkAssembly</tspan><tspan
+           sodipodi:role="line"
+           x="348.21063"
+           y="206.15259"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan2523">m_ImageAssembly</tspan></text>
+    </g>
+    <g
+       id="g3400"
+       transform="translate(-26.727916,-53.538085)">
+      <rect
+         y="27.057348"
+         x="315.1676"
+         height="50.507626"
+         width="96.974648"
+         id="rect2548"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text2525"
+         y="47.572636"
+         x="363.94693"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="47.572636"
+           x="363.94693"
+           sodipodi:role="line"
+           id="tspan2527">vtkProp3D</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="63.822636"
+           x="363.94693"
+           sodipodi:role="line"
+           id="tspan2529">m_Prop3D</tspan></text>
+    </g>
+    <g
+       id="g3376"
+       transform="translate(-134.28916,-18.592177)">
+      <rect
+         y="316.51913"
+         x="333.90848"
+         height="49.39138"
+         width="148.38634"
+         id="rect3342"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.11624622;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text2531"
+         y="336.37473"
+         x="407.97153"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           id="tspan2533"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="336.37473"
+           x="407.97153"
+           sodipodi:role="line">vtkActor</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="352.62473"
+           x="407.97153"
+           sodipodi:role="line"
+           id="tspan2535">unnamed image layers</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;marker-mid:none"
+       d="M 336.92701,26.526889 L 336.92701,71.531258"
+       id="path3432"
+       inkscape:connector-type="polyline"
+       inkscape:connection-end="#g3394"
+       inkscape:connection-start="#g3400" />
+    <path
+       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#EmptyDiamondL)"
+       d="M 259.67572,121.96854 L 98.538861,169.2835"
+       id="path4212"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3394" />
+    <path
+       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#EmptyDiamondL)"
+       d="M 336.92701,127.03888 L 336.92701,151.50643"
+       id="path4214"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3394"
+       inkscape:connection-end="#g3388" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#EmptyDiamondL);stroke-opacity:1"
+       d="M 414.1783,117.20111 L 609.88263,162.58865"
+       id="path4216"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3394"
+       inkscape:connection-end="#g3406" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 686.12377,208.02423 L 686.12376,234.28502"
+       id="path4218"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3406"
+       inkscape:connection-end="#g3412" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 686.12376,289.79264 L 686.12376,316.05339"
+       id="path4220"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3412"
+       inkscape:connection-end="#g3418" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 686.12376,371.56102 L 686.12376,397.82185"
+       id="path4222"
+       inkscape:connector-type="polyline"
+       inkscape:connection-end="#g3424"
+       inkscape:connection-start="#g3418" />
+    <path
+       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#EmptyDiamondL)"
+       d="M 324.70854,207.01406 L 286.03095,294.86883"
+       id="path4224"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3388"
+       inkscape:connection-end="#g3376" />
+    <path
+       style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#EmptyDiamondL)"
+       d="M 357.67704,207.01406 L 436.95556,313.05158"
+       id="path4226"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3388"
+       inkscape:connection-end="#g3370" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 457.70558,368.55921 L 457.70558,398.76749"
+       id="path4228"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3370"
+       inkscape:connection-end="#g3364" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 275.87812,663.14984 L 275.87812,693.27836"
+       id="path4232"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g3358"
+       inkscape:connection-end="#g3352" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="659.62958"
+       y="148.27565"
+       id="text4242"><tspan
+         sodipodi:role="line"
+         id="tspan4244"
+         x="659.62958"
+         y="148.27565">id. for back face normals</tspan></text>
+    <g
+       transform="translate(-154.47897,78.125806)"
+       id="g4246">
+      <rect
+         y="161.82751"
+         x="127.6991"
+         height="49.66787"
+         width="134.52069"
+         id="rect4248"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.83975649;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4250"
+         y="181.82137"
+         x="194.47385"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="181.82137"
+           x="194.47385"
+           sodipodi:role="line"
+           id="tspan4254">vtkPolyDataMapper</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="198.07137"
+           x="194.47385"
+           sodipodi:role="line"
+           id="tspan4258">m_EdgeMapper</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       d="M 40.480471,237.03344 L 40.480471,214.08513"
+       id="path4260"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g4246" />
+    <g
+       id="g4262"
+       transform="translate(-154.47897,156.58173)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.18969154;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect4264"
+         width="104.86618"
+         height="50.317936"
+         x="142.52635"
+         y="161.50249" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="194.47385"
+         y="181.82137"
+         id="text4266"><tspan
+           id="tspan4270"
+           sodipodi:role="line"
+           x="194.47385"
+           y="181.82137"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">vtkTubeFilter</tspan><tspan
+           sodipodi:role="line"
+           x="194.47385"
+           y="198.07137"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan4274">m_EdgeTuber</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 40.480472,292.54107 L 40.480472,315.48937"
+       id="path4276"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g4246"
+       inkscape:connection-end="#g4262" />
+    <g
+       transform="translate(-154.47897,235.03768)"
+       id="g4278">
+      <rect
+         y="162.32536"
+         x="100.92282"
+         height="48.672188"
+         width="188.07324"
+         id="rect4280"
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:6.83543825;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text4282"
+         y="181.82137"
+         x="194.47385"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           id="tspan4286"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="181.82137"
+           x="194.47385"
+           sodipodi:role="line">vtkTransformPolyDataFilter</tspan><tspan
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           y="198.07137"
+           x="194.47385"
+           sodipodi:role="line"
+           id="tspan4290">m_EdgeTransformer</tspan></text>
+    </g>
+    <g
+       id="g4292"
+       transform="translate(-154.47896,313.49358)">
+      <rect
+         style="opacity:1;fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:5.5472393;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect4294"
+         width="120.67107"
+         height="49.960388"
+         x="134.6239"
+         y="161.68126" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="194.47385"
+         y="181.82137"
+         id="text4296"><tspan
+           id="tspan4300"
+           sodipodi:role="line"
+           x="194.47385"
+           y="181.82137"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">vtkFeatureEdges</tspan><tspan
+           sodipodi:role="line"
+           x="194.47385"
+           y="198.07137"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           id="tspan4314">m_Edges</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 40.480472,370.997 L 40.480472,393.94532"
+       id="path4316"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g4262"
+       inkscape:connection-end="#g4278" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 40.480473,449.45295 L 40.480474,472.40122"
+       id="path4318"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g4278"
+       inkscape:connection-end="#g4292" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="483.76157"
+       y="170.11034"
+       id="text4331"><tspan
+         sodipodi:role="line"
+         id="tspan4333"
+         x="483.76157"
+         y="170.11034">gets UserTransform</tspan><tspan
+         sodipodi:role="line"
+         x="485.67172"
+         y="185.11034"
+         id="tspan4335">(same as the </tspan><tspan
+         sodipodi:role="line"
+         x="483.76157"
+         y="200.11034"
+         id="tspan4337">m_NormalsTransformer</tspan><tspan
+         sodipodi:role="line"
+         x="483.76157"
+         y="215.11034"
+         id="tspan8335">and</tspan><tspan
+         sodipodi:role="line"
+         x="483.76157"
+         y="230.11034"
+         id="tspan8337">m_EdgeTransformer)</tspan></text>
+    <g
+       id="g5943"
+       transform="translate(-217.1828,-2.0203053)">
+      <rect
+         y="501.16467"
+         x="451.76361"
+         height="48.249432"
+         width="213.91446"
+         id="rect4341"
+         style="fill:#ffffb4;fill-opacity:1;fill-rule:evenodd;stroke:#ffffb5;stroke-width:7.25819445;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="558.3241"
+         y="520.61121"
+         id="text4343"><tspan
+           sodipodi:role="line"
+           id="tspan4345"
+           x="558.3241"
+           y="520.61121"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">vtkPolyData</tspan><tspan
+           sodipodi:role="line"
+           x="558.3241"
+           y="536.86121"
+           id="tspan4347"
+           style="font-size:13px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arial;-inkscape-font-specification:Arial Bold">m_SurfaceCreator-&gt;GetOutput()</tspan></text>
+    </g>
+    <path
+       inkscape:connection-start="#g3358"
+       inkscape:connector-type="polyline"
+       id="path4349"
+       d="M 292.13036,607.64221 L 325.28581,551.0229"
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#EmptyDiamondL);marker-end:none;stroke-opacity:1;display:inline"
+       inkscape:connection-end="#g5943" />
+    <path
+       inkscape:connection-end="#g3364"
+       inkscape:connector-type="polyline"
+       id="path4351"
+       d="M 374.86275,495.51527 L 424.38086,454.27512"
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       inkscape:connection-start="#g5943" />
+    <path
+       inkscape:connection-end="#g3424"
+       inkscape:connector-type="polyline"
+       id="path4353"
+       d="M 439.43172,495.51527 L 615.94354,445.47244"
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+       inkscape:connection-start="#g5943" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="759.63477"
+       y="406.87469"
+       id="text5912"><tspan
+         sodipodi:role="line"
+         id="tspan5914"
+         x="759.63477"
+         y="406.87469">uses normals from</tspan><tspan
+         sodipodi:role="line"
+         x="759.63477"
+         y="421.87469"
+         id="tspan5916">input vtkPolyData.</tspan><tspan
+         sodipodi:role="line"
+         x="759.63477"
+         y="436.87469"
+         id="tspan5920">Generates line from</tspan><tspan
+         sodipodi:role="line"
+         x="759.63477"
+         y="451.87469"
+         id="tspan5924">p to p+n for each</tspan><tspan
+         sodipodi:role="line"
+         x="759.63477"
+         y="466.87469"
+         id="tspan5926">point p and normal n</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="340.42142"
+       y="46.250248"
+       id="text6991"><tspan
+         sodipodi:role="line"
+         x="340.42142"
+         y="61.250248"
+         id="tspan6995">==</tspan></text>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 103.58963,505.00031 L 230.95171,514.77869"
+       id="path6999"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#g4292"
+       inkscape:connection-end="#g5943" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="175.76654"
+       y="367.47876"
+       id="text7001"><tspan
+         sodipodi:role="line"
+         id="tspan7003"
+         x="175.76654"
+         y="367.47876">iterate ImageMapper2Ds</tspan><tspan
+         sodipodi:role="line"
+         x="175.76654"
+         y="382.47876"
+         id="tspan7011">and collects their 2D images.</tspan><tspan
+         sodipodi:role="line"
+         x="175.76654"
+         y="397.47876"
+         id="tspan7015">For each one generate a new</tspan><tspan
+         sodipodi:role="line"
+         x="175.76654"
+         y="412.47876"
+         id="tspan7017">vtkActor</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="445.71426"
+       y="279.50504"
+       id="text8339"><tspan
+         sodipodi:role="line"
+         id="tspan8341"
+         x="445.71426"
+         y="279.50504">has properties for </tspan><tspan
+         sodipodi:role="line"
+         x="445.71426"
+         y="294.50504"
+         id="tspan8343">front faces and </tspan><tspan
+         sodipodi:role="line"
+         x="445.71426"
+         y="309.50504"
+         id="tspan8345">back faces</tspan></text>
+    <text
+       id="text2532"
+       y="620.93658"
+       x="391.16602"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         id="tspan2538"
+         y="620.93658"
+         x="391.16602"
+         sodipodi:role="line">Applies a vtkPolyDataNormals</tspan><tspan
+         y="635.93658"
+         x="391.16602"
+         sodipodi:role="line"
+         id="tspan2545">filter with AutoOrientNormalsOn().</tspan><tspan
+         y="650.93658"
+         x="391.16602"
+         sodipodi:role="line"
+         id="tspan2547">This makes normals consistent with</tspan><tspan
+         y="665.93658"
+         x="391.16602"
+         sodipodi:role="line"
+         id="tspan2549">front/back faces orientation</tspan></text>
+    <text
+       id="text2555"
+       y="-3.2472281"
+       x="390.92902"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="-3.2472281"
+         x="390.92902"
+         id="tspan2557"
+         sodipodi:role="line">The top-level thing which</tspan><tspan
+         y="11.752771"
+         x="390.92902"
+         sodipodi:role="line"
+         id="tspan2559">is part of every 3D mapper</tspan></text>
+    <text
+       id="text2604"
+       y="-54.514778"
+       x="-57.609173"
+       style="font-size:20.25797844px;font-style:normal;font-weight:normal;text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold"
+         y="-54.514778"
+         x="-57.609173"
+         sodipodi:role="line"
+         id="tspan2606" /><tspan
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold"
+         y="-27.082098"
+         x="-57.609173"
+         sodipodi:role="line"
+         id="tspan2610">Presented to the outside</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20.25797844px;font-style:normal;font-weight:normal;text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="-57.609173"
+       y="758.34235"
+       id="text2614"><tspan
+         id="tspan2616"
+         sodipodi:role="line"
+         x="-57.609173"
+         y="758.34235"
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold" /><tspan
+         id="tspan2618"
+         sodipodi:role="line"
+         x="-57.609173"
+         y="785.77502"
+         style="font-size:21.9461441px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;text-anchor:start;font-family:Arial;-inkscape-font-specification:Arial Bold">Influenced from the outside (via input slot)</tspan></text>
+  </g>
+</svg>

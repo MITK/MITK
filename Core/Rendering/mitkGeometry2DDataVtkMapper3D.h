@@ -64,6 +64,11 @@ class DataStorage;
  *   - \b "front color": (ColorProperty) Color for front side of the plane
  *   - \b "back color": (ColorProperty) Color for back side of the plane
  *
+ *  The internal filter pipeline which combines a (sometimes deformed) 2D surface
+ *  with a nice frame and image textures is illustrated in the following sketch:
+ *
+ *  \image html mitkGeometry2DDataVtkMapper3D.png "Internal filter pipeline"
+ *
  */
 class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
 {

@@ -144,6 +144,12 @@ namespace mitk {
     SetOfObjects::ConstPointer GetAll() const;
 
     //##Documentation
+    //## @brief Convenience method to get the first node that matches the predicate condition
+    //##
+    mitk::DataTreeNode* GetNode(const NodePredicateBase* condition = NULL) const;
+
+
+    //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
     mitk::DataTreeNode* GetNamedNode(const char* name) const;

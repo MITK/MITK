@@ -352,6 +352,18 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
 }
 
 
+mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) const
+{
+  if (condition == NULL)
+    return NULL;
+  
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(*condition);
+  if (rs->Size() >= 1)
+    return rs->GetElement(0);
+  else
+    return NULL;
+}
+
 mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations) const
 {
   if (name == NULL)

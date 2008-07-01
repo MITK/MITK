@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "SampleApp.h"
+#include "SampleAppConfig.h"
 
 #include "mitkStatusBar.h"
 
@@ -81,8 +82,8 @@ void SampleApp::InitializeFunctionality()
     // add separator
     qfm->AddSeparator();
 
-    // add "SimpleExampleFunctionality" if requested
-    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName("QmitkSimpleExampleFunctionality");
+    // add MITK_STARTUP_FUNCTIONALITY if requested
+    QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(MITK_STARTUP_FUNCTIONALITY);
     if (createFunction) 
     {
       QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);

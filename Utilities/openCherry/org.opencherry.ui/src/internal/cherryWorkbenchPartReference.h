@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryIWorkbenchPart.h"
 
+//TODO should be removed
+#include "../cherryUiDll.h"
+
 namespace cherry {
 
 class PartPane;
@@ -31,7 +34,7 @@ class PartPane;
  * \ingroup org_opencherry_ui_internal
  * 
  */
-class WorkbenchPartReference : virtual public IWorkbenchPartReference {
+class CHERRY_UI WorkbenchPartReference : virtual public IWorkbenchPartReference {
   
 public: cherryClassMacro(WorkbenchPartReference);
 

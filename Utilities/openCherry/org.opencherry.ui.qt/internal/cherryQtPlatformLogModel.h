@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "event/cherryPlatformEvent.h"
 
 #include <vector>
+#include <ctime>
 
 namespace cherry {
 

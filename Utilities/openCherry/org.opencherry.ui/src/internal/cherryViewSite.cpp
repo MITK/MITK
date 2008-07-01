@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIViewReference.h"
 #include "../cherryIViewPart.h"
+#include "../cherryPartPane.h"
 #include "cherryViewDescriptor.h"
 #include "cherryWorkbenchPage.h"
 

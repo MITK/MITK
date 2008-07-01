@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIReusableEditor.h"
 #include "../cherryIEditorAreaHelper.h"
 
+//TODO should be removed later
+#include "../cherryUiDll.h"
+
 #include "cherryWorkbenchPagePartList.h"
 #include "cherryWorkbenchPartReference.h"
 #include "cherryEditorManager.h"
@@ -46,7 +49,7 @@ class PerspectiveHelper;
  * 
  * A collection of views and editors in a workbench.
  */
-class WorkbenchPage : public IWorkbenchPage {
+class CHERRY_UI WorkbenchPage : public IWorkbenchPage {
 
 public:
   cherryClassMacro(WorkbenchPage);

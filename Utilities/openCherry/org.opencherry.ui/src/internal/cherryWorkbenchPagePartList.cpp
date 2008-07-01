@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "cherryWorkbenchPagePartList.h"
+#include "../cherryPartPane.h"
 
 namespace cherry
 {

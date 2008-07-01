@@ -23,10 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIWorkbenchWindow.h>
 #include <cherryIViewDescriptor.h>
 
+//TODO should be removed later
+#include "../cherryUiQtDll.h"
+
 namespace cherry
 {
 
-class QtShowViewAction : public QAction {
+class CHERRY_UI_QT QtShowViewAction : public QAction {
    Q_OBJECT
    
 private:

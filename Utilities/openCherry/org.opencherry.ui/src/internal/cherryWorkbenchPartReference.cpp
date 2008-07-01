@@ -20,6 +20,7 @@
 #include <cherryPlatformException.h>
 
 #include "cherryWorkbenchPlugin.h"
+#include "../cherryPartPane.h"
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIEditorPart.h"
 

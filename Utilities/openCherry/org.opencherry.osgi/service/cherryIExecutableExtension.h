@@ -7,7 +7,7 @@
 namespace cherry
 {
 
-class IConfigurationElement;
+struct IConfigurationElement;
 
 /**
  * Interface for executable extension classes that require access to 

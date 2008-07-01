@@ -101,7 +101,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
     switch (fMode)
     {
       case UNKNOWN:
-      return EvaluationResult::FALSE;
+      return EvaluationResult::FALSE_EVAL;
       case NONE:
       return EvaluationResult::ValueOf(size == 0);
       case NONE_OR_ONE:
@@ -111,10 +111,10 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
       case EXACT:
       return EvaluationResult::ValueOf(fSize == size);
       case ANY_NUMBER:
-      return EvaluationResult::TRUE;
+      return EvaluationResult::TRUE_EVAL;
     }
     
-    return EvaluationResult::FALSE;
+    return EvaluationResult::FALSE_EVAL;
   }
 
   void

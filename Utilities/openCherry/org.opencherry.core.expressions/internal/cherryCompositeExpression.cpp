@@ -37,15 +37,15 @@ void CompositeExpression::GetChildren(std::vector<Expression::Pointer>& children
 EvaluationResult CompositeExpression::EvaluateAnd(IEvaluationContext* scope)
 {
   if (fExpressions.size() == 0)
-    return EvaluationResult::TRUE;
-  EvaluationResult result = EvaluationResult::TRUE;
+    return EvaluationResult::TRUE_EVAL;
+  EvaluationResult result = EvaluationResult::TRUE_EVAL;
   std::vector<Expression::Pointer>::iterator iter;
   for (iter= fExpressions.begin(); iter != fExpressions.end(); ++iter)
   {
     result = result.And((*iter)->Evaluate(scope));
     // keep iterating even if we have a not loaded found. It can be
-    // that we find a false which will result in a better result.
-    if (result == EvaluationResult::FALSE)
+    // that we find a FALSE_EVAL which will result in a better result.
+    if (result == EvaluationResult::FALSE_EVAL)
       return result;
   }
   return result;
@@ -54,13 +54,13 @@ EvaluationResult CompositeExpression::EvaluateAnd(IEvaluationContext* scope)
 EvaluationResult CompositeExpression::EvaluateOr(IEvaluationContext* scope)
 {
   if (fExpressions.size() == 0)
-    return EvaluationResult::TRUE;
-  EvaluationResult result = EvaluationResult::FALSE;
+    return EvaluationResult::TRUE_EVAL;
+  EvaluationResult result = EvaluationResult::FALSE_EVAL;
   std::vector<Expression::Pointer>::iterator iter;
   for (iter= fExpressions.begin(); iter != fExpressions.end(); ++iter)
   {
     result = result.Or((*iter)->Evaluate(scope));
-    if (result == EvaluationResult::TRUE)
+    if (result == EvaluationResult::TRUE_EVAL)
       return result;
   }
   return result;

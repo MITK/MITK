@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/cherryILayoutContainer.h"
 #include "internal/cherryWorkbenchPage.h"
 
+#include "cherryUiDll.h"
 #include "cherryRectangle.h"
 
 namespace cherry {

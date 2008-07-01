@@ -24,8 +24,8 @@ const int Expression::HASH_CODE_NOT_COMPUTED = -1;
 const intptr_t Expression::HASH_FACTOR = 89;
 const std::string Expression::ATT_VALUE= "value"; //$NON-NLS-1$
 
-const Expression::Pointer Expression::TRUE(new TrueExpression());
-const Expression::Pointer Expression::FALSE(new FalseExpression());
+const Expression::Pointer Expression::TRUE_EVAL(new TRUE_EVALExpression());
+const Expression::Pointer Expression::FALSE_EVAL(new FALSE_EVALExpression());
 
 Expression::Expression()
 {

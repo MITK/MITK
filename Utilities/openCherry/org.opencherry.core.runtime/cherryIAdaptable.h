@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryRuntimeDll.h"
 
+#include <typeinfo>
+
 namespace cherry {
 
 /**

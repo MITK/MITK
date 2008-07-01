@@ -82,8 +82,8 @@ protected:
    * 
    * @param left the first object to compare; may be <code>null</code>.
    * @param right the second object to compare; may be <code>null</code>.
-   * @return <code>true</code> if the two objects are equivalent;
-   *         <code>false</code> otherwise.
+   * @return <code>TRUE_EVAL</code> if the two objects are equivalent;
+   *         <code>FALSE_EVAL</code> otherwise.
    *         
    * @since 3.2
    */
@@ -99,8 +99,8 @@ protected:
    * @param rightArray the right array to compare; may be <code>null</code>, 
    *  and may be empty and may contain <code>null</code> elements.
    *  
-   * @return <code>true</code> if the arrays are equal length and the elements 
-   *  at the same position are equal; <code>false</code> otherwise.
+   * @return <code>TRUE_EVAL</code> if the arrays are equal length and the elements 
+   *  at the same position are equal; <code>FALSE_EVAL</code> otherwise.
    *         
    * @since 3.2
    */
@@ -155,14 +155,14 @@ protected:
 public:
   
   /**
-   * The expression corresponding to {@link EvaluationResult#TRUE}.
+   * The expression corresponding to {@link EvaluationResult#TRUE_EVAL}.
    */
-  static const Expression::Pointer TRUE;
+  static const Expression::Pointer TRUE_EVAL;
   
   /**
-   * The expression corresponding to {@link EvaluationResult#FALSE}.
+   * The expression corresponding to {@link EvaluationResult#FALSE_EVAL}.
    */
-  static const Expression::Pointer FALSE;
+  static const Expression::Pointer FALSE_EVAL;
   
   Expression();
   virtual ~Expression();
@@ -215,23 +215,23 @@ public:
  
 };
 
-class TrueExpression : public Expression
+class TRUE_EVALExpression : public Expression
 {
 public:
   EvaluationResult Evaluate(IEvaluationContext* /*context*/) 
   {
-      return EvaluationResult::TRUE;
+      return EvaluationResult::TRUE_EVAL;
   }
   
   void CollectExpressionInfo(ExpressionInfo* /*info*/) {}
 };
 
-class FalseExpression : public Expression
+class FALSE_EVALExpression : public Expression
 {
 public:
   EvaluationResult Evaluate(IEvaluationContext* /*context*/) 
   {
-      return EvaluationResult::FALSE;
+      return EvaluationResult::FALSE_EVAL;
   }
   
   void CollectExpressionInfo(ExpressionInfo* /*info*/) {}

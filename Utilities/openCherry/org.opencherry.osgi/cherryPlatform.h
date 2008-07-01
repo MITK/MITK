@@ -163,7 +163,7 @@ namespace cherry {
 
 using namespace Poco;
 
-class IExtensionPointService;
+struct IExtensionPointService;
 
 class CHERRY_OSGI Platform
 {

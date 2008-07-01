@@ -28,139 +28,78 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <deque>
 #include <vector>
-#include <algorithm>
 
 namespace cherry {
 
-struct ExpressionVariable : public Object
+struct CHERRY_RUNTIME ExpressionVariable : public Object
 {
   cherryClassMacro(ExpressionVariable)
   
   typedef std::deque<std::string> TypeNames;
   typedef std::deque<const std::type_info*> TypeInfos;
   
-  struct ExtTypeInfo {
+  struct CHERRY_RUNTIME ExtTypeInfo {
 
     std::deque<std::string> m_TypeNames;
     std::deque<const std::type_info*> m_TypeInfos;
     
   };
   
-  struct ExtTypeInfo_ : public ExtTypeInfo {
-   
-    void Add(const std::string& name, const std::type_info& typeinfo) {
-          if (std::find(m_TypeInfos.begin(), m_TypeInfos.end(), &typeinfo) == m_TypeInfos.end())
-                  m_TypeInfos.push_back(&typeinfo);
-          
-          if (std::find(m_TypeNames.begin(), m_TypeNames.end(), name) == m_TypeNames.end())
-            m_TypeNames.push_back(name);
-        }
+  struct CHERRY_RUNTIME ExtTypeInfo_ : public ExtTypeInfo {
+    void Add(const std::string& name, const std::type_info& typeinfo);
   };
   
   virtual bool operator==(ExpressionVariable& var) = 0;
   
-  virtual bool operator==(ExpressionVariable* var) {
-    return this->operator==(*var);
-  }
+  virtual bool operator==(ExpressionVariable* var);
   
   virtual int HashCode() = 0;
   
-  ExpressionVariable() {
-    m_TypeInfo.Add("cherry::ExpressionVariable", typeid(this));
-  }
+  ExpressionVariable();
   
-  const ExtTypeInfo& GetExtTypeInfo() const {
-    return m_TypeInfo;
-  }
+  const ExtTypeInfo& GetExtTypeInfo() const;
   
-  virtual std::string GetClassName() const {
-    return m_TypeInfo.m_TypeNames.back();
-  }
+  virtual std::string GetClassName() const;
   
-  virtual std::string ToString() const {
-    return GetClassName();
-  }
+  virtual std::string ToString() const;
   
 protected:
   ExtTypeInfo_ m_TypeInfo;
   
 };
 
-struct StringExpressionVariable : public ExpressionVariable
+struct CHERRY_RUNTIME StringExpressionVariable : public ExpressionVariable
 {
   cherryClassMacro(StringExpressionVariable)
   
-  StringExpressionVariable(const std::string& str) : m_Var(str)
-  {
-    m_TypeInfo.Add("cherry::StringExpressionVariable", typeid(this));
-  }
+  StringExpressionVariable(const std::string& str);
   
-  bool operator==(ExpressionVariable& var) {
-    try {
-      StringExpressionVariable& that = dynamic_cast<StringExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-  }
+  bool operator==(ExpressionVariable& var);
   
-  void SetVariable(const std::string& var) {
-    this->m_Var = var;
-  }
+  void SetVariable(const std::string& var);
   
-  std::string& GetVariable() {
-    return m_Var;
-  }
+  std::string& GetVariable();
   
-  int HashCode() {
-    return Poco::Hash<std::string>()(m_Var);
-  }
+  int HashCode();
   
 private:
   
   std::string m_Var;
 };
 
-struct VectorExpressionVariable : public ExpressionVariable
+struct CHERRY_RUNTIME VectorExpressionVariable : public ExpressionVariable
 {
   cherryClassMacro(VectorExpressionVariable)
   
   typedef std::vector<ExpressionVariable::Pointer> VectorType;
   
-  VectorExpressionVariable() {
-    m_TypeInfo.Add("cherry::VectorExpressionVariable", typeid(this));
-  }
+  VectorExpressionVariable();
   
-  bool operator==(ExpressionVariable& var) {
-    try {
-      VectorExpressionVariable& that = dynamic_cast<VectorExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-  }
+  bool operator==(ExpressionVariable& var);
   
-  VectorType& GetVariable() {
-    return m_Var;
-  }
+  VectorType& GetVariable();
   
-  int HashCode() {
-    static int HASH_FACTOR = Poco::Hash<std::string>()("cherry::VectorExpressionVariable");
-    if (m_Var.size() == 0)
-    {
-      return 0;
-    }
-    int hashCode = Poco::Hash<std::string>()("std::vector<ExpressionVariable::Pointer>");
-    for (unsigned int i= 0; i < m_Var.size(); i++)
-    {
-      hashCode = hashCode * HASH_FACTOR + m_Var[i]->HashCode();
-    }
-    return hashCode;
-  }
+  int HashCode();
   
   
 private:
@@ -168,37 +107,19 @@ private:
   VectorType m_Var;
 };
 
-struct BooleanExpressionVariable : public ExpressionVariable
+struct CHERRY_RUNTIME BooleanExpressionVariable : public ExpressionVariable
 {
   cherryClassMacro(BooleanExpressionVariable)
   
-  BooleanExpressionVariable(bool b) : m_Var(b)
-  {
-    m_TypeInfo.Add("cherry::BooleanExpressionVariable", typeid(this));
-  }
+  BooleanExpressionVariable(bool b);
   
-  bool operator==(ExpressionVariable& var) {
-    try {
-      BooleanExpressionVariable& that = dynamic_cast<BooleanExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-  }
+  bool operator==(ExpressionVariable& var);
   
-  void SetVariable(bool var) {
-    this->m_Var = var;
-  }
+  void SetVariable(bool var);
   
-  bool& GetVariable() {
-    return m_Var;
-  }
+  bool& GetVariable();
   
-  int HashCode() {
-    return m_Var ? 1 : 0;
-  }
+  int HashCode();
  
   
 private:
@@ -206,37 +127,19 @@ private:
   bool m_Var;
 };
 
-struct FloatExpressionVariable : public ExpressionVariable
+struct CHERRY_RUNTIME FloatExpressionVariable : public ExpressionVariable
 {
   cherryClassMacro(FloatExpressionVariable)
   
-  FloatExpressionVariable(double d) : m_Var(d)
-  {
-    m_TypeInfo.Add("cherry::FloatExpressionVariable", typeid(this));
-  }
+  FloatExpressionVariable(double d);
   
-  bool operator==(ExpressionVariable& var) {
-    try {
-      FloatExpressionVariable& that = dynamic_cast<FloatExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-  }
+  bool operator==(ExpressionVariable& var);
   
-  void SetVariable(double var) {
-    this->m_Var = var;
-  }
+  void SetVariable(double var);
   
-  int HashCode() {
-    return (int)m_Var;
-  }
+  int HashCode();
   
-  double& GetVariable() {
-    return m_Var;
-  }
+  double& GetVariable();
   
   
 private:
@@ -244,37 +147,19 @@ private:
   double m_Var;
 };
 
-struct IntegerExpressionVariable : public ExpressionVariable
+struct CHERRY_RUNTIME IntegerExpressionVariable : public ExpressionVariable
 {
   cherryClassMacro(IntegerExpressionVariable)
   
-  IntegerExpressionVariable(int i) : m_Var(i)
-  {
-    m_TypeInfo.Add("cherry::IntegerExpressionVariable", typeid(this));
-  }
+  IntegerExpressionVariable(int i);
   
-  bool operator==(ExpressionVariable& var) {
-    try {
-      IntegerExpressionVariable& that = dynamic_cast<IntegerExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
-  }
+  bool operator==(ExpressionVariable& var);
   
-  void SetVariable(int var) {
-    this->m_Var = var;
-  }
+  void SetVariable(int var);
   
-  int& GetVariable() {
-    return m_Var;
-  }
+  int& GetVariable();
   
-  int HashCode() {
-    return m_Var;
-  }
+  int HashCode();
   
   
 private:

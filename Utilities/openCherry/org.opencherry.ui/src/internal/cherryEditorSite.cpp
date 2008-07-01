@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryEditorSite.h"
 
+#include "../cherryPartPane.h"
+
 #include <cassert>
 
 namespace cherry

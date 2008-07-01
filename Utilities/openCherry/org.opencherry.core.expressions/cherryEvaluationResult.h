@@ -27,7 +27,7 @@ namespace cherry {
 /**
  * An evaluation result represents the result of an expression
  * evaluation. There are exact three instances of evaluation 
- * result. They are: <code>FALSE</code>, <code>TRUE</code> and
+ * result. They are: <code>FALSE_EVAL</code>, <code>TRUE_EVAL</code> and
  * <code>NOT_LOADED</code>. <code>NOT_LOADED</code> represents
  * the fact that an expression couldn't be evaluated since a
  * plug-in providing certain test expressions isn't loaded yet.
@@ -49,25 +49,25 @@ namespace cherry {
  *   <tbody>
  *     <tr>
  *       <td><em>AND</em></td>
- *       <td>FALSE</td>
- *       <td>TRUE</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *     <tr>
- *       <td>FALSE</td>
- *       <td>FALSE</td>
- *       <td>FALSE</td>
- *       <td>FALSE</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
  *     </tr>
  *     <tr>
- *       <td>TRUE</td>
- *       <td>FALSE</td>
- *       <td>TRUE</td>
+ *       <td>TRUE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *     <tr>
  *       <td>NOT_LOADED</td>
- *       <td>FALSE</td>
+ *       <td>FALSE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
@@ -86,26 +86,26 @@ namespace cherry {
  *   <tbody>
  *     <tr>
  *       <td><em>OR</em></td>
- *       <td>FALSE</td>
- *       <td>TRUE</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *     <tr>
- *       <td>FALSE</td>
- *       <td>FALSE</td>
- *       <td>TRUE</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *     <tr>
- *       <td>TRUE</td>
- *       <td>TRUE</td>
- *       <td>TRUE</td>
- *       <td>TRUE</td>
+ *       <td>TRUE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *     </tr>
  *     <tr>
  *       <td>NOT_LOADED</td>
  *       <td>NOT_LOADED</td>
- *       <td>TRUE</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *   </tbody>
@@ -123,14 +123,14 @@ namespace cherry {
  *   <tbody>
  *     <tr>
  *       <td><em>NOT<em></td>
- *       <td>FALSE</td>
- *       <td>TRUE</td>
+ *       <td>FALSE_EVAL</td>
+ *       <td>TRUE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *     <tr>
  *       <td></td>
- *       <td>TRUE</td>
- *       <td>FALSE</td>
+ *       <td>TRUE_EVAL</td>
+ *       <td>FALSE_EVAL</td>
  *       <td>NOT_LOADED</td>
  *     </tr>
  *   </tbody>
@@ -153,9 +153,9 @@ private:
 public:
   
   /** The evaluation result representing the value FALSE */
-  static const EvaluationResult FALSE;
+  static const EvaluationResult FALSE_EVAL;
   /** The evaluation result representing the value TRUE */
-  static const EvaluationResult TRUE;
+  static const EvaluationResult TRUE_EVAL;
   /** The evaluation result representing the value NOT_LOADED */
   static const EvaluationResult NOT_LOADED;
 
@@ -204,9 +204,9 @@ public:
   /**
    * Returns an evaluation result instance representing the
    * given boolean value. If the given boolean value is
-   * <code>true</code> then <code>ExpressionResult.TRUE</code>
-   * is returned. If the value is <code>false</code> then <code>
-   * ExpressionResult.FALSE</code> is returned.
+   * <code>TRUE_EVAL</code> then <code>ExpressionResult.TRUE_EVAL</code>
+   * is returned. If the value is <code>FALSE_EVAL</code> then <code>
+   * ExpressionResult.FALSE_EVAL</code> is returned.
    * 
    * @param b a boolean value
    * 

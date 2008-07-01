@@ -93,7 +93,7 @@ IterateExpression::InitializeEmptyResultValue(const std::string& value)
   }
   else
   {
-    fEmptyResult = Poco::toLower(value) == "true" ? 1 : 0;
+    fEmptyResult = Poco::toLower(value) == "TRUE_EVAL" ? 1 : 0;
   }
 }
 
@@ -109,11 +109,11 @@ IterateExpression::Evaluate(IEvaluationContext* context)
       case 0:
       if (fEmptyResult == -1)
       {
-        return fOperator == AND ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+        return fOperator == AND ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
       }
       else
       {
-        return fEmptyResult == 1 ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+        return fEmptyResult == 1 ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
       }
       //case 1:
       //if (col instanceof List)
@@ -121,19 +121,19 @@ IterateExpression::Evaluate(IEvaluationContext* context)
       // fall through
       default:
       IteratePool iter(context, col->GetVariable().begin(), col->GetVariable().end());
-      EvaluationResult result = fOperator == AND ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+      EvaluationResult result = fOperator == AND ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
       while (iter.HasNext())
       {
         switch(fOperator)
         {
           case OR:
           result = result.Or(this->EvaluateAnd(&iter));
-          if (result == EvaluationResult::TRUE)
+          if (result == EvaluationResult::TRUE_EVAL)
           return result;
           break;
           case AND:
           result = result.And(this->EvaluateAnd(&iter));
-          if (result != EvaluationResult::TRUE)
+          if (result != EvaluationResult::TRUE_EVAL)
           return result;
           break;
         }
@@ -150,7 +150,7 @@ IterateExpression::Evaluate(IEvaluationContext* context)
     
     int count= 0;
     IteratePool iter(context, iterable->begin(), iterable->end());
-    EvaluationResult result = fOperator == AND ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+    EvaluationResult result = fOperator == AND ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
     while (iter.HasNext())
     {
       count++;
@@ -158,12 +158,12 @@ IterateExpression::Evaluate(IEvaluationContext* context)
       {
         case OR:
         result = result.Or(this->EvaluateAnd(&iter));
-        if (result == EvaluationResult::TRUE)
+        if (result == EvaluationResult::TRUE_EVAL)
         return result;
         break;
         case AND:
         result = result.And(this->EvaluateAnd(&iter));
-        if (result != EvaluationResult::TRUE)
+        if (result != EvaluationResult::TRUE_EVAL)
         return result;
         break;
       }
@@ -177,11 +177,11 @@ IterateExpression::Evaluate(IEvaluationContext* context)
     {
       if (fEmptyResult == -1)
       {
-        return fOperator == AND ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+        return fOperator == AND ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
       }
       else
       {
-        return fEmptyResult == 1 ? EvaluationResult::TRUE : EvaluationResult::FALSE;
+        return fEmptyResult == 1 ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
       }
     }
   }

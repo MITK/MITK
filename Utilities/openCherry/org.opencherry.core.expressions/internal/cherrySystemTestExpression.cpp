@@ -56,7 +56,7 @@ SystemTestExpression::Evaluate(IEvaluationContext* context)
 {
   std::string str = Platform::GetProperty(fProperty);
   if (str.size() == 0)
-    return EvaluationResult::FALSE;
+    return EvaluationResult::FALSE_EVAL;
   
   return EvaluationResult::ValueOf(str == fExpectedValue);
 }

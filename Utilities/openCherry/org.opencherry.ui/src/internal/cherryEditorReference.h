@@ -26,18 +26,21 @@
 #include "../cherryPartPane.h"
 #include "../cherryIEditorPart.h"
 
+//TODO should be removed
+#include "../cherryUiDll.h"
+
 namespace cherry
 {
 
 class EditorManager;
 class EditorDescriptor;
-class IWorkbenchPage;
+struct IWorkbenchPage;
 
 /**
  * \ingroup org_opencherry_ui_internal
  * 
  */
-class EditorReference : public WorkbenchPartReference, public IEditorReference
+class CHERRY_UI EditorReference : public WorkbenchPartReference, public IEditorReference
 {
 
 private:

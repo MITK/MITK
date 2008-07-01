@@ -1,5 +1,6 @@
 SET(CPP_FILES
   manifest.cpp
+  cherryExpressionVariables.cpp
   cherryIAdapterManager.cpp
   cherryRuntime.cpp
   cherryRuntimePlugin.cpp

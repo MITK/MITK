@@ -1,5 +1,6 @@
 #include "cherryPartList.h"
 
+#include "../cherryPartPane.h"
 #include "../cherryIWorkbenchPartConstants.h"
 
 namespace cherry

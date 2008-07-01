@@ -20,9 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vector>
 
-#include "cherryOSGiDll.h"
-
-
 namespace cherry {
 
 class MessageCommand
@@ -180,12 +177,14 @@ class TMessageCommand2 : public MessageCommand2<T,U>
 }; 
 
 // message without parameters (pure signals)
-class CHERRY_OSGI Message
+class Message
 { 
   public: 
     
     typedef Message Self; 
     
+    ~Message() {}
+
     template <class R>
     void AddListener( R* const receiver, void(R::*fnptr)() ) const
     {
@@ -247,12 +246,14 @@ class CHERRY_OSGI Message
 
 // message with 1 parameter
 template <typename T>
-class CHERRY_OSGI Message1
+class Message1
 { 
   public: 
     
     typedef Message1 Self; 
     
+    ~Message1() {}
+
     template <class R>
     void AddListener( R* const receiver, void(R::*fnptr)(T) ) const
     {
@@ -314,12 +315,14 @@ class CHERRY_OSGI Message1
 
 // message with 2 parameters
 template <typename T, typename U>
-class CHERRY_OSGI Message2
+class Message2
 { 
   public: 
     
     typedef Message2 Self; 
     
+    ~Message2() {}
+
     template <class R>
     void AddListener( R* receiver, void(R::*fnptr)(T,U) ) const
     {

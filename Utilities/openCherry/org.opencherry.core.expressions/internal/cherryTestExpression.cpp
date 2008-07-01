@@ -88,14 +88,14 @@ TestExpression::Evaluate(IEvaluationContext* context)
     std::string str = Platform::GetProperty(fProperty);
     if (str.size() == 0)
     {
-      return EvaluationResult::FALSE;
+      return EvaluationResult::FALSE_EVAL;
     }
     
     StringExpressionVariable::Pointer var = fArgs[0].Cast<StringExpressionVariable>();
     if (!var.IsNull())
       return EvaluationResult::ValueOf(str == var->GetVariable());
     
-    return EvaluationResult::FALSE;
+    return EvaluationResult::FALSE_EVAL;
   }
   
   Property::Pointer property= fgTypeExtensionManager.GetProperty(element, fNamespace, fProperty, context->GetAllowPluginActivation() && fForcePluginActivation);

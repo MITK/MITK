@@ -23,12 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIWorkbenchPartReference.h"
 
+//TODO should be removed
+#include "../cherryUiDll.h"
+
 namespace cherry {
 
 struct IWorkbenchPart;
 struct IWorkbenchPage;
 struct IWorkbenchWindow;
-struct PartPane;
+class  PartPane;
 
 /**
  * \ingroup org_opencherry_ui_internal
@@ -52,7 +55,7 @@ struct PartPane;
  * <li>the site is activated, causing the actions to become visible </li>
  * </ol>
  */
-class PartSite : public virtual IWorkbenchPartSite {
+class CHERRY_UI PartSite : public virtual IWorkbenchPartSite {
 
 public:
   cherryClassMacro(PartSite);

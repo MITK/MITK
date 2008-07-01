@@ -32,7 +32,7 @@ namespace cherry {
  */
 struct CHERRY_EXPRESSIONS IVariableResolver {
 
-  virtual ~IVariableResolver();
+	virtual ~IVariableResolver() {};
   
   /**
    * Resolves a variable for the given name and arguments. The

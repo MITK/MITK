@@ -61,7 +61,7 @@ AdaptExpression::AdaptExpression(const std::string& typeName)
 //AdaptExpression::equals(final Object object) 
 //{
 //  if (!(object instanceof AdaptExpression))
-//    return false;
+//    return FALSE_EVAL;
 //  
 //  final AdaptExpression that= (AdaptExpression)object;
 //  return this.fTypeName.equals(that.fTypeName)
@@ -83,7 +83,7 @@ EvaluationResult
 AdaptExpression::Evaluate(IEvaluationContext* context)
 {
   if (fTypeName.size() == 0)
-    return EvaluationResult::FALSE;
+    return EvaluationResult::FALSE_EVAL;
   ExpressionVariable::Pointer var(context->GetDefaultVariable());
   ExpressionVariable::Pointer adapted;
   IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
@@ -91,17 +91,17 @@ AdaptExpression::Evaluate(IEvaluationContext* context)
     adapted= var;
   } else {
     if (!manager->HasAdapter(var, fTypeName))
-      return EvaluationResult::FALSE;
+      return EvaluationResult::FALSE_EVAL;
   
     adapted = manager->GetAdapter(var, fTypeName);
   }
-  // the adapted result is null but hasAdapter returned true check
+  // the adapted result is null but hasAdapter returned TRUE_EVAL check
   // if the adapter is loaded.
   if (adapted.IsNull()) {
     if (manager->QueryAdapter(var, fTypeName) == IAdapterManager::NOT_LOADED) {
       return EvaluationResult::NOT_LOADED;
     } else {
-      return EvaluationResult::FALSE;
+      return EvaluationResult::FALSE_EVAL;
     }
   }
   return this->EvaluateAnd(new DefaultVariable(context, adapted));

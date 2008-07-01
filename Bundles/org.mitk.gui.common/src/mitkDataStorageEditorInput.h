@@ -19,13 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDATASTORAGEEDITORINPUT_H_
 
 #include <cherryIEditorInput.h>
-
 #include <mitkIDataStorageReference.h>
+
+#include "mitkGUICommonPluginDll.h"
 
 namespace mitk
 {
 
-class DataStorageEditorInput : public cherry::IEditorInput
+class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public cherry::IEditorInput
 {
 public:
   cherryClassMacro(DataStorageEditorInput);

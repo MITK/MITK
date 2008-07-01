@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef MITKCOREPLUGINDLL_H_
-#define MITKCOREPLUGINDLL_H_
+#ifndef MITKCORESERVICESPLUGINDLL_H_
+#define MITKCORESERVICESPLUGINDLL_H_
 
 
 //
@@ -28,16 +28,16 @@ PURPOSE.  See the above copyright notices for more information.
 // defined with this macro as being exported.
 //
 #if defined(_WIN32)  // && !defined(MITK_STATIC)
-  #if defined(org_mitk_core_EXPORTS)
-    #define MITK_CORE_PLUGIN __declspec(dllexport)
+  #if defined(org_mitk_core_services_EXPORTS)
+    #define MITK_CORE_SERVICES_PLUGIN __declspec(dllexport)
   #else
-    #define MITK_CORE_PLUGIN __declspec(dllimport)  
+    #define MITK_CORE_SERVICES_PLUGIN __declspec(dllimport)  
   #endif
 #endif
 
 
-#if !defined(MITK_CORE_PLUGIN)
-  #define MITK_CORE_PLUGIN
+#if !defined(MITK_CORE_SERVICES_PLUGIN)
+  #define MITK_CORE_SERVICES_PLUGIN
 #endif
 
-#endif /*MITKCOREPLUGINDLL_H_*/
+#endif /*MITKCORESERVICESPLUGINDLL_H_*/

@@ -4,12 +4,12 @@
 #include <cherryPlugin.h>
 #include <cherryIBundleContext.h>
 
-#include "mitkCorePluginDll.h"
+#include "mitkCoreServicesPluginDll.h"
 
 namespace mitk
 {
 
-class MITK_CORE_PLUGIN CoreServicesPlugin : public cherry::Plugin
+class MITK_CORE_SERVICES_PLUGIN CoreServicesPlugin : public cherry::Plugin
 {
 public:
   

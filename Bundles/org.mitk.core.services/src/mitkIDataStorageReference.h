@@ -4,14 +4,14 @@
 #include <cherryObject.h>
 #include <cherryMacros.h>
 
-#include "mitkCorePluginDll.h"
+#include "mitkCoreServicesPluginDll.h"
 
 #include <mitkDataStorage.h>
 
 namespace mitk
 {
 
-struct MITK_CORE_PLUGIN IDataStorageReference : public cherry::Object
+struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public cherry::Object
 {
   cherryClassMacro(IDataStorageReference);
  

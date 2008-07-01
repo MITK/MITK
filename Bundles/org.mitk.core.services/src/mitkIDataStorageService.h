@@ -3,7 +3,7 @@
 
 #include <service/cherryService.h>
 
-#include "mitkCorePluginDll.h"
+#include "mitkCoreServicesPluginDll.h"
 #include "mitkIDataStorageReference.h"
 
 #include <string>
@@ -11,7 +11,7 @@
 namespace mitk
 {
 
-struct MITK_CORE_PLUGIN IDataStorageService : public cherry::Service
+struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public cherry::Service
 {
   cherryClassMacro(IDataStorageService);
   

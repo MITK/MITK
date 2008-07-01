@@ -26,8 +26,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
+#include <limits>
+
 mitk::GeometryClipImageFilter::GeometryClipImageFilter() 
-  : m_ClippingGeometry(NULL), m_ClipPartAboveGeometry(true), m_OutsideValue(0), m_AutoOutsideValue(false), m_LabelBothSides(false), m_AboveGeometryLabel(1), m_BelowGeometryLabel(2)
+  : m_ClippingGeometry(NULL), 
+    m_ClipPartAboveGeometry(true), 
+    m_OutsideValue(0), 
+    m_AutoOutsideValue(false), 
+    m_LabelBothSides(false), 
+    m_AboveGeometryLabel(1), 
+    m_BelowGeometryLabel(2),
+    m_AutoOrientLabels(false)
 {
   this->SetNumberOfInputs(2);
   this->SetNumberOfRequiredInputs(2);
@@ -134,9 +143,24 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   Point3D pointInMM;
   bool above = geometryClipper->m_ClipPartAboveGeometry;
   bool labelBothSides = geometryClipper->GetLabelBothSides();
+
+  if (geometryClipper->GetAutoOrientLabels())
+  {
+    Point3D leftMostPoint;
+    leftMostPoint.Fill( std::numeric_limits<float>::min() / 2.0 );
+    if(clippingGeometry2D->IsAbove(pointInMM) != above)
+      {
+      // invert meaning of above --> left is always the "above" side
+      above = !above;
+    std::cout << leftMostPoint << " is BELOW geometry. Inverting meaning of above" << std::endl;
+    }
+    else
+    std::cout << leftMostPoint << " is above geometry" << std::endl;
+  }
+
   typename ItkOutputImageType::PixelType aboveLabel = (typename ItkOutputImageType::PixelType)geometryClipper->GetAboveGeometryLabel();
   typename ItkOutputImageType::PixelType belowLabel = (typename ItkOutputImageType::PixelType)geometryClipper->GetBelowGeometryLabel();
-  
+
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {
     if((typename ItkOutputImageType::PixelType)inputIt.Get() == outsideValue)

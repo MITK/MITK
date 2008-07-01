@@ -36,6 +36,11 @@ namespace mitk {
 //## The given geometry for clipping can be either a Geometry2D
 //## or a TimeSlicedGeometry containing multiple instances
 //## of Geometry2D
+//##
+//## \TODO add AutoOrientLabels, which makes the "left" side (minimum X value) side of the image get one defined label.
+//##       left-most because vtkPolyDataNormals uses the same definition and this filter is used for visualization of
+//##       front/back side of curved planes
+//##
 //## @ingroup Process
 class MITK_CORE_EXPORT GeometryClipImageFilter : public ImageToImageFilter
 {
@@ -76,6 +81,9 @@ public:
   itkSetMacro(AutoOutsideValue, bool);
   itkGetConstMacro(AutoOutsideValue, bool);
   itkBooleanMacro(AutoOutsideValue);
+  
+  itkSetMacro(AutoOrientLabels, bool);
+  itkGetConstMacro(AutoOrientLabels, bool);
   
   //##Description 
   //## @brief If set to \a true both sides of the clipping
@@ -136,6 +144,11 @@ public:
   //## @brief If \a true all pixels above and below the geometry
   //## are labeled with m_AboveGeometryLabel and m_BelowGeometryLabel
   bool m_LabelBothSides;
+
+  /**
+   * \brief Orient above like vtkPolyDataNormals does with AutoOrientNormals
+   */
+  bool m_AutoOrientLabels;
   
   //##Description 
   //## @brief Is used for labeling all pixels above the geometry

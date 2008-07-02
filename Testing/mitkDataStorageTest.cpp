@@ -1073,6 +1073,48 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }
 
+  /* Checking GetNode with valid predicate */
+  std::cout << "Checking GetNode with valid predicate: " << std::flush;
+  try
+  {
+    mitk::NodePredicateDataType p("Image");
+    if (ds->GetNode(&p) == n1)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
+  /* Checking GetNode with invalid predicate */
+  std::cout << "Checking GetNode with invalid predicate: " << std::flush;
+  try
+  {
+    mitk::NodePredicateDataType p("PointSet");
+    if (ds->GetNode(&p) == NULL)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }
+
   /* Checking removal of a node without relations */
   std::cout << "Checking removal of a node without relations: " << std::flush;
   try

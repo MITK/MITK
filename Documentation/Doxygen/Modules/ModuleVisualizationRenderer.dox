@@ -8,28 +8,20 @@
 
 \section overviewVisualizationRenderer Overview
 
-The following diagram displays the main components and their context:
-
-\image html RenderingOverview.png "Classes related to rendering"
-
 To visualize a dataset it needs to be stored in the DataTree. Depending on the application, the whole DataTree may be displayed, or merely parts of it. The rendering of individual data items (e.g. volumes or polygon models) is conducted by specific Mappers: each kind of visualizable data has its own corresponding Mapper implementation (see \ref Mapper).
 
 MITK is designed to intrinsically provide different views on data. For example, a volume dataset is volume rendered in a 3D view, and displayed slice-wise in a 2D view. A polygon model would be displayed as a contour in 2D (i.e., the intersection of the 3D model and the respective 2D plane). This principle applies to all kinds of data, thereby ensuring a consistent visual representation regardless of the view type. It is realized by providing Mappers for each combination of data type and view type. Every item of the DataTree is associated with a list of Mappers, each capable of rendering the data item in a specific view.
 
-RenderWindows represent the rendering target: an area of the user interface into which data is rendered. The actual rendering process is controlled by Renderers. They are configured to render the available data in a certain way. Specifically, this is determined by the associated WorldGeometry object(s); in a 2D view for example, the WorldGeometry2D tells the Renderer how to cut a 3D dataset to extract a 2D slice from it. Similarly, each data item of the DataTree has Geometry objects attached to it which describe the geometry of the data (e.g. its bounding box, location, or spatial conversion hints).
+RenderWindows represent the rendering target: an area of the user interface into which data is rendered. The actual rendering process is controlled by Renderers, specifically by mitkVtkPropRenderer, which is a concrete implementation BaseRenderer and iterates over the elements of the DataTree to render each using the associated Mapper. Eeach data item of the DataTree has Geometry objects attached to it which describe the geometry of the data (e.g. its bounding box, location, or spatial conversion hints).
 
 
 \section vtkVisualizationRenderer Encapsulating VTK Rendering Mechanisms
 
-\warning Parts of the following may be deprecated. Please read section on \ref Rendering.
-
 As a framework, MITK aims at making use of the visualization capabilities of VTK as much as possible. For the application developer building on top of MITK, the way of how to utilize specific VTK features should be straightforward and familiar. Therefore, most of the MITK rendering components closely resemble or integrate corresponding VTK components.
 
-Just like VTK, MITK defines Renderers and Mappers. These classes do not derive from their VTK counterparts, but integrate them and have similar scopes of responsibility. While the VTK rendering mechanism is mainly focused on establishing a pipeline of rendering components (data, filters, mappers, and renderers), MITK has a central DataTree and provides convenient ways of rendering different items of the tree according to their type. Internally, the VTK rendering pipeline is used as well in most cases, though it is more hidden from the application developer who merely makes use of existing rendering capabilities.
+Just like VTK, MITK defines Renderers and Mappers. These classes do not derive from their VTK counterparts, but integrate them and have similar scopes of responsibility. While the VTK rendering mechanism is mainly focused on establishing a pipeline of rendering components (data, filters, mappers, and renderers), MITK has a central DataTree and provides convenient ways of rendering different items of the tree according to their type. Internally, the VTK rendering pipeline is used, though it is more hidden from the application developer who merely makes use of existing rendering capabilities.
 
-RenderWindow and Renderer are realized as separate components to enable multiple Renderers to draw into one RenderWindow. Usually one RenderWindow would have just one associated Renderer, but under special circumstances (e.g. when many small data views need to be rendered simultaneously, as with a thumbnail gallery), multiple Renderers on one RenderWindow can yield performance benefits.
-
-Note that some Mappers (namely Mapper2D subclasses) do not use VTK functionality for rendering. To further unify the rendering process, these classes should be revised or wrapped into a VTK-compatible interface.
+As of MITK 0.8, the class vtkMitkRenderProp (a derivation of vtkProp) represents the single prop object in the VTK rendering pipeline responsible for coordinating the rendering of all objects in MITK's DataTree. The advantage of this approach is that all rendering management is done in the usual VTK rendering pipeline style, while the control of how data is actually rendered is entirely on MITK side. For example, MITK Mapper classes may either use VTK classes for rendering (actors, properties, ...), or do their rendering entirely in OpenGL where appropriate (e.g. in 2D Mapper classes). For further details refer to the page \ref Rendering.
 
 
 \section renderingManagerVisualizationRenderer Controlling it All: RenderingManager

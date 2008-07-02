@@ -412,7 +412,7 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
 {
   // 1. m_OriginalPicSlice and m_SeedPointMemoryOffset are set to sensitive values, as well as m_LowerThreshold and m_UpperThreshold
   assert (m_OriginalPicSlice);
-  if (m_OriginalPicSlice->n[0] != 256 || m_OriginalPicSlice->n[1] != 256)
+  if (m_OriginalPicSlice->n[0] != 256 || m_OriginalPicSlice->n[1] != 256) // ???
   assert( (m_SeedPointMemoryOffset < static_cast<int>( m_OriginalPicSlice->n[0] * m_OriginalPicSlice->n[1] )) && (m_SeedPointMemoryOffset >= 0) ); // inside the image
 
   // 2. ipSegmentation is used to perform region growing
@@ -434,6 +434,8 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
     Contour::Pointer dummyContour = Contour::New();
     dummyContour->Initialize();
     FeedbackContourTool::SetFeedbackContour( *dummyContour );
+    
+    if (regionGrowerResult) ipMITKSegmentationFree(regionGrowerResult);
     return NULL;
   }
 

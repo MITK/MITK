@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageAccessByItk.h>
 #include <mitkLine.h>
 
+#define roundf(x) ((x - floor(x)) > 0.5f ? ceil(x) : floor(x))
+
 void mitk::PlaneCutFilter::GenerateData()
 {
   if (!this->m_Plane)

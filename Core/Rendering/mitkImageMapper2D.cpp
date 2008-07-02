@@ -73,7 +73,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
 
-  if ( image == NULL )
+  if ( ( image == NULL ) || ( image->image() == NULL ) )
   {
     return;
   }

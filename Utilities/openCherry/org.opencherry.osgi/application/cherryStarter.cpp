@@ -51,7 +51,7 @@ int Starter::Run(int argc, char**& argv)
     else ++iter;
   }
   
-  std::string argApplication = Platform::GetArgValue(Platform::ARG_APPLICATION);
+  std::string argApplication = Platform::GetConfiguration().getString(Platform::ARG_APPLICATION, "");
   
   IApplication* app = 0;
   if (extensions.size() == 0)

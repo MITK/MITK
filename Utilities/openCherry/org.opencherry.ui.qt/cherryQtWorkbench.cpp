@@ -53,9 +53,15 @@ bool QtWorkbench::Init()
 int
 QtWorkbench::RunUI()
 {
-  int argc;
-  char** argv;
-  Platform::GetRawApplicationArgs(argc, argv);
+  const std::vector<std::string> args = Platform::GetApplicationArgs();
+  int argc = args.size();
+  char** argv = new char*[argc];
+  
+  int counter = 0;
+  for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it, ++counter)
+  {
+    argv[counter] = const_cast<char*>(it->c_str());
+  }
   
   QApplication qtApp(argc, argv);
   
@@ -75,6 +81,8 @@ QtWorkbench::RunUI()
   
   // spin Qt event loop
   qtApp.exec();
+  
+  delete[] argv;
   
   return PlatformUI::RETURN_OK;
 }

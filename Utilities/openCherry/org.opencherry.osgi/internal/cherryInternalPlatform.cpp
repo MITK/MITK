@@ -39,7 +39,6 @@ namespace cherry {
 Poco::Mutex InternalPlatform::m_Mutex;
 
 InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
-  m_StatePath(0), m_InstallPath(0), m_InstancePath(0), m_UserPath(0),
   m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
   m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
@@ -58,170 +57,115 @@ InternalPlatform* InternalPlatform::GetInstance()
   return &instance;
 }
 
-void InternalPlatform::GetRawArguments(int& argc, char**& argv)
-{
-  argc = m_Argc;
-  argv = m_Argv;
-}
-
-bool InternalPlatform::HasArgument(const std::string& arg) const
-{
-  std::map<std::string, std::string>::const_iterator iter = m_ArgMap.find(arg);
-  return (iter != m_ArgMap.end() && iter->second != "");
-}
-  
-const std::string& 
-InternalPlatform::GetArgValue(const std::string& arg)
-{
-  return m_ArgMap[arg];
-}
-
 ServiceRegistry& InternalPlatform::GetServiceRegistry()
 {
   AssertInitialized();
   return m_ServiceRegistry;
 }
 
-void InternalPlatform::ParseConfigFile()
-{
-  Poco::Path appPath = *(this->GetInstallPath());
-  std::cout << "Application dir: " << appPath.toString() << std::endl;
-  Poco::Path configPath(appPath, "config.ini");
-  std::cout << "Configuration file: " << configPath.toString() << std::endl;
-  
-  Poco::File configFile(configPath);
-  if (!configFile.exists() || !configFile.isFile())
-  {
-    std::cout << "Could not open configuration file. Aborting.\n";
-    exit(1);
-  }
-  
-  Poco::FileInputStream configStream(configFile.path());
-  
-  Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config(new Poco::Util::PropertyFileConfiguration(configStream));
-
-//  if (config->getString(Platform::ARG_HOME, "") == "")
-//  {
-//    std::cout << "You must set the " << Platform::ARG_HOME << " property in your configuration file.\n";
-//    exit(1);
-//  }
-  
-  m_ArgMap[Platform::ARG_APPLICATION] = config->getString(Platform::ARG_APPLICATION, "");
-  m_ArgMap[Platform::ARG_CLEAN] = config->hasProperty(Platform::ARG_CLEAN) ? "1" : "";
-  //m_ArgMap[Platform::ARG_HOME] = config->getString(Platform::ARG_HOME, "");
-  
-  Poco::Path cachePath(appPath);
-  cachePath.pushDirectory("Plugins");
-  m_ArgMap[Platform::ARG_PLUGIN_CACHE] = config->getString(Platform::ARG_PLUGIN_CACHE, cachePath.toString());
-  
-  m_ArgMap[Platform::ARG_PLUGIN_DIRS] = config->getString(Platform::ARG_PLUGIN_DIRS, "");
-}
-
-void InternalPlatform::ParseArguments()
-{
-  std::string argPrefix = "-";
-  std::string arg;
-  for (int i = 1; i < m_Argc; ++i)
-  {
-    arg = m_Argv[i];
-    if (arg == argPrefix + Platform::ARG_CLEAN)
-      m_ArgMap[Platform::ARG_CLEAN] = "1";
-    else if (arg == argPrefix + Platform::ARG_APPLICATION)
-      m_ArgMap[Platform::ARG_APPLICATION] = m_Argv[++i];
-    //else if (arg == argPrefix + Platform::ARG_HOME)
-    //  m_ArgMap[Platform::ARG_HOME] = m_Argv[++i];
-    else if (arg == argPrefix + Platform::ARG_PLUGIN_CACHE)
-      m_ArgMap[Platform::ARG_PLUGIN_CACHE] = m_Argv[++i];
-    else if (arg == argPrefix + Platform::ARG_PLUGIN_DIRS)
-      m_ArgMap[Platform::ARG_PLUGIN_DIRS] = m_Argv[++i];
-    
-  }
-}
-
 void InternalPlatform::Initialize(int& argc, char** argv)
 {
   // initialization
   Poco::Mutex::ScopedLock lock(m_Mutex);
-  
-  m_Argc = argc;
-  m_Argv = argv;
-  
-  this->ParseConfigFile();
-  this->ParseArguments();
-  
-  m_PlatformLogChannel = new PlatformLogChannel("/tmp/.cherryLog");
-  m_PlatformLogger = &Poco::Logger::create("", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
-  
-  m_CodeCache = new CodeCache(m_ArgMap[Platform::ARG_PLUGIN_CACHE]);
-  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
-  
-  
-  m_Initialized = true;
-  
-  // Clear the CodeCache
-  if (this->HasArgument(Platform::ARG_CLEAN))
-    m_CodeCache->Clear();
-  
-  // assemble a list of base plugin-directories (which contain
-  // the real plugins as directories)
-  std::vector<std::string> pluginBaseDirs;
-  
-  Poco::StringTokenizer tokenizer(m_ArgMap[Platform::ARG_PLUGIN_DIRS], ";",
-                                  Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-  
-  for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
-       token != tokenizer.end(); ++token)
-  {
-    pluginBaseDirs.push_back(*token);
-  }
-  
-  std::vector<Poco::Path> pluginPaths;
-  for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
-       pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
-  {
-    std::cout << "Plugin base directory: " << *pluginBaseDir;
-    Poco::File pluginDir(*pluginBaseDir);
+ 
+//  try
+//  {
+    this->init(argc, argv);
+    this->loadConfiguration();
     
-    if (!pluginDir.exists() || !pluginDir.isDirectory())
+    m_ConfigPath.assign(this->GetConfiguration().getString("application.configDir"));
+    m_InstallPath.assign(this->GetConfiguration().getString(Platform::ARG_HOME));
+    m_InstancePath.assign(this->GetConfiguration().getString("application.dir"));
+    
+    m_UserPath.assign(Poco::Path::home());
+    m_UserPath.pushDirectory("." + this->commandName());
+    Poco::File userFile(m_UserPath);
+    userFile.createDirectory();
+    
+    m_BaseStatePath = m_UserPath;
+    m_BaseStatePath.pushDirectory(".metadata");
+    m_BaseStatePath.pushDirectory(".plugins");
+    
+    Poco::Path logPath(m_UserPath);
+    logPath.setFileName(this->commandName() + ".log");
+    m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
+    m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
+    
+    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
+    m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
+    
+    
+    m_Initialized = true;
+    
+    // Clear the CodeCache
+    if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
+      m_CodeCache->Clear();
+    
+    // assemble a list of base plugin-directories (which contain
+    // the real plugins as directories)
+    std::vector<std::string> pluginBaseDirs;
+    
+    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS), ";",
+                                    Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    
+    for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
+         token != tokenizer.end(); ++token)
     {
-      std::cout << " not a direcotry or does not exist. SKIPPED.\n";
-      continue;
+      pluginBaseDirs.push_back(*token);
     }
-    else std::cout << std::endl;
     
-    std::vector<std::string> pluginList;
-    pluginDir.list(pluginList);
-    
-    std::vector<std::string>::iterator iter;
-    for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
+    std::vector<Poco::Path> pluginPaths;
+    for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
+         pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
     {
-      Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
-      pluginPath.pushDirectory(*iter);
+      std::cout << "Plugin base directory: " << *pluginBaseDir;
+      Poco::File pluginDir(*pluginBaseDir);
       
-      Poco::File file(pluginPath);
-      if (file.exists() && file.isDirectory())
+      if (!pluginDir.exists() || !pluginDir.isDirectory())
       {
-        pluginPaths.push_back(pluginPath);
+        std::cout << " not a direcotry or does not exist. SKIPPED.\n";
+        continue;
+      }
+      else std::cout << std::endl;
+      
+      std::vector<std::string> pluginList;
+      pluginDir.list(pluginList);
+      
+      std::vector<std::string>::iterator iter;
+      for (iter = pluginList.begin(); iter != pluginList.end(); iter++)
+      {
+        Poco::Path pluginPath = Poco::Path::forDirectory(*pluginBaseDir);
+        pluginPath.pushDirectory(*iter);
+        
+        Poco::File file(pluginPath);
+        if (file.exists() && file.isDirectory())
+        {
+          pluginPaths.push_back(pluginPath);
+        }
       }
     }
-  }
-  
-  std::vector<Poco::Path>::iterator pathIter;
-  for (pathIter = pluginPaths.begin(); pathIter != pluginPaths.end(); pathIter++)
-  {
-    try
+    
+    std::vector<Poco::Path>::iterator pathIter;
+    for (pathIter = pluginPaths.begin(); pathIter != pluginPaths.end(); pathIter++)
     {
-    Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-    std::cout << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      try
+      {
+      Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
+      std::cout << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      }
+      catch (BundleStateException exc)
+      {
+        std::cout << exc.displayText() << std::endl;
+      }
     }
-    catch (BundleStateException exc)
-    {
-      std::cout << exc.displayText() << std::endl;
-    }
-  }
-  
-  // resolve plugins
-  m_BundleLoader->ResolveAllBundles();
+    
+    // resolve plugins
+    m_BundleLoader->ResolveAllBundles();
+//  }
+//  catch (Poco::Exception& exc)
+//  {
+//    this->logger().log(exc);
+//  }
   
 }
 
@@ -233,12 +177,7 @@ void InternalPlatform::Launch()
   
   m_Running = true;
   
-  SystemBundle* systemBundle = m_BundleLoader->FindBundle("system.bundle").Cast<SystemBundle>();
-  if (systemBundle == 0)
-    throw PlatformException("Could not find the system bundle");
-  m_BundleLoader->StartSystemBundle(systemBundle);
-  
-  systemBundle->Resume();
+  this->run();
 }
 
 void InternalPlatform::Shutdown()
@@ -249,10 +188,7 @@ void InternalPlatform::Shutdown()
   
   m_Initialized = false;
   
-  if (m_StatePath != 0) delete m_StatePath;
-  if (m_InstallPath != 0) delete m_InstallPath;
-  if (m_InstancePath != 0) delete m_InstancePath;
-  if (m_UserPath != 0) delete m_UserPath;
+  this->uninitialize();
   
   if (m_BundleLoader != 0) delete m_BundleLoader;
   if (m_CodeCache != 0) delete m_CodeCache;
@@ -263,7 +199,7 @@ void InternalPlatform::Shutdown()
 void InternalPlatform::AssertInitialized()
 {
   if (!m_Initialized)
-    throw SystemException("The Platform has not been initialized yet!");
+    throw Poco::SystemException("The Platform has not been initialized yet!");
 }
 
 IExtensionPointService::Pointer InternalPlatform::GetExtensionPointService()
@@ -274,47 +210,30 @@ IExtensionPointService::Pointer InternalPlatform::GetExtensionPointService()
   return m_ServiceRegistry.GetServiceById<IExtensionPointService>(IExtensionPointService::SERVICE_ID);
 }
 
-const Path* InternalPlatform::GetConfigurationPath()
+const Poco::Path& InternalPlatform::GetConfigurationPath()
 {
-  return 0;
+  return m_ConfigPath;
 }
 
-const Path* InternalPlatform::GetInstallPath()
+const Poco::Path& InternalPlatform::GetInstallPath()
 {
-  Poco::Mutex::ScopedLock lock(m_Mutex);
-  if (m_InstallPath == 0)
-  {
-    m_InstallPath = new Path(m_Argv[0]);
-    m_InstallPath->makeAbsolute();
-    m_InstallPath->makeDirectory();
-    m_InstallPath->popDirectory();
-  }
-  
   return m_InstallPath;
 }
 
-const Path* InternalPlatform::GetInstancePath()
+const Poco::Path& InternalPlatform::GetInstancePath()
 {
-  Poco::Mutex::ScopedLock lock(m_Mutex);
-  if (m_InstancePath == 0)
-    {
-      m_InstancePath = new Path(true);
-      m_InstancePath->assign(Path().absolute());
-    }
-    
   return m_InstancePath;
 }
 
-const Path* InternalPlatform::GetStatePath(IBundle* /*bundle*/)
+Poco::Path InternalPlatform::GetStatePath(IBundle* bundle)
 {
-  Poco::Mutex::ScopedLock lock(m_Mutex);
-  if (m_StatePath == 0)
-  {
-    m_StatePath = new Path(true);
-    m_StatePath->assign(Path::temp());
-  }
-
-  return m_StatePath;
+  Poco::Path statePath(m_BaseStatePath);
+  statePath.pushDirectory(bundle->GetSymbolicName());
+  Poco::File stateFile(statePath);
+  if (!stateFile.exists())
+    stateFile.createDirectories();
+  
+  return statePath;
 }
 
 PlatformEvents& InternalPlatform::GetEvents()
@@ -322,9 +241,9 @@ PlatformEvents& InternalPlatform::GetEvents()
   return m_Events;
 }
 
-const Path* InternalPlatform::GetUserPath()
+const Poco::Path& InternalPlatform::GetUserPath()
 {
-  return 0;
+  return m_UserPath;
 }
 
 bool InternalPlatform::IsRunning() const
@@ -340,6 +259,72 @@ IBundle::Pointer InternalPlatform::GetBundle(const std::string& id)
   AssertInitialized();
   
   return m_BundleLoader->FindBundle(id);
+}
+
+Poco::Util::LayeredConfiguration& InternalPlatform::GetConfiguration() const
+{
+  return this->config();
+}
+
+std::vector<std::string> InternalPlatform::GetApplicationArgs() const
+{
+  return m_FilteredArgs;
+}
+
+void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
+{
+  Poco::Util::Option helpOption("help", "h", "print this help text");
+  helpOption.callback(Poco::Util::OptionCallback<InternalPlatform>(this, &InternalPlatform::PrintHelp));
+  options.addOption(helpOption);
+  
+  Poco::Util::Option cleanOption(Platform::ARG_CLEAN, Platform::ARG_CLEAN, "cleans the plugin cache");
+  cleanOption.binding(Platform::ARG_CLEAN);
+  options.addOption(cleanOption);
+  
+  Poco::Util::Option appOption(Platform::ARG_APPLICATION, Platform::ARG_APPLICATION, "the id of the application extension to be executed");
+     appOption.binding(Platform::ARG_APPLICATION);
+  options.addOption(appOption);
+  
+  Poco::Util::Application::defineOptions(options);
+}
+
+int InternalPlatform::main(const std::vector<std::string>& args)
+{
+  m_FilteredArgs = args;
+  m_FilteredArgs.insert(m_FilteredArgs.begin(), this->config().getString("application.argv[0]"));
+  
+  SystemBundle* systemBundle = m_BundleLoader->FindBundle("system.bundle").Cast<SystemBundle>();
+  if (systemBundle == 0)
+    throw PlatformException("Could not find the system bundle");
+  m_BundleLoader->StartSystemBundle(systemBundle);
+  
+  systemBundle->Resume();
+  
+  return EXIT_OK;
+}
+
+void InternalPlatform::PrintHelp(const std::string&, const std::string&)
+{
+  std::cout << "Usage: " << this->commandName() << " [OPTION]...\n";
+  
+  const Poco::Util::OptionSet& opts = this->options();
+  for (Poco::Util::OptionSet::Iterator option = opts.begin();
+       option != opts.end(); ++option)
+  {
+    std::cout.width(35);
+    std::cout.setf(std::ios_base::left, std::ios_base::adjustfield);
+    if (option->takesArgument())
+    {
+      std::cout << ("  -" + option->fullName() + "=<value>");
+    }
+    else
+    {
+      std::cout << ("  -" + option->fullName());
+    }
+    
+    std::cout << option->description() << std::endl;
+  }
+  exit(EXIT_OK);
 }
 
 }

@@ -159,12 +159,29 @@ PURPOSE.  See the above copyright notices for more information.
 #include "event/cherryPlatformEvents.h"
 #include "service/cherryServiceRegistry.h"
 
-namespace cherry {
+#include <Poco/Util/LayeredConfiguration.h>
 
-using namespace Poco;
+namespace cherry {
 
 struct IExtensionPointService;
 
+/**
+ * The central class of the openCherry Platform Runtime. This class cannot
+ * be instantiated or subclassed by clients; all functionality is provided 
+ * by static methods.  Features include:
+ * <ul>
+ * <li>the platform registry of installed plug-ins</li>
+ * <li>the platform adapter manager</li>
+ * <li>the platform log</li>
+ * </ul>
+ * <p>
+ * Most users don't have to worry about Platform's lifecycle. However, if your 
+ * code can call methods of this class when Platform is not running, it becomes 
+ * necessary to check {@link #IsRunning()} before making the call. A runtime 
+ * exception might be thrown or incorrect result might be returned if a method 
+ * from this class is called while Platform is not running.
+ * </p>
+ */
 class CHERRY_OSGI Platform
 {
 public:
@@ -208,11 +225,63 @@ public:
   
   static PlatformEvents& GetEvents();
   
-  static const Path* GetConfigurationPath();
-  static const Path* GetInstallPath();
-  static const Path* GetInstancePath();
-  static const Path* GetStatePath(IBundle* bundle);
-  static const Path* GetUserPath();
+  /**
+   * Returns the path of the configuration information 
+   * used to run this instance of the openCherry platform.
+   * The configuration area typically
+   * contains the list of plug-ins available for use, various settings
+   * (those shared across different instances of the same configuration)
+   * and any other such data needed by plug-ins.
+   * An empty path is returned if the platform is running without a configuration location.
+   * 
+   * @return the location of the platform's configuration data area 
+   */
+  static const Poco::Path& GetConfigurationPath();
+  
+  /**
+   * Returns the path of the base installation for the running platform
+   *
+   * @return the location of the platform's installation area or <code>null</code> if none
+   */
+  static const Poco::Path& GetInstallPath();
+  
+  /**
+   * Returns the path of the platform's working directory (also known as the instance data area).  
+   * An empty path is returned if the platform is running without an instance location.
+   *
+   * @return the location of the platform's instance data area or <code>null</code> if none
+   */
+  static const Poco::Path& GetInstancePath();
+  
+  /**
+   * Returns the path in the local file system of the 
+   * plug-in state area for the given bundle.
+   * If the plug-in state area did not exist prior to this call,
+   * it is created.
+   * <p>
+   * The plug-in state area is a file directory within the
+   * platform's metadata area where a plug-in is free to create files.
+   * The content and structure of this area is defined by the plug-in,
+   * and the particular plug-in is solely responsible for any files
+   * it puts there. It is recommended for plug-in preference settings and 
+   * other configuration parameters.
+   * </p>
+   *
+   * @param bundle the bundle whose state location is returned
+   * @return a local file system path
+   * TODO Investigate the usage of a service factory
+   */
+  static Poco::Path GetStatePath(IBundle* bundle);
+  
+  /**
+   * Returns the path of the platform's user data area.  The user data area is a location on the system
+   * which is specific to the system's current user.  By default it is located relative to the 
+   * location given by the System property "user.home".  
+   * An empty path is returned if the platform is running without an user location.
+   *
+   * @return the location of the platform's user data area or <code>null</code> if none
+   */
+  static const Poco::Path& GetUserPath();
   
   static int GetOS();
   static int GetOSArch();
@@ -226,13 +295,26 @@ public:
   
   static bool IsRunning();
   
-  static void GetRawApplicationArgs(int& argc, char**& argv);
+  static Poco::Util::LayeredConfiguration& GetConfiguration();
   
-  static bool HasArgument(const std::string& arg);
-  static const std::string& GetArgValue(const std::string& arg);
+  /**
+   * Returns the applications command line arguments which
+   * have not been consumed by the platform. The first
+   * argument still is the application name
+   */
+  static std::vector<std::string> GetApplicationArgs();
   
   static ServiceRegistry& GetServiceRegistry();
   
+  /**
+   * Returns the resolved bundle with the specified symbolic name that has the
+   * highest version.  If no resolved bundles are installed that have the 
+   * specified symbolic name then null is returned.
+   *
+   * @param id the symbolic name of the bundle to be returned.
+   * @return the bundle that has the specified symbolic name with the 
+   * highest version, or <tt>null</tt> if no bundle is found.
+   */
   static IBundle::Pointer GetBundle(const std::string& id);
 
 private:

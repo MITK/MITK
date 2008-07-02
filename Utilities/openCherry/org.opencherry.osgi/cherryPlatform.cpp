@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "Poco/Path.h"
+#include <Poco/Path.h>
 
 
 #include "cherryPlatform.h"
@@ -23,8 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/cherryInternalPlatform.h"
 
 namespace cherry {
-
-using namespace Poco;
 
 int Platform::OS_FREE_BSD = CHERRY_OS_FREE_BSD;
 int Platform::OS_AIX = CHERRY_OS_AIX;
@@ -61,7 +59,7 @@ std::string Platform::ARG_HOME = "openCherry.home";
 std::string Platform::ARG_PLUGIN_CACHE = "openCherry.plugin_cache_dir";
 std::string Platform::ARG_PLUGIN_DIRS = "openCherry.plugin_dirs";
 
-const Path* Platform::GetConfigurationPath()
+const Poco::Path& Platform::GetConfigurationPath()
 {
   return InternalPlatform::GetInstance()->GetConfigurationPath();
 }
@@ -76,12 +74,12 @@ PlatformEvents& Platform::GetEvents()
   return InternalPlatform::GetInstance()->GetEvents();
 }
 
-const Path* Platform::GetInstallPath()
+const Poco::Path& Platform::GetInstallPath()
 {
   return InternalPlatform::GetInstance()->GetInstallPath();
 }
 
-const Path* Platform::GetInstancePath()
+const Poco::Path& Platform::GetInstancePath()
 {
   return InternalPlatform::GetInstance()->GetInstancePath();
 }
@@ -141,12 +139,12 @@ bool Platform::IsVMS()
 #endif
 }
 
-const Path* Platform::GetStatePath(IBundle* bundle)
+Poco::Path Platform::GetStatePath(IBundle* bundle)
 {
   return InternalPlatform::GetInstance()->GetStatePath(bundle);
 }
 
-const Path* Platform::GetUserPath()
+const Poco::Path& Platform::GetUserPath()
 {
   return InternalPlatform::GetInstance()->GetUserPath();
 }
@@ -161,19 +159,14 @@ bool Platform::IsRunning()
   return InternalPlatform::GetInstance()->IsRunning();
 }
 
-void Platform::GetRawApplicationArgs(int& argc, char**& argv)
+std::vector<std::string> Platform::GetApplicationArgs()
 {
-  InternalPlatform::GetInstance()->GetRawArguments(argc, argv);
+  return InternalPlatform::GetInstance()->GetApplicationArgs();
 }
 
-bool Platform::HasArgument(const std::string& arg)
+Poco::Util::LayeredConfiguration& Platform::GetConfiguration()
 {
-  return InternalPlatform::GetInstance()->HasArgument(arg);
-}
-
-const std::string& Platform::GetArgValue(const std::string& arg)
-{
-  return InternalPlatform::GetInstance()->GetArgValue(arg);
+  return InternalPlatform::GetInstance()->GetConfiguration();
 }
 
 ServiceRegistry& Platform::GetServiceRegistry()

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Mutex.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Logger.h"
+#include "Poco/Util/Application.h"
 
 #include "../event/cherryPlatformEvents.h"
 #include "../service/cherryServiceRegistry.h"
@@ -33,29 +34,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-using namespace Poco;
-
 struct IBundle;
 class CodeCache;
 class BundleLoader;
 class PlatformLogChannel;
 
-class CHERRY_OSGI InternalPlatform
+class CHERRY_OSGI InternalPlatform : private Poco::Util::Application
 {
 private:
   
-  static Mutex m_Mutex;
-  Path m_InstanceLocation;
+  static Poco::Mutex m_Mutex;
   
   bool m_Initialized;
   bool m_Running;
   
   ServiceRegistry m_ServiceRegistry;
   
-  Path* m_StatePath;
-  Path* m_InstallPath;
-  Path* m_InstancePath;
-  Path* m_UserPath;
+  Poco::Path m_BaseStatePath;
+  Poco::Path m_InstallPath;
+  Poco::Path m_InstancePath;
+  Poco::Path m_UserPath;
+  Poco::Path m_ConfigPath;
+  
+  std::vector<std::string> m_FilteredArgs;
   
   CodeCache* m_CodeCache;
   BundleLoader* m_BundleLoader;
@@ -68,21 +69,24 @@ private:
   PlatformEvents m_Events;
   PlatformEvent m_EventStarted;
   
-  int m_Argc;
-  char** m_Argv;
+  //int m_Argc;
+  //char** m_Argv;
   
-  std::map<std::string, std::string> m_ArgMap;
+  //std::map<std::string, std::string> m_ArgMap;
   
   InternalPlatform();
   //InternalPlatform(const InternalPlatform&) : m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED) {};
   
   void AssertInitialized();
   
-  void ParseArguments();
-  void ParseConfigFile();
+  // Poco::Application method overrides
+  void defineOptions(Poco::Util::OptionSet& options);
+  int main(const std::vector<std::string>& args);
   
 public:
   virtual ~InternalPlatform();
+  
+  void PrintHelp(const std::string& name, const std::string& value);
   
   static InternalPlatform* GetInstance();
   
@@ -99,32 +103,24 @@ public:
   /// by the platform
   IExtensionPointService::Pointer GetExtensionPointService();
   
-  /// Returns the location of the configuration information
-  /// used to run this instance of the CHERRY Platform. The 
-  /// configuration area typically contains the list of plug-ins
-  /// available for use, various settings (those shared across 
-  /// different instances of the same configuration) and any 
-  /// other such data needed by plug-ins. 
-  /// 0 is returned if the platform is running without a 
-  /// configuration location.
-  const Path* GetConfigurationPath();
   
-  const Path* GetInstallPath();
+  const Poco::Path& GetConfigurationPath();
   
-  const Path* GetInstancePath();
+  const Poco::Path& GetInstallPath();
   
-  const Path* GetStatePath(IBundle* bundle);
+  const Poco::Path& GetInstancePath();
   
-  const Path* GetUserPath();
+  Poco::Path GetStatePath(IBundle* bundle);
+  
+  const Poco::Path& GetUserPath();
   
   PlatformEvents& GetEvents();
   
   bool IsRunning() const;
   
-  void GetRawArguments(int& argc, char**& argv);
+  Poco::Util::LayeredConfiguration& GetConfiguration() const;
   
-  bool HasArgument(const std::string& arg) const;
-  const std::string& GetArgValue(const std::string& arg);
+  std::vector<std::string> GetApplicationArgs() const;
   
   IBundle::Pointer GetBundle(const std::string& id);
 };

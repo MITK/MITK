@@ -22,18 +22,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkPlaneGeometry.h"
-#include "itkVectorContainer.h"
+
+namespace itk
+{
+  template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
+}
 
 namespace mitk {
 
-//##Documentation
-//## @brief Filter to cut an image with planes. Everything in 
-//## the direction of the normal of the planes will be set to a 
-//## specified value.
-//##
-//## @todo only one plane supported yet, add 4D support
-//## @warning first version, not yet tested.
-//## @ingroup Process
+/**
+  \brief Filter to cut an image with a plane.
+
+        Everything in the direction of the normal
+        of the planes (if fill mode is set to "FILL") will be set to a specified value.
+ */
 class MITK_CORE_EXPORT PlaneCutFilter : public ImageToImageFilter
 {
 public:
@@ -42,32 +44,29 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  typedef enum {Fill, FillInverse} CreationMode;
-
-  typedef itk::VectorContainer<unsigned int, PlaneGeometry::ConstPointer> PlanesContainerType;
+  typedef enum {FILL, FILL_INVERSE} FillMode;
 
   //##Documentation
   //## @brief Set background grey level
   itkSetMacro(BackgroundLevel, float);
   itkGetMacro(BackgroundLevel, float);
 
-  itkSetMacro(CreationMode, CreationMode);
-  itkGetMacro(CreationMode, CreationMode);
+  itkSetMacro(FillMode, FillMode);
+  itkGetMacro(FillMode, FillMode);
 
-  itkSetObjectMacro(Planes, PlanesContainerType);
-  itkGetObjectMacro(Planes, PlanesContainerType);
+  itkSetObjectMacro(Plane, const PlaneGeometry);
+  itkGetObjectMacro(Plane, const PlaneGeometry);
 protected:
-  virtual void GenerateData();
+  float m_BackgroundLevel;
+  PlaneGeometry::ConstPointer m_Plane;
+  FillMode m_FillMode;
 
   PlaneCutFilter();
-
   ~PlaneCutFilter();
+  virtual void GenerateData();
 
-  float m_BackgroundLevel;
-
-  PlanesContainerType::Pointer m_Planes;
-
-  CreationMode m_CreationMode;
+  template <typename TPixel, unsigned int VImageDimension>
+  void _computeIntersection(itk::Image<TPixel, VImageDimension> *itkImage, const PlaneGeometry *plane, const Geometry3D *geometry);
 };
 
 } // namespace mitk

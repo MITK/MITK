@@ -15,54 +15,37 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkPlaneCutFilter.h"
-#include "ipPic/ipPicTypeMultiplex.h"
-#include "mitkVector.h"
 
-template <class T>
-void _planesSet(ipPicDescriptor *dest, const mitk::Geometry3D* srcgeometry, const mitk::PlaneCutFilter::PlanesContainerType* planes, float _outside_value)
-{
-  T outside_value = static_cast<T>(_outside_value);
-  T *d=(T*)dest->data;
-
-  mitk::PlaneCutFilter::PlanesContainerType::ConstIterator pit, pend;
-  pend = planes->End();
-
-  int x_max(dest->n[0]),y_max(dest->n[1]), z_max(dest->n[2]);
-  mitk::Point3D p;
-  mitk::Point3D pt_mm;
-  for(p[2]=0;p[2]<z_max;++p[2])
-    for(p[1]=0;p[1]<y_max;++p[1])
-      for(p[0]=0;p[0]<x_max;++p[0],++d)
-        for(pit=planes->Begin();pit!=pend;++pit)
-        {
-          srcgeometry->IndexToWorld(p, pt_mm);
-          if(pit.Value()->SignedDistance(pt_mm) < 0)
-            *d=outside_value;
-        }
-}
+#include <mitkImageAccessByItk.h>
+#include <mitkLine.h>
 
 void mitk::PlaneCutFilter::GenerateData()
 {
-  mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
-
-  ipPicDescriptor *pic_result;
-
-  pic_result=ipPicClone(const_cast<mitk::Image*>(input.GetPointer())->GetPic());
-  pic_result->dim=3;
-
-  if(m_Planes.IsNotNull())
+  if (!this->m_Plane)
   {
-    mitkIpPicTypeMultiplex3(_planesSet, pic_result, input->GetGeometry(), m_Planes, m_BackgroundLevel);
+    return;
   }
 
-  output->Initialize(pic_result);
-  output->SetPicVolume(pic_result);
+  InputImageType *input = const_cast<InputImageType*>(this->GetInput());
+
+  if (!input)
+  {
+    return;
+  }
+
+  //Allocate output.
+  OutputImageType *output = this->GetOutput();
+
+  output->Initialize(input);
+  output->SetImportVolume(input->GetData());
+
+  //Do the intersection.
+  AccessByItk_2(output, _computeIntersection, this->m_Plane, input->GetGeometry());
 }
 
-mitk::PlaneCutFilter::PlaneCutFilter() : m_BackgroundLevel(0), m_Planes(NULL)
+mitk::PlaneCutFilter::PlaneCutFilter()
+  : m_BackgroundLevel(0.0f), m_Plane(0), m_FillMode(FILL)
 {
 }
 
@@ -70,4 +53,203 @@ mitk::PlaneCutFilter::~PlaneCutFilter()
 {
 }
 
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimension> *image, const PlaneGeometry *plane, const Geometry3D *geometry)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
 
+  const typename ImageType::RegionType &image_region = image->GetLargestPossibleRegion();
+  const typename ImageType::SizeValueType
+      max_x = image_region.GetSize(0ul),
+      max_y = image_region.GetSize(1ul),
+      max_z = image_region.GetSize(2ul),
+      img_size = max_x * max_y;
+  TPixel *data = image->GetBufferPointer();
+  Point3D p1, p2;
+
+  p1[0] = 0;
+  p2[0] = max_x - 1ul;
+
+  if (FILL == this->m_FillMode)
+  {
+    for (unsigned long z = 0ul; z < max_z; ++z)
+    {
+      p1[2] = z;
+      p2[2] = z;
+
+      for (unsigned long y = 0ul; y < max_y; ++y)
+      {
+        p1[1] = y;
+        p2[1] = y;
+
+        Point3D p1_t, p2_t;
+
+        geometry->IndexToWorld(p1, p1_t);
+        geometry->IndexToWorld(p2, p2_t);
+
+        if (plane->IsAbove(p1_t))
+        {
+          if (plane->IsAbove(p2_t))
+          {
+            if (0.0f == this->m_BackgroundLevel)
+            {
+              memset(&data[(y * max_x) + (z * img_size)], 0, max_x * sizeof(TPixel));
+            }
+            else
+            {
+              TPixel *subdata = &data[(y * max_x) + (z * img_size)];
+
+              for (unsigned long x = 0; x < max_x; ++x)
+              {
+                subdata[x] = this->m_BackgroundLevel;
+              }
+            }
+          }
+          else
+          {
+            Point3D intersection;
+            Line3D line;
+
+            line.SetPoints(p1_t, p2_t);
+            plane->IntersectionPoint(line, intersection);
+            geometry->WorldToIndex(intersection, intersection);
+
+            if (0.0f == this->m_BackgroundLevel)
+            {
+              memset(&data[(y * max_x) + (z * img_size)], 0, (static_cast<unsigned long>(roundf(intersection[0])) + 1u) * sizeof(TPixel));
+            }
+            else
+            {
+
+              TPixel *subdata = &data[(y * max_x) + (z * img_size)];
+              const unsigned long x_size = static_cast<unsigned long>(roundf(intersection[0])) + 1u;
+
+              for (unsigned long x = 0; x < x_size; ++x)
+              {
+                subdata[x] = this->m_BackgroundLevel;
+              }
+            }
+          }
+        }
+        else if (plane->IsAbove(p2_t))
+        {
+          Point3D intersection;
+          Line3D line;
+
+          line.SetPoints(p1_t, p2_t);
+          plane->IntersectionPoint(line, intersection);
+          geometry->WorldToIndex(intersection, intersection);
+
+          if (0.0f == this->m_BackgroundLevel)
+          {
+            unsigned long x = static_cast<unsigned long>(roundf(intersection[0]));
+
+            memset(&data[x + (y * max_x) + (z * img_size)], 0, (max_x - x) * sizeof(TPixel));
+          }
+          else
+          {
+            unsigned long x = static_cast<unsigned long>(roundf(intersection[0]));
+            TPixel *subdata = &data[x + (y * max_x) + (z * img_size)];
+            const unsigned long x_size = max_x - x;
+
+            for (x = 0; x < x_size; ++x)
+            {
+              subdata[x] = this->m_BackgroundLevel;
+            }
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    for (unsigned long z = 0ul; z < max_z; ++z)
+    {
+      p1[2] = z;
+      p2[2] = z;
+
+      for (unsigned long y = 0ul; y < max_y; ++y)
+      {
+        p1[1] = y;
+        p2[1] = y;
+
+        Point3D p1_t, p2_t;
+
+        geometry->IndexToWorld(p1, p1_t);
+        geometry->IndexToWorld(p2, p2_t);
+
+        if (!plane->IsAbove(p1_t))
+        {
+          if (!plane->IsAbove(p2_t))
+          {
+            if (0.0f == this->m_BackgroundLevel)
+            {
+              memset(&data[(y * max_x) + (z * img_size)], 0, max_x * sizeof(TPixel));
+            }
+            else
+            {
+              TPixel *subdata = &data[(y * max_x) + (z * img_size)];
+
+              for (unsigned long x = 0; x < max_x; ++x)
+              {
+                subdata[x] = this->m_BackgroundLevel;
+              }
+            }
+          }
+          else
+          {
+            Point3D intersection;
+            Line3D line;
+
+            line.SetPoints(p1_t, p2_t);
+            plane->IntersectionPoint(line, intersection);
+            geometry->WorldToIndex(intersection, intersection);
+
+            if (0.0f == this->m_BackgroundLevel)
+            {
+              memset(&data[(y * max_x) + (z * img_size)], 0, (static_cast<unsigned long>(roundf(intersection[0])) + 1u) * sizeof(TPixel));
+            }
+            else
+            {
+
+              TPixel *subdata = &data[(y * max_x) + (z * img_size)];
+              const unsigned long x_size = static_cast<unsigned long>(roundf(intersection[0])) + 1u;
+
+              for (unsigned long x = 0; x < x_size; ++x)
+              {
+                subdata[x] = this->m_BackgroundLevel;
+              }
+            }
+          }
+        }
+        else if (!plane->IsAbove(p2_t))
+        {
+          Point3D intersection;
+          Line3D line;
+
+          line.SetPoints(p1_t, p2_t);
+          plane->IntersectionPoint(line, intersection);
+          geometry->WorldToIndex(intersection, intersection);
+
+          if (0.0f == this->m_BackgroundLevel)
+          {
+            unsigned long x = static_cast<unsigned long>(roundf(intersection[0]));
+
+            memset(&data[x + (y * max_x) + (z * img_size)], 0, (max_x - x) * sizeof(TPixel));
+          }
+          else
+          {
+            unsigned long x = static_cast<unsigned long>(roundf(intersection[0]));
+            TPixel *subdata = &data[x + (y * max_x) + (z * img_size)];
+            const unsigned long x_size = max_x - x;
+
+            for (x = 0; x < x_size; ++x)
+            {
+              subdata[x] = this->m_BackgroundLevel;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
+#include <vtkImageMask.h>
 
 #include <vector>
 
@@ -63,6 +64,13 @@ public:
   virtual const mitk::Image* GetInput();
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+
+  virtual void EnableMask();
+  virtual void DisableMask();
+  Image::Pointer GetMask();
+  bool SetMask(const Image* mask);
+  virtual void UpdateMask();
+
   static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
   static void EndCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
   static void StartCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
@@ -79,18 +87,18 @@ protected:
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   void SetPreferences();
-  
+
   void SetClippingPlane(vtkRenderWindowInteractor* interactor);
   void DelClippingPlane();
 
   vtkImageShiftScale* m_ImageCast;
-  vtkImageChangeInformation* m_UnitSpacingImageFilter; 
+  vtkImageChangeInformation* m_UnitSpacingImageFilter;
   vtkVolumeProperty* m_VolumePropertyLow;
   vtkVolumeProperty* m_VolumePropertyMed;
   vtkVolumeProperty* m_VolumePropertyHigh;
   vtkVolumeTextureMapper2D* m_T2DMapper;
   vtkVolumeRayCastMapper* m_HiResMapper;
-  vtkImageResample* m_Resampler; 
+  vtkImageResample* m_Resampler;
   vtkLODProp3D* m_VolumeLOD;
 
   vtkCubeSource *m_BoundingBox;
@@ -101,7 +109,10 @@ protected:
 
   vtkPlane* m_ClippingPlane;
   vtkImplicitPlaneWidget* m_PlaneWidget;
-  
+
+  vtkImageData *m_Mask;
+  vtkImageMask *m_ImageMaskFilter;
+
   int m_LowResID;
   int m_MedResID;
   int m_HiResID;

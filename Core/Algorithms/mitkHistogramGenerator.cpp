@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 
-#include "itkScalarImageToHistogramGenerator.h"
+#include "itkMITKScalarImageToHistogramGenerator.h"
 
 
 mitk::HistogramGenerator::HistogramGenerator() : m_Image(NULL), m_Size(256), m_Histogram(NULL)
@@ -39,7 +39,7 @@ template < typename TPixel, unsigned int VImageDimension >
 void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
 {
   
-  typedef itk::Statistics::ScalarImageToHistogramGenerator< 
+  typedef itk::Statistics::MITKScalarImageToHistogramGenerator< 
                                               itk::Image< TPixel, VImageDimension >,
                                               double            >   HistogramGeneratorType;
 

@@ -235,36 +235,47 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
   }
   if(complete)
   {
-    vol=m_Volumes[pos];
-    // ok, let's combine the slices!
-    if(vol.GetPointer()==NULL)
-      vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, NULL, true);
-    vol->SetComplete(true);
-    size_t size=m_OffsetTable[2]*(m_PixelType.GetBpe()/8);
-    for(s=0;s<m_Dimensions[2];++s)
+    // if there is only single slice we do not need to combine anything
+    if(m_Dimensions[2]<=1)
     {
-      int posSl;
       ImageDataItemPointer sl;
-      posSl=GetSliceIndex(s,t,n);
-
-      sl=m_Slices[posSl];
-      if(sl->GetParent()!=vol)
-      {
-        // copy data of slices in volume
-        size_t offset = ((size_t) s)*size;
-        memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
-
-        ipPicDescriptor * pic = sl->GetPicDescriptor();
-
-        // replace old slice with reference to volume
-        sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, ((size_t) s)*size);
-        sl->SetComplete(true);
-        ipFuncCopyTags(sl->GetPicDescriptor(), pic);
-        m_Slices[posSl]=sl;
-      }
+      sl=GetSliceData(0,t,n,data,importMemoryManagement);
+      vol=new ImageDataItem(*sl, 3, data, importMemoryManagement == ManageMemory);
+      vol->SetComplete(true);
     }
-    if(vol->GetPicDescriptor()->info->tags_head==NULL)
-      ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
+    else
+    {
+      vol=m_Volumes[pos];
+      // ok, let's combine the slices!
+      if(vol.GetPointer()==NULL)
+        vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, NULL, true);
+      vol->SetComplete(true);
+      size_t size=m_OffsetTable[2]*(m_PixelType.GetBpe()/8);
+      for(s=0;s<m_Dimensions[2];++s)
+      {
+        int posSl;
+        ImageDataItemPointer sl;
+        posSl=GetSliceIndex(s,t,n);
+
+        sl=m_Slices[posSl];
+        if(sl->GetParent()!=vol)
+        {
+          // copy data of slices in volume
+          size_t offset = ((size_t) s)*size;
+          memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
+
+          ipPicDescriptor * pic = sl->GetPicDescriptor();
+
+          // replace old slice with reference to volume
+          sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, ((size_t) s)*size);
+          sl->SetComplete(true);
+          ipFuncCopyTags(sl->GetPicDescriptor(), pic);
+          m_Slices[posSl]=sl;
+        }
+      }
+      if(vol->GetPicDescriptor()->info->tags_head==NULL)
+        ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
+    }
     return m_Volumes[pos]=vol;
   }
 
@@ -349,6 +360,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
 
           m_Volumes[posVol]=vol;
         }
+        // get rid of slices - they may point to old volume
+        ImageDataItemPointer dnull=NULL;
+        m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
       }
       if(ch->GetPicDescriptor()->info->tags_head==NULL)
         ipFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());

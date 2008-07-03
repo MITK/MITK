@@ -14,10 +14,10 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _itkScalarImageToHistogramGenerator_txx
-#define _itkScalarImageToHistogramGenerator_txx
+#ifndef _itkMITKScalarImageToHistogramGenerator_txx
+#define _itkMITKScalarImageToHistogramGenerator_txx
 
-#include "itkScalarImageToHistogramGenerator.h"
+#include "itkMITKScalarImageToHistogramGenerator.h"
 
 
 namespace itk { 
@@ -25,8 +25,8 @@ namespace Statistics {
 
 
 template < class TImage, class TMeasurementType >
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
-::ScalarImageToHistogramGenerator() 
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
+::MITKScalarImageToHistogramGenerator() 
 {
   m_ImageToListAdaptor = AdaptorType::New();
   m_HistogramGenerator = GeneratorType::New();
@@ -37,7 +37,7 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 template < class TImage, class TMeasurementType >
 void
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::SetInput( const ImageType * image ) 
 {
   m_ImageToListAdaptor->SetImage( image );
@@ -45,8 +45,8 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 
 template < class TImage, class TMeasurementType >
-const typename ScalarImageToHistogramGenerator< TImage, TMeasurementType >::HistogramType *
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+const typename MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >::HistogramType *
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::GetOutput() const
 {
   return m_HistogramGenerator->GetOutput();
@@ -56,7 +56,7 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 template < class TImage, class TMeasurementType >
 void
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::Compute() 
 {
   m_HistogramGenerator->Update();
@@ -66,7 +66,7 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 template < class TImage, class TMeasurementType >
 void
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::SetNumberOfBins( unsigned int numberOfBins ) 
 {
   typename HistogramType::SizeType size;
@@ -78,7 +78,7 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 template < class TImage, class TMeasurementType >
 void
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::SetMarginalScale( double marginalScale )
 {
   m_HistogramGenerator->SetMarginalScale( marginalScale );
@@ -89,7 +89,7 @@ ScalarImageToHistogramGenerator< TImage, TMeasurementType >
 
 template < class TImage, class TMeasurementType >
 void
-ScalarImageToHistogramGenerator< TImage, TMeasurementType >
+MITKScalarImageToHistogramGenerator< TImage, TMeasurementType >
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os,indent);

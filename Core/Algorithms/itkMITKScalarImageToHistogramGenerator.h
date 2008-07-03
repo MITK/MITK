@@ -14,8 +14,8 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkScalarImageToHistogramGenerator_h
-#define __itkScalarImageToHistogramGenerator_h
+#ifndef __itkMITKScalarImageToHistogramGenerator_h
+#define __itkMITKScalarImageToHistogramGenerator_h
 
 
 #include "itkScalarImageToListAdaptor.h"
@@ -28,17 +28,17 @@ namespace Statistics {
 
 template< class TImageType, class TMeasurementType = 
            ITK_TYPENAME TImageType::PixelType>
-class ScalarImageToHistogramGenerator : public Object
+class MITKScalarImageToHistogramGenerator : public Object
 {
 public:
   /** Standard typedefs */
-  typedef ScalarImageToHistogramGenerator  Self ;
+  typedef MITKScalarImageToHistogramGenerator  Self ;
   typedef Object Superclass;
   typedef SmartPointer<Self> Pointer;
   typedef SmartPointer<const Self> ConstPointer;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ScalarImageToHistogramGenerator, Object) ;
+  itkTypeMacro(MITKScalarImageToHistogramGenerator, Object) ;
 
   /** standard New() method support */
   itkNewMacro(Self) ;
@@ -82,8 +82,8 @@ public:
 
 
 protected:
-  ScalarImageToHistogramGenerator();
-  virtual ~ScalarImageToHistogramGenerator() {};
+  MITKScalarImageToHistogramGenerator();
+  virtual ~MITKScalarImageToHistogramGenerator() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
 
 
@@ -100,7 +100,7 @@ private:
 } // end of namespace itk 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkScalarImageToHistogramGenerator.txx"
+#include "itkMITKScalarImageToHistogramGenerator.txx"
 #endif
 
 #endif

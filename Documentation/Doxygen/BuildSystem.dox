@@ -21,8 +21,7 @@ Usage: \c MITK_MULTIPLEX_PICTYPE(file)
 Param "file" should be named like \c mitkMyAlgo-TYPE.cpp .
 In the file, every occurence of \c \@TYPE\@ is replaced by the
 datatype. For each datatype, a new file \c mitkMyAlgo-datatype.cpp 
-is generated and added to \c CPP_FILES. Use this macro in \c files.cmake after
-creating the \c CPP_FILES variable.
+is generated and added to \c CPP_FILES_MULTIPLEX. 
 
 */
 

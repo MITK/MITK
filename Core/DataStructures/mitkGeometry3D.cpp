@@ -337,11 +337,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     temp[j] = in[j] - offset[j];
   }
 
-#if (ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR <= 8)
-  const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverse();
-#else
   const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverseMatrix();
-#endif
   for (i = 0; i < 3; i++)
   {
     out[i] = 0.0;
@@ -354,11 +350,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
 
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
-#if (ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR <= 8)
-  const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverse();
-#else
   const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverseMatrix();
-#endif
   out = inverse * in;
 }
 

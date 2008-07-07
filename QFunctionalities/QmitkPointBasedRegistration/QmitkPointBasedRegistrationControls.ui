@@ -1,0 +1,847 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkPointBasedRegistrationControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkPointBasedRegistrationControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>280</width>
+            <height>817</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>PointBasedRegistration</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>TextLabelFixed</cstring>
+            </property>
+            <property name="text">
+                <string>Fixed:</string>
+            </property>
+        </widget>
+        <widget class="QmitkTreeNodeSelector">
+            <property name="name">
+                <cstring>m_FixedSelector</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>0</height>
+                </size>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>TextLabelMoving</cstring>
+            </property>
+            <property name="text">
+                <string>Moving:</string>
+            </property>
+        </widget>
+        <widget class="QmitkTreeNodeSelector">
+            <property name="name">
+                <cstring>m_MovingSelector</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>0</height>
+                </size>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>m_SetInvisible</cstring>
+            </property>
+            <property name="text">
+                <string>Set All Other Invisible</string>
+            </property>
+            <property name="checked">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>m_ShowRedGreenValues</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Show Images Red/Green</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3_2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QSlider">
+                    <property name="name">
+                        <cstring>m_OpacitySlider</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="maxValue">
+                        <number>100</number>
+                    </property>
+                    <property name="value">
+                        <number>50</number>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_OpacityLabel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Moving Image Opacity</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_SaveModel</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Save Transformation</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_LoadFixedPointSet</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Load Fixed Pointset</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_SaveFixedPointSet</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Save Fixed Pointset</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout5</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_LoadMovingPointSet</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Load Moving Pointset</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_SaveMovingPointSet</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Save Moving Pointset</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_UndoTransformation</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Undo Transformation</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_RedoTransformation</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Redo Transformation</string>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_ResetPointsets</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Clear Pointsets</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_FixedReinit</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Reinit Fixed</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_MovingReinit</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Reinit Moving</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_GlobalReinit</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Global Reinit</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QButtonGroup">
+            <property name="name">
+                <cstring>m_SelectedModel</cstring>
+            </property>
+            <property name="title">
+                <string>Selected model</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QRadioButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>m_FixedSelected</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Fixed Image</string>
+                    </property>
+                    <property name="checked">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QRadioButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>m_MovingSelected</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Moving Image</string>
+                    </property>
+                </widget>
+                <widget class="QRadioButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>m_NoModelSelected</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Both</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QTable">
+            <column>
+                <property name="text">
+                    <string>Fixed Pointset</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Moving Pointset</string>
+                </property>
+            </column>
+            <property name="name">
+                <cstring>m_PointsetTable</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="numRows">
+                <number>12</number>
+            </property>
+            <property name="numCols">
+                <number>2</number>
+            </property>
+            <property name="readOnly">
+                <bool>true</bool>
+            </property>
+            <property name="selectionMode">
+                <enum>Single</enum>
+            </property>
+        </widget>
+        <widget class="QComboBox">
+            <item>
+                <property name="text">
+                    <string>Rigid with ICP</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Similarity with ICP</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Affine with ICP</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Rigid</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Similarity</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Affine</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>LandmarkWarping</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>m_SelectedTransformationClass</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+        </widget>
+        <widget class="QPushButton">
+            <property name="name">
+                <cstring>m_Calculate</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>150</width>
+                    <height>0</height>
+                </size>
+            </property>
+            <property name="text">
+                <string>Calculate</string>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout3</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>m_MeanError</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>RMS between Landmarks:</string>
+                    </property>
+                </widget>
+                <widget class="QLCDNumber">
+                    <property name="name">
+                        <cstring>m_MeanErrorLCD</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Raised</enum>
+                    </property>
+                    <property name="smallDecimalPoint">
+                        <bool>false</bool>
+                    </property>
+                    <property name="numDigits">
+                        <number>9</number>
+                    </property>
+                    <property name="segmentStyle">
+                        <enum>Flat</enum>
+                    </property>
+                    <property name="value" stdset="0">
+                        <number>0</number>
+                    </property>
+                    <property name="intValue" stdset="0">
+                        <number>0</number>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <spacer>
+            <property name="name">
+                <cstring>spacer2</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>16</height>
+                </size>
+            </property>
+        </spacer>
+    </vbox>
+</widget>
+<customwidgets>
+    <customwidget>
+        <class>QmitkTreeNodeSelector</class>
+        <header location="global">QmitkTreeNodeSelector.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>3</hordata>
+            <verdata>3</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image0</pixmap>
+        <signal>Activated(mitk::DataTreeNode* node)</signal>
+        <signal>Activated(mitk::DataTreeIteratorClone node)</signal>
+        <signal>signal()</signal>
+        <slot access="public" specifier="">slot()</slot>
+        <slot access="public" specifier="">SetDataTreeNodeIterator(mitk::DataTreeIteratorClone)</slot>
+    </customwidget>
+</customwidgets>
+<images>
+    <image name="image0">
+        <data format="PNG" length="831">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000030649444154789cb59531681c4714863f9935bc0515b320c32e28e085182c57914823810ba9bca0e26c0824a98c4813486148e532080792daa4106a02960a93b8106717025db7d7184e60c30a1458430ee6c08299c2b00fbce014bb77d2dd45e04279cdeeccee7cefdfffbd999dcbb28c51acadad7de40a22cbb2b9b911b873d0f97867e90ece3bacb5f8f7fe9320ce3b8ad382deab1e54e7f3c148e9d33f9e122f8249957459d10f8a005c1fbd05d25cb5bab0ba82a200dd11fa5d9d048f329b54b1ee05de17408988a295600721fe5d0984981b90de2c91f9f304320f490cfd0b5f32065b6b4997b5813a4484fc75c4d181233ff6c0488d90de1636da11abeb4055d6b33269d118ecdf7bf4838ea15917f67eb78d2221bd6d9000ec40294e94dd5f2cf6ade1bb072150ce781f5c1c4893397f1d3650656333a6d50e310b8094a826642f95bd1dcb8bfd21499cd2fa3a02268b7d6d62741db4128e9ebb31f4dbef434cec401cfe2ce4e8b9e3abb6b0f56302087fee3bdcbb6989d3c300ec20247fe331c6d06a87103808407dc4eeaf25f9b1c79fc1d6c388ec50c8df78f29368dc31ffad189aea2bc94da93fbf813e795c17d12c08cb774324529696eb8ad9a26c8cbc045c670deb7ba93df5c388278f4bf2630514114817a57e1e84cdca70c68a19c5e60680500c14d588ac4badd408716c180e3cdb8f2c79df604feb6e485299c64ce6d1aa6efef473a1f85bc95e2aad6f047f6658bd1b922c0adb8f60f8d6b3fd4381aa621684952f94ce3f3a019e512cf3d06a4700eced587a87cad6c388957548971d3ffd9c626283f71ead948d76427c6b46f0b433b5eab575b003c35ffb43767fb36487c2d29280803db5e8998e57f6bb8e6233210c84f3dd3975568ca2a4e4fe8390284ee93cabbb213fbe508705a1d54ec9ba0ea78a2a383f69c5185c9c161405307f0e6fdd0b595d4fc84f226c51cf279f092b5f2af12dd8d84c6a918123ef5f02eebdeaa13b421237ad5601818760d486526f200b9d0300250c04e721ef2b767899c715f4bb3a71f44db9ff897375cc74c555c535a8ff51ff0bf8aae15996cdfd0b730b59f44867ea7f0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>m_ShowRedGreenValues</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>showRedGreen(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_SetInvisible</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>setInvisible(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_SaveModel</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>saveModelClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_UndoTransformation</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>UndoTransformationClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_RedoTransformation</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>RedoTransformationClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_ResetPointsets</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>ResetPointsetsClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_FixedSelected</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>fixedSelected()</slot>
+    </connection>
+    <connection>
+        <sender>m_MovingSelected</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>movingSelected()</slot>
+    </connection>
+    <connection>
+        <sender>m_NoModelSelected</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>bothSelected()</slot>
+    </connection>
+    <connection>
+        <sender>m_OpacitySlider</sender>
+        <signal>sliderMoved(int)</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>opacityChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>m_Calculate</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>calculate()</slot>
+    </connection>
+    <connection>
+        <sender>m_SelectedTransformationClass</sender>
+        <signal>activated(int)</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>transfomationClassChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>m_FixedReinit</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>reinitFixedClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_MovingReinit</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>reinitMovingClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_GlobalReinit</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>globalReinitClicked()</slot>
+    </connection>
+    <connection> 	 
+        <sender>m_PointsetTable</sender> 	 
+        <signal>currentChanged(int,int)</signal> 	 
+        <receiver>QmitkPointBasedRegistrationControls</receiver> 	 
+        <slot>LandmarkSelected(int,int)</slot> 	 
+    </connection> 	 
+    <connection> 	 
+        <sender>m_PointsetTable</sender> 	 
+        <signal>clicked ( int, int, int, const QPoint &amp; )</signal> 	 
+        <receiver>QmitkPointBasedRegistrationControls</receiver> 	 
+        <slot>LandmarkSelected( int, int, int, const QPoint &amp; )</slot> 	 
+    </connection>
+    <connection>
+        <sender>m_LoadFixedPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>loadFixedPointSetClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_SaveFixedPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>saveFixedPointSetClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_LoadMovingPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>loadMovingPointSetClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_SaveMovingPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointBasedRegistrationControls</receiver>
+        <slot>saveMovingPointSetClicked()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in declaration">PointBasedRegistrationControlParameters.h</include>
+    <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="local" impldecl="in declaration">mitkPointSet.h</include>
+    <include location="local" impldecl="in declaration">mitkStateEvent.h</include>
+    <include location="local" impldecl="in declaration">mitkEventMapper.h</include>
+    <include location="local" impldecl="in declaration">mitkInteractionConst.h</include>
+    <include location="local" impldecl="in declaration">mitkBaseData.h</include>
+    <include location="global" impldecl="in declaration">mitkDataTree.h</include>
+</includes>
+<variables>
+    <variable>PointBasedRegistrationControlParameters* m_Params;</variable>
+    <variable>int m_MovingPoints;</variable>
+    <variable>int m_FixedPoints;</variable>
+    <variable>int m_Transform;</variable>
+    <variable>mitk::PointSet::Pointer m_MovingPointset;</variable>
+    <variable>mitk::PointSet::Pointer m_FixedPointset;</variable>
+</variables>
+<signals>
+    <signal>calculateIt(PointBasedRegistrationControlParameters *)</signal>
+    <signal>addMovingInteractor()</signal>
+    <signal>addFixedInteractor()</signal>
+    <signal>SaveModel()</signal>
+    <signal>changeBothSelected()</signal>
+    <signal>showRedGreenValues(bool)</signal>
+    <signal>setImagesInvisible(bool)</signal>
+    <signal>opacityValueChanged(float)</signal>
+    <signal>ResetPointsets()</signal>
+    <signal>calculateWithICP(PointBasedRegistrationControlParameters *)</signal>
+    <signal>selectFixedPoint(int)</signal>
+    <signal>selectMovingPoint(int)</signal>
+    <signal>undoTransformation()</signal>
+    <signal>redoTransformation()</signal>
+    <signal>reinitFixed(const mitk::Geometry3D *)</signal>
+    <signal>reinitMoving(const mitk::Geometry3D *)</signal>
+    <signal>globalReinit(mitk::DataTreeIteratorBase *)</signal>
+    <signal>calculateLandmarkWarping(PointBasedRegistrationControlParameters*)</signal>
+    <signal>transformationChanged(int i)</signal>
+    <signal>loadFixedPointSet()</signal>
+    <signal>saveFixedPointSet()</signal>
+    <signal>loadMovingPointSet()</signal>
+    <signal>saveMovingPointSet()</signal>
+</signals>
+<slots>
+    <slot>transfomationClassChanged( int i )</slot>
+    <slot>fixedSelected()</slot>
+    <slot>movingSelected()</slot>
+    <slot>init()</slot>
+    <slot>calculate()</slot>
+    <slot>saveModelClicked()</slot>
+    <slot>UndoTransformationClicked()</slot>
+    <slot>bothSelected()</slot>
+    <slot>setInvisible( bool invisible)</slot>
+    <slot>showRedGreen( bool show )</slot>
+    <slot>opacityChanged( int value )</slot>
+    <slot>ResetPointsetsClicked()</slot>
+    <slot>SetNoModelSelected()</slot>
+    <slot>LandmarkSelected( int row, int col, int button = 0, const QPoint &amp; mousePos = QPoint ( 0 , 0 ) )</slot>
+    <slot>RedoTransformationClicked()</slot>
+    <slot>reinitFixedClicked()</slot>
+    <slot>reinitMovingClicked()</slot>
+    <slot>globalReinitClicked()</slot>
+    <slot>loadFixedPointSetClicked()</slot>
+    <slot>saveFixedPointSetClicked()</slot>
+    <slot>loadMovingPointSetClicked()</slot>
+    <slot>saveMovingPointSetClicked()</slot>
+</slots>
+<functions>
+    <function>addFixedPoints( mitk::PointSet::Pointer fixedPoints )</function>
+    <function>addMovingPoints( mitk::PointSet::Pointer movingPoints )</function>
+    <function>setUndoTransformationEnabled( bool enable )</function>
+    <function>checkCalculateEnabled()</function>
+    <function>setRedoTransformationEnabled( bool enable )</function>
+    <function>refreshTable()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

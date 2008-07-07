@@ -1,0 +1,99 @@
+#ifndef LANDMARKWARPING_H
+#define LANDMARKWARPING_H
+
+#include "itkDeformationFieldSource.h"
+#include "itkWarpImageFilter.h"
+#include "itkInverseDeformationFieldImageFilter.h"
+#include "itkCommand.h"
+#include "mitkProgressBar.h"
+
+class LandmarkWarping
+{
+
+public:
+  LandmarkWarping();
+  ~LandmarkWarping();
+
+  static const unsigned int Dimension = 3;
+  typedef   float VectorComponentType;
+
+  typedef   itk::Vector< VectorComponentType, Dimension >    VectorType;
+
+  typedef   itk::Image< VectorType,  Dimension >   DeformationFieldType;
+
+
+  typedef   unsigned char  PixelType;
+  typedef   itk::Transform< double, Dimension, Dimension >                                       InverseTransform;
+  typedef   itk::Image< PixelType, Dimension >                                                   FixedImageType;
+  typedef   itk::Image< PixelType, Dimension >                                                   MovingImageType;
+  typedef   itk::DeformationFieldSource< DeformationFieldType >                                  DeformationSourceType;
+  typedef   DeformationSourceType::LandmarkContainerPointer                                      LandmarkContainerPointer;
+  typedef   DeformationSourceType::LandmarkContainer                                             LandmarkContainerType;
+  typedef   DeformationSourceType::LandmarkPointType                                             LandmarkPointType;
+  typedef   itk::WarpImageFilter< MovingImageType, MovingImageType, DeformationFieldType  >      FilterType;
+  typedef   itk::InverseDeformationFieldImageFilter<DeformationFieldType, DeformationFieldType>  InverseFilterType;
+
+  FixedImageType::Pointer m_FixedImage;
+  MovingImageType::Pointer m_MovingImage;
+  DeformationSourceType::Pointer m_Deformer;
+  DeformationSourceType::Pointer m_LandmarkDeformer;
+  LandmarkWarping::LandmarkContainerType::Pointer m_TargetLandmarks;
+  LandmarkWarping::LandmarkContainerType::Pointer m_SourceLandmarks;
+  FilterType::Pointer m_Warper;
+  InverseFilterType::Pointer m_Inverse;
+  DeformationFieldType::ConstPointer m_DeformationField;
+  DeformationFieldType::ConstPointer m_InverseDeformationField;
+
+
+  void SetFixedImage(FixedImageType::Pointer fi);
+  void SetMovingImage(MovingImageType::Pointer mi);
+  void SetLandmarks(LandmarkContainerType::Pointer source, LandmarkContainerType::Pointer target);
+  MovingImageType::Pointer Register();
+  LandmarkContainerType::Pointer GetTransformedTargetLandmarks();
+
+  protected:
+
+    // observerclass to react on changes on pointsetnodes
+    class Observer : public itk::Command 
+    {
+    public:
+      typedef  Observer                 Self;
+      typedef  itk::Command             Superclass;
+      typedef  itk::SmartPointer<Self>  Pointer;
+
+      itkNewMacro( Self );
+
+    protected:
+      Observer() 
+      {
+        m_Counter = 0;
+      };
+      unsigned int m_Counter;
+
+    public:
+
+      void Execute(itk::Object *object, const itk::EventObject & event)
+      {
+        Execute( (const itk::Object*) object, event );
+      }
+    
+      void Execute(const itk::Object * object, const itk::EventObject & event)
+      {
+        const itk::ProcessObject * internalFilter = dynamic_cast<const itk::ProcessObject *>( object );
+        if (!(internalFilter->GetProgress() == 0 || internalFilter->GetProgress() == 1)) 
+        {
+          ++m_Counter;
+          mitk::ProgressBar::GetInstance()->Progress();
+        }
+        if (internalFilter->GetProgress() == 1 && m_Counter > 20 && m_Counter < 120)
+        {
+          mitk::ProgressBar::GetInstance()->Progress(120 - m_Counter);
+          m_Counter = 120;
+        }
+      }
+    };
+
+    Observer::Pointer m_Observer;
+};
+
+#endif // LANDMARKWARPING_H

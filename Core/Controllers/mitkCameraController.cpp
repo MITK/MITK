@@ -115,6 +115,7 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
       break;
     }
     vtkRenderer->ResetCamera();
+    //vtkRenderer->GetActiveCamera()->Zoom(2.0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

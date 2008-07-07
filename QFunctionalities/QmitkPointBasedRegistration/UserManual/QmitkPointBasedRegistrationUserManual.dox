@@ -1,0 +1,74 @@
+/**
+\page QmitkPointBasedRegistrationUserManual The Point Based Registration Functionality
+
+Available sections:
+  - \ref QmitkPointBasedRegistrationUserManualOverview 
+  - \ref QmitkPointBasedRegistrationUserManualDetails 
+
+\section PointBasedRegistrationUserManualOverview Overview
+
+This functionality allows you to register 2D as well as 3D images in a rigid and deformable manner via corresponding 
+PointSets. Register means to align two images, so that they become as similar as possible. 
+Therefore you have to set corresponding points in both images, which will be matched. The movement, which has to be 
+performed on the points to align them will be performed on the moving image as well. The result is shown in the multi-widget. 
+
+This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through 
+the slices of an image using the multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+
+\section QmitkRigidRegistrationUserManualDetails Details
+
+First of all you have to open the images which you want to register. Select the fixed image in the first image selector combobox and the moving image in the second.
+
+With the "Show Images Red/Green" checkbox you can switch the image color from both images. If you check the box, the fixed image will be displayed in redvalues and the moving image in greenvalues 
+to improve visibility of differences in the images. If you uncheck the "Show Images Red/Green" checkbox, both images will be displayed in greyvalues.
+
+With the "Moving Image Opacity" slider you can change the opacity of the moving image. If the slider is leftmost the moving image is totally transparent, whereas if it is rightmost the moving image 
+is totally opaque.
+
+Now it comes to set some landmarks in the images. Therefore you have to switch the "Selected model" to one of the two images, lets say the fixed image first. Select the "Fixed image" radiobutton. 
+The view changes to only display the fixed image. With the "Reinit Fixed" button or the "Global Reinit" button you can force the renderwindows to exactly fit the fixed image. To set landmarks 
+you have to find some appropriate positions, press the shift button and perform left mouse clicks on them in the render windows. Now you can release the shift button. You can select landmarks 
+in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then release the mouse 
+button. With the delete key you can remove the selected landmarks.
+
+For the moving image it is the same procedure. Select the "Moving Image" radiobutton. The view changes to only display the fixed image. With the "Reinit Moving" button or the "Global Reinit" button 
+you can force the renderwindows to exactly fit the moving image. No set the landmarks on the corresponding positions. You can select landmarks in the render window with a left mouse button click 
+on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then release the mouse button. With the delete key you can remove the selected 
+landmarks.
+
+All landmarks will be listed in the table. With a click on one of the listed landmarks the render windows will jump to the landmarks position and select it. The "Selected model" becomes that one 
+the landmark belongs to. You now can interact with the landmarks of this model. You can select landmarks in the render window with a left mouse button click on them. If you keep the mouse button 
+pressed you can move the landmark to an other position by moving the mouse and then release the mouse button. With the delete key you can remove the selected landmarks.
+
+Before you perform your transformation it is useful to see both images again. Therefore set the "Selected model" radio button to "Both". Now you can select between different kinds of transformations 
+from a combobox. 
+
+"Rigid with ICP" means only translation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed image can be mapped on landmark three in the moving image. You 
+have to set at least one landmark in each image to enable the Calculate button which performs the transformation.
+
+"Similarity with ICP" means only translation and scaling. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed image can be mapped on landmark three in the 
+moving image. You have to set at least one landmark in each image to enable the Calculate button which performs the transformation.
+
+"Affine with ICP" means only translation, scaling and shearing. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed image can be mapped on landmark three in 
+the moving image. You have to set at least one landmark in each image to enable the Calculate button which performs the transformation.
+
+"Rigid" means only translation. The order of your landmarks will be taken into account. E. g. landmark one in the fixed image will be mapped on landmark one in the moving image. You have to set 
+at least one landmark and the same number of landmarks in each image to enable the Calculate button which performs the transformation.
+
+"Similarity" means only translation and scaling. The order of your landmarks will be taken into account. E. g. landmark one in the fixed image will be mapped on landmark one in the moving image. 
+You have to set at least one landmark and the same number of landmarks in each image to enable the Calculate button which performs the transformation.
+
+"Affine" means only translation, scaling and shearing. The order of your landmarks will be taken into account. E. g. landmark one in the fixed image will be mapped on landmark one in the moving 
+image. You have to set at least one landmark and the same number of landmarks in each image to enable the Calculate button which performs the transformation.
+
+The root mean squares difference between the landmarks will be displayed as LCD number, so that you can check how good the landmarks correspond.
+
+The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
+you perform an undo to redo the transformation without to recalculate it.
+
+With the "Clear Pointsets" button you can simply remove all landmarks from the fixed image as well as from the moving image.
+
+With the "Save Transformation" button you can save the moving image with its landmarks to hard disk. With the "Load Transformation" button you can reopen an image with its landmarks from hard disk.
+
+ 
+*/

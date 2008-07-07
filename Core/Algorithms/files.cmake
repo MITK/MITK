@@ -22,6 +22,7 @@ SET(CPP_FILES
   mitkImageCastPart1.cpp
   mitkImageCastPart2.cpp
   mitkImageChannelSelector.cpp
+  mitkImageRegistrationMethod.cpp
   mitkImageSliceSelector.cpp
   mitkImageSource.cpp
   mitkImageTimeSelector.cpp
@@ -35,7 +36,10 @@ SET(CPP_FILES
   mitkManualSegmentationToSurfaceFilter.cpp
   mitkMaskImageFilter.cpp
   mitkMeshSource.cpp
+  mitkMetricParameters.cpp
   mitkNonBlockingAlgorithm.cpp
+  mitkOptimizerFactory.cpp
+  mitkOptimizerParameters.cpp
   mitkOverwriteSliceImageFilter.cpp
   mitkPadImageFilter.cpp
   mitkPlaneCutFilter.cpp
@@ -47,14 +51,19 @@ SET(CPP_FILES
   mitkPointSetToGeometryDataFilter.cpp
   mitkPolygonToRingFilter.cpp
   mitkProbeFilter.cpp
+  mitkRigidRegistrationObserver.cpp
+  mitkRigidRegistrationPreset.cpp
   mitkSegmentationSink.cpp
   mitkShowSegmentationAsSurface.cpp
   mitkSubImageSelector.cpp
   mitkSurfaceSource.cpp
   mitkSurfaceToImageFilter.cpp
+  mitkTransformParameters.cpp
   mitkUIDGenerator.cpp
   mitkUnstructuredGridHistogram.cpp
   mitkUnstructuredGridSource.cpp
   mitkVolumeCalculator.cpp
   vtkPointSetSlicer.cxx
 )
+
+MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp ) 

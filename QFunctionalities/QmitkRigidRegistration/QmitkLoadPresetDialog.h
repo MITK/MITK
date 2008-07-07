@@ -1,0 +1,64 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2008-02-13 14:07:17 +0100 (Mi, 13 Feb 2008) $
+Version:   $Revision: 13599 $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
+#ifndef QmitkLoadPresetDialog_h_Included
+#define QmitkLoadPresetDialog_h_Included
+
+#include <qdialog.h>
+#include <list>
+
+class QLabel;
+class QLineEdit;
+class QListBox;
+class QPushButton;
+
+#include <mitkCommon.h>
+
+/**
+  \brief Dialog for QmitkRigidRegistration.
+
+  This dialog is used to ask a user about a preset to load.
+*/
+class QmitkLoadPresetDialog : public QDialog
+{
+  Q_OBJECT
+
+  public:
+    
+    QmitkLoadPresetDialog(QWidget* parent, const char* name, std::list<std::string> presets);
+    virtual ~QmitkLoadPresetDialog();
+
+    const char* GetPresetName();
+
+  signals:
+
+  public slots:
+  
+  protected slots:
+
+    void onPresetImmediatelySelected(const QString& preset);
+
+  protected:
+
+    QLabel*  lblPrompt;
+    QListBox*  lstPresets;
+
+    QPushButton* btnOk;
+};
+
+#endif
+

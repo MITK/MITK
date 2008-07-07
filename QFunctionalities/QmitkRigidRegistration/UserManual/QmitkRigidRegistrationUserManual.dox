@@ -1,0 +1,20 @@
+/**
+\page QmitkRigidRegistrationUserManual The Rigid Registration Functionality
+
+Available sections:
+  - \ref QmitkRigidRegistrationUserManualOverview 
+  - \ref QmitkRigidRegistrationUserManualDetails 
+
+\section RigidRegistrationUserManualOverview Overview
+
+This functionality allows you to register 2D as well as 3D images in a rigid manner. Register means to align two images, so that they become as similar as
+possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will directly be applied to the Moving Image.
+
+This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through the slices of an image using the
+multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+
+\section QmitkRigidRegistrationUserManualDetails Details
+
+Comming soon...
+
+*/

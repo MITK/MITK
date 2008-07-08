@@ -69,6 +69,9 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
   TPixel *data = image->GetBufferPointer();
   Point3D p1, p2;
 
+  //TODO: Better solution required!
+  TPixel casted_background_level = static_cast<TPixel>(this->m_BackgroundLevel);
+
   p1[0] = 0;
   p2[0] = max_x - 1ul;
 
@@ -103,7 +106,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
               for (unsigned long x = 0; x < max_x; ++x)
               {
-                subdata[x] = this->m_BackgroundLevel;
+                subdata[x] = casted_background_level;
               }
             }
           }
@@ -128,7 +131,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
               for (unsigned long x = 0; x < x_size; ++x)
               {
-                subdata[x] = this->m_BackgroundLevel;
+                subdata[x] = casted_background_level;
               }
             }
           }
@@ -156,7 +159,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
             for (x = 0; x < x_size; ++x)
             {
-              subdata[x] = this->m_BackgroundLevel;
+              subdata[x] = casted_background_level;
             }
           }
         }
@@ -194,7 +197,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
               for (unsigned long x = 0; x < max_x; ++x)
               {
-                subdata[x] = this->m_BackgroundLevel;
+                subdata[x] = casted_background_level;
               }
             }
           }
@@ -219,7 +222,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
               for (unsigned long x = 0; x < x_size; ++x)
               {
-                subdata[x] = this->m_BackgroundLevel;
+                subdata[x] = casted_background_level;
               }
             }
           }
@@ -247,7 +250,7 @@ void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimensi
 
             for (x = 0; x < x_size; ++x)
             {
-              subdata[x] = this->m_BackgroundLevel;
+              subdata[x] = casted_background_level;
             }
           }
         }

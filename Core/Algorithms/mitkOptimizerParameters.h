@@ -253,8 +253,8 @@ namespace mitk {
     // for itk::OnePlusOneEvolutionaryOptimizer
     float m_GrowthFactorOnePlusOneEvolutionary;
     float m_ShrinkFactorOnePlusOneEvolutionary;
-    int m_EpsilonOnePlusOneEvolutionary;
-    int m_InitialRadiusOnePlusOneEvolutionary;
+    float m_EpsilonOnePlusOneEvolutionary;
+    float m_InitialRadiusOnePlusOneEvolutionary;
     int m_IterationsOnePlusOneEvolutionary;
 
     // for itk::PowellOptimizer

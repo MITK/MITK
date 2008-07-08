@@ -36,7 +36,7 @@ namespace mitk {
   bool RigidRegistrationPreset::LoadPreset()
   {
     std::string location1 = MITK_ROOT;
-    std::string location2 = "/../mbi-sb/QFunctionalities/QmitkRigidRegistration";
+    std::string location2 = "/../mitk/QFunctionalities/QmitkRigidRegistration";
     std::string location = location1 + location2;
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(location.c_str(), true);
     std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml");

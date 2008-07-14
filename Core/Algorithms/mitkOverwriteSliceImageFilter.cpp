@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkImageCast.h"
-#include "mitkSegmentationInterpolation.h"
+#include "mitkSegmentationInterpolationController.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"
@@ -112,7 +112,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   // this will do a long long if/else to find out both pixel types
   AccessFixedDimensionByItk( input3D, ItkImageSwitch, 3 );
 
-  SegmentationInterpolation* interpolator = SegmentationInterpolation::InterpolatorForImage( input );
+  SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( input );
   if (interpolator)
   {
     interpolator->BlockModified(true);

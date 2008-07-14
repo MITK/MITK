@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkSegmentationInterpolation_h_Included
-#define mitkSegmentationInterpolation_h_Included
+#ifndef mitkSegmentationInterpolationController_h_Included
+#define mitkSegmentationInterpolationController_h_Included
 
 #include "mitkCommon.h"
 #include "mitkImage.h"
@@ -43,18 +43,18 @@ class Image;
   There is a separate page describing the general design of QmitkSliceBasedSegmentation: \ref QmitkSliceBasedSegmentationTechnicalPage
 
   This class keeps track of the contents of a 3D segmentation image. 
-  \attention mitk::SegmentationInterpolation assumes that the image contains pixel values of 0 and 1.
+  \attention mitk::SegmentationInterpolationController assumes that the image contains pixel values of 0 and 1.
 
   After you set the segmentation image using SetSegmentationVolume(), the whole image is scanned for pixels other than 0.
-  SegmentationInterpolation registers as an observer to the segmentation image, and repeats the scan whenvever the
-  image is modified (still not implemented because not yet needed - but trivial TODO [bug 734]).
+  SegmentationInterpolationController registers as an observer to the segmentation image, and repeats the scan whenvever the
+  image is modified.
 
-  You can prevent this (time consuming) scan if you do the changes slice-wise and send difference images to SegmentationInterpolation.
+  You can prevent this (time consuming) scan if you do the changes slice-wise and send difference images to SegmentationInterpolationController.
   For this purpose SetChangedSlice() should be used. mitk::OverwriteImageFilter already does this every time it changes a
   slice of an image. There is a static method InterpolatorForImage(), which can be used to find out if there already is an interpolator
   instance for a specified image. OverwriteImageFilter uses this to get to know its interpolator.
 
-  SegmentationInterpolation needs to maintain some information about the image slices (in every dimension).
+  SegmentationInterpolationController needs to maintain some information about the image slices (in every dimension).
   This information is stored internally in m_SegmentationCountInSlice, which is basically three std::vectors (one for each dimension).
   Each item describes one image dimension, each vector item holds the count of pixels in "its" slice. This is perhaps better to understand
   from the following picture (where red items just mean to symbolize "there is some segmentation" - in reality there is an integer count).
@@ -63,12 +63,12 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
+class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
     
-    mitkClassMacro(SegmentationInterpolation, itk::Object);
-    itkNewMacro(SegmentationInterpolation); /// specify the segmentation image that should be interpolated
+    mitkClassMacro(SegmentationInterpolationController, itk::Object);
+    itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
 
     /**
       \brief Find interpolator for a given image.
@@ -77,15 +77,15 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
       This method is useful if several "clients" modify the same image and want to access the interpolations.
       Then they can share the same object.
      */
-    static SegmentationInterpolation* InterpolatorForImage(const Image*);
+    static SegmentationInterpolationController* InterpolatorForImage(const Image*);
 
     /**
       \brief Block reaction to an images Modified() events.
 
       Blocking the scan of the whole image is especially useful when you are about to change a single slice
-      of the image. Then you would send a difference image of this single slice to SegmentationInterpolation
+      of the image. Then you would send a difference image of this single slice to SegmentationInterpolationController
       but call image->Modified() anyway. Before calling image->Modified() you should block
-      SegmentationInterpolation's reactions to this modified by using this method.
+      SegmentationInterpolationController's reactions to this modified by using this method.
     */
     void BlockModified(bool);
 
@@ -99,6 +99,15 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
       When you change a single slice, call SetChangedSlice() instead.
     */
     void SetSegmentationVolume( const Image* segmentation );
+    
+    /**
+      \brief Set a reference image (original patient image) - optional.
+
+      If this volume is set (must exactly match the dimensions of the segmentation),
+      the interpolation algorithm may consider image content to improve the interpolated
+      (estimated) segmentation.
+     */
+    void SetReferenceVolume( const Image* segmentation );
     
     /**
       \brief Update after changing a single slice.
@@ -131,7 +140,7 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
   protected:
 
     /**
-      \brief Protected class of mitk::SegmentationInterpolation. Don't use (you shouldn't be able to do so)!
+      \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
     */
     class MITK_CORE_EXPORT SetChangedSliceOptions
     {
@@ -152,10 +161,10 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
     typedef std::vector<unsigned int> DirtyVectorType;
     //typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is used for implementation
     typedef std::vector< std::vector<DirtyVectorType> > TimeResolvedDirtyVectorType;
-    typedef std::map< const Image*, SegmentationInterpolation* > InterpolatorMapType;
+    typedef std::map< const Image*, SegmentationInterpolationController* > InterpolatorMapType;
 
-    SegmentationInterpolation();// purposely hidden
-    virtual ~SegmentationInterpolation();
+    SegmentationInterpolationController();// purposely hidden
+    virtual ~SegmentationInterpolationController();
   
     /// internal scan of a single slice
     template < typename DATATYPE >
@@ -182,6 +191,7 @@ class MITK_CORE_EXPORT SegmentationInterpolation : public itk::Object
     static InterpolatorMapType s_InterpolatorForImage;
 
     Image::ConstPointer m_Segmentation;
+    Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
 };
 

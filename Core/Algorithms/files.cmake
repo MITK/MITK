@@ -54,6 +54,7 @@ SET(CPP_FILES
   mitkRigidRegistrationObserver.cpp
   mitkRigidRegistrationPreset.cpp
   mitkSegmentationSink.cpp
+  mitkShapeBasedInterpolationAlgorithm.cpp
   mitkShowSegmentationAsSurface.cpp
   mitkSubImageSelector.cpp
   mitkSurfaceSource.cpp

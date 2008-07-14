@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkRenderingManager.h"
-#include "mitkSegmentationInterpolation.h"
+#include "mitkSegmentationInterpolationController.h"
 #include "mitkImageTimeSelector.h"
 
 #include <itkImageSliceIteratorWithIndex.h>
@@ -99,8 +99,8 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           AccessFixedDimensionByItk( m_SliceDifferenceImage, ItkInvertPixelValues, 2 );
         }
 
-        // just send the diff to SegmentationInterpolation
-        SegmentationInterpolation* interpolator = SegmentationInterpolation::InterpolatorForImage( m_Image );
+        // just send the diff to SegmentationInterpolationController
+        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( m_Image );
         if (interpolator)
         {
           interpolator->BlockModified(true);
@@ -159,8 +159,8 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           AccessFixedDimensionByItk( m_SliceDifferenceImage, ItkInvertPixelValues, 3 );
         }
 
-        // just send the diff to SegmentationInterpolation
-        SegmentationInterpolation* interpolator = SegmentationInterpolation::InterpolatorForImage( m_Image );
+        // just send the diff to SegmentationInterpolationController
+        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( m_Image );
         if (interpolator)
         {
           interpolator->BlockModified(true);

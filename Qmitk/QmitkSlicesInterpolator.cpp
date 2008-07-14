@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* name)
 :QVBox(parent, name),
- m_Interpolator( mitk::SegmentationInterpolation::New() ),
+ m_Interpolator( mitk::SegmentationInterpolationController::New() ),
  m_MultiWidget(NULL),
  m_ToolManager(NULL),
  m_Initialized(false),
@@ -92,6 +92,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
     if (m_ToolManager)
     {
       m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
+      m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
     }
 
     if (m_MultiWidget)
@@ -116,6 +117,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
 
   // react whenever the set of selected segmentation changes
   m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
   mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
@@ -174,6 +176,12 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   OnInterpolationActivated( m_InterpolationEnabled ); // re-initialize if needed
 }
+
+void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
+{
+  OnInterpolationActivated( m_InterpolationEnabled ); // re-initialize if needed
+}
+
 
 void QmitkSlicesInterpolator::OnTransversalTimeChanged(itk::Object* sender, const itk::EventObject& e)
 {
@@ -419,8 +427,9 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     // don't care (double add/remove)
   }
 
-  mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
-  QVBox::setEnabled( node != NULL );
+  mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
+  QVBox::setEnabled( workingNode != NULL );
   
   m_BtnAcceptAllInterpolations->setEnabled( on );
   m_BtnAcceptInterpolation->setEnabled( on );
@@ -432,13 +441,19 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     return;
   }
 
-  if (node)
+  if (workingNode)
   {
-    m_FeedbackNode->ReplaceProperty( "color", node->GetProperty("color") ); // use the same color as the original image (but outline - see constructor)
-    mitk::Image* segmentation = dynamic_cast<mitk::Image*>(node->GetData());
+    m_FeedbackNode->ReplaceProperty( "color", workingNode->GetProperty("color") ); // use the same color as the original image (but outline - see constructor)
+    mitk::Image* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
     if (segmentation)
     {
       m_Interpolator->SetSegmentationVolume( segmentation );
+     
+      if (referenceNode)
+      {
+        mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+        m_Interpolator->SetReferenceVolume( referenceImage ); // may be NULL
+      }
     }
   }
 

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkSegmentationInterpolation.h"
+#include "mitkSegmentationInterpolationController.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkDataTreeNodeFactory.h"
@@ -60,7 +60,7 @@ class mitkSegmentationInterpolationTestClass
 
     mitk::Image::Pointer LoadImage(const std::string& filename);
 
-    mitk::SegmentationInterpolation::Pointer m_Interpolator;
+    mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::Image::Pointer m_Image;
     
     mitk::Image::Pointer m_ManualSlices;
@@ -75,7 +75,7 @@ bool mitkSegmentationInterpolationTestClass::CreateNewInterpolator()
   std::cout << "Instantiation" << std::endl;
 
 // instantiation
-  m_Interpolator = mitk::SegmentationInterpolation::New();
+  m_Interpolator = mitk::SegmentationInterpolationController::New();
   if (m_Interpolator.IsNotNull())
   {
     std::cout << "  (II) Instantiation works." << std::endl;

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkSlicesInterpolator_h_Included
 
 #include "mitkSliceNavigationController.h"
-#include "mitkSegmentationInterpolation.h"
+#include "mitkSegmentationInterpolationController.h"
 #include "mitkDataTreeNode.h"
 
 #include <qvbox.h>
@@ -73,6 +73,11 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
       Just public because it is called by itk::Commands. You should not need to call this.
     */
     void OnToolManagerWorkingDataModified();
+
+    /**
+      Just public because it is called by itk::Commands. You should not need to call this.
+    */
+    void OnToolManagerReferenceDataModified();
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -164,7 +169,7 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public QVBox
      */
     void UpdateVisibleSuggestion();
 
-    mitk::SegmentationInterpolation::Pointer m_Interpolator;
+    mitk::SegmentationInterpolationController::Pointer m_Interpolator;
 
     QmitkStdMultiWidget* m_MultiWidget;
     mitk::ToolManager* m_ToolManager;

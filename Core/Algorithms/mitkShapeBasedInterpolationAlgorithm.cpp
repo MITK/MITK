@@ -26,10 +26,10 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
-                               unsigned int sliceDimension,
+                               unsigned int /*sliceDimension*/, // commented variables are not used
                                Image::Pointer resultImage,
-                               unsigned int timeStep,
-                               Image::ConstPointer referenceImage)
+                               unsigned int /*timeStep*/,
+                               Image::ConstPointer /*referenceImage*/)
 {
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;

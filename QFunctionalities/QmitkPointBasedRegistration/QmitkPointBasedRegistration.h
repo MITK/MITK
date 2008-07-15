@@ -272,7 +272,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
       }
     
       // if landmarks were added or removed, then update landmarklists
-      void Execute(const itk::Object * object, const itk::EventObject & event)
+      void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
       {
         if (m_FixedImage)
         {

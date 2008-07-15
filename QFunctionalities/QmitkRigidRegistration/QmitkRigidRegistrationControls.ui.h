@@ -255,7 +255,7 @@ void QmitkRigidRegistrationControls::SetOptimizerValue( double value )
   m_OptimizerValueLCD->display(value);
 }
 
-void QmitkRigidRegistrationControls::registrationTabChanged( QWidget * widget )
+void QmitkRigidRegistrationControls::registrationTabChanged( QWidget * /*widget*/ )
 {
   if (m_RigidTransform->currentPageIndex() == 0)
   {

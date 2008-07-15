@@ -572,9 +572,9 @@ void QmitkRigidRegistration::AlignCenters()
     mitk::Point3D movingPoint = m_MovingNode->GetData()->GetGeometry()->GetCenter();
     mitk::Vector3D translateVec;
     translateVec =  fixedPoint - movingPoint;
-    m_Controls->m_XTransSlider->setValue((int)m_Controls->m_XTransSlider->value() + translateVec[0]);
-    m_Controls->m_YTransSlider->setValue((int)m_Controls->m_YTransSlider->value() + translateVec[1]);
-    m_Controls->m_ZTransSlider->setValue((int)m_Controls->m_ZTransSlider->value() + translateVec[2]);
+    m_Controls->m_XTransSlider->setValue((int)m_Controls->m_XTransSlider->value() + (int)translateVec[0]);
+    m_Controls->m_YTransSlider->setValue((int)m_Controls->m_YTransSlider->value() + (int)translateVec[1]);
+    m_Controls->m_ZTransSlider->setValue((int)m_Controls->m_ZTransSlider->value() + (int)translateVec[2]);
   }
 }
 

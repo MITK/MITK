@@ -116,7 +116,7 @@ namespace mitk {
       std::string interpolator = ReadXMLStringAttribut( "INTERPOLATOR", atts );
       double inter = atof(interpolator.c_str());
       interpolatorValues[0] = inter;
-      interpolatorValues = this->loadInterpolatorValues(interpolatorValues, inter, atts);
+      interpolatorValues = this->loadInterpolatorValues(interpolatorValues/*, inter, atts*/);
       m_InterpolatorValues[m_Name] = interpolatorValues;
     }
   }
@@ -1144,7 +1144,7 @@ namespace mitk {
     return optimizerValues;
   }
 
-  itk::Array<double> RigidRegistrationPreset::loadInterpolatorValues(itk::Array<double> interpolatorValues, double interpolator, const char **atts)
+  itk::Array<double> RigidRegistrationPreset::loadInterpolatorValues(itk::Array<double> interpolatorValues/*, double interpolator, const char **atts*/)
   {
     return interpolatorValues;
   }

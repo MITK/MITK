@@ -1903,9 +1903,9 @@ void QmitkRigidRegistrationSelector::LoadRigidRegistrationParameter()
 
   itk::Array<double> transformValues = m_Preset->getTransformValues(dialog.GetPresetName());
   m_TransformGroup->setChecked(true);
-  m_TransformBox->setCurrentItem(transformValues[0]);
-  m_TransformWidgetStack->raiseWidget(transformValues[0]);
-  this->TransformSelected(transformValues[0]);
+  m_TransformBox->setCurrentItem((int)transformValues[0]);
+  m_TransformWidgetStack->raiseWidget((int)transformValues[0]);
+  this->TransformSelected((int)transformValues[0]);
   if (transformValues[0] == mitk::TransformParameters::TRANSLATIONTRANSFORM)
   {
     m_UseOptimizerScalesTranslation->setChecked(transformValues[1]);
@@ -2155,9 +2155,9 @@ void QmitkRigidRegistrationSelector::LoadRigidRegistrationParameter()
 
   itk::Array<double> metricValues = m_Preset->getMetricValues(dialog.GetPresetName());
   m_MetricGroup->setChecked(true);
-  m_MetricBox->setCurrentItem(metricValues[0]);
-  m_MetricWidgetStack->raiseWidget(metricValues[0]);
-  this->MetricSelected(metricValues[0]);
+  m_MetricBox->setCurrentItem((int)metricValues[0]);
+  m_MetricWidgetStack->raiseWidget((int)metricValues[0]);
+  this->MetricSelected((int)metricValues[0]);
   m_ComputeGradient->setChecked(metricValues[1]);
   if (metricValues[0] == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC)
   {
@@ -2201,9 +2201,9 @@ void QmitkRigidRegistrationSelector::LoadRigidRegistrationParameter()
 
   itk::Array<double> optimizerValues = m_Preset->getOptimizerValues(dialog.GetPresetName());
   m_OptimizerGroup->setChecked(true);
-  m_OptimizerBox->setCurrentItem(optimizerValues[0]);
-  m_OptimizerWidgetStack->raiseWidget(optimizerValues[0]);
-  this->OptimizerSelected(optimizerValues[0]);
+  m_OptimizerBox->setCurrentItem((int)optimizerValues[0]);
+  m_OptimizerWidgetStack->raiseWidget((int)optimizerValues[0]);
+  this->OptimizerSelected((int)optimizerValues[0]);
   m_Maximize->setChecked(optimizerValues[1]);
   if (optimizerValues[0] == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
   {
@@ -2310,7 +2310,7 @@ void QmitkRigidRegistrationSelector::LoadRigidRegistrationParameter()
 
   itk::Array<double> interpolatorValues = m_Preset->getInterpolatorValues(dialog.GetPresetName());
   m_InterpolatorGroup->setChecked(true);
-  m_InterpolatorBox->setCurrentItem(interpolatorValues[0]);
+  m_InterpolatorBox->setCurrentItem((int)interpolatorValues[0]);
 }
 
 void QmitkRigidRegistrationSelector::SaveRigidRegistrationParameter()

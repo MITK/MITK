@@ -81,7 +81,7 @@ namespace mitk {
       {
         itk::Array<double> optimizerScales = transformParameters->GetScales();
         typename OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
-        for (int i = 0; i < scales.Size(); i++)
+        for (unsigned int i = 0; i < scales.Size(); i++)
         {
           scales[i] = optimizerScales[i];
         }
@@ -196,7 +196,7 @@ namespace mitk {
       {
         itk::Array<double> optimizerScales = transformParameters->GetScales();
         typename OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
-        for (int i = 0; i < scales.Size(); i++)
+        for (unsigned int i = 0; i < scales.Size(); i++)
         {
           scales[i] = optimizerScales[i];
         }

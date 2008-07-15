@@ -222,8 +222,8 @@ bool QmitkPointBasedRegistration::TestAllTools()
       r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
       float y = r * h;
       
-      QmitkUserInputSimulation::MouseDown( sliceWidget, x+5, y+5, Qt::LeftButton, Qt::ShiftButton );
-      QmitkUserInputSimulation::MouseRelease( sliceWidget, x+5, y+5, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseDown( sliceWidget, (int)x+5, (int)y+5, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x+5, (int)y+5, Qt::LeftButton, Qt::ShiftButton );
     }
   }
 
@@ -257,8 +257,8 @@ bool QmitkPointBasedRegistration::TestAllTools()
 
       r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
       float y = r * h;
-      QmitkUserInputSimulation::MouseDown( sliceWidget, x, y, Qt::LeftButton, Qt::ShiftButton );
-      QmitkUserInputSimulation::MouseRelease( sliceWidget, x, y, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseDown( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
     }
   }
   QmitkUserInputSimulation::MouseClick( m_Controls->m_NoModelSelected, Qt::LeftButton );  
@@ -346,8 +346,8 @@ bool QmitkPointBasedRegistration::TestAllTools()
       r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
       float y = r * h;
       
-      QmitkUserInputSimulation::MouseDown( sliceWidget, x+5, y+5, Qt::LeftButton, Qt::ShiftButton );
-      QmitkUserInputSimulation::MouseRelease( sliceWidget, x+5, y+5, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseDown( sliceWidget, (int)x+5, (int)y+5, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x+5, (int)y+5, Qt::LeftButton, Qt::ShiftButton );
     }
   }
 
@@ -381,8 +381,8 @@ bool QmitkPointBasedRegistration::TestAllTools()
 
       r = ( (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
       float y = r * h;
-      QmitkUserInputSimulation::MouseDown( sliceWidget, x, y, Qt::LeftButton, Qt::ShiftButton );
-      QmitkUserInputSimulation::MouseRelease( sliceWidget, x, y, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseDown( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
+      QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
     }
   }
   QmitkUserInputSimulation::MouseClick( m_Controls->m_NoModelSelected, Qt::LeftButton );  

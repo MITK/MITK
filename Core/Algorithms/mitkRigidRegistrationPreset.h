@@ -63,7 +63,7 @@ namespace mitk {
       itk::Array<double> loadTransformValues(itk::Array<double> transformValues, double transform, const char **atts);
       itk::Array<double> loadMetricValues(itk::Array<double> metricValues, double metric, const char **atts);
       itk::Array<double> loadOptimizerValues(itk::Array<double> optimizerValues, double optimizer, const char **atts);
-      itk::Array<double> loadInterpolatorValues(itk::Array<double> interpolatorValues, double interpolator, const char **atts);
+      itk::Array<double> loadInterpolatorValues(itk::Array<double> interpolatorValues/*, double interpolator, const char **atts*/);
 
       //##Documentation
       //## @brief reads an XML-String-Attribute

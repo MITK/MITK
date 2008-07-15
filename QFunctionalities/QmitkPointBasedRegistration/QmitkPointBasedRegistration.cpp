@@ -46,10 +46,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkPointBasedRegistration::QmitkPointBasedRegistration(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-: QmitkFunctionality(parent, name, it) ,m_Controls(NULL), m_MultiWidget(mitkStdMultiWidget), m_ShowRedGreen(false),
-  m_WorkWithBoth(true), m_WorkWithFixed(false), m_WorkWithMoving(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_FixedNode(NULL), m_MovingNode(NULL),
-  m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_MovingInteractor(NULL), m_FixedInteractor(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL),
-  m_FixedLandmarkObserverSet(false), m_MovingLandmarkObserverSet(false), m_NewMovingLayer(0), m_OldMovingLayer(0), m_Transformation(0), m_SetInvisible(true)
+: QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_FixedInteractor(NULL),
+  m_MovingInteractor(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_SetInvisible(true), m_ShowRedGreen(false),m_WorkWithFixed(false), m_WorkWithMoving(false),
+  m_WorkWithBoth(true), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0), m_NewMovingLayer(0), m_FixedLandmarkObserverSet(false), 
+  m_MovingLandmarkObserverSet(false), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Transformation(0)
 {
   SetAvailability(true);
 }
@@ -58,7 +58,7 @@ QmitkPointBasedRegistration::~QmitkPointBasedRegistration()
 {
 }
 
-QWidget * QmitkPointBasedRegistration::CreateMainWidget(QWidget *parent)
+QWidget * QmitkPointBasedRegistration::CreateMainWidget(QWidget* /*parent*/)
 {
   return NULL;
 }
@@ -284,7 +284,7 @@ void QmitkPointBasedRegistration::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
-void QmitkPointBasedRegistration::FixedSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkPointBasedRegistration::FixedSelected(mitk::DataTreeIteratorClone /*imageIt*/)
 {
   if (m_Controls->m_FixedSelector->GetSelectedNode() != NULL)
   {
@@ -398,7 +398,7 @@ void QmitkPointBasedRegistration::FixedSelected(mitk::DataTreeIteratorClone imag
   this->updateFixedLandmarksList();
 }
 
-void QmitkPointBasedRegistration::MovingSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkPointBasedRegistration::MovingSelected(mitk::DataTreeIteratorClone /*imageIt*/)
 {
   if (m_Controls->m_MovingSelector->GetSelectedNode() != NULL)
   {
@@ -802,7 +802,6 @@ void QmitkPointBasedRegistration::movingLandmarkSelected(int pointID)
       mitk::PointSet::PointsContainer::Iterator it = ItkData->GetPoints()->Begin();
       mitk::PointSet::PointsContainer::Iterator end = ItkData->GetPoints()->End();
       QString label;
-      int i = 0;
       for (int i = 0; i < pointID && it != end; )
       {
         if(ItkData->GetPoints()->IndexExists(it->Index()))
@@ -839,7 +838,6 @@ void QmitkPointBasedRegistration::fixedLandmarkSelected(int pointID)
       mitk::PointSet::PointsContainer::Iterator it = ItkData->GetPoints()->Begin();
       mitk::PointSet::PointsContainer::Iterator end = ItkData->GetPoints()->End();
       QString label;
-      int i = 0;
       for (int i = 0; i < pointID && it != end; )
       {
         if(ItkData->GetPoints()->IndexExists(it->Index()))
@@ -1168,7 +1166,7 @@ void QmitkPointBasedRegistration::calculateLandmarkbased(PointBasedRegistrationC
   }
 }
 
-void QmitkPointBasedRegistration::calculateLandmarkWarping(PointBasedRegistrationControlParameters* params)
+void QmitkPointBasedRegistration::calculateLandmarkWarping(PointBasedRegistrationControlParameters* /*params*/)
 {
   LandmarkWarping* registration = new LandmarkWarping();
 
@@ -1192,13 +1190,13 @@ void QmitkPointBasedRegistration::calculateLandmarkWarping(PointBasedRegistratio
     mitk::Point3D sourcePoint, targetPoint;
     LandmarkWarping::LandmarkContainerType::Pointer fixedLandmarks = LandmarkWarping::LandmarkContainerType::New();
     LandmarkWarping::LandmarkPointType point;
-    for(pointId = 0; pointId < m_FixedLandmarks->GetSize(); ++pointId)
+    for(pointId = 0; pointId < (unsigned int)m_FixedLandmarks->GetSize(); ++pointId)
     {
       fimage->GetGeometry(0)->WorldToItkPhysicalPoint(m_FixedLandmarks->GetPoint(pointId), point);
       fixedLandmarks->InsertElement( pointId, point);
     }
     LandmarkWarping::LandmarkContainerType::Pointer movingLandmarks = LandmarkWarping::LandmarkContainerType::New();
-    for(pointId=0; pointId<m_MovingLandmarks->GetSize();++pointId)
+    for(pointId = 0; pointId < (unsigned int)m_MovingLandmarks->GetSize(); ++pointId)
     {
       mitk::BaseData::Pointer fixedData = m_FixedNode->GetData();
       mitk::Geometry3D::Pointer fixedGeometry = fixedData->GetGeometry(0);

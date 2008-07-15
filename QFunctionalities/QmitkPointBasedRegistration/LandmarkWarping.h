@@ -77,7 +77,7 @@ public:
         Execute( (const itk::Object*) object, event );
       }
     
-      void Execute(const itk::Object * object, const itk::EventObject & event)
+      void Execute(const itk::Object * object, const itk::EventObject & /*event*/)
       {
         const itk::ProcessObject * internalFilter = dynamic_cast<const itk::ProcessObject *>( object );
         if (!(internalFilter->GetProgress() == 0 || internalFilter->GetProgress() == 1)) 

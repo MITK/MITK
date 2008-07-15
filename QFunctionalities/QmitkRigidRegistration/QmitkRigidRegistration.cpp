@@ -44,7 +44,7 @@ QmitkRigidRegistration::~QmitkRigidRegistration()
 {
 }
 
-QWidget * QmitkRigidRegistration::CreateMainWidget(QWidget *parent)
+QWidget * QmitkRigidRegistration::CreateMainWidget(QWidget* /*parent*/)
 {
   return NULL;
 }
@@ -210,7 +210,7 @@ void QmitkRigidRegistration::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
-void QmitkRigidRegistration::FixedSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkRigidRegistration::FixedSelected(mitk::DataTreeIteratorClone /*imageIt*/)
 {
   if (m_Controls->m_FixedSelector->GetSelectedNode() != NULL)
   {
@@ -286,7 +286,7 @@ void QmitkRigidRegistration::FixedSelected(mitk::DataTreeIteratorClone imageIt)
   }
 }
 
-void QmitkRigidRegistration::MovingSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkRigidRegistration::MovingSelected(mitk::DataTreeIteratorClone /*imageIt*/)
 {
   if (m_Controls->m_MovingSelector->GetSelectedNode() != NULL)
   {

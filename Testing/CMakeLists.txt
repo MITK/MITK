@@ -36,6 +36,7 @@ SET(${KITNAME}_TESTS
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPropertyListTest.cpp
+  mitkRigidRegistrationPresetTest.cpp
   mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp

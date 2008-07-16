@@ -43,9 +43,8 @@ namespace mitk {
     std::map<std::string, itk::Array<double> >& getMetricValuesPresets();
     std::map<std::string, itk::Array<double> >& getOptimizerValuesPresets();
     std::map<std::string, itk::Array<double> >& getInterpolatorValuesPresets();
-    void newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
-                                            std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues);//, std::map<std::string, itk::Array<float> newMetricValues, std::map<std::string, itk::Array<float>> newOptimizerValues, std::map<std::string, itk::Array<float>> newInterpolatorValues);
-    
+    bool newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
+                                            std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues);  
 
     private:
 
@@ -53,8 +52,8 @@ namespace mitk {
       //## @brief method used in XLM-Reading; gets called when a start-tag is read
       void StartElement (const char *elementName, const char **atts);
     
-      void saveXML(mitk::XMLWriter& xmlWriter);
-      void save();
+      bool saveXML(mitk::XMLWriter& xmlWriter);
+      bool save();
       void saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item);
       void saveMetricValues(mitk::XMLWriter& xmlWriter, std::string item);
       void saveOptimizerValues(mitk::XMLWriter& xmlWriter, std::string item);

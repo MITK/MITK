@@ -36,7 +36,7 @@ namespace mitk {
   bool RigidRegistrationPreset::LoadPreset()
   {
     std::string location1 = MITK_ROOT;
-    std::string location2 = "/../mitk/QFunctionalities/QmitkRigidRegistration";
+    std::string location2 = "/QFunctionalities/QmitkRigidRegistration";
     std::string location = location1 + location2;
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(location.c_str(), true);
     std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml");
@@ -182,13 +182,13 @@ namespace mitk {
     return m_InterpolatorValues;
   }
 
-  void RigidRegistrationPreset::save()
+  bool RigidRegistrationPreset::save()
   {
     XMLWriter writer(m_XmlFileName.c_str());
-    saveXML(writer);
+    return saveXML(writer);
   }
 
-  void RigidRegistrationPreset::saveXML(mitk::XMLWriter& xmlWriter)
+  bool RigidRegistrationPreset::saveXML(mitk::XMLWriter& xmlWriter)
   {
     xmlWriter.BeginNode("mitkRigidRegistrationPresets");
     for( std::map<std::string, itk::Array<double> >::iterator iter = m_TransformValues.begin(); iter != m_TransformValues.end(); iter++ ) {
@@ -210,16 +210,17 @@ namespace mitk {
       xmlWriter.EndNode();
     }
     xmlWriter.EndNode();
+    return true;
   }
 
-  void RigidRegistrationPreset::newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
+  bool RigidRegistrationPreset::newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
                                             std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues)
   {
     m_TransformValues = newTransformValues;
     m_MetricValues = newMetricValues;
     m_OptimizerValues = newOptimizerValues;
     m_InterpolatorValues = newInterpolatorValues;
-    save();
+    return save();
   }
 
   void RigidRegistrationPreset::saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item)

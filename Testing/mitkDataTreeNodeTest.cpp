@@ -52,7 +52,9 @@ class mitkDataTreeNodeTestClass { public:
 
 static void TestDataSetting(mitk::DataTreeNode::Pointer dataTreeNode)
 {
-  mitk::BaseData::Pointer baseData = mitk::ColoredRectangleRendering::New();
+  mitk::BaseData::Pointer baseData;
+  
+  baseData = mitk::ColoredRectangleRendering::New();
   dataTreeNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataTreeNode->GetData(), "Testing if a ColoredRectangleRendering object was set correctly" )
     

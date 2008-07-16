@@ -146,7 +146,7 @@ void QmitkPointBasedRegistrationControls::checkCalculateEnabled()
   }
 }
 
-void QmitkPointBasedRegistrationControls::LandmarkSelected( int row, int col, int button, const QPoint & mousePos )
+void QmitkPointBasedRegistrationControls::LandmarkSelected( int row, int col, int /*button*/, const QPoint & /*mousePos*/ )
 {
  if (col == 0)
   {

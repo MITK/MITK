@@ -48,7 +48,6 @@ QmitkLoadPresetDialog::QmitkLoadPresetDialog(QWidget* parent, const char* name, 
   lstPresets->setSelected(0, true); // select first Item by default (might turn out to be a stupid descision)
 
   connect( lstPresets, SIGNAL(selected(const QString&)), this, SLOT(onPresetImmediatelySelected(const QString&)) );
-  connect( lstPresets, SIGNAL(highlighted(const QString&)), this, SLOT(onPresetSelected(const QString&)) );
 
   // buttons for closing the dialog
   btnOk = new QPushButton( tr("Ok"), this, "btnOk" );
@@ -74,7 +73,7 @@ const char* QmitkLoadPresetDialog::GetPresetName()
   return lstPresets->currentText().ascii();
 }
 
-void QmitkLoadPresetDialog::onPresetImmediatelySelected(const QString& preset)
+void QmitkLoadPresetDialog::onPresetImmediatelySelected(const QString& /*preset*/)
 {
   if ( (signed)(lstPresets->currentItem()) != (signed)(lstPresets->count()-1) )
   {

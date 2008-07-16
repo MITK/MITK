@@ -165,7 +165,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
   mitk::ProgressBar::GetInstance()->Progress();
 }
 
-void mitk::RigidRegistrationObserver::Execute(const itk::Object *caller, const itk::EventObject & event)
+void mitk::RigidRegistrationObserver::Execute(const itk::Object* /*caller*/, const itk::EventObject& /*event*/)
 {
 }
 

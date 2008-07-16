@@ -5,6 +5,7 @@ ENABLE_TESTING()
 
 # tests with no extra command line parameter
 SET(${KITNAME}_TESTS
+  mitkDataTreeNodeTest.cpp
   mitkAbstractTransformGeometryTest.cpp
   mitkActionTest.cpp
   mitkAutoCropImageFilterTest.cpp

@@ -52,6 +52,7 @@ public:
 
   itkNewMacro(Self);
 
+  //##Documentation
   //## @brief Re-calculate the hull of the contained geometries.
   //##
   //## The transforms, bounding-box and time-bounds of this
@@ -59,6 +60,7 @@ public:
   //## are re-calculated from the contained geometries.
   void UpdateInformation();
 
+  //##Documentation
   //## @brief Get the number of time-steps
   itkGetConstMacro(TimeSteps, unsigned int);
 
@@ -73,36 +75,52 @@ public:
   virtual void SetEvenlyTimed(bool on = true);
 
   //##Documentation
-  //## @brief Set Geometry3D at time @a t.
+  //## @brief Set the Geometry3D for time @a t
   virtual bool SetGeometry3D(mitk::Geometry3D* geometry3D, int t);
-  
+
+  //##Documentation
+  //## @brief Get the Geometry3D at time @a t
   virtual mitk::Geometry3D* GetGeometry3D(int t) const;
 
+  //##Documentation
+  //## @brief Test whether @a t is a valid time step
   virtual bool IsValidTime(int t) const;
 
+  //##Documentation
+  //## @brief Convert time in ms to a time step
   virtual int MSToTimeStep(mitk::ScalarType time_in_ms) const;
 
+  //##Documentation
+  //## @brief Convert time step to time in ms
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
 
-  //##
   virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
+  //##Documentation
   //## @brief Completely initialize this instance as evenly-timed with 
   //## @timeSteps geometries of type Geometry3D, each initialized by
   //## Geometry3D::Initialize().
   virtual void Initialize(unsigned int timeSteps);
 
   //##Documentation
-  //## @brief Completely initialize this instance as evenly-timed with timeSteps geometries 
-  //## identical to the provided Geometry3D except of the time bounds.
-  //##
+  //## @brief Completely initialize this instance as evenly-timed with 
+  //## \a timeSteps geometries identical to the provided Geometry3D 
+  //## except for the time bounds
   virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
 
+  //##Documentation
+  //## @brief Initialize this instance to contain \a timeSteps 
+  //## geometries, but without setting them yet
   virtual void InitializeEmpty(unsigned int timeSteps);
 
-  virtual void ResizeToNumberOfTimeSteps( unsigned int timeSteps);
+  //##Documentation
+  //## @brief Resize the number of time steps contained
+  //## to \a timeSteps. Currently, only enlarging is possible.
+  //##
+  //## New, additional time steps will be initialized empty.
+  //## \warning Currently, only enlarging is possible, not shrinking.
+  virtual void ResizeToNumberOfTimeSteps( unsigned int timeSteps );
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 
@@ -138,8 +156,12 @@ protected:
 
   mutable std::vector<Geometry3D::Pointer> m_Geometry3Ds;
 
+  //##Documentation
+  //## @brief Number of time steps
   unsigned int m_TimeSteps;
 
+  //##Documentation
+  //## @brief \a true in case the time steps have equal length
   bool m_EvenlyTimed;
 
   static const std::string EVENLY_TIMED;

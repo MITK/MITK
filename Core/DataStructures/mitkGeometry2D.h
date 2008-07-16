@@ -27,7 +27,7 @@ namespace mitk {
 /**
  * \brief Describes the geometry of a two-dimensional object
  *
- * Describes a two-dimensional manifold, i.e., simply speaken, 
+ * Describes a two-dimensional manifold, i.e., to put it simply, 
  * an object that can be described using a 2D coordinate-system. 
  *
  * Geometry2D can map points between 3D world coordinates 

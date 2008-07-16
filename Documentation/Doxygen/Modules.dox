@@ -10,14 +10,6 @@
 */
 
 /**
-  \defgroup Geometry Geometry Classes
-  \ingroup DataManagement
-
-  \brief This subcategory includes the geometry classes, which describe the geometry of the 
-  data in space and time.
-*/
-
-/**
   \defgroup IO IO Classes
   \ingroup DataManagement
 

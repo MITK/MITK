@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRigidRegistrationPreset.h"
 #include <itkArray.h>
 
-int mitkRigidRegistrationPresetTest(int argc, char* argv[])
+int mitkRigidRegistrationPresetTest(int /*argc*/, char* /*argv*/[])
 {
   typedef itk::Array<double>               ArrayType;
 

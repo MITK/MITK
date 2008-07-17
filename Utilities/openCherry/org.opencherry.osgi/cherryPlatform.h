@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRY_Platform_INCLUDED
@@ -167,7 +167,7 @@ struct IExtensionPointService;
 
 /**
  * The central class of the openCherry Platform Runtime. This class cannot
- * be instantiated or subclassed by clients; all functionality is provided 
+ * be instantiated or subclassed by clients; all functionality is provided
  * by static methods.  Features include:
  * <ul>
  * <li>the platform registry of installed plug-ins</li>
@@ -175,10 +175,10 @@ struct IExtensionPointService;
  * <li>the platform log</li>
  * </ul>
  * <p>
- * Most users don't have to worry about Platform's lifecycle. However, if your 
- * code can call methods of this class when Platform is not running, it becomes 
- * necessary to check {@link #IsRunning()} before making the call. A runtime 
- * exception might be thrown or incorrect result might be returned if a method 
+ * Most users don't have to worry about Platform's lifecycle. However, if your
+ * code can call methods of this class when Platform is not running, it becomes
+ * necessary to check {@link #IsRunning()} before making the call. A runtime
+ * exception might be thrown or incorrect result might be returned if a method
  * from this class is called while Platform is not running.
  * </p>
  */
@@ -213,48 +213,48 @@ public:
   static int ARCH_SPARC;
   static int ARCH_AMD64;
   static int ARCH_ARM;
-  
+
   static std::string ARG_CLEAN;
   static std::string ARG_APPLICATION;
   static std::string ARG_HOME;
   static std::string ARG_PLUGIN_CACHE;
   static std::string ARG_PLUGIN_DIRS;
-  
+
   static IExtensionPointService* GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();
-  
+
   static PlatformEvents& GetEvents();
-  
+
   /**
-   * Returns the path of the configuration information 
+   * Returns the path of the configuration information
    * used to run this instance of the openCherry platform.
    * The configuration area typically
    * contains the list of plug-ins available for use, various settings
    * (those shared across different instances of the same configuration)
    * and any other such data needed by plug-ins.
    * An empty path is returned if the platform is running without a configuration location.
-   * 
-   * @return the location of the platform's configuration data area 
+   *
+   * @return the location of the platform's configuration data area
    */
   static const Poco::Path& GetConfigurationPath();
-  
+
   /**
    * Returns the path of the base installation for the running platform
    *
    * @return the location of the platform's installation area or <code>null</code> if none
    */
   static const Poco::Path& GetInstallPath();
-  
+
   /**
-   * Returns the path of the platform's working directory (also known as the instance data area).  
+   * Returns the path of the platform's working directory (also known as the instance data area).
    * An empty path is returned if the platform is running without an instance location.
    *
    * @return the location of the platform's instance data area or <code>null</code> if none
    */
   static const Poco::Path& GetInstancePath();
-  
+
   /**
-   * Returns the path in the local file system of the 
+   * Returns the path in the local file system of the
    * plug-in state area for the given bundle.
    * If the plug-in state area did not exist prior to this call,
    * it is created.
@@ -263,7 +263,7 @@ public:
    * platform's metadata area where a plug-in is free to create files.
    * The content and structure of this area is defined by the plug-in,
    * and the particular plug-in is solely responsible for any files
-   * it puts there. It is recommended for plug-in preference settings and 
+   * it puts there. It is recommended for plug-in preference settings and
    * other configuration parameters.
    * </p>
    *
@@ -272,17 +272,17 @@ public:
    * TODO Investigate the usage of a service factory
    */
   static Poco::Path GetStatePath(IBundle* bundle);
-  
+
   /**
    * Returns the path of the platform's user data area.  The user data area is a location on the system
-   * which is specific to the system's current user.  By default it is located relative to the 
-   * location given by the System property "user.home".  
+   * which is specific to the system's current user.  By default it is located relative to the
+   * location given by the System property "user.home".
    * An empty path is returned if the platform is running without an user location.
    *
    * @return the location of the platform's user data area or <code>null</code> if none
    */
   static const Poco::Path& GetUserPath();
-  
+
   static int GetOS();
   static int GetOSArch();
   static bool IsUnix();
@@ -290,29 +290,35 @@ public:
   static bool IsBSD();
   static bool IsLinux();
   static bool IsVMS();
-  
+
   static std::string GetProperty(const std::string& key);
-  
+
   static bool IsRunning();
-  
+
   static Poco::Util::LayeredConfiguration& GetConfiguration();
-  
+
+  /**
+   * Returns the unmodified, original command line arguments
+   *
+   */
+  static int& GetRawApplicationArgs(char** argv);
+
   /**
    * Returns the applications command line arguments which
    * have not been consumed by the platform. The first
    * argument still is the application name
    */
   static std::vector<std::string> GetApplicationArgs();
-  
+
   static ServiceRegistry& GetServiceRegistry();
-  
+
   /**
    * Returns the resolved bundle with the specified symbolic name that has the
-   * highest version.  If no resolved bundles are installed that have the 
+   * highest version.  If no resolved bundles are installed that have the
    * specified symbolic name then null is returned.
    *
    * @param id the symbolic name of the bundle to be returned.
-   * @return the bundle that has the specified symbolic name with the 
+   * @return the bundle that has the specified symbolic name with the
    * highest version, or <tt>null</tt> if no bundle is found.
    */
   static IBundle::Pointer GetBundle(const std::string& id);

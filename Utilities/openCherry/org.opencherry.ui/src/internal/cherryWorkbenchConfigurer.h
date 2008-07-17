@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYWORKBENCHCONFIGURER_H_
@@ -32,17 +32,17 @@ namespace cherry
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- * 
+ *
  * @since 3.0
  */
 class WorkbenchConfigurer : public IWorkbenchConfigurer {
-  
+
 public:
-  
+
   cherryClassMacro(WorkbenchConfigurer);
 
 private:
-  
+
     /**
      * Table to hold arbitrary key-data settings (key type: <code>String</code>,
      * value type: <code>Object</code>).
@@ -51,7 +51,7 @@ private:
     //Map extraData = new HashMap();
 
     /**
-     * Indicates whether workbench state should be saved on close and 
+     * Indicates whether workbench state should be saved on close and
      * restored on subsequent open.
      */
     bool saveAndRestore;
@@ -64,16 +64,16 @@ private:
 
     /**
      * Indicates the behaviour when the last window is closed.
-     * If <code>true</code>, the workbench will exit (saving the last window's state, 
+     * If <code>true</code>, the workbench will exit (saving the last window's state,
      * if configured to do so).
      * If <code>false</code> the window will be closed, leaving the workbench running.
-     * 
+     *
      * @since 3.1
      */
   bool exitOnLastWindowClose;
 
 public:
-  
+
     /**
      * Creates a new workbench configurer.
      * <p>
@@ -86,7 +86,7 @@ public:
     /* (non-javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
      */
-    IWorkbench::Pointer GetWorkbench();
+    IWorkbench* GetWorkbench();
 
 
     /* (non-javadoc)
@@ -104,7 +104,7 @@ public:
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
      */
     IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer(IWorkbenchWindow::Pointer window);
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
      */

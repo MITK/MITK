@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "cherryIWorkbenchPart.h"
+#include "cherryISelection.h"
+
 namespace cherry {
 
 /**
@@ -34,23 +37,26 @@ namespace cherry {
  * @see ISelectionService#AddSelectionListener(std::string, ISelectionListener::Ptr)
  * @see org.opencherry.ui.INullSelectionListener
  */
-struct CHERRY_UI ISelectionListener {
-    /**
-     * Notifies this listener that the selection has changed.
-     * <p>
-     * This method is called when the selection changes from one to a 
-     * <code>non-null</code> value, but not when the selection changes to 
-     * <code>null</code>. If there is a requirement to be notified in the latter 
-     * scenario, implement <code>INullSelectionListener</code>. The event will
-     * be posted through this method.
-     * </p>
-     *
-     * @param part the workbench part containing the selection
-     * @param selection the current selection. This may be <code>null</code> 
-     *    if <code>INullSelectionListener</code> is implemented.
-     */
-    virtual void SelectionChanged(IWorkbenchPart::Ptr part, ISelection::Ptr selection);
-}
+struct CHERRY_UI ISelectionListener : public virtual Object {
+  
+  cherryClassMacro(ISelectionListener);
+  
+  /**
+   * Notifies this listener that the selection has changed.
+   * <p>
+   * This method is called when the selection changes from one to a 
+   * <code>non-null</code> value, but not when the selection changes to 
+   * <code>null</code>. If there is a requirement to be notified in the latter 
+   * scenario, implement <code>INullSelectionListener</code>. The event will
+   * be posted through this method.
+   * </p>
+   *
+   * @param part the workbench part containing the selection
+   * @param selection the current selection. This may be <code>null</code> 
+   *    if <code>INullSelectionListener</code> is implemented.
+   */
+  virtual void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::Pointer selection) = 0;
+};
 
 }
 

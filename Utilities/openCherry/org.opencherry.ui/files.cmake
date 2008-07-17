@@ -10,9 +10,9 @@ SET(SRC_CPP_FILES
   cherryPlatformUI.cpp
   cherryPoint.cpp
   cherryRectangle.cpp
+  cherrySelectionChangedEvent.cpp
   cherryUIException.cpp
   cherryViewPart.cpp
-  cherryWorkbench.cpp
   cherryWorkbenchPart.cpp
   cherryWorkbenchWindow.cpp
   
@@ -20,6 +20,10 @@ SET(SRC_CPP_FILES
   application/cherryActionBarAdvisor.cpp
   application/cherryWorkbenchAdvisor.cpp
   application/cherryWorkbenchWindowAdvisor.cpp
+  
+  #tweaklets
+  tweaklets/cherryWorkbenchPageTweaklet.cpp
+  tweaklets/cherryWorkbenchTweaklet.cpp
 )
 
 SET(HANDLERS_CPP_FILES
@@ -41,6 +45,8 @@ SET(INTERNAL_CPP_FILES
   #cherryLayoutTreeNode.cpp
   cherryNullEditorInput.cpp
   #cherryPageLayout.cpp
+  cherryPagePartSelectionTracker.cpp
+  cherryPageSelectionService.cpp
   cherryPartList.cpp
   #cherryPartPlaceholder.cpp
   cherryPartService.cpp
@@ -50,6 +56,7 @@ SET(INTERNAL_CPP_FILES
   #cherryPerspectiveDescriptor.cpp
   #cherryPlaceholderFolderLayout.cpp
   cherryRegistryReader.cpp
+  cherryTweaklets.cpp
   cherryViewDescriptor.cpp
   cherryViewFactory.cpp
   cherryViewReference.cpp
@@ -58,6 +65,8 @@ SET(INTERNAL_CPP_FILES
   cherryViewSite.cpp
   #cherryWorkbenchPage.cpp
   cherryDummyWorkbenchPage.cpp
+  cherryWindowManager.cpp
+  cherryWorkbench.cpp
   cherryWorkbenchConfigurer.cpp
   cherryWorkbenchPagePartList.cpp
   cherryWorkbenchPartReference.cpp

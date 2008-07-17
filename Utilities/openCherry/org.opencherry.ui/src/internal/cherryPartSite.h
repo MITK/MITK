@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIWorkbenchPartReference.h"
+#include "../cherryISelectionProvider.h"
 
 //TODO should be removed
 #include "../cherryUiDll.h"
@@ -96,7 +97,7 @@ private:
   std::string extensionID;
   std::string pluginID;
   std::string extensionName;
-  //ISelectionProvider selectionProvider;
+  ISelectionProvider::Pointer selectionProvider;
   //SubActionBars actionBars;
   //KeyBindingService keyBindingService;
   //ArrayList menuExtenders;
@@ -179,7 +180,7 @@ public: virtual std::string GetRegisteredName();
   /**
    * Returns the selection provider for a part.
    */
-//public: virtual ISelectionProvider GetSelectionProvider();
+public: virtual ISelectionProvider::Pointer GetSelectionProvider();
 
 
   /**
@@ -244,7 +245,7 @@ protected: virtual void SetRegisteredName(const std::string& name);
   /**
    * Set the selection provider for a part.
    */
-//public: virtual void SetSelectionProvider(ISelectionProvider provider);
+public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider);
 
   /*
    * @see IWorkbenchPartSite#getKeyBindingService()

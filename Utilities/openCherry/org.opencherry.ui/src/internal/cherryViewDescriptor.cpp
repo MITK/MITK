@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryViewDescriptor.h"
@@ -37,7 +37,7 @@ ViewDescriptor::ViewDescriptor(IConfigurationElement::Pointer e)
 
 IViewPart::Pointer ViewDescriptor::CreateView()
 {
-  return configElement->CreateExecutableExtension<IViewPart>("cherryIViewPart",
+  return configElement->CreateExecutableExtension<IViewPart>(
       WorkbenchRegistryConstants::ATT_CLASS);
 }
 
@@ -125,7 +125,7 @@ void* ViewDescriptor::GetAdapter(const std::type_info& adapter)
   return 0;
 }
 
-//void 
+//void
 //ViewDescriptor::ActivateHandler() {
 // if (handlerActivation == null) {
 //   final IHandler handler = new ShowViewHandler(getId());
@@ -135,7 +135,7 @@ void* ViewDescriptor::GetAdapter(const std::type_info& adapter)
 // }
 // }
 
-//void 
+//void
 //ViewDescriptor::DeactivateHandler() {
 // if (handlerActivation != null) {
 //   final IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);

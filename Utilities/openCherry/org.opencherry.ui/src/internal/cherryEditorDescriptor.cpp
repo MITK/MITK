@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryEditorDescriptor.h"
@@ -93,7 +93,7 @@ IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement()
 IEditorPart::Pointer EditorDescriptor::CreateEditor()
 {
   IEditorPart::Pointer extension = configurationElement->CreateExecutableExtension<IEditorPart>(
-      "cherryIEditorPart", WorkbenchRegistryConstants::ATT_CLASS);
+      WorkbenchRegistryConstants::ATT_CLASS);
   return extension;
 }
 
@@ -195,7 +195,7 @@ bool EditorDescriptor::LoadValues(IMemento::Pointer memento)
 //  }
 //  else
 //  {
-//    // legacy: handle the older attribute names, needed to allow reading of pre-3.0-RCP workspaces 
+//    // legacy: handle the older attribute names, needed to allow reading of pre-3.0-RCP workspaces
 //    boolean internal = new Boolean(memento
 //        .getString(IWorkbenchConstants.TAG_INTERNAL))
 //    .booleanValue();
@@ -272,7 +272,7 @@ int EditorDescriptor::GetOpenMode()
   }
   else if (this->GetFileName() != "")
   {
-    // open using an external editor  
+    // open using an external editor
     return EditorDescriptor::OPEN_EXTERNAL;
   }
   else if (this->GetPluginId() != "")
@@ -354,7 +354,7 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
       {
         try
         {
-          matchingStrategy = configurationElement->CreateExecutableExtension<IEditorMatchingStrategy>("cherryIEditorMatchingStrategy", WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
+          matchingStrategy = configurationElement->CreateExecutableExtension<IEditorMatchingStrategy>(WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
         }
         catch (CoreException e)
         {

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIVIEWPART_H_
@@ -29,7 +29,7 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * A view is a visual component within a workbench page. It is typically used to
  * navigate a hierarchy of information (like the workspace), open an editor, or
  * display properties for the active editor. Modifications made in a view are
@@ -65,40 +65,40 @@ namespace cherry {
  * border trim. Note that this is considered to be a hint to the presentation,
  * and not all presentations may honor size constraints.
  * </p>
- * 
+ *
  * @see IWorkbenchPage#showView
  * @see org.eclipse.ui.part.ViewPart
  * @see ISizeProvider
  */
 struct CHERRY_UI IViewPart : public virtual IWorkbenchPart {
-  
-  cherryClassMacro(IViewPart)
-  
+
+  cherryInterfaceMacro(IViewPart, cherry)
+
   virtual ~IViewPart() {}
-  
+
     /**
-     * Returns the site for this view. 
+     * Returns the site for this view.
      * This method is equivalent to <code>(IViewSite) getSite()</code>.
-     * <p>  
-     * The site can be <code>null</code> while the view is being initialized. 
+     * <p>
+     * The site can be <code>null</code> while the view is being initialized.
      * After the initialization is complete, this value must be non-<code>null</code>
      * for the remainder of the view's life cycle.
      * </p>
-     * 
+     *
      * @return the view site; this value may be <code>null</code> if the view
      *         has not yet been initialized
      */
     virtual IViewSite::Pointer GetViewSite() = 0;
 
-   
+
     /**
      * Initializes this view with the given view site.  A memento is passed to
      * the view which contains a snapshot of the views state from a previous
      * session.  Where possible, the view should try to recreate that state
      * within the part controls.
      * <p>
-     * This method is automatically called by the workbench shortly after the part 
-     * is instantiated.  It marks the start of the views's lifecycle. Clients must 
+     * This method is automatically called by the workbench shortly after the part
+     * is instantiated.  It marks the start of the views's lifecycle. Clients must
      * not call this method.
      * </p>
      *

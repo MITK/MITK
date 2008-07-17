@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryAbstractUIPlugin.h"
@@ -56,26 +56,26 @@ AbstractUIPlugin::AbstractUIPlugin()
 //    }
 
 
-IWorkbench::Pointer AbstractUIPlugin::GetWorkbench()
+IWorkbench* AbstractUIPlugin::GetWorkbench()
 {
   return PlatformUI::GetWorkbench();
 }
 
 //    ImageRegistry createImageRegistry()
 //    {
-//  
+//
 //      //If we are in the UI Thread use that
 //      if (Display.getCurrent() != null)
 //      {
 //        return new ImageRegistry(Display.getCurrent());
 //      }
-//  
+//
 //      if (PlatformUI.isWorkbenchRunning())
 //      {
 //        return new ImageRegistry(PlatformUI.getWorkbench().getDisplay());
 //      }
-//  
-//      //Invalid thread access if it is not the UI Thread 
+//
+//      //Invalid thread access if it is not the UI Thread
 //      //and the workbench is not created.
 //      throw new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS);
 //    }
@@ -104,7 +104,7 @@ IWorkbench::Pointer AbstractUIPlugin::GetWorkbench()
 //                  // load failed so ensure we have an empty settings
 //                  dialogSettings = new DialogSettings("Workbench"); //$NON-NLS-1$
 //              }
-//              
+//
 //              return;
 //          }
 //        }
@@ -143,7 +143,7 @@ IWorkbench::Pointer AbstractUIPlugin::GetWorkbench()
 //    }
 //
 //        // startup() is not guaranteed to be called in the UI thread,
-//        // but refreshPluginActions must run in the UI thread, 
+//        // but refreshPluginActions must run in the UI thread,
 //        // so use asyncExec.  See bug 6623 for more details.
 //        Display.getDefault().asyncExec(new Runnable() {
 //            public void run() {
@@ -177,15 +177,15 @@ IWorkbench::Pointer AbstractUIPlugin::GetWorkbench()
 void AbstractUIPlugin::Start(IBundleContext::Pointer context)
 {
   Plugin::Start(context);
-  
+
   // Should only attempt refreshPluginActions() once the bundle
   // has been fully started.  Otherwise, action delegates
-  // can be created while in the process of creating 
-  // a triggering action delegate (if UI events are processed during startup).  
-  // Also, if the start throws an exception, the bundle will be shut down.  
+  // can be created while in the process of creating
+  // a triggering action delegate (if UI events are processed during startup).
+  // Also, if the start throws an exception, the bundle will be shut down.
   // We don't want to have created any delegates if this happens.
   // See bug 63324 for more details.
-  
+
 //  bundleListener = new BundleListener()
 //  {
 //  public void bundleChanged(BundleEvent event)
@@ -207,7 +207,7 @@ void AbstractUIPlugin::Start(IBundleContext::Pointer context)
 //    }
 //  };
 //  context.addBundleListener(bundleListener);
-  
+
   // bundleListener is removed in stop(BundleContext)
 }
 
@@ -226,9 +226,9 @@ void AbstractUIPlugin::Stop(IBundleContext::Pointer context)
 //    imageRegistry.dispose();
 //    imageRegistry = null;
 //}
-  
+
   Plugin::Stop(context);
-  
+
 }
 
 //    static ImageDescriptor imageDescriptorFromPlugin(String pluginId,

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryViewReference.h"
@@ -20,7 +20,7 @@
 #include <service/cherryIConfigurationElement.h>
 
 #include "../cherryUIException.h"
-#include "../cherryWorkbench.h"
+#include "../tweaklets/cherryWorkbenchTweaklet.h"
 #include "../cherryPlatformUI.h"
 
 #include "cherryWorkbenchPage.h"
@@ -174,7 +174,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
     // Pass the error to the status handling facility
     //      StatusManager.getManager().handle(logStatus);
-    
+
     WorkbenchPlugin::Log("Unable to create view ID " + this->GetId() + ": " + exception.displayText());
 
     IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(this->GetId());
@@ -184,12 +184,12 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
       label = desc->GetLabel();
     }
 
-    Workbench::Pointer workbench = PlatformUI::GetWorkbench().Cast<Workbench>();
-    if (!workbench.IsNull())
-    {
-      IViewPart::Pointer part =
-          workbench->CreateErrorViewPart(label, exception.displayText());
 
+    IViewPart::Pointer part =
+        Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorViewPart(label, exception.displayText());
+
+    if (part.IsNotNull())
+    {
       //PartPane pane = getPane();
       ViewSite::Pointer site = new ViewSite(this, part, factory->GetWorkbenchPage(), GetId(),
           PlatformUI::PLUGIN_ID, label);
@@ -230,7 +230,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
 PartPane::Pointer ViewReference::CreatePane()
 {
-  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateViewPane(this, this->factory->GetWorkbenchPage());
+  return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateViewPane(this, this->factory->GetWorkbenchPage());
 }
 
 IWorkbenchPart::Pointer ViewReference::CreatePartHelper()

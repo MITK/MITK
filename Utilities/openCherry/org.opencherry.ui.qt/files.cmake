@@ -5,12 +5,14 @@ SET(CPP_FILES
   cherryQtLogView.cpp
   cherryQtUIPlugin.cpp
   cherryQtViewPart.cpp
-  cherryQtWorkbench.cpp
+  cherryQtWorkbenchPageTweaklet.cpp
+  cherryQtWorkbenchTweaklet.cpp
   #cherryQtWorkbenchWindow.cpp
   cherryQtSimpleWorkbenchWindow.cpp
   
   # application
   application/cherryQtActionBarAdvisor.cpp
+  application/cherryQtWorkbenchAdvisor.cpp
 )
 
 SET(INTERNAL_CPP_FILES

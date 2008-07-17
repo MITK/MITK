@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYWORKBENCHPAGE_H_
@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryWorkbenchPagePartList.h"
 #include "cherryWorkbenchPartReference.h"
+#include "cherryPageSelectionService.h"
 #include "cherryEditorManager.h"
 #include "cherryViewFactory.h"
 
@@ -46,22 +47,23 @@ class PerspectiveHelper;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * A collection of views and editors in a workbench.
  */
 class CHERRY_UI WorkbenchPage : public IWorkbenchPage {
 
 public:
   cherryClassMacro(WorkbenchPage);
-  
+
 protected:
-  
+
   WorkbenchWindow::Pointer window;
 
   friend class ViewFactory;
-  
+  friend class WorkbenchWindow;
+
 private:
-  
+
   /**
        * Manages editor contributions and action set part associations.
        */
@@ -73,7 +75,7 @@ private:
 
           /**
            * Updates the contributions given the new part as the active part.
-           * 
+           *
            * @param newPart
            *            the new active part, may be <code>null</code>
            */
@@ -81,7 +83,7 @@ private:
 
           /**
            * Updates the contributions given the new part as the topEditor.
-           * 
+           *
            * @param newEditor
            *            the new top editor, may be <code>null</code>
            */
@@ -91,7 +93,7 @@ private:
            * Activates the contributions of the given part. If <code>enable</code>
            * is <code>true</code> the contributions are visible and enabled,
            * otherwise they are disabled.
-           * 
+           *
            * @param part
            *            the part whose contributions are to be activated
            * @param enable
@@ -104,7 +106,7 @@ private:
            * Deactivates the contributions of the given part. If <code>remove</code>
            * is <code>true</code> the contributions are removed, otherwise they
            * are disabled.
-           * 
+           *
            * @param part
            *            the part whose contributions are to be deactivated
            * @param remove
@@ -114,12 +116,12 @@ private:
       private: void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
 
       };
-  
-  
+
+
     IAdaptable* input;
 
     void* composite;
-    
+
     //Could be delete. This information is in the active part list;
     //ActivationList activationList = new ActivationList();
 
@@ -129,13 +131,12 @@ private:
 
     //ListenerList propertyChangeListeners = new ListenerList();
 
-    //PageSelectionService selectionService = new PageSelectionService(
-    //        this);
+    PageSelectionService* selectionService;
 
     WorkbenchPagePartList partList; // = new WorkbenchPagePartList(selectionService);
 
     //IActionBars actionBars;
-    
+
     ViewFactory* viewFactory;
 
     //PerspectiveList perspList = new PerspectiveList();
@@ -143,38 +144,38 @@ private:
     //PerspectiveDescriptor deferredActivePersp;
 
     //NavigationHistory navigationHistory = new NavigationHistory(this);
-    
-   
+
+
     /**
      * If we're in the process of activating a part, this points to the new part.
      * Otherwise, this is null.
      */
     IWorkbenchPartReference::Pointer partBeingActivated;
-    
+
     /**
-     * Contains a list of perspectives that may be dirty due to plugin 
-     * installation and removal. 
+     * Contains a list of perspectives that may be dirty due to plugin
+     * installation and removal.
      */
     //Set dirtyPerspectives = new HashSet();
-    
+
     ActionSwitcher actionSwitcher;
 
    //IExtensionTracker tracker;
-    
+
     // Deferral count... delays disposing parts and sending certain events if nonzero
     int deferCount;
     // Parts waiting to be disposed
     std::vector<IWorkbenchPart::Pointer> pendingDisposals;
-    
+
 
    IExtensionPoint* GetPerspectiveExtensionPoint();
-   
-    
+
+
 public:
-  
+
     /**
    * Constructs a new page with a given perspective and input.
-   * 
+   *
    * @param w
    *            the parent window
    * @param layoutID
@@ -189,20 +190,20 @@ public:
     /**
      * Constructs a page. <code>restoreState(IMemento)</code> should be
      * called to restore this page from data stored in a persistance file.
-     * 
+     *
      * @param w
      *            the parent window
      * @param input
      *            the page input
-     * @throws WorkbenchException 
+     * @throws WorkbenchException
      */
     WorkbenchPage(WorkbenchWindow::Pointer w, IAdaptable* input);
 
     ~WorkbenchPage();
-    
+
     /**
      * Activates a part. The part will be brought to the front and given focus.
-     * 
+     *
      * @param part
      *            the part to activate
      */
@@ -213,7 +214,7 @@ public:
      */
 private: void ActivatePart(const IWorkbenchPart::Pointer part);
 
-   
+
     /**
      * Adds an IPartListener to the part service.
      */
@@ -223,28 +224,28 @@ public: void AddPartListener(IPartListener::Pointer l);
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//public: void AddSelectionListener(ISelectionListener listener);
+public: void AddSelectionListener(ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//public: void AddSelectionListener(const std::string& partId, ISelectionListener listener);
+public: void AddSelectionListener(const std::string& partId, ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//public: void AddPostSelectionListener(ISelectionListener listener);
+public: void AddPostSelectionListener(ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//public: void AddPostSelectionListener(const std::string partId,
-//            ISelectionListener listener);
-    
+public: void AddPostSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener);
+
 private: SmartPointer<PartPane> GetPane(IWorkbenchPart::Pointer part);
 
 private: SmartPointer<PartPane> GetPane(IWorkbenchPartReference::Pointer part);
-    
+
     /**
      * Brings a part to the front of its stack. Does not update the active part or
      * active editor. This should only be called if the caller knows that the part
@@ -254,12 +255,12 @@ private: SmartPointer<PartPane> GetPane(IWorkbenchPartReference::Pointer part);
      * @param part
      */
 private: bool InternalBringToTop(IWorkbenchPartReference::Pointer part);
-    
+
     /**
      * Moves a part forward in the Z order of a perspective so it is visible.
      * If the part is in the same stack as the active part, the new part is
      * activated.
-     * 
+     *
      * @param part
      *            the part to bring to move forward
      */
@@ -268,16 +269,16 @@ public: void BringToTop(IWorkbenchPart::Pointer part);
     /**
      * Resets the layout for the perspective. The active part in the old layout
      * is activated in the new layout for consistent user context.
-     * 
+     *
      * Assumes the busy cursor is active.
      */
 private: void BusyResetPerspective();
 
     /**
      * Implements <code>setPerspective</code>.
-     * 
+     *
      * Assumes that busy cursor is active.
-     * 
+     *
      * @param desc
      *            identifies the new perspective.
      */
@@ -285,7 +286,7 @@ private: void BusySetPerspective(IPerspectiveDescriptor::Pointer desc);
 
     /**
      * Shows a view.
-     * 
+     *
      * Assumes that a busy cursor is active.
      */
 protected: IViewPart::Pointer BusyShowView(const std::string& viewID, const std::string& secondaryID, int mode);
@@ -316,44 +317,44 @@ public: bool CloseAllSavedEditors();
 public: bool CloseAllEditors(bool save);
 
 private: void UpdateActivePart();
-    
+
     /**
-     * Makes the given part active. Brings it in front if necessary. Permits null 
+     * Makes the given part active. Brings it in front if necessary. Permits null
      * (indicating that no part should be active).
-     * 
-     * @since 3.1 
+     *
+     * @since 3.1
      *
      * @param ref new active part (or null)
      */
 private: void MakeActive(IWorkbenchPartReference::Pointer ref);
-    
+
     /**
-     * Makes the given editor active. Brings it to front if necessary. Permits <code>null</code> 
+     * Makes the given editor active. Brings it to front if necessary. Permits <code>null</code>
      * (indicating that no editor is active).
-     * 
-     * @since 3.1 
+     *
+     * @since 3.1
      *
      * @param ref the editor to make active, or <code>null</code> for no active editor
      */
 private: void MakeActiveEditor(IEditorReference::Pointer ref);
-    
+
     /**
      * See IWorkbenchPage
      */
 public: bool CloseEditors(const std::vector<IEditorReference::Pointer>& refArray, bool save);
-    
+
     /**
      * Enables or disables listener notifications. This is used to delay listener notifications until the
      * end of a public method.
-     * 
+     *
      * @param shouldDefer
      */
 private: void DeferUpdates(bool shouldDefer);
-    
+
 private: void StartDeferring();
 
 private: void HandleDeferredEvents();
-    
+
 private: bool IsDeferred();
 
     /**
@@ -374,7 +375,7 @@ public: bool CloseEditor(IEditorPart::Pointer editor, bool save);
     /**
    * Closes the specified perspective. If last perspective, then entire page
    * is closed.
-   * 
+   *
    * @param persp
    *            the perspective to be closed
    * @param saveParts
@@ -384,7 +385,7 @@ public: bool CloseEditor(IEditorPart::Pointer editor, bool save);
    */
     /* package */
 //protected: void ClosePerspective(Perspective::Pointer persp, bool saveParts, bool closePage);
-  
+
     /**
      * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
      */
@@ -397,7 +398,7 @@ private: void CreateClientComposite();
 
     /**
      * Creates a new view set. Return null on failure.
-     * 
+     *
      * @param desc the perspective descriptor
      * @param notify whether to fire a perspective opened event
      */
@@ -405,37 +406,37 @@ private: void CreateClientComposite();
 
     /**
      * This is called by child objects after a part has been added to the page.
-     * The page will in turn notify its listeners. 
+     * The page will in turn notify its listeners.
      */
     /* package */protected: void PartAdded(WorkbenchPartReference::Pointer ref);
-    
+
     /**
      * This is called by child objects after a part has been added to the page.
      * The part will be queued for disposal after all listeners have been notified
      */
     /* package */protected: void PartRemoved(WorkbenchPartReference::Pointer ref);
-    
+
 private: void DisposePart(WorkbenchPartReference::Pointer ref);
-    
+
     /**
      * Deactivates a part. The pane is unhilighted.
      */
 private: void DeactivatePart(IWorkbenchPart::Pointer part);
-    
+
   /**
    * Detaches a view from the WorkbenchWindow.
    */
 public: void DetachView(IViewReference::Pointer ref);
-  
+
   /**
-   * Removes a detachedwindow. 
+   * Removes a detachedwindow.
    */
 public: void AttachView(IViewReference::Pointer ref);
 
 
     /**
      * Dispose a perspective.
-     * 
+     *
      * @param persp the perspective descriptor
      * @param notify whether to fire a perspective closed event
      */
@@ -453,21 +454,21 @@ public: IViewPart::Pointer FindView(const std::string& id);
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage
      */
 public: IViewReference::Pointer FindViewReference(const std::string& viewId);
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage
      */
 public: IViewReference::Pointer FindViewReference(const std::string& viewId, const std::string& secondaryId);
 
     /**
      * Notify property change listeners about a property change.
-     * 
+     *
      * @param changeId
      *            the change id
      * @param oldValue
@@ -477,9 +478,9 @@ public: IViewReference::Pointer FindViewReference(const std::string& viewId, con
      */
 //private: void FirePropertyChange(String changeId, Object oldValue,
 //            Object newValue) {
-//        
+//
 //        UIListenerLogging.logPagePropertyChanged(this, changeId, oldValue, newValue);
-//        
+//
 //        Object[] listeners = propertyChangeListeners.getListeners();
 //        PropertyChangeEvent event = new PropertyChangeEvent(this, changeId,
 //                oldValue, newValue);
@@ -496,13 +497,13 @@ public: IViewReference::Pointer FindViewReference(const std::string& viewId, con
 public: IEditorPart::Pointer GetActiveEditor();
 
     /**
-     * Returns the reference for the active editor, or <code>null</code> 
+     * Returns the reference for the active editor, or <code>null</code>
      * if there is no active editor.
-     * 
+     *
      * @return the active editor reference or <code>null</code>
      */
 public: IEditorReference::Pointer GetActiveEditorReference();
-    
+
     /*
      * (non-Javadoc) Method declared on IPartService
      */
@@ -547,9 +548,9 @@ public: IEditorAreaHelper* GetEditorPresentation();
 public: std::vector<IEditorPart::Pointer> GetEditors();
 
 public: std::vector<IEditorPart::Pointer> GetDirtyEditors();
-  
+
 public: std::vector<IWorkbenchPart::Pointer> GetDirtyParts();
-  
+
     /**
      * See IWorkbenchPage.
      */
@@ -559,7 +560,7 @@ public: IEditorPart::Pointer FindEditor(IEditorInput::Pointer input);
      * See IWorkbenchPage.
      */
 public: std::vector<IEditorReference::Pointer> FindEditors(IEditorInput::Pointer input, const std::string& editorId, int matchFlags);
-    
+
     /**
      * See IWorkbenchPage.
      */
@@ -584,13 +585,14 @@ public: std::string GetLabel();
     /*
      * (non-Javadoc) Method declared on ISelectionService
      */
-//public: ISelection::Pointer GetSelection();
+public: ISelection::Pointer GetSelection();
 
     /*
      * (non-Javadoc) Method declared on ISelectionService
      */
-//public: ISelection::Pointer GetSelection(const std::string& partId);
+public: ISelection::Pointer GetSelection(const std::string& partId);
 
+public: SelectionEvents& GetSelectionEvents(const std::string& partId = "");
 
     /*
      * Returns the view factory.
@@ -606,10 +608,10 @@ public: std::vector<IViewReference::Pointer> GetViewReferences();
      * See IWorkbenchPage.
      */
 public: std::vector<IViewPart::Pointer> GetViews();
-  
+
   /**
    * Returns all view parts in the specified perspective
-   * 
+   *
    * @param persp the perspective
    * @return an array of view parts
    * @since 3.1
@@ -623,7 +625,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage#hideView(org.eclipse.ui.IViewReference)
      */
   public: void HideView(IViewReference::Pointer ref);
@@ -637,7 +639,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /**
      * Initialize the page.
-     * 
+     *
      * @param w
      *            the parent window
      * @param layoutID
@@ -648,7 +650,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      *            whether to process the perspective extras preference
      */
   private: void Init(WorkbenchWindow::Pointer w, const std::string& layoutID, IAdaptable* input, bool openExtras);
-    
+
     /**
    * Opens the perspectives specified in the PERSPECTIVE_BAR_EXTRAS preference (see bug 84226).
    */
@@ -658,7 +660,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * See IWorkbenchPage.
      */
   public: bool IsPartVisible(IWorkbenchPart::Pointer part);
-    
+
     /**
      * See IWorkbenchPage.
      */
@@ -668,10 +670,10 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * Returns whether the view is fast.
      */
   public: bool IsFastView(IViewReference::Pointer ref);
-    
+
     /**
      * Return whether the view is closeable or not.
-     * 
+     *
      * @param ref the view reference to check.  Must not be <code>null</code>.
      * @return true if the part is closeable.
      * @since 3.1.1
@@ -680,7 +682,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /**
      * Return whether the view is moveable or not.
-     * 
+     *
      * @param ref the view reference to check.  Must not be <code>null</code>.
      * @return true if the part is moveable.
      * @since 3.1.1
@@ -723,13 +725,13 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
   public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input, const std::string& editorID,
       bool activate);
-  
+
     /**
      * See IWorkbenchPage.
      */
   public: IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
             const std::string& editorID, bool activate, int matchFlags);
-  
+
     /**
      * This is not public API but for use internally.  editorState can be <code>null</code>.
      */
@@ -737,7 +739,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
             const std::string& editorID, bool activate, int matchFlags,
             IMemento::Pointer editorState);
 
-    
+
     /*
      * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
      * Opens a new editor using the given input and descriptor. (Normally, editors are opened using
@@ -746,7 +748,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
   public: IEditorPart::Pointer OpenEditorFromDescriptor(IEditorInput::Pointer input,
         const IEditorDescriptor::ConstPointer editorDescriptor, bool activate,
         IMemento::Pointer editorState);
-    
+
     /**
      * @see #openEditor(IEditorInput, String, boolean, int)
    */
@@ -759,22 +761,22 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
   private: IEditorPart::Pointer BusyOpenEditorFromDescriptor(IEditorInput::Pointer input, EditorDescriptor::ConstPointer editorDescriptor,
         bool activate, IMemento::Pointer editorState);
-    
+
     /**
      * Do not call this method.  Use <code>busyOpenEditor</code>.
-     * 
+     *
      * @see IWorkbenchPage#openEditor(IEditorInput, String, boolean)
      */
   protected: IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput::Pointer input,
             const std::string& editorID, bool activate,  int matchFlags, IMemento::Pointer editorState);
-    
+
     /*
      * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
      * See openEditorFromDescriptor().
      */
   private: IEditorPart::Pointer BusyOpenEditorFromDescriptorBatched(IEditorInput::Pointer input,
             EditorDescriptor::Pointer editorDescriptor, bool activate, IMemento::Pointer editorState);
-    
+
   public: void OpenEmptyTab();
 
   protected: void ShowEditor(bool activate, IEditorPart::Pointer editor);
@@ -783,7 +785,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * See IWorkbenchPage.
      */
   public: bool IsEditorPinned(IEditorPart::Pointer editor);
-    
+
 
     /**
      * Removes an IPartListener from the part service.
@@ -794,37 +796,29 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//  public: void RemoveSelectionListener(ISelectionListener listener) {
-//        selectionService.removeSelectionListener(listener);
-//    }
+  public: void RemoveSelectionListener(ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//  public: void RemoveSelectionListener(String partId,
-//            ISelectionListener listener) {
-//        selectionService.removeSelectionListener(partId, listener);
-//    }
+  public: void RemoveSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//  public: void RemovePostSelectionListener(ISelectionListener listener) {
-//        selectionService.removePostSelectionListener(listener);
-//    }
+  public: void RemovePostSelectionListener(ISelectionListener::Pointer listener);
 
     /*
      * (non-Javadoc) Method declared on ISelectionListener.
      */
-//  public: void RemovePostSelectionListener(String partId,
-//            ISelectionListener listener) {
-//        selectionService.removePostSelectionListener(partId, listener);
-//    }
+  public: void RemovePostSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener);
 
     /**
      * This method is called when a part is activated by clicking within it. In
      * response, the part, the pane, and all of its actions will be activated.
-     * 
+     *
      * In the current design this method is invoked by the part pane when the
      * pane, the part, or any children gain focus.
      */
@@ -851,10 +845,10 @@ public: std::vector<IViewPart::Pointer> GetViews();
   public: bool SaveAllEditors(bool confirm);
 
     /**
-     * @param confirm 
+     * @param confirm
      * @param addNonPartSources true if saveables from non-part sources should be saved too
-     * @return false if the user cancelled 
-     * 
+     * @return false if the user cancelled
+     *
      */
   public: bool SaveAllEditors(bool confirm, bool addNonPartSources);
 
@@ -867,7 +861,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
     /**
      * Saves an editors in the workbench. If <code>confirm</code> is <code>true</code>
      * the user is prompted to confirm the command.
-     * 
+     *
      * @param confirm
      *            if user confirmation should be sought
      * @return <code>true</code> if the command succeeded, or <code>false</code>
@@ -884,14 +878,14 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * Saves the perspective.
      */
   public: void SavePerspectiveAs(IPerspectiveDescriptor::Pointer newDesc);
-  
+
     /**
      * Save the state of the page.
      */
   public: /*IStatus*/bool SaveState(IMemento::Pointer memento);
-    
+
   private: std::string GetId(IWorkbenchPart::Pointer part);
-    
+
   private: std::string GetId(IWorkbenchPartReference::Pointer ref);
 
     /**
@@ -911,7 +905,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
 //  private: void SetPerspective(Perspective::Pointer newPersp);
 
-    
+
   /*
      * Update visibility state of all views.
      */
@@ -919,16 +913,16 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /**
      * Sets the perspective.
-     * 
+     *
      * @param desc
      *            identifies the new perspective.
      */
   public: void SetPerspective(const IPerspectiveDescriptor::ConstPointer desc);
-    
+
     /**
      * Can be used to get hold of a IPartService::PartEvents object
      * and register for individual part events.
-     * 
+     *
      * @return the part events for this page.
      */
   public: IPartService::PartEvents& GetPartEvents();
@@ -946,7 +940,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage#showView(java.lang.String,
      *      java.lang.String, int)
      */
@@ -960,7 +954,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      */
   private: bool CertifyMode(int mode);
 
-       
+
     /*
      * Returns the editors in activation order (oldest first).
      */
@@ -970,20 +964,20 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * @see IWorkbenchPage#getOpenPerspectives()
      */
   public: std::vector<IPerspectiveDescriptor::Pointer> GetOpenPerspectives();
-    
+
     /**
      * Return all open Perspective objects.
-     * 
+     *
      * @return all open Perspective objects
      * @since 3.1
      */
 //    /*package*/protected: std::vector<Perspective::Pointer> GetOpenInternalPerspectives();
-  
+
   /**
    * Checks perspectives in the order they were activiated
-   * for the specfied part.  The first sorted perspective 
+   * for the specfied part.  The first sorted perspective
    * that contains the specified part is returned.
-   * 
+   *
    * @param part specified part to search for
    * @return the first sorted perspespective containing the part
    * @since 3.1
@@ -1001,11 +995,11 @@ public: std::vector<IViewPart::Pointer> GetViews();
   public: std::vector<IWorkbenchPartReference::Pointer> GetSortedParts();
 
     /**
-     * Returns the reference to the given part, or <code>null</code> if it has no reference 
+     * Returns the reference to the given part, or <code>null</code> if it has no reference
      * (i.e. it is not a top-level part in this workbench page).
-     * 
+     *
      * @param part the part
-     * @return the part's reference or <code>null</code> if the given part does not belong 
+     * @return the part's reference or <code>null</code> if the given part does not belong
      * to this workbench page
      */
   public: IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part);
@@ -1030,27 +1024,27 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //        parts.add(ref);
 //      }
 //        }
-//        
+//
 //        /*
 //     * Ensures that the given part appears AFTER any other part in the same
 //     * container.
 //     */
 //        void bringToTop(IWorkbenchPartReference ref) {
 //            ILayoutContainer targetContainer = getContainer(ref);
-//            
+//
 //            int newIndex = lastIndexOfContainer(targetContainer);
-//            
+//
 //            //New index can be -1 if there is no last index
-//            if (newIndex >= 0 && ref == parts.get(newIndex)) 
+//            if (newIndex >= 0 && ref == parts.get(newIndex))
 //        return;
-//      
+//
 //            parts.remove(ref);
 //            if(newIndex >= 0)
 //              parts.add(newIndex, ref);
 //            else
 //              parts.add(ref);
 //        }
-//        
+//
 //        /*
 //         * Returns the last (most recent) index of the given container in the activation list, or returns
 //         * -1 if the given container does not appear in the activation list.
@@ -1061,10 +1055,10 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //
 //                ILayoutContainer cnt = getContainer(ref);
 //                if (cnt == container) {
-//                    return i; 
+//                    return i;
 //                }
 //            }
-//            
+//
 //            return -1;
 //        }
 //
@@ -1117,30 +1111,30 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //
 //  private: IWorkbenchPart getActive(int start) {
 //            IWorkbenchPartReference ref = getActiveReference(start, false);
-//            
+//
 //            if (ref == null) {
 //                return null;
 //            }
-//            
+//
 //            return ref.getPart(true);
 //        }
-//        
+//
 //  public: IWorkbenchPartReference getActiveReference(boolean editorsOnly) {
 //            return getActiveReference(parts.size() - 1, editorsOnly);
 //        }
-//        
+//
 //  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly) {
 //            // First look for parts that aren't obscured by the current zoom state
 //            IWorkbenchPartReference nonObscured = getActiveReference(start, editorsOnly, true);
-//            
+//
 //            if (nonObscured != null) {
 //                return nonObscured;
 //            }
-//            
+//
 //            // Now try all the rest of the parts
 //            return getActiveReference(start, editorsOnly, false);
 //        }
-//        
+//
 //        /*
 //         * Find a part in the list starting from the end and filter
 //         * and views from other perspectives. Will filter fast views
@@ -1155,7 +1149,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //                if (editorsOnly && !(ref instanceof IEditorReference)) {
 //                    continue;
 //                }
-//                
+//
 //                // Skip parts whose containers have disabled auto-focus
 //                PartPane pane = ref.getPane();
 //
@@ -1163,7 +1157,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //                    if (!pane.allowsAutoFocus()) {
 //                        continue;
 //                    }
-//                    
+//
 //                    if (skipPartsObscuredByZoom) {
 //                        if (pane.isObscuredByZoom()) {
 //                            continue;
@@ -1200,7 +1194,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //        }
 //
 //        /*
-//         * Returns the index of the part reference within the activation list.  
+//         * Returns the index of the part reference within the activation list.
 //         * The higher the index, the more recent it was used.
 //         */
 //        int indexOf(IWorkbenchPartReference ref) {
@@ -1261,11 +1255,11 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //         */
 //        IEditorPart getTopEditor() {
 //            IEditorReference editor = (IEditorReference)getActiveReference(parts.size() - 1, true);
-//            
+//
 //            if (editor == null) {
 //                return null;
 //            }
-//            
+//
 //            return editor.getEditor(true);
 //        }
 //    };
@@ -1296,7 +1290,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //         * Creates an empty instance of the perspective list
 //         */
 //  public: PerspectiveList() {
-//          
+//
 //        }
 //
 //        /**
@@ -1315,19 +1309,19 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //          movedPerspective = openPerspective;
 //        }
 //      }
-//      
+//
 //      if (oldLocation == newLoc) {
 //        return;
 //      }
-//      
+//
 //      openedList.remove(oldLocation);
 //      openedList.add(newLoc, movedPerspective);
-//      
+//
 //    }
 //
 //    /**
 //     * Return all perspectives in the order they were activated.
-//     * 
+//     *
 //     * @return an array of perspectives sorted by activation order, least
 //     *         recently activated perspective last.
 //     */
@@ -1449,7 +1443,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 //                usedList.add(perspective);
 //            }
 //        }
-//        
+//
 //  private: void updateActionSets(Perspective oldPersp, Perspective newPersp) {
 //      // Update action sets
 //
@@ -1503,7 +1497,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /**
    * Find the stack of view references stacked with this view part.
-   * 
+   *
    * @param part
    *            the part
    * @return the stack of references
@@ -1513,7 +1507,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage#getViewStack(org.eclipse.ui.IViewPart)
      */
 //  public: std::vector<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
@@ -1528,7 +1522,7 @@ public: std::vector<IViewPart::Pointer> GetViews();
      * <ul>
      * <li>currently applies only to views</li>
      * <li>has no effect when view is zoomed</li>
-     * </ul> 
+     * </ul>
      */
   public: void ResizeView(IViewPart::Pointer part, int width, int height);
 
@@ -1554,25 +1548,25 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
 //  private: void FindSashParts(LayoutTree tree, PartPane::Sashes sashes,
 //            SashInfo info);
-  
+
   /**
    * Returns all parts that are owned by this page
-   * 
+   *
    * @return
    */
   protected: std::vector<IWorkbenchPartReference::Pointer> GetAllParts();
-  
+
   /**
    * Returns all open parts that are owned by this page (that is, all parts
    * for which a part opened event would have been sent -- these would be
    * activated parts whose controls have already been created.
    */
   protected: std::vector<IWorkbenchPartReference::Pointer> GetOpenParts();
-    
+
     /**
      * Sanity-checks the objects in this page. Throws an Assertation exception
-     * if an object's internal state is invalid. ONLY INTENDED FOR USE IN THE 
-     * UI TEST SUITES. 
+     * if an object's internal state is invalid. ONLY INTENDED FOR USE IN THE
+     * UI TEST SUITES.
      */
   public: void TestInvariants();
 
@@ -1583,27 +1577,27 @@ public: std::vector<IViewPart::Pointer> GetViews();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage#getPerspectiveShortcuts()
      */
   public: std::vector<std::string> GetPerspectiveShortcuts();
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPage#getShowViewShortcuts()
      */
   public: std::vector<std::string> GetShowViewShortcuts();
-    
+
   void CloseAllPerspectives(bool saveEditors, bool closePage);
-  
+
     /**
    * @since 3.1
    */
   private: void SuggestReset();
-    
+
   public: bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
-  
+
 };
 
 }

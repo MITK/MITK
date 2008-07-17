@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYIEDITORPART_H_
@@ -28,17 +28,17 @@ struct IEditorSite;
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * An editor is a visual component within a workbench page. It is
- * typically used to edit or browse a document or input object. The input 
- * is identified using an <code>IEditorInput</code>.  Modifications made 
- * in an editor part follow an open-save-close lifecycle model (in contrast 
- * to a view part, where modifications are saved to the workbench 
+ * typically used to edit or browse a document or input object. The input
+ * is identified using an <code>IEditorInput</code>.  Modifications made
+ * in an editor part follow an open-save-close lifecycle model (in contrast
+ * to a view part, where modifications are saved to the workbench
  * immediately).
  * <p>
  * An editor is document or input-centric.  Each editor has an input, and only
- * one editor can exist for each editor input within a page.  This policy has 
- * been designed to simplify part management.  
+ * one editor can exist for each editor input within a page.  This policy has
+ * been designed to simplify part management.
  * </p><p>
  * An editor should be used in place of a view whenever more than one instance
  * of a document type can exist.
@@ -50,7 +50,7 @@ struct IEditorSite;
  * An editor part is added to the workbench in two stages:
  * <ol>
  *  <li>An editor extension is contributed to the workbench registry. This
- *    extension defines the extension id, extension class, and the file 
+ *    extension defines the extension id, extension class, and the file
  *    extensions which are supported by the editor.</li>
  *  <li>An editor part based upon the extension is created and added to the
  *    workbench when the user opens a file with one of the supported file
@@ -68,7 +68,7 @@ struct IEditorSite;
 struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
 { //, ISaveablePart {
 
-  cherryClassMacro(IEditorPart)
+  cherryInterfaceMacro(IEditorPart, cherry);
 
   virtual ~IEditorPart()
   {
@@ -88,7 +88,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
   /**
    * Saves the contents of this part.
    * <p>
-   * If the save is successful, the part should fire a property changed event 
+   * If the save is successful, the part should fire a property changed event
    * reflecting the new dirty state (<code>PROP_DIRTY</code> property).
    * </p>
    * <p>
@@ -98,7 +98,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    * </p>
    * <p>
    * This method is long-running; progress and cancellation are provided
-   * by the given progress monitor. 
+   * by the given progress monitor.
    * </p>
    *
    * @param monitor the progress monitor
@@ -114,7 +114,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    * <code>IProgressMonitor</code> should be used to indicate progress.
    * </p>
    * <p>
-   * If the save is successful, the part fires a property changed event 
+   * If the save is successful, the part fires a property changed event
    * reflecting the new dirty state (<code>PROP_DIRTY</code> property).
    * </p>
    */
@@ -122,11 +122,11 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
 
   /**
    * Returns whether the contents of this part have changed since the last save
-   * operation. If this value changes the part must fire a property listener 
+   * operation. If this value changes the part must fire a property listener
    * event with <code>PROP_DIRTY</code>.
    * <p>
    * <b>Note:</b> this method is called often on a part open or part
-   * activation switch, for example by actions to determine their 
+   * activation switch, for example by actions to determine their
    * enabled status.
    * </p>
    *
@@ -154,7 +154,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
   virtual bool IsSaveOnCloseNeeded() = 0;
 
   /**
-   * Returns the input for this editor.  If this value changes the part must 
+   * Returns the input for this editor.  If this value changes the part must
    * fire a property listener event with <code>PROP_INPUT</code>.
    *
    * @return the editor input
@@ -162,14 +162,14 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
   virtual SmartPointer<IEditorInput> GetEditorInput() = 0;
 
   /**
-   * Returns the site for this editor. 
+   * Returns the site for this editor.
    * This method is equivalent to <code>(IEditorSite) getSite()</code>.
-   * <p>  
-   * The site can be <code>null</code> while the editor is being initialized. 
+   * <p>
+   * The site can be <code>null</code> while the editor is being initialized.
    * After the initialization is complete, this value must be non-<code>null</code>
    * for the remainder of the editor's life cycle.
    * </p>
-   * 
+   *
    * @return the editor site; this value may be <code>null</code> if the editor
    *         has not yet been initialized
    */
@@ -179,8 +179,8 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart
    * Initializes this editor with the given editor site and input.
    * <p>
    * This method is automatically called shortly after the part is instantiated.
-   * It marks the start of the part's lifecycle. The 
-   * {@link IWorkbenchPart#dispose IWorkbenchPart.dispose} method will be called 
+   * It marks the start of the part's lifecycle. The
+   * {@link IWorkbenchPart#dispose IWorkbenchPart.dispose} method will be called
    * automically at the end of the lifecycle. Clients must not call this method.
    * </p><p>
    * Implementors of this method must examine the editor input object type to

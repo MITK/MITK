@@ -138,10 +138,11 @@ std::string PartSite::GetRegisteredName()
   return extensionName;
 }
 
-//ISelectionProvider 
-//PartSite::GetSelectionProvider() {
-//    return selectionProvider;
-//  }
+ISelectionProvider::Pointer 
+PartSite::GetSelectionProvider() 
+{
+  return selectionProvider;
+}
 
 
 IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
@@ -224,10 +225,10 @@ void PartSite::SetRegisteredName(const std::string& name)
   extensionName = name;
 }
 
-//void 
-//PartSite::SetSelectionProvider(ISelectionProvider provider) {
-//    selectionProvider = provider;
-//  }
+void PartSite::SetSelectionProvider(ISelectionProvider::Pointer provider) 
+{
+  selectionProvider = provider;
+}
 
 /*
  * @see IWorkbenchPartSite#getKeyBindingService()

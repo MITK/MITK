@@ -6,6 +6,7 @@
    <extension-point id="handlers" name="Handlers" schema="schema/handlers.exsd"/>
    <extension-point id="views" name="Views" schema="schema/views.exsd"/>
    <extension-point id="workbench" name="Workbench" schema="schema/workbench.exsd"/>
+   <extension-point id="tweaklets" name="Tweaklets" schema="schema/tweaklets.exsd"/>
    
    <extension
    	point="org.opencherry.ui.commands">

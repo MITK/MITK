@@ -1,25 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryWorkbenchConfigurer.h"
 
 #include "../cherryPlatformUI.h"
 #include "../cherryWorkbenchWindow.h"
-#include "../cherryWorkbench.h"
+#include "cherryWorkbench.h"
 
 namespace cherry
 {
@@ -30,7 +30,7 @@ WorkbenchConfigurer::WorkbenchConfigurer() :
 
 }
 
-IWorkbench::Pointer WorkbenchConfigurer::GetWorkbench()
+IWorkbench* WorkbenchConfigurer::GetWorkbench()
 {
   return PlatformUI::GetWorkbench();
 }
@@ -80,13 +80,13 @@ bool WorkbenchConfigurer::RestoreState()
 
 void WorkbenchConfigurer::OpenFirstTimeWindow()
 {
-  this->GetWorkbench().Cast<Workbench>()->OpenFirstTimeWindow();
+  dynamic_cast<Workbench*>(this->GetWorkbench())->OpenFirstTimeWindow();
 }
 
 IWorkbenchWindowConfigurer::Pointer WorkbenchConfigurer::RestoreWorkbenchWindow(
     IMemento::Pointer memento)
 {
-  return this->GetWindowConfigurer(this->GetWorkbench().Cast<Workbench>()->RestoreWorkbenchWindow(memento));
+  return this->GetWindowConfigurer(dynamic_cast<Workbench*>(this->GetWorkbench())->RestoreWorkbenchWindow(memento));
 }
 
 bool WorkbenchConfigurer::GetExitOnLastWindowClose()

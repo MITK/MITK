@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYABSTRACTUIPLUGIN_H_
@@ -26,7 +26,7 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Abstract base class for plug-ins that integrate with the Eclipse platform UI.
  * <p>
  * Subclasses obtain the following capabilities:
@@ -35,8 +35,8 @@ namespace cherry {
  * Preferences
  * <ul>
  * <li> The platform core runtime contains general support for plug-in
- *      preferences (<code>org.eclipse.core.runtime.Preferences</code>). 
- *      This class provides appropriate conversion to the older JFace preference 
+ *      preferences (<code>org.eclipse.core.runtime.Preferences</code>).
+ *      This class provides appropriate conversion to the older JFace preference
  *      API (<code>org.eclipse.jface.preference.IPreferenceStore</code>).</li>
  * <li> The method <code>getPreferenceStore</code> returns the JFace preference
  *      store (cf. <code>Plugin.getPluginPreferences</code> which returns
@@ -57,7 +57,7 @@ namespace cherry {
  * </ul>
  * Dialogs
  * <ul>
- * <li> The dialog store is read the first time <code>getDialogSettings</code> 
+ * <li> The dialog store is read the first time <code>getDialogSettings</code>
  *      is called.</li>
  * <li> The dialog store allows the plug-in to "record" important choices made
  *      by the user in a wizard or dialog, so that the next time the
@@ -72,15 +72,15 @@ namespace cherry {
  *      file containing initial values for certain settings.</li>
  * <li> Plug-in code can call <code>saveDialogSettings</code> to cause settings to
  *      be saved in the plug-in's read/write state area. A plug-in may opt to do
- *      this each time a wizard or dialog is closed to ensure the latest 
+ *      this each time a wizard or dialog is closed to ensure the latest
  *      information is always safe on disk. </li>
  * <li> Dialog settings are also saved automatically on plug-in shutdown.</li>
  * </ul>
  * Images
  * <ul>
  * <li> A typical UI plug-in will have some images that are used very frequently
- *      and so need to be cached and shared.  The plug-in's image registry 
- *      provides a central place for a plug-in to store its common images. 
+ *      and so need to be cached and shared.  The plug-in's image registry
+ *      provides a central place for a plug-in to store its common images.
  *      Images managed by the registry are created lazily as needed, and will be
  *      automatically disposed of when the plug-in shuts down. Note that the
  *      number of registry images should be kept to a minimum since many OSs
@@ -100,9 +100,9 @@ namespace cherry {
 class CHERRY_UI AbstractUIPlugin : public Plugin {
 
 private:
-  
+
     /**
-     * The name of the dialog settings file (value 
+     * The name of the dialog settings file (value
      * <code>"dialog_settings.xml"</code>).
      */
    static const std::string FN_DIALOG_SETTINGS;
@@ -126,20 +126,20 @@ private:
 
     /**
      * The bundle listener used for kicking off refreshPluginActions().
-     * 
+     *
      * @since 3.0.1
      */
     //BundleListener bundleListener;
-    
+
 
 public:
-    
+
     /**
      * Creates an abstract UI plug-in runtime object.
      * <p>
      * Plug-in runtime classes are <code>BundleActivators</code> and so must
-     * have an default constructor.  This method is called by the runtime when 
-     * the associated bundle is being activated.  
+     * have an default constructor.  This method is called by the runtime when
+     * the associated bundle is being activated.
      * <p>
      * For more details, see <code>Plugin</code>'s default constructor.
      *
@@ -148,12 +148,12 @@ public:
      */
    AbstractUIPlugin();
 
-    
-    
+
+
     /**
      * Returns the dialog settings for this UI plug-in.
      * The dialog settings is used to hold persistent state data for the various
-     * wizards and dialogs of this plug-in in the context of a workbench. 
+     * wizards and dialogs of this plug-in in the context of a workbench.
      * <p>
      * If an error occurs reading the dialog store, an empty one is quietly created
      * and returned.
@@ -167,12 +167,12 @@ public:
 //    IDialogSettings getDialogSettings();
 
     /**
-     * Returns the image registry for this UI plug-in. 
+     * Returns the image registry for this UI plug-in.
      * <p>
-     * The image registry contains the images used by this plug-in that are very 
-     * frequently used and so need to be globally shared within the plug-in. Since 
-     * many OSs have a severe limit on the number of images that can be in memory at 
-     * any given time, a plug-in should only keep a small number of images in their 
+     * The image registry contains the images used by this plug-in that are very
+     * frequently used and so need to be globally shared within the plug-in. Since
+     * many OSs have a severe limit on the number of images that can be in memory at
+     * any given time, a plug-in should only keep a small number of images in their
      * registry.
      * <p>
      * Subclasses should reimplement <code>initializeImageRegistry</code> if they have
@@ -189,7 +189,7 @@ public:
     /**
      * Returns the preference store for this UI plug-in.
      * This preference store is used to hold persistent settings for this plug-in in
-     * the context of a workbench. Some of these settings will be user controlled, 
+     * the context of a workbench. Some of these settings will be user controlled,
      * whereas others may be internal setting that are never exposed to the user.
      * <p>
      * If an error occurs reading the preference store, an empty preference store is
@@ -202,24 +202,24 @@ public:
      * will have to access the compatibility layer themselves.
      * </p>
      *
-     * @return the preference store 
+     * @return the preference store
      */
 //    IPreferenceStore getPreferenceStore();
 
     /**
-     * Returns the Platform UI workbench.  
-     * <p> 
+     * Returns the Platform UI workbench.
+     * <p>
      * This method exists as a convenience for plugin implementors.  The
      * workbench can also be accessed by invoking <code>PlatformUI.getWorkbench()</code>.
      * </p>
      * @return IWorkbench the workbench for this plug-in
      */
-    IWorkbench::Pointer GetWorkbench();
+    IWorkbench* GetWorkbench();
 
-    
+
 protected:
 
-    /** 
+    /**
      * Returns a new image registry for this plugin-in.  The registry will be
      * used to manage images which are frequently used by the plugin-in.
      * <p>
@@ -231,20 +231,20 @@ protected:
      * @see #getImageRegistry
      */
 //    ImageRegistry createImageRegistry();
-    
-    /** 
-     * Initializes an image registry with images which are frequently used by the 
+
+    /**
+     * Initializes an image registry with images which are frequently used by the
      * plugin.
      * <p>
      * The image registry contains the images used by this plug-in that are very
      * frequently used and so need to be globally shared within the plug-in. Since
      * many OSs have a severe limit on the number of images that can be in memory
-     * at any given time, each plug-in should only keep a small number of images in 
+     * at any given time, each plug-in should only keep a small number of images in
      * its registry.
      * </p><p>
      * Implementors should create a JFace image descriptor for each frequently used
-     * image.  The descriptors describe how to create/find the image should it be needed. 
-     * The image described by the descriptor is not actually allocated until someone 
+     * image.  The descriptors describe how to create/find the image should it be needed.
+     * The image described by the descriptor is not actually allocated until someone
      * retrieves it.
      * </p><p>
      * Subclasses may override this method to fill the image registry.
@@ -257,7 +257,7 @@ protected:
 
     /**
      * Loads the dialog settings for this plug-in.
-     * The default implementation first looks for a standard named file in the 
+     * The default implementation first looks for a standard named file in the
      * plug-in's read/write state area; if no such file exists, the plug-in's
      * install directory is checked to see if one was installed with some default
      * settings; if no file is found in either place, a new empty dialog settings
@@ -274,7 +274,7 @@ protected:
      * Refreshes the actions for the plugin.
      * This method is called from <code>startup</code>.
      * <p>
-     * This framework method may be overridden, although this is typically 
+     * This framework method may be overridden, although this is typically
      * unnecessary.
      * </p>
      */
@@ -286,7 +286,7 @@ protected:
      */
 //    void saveDialogSettings();
 
-    
+
 public:
 
     /**
@@ -294,20 +294,20 @@ public:
      * method refreshes the plug-in actions.  Subclasses may extend this method,
      * but must send super <b>first</b>.
      * {@inheritDoc}
-     * 
+     *
      * @since 3.0
      */
     void Start(IBundleContext::Pointer context);
 
     /**
      * The <code>AbstractUIPlugin</code> implementation of this <code>Plugin</code>
-     * method saves this plug-in's preference and dialog stores and shuts down 
+     * method saves this plug-in's preference and dialog stores and shuts down
      * its image registry (if they are in use). Subclasses may extend this
      * method, but must send super <b>last</b>. A try-finally statement should
      * be used where necessary to ensure that <code>super.shutdown()</code> is
      * always done.
      * {@inheritDoc}
-     * 
+     *
      * @since 3.0
      */
     void Stop(IBundleContext::Pointer context);
@@ -321,11 +321,11 @@ public:
      * relative to the root of the plug-in, and takes into account files
      * coming from plug-in fragments. The path may include $arg$ elements.
      * However, the path must not have a leading "." or path separator.
-     * Clients should use a path like "icons/mysample.gif" rather than 
+     * Clients should use a path like "icons/mysample.gif" rather than
      * "./icons/mysample.gif" or "/icons/mysample.gif".
      * </p>
-     * 
-     * @param pluginId the id of the plug-in containing the image file; 
+     *
+     * @param pluginId the id of the plug-in containing the image file;
      * <code>null</code> is returned if the plug-in does not exist
      * @param imageFilePath the relative path of the image file, relative to the
      * root of the plug-in; the path must be legal
@@ -335,7 +335,7 @@ public:
      */
 //    static ImageDescriptor imageDescriptorFromPlugin(String pluginId,
 //            String imageFilePath);
-    
+
 };
 
 }  // namespace cherry

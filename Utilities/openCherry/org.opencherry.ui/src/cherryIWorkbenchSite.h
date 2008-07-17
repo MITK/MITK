@@ -74,7 +74,7 @@ struct CHERRY_UI IWorkbenchSite : public Object { // IAdaptable, IShellProvider,
    * 
    * @return the selection provider, or <code>null</code> if none
    */
-  //virtual SmartPointer<ISelectionProvider> GetSelectionProvider() = 0;
+  virtual SmartPointer<ISelectionProvider> GetSelectionProvider() = 0;
 
   /**
    * Returns the workbench window containing this workbench site.

@@ -1,29 +1,29 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryShowViewHandler.h"
 #include "cherryHandlerUtil.h"
 
 #include "../cherryUIException.h"
-#include "../cherryWorkbench.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIViewDescriptor.h"
 #include "../cherryPlatformUI.h"
 
+#include "../tweaklets/cherryWorkbenchTweaklet.h"
 #include "../dialogs/cherryIShowViewDialog.h"
 
 #include <cherryObjectString.h>
@@ -78,9 +78,9 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
     return;
   }
 
-  IShowViewDialog::Pointer dialog = PlatformUI::GetWorkbench().Cast<Workbench>()->CreateStandardDialog(Workbench::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
+  IShowViewDialog::Pointer dialog = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateStandardDialog(WorkbenchTweaklet::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
   if (dialog.IsNull()) return;
-  
+
   int returnCode = dialog->Exec();
 
   if (returnCode == IDialog::CANCEL)

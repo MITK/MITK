@@ -17,5 +17,21 @@
          name="Log View" 
          category="org.opencherry.views.general" 
          class="cherry::LogView" />
+   </extension>
+   
+   <extension point="org.opencherry.ui.tweaklets"> 
+      <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.WorkbenchTweaklet" 
+         name="Qt Workbench Tweaklet" 
+         description="Qt specific Workbench tweaks" 
+         definition="cherryWorkbenchTweaklet" 
+         implementation="cherry::QtWorkbenchTweaklet" />
+         
+      <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.WorkbenchPageTweaklet" 
+         name="Qt WorkbenchPage Tweaklet" 
+         description="Qt specific WorkbenchPage tweaks" 
+         definition="cherryWorkbenchPageTweaklet" 
+         implementation="cherry::QtWorkbenchPageTweaklet" />
    </extension> 
 </plugin>

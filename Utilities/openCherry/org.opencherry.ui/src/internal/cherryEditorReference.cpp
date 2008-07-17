@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryEditorReference.h"
@@ -25,6 +25,7 @@
 #include "cherryWorkbenchPage.h"
 #include "cherryNullEditorInput.h"
 #include "cherryPartTester.h"
+#include "../tweaklets/cherryWorkbenchTweaklet.h"
 
 #include "../cherryPlatformUI.h"
 
@@ -120,7 +121,7 @@ EditorDescriptor::Pointer EditorReference::GetDescriptor(const std::string& id)
 {
   EditorDescriptor::Pointer desc;
   IEditorRegistry* reg = WorkbenchPlugin::GetDefault()->GetEditorRegistry();
-  desc = reg->FindEditor(id).Cast<EditorDescriptor>();
+  desc = reg->FindEditor(id).Cast<EditorDescriptor> ();
   return desc;
 }
 
@@ -138,7 +139,8 @@ void EditorReference::InitListenersAndHandlers()
 PartPane::Pointer EditorReference::CreatePane()
 {
   //return new EditorPane(this, this.manager.page, this.manager.editorPresentation.getActiveWorkbook());
-  return PlatformUI::GetWorkbench().Cast<Workbench>()->CreateEditorPane(this, this->manager->page);
+  return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateEditorPane(this,
+      this->manager->page);
 }
 
 void EditorReference::PinStatusUpdated()
@@ -179,7 +181,7 @@ std::string EditorReference::GetName()
 
 IEditorPart::Pointer EditorReference::GetEditor(bool restore)
 {
-  return this->GetPart(restore).Cast<IEditorPart>();
+  return this->GetPart(restore).Cast<IEditorPart> ();
 }
 
 void EditorReference::SetName(const std::string& name)
@@ -282,68 +284,68 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
   //
   try
   {
-    result = this->CreatePartHelper().Cast<IWorkbenchPart>();
-  }
-  catch (PartInitException e)
+    result = this->CreatePartHelper().Cast<IWorkbenchPart> ();
+  } catch (PartInitException e)
   {
     // If unable to create the part, create an error part instead
     // and pass the error to the status handling facility
-//    IStatus originalStatus = exception.getStatus();
-//    IStatus logStatus = StatusUtil.newStatus(originalStatus,
-//        NLS.bind("Unable to create editor ID {0}: {1}", //$NON-NLS-1$
-//            getId(), originalStatus.getMessage()));
-//    IStatus displayStatus = StatusUtil.newStatus(originalStatus,
-//        NLS.bind(WorkbenchMessages.EditorManager_unableToCreateEditor,
-//            originalStatus.getMessage()));
-    WorkbenchPlugin::Log("Unable to create editor ID " + this->GetId() + ": " + e.displayText());
+    //    IStatus originalStatus = exception.getStatus();
+    //    IStatus logStatus = StatusUtil.newStatus(originalStatus,
+    //        NLS.bind("Unable to create editor ID {0}: {1}", //$NON-NLS-1$
+    //            getId(), originalStatus.getMessage()));
+    //    IStatus displayStatus = StatusUtil.newStatus(originalStatus,
+    //        NLS.bind(WorkbenchMessages.EditorManager_unableToCreateEditor,
+    //            originalStatus.getMessage()));
+    WorkbenchPlugin::Log("Unable to create editor ID " + this->GetId() + ": "
+        + e.displayText());
 
     // Pass the error to the status handling facility
     //StatusManager.getManager().handle(logStatus);
-    
+
     EditorDescriptor::Pointer descr = this->GetDescriptor();
     std::string label = this->GetId();
     if (descr.IsNotNull())
       label = descr->GetLabel();
 
-    Workbench::Pointer workbench = PlatformUI::GetWorkbench().Cast<Workbench>();
-    if (!workbench.IsNull())
+    IEditorPart::Pointer part =
+        Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorEditorPart(label,
+            e.displayText());
+    if (part.IsNotNull())
     {
-    IEditorPart::Pointer part = workbench->CreateErrorEditorPart(label, e.displayText());
+      IEditorInput::Pointer input;
+      try
+      {
+        input = this->GetEditorInput();
+      } catch (PartInitException e1)
+      {
+        input = new NullEditorInput(this);
+      }
 
-    IEditorInput::Pointer input;
-    try
-    {
-      input = this->GetEditorInput();
-    }
-    catch (PartInitException e1)
-    {
-      input = new NullEditorInput(this);
-    }
+      PartPane::Pointer pane = this->GetPane();
 
-    PartPane::Pointer pane = this->GetPane();
+      pane->CreateControl(
+          manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
-    pane->CreateControl(manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
+      EditorSite::Pointer site =
+          new EditorSite(this, part, manager->page, descr);
 
-    EditorSite::Pointer site = new EditorSite(this, part, manager->page, descr);
+      //site.setActionBars(new EditorActionBars(manager.page, site.getWorkbenchWindow(), getId()));
 
-    //site.setActionBars(new EditorActionBars(manager.page, site.getWorkbenchWindow(), getId()));
+      part->Init(site, input);
 
-    part->Init(site, input);
+      try
+      {
+        part->CreatePartControl(pane->GetControl());
+      } catch (...)
+      {
+        //content.dispose();
+        //StatusUtil.handleStatus(e, StatusManager.SHOW
+        //    | StatusManager.LOG);
+        WorkbenchPlugin::Log("Error creating editor");
+        return 0;
+      }
 
-    try
-    {
-      part->CreatePartControl(pane->GetControl());
-    }
-    catch (...)
-    {
-      //content.dispose();
-      //StatusUtil.handleStatus(e, StatusManager.SHOW
-      //    | StatusManager.LOG);
-      WorkbenchPlugin::Log("Error creating editor");
-      return 0;
-    }
-
-    result = part.Cast<IWorkbenchPart>();
+      result = part.Cast<IWorkbenchPart> ();
     }
   }
 
@@ -355,9 +357,9 @@ bool EditorReference::SetInput(IEditorInput::Pointer input)
 
   if (part.IsNotNull())
   {
-    if (part.Cast<IReusableEditor>().IsNotNull())
+    if (part.Cast<IReusableEditor> ().IsNotNull())
     {
-      IReusableEditor::Pointer editor = part.Cast<IReusableEditor>();
+      IReusableEditor::Pointer editor = part.Cast<IReusableEditor> ();
 
       expectingInputChange = true;
 
@@ -373,7 +375,8 @@ bool EditorReference::SetInput(IEditorInput::Pointer input)
       {
 
         // Log the fact that this editor is broken
-        this->ReportMalfunction("Editor is not firing a PROP_INPUT event in response to IReusableEditor.setInput(...)"); //$NON-NLS-1$
+        this->ReportMalfunction(
+            "Editor is not firing a PROP_INPUT event in response to IReusableEditor.setInput(...)"); //$NON-NLS-1$
 
         // Fire the property for free (can't be relied on since there are other ways the input
         // can change, but we do it here to be consistent with older versions of the workbench)
@@ -407,7 +410,8 @@ void EditorReference::ReportMalfunction(const std::string& string)
     std::string errorMessage = "Problem detected with part " + this->GetId(); //$NON-NLS-1$
     if (part.IsNotNull())
     {
-      errorMessage.append("(class = ").append(part->GetNameOfClass()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+      errorMessage.append("(class = ").append(part->GetNameOfClass()).append(
+          ")"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     errorMessage += ": " + string; //$NON-NLS-1$
@@ -422,7 +426,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
 
   EditorSite::Pointer site;
   IEditorPart::Pointer part;
-  
+
   try
   {
     IEditorInput::Pointer editorInput = this->GetEditorInput();
@@ -444,16 +448,16 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
       //this->CreatePartProperties(part);
 
     }
-//    else if (desc->GetId() == IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID)
-//    {
-//
-//      part = ComponentSupport.getSystemInPlaceEditor();
-//
-//      if (part == null)
-//      {
-//        throw new PartInitException(WorkbenchMessages.EditorManager_no_in_place_support);
-//      }
-//    }
+    //    else if (desc->GetId() == IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID)
+    //    {
+    //
+    //      part = ComponentSupport.getSystemInPlaceEditor();
+    //
+    //      if (part == null)
+    //      {
+    //        throw new PartInitException(WorkbenchMessages.EditorManager_no_in_place_support);
+    //      }
+    //    }
     else
     {
       throw PartInitException("Invalid editor descriptor for id " + editorID);
@@ -487,8 +491,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
 
     return part;
 
-  }
-  catch (std::exception e)
+  } catch (std::exception e)
   {
     throw PartInitException(e.what());
   }
@@ -498,21 +501,22 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
 IEditorPart::Pointer EditorReference::GetEmptyEditor(
     EditorDescriptor::Pointer descr)
 {
-  IEditorPart::Pointer part = WorkbenchPlugin::GetDefault()->GetWorkbench().Cast<Workbench>()->CreateErrorEditorPart("(Empty)");
+  IEditorPart::Pointer part =
+      Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorEditorPart("(Empty)");
 
   IEditorInput::Pointer input;
   try
   {
     input = this->GetEditorInput();
-  }
-  catch (PartInitException e1)
+  } catch (PartInitException e1)
   {
     input = new NullEditorInput(this);
   }
 
   PartPane::Pointer pane = this->GetPane();
 
-  pane->CreateControl(manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
+  pane->CreateControl(
+      manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
   EditorSite::Pointer site = new EditorSite(this, part, manager->page, descr);
 
@@ -523,8 +527,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   try
   {
     part->CreatePartControl(pane->GetControl());
-  }
-  catch (std::exception e)
+  } catch (std::exception e)
   {
     //StatusManager.getManager().handle(
     //    StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
@@ -532,15 +535,16 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     return 0;
   }
 
-  this->part = part.Cast<IWorkbenchPart>();
+  this->part = part.Cast<IWorkbenchPart> ();
   // Add a dispose listener to the part. This dispose listener does nothing but log an exception
   // if the part's widgets get disposed unexpectedly. The workbench part reference is the only
   // object that should dispose this control, and it will remove the listener before it does so.
-  
+
   this->RefreshFromPart();
   //this->ReleaseReferences();
 
-  if (this->GetPage().Cast<WorkbenchPage>()->GetActiveEditorReference() != this)
+  if (this->GetPage().Cast<WorkbenchPage> ()->GetActiveEditorReference()
+      != this)
   {
     //fireInternalPropertyChange(INTERNAL_PROPERTY_OPENED);
   }

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryWorkbenchPage.h"
@@ -24,6 +24,9 @@
 #include "../cherryUIException.h"
 #include "../cherryPlatformUI.h"
 #include "../cherryPartPane.h"
+
+#include "../tweaklets/cherryWorkbenchTweaklet.h"
+#include "../tweaklets/cherryWorkbenchPageTweaklet.h"
 
 #include <cherryPlatform.h>
 
@@ -40,6 +43,49 @@ void WorkbenchPage::AddPartListener(IPartListener::Pointer l)
 void WorkbenchPage::RemovePartListener(IPartListener::Pointer l)
 {
   partList.GetPartService()->RemovePartListener(l);
+}
+
+void WorkbenchPage::RemoveSelectionListener(ISelectionListener::Pointer listener)
+{
+  selectionService->RemovePostSelectionListener(listener);
+}
+
+void WorkbenchPage::RemoveSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener)
+{
+  selectionService->RemoveSelectionListener(partId, listener);
+}
+
+void WorkbenchPage::RemovePostSelectionListener(ISelectionListener::Pointer listener)
+{
+  selectionService->RemovePostSelectionListener(listener);
+}
+
+void WorkbenchPage::RemovePostSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener)
+{
+  selectionService->RemovePostSelectionListener(partId, listener);
+}
+
+void WorkbenchPage::AddSelectionListener(ISelectionListener::Pointer listener)
+{
+  selectionService->AddSelectionListener(listener);
+}
+
+void WorkbenchPage::AddSelectionListener(const std::string& partId, ISelectionListener::Pointer listener)
+{
+  selectionService->AddSelectionListener(partId, listener);
+}
+
+void WorkbenchPage::AddPostSelectionListener(ISelectionListener::Pointer listener)
+{
+  selectionService->AddPostSelectionListener(listener);
+}
+
+void WorkbenchPage::AddPostSelectionListener(const std::string& partId,
+            ISelectionListener::Pointer listener)
+{
+  selectionService->AddPostSelectionListener(partId, listener);
 }
 
 void WorkbenchPage::ActionSwitcher::UpdateActivePart(
@@ -106,11 +152,11 @@ void WorkbenchPage::ActivatePart(const IWorkbenchPart::Pointer part)
 
 PartPane::Pointer WorkbenchPage::GetPane(IWorkbenchPart::Pointer part)
 {
-  if (part.IsNull()) 
+  if (part.IsNull())
   {
     return 0;
   }
-  
+
   return this->GetPane(this->GetReference(part));
 }
 
@@ -119,7 +165,7 @@ PartPane::Pointer WorkbenchPage::GetPane(IWorkbenchPartReference::Pointer part)
   if (part.IsNull()) {
     return 0;
   }
-          
+
   return part.Cast<WorkbenchPartReference>()->GetPane();
 }
 
@@ -131,7 +177,7 @@ bool WorkbenchPage::InternalBringToTop(IWorkbenchPartReference::Pointer part)
 void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
 {
   IWorkbenchPartReference::Pointer ref = this->GetReference(part);
- 
+
   if (ref.Cast<IEditorReference>().IsNotNull())
   {
     this->MakeActiveEditor(ref.Cast<IEditorReference>());
@@ -139,7 +185,7 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
   else
   {
     this->MakeActive(ref);
-  } 
+  }
 }
 
 IViewPart::Pointer WorkbenchPage::BusyShowView(const std::string& viewID,
@@ -206,18 +252,18 @@ void WorkbenchPage::UpdateActivePart()
 
 void WorkbenchPage::MakeActive(IWorkbenchPartReference::Pointer ref)
 {
-  if (ref.IsNull()) 
+  if (ref.IsNull())
   {
     this->SetActivePart(0);
-  } 
-  else 
+  }
+  else
   {
     IWorkbenchPart::Pointer newActive = ref->GetPart(true);
     if (newActive.IsNull())
     {
       this->SetActivePart(0);
     }
-    else 
+    else
     {
       this->Activate(newActive);
     }
@@ -226,28 +272,28 @@ void WorkbenchPage::MakeActive(IWorkbenchPartReference::Pointer ref)
 
 void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
 {
-  if (ref == this->GetActiveEditorReference()) 
+  if (ref == this->GetActiveEditorReference())
   {
     return;
   }
-          
+
   IEditorPart::Pointer part = 0;
   if (ref.IsNotNull())
     part = ref->GetEditor(true);
-  
+
   if (part.IsNotNull()) {
       editorMgr->SetVisibleEditor(ref, false);
       //navigationHistory.markEditor(part);
   }
-  
+
 //  actionSwitcher.updateTopEditor(part);
 //
 //  if (ref != null) {
 //      activationList.bringToTop(getReference(part));
 //  }
-//  
+//
   partList.SetActiveEditor(ref);
-  
+
 }
 
 bool WorkbenchPage::CloseEditors(
@@ -321,6 +367,7 @@ WorkbenchPage::~WorkbenchPage()
   if (viewFactory != 0) delete viewFactory;
   if (editorMgr != 0) delete editorMgr;
   if (editorPresentation != 0) delete editorPresentation;
+  if (selectionService != 0) delete selectionService;
 }
 
 IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
@@ -364,7 +411,7 @@ void* WorkbenchPage::GetClientComposite()
 {
   if (composite == 0)
     this->CreateClientComposite();
-  
+
   return composite;
 }
 
@@ -419,8 +466,8 @@ std::list<IEditorReference::Pointer> WorkbenchPage::GetEditorReferences()
 IEditorAreaHelper* WorkbenchPage::GetEditorPresentation()
 {
   if (editorPresentation == 0)
-    editorPresentation = this->GetWorkbenchWindow()->GetWorkbench().Cast<Workbench>()->CreateEditorPresentation(this);
-  
+    editorPresentation = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateEditorPresentation(this);
+
   return editorPresentation;
 }
 
@@ -435,6 +482,16 @@ IAdaptable* WorkbenchPage::GetInput()
 std::string WorkbenchPage::GetLabel()
 {
   return "";
+}
+
+ISelection::Pointer WorkbenchPage::GetSelection()
+{
+  return selectionService->GetSelection();
+}
+
+ISelection::Pointer WorkbenchPage::GetSelection(const std::string& partId)
+{
+  return selectionService->GetSelection(partId);
 }
 
 ViewFactory* WorkbenchPage::GetViewFactory()
@@ -462,6 +519,11 @@ std::vector<IViewPart::Pointer> WorkbenchPage::GetViews()
 //  return std::vector<IViewPart::Pointer>();
 //}
 
+ISelectionService::SelectionEvents& WorkbenchPage::GetSelectionEvents(const std::string& partId)
+{
+  return selectionService->GetSelectionEvents(partId);
+}
+
 /**
  * See IWorkbenchPage.
  */
@@ -472,7 +534,7 @@ IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow()
 
 /*
  * (non-Javadoc)
- * 
+ *
  * @see org.eclipse.ui.IWorkbenchPage#hideView(org.eclipse.ui.IViewReference)
  */
 void WorkbenchPage::HideView(IViewReference::Pointer ref)
@@ -498,9 +560,10 @@ void WorkbenchPage::Init(WorkbenchWindow::Pointer w,
   this->input = input;
   this->viewFactory = 0;
   //actionSets = new ActionSetManager(w);
+  selectionService = new PageSelectionService(this);
 
   deferCount = 0;
-  
+
   // Create presentation.
   composite = 0;
   editorPresentation = 0;
@@ -586,10 +649,10 @@ IEditorPart::Pointer WorkbenchPage::OpenEditor(IEditorInput::Pointer input,
   }
 
   IEditorPart::Pointer result;
-                          
+
   result = this->BusyOpenEditor(input, editorID,
                                 activate, matchFlags, editorState);
-                          
+
   return result;
 }
 
@@ -601,11 +664,11 @@ IEditorPart::Pointer WorkbenchPage::OpenEditorFromDescriptor(
   if (input.IsNull() || editorDescriptor.Cast<const EditorDescriptor>().IsNull()) {
      throw Poco::InvalidArgumentException();
   }
-      
-  IEditorPart::Pointer result = this->BusyOpenEditorFromDescriptor(input, 
+
+  IEditorPart::Pointer result = this->BusyOpenEditorFromDescriptor(input,
                 editorDescriptor.Cast<const EditorDescriptor>(),
                 activate, editorState);
-         
+
   return result;
 }
 
@@ -618,7 +681,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
   // Reuse an existing open editor, unless we are in "new editor tab management" mode
 //  editor = getEditorManager().findEditor(editorID, input, ((TabBehaviour)Tweaklets.get(TabBehaviour.KEY)).getReuseEditorMatchFlags(matchFlags));
 //  if (editor != null) {
-//      
+//
 //    // do the IShowEditorInput notification before showing the editor
 //    // to reduce flicker
 //    if (editor instanceof IShowEditorInput) {
@@ -626,7 +689,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
 //    }
 //    showEditor(activate, editor);
 //    return editor;
-//      
+//
 //  }
 
 
@@ -640,7 +703,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
 
   if (editor.IsNotNull()) {
     this->SetEditorAreaVisible(true);
-    if (activate) this->Activate(editor); 
+    if (activate) this->Activate(editor);
     else this->BringToTop(editor);
   }
 
@@ -698,7 +761,7 @@ void WorkbenchPage::RequestActivation(IWorkbenchPart::Pointer part)
 
 void WorkbenchPage::ResetPerspective()
 {
-  
+
 }
 
 bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
@@ -729,7 +792,7 @@ bool WorkbenchPage::SaveEditor(IEditorPart::Pointer editor, bool confirm)
 
 void WorkbenchPage::SavePerspective()
 {
-  
+
 }
 
 bool WorkbenchPage::SaveState(IMemento::Pointer memento)
@@ -753,7 +816,7 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
   if (this->GetActivePart() == newPart) {
       return;
   }
-  
+
   if (partBeingActivated.IsNotNull()) {
       if (partBeingActivated->GetPart(false) != newPart) {
           WorkbenchPlugin::Log(PlatformException("WARNING: Prevented recursive attempt to activate part "
@@ -765,15 +828,15 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
 
   //No need to change the history if the active editor is becoming the
   // active part
-  
-  try 
+
+  try
   {
     IWorkbenchPartReference::Pointer partref = this->GetReference(newPart);
     IWorkbenchPartReference::Pointer realPartRef = 0;
-    if (newPart.IsNotNull()) 
+    if (newPart.IsNotNull())
     {
       IWorkbenchPartSite::Pointer site = newPart->GetSite();
-      if (site.Cast<PartSite>().IsNotNull()) 
+      if (site.Cast<PartSite>().IsNotNull())
       {
         realPartRef = site.Cast<PartSite>()->GetPane()->GetPartReference();
       }
@@ -783,33 +846,33 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
 
     // Deactivate old part
     IWorkbenchPart::Pointer oldPart = this->GetActivePart();
-    if (oldPart.IsNotNull()) 
+    if (oldPart.IsNotNull())
     {
       this->DeactivatePart(oldPart);
     }
-      
+
     // Set active part.
-    if (newPart.IsNotNull()) 
+    if (newPart.IsNotNull())
     {
       //activationList.setActive(newPart);
-      if (newPart.Cast<IEditorPart>().IsNotNull()) 
+      if (newPart.Cast<IEditorPart>().IsNotNull())
       {
-        IEditorReference::Pointer editorRef = realPartRef.Cast<IEditorReference>(); 
+        IEditorReference::Pointer editorRef = realPartRef.Cast<IEditorReference>();
         this->MakeActiveEditor(editorRef);
       }
     }
     this->ActivatePart(newPart);
-      
+
     partList.SetActivePart(partref);
-  } 
+  }
   catch (std::exception* e)
   {
     partBeingActivated = 0;
     throw *e;
   }
-  
+
   partBeingActivated = 0;
-  
+
 }
 
 IPartService::PartEvents& WorkbenchPage::GetPartEvents()
@@ -853,11 +916,11 @@ IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
       throw Poco::InvalidArgumentException("Illegal secondary id");
     }
   }
-  
+
   std::cout << "Trying to show view: " << viewID << std::endl;
-  
+
   IViewReference::Pointer ref;
-  
+
   // look if view is already created
   std::vector<IViewReference::Pointer> refs(this->GetViewReferences());
   for (unsigned int i = 0; i < refs.size(); i++)
@@ -869,7 +932,7 @@ IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
       break;
     }
   }
-  
+
   IViewPart::Pointer view;
   if (ref.IsNotNull())
   {
@@ -880,8 +943,8 @@ IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
     this->BusyShowView(view, mode);
     return view;
   }
-  
-  
+
+
   // perspective show view part
   ViewFactory* factory = this->GetViewFactory();
   ref = factory->CreateView(viewID, secondaryID);
@@ -890,17 +953,17 @@ IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
       throw PartInitException("View Factory: Could not create view " + ref->GetId());
   }
   ViewSite::Pointer site = view->GetSite().Cast<ViewSite>();
-  PartPane::Pointer pane = site->GetPane(); 
-    
+  PartPane::Pointer pane = site->GetPane();
+
   // should add pane to main window here
-  window->GetWorkbench().Cast<Workbench>()->AddViewPane(pane);
-  
+  Tweaklets::Get(WorkbenchTweaklet::KEY)->AddViewPane(this->GetWorkbenchWindow(), pane);
+
   // Ensure that the newly showing part is enabled
   if (pane.IsNotNull())
     pane->SetControlEnabled(true);
-  
-  this->BusyShowView(view, mode);   
-  
+
+  this->BusyShowView(view, mode);
+
   return view;
 }
 
@@ -930,7 +993,7 @@ IWorkbenchPartReference::Pointer WorkbenchPage::GetReference(
     return 0;
   }
   PartSite::Pointer partSite = site.Cast<PartSite>();
-  
+
   return partSite->GetPartReference();
 }
 
@@ -984,12 +1047,12 @@ std::vector<std::string> WorkbenchPage::GetShowViewShortcuts()
 
 void WorkbenchPage::CloseAllPerspectives(bool saveEditors, bool closePage)
 {
-  
+
 }
 
 void WorkbenchPage::CreateClientComposite()
 {
-  composite = window->GetWorkbench().Cast<Workbench>()->CreateWorkbenchPageControl();
+  composite = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateClientComposite(this);
 }
 
 void WorkbenchPage::SuggestReset()

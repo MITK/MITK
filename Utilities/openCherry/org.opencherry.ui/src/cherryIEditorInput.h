@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYIEDITORINPUT_H_
@@ -26,13 +26,13 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * <code>IEditorInput</code> is a light weight descriptor of editor input,
  * like a file name but more abstract. It is not a model. It is a description of
  * the model source for an <code>IEditorPart</code>.
  * <p>
  * Clients implementing this editor input interface must override
- * <code>IEditorInput#operator==(const IEditorInput*)</code> to answer true 
+ * <code>IEditorInput#operator==(const IEditorInput*)</code> to answer true
  * for two inputs that are
  * the same. The <code>IWorbenchPage.openEditor</code> APIs are dependent on
  * this to find an editor with the same input.
@@ -56,15 +56,15 @@ namespace cherry
  * navigation history can hold on to quite a few inputs (i.e., the default is
  * fifty). The actual data model should probably not be held in the input.
  * </p>
- * 
- * 
+ *
+ *
  * @see org.eclipse.ui.IEditorPart
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)
  */
 struct CHERRY_UI IEditorInput : public Object // public IAdaptable
 {
-  cherryClassMacro(IEditorInput)
+  cherryInterfaceMacro(IEditorInput, cherry);
 
   /**
    * Returns whether the editor input exists.
@@ -73,7 +73,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * appear in the "File Most Recently Used" menu. An editor input will appear
    * in the list until the return value of <code>exists</code> becomes
    * <code>false</code> or it drops off the bottom of the list.
-   * 
+   *
    * @return <code>true</code> if the editor input exists;
    *         <code>false</code> otherwise
    */
@@ -81,7 +81,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
 
   /**
    * Returns the image descriptor for this input.
-   * 
+   *
    * <p>
    * Note: although a null return value has never been permitted from this
    * method, there are many known buggy implementations that return null.
@@ -92,7 +92,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * from this method should pick some other default return value (such as
    * ImageDescriptor.getMissingImageDescriptor()).
    * </p>
-   * 
+   *
    * @return the image descriptor for this input; may be <code>null</code> if
    * there is no image.
    */
@@ -103,7 +103,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * <p>
    * For instance, when the input is from a file, the return value would
    * ordinarily be just the file name.
-   * 
+   *
    * @return the name string; never <code>null</code>;
    */
   virtual std::string GetName() const = 0;
@@ -111,7 +111,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
   /**
    * Returns an object that can be used to save the state of this editor
    * input.
-   * 
+   *
    * @return the persistable element, or <code>null</code> if this editor
    *         input cannot be persisted
    */
@@ -123,14 +123,14 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * MyClass.java in folder X and MyClass.java in folder Y. The format of the
    * text varies between input types.
    * </p>
-   * 
+   *
    * @return the tool tip text; never <code>null</code>.
    */
   virtual std::string GetToolTipText() const = 0;
-  
+
   /**
    * Returns true if two editor inputs are the same
-   * 
+   *
    */
   virtual bool operator==(const IEditorInput* o) const = 0;
 };

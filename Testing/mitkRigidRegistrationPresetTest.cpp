@@ -94,7 +94,5 @@ int mitkRigidRegistrationPresetTest(int argc, char* argv[])
   delete rrp2;
 
   std::cout<<"[TEST DONE]"<<std::endl;
-  int i =0;
-  std::cin >> i;
   return EXIT_SUCCESS;
 }

@@ -39,13 +39,13 @@ namespace mitk {
 //## @brief Standard 3D-BoundingBox typedef
 //##
 //## Standard 3D-BoundingBox typedef to get rid of template arguments (3D, type).
-typedef itk::BoundingBox<unsigned long, 3, mitk::ScalarType>   BoundingBox;
+typedef itk::BoundingBox<unsigned long, 3, ScalarType>   BoundingBox;
 
 //##Documentation
 //## @brief Standard typedef for time-bounds
-typedef itk::FixedArray<mitk::ScalarType,2> TimeBounds;
+typedef itk::FixedArray<ScalarType,2> TimeBounds;
 
-typedef itk::AffineGeometryFrame<mitk::ScalarType, 3> AffineGeometryFrame3D;
+typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 
 //##Documentation
 //## @brief Describes the geometry of a data object
@@ -100,22 +100,62 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
+  // a bit of a misuse, but we want only doxygen to see the following:
+#ifdef DOXYGEN_SKIP
+  //##Documentation
+  //## @brief Get the transformation used to convert from index 
+  //## to world coordinates
+  itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D*);
+  //##Documentation
+  //## @brief Get the transformation used to convert from index 
+  //## to world coordinates
+  itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D*);
+#endif
+  //## @brief Set the transformation used to convert from index 
+  //## to world coordinates
+  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+  //##Documentation
+  //## @brief Convenience method for setting the ITK transform 
+  //## (m_IndexToWorldTransform) via an vtkMatrix4x4
+  //## \sa SetIndexToWorldTransform
+  virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
+
+#ifdef DOXYGEN_SKIP
+  //##Documentation
+  //## @brief Get bounding box (in index/unit coordinates)
+  itkGetConstObjectMacro(BoundingBox, BoundingBoxType); 
+  //##Documentation
+  //## @brief Get bounding box (in index/unit coordinates) as a BoundsArrayType
+  const BoundsArrayType GetBounds() const
+  {
+    assert(m_BoundingBox.IsNotNull());
+    return m_BoundingBox->GetBounds();
+  }
+  //##Documentation
+  //## \brief Set the bounding box (in index/unit coordinates)
+  //##
+  //## Only possible via the BoundsArray to make clear that a 
+  //## copy of the bounding-box is stored, not a reference to it.
+virtual void SetBounds(const BoundsArrayType& bounds);
+#endif
+  //## @brief Set the bounding box (in index/unit coordinates) via a float array
   virtual void SetFloatBounds(const float bounds[6]);
+  //## @brief Set the bounding box (in index/unit coordinates) via a double array
   virtual void SetFloatBounds(const double bounds[6]);
 
-  virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
-
+  //## @brief Get the time bounds (in ms)
   itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+  //## @brief Set the time bounds (in ms)
   virtual void SetTimeBounds(const TimeBounds& timebounds);
 
   //##Documentation
-  //## @brief Get the position of the corner number \a id
+  //## @brief Get the position of the corner number \a id (in world coordinates)
   //##
   //## See SetImageGeometry for how a corner is defined on images.
   Point3D GetCornerPoint(int id) const;
 
   //##Documentation
-  //## @brief Get the position of a corner
+  //## @brief Get the position of a corner (in world coordinates)
   //##
   //## See SetImageGeometry for how a corner is defined on images.
   Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
@@ -170,6 +210,14 @@ public:
     return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
   }
 
+#ifdef DOXYGEN_SKIP
+  //##Documentation
+  //## @brief Get the extent of the bounding box (in index/unit coordinates)
+  //##
+  //## To access the extent in mm use GetExtentInMM
+  ScalarType GetExtent(unsigned int direction) const;
+#endif
+
   //##Documentation
   //## @brief Get the extent of the bounding-box in the specified @a direction in mm
   //##
@@ -185,6 +233,8 @@ public:
   //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
   virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
+  //##Documentation
+  //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
   vtkLinearTransform* GetVtkTransform() const
   {
     return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
@@ -259,8 +309,8 @@ public:
   void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em point to index coordinates (in units)
-  //## In contrast to WorldToIndex(Point3D) this method rounds to integer indices!
+  //## @brief Convert world coordinates (in mm) of a \em point to index coordinates (in units).
+  //## This method rounds to integer indices!
   template <unsigned int VIndexDimension>
      void WorldToIndex(const mitk::Point3D &pt_mm, itk::Index<VIndexDimension> &index) const
   {
@@ -349,10 +399,6 @@ public:
   //## to correct for this and to be able to do that, we need to know
   //## that the Geometry3D is referring to an Image.
   itkSetMacro(ImageGeometry, bool);
-  //##Documentation
-  //## @brief Is this an ImageGeometry?
-  //##
-  //## For more information, see SetImageGeometry
   itkBooleanMacro(ImageGeometry);
 
   //##Documentation
@@ -441,28 +487,6 @@ public:
   //## to the ITK transform (m_IndexToWorldTransform)
   //## \sa SetIndexToWorldTransform
   void TransferVtkToItkTransform();
-
-  //##Documentation
-  //## @brief Convenience method for setting the ITK transform 
-  //## (m_IndexToWorldTransform) via an vtkMatrix4x4
-  //## \sa SetIndexToWorldTransform
-  virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
-
-  // a bit of a misuse, but we want only doxygen to see the following:
-#ifdef DOXYGEN_SKIP
-  //##Documentation
-  //## @brief Get the transformation used to convert from index 
-  //## to world coordinates
-  itkGetConstObjectMacro(IndexToWorldTransform, TransformType);
-  //##Documentation
-  //## @brief Get the transformation used to convert from index 
-  //## to world coordinates
-  itkGetObjectMacro(IndexToWorldTransform, TransformType);
-  //##Documentation
-  //## @brief Set the transformation used to convert from index 
-  //## to world coordinates
-  itkSetObjectMacro(IndexToWorldTransform, TransformType);
-#endif
 
   //##Documentation
   //## @brief Get the parametric bounding-box

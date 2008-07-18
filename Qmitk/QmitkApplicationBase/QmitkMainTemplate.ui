@@ -1349,7 +1349,6 @@
     <signal>OptionsLoaded()</signal>
 </signals>
 <slots>
-    <slot>EventObject &amp; )</slot>
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
     <slot>fileOpenProject()</slot>

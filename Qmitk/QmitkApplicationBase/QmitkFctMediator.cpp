@@ -640,7 +640,7 @@ void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer opti
 void QmitkFctMediator::InitToolbars()
 {
   //Label for the combo box toolbar
-  QLabel all_label = new QLabel(" Available Functionalities:  ", m_FunctionalityToolBar, "all_label");
+  new QLabel(QString("Available Functionalities:  "), m_FunctionalityToolBar, "all_label");
 
   //Initialize the combo box in its toolbar
   if(m_ToolbarComboBox == NULL)
@@ -658,7 +658,7 @@ void QmitkFctMediator::InitToolbars()
   //Initialize Search Bar and Combo Box
   if(m_SearchComboBox == NULL)
   {
-    QLabel search_label = new QLabel(" Search Functionalities:  ", 
+    new QLabel(QString(" Search Functionalities:  "), 
       m_SearchToolBar, "search_label");
     m_SearchBar = new QLineEdit("Search...", m_SearchToolBar, "search line");
     m_SearchComboBox = new QComboBox(m_SearchToolBar, "searchComboBox");
@@ -684,7 +684,7 @@ void QmitkFctMediator::InitToolbars()
   }
 
   //add label to "recently used" toolbar
-  QLabel favorites_label = new QLabel("Recently used:  ", m_FavoritesToolBar, "favorites_label");
+  new QLabel(QString("Recently used:  "), m_FavoritesToolBar, "favorites_label");
 
 }
 
@@ -754,7 +754,7 @@ void QmitkFctMediator::TrackFunctionalityCall( QAction *action )
     //re-display the items.  For some reason, if this is done if the functionality
     //is already on the list, it crashes the program in certain situations.
     m_FavoritesToolBar->clear();
-    QLabel favorites_label = new QLabel("Recently used:  ", m_FavoritesToolBar, "favorites_label");
+    new QLabel(QString("Recently used:  "), m_FavoritesToolBar, "favorites_label");
     for(int n = 0; n < m_FavFunctionalityActions.count(); ++n)
     {
       m_FavFunctionalityActions.at(n)->addTo(m_FavoritesToolBar);

@@ -79,8 +79,8 @@ void SampleApp::InitializeFunctionality()
     QmitkStandardViewsDialogBar *standardViewsDialogBar = new QmitkStandardViewsDialogBar( m_MultiWidget, "viewsbar", m_MultiWidget );
     qfm->AddDialogBar( standardViewsDialogBar );
 
-    // add separator
-    qfm->AddSeparator();
+    // initialize toolbars
+    qfm->InitToolbars();
 
     // add MITK_STARTUP_FUNCTIONALITY if requested
     QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(MITK_STARTUP_FUNCTIONALITY);
@@ -106,8 +106,8 @@ void SampleApp::InitializeFunctionality()
     QmitkFunctionalityFactory::CreateFunctionalityPtr createFunction = qff.GetCreateFunctionalityPtrByName(m_TestingParameter);
     if (createFunction) 
     {
-     QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
-     qfm->AddFunctionality(functionalityInstance);
+      QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+      qfm->AddFunctionality(functionalityInstance);
     }
   }
 

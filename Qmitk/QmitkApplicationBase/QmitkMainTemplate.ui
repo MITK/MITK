@@ -11,8 +11,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>472</width>
-            <height>792</height>
+            <width>493</width>
+            <height>903</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -67,11 +67,18 @@
         <action name="viewLinkSliceRotationAction"/>
     </item>
     <item text="&amp;Options" name="Options">
-        <action name="HideToolbarAction"/>
         <action name="optionsFine_Undo_enabledAction"/>
         <separator/>
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
+        <action name="optionsToolbarsAction"/>
+        <item text="Toolbars" name="popupMenu_30" accel="">
+            <action name="options_showMainToolbarAction"/>
+            <action name="options_showSearchToolbarAction"/>
+            <action name="options_ShowDropdownToolbarAction"/>
+            <action name="options_ShowIconsetToolbarAction"/>
+            <action name="options_ShowRecentlyusedToolbarAction"/>
+        </item>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
@@ -107,6 +114,38 @@
         <action name="toolbarPlaneSlicingModeAction"/>
         <action name="toolbarPlaneRotationModeAction"/>
         <action name="toolbarPlaneSwivelModeAction"/>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>FunctionalityToolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>FavoritesToolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar_2</string>
+        </property>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>SearchToolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar_3</string>
+        </property>
+    </toolbar>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>FunctionalitiesIconToolBar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar_4</string>
+        </property>
     </toolbar>
 </toolbars>
 <customwidgets>
@@ -497,16 +536,19 @@
     </action>
     <action>
         <property name="name">
-            <cstring>HideToolbarAction</cstring>
+            <cstring>options_showMainToolbarAction</cstring>
         </property>
         <property name="toggleAction">
             <bool>true</bool>
         </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
         <property name="text">
-            <string>Hide Toolbar</string>
+            <string>Show &amp;Main</string>
         </property>
         <property name="menuText">
-            <string>&amp;Hide Toolbar</string>
+            <string>Show &amp;Main</string>
         </property>
     </action>
     <action>
@@ -880,6 +922,85 @@
             <string>Track Mouse Position</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>optionsToolbarsAction</cstring>
+        </property>
+        <property name="text">
+            <string>Toolbars</string>
+        </property>
+        <property name="menuText">
+            <string>Toolbars</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>options_showSearchToolbarAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show &amp;Search</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;Search</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>options_ShowDropdownToolbarAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show &amp;Drop-down</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;Drop-down</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>options_ShowIconsetToolbarAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show &amp;Icon set</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;Icon set</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>options_ShowRecentlyusedToolbarAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show &amp;Recently used</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;Recently used</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -1017,10 +1138,10 @@
         <slot>changeToRowWidget3n4Layout()</slot>
     </connection>
     <connection>
-        <sender>HideToolbarAction</sender>
+        <sender>options_showMainToolbarAction</sender>
         <signal>toggled(bool)</signal>
         <receiver>QmitkMainTemplate</receiver>
-        <slot>hideToolbar(bool)</slot>
+        <slot>showMainbar(bool)</slot>
     </connection>
     <connection>
         <sender>optionsFine_Undo_enabledAction</sender>
@@ -1124,8 +1245,61 @@
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileCloseProject()</slot>
     </connection>
+    <connection>
+        <sender>options_ShowDropdownToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>showDropdownbar(bool)</slot>
+    </connection>
+    <connection>
+        <sender>options_ShowIconsetToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>showIconbar(bool)</slot>
+    </connection>
+    <connection>
+        <sender>options_showSearchToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>showSearchbar(bool)</slot>
+    </connection>
+    <connection>
+        <sender>options_ShowRecentlyusedToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>showFavoritesbar(bool)</slot>
+    </connection>
+    <connection>
+        <sender>options_showMainToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>updateToolbarOptions()</slot>
+    </connection>
+    <connection>
+        <sender>options_ShowDropdownToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>updateToolbarOptions()</slot>
+    </connection>
+    <connection>
+        <sender>options_ShowIconsetToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>updateToolbarOptions()</slot>
+    </connection>
+    <connection>
+        <sender>options_ShowRecentlyusedToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>updateToolbarOptions()</slot>
+    </connection>
+    <connection>
+        <sender>options_showSearchToolbarAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>updateToolbarOptions()</slot>
+    </connection>
 </connections>
-<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
     <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="global" impldecl="in implementation">QmitkStdMultiWidget.h</include>
@@ -1155,25 +1329,27 @@
     <forward>class QmitkSelectableGLWidget</forward>
 </forwards>
 <variables>
-    <variable>QPalette m_StandardPalette;</variable>
-    <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
-    <variable>mitk::UndoController* m_UndoController;</variable>
-    <variable>QmitkFctMediator* qfm;</variable>
-    <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
-    <variable>mitk::DataTree::Pointer m_Tree;</variable>
-    <variable>bool m_StandardViewsInitialized;</variable>
-    <variable access="private">bool m_NoMITKOptions;</variable>
-    <variable access="private">bool m_FineUndoEnabled;</variable>
-    <variable access="public">mitk::PropertyList::Pointer m_Options;</variable>
-    <variable>QString m_ProjectFileName;</variable>
-    <variable>mitk::StringProperty::Pointer m_DefaultDatasetPath;</variable>
+    <variable>bool m_InOptionsUpdate;</variable>
     <variable>bool m_FirstFileOpen;</variable>
+    <variable>mitk::StringProperty::Pointer m_DefaultDatasetPath;</variable>
+    <variable>QString m_ProjectFileName;</variable>
+    <variable access="public">mitk::PropertyList::Pointer m_Options;</variable>
+    <variable access="private">bool m_FineUndoEnabled;</variable>
+    <variable access="private">bool m_NoMITKOptions;</variable>
+    <variable>bool m_StandardViewsInitialized;</variable>
+    <variable>mitk::DataTree::Pointer m_Tree;</variable>
+    <variable>QmitkStdMultiWidget* m_MultiWidget;</variable>
+    <variable>QmitkFctMediator* qfm;</variable>
+    <variable>mitk::UndoController* m_UndoController;</variable>
+    <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
+    <variable>QPalette m_StandardPalette;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>
     <signal>OptionsLoaded()</signal>
 </signals>
 <slots>
+    <slot>EventObject &amp; )</slot>
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
     <slot>fileOpenProject()</slot>
@@ -1192,7 +1368,6 @@
     <slot>changeTo2x2Dand3DLayout()</slot>
     <slot>changeToLeft2DAnd3DRight2DLayout()</slot>
     <slot>FullScreenMode( bool fullscreen )</slot>
-    <slot>hideToolbar( bool on )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>
     <slot>editUndo()</slot>
@@ -1214,6 +1389,12 @@
     <slot>enableDepartmentLogo( bool enable )</slot>
     <slot>dropEvent( QDropEvent * event )</slot>
     <slot>dragEnterEvent( QDragEnterEvent * event )</slot>
+    <slot>updateToolbarOptions()</slot>
+    <slot>showMainbar( bool on )</slot>
+    <slot>showSearchbar( bool on )</slot>
+    <slot>showDropdownbar( bool on )</slot>
+    <slot>showIconbar( bool on )</slot>
+    <slot>showFavoritesbar( bool on )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>
@@ -1236,5 +1417,6 @@
     <function access="protected">SaveOptionsToFile( const char * filename )</function>
     <function access="protected">LoadOptionsFromFile( const char * filename )</function>
 </functions>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

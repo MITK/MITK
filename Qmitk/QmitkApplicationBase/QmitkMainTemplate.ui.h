@@ -26,46 +26,46 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
 
-  \class QmitkMainTemplate
+\class QmitkMainTemplate
 
-  Base application that is used by most MITK applications.
+Base application that is used by most MITK applications.
 
-  \section Command line parsing
+\section Command line parsing
 
-  -testing: automatically switch functionalities for GUI testing
+-testing: automatically switch functionalities for GUI testing
 
-  -testEmptyNode: create an additional empty mitk::DataTreeNode
-  
-  -testEmptyImage, -testEmptyPointSet, -testEmptySurface: create an additional mitk::DataTreeNode 
-  containing the specified BaseData just created with New() without any initializations.
+-testEmptyNode: create an additional empty mitk::DataTreeNode
 
-  -noMITKOptions: do not read user-specific options on startup
-  
-  \section QmitkMainTemplateHelpBrowser Help window
-	
-  \subsection QmitkMainTemplateHelpBrowserSub1 Which help file is displayed
+-testEmptyImage, -testEmptyPointSet, -testEmptySurface: create an additional mitk::DataTreeNode 
+containing the specified BaseData just created with New() without any initializations.
 
-  QmitkMainTemplate supports a very basic help system. If the users presses F1 or chooses Help/Content from the menu,
-  QmitkMainTemplate opens a QmitkHelpBrowser to display a HTML page that should explain the currently active functionality.
+-noMITKOptions: do not read user-specific options on startup
 
-  The intelligence behind finding the correct help page is not very sophisticated: from the application options, the value
-  of "HTML documentation path" is read. It is expected that there are HTML pages in this directory. To this path is added
-  "FUNCTIONALITY_CLASS_NAMEUserManual.html", where FUNCTIONALITY_CLASS_NAME is the class name of a concrete functionality.
+\section QmitkMainTemplateHelpBrowser Help window
 
-  <b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose
-           "HTML documentation path" to point to "~/mitk/doxygen/". The help browser will then try to open
-           ~/mitk/doxygen/QmitkSimpleExampleFunctionalityUserManual.html
+\subsection QmitkMainTemplateHelpBrowserSub1 Which help file is displayed
+
+QmitkMainTemplate supports a very basic help system. If the users presses F1 or chooses Help/Content from the menu,
+QmitkMainTemplate opens a QmitkHelpBrowser to display a HTML page that should explain the currently active functionality.
+
+The intelligence behind finding the correct help page is not very sophisticated: from the application options, the value
+of "HTML documentation path" is read. It is expected that there are HTML pages in this directory. To this path is added
+"FUNCTIONALITY_CLASS_NAMEUserManual.html", where FUNCTIONALITY_CLASS_NAME is the class name of a concrete functionality.
+
+<b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose
+"HTML documentation path" to point to "~/mitk/doxygen/". The help browser will then try to open
+~/mitk/doxygen/QmitkSimpleExampleFunctionalityUserManual.html
 
 
-  \subsection QmitkMainTemplateHelpBrowserSub2 How to create the help page
+\subsection QmitkMainTemplateHelpBrowserSub2 How to create the help page
 
-  If you have Doxygen installed on your system, the MITK build system is able to generate a lot of HTML documentation from
-  all the classes of the source tree. To do that you have to build the target "doc" (Visual Studio: right-click the target,
-  choose "Build/Erzeugen"; Linux: make doc)
+If you have Doxygen installed on your system, the MITK build system is able to generate a lot of HTML documentation from
+all the classes of the source tree. To do that you have to build the target "doc" (Visual Studio: right-click the target,
+choose "Build/Erzeugen"; Linux: make doc)
 
-  To add a help page to the Doxygen output, you should create a directory "UserManual" inside your functionality directory
-  (because the build system configures Doxygen to look for images in these directories).
-  Inside the directory "UserManual" you create a file called FUNCTIONALITY_CLASS_NAMEUserManual.dox with basically this content
+To add a help page to the Doxygen output, you should create a directory "UserManual" inside your functionality directory
+(because the build system configures Doxygen to look for images in these directories).
+Inside the directory "UserManual" you create a file called FUNCTIONALITY_CLASS_NAMEUserManual.dox with basically this content
 
 \verbatim
 
@@ -73,9 +73,9 @@ PURPOSE.  See the above copyright notices for more information.
 \page QmitkFUNCTIONALITY_CLASS_NAMEUserManual The functionality to solve all problems
 
 Available sections:
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualOverview
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails
-  - \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen
+- \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualOverview
+- \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualDetails
+- \ref QmitkFUNCTIONALITY_CLASS_NAMEUserManualGrundfunktionen
 
 \section QmitkLymphNodeVolumetryUserManualOverview Overview of the problems
 
@@ -92,7 +92,7 @@ Tadaa
 *&#47;
 \endverbatim
 
-  However, it is nice to actually replace the nonsense :-)
+However, it is nice to actually replace the nonsense :-)
 */
 
 // PLEASE: do not remove this strange 47 character up ther in the doxygen documentation. Putting a normal slash there produced errors on
@@ -104,19 +104,19 @@ Tadaa
 #include <mitkConfig.h> //for MBI_INTERNAL
 #include <mitkCoreObjectFactory.h>
 #ifdef MBI_INTERNAL
-  #include <mitkVesselTreeFileReader.h>
-  #include <mitkVesselGraphFileReader.h>
-  #include <mitkDICOMFileReader.h>
-  #include <mitkDSRFileReader.h>
-  #include <mitkCylindricToCartesianFilter.h>
-  #include <QmitkSaveProjectWidget.h>
-  #include <itksys/SystemTools.hxx>
+#include <mitkVesselTreeFileReader.h>
+#include <mitkVesselGraphFileReader.h>
+#include <mitkDICOMFileReader.h>
+#include <mitkDSRFileReader.h>
+#include <mitkCylindricToCartesianFilter.h>
+#include <QmitkSaveProjectWidget.h>
+#include <itksys/SystemTools.hxx>
 #else
-  #include <itkImage.h>
-  #include <itkImageFileReader.h>
-  #include <itkDICOMImageIO2.h>
-  #include <itkImageSeriesReader.h>
-  #include <itkDICOMSeriesFileNames.h>
+#include <itkImage.h>
+#include <itkImageFileReader.h>
+#include <itkDICOMImageIO2.h>
+#include <itkImageSeriesReader.h>
+#include <itkDICOMSeriesFileNames.h>
 #endif
 
 #include <QmitkCommonFunctionality.h>
@@ -233,18 +233,18 @@ public:
   {
     m_DataTreeIterator = iterator;
     m_TimeSelector = mitk::ImageTimeSelector::New();
-		if(m_DataTreeIterator.IsNotNull())
-		{
-			itk::ReceptorMemberCommand<posOutputType>::Pointer command = itk::ReceptorMemberCommand<posOutputType>::New();
-			command->SetCallbackFunction(this, &posOutputType::TreeChanged);
-			m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
-		}
+    if(m_DataTreeIterator.IsNotNull())
+    {
+      itk::ReceptorMemberCommand<posOutputType>::Pointer command = itk::ReceptorMemberCommand<posOutputType>::New();
+      command->SetCallbackFunction(this, &posOutputType::TreeChanged);
+      m_ObserverTag = m_DataTreeIterator->GetTree()->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+    }
   }
 
   ~posOutputType()
   {
-		m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
-	}
+    m_DataTreeIterator->GetTree()->RemoveObserver(m_ObserverTag);
+  }
 
   typedef mitk::Operation Operation;
   void ExecuteOperation(Operation* operation) //writing mitk::Operation causes QT-Designer to create a Slot calles Operation*operation) and thus causes errors. Thats why we here have a typedef. //TODO: FIX it!
@@ -258,7 +258,7 @@ public:
       case mitk::OpMOVE:
         {
           mitk::Image* image = NULL;
-					image = GetImageFromDataTree();
+          image = GetImageFromDataTree();
           QString s;
           mitk::Point3D p = pointoperation->GetPoint();
           mitk::ScalarType time = pointoperation->GetTimeInMS();
@@ -272,11 +272,11 @@ public:
           }
 
 
-					if (image==NULL)
-					{
-						m_TimeSelector->SetInput(NULL);
-					}
-					else if ( image->IsInitialized() )
+          if (image==NULL)
+          {
+            m_TimeSelector->SetInput(NULL);
+          }
+          else if ( image->IsInitialized() )
           {
             m_TimeSelector->SetInput(image);
             mitk::Image* image3D = m_TimeSelector->GetOutput();
@@ -343,7 +343,6 @@ public:
     }
   }
 
-
   virtual void TreeChanged(const itk::EventObject &)
   {
     mitk::Image* image = NULL;
@@ -393,7 +392,7 @@ public:
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
 #ifdef MBI_INTERNAL
-  QmitkSaveProjectWidget* m_SceneWidget;
+QmitkSaveProjectWidget* m_SceneWidget;
 #endif
 
 void QmitkMainTemplate::fileOpen()
@@ -440,7 +439,7 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
   {
     factory->SetFileName( fileName );
     factory->SetImageSerie(false);
-    
+
     /*QString qFileName( fileName );
 
     // just in case this is a series
@@ -449,20 +448,20 @@ void QmitkMainTemplate::fileOpen( const char * fileName )
     int start = qFileName.find( QRegExp("[0-9]*\\."), fnstart );
     if ( start>=0 )
     {
-      char prefix[1024], pattern[1024];
+    char prefix[1024], pattern[1024];
 
-      strncpy(prefix, qFileName.ascii(), start);
-      prefix[start]=0;
+    strncpy(prefix, qFileName.ascii(), start);
+    prefix[start]=0;
 
-      int stop=qFileName.find( QRegExp("[^0-9]"), start );
-      sprintf(pattern, "%%s%%0%uu%s",stop-start,qFileName.ascii()+stop);
+    int stop=qFileName.find( QRegExp("[^0-9]"), start );
+    sprintf(pattern, "%%s%%0%uu%s",stop-start,qFileName.ascii()+stop);
 
-      if (start != stop)
-      {
-        factory->SetImageSerie(true);
-        factory->SetFilePattern( pattern );
-        factory->SetFilePrefix( prefix );
-      }
+    if (start != stop)
+    {
+    factory->SetImageSerie(true);
+    factory->SetFilePattern( pattern );
+    factory->SetFilePrefix( prefix );
+    }
     }*/
 
     QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
@@ -599,7 +598,7 @@ void QmitkMainTemplate::fileOpenProject()
 {
 #ifdef MBI_INTERNAL
   QString filename = QFileDialog::getOpenFileName( QString::null, "XML Project description (*.xml)",0,
-                                                   "Open Project File", "Choose a file to open");
+    "Open Project File", "Choose a file to open");
   if ( !filename.isEmpty() ) {
     try
     {
@@ -652,7 +651,7 @@ void QmitkMainTemplate::fileSaveProjectAs()
 
   if ( !fileName.isNull() )
   {
-  try
+    try
     {
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
@@ -692,7 +691,7 @@ void QmitkMainTemplate::fileSave()
 
   if ( !fileName.isNull() )
   {
-  try
+    try
     {
       QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
@@ -740,6 +739,10 @@ void QmitkMainTemplate::init()
 
   //this seems to be a bug of Qt3.1.1's designer: The object name of ToolBar is not initialized.
   ToolBar->setName("ToolBar");
+  FunctionalityToolbar->setName("FunctionalityToolbar");
+  FavoritesToolbar->setName("FavoritesToolbar");
+  SearchToolbar->setName("SearchToolbar");
+  FunctionalitiesIconToolBar->setName("FunctionalitiesIconToolBar");
 
   //create the data m_Tree
   m_Tree=mitk::DataTree::New();
@@ -753,7 +756,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Gradient color 2", mitk::ColorProperty::New( 0.7f, 0.7f, 0.8f ) );
   m_Options->SetProperty( "Background color", mitk::ColorProperty::New(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New("/local/ip++bin/Documentations/Doxygen/html/") );
-  m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(true) );
   m_Options->SetProperty( "Department logo visible", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Department logo path", mitk::StringProperty::New("") );
   m_Options->SetProperty( "Default value for texture interpolation", mitk::BoolProperty::New(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
@@ -762,6 +765,13 @@ void QmitkMainTemplate::init()
   mitk::FillVector3D(point,0.0,0.0,0.0);
   m_Options->SetProperty( "Startup window size", mitk::Point3dProperty::New(point) );
   m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
+
+  //Set the toolbar state properties
+  m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(false) );
 }
 
 /*!
@@ -935,11 +945,48 @@ void QmitkMainTemplate::Initialize()
   mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color"));
   mitk::Color c = colProperty->GetColor();
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
-  
+
   // Initialize other global options
   mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
   if (textureInterpolationProperty != NULL)
     mitk::DataTreeNodeFactory::m_TextureInterpolationActive = textureInterpolationProperty->GetValue();
+
+  //Show/hide toolbars - the m_InOptionsUpdate flag lets the other functions know that the program is in the process of updating
+  //the toolbar states based on the options from m_Options.  This is necessary to prevent the call to setOn from causing the options
+  //file to update with the updateToolbarOptions function, which would override the changes with the current state of the toolbars.
+  m_InOptionsUpdate = true;
+  mitk::BoolProperty* mainBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show main toolbar"));
+  if(mainBarProperty != NULL)
+  {
+    options_showMainToolbarAction->setOn(mainBarProperty->GetValue());
+  }
+  mitk::BoolProperty* searchBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show search toolbar"));
+  if(searchBarProperty != NULL)
+  {	
+    options_showSearchToolbarAction->setOn(searchBarProperty->GetValue());
+  }
+  mitk::BoolProperty* dropdownBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show dropdown toolbar"));
+  if(dropdownBarProperty != NULL)
+  {	
+    options_ShowDropdownToolbarAction->setOn(dropdownBarProperty->GetValue());
+  }
+
+  mitk::BoolProperty* iconBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show icon set toolbar"));
+  if(iconBarProperty != NULL)
+  {	
+    options_ShowIconsetToolbarAction->setOn(iconBarProperty->GetValue());
+  }
+
+  mitk::BoolProperty* favBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show recently used toolbar"));
+  if(favBarProperty != NULL)
+  {	
+    options_ShowRecentlyusedToolbarAction->setOn(favBarProperty->GetValue());
+  }
+
+  m_InOptionsUpdate = false;
+
+
+
 
   // Add MoveAndZoomInteractor and widget NavigationControllers as
   // GlobalInteraction listeners
@@ -949,7 +996,7 @@ void QmitkMainTemplate::Initialize()
 
 
 /** \brief Activates all DialogBars which are specified in the global options
- */
+*/
 void QmitkMainTemplate::RaiseDialogBars()
 {
   if ( m_Options.IsNotNull() )
@@ -1057,9 +1104,9 @@ void QmitkMainTemplate::parseCommandLine()
 }
 
 /**
- * checks, whether the application is run in statemachine debug mode and
- * creates a QmitkSocketClient object
- */
+* checks, whether the application is run in statemachine debug mode and
+* creates a QmitkSocketClient object
+*/
 void QmitkMainTemplate::CheckStatemachineDebugMode()
 {
   for ( int i = 1; i < qApp->argc(); ++i )
@@ -1073,9 +1120,9 @@ void QmitkMainTemplate::CheckStatemachineDebugMode()
 }
 
 /**
- * returns true, when the application is run in testing mode and
- * false otherwise
- */
+* returns true, when the application is run in testing mode and
+* false otherwise
+*/
 bool QmitkMainTemplate::IsTesting( )
 {
   bool testing = false;
@@ -1195,7 +1242,7 @@ void QmitkMainTemplate::FullScreenMode(bool fullscreen)
 void QmitkMainTemplate::destroy()
 {
   mitk::Point3D point;
-  
+
   //save MainWindow size
   if(this->isMaximized())
     mitk::FillVector3D(point,0.0,0.0,0.0);
@@ -1208,14 +1255,14 @@ void QmitkMainTemplate::destroy()
     mitk::FillVector3D(point,0.0,0.0,0.0);
   else
     mitk::FillVector3D(point,this->size().width(),this->size().height(),0.0);
-  
+
   QmitkControlsRightFctLayoutTemplate* fctwidget =  (QmitkControlsRightFctLayoutTemplate*) this->centralWidget();
   if(fctwidget)
   {
     mitk::FillVector3D(point, fctwidget->MainSplitter->sizes()[0], fctwidget->MainSplitter->sizes()[1], 0.0);
     m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
   }
-  
+
   if (! m_NoMITKOptions) 
   {
     // save options now
@@ -1244,14 +1291,6 @@ QmitkFctMediator* QmitkMainTemplate::GetFctMediator()
   return qfm;
 }
 
-
-void QmitkMainTemplate::hideToolbar(bool on)
-{
-  if ( on )
-    ToolBar->hide();
-  else
-    ToolBar->show();
-}
 
 
 void QmitkMainTemplate::enableFineUndo( bool enabled )
@@ -1412,6 +1451,40 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     // options list).
     qfm->ApplyOptionsToDialogBars( m_Options );
 
+    //Show/hide toolbars - the m_InOptionsUpdate flag lets the other functions know that the program is in the process of updating
+    //the toolbar states based on the options from m_Options.  This is necessary to prevent the call to setOn from causing the options
+    //file to update with the updateToolbarOptions function, which would override the changes with the current state of the toolbars.
+    m_InOptionsUpdate = true;
+    mitk::BoolProperty* mainBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show main toolbar"));
+    if(mainBarProperty != NULL)
+    {
+      options_showMainToolbarAction->setOn(mainBarProperty->GetValue());
+    }
+    mitk::BoolProperty* searchBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show search toolbar"));
+    if(searchBarProperty != NULL)
+    {	
+      options_showSearchToolbarAction->setOn(searchBarProperty->GetValue());
+    }
+    mitk::BoolProperty* dropdownBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show dropdown toolbar"));
+    if(dropdownBarProperty != NULL)
+    {	
+      options_ShowDropdownToolbarAction->setOn(dropdownBarProperty->GetValue());
+    }
+
+    mitk::BoolProperty* iconBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show icon set toolbar"));
+    if(iconBarProperty != NULL)
+    {	
+      options_ShowIconsetToolbarAction->setOn(iconBarProperty->GetValue());
+    }
+
+    mitk::BoolProperty* favBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show recently used toolbar"));
+    if(favBarProperty != NULL)
+    {	
+      options_ShowRecentlyusedToolbarAction->setOn(favBarProperty->GetValue());
+    }
+    m_InOptionsUpdate = false;
+
+
     // next, notify the functionalities of changes in their options
     for (unsigned int i = 0; i < qfm->GetFunctionalityCount(); ++i)
     {
@@ -1430,7 +1503,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
 {
   m_Options->PrepareXML_IO();
-  
+
   //create a XMLWriter
   mitk::XMLWriter xmlw(filename);
   // start tree
@@ -1440,10 +1513,10 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
   xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
   xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
   xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "DataTreeNode");
-    xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
-    xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
-      m_Options->WriteXMLData( xmlw );
-    xmlw.EndNode();
+  xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
+  xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
+  m_Options->WriteXMLData( xmlw );
+  xmlw.EndNode();
   xmlw.EndNode();
   xmlw.EndNode();
 
@@ -1459,10 +1532,10 @@ void QmitkMainTemplate::SaveOptionsToFile(const char* filename)
       xmlw.BeginNode(mitk::DataTree::XML_TAG_TREE_NODE);
       xmlw.BeginNode(mitk::DataTreeNode::XML_NODE_NAME);
       xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "DataTreeNode");
-        xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
-        xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
-          fo->WriteXMLData( xmlw );
-        xmlw.EndNode();
+      xmlw.BeginNode(mitk::PropertyList::XML_NODE_NAME);
+      xmlw.WriteProperty(mitk::XMLIO::CLASS_NAME, "PropertyList");
+      fo->WriteXMLData( xmlw );
+      xmlw.EndNode();
       xmlw.EndNode();
       xmlw.EndNode();
     }
@@ -1527,7 +1600,7 @@ void QmitkMainTemplate::LoadOptionsFromFile(const char* filename)
 
     ++iter;
   }
-  
+
   emit OptionsLoaded();
 }
 
@@ -1572,13 +1645,13 @@ void QmitkMainTemplate::changeToRowWidgetSmall3nBig4Layout()
 
 void QmitkMainTemplate::changeToSmallUpperWidget2Big3n4Layout()
 {
-    m_MultiWidget->changeLayoutToSmallUpperWidget2Big3and4();
+  m_MultiWidget->changeLayoutToSmallUpperWidget2Big3and4();
 }
 
 // New code for Raw Image reading
 void QmitkMainTemplate::fileOpenRawImage()
 {
-    QStringList fileNames = QFileDialog::getOpenFileName("/home","Raw images: (*.raw *.ct)", NULL);
+  QStringList fileNames = QFileDialog::getOpenFileName("/home","Raw images: (*.raw *.ct)", NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     fileOpenRawImage((*it).ascii());
@@ -1671,9 +1744,9 @@ void QmitkMainTemplate::enableDarkPalette( bool enable )
 void QmitkMainTemplate::fileCloseProject()
 {
   /* This method deletes all nodes but the three widget planes, their grouping node
-     and nodes that do not have a data object. This should free most of the used memory.
-     If other nodes (with helper objects like the widget planes) should be kept, they have
-     to be added here as a predicate. */
+  and nodes that do not have a data object. This should free most of the used memory.
+  If other nodes (with helper objects like the widget planes) should be kept, they have
+  to be added here as a predicate. */
   mitk::NodePredicateProperty w1("name", mitk::StringProperty::New("Widgets"));        // keep helper objects
   mitk::NodePredicateProperty w2("name", mitk::StringProperty::New("widget1Plane"));
   mitk::NodePredicateProperty w3("name", mitk::StringProperty::New("widget2Plane"));
@@ -1732,6 +1805,64 @@ void QmitkMainTemplate::dropEvent( QDropEvent * event )
 
 void QmitkMainTemplate::dragEnterEvent( QDragEnterEvent *event )
 {   // accept drags
-    event->accept();
+  event->accept();
 }
 
+//This function updates the toolbar options in the m_Options file whenever one of the toolbars' state is changed.
+// the m_InOptionsUpdate flag stops this update process from happening if the toolbar's state has been changed
+// because of a change in the options file.  Without it, this function would override those changes with the current
+// state of the toolbar.
+void QmitkMainTemplate::updateToolbarOptions()
+{
+  if(m_InOptionsUpdate) return;
+  m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New( options_showMainToolbarAction->isOn() ) );
+  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New( options_showSearchToolbarAction->isOn() ) );
+  m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New( options_ShowDropdownToolbarAction->isOn() ) );
+  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New( options_ShowIconsetToolbarAction->isOn() ) );
+  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New( options_ShowRecentlyusedToolbarAction->isOn() ) );
+}
+
+
+void QmitkMainTemplate::showMainbar( bool on )
+{
+  if ( !on )
+    ToolBar->hide();
+  else
+    ToolBar->show();
+}
+
+
+void QmitkMainTemplate::showSearchbar( bool on )
+{
+  if ( !on )
+    SearchToolbar->hide();
+  else
+    SearchToolbar->show();
+}
+
+
+void QmitkMainTemplate::showDropdownbar( bool on )
+{
+  if ( !on )
+    FunctionalityToolbar->hide();
+  else
+    FunctionalityToolbar->show();
+}
+
+
+void QmitkMainTemplate::showIconbar( bool on )
+{
+  if ( !on )
+    FunctionalitiesIconToolBar->hide();
+  else
+    FunctionalitiesIconToolBar->show();
+}
+
+
+void QmitkMainTemplate::showFavoritesbar( bool on )
+{
+  if ( !on )
+    FavoritesToolbar->hide();
+  else
+    FavoritesToolbar->show();
+}

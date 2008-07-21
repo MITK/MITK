@@ -37,9 +37,7 @@ volume.
 all the segmentations in a volume and generate suggestions for missing slices.
 This should be possible in all three orthogonal slice direction.
 <li> <b>Undo</b>: Slice manipulations should be undoable, no matter whether a
-tool or the interpolation mechanism changed something. This is a TODO! Should be
-somehow integrated into the MITK undo stack, perhaps a limited stack with some
-binary diffs would work fine.
+tool or the interpolation mechanism changed something.
 <li> <b>GUI</b>: Integration of everything. 
 </ol>
 
@@ -77,7 +75,7 @@ used extensively by most of the tools to fulfill their task.
 mitk::OverwriteSliceImageFilter cooperates with the interpolation classes to
 inform them of single slice modifications.
 <li> <b>Interpolation of unsegmented slices</b>: There are two classes involved
-in interpolation: mitk::SegmentationInterpolation knows a mitk::Image (the
+in interpolation: mitk::SegmentationInterpolationController knows a mitk::Image (the
 segmentation) and scans its contents for slices with non-zero pixels. It keeps
 track of changes in the image and is always able to tell, which neighbors of a
 slice (in the three orthogonal slice directions) contain segmentations. The
@@ -85,10 +83,11 @@ class also performs this interpolation for single slices on demand.
 Again, we have a second class responsible for the GUI:
 QmitkSlicesInterpolator enables/disables interpolation and offers to
 accept interpolations for one or all slices.
-<li> <b>Undo</b>: Not yet implemented. Most probably, this functionality will be
-triggered from mitk::OverwriteImageFilter, where all ReLiver specific
-manipulations take place so far. Binary diff in undo stack? What about deleted
-images?
+<li> <b>Undo</b>: Undo functionality is implemented in mitk::OverwriteSliceImageFilter, 
+since this is the central place where all image modifications are made. The filter stores a binary difference image
+to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests undo, this ApplyDiffImageOperation
+will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,
+for itk::DeleteEvent, so no undo operation will be executed on/for images that have already been destroyed.
 <li> <b>GUI</b>: The top-level GUI is the functionality
 QmitkSliceBasedSegmentation, which is very thin in comparison to ERIS. There are
 separate widgets for image and tool selection, for interpolation. Additionaly,

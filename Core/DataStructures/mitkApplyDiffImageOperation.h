@@ -27,10 +27,16 @@ namespace mitk {
 /**
  @brief Operation, that holds information about some image difference
 
- Implemented only for image slices, but could be used for whole 3D images.
+ This class stores undo information for DiffImageApplier. 
+ Instances of this class are created e.g. by OverwriteSliceImageFilter.
+ This works only for images with 1 channel (gray scale images, no color images).
 
- @TODO Should implement some kind of compression to save memory.
- @TODO This works only for images with 1 channel (gray scale images, no color images). Change?
+ ApplyDiffImageOperation of course refers to an image (a segmentation usually). 
+ The refered image is observed for itk::DeleteEvent, because there is no SmartPointer
+ used to keep the image alive -- the purpose of this class is undo and the undo
+ stack should not keep things alive forever.
+
+ To save memory, zlib compression is used via CompressedImageContainer.
 
  @ingroup Undo
  @ingroup Reliver

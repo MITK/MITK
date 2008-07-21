@@ -44,7 +44,10 @@ namespace mitk
   Two parameters determine which slice is replaced: the "slice dimension" is that one, which is constant for all points in the plane, e.g. transversal would mean 2.
   The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count from zero.
 
-  This class works with all kind of image types, the only restrictions being that the input is 3D, and the slice image is 2D
+  This class works with all kind of image types, the only restrictions being that the input is 3D, and the slice image is 2D.
+
+  If requested by SetCreateUndoInformation(true), this class will create instances of ApplyDiffImageOperation for the undo stack.
+  These operations will (on user request) be executed by DiffImageApplier to perform undo.
 
   Last contributor: $Author$
 */
@@ -75,6 +78,9 @@ class MITK_CORE_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
     itkSetMacro(TimeStep, unsigned int);
     itkGetConstMacro(TimeStep, unsigned int);
     
+    /**
+      \brief Whether to create undo operation in the MITK undo stack
+     */
     itkSetMacro(CreateUndoInformation, bool);
     itkGetConstMacro(CreateUndoInformation, bool);
     

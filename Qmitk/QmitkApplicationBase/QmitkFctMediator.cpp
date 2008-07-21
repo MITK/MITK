@@ -639,6 +639,14 @@ void QmitkFctMediator::ApplyOptionsToDialogBars(mitk::PropertyList::Pointer opti
 //This function is called to initialize all of the toolbars except the main one.
 void QmitkFctMediator::InitToolbars()
 {
+  //Give toolbars their names
+  m_FavoritesToolBar->setLabel(QString("Recently Used Items"));
+  m_SearchToolBar->setLabel(QString("Search"));
+  m_IconToolBar->setLabel(QString("Functionality Icons"));  
+  m_ToolBar->setLabel(QString("Main Tools"));
+  m_FunctionalityToolBar->setLabel(QString("Functionality List"));
+
+
   //Label for the combo box toolbar
   new QLabel(QString("Available Functionalities:  "), m_FunctionalityToolBar, "all_label");
 

@@ -767,11 +767,11 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
 
   //Set the toolbar state properties
-  m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(false) );
-  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New(false) );
-  m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New(false) );
-  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(false) );
-  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(true) );
 }
 
 /*!

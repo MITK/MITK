@@ -59,8 +59,8 @@ public:
 
 mitk::ImageBackground2D::ImageBackground2D()
 {
-  m_ImageWidth              = 720;
-  m_ImageHeight             = 576;
+  m_ImageWidth              = 0;
+  m_ImageHeight             = 0;
   m_ImageScalarComponents   = 3;
   m_ParallelScale           = 0;
   m_RenderWindow = NULL;
@@ -70,8 +70,6 @@ mitk::ImageBackground2D::ImageBackground2D()
   m_VtkImageImport    = vtkImageImport::New();
   
   m_ImageData         = NULL;
-
-  InitVtkImageImport();
 }
 
 void mitk::ImageBackground2D::InitVtkImageImport()
@@ -209,11 +207,14 @@ void mitk::ImageBackground2D::Update(char * dataPointer, int width, int height, 
   }
   else
   {
-    m_ImageHeight = height;
-    m_ImageWidth  = width;
-    m_ImageScalarComponents = imageScalarComponents;
-
-    //InitVtkImageImport();
+    if(m_ImageWidth == 0)
+    { // VTK Image Import has to be initialized properly
+      m_ImageHeight = height;
+      m_ImageWidth  = width;
+      m_ImageScalarComponents = imageScalarComponents;
+      InitVtkImageImport();
+    }
+    
 
     // VTK import image data must be allocated before import (with correct parameters)
     if(m_ImageData == NULL)

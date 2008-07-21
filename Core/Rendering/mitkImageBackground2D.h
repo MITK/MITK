@@ -34,7 +34,7 @@ namespace mitk
   class RenderWindow;
 
   /**
-  * Displays a image (currently unsigned char) in the background
+  * Displays a 2D image (currently unsigned char) in the background
   * of a vtkRenderWindow.
   * Caution: As the data is not being copied, a user is responsible for a valid 
   * pointer to the image. Also the image dimensions needs to be set correctly before enabling the 

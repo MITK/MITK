@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::VideoSource::VideoSource()
 { 
-  m_CaptureWidth  = 720;
-  m_CaptureHeight = 576;
+  m_CaptureWidth  = 0;
+  m_CaptureHeight = 0;
   m_CapturingInProcess = false;
   m_CurrentVideoTexture = NULL;
   m_RotationAngle = 0.0;

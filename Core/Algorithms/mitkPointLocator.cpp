@@ -186,4 +186,16 @@ void mitk::PointLocator::DestroyANN()
     delete m_ANNTree;
 }
 
+bool mitk::PointLocator::FindClosestPointAndDistance( mitk::PointSet::PointType point, IdType* id, DistanceType* dist )
+{
+  m_ANNQueryPoint[0] = point[0];
+  m_ANNQueryPoint[1] = point[1];
+  m_ANNQueryPoint[2] = point[2];
+
+  m_ANNTree->annkSearch( m_ANNQueryPoint, m_ANNK, m_ANNPointIndexes, m_ANNDistances);
+
+  *id = m_IndexToPointIdContainer[m_ANNPointIndexes[0]];
+  *dist = m_ANNDistances[0];
+  return true;
+}
 

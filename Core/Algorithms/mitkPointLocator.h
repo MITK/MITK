@@ -110,6 +110,17 @@ public:
    * @returns the distance in world coordinates between the nearest point in point set and the given point
    */
   DistanceType GetMinimalDistance( mitk::PointSet::PointType point );
+
+  /**
+  * Finds the nearest neighbour in the point set previously defined by SetPoints().
+  * The Index and minimal distance between this point and the closest point of the point set is returned. 
+  * Please note, that there is no case, in which
+  * no point is found, since as a precondition at least one point has to be contained
+  * in the point set.
+  * @param point the query point, for whom the minimal distancew will be determined
+  * @returns the index of and distance (in world coordinates) between the nearest point in point set and the given point
+  */
+  bool FindClosestPointAndDistance( mitk::PointSet::PointType point, IdType* id, DistanceType* dist);
   
 protected: 
   //

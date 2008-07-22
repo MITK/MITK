@@ -138,13 +138,17 @@ public:
   //## copy of the bounding-box is stored, not a reference to it.
 virtual void SetBounds(const BoundsArrayType& bounds);
 #endif
+  //##Documentation
   //## @brief Set the bounding box (in index/unit coordinates) via a float array
   virtual void SetFloatBounds(const float bounds[6]);
+  //##Documentation
   //## @brief Set the bounding box (in index/unit coordinates) via a double array
   virtual void SetFloatBounds(const double bounds[6]);
 
+  //##Documentation
   //## @brief Get the time bounds (in ms)
   itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+  //##Documentation
   //## @brief Set the time bounds (in ms)
   virtual void SetTimeBounds(const TimeBounds& timebounds);
 

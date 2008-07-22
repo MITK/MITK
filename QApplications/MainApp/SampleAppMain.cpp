@@ -45,6 +45,8 @@ int main(int argc, char* argv[])
 {
   try
   {
+    itk::TimeStamp timestamp;
+    timestamp.Modified();
     // Add directory in which the application executable resides as search directory
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(itksys::SystemTools::GetFilenamePath(argv[0]).c_str()); 
     //

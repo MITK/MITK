@@ -48,9 +48,15 @@ class ImageDataItem;
 //## x ND). Channels are for different kind of data, e.g., morphology in 
 //## channel 0, velocities in channel 1. All channels must have the same Geometry! In 
 //## particular, the dimensions of all channels are the same, only the pixel-type
-//## may differ between channels
+//## may differ between channels.
 //##
-//## For importing ITK images use of mitk::ITKImageImport is recommended.
+//## For importing ITK images use of mitk::ITKImageImport is recommended, see
+//## \ref Adaptor.
+//##
+//## Converting coordinates from the ITK physical coordinate system 
+//## (which does not support rotated images) to the MITK world coordinate
+//## system should be performed via the Geometry3D of the Image, see
+//## Geometry3D::WorldToItkPhysicalPoint.
 //## @ingroup Data
 class MITK_CORE_EXPORT Image : public SlicedData
 {

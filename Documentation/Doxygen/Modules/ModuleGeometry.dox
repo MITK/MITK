@@ -35,7 +35,13 @@ Comparable to TimeSlicedGeometry the class SlicedGeometry3D contains a list of G
 
 Geometry2D provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space. For example it allows mapping a 3D point on the 2D manifold using Geometry2D::Map. The most important sub-class is PlaneGeometry2D, which describes a planar rectangle.
 
-Putting it together for Image: Image has a TimeSlicedGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry2D).
+\section ExampleForImage Putting it together for Image
+
+Image has a TimeSlicedGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry2D).
+
+Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see Geometry3D::WorldToItkPhysicalPoint.
+
+As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.
 */
 //\f$-\infty\f$ to \f$+\infty\f$.
 }

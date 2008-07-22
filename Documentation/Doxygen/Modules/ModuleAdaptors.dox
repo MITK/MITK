@@ -7,8 +7,10 @@ other toolkits, especially ITK.
 
 The task of most of the classes in this category is to deal with the conversion between the (templated) itk::Image and the (not-templated) mitk::Image.
 Methods for conversion are provided for both directions:
-\li MITK to ITK
-\li ITK to MITK
+\li \ref MitkToItk
+\li \ref ItkToMitk
+
+Care has to be taken regarding the involved coordinate systems, see \ref ItkToMitkCoordinateSystems.
 
 \section MitkToItk MITK to ITK adaptor classes
 Pixel type and dimension of MITK images can be specified at run time whereas whereas ITK images are templated over the pixel type and the dimension, thus in ITK both need to be specified at compile time.
@@ -56,9 +58,12 @@ Another workaround is to reduce the created code by fixing either the type (Acce
 
 There are variants for additional parameters for AccessByItk... and InstantiateAccessFunction..., e.g., AccessFixedTypeByItk_2 allows to pass two additional parameters to the access-function.
 
-\section MitkToItk ITK to MITK adaptor classes
+\section ItkToMitk ITK to MITK adaptor classes
 Converting ITK images to MITK is easier than the other way round. Basically, you have three options:
 \li mitk::ITKImageImport<TInputImage>: is a process class that takes an itk::Image of the given type \a TOutputImage as input and produces an mitk::Image as output (to be access using \a GetOutput()). The image data contained in the itk::Image is referenced, not copied.
 \li mitk::ImportItkImage: this function takes the itk::Image as input and returns an mitk::Image. Internally, it uses the class just described. So again, the image data contained in the itk::Image is referenced, not copied.
 \li mitk::CastToMitkImage: this function has two parameters, the itk::Image (input) and a smartpointer to an mitk::Image (output, does not need to be initialized). In contrast to the other described methods, this functions copies the image data!
+
+\section ItkToMitkCoordinateSystems ITK image vs MITK coordinate systems
+Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see Geometry3D::WorldToItkPhysicalPoint.
 */

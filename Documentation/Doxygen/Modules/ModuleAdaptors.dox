@@ -65,5 +65,5 @@ Converting ITK images to MITK is easier than the other way round. Basically, you
 \li mitk::CastToMitkImage: this function has two parameters, the itk::Image (input) and a smartpointer to an mitk::Image (output, does not need to be initialized). In contrast to the other described methods, this functions copies the image data!
 
 \section ItkToMitkCoordinateSystems ITK image vs MITK coordinate systems
-Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see Geometry3D::WorldToItkPhysicalPoint.
+Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see mitk::Geometry3D::WorldToItkPhysicalPoint.
 */

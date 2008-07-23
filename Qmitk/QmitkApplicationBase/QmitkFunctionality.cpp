@@ -203,3 +203,10 @@ int QmitkFunctionality::TestYourself()
   std::cout << "NO TEST IMPLEMENTED : ";
   return EXIT_SUCCESS;
 }
+
+int QmitkFunctionality::TestOptions()
+{
+    QWidget* optionWidget = this -> CreateOptionWidget(NULL);
+    this -> OptionsChanged(optionWidget);
+    return EXIT_SUCCESS;
+}

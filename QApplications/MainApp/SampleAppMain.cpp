@@ -55,15 +55,24 @@ int main(int argc, char* argv[])
     caption << executableName << ", Builddate " << __DATE__ << ", " << __TIME__ << ".";
     itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
     // parse testing parameters
-    bool enableFunctionalityTesting = false;
     const char * testingParameter = NULL;
-    if (strcmp(argv[argc-1], "-testing")==0) {
-      enableFunctionalityTesting = true;
-    } else if (argc >= 2 && strcmp(argv[argc-2], "-testing")==0) {
-      testingParameter = argv[argc-1];
-      enableFunctionalityTesting = true;
+    int testType = 0;
+    for (int i = 0; i < argc; i++)
+    {
+        if ((strcmp(argv[i], "-testing") == 0))
+        {
+             testType |= QmitkFunctionalityTesting::GUITest;
+        }
+        if ((strcmp(argv[i], "-optiontesting") == 0))
+        {
+             testType |= QmitkFunctionalityTesting::OptionsTest;
+        }
+        if ((strcmp(argv[i], "-alltesting") == 0))
+        {
+             testType |= QmitkFunctionalityTesting::AllTests;
+        }
     }
-
+    
     QApplication a( argc, argv );
 
     // popup a splash screen
@@ -102,10 +111,10 @@ int main(int argc, char* argv[])
       QTimer::singleShot(5000, splasher, SLOT(close()) );
     }
 
-    if(enableFunctionalityTesting)
+    if(testType)
     {
       std::cout.setf(std::ios_base::unitbuf);
-      return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator());
+      return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator(), testType);
     }
     else
     {

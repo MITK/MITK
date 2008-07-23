@@ -275,6 +275,8 @@ public:
     * To indicate a successful test, return EXIT_SUCCESS, else return EXIT_FAILURE
     */
   virtual int TestYourself();
+  virtual int TestOptions();
+  
 
 signals:
   void Signal_dummy();

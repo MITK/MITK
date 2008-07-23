@@ -30,15 +30,27 @@ class QMITK_EXPORT QmitkFunctionalityTesting : public QObject
 public:
   QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent = 0, const char * name = 0 );
   ~QmitkFunctionalityTesting();
+  void SetTestType(int testType);
+  
   QTimer m_CloseMessagesTimer;
-  unsigned int m_NumberOfFunctionalitiesFailed;
-  std::list<std::string> m_NamesOfFailedFunctionalities;
+  unsigned int m_NumberOfFunctionalitiesGUITestFailed;
+  unsigned int m_NumberOfFunctionalitiesOptionsTestFailed;
+  std::list<std::string> m_NamesOfGUITestFailedFunctionalities;
+  std::list<std::string> m_NamesOfOptionsTestFailedFunctionalities;
+  
+  static const int GUITest;
+  static const int OptionsTest;
+  static const int AllTests;
+  
 protected slots:
   virtual void ActivateNextFunctionality();
   virtual void CloseFirstMessageBox();
 protected:
   QmitkFctMediator* m_QmitkFctMediator;
   QTimer m_ActivateTimer;
+  int m_TestType;
+  
 };
 
-int QMITK_EXPORT StartQmitkFunctionalityTesting(QmitkFctMediator* qfm);
+int QMITK_EXPORT StartQmitkFunctionalityTesting(QmitkFctMediator* qfm, int testType);
+

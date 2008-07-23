@@ -32,11 +32,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTestingConfig.h>
 
+const int QmitkFunctionalityTesting::GUITest = 1;
+const int QmitkFunctionalityTesting::OptionsTest = 1 << 1;
+const int QmitkFunctionalityTesting::AllTests = QmitkFunctionalityTesting::GUITest |
+                                                                          QmitkFunctionalityTesting::OptionsTest;
+                                                                        
 QmitkFunctionalityTesting::QmitkFunctionalityTesting( QmitkFctMediator* qfm, QObject * parent, const char * name ) 
   : QObject(parent, name), m_QmitkFctMediator(qfm)
 {
   QObject::connect( &m_ActivateTimer, SIGNAL(timeout()), this, SLOT(ActivateNextFunctionality()) );
   QObject::connect( &m_CloseMessagesTimer, SIGNAL(timeout()), this, SLOT(CloseFirstMessageBox()) );
+  
+  m_TestType = AllTests;
+  
+  
 }
 
 QmitkFunctionalityTesting::~QmitkFunctionalityTesting()
@@ -109,18 +118,35 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   QmitkFunctionality* activeFunctionality = m_QmitkFctMediator->GetActiveFunctionality();
   if (activeFunctionality)
   {
-    std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
-    if ( activeFunctionality->TestYourself() == EXIT_SUCCESS )
-    {
-      std::cout<<"[PASSED]"<<std::endl;
+        std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
+        if (m_TestType & GUITest)
+        {
+            if ( activeFunctionality->TestYourself() == EXIT_SUCCESS )
+            {
+            std::cout<<"[PASSED]"<<std::endl;
+            }
+            else
+            {
+            std::cout<<"[FAILED]"<<std::endl;
+            ++m_NumberOfFunctionalitiesGUITestFailed;
+            m_NamesOfGUITestFailedFunctionalities.push_back( activeFunctionality->className() );
+            }
+        }
+        if (m_TestType & OptionsTest)
+        {
+            std::cout << "Options test for \"" << activeFunctionality->className() <<"\": "<< std::flush;    
+            if (activeFunctionality -> TestOptions() == EXIT_SUCCESS)
+            {
+                std::cout<<"[PASSED]"<<std::endl;
+            }
+            else
+            {
+                std::cout<<"[FAILED]"<<std::endl;
+                ++m_NumberOfFunctionalitiesOptionsTestFailed;
+                m_NamesOfOptionsTestFailedFunctionalities.push_back( activeFunctionality->className() );
+            }
+        }
     }
-    else
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      ++m_NumberOfFunctionalitiesFailed;
-      m_NamesOfFailedFunctionalities.push_back( activeFunctionality->className() );
-    }
-  }
 #endif
 
   static time_t previousFunctionalitiesTime = time(NULL);
@@ -149,39 +175,99 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   }
 }
 
-int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm)
+void QmitkFunctionalityTesting::SetTestType(int testType)
 {
-  QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
-  testing->m_NumberOfFunctionalitiesFailed = 0;
-
-  QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
-  testing->m_CloseMessagesTimer.start(3000,false); // close message boxes if RaiseFunctionality doesn't return
-
-  std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
-  if (qfm->GetActiveFunctionality()) {
-    std::cout << "Activating \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
-  } 
-  else
-  { 
-    std::cout << "No active functionality yet ..." << std::endl << std::flush;
-  }
-  qApp->exec();
-
-  if (testing->m_NumberOfFunctionalitiesFailed > 0)
-  {
-    std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesFailed << " functionalities failed during testing themselves:" <<std::endl;
-    for ( std::list<std::string>::iterator iter = testing->m_NamesOfFailedFunctionalities.begin();
-          iter != testing->m_NamesOfFailedFunctionalities.end();
-          ++iter )
-    {
-      std::cout << *iter << std::endl;
-    }
-    std::cout<<"Functionality Test done [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else
-  {
-    std::cout<<"Functionality Test done [PASSED]"<<std::endl;
-    return EXIT_SUCCESS;
-  }
+    m_TestType = testType;
 }
+
+int StartQmitkFunctionalityTesting(QmitkFctMediator* qfm, int testType)
+{
+    QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
+    testing->SetTestType(testType);
+    testing->m_NumberOfFunctionalitiesGUITestFailed = 0;
+    testing->m_NumberOfFunctionalitiesOptionsTestFailed = 0;
+    
+    QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
+    testing->m_CloseMessagesTimer.start(3000,false); // close message boxes if RaiseFunctionality doesn't return
+    
+    std::cout << "Starting QmitkFunctionalityTesting ... " << std::endl;
+    if (qfm->GetActiveFunctionality()) {
+        std::cout << "Activating \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+    } 
+    else
+    { 
+        std::cout << "No active functionality yet ..." << std::endl << std::flush;
+    }
+    qApp->exec();
+    if((testing->m_NumberOfFunctionalitiesGUITestFailed > 0) || (testing->m_NumberOfFunctionalitiesOptionsTestFailed > 0))
+    {
+        if (testing->m_NumberOfFunctionalitiesGUITestFailed > 0)
+        {
+            std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesGUITestFailed << " functionalities failed during testing themselves:" <<std::endl;
+            for ( std::list<std::string>::iterator iter = testing->m_NamesOfGUITestFailedFunctionalities.begin();
+                iter != testing->m_NamesOfGUITestFailedFunctionalities.end();
+                ++iter )
+            {
+            std::cout << *iter << std::endl;
+            }
+            std::cout<<"Functionality Test done [FAILED]"<<std::endl;
+        }
+        
+        if (testing->m_NumberOfFunctionalitiesOptionsTestFailed > 0)
+        {
+            std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesOptionsTestFailed << " functionalities failed during testing own options field:" <<std::endl;
+            for ( std::list<std::string>::iterator iter = testing->m_NamesOfOptionsTestFailedFunctionalities.begin();
+                iter != testing->m_NamesOfOptionsTestFailedFunctionalities.end();
+                ++iter )
+            {
+            std::cout << *iter << std::endl;
+            }
+            std::cout<<"Options Test done [FAILED]"<<std::endl;
+        }
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        std::cout<<"Functionality Test done [PASSED]"<<std::endl;
+        return EXIT_SUCCESS;
+    }
+}
+
+
+int StartQmitkOptionsTesting(QmitkFctMediator* qfm)
+{
+    QmitkFunctionalityTesting *testing = new QmitkFunctionalityTesting(qfm);
+    testing->m_NumberOfFunctionalitiesOptionsTestFailed = 0;
+    
+    QTimer::singleShot(2000,testing,SLOT(ActivateNextFunctionality())); // 2 seconds single-shot timer
+    testing->m_CloseMessagesTimer.start(3000,false); // close message boxes if RaiseFunctionality doesn't return
+    
+    std::cout << "Starting QmitkOptionsTesting ... " << std::endl;
+    if (qfm->GetActiveFunctionality()) {
+        std::cout << "Activating \"" << qfm->GetActiveFunctionality()->className() <<"\": "<< std::flush;
+    } 
+    else
+    { 
+        std::cout << "No active functionality yet ..." << std::endl << std::flush;
+    }
+    qApp->exec();
+
+    if (testing->m_NumberOfFunctionalitiesOptionsTestFailed > 0)
+    {
+        std::cout<<"No crashes, but " << testing->m_NumberOfFunctionalitiesOptionsTestFailed << " functionalities failed during testing own options field:" <<std::endl;
+        for ( std::list<std::string>::iterator iter = testing->m_NamesOfOptionsTestFailedFunctionalities.begin();
+            iter != testing->m_NamesOfOptionsTestFailedFunctionalities.end();
+            ++iter )
+        {
+        std::cout << *iter << std::endl;
+        }
+        std::cout<<"Options Test done [FAILED]"<<std::endl;
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        std::cout<<"Functionality Options Test done [PASSED]"<<std::endl;
+        return EXIT_SUCCESS;
+    }
+}
+

@@ -1,3 +1,8 @@
+SET(H_FILES  
+  mitkGenericProperty.h
+  mitkTransferFunctionProperty.h
+)
+
 SET(CPP_FILES  
   mitkAbstractTransformGeometry.cpp
   mitkAffineTransformationOperation.cpp

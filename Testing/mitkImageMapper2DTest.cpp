@@ -23,8 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkVtkPropRenderer.h>
+#include <mitkVolumeDataVtkMapper3D.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkTransferFunction.h>
 
 #include <mitkNativeRenderWindowInteractor.h>
+
+#include "mitkReferenceCountWatcher.h"
 
 #include <fstream>
 int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
@@ -50,8 +55,26 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating tree: ";
-  mitk::DataTree* tree;
-  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree h�lt, wird tree sonst gel�scht.
+  mitk::DataTree::Pointer tree;
+  tree=mitk::DataTree::New();
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of tree: ";
+  mitk::ReferenceCountWatcher::Pointer treeWatcher = new mitk::ReferenceCountWatcher(tree, "tree");
+  if(treeWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<treeWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of node: ";
+  mitk::ReferenceCountWatcher::Pointer nodeWatcher = new mitk::ReferenceCountWatcher(node, "node");
+  if(nodeWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<nodeWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
@@ -72,23 +95,112 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Creating VtkPropRenderer: ";
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
-  mitk::VtkPropRenderer *propRenderer = new mitk::VtkPropRenderer( "the renderer", renderWindow );
+  mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New( "the renderer", renderWindow );
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "BaseRenderer::SetData(iterator): ";
   propRenderer->SetData(&it);
   std::cout<<"[PASSED]"<<std::endl;
 
+  std::cout << "Testing reference count of node: ";
+  if(nodeWatcher->GetReferenceCount()!=2)
+  {
+    std::cout<<nodeWatcher->GetReferenceCount()<<"!=2 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
   std::cout << "Testing if an mitk::ImageMapper2D was created: ";
-  if(dynamic_cast<mitk::ImageMapper2D*>(node->GetMapper(1))==NULL)
+  if(dynamic_cast<mitk::ImageMapper2D*>(node->GetMapper(mitk::BaseRenderer::Standard2D))==NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  std::cout << "Testing if an mitk::VolumeDataVtkMapper3D was created: ";
+  if(dynamic_cast<mitk::VolumeDataVtkMapper3D*>(node->GetMapper(mitk::BaseRenderer::Standard3D))==NULL)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing if an mitk::TransferFunctionProperty was created: ";
+  mitk::TransferFunctionProperty::Pointer transferFctProperty;
+  if(node->GetProperty<mitk::TransferFunctionProperty>(transferFctProperty, "TransferFunction") == false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing if an mitk::TransferFunctionProperty contains an mitk::TransferFunction: ";
+  mitk::TransferFunction::Pointer transferFct = transferFctProperty->GetValue();
+  if(transferFct.IsNull())
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of mitk::TransferFunctionProperty: ";
+  mitk::ReferenceCountWatcher::Pointer transferFctPropertyWatcher = new mitk::ReferenceCountWatcher(transferFctProperty, "transferFctProperty");
+  transferFctProperty = NULL;
+  if(transferFctPropertyWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<transferFctPropertyWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of mitk::TransferFunctionProperty: ";
+  mitk::ReferenceCountWatcher::Pointer transferFctWatcher = new mitk::ReferenceCountWatcher(transferFct, "transferFct");
+  transferFct = NULL;
+  if(transferFctWatcher->GetReferenceCount()!=1)
+  {
+    std::cout<<transferFctWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Deleting renderwindow, node and tree: ";
   renderWindow->Delete();
-  tree = NULL; // As the tree has been registered explicitely, destroy it again.
+  node = NULL;
+  tree = NULL;
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of tree: ";
+  if(treeWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<treeWatcher->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of node: ";
+  if(nodeWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<nodeWatcher->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of mitk::TransferFunctionProperty: ";
+  if(transferFctPropertyWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<transferFctPropertyWatcher->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing reference count of mitk::TransferFunctionProperty: ";
+  if(transferFctWatcher->GetReferenceCount()!=0)
+  {
+    std::cout<<transferFctWatcher->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

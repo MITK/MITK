@@ -23,11 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkEventTest(int /*argc*/, char* /*argv*/[])
 {
   vtkRenderWindow* renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer * renderer = new mitk::VtkPropRenderer("ContourRenderer",renWin);
-  
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
+
   //Create Event
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);
-  
+
   //check Get...
   std::cout << "check the get methods of the Event";
   if (event->GetSender() != renderer ||
@@ -44,7 +44,6 @@ int mitkEventTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   renWin->Delete();
-  renderer->Delete();
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

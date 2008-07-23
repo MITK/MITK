@@ -75,8 +75,8 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating tree: ";
-  mitk::DataTree* tree;
-  (tree=mitk::DataTree::New())->Register(); //@FIXME: da DataTreeIteratorClone keinen Smartpointer auf DataTree h�lt, wird tree sonst gel�scht.
+  mitk::DataTree::Pointer tree;
+  tree=mitk::DataTree::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
@@ -103,21 +103,24 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   vtkPolyDataMapper *map = vtkPolyDataMapper::New();
   map->SetInput(sphere->GetOutput());
+  sphere->Delete();
 
   vtkActor *aSphere = vtkActor::New();
   aSphere->SetMapper(map);
+  map->Delete();
   aSphere->GetProperty()->SetColor(0,0,1); // sphere color blue
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating a renderer for the sphere: ";
   vtkRenderer *sphereRenderer = vtkRenderer::New();
   sphereRenderer->AddActor(aSphere);
+  aSphere->Delete();
   //sphereRenderer->SetBackground(1,1,1); // Background color white
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating vtkRenderWindow and VtkPropRenderer: ";
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
-  mitk::VtkPropRenderer *propRenderer = new mitk::VtkPropRenderer( "the renderer", renderWindow );
+  mitk::VtkPropRenderer::Pointer propRenderer = mitk::VtkPropRenderer::New( "the renderer", renderWindow );
   //propRenderer->SetMapperID(2);
   std::cout<<"[PASSED]"<<std::endl;
 
@@ -198,7 +201,15 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   //  std::cout<<"Unknown image, comparison test skipped"<<std::endl;
   //}
 
+
+  propRenderer->GetVtkRenderer()->RemoveViewProp(renderProp);
+  renderProp->Delete();
+  propRenderer = NULL;
+  sphereRenderer->Delete();
+
   renderWindow->Delete();
+
+  vtkImage->Delete();
   tree = NULL; // As the tree has been registered explicitely, destroy it again.
 
   std::cout<<"[TEST DONE]"<<std::endl;

@@ -116,7 +116,7 @@ namespace mitk {
     * \brief Release vtk-based graphics resources. Must be overwritten in
     * subclasses if vtkProps are used.
     */
-    virtual void ReleaseGraphicsResources(vtkWindow *renWin) { };
+    virtual void ReleaseGraphicsResources(vtkWindow*) { };
 
     //##Documentation
     virtual const std::string& GetXMLNodeName() const;

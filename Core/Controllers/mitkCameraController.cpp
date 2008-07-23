@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
+#include <vtkRenderWindowInteractor.h>
+#include "vtkCommand.h"
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -115,7 +117,29 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
       break;
     }
     vtkRenderer->ResetCamera();
-    //vtkRenderer->GetActiveCamera()->Zoom(2.0);
+    
+    double *cameraPosition = vtkRenderer->GetActiveCamera()->GetPosition();
+    double zoomFactor = 1.0;
+    
+    switch(view)
+    {
+    case ANTERIOR:
+    case POSTERIOR:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1] / zoomFactor,cameraPosition[2]);
+      break;
+
+    case SINISTER:
+    case DEXTER:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0] / zoomFactor,cameraPosition[1],cameraPosition[2]);
+      break;
+
+    case CRANIAL:
+    case CAUDAL:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2] / zoomFactor);
+      break;
+    }
+
+    vtkRenderer->ResetCameraClippingRange();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

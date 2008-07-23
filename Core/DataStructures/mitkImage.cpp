@@ -52,7 +52,6 @@ mitk::Image::Image() :
   this->UnRegister();
 }
 
-//##ModelId=3E15F6CA014F
 mitk::Image::~Image()
 {
   Clear();
@@ -67,19 +66,16 @@ mitk::Image::~Image()
   delete [] m_OffsetTable;
 }
 
-//##ModelId=3DCBC2B50345
 const mitk::PixelType& mitk::Image::GetPixelType(int /*n*/) const
 {
   return m_PixelType;
 }
 
-//##ModelId=3DCBC5AA0112
 unsigned int mitk::Image::GetDimension() const
 {
   return m_Dimension;
 }
 
-//##ModelId=3DCBC6040068
 unsigned int mitk::Image::GetDimension(int i) const
 {
   if((i>=0) && (i<(int)m_Dimension))
@@ -87,7 +83,6 @@ unsigned int mitk::Image::GetDimension(int i) const
   return 1;
 }
 
-//##ModelId=3E0B494802D6
 void* mitk::Image::GetData()
 {
   if(m_Initialized==false)
@@ -101,7 +96,6 @@ void* mitk::Image::GetData()
   return m_CompleteData->GetData();
 }
 
-//##ModelId=3DCBEF2902C6
 vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
 {
   if(m_Initialized==false)
@@ -125,7 +119,6 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   return volume->GetVtkImageData();
 }
 
-//##ModelId=3DCBE2B802E4
 ipPicDescriptor* mitk::Image::GetPic()
 {
   if(m_Initialized==false)
@@ -141,7 +134,6 @@ ipPicDescriptor* mitk::Image::GetPic()
   return m_CompleteData->GetPicDescriptor();
 }
 
-//##ModelId=3E0B4A6A01EC
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidSlice(s,t,n)==false) return NULL;
@@ -200,7 +192,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n,
   }
 }
 
-//##ModelId=3E0B4A82001A
 mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidVolume(t,n)==false) return NULL;
@@ -309,7 +300,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
   }
 }
 
-//##ModelId=3E0B4A9100BC
 mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   if(IsValidChannel(n)==false) return NULL;
@@ -401,7 +391,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
   }
 }
 
-//##ModelId=3E1012990305
 bool mitk::Image::IsSliceSet(int s, int t, int n) const
 {
   if(IsValidSlice(s,t,n)==false) return false;
@@ -419,7 +408,6 @@ bool mitk::Image::IsSliceSet(int s, int t, int n) const
   return false;
 }
 
-//##ModelId=3E10139001BF
 bool mitk::Image::IsVolumeSet(int t, int n) const
 {
   if(IsValidVolume(t,n)==false) return false;
@@ -443,7 +431,6 @@ bool mitk::Image::IsVolumeSet(int t, int n) const
   return true;
 }
 
-//##ModelId=3E1550E700E2
 bool mitk::Image::IsChannelSet(int n) const
 {
   if(IsValidChannel(n)==false) return false;
@@ -659,7 +646,6 @@ void mitk::Image::Initialize()
   SetRequestedRegionToLargestPossibleRegion();
 }
 
-//##ModelId=3E102AE9004B
 void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
 {
   Clear();
@@ -825,7 +811,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
 
   mitk::PixelType pixelType;
 
-  switch ( vtkimagedata->GetScalarType () ) 
+  switch ( vtkimagedata->GetScalarType() ) 
   {
   case VTK_BIT: 
   case VTK_CHAR: 
@@ -901,7 +887,6 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   delete [] tmpDimensions;
 }
 
-//##ModelId=3E102D2601DF
 void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim, int sDim)
 {
   if(pic==NULL) return;
@@ -965,7 +950,6 @@ void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim,
   m_Initialized = true;
 }
 
-//##ModelId=3E155CF000F6
 bool mitk::Image::IsValidSlice(int s, int t, int n) const
 {
   if(m_Initialized)
@@ -974,7 +958,6 @@ bool mitk::Image::IsValidSlice(int s, int t, int n) const
     return false;
 }
 
-//##ModelId=3E155D2501A7
 bool mitk::Image::IsValidVolume(int t, int n) const
 {
   if(m_Initialized)
@@ -983,7 +966,6 @@ bool mitk::Image::IsValidVolume(int t, int n) const
     return false;
 }
 
-//##ModelId=3E157C53030B
 bool mitk::Image::IsValidChannel(int n) const
 {
   if(m_Initialized)
@@ -992,7 +974,6 @@ bool mitk::Image::IsValidChannel(int n) const
     return false;
 }
 
-//##ModelId=3E155E7A0374
 void mitk::Image::ComputeOffsetTable()
 {
   if(m_OffsetTable!=NULL)
@@ -1012,21 +993,18 @@ void mitk::Image::ComputeOffsetTable()
     m_OffsetTable[i+1] = num;
 }
 
-//##ModelId=3E155C940248
 int mitk::Image::GetSliceIndex(int s, int t, int n) const
 {
   if(IsValidSlice(s,t,n)==false) return false;
   return ((size_t)s)+((size_t) t)*m_Dimensions[2]+((size_t) n)*m_Dimensions[3]*m_Dimensions[2]; //??
 }
 
-//##ModelId=3E155C76012D
 int mitk::Image::GetVolumeIndex(int t, int n) const
 {
   if(IsValidVolume(t,n)==false) return false;
   return ((size_t)t)+((size_t) n)*m_Dimensions[3]; //??
 }
 
-//##ModelId=3E1569310328
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   int pos;
@@ -1064,7 +1042,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, i
   //return vol;
 }
 
-//##ModelId=3E15694500EC
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   int pos;
@@ -1094,7 +1071,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, 
   return vol;
 }
 
-//##ModelId=3E1569500322
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
 {
   ImageDataItemPointer ch;
@@ -1113,7 +1089,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData(int n, void *
   return ch;
 }
 
-//##ModelId=3E1A11530384
 unsigned int* mitk::Image::GetDimensions() const
 {
   return m_Dimensions;
@@ -1183,7 +1158,6 @@ bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
     return false;
   }
 
-  
   return true;
 }
 
@@ -1223,7 +1197,7 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
   typedef typename ItkImageType::PixelType TPixel;
-  TPixel value;
+  TPixel value = 0;
 
   mitkImage->m_CountOfMinValuedVoxels = 0;
   mitkImage->m_CountOfMaxValuedVoxels = 0;

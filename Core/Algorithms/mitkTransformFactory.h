@@ -21,19 +21,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkTransform.h"
 #include "itkImage.h"
+#include "mitkTransformParameters.h"
 
 namespace mitk {
 
   template < class TPixelType, unsigned int VImageDimension >
-  class TransformFactory //: public itk::Object
+  class TransformFactory : public itk::Object
   {
   public:
-    TransformFactory();
-    ~TransformFactory();
-    //mitkClassMacro(MetricFactory<class TFixedImage, class TMovingImage>, RegistrationBase);
+    mitkClassMacro(TransformFactory, itk::Object);
   
 	  /** Method for creation through the object factory. */
-	  //itkNewMacro(Self);
+	  itkNewMacro(Self);
 
     typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
     typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
@@ -50,10 +49,21 @@ namespace mitk {
     void SetFixedImage(FixedImageType* fixed);
     void SetMovingImage(MovingImageType* moving);
 
+    void SetTransformParameters(TransformParameters::Pointer transformParameters)
+    {
+      m_TransformParameters = transformParameters;
+    }
+
+    TransformParameters::Pointer GetTransformParameters()
+    {
+      return m_TransformParameters;
+    }
+
   protected:
-    //TransformFactory();
-    //virtual ~TransformFactory();
-      //template < unsigned int VImageDimension >
+    TransformFactory();
+    ~TransformFactory() {};
+
+    TransformParameters::Pointer m_TransformParameters;
     typename FixedImageType::Pointer m_FixedImage;
     typename MovingImageType::Pointer m_MovingImage;
     typename FixedImage2DType::Pointer m_FixedImage2D;

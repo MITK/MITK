@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKMETRICPARAMETERS_H
 #define MITKMETRICPARAMETERS_H
 
-#include <itkObject.h>
+#include <itkObjectFactory.h>
 #include "mitkCommon.h"
 
 namespace mitk {
@@ -27,73 +27,74 @@ namespace mitk {
   class MITK_CORE_EXPORT MetricParameters : public itk::Object
   {
   public:
-    itkTypeMacro(MetricParameters, itk::Object);
+    mitkClassMacro(MetricParameters,::itk::Object);
+    itkNewMacro(Self);
 
-    static MetricParameters* GetInstance(); //singleton
+    enum MetricType {
+      MEANSQUARESIMAGETOIMAGEMETRIC = 0,
+      NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC = 1,
+      GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC = 2,
+      KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC = 3,
+      CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC = 4,
+      MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC = 5,
+      MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC = 6,
+      NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC = 7,
+      MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC = 8,
+      MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC = 9,
+      MUTUALINFORMATIONIMAGETOIMAGEMETRIC = 10,
+      MATCHCARDINALITYIMAGETOIMAGEMETRIC = 11,
+      KAPPASTATISTICIMAGETOIMAGEMETRIC = 12
+    };
 
-    static const int MEANSQUARESIMAGETOIMAGEMETRIC = 0;
-    static const int NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC = 1;
-    static const int GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC = 2;
-    static const int KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC = 3;
-    static const int CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC = 4;
-    static const int MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC = 5;
-    static const int MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC = 6;
-    static const int NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC = 7;
-    static const int MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC = 8;
-    static const int MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC = 9;
-    static const int MUTUALINFORMATIONIMAGETOIMAGEMETRIC = 10;
-    static const int MATCHCARDINALITYIMAGETOIMAGEMETRIC = 11;
-    static const int KAPPASTATISTICIMAGETOIMAGEMETRIC = 12;
+    itkSetMacro( Metric, int );
+    itkGetMacro( Metric, int );
 
-    void SetMetric(int metric);
-    int GetMetric();
-
-    void SetComputeGradient(bool gradient);
-    bool GetComputeGradient();
+    itkSetMacro( ComputeGradient, bool );
+    itkGetMacro( ComputeGradient, bool );
 
     // for itk::KullbackLeiblerCompareHistogramImageToImageMetric
-    void SetNumberOfHistogramBinsKullbackLeiblerCompareHistogram(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsKullbackLeiblerCompareHistogram();
+    itkSetMacro( NumberOfHistogramBinsKullbackLeiblerCompareHistogram, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsKullbackLeiblerCompareHistogram, unsigned int );
     // for itk::CorrelationCoefficientHistogramImageToImageMetric
-    void SetNumberOfHistogramBinsCorrelationCoefficientHistogram(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsCorrelationCoefficientHistogram();
+    itkSetMacro( NumberOfHistogramBinsCorrelationCoefficientHistogram, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsCorrelationCoefficientHistogram, unsigned int );
     // for itk::MeanSquaresHistogramImageToImageMetric
-    void SetNumberOfHistogramBinsMeanSquaresHistogram(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsMeanSquaresHistogram();
+    itkSetMacro( NumberOfHistogramBinsMeanSquaresHistogram, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsMeanSquaresHistogram, unsigned int );
     // for itk::MutualInformationHistogramImageToImageMetric
-    void SetNumberOfHistogramBinsMutualInformationHistogram(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsMutualInformationHistogram();
+    itkSetMacro( NumberOfHistogramBinsMutualInformationHistogram, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsMutualInformationHistogram, unsigned int );
     // for itk::NormalizedMutualInformationHistogramImageToImageMetric
-    void SetNumberOfHistogramBinsNormalizedMutualInformationHistogram(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsNormalizedMutualInformationHistogram();
+    itkSetMacro( NumberOfHistogramBinsNormalizedMutualInformationHistogram, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsNormalizedMutualInformationHistogram, unsigned int );
     // for itk::MattesMutualInformationImageToImageMetric
-    void SetSpatialSamplesMattesMutualInformation(unsigned int spatialSamples);
-    unsigned int GetSpatialSamplesMattesMutualInformation();
-    void SetUseSamplesMattesMutualInformation(bool samples);
-    bool GetUseSamplesMattesMutualInformation();
-    void SetNumberOfHistogramBinsMattesMutualInformation(unsigned int bins);
-    unsigned int GetNumberOfHistogramBinsMattesMutualInformation();
+    itkSetMacro( SpatialSamplesMattesMutualInformation, unsigned int );
+    itkGetMacro( SpatialSamplesMattesMutualInformation, unsigned int );
+    itkSetMacro( UseSamplesMattesMutualInformation, bool );
+    itkGetMacro( UseSamplesMattesMutualInformation, bool );
+    itkSetMacro( NumberOfHistogramBinsMattesMutualInformation, unsigned int );
+    itkGetMacro( NumberOfHistogramBinsMattesMutualInformation, unsigned int );
     // for itk::MeanReciprocalSquareDifferenceImageToImageMetric
-    void SetLambdaMeanReciprocalSquareDifference(unsigned int lambda);
-    unsigned int GetLambdaMeanReciprocalSquareDifference();
+    itkSetMacro( LambdaMeanReciprocalSquareDifference, unsigned int );
+    itkGetMacro( LambdaMeanReciprocalSquareDifference, unsigned int );
     // for itk::MutualInformationImageToImageMetric
-    void SetSpatialSamplesMutualInformation(unsigned int spatialSamples);
-    unsigned int GetSpatialSamplesMutualInformation();
-    void SetFixedImageStandardDeviationMutualInformation(float fixedStandardDev);
-    float GetFixedImageStandardDeviationMutualInformation();
-    void SetMovingImageStandardDeviationMutualInformation(float movingStandardDev);
-    float GetMovingImageStandardDeviationMutualInformation();
-    void SetUseNormalizerAndSmootherMutualInformation(bool useNormalizer);
-    bool GetUseNormalizerAndSmootherMutualInformation();
-    void SetFixedSmootherVarianceMutualInformation(float fixedSmootherVariance);
-    float GetFixedSmootherVarianceMutualInformation();
-    void SetMovingSmootherVarianceMutualInformation(float movingSmootherVariance);
-    float GetMovingSmootherVarianceMutualInformation();
+    itkSetMacro( SpatialSamplesMutualInformation, unsigned int );
+    itkGetMacro( SpatialSamplesMutualInformation, unsigned int );
+    itkSetMacro( FixedImageStandardDeviationMutualInformation, float );
+    itkGetMacro( FixedImageStandardDeviationMutualInformation, float );
+    itkSetMacro( MovingImageStandardDeviationMutualInformation, float );
+    itkGetMacro( MovingImageStandardDeviationMutualInformation, float );
+    itkSetMacro( UseNormalizerAndSmootherMutualInformation, bool );
+    itkGetMacro( UseNormalizerAndSmootherMutualInformation, bool );
+    itkSetMacro( FixedSmootherVarianceMutualInformation, float );
+    itkGetMacro( FixedSmootherVarianceMutualInformation, float );
+    itkSetMacro( MovingSmootherVarianceMutualInformation, float );
+    itkGetMacro( MovingSmootherVarianceMutualInformation, float );
 
   protected:
-    MetricParameters(); // hidden, access through GetInstance()
-    ~MetricParameters();
-    static MetricParameters* m_Instance;
+    MetricParameters();
+    ~MetricParameters() {};
+
     int m_Metric;
     bool m_ComputeGradient;
     // for itk::KullbackLeiblerCompareHistogramImageToImageMetric
@@ -108,17 +109,17 @@ namespace mitk {
     unsigned int m_NumberOfHistogramBinsNormalizedMutualInformationHistogram;
     // for itk::MattesMutualInformationImageToImageMetric
     unsigned int m_NumberOfHistogramBinsMattesMutualInformation;
-    bool m_UseSamplingMattesMutualInformation;
-    unsigned int m_NumberOfSpatialSamplesMattesMutualInformation;
+    bool m_UseSamplesMattesMutualInformation;
+    unsigned int m_SpatialSamplesMattesMutualInformation;
     // for itk::MeanReciprocalSquareDifferenceImageToImageMetric
     unsigned int m_LambdaMeanReciprocalSquareDifference;
     // for itk::MutualInformationImageToImageMetric
-    unsigned int m_NumberOfSpatialSamplesMutualInformation;
+    unsigned int m_SpatialSamplesMutualInformation;
     float m_FixedImageStandardDeviationMutualInformation;
     float m_MovingImageStandardDeviationMutualInformation;
-    bool m_UseNormalizer;
-    float m_FixedSmootherVariance;
-    float m_MovingSmootherVariance;
+    bool m_UseNormalizerAndSmootherMutualInformation;
+    float m_FixedSmootherVarianceMutualInformation;
+    float m_MovingSmootherVarianceMutualInformation;
   };
 
 } // namespace mitk

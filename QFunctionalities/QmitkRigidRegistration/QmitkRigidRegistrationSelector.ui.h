@@ -49,8 +49,11 @@ void QmitkRigidRegistrationSelector::CalculateTransformation()
     registration->SetReferenceImage(fimage);
     registration->SetInput(mimage);
     this->setTransformParameters();
+    registration->SetTransformParameters(m_TransformParameters);
     this->setMetricParameters();
+    registration->SetMetricParameters(m_MetricParameters);
     this->setOptimizerParameters();
+    registration->SetOptimizerParameters(m_OptimizerParameters);
     registration->Update();
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -83,6 +86,9 @@ void QmitkRigidRegistrationSelector::SetMovingDimension(int dimension )
 /// this method initializes all variables and all line edits get their appropriate validator for int or float
 void QmitkRigidRegistrationSelector::init()
 {
+  m_OptimizerParameters = NULL;
+  m_TransformParameters = NULL;
+  m_MetricParameters = NULL;
   m_FixedNode = NULL;
   m_FixedDimension = 0;
   m_MovingNode = NULL;
@@ -387,7 +393,7 @@ void QmitkRigidRegistrationSelector::hideAllMetricFrames()
 //// to the transform parameters, which will be delivered by mitkRigidRgistrationObserver.cpp
 void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject & )
 {
-  mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
+  //mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
   double value = m_Observer->GetCurrentOptimizerValue();
   itk::Array<double> translateVector = m_Observer->GetCurrentTranslation();
   vtkMatrix4x4* vtkmatrix = vtkMatrix4x4::New();
@@ -435,21 +441,21 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
       if (m_FixedDimension == 2)
       {
-        vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[4]);
-        vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[5]);
+        vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[4]);
+        vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[5]);
       }
       else if (m_FixedDimension == 3)
       {
-        vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[9]);
-        vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[10]);
-        vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterY() + translateVector[11]);
+        vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[9]);
+        vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[10]);
+        vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterY() + translateVector[11]);
       }
       vtktransform->SetMatrix(vtkmatrix);
     }
@@ -466,21 +472,21 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
       if (m_FixedDimension == 2)
       {
-        vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[4]);
-        vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[5]);
+        vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[4]);
+        vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[5]);
       }
       else if (m_FixedDimension == 3)
       {
-        vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[9]);
-        vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[10]);
-        vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterY() + translateVector[11]);
+        vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[9]);
+        vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[10]);
+        vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterY() + translateVector[11]);
       }
       vtktransform->SetMatrix(vtkmatrix);
     }
@@ -497,14 +503,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[9]);
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[10]);
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterY() + translateVector[11]);
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[9]);
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[10]);
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterY() + translateVector[11]);
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::EULER3DTRANSFORM)
@@ -513,11 +519,11 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       mitk::ScalarType angleY = translateVector[1] * 45.0 / atan(1.0);
       mitk::ScalarType angleZ = translateVector[2] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
-      vtktransform->Translate(-transformParameters->GetTransformCenterX(), -transformParameters->GetTransformCenterY(), -transformParameters->GetTransformCenterZ());
+      vtktransform->Translate(-m_TransformParameters->GetTransformCenterX(), -m_TransformParameters->GetTransformCenterY(), -m_TransformParameters->GetTransformCenterZ());
       vtktransform->RotateX(angleX);
       vtktransform->RotateY(angleY);
       vtktransform->RotateZ(angleZ);
-      vtktransform->Translate(transformParameters->GetTransformCenterX(), transformParameters->GetTransformCenterY(), transformParameters->GetTransformCenterZ());
+      vtktransform->Translate(m_TransformParameters->GetTransformCenterX(), m_TransformParameters->GetTransformCenterY(), m_TransformParameters->GetTransformCenterZ());
       vtktransform->Translate(translateVector[3], translateVector[4], translateVector[5]);
       vtktransform->PreMultiply();
     }
@@ -527,11 +533,11 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       mitk::ScalarType angleY = translateVector[1] * 45.0 / atan(1.0);
       mitk::ScalarType angleZ = translateVector[2] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
-      vtktransform->Translate(-transformParameters->GetTransformCenterX(), -transformParameters->GetTransformCenterY(), -transformParameters->GetTransformCenterZ());
+      vtktransform->Translate(-m_TransformParameters->GetTransformCenterX(), -m_TransformParameters->GetTransformCenterY(), -m_TransformParameters->GetTransformCenterZ());
       vtktransform->RotateX(angleX);
       vtktransform->RotateY(angleY);
       vtktransform->RotateZ(angleZ);
-      vtktransform->Translate(transformParameters->GetTransformCenterX(), transformParameters->GetTransformCenterY(), transformParameters->GetTransformCenterZ());
+      vtktransform->Translate(m_TransformParameters->GetTransformCenterX(), m_TransformParameters->GetTransformCenterY(), m_TransformParameters->GetTransformCenterZ());
       vtktransform->Translate(translateVector[3], translateVector[4], translateVector[5]);
       vtktransform->PreMultiply();
     }
@@ -549,14 +555,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[4]);
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[5]);
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterZ() + translateVector[6]);
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[4]);
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[5]);
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterZ() + translateVector[6]);
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::VERSORTRANSFORM)
@@ -573,14 +579,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX());
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY());
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterZ());
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX());
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY());
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterZ());
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
@@ -597,14 +603,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[3]);
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[4]);
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterZ() + translateVector[5]);
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[3]);
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[4]);
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterZ() + translateVector[5]);
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
@@ -621,14 +627,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[3]);
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[4]);
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterZ() + translateVector[5]);
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[3]);
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[4]);
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterZ() + translateVector[5]);
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
@@ -645,14 +651,14 @@ void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject &
       }
       float center[4];
       float translation[4];
-      center[0] = transformParameters->GetTransformCenterX();
-      center[1] = transformParameters->GetTransformCenterY();
-      center[2] = transformParameters->GetTransformCenterZ();
+      center[0] = m_TransformParameters->GetTransformCenterX();
+      center[1] = m_TransformParameters->GetTransformCenterY();
+      center[2] = m_TransformParameters->GetTransformCenterZ();
       center[3] = 1;
       vtkmatrix->MultiplyPoint(center, translation);
-      vtkmatrix->SetElement(0, 3, -translation[0] + transformParameters->GetTransformCenterX() + translateVector[4]);
-      vtkmatrix->SetElement(1, 3, -translation[1] + transformParameters->GetTransformCenterY() + translateVector[5]);
-      vtkmatrix->SetElement(2, 3, -translation[2] + transformParameters->GetTransformCenterZ() + translateVector[6]);
+      vtkmatrix->SetElement(0, 3, -translation[0] + m_TransformParameters->GetTransformCenterX() + translateVector[4]);
+      vtkmatrix->SetElement(1, 3, -translation[1] + m_TransformParameters->GetTransformCenterY() + translateVector[5]);
+      vtkmatrix->SetElement(2, 3, -translation[2] + m_TransformParameters->GetTransformCenterZ() + translateVector[6]);
       vtktransform->SetMatrix(vtkmatrix);
     }
     else if (m_TransformBox->currentItem() == mitk::TransformParameters::RIGID2DTRANSFORM)
@@ -1085,13 +1091,13 @@ void QmitkRigidRegistrationSelector::MetricSelected( int metric )
   }
 }
 
-/// this method writes the transform parameters from the selected transform into the singleton mitkTransformParameters class
+/// this method writes the transform parameters from the selected transform into mitkTransformParameters class
 /// so that the desired transform can be build up with these parameters
 void QmitkRigidRegistrationSelector::setTransformParameters()
 {
   itk::Array<double> m_Scales;
-  mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
-  transformParameters->SetTransform(m_TransformBox->currentItem());
+  m_TransformParameters = mitk::TransformParameters::New();
+  m_TransformParameters->SetTransform(m_TransformBox->currentItem());
   if (m_TransformBox->currentItem() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
   {
     if (m_UseOptimizerScalesTranslation->isChecked())
@@ -1100,7 +1106,7 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_ScalesTranslationTransformTranslationX->text().toDouble();
       m_Scales[1] = m_ScalesTranslationTransformTranslationY->text().toDouble();
       m_Scales[2] = m_ScalesTranslationTransformTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::SCALETRANSFORM)
@@ -1111,7 +1117,7 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_ScalesScaleTransformScaleX->text().toDouble();
       m_Scales[1] = m_ScalesScaleTransformScaleY->text().toDouble();
       m_Scales[2] = m_ScalesScaleTransformScaleZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM)
@@ -1122,7 +1128,7 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_ScalesScaleLogarithmicTransformScaleX->text().toDouble();
       m_Scales[1] = m_ScalesScaleLogarithmicTransformScaleY->text().toDouble();
       m_Scales[2] = m_ScalesScaleLogarithmicTransformScaleZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::AFFINETRANSFORM)
@@ -1146,12 +1152,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[13] = m_ScalesAffineTransformScaleTranslationX->text().toDouble();
       m_Scales[14] = m_ScalesAffineTransformScaleTranslationY->text().toDouble();
       m_Scales[15] = m_ScalesAffineTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerAffine->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerAffine->isChecked());
-      transformParameters->MomentsOn(m_MomentsAffine->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerAffine->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsAffine->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
@@ -1175,12 +1181,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[13] = m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationX->text().toDouble();
       m_Scales[14] = m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationY->text().toDouble();
       m_Scales[15] = m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerFixedCenterOfRotationAffine->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerFixedCenterOfRotationAffine->isChecked());
-      transformParameters->MomentsOn(m_MomentsFixedCenterOfRotationAffine->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerFixedCenterOfRotationAffine->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsFixedCenterOfRotationAffine->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::RIGID3DTRANSFORM)
@@ -1200,12 +1206,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[9] = m_ScalesRigid3DTransformScaleTranslationX->text().toDouble();
       m_Scales[10] = m_ScalesRigid3DTransformScaleTranslationY->text().toDouble();
       m_Scales[11] = m_ScalesRigid3DTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerRigid3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerRigid3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsRigid3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerRigid3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsRigid3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::EULER3DTRANSFORM)
@@ -1219,12 +1225,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[3] = m_ScalesEuler3DTransformScaleTranslationX->text().toDouble();
       m_Scales[4] = m_ScalesEuler3DTransformScaleTranslationY->text().toDouble();
       m_Scales[5] = m_ScalesEuler3DTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerEuler3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerEuler3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsEuler3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerEuler3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsEuler3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM)
@@ -1238,12 +1244,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[3] = m_ScalesCenteredEuler3DTransformScaleTranslationX->text().toDouble();
       m_Scales[4] = m_ScalesCenteredEuler3DTransformScaleTranslationY->text().toDouble();
       m_Scales[5] = m_ScalesCenteredEuler3DTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerCenteredEuler3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerCenteredEuler3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsCenteredEuler3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerCenteredEuler3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsCenteredEuler3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM)
@@ -1258,12 +1264,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[4] = m_ScalesQuaternionRigidTransformScaleTranslationX->text().toDouble();
       m_Scales[5] = m_ScalesQuaternionRigidTransformScaleTranslationY->text().toDouble();
       m_Scales[6] = m_ScalesQuaternionRigidTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerQuaternionRigid->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerQuaternionRigid->isChecked());
-      transformParameters->MomentsOn(m_MomentsQuaternionRigid->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerQuaternionRigid->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsQuaternionRigid->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::VERSORTRANSFORM)
@@ -1274,12 +1280,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_ScalesVersorTransformScale1->text().toDouble();
       m_Scales[1] = m_ScalesVersorTransformScale2->text().toDouble();
       m_Scales[2] = m_ScalesVersorTransformScale3->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerVersor->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerVersor->isChecked());
-      transformParameters->MomentsOn(m_MomentsVersor->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerVersor->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsVersor->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
@@ -1293,12 +1299,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[3] = m_ScalesVersorRigid3DTransformScaleTranslationX->text().toDouble();
       m_Scales[4] = m_ScalesVersorRigid3DTransformScaleTranslationY->text().toDouble();
       m_Scales[5] = m_ScalesVersorRigid3DTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerVersorRigid3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerVersorRigid3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsVersorRigid3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerVersorRigid3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsVersorRigid3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
@@ -1321,12 +1327,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[12] = m_ScalesScaleSkewVersorRigid3DTransformScale13->text().toDouble();
       m_Scales[13] = m_ScalesScaleSkewVersorRigid3DTransformScale14->text().toDouble();
       m_Scales[14] = m_ScalesScaleSkewVersorRigid3DTransformScale15->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerScaleSkewVersorRigid3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerScaleSkewVersorRigid3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsScaleSkewVersorRigid3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerScaleSkewVersorRigid3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsScaleSkewVersorRigid3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
@@ -1341,12 +1347,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[4] = m_ScalesSimilarity3DTransformScaleTranslationX->text().toDouble();
       m_Scales[5] = m_ScalesSimilarity3DTransformScaleTranslationY->text().toDouble();
       m_Scales[6] = m_ScalesSimilarity3DTransformScaleTranslationZ->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerSimilarity3D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerSimilarity3D->isChecked());
-      transformParameters->MomentsOn(m_MomentsSimilarity3D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerSimilarity3D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsSimilarity3D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::RIGID2DTRANSFORM)
@@ -1357,12 +1363,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_ScalesRigid2DTransformScale1->text().toDouble();
       m_Scales[1] = m_ScalesRigid2DTransformScaleTranslationX->text().toDouble();
       m_Scales[2] = m_ScalesRigid2DTransformScaleTranslationY->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerRigid2D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerRigid2D->isChecked());
-      transformParameters->MomentsOn(m_MomentsRigid2D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerRigid2D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsRigid2D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
@@ -1375,13 +1381,13 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[2] = m_CenterYScaleCenteredRigid2D->text().toDouble();
       m_Scales[3] = m_TranslationXScaleCenteredRigid2D->text().toDouble();
       m_Scales[4] = m_TranslationYScaleCenteredRigid2D->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
-    transformParameters->SetAngle(m_AngleCenteredRigid2D->text().toFloat());
+    m_TransformParameters->SetAngle(m_AngleCenteredRigid2D->text().toFloat());
     if (m_CenterForInitializerCenteredRigid2D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerCenteredRigid2D->isChecked());
-      transformParameters->MomentsOn(m_MomentsCenteredRigid2D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerCenteredRigid2D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsCenteredRigid2D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::EULER2DTRANSFORM)
@@ -1392,12 +1398,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[0] = m_RotationScaleEuler2D->text().toDouble();
       m_Scales[1] = m_TranslationXScaleEuler2D->text().toDouble();
       m_Scales[2] = m_TranslationYScaleEuler2D->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
     if (m_CenterForInitializerEuler2D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerEuler2D->isChecked());
-      transformParameters->MomentsOn(m_MomentsEuler2D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerEuler2D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsEuler2D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
@@ -1409,14 +1415,14 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[1] = m_RotationScaleSimilarity2D->text().toDouble();
       m_Scales[2] = m_TranslationXScaleSimilarity2D->text().toDouble();
       m_Scales[3] = m_TranslationYScaleSimilarity2D->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
-    transformParameters->SetScale(m_InitialScaleSimilarity2D->text().toFloat());
-    transformParameters->SetAngle(m_AngleSimilarity2D->text().toFloat());
+    m_TransformParameters->SetScale(m_InitialScaleSimilarity2D->text().toFloat());
+    m_TransformParameters->SetAngle(m_AngleSimilarity2D->text().toFloat());
     if (m_CenterForInitializerSimilarity2D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerSimilarity2D->isChecked());
-      transformParameters->MomentsOn(m_MomentsSimilarity2D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerSimilarity2D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsSimilarity2D->isChecked());
     }
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
@@ -1430,80 +1436,80 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
       m_Scales[3] = m_ScalesCenteredSimilarity2DTransformScale4->text().toDouble();
       m_Scales[4] = m_ScalesCenteredSimilarity2DTransformScaleTranslationX->text().toDouble();
       m_Scales[5] = m_ScalesCenteredSimilarity2DTransformScaleTranslationY->text().toDouble();
-      transformParameters->SetScales(m_Scales);
+      m_TransformParameters->SetScales(m_Scales);
     }
-    transformParameters->SetScale(m_InitialScaleCenteredSimilarity2D->text().toFloat());
-    transformParameters->SetAngle(m_AngleCenteredSimilarity2D->text().toFloat());
+    m_TransformParameters->SetScale(m_InitialScaleCenteredSimilarity2D->text().toFloat());
+    m_TransformParameters->SetAngle(m_AngleCenteredSimilarity2D->text().toFloat());
     if (m_CenterForInitializerCenteredSimilarity2D->isChecked())
     {
-      transformParameters->TransformInitializerOn(m_CenterForInitializerCenteredSimilarity2D->isChecked());
-      transformParameters->MomentsOn(m_MomentsCenteredSimilarity2D->isChecked());
+      m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerCenteredSimilarity2D->isChecked());
+      m_TransformParameters->SetMomentsOn(m_MomentsCenteredSimilarity2D->isChecked());
     }
   }
 }
 
-/// this method writes the optimizer parameters from the selected optimizer into the singleton mitkOptimizerParameters class
+/// this method writes the optimizer parameters from the selected optimizer into mitkOptimizerParameters class
 /// so that the desired optimizer can be build up with these parameters
 void QmitkRigidRegistrationSelector::setOptimizerParameters()
 {
-  mitk::OptimizerParameters* optimizerParameters = mitk::OptimizerParameters::GetInstance();
-  optimizerParameters->SetOptimizer(m_OptimizerBox->currentItem());
-  optimizerParameters->SetDimension(m_FixedDimension);
-  optimizerParameters->SetMaximize(m_Maximize->isOn());
+  m_OptimizerParameters = mitk::OptimizerParameters::New();
+  m_OptimizerParameters->SetOptimizer(m_OptimizerBox->currentItem());
+  m_OptimizerParameters->SetDimension(m_FixedDimension);
+  m_OptimizerParameters->SetMaximize(m_Maximize->isOn());
   if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
   {
-    optimizerParameters->SetStepLengthExhaustive(m_StepLengthExhaustive->text().toFloat());
-    optimizerParameters->SetNumberOfStepsExhaustive(m_NumberOfStepsExhaustive->text().toInt());
+    m_OptimizerParameters->SetStepLengthExhaustive(m_StepLengthExhaustive->text().toFloat());
+    m_OptimizerParameters->SetNumberOfStepsExhaustive(m_NumberOfStepsExhaustive->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER)
   {
-    optimizerParameters->SetLearningRateGradientDescent(m_LearningRateGradientDescent->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsGradientDescent(m_IterationsGradientDescent->text().toInt());
+    m_OptimizerParameters->SetLearningRateGradientDescent(m_LearningRateGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsGradientDescent(m_IterationsGradientDescent->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER)
   {
-    optimizerParameters->SetLearningRateQuaternionRigidTransformGradientDescent(m_LearningRateQuaternionRigidTransformGradientDescent->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsQuaternionRigidTransformGradientDescent(m_IterationsQuaternionRigidTransformGradientDescent->text().toInt());
+    m_OptimizerParameters->SetLearningRateQuaternionRigidTransformGradientDescent(m_LearningRateQuaternionRigidTransformGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsQuaternionRigidTransformGradientDescent(m_IterationsQuaternionRigidTransformGradientDescent->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
   {
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
   {
-    optimizerParameters->SetShrinkFactorOnePlusOneEvolutionary(m_ShrinkFactorOnePlusOneEvolutionary->text().toFloat());
-    optimizerParameters->SetGrowthFactorOnePlusOneEvolutionary(m_GrowthFactorOnePlusOneEvolutionary->text().toFloat());
-    optimizerParameters->SetEpsilonOnePlusOneEvolutionary(m_EpsilonOnePlusOneEvolutionary->text().toFloat());
-    optimizerParameters->SetInitialRadiusOnePlusOneEvolutionary(m_InitialRadiusOnePlusOneEvolutionary->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsOnePlusOneEvolutionary(m_IterationsOnePlusOneEvolutionary->text().toInt());
+    m_OptimizerParameters->SetShrinkFactorOnePlusOneEvolutionary(m_ShrinkFactorOnePlusOneEvolutionary->text().toFloat());
+    m_OptimizerParameters->SetGrowthFactorOnePlusOneEvolutionary(m_GrowthFactorOnePlusOneEvolutionary->text().toFloat());
+    m_OptimizerParameters->SetEpsilonOnePlusOneEvolutionary(m_EpsilonOnePlusOneEvolutionary->text().toFloat());
+    m_OptimizerParameters->SetInitialRadiusOnePlusOneEvolutionary(m_InitialRadiusOnePlusOneEvolutionary->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsOnePlusOneEvolutionary(m_IterationsOnePlusOneEvolutionary->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::POWELLOPTIMIZER)
   {
-    optimizerParameters->SetStepLengthPowell(m_StepLengthPowell->text().toFloat());
-    optimizerParameters->SetStepTolerancePowell(m_StepTolerancePowell->text().toFloat());
-    optimizerParameters->SetValueTolerancePowell(m_ValueTolerancePowell->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsPowell(m_IterationsPowell->text().toInt());
+    m_OptimizerParameters->SetStepLengthPowell(m_StepLengthPowell->text().toFloat());
+    m_OptimizerParameters->SetStepTolerancePowell(m_StepTolerancePowell->text().toFloat());
+    m_OptimizerParameters->SetValueTolerancePowell(m_ValueTolerancePowell->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsPowell(m_IterationsPowell->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::FRPROPTIMIZER)
   {
-    optimizerParameters->SetToFletchReevesFRPR(m_FletchReevesFRPR->isOn());
-    optimizerParameters->SetToPolakRibiereFRPR(m_PolakRibiereFRPR->isOn());
-    optimizerParameters->SetStepLengthFRPR(m_StepLengthFRPR->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsFRPR(m_IterationsFRPR->text().toInt());
+    m_OptimizerParameters->SetFletchReevesFRPR(m_FletchReevesFRPR->isOn());
+    m_OptimizerParameters->SetPolakRibiereFRPR(m_PolakRibiereFRPR->isOn());
+    m_OptimizerParameters->SetStepLengthFRPR(m_StepLengthFRPR->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsFRPR(m_IterationsFRPR->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::REGULARSTEPGRADIENTDESCENTOPTIMIZER)
   {
-    optimizerParameters->SetGradientMagnitudeToleranceRegularStepGradientDescent(m_GradientMagnitudeToleranceRegularStepGradientDescent->text().toFloat());
-    optimizerParameters->SetMinimumStepLengthRegularStepGradientDescent(m_MinimumStepLengthRegularStepGradientDescent->text().toFloat());
-    optimizerParameters->SetMaximumStepLengthRegularStepGradientDescent(m_MaximumStepLengthRegularStepGradientDescent->text().toFloat());
-    optimizerParameters->SetRelaxationFactorRegularStepGradientDescent(m_RelaxationFactorRegularStepGradientDescent->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsRegularStepGradientDescent(m_IterationsRegularStepGradientDescent->text().toInt());
+    m_OptimizerParameters->SetGradientMagnitudeToleranceRegularStepGradientDescent(m_GradientMagnitudeToleranceRegularStepGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetMinimumStepLengthRegularStepGradientDescent(m_MinimumStepLengthRegularStepGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetMaximumStepLengthRegularStepGradientDescent(m_MaximumStepLengthRegularStepGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetRelaxationFactorRegularStepGradientDescent(m_RelaxationFactorRegularStepGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsRegularStepGradientDescent(m_IterationsRegularStepGradientDescent->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER)
   {
-    optimizerParameters->SetGradientMagnitudeToleranceVersorTransform(m_GradientMagnitudeToleranceVersorTransform->text().toFloat());
-    optimizerParameters->SetMinimumStepLengthVersorTransform(m_MinimumStepLengthVersorTransform->text().toFloat());
-    optimizerParameters->SetMaximumStepLengthVersorTransform(m_MaximumStepLengthVersorTransform->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsVersorTransform(m_IterationsVersorTransform->text().toInt());
+    m_OptimizerParameters->SetGradientMagnitudeToleranceVersorTransform(m_GradientMagnitudeToleranceVersorTransform->text().toFloat());
+    m_OptimizerParameters->SetMinimumStepLengthVersorTransform(m_MinimumStepLengthVersorTransform->text().toFloat());
+    m_OptimizerParameters->SetMaximumStepLengthVersorTransform(m_MaximumStepLengthVersorTransform->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsVersorTransform(m_IterationsVersorTransform->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::AMOEBAOPTIMIZER)
   {
@@ -1525,51 +1531,51 @@ void QmitkRigidRegistrationSelector::setOptimizerParameters()
     simplexDelta[13] = m_SimplexDeltaAmoeba14->text().toDouble();
     simplexDelta[14] = m_SimplexDeltaAmoeba15->text().toDouble();
     simplexDelta[15] = m_SimplexDeltaAmoeba16->text().toDouble();
-    optimizerParameters->SetSimplexDeltaAmoeba(simplexDelta);
-    optimizerParameters->SetParametersConvergenceToleranceAmoeba(m_ParametersConvergenceToleranceAmoeba->text().toFloat());
-    optimizerParameters->SetFunctionConvergenceToleranceAmoeba(m_FunctionConvergenceToleranceAmoeba->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsAmoeba(m_IterationsAmoeba->text().toInt());
+    m_OptimizerParameters->SetSimplexDeltaAmoeba(simplexDelta);
+    m_OptimizerParameters->SetParametersConvergenceToleranceAmoeba(m_ParametersConvergenceToleranceAmoeba->text().toFloat());
+    m_OptimizerParameters->SetFunctionConvergenceToleranceAmoeba(m_FunctionConvergenceToleranceAmoeba->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsAmoeba(m_IterationsAmoeba->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::CONJUGATEGRADIENTOPTIMIZER)
   {
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::LBFGSOPTIMIZER)
   {
-    optimizerParameters->SetGradientConvergenceToleranceLBFGS(m_GradientConvergenceToleranceLBFGS->text().toFloat());
-    optimizerParameters->SetLineSearchAccuracyLBFGS(m_LineSearchAccuracyLBFGS->text().toFloat());
-    optimizerParameters->SetDefaultStepLengthLBFGS(m_DefaultStepLengthLBFGS->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsLBFGS(m_IterationsLBFGS->text().toInt());
-    optimizerParameters->SetTraceOnLBFGS(m_TraceOnLBFGS->isOn());
+    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS(m_GradientConvergenceToleranceLBFGS->text().toFloat());
+    m_OptimizerParameters->SetLineSearchAccuracyLBFGS(m_LineSearchAccuracyLBFGS->text().toFloat());
+    m_OptimizerParameters->SetDefaultStepLengthLBFGS(m_DefaultStepLengthLBFGS->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsLBFGS(m_IterationsLBFGS->text().toInt());
+    m_OptimizerParameters->SetTraceOnLBFGS(m_TraceOnLBFGS->isOn());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::SPSAOPTIMIZER)
   {
-    optimizerParameters->SetaSPSA(m_aSPSA->text().toFloat());
-    optimizerParameters->SetASPSA(m_ASPSA->text().toFloat());
-    optimizerParameters->SetAlphaSPSA(m_AlphaSPSA->text().toFloat());
-    optimizerParameters->SetcSPSA(m_cSPSA->text().toFloat());
-    optimizerParameters->SetGammaSPSA(m_GammaSPSA->text().toFloat());
-    optimizerParameters->SetToleranceSPSA(m_ToleranceSPSA->text().toFloat());
-    optimizerParameters->SetStateOfConvergenceDecayRateSPSA(m_StateOfConvergenceDecayRateSPSA->text().toFloat());
-    optimizerParameters->SetMinimumNumberOfIterationsSPSA(m_MinimumNumberOfIterationsSPSA->text().toInt());
-    optimizerParameters->SetNumberOfPerturbationsSPSA(m_NumberOfPerturbationsSPSA->text().toInt());
-    optimizerParameters->SetNumberOfIterationsSPSA(m_IterationsSPSA->text().toInt());
+    m_OptimizerParameters->SetaSPSA(m_aSPSA->text().toFloat());
+    m_OptimizerParameters->SetASPSA(m_ASPSA->text().toFloat());
+    m_OptimizerParameters->SetAlphaSPSA(m_AlphaSPSA->text().toFloat());
+    m_OptimizerParameters->SetcSPSA(m_cSPSA->text().toFloat());
+    m_OptimizerParameters->SetGammaSPSA(m_GammaSPSA->text().toFloat());
+    m_OptimizerParameters->SetToleranceSPSA(m_ToleranceSPSA->text().toFloat());
+    m_OptimizerParameters->SetStateOfConvergenceDecayRateSPSA(m_StateOfConvergenceDecayRateSPSA->text().toFloat());
+    m_OptimizerParameters->SetMinimumNumberOfIterationsSPSA(m_MinimumNumberOfIterationsSPSA->text().toInt());
+    m_OptimizerParameters->SetNumberOfPerturbationsSPSA(m_NumberOfPerturbationsSPSA->text().toInt());
+    m_OptimizerParameters->SetNumberOfIterationsSPSA(m_IterationsSPSA->text().toInt());
   }
   else if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
   {
-    optimizerParameters->SetGradientMagnitudeToleranceVersorRigid3DTransform(m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat());
-    optimizerParameters->SetMinimumStepLengthVersorRigid3DTransform(m_MinimumStepLengthVersorRigid3DTransform->text().toFloat());
-    optimizerParameters->SetMaximumStepLengthVersorRigid3DTransform(m_MaximumStepLengthVersorRigid3DTransform->text().toFloat());
-    optimizerParameters->SetNumberOfIterationsVersorRigid3DTransform(m_IterationsVersorRigid3DTransform->text().toInt());
+    m_OptimizerParameters->SetGradientMagnitudeToleranceVersorRigid3DTransform(m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat());
+    m_OptimizerParameters->SetMinimumStepLengthVersorRigid3DTransform(m_MinimumStepLengthVersorRigid3DTransform->text().toFloat());
+    m_OptimizerParameters->SetMaximumStepLengthVersorRigid3DTransform(m_MaximumStepLengthVersorRigid3DTransform->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsVersorRigid3DTransform(m_IterationsVersorRigid3DTransform->text().toInt());
   }
 }
 
-/// this method writes the metric parameters from the selected metric into the singleton mitkMetricParameters class
+/// this method writes the metric parameters from the selected metric into mitkMetricParameters class
 /// so that the desired metric can be build up with these parameters
 void QmitkRigidRegistrationSelector::setMetricParameters()
 {
-  mitk::MetricParameters* metricParameters = mitk::MetricParameters::GetInstance();
-  metricParameters->SetMetric(m_MetricBox->currentItem());
-  metricParameters->SetComputeGradient(m_ComputeGradient->isOn());
+  m_MetricParameters = mitk::MetricParameters::New();
+  m_MetricParameters->SetMetric(m_MetricBox->currentItem());
+  m_MetricParameters->SetComputeGradient(m_ComputeGradient->isOn());
   if (m_MetricBox->currentItem() == mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC)
   {
   }
@@ -1581,33 +1587,33 @@ void QmitkRigidRegistrationSelector::setMetricParameters()
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetNumberOfHistogramBinsKullbackLeiblerCompareHistogram(m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsKullbackLeiblerCompareHistogram(m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetNumberOfHistogramBinsCorrelationCoefficientHistogram(m_NumberOfHistogramBinsCorrelationCoefficientHistogram->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsCorrelationCoefficientHistogram(m_NumberOfHistogramBinsCorrelationCoefficientHistogram->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetNumberOfHistogramBinsMeanSquaresHistogram(m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsMeanSquaresHistogram(m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetNumberOfHistogramBinsMutualInformationHistogram(m_NumberOfHistogramBinsMutualInformationHistogram->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsMutualInformationHistogram(m_NumberOfHistogramBinsMutualInformationHistogram->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetNumberOfHistogramBinsNormalizedMutualInformationHistogram(m_NumberOfHistogramBinsNormalizedMutualInformationHistogram->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsNormalizedMutualInformationHistogram(m_NumberOfHistogramBinsNormalizedMutualInformationHistogram->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetUseSamplesMattesMutualInformation(m_UseSamplingMattesMutualInformation->isOn());
-    metricParameters->SetSpatialSamplesMattesMutualInformation(m_NumberOfSpatialSamplesMattesMutualInformation->text().toInt());
-    metricParameters->SetNumberOfHistogramBinsMattesMutualInformation(m_NumberOfHistogramBinsMattesMutualInformation->text().toInt());
+    m_MetricParameters->SetUseSamplesMattesMutualInformation(m_UseSamplingMattesMutualInformation->isOn());
+    m_MetricParameters->SetSpatialSamplesMattesMutualInformation(m_NumberOfSpatialSamplesMattesMutualInformation->text().toInt());
+    m_MetricParameters->SetNumberOfHistogramBinsMattesMutualInformation(m_NumberOfHistogramBinsMattesMutualInformation->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC)
   {
-    metricParameters->SetLambdaMeanReciprocalSquareDifference(m_LambdaMeanReciprocalSquareDifference->text().toInt());
+    m_MetricParameters->SetLambdaMeanReciprocalSquareDifference(m_LambdaMeanReciprocalSquareDifference->text().toInt());
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC)
   {
@@ -1617,18 +1623,18 @@ void QmitkRigidRegistrationSelector::setMetricParameters()
     {
       nPixel *= fixedImage->GetDimension(i);
     }
-    metricParameters->SetSpatialSamplesMutualInformation(nPixel * m_NumberOfSpatialSamplesMutualInformation->text().toInt()/100);
-    metricParameters->SetFixedImageStandardDeviationMutualInformation(m_FixedImageStandardDeviationMutualInformation->text().toFloat());
-    metricParameters->SetMovingImageStandardDeviationMutualInformation(m_MovingImageStandardDeviationMutualInformation->text().toFloat());
+    m_MetricParameters->SetSpatialSamplesMutualInformation(nPixel * m_NumberOfSpatialSamplesMutualInformation->text().toInt()/100);
+    m_MetricParameters->SetFixedImageStandardDeviationMutualInformation(m_FixedImageStandardDeviationMutualInformation->text().toFloat());
+    m_MetricParameters->SetMovingImageStandardDeviationMutualInformation(m_MovingImageStandardDeviationMutualInformation->text().toFloat());
     if (m_UseNormalizerAndSmoother)
     {
-      metricParameters->SetUseNormalizerAndSmootherMutualInformation(m_UseNormalizerAndSmoother->isChecked());
-      metricParameters->SetFixedSmootherVarianceMutualInformation(m_FixedSmootherVarianceMutualInformation->text().toFloat());
-      metricParameters->SetMovingSmootherVarianceMutualInformation(m_MovingSmootherVarianceMutualInformation->text().toFloat());
+      m_MetricParameters->SetUseNormalizerAndSmootherMutualInformation(m_UseNormalizerAndSmoother->isChecked());
+      m_MetricParameters->SetFixedSmootherVarianceMutualInformation(m_FixedSmootherVarianceMutualInformation->text().toFloat());
+      m_MetricParameters->SetMovingSmootherVarianceMutualInformation(m_MovingSmootherVarianceMutualInformation->text().toFloat());
     }
     else
     {
-      metricParameters->SetUseNormalizerAndSmootherMutualInformation(m_UseNormalizerAndSmoother->isChecked());
+      m_MetricParameters->SetUseNormalizerAndSmootherMutualInformation(m_UseNormalizerAndSmoother->isChecked());
     }
   }
   else if (m_MetricBox->currentItem() == mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC)
@@ -1639,8 +1645,8 @@ void QmitkRigidRegistrationSelector::setMetricParameters()
   }
 }
 
-/// this method is needed becaus the Amoeba optimizer needs a simplex delta parameter, which defines the search range for each transform parameter
-/// every transform has its own set of parameters, so this method looks for everytime showing the correct number of simplex delta input fields for the
+/// this method is needed because the Amoeba optimizer needs a simplex delta parameter, which defines the search range for each transform parameter
+/// every transform has its own set of parameters, so this method looks for every time showing the correct number of simplex delta input fields for the
 /// Amoeba optimizer
 void QmitkRigidRegistrationSelector::SetSimplexDeltaVisible()
 {

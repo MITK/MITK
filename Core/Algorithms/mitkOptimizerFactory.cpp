@@ -19,9 +19,8 @@
 
 namespace mitk {
 
-  OptimizerFactory::OptimizerFactory()
+  OptimizerFactory::OptimizerFactory() : m_OptimizerParameters(NULL), m_NumberTransformParameters(16)
   {
-    m_NumberTransformParameters = 16;
   }
 
   OptimizerFactory::~OptimizerFactory()
@@ -35,7 +34,11 @@ namespace mitk {
 
   OptimizerFactory::OptimizerType::Pointer OptimizerFactory::GetOptimizer( )
   {
-    m_OptimizerParameters = OptimizerParameters::GetInstance();
+    if( m_OptimizerParameters.IsNull() ) 
+    {
+      std::cerr << "No parameters set! Returning\n";
+      return NULL;
+    }
     int optimizer = m_OptimizerParameters->GetOptimizer();
     if (optimizer == OptimizerParameters::EXHAUSTIVEOPTIMIZER)
     {

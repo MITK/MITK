@@ -8636,6 +8636,9 @@
     <include location="local" impldecl="in declaration">mitkRigidRegistrationPreset.h</include>
 </includes>
 <variables>
+    <variable>mitk::OptimizerParameters::Pointer m_OptimizerParameters;</variable>
+    <variable>mitk::TransformParameters::Pointer m_TransformParameters;</variable>
+    <variable>mitk::MetricParameters::Pointer m_MetricParameters;</variable>
     <variable>mitk::DataTreeNode* m_FixedNode;</variable>
     <variable>int m_FixedDimension;</variable>
     <variable>mitk::DataTreeNode* m_MovingNode;</variable>

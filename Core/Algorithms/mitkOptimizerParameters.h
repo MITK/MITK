@@ -19,217 +19,216 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKOPTIMIZERPARAMETERS_H
 #define MITKOPTIMIZERPARAMETERS_H
 
-#include <itkObject.h>
-#include "itkArray.h"
+#include <itkArray.h>
+#include <itkObjectFactory.h>
 #include "mitkCommon.h"
 
 namespace mitk {
 
-  class MITK_CORE_EXPORT OptimizerParameters : public itk::Object
+  class MITK_CORE_EXPORT OptimizerParameters : public ::itk::Object
   {
   public:
-    itkTypeMacro(ProgressBar, itk::Object);
 
-    static OptimizerParameters* GetInstance(); //singleton
+    mitkClassMacro(OptimizerParameters,::itk::Object);
+    itkNewMacro(Self);
 
-    static const int EXHAUSTIVEOPTIMIZER = 0;
-    static const int GRADIENTDESCENTOPTIMIZER = 1;
-    static const int QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER = 2;
-    static const int LBFGSBOPTIMIZER = 3;
-    static const int ONEPLUSONEEVOLUTIONARYOPTIMIZER = 4;
-    static const int POWELLOPTIMIZER = 5;
-    static const int FRPROPTIMIZER = 6;
-    static const int REGULARSTEPGRADIENTDESCENTOPTIMIZER = 7;
-    static const int VERSORTRANSFORMOPTIMIZER = 8;
-    static const int AMOEBAOPTIMIZER = 9;
-    static const int CONJUGATEGRADIENTOPTIMIZER = 10;
-    static const int LBFGSOPTIMIZER = 11;
-    static const int SPSAOPTIMIZER = 12;
-    static const int VERSORRIGID3DTRANSFORMOPTIMIZER = 13;
+    enum OptimizerType {
+      EXHAUSTIVEOPTIMIZER = 0,
+      GRADIENTDESCENTOPTIMIZER = 1,
+      QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER = 2,
+      LBFGSBOPTIMIZER = 3,
+      ONEPLUSONEEVOLUTIONARYOPTIMIZER = 4,
+      POWELLOPTIMIZER = 5,
+      FRPROPTIMIZER = 6,
+      REGULARSTEPGRADIENTDESCENTOPTIMIZER = 7,
+      VERSORTRANSFORMOPTIMIZER = 8,
+      AMOEBAOPTIMIZER = 9,
+      CONJUGATEGRADIENTOPTIMIZER = 10,
+      LBFGSOPTIMIZER = 11,
+      SPSAOPTIMIZER = 12,
+      VERSORRIGID3DTRANSFORMOPTIMIZER = 13
+    };
 
     // for all Optimizer
-    void SetOptimizer(int optimizer);
-    int GetOptimizer();
+    itkSetMacro( Optimizer, int );
+    itkGetMacro( Optimizer, int );
 
-    void SetDimension(unsigned int dimension);
-    unsigned int GetDimension();
+    itkSetMacro( Dimension, int );
+    itkGetMacro( Dimension, int );
 
-    void SetMaximize(bool maximize);
-    bool GetMaximize();
-
+    itkSetMacro( Maximize, bool );
+    itkGetMacro( Maximize, bool );
 
     // for itk::ExhaustiveOptimizer
-    void SetStepLengthExhaustive(float stepLength);
-    float GetStepLengthExhaustive();
+    itkSetMacro( StepLengthExhaustive, float );
+    itkGetMacro( StepLengthExhaustive, float );
 
-    void SetNumberOfStepsExhaustive(int numberOfSteps);
-    int GetNumberOfStepsExhaustive();
+    itkSetMacro( NumberOfStepsExhaustive, int );
+    itkGetMacro( NumberOfStepsExhaustive, int );
 
     // for itk::GradientDescentOptimizer
-    void SetLearningRateGradientDescent(float learningRate);
-    float GetLearningRateGradientDescent();
-    
-    void SetNumberOfIterationsGradientDescent(int iterations);
-    int GetNumberOfIterationsGradientDescent();
+    itkSetMacro( LearningRateGradientDescent, float );
+    itkGetMacro( LearningRateGradientDescent, float );
+
+    itkSetMacro( NumberOfIterationsGradientDescent, int );
+    itkGetMacro( NumberOfIterationsGradientDescent, int );
 
     // for itk::QuaternionRigidTransformGradientDescentOptimizer
-    void SetLearningRateQuaternionRigidTransformGradientDescent(float learningRate);
-    float GetLearningRateQuaternionRigidTransformGradientDescent();
+    itkSetMacro( LearningRateQuaternionRigidTransformGradientDescent, float );
+    itkGetMacro( LearningRateQuaternionRigidTransformGradientDescent, float );
 
-    void SetNumberOfIterationsQuaternionRigidTransformGradientDescent(int iterations);
-    int GetNumberOfIterationsQuaternionRigidTransformGradientDescent();
+    itkSetMacro( NumberOfIterationsQuaternionRigidTransformGradientDescent, int );
+    itkGetMacro( NumberOfIterationsQuaternionRigidTransformGradientDescent, int );
 
     // for itk::OnePlusOneEvolutionaryOptimizer
+    itkSetMacro( GrowthFactorOnePlusOneEvolutionary, float );
+    itkGetMacro( GrowthFactorOnePlusOneEvolutionary, float );
 
-    void SetGrowthFactorOnePlusOneEvolutionary(float growthFactor);
-    float GetGrowthFactorOnePlusOneEvolutionary();
+    itkSetMacro( ShrinkFactorOnePlusOneEvolutionary, float );
+    itkGetMacro( ShrinkFactorOnePlusOneEvolutionary, float );
 
-    void SetShrinkFactorOnePlusOneEvolutionary(float shrinkFactor);
-    float GetShrinkFactorOnePlusOneEvolutionary();
+    itkSetMacro( EpsilonOnePlusOneEvolutionary, float );
+    itkGetMacro( EpsilonOnePlusOneEvolutionary, float );
 
-    void SetEpsilonOnePlusOneEvolutionary(float epsilon);
-    float GetEpsilonOnePlusOneEvolutionary();
+    itkSetMacro( InitialRadiusOnePlusOneEvolutionary, float );
+    itkGetMacro( InitialRadiusOnePlusOneEvolutionary, float );
 
-    void SetInitialRadiusOnePlusOneEvolutionary(float initialRadius);
-    float GetInitialRadiusOnePlusOneEvolutionary();
-
-    void SetNumberOfIterationsOnePlusOneEvolutionary(int iterations);
-    int GetNumberOfIterationsOnePlusOneEvolutionary();
+    itkSetMacro( NumberOfIterationsOnePlusOneEvolutionary, int );
+    itkGetMacro( NumberOfIterationsOnePlusOneEvolutionary, int );
 
     // for itk::PowellOptimizer
-    void SetStepLengthPowell(float stepLength);
-    float GetStepLengthPowell();
+    itkSetMacro( StepLengthPowell, float );
+    itkGetMacro( StepLengthPowell, float );
 
-    void SetStepTolerancePowell(float stepTolerance);
-    float GetStepTolerancePowell();
+    itkSetMacro( StepTolerancePowell, float );
+    itkGetMacro( StepTolerancePowell, float );
 
-    void SetValueTolerancePowell(float valueTolerance);
-    float GetValueTolerancePowell();
+    itkSetMacro( ValueTolerancePowell, float );
+    itkGetMacro( ValueTolerancePowell, float );
 
-    void SetNumberOfIterationsPowell(int iterations);
-    int GetNumberOfIterationsPowell();
+    itkSetMacro( NumberOfIterationsPowell, int );
+    itkGetMacro( NumberOfIterationsPowell, int );
 
     // for itk::FRPROptimizer
-    void SetStepLengthFRPR(float stepLength);
-    float GetStepLengthFRPR();
+    itkSetMacro( StepLengthFRPR, float );
+    itkGetMacro( StepLengthFRPR, float );
 
-    void SetToFletchReevesFRPR(bool fletchReeves);
-    bool GetFletchReevesFRPR();
+    itkSetMacro( FletchReevesFRPR, bool );
+    itkGetMacro( FletchReevesFRPR, bool );
 
-    void SetToPolakRibiereFRPR(bool polakRibiere);
-    bool GetPolakRibiereFRPR();
-    
-    void SetNumberOfIterationsFRPR(int iterations);
-    int GetNumberOfIterationsFRPR();
+    itkSetMacro( PolakRibiereFRPR, bool );
+    itkGetMacro( PolakRibiereFRPR, bool );
+
+    itkSetMacro( NumberOfIterationsFRPR, int );
+    itkGetMacro( NumberOfIterationsFRPR, int );
 
     // for itk::RegularStepGradientDescentOptimizer
-    void SetGradientMagnitudeToleranceRegularStepGradientDescent(float gradientMagnitudeTolerance);
-    float GetGradientMagnitudeToleranceRegularStepGradientDescent();
+    itkSetMacro( GradientMagnitudeToleranceRegularStepGradientDescent, float );
+    itkGetMacro( GradientMagnitudeToleranceRegularStepGradientDescent, float );
 
-    void SetMinimumStepLengthRegularStepGradientDescent(float minimumStepLength);
-    float GetMinimumStepLengthRegularStepGradientDescent();
+    itkSetMacro( MinimumStepLengthRegularStepGradientDescent, float );
+    itkGetMacro( MinimumStepLengthRegularStepGradientDescent, float );
 
-    void SetMaximumStepLengthRegularStepGradientDescent(float minimumStepLength);
-    float GetMaximumStepLengthRegularStepGradientDescent();
+    itkSetMacro( MaximumStepLengthRegularStepGradientDescent, float );
+    itkGetMacro( MaximumStepLengthRegularStepGradientDescent, float );
 
-    void SetNumberOfIterationsRegularStepGradientDescent(int iterations);
-    int GetNumberOfIterationsRegularStepGradientDescent();
+    itkSetMacro( NumberOfIterationsRegularStepGradientDescent, int );
+    itkGetMacro( NumberOfIterationsRegularStepGradientDescent, int );
 
-    void SetRelaxationFactorRegularStepGradientDescent(double relaxationFactor);
-    double GetRelaxationFactorRegularStepGradientDescent();
+    itkSetMacro( RelaxationFactorRegularStepGradientDescent, double );
+    itkGetMacro( RelaxationFactorRegularStepGradientDescent, double );
 
     // for itk::VersorRigid3DTransformOptimizer
-    void SetGradientMagnitudeToleranceVersorRigid3DTransform(float gradientMagnitudeTolerance);
-    float GetGradientMagnitudeToleranceVersorRigid3DTransform();
+    itkSetMacro( GradientMagnitudeToleranceVersorRigid3DTransform, float );
+    itkGetMacro( GradientMagnitudeToleranceVersorRigid3DTransform, float );
 
-    void SetMinimumStepLengthVersorRigid3DTransform(float minimumStepLength);
-    float GetMinimumStepLengthVersorRigid3DTransform();
+    itkSetMacro( MinimumStepLengthVersorRigid3DTransform, float );
+    itkGetMacro( MinimumStepLengthVersorRigid3DTransform, float );
 
-    void SetMaximumStepLengthVersorRigid3DTransform(float minimumStepLength);
-    float GetMaximumStepLengthVersorRigid3DTransform();
+    itkSetMacro( MaximumStepLengthVersorRigid3DTransform, float );
+    itkGetMacro( MaximumStepLengthVersorRigid3DTransform, float );
 
-    void SetNumberOfIterationsVersorRigid3DTransform(int iterations);
-    int GetNumberOfIterationsVersorRigid3DTransform();
+    itkSetMacro( NumberOfIterationsVersorRigid3DTransform, int );
+    itkGetMacro( NumberOfIterationsVersorRigid3DTransform, int );
 
     // for itk::VersorTransformOptimizer
-    void SetGradientMagnitudeToleranceVersorTransform(float gradientMagnitudeTolerance);
-    float GetGradientMagnitudeToleranceVersorTransform();
+    itkSetMacro( GradientMagnitudeToleranceVersorTransform, float );
+    itkGetMacro( GradientMagnitudeToleranceVersorTransform, float );
 
-    void SetMinimumStepLengthVersorTransform(float minimumStepLength);
-    float GetMinimumStepLengthVersorTransform();
+    itkSetMacro( MinimumStepLengthVersorTransform, float );
+    itkGetMacro( MinimumStepLengthVersorTransform, float );
 
-    void SetMaximumStepLengthVersorTransform(float minimumStepLength);
-    float GetMaximumStepLengthVersorTransform();
+    itkSetMacro( MaximumStepLengthVersorTransform, float );
+    itkGetMacro( MaximumStepLengthVersorTransform, float );
 
-    void SetNumberOfIterationsVersorTransform(int iterations);
-    int GetNumberOfIterationsVersorTransform();
+    itkSetMacro( NumberOfIterationsVersorTransform, int );
+    itkGetMacro( NumberOfIterationsVersorTransform, int );
 
     // for itk::AmoebaOptimizer
     void SetSimplexDeltaAmoeba(itk::Array<double> simplexDelta);
     itk::Array<double> GetSimplexDeltaAmoeba();
 
-    void SetParametersConvergenceToleranceAmoeba(float parametersConvergenceTolerance);
-    float GetParametersConvergenceToleranceAmoeba();
+    itkSetMacro( ParametersConvergenceToleranceAmoeba, float );
+    itkGetMacro( ParametersConvergenceToleranceAmoeba, float );
 
-    void SetFunctionConvergenceToleranceAmoeba(float functionConvergenceTolerance);
-    float GetFunctionConvergenceToleranceAmoeba();
+    itkSetMacro( FunctionConvergenceToleranceAmoeba, float );
+    itkGetMacro( FunctionConvergenceToleranceAmoeba, float );
 
-    void SetNumberOfIterationsAmoeba(int iterations);
-    int GetNumberOfIterationsAmoeba();
+    itkSetMacro( NumberOfIterationsAmoeba, int );
+    itkGetMacro( NumberOfIterationsAmoeba, int );
 
     // for itk::ConjugateGradientOptimizer
 
     // for itk::LBFGSOptimizer
-    void SetGradientConvergenceToleranceLBFGS(float gradientConvergenceTolerance);
-    float GetGradientConvergenceToleranceLBFGS();
+    itkSetMacro( GradientConvergenceToleranceLBFGS, float );
+    itkGetMacro( GradientConvergenceToleranceLBFGS, float );
 
-    void SetLineSearchAccuracyLBFGS(float lineSearchAccuracy);
-    float GetLineSearchAccuracyLBFGS();
+    itkSetMacro( LineSearchAccuracyLBFGS, float );
+    itkGetMacro( LineSearchAccuracyLBFGS, float );
 
-    void SetDefaultStepLengthLBFGS(float DefaultStepLength);
-    float GetDefaultStepLengthLBFGS();
+    itkSetMacro( DefaultStepLengthLBFGS, float );
+    itkGetMacro( DefaultStepLengthLBFGS, float );
 
-    void SetTraceOnLBFGS(bool traceOn);
-    bool GetTraceOnLBFGS();
+    itkSetMacro( TraceOnLBFGS, bool );
+    itkGetMacro( TraceOnLBFGS, bool );
 
-    void SetNumberOfIterationsLBFGS(int iterations);
-    int GetNumberOfIterationsLBFGS();
+    itkSetMacro( NumberOfIterationsLBFGS, int );
+    itkGetMacro( NumberOfIterationsLBFGS, int );
 
     // for itk::SPSAOptimizer
-    void SetaSPSA(float a);
-    float GetaSPSA();
-  
-    void SetASPSA(float A);
-    float GetASPSA();
+    itkSetMacro( aSPSA, float );
+    itkGetMacro( aSPSA, float );
 
-    void SetAlphaSPSA(float alpha);
-    float GetAlphaSPSA();
+    itkSetMacro( ASPSA, float );
+    itkGetMacro( ASPSA, float );
 
-    void SetcSPSA(float c);
-    float GetcSPSA();
+    itkSetMacro( AlphaSPSA, float );
+    itkGetMacro( AlphaSPSA, float );
 
-    void SetGammaSPSA(float gamma);
-    float GetGammaSPSA();
+    itkSetMacro( cSPSA, float );
+    itkGetMacro( cSPSA, float );
 
-    void SetToleranceSPSA(float tolerance);
-    float GetToleranceSPSA();
+    itkSetMacro( GammaSPSA, float );
+    itkGetMacro( GammaSPSA, float );
 
-    void SetStateOfConvergenceDecayRateSPSA(float stateOfConvergenceDecayRate);
-    float GetStateOfConvergenceDecayRateSPSA();
+    itkSetMacro( ToleranceSPSA, float );
+    itkGetMacro( ToleranceSPSA, float );
 
-    void SetMinimumNumberOfIterationsSPSA(int minimumNumberOfIterations);
-    int GetMinimumNumberOfIterationsSPSA();
+    itkSetMacro( StateOfConvergenceDecayRateSPSA, float );
+    itkGetMacro( StateOfConvergenceDecayRateSPSA, float );
 
-    void SetNumberOfPerturbationsSPSA(int numberOfPerturbations);
-    int GetNumberOfPerturbationsSPSA();
+    itkSetMacro( MinimumNumberOfIterationsSPSA, int );
+    itkGetMacro( MinimumNumberOfIterationsSPSA, int );
 
-    void SetNumberOfIterationsSPSA(int iterations);
-    int GetNumberOfIterationsSPSA();
+    itkSetMacro( NumberOfPerturbationsSPSA, int );
+    itkGetMacro( NumberOfPerturbationsSPSA, int );
+
+    itkSetMacro( NumberOfIterationsSPSA, int );
+    itkGetMacro( NumberOfIterationsSPSA, int );
 
   protected:
-    OptimizerParameters(); // hidden, access through GetInstance()
-    ~OptimizerParameters();
-    static OptimizerParameters* m_Instance;
+    OptimizerParameters(); 
+    ~OptimizerParameters(){};
 
     // for all Optimizer
     int m_Optimizer;
@@ -242,11 +241,11 @@ namespace mitk {
 
     // for itk::GradientDescentOptimizer
     float m_LearningRateGradientDescent;
-    int m_IterationsGradientDescent;
+    int m_NumberOfIterationsGradientDescent;
 
     // for itk::QuaternionRigidTransformGradientDescentOptimizer
     float m_LearningRateQuaternionRigidTransformGradientDescent;
-    int m_IterationsQuaternionRigidTransformGradientDescent;
+    int m_NumberOfIterationsQuaternionRigidTransformGradientDescent;
 
     // for itk::LBFGSBOptimizer
 
@@ -255,44 +254,44 @@ namespace mitk {
     float m_ShrinkFactorOnePlusOneEvolutionary;
     float m_EpsilonOnePlusOneEvolutionary;
     float m_InitialRadiusOnePlusOneEvolutionary;
-    int m_IterationsOnePlusOneEvolutionary;
+    int m_NumberOfIterationsOnePlusOneEvolutionary;
 
     // for itk::PowellOptimizer
     float m_StepLengthPowell;
     float m_StepTolerancePowell;
     float m_ValueTolerancePowell;
-    int m_IterationsPowell;
+    int m_NumberOfIterationsPowell;
 
     // for itk::FRPROptimizer
     float m_StepLengthFRPR;
     bool m_FletchReevesFRPR;
     bool m_PolakRibiereFRPR;
-    int m_IterationsFRPR;
+    int m_NumberOfIterationsFRPR;
 
     // for itk::RegularStepGradientDescentOptimizer
     float m_GradientMagnitudeToleranceRegularStepGradientDescent;
     float m_MinimumStepLengthRegularStepGradientDescent;
     float m_MaximumStepLengthRegularStepGradientDescent;
-    int m_IterationsRegularStepGradientDescent;
+    int m_NumberOfIterationsRegularStepGradientDescent;
     double m_RelaxationFactorRegularStepGradientDescent;
 
     // for itk::VersorRigid3DTransformOptimizer
     float m_GradientMagnitudeToleranceVersorRigid3DTransform;
     float m_MinimumStepLengthVersorRigid3DTransform;
     float m_MaximumStepLengthVersorRigid3DTransform;
-    int m_IterationsVersorRigid3DTransform;
+    int m_NumberOfIterationsVersorRigid3DTransform;
     
     // for itk::VersorTransformOptimizer
     float m_GradientMagnitudeToleranceVersorTransform;
     float m_MinimumStepLengthVersorTransform;
     float m_MaximumStepLengthVersorTransform;
-    int m_IterationsVersorTransform;
+    int m_NumberOfIterationsVersorTransform;
 
     // for itk::AmoebaOptimizer
     itk::Array<double> m_SimplexDeltaAmoeba;
     float m_ParametersConvergenceToleranceAmoeba;
     float m_FunctionConvergenceToleranceAmoeba;
-    int m_IterationsAmoeba;
+    int m_NumberOfIterationsAmoeba;
 
     // for itk::ConjugateGradientOptimizer
 
@@ -301,7 +300,7 @@ namespace mitk {
     float m_LineSearchAccuracyLBFGS;
     float m_DefaultStepLengthLBFGS;
     bool m_TraceOnLBFGS;
-    int m_IterationsLBFGS;
+    int m_NumberOfIterationsLBFGS;
 
     // for itk::SPSAOptimizer
     float m_aSPSA;
@@ -313,7 +312,7 @@ namespace mitk {
     float m_StateOfConvergenceDecayRateSPSA;
     int m_MinimumNumberOfIterationsSPSA;
     int m_NumberOfPerturbationsSPSA;
-    int m_IterationsSPSA;
+    int m_NumberOfIterationsSPSA;
 
   };
 

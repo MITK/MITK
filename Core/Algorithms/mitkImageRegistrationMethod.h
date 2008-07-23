@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include "mitkRigidRegistrationObserver.h"
 #include "mitkCommon.h"
+#include "mitkOptimizerParameters.h"
+#include "mitkTransformParameters.h"
+#include "mitkMetricParameters.h"
 
 
 namespace mitk
@@ -52,7 +55,37 @@ namespace mitk
     virtual void GenerateData();
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
-    
+
+    void SetOptimizerParameters(OptimizerParameters::Pointer optimizerParameters)
+    {
+      m_OptimizerParameters = optimizerParameters;
+    }
+
+    OptimizerParameters::Pointer GetOptimizerParameters()
+    {
+      return m_OptimizerParameters;
+    }
+
+    void SetTransformParameters(TransformParameters::Pointer transformParameters)
+    {
+      m_TransformParameters = transformParameters;
+    }
+
+    TransformParameters::Pointer GetTransformParameters()
+    {
+      return m_TransformParameters;
+    }
+
+    void SetMetricParameters(MetricParameters::Pointer metricParameters)
+    {
+      m_MetricParameters = metricParameters;
+    }
+
+    MetricParameters::Pointer GetMetricParameters()
+    {
+      return m_MetricParameters;
+    }
+
   protected:
     ImageRegistrationMethod();
     virtual ~ImageRegistrationMethod();
@@ -63,6 +96,12 @@ namespace mitk
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;
     Image::Pointer m_ReferenceImage;
+
+  private:
+    OptimizerParameters::Pointer m_OptimizerParameters;
+    TransformParameters::Pointer m_TransformParameters;
+    MetricParameters::Pointer m_MetricParameters;
+
   };
 }
 

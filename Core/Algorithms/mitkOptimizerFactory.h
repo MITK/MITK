@@ -24,11 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class OptimizerFactory
+  class MITK_CORE_EXPORT OptimizerFactory : public ::itk::Object
   {
   public:
-    OptimizerFactory();
-    ~OptimizerFactory();
+
+    mitkClassMacro(OptimizerFactory, Object);
+    itkNewMacro(Self);
 
     typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
 
@@ -37,8 +38,22 @@ namespace mitk {
     // for AmoebaOptimizer
     void SetNumberOfTransformParameters(int numberTransformParameters);
 
+    void SetOptimizerParameters(OptimizerParameters::Pointer optimizerParameters)
+    {
+      m_OptimizerParameters = optimizerParameters;
+    }
+    OptimizerParameters::Pointer GetOptimizerParameters()
+    {
+      return m_OptimizerParameters;
+    }
+
   protected:
-    OptimizerParameters* m_OptimizerParameters;
+
+    OptimizerFactory();
+    ~OptimizerFactory();
+
+  private:
+    OptimizerParameters::Pointer m_OptimizerParameters;
     int m_NumberTransformParameters;
   };
 

@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  ImageRegistrationMethod::ImageRegistrationMethod()
+  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0)
   {
-    m_Observer = NULL;
-    m_Interpolator = 0;
+    m_OptimizerParameters = OptimizerParameters::New();
+    m_TransformParameters = TransformParameters::New();
+    m_MetricParameters = MetricParameters::New();
     m_ReferenceImage = Image::New();
   }
 

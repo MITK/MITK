@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKTRANSFORMPARAMETERS_H
 #define MITKTRANSFORMPARAMETERS_H
 
-#include <itkObject.h>
-#include "itkArray.h"
+#include <itkObjectFactory.h>
+#include <itkArray.h>
 #include "mitkCommon.h"
 
 namespace mitk {
@@ -28,31 +28,32 @@ namespace mitk {
   class MITK_CORE_EXPORT TransformParameters : public itk::Object
   {
   public:
-    itkTypeMacro(TransformParameters, itk::Object);
+    mitkClassMacro(TransformParameters, ::itk::Object);
+    itkNewMacro(Self);
 
-    static TransformParameters* GetInstance(); //singleton
+    enum TransformType {
+      TRANSLATIONTRANSFORM = 0,
+      SCALETRANSFORM = 1,
+      SCALELOGARITHMICTRANSFORM = 2,
+      AFFINETRANSFORM = 3,
+      FIXEDCENTEROFROTATIONAFFINETRANSFORM = 4,
+      RIGID3DTRANSFORM = 5,
+      EULER3DTRANSFORM = 6,
+      CENTEREDEULER3DTRANSFORM = 7,
+      QUATERNIONRIGIDTRANSFORM = 8,
+      VERSORTRANSFORM = 9,
+      VERSORRIGID3DTRANSFORM = 10,
+      SCALESKEWVERSOR3DTRANSFORM = 11,
+      SIMILARITY3DTRANSFORM = 12,
+      RIGID2DTRANSFORM = 13,
+      CENTEREDRIGID2DTRANSFORM = 14,
+      EULER2DTRANSFORM = 15,
+      SIMILARITY2DTRANSFORM = 16,
+      CENTEREDSIMILARITY2DTRANSFORM = 17
+    };
 
-    static const int TRANSLATIONTRANSFORM = 0;
-    static const int SCALETRANSFORM = 1;
-    static const int SCALELOGARITHMICTRANSFORM = 2;
-    static const int AFFINETRANSFORM = 3;
-    static const int FIXEDCENTEROFROTATIONAFFINETRANSFORM = 4;
-    static const int RIGID3DTRANSFORM = 5;
-    static const int EULER3DTRANSFORM = 6;
-    static const int CENTEREDEULER3DTRANSFORM = 7;
-    static const int QUATERNIONRIGIDTRANSFORM = 8;
-    static const int VERSORTRANSFORM = 9;
-    static const int VERSORRIGID3DTRANSFORM = 10;
-    static const int SCALESKEWVERSOR3DTRANSFORM = 11;
-    static const int SIMILARITY3DTRANSFORM = 12;
-    static const int RIGID2DTRANSFORM = 13;
-    static const int CENTEREDRIGID2DTRANSFORM = 14;
-    static const int EULER2DTRANSFORM = 15;
-    static const int SIMILARITY2DTRANSFORM = 16;
-    static const int CENTEREDSIMILARITY2DTRANSFORM = 17;
-
-    void SetTransform(int transform);
-    int GetTransform();
+    itkSetMacro( Transform, int );
+    itkGetMacro( Transform, int );
 
     void SetScales(itk::Array<double> scales);
     itk::Array<double> GetScales();
@@ -60,45 +61,46 @@ namespace mitk {
     void SetInitialParameters(itk::Array<double> initialParameters);
     itk::Array<double> GetInitialParameters();
 
-    void TransformInitializerOn(bool initializer);
-    bool GetTransformInitializerOn();
+    itkSetMacro( TransformInitializerOn, bool );
+    itkGetMacro( TransformInitializerOn, bool );
 
-    void MomentsOn(bool moments);
-    bool GetMomentsOn();
+    itkSetMacro( MomentsOn, bool );
+    itkGetMacro( MomentsOn, bool );
 
-    void UseOptimizerScales(bool useScales);
-    bool GetUseOptimizerScales();
+    itkSetMacro( UseOptimizerScales, bool );
+    itkGetMacro( UseOptimizerScales, bool );
 
-    void SetAngle(float angle);
-    float GetAngle();
+    itkSetMacro( Angle, float );
+    itkGetMacro( Angle, float );
 
-    void SetScale(float scale);
-    float GetScale();
+    itkSetMacro( Scale, float );
+    itkGetMacro( Scale, float );
 
-    void SetTransformCenterX(double centerX);
-    double GetTransformCenterX();
+    itkSetMacro( TransformCenterX, double );
+    itkGetMacro( TransformCenterX, double );
 
-    void SetTransformCenterY(double centerY);
-    double GetTransformCenterY();
+    itkSetMacro( TransformCenterY, double );
+    itkGetMacro( TransformCenterY, double );
 
-    void SetTransformCenterZ(double centerZ);
-    double GetTransformCenterZ();
+    itkSetMacro( TransformCenterZ, double );
+    itkGetMacro( TransformCenterZ, double );
 
   protected:
-    TransformParameters(); // hidden, access through GetInstance()
-    ~TransformParameters();
-    static TransformParameters* m_Instance;
+
+    TransformParameters();
+    ~TransformParameters() {};
+
     int m_Transform;
     float m_Angle;
     float m_Scale;
-    bool m_Initializer;
-    bool m_Moments;
+    bool m_TransformInitializerOn;
+    bool m_MomentsOn;
     bool m_UseOptimizerScales;
-    itk::Array<double> m_Scales;
-    itk::Array<double> m_InitialParameters;
     double m_TransformCenterX;
     double m_TransformCenterY;
     double m_TransformCenterZ;
+    itk::Array<double> m_Scales;
+    itk::Array<double> m_InitialParameters;
   };
 
 } // namespace mitk

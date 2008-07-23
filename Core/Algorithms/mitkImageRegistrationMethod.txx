@@ -43,8 +43,7 @@ namespace mitk {
   template<typename TPixel, unsigned int VImageDimension>
     void ImageRegistrationMethod::GenerateData2(itk::Image<TPixel, VImageDimension>* itkImage1)
   {
-    mitk::MetricParameters* metricParameters = mitk::MetricParameters::GetInstance();
-    if (metricParameters->GetMetric() != mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC || (metricParameters->GetMetric() == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC && metricParameters->GetUseNormalizerAndSmootherMutualInformation() == false))
+    if (m_MetricParameters->GetMetric() != mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC || (m_MetricParameters->GetMetric() == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC && m_MetricParameters->GetUseNormalizerAndSmootherMutualInformation() == false))
     {
       typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
       typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
@@ -64,22 +63,25 @@ namespace mitk {
       
       mitk::CastToItkImage(m_ReferenceImage, fixedImage);
 
-      MetricFactoryType* metFac = new MetricFactoryType();
+      typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
+      metFac->SetMetricParameters(m_MetricParameters);
       
-      TransformFactoryType* transFac = new TransformFactoryType();
+      typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
+      transFac->SetTransformParameters(m_TransformParameters);
       transFac->SetFixedImage(fixedImage);
       transFac->SetMovingImage(movingImage);
       
-      OptimizerFactory* optFac = new OptimizerFactory();
+      OptimizerFactory::Pointer optFac = OptimizerFactory::New();
+      optFac->SetOptimizerParameters(m_OptimizerParameters);
       
       typename TransformType::Pointer transform = transFac->GetTransform();
       optFac->SetNumberOfTransformParameters(transform->GetNumberOfParameters());
       typename OptimizerType::Pointer optimizer = optFac->GetOptimizer();
       
-      mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
-      if (transformParameters->GetUseOptimizerScales())
+      //mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
+      if (m_TransformParameters->GetUseOptimizerScales())
       {
-        itk::Array<double> optimizerScales = transformParameters->GetScales();
+        itk::Array<double> optimizerScales = m_TransformParameters->GetScales();
         typename OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
         for (unsigned int i = 0; i < scales.Size(); i++)
         {
@@ -170,8 +172,8 @@ namespace mitk {
       typename GaussianFilterType::Pointer fixedSmoother  = GaussianFilterType::New();
       typename GaussianFilterType::Pointer movingSmoother = GaussianFilterType::New();
 
-      fixedSmoother->SetVariance(metricParameters->GetFixedSmootherVarianceMutualInformation());
-      movingSmoother->SetVariance(metricParameters->GetMovingSmootherVarianceMutualInformation());
+      fixedSmoother->SetVariance(m_MetricParameters->GetFixedSmootherVarianceMutualInformation());
+      movingSmoother->SetVariance(m_MetricParameters->GetMovingSmootherVarianceMutualInformation());
 
       fixedNormalizer->SetInput(  fixedImage );
       movingNormalizer->SetInput( movingImage );
@@ -179,22 +181,24 @@ namespace mitk {
       fixedSmoother->SetInput( fixedNormalizer->GetOutput() );
       movingSmoother->SetInput( movingNormalizer->GetOutput() );
 
-      MetricFactoryType* metFac = new MetricFactoryType();
+      typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
+      metFac->SetMetricParameters(m_MetricParameters);
       
-      TransformFactoryType* transFac = new TransformFactoryType();
+      typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
+      transFac->SetTransformParameters(m_TransformParameters);
       transFac->SetFixedImage(fixedImage);
       transFac->SetMovingImage(movingImage);
       
-      OptimizerFactory* optFac = new OptimizerFactory();
+      OptimizerFactory::Pointer optFac = OptimizerFactory::New();
+      optFac->SetOptimizerParameters(m_OptimizerParameters);
       
       typename TransformType::Pointer transform = transFac->GetTransform();
       optFac->SetNumberOfTransformParameters(transform->GetNumberOfParameters());
       typename OptimizerType::Pointer optimizer = optFac->GetOptimizer();
       
-      mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
-      if (transformParameters->GetUseOptimizerScales())
+      if (m_TransformParameters->GetUseOptimizerScales())
       {
-        itk::Array<double> optimizerScales = transformParameters->GetScales();
+        itk::Array<double> optimizerScales = m_TransformParameters->GetScales();
         typename OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
         for (unsigned int i = 0; i < scales.Size(); i++)
         {

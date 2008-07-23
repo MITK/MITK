@@ -25,11 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   template < class TPixelType, unsigned int VImageDimension >
-  class MetricFactory //: public itk::Object
+  class MetricFactory : public itk::Object
   {
   public:
-    MetricFactory();
-    ~MetricFactory();
+    mitkClassMacro(MetricFactory, itk::Object);
+
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
     typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
     typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
@@ -38,10 +40,22 @@ namespace mitk {
     typedef typename MetricType::Pointer                MetricPointer;
 
     MetricPointer GetMetric( );
+    
+    void SetMetricParameters(MetricParameters::Pointer metricParameters)
+    {
+      m_MetricParameters = metricParameters;
+    }
+
+    MetricParameters::Pointer GetMetricParameters()
+    {
+      return m_MetricParameters;
+    }
 
   protected:
-    //MetricFactory();
-    //virtual ~MetricFactory();
+    MetricFactory();
+    ~MetricFactory() {};
+
+    MetricParameters::Pointer m_MetricParameters;
   };
 
 } // namespace mitk

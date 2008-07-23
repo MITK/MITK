@@ -18,12 +18,7 @@
 namespace mitk {
 
   template < class TPixelType, unsigned int VImageDimension >
-  MetricFactory<TPixelType, VImageDimension>::MetricFactory()
-  {
-  }
-
-  template < class TPixelType, unsigned int VImageDimension > 
-  MetricFactory<TPixelType, VImageDimension>::~MetricFactory()
+  MetricFactory<TPixelType, VImageDimension>::MetricFactory() : m_MetricParameters(NULL)
   {
   }
 
@@ -32,30 +27,29 @@ namespace mitk {
     MetricFactory<TPixelType, VImageDimension>
     ::GetMetric( )
   {
-    MetricParameters* metricParameters = MetricParameters::GetInstance();
-    int metric = metricParameters->GetMetric();
+    int metric = m_MetricParameters->GetMetric();
     if (metric == MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC)
     {
       typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)
     {
       typename itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC)
     {
       typename itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC)
     {
       typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = metricParameters->GetNumberOfHistogramBinsKullbackLeiblerCompareHistogram();
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsKullbackLeiblerCompareHistogram();
       typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       if (VImageDimension == 2)
       {
@@ -69,13 +63,13 @@ namespace mitk {
         histogramSize[2] = nBins;
       }
       MetricPointer->SetHistogramSize(histogramSize);
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC)
     {
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = metricParameters->GetNumberOfHistogramBinsCorrelationCoefficientHistogram();
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsCorrelationCoefficientHistogram();
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       if (VImageDimension == 2)
       {
@@ -89,13 +83,13 @@ namespace mitk {
         histogramSize[2] = nBins;
       }
       MetricPointer->SetHistogramSize(histogramSize);
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC)
     {
       typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = metricParameters->GetNumberOfHistogramBinsMeanSquaresHistogram();
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMeanSquaresHistogram();
       typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       if (VImageDimension == 2)
       {
@@ -109,13 +103,13 @@ namespace mitk {
         histogramSize[2] = nBins;
       }
       MetricPointer->SetHistogramSize(histogramSize);
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
     {
       typename itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = metricParameters->GetNumberOfHistogramBinsMutualInformationHistogram();
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMutualInformationHistogram();
       typename itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       if (VImageDimension == 2)
       {
@@ -129,13 +123,13 @@ namespace mitk {
         histogramSize[2] = nBins;
       }
       MetricPointer->SetHistogramSize(histogramSize);
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
     {
       typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = metricParameters->GetNumberOfHistogramBinsNormalizedMutualInformationHistogram();
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsNormalizedMutualInformationHistogram();
       typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       if (VImageDimension == 2)
       {
@@ -149,25 +143,25 @@ namespace mitk {
         histogramSize[2] = nBins;
       }
       MetricPointer->SetHistogramSize( histogramSize );
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
     {
       typename itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
-      bool useSampling = metricParameters->GetUseSamplesMattesMutualInformation();
+      bool useSampling = m_MetricParameters->GetUseSamplesMattesMutualInformation();
       if( useSampling )
       {
         // set the number of samples to use
-        MetricPointer->SetNumberOfSpatialSamples( metricParameters->GetSpatialSamplesMattesMutualInformation() );
+        MetricPointer->SetNumberOfSpatialSamples( m_MetricParameters->GetSpatialSamplesMattesMutualInformation() );
       }
       else
       {
         MetricPointer->UseAllPixelsOn();
       }
-      MetricPointer->SetNumberOfHistogramBins(metricParameters->GetNumberOfHistogramBinsMattesMutualInformation());
+      MetricPointer->SetNumberOfHistogramBins(m_MetricParameters->GetNumberOfHistogramBinsMattesMutualInformation());
       MetricPointer->ReinitializeSeed( 76926294 );
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC)
@@ -177,29 +171,29 @@ namespace mitk {
       // The lambda value is the intensity difference that should
       // make the metric drop by 50%
       //------------------------------------------------------------
-      MetricPointer->SetLambda( metricParameters->GetLambdaMeanReciprocalSquareDifference() );
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetLambda( m_MetricParameters->GetLambdaMeanReciprocalSquareDifference() );
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC)
     {
       typename itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetNumberOfSpatialSamples(metricParameters->GetSpatialSamplesMutualInformation());
-      MetricPointer->SetFixedImageStandardDeviation(metricParameters->GetFixedImageStandardDeviationMutualInformation());
-      MetricPointer->SetMovingImageStandardDeviation(metricParameters->GetMovingImageStandardDeviationMutualInformation());
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetNumberOfSpatialSamples(m_MetricParameters->GetSpatialSamplesMutualInformation());
+      MetricPointer->SetFixedImageStandardDeviation(m_MetricParameters->GetFixedImageStandardDeviationMutualInformation());
+      MetricPointer->SetMovingImageStandardDeviation(m_MetricParameters->GetMovingImageStandardDeviationMutualInformation());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC)
     {
       typename itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC)
     {
       typename itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(metricParameters->GetComputeGradient());
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
     }
     return NULL;

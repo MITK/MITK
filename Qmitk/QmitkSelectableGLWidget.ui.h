@@ -35,7 +35,7 @@ void QmitkSelectableGLWidget::init()
   rendererName += name();
 
   // create Renderer
-  m_Renderer= new mitk::VtkPropRenderer( rendererName ); 
+  m_Renderer= mitk::VtkPropRenderer::New( rendererName, NULL ); 
 
   // create widget
   QString composedName("QSGLWt::");

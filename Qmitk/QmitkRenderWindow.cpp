@@ -34,7 +34,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::Vt
   if(m_Renderer.IsNull())
   {
     std::string rendererName(name);
-    m_Renderer = new mitk::VtkPropRenderer( rendererName.c_str(), GetRenderWindow());
+    m_Renderer = mitk::VtkPropRenderer::New( rendererName.c_str(), GetRenderWindow());
   }
 
   m_Renderer->InitRenderer(this->GetRenderWindow());

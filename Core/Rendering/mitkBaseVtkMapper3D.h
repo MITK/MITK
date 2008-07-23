@@ -62,6 +62,12 @@ public:
   //## @brief Apply color and opacity read from the PropertyList
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
+  /** 
+  * \brief Release vtk-based graphics resources. Must be overwritten in
+  * subclasses if vtkProps additional to m_Prop3D are used.
+  */
+  virtual void ReleaseGraphicsResources(vtkWindow *renWin);
+
 protected:
   BaseVtkMapper3D();
 

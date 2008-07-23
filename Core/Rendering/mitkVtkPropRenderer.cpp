@@ -98,6 +98,8 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_CameraController = NULL;
 
     m_VtkRenderer->Delete();
+
+    m_VtkRenderer = NULL;
   }
   else
     m_CameraController = NULL;
@@ -586,6 +588,26 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
   else
   {
     return NULL;
+  }
+}
+
+void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
+{
+  if(m_DataTreeIterator.IsNull())
+    return;
+
+  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+
+  for(;it->IsAtEnd()==false;++it)
+  {
+    mitk::DataTreeNode::Pointer node = it->Get();
+    if(node.IsNull())
+      continue;
+    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    if(mapper.IsNotNull())
+    {
+      mapper->ReleaseGraphicsResources(renWin);
+    }
   }
 }
   

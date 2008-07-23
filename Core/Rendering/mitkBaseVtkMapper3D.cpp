@@ -199,5 +199,12 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 #endif
 }
 
+void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
+{
+  if(m_Prop3D)
+    m_Prop3D->ReleaseGraphicsResources(renWin);
+}
+
+
 } // namespace
 

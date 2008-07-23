@@ -56,7 +56,7 @@ class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
 public:
   
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL);
+  mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow *);
   
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
   enum RenderType{Opaque,Translucent,Overlay};
@@ -112,8 +112,14 @@ public:
   vtkWorldPointPicker* GetWorldPointPicker();
   vtkPointPicker* GetPointPicker();
   
+  /** 
+  * \brief Release vtk-based graphics resources. Called by
+  * vtkMitkRenderProp::ReleaseGraphicsResources.
+  */
+  virtual void ReleaseGraphicsResources(vtkWindow *renWin);
+
 protected:
-  
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL);
   virtual ~VtkPropRenderer();
   virtual void Update();
 

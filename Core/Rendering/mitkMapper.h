@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkWeakPointer.h"
 #include "mitkXMLIO.h"
 
+class vtkWindow;
+
 namespace mitk {
 
   class BaseRenderer;
@@ -102,12 +104,19 @@ namespace mitk {
     virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) = 0;
     virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) = 0;
 
-
-
+    /** 
+    * \brief Returns whether this is an vtk-based mapper
+    */
     bool IsVtkBased() const
     {
       return m_VtkBased;
     }
+
+    /** 
+    * \brief Release vtk-based graphics resources. Must be overwritten in
+    * subclasses if vtkProps are used.
+    */
+    virtual void ReleaseGraphicsResources(vtkWindow *renWin) { };
 
     //##Documentation
     virtual const std::string& GetXMLNodeName() const;

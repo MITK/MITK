@@ -52,7 +52,7 @@ bool mitk::PointSet::IsEmpty(unsigned int t) const
   return IsInitialized() && (GetSize(t) <= 0);
 }
 
-void mitk::PointSet::Resize( unsigned int timeSteps )
+void mitk::PointSet::Expand( unsigned int timeSteps )
 {
   // Check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient pre-initialized
@@ -66,7 +66,7 @@ void mitk::PointSet::Resize( unsigned int timeSteps )
 
   if ( timeSteps > oldSize )
   {
-    Superclass::Resize( timeSteps );
+    Superclass::Expand( timeSteps );
 
     m_PointSetSeries.resize( timeSteps );
     for ( unsigned int i = oldSize; i < timeSteps; ++i )
@@ -225,7 +225,7 @@ mitk::PointSet
 void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
 {
   // Adapt the size of the data vector if necessary
-  this->Resize( t+1 );
+  this->Expand( t+1 );
 
   mitk::Point3D indexPoint;
   this->GetGeometry( t )->WorldToIndex( point, indexPoint );

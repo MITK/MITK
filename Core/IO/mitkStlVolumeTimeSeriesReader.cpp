@@ -31,7 +31,7 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
 
   mitk::Surface::Pointer surface = this->GetOutput();
   std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
-  surface->Resize(m_MatchedFileNames.size());
+  surface->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
   {
     std::string fileName = m_MatchedFileNames[i];

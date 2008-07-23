@@ -52,7 +52,7 @@ mitk::Mesh::DataType* mitk::Mesh::GetMesh( int t )
 
 void mitk::Mesh::SetMesh( DataType *mesh, int t )
 {
-  this->Resize( t+1 );
+  this->Expand( t+1 );
   m_PointSetSeries[t] = mesh;
 }
 

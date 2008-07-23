@@ -66,7 +66,7 @@ namespace mitk {
 
     virtual void Update();
 
-    virtual void Resize( unsigned int timeSteps = 1 );
+    virtual void Expand( unsigned int timeSteps = 1 );
 
     const RegionType& GetLargestPossibleRegion() const
     {

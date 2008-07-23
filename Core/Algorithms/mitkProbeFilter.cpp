@@ -86,7 +86,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
     TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();
     outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeSlicedGeometry()->GetTimeSteps());
 
-    output->Resize(outputTimeSlicedGeometry->GetTimeSteps());
+    output->Expand(outputTimeSlicedGeometry->GetTimeSteps());
     output->SetGeometry( outputTimeSlicedGeometry );
   }
   else

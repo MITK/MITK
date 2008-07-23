@@ -77,12 +77,13 @@ public:
   const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
 
   //##Documentation
-  //## @brief Resizes the TimeSlicedGeometry to a number of TimeSteps.
+  //## @brief Expands the TimeSlicedGeometry to a number of TimeSteps.
   //## 
-  //## The methohd resizes the TimeSlicedGeometry to the given number of TimeSteps,
+  //## The method expands the TimeSlicedGeometry to the given number of TimeSteps,
   //## filling newly created elements with empty geometries. Sub-classes should override
   //## this method to handle the elongation of their data vectors, too.
-  void Resize( unsigned int timeSteps );
+  //## Note that a shrinking is neither possible nor intended.
+  void Expand( unsigned int timeSteps );
 
   //##Documentation
   //## @brief Return the Geometry3D of the data at time \a t.

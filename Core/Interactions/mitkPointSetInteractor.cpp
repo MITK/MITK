@@ -234,7 +234,7 @@ bool mitk::PointSetInteractor
 
   // Make sure that the point set (if time-resolved) has enough entries;
   // if not, create the required extra ones (empty)
-  pointSet->Resize( timeStep+1 );
+  pointSet->Expand( timeStep+1 );
 
   //for reading on the points, Id's etc
   mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet( timeStep );

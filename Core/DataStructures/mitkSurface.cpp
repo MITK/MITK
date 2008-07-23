@@ -51,7 +51,7 @@ mitk::Surface::~Surface()
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 {
   // Adapt the size of the data vector if necessary
-  this->Resize( t+1 );
+  this->Expand( t+1 );
 
   if(m_PolyDataSeries[ t ] != NULL)
   {
@@ -230,13 +230,13 @@ void mitk::Surface::Update()
   Superclass::Update();
 }
 
-void mitk::Surface::Resize( unsigned int timeSteps )
+void mitk::Surface::Expand( unsigned int timeSteps )
 {  
   // check if the vector is long enouth to contain the new element
   // at the given position. If not, expand it with sufficient zero-filled elements.
   if ( timeSteps > m_PolyDataSeries.size() )
   {
-    Superclass::Resize( timeSteps );
+    Superclass::Expand( timeSteps );
     vtkPolyData* pdnull = NULL;
     m_PolyDataSeries.resize( timeSteps, pdnull );
     m_CalculateBoundingBox = true;

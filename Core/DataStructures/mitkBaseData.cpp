@@ -81,10 +81,10 @@ const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
   return GetTimeSlicedGeometry();
 }
 
-void mitk::BaseData::Resize( unsigned int timeSteps )
+void mitk::BaseData::Expand( unsigned int timeSteps )
 {
   if( m_TimeSlicedGeometry.IsNotNull() )
-    m_TimeSlicedGeometry->ResizeToNumberOfTimeSteps( timeSteps );
+    m_TimeSlicedGeometry->ExpandToNumberOfTimeSteps( timeSteps );
 }
 
 const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)

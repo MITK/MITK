@@ -115,12 +115,12 @@ public:
   virtual void InitializeEmpty(unsigned int timeSteps);
 
   //##Documentation
-  //## @brief Resize the number of time steps contained
-  //## to \a timeSteps. Currently, only enlarging is possible.
+  //## @brief Expand the number of time steps contained
+  //## to \a timeSteps.
   //##
   //## New, additional time steps will be initialized empty.
-  //## \warning Currently, only enlarging is possible, not shrinking.
-  virtual void ResizeToNumberOfTimeSteps( unsigned int timeSteps );
+  //## Only enlargement of the time steps vector is intended and possible.
+  virtual void ExpandToNumberOfTimeSteps( unsigned int timeSteps );
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 

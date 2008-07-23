@@ -144,7 +144,7 @@ public:
   typedef DataType::PointDataContainerIterator PointDataIterator;
 
 
-  virtual void Resize( unsigned int timeSteps );
+  virtual void Expand( unsigned int timeSteps );
 
   /** \brief executes the given Operation */
   virtual void ExecuteOperation(Operation* operation);

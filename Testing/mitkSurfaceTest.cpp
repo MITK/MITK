@@ -87,8 +87,8 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   }
 
 
-  std::cout << "Testing mitk::Surface::Resize( timesteps ): ";
-  surface->Resize(5);
+  std::cout << "Testing mitk::Surface::Expand( timesteps ): ";
+  surface->Expand(5);
   surface->Update();
   surface->SetRequestedRegionToLargestPossibleRegion();
   mitk::Surface::RegionType requestedRegion = surface->GetRequestedRegion();

@@ -53,8 +53,8 @@ namespace mitk {
     itkSetMacro( Optimizer, int );
     itkGetMacro( Optimizer, int );
 
-    itkSetMacro( Dimension, int );
-    itkGetMacro( Dimension, int );
+    itkSetMacro( Dimension, unsigned int );
+    itkGetMacro( Dimension, unsigned int );
 
     itkSetMacro( Maximize, bool );
     itkGetMacro( Maximize, bool );

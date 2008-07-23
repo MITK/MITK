@@ -45,7 +45,7 @@
           {
             //static Pointer New(mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
             mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-            mitk::BaseRenderer::Pointer renderer = new mitk::VtkPropRenderer();
+            mitk::BaseRenderer::Pointer renderer = mitk::VtkPropRenderer::New();
             myMP = mitk::MaterialProperty::New(node, renderer);
             MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
             MITK_TEST_CONDITION( node == myMP->GetDataTreeNode(), "Testing if a DataTreeNode object was set correctly" )

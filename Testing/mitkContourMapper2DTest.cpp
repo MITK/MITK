@@ -64,7 +64,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout << "visible bounds: " << bounds << std::endl;
  
   vtkRenderWindow* renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer * renderer = new mitk::VtkPropRenderer("ContourRenderer",renWin);
+  mitk::VtkPropRenderer * renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
     
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
   

@@ -109,7 +109,8 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_Resampler->SetAxisMagnificationFactor(2,0.25);
 
   // For abort rendering mechanism
-  m_VolumeLOD->AutomaticLODSelectionOff();
+  //m_VolumeLOD->AutomaticLODSelectionOff();
+  m_VolumeLOD->AutomaticLODSelectionOn();
 
 
   m_BoundingBox = vtkCubeSource::New();
@@ -209,6 +210,11 @@ void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long
 
 void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
+  // Preliminary fix of bug # 1413: Using flightmodus "F-Key" leads to vtk errors
+  // If this mapper's GenerateData didn't run completely at least once, the VTK internal "F-Key" flight mode does not work due to 
+  // missing instantiations of the m_VolumeLOD inputs/outputs.
+  static bool firstDataGeneration = true;
+  
   if(IsVisible(renderer)==false ||
       GetDataTreeNode() == NULL ||
       dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))==NULL ||
@@ -256,7 +262,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
         }
       }
     }
-    return;
+    if(!firstDataGeneration)
+      return;
   }
 
   SetPreferences();
@@ -281,9 +288,10 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     //std::cout<<"Could not get current LOD "<<std::endl;
   }
 
-  if (m_VolumeLOD) {
+  if (m_VolumeLOD && !firstDataGeneration) {
     m_VolumeLOD->VisibilityOn();
   }
+  firstDataGeneration = false;
 
   mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
   if((input==NULL) || (input->IsInitialized()==false))
@@ -472,23 +480,28 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if(NewRW)
   {
-    m_VtkRWList.push_back(vtkRendWin);
+    //m_VtkRWList.push_back(vtkRendWin);
 
     mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
 
-    vtkCallbackCommand* cbc = vtkCallbackCommand::New();
-    cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
-    vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc);
+    // Preliminary fix of bug # 1293 / 1463 :Black 3D render window after volume rendering and mouse wheel event in 2D widgets
+    // and 3D Surface Rendering slows down enormous after volume rendering
+    // Use of vtkCallback inside the VTK-Rendering Process may cause severe damage to VTK rendering pipeline
+    // We temporarily deactivate the Volume Rendering LOD mechanism, until some alternative for LOD is implemented
 
-    vtkCallbackCommand *startCommand = vtkCallbackCommand::New();
-    startCommand->SetCallback( VolumeDataVtkMapper3D::StartCallback );
-    vtkRendWin->AddObserver( vtkCommand::StartEvent, startCommand );
+    //vtkCallbackCommand* cbc = vtkCallbackCommand::New();
+    //cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
+    //vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc);
 
-    vtkCallbackCommand *endCommand = vtkCallbackCommand::New();
-    endCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
-    vtkRendWin->AddObserver( vtkCommand::EndEvent, endCommand );
+    //vtkCallbackCommand *startCommand = vtkCallbackCommand::New();
+    //startCommand->SetCallback( VolumeDataVtkMapper3D::StartCallback );
+    //vtkRendWin->AddObserver( vtkCommand::StartEvent, startCommand );
 
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+    //vtkCallbackCommand *endCommand = vtkCallbackCommand::New();
+    //endCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
+    //vtkRendWin->AddObserver( vtkCommand::EndEvent, endCommand );
+
+    mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
 
     mitk::RenderingManager::GetInstance()->SetShading(true,0);
     mitk::RenderingManager::GetInstance()->SetShading(true,1);

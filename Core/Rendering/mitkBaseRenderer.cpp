@@ -180,14 +180,9 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_CameraRotationController->AcquireCamera();
 
   m_CameraController = VtkInteractorCameraController::New(); //B/
-  
-
-  m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();
 
   m_VtkRenderer = vtkRenderer::New();
-  
+
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == NULL)
   {  
     mitk::VtkLayerController::AddInstance(m_RenderWindow,m_VtkRenderer);
@@ -201,6 +196,12 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
 //##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
+  if(m_VtkRenderer!=NULL)
+  {
+    m_VtkRenderer->Delete();
+    m_VtkRenderer = NULL;
+  }
+
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
   

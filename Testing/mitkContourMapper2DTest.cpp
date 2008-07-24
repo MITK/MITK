@@ -44,8 +44,8 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   }
   else {
   std::cout<<"[PASSED]"<<std::endl;
-  } 
-  
+  }
+
   contourMapper->SetDataTreeNode( node );
   contourMapper->Update(NULL);
   mitk::Contour* testContour = (mitk::Contour*)contourMapper->GetInput();
@@ -53,27 +53,27 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   
   mitk::DataTree::Pointer dataTree = mitk::DataTree::New();
   mitk::DataTreePreOrderIterator it(dataTree);
-  
+
   it.Add( node );
-  
+
   mitk::BoundingBox::Pointer bounds = mitk::DataTree::ComputeBoundingBox(&it);
-  
+
   std::cout << "bounds: " << bounds << std::endl;
 
   bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
   std::cout << "visible bounds: " << bounds << std::endl;
- 
+
   vtkRenderWindow* renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer * renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
-    
+
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
+
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
-  
+
   renderer->SetData(&it);
 
   std::cout<<"[TEST DONE]"<<std::endl;
 
   renWin->Delete();
-  renderer->Delete();
 
   return EXIT_SUCCESS;
 }

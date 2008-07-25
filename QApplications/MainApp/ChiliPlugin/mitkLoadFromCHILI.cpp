@@ -89,7 +89,10 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromLigh
     ProgressBar::GetInstance()->Progress();
   }
 
-  return CreateNodesFromLists( instance, lightbox->currentSeries()->oid, tmpDirectory );
+  if ( lightbox->getFrames() > 0 )
+    return CreateNodesFromLists( instance, lightbox->currentSeries()->oid, tmpDirectory );
+  else
+    return std::vector<DataTreeNode::Pointer>();
 }
 
 mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mitkIpPicDescriptor* pic)

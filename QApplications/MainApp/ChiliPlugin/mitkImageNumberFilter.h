@@ -15,47 +15,52 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef IMAGENUMBERFILTER_H_HEADER_INCLUDED
-#define IMAGENUMBERFILTER_H_HEADER_INCLUDED
+#ifndef mitkImageNumberFilterHIncluded
+#define mitkImageNumberFilterHIncluded
 
 #include <mitkPicDescriptorToNode.h>
 #include <vector>
 
 namespace mitk {
 
-  /**
-  This class creates multiple mitk::DataTreeNodes (mitk::Images) from a list of mitkIpPicDescriptors.
-
-  WARNING:
-  This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
-  If you use them, be carefull with the parameter.
-  This filter need the CHILI-Version 3.10.
-  */
-
+/**
+ * \brief Basic CHILI images import class.
+ *
+ *
+ * WARNING:
+ * This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
+ * If you use them, be carefull with the parameter.
+ * This filter need the CHILI-Version 3.10.
+ */
 class ImageNumberFilter : public PicDescriptorToNode
 {
   public:
 
    mitkClassMacro( ImageNumberFilter, PicDescriptorToNode );
    itkNewMacro( ImageNumberFilter );
-   /** destructor */
-   virtual ~ImageNumberFilter();
 
     /*!
     \brief Create multiple nodes (images).
-    This function is subdivided into several steps. For further information look at the protected-functions.
+    Calls other methods of this class in turn:
+
+    <li>  SortPicsToGroup
+    <li>  SortSlicesByImageNumber
+    <li>  SeperateBySpacing
+    <li>  SeperateByTime
+    <li>  GenerateImages
+      
     */
     virtual void Update();
 
   protected:
 
-    /** constructor */
-    ImageNumberFilter();
+    ImageNumberFilter();  // purposely hidden, created by New()
+    virtual ~ImageNumberFilter();
 
     /** Struct for single slices. */
     struct Slice
     {
-      mitkIpPicDescriptor* currentPic;
+      mitkIpPicDescriptor* pic;
       Vector3D origin;
       Vector3D normal;
       int imageNumber;
@@ -67,7 +72,7 @@ class ImageNumberFilter : public PicDescriptorToNode
       std::vector< Slice > includedSlices;
       std::string referenceUID;
       std::string seriesDescription;
-      int dimension;
+      int dimension;  // dimension of the images grouped in this group
       Vector3D pixelSize;
       Vector3D normalWithImageSize;
    };
@@ -75,31 +80,57 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** all groups */
     std::vector< Group > m_GroupList;
 
-    /** This struct is used to calculate the most commonly used spacing. */
-    struct Spacing
-    {
-      Vector3D spacing;
-      int count;
-    };
-
-    /** This function sort the mitkIpPicDescriptor to groups and slices.  */
+    /**
+     * \brief Group slices (mitkIpPicDescriptors) of equal size and orientation.
+     *
+     * For 2D slices: compare orientation (normal) and extent in x and y, group similar slices
+     * For 3D volumes: compare origin, orientation and z extent, group similar volumes
+     * For 4D images: sort into separate groups (no 2 4D images are grouped)
+     */
     void SortPicsToGroup();
     /** This function sort the slices by imagenumber and location. */
+  
+    /** 
+     * \brief Sort all slices in each group by image number.
+     * 
+     * Sort by image number if possible, 
+     * else sort by distance of image origin from world origin.
+     * 
+     * Uses ImageNumberFilter::NumberSort for comparison of two slices.
+     */
     void SortSlicesByImageNumber();
-    /** This function seperate mitkIpPicDescriptors with different spacings. */
+
+    /**
+     * \brief Split groups into sub-groups with uniform slice distances.
+     */
     void SeperateBySpacing();
-    /** This function seperate mitkIpPicDescriptors with different time-count. */
+
+    /**
+     * Ensures that for each position in space we have an 
+     * equal number of slices that share this position. The
+     * number of "allowed" slices per position is set to the
+     * minimum number of slices seen for any timestep.
+     *
+     * The loop inside this method will go through all slices and sort 
+     * everything beyond minTimeSteps into a new group (waste?).
+     */
     void SeperateByTime();
-    /** This function seperate two mitkIpPicDescriptors. Three or more slices represent a volume. */
-    void SplitDummiVolumes();
+
     /** This function generate all needed parameter to create the mitk::Images. */
     void GenerateImages();
 
     /** help-functions */
     static bool PositionSort( const Slice elem1, const Slice elem2 );
+    
+    /* \brief Comparison function for std::sort.
+     *
+     * Sort by image number if possible, 
+     * else sort by distance of image origin from world origin.
+     */
     static bool NumberSort( const Slice elem1, const Slice elem2 );
 };
 
 } // namespace mitk
 
 #endif
+

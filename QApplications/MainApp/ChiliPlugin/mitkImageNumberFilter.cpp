@@ -29,26 +29,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <algorithm>  //needed for "sort" (windows)
 
-//help-functions
 bool mitk::ImageNumberFilter::NumberSort( const Slice elem1, const Slice elem2 )
 {
+  /* sort by image number if possible, 
+   * else sort by distance of image origin from world origin */
   if( elem1.imageNumber == elem2.imageNumber )
-    return elem1.origin*elem1.normal < elem2.origin*elem2.normal; // projection of origin on inter-slice-direction
+  {
+    return PositionSort(elem1, elem2);
+  }
   else
+  {
     return elem1.imageNumber < elem2.imageNumber;
+  }
 }
 
 bool mitk::ImageNumberFilter::PositionSort( const Slice elem1, const Slice elem2 )
 {
+  /* sort by distance of image origin from world origin */
   return elem1.origin*elem1.normal < elem2.origin*elem2.normal; // projection of origin on inter-slice-direction
 }
 
-// constructor
 mitk::ImageNumberFilter::ImageNumberFilter()
 {
 }
 
-// destructor
 mitk::ImageNumberFilter::~ImageNumberFilter()
 {
 }
@@ -56,6 +60,7 @@ mitk::ImageNumberFilter::~ImageNumberFilter()
 // the "main"-function
 void mitk::ImageNumberFilter::Update()
 {
+  std::cout << "Update" << std::endl;
   m_Output.clear();
   m_GroupList.clear();
   m_ImageInstanceUIDs.clear();
@@ -63,28 +68,47 @@ void mitk::ImageNumberFilter::Update()
 
   if( m_PicDescriptorList.size() > 0 && m_SeriesOID != "" )
   {
-    ProgressBar::GetInstance()->AddStepsToDo( 6 );
+    ProgressBar::GetInstance()->AddStepsToDo( 5 );
+    
+    // Group slices (mitkIpPicDescriptors) of equal size and orientation.
     SortPicsToGroup();
     ProgressBar::GetInstance()->Progress();
+
+    // Sort slices in groups by image number
     SortSlicesByImageNumber();
     ProgressBar::GetInstance()->Progress();
+
+    // Split groups into sub-groups with uniform slice distances.
     SeperateBySpacing();
     ProgressBar::GetInstance()->Progress();
+
+    // Ensure an equal number of slices per position in space. 
     SeperateByTime();
     ProgressBar::GetInstance()->Progress();
-    SplitDummiVolumes();
-    ProgressBar::GetInstance()->Progress();
+
+    // Create an mitk::Image for each group
     GenerateImages();
     ProgressBar::GetInstance()->Progress();
   }
-  else std::cout<<"ImageNumberFilter-WARNING: No SeriesOID or PicDescriptorList set."<<std::endl;
+  else 
+  {
+    std::cout << "ImageNumberFilter: WARNING: No SeriesOID or PicDescriptorList set." << std::endl;
+  }
 }
 
 void mitk::ImageNumberFilter::SortPicsToGroup()
 {
-  for( std::list< mitkIpPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); currentPic != m_PicDescriptorList.end(); currentPic ++ )
+  std::cout << "SortPicsToGroup... " << std::flush;
+  for( std::list< mitkIpPicDescriptor* >::iterator currentPic = m_PicDescriptorList.begin(); 
+       currentPic != m_PicDescriptorList.end(); 
+       ++currentPic )
   {
-    if( m_Abort ) return;
+    if( m_Abort ) 
+    {
+      std::cout << "ABORT" << std::endl;
+      return;
+    }
+
     //check intersliceGeomtry
     ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>((*currentPic));
     interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
@@ -96,19 +120,19 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
       continue;
     }
 
-    //new Slice
+    //new slice
     Slice newSlice;
-    newSlice.currentPic = (*currentPic);
+    newSlice.pic = (*currentPic);
     vtk2itk( isg->o, newSlice.origin );
-    //set normale
+    //set normal
     Vector3D rightVector, downVector;
     vtk2itk( isg->u, rightVector );
     vtk2itk( isg->v, downVector );
-    newSlice.normal[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2 );
+    newSlice.normal[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2);
     newSlice.normal[1] = Round( ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) ), 2);
     newSlice.normal[2] = Round( ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) ), 2);
     //set imageNumber
-    mitkIpPicTSV_t* imagenumberTag = mitkIpPicQueryTag( newSlice.currentPic, (char*)tagIMAGE_NUMBER );
+    mitkIpPicTSV_t* imagenumberTag = mitkIpPicQueryTag( newSlice.pic, (char*)tagIMAGE_NUMBER );
     if( imagenumberTag && imagenumberTag->type == mitkIpPicInt )
       newSlice.imageNumber = *( (int*)(imagenumberTag->value) );
     else
@@ -116,7 +140,7 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
       mitkIpPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
-      tsv = mitkIpPicQueryTag( newSlice.currentPic, (char*)"SOURCE HEADER" );
+      tsv = mitkIpPicQueryTag( newSlice.pic, (char*)"SOURCE HEADER" );
       if( tsv )
       {
         if( dicomFindElement( (unsigned char*) tsv->value, 0x0020, 0x0013, &data, &len ) )
@@ -153,322 +177,342 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
 
     if( currentDimension < 2 || currentDimension > 4 )
     {
-      std::cout<<"ImageNumberFilter-WARNING: Wrong PicDescriptor-Dimension. Image ignored."<<std::endl;
+      std::cout << "mitk::ImageNumberFilter " 
+                << __FILE__ << " l. " << __LINE__ 
+                << ": Wrong dimension (" << currentDimension << ") in ipPicDescriptor. Image ignored." << std::endl;
       free( isg );
       continue;
     }
 
-    //normale with ImageSize
+    //normal (multiplied by width * height)
     Vector3D currentNormalWithImageSize;
-    rightVector = rightVector * newSlice.currentPic->n[0];
-    downVector = downVector * newSlice.currentPic->n[1];
-    currentNormalWithImageSize[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2 );
+    rightVector = rightVector * newSlice.pic->n[0];
+    downVector = downVector * newSlice.pic->n[1];
+    currentNormalWithImageSize[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2);
     currentNormalWithImageSize[1] = Round( ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) ), 2);
     currentNormalWithImageSize[2] = Round( ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) ), 2);
 
-    bool foundMatch;
-    int curCount, maxCount;
+    bool foundMatch = false;
+    unsigned int curCount = 0;
 
-    if( currentDimension == 4 )
+    if( currentDimension != 4 )
     {
-      //with this combination, no search initialize and a new group created --> 4D-datasets are seperate groups
-      foundMatch = false;
-      curCount = 0;
-      maxCount = 0;
-    }
-    else
-    {
-      //initialize searching
-      foundMatch = false;
-      curCount = 0;
-      maxCount = m_GroupList.size();
-    }
-
-    // searching for equal output
-    while( curCount < maxCount && !foundMatch )
-    {
-      //checking referenceUID, seriesDescription, pixelSize and NormaleWithSize
-      if( m_GroupList[ curCount ].referenceUID == isg->forUID && m_GroupList[ curCount ].seriesDescription == currentSeriesDescription && m_GroupList[ curCount ].pixelSize == currentPixelSize && m_GroupList[ curCount ].normalWithImageSize == currentNormalWithImageSize )
+      // searching for equal output
+      for (curCount = 0; curCount < m_GroupList.size(); ++curCount)
       {
-        if( m_GroupList[ curCount ].dimension == 2 || ( m_GroupList[ curCount ].dimension == 3 && m_GroupList[ curCount ].includedSlices.front().origin == newSlice.origin && m_GroupList[ curCount ].includedSlices.front().currentPic->n[2] == (*currentPic)->n[2] ) )
-          foundMatch = true;
-        else
-          curCount++;
+        //checking referenceUID, seriesDescription, pixelSize and NormaleWithSize
+        if(    m_GroupList[ curCount ].referenceUID        == isg->forUID 
+            /* Following line was deactivated, because this would not create time series
+             * for image series where slices are describes as
+             *
+             *  myspecial_sequence_T=3.2s
+             *  myspecial_sequence_T=3.5s
+             *  myspecial_sequence_T=3.8s
+             *  etc.
+             */
+            /* && m_GroupList[ curCount ].seriesDescription   == currentSeriesDescription */
+            && m_GroupList[ curCount ].pixelSize           == currentPixelSize 
+            && Equal( m_GroupList[ curCount ].normalWithImageSize, currentNormalWithImageSize) )
+        {
+          if(      m_GroupList[ curCount ].dimension == 2       // if we are sorting slices, everything is fine
+              || (    m_GroupList[ curCount ].dimension == 3    // else the origin and z extent is also checked
+                   && m_GroupList[ curCount ].includedSlices.front().origin == newSlice.origin 
+                   && m_GroupList[ curCount ].includedSlices.front().pic->n[2] == (*currentPic)->n[2] 
+                 ) 
+            )
+            m_GroupList[ curCount ].includedSlices.push_back( newSlice ); // similar (equal) group found, inserting current slice or volume
+            foundMatch = true;
+            break;
+        }
       }
-      else
-        curCount++;
     }
 
-    //if a matching output found, add slice or create a new group
-    if( foundMatch )
-      m_GroupList[ curCount ].includedSlices.push_back( newSlice );
-    else
+    // if nothing is found (or ipPicDescriptor has dimension 4), a new group is created
+    if (!foundMatch)
     {
       Group newGroup;
-      newGroup.includedSlices.clear();
       newGroup.includedSlices.push_back( newSlice );
       newGroup.referenceUID = isg->forUID;
       newGroup.seriesDescription = currentSeriesDescription;
       newGroup.dimension = currentDimension;
       newGroup.pixelSize = currentPixelSize;
       newGroup.normalWithImageSize = currentNormalWithImageSize;
+
+      std::cout << "Created new group: " << std::endl;
+      std::cout << "   refUID " << newGroup.referenceUID << std::endl;
+      std::cout << "   desc.  " << newGroup.seriesDescription << std::endl;
+      std::cout << "   dim    " << newGroup.dimension << std::endl;
+      std::cout << "   pixelSZ" << newGroup.pixelSize << std::endl;
+      std::cout << "   normal " << newGroup.normalWithImageSize << std::endl;
+
       m_GroupList.push_back( newGroup );
     }
-  free( isg );
+   
+    free( isg );
   }
+      
+  std::cout << "sorted all pictures into " << m_GroupList.size() << " groups of similar slices." << std::endl;
 }
 
 void mitk::ImageNumberFilter::SortSlicesByImageNumber()
 {
-  for( std::vector< Group >::iterator iter = m_GroupList.begin(); iter != m_GroupList.end(); iter++ )
+  std::cout << "SortSlicesByImageNumber... " << std::flush;
+  for( std::vector< Group >::iterator iter = m_GroupList.begin(); 
+       iter != m_GroupList.end(); 
+       ++iter )
   {
-    std::sort( (*iter).includedSlices.begin(), (*iter).includedSlices.end(), NumberSort );
+    std::sort( iter->includedSlices.begin(), 
+               iter->includedSlices.end(), 
+               NumberSort );  // "comparison operator", defined at beginning of this file
   }
+  std::cout << "done" << std::endl;
 }
 
-// separation on spacing and set minimum of timslices and slices
 void mitk::ImageNumberFilter::SeperateBySpacing()
 {
+  std::cout << "SeperateBySpacing " << std::flush;
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
     if( m_Abort )
     {
       ProgressBar::GetInstance()->Progress( m_GroupList.size() - n );
+      std::cout << " aborted." << std::endl;
       return;
     }
-    if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
+
+    std::vector< Slice >& slicesOfCurrentGroup = m_GroupList[n].includedSlices;
+    
+    if ( m_GroupList[n].dimension != 2 )    
     {
-      int currentCount = 0;  //used to split list
-      //get reference-spacing
-      double referenceSpacing;
-      std::vector< Slice >::iterator originIter = m_GroupList[n].includedSlices.begin();
-      while( originIter != m_GroupList[n].includedSlices.end() && Equal( m_GroupList[n].includedSlices.begin()->origin, originIter->origin ) )
+      ProgressBar::GetInstance()->Progress();
+      continue;
+    }
+    if ( slicesOfCurrentGroup.size() <= 1 ) // only for groups of slices
+    {
+      ProgressBar::GetInstance()->Progress();
+      continue;
+    }
+
+    std::vector< Slice >::iterator sliceIter;
+    Slice* firstSlice = &(slicesOfCurrentGroup.front());
+    double lastDistance = -1.0; // this distance cannot be found between two slices
+    for ( sliceIter  = slicesOfCurrentGroup.begin();
+          sliceIter != slicesOfCurrentGroup.end();
+          ++sliceIter )
+    {
+      if ( Equal(firstSlice->origin, sliceIter->origin ) ) continue;
+        
+      // check if the distance between this slice set (slices at the same point in space) and 
+      // the last slice set is the same as before
+      double currentDistance = Round( (sliceIter->origin - firstSlice->origin).GetNorm(), 2 );
+      if ( Equal(currentDistance, lastDistance) )
       {
-        originIter++;
-        currentCount++;
+        // everything is fine, still in the same distance pattern
+        firstSlice = &(*sliceIter); // remember correct slice for next distance calculation
+        continue;
       }
-
-      if( originIter != m_GroupList[n].includedSlices.end() )
+      else if ( lastDistance < 0.0 )
       {
-        Vector3D tempDistance = originIter->origin - m_GroupList[n].includedSlices.begin()->origin;
-        referenceSpacing = Round( tempDistance.GetNorm(), 2 );
+        // first distance ever calculated
+        lastDistance = currentDistance;
+        firstSlice = &(*sliceIter);
+      }
+      else
+      {
+        std::cout << "Splitting group '" << m_GroupList[n].seriesDescription 
+                  << "' into two because slice distance is not consistent" << std::endl;
+        std::cout << "   slice distance before was: " << lastDistance << std::endl;
+        std::cout << "   slice distance is now: " << currentDistance << std::endl;
 
-        std::vector< Slice >::iterator iterB4 = originIter;
-        while( originIter != m_GroupList[n].includedSlices.end() )
-        {
-          ProgressBar::GetInstance()->AddStepsToDo( 1 );
-          if( Equal ( iterB4->origin, originIter->origin ) )
-          {
-            originIter++;
-            currentCount++;
-          }
-          else
-          {
-            tempDistance = originIter->origin - iterB4->origin;
-            double tmpSpacing = Round( tempDistance.GetNorm(), 2 );
-            if( tmpSpacing == referenceSpacing )
-            {
-              iterB4 = originIter;
-              originIter++;
-              currentCount++;
-            }
-            else
-            {
-              Group newGroup;
-              newGroup.referenceUID = m_GroupList[n].referenceUID;
-              newGroup.seriesDescription = m_GroupList[n].seriesDescription;
-              newGroup.dimension = m_GroupList[n].dimension;
-              newGroup.pixelSize = m_GroupList[n].pixelSize;
-              newGroup.includedSlices.clear();
-              newGroup.includedSlices.assign( originIter, m_GroupList[n].includedSlices.end() );
-              m_GroupList[n].includedSlices.resize( currentCount );
-              m_GroupList.push_back( newGroup );
-              originIter = m_GroupList[n].includedSlices.end();
-            }
-          }
-          ProgressBar::GetInstance()->Progress();
-        }
+        // split group into two separate groups
+        Group newGroup;
+        newGroup.referenceUID = m_GroupList[n].referenceUID;
+        newGroup.seriesDescription = m_GroupList[n].seriesDescription;
+        newGroup.dimension = m_GroupList[n].dimension;
+        newGroup.pixelSize = m_GroupList[n].pixelSize;
+        newGroup.includedSlices.assign( sliceIter, slicesOfCurrentGroup.end() ); // new group contains the non-fitting remaining slices
+        slicesOfCurrentGroup.erase( sliceIter, slicesOfCurrentGroup.end() );
+        
+        m_GroupList.push_back( newGroup );
+        std::cout << "." << std::flush;
+        break; // continue outer for-groups loop
       }
     }
-    ProgressBar::GetInstance()->Progress();
+
+    ProgressBar::GetInstance()->Progress(); // one group processed
   }
+  
+  std::cout << " done" << std::endl;
 }
 
 void mitk::ImageNumberFilter::SeperateByTime()
 {
+  std::cout << "SeperateByTime: time steps in groups: " << std::flush; 
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
     if( m_Abort )
     {
       ProgressBar::GetInstance()->Progress( m_GroupList.size() - n );
+      std::cout << " aborted." << std::endl;
       return;
     }
-    if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() > 2 )
+    
+    std::vector< Slice >& slicesOfCurrentGroup = m_GroupList[n].includedSlices;
+   
+    if ( m_GroupList[n].dimension != 2 )    
     {
-      bool differentTimeSliced = false;
-      unsigned int minTimeSteps = 0;
+      ProgressBar::GetInstance()->Progress();
+      continue;
+    }
+    if ( slicesOfCurrentGroup.size() <= 1 ) // only for groups of slices
+    {
+      ProgressBar::GetInstance()->Progress();
+      continue;
+    }
 
-      std::vector< Slice >::iterator walkIter = m_GroupList[n].includedSlices.begin();
-      walkIter++;
-      unsigned int timeSteps = 0;
-      Vector3D tmpOrigin = m_GroupList[n].includedSlices.front().origin;
+    unsigned int minTimeSteps = std::numeric_limits<unsigned int>::max();
 
-      for( ; walkIter != m_GroupList[n].includedSlices.end(); walkIter++ )
+    Vector3D lastOrigin;
+    lastOrigin.Fill( std::numeric_limits<mitk::ScalarType>::infinity() );
+
+    unsigned int timeStepsAtThisPosition = 1;
+    unsigned int differentTimeStepCount = 0;
+    for ( std::vector< Slice >::iterator sliceIter = slicesOfCurrentGroup.begin();
+          sliceIter != slicesOfCurrentGroup.end();
+          ++sliceIter )
+    {
+      if( Equal ( lastOrigin, sliceIter->origin ) ) // while slices share a position in space, count their number
       {
-        ProgressBar::GetInstance()->AddStepsToDo( 1 );
-        if( Equal ( tmpOrigin, walkIter->origin ) )
-          timeSteps++;
-        else
-        {
-          if( timeSteps < minTimeSteps || minTimeSteps == 0 )
-          {
-            minTimeSteps = timeSteps;
-            if( timeSteps < minTimeSteps )
-              differentTimeSliced = true;
-          }
-        }
-        tmpOrigin = walkIter->origin;
-        ProgressBar::GetInstance()->Progress();
+        ++timeStepsAtThisPosition;
       }
-
-      if( differentTimeSliced )
+      else
       {
-        Group newGroup;
-        newGroup.referenceUID = m_GroupList[n].referenceUID;
-        newGroup.seriesDescription = m_GroupList[n].seriesDescription;
-        newGroup.dimension = m_GroupList[n].dimension;
-        newGroup.pixelSize = m_GroupList[n].pixelSize;
-        newGroup.includedSlices.clear();
-
-        unsigned int currentTimeStep = 0;
-        tmpOrigin = m_GroupList[n].includedSlices.front().origin;
-        std::vector< Slice >::iterator delIter = m_GroupList[n].includedSlices.begin();
-        delIter++;
-        while( delIter != m_GroupList[n].includedSlices.end() )
+        if ( timeStepsAtThisPosition < minTimeSteps ) // remember the minimum number of slices that share a position
         {
-          if( Equal( delIter->origin, tmpOrigin ) )
-            currentTimeStep++;
-          else currentTimeStep = 0;
+          ++differentTimeStepCount;
+          minTimeSteps = timeStepsAtThisPosition;
+        }
+        timeStepsAtThisPosition = 1;
+      }
+    }
 
-          if( currentTimeStep > minTimeSteps )
+    std::cout << minTimeSteps << " " << std::flush;
+
+    // Now ensure that for each position in space we have an equal number of slices that
+    // share this position. The maximum number of allowed slices here is minTimeSteps.
+    // The following loop will go through all slices and sort everything beyond minTimeSteps
+    // into a new group (waste?).
+    if( differentTimeStepCount > 1 ) // one will happen regularly due to the comparison with max()
+    {
+      Group newGroup;
+      newGroup.referenceUID = m_GroupList[n].referenceUID;
+      newGroup.seriesDescription = m_GroupList[n].seriesDescription;
+      newGroup.dimension = m_GroupList[n].dimension;
+      newGroup.pixelSize = m_GroupList[n].pixelSize;
+
+      unsigned int currentTimeStep = 0;
+      lastOrigin = slicesOfCurrentGroup.front().origin;
+      std::vector< Slice >::iterator delIter = slicesOfCurrentGroup.begin();
+      ++delIter; 
+      while( delIter != slicesOfCurrentGroup.end() )
+      {
+        if( Equal( delIter->origin, lastOrigin ) ) // still at the same position in space?
+        {
+          if( ++currentTimeStep >= minTimeSteps )  // beyond the allowed limit?
           {
-            newGroup.includedSlices.push_back( (*delIter) );
-            delIter = m_GroupList[n].includedSlices.erase( delIter );
+            newGroup.includedSlices.push_back( (*delIter) ); // then sort slice into new group
+            delIter = slicesOfCurrentGroup.erase( delIter );
           }
           else
           {
-            tmpOrigin = delIter->origin;
-            delIter++;
+            ++delIter;
           }
         }
-        m_GroupList.push_back( newGroup );
+        else // new position in space, but the number of slices seen before was ok
+        {
+          currentTimeStep = 0;
+          lastOrigin = delIter->origin;
+          ++delIter;
+        }
       }
+      
+      m_GroupList.push_back( newGroup ); // add the new group to the list of groups 
+                                         // (and automatically process it within the outer loop)
     }
+
     ProgressBar::GetInstance()->Progress();
   }
-}
 
-void mitk::ImageNumberFilter::SplitDummiVolumes()
-{
-  for( unsigned int n = 0; n < m_GroupList.size(); n++)
-  {
-    if( m_Abort ) return;
-    if( m_GroupList[n].dimension == 2 && m_GroupList[n].includedSlices.size() == 2 )
-    {
-      if( !Equal( m_GroupList[n].includedSlices.front().origin, m_GroupList[n].includedSlices.back().origin ) )  // 2D+t ?
-      {
-        Group newGroup;
-        newGroup.referenceUID = m_GroupList[n].referenceUID;
-        newGroup.seriesDescription = m_GroupList[n].seriesDescription;
-        newGroup.dimension = m_GroupList[n].dimension;
-        newGroup.pixelSize = m_GroupList[n].pixelSize;
-        newGroup.includedSlices.clear();
-        newGroup.includedSlices.push_back( m_GroupList[n].includedSlices.back() );
-        m_GroupList.push_back( newGroup );
-        m_GroupList[n].includedSlices.pop_back();
-      }
-    }
-  }
+  std::cout << " done" << std::endl;
 }
 
 void mitk::ImageNumberFilter::GenerateImages()
 {
-  for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); groupIter != m_GroupList.end(); groupIter++ )
+  std::cout << "GenerateImages: " << std::flush;
+  for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); 
+       groupIter != m_GroupList.end(); 
+       ++groupIter )
   {
     if( m_Abort ) return;
-    //get time, count
-    int timeSteps = 0, sliceSteps = 0;
-    std::vector< Slice >::iterator originIter = groupIter->includedSlices.begin();
-    while( originIter != groupIter->includedSlices.end() && Equal( groupIter->includedSlices.begin()->origin, originIter->origin ) )
-    {
-      timeSteps++;
-      originIter++;
-    }
-    sliceSteps = groupIter->includedSlices.size()/timeSteps;
 
-    //get spacing
+    std::vector< Slice >& slicesOfCurrentGroup = groupIter->includedSlices;
+    
+    // get number of time steps and slice count per time step for this group
+    unsigned int timeSteps = 0;
+    std::vector< Slice >::iterator sliceIter = slicesOfCurrentGroup.begin();
+    while(    sliceIter != slicesOfCurrentGroup.end() 
+           && Equal( slicesOfCurrentGroup.front().origin, sliceIter->origin ) )
+    {
+      ++timeSteps;
+      ++sliceIter;
+    }
+    assert (timeSteps > 0); // otherwise logic error in some earlier function
+    unsigned int slicesPerTimeStep = slicesOfCurrentGroup.size() / timeSteps;
+
+    //get image spacing
     Vector3D spacing;
-    //initialize
-    ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(groupIter->includedSlices.begin()->currentPic);
+    ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(slicesOfCurrentGroup.front().pic);
     interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
     pFetchSliceGeometryFromPic( chiliPic, isg );
     vtk2itk( isg->ps, spacing );
-    if( spacing[0] == 0 && spacing[1] == 0 && spacing[2] == 0 )
-      spacing.Fill(1.0);
+    if(    Equal(spacing[0], 0.0) 
+        && Equal(spacing[1], 0.0) 
+        && Equal(spacing[2], 0.0) 
+      ) 
+    {
+      spacing.Fill(1.0); // if no good spacing, then use default spacing 1,1,1
+    }
     free( isg );
-    //get the not rounded spacing
-    std::list<Spacing> SpacingList;
-    SpacingList.clear();
-    std::vector< Slice >::iterator walkIter = groupIter->includedSlices.begin();
-    walkIter++;
-    for( ; walkIter != groupIter->includedSlices.end(); walkIter ++)
+
+    // we calculate the spacing ourselves (don't trust the slices)
+    Slice& firstSlice = slicesOfCurrentGroup.front();
+    for ( sliceIter  = slicesOfCurrentGroup.begin();
+          sliceIter != slicesOfCurrentGroup.end();
+          ++sliceIter )
     {
-      std::vector<Slice>::iterator iterB4 = walkIter;
-      iterB4--;
-      if( !Equal( walkIter->origin, iterB4->origin ) )
-      {
-        Vector3D tempDistance = walkIter->origin - iterB4->origin;
-        spacing[2] = tempDistance.GetNorm();
-        //search for spacing
-        std::list<Spacing>::iterator searchIter = SpacingList.begin();
-        for( ; searchIter != SpacingList.end(); searchIter++ )
-        {
-          if( Equal( searchIter->spacing, spacing) )
-          {
-            searchIter->count++;
-            break;
-          }
-        }
-        //dont exist, create new entry
-        if( searchIter == SpacingList.end() )
-        {
-          Spacing newElement;
-          newElement.spacing = spacing;
-          newElement.count = 1;
-          SpacingList.push_back( newElement );
-        }
-      }
-    }
-    //get spacing
-    int count = 0;
-    for( std::list<Spacing>::iterator searchIter = SpacingList.begin(); searchIter != SpacingList.end(); searchIter++ )
+      if ( Equal(firstSlice.origin, sliceIter->origin ) ) continue;
+
+      spacing[2] = (sliceIter->origin - firstSlice.origin).GetNorm();
+      break;
+     }
+        
+    // build image volume from a list of pic descriptors
+    std::sort( slicesOfCurrentGroup.begin(), slicesOfCurrentGroup.end(), PositionSort );
+    
+    std::list<mitkIpPicDescriptor*> picList;
+    for( std::vector< Slice >::iterator sliceIter = slicesOfCurrentGroup.begin(); 
+        sliceIter != slicesOfCurrentGroup.end(); 
+        ++sliceIter )
     {
-      if( searchIter->count > count )
-      {
-        spacing = searchIter->spacing;
-        count = searchIter->count;
-      }
+      picList.push_back( sliceIter->pic );
     }
 
-    //get all mitkIpPicDescriptor
-    std::sort( groupIter->includedSlices.begin(), groupIter->includedSlices.end(),PositionSort );
-    std::list<mitkIpPicDescriptor*> usedPic;
-    usedPic.clear();
-    for( std::vector< Slice >::iterator picIter = groupIter->includedSlices.begin(); picIter != groupIter->includedSlices.end(); picIter++ )
-      usedPic.push_back( picIter->currentPic );
-
-    GenerateData( usedPic, sliceSteps, timeSteps, spacing, groupIter->seriesDescription );
+    // method of the super class
+    GenerateData( picList, slicesPerTimeStep, timeSteps, spacing, groupIter->seriesDescription );
+    std::cout << "." << std::flush;
   }
+  std::cout << " done" << std::endl;
 }
+

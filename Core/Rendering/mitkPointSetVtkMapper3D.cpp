@@ -85,6 +85,14 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
   m_ContourActor->Delete();
 }
 
+void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
+{
+  m_PointsAssembly->ReleaseGraphicsResources(renWin);
+
+  m_SelectedActor->ReleaseGraphicsResources(renWin);
+  m_UnselectedActor->ReleaseGraphicsResources(renWin);
+  m_ContourActor->ReleaseGraphicsResources(renWin);
+}
 
 void mitk::PointSetVtkMapper3D::GenerateData()
 {
@@ -340,7 +348,6 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   {
     m_VtkSelectedPolyDataMapper = vtkPolyDataMapper::New();
     m_VtkSelectedPolyDataMapper->SetInput(m_vtkSelectedPointList->GetOutput());
-    m_vtkSelectedPointList->Delete();
 
     //create a new instance of the actor
     m_SelectedActor->Delete();
@@ -350,12 +357,12 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_VtkSelectedPolyDataMapper->Delete();
     m_PointsAssembly->AddPart(m_SelectedActor);
   }
+  m_vtkSelectedPointList->Delete();
 
   if (m_NumberOfUnselectedAdded > 0)
   {
     m_VtkUnselectedPolyDataMapper = vtkPolyDataMapper::New();
     m_VtkUnselectedPolyDataMapper->SetInput(m_vtkUnselectedPointList->GetOutput());
-    m_vtkUnselectedPointList->Delete();
 
     //create a new instance of the actor
     m_UnselectedActor->Delete();
@@ -365,6 +372,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_VtkUnselectedPolyDataMapper->Delete();
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
+  m_vtkUnselectedPointList->Delete();
 
     //apply props
   Superclass::ApplyProperties( m_ContourActor, NULL );

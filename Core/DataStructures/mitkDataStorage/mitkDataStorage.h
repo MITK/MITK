@@ -61,7 +61,11 @@ namespace mitk {
 
     static DataStorage* CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
     static DataStorage* GetInstance();    // Singleton pattern like access method
-    
+
+    //##Documentation
+    //## @brief Shutdown the singleton. Workaround for bug #1446
+    static void ShutdownSingleton();
+
     //##Documentation
     //## @brief A Container of objects that is used as a resultset of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
     typedef itk::VectorContainer<unsigned int, mitk::DataTreeNode::Pointer> SetOfObjects;

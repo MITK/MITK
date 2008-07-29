@@ -1276,6 +1276,7 @@ void QmitkMainTemplate::destroy()
   delete m_SceneWidget;
 #endif
 
+  mitk::DataStorage::GetInstance()->ShutdownSingleton();
   m_Tree = NULL;
 }
 

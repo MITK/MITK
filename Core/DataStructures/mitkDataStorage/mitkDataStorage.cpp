@@ -37,6 +37,18 @@ mitk::DataStorage::DataStorage()
 
 mitk::DataStorage::~DataStorage()
 {
+  if(m_DataTree.IsNotNull())
+  {
+    m_DataTree->RemoveObserver(m_DeleteInTreeObserverTag);
+  }
+
+  // workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
+  // which happens when a PlugIn is re-initialized within Chili
+  if(s_Instance.IsNotNull())
+  {
+    s_Instance->m_DataTree->UnRegister();
+  }
+
   m_DataTree = NULL; 
 }
 
@@ -443,4 +455,13 @@ const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
   }
 
   return result;
+}
+
+void mitk::DataStorage::ShutdownSingleton()
+{
+  if(s_Instance.IsNotNull())
+  {
+    s_Instance->m_DataTree->UnRegister();
+  }
+  s_Instance = NULL; 
 }

@@ -36,6 +36,7 @@ SET(CPP_FILES
   mitkVolumeDataVtkMapper3D.cpp
   vtkMitkRenderProp.cpp
   mitkVtkPropRenderer.cpp
+  mitkVtkWidgetRendering.cpp
   mitkColoredRectangleRendering.cpp
   vtkMitkRectangleProp.cpp
   vtkUnstructuredGridMapper.cpp

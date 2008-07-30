@@ -155,6 +155,13 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             return;
           }
 
+          // check if extension is .mps
+          if (qfileName.endsWith(".mps")==false)
+          {
+            QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing PointSet data. Choose .mps");
+            return;
+          }
+
           if (fileName.empty() == false )
           {
             mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
@@ -558,7 +565,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 
   std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
   selectedItemsName += ".stl";
-  QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk)");
+  QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk *.vtp)");
   if (qfileName != NULL )
   {
     //check if file is valid for writing
@@ -585,14 +592,19 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       writer->GetVtkWriter()->SetDataModeToBinary();
       writer->Write();
     }
-    else
+    else if (qfileName.endsWith(".vtk")==true)
     {
-      if (qfileName.endsWith(".vtk")==false)
-        qfileName += ".vtk";
+      /*if (qfileName.endsWith(".vtk")==false)
+        qfileName += ".vtk";*/
       mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
       writer->SetInput( surface );
       writer->SetFileName(qfileName.latin1());
       writer->Write();
+    }
+    else
+    {
+      // file extension not suitable for writing specified data type
+      QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Surface data. Choose .vtk, .stl or .vtp");
     }
     fileName = qfileName.ascii();
   }
@@ -647,6 +659,12 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
                                                  ".pic.gz format. You must save as a normal .pic file.\n"
                                                  "Please press Save again and choose a filename with a .pic ending.",
                                                  QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+      return "";
+    }
+    // check if extension is suitable for writing image data
+    if ((extension!=".pic")&&(extension!=".mhd")&&(extension!=".vtk")&&(extension!=".vti")&&(extension!=".hdr")&&(extension!=".png")&&(extension!=".tif")&&(extension!=".jpg"))
+    {
+      QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Image data. Choose .pic, .mhd, .vtk, .vti, .hdr, .png, .tif or .jpg");
       return "";
     }
     dir += "/";

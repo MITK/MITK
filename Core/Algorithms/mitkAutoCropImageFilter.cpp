@@ -19,18 +19,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageCast.h"
 #include <itkImageRegionConstIterator.h>
-#include <itkImageRegionIterator.h>
-#include <mitkImage.h>
-#include <vtkLinearTransform.h>
-#include "mitkTimeHelper.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkGeometry3D.h"
 #include "mitkStatusBar.h"
 
 
 template < typename TPixel, unsigned int VImageDimension>
-void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage)
+void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep)
 {
+
+  if (inputItkImage == NULL)
+  {
+    mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
+    std::cout << " image is NULL...returning" << std::endl;
+    return; 
+  }
+
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
   typedef typename InternalImageType::Pointer            InternalImagePointer;
 
@@ -47,61 +51,11 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   outputItk = cropFilter->GetOutput();
   outputItk->DisconnectPipeline();
 
+  mitk::Image::Pointer newMitkImage = mitk::Image::New();
+  mitk::CastToMitkImage( outputItk, newMitkImage );
 
-  // ************************* MITK import
-
-  typedef typename itk::ImageBase<VImageDimension>::RegionType ItkRegionType;
-  typedef itk::ImageRegionIteratorWithIndex< InternalImageType > ItkInputImageIteratorType;
-
-  if (inputItkImage == NULL)
-  {
-    mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-    std::cout << " image is NULL...returning" << std::endl;
-    return; 
-  }
-
-  // PART 1: convert m_InputRequestedRegion (type mitk::SlicedData::RegionType)
-  // into ITK-image-region (ItkImageType::RegionType)
-  // unfortunately, we cannot use input->GetRequestedRegion(), because it
-  // has been destroyed by the mitk::CastToItkImage call of PART 1
-  // (which sets the m_RequestedRegion to the LargestPossibleRegion).
-  // Thus, use our own member m_InputRequestedRegion insead.
-  
-  // first convert the index
-  typename ItkRegionType::IndexType index;
-  index.Fill(0);
-  typename ItkRegionType::SizeType size;
-  size[0] = outputItk->GetLargestPossibleRegion().GetSize()[0];
-  size[1] = outputItk->GetLargestPossibleRegion().GetSize()[1];
-  size[2] = outputItk->GetLargestPossibleRegion().GetSize()[2];
-  
-  //create the ITK-image-region out of index and size
-  ItkRegionType inputRegionOfInterest(index, size);
-
-  // PART 2: get access to the MITK output image via an ITK image
-  typename mitk::ImageToItk<InternalImageType>::Pointer outputimagetoitk = mitk::ImageToItk<InternalImageType>::New();
-  mitk::Image::Pointer timeImage = m_OutputTimeSelector->GetOutput();
-  outputimagetoitk->SetInput(timeImage);
-  outputimagetoitk->Update();
-  typename InternalImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
-//  outputItkImage->DisconnectPipeline();
-
-  // PART 3: iterate over input and output using ITK iterators
-  
-  // create the iterators
-  ItkInputImageIteratorType  inputIt( inputItkImage, outputItk->GetLargestPossibleRegion());
-  ItkInputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
-
-  // Cut the boundingbox out of the image by iterating through 
-  // all pixels and checking if they are inside using IsInside()
-  mitk::Point3D p;
-
-  for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
-  {
-    outputIt.Set(inputIt.Get());
-  }
-
-  // *************************
+  ipPicDescriptor* image3D = newMitkImage->GetVolumeData(0)->GetPicDescriptor();
+  this->GetOutput()->SetPicVolume( image3D , timestep );
 }
 
 
@@ -110,8 +64,7 @@ mitk::AutoCropImageFilter::AutoCropImageFilter()
   m_MarginFactor(1.0),
   m_OverrideCroppingRegion(false)
 {
-  m_InputTimeSelector  = mitk::ImageTimeSelector::New();
-  m_OutputTimeSelector = mitk::ImageTimeSelector::New();
+  m_TimeSelector = mitk::ImageTimeSelector::New();
 }
 
 
@@ -121,9 +74,14 @@ mitk::AutoCropImageFilter::~AutoCropImageFilter()
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
 {
-  ComputeNewImageBounds();
-//  mitk::Image::ConstPointer input  = this->GetInput();
   mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
+  if(input->GetDimension() <= 2)
+  {
+    std::cout << "Only 3D any 4D images are supported." << std::endl;
+    return;
+  }
+  ComputeNewImageBounds();
+  //  mitk::Image::ConstPointer input  = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -163,7 +121,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     // crop not possible => do nothing: set time size to 0.
     size.Fill(0);
     m_InputRequestedRegion.SetSize(size);
-    boRegion.SetSize(size);
     return;
   }
 
@@ -172,6 +129,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   input->SetRequestedRegion(&m_InputRequestedRegion);
 
   // PART II: initialize output image
+
   unsigned int dimension = input->GetDimension();
   unsigned int *dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
@@ -180,15 +138,15 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   output->Initialize(mitk::PixelType( GetOutputPixelType() ), dimension, dimensions);
   delete [] dimensions;
 
-  // set the spacing
-  mitk::Vector3D spacing = input->GetSlicedGeometry()->GetSpacing();
-  output->SetSpacing(spacing);
+  // Set the spacing
+  output->GetGeometry()->SetIndexToWorldTransform( input->GetGeometry()->GetIndexToWorldTransform() );
+  output->SetSpacing( input->GetSlicedGeometry()->GetSpacing() );
   
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
   mitk::Point3D origin; vtk2itk(start, origin);
-  inputImageGeometry->IndexToWorld(origin, origin);
+  input->GetSlicedGeometry()->IndexToWorld(origin, origin);
   slicedGeometry->SetOrigin(origin);
 
   mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
@@ -208,39 +166,34 @@ void mitk::AutoCropImageFilter::GenerateData()
   if(input.IsNull())
     return;  
 
+  // TODO also implement 2D
+  if(input->GetDimension() <= 2)
+  {
+    std::cerr << "Only 3D and 4D images supported";
+    return;
+  }
+
   if((output->IsInitialized()==false) )
     return;
 
-  m_InputTimeSelector->SetInput(input);
-  m_OutputTimeSelector->SetInput(this->GetOutput());
+  if( m_TimeSelector.IsNull() ) m_TimeSelector = mitk::ImageTimeSelector::New();
+
+  m_TimeSelector->SetInput(input);
 
   mitk::SlicedData::RegionType outputRegion = input->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
 
-  ScalarType timeInMS;
+  int tstart = outputRegion.GetIndex(3);
+  int tmax = tstart + outputRegion.GetSize(3);
 
-  int timestep=0;
-  int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3);
-
-  int t;
-  for(t=tstart;t<tmax;++t)
+  for( unsigned int timestep=tstart;timestep<tmax;++timestep )
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
+    m_TimeSelector->SetTimeNr(timestep);
+    m_TimeSelector->UpdateLargestPossibleRegion();
 
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-
-    m_InputTimeSelector->SetTimeNr(t);
-    m_InputTimeSelector->UpdateLargestPossibleRegion();
-    m_OutputTimeSelector->SetTimeNr(t);
-    m_OutputTimeSelector->UpdateLargestPossibleRegion();
-
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-
-    // TODO what about 2D?
-    AccessFixedDimensionByItk( m_InputTimeSelector->GetOutput(), ITKCrop3DImage, 3);
+    AccessFixedDimensionByItk_1( m_TimeSelector->GetOutput(), ITKCrop3DImage, 3, timestep );
   }
+
+  // this->GetOutput()->Update(); // Not sure if this is necessary...
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -248,18 +201,6 @@ void mitk::AutoCropImageFilter::GenerateData()
 void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 {
   mitk::Image::ConstPointer img;
-  if ( this->GetInput()->GetDimension()==4)
-  {
-    mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput( this->GetInput() );
-    timeSelector->SetTimeNr( 0 );
-    timeSelector->UpdateLargestPossibleRegion(); 
-    img = timeSelector->GetOutput();
-  }
-  else if (this->GetInput()->GetDimension() == 3 )
-  {
-    img =  this->GetInput();
-  }
 
   if (m_OverrideCroppingRegion)
   {
@@ -274,40 +215,81 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
   }
   else
   {
+    mitk::Image::Pointer inputMitk = const_cast< mitk::Image * > ( this->GetInput() );
+
+    // Check if a 3D or 4D image is present
+    unsigned int timeSteps = 1;
+    if (inputMitk->GetDimension() == 4 ) timeSteps = inputMitk->GetDimension(3);
+
+    ImageType::IndexType minima,maxima;
+
+    m_TimeSelector = mitk::ImageTimeSelector::New();
+    m_TimeSelector->SetInput( inputMitk );
 
     ImagePointer inputItk = ImageType::New();
+
+    if (inputMitk->GetDimension() == 3) 
+      img = inputMitk;
+    else if (inputMitk->GetDimension() == 4)
+    {
+      // initialize with time step 0
+      m_TimeSelector->SetTimeNr( 0 );
+      m_TimeSelector->UpdateLargestPossibleRegion(); 
+      img = m_TimeSelector->GetOutput();
+    }
+
     mitk::CastToItkImage( img , inputItk );
-    typedef itk::ImageRegionConstIterator< ImageType > ConstIteratorType;
-    ConstIteratorType inIt( inputItk,  inputItk->GetLargestPossibleRegion() );
-    ImageType::IndexType minima,maxima;
+
+    // it is assumed that all volumes in a time series have the same 3D dimensions
+    ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
+
+    // Initialize min and max on the first (or only) time step
     maxima = inputItk->GetLargestPossibleRegion().GetIndex();
     minima[0] = inputItk->GetLargestPossibleRegion().GetSize()[0];
     minima[1] = inputItk->GetLargestPossibleRegion().GetSize()[1];
     minima[2] = inputItk->GetLargestPossibleRegion().GetSize()[2];
 
-    for ( inIt.GoToBegin(); !inIt.IsAtEnd(); ++inIt)
+    typedef itk::ImageRegionConstIterator< ImageType > ConstIteratorType;
+
+    for(unsigned int idx = 0; idx < timeSteps; ++idx)
     {
-      float pix_val = inIt.Get();
-      if ( fabs(pix_val - m_BackgroundValue) > mitk::eps )
+       // if 4D image, update time step and itk image
+      if( idx > 0)
       {
-        for (int i=0; i < 3; i++)
+        m_TimeSelector->SetTimeNr( idx );
+        m_TimeSelector->UpdateLargestPossibleRegion(); 
+        img = m_TimeSelector->GetOutput();
+        mitk::CastToItkImage( img , inputItk );
+        ImageType::RegionType xxx = inputItk->GetLargestPossibleRegion();
+      }
+
+      ConstIteratorType inIt( inputItk,  origRegion );
+
+      for ( inIt.GoToBegin(); !inIt.IsAtEnd(); ++inIt)
+      {
+        float pix_val = inIt.Get();
+        if ( fabs(pix_val - m_BackgroundValue) > mitk::eps )
         {
-          minima[i] = vnl_math_min((int)minima[i],(int)(inIt.GetIndex()[i]));
-          maxima[i] = vnl_math_max((int)maxima[i],(int)(inIt.GetIndex()[i]));
+          for (int i=0; i < 3; i++)
+          {
+            minima[i] = vnl_math_min((int)minima[i],(int)(inIt.GetIndex()[i]));
+            maxima[i] = vnl_math_max((int)maxima[i],(int)(inIt.GetIndex()[i]));
+          }
         }
       }
     }
 
-    m_RegionSize[0] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
-    m_RegionSize[1] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
-    m_RegionSize[2] = (ImageType::RegionType::SizeType::SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
+    typedef ImageType::RegionType::SizeType::SizeValueType  SizeValueType;
+
+    m_RegionSize[0] = (SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
+    m_RegionSize[1] = (SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
+    m_RegionSize[2] = (SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
     m_RegionIndex = minima;
 
     m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2;
     m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2;
     m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2;
 
-    ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
     ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);
     origRegion.Crop(cropRegion);
     
@@ -323,6 +305,8 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     m_LowerBounds[1] = m_RegionIndex[1];
     m_LowerBounds[2] = m_RegionIndex[2];
 
+    // It is assumed that the first and the last 3D images have the same LargestPossibleRegion.
+    // If they have not, this will surely crash somewhere.
     m_UpperBounds[0] = inputItk->GetLargestPossibleRegion().GetSize()[0]-m_RegionSize[0]-m_RegionIndex[0];
     m_UpperBounds[1] = inputItk->GetLargestPossibleRegion().GetSize()[1]-m_RegionSize[1]-m_RegionIndex[1];
     m_UpperBounds[2] = inputItk->GetLargestPossibleRegion().GetSize()[2]-m_RegionSize[2]-m_RegionIndex[2];
@@ -332,7 +316,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
 void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 {
-  //todo
+
 }
 
 const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType() 

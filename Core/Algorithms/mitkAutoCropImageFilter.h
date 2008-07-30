@@ -65,7 +65,7 @@ protected:
   void ComputeNewImageBounds();
 
   template < typename TPixel, unsigned int VImageDimension> 
-  void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage );
+  void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep );
 
 
 protected:
@@ -96,8 +96,7 @@ protected:
   CropFilterType::SizeType m_LowerBounds;
   CropFilterType::SizeType m_UpperBounds;
 
-  mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
-  mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
+  mitk::ImageTimeSelector::Pointer m_TimeSelector;
 
   mitk::SlicedData::RegionType m_InputRequestedRegion;
   itk::TimeStamp m_TimeOfHeaderInitialization;

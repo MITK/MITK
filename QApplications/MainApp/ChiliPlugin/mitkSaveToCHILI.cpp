@@ -311,7 +311,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
           //use Writer
           for( std::list<FileWriter::Pointer>::iterator it = possibleWriter.begin(); it != possibleWriter.end(); it++ )
           {
-            if( it->GetPointer()->CanWrite( (*nodeIter) ) )
+            if( it->GetPointer()->CanWriteDataType( (*nodeIter) ) )
             {
               //save Volume to Parent-Child-XML
               if( currentVolumeLabel == "" || currentSeriesOID == "" || currentSeriesOID != seriesOID )

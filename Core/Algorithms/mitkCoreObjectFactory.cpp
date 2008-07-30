@@ -380,8 +380,8 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 }
 
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
-    "DICOM files(*.dcm *.DCM *.gdcm);;" \
+    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
+    "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \
     "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
@@ -389,7 +389,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 
 #define INTERNAL_FILE_EXTENSIONS \
     "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves " \
-         "*.uvg *.dvg *.par *.dcm *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
+         "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \
     "surface files (*.stl *.vtk *.vtp *.obj);;" \
@@ -399,7 +399,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     "vessel files (*.ves *.uvg *.dvg);;" \
     "par/rec files (*.par);;" \
     "DSR files (hpsonos.db HPSONOS.DB);;" \
-    "DICOM files (*.dcm *.gdcm *.ima)"
+    "DICOM files (*.dcm *.gdcm *.dc3 *.ima)"
 
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg)"
 

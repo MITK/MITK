@@ -87,8 +87,6 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 
 void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  Superclass::ReleaseGraphicsResources(renWin);
-  return;
   m_PointsAssembly->ReleaseGraphicsResources(renWin);
 
   m_SelectedActor->ReleaseGraphicsResources(renWin);

@@ -87,8 +87,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     return;
 
   itkDebugMacro(<<"GenerateOutputInformation()");
-
-  mitk::Geometry3D* inputImageGeometry = input->GetSlicedGeometry();
   
   // PART I: initialize input requested region. We do this already here (and not 
   // later when GenerateInputRequestedRegion() is called), because we 
@@ -185,7 +183,7 @@ void mitk::AutoCropImageFilter::GenerateData()
   int tstart = outputRegion.GetIndex(3);
   int tmax = tstart + outputRegion.GetSize(3);
 
-  for( unsigned int timestep=tstart;timestep<tmax;++timestep )
+  for( int timestep=tstart;timestep<tmax;++timestep )
   {
     m_TimeSelector->SetTimeNr(timestep);
     m_TimeSelector->UpdateLargestPossibleRegion();

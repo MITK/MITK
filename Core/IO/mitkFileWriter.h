@@ -79,9 +79,9 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     virtual std::string GetFileExtension();
 
     //##Documentation
-    //## @brief Check if the Writer can write the Content of the 
+    //## @brief Check if the Writer can write this type of data of the 
     //## DataTreenode.
-    virtual bool CanWrite( DataTreeNode* );
+    virtual bool CanWriteDataType( DataTreeNode* );
 
     //##Documentation
     //## @brief Return the MimeType of the saved File.
@@ -105,20 +105,21 @@ protected:
 virtual void Write()                                                          \
 {                                                                             \
   if ( this->GetInput() == NULL )                                             \
-    {                                                                         \
-    itkExceptionMacro(<<"Write:Please specify an input!");                    \
-    return;                                                                   \
-    }                                                                         \
-  /* Fill in image information.*/                                             \
+{                                                                             \
+  itkExceptionMacro(<<"Write:Please specify an input!");                      \
+  return;                                                                     \
+}                                                                             \
+/* Fill in image information.*/                                               \
   this->UpdateOutputInformation();                                            \
   (*(this->GetInputs().begin()))->SetRequestedRegionToLargestPossibleRegion();\
   this->PropagateRequestedRegion(NULL);                                       \
   this->UpdateOutputData(NULL);                                               \
 }                                                                             \
+                                                                              \
 virtual void Update()                                                         \
 {                                                                             \
   Write();                                                                    \
-}                                                                           
+}                                                                                                                                                    
 
 } // namespace mitk
 #endif /* FILEWRITER_H_HEADER_INCLUDED */

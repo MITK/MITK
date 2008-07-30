@@ -136,7 +136,7 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
 }
 
 template <class VTKWRITER>
-bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWrite( DataTreeNode* input )
+bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWriteDataType( DataTreeNode* input )
 {
   if ( input )
   {
@@ -157,7 +157,7 @@ bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWrite( DataTreeNode* input )
 template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( DataTreeNode* input )
 {
-  if( input && CanWrite( input ) )
+  if( input && CanWriteDataType( input ) )
     SetInput( dynamic_cast<mitk::Surface*>( input->GetData() ) );
 }
 

@@ -33,7 +33,7 @@ class MITK_CORE_EXPORT FileWriterWithInformation : public FileWriter {
     virtual const char *GetDefaultFilename() = 0;
     virtual const char *GetFileDialogPattern() = 0;
     virtual const char *GetDefaultExtension() = 0;
-    virtual bool CanWrite(BaseData::Pointer data) = 0;  
+    virtual bool CanWriteDataType(BaseData::Pointer data) = 0;  
     virtual void DoWrite(BaseData::Pointer data) = 0;
 };
 }

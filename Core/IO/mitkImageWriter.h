@@ -110,7 +110,7 @@ public:
     /**
     * @brief Check if the Writer can write the Content of the 
     */
-    virtual bool CanWrite( DataTreeNode* );
+    virtual bool CanWriteDataType( DataTreeNode* );
 
     /**
     * @brief Return the MimeType of the saved File.

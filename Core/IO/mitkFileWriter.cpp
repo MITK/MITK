@@ -17,8 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFileWriter.h"
 
-bool mitk::FileWriter::CanWrite( DataTreeNode* )
+bool mitk::FileWriter::CanWriteDataType( DataTreeNode* )
 {
+  //TODO #345 check for writing permission
   return false;
 }
 

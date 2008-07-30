@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qregexp.h>
 #include <qmessagebox.h>
+#include <qfileinfo.h>
+#include <qstring.h>
 #include <string>
 #include <strstream>
 #include "mitkPointSetWriter.h"
@@ -34,10 +36,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
 { 
-  if (! fileWriter->CanWrite(data) ) {
-    std::cout << "ERROR: wrong data in SaveToFileWriter" << std::endl;
+  if (! fileWriter->CanWriteDataType(data) ) {
+    QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
     return;
   }
+
   QString fileName;
   if (aFileName == NULL)
   {
@@ -52,11 +55,52 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
   else
     fileName = aFileName;
 
+  //check if file is valid for writing
+  if(!IsFilenameValidForWriting(fileName.ascii()))
+  {
+    QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
+    return;
+  }
+
   if (fileName.isEmpty() == false )
   {
     fileWriter->SetFileName( fileName.ascii() );
     fileWriter->DoWrite( data );
   }
+}
+
+
+
+bool CommonFunctionality::IsFilenameValidForWriting(const char* aFileName)
+{
+  bool isValid = true;
+
+  //check if file exisst
+  QFileInfo* fileInfo = new QFileInfo(QString(aFileName));
+  if(fileInfo->exists())
+  {
+    //ask the user whether the file shall be overwritten
+    int overwrite = QMessageBox::question(NULL, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
+    if(overwrite == QMessageBox::Yes)
+    {
+      isValid = true;
+    } else {
+      isValid  = false;
+    }
+  }
+
+  //TODO #345 does not work because isWritable returns the wrong value
+  //check if user has writing permission
+  //if(isValid)
+  //{
+  //  if(!fileInfo->isWritable())
+  //  {
+  //    isValid = false;
+  //    QMessageBox::critical(NULL,"ERROR","No writing permission");
+  //  }
+  //}
+  delete fileInfo;
+  return isValid;
 }
 
 
@@ -70,49 +114,129 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
  */
 void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFileName )
 {
-  if (data != NULL)
-  {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
-    if(image.IsNotNull())
-    {
-      CommonFunctionality::SaveImage(image);
-    }
+  //save initial time
+  QDateTime initialTime = QDateTime::currentDateTime();
+  std::string fileNameUsed; //file name that was actually used by the writer (e.g. after file open dialog)
+  bool writingSuccessful = false;
 
-    mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data);
-    if(pointset.IsNotNull())
+  try{
+    if (data != NULL)
     {
-      std::string fileName;
-      if(aFileName == NULL)
-        fileName = "PointSet";
-      else
-        fileName = aFileName;
-      fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
-      fileName += ".mps";
-      QString qfileName = QFileDialog::getSaveFileName(QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
-      if (fileName.empty() == false )
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
+      if(image.IsNotNull())
       {
-        mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
-        writer->SetInput( pointset );
-        writer->SetFileName( qfileName.ascii() );
-        writer->Update();
+        fileNameUsed = CommonFunctionality::SaveImage(image);
+        if(!fileNameUsed.length()>0){
+          return;
+        } else {
+          writingSuccessful = true;
+        }
       }
-    }
 
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data);
-    if(surface.IsNotNull())
+      if(!writingSuccessful)
+      {
+        mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(data);
+        if(pointset.IsNotNull())
+        {
+          std::string fileName;
+          if(aFileName == NULL)
+            fileName = "PointSet";
+          else
+            fileName = aFileName;
+          fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
+          fileName += ".mps";
+          QString qfileName = QFileDialog::getSaveFileName(QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
+
+          //check if file is valid for writing
+          if(!IsFilenameValidForWriting(qfileName.ascii()))
+          {
+            QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
+            writingSuccessful = false;
+            return;
+          }
+
+          if (fileName.empty() == false )
+          {
+            mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
+            writer->SetInput( pointset );
+            writer->SetFileName( qfileName.ascii() );
+            writer->Update();
+            fileNameUsed = writer->GetFileName();
+            writingSuccessful = true;
+          } else {
+            return;
+          }
+        }
+
+        if(!writingSuccessful)
+        {
+          mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(data);
+          if(surface.IsNotNull())
+          {
+            fileNameUsed = CommonFunctionality::SaveSurface(surface, aFileName);
+            if(!fileNameUsed.length()>0){
+              return;
+            } else {
+              writingSuccessful = true;
+            }
+          }
+
+          if(!writingSuccessful)
+          {
+            // now try the file writers provided by the CoreObjectFactory
+            mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+            bool writerFound = false;
+
+            for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) 
+            {
+              if ( (*it)->CanWriteDataType(data) ) {
+                writerFound = true;
+                SaveToFileWriter(*it, data, NULL); 
+                fileNameUsed = (*it)->GetFileName();
+                // correct writer has been found->break
+                if(!fileNameUsed.length()>0){
+                  return;
+                } else {
+                  writingSuccessful = true;
+                  break;
+                }
+              } 
+            }
+            if(!writerFound)
+            {
+              // no appropriate writer has been found 
+              QMessageBox::critical(NULL,"ERROR","Could not find file writer for this data type"); 
+              return;
+            }
+          }
+        }
+
+      }
+    } else {
+      QMessageBox::critical(NULL,"ERROR","Cannot write data (invalid/empty)"); 
+      return;
+    }
+  } catch(itk::ExceptionObject e)
+  {
+    QMessageBox::critical( NULL, "SaveDialog", e.GetDescription(),QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+  }
+
+  //writing is assumed to have been successful
+
+  //check if file exists, file size >0 and last modified after this function was called
+  try{
+    QFileInfo* fileInfo = new QFileInfo(QString(fileNameUsed.c_str()));
+    if(!fileInfo->exists())
     {
-      CommonFunctionality::SaveSurface(surface, aFileName);
+      QMessageBox::critical(NULL,"ERROR","Save not successful. File was not created");
+    } else if(fileInfo->size()==0) {
+      QMessageBox::critical(NULL,"ERROR","Save not successful. File is empty");
+    } else if(fileInfo->lastModified()<initialTime) {
+      QMessageBox::critical(NULL,"ERROR","Save not successful. File was not updated (only old version available)");
     }
-
-    // now try the file writers provided by the CoreObjectFactory
-    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it) {
-      if ( (*it)->CanWrite(data) ) {
-        SaveToFileWriter(*it, data, NULL); 
-      } 
-    }
-    
-    // internal vessel graph save code removed ...
+    delete fileInfo;
+  } catch(...) {
+    QMessageBox::critical(NULL,"ERROR","Save not successful. Possibly no writing permission.");
   }
 }
 
@@ -437,6 +561,13 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
   QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk)");
   if (qfileName != NULL )
   {
+    //check if file is valid for writing
+    if(!IsFilenameValidForWriting(fileName.c_str()))
+    {
+      QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
+      return "";
+    }
+
     if(qfileName.endsWith(".stl")==true)
     {
       mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
@@ -495,6 +626,12 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   else
     fileName = aFileName;
 
+  //check if file is valid for writing
+  if(!IsFilenameValidForWriting(fileName.c_str()))
+  {
+    QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
+    return "";
+  }
   try
   {
     std::string dir = itksys::SystemTools::GetFilenamePath( fileName );
@@ -530,6 +667,8 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   catch ( ... )
   {
     itkGenericOutputMacro( << "Unknown type of exception during write" );
+    QMessageBox::critical(NULL,"ERROR","Error during write image. Possibly no writing permission.");
+    fileName = "";
   }
   return fileName;
 }

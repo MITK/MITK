@@ -241,6 +241,15 @@ namespace CommonFunctionality
   QMITK_EXPORT mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
 
   /**
+  * Checks if the filename is valid for writing. This includes checking whether the file already exists. 
+  * If so, the user is asked whether he wants to overwrite the existing file. In addition, the writing permission is checked.
+  * @param filename the filename, under which the file should be saved. 
+  * @returns true if the filename is valid for writing  
+  */
+  QMITK_EXPORT bool IsFilenameValidForWriting(const char* aFileName);
+
+
+  /**
    * Searches for the first node in the data tree, which holds a given type. 
    * @param it an iterator pointing to the position in the data tree, where
    *          the search should start

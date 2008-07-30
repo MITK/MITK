@@ -49,6 +49,10 @@ class PointSet;
  *     lines that are far away form the current slice (default true)
  * - \b "label": StringProperty with a label for this point set
  *
+ * BUG 1321 - possible new features:
+ * point-2d-size (length of lines in cross/diamond)
+ * point-linewidth
+ *
  * @ingroup Mapper
  */
 class MITK_CORE_EXPORT PointSetMapper2D : public GLMapper2D
@@ -79,6 +83,8 @@ protected:
   bool m_ShowAngles;
   bool m_ShowDistantLines;
   int  m_LineWidth;
+  int m_PointLineWidth;
+  int m_Point2DSize;
 };
 
 } // namespace mitk

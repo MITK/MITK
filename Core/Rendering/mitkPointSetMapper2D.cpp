@@ -67,6 +67,8 @@ void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   node->GetBoolProperty("show angles",        m_ShowAngles);
   node->GetBoolProperty("show distant lines", m_ShowDistantLines);
   node->GetIntProperty("line width",          m_LineWidth);
+  node->GetIntProperty("point line width",    m_PointLineWidth);
+  node->GetIntProperty("point 2D size",       m_Point2DSize);
 }
 
 
@@ -219,6 +221,26 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
       selectedColor[3] = 1.0f;
     }
 
+    //check if there is an pointLineWidth property
+    if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(renderer)->GetProperty("point line width")) != NULL)
+    {
+      m_PointLineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("point line width"))->GetValue();
+    }
+    else if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(NULL)->GetProperty("point line width")) != NULL)
+    {
+      m_PointLineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("point line width"))->GetValue();
+    }
+
+    //check if there is an point 2D size property
+    if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(renderer)->GetProperty("point 2D size")) != NULL)
+    {
+      m_Point2DSize = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetPropertyList(renderer)->GetProperty("point 2D size"))->GetValue();
+    }
+    else if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(NULL)->GetProperty("point 2D size")) != NULL)
+    {
+      m_Point2DSize = dynamic_cast<mitk::IntProperty *>(this->GetDataTreeNode()->GetPropertyList(NULL)->GetProperty("point 2D size"))->GetValue();
+    }
+
     Point3D p;                      // currently visited point 
     Point3D lastP;                  // last visited point 
     Vector3D vec;                   // p - lastP
@@ -261,9 +283,14 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         displayGeometry->WorldToDisplay(pt2d, pt2d);
 
         //Point size depending of distance to slice
-        float p_size = (1/scalardiff)*100;
+        /*float p_size = (1/scalardiff)*10*m_Point2DSize;
+        if(p_size < m_Point2DSize * 0.6 ) 
+          p_size = m_Point2DSize * 0.6 ;
+        else if ( p_size > m_Point2DSize )
+          p_size = m_Point2DSize;*/
+        float p_size = (1/scalardiff)*100.0;
         if(p_size < 6.0 ) 
-          p_size = 6.0;
+          p_size = 6.0 ;
         else if ( p_size > 10.0 )
           p_size = 10.0;
 
@@ -285,8 +312,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         displayGeometry->WorldToDisplay(pt2d, pt2d);
 
         Vector2D horz,vert;
-        horz[0]=8.0-scalardiff*2; horz[1]=0;
-        vert[0]=0;                vert[1]=8.0-scalardiff*2;
+        horz[0]=(float)m_Point2DSize-scalardiff*2; horz[1]=0;
+        vert[0]=0;                vert[1]=(float)m_Point2DSize-scalardiff*2;
 
         // now paint text if available
         if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()
@@ -330,10 +357,10 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
             if (addAsSelected)
             {
-              horz[0]=8;
-              vert[1]=8;
+              horz[0]=(float)m_Point2DSize;
+              vert[1]=(float)m_Point2DSize;
               glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);
-
+              glLineWidth(m_PointLineWidth);
               //a diamond around the point with the selected color
               glBegin (GL_LINE_LOOP);
                tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
@@ -341,6 +368,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
                tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
                tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
               glEnd ();
+              glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
               glPointSize(1);
@@ -351,6 +379,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
             else //if not selected
             {
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+              glLineWidth(m_PointLineWidth);
               //drawing crosses
               glBegin (GL_LINES);
               tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
@@ -358,6 +387,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
               tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
               tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
               glEnd ();
+              glLineWidth(1);
             }
           }
         }
@@ -452,6 +482,8 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite );
+  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite );
   node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
   node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
   node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow

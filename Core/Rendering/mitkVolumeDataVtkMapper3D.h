@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageMask.h>
 
 #include <vector>
+#include <set>
 
 class vtkAssembly;
 class vtkVolumeRayCastMapper;
@@ -86,6 +87,10 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
+  void CreateDefaultTransferFunctions();
+
+  void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
+
   void SetPreferences();
 
   void SetClippingPlane(vtkRenderWindowInteractor* interactor);
@@ -99,7 +104,11 @@ protected:
   vtkVolumeTextureMapper2D* m_T2DMapper;
   vtkVolumeRayCastMapper* m_HiResMapper;
   vtkImageResample* m_Resampler;
+  
   vtkLODProp3D* m_VolumeLOD;
+  
+  // Empty Prop (vtkAssembly) used if volume rendering is disabled
+  vtkAssembly *m_DummyProp;
 
   vtkCubeSource *m_BoundingBox;
   vtkPolyDataMapper *m_BoundingBoxMapper;
@@ -113,6 +122,14 @@ protected:
   vtkImageData *m_Mask;
   vtkImageMask *m_ImageMaskFilter;
 
+  vtkCallbackCommand *m_AbortCallbackCommand;
+  vtkCallbackCommand *m_StartCallbackCommand;
+  vtkCallbackCommand *m_EndCallbackCommand;
+
+  vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
+  vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
+  vtkColorTransferFunction *m_DefaultColorTransferFunction;
+
   int m_LowResID;
   int m_MedResID;
   int m_HiResID;
@@ -122,7 +139,7 @@ protected:
   double m_PlaneNormalC;
 
 
-  std::vector<vtkRenderWindow*> m_VtkRWList;
+  std::set< vtkRenderWindow * > m_RenderWindowInitialized;
 };
 
 } // namespace mitk

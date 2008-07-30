@@ -74,6 +74,8 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_PlaneWidget = vtkImplicitPlaneWidget::New();
 
   m_T2DMapper =  vtkVolumeTextureMapper2D::New();
+  m_T2DMapper->SetMaximumNumberOfPlanes( 100 );
+
   m_HiResMapper = vtkVolumeRayCastMapper::New();
   m_HiResMapper->SetSampleDistance(0.5); // 4 rays for every pixel
 
@@ -94,6 +96,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_VolumePropertyHigh = vtkVolumeProperty::New();
 
   m_VolumeLOD = vtkLODProp3D::New();
+  m_DummyProp = vtkAssembly::New();
 
   m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0); // RayCast
 
@@ -109,8 +112,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_Resampler->SetAxisMagnificationFactor(2,0.25);
 
   // For abort rendering mechanism
-  //m_VolumeLOD->AutomaticLODSelectionOff();
-  m_VolumeLOD->AutomaticLODSelectionOn();
+  m_VolumeLOD->AutomaticLODSelectionOff();
 
 
   m_BoundingBox = vtkCubeSource::New();
@@ -127,16 +129,14 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_BoundingBoxActor->GetProperty()->SetRepresentationToWireframe();
 
 
-  m_Prop3DAssembly = vtkAssembly::New();
-  m_Prop3DAssembly->AddPart( m_VolumeLOD );
-  m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
-
-
   // BoundingBox rendering is not working due to problem with assembly
   // transformation; see bug #454
+  //m_Prop3DAssembly = vtkAssembly::New();
+  //m_Prop3DAssembly->AddPart( m_VolumeLOD );
+  //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
   //m_Prop3D = m_Prop3DAssembly;
 
-  m_Prop3D = m_VolumeLOD;
+  m_Prop3D = m_DummyProp;
   m_Prop3D->Register(NULL);
 
   m_ImageCast = vtkImageShiftScale::New();
@@ -149,6 +149,23 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_ImageMaskFilter = vtkImageMask::New();
   m_ImageMaskFilter->SetMaskedOutputValue(0xffff);
+
+  this->m_Resampler->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  this->m_HiResMapper->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+
+  m_T2DMapper->SetInput(m_Resampler->GetOutput());
+
+
+  m_AbortCallbackCommand = vtkCallbackCommand::New();
+  m_AbortCallbackCommand->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
+
+  m_StartCallbackCommand = vtkCallbackCommand::New();
+  m_StartCallbackCommand ->SetCallback( VolumeDataVtkMapper3D::StartCallback );
+
+  m_EndCallbackCommand = vtkCallbackCommand::New();
+  m_EndCallbackCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
+
+  this->CreateDefaultTransferFunctions();
 }
 
 
@@ -171,6 +188,189 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   {
 	  m_Mask->Delete();
   }
+}
+
+void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+{
+  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  if ((input==NULL) || (input->IsInitialized()==false))
+    return;
+
+  vtkRenderWindow* vtkRendWin = renderer->GetRenderWindow();
+
+  if (this->IsVisible(renderer)==false ||
+      this->GetDataTreeNode() == NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))==NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
+    )
+  {
+    m_Prop3D->UnRegister( NULL );
+    m_Prop3D = m_DummyProp;
+    m_Prop3D->Register( NULL );
+
+    //REM m_VolumeLOD->VisibilityOff();
+
+    // Check if a bounding box should be displayed around the dataset
+    // (even if volume rendering is disabled)
+    bool hasBoundingBox = false;
+    this->GetDataTreeNode()->GetBoolProperty( "bounding box", hasBoundingBox );
+
+    if ( !hasBoundingBox )
+    {
+      m_BoundingBoxActor->VisibilityOff();
+    }
+    else
+    {
+      m_BoundingBoxActor->VisibilityOn();
+
+      const BoundingBox::BoundsArrayType &bounds =
+        input->GetTimeSlicedGeometry()->GetBounds();
+
+      m_BoundingBox->SetBounds(
+        bounds[0], bounds[1],
+        bounds[2], bounds[3],
+        bounds[4], bounds[5] );
+
+      ColorProperty *colorProperty;
+      if ( this->GetDataTreeNode()->GetProperty(
+        colorProperty, "color" ) )
+      {
+        const mitk::Color &color = colorProperty->GetColor();
+        m_BoundingBoxActor->GetProperty()->SetColor(
+          color[0], color[1], color[2] );
+      }
+      else
+      {
+        m_BoundingBoxActor->GetProperty()->SetColor(
+          1.0, 1.0, 1.0 );
+      }
+    }
+
+    mitk::RenderingManager::GetInstance()->SetNumberOfLOD(1); //how many LODs should be used
+
+    //vtkRendWin->RemoveObserver( m_AbortCallbackCommand );
+    //vtkRendWin->RemoveObserver( m_StartCallbackCommand );
+    //vtkRendWin->RemoveObserver( m_EndCallbackCommand );
+
+    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+
+    return;
+  }
+
+  m_Prop3D->UnRegister( NULL );
+  m_Prop3D = m_VolumeLOD;
+  m_Prop3D->Register( NULL );
+
+  mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
+
+  this->SetPreferences();
+
+  switch ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() )
+  {
+  case 0:
+  default:
+    m_VolumeLOD->SetSelectedLODID( m_LowResID );
+    break;
+
+  case 1:
+    m_VolumeLOD->SetSelectedLODID( m_MedResID );
+    break;
+
+  case 2:
+    m_VolumeLOD->SetSelectedLODID( m_HiResID );
+    break;
+  }
+
+  //REM
+  //if (m_VolumeLOD) {
+  //  m_VolumeLOD->VisibilityOn();
+  //}
+
+  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
+  assert(inputtimegeometry!=NULL);
+
+  const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
+  if(worldgeometry==NULL)
+  {
+    GetDataTreeNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
+    return;
+  }
+
+  int timestep=0;
+  ScalarType time = worldgeometry->GetTimeBounds()[0];
+  if (time> ScalarTypeNumericTraits::NonpositiveMin())
+    timestep = inputtimegeometry->MSToTimeStep(time);
+
+  if (inputtimegeometry->IsValidTime(timestep)==false)
+    return;
+
+  vtkImageData *inputData = input->GetVtkImageData(timestep);
+  if(inputData==NULL)
+    return;
+
+
+  m_ImageCast->SetInput( inputData );
+
+  //REM
+  //trying to avoid update-problem, when size of input changed. Does not really help much.
+  //if(m_ImageCast->GetOutput()!=NULL)
+  //{
+  //  int inputWE[6];
+  //  inputData->GetWholeExtent(inputWE);
+  //  int * outputWE=m_UnitSpacingImageFilter->GetOutput()->GetExtent();
+  //  if( memcmp(inputWE, outputWE,sizeof(int)*6) != 0 )
+  //  {
+  //    m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtent(inputWE);
+  //    m_UnitSpacingImageFilter->UpdateWholeExtent();
+  //  }
+  //}
+
+  //If mask exists, process mask before resampling.
+  if (this->m_Mask)
+  {
+    this->m_ImageMaskFilter->SetImageInput(this->m_UnitSpacingImageFilter->GetOutput());
+    this->m_Resampler->SetInput(this->m_ImageMaskFilter->GetOutput());
+    this->m_HiResMapper->SetInput(this->m_ImageMaskFilter->GetOutput());
+  }
+  else
+  {
+    this->m_Resampler->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
+    this->m_HiResMapper->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
+  }
+
+
+  this->UpdateTransferFunctions( renderer );
+
+
+  vtkRenderWindowInteractor *interactor = vtkRendWin->GetInteractor();
+  interactor->SetDesiredUpdateRate(0.00001);
+  interactor->SetStillUpdateRate(0.00001);
+
+
+  if ( m_RenderWindowInitialized.find( vtkRendWin ) == m_RenderWindowInitialized.end() )
+  {
+    m_RenderWindowInitialized.insert( vtkRendWin );
+
+    vtkRendWin->AddObserver( vtkCommand::AbortCheckEvent,m_AbortCallbackCommand );
+    vtkRendWin->AddObserver( vtkCommand::StartEvent, m_StartCallbackCommand );
+    vtkRendWin->AddObserver( vtkCommand::EndEvent, m_EndCallbackCommand );
+
+    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+
+    mitk::RenderingManager::GetInstance()->SetShading( true, 0 );
+    mitk::RenderingManager::GetInstance()->SetShading( true, 1 );
+    mitk::RenderingManager::GetInstance()->SetShading( true, 2 );
+
+    mitk::RenderingManager::GetInstance()->SetShadingValues(
+      m_VolumePropertyHigh->GetAmbient(),
+      m_VolumePropertyHigh->GetDiffuse(),
+      m_VolumePropertyHigh->GetSpecular(),
+      m_VolumePropertyHigh->GetSpecularPower());
+
+    mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
+  }
+
+  this->SetClippingPlane( interactor );
 }
 
 void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
@@ -207,165 +407,30 @@ void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long
 
 }
 
-
-void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::VolumeDataVtkMapper3D::CreateDefaultTransferFunctions()
 {
-  // Preliminary fix of bug # 1413: Using flightmodus "F-Key" leads to vtk errors
-  // If this mapper's GenerateData didn't run completely at least once, the VTK internal "F-Key" flight mode does not work due to 
-  // missing instantiations of the m_VolumeLOD inputs/outputs.
-  static bool firstDataGeneration = true;
-  
-  if(IsVisible(renderer)==false ||
-      GetDataTreeNode() == NULL ||
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))==NULL ||
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
-    )
-  {
-    m_VolumeLOD->VisibilityOff();
+  m_DefaultOpacityTransferFunction = vtkPiecewiseFunction::New();
+  m_DefaultOpacityTransferFunction->AddPoint( 0.0, 0.0 );
+  m_DefaultOpacityTransferFunction->AddPoint( 255.0, 0.8 );
+  m_DefaultOpacityTransferFunction->ClampingOn();
 
-    // Check if a bounding box should be displayed around the dataset
-    // (even if volume rendering is disabled)
-    bool hasBoundingBox = false;
-    this->GetDataTreeNode()->GetBoolProperty( "bounding box", hasBoundingBox );
+  m_DefaultGradientTransferFunction = vtkPiecewiseFunction::New();
+  m_DefaultGradientTransferFunction->AddPoint( 0.0, 0.0 );
+  m_DefaultGradientTransferFunction->AddPoint( 255.0, 0.8 );
+  m_DefaultGradientTransferFunction->ClampingOn();
 
-    if ( !hasBoundingBox )
-    {
-      m_BoundingBoxActor->VisibilityOff();
-    }
-    else
-    {
-      m_BoundingBoxActor->VisibilityOn();
+  m_DefaultColorTransferFunction = vtkColorTransferFunction::New();
+  m_DefaultColorTransferFunction->AddRGBPoint( 0.0, 0.0, 0.0, 0.0 );
+  m_DefaultColorTransferFunction->AddRGBPoint( 127.5, 1, 1, 0.0 );
+  m_DefaultColorTransferFunction->AddRGBPoint( 255.0, 0.8, 0.2, 0 );
+  m_DefaultColorTransferFunction->ClampingOn();
+}
 
-      mitk::Image *input  = const_cast<mitk::Image *>(this->GetInput());
-      if ( (input!=NULL) && (input->IsInitialized()==true) )
-      {
-        const BoundingBox::BoundsArrayType &bounds =
-          input->GetTimeSlicedGeometry()->GetBounds();
-
-        m_BoundingBox->SetBounds(
-          bounds[0], bounds[1],
-          bounds[2], bounds[3],
-          bounds[4], bounds[5] );
-
-        ColorProperty *colorProperty;
-        if ( this->GetDataTreeNode()->GetProperty(
-          colorProperty, "color" ) )
-        {
-          const mitk::Color &color = colorProperty->GetColor();
-          m_BoundingBoxActor->GetProperty()->SetColor(
-            color[0], color[1], color[2] );
-        }
-        else
-        {
-          m_BoundingBoxActor->GetProperty()->SetColor(
-            1.0, 1.0, 1.0 );
-        }
-      }
-    }
-    if(!firstDataGeneration)
-      return;
-  }
-
-  SetPreferences();
-
-  if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 0)
-  {
-    m_VolumeLOD->SetSelectedLODID(m_LowResID);
-    //std::cout<<" Low "<<std::endl;
-  }
-  else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 1)
-  {
-    m_VolumeLOD->SetSelectedLODID(m_MedResID);
-    //std::cout<<" Med "<<std::endl;
-  }
-  else if(mitk::RenderingManager::GetInstance()->GetCurrentLOD() == 2)
-  {
-    m_VolumeLOD->SetSelectedLODID(m_HiResID);
-    //std::cout<<" Hi "<<std::endl;
-  }
-  else
-  {
-    //std::cout<<"Could not get current LOD "<<std::endl;
-  }
-
-  if (m_VolumeLOD && !firstDataGeneration) {
-    m_VolumeLOD->VisibilityOn();
-  }
-  firstDataGeneration = false;
-
-  mitk::Image* input  = const_cast<mitk::Image *>(this->GetInput());
-  if((input==NULL) || (input->IsInitialized()==false))
-    return;
-
-  // FIXME: const_cast; maybe GetVtkImageData can be made const by using volatile
-  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
-  assert(inputtimegeometry!=NULL);
-
-  const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
-
-  if(worldgeometry==NULL)
-  {
-    GetDataTreeNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
-    return;
-  }
-
-  assert(worldgeometry!=NULL);
-
-  int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBounds()[0];
-  if(time> ScalarTypeNumericTraits::NonpositiveMin())
-    timestep = inputtimegeometry->MSToTimeStep(time);
-
-  if(inputtimegeometry->IsValidTime(timestep)==false)
-    return;
-
-  vtkImageData* inputData = input->GetVtkImageData(timestep);
-  if(inputData==NULL)
-    return;
-
-  m_ImageCast->SetInput( inputData );
-
-//  m_ImageCast->Update();
-
-  //trying to avoid update-problem, when size of input changed. Does not really help much.
-  if(m_ImageCast->GetOutput()!=NULL)
-  {
-    int inputWE[6];
-    inputData->GetWholeExtent(inputWE);
-    int * outputWE=m_UnitSpacingImageFilter->GetOutput()->GetExtent();
-    if(m_ImageCast->GetOutput()!=NULL && memcmp(inputWE, outputWE,sizeof(int)*6) != 0)
-    {
-//      m_ImageCast->GetOutput()->SetUpdateExtentToWholeExtent();
-//      m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtentToWholeExtent();
-      m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtent(inputWE);
-      m_UnitSpacingImageFilter->UpdateWholeExtent();
-    }
-  }
-
-  //If mask exists, process mask before resampling.
-  if (this->m_Mask)
-  {
-	  this->m_ImageMaskFilter->SetImageInput(this->m_UnitSpacingImageFilter->GetOutput());
-	  this->m_Resampler->SetInput(this->m_ImageMaskFilter->GetOutput());
-	  this->m_HiResMapper->SetInput(this->m_ImageMaskFilter->GetOutput());
-  }
-  else
-  {
-	  this->m_Resampler->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
-	  this->m_HiResMapper->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
-  }
-
-  m_T2DMapper->SetInput(m_Resampler->GetOutput());
-
-  vtkPiecewiseFunction *opacityTransferFunction;
-  vtkPiecewiseFunction *gradientTransferFunction;
-  vtkColorTransferFunction* colorTransferFunction;
-
-  opacityTransferFunction = NULL;
-  gradientTransferFunction = NULL;
-  colorTransferFunction = NULL;
-
-  m_ImageCast->SetShift(0);
+void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *renderer )
+{
+  vtkPiecewiseFunction *opacityTransferFunction = NULL;
+  vtkPiecewiseFunction *gradientTransferFunction = NULL;
+  vtkColorTransferFunction *colorTransferFunction = NULL;
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
   lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable"));
@@ -374,84 +439,43 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if ( transferFunctionProp.IsNotNull() )   {
 
     opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
-    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
     gradientTransferFunction = transferFunctionProp->GetValue()->GetGradientOpacityFunction();
-  } else if (lookupTableProp.IsNotNull() )
+    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
+  }
+  else if (lookupTableProp.IsNotNull() )
   {
-    lookupTableProp->GetLookupTable()->CreateColorTransferFunction(colorTransferFunction);
-    colorTransferFunction->ClampingOn();
-    lookupTableProp->GetLookupTable()->CreateGradientTransferFunction(gradientTransferFunction);
-    gradientTransferFunction->ClampingOn();
     lookupTableProp->GetLookupTable()->CreateOpacityTransferFunction(opacityTransferFunction);
     opacityTransferFunction->ClampingOn();
+    lookupTableProp->GetLookupTable()->CreateGradientTransferFunction(gradientTransferFunction);
+    gradientTransferFunction->ClampingOn();
+    lookupTableProp->GetLookupTable()->CreateColorTransferFunction(colorTransferFunction);
+    colorTransferFunction->ClampingOn();
   }
   else
   {
-    mitk::LevelWindow levelWindow;
-    int lw_min,lw_max;
-
-    bool binary=false;
-    GetDataTreeNode()->GetBoolProperty("binary", binary, renderer);
-    if(binary)
-    {
-      lw_min=0; lw_max=2;
-    }
-    else
-    if(GetLevelWindow(levelWindow,renderer,"levelWindow") || GetLevelWindow(levelWindow,renderer))
-    {
-      lw_min = (int)levelWindow.GetMin();
-      lw_max = (int)levelWindow.GetMax();
-      //      std::cout << "levwin:" << levelWindow << std::endl;
-      if(lw_min<0)
-      {
-        m_ImageCast->SetShift(-lw_min);
-        lw_max+=-lw_min;
-        lw_min=0;
-      }
-    }
-    else
-    {
-      lw_min = 0;
-      lw_max = 255;
-    }
-
-    opacityTransferFunction->AddPoint( lw_min, 0.0 );
-    opacityTransferFunction->AddPoint( lw_max, 0.8 );
-    opacityTransferFunction->ClampingOn();
-
-    gradientTransferFunction->AddPoint( lw_min, 0.0 );
-    gradientTransferFunction->AddPoint( lw_max, 0.8 );
-    gradientTransferFunction->ClampingOn();
+    opacityTransferFunction = m_DefaultOpacityTransferFunction;
+    gradientTransferFunction = m_DefaultGradientTransferFunction;
+    colorTransferFunction = m_DefaultColorTransferFunction;
 
     float rgb[3]={1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists
     if(GetColor(rgb, renderer))
     {
-      colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 0.0 );
-      colorTransferFunction->AddRGBPoint( (lw_min+lw_max)/2, rgb[0], rgb[1], rgb[2] );
-      colorTransferFunction->AddRGBPoint( lw_max, rgb[0], rgb[1], rgb[2] );
+      colorTransferFunction->AddRGBPoint( 0.0, 0.0, 0.0, 0.0 );
+      colorTransferFunction->AddRGBPoint( 127.5, rgb[0], rgb[1], rgb[2] );
+      colorTransferFunction->AddRGBPoint( 255.0, rgb[0], rgb[1], rgb[2] );
     }
-    else
-    {
-      colorTransferFunction->AddRGBPoint( lw_min, 0.0, 0.0, 0.0 );
-      colorTransferFunction->AddRGBPoint( (lw_min+lw_max)/2, 1, 1, 0.0 );
-      colorTransferFunction->AddRGBPoint( lw_max, 0.8, 0.2, 0 );
-    }
-
-    colorTransferFunction->ClampingOn();
   }
 
   if (this->m_Mask)
   {
-	  opacityTransferFunction->AddPoint(0xffff, 0.0);
+    opacityTransferFunction->AddPoint(0xffff, 0.0);
   }
 
   m_VolumePropertyLow->SetColor( colorTransferFunction );
   m_VolumePropertyLow->SetScalarOpacity( opacityTransferFunction );
   m_VolumePropertyLow->SetGradientOpacity( gradientTransferFunction );
   m_VolumePropertyLow->SetInterpolationTypeToNearest();
-
-  m_T2DMapper->SetMaximumNumberOfPlanes(100);
 
   m_VolumePropertyMed->SetColor( colorTransferFunction );
   m_VolumePropertyMed->SetScalarOpacity( opacityTransferFunction );
@@ -462,65 +486,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_VolumePropertyHigh->SetScalarOpacity( opacityTransferFunction );
   m_VolumePropertyHigh->SetGradientOpacity( gradientTransferFunction );
   m_VolumePropertyHigh->SetInterpolationTypeToLinear();
-
-  vtkRenderWindow* vtkRendWin = renderer->GetRenderWindow();
-
-
-  vtkRenderWindowInteractor* interactor = vtkRendWin->GetInteractor();
-  interactor->SetDesiredUpdateRate(0.00001);
-  interactor->SetStillUpdateRate(0.00001);
-  bool NewRW = true;
-  for(unsigned int i = 0; i < m_VtkRWList.size(); i++)
-  {
-    if(m_VtkRWList[i] == vtkRendWin)
-    {
-      NewRW = false;
-    }
-  }
-
-  if(NewRW)
-  {
-    //m_VtkRWList.push_back(vtkRendWin);
-
-    mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
-
-    // Preliminary fix of bug # 1293 / 1463 :Black 3D render window after volume rendering and mouse wheel event in 2D widgets
-    // and 3D Surface Rendering slows down enormous after volume rendering
-    // Use of vtkCallback inside the VTK-Rendering Process may cause severe damage to VTK rendering pipeline
-    // We temporarily deactivate the Volume Rendering LOD mechanism, until some alternative for LOD is implemented
-
-    //vtkCallbackCommand* cbc = vtkCallbackCommand::New();
-    //cbc->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
-    //vtkRendWin->AddObserver(vtkCommand::AbortCheckEvent,cbc);
-
-    //vtkCallbackCommand *startCommand = vtkCallbackCommand::New();
-    //startCommand->SetCallback( VolumeDataVtkMapper3D::StartCallback );
-    //vtkRendWin->AddObserver( vtkCommand::StartEvent, startCommand );
-
-    //vtkCallbackCommand *endCommand = vtkCallbackCommand::New();
-    //endCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
-    //vtkRendWin->AddObserver( vtkCommand::EndEvent, endCommand );
-
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
-
-    mitk::RenderingManager::GetInstance()->SetShading(true,0);
-    mitk::RenderingManager::GetInstance()->SetShading(true,1);
-    mitk::RenderingManager::GetInstance()->SetShading(true,2);
-
-    mitk::RenderingManager::GetInstance()->SetShadingValues(m_VolumePropertyHigh->GetAmbient(),m_VolumePropertyHigh->GetDiffuse(),m_VolumePropertyHigh->GetSpecular(),m_VolumePropertyHigh->GetSpecularPower());
-
-    mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(false);
-  }
-  SetClippingPlane(interactor);
-
-/*  std::cout<<"RenderTime LowRes (T2D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_LowResID)<<std::endl;
-#if (VTK_MAJOR_VERSION >= 5)
-  std::cout<<"RenderTime FPRC: "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_FPRCID)<<std::endl;
-#else
-  std::cout<<"RenderTime MedRes (T2DHi): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_MedResID)<<std::endl;
-#endif
-  std::cout<<"RenderTime HiRes(T3D): "<<m_VolumeLOD->GetLODEstimatedRenderTime(m_HiResID)<<std::endl;  */
 }
+
 
 /* Shading enabled / disabled */
 void mitk::VolumeDataVtkMapper3D::SetPreferences()
@@ -675,38 +642,39 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
+
 void mitk::VolumeDataVtkMapper3D::EnableMask()
 {
-	if (!this->m_Mask)
-	{
-		const Image *orig_image = this->GetInput();
-		unsigned int *dimensions = orig_image->GetDimensions();
+  if (!this->m_Mask)
+  {
+    const Image *orig_image = this->GetInput();
+    unsigned int *dimensions = orig_image->GetDimensions();
 
-		this->m_Mask = vtkImageData::New();
-		this->m_Mask->SetDimensions(dimensions[0], dimensions[1], dimensions[2]);
-		this->m_Mask->SetScalarTypeToUnsignedChar();
-		this->m_Mask->SetNumberOfScalarComponents(1);
-		this->m_Mask->AllocateScalars();
+    this->m_Mask = vtkImageData::New();
+    this->m_Mask->SetDimensions(dimensions[0], dimensions[1], dimensions[2]);
+    this->m_Mask->SetScalarTypeToUnsignedChar();
+    this->m_Mask->SetNumberOfScalarComponents(1);
+    this->m_Mask->AllocateScalars();
 
-		unsigned char *mask_data = static_cast<unsigned char*>(this->m_Mask->GetScalarPointer());
-		unsigned int size = dimensions[0] * dimensions[1] * dimensions[2];
+    unsigned char *mask_data = static_cast<unsigned char*>(this->m_Mask->GetScalarPointer());
+    unsigned int size = dimensions[0] * dimensions[1] * dimensions[2];
 
-		for (unsigned int i = 0u; i < size; ++i)
-		{
-			*mask_data++ = 1u;
-		}
-		this->m_ImageMaskFilter->SetMaskInput(this->m_Mask);
-		this->m_ImageMaskFilter->Modified();
-	}
+    for (unsigned int i = 0u; i < size; ++i)
+    {
+      *mask_data++ = 1u;
+    }
+    this->m_ImageMaskFilter->SetMaskInput(this->m_Mask);
+    this->m_ImageMaskFilter->Modified();
+  }
 }
 
 void mitk::VolumeDataVtkMapper3D::DisableMask()
 {
-	if (this->m_Mask)
-	{
+  if (this->m_Mask)
+  {
     this->m_Mask->Delete();
-		this->m_Mask = 0;
-	}
+    this->m_Mask = 0;
+  }
 }
 
 mitk::Image::Pointer mitk::VolumeDataVtkMapper3D::GetMask()
@@ -726,22 +694,22 @@ mitk::Image::Pointer mitk::VolumeDataVtkMapper3D::GetMask()
 
 void mitk::VolumeDataVtkMapper3D::UpdateMask()
 {
-	if (this->m_Mask)
-	{
-		this->m_ImageMaskFilter->Modified();
-	}
+  if (this->m_Mask)
+  {
+    this->m_ImageMaskFilter->Modified();
+  }
 }
 
 bool mitk::VolumeDataVtkMapper3D::SetMask(const mitk::Image* mask)
 {
-	if (this->m_Mask)
-	{
+  if (this->m_Mask)
+  {
     if (mask->GetPixelType() == PixelType(typeid(unsigned char)))
     {
       Image *img = const_cast<Image*>(mask);
 
       this->m_Mask->DeepCopy(img->GetVtkImageData());
-	    this->m_ImageMaskFilter->Modified();
+      this->m_ImageMaskFilter->Modified();
       return true;
     }
   }

@@ -39,7 +39,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 {
   if(m_Renderer.IsNull())
   {
-    m_Renderer = new mitk::VtkPropRenderer( qPrintable(name), GetRenderWindow());
+      m_Renderer = mitk::VtkPropRenderer::New( qPrintable(name), GetRenderWindow());
   }
 
   m_Renderer->InitRenderer(this->GetRenderWindow());

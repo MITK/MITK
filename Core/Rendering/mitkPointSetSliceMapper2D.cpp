@@ -543,6 +543,6 @@ mitk::PointSetSliceMapper2D::~PointSetSliceMapper2D()
   
   if (m_ScalarsToOpacity != 0) m_ScalarsToOpacity->UnRegister(0);
   if (m_ScalarsToColors != 0) m_ScalarsToColors->UnRegister(0);
-  m_VtkPointSet->UnRegister(0);
+  if (m_VtkPointSet != 0) m_VtkPointSet->UnRegister(0);
 }
 

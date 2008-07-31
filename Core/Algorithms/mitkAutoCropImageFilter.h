@@ -31,15 +31,30 @@ namespace mitk {
  *
  * @brief Shrink the image borders to a minimum considering a background color.
  * 
- * This filter determines the bounding box of all pixels different.
- * from the background, crops the input image and returns it.
+ * This filter determines the smallest bounding box of all pixels different
+ * from the background, and returns an output image which has been cropped to this size.
+ * The box calculated this way is not the smallest possible box, but the box with the
+ * smallest sides perpendicular to the world coordinate system.
+ * 
+ * The filter works on 3D and 4D image data. For the 4D case, the smallest box is 
+ * calculated with side lengths as the maximum of single side lengths from all time steps.
+ *
+ * 2D images are not supported, and will never be.
+ *
+ * It is also possible to set the region to be cropped manually using the 
+ * SetCroppingRegion() method.
+ *
+ * A margin can be set to enlarge the cropped region with a constant factor in all 
+ * directions around the smallest possible.
+ *
  *
  * @ingroup Process
- *
- * @todo clean up, this is messy. bug #524
- * @todo not able to handle 3D+t images. bug #1281
  * 
+ * @author Thomas Boettger; revised by Tobias Schwarz and Daniel Stein; Division of Medical
+ * and Biological Informatics
+ *
  */
+
 class MITK_CORE_EXPORT AutoCropImageFilter : public SubImageSelector
 {
 public:
@@ -56,28 +71,33 @@ public:
   itkGetConstMacro(MarginFactor,float);
   itkSetMacro(MarginFactor,float);
   
+  // Use this method to manually set a region
   void SetCroppingRegion(RegionType overrideRegion);
 
   virtual const std::type_info& GetOutputPixelType();
 
 protected:
 
+  // default constructor
+  AutoCropImageFilter();
+
+  // default destructor
+  virtual ~AutoCropImageFilter();
+
+  // This method calculates the actual smallest box
   void ComputeNewImageBounds();
 
+  // Crops the image using the itk::CropImageFilter and creates the new output image
   template < typename TPixel, unsigned int VImageDimension> 
   void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep );
 
-
-protected:
-
-  AutoCropImageFilter();
-
-  virtual ~AutoCropImageFilter();
-
+  // Here, the output image is initialized by the input and the newly calculated region
   virtual void GenerateOutputInformation();
 
+  // Purposely not implemented
   virtual void GenerateInputRequestedRegion();
 
+  // Crops the image on all time steps
   virtual void GenerateData();
 
   float m_BackgroundValue;

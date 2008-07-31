@@ -126,7 +126,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       if(image.IsNotNull())
       {
         fileNameUsed = CommonFunctionality::SaveImage(image);
-        if(!fileNameUsed.length()>0){
+        if(!(fileNameUsed.length()>0)){
           return;
         } else {
           writingSuccessful = true;
@@ -181,7 +181,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
           if(surface.IsNotNull())
           {
             fileNameUsed = CommonFunctionality::SaveSurface(surface, aFileName);
-            if(!fileNameUsed.length()>0){
+            if(!(fileNameUsed.length()>0)){
               return;
             } else {
               writingSuccessful = true;
@@ -201,7 +201,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
                 SaveToFileWriter(*it, data, NULL); 
                 fileNameUsed = (*it)->GetFileName();
                 // correct writer has been found->break
-                if(!fileNameUsed.length()>0){
+                if(!(fileNameUsed.length()>0)){
                   return;
                 } else {
                   writingSuccessful = true;

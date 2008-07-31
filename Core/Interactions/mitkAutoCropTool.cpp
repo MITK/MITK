@@ -52,11 +52,11 @@ bool mitk::AutoCropTool::ProcessOneWorkingData( DataTreeNode* node )
     Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNull()) return false;
       
-    if (image->GetDimension() == 4)
-    {
-      Tool::ErrorMessage.Send("Cropping 3D+t segmentations is not implemented. Sorry. Bug #1281");
-      return false;
-    }
+//     if (image->GetDimension() == 4)
+//     {
+//       Tool::ErrorMessage.Send("Cropping 3D+t segmentations is not implemented. Sorry. Bug #1281");
+//       return false;
+//     }
 
     AutoCropImageFilter::Pointer cropFilter = AutoCropImageFilter::New();
     cropFilter->SetInput( image );

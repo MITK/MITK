@@ -37,19 +37,17 @@ mitk::DataStorage::DataStorage()
 
 mitk::DataStorage::~DataStorage()
 {
-  //\fixme the following has to be done, but is commented out, because of
-  // a singleton-free-order-problem.
-  //if(m_DataTree.IsNotNull())
-  //{
-  //  m_DataTree->RemoveObserver(m_DeleteInTreeObserverTag);
-  //}
+  if(m_DataTree.IsNotNull())
+  {
+    m_DataTree->RemoveObserver(m_DeleteInTreeObserverTag);
+  }
 
-  //// workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
-  //// which happens when a PlugIn is re-initialized within Chili
-  //if(s_Instance.IsNotNull())
-  //{
-  //  s_Instance->m_DataTree->UnRegister();
-  //}
+  // workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
+  // which happens when a PlugIn is re-initialized within Chili
+  if(s_Instance.IsNotNull())
+  {
+    s_Instance->m_DataTree->UnRegister();
+  }
 
   m_DataTree = NULL; 
 }

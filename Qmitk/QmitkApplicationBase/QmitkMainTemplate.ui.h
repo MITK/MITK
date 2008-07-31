@@ -772,6 +772,14 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New(true) );
   m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(true) );
   m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(true) );
+
+  //create a couple of additional connections to allow the right-click show/hide to connect with the
+  //options menu actions
+  connect(FunctionalityToolbar, SIGNAL(visibilityChanged ( bool )), options_ShowDropdownToolbarAction, SLOT(setOn(bool)));
+  connect(ToolBar, SIGNAL(visibilityChanged ( bool )), options_showMainToolbarAction, SLOT(setOn(bool)));
+  connect(FavoritesToolbar, SIGNAL(visibilityChanged ( bool )), options_ShowRecentlyusedToolbarAction, SLOT(setOn(bool)));
+  connect(SearchToolbar, SIGNAL(visibilityChanged ( bool )),options_showSearchToolbarAction, SLOT(setOn(bool)));
+  connect(FunctionalitiesIconToolBar, SIGNAL(visibilityChanged ( bool )), options_ShowIconsetToolbarAction, SLOT(setOn(bool)));
 }
 
 /*!

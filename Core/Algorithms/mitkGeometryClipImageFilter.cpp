@@ -33,10 +33,10 @@ mitk::GeometryClipImageFilter::GeometryClipImageFilter()
     m_ClipPartAboveGeometry(true), 
     m_OutsideValue(0), 
     m_AutoOutsideValue(false), 
-    m_LabelBothSides(false), 
+    m_LabelBothSides(false),
+    m_AutoOrientLabels(false),
     m_AboveGeometryLabel(1), 
-    m_BelowGeometryLabel(2),
-    m_AutoOrientLabels(false)
+    m_BelowGeometryLabel(2)
 {
   this->SetNumberOfInputs(2);
   this->SetNumberOfRequiredInputs(2);

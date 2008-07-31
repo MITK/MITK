@@ -62,11 +62,11 @@ m_DefaultMain( NULL ),
 m_NumberOfFunctionalities( 0 ), 
 m_NumberOfDialogBars( 0 ), 
 m_FunctionalityActionGroup( NULL ), 
-m_CurrentFunctionality( -1 ),
 m_ToolbarComboBox(NULL),
 m_SearchComboBox(NULL),
 m_SearchBar(NULL),
-m_FunctionalityToolBar(NULL)
+m_FunctionalityToolBar(NULL),
+m_CurrentFunctionality( -1 )
 {
 }
 
@@ -763,7 +763,7 @@ void QmitkFctMediator::TrackFunctionalityCall( QAction *action )
     //is already on the list, it crashes the program in certain situations.
     m_FavoritesToolBar->clear();
     new QLabel(QString("Recently used:  "), m_FavoritesToolBar, "favorites_label");
-    for(int n = 0; n < m_FavFunctionalityActions.count(); ++n)
+    for(unsigned int n = 0; n < m_FavFunctionalityActions.count(); ++n)
     {
       m_FavFunctionalityActions.at(n)->addTo(m_FavoritesToolBar);
     }

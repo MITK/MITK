@@ -93,8 +93,11 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
   m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
   m_BackgroundActor->SetMapper( m_BackgroundMapper );
-  m_BackgroundActor->SetBackfaceProperty( m_BackgroundActor->MakeProperty() );
-  m_BackgroundActor->GetBackfaceProperty()->SetColor( 0.0, 0.0, 0.0 );
+
+  vtkProperty * backfaceProperty = m_BackgroundActor->MakeProperty();
+  backfaceProperty->SetColor( 0.0, 0.0, 0.0 );
+  m_BackgroundActor->SetBackfaceProperty( backfaceProperty );
+  backfaceProperty->Delete();
 
   m_FrontHedgeHog = vtkHedgeHog::New();
   m_BackHedgeHog  = vtkHedgeHog::New();
@@ -152,12 +155,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_BackHedgeHog->Delete();
 
   // Delete entries in m_ImageActors list one by one
-  ActorList::iterator it;
-                                                                      
-  for ( it = m_ImageActors.begin(); it != m_ImageActors.end(); ++it )
-  {
-    it->second->Delete();
-  }
+  m_ImageActors.clear();
 }
 
 
@@ -286,7 +284,7 @@ Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
   {
     if ( m_ImageActors.count( imageMapper ) > 0)
     {
-      m_ImageActors[imageMapper]->Delete();
+      m_ImageActors[imageMapper].m_Sender = NULL; // sender is already destroying itself
       m_ImageActors.erase( imageMapper );
     }
     if ( m_LookupTableProperties.count( imageMapper ) > 0 )
@@ -548,19 +546,14 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                   texture->UnRegister( NULL );
                   
                   // Store the actor so that it may be accessed in following
-                  // passes.
-                  m_ImageActors[imageMapper] = imageActor;
-
-                  // Get informed when ImageMapper object is deleted, so that
-                  // the datastructures built here can be deleted as well
-                  imageMapper->AddObserver( 
-                    itk::DeleteEvent(), m_ImageMapperDeletedCommand );
+                  // passes.                  
+                  m_ImageActors[imageMapper].Initialize(imageActor, imageMapper, m_ImageMapperDeletedCommand);
                 }
                 else
                 {
                   // Else, retrieve the actor and associated objects from the
                   // previous pass.
-                  imageActor = m_ImageActors[imageMapper];
+                  imageActor = m_ImageActors[imageMapper].m_Actor;
                   dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
                   texture = imageActor->GetTexture();
                   lookupTable = texture->GetLookupTable();
@@ -771,5 +764,33 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 }
 
+void 
+Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
+{
+  m_Actor = actor;
+  m_Sender = sender;
+  // Get informed when ImageMapper object is deleted, so that
+  // the data structures built here can be deleted as well
+  m_ObserverID = sender->AddObserver( itk::DeleteEvent(), command );
+}
+
+Geometry2DDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(NULL), m_Sender(NULL), m_ObserverID(0)
+{
+}
+
+Geometry2DDataVtkMapper3D::ActorInfo::~ActorInfo()
+{
+  if(m_Sender != NULL)
+  {
+    m_Sender->RemoveObserver(m_ObserverID);
+  }
+  if(m_Actor != NULL)
+  {
+    m_Actor->Delete();
+  }
+}
+
 } // namespace mitk
+
+
 

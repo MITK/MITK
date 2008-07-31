@@ -201,11 +201,26 @@ protected:
   /** A default grayscale lookup-table, used for reference */
   vtkLookupTable *m_DefaultLookupTable;
 
+  class MITK_CORE_EXPORT ActorInfo
+  {
+  public:
+    vtkActor * m_Actor;
+    // we do not need a smart-pointer, because we delete our
+    // connection, when the referenced mapper is destroyed
+    itk::Object* m_Sender;
+    unsigned long m_ObserverID;
+
+    void Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command);
+
+    ActorInfo();
+
+    ~ActorInfo();
+  };
 
   /** \brief List holding the vtkActor to map the image into 3D for each 
    * ImageMapper 
    */
-  typedef std::map< ImageMapper2D *, vtkActor * > ActorList;
+  typedef std::map< ImageMapper2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
 
   struct LookupTableProperties
@@ -237,4 +252,6 @@ protected:
 } // namespace mitk
 
 #endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */
+
+
 

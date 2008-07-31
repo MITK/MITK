@@ -58,14 +58,14 @@ m_MainStack( NULL ),
 m_ControlStack( NULL ), 
 m_DialogBarsFrame( NULL ),
 m_ToolBar( NULL ),
-m_DefaultMain( NULL ), 
-m_NumberOfFunctionalities( 0 ), 
-m_NumberOfDialogBars( 0 ), 
-m_FunctionalityActionGroup( NULL ), 
 m_ToolbarComboBox(NULL),
 m_SearchComboBox(NULL),
 m_SearchBar(NULL),
 m_FunctionalityToolBar(NULL),
+m_DefaultMain( NULL ), 
+m_NumberOfFunctionalities( 0 ), 
+m_NumberOfDialogBars( 0 ), 
+m_FunctionalityActionGroup( NULL ), 
 m_CurrentFunctionality( -1 )
 {
 }

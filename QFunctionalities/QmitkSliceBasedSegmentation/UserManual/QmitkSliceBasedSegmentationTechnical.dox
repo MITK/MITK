@@ -18,6 +18,10 @@ documentation and tests for newly developed code. In addition, the old code had
 some design weaknesses (e.g. a monolithic class), which would be hard to
 maintain in the future.
 
+By now SliceBasedSegmentation is a well tested and easily extensible vehicle for all kinds of interactive
+segmentation applications. A separate page describes how you can extend SliceBasedSegmentation with new
+tools in a shared object (DLL): \ref ToolExtensionsGeneralOverview.
+
 \section QmitkSliceBasedSegmentationTechnicalPage3 Overview of tasks
 
 We identified the following major tasks:

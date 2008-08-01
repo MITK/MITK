@@ -2,20 +2,24 @@
 
 \page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools.
 
+<ul>
 \li \ref ToolExtensionsGeneralOverview2
 \li \ref ToolExtensionsGeneralOverview3
-\li \ref ToolExtensionsGeneralOverview31
-\li \ref ToolExtensionsGeneralOverview32
-\li \ref ToolExtensionsGeneralOverview33
+  <ul>
+  \li \ref ToolExtensionsGeneralOverview31
+  \li \ref ToolExtensionsGeneralOverview32
+  \li \ref ToolExtensionsGeneralOverview33
+  </ul>
 \li \ref ToolExtensionsGeneralOverview4
 \li \ref ToolExtensionsGeneralOverview5
 \li \ref ToolExtensionsGeneralOverview6
+</ul>
 
 \section ToolExtensionsGeneralOverview2 Introduction
 
 The application for manual segmentation in MITK (SliceBasedSegmentation) comes
 with a tool class framework that is extensible with new tools (description at
-\li \ref QmitkSliceBasedSegmentationTechnicalPage). The usual way
+\ref QmitkSliceBasedSegmentationTechnicalPage). The usual way
 to create new tools (since it is mostly used inside DKFZ) is to just add new
 files to the MITK source code tree. However, this requires to be familiar with
 the MITK build system and turnaround time during development might be long 

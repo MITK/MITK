@@ -208,8 +208,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Prop3D = m_DummyProp;
     m_Prop3D->Register( NULL );
 
-    //REM m_VolumeLOD->VisibilityOff();
-
     // Check if a bounding box should be displayed around the dataset
     // (even if volume rendering is disabled)
     bool hasBoundingBox = false;
@@ -248,10 +246,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     mitk::RenderingManager::GetInstance()->SetNumberOfLOD(1); //how many LODs should be used
 
-    //vtkRendWin->RemoveObserver( m_AbortCallbackCommand );
-    //vtkRendWin->RemoveObserver( m_StartCallbackCommand );
-    //vtkRendWin->RemoveObserver( m_EndCallbackCommand );
-
     mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
 
     return;
@@ -281,11 +275,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     break;
   }
 
-  //REM
-  //if (m_VolumeLOD) {
-  //  m_VolumeLOD->VisibilityOn();
-  //}
-
   const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);
 
@@ -311,20 +300,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   m_ImageCast->SetInput( inputData );
 
-  //REM
-  //trying to avoid update-problem, when size of input changed. Does not really help much.
-  //if(m_ImageCast->GetOutput()!=NULL)
-  //{
-  //  int inputWE[6];
-  //  inputData->GetWholeExtent(inputWE);
-  //  int * outputWE=m_UnitSpacingImageFilter->GetOutput()->GetExtent();
-  //  if( memcmp(inputWE, outputWE,sizeof(int)*6) != 0 )
-  //  {
-  //    m_UnitSpacingImageFilter->GetOutput()->SetUpdateExtent(inputWE);
-  //    m_UnitSpacingImageFilter->UpdateWholeExtent();
-  //  }
-  //}
-
   //If mask exists, process mask before resampling.
   if (this->m_Mask)
   {
@@ -338,9 +313,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     this->m_HiResMapper->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
   }
 
-
   this->UpdateTransferFunctions( renderer );
-
 
   vtkRenderWindowInteractor *interactor = vtkRendWin->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);

@@ -1,0 +1,174 @@
+/**
+
+\page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools.
+
+\li \ref ToolExtensionsGeneralOverview2
+\li \ref ToolExtensionsGeneralOverview3
+\li \ref ToolExtensionsGeneralOverview31
+\li \ref ToolExtensionsGeneralOverview32
+\li \ref ToolExtensionsGeneralOverview33
+\li \ref ToolExtensionsGeneralOverview4
+\li \ref ToolExtensionsGeneralOverview5
+\li \ref ToolExtensionsGeneralOverview6
+
+\section ToolExtensionsGeneralOverview2 Introduction
+
+The application for manual segmentation in MITK (SliceBasedSegmentation) comes
+with a tool class framework that is extensible with new tools (description at
+\li \ref QmitkSliceBasedSegmentationTechnicalPage). The usual way
+to create new tools (since it is mostly used inside DKFZ) is to just add new
+files to the MITK source code tree. However, this requires to be familiar with
+the MITK build system and turnaround time during development might be long 
+(recompiling parts of MITK again and again).
+
+For external users who just want to use
+MITK as a library and application, there is a way to create new segmentation 
+tools in an MITK external project, which will compile the new tools into a 
+shared object (DLL). Such shared objects can be loaded via the ITK object factory
+and its autoload feature on application startup. This document describes
+how to build such external extensions.
+
+\section ToolExtensionsGeneralOverview3 What might be part of an extension
+
+The extension concept assumes that you want to create one or several new
+interactive segmentation tools for SliceBasedSegmentation or another MITK
+functionality that uses the tools infrastructure. In the result you
+will create a shared object (DLL), which contains several tools and their GUI
+counterparts, plus optional code that your extension requires. The following
+sections shortly describe each of these parts.
+
+\subsection ToolExtensionsGeneralOverview31 Tool classes
+
+A tool is basically any subclass of mitk::Tool. Tools are created at runtime
+through the ITK object factory (so they inherit from itk::Object). Tools
+should handle the interaction part of a segmentation method, i.e. create
+seed points, draw contours, etc., in order to parameterize segmentation algorithms.
+Simple algorithms can even be part of a tool. A tools is identified by icon (XPM format),
+name (short string) and optionally a group name (e.g. the group name for SliceBasedSegmentation
+is "default").
+
+<b>There is a naming convention</b>: you should put a tool called \c mitk::ExternalTool into
+files called \c mitkExternalTool.h and \c mitkExternalTool.cpp. This is \e required if
+you use the convenience macros described below, because there need to be ITK factories,
+which names are directly derived from the file names of the tools. For the example of mitk::ExternalTool
+there would be a factory called \c mitk::ExternalToolFactory in a file named \c mitkExternalToolFactory.cpp.
+
+\subsection ToolExtensionsGeneralOverview32 GUI classes for tools
+
+Tools are non-graphical classes that only implement interactions in renderwindows. However,
+some tools will need a means to allow the user to set some parameters -- a graphical user interface, GUI.
+In the Qt3 case, tool GUIs inherit from QmitkToolGUI, which is a mixture of QWidget and itk::Object.
+Tool GUIs are also created through the ITK object factory.
+
+Tools inform their GUIs about state changes by messages. Tool GUIs communicate with their associated tools
+via direct method calls (they know their tools). See mitk::BinaryThresholdTool for examples.
+
+<b>Again a naming convention</b>: if the convenience macros for tool extension shared objects are used,
+you have to put a tool GUI called \c QmitkExternalToolGUI into a files named \c QmitkExternalToolGUI.cpp
+and \c QmitkExternalToolGUI.h. The convenience macro will create a factory called \c QmitkExternalToolGUIFactory
+into a file named \c QmitkExternalToolGUIFactory.cpp.
+
+\subsection ToolExtensionsGeneralOverview33 Additional files
+
+If you are writing tools MITK externally, these tools might depend on additional files, e.g.
+segmentation algorithms. These can also be compiled into a tool extension shared object.
+
+\section ToolExtensionsGeneralOverview4 Writing a CMake file for a tool extension
+
+Summing up the last section, an example tool extension could comprise the following files:
+\verbatim
+mitkExternalTool.h      \
+mitkExternalTool.xpm     >--- implementing mitk::ExternalTool (header, icon, implementation)
+mitkExternalTool.cpp    /
+
+QmitkExternalToolGUI.h    ,-- implementing a GUI for mitk::ExternalTool
+QmitkExternalToolGUI.cpp /
+
+externalalgorithm.h         \
+externalalgorithm.cpp        \
+externalalgorithmsolver.h     >-- a couple of files (not related to MITK tools)
+externalalgorithmsolver.cpp  /
+\endverbatim
+
+This should all be compiled into one shared object. Just like ITK, VTK and MITK we
+will use CMake for this purpose (I assume you either know or are willing to learn about
+<a href="htpp://www.cmake.org">www.cmake.org</a>)
+A CMake file for the above example would look like this:
+
+\code
+PROJECT ( ExternalTool )
+
+FIND_PACKAGE(ITK)
+FIND_PACKAGE(MITK)
+FIND_PACKAGE(Qt3)
+
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+SET( TOOL_QT3GUI_FILES
+     QmitkExternalToolGUI.cpp
+   )
+
+SET( TOOL_FILES
+     mitkExternalTool.cpp
+   )
+
+SET( TOOL_ADDITIONAL_CPPS
+     externalalgorithm.cpp
+     externalalgorithmsolver.cpp
+   )
+
+SET( TOOL_ADDITIONAL_MOC_H
+)
+
+MITK_GENERATE_TOOLS_LIBRARY(mitkExternalTools)
+\endcode
+
+Basically, you only have to change the definitions of \c TOOL_FILES and, optionally, 
+\c TOOL_QT3GUI_FILES, \c TOOL_ADDITIONAL_CPPS and \c TOOL_ADDITIONAL_MOC_H. 
+For all .cpp files in \c TOOL_FILES and \c TOOL_QT3GUI_FILES there will be factories
+created assuming the naming conventions described in the sections above.
+Files listed in \c TOOL_ADDITIONAL_CPPS will just be compiled. Files listed in
+\c TOOL_ADDITIONAL_MOC_H will be run through Qts meta object compiler \c moc -- 
+this is neccessary for all objects that have the Q_OBJECT macro in their declaration.
+\c moc will create new files that will also be compiled into the library.
+
+\section ToolExtensionsGeneralOverview5 Compiling the extension
+
+For compiling a tool extension, you will need a compiled version of MITK. We will
+assume MITK was compiled into /home/user/mitk/debug. You need to build MITK with
+<b>BUILD_SHARED_CORE</b> turned on!
+
+You build the tool extension just like any other CMake based project:
+\li know where your source code is (e.g. /home/user/mitk/tool-extension-src)
+\li change into the directory, where you want to compile the shared object (e.g. /home/user/mitk/tool-extension-debug)
+\li invoke cmake: <tt>ccmake /home/user/mitk/tool-extension-src</tt>
+\li configure (press c or the "configure" button)
+\li set the ITK_DIR variable to the directory, where you compiled ITK
+\li set the MITK_DIR variable to the directory, where you compiled MITK: <tt>/home/user/mitk/debug</tt>
+\li configure (press "c" or the "configure" button)
+\li generate (press "g" or the "generate" button)
+
+This should do it and leave you with a or project file or Makefile that you can compile (using make or VisualStudio).
+
+\section ToolExtensionsGeneralOverview6 Configuring ITK autoload
+
+If the compile succeeds, you will get a library mitkExternalTools.dll or libmitkExternalTools.so.
+This library exports a symbol \c itkLoad which is expected by the ITK object factory.
+
+On application startup the ITK object factory will search a list of directories from 
+the environment variable \c ITK_AUTOLOAD_PATH. Set this environment variable to your binary directory (<tt>/home/user/mitk/tool-extension-debug</tt>).
+
+The ITK object factory will load all shared objects that it finds in the specified directories
+and will test if they contain a symbol (function pointer) \c itkLoad, which is expected
+to return a pointer to a itk::ObjectFactoryBase instance. If such a symbol is found, the
+returned factory will be registered with the ITK object factory.
+
+If you successfully followed all the steps above, MITK will find your mitk::ExternalTool on
+application startup, when the ITK object factory is asked to create all known instances of
+mitk::Tool. Furthermore, if your mitk::ExternalTool claims to be part of the "default" group,
+there will be a new icon in SliceBasedSegmentation, which activates your tool.
+
+<b>Have fun!</b> (And Windows users: welcome to the world of DLLs)
+
+**/
+

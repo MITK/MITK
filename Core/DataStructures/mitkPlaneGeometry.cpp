@@ -710,8 +710,8 @@ PlaneGeometry::Clone() const
 void 
 PlaneGeometry::ExecuteOperation( Operation *operation )
 {
-  vtkTransform *vtktransform = vtkTransform::New();
-  vtktransform->SetMatrix( m_VtkMatrix );
+  vtkTransform *transform = vtkTransform::New();
+  transform->SetMatrix( m_VtkMatrix );
 
   switch ( operation->GetOperationType() )
   {
@@ -723,6 +723,8 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
         return;
       }
 
+      Point3D center = planeOp->GetPoint();
+
       Vector3D orientationVector = planeOp->GetNormal();
       Vector3D defaultVector;
       FillVector3D( defaultVector, 0.0, 0.0, 1.0 );
@@ -733,22 +735,25 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       vtkFloatingPointType rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
       rotationAngle *= 180.0 / vnl_math::pi;
 
-      vtktransform->Identity();
-      vtktransform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
+      transform->PostMultiply();
+      transform->Identity();
+      transform->Translate( center[0], center[1], center[2] );
+      transform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
+      transform->Translate( -center[0], -center[1], -center[2] );
       break;
     }
 
 
   default:
     Superclass::ExecuteOperation( operation );
-    vtktransform->Delete();
+    transform->Delete();
     return;
   }
 
-  m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
-  TransferVtkToItkTransform();
+  m_VtkMatrix->DeepCopy(transform->GetMatrix());
+  this->TransferVtkToItkTransform();
   this->Modified();
-  vtktransform->Delete();
+  transform->Delete();
 }
 
 

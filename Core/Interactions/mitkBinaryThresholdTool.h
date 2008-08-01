@@ -76,8 +76,6 @@ class MITK_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
     int m_CurrentThresholdValue;
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, BinaryThresholdTool, "Create segmentation by thresholding")
-
 } // namespace
 
 #endif

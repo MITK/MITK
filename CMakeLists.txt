@@ -8,6 +8,7 @@ INCLUDE(Dart)
 ENDIF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
 
 INCLUDE(CMake/CoreHelpers.cmake)
+INCLUDE(CMake/ToolExtensionHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")
 SET(LIBPOSTFIX "")
@@ -119,6 +120,10 @@ SET(LIBRARIES_FOR_MITK_CORE
 
 SET(ANN_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ann/include)
 SET(IPSEGMENTATION_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipSegmentation)
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
 
 ADD_SUBDIRECTORY(Core)
 

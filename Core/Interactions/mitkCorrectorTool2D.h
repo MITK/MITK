@@ -91,8 +91,6 @@ class MITK_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
     Image::Pointer m_WorkingSlice;
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, CorrectorTool2D, "MITK 2D correction tool")
-
 } // namespace
 
 #endif

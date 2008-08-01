@@ -65,7 +65,5 @@ class QMITK_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };
 
-MITK_TOOL_GUI_FACTORY_MACRO( QMITK_EXPORT, QmitkBinaryThresholdToolGUI, "Interactive surface GUI")
-
 #endif
 

@@ -59,8 +59,6 @@ class MITK_CORE_EXPORT AddContourTool : public ContourTool
 
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, AddContourTool, "MITK 2D contour drawing tool (add contour)")
-
 } // namespace
 
 #endif

@@ -54,8 +54,6 @@ class MITK_CORE_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
     virtual ~CreateSurfaceTool();
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, CreateSurfaceTool, "Create surfaces for all segmentations")
-
 } // namespace
 
 #endif

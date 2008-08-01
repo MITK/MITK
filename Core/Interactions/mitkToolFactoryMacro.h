@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#define MITK_TOOL_FACTORY_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+#define MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
  \
 class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
 { \
@@ -74,9 +74,24 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
  \
 };
 
+#define MITK_EXTERNAL_TOOL_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+extern "C" { \
+EXPORT_SPEC itk::ObjectFactoryBase* itkLoad(); \
+}
+
+
+#define MITK_EXTERNAL_TOOL_CPP_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+extern "C" { \
+EXPORT_SPEC itk::ObjectFactoryBase* itkLoad() { \
+  static CLASS_NAME ## Factory::Pointer p = CLASS_NAME ## Factory::New(); \
+  return p; \
+} \
+}
+
 /* GUI classes are _not_ exported! */
 
-#define MITK_TOOL_GUI_FACTORY_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+#define MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
  \
 class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
 { \
@@ -134,6 +149,19 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
  \
 };
 
+#define MITK_EXTERNAL_TOOL_GUI_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+extern "C" { \
+EXPORT_SPEC itk::ObjectFactoryBase* itkLoad(); \
+}
+
+#define MITK_EXTERNAL_TOOL_GUI_CPP_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
+extern "C" { \
+EXPORT_SPEC itk::ObjectFactoryBase* itkLoad() { \
+  static CLASS_NAME ## Factory::Pointer p = CLASS_NAME ## Factory::New(); \
+  return p; \
+} \
+}
 
 
 

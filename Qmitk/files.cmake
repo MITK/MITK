@@ -15,8 +15,6 @@ SET(CPP_FILES
   QmitkBaseAlgorithmComponent.cpp
   QmitkBaseComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
-  QmitkBinaryThresholdToolGUI.cpp
-  QmitkCalculateGrayValueStatisticsToolGUI.cpp
   QmitkCallbackFromGUIThread.cpp
   QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
@@ -140,10 +138,8 @@ SET(MOC_H_FILES
   QmitkApplicationBase/QmitkSaveProjectWidget.h
   QmitkBaseComponent.h
   QmitkBaseFunctionalityComponent.h
-  QmitkBinaryThresholdToolGUI.h
   QmitkCallbackFromGUIThread.h
   QmitkChiliPluginSaveDialog.h
-  QmitkCalculateGrayValueStatisticsToolGUI.h
   QmitkColorTransferFunctionCanvas.h
   QmitkCopyToClipBoardDialog.h
   QmitkDialogBar.h
@@ -202,4 +198,9 @@ SET(MOC_H_FILES
   QmitkUndoRedoButton.h
   QmitkVideoBackground.h
   qundoredobutton.h
+)
+
+SET(TOOL_QT3GUI_FILES
+  QmitkBinaryThresholdToolGUI.cpp
+  QmitkCalculateGrayValueStatisticsToolGUI.cpp
 )

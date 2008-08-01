@@ -104,8 +104,6 @@ class MITK_CORE_EXPORT RegionGrowingTool : public FeedbackContourTool
     bool m_FillFeedbackContour;
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, RegionGrowingTool, "MITK 2D region growing tool")
-
 } // namespace
 
 #endif

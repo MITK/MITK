@@ -68,8 +68,6 @@ class MITK_CORE_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsPr
     std::stringstream m_CompleteReport;
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, CalculateGrayValueStatisticsTool, "Calculates some gray value statistics for segmentations")
-
 } // namespace
 
 #endif

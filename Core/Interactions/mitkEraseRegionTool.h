@@ -55,8 +55,6 @@ class MITK_CORE_EXPORT EraseRegionTool : public SetRegionTool
 
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT,EraseRegionTool, "MITK 2D contour drawing tool (add contour)")
-
 } // namespace
 
 #endif

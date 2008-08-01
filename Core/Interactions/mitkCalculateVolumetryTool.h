@@ -55,8 +55,6 @@ class MITK_CORE_EXPORT CalculateVolumetryTool : public SegmentationsProcessingTo
     virtual ~CalculateVolumetryTool();
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, CalculateVolumetryTool, "Volumetry for all segmentations")
-
 } // namespace
 
 #endif

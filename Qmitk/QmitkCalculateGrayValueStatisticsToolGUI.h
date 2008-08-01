@@ -60,7 +60,5 @@ class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGU
     mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
 };
 
-MITK_TOOL_GUI_FACTORY_MACRO( QMITK_EXPORT, QmitkCalculateGrayValueStatisticsToolGUI, "Statistics for a segmentation")
-
 #endif
 

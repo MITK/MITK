@@ -53,8 +53,6 @@ class MITK_CORE_EXPORT AutoCropTool : public SegmentationsProcessingTool
     virtual ~AutoCropTool();
 };
 
-MITK_TOOL_FACTORY_MACRO(MITK_CORE_EXPORT, AutoCropTool, "Auto cropping of all segmentations")
-
 } // namespace
 
 #endif

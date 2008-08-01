@@ -3,16 +3,16 @@
 \page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools.
 
 <ul>
-\li \ref ToolExtensionsGeneralOverview2
-\li \ref ToolExtensionsGeneralOverview3
+<li> \ref ToolExtensionsGeneralOverview2 </li>
+<li> \ref ToolExtensionsGeneralOverview3 </li>
   <ul>
-  \li \ref ToolExtensionsGeneralOverview31
-  \li \ref ToolExtensionsGeneralOverview32
-  \li \ref ToolExtensionsGeneralOverview33
+  <li> \ref ToolExtensionsGeneralOverview31 </li>
+  <li> \ref ToolExtensionsGeneralOverview32 </li>
+  <li> \ref ToolExtensionsGeneralOverview33 </li>
   </ul>
-\li \ref ToolExtensionsGeneralOverview4
-\li \ref ToolExtensionsGeneralOverview5
-\li \ref ToolExtensionsGeneralOverview6
+<li> \ref ToolExtensionsGeneralOverview4 </li>
+<li> \ref ToolExtensionsGeneralOverview5 </li>
+<li> \ref ToolExtensionsGeneralOverview6 </li>
 </ul>
 
 \section ToolExtensionsGeneralOverview2 Introduction

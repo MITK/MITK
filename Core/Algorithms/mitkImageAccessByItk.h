@@ -486,7 +486,7 @@ PURPOSE.  See the above copyright notices for more information.
     imagetoitk2->SetInput(mitkImage2);                                                                         \
     imagetoitk2->Update();                                                                                     \
     itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());                                  \
-  }     
+  }
        
 #define _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, dimension)                    \
   if ( pixelType1 == typeid(pixeltype) )                                                                             \
@@ -499,8 +499,8 @@ PURPOSE.  See the above copyright notices for more information.
     _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, unsigned short, dimension) else  \
     _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, char, dimension) else            \
     _accessTwoImagesByItk2(mitkImage1, mitkImage2, itkImageTypeFunction, pixeltype, unsigned char, dimension) else   \
-    _accessByItkWarningParam(pixelType2, _accessTwoImagesByItk)                                                      \
-  }     
+    _accessByItkWarningParam(pixelType2, "_accessTwoImagesByItk")                                                    \
+  }
 
 #define _accessTwoImagesAllTypesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension)               \
       _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, double, dimension) else            \
@@ -511,7 +511,7 @@ PURPOSE.  See the above copyright notices for more information.
       _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, unsigned short, dimension) else    \
       _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, char, dimension) else              \
       _accessTwoImagesByItk(mitkImage1, mitkImage2, itkImageTypeFunction, unsigned char,  dimension) else    \
-      _accessByItkWarningParam(pixelType1, _accessTwoImagesByItk)
+      _accessByItkWarningParam(pixelType1, "_accessTwoImagesByItk")
 
 //##Documentation
 //## @brief Access two mitk-images with known dimension by itk-images

@@ -1,6 +1,6 @@
 /**
 
-\page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools.
+\page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools
 
 <ul>
 <li> \ref ToolExtensionsGeneralOverview2 </li>
@@ -31,6 +31,9 @@ tools in an MITK external project, which will compile the new tools into a
 shared object (DLL). Such shared objects can be loaded via the ITK object factory
 and its autoload feature on application startup. This document describes
 how to build such external extensions.
+
+<b>Example files can be found</b> in the MITK source code in the directory
+<tt>${MITK_SOURCE_DIR}/QApplications/ToolExtensionsExample/</tt>.
 
 \section ToolExtensionsGeneralOverview3 What might be part of an extension
 

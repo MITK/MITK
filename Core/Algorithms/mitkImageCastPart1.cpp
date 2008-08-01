@@ -48,6 +48,7 @@ typedef itk::Image<short, 2>          itkImageSS2;
 typedef itk::Image<unsigned short, 2> itkImageUS2;
 typedef itk::Image<char, 2>           itkImageSC2;
 typedef itk::Image<unsigned char, 2>  itkImageUC2;
+typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 
 typedef itk::Image<double, 3>         itkImageD3;
 typedef itk::Image<float, 3>          itkImageF3;
@@ -57,6 +58,7 @@ typedef itk::Image<short, 3>          itkImageSS3;
 typedef itk::Image<unsigned short, 3> itkImageUS3;
 typedef itk::Image<char, 3>           itkImageSC3;
 typedef itk::Image<unsigned char, 3>  itkImageUC3;
+typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
 
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageD2>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageF2>&);
@@ -66,6 +68,7 @@ InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::Sma
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageUS2>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageSC2>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageUC2>&);
+InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 2, itk::SmartPointer<itkImageRGBUC2>&);
 
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageD3>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageF3>&);
@@ -75,4 +78,5 @@ InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::Sma
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageUS3>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageSC3>&);
 InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageUC3>&);
+InstantiateAccessFunctionForFixedDimension_1(_CastToItkImage2Access, 3, itk::SmartPointer<itkImageRGBUC3>&);
 }

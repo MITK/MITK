@@ -10,9 +10,14 @@ other toolkits, especially ITK.
 The task of most of the classes in this category is to deal with the conversion between the (templated) itk::Image and the (not-templated) mitk::Image.
 Methods for conversion are provided for both directions:
 \li \ref MitkToItk
-\li \ref ItkToMitk
+\li ref ItkToMitk
 
 Care has to be taken regarding the involved coordinate systems, see \ref ItkToMitkCoordinateSystems.
+
+For limitations on ITK-type conversion see the section \ref Limitations.
+
+VTK-based access to MITK images is straightforward: simply ask your mitk::Image vor a \a vtkImageData by calling Image:GetVtkImageData.
+Similarily, to get a \a vtkPolyData from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
 
 \section MitkToItk MITK to ITK adaptor classes
 Pixel type and dimension of MITK images can be specified at run time whereas whereas ITK images are templated over the pixel type and the dimension, thus in ITK both need to be specified at compile time.
@@ -68,5 +73,20 @@ Converting ITK images to MITK is easier than the other way round. Basically, you
 
 \section ItkToMitkCoordinateSystems ITK image vs MITK coordinate systems
 Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see mitk::Geometry3D::WorldToItkPhysicalPoint.
+
+\section Limitations Limitations
+The \ref MitkToItk access macros have to do type multiplexing at compile time. This is done for a limited number of pixel types (\a char, \a short, \a int, \a long, \a double, \a float, and the \a unsigned variants of the integer data types) and for dimensions 2 and 3.
+
+Especially, color image types are not multiplexed. This is because many algorithms do not support color images (e.g. with data type itk::RGBPixel) because they do not have a scalar data type. If your algorithm do support color and you want to multiplex over all scalar as well as the color data type, try the following:
+\code
+  if (myMitkImageThatMaybeColor->GetPixelType()==typeid(itk::RGBPixel<unsigned char>))
+  {
+    AccessFixedPixelTypeByItk(myMitkImageThatMaybeColor, myAlgorithmFunction, itk::RGBPixel<unsigned char>);
+  }
+  else
+  {
+    AccessByItk(myMitkImageThatMaybeColor, myAlgorithmFunction);
+  }
+\endcode
 */
 }

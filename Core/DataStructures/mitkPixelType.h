@@ -19,66 +19,106 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 #define PIXELTYPE_H_HEADER_INCLUDED_C1EBF565
 
-
 #include "mitkCommon.h"
 #include <mitkIpPic.h>
+#include <itkImageIOBase.h>
 
 namespace mitk {
 
-//##ModelId=3DF45FE9023C
 //##Documentation
 //## @brief Class for defining the data type of pixels 
+//##
+//## To obtain additional type information not provided by this class
+//## itk::ImageIOBase can be used by passing the return value of 
+//## PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
+//## and using the itk::ImageIOBase methods GetComponentType,
+//## GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
 //## @ingroup Data
 class MITK_CORE_EXPORT PixelType
 {
 public:
   itkTypeMacro(PixelType, None);
 
-  //##ModelId=3E1400C40198
-  PixelType(const std::type_info& aTypeId, int numberOfComponents = 1);
+  typedef itk::ImageIOBase::IOPixelType ItkIOPixelType;
 
-  //##ModelId=3E1400150088
+  PixelType(const std::type_info& aTypeId, int numberOfComponents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
+
   PixelType(ipPicType_t type, int bpe, int numberOfComponents = 1);
 
-  //##ModelId=3E1400060113
   PixelType(const ipPicDescriptor* pic);
-  //##ModelId=3E1412720060
   PixelType(const mitk::PixelType & aPixelType);
-  //##ModelId=3E14131D0246
+  /** \brief Get the \a type_info of the scalar (!) type. Each element
+  * may contain m_NumberOfComponents (more than one) of these scalars.
+  *
+  * \sa GetItkTypeId
+  */
   inline const std::type_info * const GetTypeId() const
   {
     return m_TypeId;
   }
+  /** \brief Get the \a type_info of the ITK-type representing an 
+  * element. Can be \a NULL in case the ITK-type is unknown.
+  *
+  * \sa GetTypeId
+  */
+  inline const std::type_info * const GetItkTypeId() const
+  {
+    return m_ItkTypeId;
+  }
 
-
-  //##ModelId=3E1413040237
+  /** \brief Get the \a ipPicType_t of the scalar (!) component type. Each element
+  * may contain m_NumberOfComponents (more than one) of these scalars.
+  *
+  * \sa GetItkTypeId
+  * \sa GetTypeId
+  */
   inline ipPicType_t GetType() const
   {
     return m_Type;
   }
 
-
-  //##ModelId=3E1413110195
+  /** \brief Get the number of bits per element (of an
+  * element)
+  *
+  * A vector of double with three components will return
+  * 8*sizeof(double)*3.
+  * \sa GetBitsPerComponent
+  * \sa GetItkTypeId
+  * \sa GetTypeId
+  */
   inline int GetBpe() const
   {
     return m_Bpe;
   }
 
+  /** \brief Get the number of components of which each element consists
+  *
+  * Each pixel can consist of multiple components, e.g. RGB.
+  */
   inline int GetNumberOfComponents() const
   {
     return m_NumberOfComponents;    
   }
   
+  /** \brief Get the number of bits per components
+  * \sa GetBitsPerComponent
+  */
   inline int GetBitsPerComponent() const
   {
     return m_BitsPerComponent;    
   }
   
-  
-  //##ModelId=3E1550B401ED
+  /** \brief Get the typename of the ITK-type representing an 
+  * element as a human-readable string
+  *
+  * \sa GetItkTypeId
+  */
+  std::string GetItkTypeAsString() const;
+
   inline PixelType& operator=(const PixelType& aPixelType)
   {
     m_TypeId=aPixelType.GetTypeId();
+    m_ItkTypeId=aPixelType.GetItkTypeId();
     m_Type=aPixelType.GetType();
     m_Bpe=aPixelType.GetBpe();
     m_NumberOfComponents = aPixelType.GetNumberOfComponents();
@@ -89,23 +129,33 @@ public:
   bool operator==(const PixelType& rhs) const;
   bool operator!=(const PixelType& rhs) const;
 
-  //##ModelId=3E15F73502BB
+  bool operator==(const std::type_info& typeId) const;
+  bool operator!=(const std::type_info& typeId) const;
+
   PixelType();
 
-  void Initialize(const std::type_info& aTypeId, int numberOfCompontents = 1);
+  void Initialize(const std::type_info& aTypeId, int numberOfCompontents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
 
-  //##ModelId=3E140E4F00E9
   void Initialize(ipPicType_t type, int bpe, int numberOfComponents = 1);
+
   virtual ~PixelType() {}
 
 private:
-  //##ModelId=3E13FFAD038C
+  /** \brief the \a type_info of the scalar (!) component type. Each element
+   * may contain m_NumberOfComponents (more than one) of these scalars.
+   *
+   * \sa m_ItkTypeId
+   */
   const std::type_info* m_TypeId;
+  /** \brief the \a type_info of the ITK-type representing an 
+   * element
+   *
+   * \sa m_TypeId
+   */
+  const std::type_info* m_ItkTypeId;
 
-  //##ModelId=3E1400610236
   ipPicType_t m_Type;
 
-  //##ModelId=3E14006C02E6
   int m_Bpe;
   
   int m_NumberOfComponents;
@@ -115,7 +165,5 @@ private:
 };
 
 } // namespace mitk
-
-
 
 #endif /* PIXELTYPE_H_HEADER_INCLUDED_C1EBF565 */

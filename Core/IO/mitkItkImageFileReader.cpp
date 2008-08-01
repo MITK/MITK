@@ -119,22 +119,10 @@ void mitk::ItkImageFileReader::GenerateData()
     ndim = 3;
   if((ndim==3) && (dimensions[2]<=1))
     ndim = 2;
-#if ITK_VERSION_MAJOR >= 2 || ( ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 6 )
-  mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents() );
+  mitk::PixelType pixelType( imageIO->GetComponentTypeInfo(), imageIO->GetNumberOfComponents(), imageIO->GetPixelType() );
   image->Initialize( pixelType, ndim, dimensions );
-#else
-  if ( imageIO->GetNumberOfComponents() > 1)
-    itkWarningMacro(<<"For older itk versions, only scalar images are supported!");
-  mitk::PixelType pixelType( imageIO->GetPixelType() );
-  image->Initialize( pixelType, ndim, dimensions );
-#endif 
   image->SetImportChannel( buffer, 0, Image::ManageMemory );
 
-#if ITK_VERSION_MAJOR == 2 && ITK_VERSION_MINOR < 4
-  image->GetSlicedGeometry()->SetOrigin( origin );
-  image->GetSlicedGeometry()->SetSpacing( spacing );
-  image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(image->GetSlicedGeometry(), image->GetDimension(3));
-#else
   // access direction of itk::Image and include spacing
   mitk::Matrix3D matrix;
   matrix.SetIdentity();
@@ -155,7 +143,7 @@ void mitk::ItkImageFileReader::GenerateData()
 
   // re-initialize TimeSlicedGeometry
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
-#endif
+
   buffer = NULL;
   std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 //  mitk::DataTreeNode::Pointer node = this->GetOutput();

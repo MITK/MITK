@@ -244,8 +244,8 @@
     <slot>DisableGradientBackground()</slot>
     <slot>EnableDepartmentLogo()</slot>
     <slot>DisableDepartmentLogo()</slot>
-    <slot>SetWidgetPlaneVisibility( const char * widgetName, bool visible )</slot>
-    <slot>SetWidgetPlanesVisibility( bool visible )</slot>
+    <slot>SetWidgetPlaneVisibility( const char * widgetName, bool visible, mitk::BaseRenderer *renderer = NULL )</slot>
+    <slot>SetWidgetPlanesVisibility( bool visible, mitk::BaseRenderer *renderer = NULL )</slot>
     <slot>SetWidgetPlanesLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLocked( bool locked )</slot>
     <slot>SetWidgetPlanesRotationLinked( bool link )</slot>

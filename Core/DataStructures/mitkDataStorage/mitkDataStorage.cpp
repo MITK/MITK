@@ -81,7 +81,13 @@ mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
 mitk::DataStorage* mitk::DataStorage::GetInstance()
 {
   if (DataStorage::s_Instance.IsNull())
-   throw 1;  // insert exception handling here
+  {
+      itkGenericOutputMacro("Trying to use mitk::DataStorage::GetInstance() " 
+        << "without an available singleton instance. Either no instance has "
+        << "been created (use DataStorage::CreateInstance) or it has already "
+        << "been destroyed.");
+      return NULL;
+  }
   else  
     return s_Instance;
 }

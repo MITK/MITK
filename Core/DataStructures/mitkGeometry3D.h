@@ -105,11 +105,7 @@ public:
   //##Documentation
   //## @brief Get the transformation used to convert from index 
   //## to world coordinates
-  itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D*);
-  //##Documentation
-  //## @brief Get the transformation used to convert from index 
-  //## to world coordinates
-  itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D*);
+  itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 #endif
   //## @brief Set the transformation used to convert from index 
   //## to world coordinates

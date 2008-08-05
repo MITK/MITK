@@ -23,14 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 //static member-variables init.
-//##ModelId=3EAEBEBD02DC
 mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
-//##ModelId=3F0185C900A5
 mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
-//##ModelId=3F0185C90085
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
-//##ModelId=3F01770A0170
 //const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = LIMITEDLINEARUNDO;
 const mitk::UndoController::UndoType mitk::UndoController::DEFAULTUNDOMODEL = VERBOSE_LIMITEDLINEARUNDO;
 
@@ -62,20 +58,17 @@ mitk::UndoController::UndoController(UndoType undoType)
   }
 }
 
-//##ModelId=3E5F543402C5
 bool mitk::UndoController::SetOperationEvent(UndoStackItem* operationEvent)
 {
   m_CurUndoModel->SetOperationEvent(operationEvent);
   return true;
 }
 
-//##ModelId=3E5F55C80207
 bool mitk::UndoController::Undo()
 {
   return this->Undo(true);
 }
 
-//##ModelId=3F045196036A
 bool mitk::UndoController::Undo(bool fine)
 {
   bool ret = m_CurUndoModel->Undo(fine);
@@ -85,13 +78,11 @@ bool mitk::UndoController::Undo(bool fine)
   return ret;
 }
 
-//##ModelId=3E5F55E6003E
 bool mitk::UndoController::Redo()
 {
   return this->Redo(true);
 }
 
-//##ModelId=3F0451960398
 bool mitk::UndoController::Redo(bool fine)
 {
   bool ret = m_CurUndoModel->Redo(fine);
@@ -101,25 +92,21 @@ bool mitk::UndoController::Redo(bool fine)
   return ret;
 }
 
-//##ModelId=3F04519603B8
 void mitk::UndoController::Clear()
 {
   m_CurUndoModel->Clear();
 }
 
-//##ModelId=3F04519603C7
 void mitk::UndoController::ClearRedoList()
 {
   m_CurUndoModel->ClearRedoList();
 }
 
-//##ModelId=3F04519603D7
 bool mitk::UndoController::RedoListEmpty()
 {
   return m_CurUndoModel->RedoListEmpty();
 }
 
-//##ModelId=3E5F56EB017A
 //##Documentation
 //##Switches the UndoModel to the given Type
 //##if there is no equal Type in List, then return false
@@ -142,7 +129,6 @@ bool mitk::UndoController::SwitchUndoModel(UndoType undoType)
   return true;
 }
 
-//##ModelId=3E9C45D502B9
 //##Documentation
 //##adds a new kind of UndoModel to the set of UndoModels
 //##and switches to that UndoModel
@@ -172,7 +158,6 @@ bool mitk::UndoController::AddUndoModel(UndoType undoType)
   return true;
 }
 
-//##ModelId=3E9C45D502EB
 //##Documentation
 //##Removes an UndoModel from the set of UndoModels
 //##If that UndoModel is currently selected, then the DefaultUndoModel(const) is set. 

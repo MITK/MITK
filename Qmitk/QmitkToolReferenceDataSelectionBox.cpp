@@ -46,6 +46,7 @@ QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* 
 
 QmitkToolReferenceDataSelectionBox::~QmitkToolReferenceDataSelectionBox()
 {
+  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
 
 void QmitkToolReferenceDataSelectionBox::Initialize(mitk::DataTreeBase* tree )

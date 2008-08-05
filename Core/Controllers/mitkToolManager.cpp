@@ -63,6 +63,10 @@ mitk::ToolManager::~ToolManager()
 
     ActiveToolChanged.Send();
   }
+  for ( NodeTagMapType::iterator observerTagMapIter = m_ReferenceDataObserverTags.begin(); observerTagMapIter != m_ReferenceDataObserverTags.end(); ++observerTagMapIter )
+  {
+    observerTagMapIter->first->RemoveObserver( observerTagMapIter->second );
+  }
 }
 
 void mitk::ToolManager::OnToolErrorMessage(std::string s)

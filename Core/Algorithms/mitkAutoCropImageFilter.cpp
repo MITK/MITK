@@ -198,7 +198,7 @@ void mitk::AutoCropImageFilter::GenerateData()
 
 void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 {
-  mitk::Image::ConstPointer img;
+  mitk::Image::ConstPointer img = this->GetInput();
 
   if (m_OverrideCroppingRegion)
   {

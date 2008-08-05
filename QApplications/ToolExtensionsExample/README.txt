@@ -11,7 +11,7 @@ http://mitk.org/documentation/doxygen/QmitkSliceBasedSegmentationTechnicalPage.h
 A lengthy description of the external extensions
 can be found at
 
-http://mitk.org/documentation/doxygen/ToolExtensionsGeneralOverview.html
+http://mitk.org/documentation/doxygen/toolextensions.html
 
 Questions should be posted directly to mitk-users@lists.sourceforge.net
 

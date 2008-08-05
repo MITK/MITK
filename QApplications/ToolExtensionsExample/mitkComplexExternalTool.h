@@ -40,7 +40,7 @@ class Image;
   This is no functional tool, it is only meant as an example on how to
   create tools as en external extension to MITK's SliceBasedSegmentation
   (and similar functionalities). The full description of how this works
-  can be found here: \li \ref ToolExtensionsGeneralOverview
+  can be found here: \li \ref toolextensions
 
   In contrast to PlainExternalTool, this tool here comes with a GUI.
 

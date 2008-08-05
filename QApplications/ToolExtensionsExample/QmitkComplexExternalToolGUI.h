@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
   This is only meant as an example on how to create tools (and their GUIs) 
   as en external extension to MITK's SliceBasedSegmentation
   (and similar functionalities). The full description of how this works
-  can be found here: \li \ref ToolExtensionsGeneralOverview
+  can be found here: \li \ref toolextensions
 
   Last contributor: $Author$
 */

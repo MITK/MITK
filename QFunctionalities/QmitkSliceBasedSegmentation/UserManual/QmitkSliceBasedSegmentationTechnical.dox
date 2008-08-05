@@ -20,7 +20,7 @@ maintain in the future.
 
 By now SliceBasedSegmentation is a well tested and easily extensible vehicle for all kinds of interactive
 segmentation applications. A separate page describes how you can extend SliceBasedSegmentation with new
-tools in a shared object (DLL): \ref ToolExtensionsGeneralOverview.
+tools in a shared object (DLL): \ref toolextensions.
 
 \section QmitkSliceBasedSegmentationTechnicalPage3 Overview of tasks
 

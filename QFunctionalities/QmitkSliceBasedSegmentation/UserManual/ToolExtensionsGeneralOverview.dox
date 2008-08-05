@@ -1,6 +1,6 @@
 /**
 
-\page ToolExtensionsGeneralOverview How to extend SliceBasedSegmentation with external tools
+\page toolextensions How to extend SliceBasedSegmentation with external tools
 
 <ul>
 <li> \ref ToolExtensionsGeneralOverview2 </li>

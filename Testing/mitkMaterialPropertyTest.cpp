@@ -40,10 +40,12 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("MaterialProperty")
 
       mitk::MaterialProperty::Pointer myMP;
+      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+
 
         {
           //static Pointer New(mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+          
           mitk::BaseRenderer *renderer = NULL;
           myMP = mitk::MaterialProperty::New(node, renderer);
           MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
@@ -53,8 +55,7 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
 
         {
           //static Pointer New( Color color, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-          mitk::BaseRenderer *renderer = NULL;
+           mitk::BaseRenderer *renderer = NULL;
           mitk::Color color;
           color.Set(0, 0, 0);
           vtkFloatingPointType opacity = 1.0f;
@@ -68,7 +69,6 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
 
         {
           //static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0f, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0)
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
           mitk::BaseRenderer *renderer = NULL;
           mitk::MaterialProperty::Color color;
           color.Set(0, 0, 0);
@@ -86,7 +86,6 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
 
         {
           //static Pointer New( vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType colorCoefficient,  vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
           mitk::BaseRenderer *renderer = NULL;
           mitk::MaterialProperty::Color color;
           color.Set(0, 0, 0);
@@ -111,7 +110,6 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
 mitk::MaterialProperty::ConstPointer reference = NULL;
         {
           //static Pointer New( Color color, vtkFloatingPointType colorCoefficient, vtkFloatingPointType specularCoefficient, vtkFloatingPointType specularPower, vtkFloatingPointType opacity, mitk::DataTreeNode* node = 0, mitk::BaseRenderer* renderer = 0 )
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
           mitk::BaseRenderer *renderer = NULL;
           mitk::MaterialProperty::Color color;
           color.Set(0, 0, 0);
@@ -136,13 +134,12 @@ mitk::MaterialProperty::ConstPointer reference = NULL;
 
         {
           //static Pointer New( const MaterialProperty& property, vtkFloatingPointType red, vtkFloatingPointType green, vtkFloatingPointType blue, vtkFloatingPointType opacity = 1.0, std::string name = "" )
-          mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
           mitk::BaseRenderer *renderer = NULL;
           vtkFloatingPointType opacity = 1.0f;
           vtkFloatingPointType rgb = 0;
           std::string name = "Hans Wurst";
 
-          myMP = mitk::MaterialProperty::New(*reference.GetPointer(), rgb, rgb, rgb, opacity, name);
+          myMP = mitk::MaterialProperty::New(*reference, rgb, rgb, rgb, opacity, name);
           MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
           MITK_TEST_CONDITION( node==myMP->GetDataTreeNode(), "Testing if a DataTreeNode object was set correctly" )
           MITK_TEST_CONDITION( renderer==myMP->GetRenderer(), "Testing if a Renderer object was set correctly" )

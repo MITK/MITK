@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+/*
+ * Last reviewed: 2008/08 by maleike and jochen
+ */
+
 #include "mitkImageNumberFilter.h"
 
 // MITK-Includes
@@ -29,24 +33,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <algorithm>  //needed for "sort" (windows)
 
-bool mitk::ImageNumberFilter::NumberSort( const Slice elem1, const Slice elem2 )
-{
-  /* sort by image number if possible, 
-   * else sort by distance of image origin from world origin */
-  if( elem1.imageNumber == elem2.imageNumber )
-  {
-    return PositionSort(elem1, elem2);
-  }
-  else
-  {
-    return elem1.imageNumber < elem2.imageNumber;
-  }
-}
-
 bool mitk::ImageNumberFilter::PositionSort( const Slice elem1, const Slice elem2 )
 {
   /* sort by distance of image origin from world origin */
-  return elem1.origin*elem1.normal < elem2.origin*elem2.normal; // projection of origin on inter-slice-direction
+  if ( elem1.origin*elem1.normal < elem2.origin*elem2.normal ) // projection of origin on inter-slice-direction
+  {
+    return true;
+  }
+  else if ( elem1.origin*elem1.normal > elem2.origin*elem2.normal ) // projection of origin on inter-slice-direction
+  {
+    return false;
+  }
+  else // if neccessary base the decision on the image number
+  {
+    return elem1.imageNumber < elem2.imageNumber;
+  }
 }
 
 mitk::ImageNumberFilter::ImageNumberFilter()
@@ -74,16 +75,16 @@ void mitk::ImageNumberFilter::Update()
     SortPicsToGroup();
     ProgressBar::GetInstance()->Progress();
 
-    // Sort slices in groups by image number
-    SortSlicesByImageNumber();
+    // Sort slices in groups by slice position in space
+    SortSlicesBySlicePosition();
     ProgressBar::GetInstance()->Progress();
 
     // Split groups into sub-groups with uniform slice distances.
-    SeperateBySpacing();
+    SeparateBySpacing();
     ProgressBar::GetInstance()->Progress();
 
     // Ensure an equal number of slices per position in space. 
-    SeperateByTime();
+    SeparateByTime();
     ProgressBar::GetInstance()->Progress();
 
     // Create an mitk::Image for each group
@@ -254,7 +255,7 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
   std::cout << "sorted all pictures into " << m_GroupList.size() << " groups of similar slices." << std::endl;
 }
 
-void mitk::ImageNumberFilter::SortSlicesByImageNumber()
+void mitk::ImageNumberFilter::SortSlicesBySlicePosition()
 {
   std::cout << "SortSlicesByImageNumber... " << std::flush;
   for( std::vector< Group >::iterator iter = m_GroupList.begin(); 
@@ -263,14 +264,14 @@ void mitk::ImageNumberFilter::SortSlicesByImageNumber()
   {
     std::sort( iter->includedSlices.begin(), 
                iter->includedSlices.end(), 
-               NumberSort );  // "comparison operator", defined at beginning of this file
+               PositionSort );  // "comparison operator", defined at beginning of this file
   }
   std::cout << "done" << std::endl;
 }
 
-void mitk::ImageNumberFilter::SeperateBySpacing()
+void mitk::ImageNumberFilter::SeparateBySpacing()
 {
-  std::cout << "SeperateBySpacing " << std::flush;
+  std::cout << "SeparateBySpacing " << std::flush;
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
@@ -295,7 +296,7 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
     }
 
     std::vector< Slice >::iterator sliceIter;
-    Slice* firstSlice = &(slicesOfCurrentGroup.front());
+    std::vector< Slice >::iterator firstSlice = slicesOfCurrentGroup.begin();
     double lastDistance = -1.0; // this distance cannot be found between two slices
     for ( sliceIter  = slicesOfCurrentGroup.begin();
           sliceIter != slicesOfCurrentGroup.end();
@@ -309,14 +310,14 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
       if ( Equal(currentDistance, lastDistance) )
       {
         // everything is fine, still in the same distance pattern
-        firstSlice = &(*sliceIter); // remember correct slice for next distance calculation
+        firstSlice = sliceIter; // remember correct slice for next distance calculation
         continue;
       }
       else if ( lastDistance < 0.0 )
       {
         // first distance ever calculated
         lastDistance = currentDistance;
-        firstSlice = &(*sliceIter);
+        firstSlice = sliceIter;
       }
       else
       {
@@ -332,7 +333,7 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
         newGroup.dimension = m_GroupList[n].dimension;
         newGroup.pixelSize = m_GroupList[n].pixelSize;
         newGroup.includedSlices.assign( sliceIter, slicesOfCurrentGroup.end() ); // new group contains the non-fitting remaining slices
-        slicesOfCurrentGroup.erase( sliceIter, slicesOfCurrentGroup.end() );
+        sliceIter = slicesOfCurrentGroup.erase( sliceIter, slicesOfCurrentGroup.end() );
         
         m_GroupList.push_back( newGroup );
         std::cout << "." << std::flush;
@@ -346,9 +347,9 @@ void mitk::ImageNumberFilter::SeperateBySpacing()
   std::cout << " done" << std::endl;
 }
 
-void mitk::ImageNumberFilter::SeperateByTime()
+void mitk::ImageNumberFilter::SeparateByTime()
 {
-  std::cout << "SeperateByTime: time steps in groups: " << std::flush; 
+  std::cout << "SeparateByTime: time steps in groups: " << std::flush; 
   ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
   for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
@@ -487,14 +488,14 @@ void mitk::ImageNumberFilter::GenerateImages()
     free( isg );
 
     // we calculate the spacing ourselves (don't trust the slices)
-    Slice& firstSlice = slicesOfCurrentGroup.front();
+    std::vector< Slice >::iterator firstSlice = slicesOfCurrentGroup.begin();
     for ( sliceIter  = slicesOfCurrentGroup.begin();
           sliceIter != slicesOfCurrentGroup.end();
           ++sliceIter )
     {
-      if ( Equal(firstSlice.origin, sliceIter->origin ) ) continue;
+      if ( Equal(firstSlice->origin, sliceIter->origin ) ) continue;
 
-      spacing[2] = (sliceIter->origin - firstSlice.origin).GetNorm();
+      spacing[2] = (sliceIter->origin - firstSlice->origin).GetNorm();
       break;
      }
         

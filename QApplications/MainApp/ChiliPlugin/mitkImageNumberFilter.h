@@ -23,14 +23,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+
 /**
  * \brief Basic CHILI images import class.
  *
+ * Imports a number of (usually 2D) image slices from CHILI
+ * into one mitk::Image volume (possibly with time resolution).
+ * This is done in a number of separate steps:
  *
- * WARNING:
- * This class arranged as helper-class. Dont use this class, use mitk::ChiliPlugin.
- * If you use them, be carefull with the parameter.
- * This filter need the CHILI-Version 3.10.
+ * \li Group slices (mitkIpPicDescriptors) of equal size and orientation.
+ * \li Sort slices in groups by slice position in space
+ * \li Split groups into sub-groups with uniform slice distances.
+ * \li Ensure an equal number of slices per position in space (will be assumes time steps later)
+ * \li Create an mitk::Image for each group
+ *
+ * For further details refer to the implementation which should have enough comments by now.
+ *
+ * \warning This class is meant as a helper class. Do not use this class directly, rather use mitk::PACSPlugin!
+ * \warning This filter requires a CHILI-PACS-Workstation version of 3.10 or newer.
+ *
+ * Last reviewed: 2008/08 by maleike and jochen
  */
 class ImageNumberFilter : public PicDescriptorToNode
 {
@@ -45,10 +57,9 @@ class ImageNumberFilter : public PicDescriptorToNode
 
     <li>  SortPicsToGroup
     <li>  SortSlicesByImageNumber
-    <li>  SeperateBySpacing
-    <li>  SeperateByTime
+    <li>  SeparateBySpacing
+    <li>  SeparateByTime
     <li>  GenerateImages
-      
     */
     virtual void Update();
 
@@ -91,19 +102,19 @@ class ImageNumberFilter : public PicDescriptorToNode
     /** This function sort the slices by imagenumber and location. */
   
     /** 
-     * \brief Sort all slices in each group by image number.
+     * \brief Sort all slices in each group by slice position.
      * 
-     * Sort by image number if possible, 
-     * else sort by distance of image origin from world origin.
+     * Sort by distance of image origin from world origin
+     * else sort by image number
      * 
-     * Uses ImageNumberFilter::NumberSort for comparison of two slices.
+     * Uses ImageNumberFilter::PositionSort for comparison of two slices.
      */
-    void SortSlicesByImageNumber();
+    void SortSlicesBySlicePosition();
 
     /**
      * \brief Split groups into sub-groups with uniform slice distances.
      */
-    void SeperateBySpacing();
+    void SeparateBySpacing();
 
     /**
      * Ensures that for each position in space we have an 
@@ -114,20 +125,13 @@ class ImageNumberFilter : public PicDescriptorToNode
      * The loop inside this method will go through all slices and sort 
      * everything beyond minTimeSteps into a new group (waste?).
      */
-    void SeperateByTime();
+    void SeparateByTime();
 
     /** This function generate all needed parameter to create the mitk::Images. */
     void GenerateImages();
 
     /** help-functions */
     static bool PositionSort( const Slice elem1, const Slice elem2 );
-    
-    /* \brief Comparison function for std::sort.
-     *
-     * Sort by image number if possible, 
-     * else sort by distance of image origin from world origin.
-     */
-    static bool NumberSort( const Slice elem1, const Slice elem2 );
 };
 
 } // namespace mitk

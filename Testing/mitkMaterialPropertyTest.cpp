@@ -159,7 +159,7 @@ void testConstructorWithNodeAndRenderer()
 
   void testConstructorPropertyRedGreenBlueOpacityAndName()
   {
-    mitk::MaterialProperty::ConstPointer reference = myMP;
+    mitk::MaterialProperty::Pointer reference = myMP;
     mitk::BaseRenderer *renderer = NULL;
     vtkFloatingPointType opacity = 1.0f;
     vtkFloatingPointType rgb = 0;

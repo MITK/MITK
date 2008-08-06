@@ -102,7 +102,19 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
       return true;
     }
-    
+
+    case QEvent::Wheel:
+    {
+      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+      mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+      QWheelEvent* we = ( QWheelEvent* )( event );
+
+      QWheelEvent* newEvent = new QWheelEvent(
+        we->pos(), we->globalPos(), we->delta(), we->state(), we->orientation()
+      );
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }    
    
     case QEvent::Resize:
       { 

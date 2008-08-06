@@ -24,6 +24,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 
 
+mitk::AutoCropImageFilter::AutoCropImageFilter() 
+: m_BackgroundValue(0), 
+  m_MarginFactor(1.0),
+  m_OverrideCroppingRegion(false),
+  m_TimeSelector(NULL)
+{
+
+}
+
+
+mitk::AutoCropImageFilter::~AutoCropImageFilter()
+{
+
+}
+
+
 template < typename TPixel, unsigned int VImageDimension>
 void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep)
 {
@@ -56,20 +72,6 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
 
   ipPicDescriptor* image3D = newMitkImage->GetVolumeData(0)->GetPicDescriptor();
   this->GetOutput()->SetPicVolume( image3D , timestep );
-}
-
-
-mitk::AutoCropImageFilter::AutoCropImageFilter() 
-: m_BackgroundValue(0), 
-  m_MarginFactor(1.0),
-  m_OverrideCroppingRegion(false)
-{
-  m_TimeSelector = mitk::ImageTimeSelector::New();
-}
-
-
-mitk::AutoCropImageFilter::~AutoCropImageFilter()
-{
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
@@ -164,7 +166,6 @@ void mitk::AutoCropImageFilter::GenerateData()
   if(input.IsNull())
     return;  
 
-  // TODO also implement 2D
   if(input->GetDimension() <= 2)
   {
     std::cerr << "Only 3D and 4D images supported";
@@ -198,7 +199,7 @@ void mitk::AutoCropImageFilter::GenerateData()
 
 void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 {
-  mitk::Image::ConstPointer img = this->GetInput();
+  mitk::Image::Pointer inputMitk = const_cast< mitk::Image * > ( this->GetInput() );
 
   if (m_OverrideCroppingRegion)
   {
@@ -208,35 +209,29 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
 
       m_LowerBounds[i] = m_CroppingRegion.GetIndex()[i];
-      m_UpperBounds[i] = img->GetDimension(i)-m_CroppingRegion.GetSize()[i]-m_LowerBounds[i];
+      m_UpperBounds[i] = inputMitk->GetDimension(i)-m_CroppingRegion.GetSize()[i]-m_LowerBounds[i];
     }
   }
   else
   {
-    mitk::Image::Pointer inputMitk = const_cast< mitk::Image * > ( this->GetInput() );
-
     // Check if a 3D or 4D image is present
     unsigned int timeSteps = 1;
     if (inputMitk->GetDimension() == 4 ) timeSteps = inputMitk->GetDimension(3);
 
     ImageType::IndexType minima,maxima;
 
-    m_TimeSelector = mitk::ImageTimeSelector::New();
-    m_TimeSelector->SetInput( inputMitk );
-
-    ImagePointer inputItk = ImageType::New();
-
-    if (inputMitk->GetDimension() == 3) 
-      img = inputMitk;
-    else if (inputMitk->GetDimension() == 4)
+    if (inputMitk->GetDimension() == 4)
     {
       // initialize with time step 0
+      m_TimeSelector = mitk::ImageTimeSelector::New();
+      m_TimeSelector->SetInput( inputMitk );
       m_TimeSelector->SetTimeNr( 0 );
       m_TimeSelector->UpdateLargestPossibleRegion(); 
-      img = m_TimeSelector->GetOutput();
+      inputMitk = m_TimeSelector->GetOutput();
     }
 
-    mitk::CastToItkImage( img , inputItk );
+    ImagePointer inputItk = ImageType::New();
+    mitk::CastToItkImage( inputMitk , inputItk );
 
     // it is assumed that all volumes in a time series have the same 3D dimensions
     ImageType::RegionType origRegion = inputItk->GetLargestPossibleRegion();
@@ -256,9 +251,8 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       {
         m_TimeSelector->SetTimeNr( idx );
         m_TimeSelector->UpdateLargestPossibleRegion(); 
-        img = m_TimeSelector->GetOutput();
-        mitk::CastToItkImage( img , inputItk );
-        ImageType::RegionType xxx = inputItk->GetLargestPossibleRegion();
+        inputMitk = m_TimeSelector->GetOutput();
+        mitk::CastToItkImage( inputMitk , inputItk );
       }
 
       ConstIteratorType inIt( inputItk,  origRegion );

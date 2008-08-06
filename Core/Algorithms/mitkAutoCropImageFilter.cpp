@@ -27,8 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::AutoCropImageFilter::AutoCropImageFilter() 
 : m_BackgroundValue(0), 
   m_MarginFactor(1.0),
-  m_OverrideCroppingRegion(false),
-  m_TimeSelector(NULL)
+  m_TimeSelector(NULL),
+  m_OverrideCroppingRegion(false)
 {
 
 }

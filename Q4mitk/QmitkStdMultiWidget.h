@@ -140,9 +140,9 @@ public slots:
   
   void DisableDepartmentLogo();
   
-  void SetWidgetPlaneVisibility(const char* widgetName, bool visible);
+  void SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer=NULL);
    
-  void SetWidgetPlanesVisibility(bool visible);
+  void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer=NULL);
   
   void SetWidgetPlanesLocked(bool locked);
   

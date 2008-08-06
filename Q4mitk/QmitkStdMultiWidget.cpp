@@ -1103,7 +1103,7 @@ mitk::SlicesSwiveller * QmitkStdMultiWidget::GetSlicesSwiveller() const
   return m_SlicesSwiveller;
 }
 
-void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible)
+void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer)
 {
   mitk::DataTree* tree = dynamic_cast<mitk::DataTree*>( m_Tree.GetPointer() );
   if (!tree) return;
@@ -1114,16 +1114,16 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool 
     mitk::DataTreeNode::Pointer node = it->Get();
     if ( node.IsNotNull() )
     {
-      node->SetVisibility(visible);
+      node->SetVisibility(visible, renderer);
     }
   }
 }
  
-void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible)
+void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer)
 {
-  SetWidgetPlaneVisibility("widget1Plane", visible);
-  SetWidgetPlaneVisibility("widget2Plane", visible);
-  SetWidgetPlaneVisibility("widget3Plane", visible);
+  SetWidgetPlaneVisibility("widget1Plane", visible, renderer);
+  SetWidgetPlaneVisibility("widget2Plane", visible, renderer);
+  SetWidgetPlaneVisibility("widget3Plane", visible, renderer);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

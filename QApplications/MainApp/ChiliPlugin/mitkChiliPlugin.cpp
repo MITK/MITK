@@ -312,13 +312,23 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     //dont use "LoadCompleteSeries( ... )", the Buttons called LightboxImportButtons, so use the LoadImagesFromLightbox-Function
     std::vector<DataTreeNode::Pointer> resultNodes = LoadImagesFromLightbox( selectedLightbox );
 
-    if( resultNodes.size() > 8 )
+    if( resultNodes.size() < 8 )
     {
-      if( QMessageBox::question( 0, tr("MITK"), QString("MITK detected %1 distinct image volumes.\nDo you want to load all of them (might slow down MITK)?").arg(resultNodes.size()), QMessageBox::Yes, QMessageBox::No ) == QMessageBox::Yes )
+      SetRelationsToDataStorage( resultNodes );
+    }
+    else 
+    {
+      int answer = QMessageBox::question( 0, tr("MITK"), 
+             QString("MITK detected %1 distinct image volumes.\nDo you want to load all of them (might slow down MITK)?").arg(resultNodes.size()),
+             QString("Load all images"),
+             //QString("Ignore only single slices"),
+             QString("Cancel complete import") );
+      if ( answer == 0 )
       {
         SetRelationsToDataStorage( resultNodes );
       }
-      else
+      /*
+      else if ( answer == 1 )
       {
         for( unsigned int n = 0; n < resultNodes.size(); n++ )
         {
@@ -326,15 +336,17 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
           if( propertyImageNumber.IsNull() || ( propertyImageNumber.IsNotNull() && propertyImageNumber->GetValueAsString() != "1" ) )
           {
             std::vector<mitk::DataTreeNode::Pointer> tmpVec;
-            tmpVec.clear();
             tmpVec.push_back( resultNodes[n] );
             SetRelationsToDataStorage( tmpVec );
           }
         }
       }
+      */
+      else
+      {
+        // do nothing, import cancelled
+      }
     }
-    else
-      SetRelationsToDataStorage( resultNodes );
 
     if( selectedLightbox->currentSeries() )
       SetRelationsToDataStorage( LoadTextsFromSeries( selectedLightbox->currentSeries()->oid ) );  //load all texts

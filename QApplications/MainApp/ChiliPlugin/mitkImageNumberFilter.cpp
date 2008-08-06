@@ -335,6 +335,7 @@ void mitk::ImageNumberFilter::SeparateBySpacing()
         newGroup.includedSlices.assign( sliceIter, slicesOfCurrentGroup.end() ); // new group contains the non-fitting remaining slices
         sliceIter = slicesOfCurrentGroup.erase( sliceIter, slicesOfCurrentGroup.end() );
         
+        ProgressBar::GetInstance()->AddStepsToDo(1);
         m_GroupList.push_back( newGroup );
         std::cout << "." << std::flush;
         break; // continue outer for-groups loop
@@ -441,6 +442,8 @@ void mitk::ImageNumberFilter::SeparateByTime()
       
       m_GroupList.push_back( newGroup ); // add the new group to the list of groups 
                                          // (and automatically process it within the outer loop)
+
+      ProgressBar::GetInstance()->AddStepsToDo(1);
     }
 
     ProgressBar::GetInstance()->Progress();
@@ -452,13 +455,17 @@ void mitk::ImageNumberFilter::SeparateByTime()
 void mitk::ImageNumberFilter::GenerateImages()
 {
   std::cout << "GenerateImages: " << std::flush;
-  for( std::vector< Group >::iterator groupIter = m_GroupList.begin(); 
-       groupIter != m_GroupList.end(); 
-       ++groupIter )
+  ProgressBar::GetInstance()->AddStepsToDo( m_GroupList.size() );
+  for( unsigned int n = 0; n < m_GroupList.size(); n++)
   {
-    if( m_Abort ) return;
+    if( m_Abort )
+    {
+      ProgressBar::GetInstance()->Progress( m_GroupList.size() - n );
+      std::cout << " aborted." << std::endl;
+      return;
+    }
 
-    std::vector< Slice >& slicesOfCurrentGroup = groupIter->includedSlices;
+    std::vector< Slice >& slicesOfCurrentGroup = m_GroupList[n].includedSlices;
     
     // get number of time steps and slice count per time step for this group
     unsigned int timeSteps = 0;
@@ -511,8 +518,9 @@ void mitk::ImageNumberFilter::GenerateImages()
     }
 
     // method of the super class
-    GenerateData( picList, slicesPerTimeStep, timeSteps, spacing, groupIter->seriesDescription );
+    GenerateData( picList, slicesPerTimeStep, timeSteps, spacing, m_GroupList[n].seriesDescription );
     std::cout << "." << std::flush;
+    ProgressBar::GetInstance()->Progress(1);
   }
   std::cout << " done" << std::endl;
 }

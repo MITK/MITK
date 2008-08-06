@@ -1,5 +1,5 @@
 FIND_PACKAGE(VTK)
-
+APPLY_VTK_FLAGS()
 # mitkGL.h is in Core/Rendering :(
 FIND_PACKAGE(OpenGL)
 IF(NOT OPENGL_FOUND)

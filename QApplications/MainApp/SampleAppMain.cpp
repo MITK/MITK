@@ -23,7 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdexcept>
 
 #include <mitkStandardFileLocations.h>
-#include <mitkDataStorage.h>
+#include <mitkProperties.h>
+#include <mitkVector.h>
 
 #include <QmitkFunctionalityTesting.h>
 #include <sstream>
@@ -42,7 +43,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 int main(int argc, char* argv[])
 {
-  int result;
   try
   {
     // Add directory in which the application executable resides as search directory
@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
     caption << executableName << ", Builddate " << __DATE__ << ", " << __TIME__ << ".";
     itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
     // parse testing parameters
-    const char * testingParameter = NULL;
     int testType = 0;
     for (int i = 0; i < argc; i++)
     {
@@ -73,6 +72,12 @@ int main(int argc, char* argv[])
         }
     }
     
+    std::cout << "testType = " << testType << "\n";
+    
+    const char * testingParameter = NULL;
+    if ((strcmp(argv[argc - 1], "-testing") != 0) && (strcmp(argv[argc - 1], "-optiontesting") != 0) && (strcmp(argv[argc - 1], "-alltesting") != 0) )
+        testingParameter = argv[argc - 1];
+        
     QApplication a( argc, argv );
 
     // popup a splash screen
@@ -114,11 +119,11 @@ int main(int argc, char* argv[])
     if(testType)
     {
       std::cout.setf(std::ios_base::unitbuf);
-      result = StartQmitkFunctionalityTesting(mainWindow.GetFctMediator(), testType);
+      return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator(), testType);
     }
     else
     {
-      result = a.exec();
+      return a.exec();
     }
   }
   catch (const std::bad_alloc& e)
@@ -136,19 +141,4 @@ int main(int argc, char* argv[])
     std::cout << "MITK MainApp caught something like an exception..." << std::endl;
     return EXIT_FAILURE;
   }  
-  try
-  {
-    mitk::DataStorage::GetInstance()->ShutdownSingleton();
-  }
-  catch (const std::exception& e)
-  {
-    std::cout << "MITK MainApp caught an exception on ShutdownSingleton: " << e.what() << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::cout << "MITK MainApp caught something like an exception on ShutdownSingleton..." << std::endl;
-    return EXIT_FAILURE;
-  }  
-  return result;
 } 

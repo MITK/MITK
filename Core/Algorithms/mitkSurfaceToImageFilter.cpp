@@ -40,7 +40,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 {
-  m_MakeOutputBinaryOn = false;
+  m_MakeOutputBinary = false;
   m_BackgroundValue = -10000;
 }
 
@@ -166,7 +166,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   stencil->SetInput( castFilter->GetOutput() );
   castFilter->Delete();
 
-  if (m_MakeOutputBinaryOn)
+  if (m_MakeOutputBinary)
   {
     vtkImageThreshold * threshold = vtkImageThreshold::New();
     threshold->SetInput( stencil->GetOutput() );

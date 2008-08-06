@@ -33,14 +33,17 @@ namespace mitk {
 
 /**
  *
- * @brief Converts surface data to pixel data, one needs a surface and an image
+ * @brief Converts surface data to pixel data. Requires a surface and an 
+ * image, which header information defines the output image.
  *
- * The resulting image has the same size as the input image. The image is cut using a vtkStencil
- * User can decide if he wants to keep the original values or create a binary image 
- * by setting MakeBinaryOutputOn (default is false). If set to true all voxels inside the 
- * surface are set to one and all outside voxel are set to zero.
+ * The resulting image has the same dimension, size, and Geometry3D 
+ * as the input image. The image is cut using a vtkStencil.
+ * The user can decide if he wants to keep the original values or create a 
+ * binary image by setting MakeBinaryOutputOn (default is \a false). If 
+ * set to \a true all voxels inside the surface are set to one and all 
+ * outside voxel are set to zero.
  *
- *  The pixel type of the output image is currently always integer
+ * The pixel type of the output image is currently always integer.
  * 
  * @ingroup SurfaceFilters
  * @ingroup Process
@@ -51,8 +54,9 @@ public:
   mitkClassMacro(SurfaceToImageFilter, ImageSource);
   itkNewMacro(Self);
 
-  itkSetMacro(MakeOutputBinaryOn, bool);
-  itkGetMacro(MakeOutputBinaryOn, bool);
+  itkSetMacro(MakeOutputBinary, bool);
+  itkGetMacro(MakeOutputBinary, bool);
+  itkBooleanMacro(MakeOutputBinary);
 
 	itkGetConstMacro(BackgroundValue,float);
 	itkSetMacro(BackgroundValue,float);
@@ -72,15 +76,13 @@ public:
   const mitk::Image *GetImage(void);
 
 protected:
-  //##ModelId=3EF4A4A70345
   SurfaceToImageFilter();
 
-  //##ModelId=3EF4A4A70363
   virtual ~SurfaceToImageFilter();
 
   void Stencil3DImage(int time = 0);
 
-  bool m_MakeOutputBinaryOn;
+  bool m_MakeOutputBinary;
 
   float m_BackgroundValue;
 

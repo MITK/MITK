@@ -31,9 +31,11 @@ namespace mitk {
 class MITK_CORE_EXPORT UndoController
 {
   public:
-  typedef int UndoType;
-  typedef std::map<UndoType, UndoModel*> UndoModelMap;
-  typedef std::map<UndoType, UndoModel*>::iterator UndoModelMapIter;
+  //different UndoModels:
+  typedef enum UndoType{LIMITEDLINEARUNDO=10, VERBOSE_LIMITEDLINEARUNDO=11, TREEUNDO=20};
+
+  typedef std::map<UndoType, UndoModel::Pointer> UndoModelMap;
+  typedef std::map<UndoType, UndoModel::Pointer>::iterator UndoModelMapIter;
   //##Documentation
   //## @brief Default UndoModel to use.
   static const UndoType DEFAULTUNDOMODEL;
@@ -42,6 +44,7 @@ class MITK_CORE_EXPORT UndoController
   //## Constructor; Adds the new UndoType or if undoType exists ,
   //## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
   UndoController(UndoType undoType = DEFAULTUNDOMODEL);
+  ~UndoController(){};
 
   bool SetOperationEvent(UndoStackItem* operationEvent);
 
@@ -118,7 +121,7 @@ class MITK_CORE_EXPORT UndoController
   private:
   //##Documentation
   //## current selected UndoModel
-  static UndoModel *m_CurUndoModel;
+  static UndoModel::Pointer m_CurUndoModel;
   //##Documentation
   //## current selected Type of m_CurUndoModel
   static UndoType m_CurUndoType;

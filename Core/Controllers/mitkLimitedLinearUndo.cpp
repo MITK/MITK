@@ -31,7 +31,6 @@ mitk::LimitedLinearUndo::~LimitedLinearUndo()
 }
 
 
-//##ModelId=3E5F5D8C00B2
 bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
 {
   OperationEvent* operationEvent = dynamic_cast<OperationEvent*>(stackItem); 
@@ -99,7 +98,6 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
   return true;
 }
 
-//##ModelId=3E5F5D8C00DA
 bool mitk::LimitedLinearUndo::Redo(bool)
 {
   return Redo();
@@ -138,7 +136,6 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
   return true;
 }
 
-//##ModelId=3F04519601A4
 void mitk::LimitedLinearUndo::Clear()
 {
   m_UndoList.clear();
@@ -148,14 +145,12 @@ void mitk::LimitedLinearUndo::Clear()
   InvokeEvent( RedoEmptyEvent() );
 }
 
-//##ModelId=3F04519601B5
 void mitk::LimitedLinearUndo::ClearRedoList()
 {
   m_RedoList.clear();
   InvokeEvent( RedoEmptyEvent() );
 }
 
-//##ModelId=3F04519601D3
 bool mitk::LimitedLinearUndo::RedoListEmpty()
 {
   return m_RedoList.empty();

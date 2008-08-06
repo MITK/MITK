@@ -19,7 +19,6 @@ SET(CPP_FILES
   mitkTestManager.cpp
   mitkToolManager.cpp
   mitkUndoController.cpp
-  mitkUndoModel.cpp
   mitkVerboseLimitedLinearUndo.cpp
   mitkVtkInteractorCameraController.cpp
   mitkVtkLayerController.cpp

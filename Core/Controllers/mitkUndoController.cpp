@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 //static member-variables init.
-mitk::UndoModel* mitk::UndoController::m_CurUndoModel;
+mitk::UndoModel::Pointer mitk::UndoController::m_CurUndoModel;
 mitk::UndoController::UndoModelMap mitk::UndoController::m_UndoModelList;
 mitk::UndoController::UndoType mitk::UndoController::m_CurUndoType;
 
@@ -38,12 +38,12 @@ mitk::UndoController::UndoController(UndoType undoType)
     switch (undoType)
     {
     case LIMITEDLINEARUNDO:
-      m_CurUndoModel = new mitk::LimitedLinearUndo;
+      m_CurUndoModel = mitk::LimitedLinearUndo::New();
       m_CurUndoType = undoType;
       m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
       break;
     case VERBOSE_LIMITEDLINEARUNDO:
-      m_CurUndoModel = new mitk::VerboseLimitedLinearUndo;
+      m_CurUndoModel = mitk::VerboseLimitedLinearUndo::New();
       m_CurUndoType = undoType;
       m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
       break;
@@ -51,7 +51,7 @@ mitk::UndoController::UndoController(UndoType undoType)
       //insert here, in add- and RemoveUndoModel new sets of UndoModels!
       //break;
     default :
-      m_CurUndoModel = new VerboseLimitedLinearUndo;
+      m_CurUndoModel = VerboseLimitedLinearUndo::New();
       m_CurUndoType = undoType;
       m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
     }
@@ -143,14 +143,15 @@ bool mitk::UndoController::AddUndoModel(UndoType undoType)
   switch (undoType)
   {
   case LIMITEDLINEARUNDO:
-    m_CurUndoModel = new LimitedLinearUndo;
+    m_CurUndoModel = LimitedLinearUndo::New();
     m_CurUndoType = undoType;
     m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
     break;
-
-    //case:... insert new UndoModels
-    //break;
-
+  case VERBOSE_LIMITEDLINEARUNDO:
+    m_CurUndoModel = VerboseLimitedLinearUndo::New();
+    m_CurUndoType = undoType;
+    m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
+    break;
   default:
     //that undoType is not implemented!
     return false;

@@ -40,20 +40,22 @@ class UndoStackItem;
 */
 class MITK_CORE_EXPORT VerboseLimitedLinearUndo : public LimitedLinearUndo
 {
-  
 public:
-  
+  mitkClassMacro(VerboseLimitedLinearUndo, LimitedLinearUndo);
+  itkNewMacro(Self);
+
   typedef std::pair<int,std::string> StackDescriptionItem; 
   typedef std::vector<StackDescriptionItem> StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions
 
   virtual bool SetOperationEvent(UndoStackItem* undoStackItem);
 
-  VerboseLimitedLinearUndo();
-
-  virtual ~VerboseLimitedLinearUndo();
-
   virtual StackDescription GetUndoDescriptions();
   virtual StackDescription GetRedoDescriptions();
+
+protected:
+  VerboseLimitedLinearUndo();
+  virtual ~VerboseLimitedLinearUndo();
+
 };
 
 } // namespace mitk

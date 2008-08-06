@@ -52,7 +52,7 @@ mitk::StateMachine::StateMachine(const char * type)
   //\*todo: check the process with BaseControllers, cause they are always instantiated with type ==NULL! So here we can't check and warn the user.
   //\*todo: @todo:why are the basecontrollers statemachines then??? <ingmar 18.12.06>
   
-  m_UndoController = new UndoController(VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
+  m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
 	m_UndoEnabled = true;
 
   InteractionDebug::GetInstance()->NewStateMachine( type, this );

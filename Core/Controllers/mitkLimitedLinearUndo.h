@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 // STL header
 #include <vector>
 // ITK header
-#include <itkObject.h>
 #include<itkEventObject.h>
 
 namespace mitk {
@@ -36,27 +35,17 @@ namespace mitk {
 //##
 //## Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
 //## GUI elements, whether each of the stacks is empty or not (to enable/disable button, ...)
-//##ModelId=3E5F5D3F0075
-class MITK_CORE_EXPORT LimitedLinearUndo : public UndoModel, public itk::Object
+class MITK_CORE_EXPORT LimitedLinearUndo : public UndoModel
 {
 public:
-  //##ModelId=3F0451950379
   typedef std::vector<UndoStackItem*> UndoContainer;
-
   typedef std::vector<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
   
-  //##ModelId=3E5F5D8C00B2
+  mitkClassMacro(LimitedLinearUndo, UndoModel);
+  itkNewMacro(Self);
+
   virtual bool SetOperationEvent(UndoStackItem* stackItem);
 
-  //##Documentation
-  //## Constructor
-  LimitedLinearUndo();
-
-  //##Documentation
-  //## Destructor
-  virtual ~LimitedLinearUndo();
-
-  //##ModelId=3E5F5D8C00C6
   //##Documentation
   //## @brief Undoes the last changes
   //##
@@ -71,7 +60,6 @@ public:
   //## @brief Undoes all changes until ObjectEventID oeid
   virtual bool Undo(int oeid);
 
-  //##ModelId=3E5F5D8C00DA
   //##Documentation
   //## @brief Undoes the last changes
   //##
@@ -86,17 +74,14 @@ public:
   //## @brief Redoes all changes until ObjectEventID oeid
   virtual bool Redo(int oeid);
 
-  //##ModelId=3F04519601A4
   //##Documentation
   //## @brief Clears UndoList and RedoList
   virtual void Clear();
 
-  //##ModelId=3F04519601B5
   //##Documentation
   //## @brief Clears the RedoList
   virtual void ClearRedoList();
 
-  //##ModelId=3F04519601D3
   //##Documentation
   //## @brief True, if RedoList is empty
   virtual bool RedoListEmpty();
@@ -117,10 +102,16 @@ public:
   virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType);
 
 protected:
-  //##ModelId=3E5F5DF80360
+  //##Documentation
+  //## Constructor
+  LimitedLinearUndo();
+
+  //##Documentation
+  //## Destructor
+  virtual ~LimitedLinearUndo();
+
   UndoContainer m_UndoList;
 
-  //##ModelId=3E5F5E020332
   UndoContainer m_RedoList;
 
 private:

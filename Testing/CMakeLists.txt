@@ -49,6 +49,7 @@ SET(${KITNAME}_TESTS
   mitkTimeSlicedGeometryTest.cpp
   mitkToolManagerTest.cpp
   mitkTransitionTest.cpp
+  mitkUndoControllerTest.cpp
 )
 
 # test with image filename as an extra command line parameter

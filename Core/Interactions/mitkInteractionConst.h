@@ -37,13 +37,6 @@ Key_ = Keys like in QT
 */
 namespace mitk{
 
-/*
-//UndoMechanism:
-//constants for UndoMechanism;
-*/
-//different UndoModels:
-typedef enum EUndoModels{LIMITEDLINEARUNDO=10, VERBOSE_LIMITEDLINEARUNDO=11, TREEUNDO=20};
-
 //Constants for EventIds; use the according constant to through an event in the code
 typedef enum EEventIds
 {

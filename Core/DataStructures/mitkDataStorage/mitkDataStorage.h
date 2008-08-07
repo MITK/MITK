@@ -37,7 +37,7 @@ namespace mitk {
   //## @brief Data management class that handles 'was created by' relations
   //##
   //## The DataStorage provides data storage and management functionality.
-  //## It handles a 'was created by' relation by associating each data object with a 
+  //## It handles a 'was created by' relation by associating each data object with a
   //## set of source objects, that this object was created from. The DataStorage
   //## class does not yet provide an observer mechanism to notify on changes in the data
   //## objects that it manages. This is planned for a future version.
@@ -45,13 +45,13 @@ namespace mitk {
   //## must be initialized with a DataTree before it can be used by calling ->Initialize(myTree).
   //## @warning DataStorage methods will raise exceptions if called before the DataStorage is initialized.
   //##
-  //## All objects that are added to DataStorage get automatically added to the underlying tree. 
+  //## All objects that are added to DataStorage get automatically added to the underlying tree.
   //## The tree can be used to get notifications on New/Delete events.
-  //## @warning Do not mix Adding/Removing objects with the DataStorage and DataTree methods.  
-  //## @warning The DataStorage does not automatically return all objects that are stored in the 
+  //## @warning Do not mix Adding/Removing objects with the DataStorage and DataTree methods.
+  //## @warning The DataStorage does not automatically return all objects that are stored in the
   //##          DataTree. Use SetManageCompleteTree() to enable/disable management of objects that were
-  //##          added to the tree directly.  
-  //## 
+  //##          added to the tree directly.
+  //##
   //## @ingroup DataStorage
   class MITK_CORE_EXPORT DataStorage : public itk::Object
   {
@@ -73,15 +73,15 @@ namespace mitk {
     //##Documentation
     //## @brief Adds a DataTreeNode containing a data object to its internal storage
     //##
-    //## This Method adds a new data object to the DataStorage. The new object is 
-    //## passed in the first parameter. The second parameter is a set 
+    //## This Method adds a new data object to the DataStorage. The new object is
+    //## passed in the first parameter. The second parameter is a set
     //## of source objects, that were used to create this object. The new object will have
     //## a 'was created from' relation to its source objects.
     //## the addition of a new object will fire the notification mechanism.
-    //## If the node parameter is NULL or if the DataTreeNode has already been added, 
+    //## If the node parameter is NULL or if the DataTreeNode has already been added,
     //## an exception will be thrown.
     void Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL);
-    
+
     //##Documentation
     //## @brief Convenience method to add a node that has one parent
     //##
@@ -100,19 +100,19 @@ namespace mitk {
     //##Documentation
     //## @brief Notifies the DataStorage that the object in node has been modified
     //##
-    //## Calling the Update() method will start the nofitication mechanism that will notifiy 
+    //## Calling the Update() method will start the nofitication mechanism that will notifiy
     //## all registered agents that the object has been updated. Depending on the registered
     //## agents, this could lead to an update of other objects, like surfaces that were created
     //## from segmentations.
-    //## If the node parameter is NULL or if the DataTreeNode is not contained in the 
+    //## If the node parameter is NULL or if the DataTreeNode is not contained in the
     //## DataStorage, an exception will be thrown.
     void Update(mitk::DataTreeNode* node);
 
     //##Documentation
     //## @brief returns a set of data objects that meet the given condition(s)
     //##
-    //## GetSubset returns a set of objects  with a specific datatype that meet the condition(s) 
-    //## specified in the condition parameter. Conditions can be 
+    //## GetSubset returns a set of objects  with a specific datatype that meet the condition(s)
+    //## specified in the condition parameter. Conditions can be
     //##  - data type of the data object
     //##  - is source object of specific object (e.g. all source objects of node x)
     //##  - has property with specific value (e.g. OrganType is Liver)
@@ -121,24 +121,24 @@ namespace mitk {
     //##  - disjunction of a set of conditions
     //## Conditions are implemented as predicates using the Composite Design Pattern
     //## (see definition of NodePredicateBase for details).
-    //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the 
+    //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the
     //## conditions. A set of all objects can be retrieved with the GetAll() method;
     SetOfObjects::ConstPointer GetSubset(const NodePredicateBase& condition) const;
 
     //##Documentation
-    //## @brief returns a set of source objects for a given node that meet the given condition(s). 
+    //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
     SetOfObjects::ConstPointer GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
-    //## 
+    //##
     //## GetDerivations() returns a set of objects that are derived from the DataTreeNode node.
-    //## This means, that node was used to create the returned objects. If the parameter 
+    //## This means, that node was used to create the returned objects. If the parameter
     //## onlyDirectDerivations is set to true (default value), only objects that directly have
-    //## node as one of their source objects will be returned. Otherwise, objects that are 
+    //## node as one of their source objects will be returned. Otherwise, objects that are
     //## derived from derivations of node are returned too.
-    //## The derived objects can be filtered with a predicate object as described in the GetSubset() 
+    //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
     SetOfObjects::ConstPointer GetDerivations(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const;
 
@@ -157,7 +157,7 @@ namespace mitk {
     //## @brief Convenience method to get the first node with a given name
     //##
     mitk::DataTreeNode* GetNamedNode(const char* name) const;
-    
+
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
     //##
@@ -203,7 +203,7 @@ namespace mitk {
     //## @brief Initializes the class by providing the data tree that should be used for data storage
     //##
     void Initialize(mitk::DataTree* tree);
-    
+
     //##Documentation
     //## @brief Callback method to get notified, if a node in the underlying DataTree gets removed
     //##
@@ -217,15 +217,18 @@ namespace mitk {
 
   protected:
 
+    //TODO investigate removing friend declarations when DataStorage is
+    //     independent of the DataTree
     friend class BaseRenderer;
     friend class Geometry2DDataVtkMapper3D;
+    friend class RenderingManager;
 
     itkNewMacro(Self);    // New Macro is protected, because we use Singleton pattern for DataStorage
 
     typedef std::map<mitk::DataTreeNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;
 
     //##Documentation
-    //## @brief Standard Constructor for ::New() instantiation     
+    //## @brief Standard Constructor for ::New() instantiation
     DataStorage();
     //##Documentation
     //## @brief Standard Destructor
@@ -255,7 +258,7 @@ namespace mitk {
     //##Documentation
     //## @brief holds the data tree that is encapsulated by this class
     mitk::DataTree::Pointer m_DataTree;
-    
+
     //##Documentation
     //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
     bool m_ManageCompleteTree;
@@ -266,7 +269,7 @@ namespace mitk {
 
     AdjacencyList m_SourceNodes;
     AdjacencyList m_DerivedNodes;
-    
+
     unsigned long m_DeleteInTreeObserverTag;
 
     static mitk::DataStorage::Pointer s_Instance;

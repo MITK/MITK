@@ -56,7 +56,7 @@ private:
   EventQueue m_EventQueue;
 };
 
-class QmitkDebugEventFilter : public QObject
+class QMITK_EXPORT QmitkDebugEventFilter : public QObject
 {
  protected:
    bool eventFilter( QObject* object, QEvent* event )

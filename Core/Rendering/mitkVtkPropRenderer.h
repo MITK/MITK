@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <utility>
 
 class vtkRenderWindow;
-class vtkLight; 
+class vtkLight;
 class vtkLightKit;
 class vtkWorldPointPicker;
 class vtkPointPicker;
@@ -42,7 +42,7 @@ class vtkAssemblyPath;
 namespace mitk {
 
 /*!
-\brief VtkPropRenderer 
+\brief VtkPropRenderer
 
 VtkPropRenderer organizes the MITK rendering process. The MITK rendering process is completely integrated into the VTK rendering pipeline.
 The vtkMitkRenderProp is a custom vtkProp derived class, which implements the rendering interface between MITK and VTK. It redirects render() calls to the VtkPropRenderer, which is responsible for rendering of the datatreenodes.
@@ -54,10 +54,10 @@ VtkPropRenderer replaces the old OpenGLRenderer.
 class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
 {
 public:
-  
+
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
   mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow *);
-  
+
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
   enum RenderType{Opaque,Translucent,Overlay};
   int Render(RenderType type);
@@ -66,11 +66,12 @@ public:
   virtual void MakeCurrent();
 
   // Data handling
+  using BaseRenderer::SetData;
   virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
   virtual void Update(mitk::DataTreeNode* datatreenode);
   virtual void SetMapperID(const MapperSlotId mapperId);
-  
+
   // Size
   virtual void InitSize(int w, int h);
   virtual void Resize(int w, int h);
@@ -102,17 +103,17 @@ public:
    * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
    */
   void InitPathTraversal();
-  
+
   /**
    * \brief Used by vtkPointPicker/vtkPicker.
    * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
    */
   vtkAssemblyPath* GetNextPath();
-  
+
   vtkWorldPointPicker* GetWorldPointPicker();
   vtkPointPicker* GetPointPicker();
-  
-  /** 
+
+  /**
   * \brief Release vtk-based graphics resources. Called by
   * vtkMitkRenderProp::ReleaseGraphicsResources.
   */
@@ -131,19 +132,19 @@ private:
 
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();
-  
-  bool m_InitNeeded; 
+
+  bool m_InitNeeded;
   bool m_ResizeNeeded;
   bool m_VtkMapperPresent;
   bool m_NewRenderer;
-  
+
   // Picking
   vtkWorldPointPicker     * m_WorldPointPicker;
   vtkPointPicker          * m_PointPicker;
   PickingMode               m_PickingMode;
 
   mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
-  
+
   vtkLightKit* m_LightKit;
 
   // sorted list of mappers

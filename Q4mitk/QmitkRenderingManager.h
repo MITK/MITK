@@ -45,42 +45,13 @@ class QmitkRenderingManagerFactory;
 class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
-  
+
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
   virtual ~QmitkRenderingManager();
 
   virtual void DoMonitorRendering();
   virtual void DoFinishAbortRendering();
-
-
-  /** Initializes the windows specified by requestType to the geometry of the
-   * given DataTreeNode. */
-  virtual bool InitializeViews( mitk::DataTreeIteratorBase *dataIt, 
-    unsigned int requestType = REQUEST_UPDATE_ALL );
-
-  /** Initializes the windows specified by requestType to the given
-   * geometry. */
-  virtual bool InitializeViews( const mitk::Geometry3D * geometry,
-    unsigned int requestType = REQUEST_UPDATE_ALL );
-
-  /** Initializes the windows to the default viewing direction
-   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
-  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
-
-  /** Initializes the specified window to the geometry of the given
-   * DataTreeNode. PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow,
-    mitk::DataTreeIteratorBase *dataIt, bool initializeGlobalTimeSNC = false );
-
-  /** Initializes the specified window to the given geometry.
-   * PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow,
-    const mitk::Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
-
-  /** Initializes the specified window to the default viewing direction
-   * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow );
 
 
 protected:
@@ -94,9 +65,6 @@ protected:
 
 
 private:
-  void InternalViewInitialization( 
-    mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
-    bool boundingBoxInitialized, int mapperID );
 
   QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
 
@@ -107,7 +75,7 @@ class QMITK_EXPORT QmitkRenderingManagerInternal : public QObject
 {
   Q_OBJECT
 
-public:  
+public:
   friend class QmitkRenderingManager;
 
   virtual ~QmitkRenderingManagerInternal();

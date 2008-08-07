@@ -49,13 +49,17 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a tree
+  // For now we need a DataTree to initialize a DataStorage later on. In the
+  // future, the DataStorage will be independent of the DataTree
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
 
   // Create an iterator on the tree
+  // We need the iterator to initialize the slice widget below. This will be
+  // done with a datastorage in the future
   mitk::DataTreePreOrderIterator it(tree);
 
-  // Create DataStorageInstance
-  mitk::DataStorage::CreateInstance(tree);
+  // Create a data storage object. We will use it as a singleton
+  mitk::DataStorage* storage = mitk::DataStorage::CreateInstance(tree);
 
   //*************************************************************************
   // Part II: Create some data by reading files
@@ -81,7 +85,7 @@ int main(int argc, char* argv[])
       // Since the DataTreeNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
-      it.Add(node);
+      storage->Add(node);
     }
     catch(...)
     {
@@ -93,7 +97,7 @@ int main(int argc, char* argv[])
   // *******************************************************
   // ****************** START OF NEW PART ******************
   // *******************************************************
-  
+
   //*************************************************************************
   // Part VI: For allowing to interactively add points ...
   //*************************************************************************
@@ -104,7 +108,7 @@ int main(int argc, char* argv[])
   pointSetNode->SetData(pointSet);
 
   // Add the node to the tree
-  it.Add(pointSetNode);
+  storage->Add(pointSetNode);
 
   // Create PointSetInteractor, associate to pointSetNode and add as
   // interactor to GlobalInteraction
@@ -132,7 +136,7 @@ int main(int argc, char* argv[])
   QmitkRenderWindow renderWindow(&toplevelWidget);
 
   // Tell the renderwindow which (part of) the tree to render
-  renderWindow.GetRenderer()->SetData(&it);
+  renderWindow.GetRenderer()->SetData(storage);
 
   // Use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
@@ -181,6 +185,10 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
+
+  // Release all resources used by the data storage and
+  // the datatree
+  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

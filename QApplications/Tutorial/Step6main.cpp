@@ -1,6 +1,7 @@
 #include "Step6.h"
 #include "QmitkRegisterClasses.h"
 
+#include "mitkDataStorage.h"
 
 #include <qapplication.h>
 #include <itksys/SystemTools.hxx>
@@ -28,6 +29,10 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
+
+  // Release all resources used by the data storage and
+  // the datatree
+  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

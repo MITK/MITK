@@ -27,10 +27,13 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a tree
+  // For now we need a DataTree to initialize a DataStorage later on. In the
+  // future, the DataStorage will be independent of the DataTree
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
 
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(tree);
+  // Create a data storage object. We will use it as a singleton
+  mitk::DataStorage::CreateInstance(tree);
+
 
   //*************************************************************************
   // Part II: Create some data by reading a file
@@ -58,22 +61,22 @@ int main(int argc, char* argv[])
   mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
   node->SetData(reader->GetOutput());
 
-  // Use the iterator to add the node to the tree
-  it.Add(node);
+  // Add the node to the DataStorage
+  mitk::DataStorage::GetInstance()->Add(node);
 
 
   //*************************************************************************
-  // Part IV: Create window and pass the tree to it
+  // Part IV: Create window and pass the datastorage to it
   //*************************************************************************
 
   // Create a RenderWindow
   QmitkRenderWindow renderWindow;
-  
-  // Tell the RenderWindow which (part of) the tree to render
-  renderWindow.GetRenderer()->SetData(&it);
+
+  // Tell the RenderWindow which (part of) the datastorage to render
+  renderWindow.GetRenderer()->SetData(mitk::DataStorage::GetInstance());
 
   // Initialize the RenderWindow
-  mitk::RenderingManager::GetInstance()->InitializeViews( &it );
+  mitk::RenderingManager::GetInstance()->InitializeViews( mitk::DataStorage::GetInstance() );
 
   // Select a slice
   renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 0 );
@@ -90,6 +93,10 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
+
+  // Release all resources used by the data storage and
+  // the datatree
+  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

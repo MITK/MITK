@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkDataTree.h"
+#include "mitkDataStorage.h"
 
 #include <string>
 #include <itkObject.h>
@@ -123,25 +124,30 @@ public:
     /** Requests an update for the specified RenderWindow, to be executed as
    * soon as the main loop is ready for rendering. */
   void RequestUpdate( vtkRenderWindow *renderWindow );
-  
+
   /** Immediately executes an update of the specified RenderWindow. */
   void ForceImmediateUpdate( vtkRenderWindow *renderWindow );
 
-  /** Requests all currently registered RenderWindows to be updated. 
+  /** Requests all currently registered RenderWindows to be updated.
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
   void RequestUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
-  
+
   /** Immediately executes an update of all registered RenderWindows.
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
   void ForceImmediateUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
 
-  
+
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataTreeNode. PLATFORM SPECIFIC. */
-  virtual bool InitializeViews( DataTreeIteratorBase *dataIt, 
+  virtual bool InitializeViews( DataTreeIteratorBase *dataIt,
     unsigned int requestType = REQUEST_UPDATE_ALL );
+
+  /** Initializes the windows specified by requestType to the geometry of the
+   * given DataStorage. */
+  virtual bool InitializeViews( const DataStorage *storage,
+     unsigned int requestType = REQUEST_UPDATE_ALL );
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. */
@@ -158,8 +164,8 @@ public:
   virtual bool InitializeView( vtkRenderWindow *renderWindow,
     DataTreeIteratorBase *dataIt, bool initializeGlobalTimeSNC = false );
 
-  /** Initializes the specified window to the given geometry. Set 
-   * "initializeGlobalTimeSNC" to true in order to use this geometry as 
+  /** Initializes the specified window to the given geometry. Set
+   * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeSlicedGeometry. PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow,
     const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
@@ -169,15 +175,15 @@ public:
   virtual bool InitializeView( vtkRenderWindow *renderWindow );
 
 
-  /** Sets the (global) SliceNavigationController responsible for 
+  /** Sets the (global) SliceNavigationController responsible for
    * time-slicing. */
   void SetTimeNavigationController( SliceNavigationController *snc );
 
-  /** Gets the (global) SliceNavigationController responsible for 
+  /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
   const SliceNavigationController *GetTimeNavigationController() const;
-  
-  /** Gets the (global) SliceNavigationController responsible for 
+
+  /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
   SliceNavigationController *GetTimeNavigationController();
 
@@ -197,18 +203,18 @@ public:
   int GetCurrentLOD();
   void SetCurrentLOD( int lod );
   void SetNumberOfLOD( int number );
-  
+
   void SetShading( bool state, int lod );
   bool GetShading( int lod );
-  
+
   void SetClippingPlaneStatus( bool status );
   bool GetClippingPlaneStatus();
-  
-  void SetShadingValues( float ambient, float diffuse, 
+
+  void SetShadingValues( float ambient, float diffuse,
     float specular, float specpower );
 
   FloatVector &GetShadingValues();
-  
+
 
 protected:
   enum
@@ -232,7 +238,7 @@ protected:
 
   /** Checks whether there are still pending update requests and sets
    * m_UpdatePending accordingly. To be called when it is not clear that
-   * m_UpdatePending is still correct, e.g. typically after a single forced 
+   * m_UpdatePending is still correct, e.g. typically after a single forced
    * after update. */
   virtual void CheckUpdatePending();
 
@@ -251,7 +257,7 @@ protected:
   bool m_ClippingPlaneEnabled;
 
   FloatVector m_ShadingValues;
-  
+
   vtkRenderWindow *m_LastUpdatedRW;
 
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
@@ -271,6 +277,12 @@ protected:
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;
 
+private:
+
+  void InternalViewInitialization(
+      mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
+      bool boundingBoxInitialized, int mapperID );
+
 };
 
 itkEventMacro( RenderingManagerEvent, itk::AnyEvent );
@@ -279,7 +291,7 @@ itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",
- * e.g. for tests. Its factory (GenericRenderingManagerFactory) is 
+ * e.g. for tests. Its factory (GenericRenderingManagerFactory) is
  * automatically on start-up and is used by default if not other
  * RenderingManagerFactory is instantiated explicitly thereafter.
  * (see mitkRenderingManager.cpp)

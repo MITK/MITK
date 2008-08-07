@@ -45,14 +45,14 @@ QmitkAbortEventFilter::~QmitkAbortEventFilter()
 }
 
 bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
-{   
+{
   if (mitk::RenderingManager::GetInstance()->IsRendering() )
   {
     switch ( event->type() )
     {
-   
+
     case QEvent::MouseButtonPress:
-    { 
+    {
       m_ButtonPressed = true;
       //std::cout << "#BP "<<std::endl;
 
@@ -60,31 +60,31 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       QMouseEvent* me = ( QMouseEvent* )( event );
 
       QMouseEvent* newEvent = new QMouseEvent(
-        me->type(), me->pos(), me->globalPos(), me->button(), 
+        me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
       return true;
     }
 
-    
+
     case QEvent::MouseButtonDblClick:
-    { 
+    {
       //std::cout << "#DC "<<std::endl;
       mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
       QMouseEvent* me = ( QMouseEvent* )( event );
 
       QMouseEvent* newEvent = new QMouseEvent(
-        me->type(), me->pos(), me->globalPos(), me->button(), 
+        me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
       return true;
     }
 
     case QEvent::MouseButtonRelease:
-    { 
+    {
       m_ButtonPressed = false;
       //std::cout << "#BR "<<std::endl;
-      
+
       QMouseEvent* me = ( QMouseEvent* )( event );
 
       QMouseEvent* newEvent = new QMouseEvent(
@@ -95,7 +95,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     }
 
     case QEvent::MouseMove:
-    { 
+    {
       if(m_ButtonPressed && mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
       {
         //std::cout << "#MM "<<std::endl;
@@ -104,10 +104,23 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
       return true;
     }
-    
-   
+
+    case QEvent::Wheel:
+    {
+      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+      mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+      QWheelEvent* we = ( QWheelEvent* )( event );
+
+      QWheelEvent* newEvent = new QWheelEvent(
+        we->pos(), we->globalPos(), we->delta(), we->buttons(),
+        we->modifiers(), we->orientation()
+      );
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
     case QEvent::Resize:
-      { 
+      {
         //std::cout << "#R "<<std::endl;
         mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
 
@@ -119,7 +132,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
 
     case QEvent::Paint:
-      { 
+      {
         //std::cout << "#P ";
         QPaintEvent* pe = ( QPaintEvent* )( event );
         QPaintEvent* newPaintEvent = new QPaintEvent( pe->region() );
@@ -136,7 +149,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
 
       case QEvent::KeyPress:
-      { 
+      {
         //std::cout << "#KP "<<std::endl;
         mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
         QKeyEvent* ke = ( QKeyEvent* )( event );
@@ -148,7 +161,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       }
 
       case QEvent::Timer:
-      { 
+      {
         //std::cout << "#T ";
         QTimerEvent* te = ( QTimerEvent* )( event );
         QTimerEvent* newEvent = new QTimerEvent(te->timerId());
@@ -183,7 +196,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
           {
             mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
             mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", mitk::BoolProperty::New(true));
-            mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet = 
+            mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet =
                 dataStorage->GetSubset( VolRenTurnedOn );
             if ( VolRenSet->Size() > 0 )
             {
@@ -201,13 +214,13 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         //std::cout << "#BR2 "<<std::endl;
         return false;
       }
-    
+
       case QEvent::Resize:
       {
         //std::cout << "#R2 "<<std::endl;
         //mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         return false;
-      } 
+      }
 
       case QEvent::ChildAdded:
       {
@@ -226,7 +239,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 }
 
 void QmitkAbortEventFilter::ProcessEvents()
-{ 
+{
   //std::cout << "P";
   qApp->processEvents( QEventLoop::AllEvents );
 }

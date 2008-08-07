@@ -36,7 +36,7 @@ RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 
 RenderingManager
 ::RenderingManager()
-: m_UpdatePending( false ), 
+: m_UpdatePending( false ),
   m_CurrentLOD( 0 ),
   m_MaxLOD( 3 ),
   m_NumberOf3DRW( 0 ),
@@ -63,7 +63,7 @@ RenderingManager
 }
 
 
-const RenderingManagerFactory * 
+const RenderingManagerFactory *
 RenderingManager
 ::GetFactory()
 {
@@ -86,7 +86,7 @@ RenderingManager
 }
 
 
-RenderingManager::Pointer 
+RenderingManager::Pointer
 RenderingManager
 ::New()
 {
@@ -100,7 +100,7 @@ RenderingManager
 RenderingManager *
 RenderingManager
 ::GetInstance()
-{ 
+{
   if ( !RenderingManager::s_Instance )
   {
     if ( s_RenderingManagerFactory )
@@ -141,14 +141,14 @@ RenderingManager
     startCallbackCommand->SetCallbackFunction(
       this, &RenderingManager::RenderingStartCallback);
     renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
-    
+
     MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
     progressCallbackCommand->SetCallbackFunction(
       this, &RenderingManager::RenderingProgressCallback);
     renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
 
     MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
-    endCallbackCommand->SetCallbackFunction( 
+    endCallbackCommand->SetCallbackFunction(
       this, &RenderingManager::RenderingEndCallback);
     renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
  }
@@ -237,7 +237,7 @@ RenderingManager
 
   // Immediately repaint this window (implementation platform specific)
   renderWindow->Render();
- 
+
 }
 
 
@@ -274,7 +274,7 @@ RenderingManager
 void
 RenderingManager
 ::ForceImmediateUpdateAll( unsigned int requestType )
-{ 
+{
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -302,57 +302,276 @@ RenderingManager
 }
 
 
-bool 
+bool
 RenderingManager
-::InitializeViews( DataTreeIteratorBase * /*dataIt*/, unsigned int /*requestType*/ )
-{ 
-  return false; 
-}
-
-
-bool 
-RenderingManager
-::InitializeViews( const Geometry3D * /*geometry*/, unsigned int /*requestType*/ )
-{ 
-  return false; 
-}
-
-
-bool 
-RenderingManager
-::InitializeViews( unsigned int /*requestType*/ )
-{ 
-  return false; 
-}
-
-bool 
-RenderingManager
-::InitializeView( vtkRenderWindow * /*renderWindow*/, 
-  DataTreeIteratorBase * /*dataIt*/,
-  bool /*initializeGlobalTimeSNC*/ )
+::InitializeViews( DataTreeIteratorBase * dataIt, unsigned int requestType )
 {
-  return false;
+  mitk::Geometry3D::Pointer geometry;
+  if ( dataIt != NULL )
+  {
+    geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(
+      dataIt, NULL, "includeInBoundingBox" );
+
+    if ( geometry.IsNotNull() )
+    {
+      // let's see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+      {
+        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+
+        mitk::TimeSlicedGeometry::Pointer timegeometry =
+          mitk::TimeSlicedGeometry::New();
+        timegeometry->InitializeEvenlyTimed(
+          geometry, (unsigned int) duration );
+        timegeometry->SetTimeBounds( timebounds );
+
+        timebounds[1] = timebounds[0] + 1.0;
+        geometry->SetTimeBounds( timebounds );
+
+        geometry = timegeometry;
+      }
+    }
+  }
+
+  // Use geometry for initialization
+  return this->InitializeViews( geometry.GetPointer(), requestType );
 }
 
-bool 
+
+bool
 RenderingManager
-::InitializeView( vtkRenderWindow * /*renderWindow*/,
-  const Geometry3D * /*geometry*/,
-  bool /*initializeGlobalTimeSNC*/ )
+::InitializeViews( const DataStorage * storage, unsigned int requestType )
 {
-  return false;
+  //TODO native DataStorage code
+  mitk::DataTreePreOrderIterator it(storage->m_DataTree);
+  return this->InitializeViews(&it, requestType);
 }
 
-  
-bool 
+
+bool
 RenderingManager
-::InitializeView( vtkRenderWindow * /*renderWindow*/ )
+::InitializeViews( const Geometry3D * geometry, unsigned int requestType )
 {
-  return false;
+  bool boundingBoxInitialized = false;
+
+  int warningLevel = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
+
+  if ( (geometry != NULL ) && (const_cast< mitk::BoundingBox * >(
+    geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+  {
+    boundingBoxInitialized = true;
+  }
+
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    mitk::BaseRenderer *baseRenderer =
+      mitk::BaseRenderer::GetInstance( it->first );
+    int id = baseRenderer->GetMapperID();
+    if ( (requestType == REQUEST_UPDATE_ALL)
+      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    {
+      this->InternalViewInitialization( baseRenderer, geometry,
+        boundingBoxInitialized, id );
+    }
+  }
+
+  if ( m_TimeNavigationController != NULL )
+  {
+    if ( boundingBoxInitialized )
+    {
+      m_TimeNavigationController->SetInputWorldGeometry( geometry );
+    }
+    m_TimeNavigationController->Update();
+  }
+
+  this->RequestUpdateAll( requestType );
+
+  vtkObject::SetGlobalWarningDisplay( warningLevel );
+
+  // Inform listeners that views have been initialized
+  this->InvokeEvent( mitk::RenderingManagerViewsInitializedEvent() );
+
+
+  return boundingBoxInitialized;
 }
 
-  
-void 
+
+bool
+RenderingManager
+::InitializeViews( unsigned int requestType )
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    mitk::BaseRenderer *baseRenderer =
+      mitk::BaseRenderer::GetInstance( it->first );
+    int id = baseRenderer->GetMapperID();
+    if ( (requestType == REQUEST_UPDATE_ALL)
+      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    {
+      mitk::SliceNavigationController *snc =
+        baseRenderer->GetSliceNavigationController();
+
+      // Re-initialize view direction
+      snc->SetViewDirectionToDefault();
+
+      // Update the SNC
+      snc->Update();
+    }
+  }
+
+  this->RequestUpdateAll( requestType );
+
+  return true;
+}
+
+bool
+RenderingManager
+::InitializeView( vtkRenderWindow * renderWindow,
+  DataTreeIteratorBase * dataIt,
+  bool initializeGlobalTimeSNC )
+{
+  mitk::Geometry3D::Pointer geometry;
+  if ( dataIt != NULL )
+  {
+    geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(
+      dataIt, NULL, "includeInBoundingBox" );
+
+    if ( geometry.IsNotNull() )
+    {
+      // let's see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+      {
+        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+
+        mitk::TimeSlicedGeometry::Pointer timegeometry =
+          mitk::TimeSlicedGeometry::New();
+        timegeometry->InitializeEvenlyTimed(
+          geometry, (unsigned int) duration );
+        timegeometry->SetTimeBounds( timebounds );
+
+        timebounds[1] = timebounds[0] + 1.0;
+        geometry->SetTimeBounds( timebounds );
+
+        geometry = timegeometry;
+      }
+    }
+  }
+
+  // Use geometry for initialization
+  return this->InitializeView( renderWindow,
+    geometry.GetPointer(), initializeGlobalTimeSNC );
+}
+
+bool
+RenderingManager
+::InitializeView( vtkRenderWindow * renderWindow,
+  const Geometry3D * geometry,
+  bool initializeGlobalTimeSNC )
+{
+  bool boundingBoxInitialized = false;
+
+  int warningLevel = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
+
+  if ( (geometry != NULL ) && (const_cast< mitk::BoundingBox * >(
+   geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+  {
+   boundingBoxInitialized = true;
+  }
+
+  mitk::BaseRenderer *baseRenderer =
+   mitk::BaseRenderer::GetInstance( renderWindow );
+
+  int id = baseRenderer->GetMapperID();
+
+  this->InternalViewInitialization( baseRenderer, geometry,
+   boundingBoxInitialized, id );
+
+  if ( m_TimeNavigationController != NULL )
+  {
+   if ( boundingBoxInitialized && initializeGlobalTimeSNC )
+   {
+     m_TimeNavigationController->SetInputWorldGeometry( geometry );
+   }
+   m_TimeNavigationController->Update();
+  }
+
+  this->RequestUpdate( renderWindow );
+
+  vtkObject::SetGlobalWarningDisplay( warningLevel );
+
+  return boundingBoxInitialized;
+}
+
+
+bool
+RenderingManager
+::InitializeView( vtkRenderWindow * renderWindow )
+{
+  mitk::BaseRenderer *baseRenderer =
+      mitk::BaseRenderer::GetInstance( renderWindow );
+
+  mitk::SliceNavigationController *snc =
+    baseRenderer->GetSliceNavigationController();
+
+  // Re-initialize view direction
+  snc->SetViewDirectionToDefault();
+
+  // Update the SNC
+  snc->Update();
+
+  this->RequestUpdate( renderWindow );
+
+  return true;
+}
+
+void
+RenderingManager
+::InternalViewInitialization(
+  mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
+  bool boundingBoxInitialized, int mapperID )
+{
+  mitk::SliceNavigationController *snc =
+    baseRenderer->GetSliceNavigationController();
+
+  // Re-initialize view direction
+  snc->SetViewDirectionToDefault();
+
+  if ( boundingBoxInitialized )
+  {
+    // Set geometry for SNC
+    snc->SetInputWorldGeometry( geometry );
+    snc->Update();
+
+    if ( mapperID == 1 )
+    {
+      // For 2D SNCs, steppers are set so that the cross is centered
+      // in the image
+      snc->GetSlice()->SetPos( snc->GetSlice()->GetSteps() / 2 );
+    }
+
+    // Fit the render window DisplayGeometry
+    baseRenderer->GetDisplayGeometry()->Fit();
+
+    vtkRenderer *renderer = baseRenderer->GetVtkRenderer();
+
+    if ( renderer != NULL ) renderer->ResetCamera();
+  }
+  else
+  {
+    snc->Update();
+  }
+}
+
+
+void
 RenderingManager
 ::SetTimeNavigationController( SliceNavigationController *snc )
 {
@@ -396,11 +615,11 @@ RenderingManager
 void
 RenderingManager
 ::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
-{ 
+{
   //std::cout<< m_CurrentLOD << "<S";
   BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
   if (renderer)
-  { 
+  {
     m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INPROGRESS;
   }
 }
@@ -418,14 +637,14 @@ RenderingManager
 void
 RenderingManager
 ::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
-{ 
+{
   //std::cout<<"E> "<<std::endl;
   BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
   if (renderer)
   {
     m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
     this->DoFinishAbortRendering();
-    
+
     /** Level-Of-Detail **/
    if(m_NumberOf3DRW > 0)
     {
@@ -461,7 +680,7 @@ RenderingManager
 void
 RenderingManager
 ::AbortRendering( vtkRenderWindow* renderWindow )
-{ 
+{
   //std::cout << "A";
   if ( (m_RenderWindowList.count( renderWindow ) != 0)
     && (m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS) )
@@ -475,25 +694,25 @@ RenderingManager
     {
       if ( it->second == RENDERING_INPROGRESS )
       {
-        it->first->SetAbortRender( true );       
+        it->first->SetAbortRender( true );
       }
     }
   }
 }
 
 
-int 
+int
 RenderingManager
 ::GetCurrentLOD()
-{ 
+{
   return m_CurrentLOD;
 }
 
 
-void 
+void
 RenderingManager
 ::SetCurrentLOD( int lod )
-{ 
+{
   //std::cout << lod << std::endl;
   if ( m_CurrentLOD != lod )
   {
@@ -507,7 +726,7 @@ RenderingManager
 }
 
 
-void 
+void
 RenderingManager
 ::SetNumberOfLOD( int number )
 {
@@ -516,10 +735,10 @@ RenderingManager
 
 
 //enable/disable shading
-void 
+void
 RenderingManager
 ::SetShading(bool state, int lod)
-{ 
+{
   if(lod>m_MaxLOD)
   {
     itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
@@ -529,10 +748,10 @@ RenderingManager
 
 }
 
-bool 
+bool
 RenderingManager
 ::GetShading(int lod)
-{ 
+{
   if(lod>m_MaxLOD)
   {
     itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
@@ -543,7 +762,7 @@ RenderingManager
 
 
 //enable/disable the clipping plane
-void 
+void
 RenderingManager
 ::SetClippingPlaneStatus(bool status)
 {
@@ -551,7 +770,7 @@ RenderingManager
 }
 
 
-bool 
+bool
 RenderingManager
 ::GetClippingPlaneStatus()
 {
@@ -559,7 +778,7 @@ RenderingManager
 }
 
 
-void 
+void
 RenderingManager
 ::SetShadingValues(float ambient, float diffuse, float specular, float specpower)
 {

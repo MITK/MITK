@@ -36,11 +36,12 @@ void Step8::SetupWidgets()
   mitk::DataTreePreOrderIterator it(m_Tree);
 
   // Tell the multiWidget which (part of) the tree to render
+  // This will be changed to take a DataStorage object
   multiWidget->SetData(&it);
 
   // Initialize views as transversal, sagittal, coronar (from
   // top-left to bottom)
-  mitk::RenderingManager::GetInstance()->InitializeViews(&it);
+  mitk::RenderingManager::GetInstance()->InitializeViews(mitk::DataStorage::GetInstance());
 
   // Initialize bottom-right view as 3D view
   multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
@@ -51,6 +52,7 @@ void Step8::SetupWidgets()
 
   // Add the displayed views to the tree to see their positions
   // in 2D and 3D
+  // This will be changed to take a DataStorage object
   multiWidget->AddDisplayPlaneSubTree(&it);
 
   //*************************************************************************

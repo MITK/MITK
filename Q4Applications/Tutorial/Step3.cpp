@@ -41,13 +41,12 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a tree
+  // For now we need a DataTree to initialize a DataStorage later on. In the
+  // future, the DataStorage will be independent of the DataTree
   mitk::DataTree::Pointer tree=mitk::DataTree::New();
 
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(tree);
-
-  // Create DataStorageInstance
-  mitk::DataStorage::CreateInstance(tree);
+  // Create a data storage object. We will use it as a singleton
+  mitk::DataStorage* storage = mitk::DataStorage::CreateInstance(tree);
 
   //*************************************************************************
   // Part II: Create some data by reading files
@@ -72,9 +71,9 @@ int main(int argc, char* argv[])
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,
-      // use the iterator to add the read node to the tree
+      // use the datastorage to add the read node
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
-      it.Add(node);
+      storage->Add(node);
 
       // *********************************************************
       // ****************** START OF NEW PART 1 ******************
@@ -127,8 +126,8 @@ int main(int argc, char* argv[])
   // Create a renderwindow
   QmitkRenderWindow renderWindow;
 
-  // Tell the renderwindow which (part of) the tree to render
-  renderWindow.GetRenderer()->SetData(&it);
+  // Tell the renderwindow which (part of) the datastorage to render
+  renderWindow.GetRenderer()->SetData(storage);
 
   // *********************************************************
   // ****************** START OF NEW PART 2 ******************
@@ -154,6 +153,10 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
+
+  // Release all resources used by the data storage and
+  // the datatree
+  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

@@ -12,7 +12,6 @@
 #include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
 
-#include <itkConfidenceConnectedImageFilter.h>
 #include "mitkImageAccessByItk.h"
 #include "mitkDataTreeHelper.h"
 
@@ -77,14 +76,13 @@ void Step6::Initialize()
 
   // as in Step5, create PointSet (now as a member m_Seeds) and
   // associate a interactor to it
-  mitk::DataTreePreOrderIterator it( m_Tree );
   m_Seeds = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
-  pointSetNode->SetData( m_Seeds );
-  pointSetNode->SetProperty( "layer", mitk::IntProperty::New(2) );
-  it.Add(pointSetNode);
+  pointSetNode->SetData(m_Seeds);
+  pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
+  mitk::DataStorage::GetInstance()->Add(pointSetNode);
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New( "pointsetinteractor", pointSetNode )
+    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
 }
 
@@ -144,7 +142,7 @@ void Step6::Load(int argc, char* argv[])
       // Since the DataTreeNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
-      it.Add(node);
+      mitk::DataStorage::GetInstance()->Add(node);
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
       if((m_FirstImage.IsNull()) && (image.IsNotNull()))

@@ -1,5 +1,7 @@
 SET(CPP_FILES
 
+ QmitkModels/QmitkDataStorageListModel.cpp
+
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
  QmitkPropertyObservers/QmitkBoolPropertyView.cpp

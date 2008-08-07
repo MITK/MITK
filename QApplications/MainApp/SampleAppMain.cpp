@@ -23,8 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdexcept>
 
 #include <mitkStandardFileLocations.h>
-#include <mitkProperties.h>
-#include <mitkVector.h>
+#include <mitkDataStorage.h>
 
 #include <QmitkFunctionalityTesting.h>
 #include <sstream>
@@ -43,6 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 int main(int argc, char* argv[])
 {
+  int result;
   try
   {
     // Add directory in which the application executable resides as search directory
@@ -119,11 +119,11 @@ int main(int argc, char* argv[])
     if(testType)
     {
       std::cout.setf(std::ios_base::unitbuf);
-      return StartQmitkFunctionalityTesting(mainWindow.GetFctMediator(), testType);
+      result = StartQmitkFunctionalityTesting(mainWindow.GetFctMediator(), testType);
     }
     else
     {
-      return a.exec();
+      result = a.exec();
     }
   }
   catch (const std::bad_alloc& e)
@@ -141,4 +141,19 @@ int main(int argc, char* argv[])
     std::cout << "MITK MainApp caught something like an exception..." << std::endl;
     return EXIT_FAILURE;
   }  
+  try
+  {
+    mitk::DataStorage::GetInstance()->ShutdownSingleton();
+  }
+  catch (const std::exception& e)
+  {
+    std::cout << "MITK MainApp caught an exception on ShutdownSingleton: " << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::cout << "MITK MainApp caught something like an exception on ShutdownSingleton..." << std::endl;
+    return EXIT_FAILURE;
+  }
+  return result;
 } 

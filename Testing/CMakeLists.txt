@@ -45,7 +45,6 @@ SET(${KITNAME}_TESTS
   mitkStateTest.cpp
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp
-  mitkSurfaceToImageFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkToolManagerTest.cpp
   mitkTransitionTest.cpp
@@ -62,6 +61,7 @@ SET(${KITNAME}_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp  
   mitkPicFileReaderTest.cpp
+  mitkSurfaceToImageFilterTest.cpp
   mitkVtkPropRendererTest.cpp
 )
 

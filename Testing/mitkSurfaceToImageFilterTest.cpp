@@ -88,10 +88,10 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
   s2iFilter->Update();
   std::cout<<"[PASSED]"<<std::endl;
 
-  mitk::PicFileWriter::Pointer picWriter = mitk::PicFileWriter::New();
-  picWriter->SetInput(s2iFilter->GetOutput());
-  picWriter->SetFileName("SurfaceToImageFilterTestOutput.pic");
-  picWriter->Write();
+  //mitk::PicFileWriter::Pointer picWriter = mitk::PicFileWriter::New();
+  //picWriter->SetInput(s2iFilter->GetOutput());
+  //picWriter->SetFileName("SurfaceToImageFilterTestOutput.pic");
+  //picWriter->Write();
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

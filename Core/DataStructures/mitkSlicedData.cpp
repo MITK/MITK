@@ -263,8 +263,9 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
         else
         {
           slicedGeometry = SlicedGeometry3D::New();
-          slicedGeometry->SetBounds(aGeometry3D->GetBoundingBox()->GetBounds());
-          slicedGeometry->SetIndexToWorldTransform( const_cast<mitk::AffineTransform3D*>(aGeometry3D->GetIndexToWorldTransform()) );
+          PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
+          planeGeometry->InitializeStandardPlane(aGeometry3D);
+          slicedGeometry->InitializeEvenlySpaced(planeGeometry, aGeometry3D->GetExtent(2));
         }
       }
       assert(slicedGeometry.IsNotNull());
@@ -342,4 +343,5 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
     }
   }
 }
+
 

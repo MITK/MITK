@@ -73,6 +73,7 @@ SET(${KITNAME}_TESTIMAGES
   BallBinary30x30x30.pic.gz
   Png2D-bw.png
   binary.stl
+  ball.stl
 )
 
 SET(${KITNAME}_CUSTOM_TESTS 

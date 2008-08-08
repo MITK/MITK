@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkPicFileWriter.h"
 
+#include <vtkPolyData.h>
+
 #include <fstream>
 
 int mitkSurfaceToImageFilterTest(int argc, char* argv[])
@@ -71,18 +73,22 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-#ifdef _WIN32
-#if (VTK_MAJOR_VERSION<=5)&&(VTK_BUILD_VERSION<=4)
-  std::cout << "Test aborted because of bug in vtkSTLReader.cxx in versions before 1.72" <<std::endl;
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
-#endif
-#endif
+  std::cout << "Testing number of points of surface: " << std::flush;
+  if(surface->GetVtkPolyData()->GetNumberOfPoints() == 0)
+  {
+    std::cout<<"number of points is 0 - test will not be applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
+  }
 
   std::cout << "Testing creation of mitk::Image with same Geometry as Surface: " << std::flush;
   mitk::Image::Pointer image = mitk::Image::New();
   surface->UpdateOutputInformation(); //should not be necessary, bug #1536
   image->Initialize(typeid(unsigned char), *surface->GetGeometry());
+
+  std::cout << "Testing mitk::SurfaceToImageFilter::MakeOutputBinaryOn(): " << std::flush;
+  s2iFilter->MakeOutputBinaryOn();
+  std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing mitk::SurfaceToImageFilter::SetInput(): " << std::flush;
   s2iFilter->SetInput(surface);

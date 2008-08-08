@@ -265,7 +265,7 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
           slicedGeometry = SlicedGeometry3D::New();
           PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
           planeGeometry->InitializeStandardPlane(aGeometry3D);
-          slicedGeometry->InitializeEvenlySpaced(planeGeometry, aGeometry3D->GetExtent(2));
+          slicedGeometry->InitializeEvenlySpaced(planeGeometry, (unsigned int) aGeometry3D->GetExtent(2));
         }
       }
       assert(slicedGeometry.IsNotNull());

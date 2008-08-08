@@ -71,6 +71,14 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+#ifdef _WIN32
+#if (VTK_MAJOR_VERSION<=5)&&(VTK_BUILD_VERSION<=4)
+  std::cout << "Test aborted because of bug in vtkSTLReader.cxx in versions before 1.72" <<std::endl;
+  std::cout<<"[TEST DONE]"<<std::endl;
+  return EXIT_SUCCESS;
+#endif
+#endif
+
   std::cout << "Testing creation of mitk::Image with same Geometry as Surface: " << std::flush;
   mitk::Image::Pointer image = mitk::Image::New();
   surface->UpdateOutputInformation(); //should not be necessary, bug #1536

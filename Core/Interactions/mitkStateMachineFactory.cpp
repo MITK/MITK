@@ -55,6 +55,12 @@ const std::string mitk::StateMachineFactory::DOUBLE_PARAMETER = "doubleParameter
 const std::string mitk::StateMachineFactory::STRING_PARAMETER = "stringParameter";
 const std::string mitk::StateMachineFactory::VALUE = "VALUE";
 
+#include <vtkObjectFactory.h>
+namespace mitk
+{
+vtkStandardNewMacro(StateMachineFactory);
+}
+
 mitk::StateMachineFactory::StateMachineFactory()
 : m_AktStateMachineName("")
 {}
@@ -97,7 +103,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   s_LastLoadedBehavior = fileName;
 
   //call a new instance of this class and let it build up static containers
-  mitk::StateMachineFactory* stateMachineFactory = new StateMachineFactory();
+  mitk::StateMachineFactory* stateMachineFactory = StateMachineFactory::New();
   stateMachineFactory->SetFileName( fileName.c_str() );
 
   InteractionDebug::SetXMLFileName( "StateMachine.xml" );

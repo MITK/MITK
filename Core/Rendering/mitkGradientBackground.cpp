@@ -68,6 +68,10 @@ mitk::GradientBackground::GradientBackground()
   m_Plane->SetPolys( cellArray );
   m_Plane->GetPointData()->SetScalars( data );
 
+  points->Delete();
+  cellArray->Delete();
+  data->Delete();
+
   m_Lut->SetNumberOfColors( 2 );
   m_Lut->Build();
   m_Lut->SetTableValue( m_Lut->GetIndex(0), 1, 1, 1 );

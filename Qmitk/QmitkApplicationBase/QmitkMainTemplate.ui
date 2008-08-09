@@ -1327,6 +1327,7 @@
     <forward>class QmitkSimpleExampleFunctionality</forward>
     <forward>class QmitkStdMultiWidget</forward>
     <forward>class QmitkSelectableGLWidget</forward>
+    <forward>class posOutputType</forward>
 </forwards>
 <variables>
     <variable>bool m_InOptionsUpdate;</variable>
@@ -1343,6 +1344,7 @@
     <variable>mitk::UndoController* m_UndoController;</variable>
     <variable access="private">static QmitkMainTemplate* m_Instance;</variable>
     <variable>QPalette m_StandardPalette;</variable>
+    <variable access="private">posOutputType* m_PosOutput;</variable>
 </variables>
 <signals>
     <signal>ShowWidgetPlanesToggled(bool)</signal>

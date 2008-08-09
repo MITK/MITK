@@ -92,7 +92,9 @@ void mitk::ColoredRectangleRendering::Enable(float col1, float col2, float col3)
   rect->SetColor(col1, col2, col3);
 
   m_RectangleRenderer->AddViewProp(rect);
-    
+
+  rect->Delete();
+
   if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
   {
     #if ( VTK_MAJOR_VERSION >= 5 )

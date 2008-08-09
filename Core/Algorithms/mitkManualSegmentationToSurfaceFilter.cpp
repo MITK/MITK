@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
+#include <vtkSmartPointer.h>
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
 {
@@ -49,10 +50,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   for( int t=tstart; t<tmax; t++ )
   {
 
-    vtkImageData *vtkimage = image->GetVtkImageData(t);
-
-    //Inkrement Referenzcounter Counter (hier: RC)
-    vtkimage->Register(NULL);
+    vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D 
     if(m_MedianFilter3D)
@@ -63,9 +61,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
       median->Update();
-      vtkimage->Delete(); //->Input
       vtkimage = median->GetOutput(); //->Out
-      vtkimage->Register(NULL);
       median->Delete();
     }
 
@@ -81,9 +77,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       imageresample->SetAxisOutputSpacing(2, m_MedianKernelSizeZ);
       imageresample->UpdateInformation();
       imageresample->Update();
-      vtkimage->Delete(); //->Input
       vtkimage=imageresample->GetOutput();//->Output
-      vtkimage->Register(NULL);
       imageresample->Delete();
     }
 
@@ -101,15 +95,14 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
       gaussian->SetInput(vtkimagethreshold->GetOutput()); 
+      vtkimagethreshold->Delete();
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
       gaussian->ReleaseDataFlagOn();
       gaussian->UpdateInformation();
       gaussian->Update();
-      vtkimage->Delete();//->Input
       vtkimage = gaussian->GetOutput(); //->Out
-      gaussian->Register(NULL);
       gaussian->Delete();
     }
 

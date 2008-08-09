@@ -22,6 +22,10 @@ namespace mitk
 class MITK_CORE_EXPORT vtkPointSetXMLParser : public vtkXMLParser
 {
 public:
+    vtkTypeMacro(vtkPointSetXMLParser,vtkXMLParser);
+
+    static vtkPointSetXMLParser* New();
+
     typedef mitk::PointSet PointSetType;
 
     typedef std::stack< std::string > ParseStack;
@@ -69,6 +73,8 @@ public:
     virtual PointSetList GetParsedPointSets();
     
 protected:
+    vtkPointSetXMLParser();
+    virtual ~vtkPointSetXMLParser();
     
     /**
      * A stack containing the parsed start-tags. 

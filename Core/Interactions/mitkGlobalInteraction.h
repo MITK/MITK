@@ -135,7 +135,14 @@ namespace mitk {
 
     static bool StandardInteractionSetup(const char * XMLbehaviorFile = NULL, const char * globalInteractionName = NULL);
 
+    //##Documentation
+    //## @brief Returns the global (singleton) instance of
+    //## GlobalInteraction. Create it, if it does not exist.
     static GlobalInteraction* GetInstance();
+
+    //##Documentation
+    //## @brief Returns whether an instance exists
+    static bool HasInstance();
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;

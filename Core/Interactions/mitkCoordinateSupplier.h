@@ -49,6 +49,8 @@ namespace mitk {
     //## @param operationActor: the Data, operations (+ points) are send to
     CoordinateSupplier(const char * type, OperationActor* operationActor);
 
+    ~CoordinateSupplier();
+
     //##Documentation
     //## @brief executes the actions that are sent to this statemachine
     //## derived from StateMachine 

@@ -44,7 +44,7 @@ class MITK_CORE_EXPORT UndoController
   //## Constructor; Adds the new UndoType or if undoType exists ,
   //## switches it to undoType; for UndoTypes see definitionmitkInteractionConst.h
   UndoController(UndoType undoType = DEFAULTUNDOMODEL);
-  ~UndoController(){};
+  virtual ~UndoController();
 
   bool SetOperationEvent(UndoStackItem* operationEvent);
 

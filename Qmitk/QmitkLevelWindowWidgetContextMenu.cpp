@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget * parent, const char * name, WFlags f )
 : QWidget( parent, name, f )
 {
-  m_LevelWindowPreset = new mitk::LevelWindowPreset();
+  m_LevelWindowPreset = mitk::LevelWindowPreset::New();
   m_LevelWindowPreset->LoadPreset();
 }
 

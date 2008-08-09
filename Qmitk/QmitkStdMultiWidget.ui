@@ -191,8 +191,8 @@
     <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
     <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>
     <variable>mitk::DataTreeBase::Pointer m_Tree;</variable>
-    <variable>mitk::SlicesRotator *m_SlicesRotator;</variable>
-    <variable>mitk::SlicesSwiveller *m_SlicesSwiveller;</variable>
+    <variable>mitk::SlicesRotator::Pointer m_SlicesRotator;</variable>
+    <variable>mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground1;</variable>
     <variable>mitk::GradientBackground::Pointer m_GradientBackground2;</variable>
     <variable>mitk::LogoRendering::Pointer m_LogoRendering1;</variable>

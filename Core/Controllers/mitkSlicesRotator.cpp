@@ -48,12 +48,7 @@ namespace mitk {
 
 SlicesRotator::Pointer SlicesRotator::New()
 {
-  // from itkNewMacro()
-  Pointer smartPtr;
-  SlicesRotator* rawPtr = new SlicesRotator("slices-rotator");
-  smartPtr = rawPtr;
-  rawPtr->UnRegister();
-  return smartPtr;
+  return SlicesRotator::New("slices-rotator");
 }
 
 SlicesRotator::SlicesRotator(const char* machine)

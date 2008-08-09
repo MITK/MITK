@@ -16,6 +16,8 @@ itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::~VtkAbstractTransform()
 {
+  if(m_VtkAbstractTransform!=NULL)
+    m_VtkAbstractTransform->UnRegister(NULL);
 }
 
 template <class TScalarType>
@@ -39,15 +41,11 @@ void itk::VtkAbstractTransform<TScalarType>::SetVtkAbstractTransform(vtkAbstract
   if(m_VtkAbstractTransform!=NULL)
     m_VtkAbstractTransform->UnRegister(NULL);
 
-  if(m_InverseVtkAbstractTransform!=NULL)
-    m_InverseVtkAbstractTransform->UnRegister(NULL);
-
   m_VtkAbstractTransform=aVtkAbstractTransform;
   if(m_VtkAbstractTransform!=NULL)
   {
     m_VtkAbstractTransform->Register(NULL);
-    m_InverseVtkAbstractTransform=m_VtkAbstractTransform->GetInverse();
-    m_InverseVtkAbstractTransform->Register(NULL);
+    m_InverseVtkAbstractTransform=m_VtkAbstractTransform->GetInverse(); // memory managed by m_VtkAbstractTransform
   }
 
   m_LastVtkAbstractTransformTimeStamp = m_VtkAbstractTransform->GetMTime();

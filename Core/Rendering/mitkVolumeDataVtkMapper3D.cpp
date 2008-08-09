@@ -131,6 +131,8 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   // BoundingBox rendering is not working due to problem with assembly
   // transformation; see bug #454
+  // If commenting in the following, do not forget to comment in the
+  // m_Prop3DAssembly->Delete() line in the destructor.
   //m_Prop3DAssembly = vtkAssembly::New();
   //m_Prop3DAssembly->AddPart( m_VolumeLOD );
   //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
@@ -182,7 +184,18 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_VolumeLOD->Delete();
   m_ClippingPlane->Delete();
   m_PlaneWidget->Delete();
+  // m_Prop3DAssembly->Delete();
+  m_BoundingBox->Delete();
+  m_BoundingBoxMapper->Delete();
+  m_BoundingBoxActor->Delete();
   m_ImageMaskFilter->Delete();
+  m_DummyProp->Delete();
+  m_DefaultColorTransferFunction->Delete();
+  m_DefaultOpacityTransferFunction->Delete();
+  m_DefaultGradientTransferFunction->Delete();
+  m_AbortCallbackCommand->Delete();
+  m_StartCallbackCommand->Delete();
+  m_EndCallbackCommand->Delete();
 
   if (m_Mask)
   {

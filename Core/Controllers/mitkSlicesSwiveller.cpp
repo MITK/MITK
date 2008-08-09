@@ -47,12 +47,7 @@ namespace mitk {
 
 SlicesSwiveller::Pointer SlicesSwiveller::New()
 {
-  // from itkNewMacro()
-  Pointer smartPtr;
-  SlicesSwiveller* rawPtr = new SlicesSwiveller("slices-rotator");
-  smartPtr = rawPtr;
-  rawPtr->UnRegister();
-  return smartPtr;
+  return SlicesSwiveller::New("slices-rotator");
 }
 
 SlicesSwiveller::SlicesSwiveller(const char* machine)

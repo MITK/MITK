@@ -724,6 +724,7 @@ void QmitkMainTemplate::init()
   m_StandardPalette = QApplication::palette();
   m_FirstFileOpen = true;
   m_NoMITKOptions = false;
+  m_PosOutput = NULL;
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
   QmitkStatusBar *statusBar = new QmitkStatusBar(this->statusBar());
@@ -807,9 +808,9 @@ void QmitkMainTemplate::Initialize()
   //could the behavior file be found?
   if ( smLoadOK )
   {
-    posOutputType* posOutput = new posOutputType(&it);
+    m_PosOutput = new posOutputType(&it);
 
-    mitk::GlobalInteraction::GetInstance()->AddListener(mitk::CoordinateSupplier::New("navigation", posOutput)); //sends PointOperations
+    mitk::GlobalInteraction::GetInstance()->AddListener(mitk::CoordinateSupplier::New("navigation", m_PosOutput)); //sends PointOperations
   }
   else
   {
@@ -1283,6 +1284,8 @@ void QmitkMainTemplate::destroy()
 #ifdef MBI_INTERNAL
   delete m_SceneWidget;
 #endif
+
+  delete m_PosOutput;
 
   m_Tree = NULL;
 }

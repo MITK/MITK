@@ -156,6 +156,16 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 
   // Delete entries in m_ImageActors list one by one
   m_ImageActors.clear();
+
+  LookupTablePropertiesList::iterator it;
+  for(it = m_LookupTableProperties.begin(); it != m_LookupTableProperties.end();++it)
+  {
+    if ( it->second.LookupTableSource != NULL )
+    {
+      it->second.LookupTableSource->Delete();
+      it->second.LookupTableSource = NULL;
+    }
+  }
 }
 
 
@@ -791,6 +801,3 @@ Geometry2DDataVtkMapper3D::ActorInfo::~ActorInfo()
 }
 
 } // namespace mitk
-
-
-

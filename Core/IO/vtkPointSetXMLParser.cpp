@@ -1,10 +1,22 @@
 #include "vtkPointSetXMLParser.h"
+#include "vtkObjectFactory.h"
 #include "mitkPointSetWriter.h"
 #include "mitkOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 
+namespace mitk
+{
+vtkStandardNewMacro(vtkPointSetXMLParser);
+}
 
+mitk::vtkPointSetXMLParser::vtkPointSetXMLParser()
+{
+}
+
+mitk::vtkPointSetXMLParser::~vtkPointSetXMLParser()
+{
+}
 
 
 void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char ** /*atts */)

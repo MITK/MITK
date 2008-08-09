@@ -67,14 +67,16 @@ public:
 
   mitkClassMacro(SlicesSwiveller, SlicesCoordinator);
   
-  /// @TODO FIX StateMachine smart pointer handling (or learn about the reason)
   static Pointer New();
-  /// @TODO public ONLY because of StateMachine's meddling with m_ReferenceCount
-  SlicesSwiveller(const char* machine);
+  /**
+  * @brief New Macro with one parameter for creating this object with static New(..) method
+  **/
+  mitkNewMacro1Param(Self, const char*);
 
   virtual void SetGeometry(const itk::EventObject& EventObject);
 
 protected:
+  SlicesSwiveller(const char* machine);
 
   // clear list of controllers
   virtual ~SlicesSwiveller();

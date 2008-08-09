@@ -17,10 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkLevelWindowPreset.h"
 #include "mitkStandardFileLocations.h"
+#include <vtkObjectFactory.h>
 
 namespace mitk {
 
-  const std::string LevelWindowPreset::PRESET = "preset";
+const std::string LevelWindowPreset::PRESET = "preset";
+
+vtkStandardNewMacro(LevelWindowPreset);
 
 LevelWindowPreset::LevelWindowPreset()
 {
@@ -142,4 +145,5 @@ void LevelWindowPreset::newPresets(std::map<std::string, double> newLevel, std::
   m_Window = newWindow;
   save();
 }
+
 }

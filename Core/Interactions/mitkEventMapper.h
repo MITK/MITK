@@ -60,10 +60,8 @@ namespace mitk {
   class MITK_CORE_EXPORT EventMapper : public vtkXMLParser
   {
   public:
-    //##ModelId=3F02F896006D
-    EventMapper();
-    //##ModelId=3F02F896008C
-    ~EventMapper();
+    static EventMapper *New();
+    vtkTypeMacro(EventMapper,vtkXMLParser);
 
     //##ModelId=3F0177080269
     typedef std::vector<mitk::EventDescription> EventDescriptionVec;
@@ -124,6 +122,9 @@ namespace mitk {
     friend class mitk::GlobalInteraction;
 
   protected:
+    EventMapper();
+    ~EventMapper();
+
     //##Documentation
     //##@brief method only for GlobalInteraction to change the Event (from DiplayPositionEvent to PositionEvent)
     static void SetStateEvent(Event* event);

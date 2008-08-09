@@ -53,7 +53,7 @@ void mitk::PointSetReader::GenerateData()
     }
     in.close();
 
-    mitk::vtkPointSetXMLParser* parser = new mitk::vtkPointSetXMLParser();
+    mitk::vtkPointSetXMLParser* parser = mitk::vtkPointSetXMLParser::New();
    parser->SetFileName( m_FileName.c_str() );
     if ( parser->Parse() == 0 ) //Parse returns zero as error indicator
     {

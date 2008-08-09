@@ -44,6 +44,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 #include "mitkCoreObjectFactory.h"
 
+#include <vtkObjectFactory.h>
+namespace mitk
+{
+vtkStandardNewMacro(EventMapper);
+}
+
 #ifdef MBI_INTERNAL_CONFERENCE
   #include <mitkGeometry3D.h>
   #include <mitkDisplayPositionEvent.h>
@@ -554,7 +560,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
   if ( fileName.empty() )
     return false;
 
-  mitk::EventMapper* eventMapper = new EventMapper();
+  mitk::EventMapper* eventMapper = EventMapper::New();
   eventMapper->SetFileName( fileName.c_str() );
 
   if ( ! eventMapper->Parse() )

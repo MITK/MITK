@@ -104,10 +104,12 @@ mitk::DataTreeNode::~DataTreeNode()
 {
   Interactor* interactor = this->GetInteractor();
 
-  if ( interactor )
+  if ( ( interactor ) && ( mitk::GlobalInteraction::HasInstance() ) )
   {
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );  
   }
+  m_Mappers.clear();
+  m_Data = NULL;
 }
 
 //##ModelId=3E33F5D7032D

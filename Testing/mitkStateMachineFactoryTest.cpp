@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
 {
   //create statemachinefactory
-  mitk::StateMachineFactory* statemachineFactory = new mitk::StateMachineFactory();
+  mitk::StateMachineFactory* statemachineFactory = mitk::StateMachineFactory::New();
   
   //load standard behavior 
   std::cout << "Testing LoadStandardBehavior(): ";

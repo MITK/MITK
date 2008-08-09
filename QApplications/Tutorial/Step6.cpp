@@ -108,9 +108,6 @@ void Step6::Load(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a tree
-  m_Tree=mitk::DataTree::New();
-
   // Create an iterator on the tree
   mitk::DataTreePreOrderIterator it(m_Tree);
 

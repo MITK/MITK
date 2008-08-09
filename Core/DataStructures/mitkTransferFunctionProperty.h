@@ -83,6 +83,10 @@ namespace mitk {
           : BaseProperty()
         {};
 
+        virtual ~TransferFunctionProperty()
+        {
+        };
+
         TransferFunctionProperty( mitk::TransferFunction::Pointer value )
           : BaseProperty(), m_Value( value )
         {};

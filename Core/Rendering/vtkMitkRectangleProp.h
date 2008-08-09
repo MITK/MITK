@@ -27,8 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {
   public:
-    
     static vtkMitkRectangleProp* New();
+    vtkTypeMacro(vtkMitkRectangleProp,vtkProp);
 
     int RenderOpaqueGeometry(vtkViewport* viewport);
     int RenderTranslucentGeometry(vtkViewport* viewport);

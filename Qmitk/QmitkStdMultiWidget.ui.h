@@ -98,7 +98,7 @@ void QmitkStdMultiWidget::init()
   // m_SlicesRotator = mitk::SlicesRotator::New();
   // @TODO next line causes sure memory leak
   // rotator will be created nonetheless (will be switched on and off)
-  m_SlicesRotator = new mitk::SlicesRotator("slices-rotator");
+  m_SlicesRotator = mitk::SlicesRotator::New("slices-rotator");
   m_SlicesRotator->AddSliceController( 
     mitkWidget1->GetSliceNavigationController() );
   m_SlicesRotator->AddSliceController( 
@@ -107,7 +107,7 @@ void QmitkStdMultiWidget::init()
     mitkWidget3->GetSliceNavigationController() );
 
   // create a slice swiveller (using the same state-machine as SlicesRotator)
-  m_SlicesSwiveller = new mitk::SlicesSwiveller("slices-rotator");
+  m_SlicesSwiveller = mitk::SlicesSwiveller::New("slices-rotator");
   m_SlicesSwiveller->AddSliceController( 
     mitkWidget1->GetSliceNavigationController() );
   m_SlicesSwiveller->AddSliceController( 

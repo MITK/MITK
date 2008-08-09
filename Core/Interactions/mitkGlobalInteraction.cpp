@@ -349,6 +349,11 @@ mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
   return s_GlobalInteraction.GetPointer();
 }
 
+bool mitk::GlobalInteraction::HasInstance()
+{
+  return s_GlobalInteraction.IsNotNull();
+}
+
 bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)
 {
   InteractorListIter position = std::find(m_SelectedList.begin(), m_SelectedList.end(),interactor);

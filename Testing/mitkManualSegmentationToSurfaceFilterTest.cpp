@@ -52,7 +52,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
   try
   {
-    std::cout << "Loading file: ";
+    std::cout << "Loading file: "<<std::flush;
     factory->SetFileName( fileIn.c_str() );
     factory->Update();
 

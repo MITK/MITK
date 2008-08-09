@@ -43,6 +43,9 @@ namespace mitk {
   class MITK_CORE_EXPORT StateMachineFactory : public vtkXMLParser
   {
   public:
+    static StateMachineFactory *New();
+    vtkTypeMacro(StateMachineFactory,vtkXMLParser);
+
     /**
     * @brief Typedef for all states that are defined as start-states
     **/
@@ -64,16 +67,6 @@ namespace mitk {
     * @brief this type holds all states of all statemachines so that a specific state can be accessed for persistence
     **/
     typedef std::map<std::string, StateMachineMapType* > AllStateMachineMapType;
-
-    /**
-    * @brief Default Constructor
-    **/
-    StateMachineFactory();
-
-    /**
-    * @brief Default Destructor
-    **/
-    ~StateMachineFactory();
 
     /**
     * @brief Returns the StartState of the StateMachine with the name type;
@@ -118,6 +111,17 @@ namespace mitk {
     * brief To enable StateMachine to access states
     **/
     friend class StateMachine;
+
+  protected:
+    /**
+    * @brief Default Constructor
+    **/
+    StateMachineFactory();
+
+    /**
+    * @brief Default Destructor
+    **/
+    ~StateMachineFactory();
 
   private:
     /**

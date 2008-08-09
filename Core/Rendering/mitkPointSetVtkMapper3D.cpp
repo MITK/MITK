@@ -80,7 +80,7 @@ mitk::PointSetVtkMapper3D::~PointSetVtkMapper3D()
 {
   m_PointsAssembly->Delete();
 
-  //m_SelectedActor->Delete(); //leads to an exeption
+  m_SelectedActor->Delete();
   m_UnselectedActor->Delete();
   m_ContourActor->Delete();
 }

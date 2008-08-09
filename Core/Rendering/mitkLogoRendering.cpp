@@ -188,7 +188,7 @@ void mitk::LogoRendering::Enable()
             *dest++ = a;
           }        
 
-      m_VtkImageImport->SetImportVoidPointer(m_ImageData);
+      m_VtkImageImport->SetImportVoidPointer(m_ImageData, 0 /*delete on destruct*/);
       m_VtkImageImport->Modified();
       m_VtkImageImport->Update();
       

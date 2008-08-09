@@ -31,14 +31,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAction.h"
 
 
-//##ModelId=3F0189F0025B
 mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationActor* operationActor)
 : mitk::StateMachine(type), m_Destination(operationActor)
 {
   m_CurrentPoint.Fill(0);
 }
 
-//##ModelId=3F0189F00269
+mitk::CoordinateSupplier::~CoordinateSupplier()
+{
+
+}
+
 bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
     bool ok = false;

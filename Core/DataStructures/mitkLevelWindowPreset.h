@@ -25,38 +25,39 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class MITK_CORE_EXPORT LevelWindowPreset : public vtkXMLParser
-  {
-  public:
-    LevelWindowPreset();
-    ~LevelWindowPreset();
+class MITK_CORE_EXPORT LevelWindowPreset : public vtkXMLParser
+{
+public:
+  static LevelWindowPreset *New();
+  vtkTypeMacro(LevelWindowPreset,vtkXMLParser);
 
-    bool LoadPreset();
-    bool LoadPreset(std::string fileName);
-    double getLevel(std::string name);
-    double getWindow(std::string window);
-    std::map<std::string, double>& getLevelPresets();
-    std::map<std::string, double>& getWindowPresets();
-    void newPresets(std::map<std::string, double> newLevel, std::map<std::string, double> newWindow);
-  
+  bool LoadPreset();
+  bool LoadPreset(std::string fileName);
+  double getLevel(std::string name);
+  double getWindow(std::string window);
+  std::map<std::string, double>& getLevelPresets();
+  std::map<std::string, double>& getWindowPresets();
+  void newPresets(std::map<std::string, double> newLevel, std::map<std::string, double> newWindow);
+protected:
+  LevelWindowPreset();
+  ~LevelWindowPreset();
 
-    private:
+private:
+  //##Documentation
+  //## @brief method used in XLM-Reading; gets called when a start-tag is read
+  void StartElement (const char *elementName, const char **atts);
 
-      //##Documentation
-      //## @brief method used in XLM-Reading; gets called when a start-tag is read
-      void StartElement (const char *elementName, const char **atts);
-    
-      void saveXML(mitk::XMLWriter& xmlWriter);
-      void save();
+  void saveXML(mitk::XMLWriter& xmlWriter);
+  void save();
 
-      //##Documentation
-      //## @brief reads an XML-String-Attribute
-      std::string ReadXMLStringAttribut( std::string name, const char** atts);
+  //##Documentation
+  //## @brief reads an XML-String-Attribute
+  std::string ReadXMLStringAttribut( std::string name, const char** atts);
 
-      static const std::string PRESET;
-      std::map<std::string, double> m_Level;
-      std::map<std::string, double> m_Window;
-      std::string m_XmlFileName;
-  };
+  static const std::string PRESET;
+  std::map<std::string, double> m_Level;
+  std::map<std::string, double> m_Window;
+  std::string m_XmlFileName;
+};
 }
 #endif

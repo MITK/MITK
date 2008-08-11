@@ -36,6 +36,6 @@ const char** mitk::SubstractContourTool::GetXPM() const
 
 const char* mitk::SubstractContourTool::GetName() const
 {
-  return "Substract";
+  return "Subtract";
 }
 

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkLevelWindowWidgetContextMenu::QmitkLevelWindowWidgetContextMenu(QWidget * parent, Qt::WindowFlags f )
 : QWidget( parent, f )
 {
-  m_LevelWindowPreset = new mitk::LevelWindowPreset();
+  m_LevelWindowPreset = mitk::LevelWindowPreset::New();
   m_LevelWindowPreset->LoadPreset();
 }
 
@@ -170,7 +170,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     contextMenu->addAction(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
     contextMenu->addAction(tr("Default Scale Range"), this, SLOT(setDefaultScaleRange()));
     contextMenu->addSeparator();
-    
+
     m_PresetSubmenu = new QMenu( this );
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetSubmenu->setTitle("Presets");
@@ -250,7 +250,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     contextMenu->addAction(tr("Change Scale Range"), this, SLOT(changeScaleRange()));
     contextMenu->addAction(tr("Default Scale Range"), this, SLOT(setDefaultScaleRange()));
     contextMenu->addSeparator();
-    
+
     m_PresetSubmenu = new QMenu( this );
     Q_CHECK_PTR( m_PresetSubmenu );
     m_PresetSubmenu->setTitle("Presets");

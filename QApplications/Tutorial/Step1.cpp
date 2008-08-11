@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   }
 
   //*************************************************************************
-  // Part III: Put the data into the tree
+  // Part III: Put the data into the datastorage
   //*************************************************************************
 
   // Create a node and add the Image (which is read from the file) to it

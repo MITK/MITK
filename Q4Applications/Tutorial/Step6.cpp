@@ -27,12 +27,9 @@
 //##Documentation
 //## @brief Start region-grower at interactively added points
 Step6::Step6( int argc, char* argv[], QWidget *parent )
-: QWidget( parent ), m_FirstImage(NULL), m_ResultImage(NULL), 
+: QWidget( parent ), m_FirstImage(NULL), m_ResultImage(NULL),
   m_ResultNode(NULL)
 {
-  // create the tree: this is now a member
-  m_Tree=mitk::DataTree::New();
-
   // load data as in the previous steps; a reference to the first loaded
   // image is kept in the member m_FirstImage and used as input for the
   // region growing
@@ -52,7 +49,7 @@ void Step6::Initialize()
   QHBoxLayout* hlayout = new QHBoxLayout( controlsParent );
   hlayout->setSpacing(2);
 
-  QLabel *labelThresholdMin = 
+  QLabel *labelThresholdMin =
     new QLabel( "Lower Threshold:", controlsParent );
   hlayout->addWidget( labelThresholdMin );
 
@@ -62,7 +59,7 @@ void Step6::Initialize()
   QLabel *labelThresholdMax =
     new QLabel( "Upper Threshold:", controlsParent );
   hlayout->addWidget( labelThresholdMax );
-  
+
   m_LineEditThresholdMax = new QLineEdit( "-400", controlsParent );
   hlayout->addWidget( m_LineEditThresholdMax );
 
@@ -112,9 +109,6 @@ void Step6::Load(int argc, char* argv[])
   // Create a tree
   m_Tree=mitk::DataTree::New();
 
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(m_Tree);
-
   // Create DataStorageInstance
   mitk::DataStorage::CreateInstance(m_Tree);
 
@@ -136,7 +130,7 @@ void Step6::Load(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      // Part III: Put the data into the tree
+      // Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,
@@ -164,20 +158,20 @@ void Step6::SetupWidgets()
   //*************************************************************************
   // Part I: Create windows and pass the tree to it
   //*************************************************************************
-  
+
   // Create toplevel widget with vertical layout
   QVBoxLayout* vlayout = new QVBoxLayout(this);
   vlayout->setMargin(0);
   vlayout->setSpacing(2);
-  
+
   // Create viewParent widget with horizontal layout
   QWidget* viewParent = new QWidget(this);
   vlayout->addWidget(viewParent);
-  
+
   QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
   hlayout->setMargin(0);
   hlayout->setSpacing(2);
-  
+
   //*************************************************************************
   // Part Ia: 3D view
   //*************************************************************************
@@ -185,7 +179,7 @@ void Step6::SetupWidgets()
   // Create a renderwindow
   QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);
   hlayout->addWidget(renderWindow);
-  
+
   // Tell the renderwindow which (part of) the tree to render
   renderWindow->GetRenderer()->SetData(&it);
 
@@ -200,7 +194,7 @@ void Step6::SetupWidgets()
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
   hlayout->addWidget(view2);
-  
+
   // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2->SetData(&it);

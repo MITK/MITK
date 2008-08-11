@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      //Part III: Put the data into the tree
+      //Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,
@@ -92,25 +92,25 @@ int main(int argc, char* argv[])
   //*************************************************************************
   // Part IV: Create windows and pass the tree to it
   //*************************************************************************
-  
+
   // Create toplevel widget with horizontal layout
   QWidget toplevelWidget;
   QHBoxLayout layout;
   layout.setSpacing(2);
   layout.setMargin(0);
   toplevelWidget.setLayout(&layout);
-  
+
   //*************************************************************************
   // Part IVa: 3D view
   //*************************************************************************
-  
+
   // Create a renderwindow
   QmitkRenderWindow renderWindow(&toplevelWidget);
   layout.addWidget(&renderWindow);
-  
+
   // Tell the renderwindow which (part of) the datastorage to render
   renderWindow.GetRenderer()->SetData(storage);
-  
+
   // Use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view3(&toplevelWidget);
   layout.addWidget(&view3);
-  
+
   // Tell the QmitkSliceWidget which (part of) the datastorage to render
   // and to slice sagitally
   view3.SetData(&it, mitk::SliceNavigationController::Sagittal);

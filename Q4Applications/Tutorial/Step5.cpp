@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      // Part III: Put the data into the tree
+      // Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
   // *******************************************************
   // ****************** START OF NEW PART ******************
   // *******************************************************
-  
+
   //*************************************************************************
   // Part VI: For allowing to interactively add points ...
   //*************************************************************************
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
   layout.setSpacing(2);
   layout.setMargin(0);
   toplevelWidget.setLayout(&layout);
-  
+
   //*************************************************************************
   // Part Va: 3D view
   //*************************************************************************
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
   // Create a renderwindow
   QmitkRenderWindow renderWindow(&toplevelWidget);
   layout.addWidget(&renderWindow);
-  
+
   // Tell the renderwindow which (part of) the tree to render
   renderWindow.GetRenderer()->SetData(storage);
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view2(&toplevelWidget);
   layout.addWidget(&view2);
-  
+
   // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2.SetData(&it);
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
   // QmitkRenderWindow, but additionally provides sliders
   QmitkSliceWidget view3(&toplevelWidget);
   layout.addWidget(&view3);
-  
+
   // Tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
   view3.SetData(&it, mitk::SliceNavigationController::Sagittal);

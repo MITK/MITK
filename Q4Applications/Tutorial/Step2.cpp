@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
   if(argc<2)
   {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", 
+    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n",
       itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
   }
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      // Part III: Put the data into the tree
+      // Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it
   //*************************************************************************
-  
+
   // Create a RenderWindow
   QmitkRenderWindow renderWindow;
 

@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      //Part III: Put the data into the tree
+      //Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,

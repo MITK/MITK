@@ -31,12 +31,6 @@ Step6::Step6( int argc, char *argv[], QWidget *parent, const char *name )
 : QMainWindow ( parent, name ), m_FirstImage(NULL), m_ResultImage(NULL),
   m_ResultNode(NULL)
 {
-  // create the tree: this is now a member
-  m_Tree=mitk::DataTree::New();
-
-  // create a datastorage object
-  mitk::DataStorage::CreateInstance(m_Tree);
-
   // load data as in the previous steps; a reference to the first loaded
   // image is kept in the member m_FirstImage and used as input for the
   // region growing
@@ -108,11 +102,12 @@ void Step6::Load(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(m_Tree);
+  // create the tree: this is now a member
+  m_Tree=mitk::DataTree::New();
 
-  // Create DataStorageInstance
+  // create a datastorage object
   mitk::DataStorage::CreateInstance(m_Tree);
+
 
   //*************************************************************************
   // Part II: Create some data by reading files
@@ -132,7 +127,7 @@ void Step6::Load(int argc, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
       //*********************************************************************
-      // Part III: Put the data into the tree
+      // Part III: Put the data into the datastorage
       //*********************************************************************
 
       // Since the DataTreeNodeFactory directly creates a node,

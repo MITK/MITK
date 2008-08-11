@@ -87,7 +87,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceVtkWriterFactory.h"
 
 #include "mitkAddContourToolFactory.h"
-#include "mitkSubstractContourToolFactory.h"
+#include "mitkSubtractContourToolFactory.h"
 #include "mitkRegionGrowingToolFactory.h"
 #include "mitkCorrectorTool2DFactory.h"
 #include "mitkFillRegionToolFactory.h"
@@ -247,7 +247,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     mitk::ImageWriterFactory::RegisterOneFactory();
 
     itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( SubstractContourToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( SubtractContourToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( RegionGrowingToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( CorrectorTool2DFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( FillRegionToolFactory::New() );

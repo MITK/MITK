@@ -60,6 +60,6 @@ SET( TOOL_FILES
   mitkEraseRegionTool.cpp
   mitkFillRegionTool.cpp
   mitkRegionGrowingTool.cpp
-  mitkSubstractContourTool.cpp
+  mitkSubtractContourTool.cpp
 )
 

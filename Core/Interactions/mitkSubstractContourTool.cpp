@@ -15,26 +15,26 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "mitkSubstractContourTool.h"
+#include "mitkSubtractContourTool.h"
 
-#include "mitkSubstractContourTool.xpm"
+#include "mitkSubtractContourTool.xpm"
 
-mitk::SubstractContourTool::SubstractContourTool()
+mitk::SubtractContourTool::SubtractContourTool()
 :ContourTool(0)
 {
   FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 }
 
-mitk::SubstractContourTool::~SubstractContourTool()
+mitk::SubtractContourTool::~SubtractContourTool()
 {
 }
 
-const char** mitk::SubstractContourTool::GetXPM() const
+const char** mitk::SubtractContourTool::GetXPM() const
 {
-  return mitkSubstractContourTool_xpm;
+  return mitkSubtractContourTool_xpm;
 }
 
-const char* mitk::SubstractContourTool::GetName() const
+const char* mitk::SubtractContourTool::GetName() const
 {
   return "Subtract";
 }

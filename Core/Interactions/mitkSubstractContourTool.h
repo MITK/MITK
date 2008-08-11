@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkSubstractContourTool_h_Included
-#define mitkSubstractContourTool_h_Included
+#ifndef mitkSubtractContourTool_h_Included
+#define mitkSubtractContourTool_h_Included
 
 #include "mitkContourTool.h"
 
@@ -32,7 +32,7 @@ namespace mitk
   \ingroup Reliver
 
   Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
-  is released, SubstractContourTool tries to extract a slice from the working image and fill in
+  is released, SubtractContourTool tries to extract a slice from the working image and fill in
   the (filled) contour as a binary image. All inside pixels are set to 0.
   
   While holding the CTRL key, the contour changes color and the pixels on the inside would be
@@ -43,20 +43,20 @@ namespace mitk
 
   $Author$
 */
-class MITK_CORE_EXPORT SubstractContourTool : public ContourTool
+class MITK_CORE_EXPORT SubtractContourTool : public ContourTool
 {
   public:
     
-    mitkClassMacro(SubstractContourTool, ContourTool);
-    itkNewMacro(SubstractContourTool);
+    mitkClassMacro(SubtractContourTool, ContourTool);
+    itkNewMacro(SubtractContourTool);
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
 
   protected:
     
-    SubstractContourTool(); // purposely hidden
-    virtual ~SubstractContourTool();
+    SubtractContourTool(); // purposely hidden
+    virtual ~SubtractContourTool();
 
 };
 

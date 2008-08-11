@@ -176,7 +176,7 @@ There should be different results, depending on the line's properties:
 connected to a contour and the area enclosed by the contour will be marked as segmentation.
 
 2. When the whole line is inside a segmentation, start and end point will be connected to
-a contour and the area of this contour will be substracted from the segmentation.
+a contour and the area of this contour will be subtracted from the segmentation.
 
 3. When the line starts inside a segmentation and ends outside with only a single
 transition from segmentation to no-segmentation, nothing will happen.
@@ -184,7 +184,7 @@ transition from segmentation to no-segmentation, nothing will happen.
 4. When there are multiple transitions between inside-segmentation and
 outside-segmentation, the line will be divided in so called segments. Each segment is
 either fully inside or fully outside a segmentation. When it is inside a segmentation, its
-enclosed area will be substracted from the segmentation. When the segment is outside a
+enclosed area will be subtracted from the segmentation. When the segment is outside a
 segmentation, its enclosed area it will be added to the segmentation.
 
 The algorithm is described in full length in Tobias Heimann's diploma thesis 

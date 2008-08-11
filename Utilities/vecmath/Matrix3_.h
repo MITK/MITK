@@ -352,7 +352,7 @@ public:
     void add(T scalar);
 
     /**
-      * Substracts a scalar from each component of this matrix.
+      * Subtracts a scalar from each component of this matrix.
       * @param scalar The scalar adder.
       */
     void sub(T scalar);

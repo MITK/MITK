@@ -78,7 +78,7 @@ class MITK_CORE_EXPORT FeedbackContourTool : public SegTool2D
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
       
-      \param correctionForIpSegmentation substracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
+      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
     Contour::Pointer BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 

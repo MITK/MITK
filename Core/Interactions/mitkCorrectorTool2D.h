@@ -39,7 +39,7 @@ class Image;
   \ingroup Reliver
 
   Lets the user draw a (multi-point) line and intelligently decides what to do. The underlying algorithm
-  tests if the line begins and ends inside or outside a segmentation and either adds or substracts a piece of
+  tests if the line begins and ends inside or outside a segmentation and either adds or subtracts a piece of
   segmentation.
 
   \warning Only to be instantiated by mitk::ToolManager.

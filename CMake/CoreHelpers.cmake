@@ -6,7 +6,7 @@
 #
 
 MACRO(ORGANIZE_SOURCES)
-  
+
   # this macro gets a filelist as input and looks
   # for corresponding h-files to add them to the project.
   
@@ -45,78 +45,81 @@ MACRO(ORGANIZE_SOURCES)
   
   # iterate through sources
   FOREACH(MYFILE ${ARGV} )#${GLOBBED_TXX_FILES})
-    STRING(REGEX MATCH "cxx$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("Generated Source Files" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH "cpp$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("== Source Files ==" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH ".*\\moc_.*cxx$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("Generated MOC Source Files" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH "txx$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("== Template Files ==" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH "c$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("== Source Files ==" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH "h$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("== Header Files ==" FILES ${MYFILE})
-    ENDIF(RESULT)
-    STRING(REGEX MATCH "ui$" RESULT ${MYFILE})
-    IF(RESULT)
-      SOURCE_GROUP("UI XML-Files" FILES ${MYFILE})
-    ENDIF(RESULT)
-    
-    # include header files in visual studio solution
-    STRING(REGEX MATCH "(txx|cpp|c|cxx)$" RESULT ${MYFILE})
-    IF(RESULT)
-      STRING(REGEX REPLACE "(txx|cpp|c|cxx)$" "h" H_FILE ${MYFILE})
-      IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE})
-        SET(CORRESPONDING_H_FILES
-          ${CORRESPONDING_H_FILES}
-          ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
-        )
-        SOURCE_GROUP("== Header Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE} )
-      ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE})
-    ENDIF(RESULT)
-    
-    # include txx files in visual studio solution
-    STRING(REGEX MATCH "(h|cpp|c|cxx)$" RESULT ${MYFILE})
-    IF(RESULT)
-      STRING(REGEX REPLACE "(h|cpp|c|cxx)$" "txx" TXX_FILE ${MYFILE})
-      IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE})
-        SET(CORRESPONDING_TXX_FILES
-          ${CORRESPONDING_TXX_FILES}
-          ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE}
-        )
-        SOURCE_GROUP("== Template Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE} )
-      ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE})
-    ENDIF(RESULT)
-    
-    # include ui.h files in visual studio solution
-    STRING(REGEX MATCH "(ui)$" RESULT ${MYFILE})
-    IF(RESULT)
-      STRING(REGEX REPLACE "(ui)$" "ui.h" UI_H_FILE ${MYFILE})
-      IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE})
-        SET(CORRESPONDING_UI_H_FILES
-          ${CORRESPONDING_UI_H_FILES}
-          ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE}
-        )
-        SOURCE_GROUP("== Header Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE} )
-      ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE})
-    ENDIF(RESULT)
-    
+    IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${MYFILE})
+      STRING(REGEX MATCH "cxx$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("Generated Source Files" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH "cpp$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("== Source Files ==" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH ".*\\moc_.*cxx$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("Generated MOC Source Files" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH "txx$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("== Template Files ==" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH "c$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("== Source Files ==" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH "h$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("== Header Files ==" FILES ${MYFILE})
+      ENDIF(RESULT)
+      STRING(REGEX MATCH "ui$" RESULT ${MYFILE})
+      IF(RESULT)
+        SOURCE_GROUP("UI XML-Files" FILES ${MYFILE})
+      ENDIF(RESULT)
+      
+      # include header files in visual studio solution
+      STRING(REGEX MATCH "(txx|cpp|c|cxx)$" RESULT ${MYFILE})
+      IF(RESULT)
+        STRING(REGEX REPLACE "(txx|cpp|c|cxx)$" "h" H_FILE ${MYFILE})
+        IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE})
+          SET(CORRESPONDING_H_FILES
+            ${CORRESPONDING_H_FILES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE}
+          )
+          SOURCE_GROUP("== Header Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE} )
+        ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${H_FILE})
+      ENDIF(RESULT)
+      
+      # include txx files in visual studio solution
+      STRING(REGEX MATCH "(h|cpp|c|cxx)$" RESULT ${MYFILE})
+      IF(RESULT)
+        STRING(REGEX REPLACE "(h|cpp|c|cxx)$" "txx" TXX_FILE ${MYFILE})
+        IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE})
+          SET(CORRESPONDING_TXX_FILES
+            ${CORRESPONDING_TXX_FILES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE}
+          )
+          SOURCE_GROUP("== Template Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE} )
+        ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TXX_FILE})
+      ENDIF(RESULT)
+      
+      # include ui.h files in visual studio solution
+      STRING(REGEX MATCH "(ui)$" RESULT ${MYFILE})
+      IF(RESULT)
+        STRING(REGEX REPLACE "(ui)$" "ui.h" UI_H_FILE ${MYFILE})
+        IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE})
+          SET(CORRESPONDING_UI_H_FILES
+            ${CORRESPONDING_UI_H_FILES}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE}
+          )
+          SOURCE_GROUP("== Header Files ==" FILES ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE} )
+        ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${UI_H_FILE})
+      ENDIF(RESULT)
+    ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${MYFILE})
   ENDFOREACH(MYFILE)
+  
   IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Register${FUNC_NAME}.cpp")
     SOURCE_GROUP("Generated Source Files" FILES "${CMAKE_CURRENT_BINARY_DIR}/Register${FUNC_NAME}.cpp")
   ENDIF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Register${FUNC_NAME}.cpp")
+  
 ENDMACRO(ORGANIZE_SOURCES)
 
 MACRO(CREATE_CORE_LIB)

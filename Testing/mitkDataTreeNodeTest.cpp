@@ -17,6 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNode.h"
 
+#include "vtkWindow.h"
+#include <mitkVtkPropRenderer.h>
+
 #include "mitkTestingMacros.h"
 
 #include <iostream>
@@ -88,6 +91,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkDisplayPointSetInteractor.h>
 
+//Propertylist Test
+//#include <mitkAnnotationProperty.h>
+//#include <mitkClippingProperty.h>
+//#include <mitkColorProperty.h>
+//#include <mitkEnumerationProperty.h>
+//  #include <mitkGridRepresentationProperty.h>
+//  #include <mitkGridVolumeMapperProperty.h>
+//  #include <mitkOrganTypeProperty.h>
+//  #include <mitkVtkInterpolationProperty.h>
+//  #include <mitkVtkRepresentationProperty.h>
+//  #include <mitkVtkResliceInterpolationProperty.h>
+//  #include <mitkVtkScalarModeProperty.h>
+//
+
+
 
 
 /**
@@ -112,7 +130,8 @@ static void TestDataSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   baseData = mitk::ColoredRectangleRendering::New();
   dataTreeNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataTreeNode->GetData(), "Testing if a ColoredRectangleRendering object was set correctly" )
-    
+//  MITK_TEST_CONDITION( baseData->GetGeometry(0)->GetVtkTransform() == dataTreeNode->GetVtkTransform(0), "Testing if a NULL pointer was set correctly" )    
+  
   baseData = mitk::Contour::New();
   dataTreeNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataTreeNode->GetData(), "Testing if a Contour object was set correctly" )
@@ -364,6 +383,60 @@ static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a DisplayPointSetInteractor was set correctly" )
 
 }
+static void mitkDataTreeNodeTestClass::TestPropertyList(mitk::DataTreeNode::Pointer dataTreeNode)
+{
+
+  mitk::PropertyList::Pointer propertyList =  dataTreeNode->GetPropertyList();
+   
+
+  MITK_TEST_CONDITION(dataTreeNode->GetPropertyList() != NULL, "Testing if the constructor set the propertylist" )
+    
+//  MITK_TEST_CONDITION(dataTreeNode->AddProperty() != NULL, "Testing if t" )
+
+  MITK_TEST_CONDITION(propertyList == dataTreeNode->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
+
+
+}
+static void mitkDataTreeNodeTestClass::TestSelected(mitk::DataTreeNode::Pointer dataTreeNode)
+{
+  vtkRenderWindow *renderWindow = vtkRenderWindow::New();
+ 
+  mitk::VtkPropRenderer::Pointer base = mitk::VtkPropRenderer::New( "the first renderer", renderWindow );
+
+  //with BaseRenderer==Null
+  MITK_TEST_CONDITION(!dataTreeNode->IsSelected(), "Testing if this node is not set as selected" )
+
+  dataTreeNode->SetSelected(true);
+  MITK_TEST_CONDITION(dataTreeNode->IsSelected(), "Testing if this node is set as selected" )
+  dataTreeNode->SetSelected(false);
+
+  dataTreeNode->SetSelected(true,base);
+
+  MITK_TEST_CONDITION(dataTreeNode->IsSelected(base), "Testing if this node with right base renderer is set as selected" )
+
+
+
+
+}
+static void mitkDataTreeNodeTestClass::TestGetMTime(mitk::DataTreeNode::Pointer dataTreeNode)
+{
+  unsigned long time;
+  time = dataTreeNode->GetMTime();
+  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  
+  dataTreeNode->SetData(pointSet);
+  MITK_TEST_CONDITION( time != dataTreeNode->GetMTime(), "Testing if the node timestamp is updated after adding data to the node" )
+  
+  mitk::Point3D point;
+  point.Fill(3.0);
+  pointSet->SetPoint(0,point);
+
+  //less or equal because dataTreeNode timestamp is little later then the basedata timestamp
+  MITK_TEST_CONDITION( pointSet->GetMTime() <= dataTreeNode->GetMTime(), "Testing if the node timestamp is updated after base data was modified" )
+
+
+
+}
 }; //mitkDataTreeNodeTestClass
 int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
 {
@@ -382,6 +455,12 @@ int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
   mitkDataTreeNodeTestClass::TestDataSetting(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestMapperSetting(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestInteractorSetting(myDataTreeNode);
+  mitkDataTreeNodeTestClass::TestPropertyList(myDataTreeNode);
+  mitkDataTreeNodeTestClass::TestSelected(myDataTreeNode);
+  mitkDataTreeNodeTestClass::TestGetMTime(myDataTreeNode);
+
+ 
+
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

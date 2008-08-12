@@ -383,7 +383,7 @@ static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a DisplayPointSetInteractor was set correctly" )
 
 }
-static void mitkDataTreeNodeTestClass::TestPropertyList(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestPropertyList(mitk::DataTreeNode::Pointer dataTreeNode)
 {
 
   mitk::PropertyList::Pointer propertyList =  dataTreeNode->GetPropertyList();
@@ -397,7 +397,7 @@ static void mitkDataTreeNodeTestClass::TestPropertyList(mitk::DataTreeNode::Poin
 
 
 }
-static void mitkDataTreeNodeTestClass::TestSelected(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestSelected(mitk::DataTreeNode::Pointer dataTreeNode)
 {
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
  
@@ -418,7 +418,7 @@ static void mitkDataTreeNodeTestClass::TestSelected(mitk::DataTreeNode::Pointer 
 
 
 }
-static void mitkDataTreeNodeTestClass::TestGetMTime(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestGetMTime(mitk::DataTreeNode::Pointer dataTreeNode)
 {
   unsigned long time;
   time = dataTreeNode->GetMTime();

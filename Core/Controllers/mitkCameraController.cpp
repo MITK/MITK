@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 
-mitk::CameraController::CameraController(const char * type) : BaseController(type), m_Renderer(NULL)
+mitk::CameraController::CameraController(const char * type) : BaseController(type), m_Renderer(NULL), m_ZoomFactor(1.0)
 {}
 
 
@@ -119,23 +119,22 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
     vtkRenderer->ResetCamera();
     
     double *cameraPosition = vtkRenderer->GetActiveCamera()->GetPosition();
-    double zoomFactor = 1.0;
     
     switch(view)
     {
     case ANTERIOR:
     case POSTERIOR:
-      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1] / zoomFactor,cameraPosition[2]);
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1] / m_ZoomFactor,cameraPosition[2]);
       break;
 
     case SINISTER:
     case DEXTER:
-      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0] / zoomFactor,cameraPosition[1],cameraPosition[2]);
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0] / m_ZoomFactor,cameraPosition[1],cameraPosition[2]);
       break;
 
     case CRANIAL:
     case CAUDAL:
-      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2] / zoomFactor);
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2] / m_ZoomFactor);
       break;
     }
 

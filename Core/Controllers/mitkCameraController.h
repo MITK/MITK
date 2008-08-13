@@ -42,7 +42,9 @@ public:
     mitkNewMacro1Param(Self, const char*);
     
     itkSetMacro(Renderer,BaseRenderer*);
+    itkSetMacro(ZoomFactor,double);
     itkGetConstMacro(Renderer,const BaseRenderer*);
+    itkGetConstMacro(ZoomFactor,double);
 
     //##Documentation
     //## @brief Implemented in sub-classes.
@@ -80,6 +82,8 @@ protected:
     **/
     virtual ~CameraController();
     const BaseRenderer* m_Renderer;
+
+    double m_ZoomFactor; ///< zoom factor used for the standard view camera
 };
 
 } // namespace mitk

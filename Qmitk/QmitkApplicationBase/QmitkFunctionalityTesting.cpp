@@ -118,9 +118,9 @@ void QmitkFunctionalityTesting::ActivateNextFunctionality()
   QmitkFunctionality* activeFunctionality = m_QmitkFctMediator->GetActiveFunctionality();
   if (activeFunctionality)
   {
-        std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
         if (m_TestType & GUITest)
         {
+            std::cout << "GUI test for \"" << activeFunctionality->className() <<"\": "<< std::flush;
             if ( activeFunctionality->TestYourself() == EXIT_SUCCESS )
             {
             std::cout<<"[PASSED]"<<std::endl;

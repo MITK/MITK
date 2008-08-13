@@ -208,5 +208,6 @@ int QmitkFunctionality::TestOptions()
 {
     QWidget* optionWidget = this -> CreateOptionWidget(NULL);
     this -> OptionsChanged(optionWidget);
+    delete optionWidget;
     return EXIT_SUCCESS;
 }

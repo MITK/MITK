@@ -1077,6 +1077,15 @@ void QmitkMainTemplate::parseCommandLine()
     if(strcmp(qApp->argv()[i], "-testing")==0) {
       break;
     }
+    
+    if(strcmp(qApp->argv()[i], "-optiontesting")==0) {
+      break;
+    }
+    
+    if(strcmp(qApp->argv()[i], "-alltesting")==0) {
+      break;
+    }
+    
     if(strcmp(qApp->argv()[i], "-testEmptyImage")==0) {
       mitk::DataTreePreOrderIterator it(m_Tree);
       mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();

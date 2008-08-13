@@ -3,6 +3,7 @@ SET(datatypes Image Surface PointSet Node)
 
 IF(MITK_APPLICATION_TESTING)
   ADD_TEST(MainAppWithoutData ${EXECUTABLE_OUTPUT_PATH}/MainApp -noMITKOptions -testing)
+  ADD_TEST(MainAppOptionTesting ${EXECUTABLE_OUTPUT_PATH}/MainApp -noMITKOptions -optiontesting)
   FOREACH(datatype ${datatypes})
     ADD_TEST(MainApp_Empty${datatype} ${EXECUTABLE_OUTPUT_PATH}/MainApp -testEmpty${datatype} -noMITKOptions -testing)
   ENDFOREACH(datatype)

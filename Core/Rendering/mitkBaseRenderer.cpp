@@ -107,7 +107,7 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
 }
 
 mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-  m_MapperID(defaultMapper), m_RenderWindow(NULL), m_VtkRenderer(NULL), m_DataTreeIterator(NULL),
+  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataTreeIterator(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),

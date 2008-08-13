@@ -42,7 +42,6 @@ class CameraRotationController;
 class CameraController;
 class DataStorage;
 
-//##ModelId=3C6E9AA90306
 //##Documentation
 //## @brief Organizes the rendering process
 //##
@@ -78,10 +77,8 @@ public:
   itkEventMacro( RendererResetEvent, itk::AnyEvent );
 
   /** Standard class typedefs. */
-  //##ModelId=3E691E0901DB
   mitkClassMacro(BaseRenderer, itk::Object);
 
-  //##ModelId=3E3D2F120050
   BaseRenderer( const char* name = NULL, vtkRenderWindow * renWin = NULL );
 
   //##Documentation
@@ -90,13 +87,11 @@ public:
 
   enum StandardMapperSlot{Standard2D=1, Standard3D=2};
 
-  //##ModelId=3D6A1791038B
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.
   virtual void SetData(const DataTreeIteratorBase* iterator);
   virtual void SetData(DataStorage* storage);
 
-  //##ModelId=3E6423D20245
   //##Documentation
   //## @brief Get the DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
   virtual DataTreeIteratorBase* GetData() const
@@ -104,7 +99,6 @@ public:
     return m_DataTreeIterator.GetPointer();
   };
 
-  //##ModelId=3E6423D20264
   //##Documentation
   //## @brief Access the RenderWindow into which this renderer renders.
   vtkRenderWindow* GetRenderWindow() const
@@ -119,32 +113,26 @@ public:
   vtkRenderWindow* m_RenderWindow;
   vtkRenderer*     m_VtkRenderer;
 
-  //##ModelId=3E330C4D0395
   //##Documentation
   //## @brief Default mapper id to use.
   static const MapperSlotId defaultMapper;
 
-  //##ModelId=3E33162C00D0
   //##Documentation
   //## @brief Do the rendering and flush the result.
   virtual void Paint();
 
-  //##ModelId=3E331632031E
   //##Documentation
   //## @brief Initialize the RenderWindow. Should only be called from RenderWindow.
   virtual void Initialize();
 
-  //##ModelId=3E33163703D9
   //##Documentation
   //## @brief Called to inform the renderer that the RenderWindow has been resized.
   virtual void Resize(int w, int h);
 
-  //##ModelId=3E33163A0261
   //##Documentation
   //## @brief Initialize the renderer with a RenderWindow (@a renderwindow).
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
 
-  //##ModelId=3E3799250397
   //##Documentation
   //## @brief Set the initial size. Called by RenderWindow after it has become
   //## visible for the first time.
@@ -314,17 +302,14 @@ public:
 
   itkGetMacro(EmptyWorldGeometry, bool);
 
-  //##ModelId=3E6D5DD30322
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
   virtual void MousePressEvent(MouseEvent*);
-  //##ModelId=3E6D5DD30372
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
   virtual void MouseReleaseEvent(MouseEvent*);
-  //##ModelId=3E6D5DD303C2
   //##Documentation
   //## @brief Mouse event dispatchers
   //## @note for internal use only. preliminary.
@@ -333,7 +318,6 @@ public:
   //## @brief Wheel event dispatcher
   //## @note for internal use only. preliminary.
   virtual void WheelEvent(mitk::WheelEvent*);
-  //##ModelId=3E6D5DD4002A
   //##Documentation
   //## @brief Key event dispatcher
   //## @note for internal use only. preliminary.
@@ -370,31 +354,24 @@ public:
   
 protected:
 
-  //##ModelId=3E3D2F12008C
   virtual ~BaseRenderer();
 
-
-  //##ModelId=3E330B930328
   //##Documentation
   //## @brief Call update of all mappers. To be implemented in subclasses.
   virtual void Update() = 0;
 
-  //##ModelId=3E3D381A027D
   //##Documentation
   //## @brief MapperSlotId to use. Defines which kind of mapper (e.g., 2D or 3D) shoud be used.
   MapperSlotId m_MapperID;
 
-  //##ModelId=3E330D6902E8
   //##Documentation
   //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
   DataTreeIteratorClone m_DataTreeIterator;
 
-  //##ModelId=3E6423D20213
   //##Documentation
   //## @brief Timestamp of last call of Update().
   unsigned long m_LastUpdateTime;
 
-  //##ModelId=3E6D5DD30232
   //##Documentation
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
@@ -403,14 +380,10 @@ protected:
   CameraRotationController::Pointer   m_CameraRotationController;
 
 
-
-
-  //##ModelId=3E6D5DD302E6
   //##Documentation
   //## @brief Size of the RenderWindow.
   int m_Size[2];
 
-  //##ModelId=3ED91D0400D3
   //##Documentation
   //## @brief Contains whether the renderer that it is focused. The caller of
   //## SetFocused is responsible for focus management, not the renderer itself.
@@ -448,7 +421,6 @@ private:
   //## Pointer to the current 3D-worldgeometry.
   Geometry3D::Pointer m_CurrentWorldGeometry;
 
-  //##ModelId=3EDD039F00A9
   //##Documentation
   //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry
   //## describes the maximal area (2D manifold) to be rendered in case we
@@ -459,7 +431,6 @@ private:
   //## very strange when suddenly the image-slice changes its geometry).
   Geometry2D::Pointer m_CurrentWorldGeometry2D;
 
-  //##ModelId=3EDD039F002C
   //##Documentation
   //## Pointer to the displaygeometry. The displaygeometry describes the
   //## geometry of the \em visible area in the window controlled by the renderer
@@ -496,11 +467,9 @@ protected:
   //##Documentation
   //## Data object containing the m_WorldGeometry defined above.
   Geometry2DData::Pointer m_WorldGeometryData;
-  //##ModelId=3E66BDF000F4
   //##Documentation
   //## Data object containing the m_DisplayGeometry defined above.
   Geometry2DData::Pointer m_DisplayGeometryData;
-  //##ModelId=3E66CC5901C1
   //##Documentation
   //## Data object containing the m_CurrentWorldGeometry2D defined above.
   Geometry2DData::Pointer m_CurrentWorldGeometry2DData;
@@ -508,20 +477,16 @@ protected:
   //##Documentation
   //## DataTreeNode objects containing the m_WorldGeometryData defined above.
   DataTreeNode::Pointer m_WorldGeometryNode;
-  //##ModelId=3ED91D04020B
   //##Documentation
   //## DataTreeNode objects containing the m_DisplayGeometryData defined above.
   DataTreeNode::Pointer m_DisplayGeometryNode;
-  //##ModelId=3ED91D040288
   //##Documentation
   //## DataTreeNode objects containing the m_CurrentWorldGeometry2DData defined above.
   DataTreeNode::Pointer m_CurrentWorldGeometry2DNode;
 
-  //##ModelId=3ED91D040305
   //##Documentation
   //## @brief test only
   unsigned long m_DisplayGeometryTransformTime;
-  //##ModelId=3ED91D040382
   //##Documentation
   //## @brief test only
   unsigned long m_CurrentWorldGeometry2DTransformTime;

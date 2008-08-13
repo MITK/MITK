@@ -882,10 +882,6 @@ mitk::ImageMapper2D::Clear()
     it->second.RemoveObserver();
     it->second.Squeeze();
   }
-  //@FIXME: durch die folgende Zeile sollte doch wohl der desctructor von
-  // RendererInfo aufgerufen werden. Das passiert aber nie. Deshalb wird bei
-  // der Programm-Beendung auch das iil4mitkImage und damit die textur nicht
-  // rechtzeitig freigegeben und das Programm crashed.
   m_RendererInfo.clear();
 }
 
@@ -1075,10 +1071,6 @@ mitk::ImageMapper2D::RendererInfo
   {
     m_Image->Delete();
   }
-
-  //delete m_iil4mitkImage;
-  //@FIXME: diese Zeile wird nie erreicht, s. Kommentar im desctuctor von
-  //ImageMapper2D
 }
 
 

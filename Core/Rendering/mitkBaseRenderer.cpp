@@ -106,10 +106,8 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
   return NULL;
 }
 
-
-//##ModelId=3E3D2F120050
 mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-  m_MapperID(defaultMapper), m_DataTreeIterator(NULL),
+  m_MapperID(defaultMapper), m_RenderWindow(NULL), m_VtkRenderer(NULL), m_DataTreeIterator(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
@@ -133,7 +131,10 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   }
 
   if(renWin != NULL)
+  {
     m_RenderWindow = renWin;
+    m_RenderWindow->Register(NULL);
+  }
   else
   {
     itkWarningMacro(<< "Created mitkBaseRenderer without vtkRenderWindow present.");
@@ -179,7 +180,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_CameraRotationController->SetRenderWindow( m_RenderWindow );
   m_CameraRotationController->AcquireCamera();
 
-  m_CameraController = VtkInteractorCameraController::New(); //B/
+  m_CameraController = VtkInteractorCameraController::New();
 
   m_VtkRenderer = vtkRenderer::New();
 
@@ -193,7 +194,6 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
 }
 
 
-//##ModelId=3E3D2F12008C
 mitk::BaseRenderer::~BaseRenderer()
 {
   if(m_VtkRenderer!=NULL)
@@ -209,9 +209,14 @@ mitk::BaseRenderer::~BaseRenderer()
   
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
   m_DataTreeIterator = NULL;
+
+  if(m_RenderWindow!=NULL)
+  {
+    m_RenderWindow->Delete();
+    m_RenderWindow = NULL;
+  }
 }
 
-//##ModelId=3D6A1791038B
 void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
 {
   if(m_DataTreeIterator != iterator)
@@ -233,20 +238,16 @@ void mitk::BaseRenderer::SetData(DataStorage* storage)
   }
 }
 
-//##ModelId=3E330C4D0395
 const mitk::BaseRenderer::MapperSlotId mitk::BaseRenderer::defaultMapper = 1;
 
-//##ModelId=3E33162C00D0
 void mitk::BaseRenderer::Paint()
 {
 }
 
-//##ModelId=3E331632031E
 void mitk::BaseRenderer::Initialize()
 {
 }
 
-//##ModelId=3E33163703D9
 void mitk::BaseRenderer::Resize(int w, int h)
 {
   m_Size[0] = w;
@@ -258,10 +259,17 @@ void mitk::BaseRenderer::Resize(int w, int h)
   GetDisplayGeometry()->SetSizeInDisplayUnits(w, h);
 }
 
-//##ModelId=3E33163A0261
 void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
 {
+  if(m_RenderWindow != NULL)
+  {
+    m_RenderWindow->Delete();
+  }
   m_RenderWindow = renderwindow;
+  if(m_RenderWindow != NULL)
+  {
+    m_RenderWindow->Register(NULL);
+  }
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
   
   if(m_CameraController.IsNotNull())
@@ -273,10 +281,8 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
       //vicc->GetVtkInteractor()->Disable();
     }
   }
-
 }
 
-//##ModelId=3E3799250397
 void mitk::BaseRenderer::InitSize(int w, int h)
 {
   m_Size[0] = w;
@@ -354,7 +360,6 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   }
 }
 
-//##ModelId=3E66CC590379
 void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
 {
   itkDebugMacro("setting WorldGeometry to " << geometry);
@@ -409,7 +414,6 @@ void mitk::BaseRenderer::SetWorldGeometry(mitk::Geometry3D* geometry)
     itkWarningMacro("m_CurrentWorldGeometry2D is NULL");
 }
 
-//##ModelId=3E66CC59026B
 void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
 {
   itkDebugMacro("setting DisplayGeometry to " << geometry2d);
@@ -515,7 +519,6 @@ const double* mitk::BaseRenderer::GetBounds() const
 }
 
 
-//##ModelId=3E6D5DD30322
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   //set the Focus on the renderer
@@ -549,7 +552,6 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   }
 }
 
-//##ModelId=3E6D5DD30372
 void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
@@ -578,7 +580,6 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
   }
 }
 
-//##ModelId=3E6D5DD303C2
 void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
   if (m_CameraController)
@@ -619,7 +620,6 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *)
   //mitk::EventMapper::MapEvent(&event);
 }
 
-//##ModelId=3E6D5DD4002A
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {
   if (m_CameraController)

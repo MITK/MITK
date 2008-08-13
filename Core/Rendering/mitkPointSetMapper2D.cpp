@@ -481,19 +481,21 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
-  node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite );
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite );
-  node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
-  node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
-  node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
-  node->AddProperty( "contour", mitk::BoolProperty::New(false), renderer, overwrite );
-  node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
-  node->AddProperty( "close", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite ); // width of the line from one point to another
+  node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
+  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
+  node->AddProperty( "contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
+
+  //node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
+  //node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
+  //node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
+  //node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
+  //node->AddProperty( "close", mitk::BoolProperty::New(false), renderer, overwrite );
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

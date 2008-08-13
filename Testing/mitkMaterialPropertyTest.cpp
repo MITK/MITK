@@ -206,9 +206,7 @@ void testConstructorWithNodeAndRenderer()
 void testSetColor()
 {
   mitk::BaseRenderer *renderer = NULL;
-  vtkFloatingPointType red = 0;
-  vtkFloatingPointType green = 0;
-  vtkFloatingPointType blue = 0;
+  
   mitk::MaterialProperty::Color color;
   color.Set(0,0,0);
   myMP = mitk::MaterialProperty::New(node, NULL);

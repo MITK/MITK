@@ -72,8 +72,6 @@ int main(int argc, char* argv[])
         }
     }
     
-    std::cout << "testType = " << testType << "\n";
-    
     const char * testingParameter = NULL;
     if ((testType != 0) && (strcmp(argv[argc - 1], "-testing") != 0) && (strcmp(argv[argc - 1], "-optiontesting") != 0) && (strcmp(argv[argc - 1], "-alltesting") != 0) )
         testingParameter = argv[argc - 1];

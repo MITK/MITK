@@ -192,8 +192,8 @@ public:
      * used to store/retrieve the values;
      * @param node the data tree node associated with the given material property
      */
-    virtual void SetDataTreeNode( mitk::DataTreeNode* node );
-    
+    //virtual void SetDataTreeNode( mitk::DataTreeNode* node );
+    itkSetObjectMacro(DataTreeNode,mitk::DataTreeNode);
     /**
      * Returns the data tree node associated with the current material property
      * @returns the data tree node associated with the current matieral property.
@@ -201,14 +201,16 @@ public:
      *          member variables are used for storing the properties
      */
     virtual mitk::DataTreeNode* GetDataTreeNode() const;
-    
+    //itkGetObjectMacro(DataTreeNode,mitk::DataTreeNode);
     /**
      * If material Property is associated with a data tree node, properties may
      * be limited to a specific renderer. 
      * @param the renderer, for which the material properties should be valid
      */
-    virtual void SetRenderer( mitk::BaseRenderer* renderer );
-    
+   // virtual void SetRenderer( mitk::BaseRenderer* renderer );
+    itkSetObjectMacro(Renderer,mitk::BaseRenderer);
+
+
     /**
      * If the material property is associated with a data tree node, properties may
      * be limited to a specific renderer.  
@@ -216,8 +218,7 @@ public:
      */
     virtual  mitk::BaseRenderer* GetRenderer( ) const;
     
-    /**
-     * Sets the materials color in RGB space. The rgb components have to be
+     /* Sets the materials color in RGB space. The rgb components have to be
      * in the range [0..1]
      * @param color the new color of the material
      */

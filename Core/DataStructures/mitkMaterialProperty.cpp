@@ -157,20 +157,14 @@ mitk::BaseProperty& mitk::MaterialProperty::operator=(const mitk::BaseProperty& 
   return *this;
 }
 
-void mitk::MaterialProperty::SetDataTreeNode( mitk::DataTreeNode* node )
-{
-  m_DataTreeNode = node;
-}
+
 
 mitk::DataTreeNode* mitk::MaterialProperty::GetDataTreeNode() const
 {
   return m_DataTreeNode;
 }
 
-void mitk::MaterialProperty::SetRenderer( mitk::BaseRenderer* renderer )
-{
-  m_Renderer = renderer;
-}
+
 
 mitk::BaseRenderer* mitk::MaterialProperty::GetRenderer( ) const
 {

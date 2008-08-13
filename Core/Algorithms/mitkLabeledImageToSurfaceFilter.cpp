@@ -312,16 +312,21 @@ template < typename TPixel, unsigned int VImageDimension >
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ImageRegionIterator< ImageType > ImageRegionIteratorType;
   availableLabels.clear();
-  ImageRegionIteratorType it( image, image->GetRequestedRegion() );
+  ImageRegionIteratorType it( image, image->GetLargestPossibleRegion() );
   it.GoToBegin();
   mitk::LabeledImageToSurfaceFilter::LabelMapType::iterator labelIt;
   while( ! it.IsAtEnd() )
   {
     labelIt = availableLabels.find( ( mitk::LabeledImageToSurfaceFilter::LabelType ) ( it.Get() ) );
     if ( labelIt == availableLabels.end() )
+    {
       availableLabels[ ( mitk::LabeledImageToSurfaceFilter::LabelType ) ( it.Get() ) ] = 1;
+    }
     else
-      ( labelIt->second )++;
+    {
+      labelIt->second += 1;
+    }
+
     ++it;
   }
 }
@@ -374,7 +379,7 @@ mitk::ScalarType mitk::LabeledImageToSurfaceFilter::GetVolumeForLabel( const mit
   LabelMapType::iterator it = m_AvailableLabels.find( label );
   if ( it != m_AvailableLabels.end() )
   {
-    return it->second * ( spacing[0] * spacing[1] * spacing[2] / 1000.0 );
+    return static_cast<float>(it->second) * ( spacing[0] * spacing[1] * spacing[2] / 1000.0f );
   }
   else
   {

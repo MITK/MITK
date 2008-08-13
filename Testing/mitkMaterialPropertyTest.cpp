@@ -5,7 +5,7 @@
  Date:      $Date$
  Version:   $Revision$
 
- Copyright (c) German Cancer Research Center, Division of Medical and
+ Copyright () German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
@@ -25,12 +25,12 @@
 #include <iostream>
 
 /**
- *  Simple example for a test for the (non-existent) class "ClassName".
+ *  Simple example for a test for the () class "ClassName".
  *
  *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
- *  of a test image for the image tests (see CMakeLists.txt).
+ *  of a test image for the image tests ().
  */
 mitk::DataTreeNode::Pointer node = NULL;
 mitk::MaterialProperty::Pointer myMP = NULL;
@@ -44,6 +44,25 @@ void testConstructorWithRedGreenBlueOpacityNodeAndRenderer();
 void testConstructorRedGreenBlueColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
 void testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
 void testConstructorPropertyRedGreenBlueOpacityAndName();
+
+//void testAssignable();//TODO
+//void testOperator=();//TODO
+void testSetColor();
+void testSetColorCoefficient();
+void testSetSpecularColor();
+void testSetSpecularCoefficient();
+void testSetSpecularPower();
+void testSetOpacity();
+void testSetInterpolation();
+void testSetRepresentation();
+void testSetLineWidth();
+void testInitialize();
+void testOperatorequality();
+void testForwardToDataTreeNode();
+
+
+
+
 
 
 int
@@ -60,7 +79,19 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
       testConstructorRedGreenBlueColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
       testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
       testConstructorPropertyRedGreenBlueOpacityAndName();
-
+      testSetColor();
+      testSetColorCoefficient();
+      testSetSpecularColor();
+      testSetSpecularCoefficient();
+      testSetSpecularPower();
+      testSetOpacity();
+      testSetInterpolation();
+      testSetRepresentation();
+      testSetLineWidth();
+      testInitialize(); 
+      /*testOperatorequality();
+      testForwardToDataTreeNode();
+    */
       // first test: did this work?
       // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
       // it makes no sense to continue without an object.
@@ -69,8 +100,8 @@ mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
       // do not write to std::cout and do not return from this function yourself!
 
       // always end with this!
-MITK_TEST_END    ()
-  }
+MITK_TEST_END    ()  
+}
 
 void testConstructorWithNodeAndRenderer()
   {
@@ -172,3 +203,218 @@ void testConstructorWithNodeAndRenderer()
     MITK_TEST_CONDITION( opacity==myMP->GetOpacity(), "Testing if a Opacity object was set correctly" )
     //MITK_TEST_CONDITION( name.compare(myMP->GetName(),0,9), "Testing if a Name object was set correctly" )
   }
+void testSetColor()
+{
+  mitk::BaseRenderer *renderer = NULL;
+  vtkFloatingPointType red = 0;
+  vtkFloatingPointType green = 0;
+  vtkFloatingPointType blue = 0;
+  mitk::MaterialProperty::Color color;
+  color.Set(0,0,0);
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  myMP->SetColor(color);
+  MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(),"Testing instantiation")
+  MITK_TEST_CONDITION(node==myMP->GetDataTreeNode(), "Testing if a DataTreeNode object was set correctly" )
+  MITK_TEST_CONDITION(renderer==myMP->GetRenderer(), "Testing if a Renderer object was set correctly" )
+  MITK_TEST_CONDITION(color==myMP->GetColor(),"Testing if a color was set correctly")
+  color.Set(0,0,0);
+  myMP->SetColor(color);
+  MITK_TEST_CONDITION(color==myMP->GetColor(),"Testing if a color was set correctly")
+}
+
+void testSetColorCoefficient()
+{
+  
+  vtkFloatingPointType colorCoefficient = 0;
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  myMP->SetColorCoefficient(colorCoefficient);
+  MITK_TEST_CONDITION(colorCoefficient == myMP->GetColorCoefficient(), "Testing if a colorcoefficent was set correctly")
+
+}
+void testSetSpecularColor()
+{
+    mitk::MaterialProperty::Color color;
+    color.Set(0,0,0);
+    myMP = mitk::MaterialProperty::New();
+    myMP->SetSpecularColor(color);
+    MITK_TEST_CONDITION(color == myMP->GetSpecularColor(),"Testing if a SpecularColor was set correctly")
+
+
+
+}
+
+void testSetSpecularCoefficient()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  vtkFloatingPointType specularCoefficient = 1;
+  myMP->SetSpecularCoefficient(specularCoefficient);
+  MITK_TEST_CONDITION(specularCoefficient == myMP->GetSpecularCoefficient(),"Testing if a SpecularCoefficient was set correctly")
+
+}
+void testSetSpecularPower()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  vtkFloatingPointType specularPower = 1;
+  myMP->SetSpecularPower(specularPower);
+  MITK_TEST_CONDITION(specularPower==myMP->GetSpecularPower(), "Testing if a SpecularPower was set correctly")
+
+
+}
+void testSetOpacity()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  vtkFloatingPointType opacity = 1;
+  myMP->SetOpacity(opacity);
+  MITK_TEST_CONDITION(opacity==myMP->GetOpacity(), "Testing if a Opacity was set correctly")
+
+}
+
+
+void testSetInterpolation()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  mitk::MaterialProperty::InterpolationType interpolation = mitk::MaterialProperty::Flat;
+  myMP->SetInterpolation(interpolation);
+  MITK_TEST_CONDITION(interpolation == myMP->GetInterpolation(), "Testing if a Interpolation was set correctly")
+}
+void testSetRepresentation()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  mitk::MaterialProperty::RepresentationType representation = mitk::MaterialProperty::Wireframe;
+  myMP->SetRepresentation(representation);
+  MITK_TEST_CONDITION(representation == myMP->GetRepresentation(), "Testing if a Representation was set correctly")
+
+}
+
+void testSetLineWidth()
+{
+  myMP = mitk::MaterialProperty::New(node, NULL);
+  vtkFloatingPointType lineWidth = 1;
+  myMP->SetLineWidth(lineWidth);
+  MITK_TEST_CONDITION(lineWidth==myMP->GetLineWidth(), "Testing if a LineWidth was set correctly")
+}
+
+void testInitialize()
+{
+  mitk::BaseRenderer *renderer = NULL;
+  mitk::MaterialProperty::Color color;
+  color.Set(0, 0, 0);
+  vtkFloatingPointType opacity = 1.0f;
+  vtkFloatingPointType rgb = 0;
+  vtkFloatingPointType colorCoefficient = 0;
+  vtkFloatingPointType specularCoefficient = 0;
+  vtkFloatingPointType specularPower = 0;
+
+  myMP = mitk::MaterialProperty::New(rgb, rgb, rgb, colorCoefficient,
+    specularCoefficient, specularPower, opacity, node, renderer);
+  vtkFloatingPointType lineWidth = 1;
+  myMP->SetLineWidth(lineWidth);
+  mitk::MaterialProperty::RepresentationType representation = mitk::MaterialProperty::Wireframe;
+  myMP->SetRepresentation(representation);mitk::MaterialProperty::InterpolationType interpolation = mitk::MaterialProperty::Flat;
+  myMP->SetInterpolation(interpolation);
+  myMP->SetSpecularColor(color);
+  std::string name = "Hans Wurst";
+  myMP->SetName(name);
+  mitk::MaterialProperty::Pointer myMP2 = mitk::MaterialProperty::New(node, NULL);
+  myMP2->Initialize(*myMP);
+  MITK_TEST_CONDITION(*myMP == *myMP2, "testing equality after .Intitialize")
+}
+void testOperatorequality()
+{
+  {
+    mitk::BaseRenderer *renderer = NULL;
+    mitk::MaterialProperty::Color color;
+    color.Set(0, 0, 0);
+    vtkFloatingPointType opacity = 1.0f;
+    vtkFloatingPointType rgb = 0;
+    vtkFloatingPointType colorCoefficient = 0;
+    vtkFloatingPointType specularCoefficient = 0;
+    vtkFloatingPointType specularPower = 0;
+
+    myMP = mitk::MaterialProperty::New(rgb, rgb, rgb, colorCoefficient,
+      specularCoefficient, specularPower, opacity, node, renderer);
+    vtkFloatingPointType lineWidth = 1;
+    myMP->SetLineWidth(lineWidth);
+    mitk::MaterialProperty::RepresentationType representation = mitk::MaterialProperty::Wireframe;
+    myMP->SetRepresentation(representation);mitk::MaterialProperty::InterpolationType interpolation = mitk::MaterialProperty::Flat;
+    myMP->SetInterpolation(interpolation);
+    myMP->SetSpecularColor(color);
+    std::string name = "Hans Wurst";
+    myMP->SetName(name);
+
+
+    mitk::BaseRenderer *renderer2 = NULL;
+    mitk::MaterialProperty::Color color2;
+    color2.Set(0, 0, 0);
+    vtkFloatingPointType opacity2 = 1.0f;
+    vtkFloatingPointType rgb2 = 0;
+    vtkFloatingPointType colorCoefficient2 = 0;
+    vtkFloatingPointType specularCoefficient2 = 0;
+    vtkFloatingPointType specularPower2 = 0;
+
+    mitk::MaterialProperty::Pointer myMP2 = mitk::MaterialProperty::New(rgb2, rgb2, rgb2, colorCoefficient2,
+      specularCoefficient2, specularPower2, opacity2, node, renderer2);
+    vtkFloatingPointType lineWidth2 = 1;
+    myMP2->SetLineWidth(lineWidth2);
+    mitk::MaterialProperty::RepresentationType representation2 = mitk::MaterialProperty::Wireframe;
+    myMP2->SetRepresentation(representation2);
+    mitk::MaterialProperty::InterpolationType interpolation2 = mitk::MaterialProperty::Flat;
+    myMP2->SetInterpolation(interpolation2);
+    myMP2->SetSpecularColor(color2);
+    std::string name2 = "Hans Wurst";
+    myMP2->SetName(name2);
+    MITK_TEST_CONDITION(*myMP == *myMP2, "testing equality Operator")
+  }
+  {
+    mitk::BaseRenderer *renderer = NULL;
+    mitk::MaterialProperty::Color color;
+    color.Set(0, 0, 0);
+    vtkFloatingPointType opacity = 1.0f;
+    vtkFloatingPointType rgb = 0;
+    vtkFloatingPointType colorCoefficient = 0;
+    vtkFloatingPointType specularCoefficient = 0;
+    vtkFloatingPointType specularPower = 0;
+
+    myMP = mitk::MaterialProperty::New(rgb, rgb, rgb, colorCoefficient,
+      specularCoefficient, specularPower, opacity, node, renderer);
+    vtkFloatingPointType lineWidth = 1;
+    myMP->SetLineWidth(lineWidth);
+    mitk::MaterialProperty::RepresentationType representation = mitk::MaterialProperty::Wireframe;
+    myMP->SetRepresentation(representation);mitk::MaterialProperty::InterpolationType interpolation = mitk::MaterialProperty::Flat;
+    myMP->SetInterpolation(interpolation);
+    myMP->SetSpecularColor(color);
+    std::string name = "Hans Wurst";
+    myMP->SetName(name);
+
+
+    mitk::BaseRenderer *renderer2 = NULL;
+    mitk::MaterialProperty::Color color2;
+    color2.Set(0, 0, 0);
+    vtkFloatingPointType opacity2 = 1.0f;
+    vtkFloatingPointType rgb2 = 1;
+    vtkFloatingPointType colorCoefficient2 = 0;
+    vtkFloatingPointType specularCoefficient2 = 0;
+    vtkFloatingPointType specularPower2 = 0;
+
+    mitk::MaterialProperty::Pointer myMP2 = mitk::MaterialProperty::New(rgb2, rgb2, rgb2, colorCoefficient2,
+      specularCoefficient2, specularPower2, opacity2, node, renderer2);
+    vtkFloatingPointType lineWidth2 = 1;
+    myMP2->SetLineWidth(lineWidth2);
+    mitk::MaterialProperty::RepresentationType representation2 = mitk::MaterialProperty::Wireframe;
+    myMP2->SetRepresentation(representation2);
+    mitk::MaterialProperty::InterpolationType interpolation2 = mitk::MaterialProperty::Flat;
+    myMP2->SetInterpolation(interpolation2);
+    myMP2->SetSpecularColor(color2);
+    std::string name2 = "Hans Wurst";
+    myMP2->SetName(name2);
+    MITK_TEST_CONDITION(!(*myMP == *myMP2), "testing equality Operator")
+  }
+ 
+
+}
+
+
+
+
+
+

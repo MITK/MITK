@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>275</width>
-            <height>682</height>
+            <width>228</width>
+            <height>466</height>
         </rect>
     </property>
     <property name="caption">
@@ -19,609 +19,631 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QLayoutWidget">
+        <widget class="QFrame">
             <property name="name">
-                <cstring>layout12</cstring>
+                <cstring>frame4</cstring>
             </property>
-            <hbox>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Raised</enum>
+            </property>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>TextLabelFixed</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Fixed:</string>
-                    </property>
-                </widget>
-                <widget class="QmitkTreeNodeSelector">
-                    <property name="name">
-                        <cstring>m_FixedSelector</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>0</height>
-                        </size>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout11</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
+                <property name="margin">
+                    <number>0</number>
                 </property>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>TextLabelMoving</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Moving:</string>
-                    </property>
-                </widget>
-                <widget class="QmitkTreeNodeSelector">
-                    <property name="name">
-                        <cstring>m_MovingSelector</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>0</height>
-                        </size>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>m_ShowRedGreenValues</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Show Images Red/Green</string>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout13</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
+                <property name="spacing">
+                    <number>0</number>
                 </property>
-                <widget class="QLabel">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>m_OpacityLabel</cstring>
+                        <cstring>layout12</cstring>
                     </property>
-                    <property name="text">
-                        <string>Moving Image Opacity:</string>
-                    </property>
-                </widget>
-                <widget class="QSlider">
-                    <property name="name">
-                        <cstring>m_OpacitySlider</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>7</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="maxValue">
-                        <number>100</number>
-                    </property>
-                    <property name="value">
-                        <number>50</number>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout14</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_SaveModel</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Save Transformation</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>m_LoadRigidRegistrationParameter</cstring>
-            </property>
-            <property name="text">
-                <string>Load Rigid Registration Parameter</string>
-            </property>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>m_SaveRigidRegistrationParameter</cstring>
-            </property>
-            <property name="text">
-                <string>Save Rigid Registration Parameter</string>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout7</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_UndoTransformation</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Undo Transformation</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_RedoTransformation</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Redo Transformation</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QLayoutWidget">
-            <property name="name">
-                <cstring>layout3</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_FixedReinit</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Reinit Fixed</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_MovingReinit</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Reinit Moving</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>m_GlobalReinit</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Global Reinit</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QButtonGroup">
-            <property name="name">
-                <cstring>m_SelectedModel</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
-            <property name="title">
-                <string>Select Shown Image</string>
-            </property>
-            <grid>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QRadioButton" row="0" column="0">
-                    <property name="name">
-                        <cstring>m_ShowFixedImage</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Fixed Image</string>
-                    </property>
-                    <property name="checked">
-                        <bool>false</bool>
-                    </property>
-                </widget>
-                <widget class="QRadioButton" row="0" column="1">
-                    <property name="name">
-                        <cstring>m_ShowMovingImage</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Moving Image</string>
-                    </property>
-                </widget>
-                <widget class="QRadioButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>m_ShowBothImages</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>5</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string>Both Images</string>
-                    </property>
-                    <property name="checked">
-                        <bool>true</bool>
-                    </property>
-                </widget>
-            </grid>
-        </widget>
-        <widget class="QTabWidget">
-            <property name="name">
-                <cstring>m_RigidTransform</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>tab</cstring>
-                </property>
-                <attribute name="title">
-                    <string>Automatic</string>
-                </attribute>
-                <vbox>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <widget class="QmitkRigidRegistrationSelector">
+                    <hbox>
                         <property name="name">
-                            <cstring>qmitkRigidRegistrationSelector1</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                    </widget>
-                </vbox>
-            </widget>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>TabPage</cstring>
-                </property>
-                <attribute name="title">
-                    <string>Manual</string>
-                </attribute>
-                <vbox>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TextLabelFixed</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Fixed:</string>
+                            </property>
+                        </widget>
+                        <widget class="QmitkTreeNodeSelector">
+                            <property name="name">
+                                <cstring>m_FixedSelector</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>layout11</cstring>
                     </property>
-                    <property name="margin">
-                        <number>2</number>
-                    </property>
-                    <property name="spacing">
-                        <number>0</number>
-                    </property>
-                    <widget class="QFrame">
+                    <hbox>
                         <property name="name">
-                            <cstring>m_ManualFrame</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="frameShape">
-                            <enum>StyledPanel</enum>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TextLabelMoving</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Moving:</string>
+                            </property>
+                        </widget>
+                        <widget class="QmitkTreeNodeSelector">
+                            <property name="name">
+                                <cstring>m_MovingSelector</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_ShowRedGreenValues</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Show Images Red/Green</string>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout13</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="frameShadow">
-                            <enum>Raised</enum>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_OpacityLabel</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Moving Image Opacity:</string>
+                            </property>
+                        </widget>
+                        <widget class="QSlider">
+                            <property name="name">
+                                <cstring>m_OpacitySlider</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maxValue">
+                                <number>100</number>
+                            </property>
+                            <property name="value">
+                                <number>50</number>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout14</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
                         </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_SaveModel</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Save Transformation</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_LoadRigidRegistrationParameter</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Load Rigid Registration Parameter</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_SaveRigidRegistrationParameter</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Save Rigid Registration Parameter</string>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout7</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_UndoTransformation</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Undo Transformation</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_RedoTransformation</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Redo Transformation</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_FixedReinit</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Reinit Fixed</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_MovingReinit</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Reinit Moving</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_GlobalReinit</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Global Reinit</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QButtonGroup">
+                    <property name="name">
+                        <cstring>m_SelectedModel</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>1</bold>
+                        </font>
+                    </property>
+                    <property name="title">
+                        <string>Select Shown Image</string>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QRadioButton" row="0" column="0">
+                            <property name="name">
+                                <cstring>m_ShowFixedImage</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Fixed Image</string>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="0" column="1">
+                            <property name="name">
+                                <cstring>m_ShowMovingImage</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Moving Image</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" row="1" column="0">
+                            <property name="name">
+                                <cstring>m_ShowBothImages</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>Both Images</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget class="QTabWidget">
+                    <property name="name">
+                        <cstring>m_RigidTransform</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>tab</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>Automatic</string>
+                        </attribute>
                         <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLayoutWidget">
+                            <widget class="QmitkRigidRegistrationSelector">
                                 <property name="name">
-                                    <cstring>layout9</cstring>
+                                    <cstring>qmitkRigidRegistrationSelector1</cstring>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>TabPage</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>Manual</string>
+                        </attribute>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <property name="margin">
+                                <number>2</number>
+                            </property>
+                            <property name="spacing">
+                                <number>0</number>
+                            </property>
+                            <widget class="QFrame">
+                                <property name="name">
+                                    <cstring>m_ManualFrame</cstring>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>StyledPanel</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>Raised</enum>
                                 </property>
                                 <vbox>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QGroupBox">
+                                    <widget class="QLayoutWidget">
                                         <property name="name">
-                                            <cstring>interactiveTranslationBox</cstring>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>1</bold>
-                                            </font>
-                                        </property>
-                                        <property name="title">
-                                            <string>Interactive Translations</string>
+                                            <cstring>layout9</cstring>
                                         </property>
                                         <vbox>
                                             <property name="name">
                                                 <cstring>unnamed</cstring>
                                             </property>
-                                            <widget class="QLayoutWidget">
+                                            <widget class="QGroupBox">
                                                 <property name="name">
-                                                    <cstring>layout8</cstring>
+                                                    <cstring>interactiveTranslationBox</cstring>
                                                 </property>
-                                                <hbox>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>1</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="title">
+                                                    <string>Interactive Translations</string>
+                                                </property>
+                                                <vbox>
                                                     <property name="name">
                                                         <cstring>unnamed</cstring>
                                                     </property>
                                                     <widget class="QLayoutWidget">
                                                         <property name="name">
-                                                            <cstring>layout4</cstring>
+                                                            <cstring>layout8</cstring>
                                                         </property>
-                                                        <vbox>
+                                                        <hbox>
                                                             <property name="name">
                                                                 <cstring>unnamed</cstring>
                                                             </property>
-                                                            <widget class="QLabel">
+                                                            <widget class="QLayoutWidget">
                                                                 <property name="name">
-                                                                    <cstring>xTranslationLabel</cstring>
+                                                                    <cstring>layout4</cstring>
                                                                 </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <bold>0</bold>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="text">
-                                                                    <string>x-Direction (Frontal):</string>
-                                                                </property>
+                                                                <vbox>
+                                                                    <property name="name">
+                                                                        <cstring>unnamed</cstring>
+                                                                    </property>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>xTranslationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>x-Direction (Frontal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>yTranslationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>y-Direction (Sagittal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>zTranslationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>z-Direction (Transversal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </vbox>
                                                             </widget>
-                                                            <widget class="QLabel">
+                                                            <widget class="QLayoutWidget">
                                                                 <property name="name">
-                                                                    <cstring>yTranslationLabel</cstring>
+                                                                    <cstring>layout7_2</cstring>
                                                                 </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <bold>0</bold>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="text">
-                                                                    <string>y-Direction (Sagittal):</string>
-                                                                </property>
+                                                                <vbox>
+                                                                    <property name="name">
+                                                                        <cstring>unnamed</cstring>
+                                                                    </property>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_XTransSlider</cstring>
+                                                                        </property>
+                                                                        <property name="cursor">
+                                                                            <cursor>0</cursor>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-256</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>256</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                        <property name="toolTip" stdset="0">
+                                                                            <string></string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_YTransSlider</cstring>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-256</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>256</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_ZTransSlider</cstring>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-256</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>256</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </vbox>
                                                             </widget>
-                                                            <widget class="QLabel">
-                                                                <property name="name">
-                                                                    <cstring>zTranslationLabel</cstring>
-                                                                </property>
-                                                                <property name="font">
-                                                                    <font>
-                                                                        <bold>0</bold>
-                                                                    </font>
-                                                                </property>
-                                                                <property name="text">
-                                                                    <string>z-Direction (Transversal):</string>
-                                                                </property>
-                                                            </widget>
-                                                        </vbox>
+                                                        </hbox>
                                                     </widget>
-                                                    <widget class="QLayoutWidget">
-                                                        <property name="name">
-                                                            <cstring>layout7_2</cstring>
-                                                        </property>
-                                                        <vbox>
-                                                            <property name="name">
-                                                                <cstring>unnamed</cstring>
-                                                            </property>
-                                                            <widget class="QSlider">
-                                                                <property name="name">
-                                                                    <cstring>m_XTransSlider</cstring>
-                                                                </property>
-                                                                <property name="cursor">
-                                                                    <cursor>0</cursor>
-                                                                </property>
-                                                                <property name="minValue">
-                                                                    <number>-256</number>
-                                                                </property>
-                                                                <property name="maxValue">
-                                                                    <number>256</number>
-                                                                </property>
-                                                                <property name="orientation">
-                                                                    <enum>Horizontal</enum>
-                                                                </property>
-                                                                <property name="toolTip" stdset="0">
-                                                                    <string></string>
-                                                                </property>
-                                                            </widget>
-                                                            <widget class="QSlider">
-                                                                <property name="name">
-                                                                    <cstring>m_YTransSlider</cstring>
-                                                                </property>
-                                                                <property name="minValue">
-                                                                    <number>-256</number>
-                                                                </property>
-                                                                <property name="maxValue">
-                                                                    <number>256</number>
-                                                                </property>
-                                                                <property name="orientation">
-                                                                    <enum>Horizontal</enum>
-                                                                </property>
-                                                            </widget>
-                                                            <widget class="QSlider">
-                                                                <property name="name">
-                                                                    <cstring>m_ZTransSlider</cstring>
-                                                                </property>
-                                                                <property name="minValue">
-                                                                    <number>-256</number>
-                                                                </property>
-                                                                <property name="maxValue">
-                                                                    <number>256</number>
-                                                                </property>
-                                                                <property name="orientation">
-                                                                    <enum>Horizontal</enum>
-                                                                </property>
-                                                            </widget>
-                                                        </vbox>
-                                                    </widget>
-                                                </hbox>
+                                                </vbox>
                                             </widget>
-                                        </vbox>
-                                    </widget>
-                                    <widget class="QGroupBox">
-                                        <property name="name">
-                                            <cstring>automaticTranslationBox</cstring>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>1</bold>
-                                            </font>
-                                        </property>
-                                        <property name="title">
-                                            <string>Automatic Allign Image Centers</string>
-                                        </property>
-                                        <vbox>
-                                            <property name="name">
-                                                <cstring>unnamed</cstring>
-                                            </property>
-                                            <widget class="QPushButton">
+                                            <widget class="QGroupBox">
                                                 <property name="name">
-                                                    <cstring>m_AutomaticTranslation</cstring>
+                                                    <cstring>automaticTranslationBox</cstring>
                                                 </property>
                                                 <property name="font">
                                                     <font>
-                                                        <bold>0</bold>
+                                                        <bold>1</bold>
                                                     </font>
                                                 </property>
-                                                <property name="text">
-                                                    <string>Automatic Align Image Centers</string>
+                                                <property name="title">
+                                                    <string>Automatic Allign Image Centers</string>
                                                 </property>
+                                                <vbox>
+                                                    <property name="name">
+                                                        <cstring>unnamed</cstring>
+                                                    </property>
+                                                    <widget class="QPushButton">
+                                                        <property name="name">
+                                                            <cstring>m_AutomaticTranslation</cstring>
+                                                        </property>
+                                                        <property name="font">
+                                                            <font>
+                                                                <bold>0</bold>
+                                                            </font>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>Automatic Align Image Centers</string>
+                                                        </property>
+                                                    </widget>
+                                                </vbox>
                                             </widget>
                                         </vbox>
                                     </widget>
@@ -629,35 +651,46 @@
                             </widget>
                         </vbox>
                     </widget>
-                </vbox>
-            </widget>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>m_CalculateTransformation</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>150</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string>Calculate Transformation</string>
+                    </property>
+                    <property name="default">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QPushButton">
             <property name="name">
-                <cstring>m_CalculateTransformation</cstring>
+                <cstring>m_StopOptimization</cstring>
             </property>
             <property name="enabled">
                 <bool>false</bool>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="minimumSize">
-                <size>
-                    <width>150</width>
-                    <height>0</height>
-                </size>
-            </property>
             <property name="text">
-                <string>Calculate Transformation</string>
-            </property>
-            <property name="default">
-                <bool>false</bool>
+                <string>Stop Optimization</string>
             </property>
         </widget>
         <widget class="QLayoutWidget">
@@ -705,7 +738,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>30</height>
+                    <height>251</height>
                 </size>
             </property>
         </spacer>
@@ -891,6 +924,12 @@
         <receiver>QmitkRigidRegistrationControls</receiver>
         <slot>SaveRigidRegistrationParameterClicked()</slot>
     </connection>
+    <connection>
+        <sender>m_StopOptimization</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkRigidRegistrationControls</receiver>
+        <slot>StopOptimizationClicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
@@ -921,6 +960,7 @@
     <signal>addNewTransformationToUndoList()</signal>
     <signal>loadRigidRegistrationParameter()</signal>
     <signal>saveRigidRegistrationParameter()</signal>
+    <signal>stopOptimization(bool)</signal>
 </signals>
 <slots>
     <slot>SaveModelClicked()</slot>
@@ -947,6 +987,7 @@
     <slot>AddNewTransformationToUndoList()</slot>
     <slot>LoadRigidRegistrationParameterClicked()</slot>
     <slot>SaveRigidRegistrationParameterClicked()</slot>
+    <slot>StopOptimizationClicked()</slot>
 </slots>
 <functions>
     <function>init()</function>

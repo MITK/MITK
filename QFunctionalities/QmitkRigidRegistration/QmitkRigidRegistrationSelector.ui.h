@@ -93,6 +93,7 @@ void QmitkRigidRegistrationSelector::init()
   m_FixedDimension = 0;
   m_MovingNode = NULL;
   m_MovingDimension = 0;
+  m_StopOptimization = false;
 
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
@@ -393,6 +394,11 @@ void QmitkRigidRegistrationSelector::hideAllMetricFrames()
 //// to the transform parameters, which will be delivered by mitkRigidRgistrationObserver.cpp
 void QmitkRigidRegistrationSelector::SetOptimizerValue( const itk::EventObject & )
 {
+  if (m_StopOptimization)
+  {
+    m_Observer->SetStopOptimization(true);
+    m_StopOptimization = false;
+  }
   //mitk::TransformParameters* transformParameters = mitk::TransformParameters::GetInstance();
   double value = m_Observer->GetCurrentOptimizerValue();
   itk::Array<double> translateVector = m_Observer->GetCurrentTranslation();
@@ -2752,4 +2758,9 @@ void QmitkRigidRegistrationSelector::SaveRigidRegistrationParameter()
   {
       // user pressed Cancel
   }
+}
+
+void QmitkRigidRegistrationSelector::StopOptimization(bool stopOptimization)
+{
+  m_StopOptimization = stopOptimization;
 }

@@ -8649,6 +8649,7 @@
     <variable>mitk::Geometry3D::TransformType::Pointer m_GeometryWorldToItkPhysicalTransform;</variable>
     <variable>mitk::Geometry3D::TransformType::Pointer m_GeometryItkPhysicalToWorldTransform;</variable>
     <variable>mitk::RigidRegistrationPreset* m_Preset;</variable>
+    <variable>bool m_StopOptimization;</variable>
 </variables>
 <signals>
     <signal>OptimizerChanged(double value)</signal>
@@ -8668,6 +8669,7 @@
     <slot>SetSimplexDeltaVisible()</slot>
     <slot>LoadRigidRegistrationParameter()</slot>
     <slot>SaveRigidRegistrationParameter()</slot>
+    <slot>StopOptimization(bool stopOptimization)</slot>
 </slots>
 <functions>
     <function access="private">init()</function>

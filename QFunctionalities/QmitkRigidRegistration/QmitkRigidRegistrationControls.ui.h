@@ -22,6 +22,7 @@ void QmitkRigidRegistrationControls::init()
   connect(this,SIGNAL(calculateRigidRegistration()),qmitkRigidRegistrationSelector1,SLOT(CalculateTransformation()));
   connect(this,SIGNAL(loadRigidRegistrationParameter()),qmitkRigidRegistrationSelector1,SLOT(LoadRigidRegistrationParameter()));
   connect(this,SIGNAL(saveRigidRegistrationParameter()),qmitkRigidRegistrationSelector1,SLOT(SaveRigidRegistrationParameter()));
+  connect(this,SIGNAL(stopOptimization(bool)),qmitkRigidRegistrationSelector1,SLOT(StopOptimization(bool)));
   connect(qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
   connect(qmitkRigidRegistrationSelector1,SIGNAL(AddNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));
@@ -236,12 +237,15 @@ void QmitkRigidRegistrationControls::Calculate()
 {
   qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedSelector->GetSelectedNode());
   qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingSelector->GetSelectedNode());
-  this->setEnabled(false);
+  this->frame4->setEnabled(false);
+  this->m_StopOptimization->setEnabled(true);
   if (m_RigidTransform->label(m_RigidTransform->currentPageIndex()) == "Automatic")
   {
     emit calculateRigidRegistration();
   }
-  this->setEnabled(true);
+  this->m_StopOptimization->setEnabled(false);
+  emit (stopOptimization(false));
+  this->frame4->setEnabled(true);
 }
 
 void QmitkRigidRegistrationControls::AutomaticAlignCenters()
@@ -282,4 +286,9 @@ void QmitkRigidRegistrationControls::LoadRigidRegistrationParameterClicked()
 void QmitkRigidRegistrationControls::SaveRigidRegistrationParameterClicked()
 {
   emit saveRigidRegistrationParameter();
+}
+
+void QmitkRigidRegistrationControls::StopOptimizationClicked()
+{
+  emit stopOptimization(true);
 }

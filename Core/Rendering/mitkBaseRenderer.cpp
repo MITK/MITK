@@ -526,11 +526,11 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
   if (! success) 
     mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
 
-  if (m_CameraController)
-  {
-    if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
-      m_CameraController->MousePressEvent(me);
-  }
+  //if (m_CameraController)
+  //{
+  //  if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+  //    m_CameraController->MousePressEvent(me);
+  //}
   if(m_MapperID==1)
   {
     Point2D p(me->GetDisplayPosition());
@@ -554,11 +554,12 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 
 void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 {
-  if (m_CameraController)
-  {
-    if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
-      m_CameraController->MouseReleaseEvent(me);
-  }
+
+  //if (m_CameraController)
+  //{
+  //  if(me->GetButtonState()!=512) // provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+  //    m_CameraController->MouseReleaseEvent(me);
+  //}
 
   if(m_MapperID==1)
   {
@@ -582,11 +583,11 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
 
 void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
 {
-  if (m_CameraController)
-  {
-    if((me->GetButtonState()<=512) || (me->GetButtonState()>=516))// provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
-      m_CameraController->MouseMoveEvent(me);
-  }
+  //if (m_CameraController)
+  //{
+  //  if((me->GetButtonState()<=512) || (me->GetButtonState()>=516))// provisorisch: Ctrl nicht durchlassen. Bald wird aus m_CameraController eine StateMachine
+  //    m_CameraController->MouseMoveEvent(me);
+  //}
   if(m_MapperID==1)
   {
     Point2D p(me->GetDisplayPosition());
@@ -622,8 +623,8 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *)
 
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {
-  if (m_CameraController)
-    m_CameraController->KeyPressEvent(ke);
+  //if (m_CameraController)
+  //  m_CameraController->KeyPressEvent(ke);
   mitk::Event event(this, ke->type(), BS_NoButton, BS_NoButton, ke->key());
   mitk::EventMapper::MapEvent(&event);
 }
@@ -649,6 +650,7 @@ Sets the new camera controller and deletes the vtkRenderWindowInteractor in case
 */
 void mitk::BaseRenderer::SetCameraController(CameraController* cameraController)
 {
+  std::cout<<"!!!WARNING!!!: RenderWindow interaction events are no longer handled via CameraController (See Bug #954)."<<std::endl;
   m_CameraController->SetRenderer(NULL);
   m_CameraController = NULL;
   m_CameraController = cameraController;

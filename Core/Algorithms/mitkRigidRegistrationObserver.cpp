@@ -1,7 +1,7 @@
 #include "mitkRigidRegistrationObserver.h"
 #include "mitkProgressBar.h"
 
-mitk::RigidRegistrationObserver::RigidRegistrationObserver() 
+mitk::RigidRegistrationObserver::RigidRegistrationObserver() : m_OptimizerValue(0), m_StopOptimization(false)
 {  
 }
 
@@ -30,6 +30,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition()) << "   ";
       std::cout << ExhaustiveOptimizer->GetCurrentPosition() << std::endl;
       m_Params = ExhaustiveOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        //ExhaustiveOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (GradientDescentOptimizer != NULL)
@@ -39,6 +44,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << GradientDescentOptimizer->GetValue() << "   ";
       std::cout << GradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = GradientDescentOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        GradientDescentOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (QuaternionRigidTransformGradientDescentOptimizer != NULL)
@@ -48,6 +58,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << QuaternionRigidTransformGradientDescentOptimizer->GetValue() << "   ";
       std::cout << QuaternionRigidTransformGradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = QuaternionRigidTransformGradientDescentOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        QuaternionRigidTransformGradientDescentOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (LBFGSBOptimizer != NULL)
@@ -57,6 +72,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << LBFGSBOptimizer->GetValue() << "   ";
       std::cout << LBFGSBOptimizer->GetCurrentPosition() << std::endl;
       m_Params = LBFGSBOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        //LBFGSBOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (OnePlusOneEvolutionaryOptimizer != NULL)
@@ -66,6 +86,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << OnePlusOneEvolutionaryOptimizer->GetValue() << "   ";
       std::cout << OnePlusOneEvolutionaryOptimizer->GetCurrentPosition() << std::endl;
       m_Params = OnePlusOneEvolutionaryOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        OnePlusOneEvolutionaryOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (PowellOptimizer != NULL)
@@ -75,6 +100,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << PowellOptimizer->GetValue() << "   ";
       std::cout << PowellOptimizer->GetCurrentPosition() << std::endl;
       m_Params = PowellOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        PowellOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (FRPROptimizer != NULL)
@@ -84,6 +114,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << FRPROptimizer->GetValue() << "   ";
       std::cout << FRPROptimizer->GetCurrentPosition() << std::endl;
       m_Params = FRPROptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        FRPROptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (RegularStepGradientDescentOptimizer != NULL)
@@ -93,6 +128,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << RegularStepGradientDescentOptimizer->GetValue() << "   ";
       std::cout << RegularStepGradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = RegularStepGradientDescentOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        RegularStepGradientDescentOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (VersorRigid3DTransformOptimizer != NULL)
@@ -102,6 +142,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << VersorRigid3DTransformOptimizer->GetValue() << "   ";
       std::cout << VersorRigid3DTransformOptimizer->GetCurrentPosition() << std::endl;
       m_Params = VersorRigid3DTransformOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        VersorRigid3DTransformOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (VersorTransformOptimizer != NULL)
@@ -111,6 +156,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << VersorTransformOptimizer->GetValue() << "   ";
       std::cout << VersorTransformOptimizer->GetCurrentPosition() << std::endl;
       m_Params = VersorTransformOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        VersorTransformOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (AmoebaOptimizer != NULL)
@@ -119,6 +169,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << AmoebaOptimizer->GetCachedValue() << "   ";
       std::cout << AmoebaOptimizer->GetCachedCurrentPosition() << std::endl;
       m_Params = AmoebaOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        //AmoebaOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (ConjugateGradientOptimizer != NULL)
@@ -128,10 +183,20 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << ConjugateGradientOptimizer->GetValue() << "   ";
       std::cout << ConjugateGradientOptimizer->GetCurrentPosition() << std::endl;
       m_Params = ConjugateGradientOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        //ConjugateGradientOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (LBFGSOptimizer != NULL)
     {
+      if(m_StopOptimization)
+      {
+        //LBFGSOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       //m_OptimizerValue = LBFGSOptimizer->GetValue();
       /*std::cout << LBFGSOptimizer->GetCurrentIteration() << "   ";
       std::cout << LBFGSOptimizer->GetValue() << "   ";
@@ -145,6 +210,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << SPSAOptimizer->GetValue() << "   ";
       std::cout << SPSAOptimizer->GetCurrentPosition() << std::endl;
       m_Params = SPSAOptimizer->GetCurrentPosition();
+      if(m_StopOptimization)
+      {
+        SPSAOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
   }
@@ -158,6 +228,11 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       std::cout << AmoebaOptimizer->GetCachedValue() << "   ";
       std::cout << AmoebaOptimizer->GetCachedCurrentPosition() << std::endl;
       m_Params = AmoebaOptimizer->GetCachedCurrentPosition();
+      if(m_StopOptimization)
+      {
+        //AmoebaOptimizer->StopOptimization();
+        m_StopOptimization = false;
+      }
       InvokeEvent(itk::ModifiedEvent());
     }
   }
@@ -187,4 +262,11 @@ double mitk::RigidRegistrationObserver::GetCurrentOptimizerValue()
 itk::Array<double> mitk::RigidRegistrationObserver::GetCurrentTranslation()
 {
   return m_Params;
+}
+
+// Sets the stop optimization flag, which is used to call the StopOptimization() method of the optimizer.
+// Unfortunately it is not implemented for ExhaustiveOptimizer, LBFGSBOptimizer, AmoebaOptimizer, ConjugateGradientOptimizer and LBFGSOptimizer in ITK.
+void mitk::RigidRegistrationObserver::SetStopOptimization(bool stopOptimization)
+{
+  m_StopOptimization = stopOptimization;
 }

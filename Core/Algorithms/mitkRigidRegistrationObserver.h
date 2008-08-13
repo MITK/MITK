@@ -49,49 +49,49 @@ namespace mitk {
       itkNewMacro( Self );
 
       typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
-      typedef const OptimizerType * OptimizerPointer;
+      typedef OptimizerType * OptimizerPointer;
 
       typedef itk::ExhaustiveOptimizer ExhaustiveOptimizerType;
-      typedef const ExhaustiveOptimizerType * ExhaustiveOptimizerPointer;
+      typedef ExhaustiveOptimizerType * ExhaustiveOptimizerPointer;
 
       typedef itk::GradientDescentOptimizer GradientDescentOptimizerType;
-      typedef const GradientDescentOptimizerType * GradientDescentOptimizerPointer;
+      typedef GradientDescentOptimizerType * GradientDescentOptimizerPointer;
 
       typedef itk::QuaternionRigidTransformGradientDescentOptimizer QuaternionRigidTransformGradientDescentOptimizerType;
-      typedef const QuaternionRigidTransformGradientDescentOptimizerType * QuaternionRigidTransformGradientDescentOptimizerPointer;
+      typedef QuaternionRigidTransformGradientDescentOptimizerType * QuaternionRigidTransformGradientDescentOptimizerPointer;
 
       typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
-      typedef const LBFGSBOptimizerType * LBFGSBOptimizerPointer;
+      typedef LBFGSBOptimizerType * LBFGSBOptimizerPointer;
 
       typedef itk::OnePlusOneEvolutionaryOptimizer OnePlusOneEvolutionaryOptimizerType;
-      typedef const OnePlusOneEvolutionaryOptimizerType * OnePlusOneEvolutionaryOptimizerPointer;
+      typedef OnePlusOneEvolutionaryOptimizerType * OnePlusOneEvolutionaryOptimizerPointer;
 
       typedef itk::PowellOptimizer PowellOptimizerType;
-      typedef const PowellOptimizerType * PowellOptimizerPointer;
+      typedef PowellOptimizerType * PowellOptimizerPointer;
 
       typedef itk::FRPROptimizer FRPROptimizerType;
-      typedef const FRPROptimizerType * FRPROptimizerPointer;
+      typedef FRPROptimizerType * FRPROptimizerPointer;
 
       typedef itk::RegularStepGradientDescentOptimizer RegularStepGradientDescentOptimizerType;
-      typedef const RegularStepGradientDescentOptimizerType * RegularStepGradientDescentOptimizerPointer;
+      typedef RegularStepGradientDescentOptimizerType * RegularStepGradientDescentOptimizerPointer;
 
       typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
-      typedef const VersorRigid3DTransformOptimizerType * VersorRigid3DTransformOptimizerPointer;
+      typedef VersorRigid3DTransformOptimizerType * VersorRigid3DTransformOptimizerPointer;
 
       typedef itk::VersorTransformOptimizer VersorTransformOptimizerType;
-      typedef const VersorTransformOptimizerType * VersorTransformOptimizerPointer;
+      typedef VersorTransformOptimizerType * VersorTransformOptimizerPointer;
 
       typedef itk::AmoebaOptimizer AmoebaOptimizerType;
-      typedef const AmoebaOptimizerType * AmoebaOptimizerPointer;
+      typedef AmoebaOptimizerType * AmoebaOptimizerPointer;
 
       typedef itk::ConjugateGradientOptimizer ConjugateGradientOptimizerType;
-      typedef const ConjugateGradientOptimizerType * ConjugateGradientOptimizerPointer;
+      typedef ConjugateGradientOptimizerType * ConjugateGradientOptimizerPointer;
 
       typedef itk::LBFGSOptimizer LBFGSOptimizerType;
-      typedef const LBFGSOptimizerType * LBFGSOptimizerPointer;
+      typedef LBFGSOptimizerType * LBFGSOptimizerPointer;
 
       typedef itk::SPSAOptimizer SPSAOptimizerType;
-      typedef const SPSAOptimizerType * SPSAOptimizerPointer;
+      typedef SPSAOptimizerType * SPSAOptimizerPointer;
 
 
       void Execute(itk::Object *caller, const itk::EventObject & event);
@@ -101,6 +101,7 @@ namespace mitk {
       void SetRemainingProgress(int steps);
       double GetCurrentOptimizerValue();
       itk::Array<double> GetCurrentTranslation();
+      void SetStopOptimization(bool stopOptimization);
 
     protected:
       RigidRegistrationObserver();
@@ -108,6 +109,7 @@ namespace mitk {
   private:
     double m_OptimizerValue;
     itk::Array<double> m_Params;
+    bool m_StopOptimization;
 
   };  
 

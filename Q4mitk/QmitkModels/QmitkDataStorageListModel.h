@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   MITK
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -27,7 +27,7 @@
 #include <QmitkEnums.h>
 #include <QmitkCustomVariants.h>
 
-class QmitkDataStorageListModel : public QAbstractListModel
+class QMITK_EXPORT QmitkDataStorageListModel : public QAbstractListModel
 {
 public:
 

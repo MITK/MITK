@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   MITK
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -22,7 +22,7 @@
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::NodePredicateBase* pred, QObject* parent)
  : QAbstractListModel(parent), m_NodePredicate(pred)
 {
-
+  SetDataStorage(mitk::DataStorage::GetInstance());
 }
 
 QmitkDataStorageListModel::~QmitkDataStorageListModel()

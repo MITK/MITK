@@ -65,6 +65,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"
+#include "mitkVtkInteractorCameraController.h"
+#include "mitkTDMouseVtkCameraController.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 

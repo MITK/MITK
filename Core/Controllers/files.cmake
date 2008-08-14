@@ -28,5 +28,7 @@ IF(WIN32)
   SET(CPP_FILES ${CPP_FILES} mitkMovieGeneratorWin32.cpp)
 ENDIF(WIN32)
 
-
+IF(MITK_USE_TD_MOUSE)
+  SET(CPP_FILES ${CPP_FILES}  mitkTDMouseVtkCameraController.cpp)
+ENDIF(MITK_USE_TD_MOUSE)
 

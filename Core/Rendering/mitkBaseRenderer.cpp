@@ -26,7 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
-#include "mitkVtkInteractorCameraController.h"
+
+#ifdef MITK_USE_TD_MOUSE
+  #include "mitkTDMouseVtkCameraController.h"
+#else
+  #include "mitkCameraController.h"
+#endif
 
 #include "mitkVtkLayerController.h"
 
@@ -180,7 +185,12 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_CameraRotationController->SetRenderWindow( m_RenderWindow );
   m_CameraRotationController->AcquireCamera();
 
-  m_CameraController = VtkInteractorCameraController::New();
+//if TD Mouse Interaction is activated, then call TDMouseVtkCameraController instead of VtkInteractorCameraController
+#ifdef MITK_USE_TD_MOUSE
+    m_CameraController = mitk::TDMouseVtkCameraController::New();
+#else
+    m_CameraController = mitk::CameraController::New(NULL);
+#endif
 
   m_VtkRenderer = vtkRenderer::New();
 
@@ -274,12 +284,7 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   
   if(m_CameraController.IsNotNull())
   {
-    VtkInteractorCameraController* vicc=dynamic_cast<VtkInteractorCameraController*>(m_CameraController.GetPointer());
-    if(vicc!=NULL)
-    {
-      vicc->SetRenderer(this);
-      //vicc->GetVtkInteractor()->Disable();
-    }
+    m_CameraController->SetRenderer(this);
   }
 }
 

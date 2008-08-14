@@ -63,3 +63,7 @@ SET( TOOL_FILES
   mitkSubtractContourTool.cpp
 )
 
+IF(MITK_USE_TD_MOUSE)
+  SET(CPP_FILES ${CPP_FILES} mitkTDMouseEvent.cpp mitkSpaceNavigatorDriver.cpp mitkTDMouseEventThrower.cpp)
+ENDIF(MITK_USE_TD_MOUSE)
+

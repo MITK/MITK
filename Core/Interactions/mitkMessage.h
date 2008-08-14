@@ -176,6 +176,26 @@ class TMessageCommand2 : public MessageCommand2<T,U>
     void (R::*m_MemberFunctionPointer)(T, U);   // pointer to member function
 }; 
 
+/**
+ * \brief Event/message/notification class.
+ *
+ * \sa mitk::BinaryThresholdTool
+ * \sa QmitkBinaryThresholdToolGUI
+ *
+ * This totally ITK, Qt, VTK, whatever toolkit independent class
+ * allows one class to send out messages and another class to
+ * receive these message. There are two subclasses for sending
+ * parameters along with the messages.
+ *
+ * This is an implementation of the Observer pattern.
+ *
+ * \li There is no guarantee about the order of which observer is notified first. At the moment the observers which register first will be notified first.
+ * \li Notifications are <b>synchronous</b>, by direct method calls. There is no support for asynchronous messages.
+ * 
+ * A lengthy example of how to use these message classes can be 
+ * found in the directory Testing, file mitkMessageTest.cpp
+ *
+ */
 // message without parameters (pure signals)
 class Message
 { 

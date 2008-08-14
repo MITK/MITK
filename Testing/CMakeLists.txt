@@ -30,6 +30,7 @@ SET(${KITNAME}_TESTS
   mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp
   mitkMeshTest.cpp
+  mitkMessageTest.cpp
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneGeometryTest.cpp

@@ -257,6 +257,23 @@ class Message
     
     typedef std::vector<MessageCommand* > ListenerList;
     
+    /**
+     * \brief List of listeners.
+     *
+     * This is declared mutable for a reason: Imagine an object that sends out notifications, e.g.
+     *
+     * \code
+class Database {
+  public:
+    Message Modified;
+};
+     * \endcode
+     *
+     * Now imaginge someone gets a <tt>const Database</tt> object, because he/she should not write to the
+     * database. He/she should anyway be able to register for notifications about changes in the database
+     * -- this is why AddListener and RemoveListener are declared <tt>const</tt>. m_Listeners must be
+     *  mutable so that AddListener and RemoveListener can modify it regardless of the object's constness.
+     */    
     mutable ListenerList m_Listeners;
  
 };

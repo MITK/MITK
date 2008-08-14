@@ -257,6 +257,14 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     }
   }
 
+  if (_ofsNum == 0)
+  {
+    // contour was completely outside the binary image
+    delete[] _ofsArray;
+    delete[] _points;
+    return;
+  }
+
   ipMITKSegmentationTYPE* picdata = static_cast<ipMITKSegmentationTYPE*>(pic->data);
 
   // divide line in logical segments:

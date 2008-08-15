@@ -174,6 +174,8 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
     mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
+  /* Notify observers */
+  m_AddNodeEvent.Send(node);
 }
 
 
@@ -197,7 +199,12 @@ void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
     return;       // node not found
  
   m_DuringRemove = true;
-  if (it->Disconnect() == false)   // remove node from tree, but keep its children 
+
+  /* Notify observers of imminent node removal */
+  m_RemoveNodeEvent.Send(node);
+  
+  /* remove node from tree, but keep its children */
+  if (it->Disconnect() == false)
   {
     m_DuringRemove = false;
     throw 2;
@@ -207,6 +214,7 @@ void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
   this->RemoveFromRelation(node, m_SourceNodes);
   this->RemoveFromRelation(node, m_DerivedNodes);
   m_DuringRemove = false;
+
 }
 
 
@@ -215,7 +223,7 @@ void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
   if (nodes == NULL)
     return;
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
-    this->Remove(it.Value());  
+    this->Remove(it.Value());
 }
 
 
@@ -237,9 +245,9 @@ void mitk::DataStorage::RemoveFromRelation(const mitk::DataTreeNode* node, Adjac
 }
 
 
-void mitk::DataStorage::Update(mitk::DataTreeNode* /* node */)
-{
-}
+//void mitk::DataStorage::Update(mitk::DataTreeNode* /* node */)
+//{
+//}
 
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const NodePredicateBase& condition) const

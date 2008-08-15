@@ -39,6 +39,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 int CheckDataStorage(int argc, char* argv[], bool manageCompleteTree);
 
+class DSEventReceiver
+{
+public:
+  const mitk::DataTreeNode* m_NodeAdded;
+  const mitk::DataTreeNode* m_NodeRemoved;
+
+  DSEventReceiver()
+    : m_NodeAdded(NULL), m_NodeRemoved(NULL)
+  {
+  }
+
+  void OnAdd(const mitk::DataTreeNode* node)
+  {
+    m_NodeAdded = node;
+  }
+
+  void OnRemove(const mitk::DataTreeNode* node)
+  {
+    m_NodeRemoved = node;
+  }
+
+};
+
+
 int mitkDataStorageTest(int argc, char* argv[])
 {
   
@@ -1442,8 +1466,8 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   }  
 
 
- /* Checking DataTree Delete Oberver funtionality */
-  std::cout << "Checking DataTree Delete Oberver funtionality: " << std::flush;
+ /* Checking DataTree Delete Observer functionality */
+  std::cout << "Checking DataTree Delete Observer functionality: " << std::flush;
   try
   {
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
@@ -1469,6 +1493,79 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
     returnValue = EXIT_FAILURE;
   }  
  
+  /* Checking Event handling */
+  std::cout << "Checking Event handling: " << std::endl;
+  DSEventReceiver listener;
+  try
+  {
+    ds->RegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
+    ds->RegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
+
+    std::cout << "AddEvent: " << std::flush;
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+    ds->Add(extra); 
+
+    if (listener.m_NodeAdded == extra.GetPointer())
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+    std::cout << "RemoveEvent: " << std::flush;
+    ds->Remove(extra); 
+    if (listener.m_NodeRemoved == extra.GetPointer())
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+
+    std::cout << "Unregister: " << std::flush;
+    ds->UnRegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
+    ds->UnRegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
+    listener.m_NodeAdded = NULL;
+    listener.m_NodeRemoved = NULL;
+    ds->Add(extra);
+    ds->Remove(extra);
+    if ((listener.m_NodeRemoved == NULL) && (listener.m_NodeAdded == NULL))
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+
+    std::cout << "Pointer handling after event handling: " << std::flush;
+    extra = NULL; // delete reference to the node. its memory should be freed now
+    if (watcher->GetReferenceCount() == 0)
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout << "[FAILED] - some exception was thrown." << std::endl;
+    returnValue = EXIT_FAILURE;
+    /* cleanup */
+    ds->UnRegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
+    ds->UnRegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
+
+  }
+    
 
   /* finally return cumulated returnValue */
   return returnValue;

@@ -73,6 +73,10 @@ protected:
 
   virtual ~BaseVtkMapper3D();
 
+  /** Checks whether the specified property is a AnnotationProperty and if yes,
+  * adds it to m_LabelActorCollection (internal method). */
+  virtual void CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer );
+
 public:
 
   itkGetObjectMacro(Geometry,Geometry3D);

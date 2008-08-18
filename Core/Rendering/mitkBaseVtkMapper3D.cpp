@@ -135,60 +135,6 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
   // check for opacity prop and use it for rendering if it exists
   this->GetOpacity(rgba[3], renderer);
 
-  // Combine renderer-specific and universal properties into one list
-  PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->ConcatenatePropertyList(
-    this->GetDataTreeNode()->GetPropertyList( renderer ) );
-  propertyList->ConcatenatePropertyList(
-    this->GetDataTreeNode()->GetPropertyList( NULL ) );
-
-  const PropertyList::PropertyMap *propertyMap =
-    propertyList->GetMap();
-  
-  // Add annotations to assembly, if any (camera (renderer) must be present)
-  if ( renderer != NULL )
-  {
-    m_LabelActorCollection->RemoveAllItems();
-    
-    PropertyList::PropertyMap::const_iterator it;
-    for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
-    {
-      AnnotationProperty *annotationProperty =
-        dynamic_cast< AnnotationProperty * >( (*it).second.first.GetPointer() );
-
-      if ( annotationProperty != NULL )
-      {
-        vtkVectorText *labelText = vtkVectorText::New();
-        vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
-        labelMapper->SetInput( labelText->GetOutput() );
-
-        vtkFollower *labelFollower = vtkFollower::New();
-        labelFollower->SetMapper( labelMapper );
-        labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
-
-        labelFollower->SetScale( 2.5, 2.5, 2.5 );
-        labelFollower->GetProperty()->SetColor( 1.0, 0.2, 0.1 );
-
-        labelText->SetText( annotationProperty->GetLabel() );
-
-        const Point3D &pos = annotationProperty->GetPosition();
-
-        Geometry3D *geometry = m_DataTreeNode->GetData()->GetGeometry();
-
-        Point3D transformedPos;
-        geometry->IndexToWorld( pos, transformedPos );
-
-        labelFollower->SetPosition( transformedPos[0], transformedPos[1], transformedPos[2] );
-
-        //labelFollower->SetUserTransform(
-        //  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform() );
-
-        m_LabelActorCollection->AddItem( labelFollower );
-      }
-    }
-  }
-
-
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
   actor->GetProperty()->SetColor(drgba);
@@ -197,6 +143,67 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
   actor->GetProperty()->SetColor(rgba);
   actor->GetProperty()->SetOpacity(rgba[3]);
 #endif
+
+
+  // Add annotations to assembly, if any (camera (renderer) must be present)
+  if ( renderer != NULL )
+  {
+    // Check whether one or more AnnotationProperty objects have been defined for
+    // this node. Check both renderer specific and global property lists, since
+    // properties in both should be considered.
+    const PropertyList::PropertyMap *rendererProperties = this->GetDataTreeNode()->GetPropertyList( renderer )->GetMap();
+    const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
+
+    // Add clipping planes (if any)
+    m_LabelActorCollection->RemoveAllItems();
+
+    PropertyList::PropertyMap::const_iterator it;
+    for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
+    {
+      this->CheckForAnnotationProperty( (*it).second.first.GetPointer(), renderer );
+    }
+
+    for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
+    {
+      this->CheckForAnnotationProperty( (*it).second.first.GetPointer(), renderer );
+    }
+  } 
+}
+
+void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer )
+{
+  AnnotationProperty *annotationProperty =
+    dynamic_cast< AnnotationProperty * >( property );
+
+  if ( annotationProperty != NULL )
+  {
+    vtkVectorText *labelText = vtkVectorText::New();
+    vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
+    labelMapper->SetInput( labelText->GetOutput() );
+
+    vtkFollower *labelFollower = vtkFollower::New();
+    labelFollower->SetMapper( labelMapper );
+    labelFollower->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+
+    labelFollower->SetScale( 2.5, 2.5, 2.5 );
+    labelFollower->GetProperty()->SetColor( 1.0, 0.2, 0.1 );
+
+    labelText->SetText( annotationProperty->GetLabel() );
+
+    const Point3D &pos = annotationProperty->GetPosition();
+
+    Geometry3D *geometry = m_DataTreeNode->GetData()->GetGeometry();
+
+    Point3D transformedPos;
+    geometry->IndexToWorld( pos, transformedPos );
+
+    labelFollower->SetPosition( transformedPos[0], transformedPos[1], transformedPos[2] );
+
+    //labelFollower->SetUserTransform(
+    //  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform() );
+
+    m_LabelActorCollection->AddItem( labelFollower );
+  }
 }
 
 void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)

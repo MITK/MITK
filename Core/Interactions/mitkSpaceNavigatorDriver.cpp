@@ -30,8 +30,6 @@ SpaceNavigatorDriver::SpaceNavigatorDriver()
          // stop creation of window
          result = -1;
       }
-      else
-        cout << "alles bestens \n";
     }
 }
 

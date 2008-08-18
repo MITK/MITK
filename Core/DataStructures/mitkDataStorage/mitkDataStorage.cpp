@@ -121,7 +121,7 @@ void mitk::DataStorage::NodeDeletedInTree(const itk::EventObject & treeChangedEv
 }
 
 
-inline bool mitk::DataStorage::IsInitialized() const
+bool mitk::DataStorage::IsInitialized() const
 {
   return m_DataTree.IsNotNull();
 }

@@ -88,6 +88,10 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
+  /** Checks whether the specified property is a ClippingProperty and if yes,
+   * adds it to m_ClippingPlaneCollection (internal method). */
+  virtual void CheckForClippingProperty( mitk::BaseProperty *property );
+
   bool m_GenerateNormals;
 
   vtkActor* m_Actor;

@@ -295,39 +295,24 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   }
 
 
-  // Combine renderer-specific and universal properties into one list
-  PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->ConcatenatePropertyList(
-    this->GetDataTreeNode()->GetPropertyList( renderer ) );
-  propertyList->ConcatenatePropertyList(
-    this->GetDataTreeNode()->GetPropertyList( NULL ) );
-
-  const PropertyList::PropertyMap *propertyMap =
-    propertyList->GetMap();
+  // Check whether one or more ClippingProperty objects have been defined for
+  // this node. Check both renderer specific and global property lists, since
+  // properties in both should be considered.
+  const PropertyList::PropertyMap *rendererProperties = this->GetDataTreeNode()->GetPropertyList( renderer )->GetMap();
+  const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
 
   // Add clipping planes (if any)
   m_ClippingPlaneCollection->RemoveAllItems();
   
   PropertyList::PropertyMap::const_iterator it;
-  for ( it = propertyMap->begin(); it != propertyMap->end(); ++it )
+  for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
   {
-    ClippingProperty *clippingProperty =
-      dynamic_cast< ClippingProperty * >( (*it).second.first.GetPointer() );
+    this->CheckForClippingProperty( (*it).second.first.GetPointer() );
+  }
 
-    if ( (clippingProperty != NULL)
-      && (clippingProperty->GetClippingEnabled()) )
-    {
-      const Point3D &origin = clippingProperty->GetOrigin();
-      const Vector3D &normal = clippingProperty->GetNormal();
-
-      vtkPlane *clippingPlane = vtkPlane::New();
-      clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
-      clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
-
-      m_ClippingPlaneCollection->AddItem( clippingPlane );
-
-      clippingPlane->UnRegister( NULL );
-    }
+  for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
+  {
+    this->CheckForClippingProperty( (*it).second.first.GetPointer() );
   }
 
   if ( m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
@@ -339,6 +324,27 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     m_VtkPolyDataMapper->RemoveAllClippingPlanes();
   }
 }
+
+void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseProperty *property )
+{
+  ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >( property );
+
+  if ( (clippingProperty != NULL)
+    && (clippingProperty->GetClippingEnabled()) )
+  {
+    const Point3D &origin = clippingProperty->GetOrigin();
+    const Vector3D &normal = clippingProperty->GetNormal();
+
+    vtkPlane *clippingPlane = vtkPlane::New();
+    clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
+    clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
+
+    m_ClippingPlaneCollection->AddItem( clippingPlane );
+
+    clippingPlane->UnRegister( NULL );
+  }
+}
+
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {

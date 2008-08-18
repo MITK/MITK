@@ -115,6 +115,10 @@ void mitk::DataStorage::NodeDeletedInTree(const itk::EventObject & treeChangedEv
   mitk::DataTreeNode* node = it->Get();
   if (node == NULL)
     return;
+  
+  /* Notify observers of imminent node removal */
+  RemoveNodeEvent.Send(node);
+
   /* remove the node from our relation, now that it was removed from the tree */
   this->RemoveFromRelation(node, m_SourceNodes);
   this->RemoveFromRelation(node, m_DerivedNodes);
@@ -175,7 +179,7 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::S
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
   /* Notify observers */
-  m_AddNodeEvent.Send(node);
+  AddNodeEvent.Send(node);
 }
 
 
@@ -201,7 +205,7 @@ void mitk::DataStorage::Remove(const mitk::DataTreeNode* node)
   m_DuringRemove = true;
 
   /* Notify observers of imminent node removal */
-  m_RemoveNodeEvent.Send(node);
+  RemoveNodeEvent.Send(node);
   
   /* remove node from tree, but keep its children */
   if (it->Disconnect() == false)

@@ -1498,9 +1498,9 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
   DSEventReceiver listener;
   try
   {
-    ds->RegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
-    ds->RegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
-
+    ds->AddNodeEvent.AddListener(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent.AddListener(&listener, &DSEventReceiver::OnRemove);
+    
     std::cout << "AddEvent: " << std::flush;
     mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
@@ -1528,8 +1528,8 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
     }
 
     std::cout << "Unregister: " << std::flush;
-    ds->UnRegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
-    ds->UnRegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
+    ds->AddNodeEvent.RemoveListener(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent.RemoveListener(&listener, &DSEventReceiver::OnRemove);
     listener.m_NodeAdded = NULL;
     listener.m_NodeRemoved = NULL;
     ds->Add(extra);
@@ -1561,10 +1561,38 @@ int CheckDataStorage(int, char*[], bool manageCompleteTree)
     std::cout << "[FAILED] - some exception was thrown." << std::endl;
     returnValue = EXIT_FAILURE;
     /* cleanup */
-    ds->UnRegisterAddNodeObserver(&listener, &DSEventReceiver::OnAdd);
-    ds->UnRegisterRemoveNodeObserver(&listener, &DSEventReceiver::OnRemove);
+    ds->AddNodeEvent.RemoveListener(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent.RemoveListener(&listener, &DSEventReceiver::OnRemove);
 
   }
+  /* Checking RemoveEvent on delete in DataTree */
+  std::cout << "Checking RemoveEvent on delete in DataTree: " << std::flush;
+  try
+  {
+    DSEventReceiver listener;
+    ds->RemoveNodeEvent.AddListener(&listener, &DSEventReceiver::OnRemove);
+
+    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();    
+    ds->Add(extra); 
+    mitk::DataTreeIteratorClone it = mitk::DataTreeHelper::FindIteratorToNode(tree, extra); // remove extra directly from tree
+    it->Disconnect(); // delete node directly from tree. the observer mechanism should delete it from the internal relations too
+    
+    if (listener.m_NodeRemoved == extra.GetPointer())
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      returnValue = EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout<<"[FAILED] - Exception thrown" << std::endl;
+    returnValue = EXIT_FAILURE;
+  }  
+
     
 
   /* finally return cumulated returnValue */

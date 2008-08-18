@@ -105,15 +105,15 @@ namespace mitk {
     //## myDataStorage->RegisterAddNodeObserver(this, &myClass::myNotifyMethod);
     //## Whenever a new data object is added to the DataStorage, myNotifyMethod will be called with a pointer 
     //## to the new data object as parameter. Notification occurs directly after the data object was added to the DataStorage.
-    template <class R>
-    void RegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
+    //template <class R>
+    //void RegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
 
     //##Documentation
     //## @brief Unregister an observer for AddEvent 
     //##
     //## Remove an registered observer for the AddEvent.
-    template <class R>
-    void UnRegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
+    //template <class R>
+    //void UnRegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
 
     //##Documentation
     //## @brief Register an observer for RemoveEvent 
@@ -123,15 +123,15 @@ namespace mitk {
     //## myDataStorage->RegisterRemoveNodeObserver(this, &myClass::myNotifyMethod);
     //## Whenever a data object is removed from the DataStorage, myNotifyMethod will be called with a pointer 
     //## to the data object as parameter. Notification occurs directly before the data object is removed from the DataStorage.
-    template <class R>
-    void RegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
+    //template <class R>
+    //void RegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
 
     //##Documentation
     //## @brief Unregister an observer for RemoveEvent 
     //##
     //## Remove an registered observer for the RemoveEvent.
-    template <class R>
-    void UnRegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
+    //template <class R>
+    //void UnRegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
 
 
     //##Documentation
@@ -252,6 +252,26 @@ namespace mitk {
     itkGetMacro(ManageCompleteTree, bool);
     itkBooleanMacro(ManageCompleteTree);
 
+    /* Public Events */
+
+    //##Documentation
+    //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage. 
+    //##
+    //## Observers should register to this event by calling myDataStorage->AddNodeEvent.AddListener(myObject, MyObject::MyMethod).
+    //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
+    //## Observers should unregister by calling myDataStorage->AddNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
+    //## Note: AddEvents are _not_ emitted if a node is added to DataStorage by adding it to the the underlying DataTree!
+    Message1<const mitk::DataTreeNode*> AddNodeEvent;
+
+    //##Documentation
+    //## @brief RemoveEvent is emitted directly before a node is removed from the DataStorage. 
+    //##
+    //## Observers should register to this event by calling myDataStorage->RemoveNodeEvent.AddListener(myObject, MyObject::MyMethod).
+    //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
+    //## Observers should unregister by calling myDataStorage->RemoveNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
+    //## Note: RemoveEvents are also emitted if a node was removed from the DataStorage by deleting it from the underlying DataTree
+    Message1<const mitk::DataTreeNode*> RemoveNodeEvent;
+
   protected:
 
     //TODO investigate removing friend declarations when DataStorage is
@@ -311,56 +331,8 @@ namespace mitk {
 
     static mitk::DataStorage::Pointer s_Instance;
 
-    //##Documentation
-    //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage. 
-    //##
-    //## Observers should register to this event by calling the RegisterAddEvent() method.
-    //## Observers should unregister by calling the UnRegisterAddEvent() method.
-    Message1<const mitk::DataTreeNode*> m_AddNodeEvent;
-    
-    //##Documentation
-    //## @brief RemoveEvent is emitted directly before a node is removed from the DataStorage. 
-    //##
-    //## Observers should register to this event by calling the RegisterRemoveEvent() method.
-    //## Observers should unregister by calling the UnRegisterRemoveEvent() method.
-    Message1<const mitk::DataTreeNode*> m_RemoveNodeEvent;
+
   };
 } // namespace mitk
-
-template <class R>
-void mitk::DataStorage::RegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*))
-{
-  if (!IsInitialized())
-    throw 1;  // insert exception handling here
-  this->m_AddNodeEvent.AddListener(receiver, fnptr);
-}
-
-
-template <class R>
-void mitk::DataStorage::UnRegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*))
-{
-  if (!IsInitialized())
-    throw 1;  // insert exception handling here
-  this->m_AddNodeEvent.RemoveListener(receiver, fnptr);
-}
-
-
-template <class R>
-void mitk::DataStorage::RegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*))
-{
-  if (!IsInitialized())
-    throw 1;  // insert exception handling here
-  this->m_RemoveNodeEvent.AddListener(receiver, fnptr);
-}
-
-
-template <class R>
-void mitk::DataStorage::UnRegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*))
-{
-  if (!IsInitialized())
-    throw 1;  // insert exception handling here
-  this->m_RemoveNodeEvent.RemoveListener(receiver, fnptr);
-}
-
 
 #endif /* MITKDATASTORAGE_H_HEADER_INCLUDED_ */

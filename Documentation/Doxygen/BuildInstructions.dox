@@ -45,6 +45,7 @@ If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool 
  - \b MITK_DOXYGEN_OUTPUT_DIR: specify the directory where the doxygen documentation will we generated. 
  - \b USE_ITKZLIB: This should be ON in nearly all cases.
  - \b MITK_STARTUP_FUNCTIONALITY: This can be used to specify the functionality which should be activated first after launching the application.
+ - \b MITK_USE_TD_MOUSE: (Win32 only) Set to ON if a 3Dconnexion mouse is available and the vendor driver is installed.
 
 \section MITKConfig.cmake
 

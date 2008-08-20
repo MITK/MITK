@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QcMITKTask;
 class QHBoxLayout;
 class QIDToolButton;
+class QPopupMenu;
 
 class Chili3Conference;
 class SampleApp;
@@ -286,6 +287,9 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     /** Slot to create the SampleApp. */
     void CreateSampleApp();
 
+    void OnMenuSeparateByAcquisitionNumberClicked();
+    void OnMenuImportFilterSelected(int id);
+   
   protected:
 
     /** REMEMBER: QcPlugin inheritanced protected */
@@ -352,6 +356,8 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
 
     QObject* findProgressBar(QObject* object);
     bool ChiliFillingLightbox();
+
+    QPopupMenu* m_PopupMenu;
 };
 
 } // namespace mitk

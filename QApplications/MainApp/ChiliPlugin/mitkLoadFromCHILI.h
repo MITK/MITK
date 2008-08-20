@@ -40,7 +40,24 @@ class LoadFromCHILI: public itk::Object
 {
   public:
 
+    /*
+     0 for mitk::ImageNumberFilter
+     1 for SpacingSetFilter
+     2 for SingleSpacingFilter
+     */
     void SetReaderType( unsigned int readerType );
+
+    /*!
+    \brief Should acquisition number be used to group images?
+    If this flag is on, images are only grouped if they have an equal acquisition number.
+    This is useful to separate images from the same series/lightbox that would
+    otherwise be sorted into the same image.
+
+    Default if false, because time series are assumed.
+
+    \warning Only useful with ImageNumberFilter.
+    */
+    void SetSeparateByAcquisitionNumber(bool on);
 
     std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcPlugin* instance, QcLightbox* lightbox, const std::string& tmpDirectory );
 
@@ -101,6 +118,8 @@ class LoadFromCHILI: public itk::Object
   protected:
 
     LoadFromCHILI();
+    
+    bool m_GroupByAcquisitionNumber;
 };
 
 } // namespace mitk

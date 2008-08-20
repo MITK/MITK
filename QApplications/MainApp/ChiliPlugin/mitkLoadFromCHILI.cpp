@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipDicom/ipDicom.h>  //read DICOM-Files
 
 mitk::LoadFromCHILI::LoadFromCHILI()
+:m_GroupByAcquisitionNumber(false)
 {
   m_UsedReader = 0;
   m_ParentChild = ParentChild::New();
@@ -167,7 +168,9 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::CreateNodesFromLis
     {
       case 0:
       {
-        converterToNode = ImageNumberFilter::New();
+        ImageNumberFilter::Pointer imageNumberFilter = ImageNumberFilter::New();
+        imageNumberFilter->SetGroupByAcquisitionNumber( m_GroupByAcquisitionNumber );
+        converterToNode = imageNumberFilter;
         break;
       }
       case 1:
@@ -611,3 +614,9 @@ ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadSinglePics( int /*rows*/, int row
   }
   return ipTrue; // true = next element; false = break iterate
 }
+    
+void mitk::LoadFromCHILI::SetSeparateByAcquisitionNumber(bool on)
+{
+  m_GroupByAcquisitionNumber = on;
+}
+

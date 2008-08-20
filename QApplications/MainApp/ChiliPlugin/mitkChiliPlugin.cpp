@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobjectlist.h>
 #include <qprogressbar.h>
 #include <qsplitter.h>
+#include <qpopupmenu.h>
 //XPM
 #include <mitk_chili_plugin.xpm>
 #include "chili_lightbox_import.xpm"
@@ -179,16 +180,31 @@ void mitk::ChiliPlugin::CreateSampleApp()
       }
     }
 
-    // button for application restart
+
+    // menu for plugin options
+    m_PopupMenu = new QPopupMenu(task);
+    m_PopupMenu->setCheckable(true);
+    m_PopupMenu->insertItem("Import using 'Image number' filter (default)", 0);
+    m_PopupMenu->setItemChecked(0, true);
+    m_PopupMenu->insertItem("Import using 'Single spacing' filter", 1);
+    m_PopupMenu->insertItem("Import using 'Spacing set' filter", 2);
+    m_PopupMenu->insertSeparator();
+    m_PopupMenu->insertItem("Separate by acquisition number", this, SLOT(OnMenuSeparateByAcquisitionNumberClicked()), 0, 4);
+    m_PopupMenu->setItemChecked(4, false);
+    connect( m_PopupMenu, SIGNAL(activated(int)), this, SLOT(OnMenuImportFilterSelected(int)) );
+
+    // button for plugin options
     m_LightBoxImportToggleButton = new QToolButton( task );
     m_LightBoxImportToggleButton->setText(" "); // just some space that generates one short empty line of text
     m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_restart_mitk_xpm) );
     m_LightBoxImportToggleButton->setAutoRaise(true);
     m_LightBoxImportToggleButton->setEnabled(true); //!! secret button to reinit application
-    connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
+    //connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
     QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
     policy.setVerStretch( 1 );
     m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());
+    m_LightBoxImportToggleButton->setPopup( m_PopupMenu );
+    m_LightBoxImportToggleButton->setPopupDelay( 1 );
     vertlayout->addWidget( m_LightBoxImportToggleButton );
   }
 
@@ -996,3 +1012,45 @@ void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
       break;
   }
 }
+
+void mitk::ChiliPlugin::OnMenuSeparateByAcquisitionNumberClicked()
+{
+  // toggle check mark in menu
+  bool checked = m_PopupMenu->isItemChecked(4);
+  checked = !checked;
+  m_PopupMenu->setItemChecked(4, checked);
+  
+  // toggle flag in ImageNumberFilter
+  m_LoadFromCHILI->SetSeparateByAcquisitionNumber(checked);
+}
+
+void mitk::ChiliPlugin::OnMenuImportFilterSelected(int id)
+{
+  // 
+  std::cout << "checkeli" << id << std::endl;
+  switch (id)
+  {
+    case 0:
+      // Image Number filter
+      m_LoadFromCHILI->SetReaderType(0);
+      m_PopupMenu->setItemChecked(0, true);
+      m_PopupMenu->setItemChecked(1, false);
+      m_PopupMenu->setItemChecked(2, false);
+      break;
+    case 1:
+      // Single Spacing filter
+      m_LoadFromCHILI->SetReaderType(2); // NO typo! This IS a little strange.
+      m_PopupMenu->setItemChecked(0, false);
+      m_PopupMenu->setItemChecked(1, true);
+      m_PopupMenu->setItemChecked(2, false);
+      break;
+    case 2:
+      // Spacing Set filter
+      m_LoadFromCHILI->SetReaderType(1); // NO typo! This IS a little strange.
+      m_PopupMenu->setItemChecked(0, false);
+      m_PopupMenu->setItemChecked(1, false);
+      m_PopupMenu->setItemChecked(2, true);
+      break;
+  }
+}
+

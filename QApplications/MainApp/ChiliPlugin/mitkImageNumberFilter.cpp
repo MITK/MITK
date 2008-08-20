@@ -51,11 +51,22 @@ bool mitk::ImageNumberFilter::PositionSort( const Slice elem1, const Slice elem2
 }
 
 mitk::ImageNumberFilter::ImageNumberFilter()
+:m_GroupByAcquisitionNumber(false)
 {
 }
 
 mitk::ImageNumberFilter::~ImageNumberFilter()
 {
+}
+    
+void mitk::ImageNumberFilter::SetGroupByAcquisitionNumber(bool on)
+{
+  m_GroupByAcquisitionNumber = on;
+}
+
+bool mitk::ImageNumberFilter::GetGroupByAcquisitionNumber()
+{
+  return m_GroupByAcquisitionNumber;
 }
 
 // the "main"-function
@@ -203,6 +214,7 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
       {
         //checking referenceUID, seriesDescription, pixelSize and NormaleWithSize
         if(    m_GroupList[ curCount ].referenceUID        == isg->forUID 
+            && (m_GroupList[ curCount ].acq == isg->acq || ! m_GroupByAcquisitionNumber)
             /* Following line was deactivated, because this would not create time series
              * for image series where slices are describes as
              *
@@ -234,6 +246,7 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
       Group newGroup;
       newGroup.includedSlices.push_back( newSlice );
       newGroup.referenceUID = isg->forUID;
+      newGroup.acq = isg->acq;
       newGroup.seriesDescription = currentSeriesDescription;
       newGroup.dimension = currentDimension;
       newGroup.pixelSize = currentPixelSize;
@@ -377,7 +390,7 @@ void mitk::ImageNumberFilter::SeparateByTime()
     unsigned int minTimeSteps = std::numeric_limits<unsigned int>::max();
 
     Vector3D lastOrigin;
-    lastOrigin.Fill( std::numeric_limits<mitk::ScalarType>::infinity() );
+    lastOrigin.Fill( std::numeric_limits<mitk::ScalarType>::max() );
 
     unsigned int timeStepsAtThisPosition = 1;
     unsigned int differentTimeStepCount = 0;
@@ -396,6 +409,7 @@ void mitk::ImageNumberFilter::SeparateByTime()
           ++differentTimeStepCount;
           minTimeSteps = timeStepsAtThisPosition;
         }
+        lastOrigin = sliceIter->origin; // we guess this is a new time step from here on
         timeStepsAtThisPosition = 1;
       }
     }

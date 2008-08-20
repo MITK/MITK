@@ -63,6 +63,17 @@ class ImageNumberFilter : public PicDescriptorToNode
     */
     virtual void Update();
 
+    /*!
+    \brief Should acquisition number be used to group images?
+    If this flag is on, images are only grouped if they have an equal acquisition number.
+    This is useful to separate images from the same series/lightbox that would
+    otherwise be sorted into the same image.
+
+    Default if false, because time series are assumed.
+    */
+    void SetGroupByAcquisitionNumber(bool on);
+    bool GetGroupByAcquisitionNumber();
+
   protected:
 
     ImageNumberFilter();  // purposely hidden, created by New()
@@ -82,6 +93,7 @@ class ImageNumberFilter : public PicDescriptorToNode
     {
       std::vector< Slice > includedSlices;
       std::string referenceUID;
+      int acq;
       std::string seriesDescription;
       int dimension;  // dimension of the images grouped in this group
       Vector3D pixelSize;
@@ -132,6 +144,8 @@ class ImageNumberFilter : public PicDescriptorToNode
 
     /** help-functions */
     static bool PositionSort( const Slice elem1, const Slice elem2 );
+
+    bool m_GroupByAcquisitionNumber;
 };
 
 } // namespace mitk

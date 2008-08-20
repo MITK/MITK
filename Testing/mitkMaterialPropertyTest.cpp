@@ -21,6 +21,7 @@
 #include "mitkTestingMacros.h"
 #include "mitkDataTreeNode.h"
 #include <mitkVtkPropRenderer.h>
+#include <mitkColorProperty.h>
 
 #include <iostream>
 
@@ -32,76 +33,17 @@
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests ().
  */
-mitk::DataTreeNode::Pointer node = NULL;
-mitk::MaterialProperty::Pointer myMP = NULL;
 
 
 
 
-void testConstructorWithNodeAndRenderer();
-void testConstructorWithColorOpacityNodeAndRenderer();
-void testConstructorWithRedGreenBlueOpacityNodeAndRenderer();
-void testConstructorRedGreenBlueColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
-void testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
-void testConstructorPropertyRedGreenBlueOpacityAndName();
-
-//void testAssignable();//TODO
-//void testOperator=();//TODO
-void testSetColor();
-void testSetColorCoefficient();
-void testSetSpecularColor();
-void testSetSpecularCoefficient();
-void testSetSpecularPower();
-void testSetOpacity();
-void testSetInterpolation();
-void testSetRepresentation();
-void testSetLineWidth();
-void testInitialize();
-void testOperatorequality();
-void testForwardToDataTreeNode();
-
-
-
-
-
-
-int
-mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
+class MaterialPropTest
 {
-  // always start with this!
-  MITK_TEST_BEGIN("MaterialProperty")
-      
-      node = mitk::DataTreeNode::New();
+  public:
+mitk::DataTreeNode::Pointer node;
+mitk::MaterialProperty::Pointer myMP;
 
-      testConstructorWithNodeAndRenderer();
-      testConstructorWithColorOpacityNodeAndRenderer();
-      testConstructorWithRedGreenBlueOpacityNodeAndRenderer();
-      testConstructorRedGreenBlueColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
-      testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
-      testConstructorPropertyRedGreenBlueOpacityAndName();
-      testSetColor();
-      testSetColorCoefficient();
-      testSetSpecularColor();
-      testSetSpecularCoefficient();
-      testSetSpecularPower();
-      testSetOpacity();
-      testSetInterpolation();
-      testSetRepresentation();
-      testSetLineWidth();
-      testInitialize(); 
-      /*testOperatorequality();
-      testForwardToDataTreeNode();
-    */
-      // first test: did this work?
-      // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-      // it makes no sense to continue without an object.
-
-      // write your own tests here and use the macros from mitkTestingMacros.h !!!
-      // do not write to std::cout and do not return from this function yourself!
-
-      // always end with this!
-MITK_TEST_END    ()  
-}
+MaterialPropTest(){node = NULL; myMP = NULL;}
 
 void testConstructorWithNodeAndRenderer()
   {
@@ -410,9 +352,77 @@ void testOperatorequality()
  
 
 }
+void testForwardToDataTreeNode()
+{
+  myMP = NULL;
+  mitk::BaseRenderer *renderer = NULL;
+  myMP = mitk::MaterialProperty::New(node, renderer);
+  MITK_TEST_CONDITION(myMP->ForwardToDataTreeNode(), "testing ForwardToDataTreeNode() with (node = mitk::DataTreeNode::New())")
+  myMP->SetDataTreeNode(NULL);
+  MITK_TEST_CONDITION(!(myMP->ForwardToDataTreeNode()), "testing ForwardToDataTreeNode() with (node = NULL)")
+
+
+}
+
+void testAssignable()
+{
+  mitk::ColorProperty::Pointer colorProp = mitk::ColorProperty::New();
+  mitk::MaterialProperty::Pointer materialProp = mitk::MaterialProperty::New();
+  MITK_TEST_CONDITION(!(myMP->Assignable(*colorProp)), "testing Assignable with ColorProperty")
+  MITK_TEST_CONDITION(myMP->Assignable(*materialProp),"testing Assignable with MaterialProperty" )
+} 
+
+void testOperatorAssign()
+{
+  mitk::MaterialProperty::Pointer myMP2 = mitk::MaterialProperty::New();
+  *myMP2 = *myMP;
+  MITK_TEST_CONDITION(*myMP == *myMP2, "Testing Assignment Operator")
+}
+};
 
 
 
 
+
+int
+mitkMaterialPropertyTest(int /* argc */, char* /*argv*/[])
+{
+  // always start with this!
+  MITK_TEST_BEGIN("MaterialProperty")
+      
+      MaterialPropTest materialPropTest;
+      materialPropTest.node = mitk::DataTreeNode::New();
+
+      materialPropTest.testConstructorWithNodeAndRenderer();
+      materialPropTest.testConstructorWithColorOpacityNodeAndRenderer();
+      materialPropTest.testConstructorWithRedGreenBlueOpacityNodeAndRenderer();
+      materialPropTest.testConstructorRedGreenBlueColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
+      materialPropTest.testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacityNodeAndRenderer();
+      materialPropTest.testConstructorPropertyRedGreenBlueOpacityAndName();
+      materialPropTest.testAssignable();
+      materialPropTest.testOperatorAssign();
+      materialPropTest.testSetColor();
+      materialPropTest.testSetColorCoefficient();
+      materialPropTest.testSetSpecularColor();
+      materialPropTest.testSetSpecularCoefficient();
+      materialPropTest.testSetSpecularPower();
+      materialPropTest.testSetOpacity();
+      materialPropTest.testSetInterpolation();
+      materialPropTest.testSetRepresentation();
+      materialPropTest.testSetLineWidth();
+      materialPropTest.testInitialize();
+      materialPropTest.testOperatorequality();
+      materialPropTest.testForwardToDataTreeNode();
+   
+      // first test: did this work?
+      // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
+      // it makes no sense to continue without an object.
+
+      // write your own tests here and use the macros from mitkTestingMacros.h !!!
+      // do not write to std::cout and do not return from this function yourself!
+
+      // always end with this!
+MITK_TEST_END    ()  
+}
 
 

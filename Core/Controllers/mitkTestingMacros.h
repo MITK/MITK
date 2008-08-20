@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <iostream>
 
+#include <itkExceptionObject.h>
 #include <mitkTestManager.h>
 
 namespace mitk {
@@ -57,7 +58,10 @@ namespace mitk {
   } catch (mitk::TestFailedException ex) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
     mitk::TestManager::GetInstance()->TestFailed(); \
-  }                                                         \
+  } catch (itk::ExceptionObject ex) { \
+    MITK_TEST_OUTPUT(<< "ITKException occured: " << ex) \
+    mitk::TestManager::GetInstance()->TestFailed(); \
+  }                                                     \
   if (mitk::TestManager::GetInstance()->NumberOfFailedTests() > 0) {  \
     MITK_TEST_OUTPUT(<< mitkTestName << ": [DONE FAILED] , subtests passed: " << \
     mitk::TestManager::GetInstance()->NumberOfPassedTests() << " failed: " << \
@@ -91,5 +95,41 @@ namespace mitk {
     mitk::TestManager::GetInstance()->TestPassed(); \
  }
 
+/**
+ * \brief Begin block which should be checked for exceptions
+ *
+ * This macro, together with MITK_TEST_FOR_EXCEPTION_END, can be used
+ * to test whether a code block throws an expected exception. The test FAILS if the exception is NOT thrown. A simple example:
+ *
 
+ MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ImageFileReaderException)
+    typedef itk::ImageFileReader< itk::Image<unsigned char,2> > ReaderType;
+    ReaderType::Pointer reader = ReaderType::New();
+    reader->SetFileName("/tmp/not-existing");
+    reader->Update();
+ MITK_TEST_FOR_EXCEPTION_END(itk::ImageFileReaderException)
+
+ *
+ */ 
+#define MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
+  try {
+
+#define MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS) \
+    mitk::TestManager::GetInstance()->TestFailed(); \
+    MITK_TEST_OUTPUT( << "Expected an " << #EXCEPTIONCLASS << "exception. [FAILED]") \
+  } \
+  catch (EXCEPTIONCLASS) { \
+    MITK_TEST_OUTPUT( << "Catched an expected " << #EXCEPTIONCLASS << "exception. [PASSED]") \
+    mitk::TestManager::GetInstance()->TestPassed(); \
+  }
+
+
+/**
+ * \brief Simplified version of MITK_TEST_FOR_EXCEPTION_BEGIN / END for
+ * a single statement
+ */
+#define MITK_TEST_FOR_EXCEPTION(EXCEPTIONCLASS, STATEMENT) \
+  MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS) \
+  STATEMENT ; \
+  MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)
 

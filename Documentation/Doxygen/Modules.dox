@@ -72,7 +72,7 @@
   \defgroup Undo Undo Classes
   \ingroup InteractionUndo
 
-  \brief This subcategory includes classes the undo/redo-specific classes. 
+  \brief This subcategory includes the undo/redo-specific classes. 
   
   For undo-support, the change is done by sending an OperationEvent to the respective data object, 
   which changes itself accordingly.
@@ -86,6 +86,19 @@
 
   \brief A couple of classes related to SliceBasedSegmentation.
   \sa QmitkSliceBasedSegmentationTechnicalPage
+*/
+
+/**
+  \defgroup Registration Registration
+
+  \brief A couple of classes related to registration.
+*/
+
+/**
+  \defgroup RigidRegistration Classes related to rigid registration
+  \ingroup Registration
+  
+  \brief A couple of classes related to rigid registration.
 */
 
 

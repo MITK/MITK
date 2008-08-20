@@ -40,6 +40,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /**
+  * \brief Observer to react on rigid registration optimizer events. 
+  * 
+  * \sa ProgressBar
+  *
+  * \ingroup Registration
+  *
+  * This class reacts on events sent by ITK optimizers. These events will be sent for every iteration the optimizer performs.
+  * This class also takes care for the progress bar for every iteration step.
+  *
+  * The current optimizer values will be stored and a modified event will be sent to listeners registered to this observer.  
+  * These listeners have the possibility to get the current optimizer parameters.
+  * 
+  * The optimization process can be stopped by setting stopOptimization to true. The optimization will be stopped after the next
+  * iteration step of the optimizer. Unfortunately this is not implemented for ExhaustiveOptimizer, LBFGSBOptimizer, AmoebaOptimizer, 
+  * ConjugateGradientOptimizer and LBFGSOptimizer in ITK.
+  *
+  * \author Daniel Stein
+  */
   class MITK_CORE_EXPORT RigidRegistrationObserver : public itk::Command
   {
     public:
@@ -93,14 +112,52 @@ namespace mitk {
       typedef itk::SPSAOptimizer SPSAOptimizerType;
       typedef SPSAOptimizerType * SPSAOptimizerPointer;
 
-
+      /*
+      * \brief Reacts on events from ITK optimizers.
+      * 
+      * Stores the optimizer values, adds progress to the progress bar and sends a stop flag to stop the optimization process if it is
+      * set in this class. Also emits a signal to inform listeners about new optimizer values.
+      */
       void Execute(itk::Object *caller, const itk::EventObject & event);
+      
+      /*
+      * \brief Not implemented...
+      *
+      */
       void Execute(const itk::Object * object, const itk::EventObject & event);
 
+      /*
+      * \brief Add new steps to the progress bar.
+      *
+      */
       void AddStepsToDo(int steps);
+      
+      /*
+      * \brief Sets the remaining progress to the progress bar when the optimization process is done.
+      *
+      */
       void SetRemainingProgress(int steps);
+      
+      /*
+      * \brief Returns the current optimizer value. This value is calculated by the used metric and shows, how good the images are aligned.
+      *
+      * 
+      */
       double GetCurrentOptimizerValue();
+      
+      /*
+      * \brief Returns the current transformation parameters for the moving image to this iteration step.
+      *
+      * These can include parameters for translation, scaling, rotation and shearing.
+      */
       itk::Array<double> GetCurrentTranslation();
+      
+      /*
+      * \brief Sets the stop optimization flag, which is used to call the StopOptimization() method of the optimizer.
+      *
+      * Unfortunately it is not implemented for ExhaustiveOptimizer, LBFGSBOptimizer, AmoebaOptimizer, 
+      * ConjugateGradientOptimizer and LBFGSOptimizer in ITK.
+      */
       void SetStopOptimization(bool stopOptimization);
 
     protected:

@@ -50,13 +50,11 @@ void Step6::Initialize()
   QHBox *segmentationBox = new QHBox( m_TopLevelWidget );
   segmentationBox->setSpacing( 2 );
 
-  QLabel *labelThresholdMin =
-    new QLabel( "Lower Threshold:", segmentationBox );
+  new QLabel( "Lower Threshold:", segmentationBox );
 
   m_LineEditThresholdMin = new QLineEdit( "-1000", segmentationBox );
 
-  QLabel *labelThresholdMax =
-    new QLabel( "Upper Threshold:", segmentationBox);
+  new QLabel( "Upper Threshold:", segmentationBox);
 
   m_LineEditThresholdMax = new QLineEdit( "-400", segmentationBox );
 

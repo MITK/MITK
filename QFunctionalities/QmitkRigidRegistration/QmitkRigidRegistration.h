@@ -34,7 +34,7 @@ Registration results will directly be applied to the Moving Image.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
-\ingroup Registration
+\ingroup RigidRegistration
 
 \author Daniel Stein
 */

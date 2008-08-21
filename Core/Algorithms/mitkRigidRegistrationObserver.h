@@ -45,7 +45,7 @@ namespace mitk {
   * 
   * \sa ProgressBar
   *
-  * \ingroup Registration
+  * \ingroup RigidRegistration
   *
   * This class reacts on events sent by ITK optimizers. These events will be sent for every iteration the optimizer performs.
   * This class also takes care for the progress bar for every iteration step.

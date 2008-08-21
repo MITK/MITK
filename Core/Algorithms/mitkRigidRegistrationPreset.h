@@ -30,7 +30,7 @@ namespace mitk {
   /**
    * \brief Class to load and save parameter presets for rigid registration.
    * 
-   * \ingroup Registration
+   * \ingroup RigidRegistration
    *
    * This class stores parameter presets for rigid registration applications. To that belong parameters for transformations, metrics, 
    * optimizer and interpolators. The presets will be stored in a xml file. Existing presets can be opened with LoadPreset() and saved with 

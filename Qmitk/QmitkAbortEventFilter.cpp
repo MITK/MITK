@@ -61,6 +61,8 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         me->type(), me->pos(), me->globalPos(), me->button(), me->state()
       );
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
+
+      mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
       return true;
     }
 
@@ -89,16 +91,21 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         me->type(), me->pos(), me->globalPos(), me->button(), me->state()
       );
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
+
+      mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
       return true;
     }
 
     case QEvent::MouseMove:
     { 
-      if(m_ButtonPressed && mitk::RenderingManager::GetInstance()->GetCurrentLOD()!=0)
+      if ( m_ButtonPressed )
       {
-        //std::cout << "#MM "<<std::endl;
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-        mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        if ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() != 0 )
+        {
+          //std::cout << "#MM "<<std::endl;
+          mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+          mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        }
       }
       return true;
     }
@@ -181,6 +188,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       {
         m_ButtonPressed = true;
         //std::cout << "#BP2 "<<std::endl;
+        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
         return false;
       }
 
@@ -188,7 +196,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       {
         if(m_ButtonPressed)
         {
-        //std::cout << "#MM2 "<<std::endl;
           try
           {
             mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
@@ -209,6 +216,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       {
         m_ButtonPressed = false;
         //std::cout << "#BR2 "<<std::endl;
+        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
         return false;
       }
     

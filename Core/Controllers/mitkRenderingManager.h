@@ -196,6 +196,15 @@ public:
   bool IsRendering() const;
   void AbortRendering( vtkRenderWindow *renderWindow );
 
+  /** En-/Disable LOD increase globally. */
+  itkSetMacro( LODIncreaseBlocked, bool );
+
+  /** En-/Disable LOD increase globally. */
+  itkGetMacro( LODIncreaseBlocked, bool );
+
+  /** En-/Disable LOD increase globally. */
+  itkBooleanMacro( LODIncreaseBlocked );
+
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
@@ -273,6 +282,7 @@ protected:
 
   SliceNavigationController *m_TimeNavigationController;
 
+  bool m_LODIncreaseBlocked;
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;

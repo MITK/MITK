@@ -38,10 +38,11 @@ RenderingManager
 ::RenderingManager()
 : m_UpdatePending( false ),
   m_CurrentLOD( 0 ),
-  m_MaxLOD( 3 ),
+  m_MaxLOD( 2 ),
   m_NumberOf3DRW( 0 ),
   m_ClippingPlaneEnabled( false ),
-  m_TimeNavigationController( NULL )
+  m_TimeNavigationController( NULL ),
+  m_LODIncreaseBlocked( false )
 {
   m_ShadingEnabled.assign(3, false);
   m_ShadingValues.assign(4, 0.0);
@@ -650,10 +651,11 @@ RenderingManager
     {
       if(m_CurrentLOD < m_MaxLOD)
       {
-        int nextLOD = m_CurrentLOD+1;
-        SetCurrentLOD(nextLOD);
-        this->RequestUpdate(renderer->GetRenderWindow());
-        //std::cout << "(" << m_CurrentLOD << ")" << std::endl;
+        if ( !m_LODIncreaseBlocked )
+        {
+          this->SetCurrentLOD( m_CurrentLOD + 1 );
+          this->RequestUpdate(renderer->GetRenderWindow());
+        }
       }
     }
   }

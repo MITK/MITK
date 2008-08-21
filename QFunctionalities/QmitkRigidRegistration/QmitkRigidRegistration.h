@@ -88,99 +88,99 @@ class QmitkRigidRegistration : public QmitkFunctionality
 
   protected slots:  
     
-    /*
+    /*!
     * \brief Called whenever the data tree has changed. 
     */
     void TreeChanged();
     
-    /*
+    /*!
     * \brief sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(mitk::DataTreeIteratorClone imageIt);
     
-    /*
+    /*!
     * \brief sets the moving Image according to TreeNodeSelector widget
     */
     void MovingSelected(mitk::DataTreeIteratorClone imageIt);
 
-    /*
+    /*!
     * \brief checks if registration is possible
     */
     bool CheckCalculate();
 
-    /*
+    /*!
     * \brief Saves the moving image, intended to be done after a registration.
     */
     void SaveModel();
     
-    /*
+    /*!
     * \brief Undo the last registration.
     */
     void UndoTransformation();
     
-    /*
+    /*!
     * \brief Redo the last registration
     */
     void RedoTransformation();
 
-    /*
+    /*!
     * \brief Adds a new Transformation to the undo list and enables the undo button.
     */
     void AddNewTransformationToUndoList();
 
-    /*
+    /*!
     * \brief Starts the registration process.
     */
     void CalculateTransformation();
     
-    /*
+    /*!
     * \brief Translates the moving image in x, y and z direction given by translateVector
     *
     * @param translateVector Contains the translation in x, y and z direction.
     */
     void Translate(int* translateVector);
 
-    /*
+    /*!
     * \brief Automatically aligns the image centers.
     */
     void AlignCenters();
 
-    /*
+    /*!
     * \brief Stores whether the image will be shown in gray values or in red for fixed image and green for moving image
     * @param if true, then images will be shown in red and green
     */
     void ShowRedGreen(bool show);
 
-    /*
+    /*!
     * \brief Sets the selected opacity for moving image
     * @param opacity the selected opacity
     */
     void OpacityUpdate(float opacity);
 
-    /*
+    /*!
     * \brief Sets the images to grayvalues or fixed image to red and moving image to green
     * @param if true, then images will be shown in red and green
     */
     void SetImageColor(bool redGreen);
 
-    /*
+    /*!
     * \brief Clears the undo and redo lists and sets the undo and redo buttons to disabled.
     */
     void ClearTransformationLists();
 
-    /*
+    /*!
     * \brief Only shows the fixed image in the render windows.
     * Only shows the fixed image in the render windows.  All other data tree nodes are invisible.
     */
     void ShowFixedImage();
 
-    /*
+    /*!
     * \brief Only shows the moving image in the render windows.
     * Only shows the moving image in the render windows. All other data tree nodes are invisible.
     */
     void ShowMovingImage();
 
-    /*
+    /*!
     * \brief Shows the fixed and the moving image in the render windows.
     * Shows the fixed and the moving image in the render windows. All other data tree nodes are invisible.
     */

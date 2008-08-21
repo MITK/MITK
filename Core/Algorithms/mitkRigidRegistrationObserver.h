@@ -112,7 +112,7 @@ namespace mitk {
       typedef itk::SPSAOptimizer SPSAOptimizerType;
       typedef SPSAOptimizerType * SPSAOptimizerPointer;
 
-      /*
+      /**
       * \brief Reacts on events from ITK optimizers.
       * 
       * Stores the optimizer values, adds progress to the progress bar and sends a stop flag to stop the optimization process if it is
@@ -120,39 +120,39 @@ namespace mitk {
       */
       void Execute(itk::Object *caller, const itk::EventObject & event);
       
-      /*
+      /**
       * \brief Not implemented...
       *
       */
       void Execute(const itk::Object * object, const itk::EventObject & event);
 
-      /*
+      /**
       * \brief Add new steps to the progress bar.
       *
       */
       void AddStepsToDo(int steps);
       
-      /*
+      /**
       * \brief Sets the remaining progress to the progress bar when the optimization process is done.
       *
       */
       void SetRemainingProgress(int steps);
       
-      /*
+      /**
       * \brief Returns the current optimizer value. This value is calculated by the used metric and shows, how good the images are aligned.
       *
       * 
       */
       double GetCurrentOptimizerValue();
       
-      /*
+      /**
       * \brief Returns the current transformation parameters for the moving image to this iteration step.
       *
       * These can include parameters for translation, scaling, rotation and shearing.
       */
       itk::Array<double> GetCurrentTranslation();
       
-      /*
+      /**
       * \brief Sets the stop optimization flag, which is used to call the StopOptimization() method of the optimizer.
       *
       * Unfortunately it is not implemented for ExhaustiveOptimizer, LBFGSBOptimizer, AmoebaOptimizer, 

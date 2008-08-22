@@ -32,21 +32,21 @@ int mitkExternalToolsTest(int argc, char* argv[])
     std::string sourceDirectory( argv[3] );
 
     // try to configure MITK external project
-    std::cout << "Caling CMake as '" << cmakeBinary << "'" << std::endl;
+    std::cout << "Calling CMake as '" << cmakeBinary << "'" << std::endl;
     std::cout << "MITK was compiled in '" << mitkBinaryDirectory << "'" << std::endl;
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
     std::string commandline(cmakeBinary);
     
-	commandline += " -DMITK_DIR:PATH=";
+    commandline += " -DMITK_DIR:PATH=";
 
-	commandline += """";
+    commandline += """";
     commandline += mitkBinaryDirectory;
-	commandline += """";
+    commandline += """";
     commandline += " ";
-	commandline += """";
+    commandline += """";
     commandline += sourceDirectory;
-	commandline += """";
+    commandline += """";
 
     std::cout << "Calling system() with '" 
               << commandline
@@ -57,7 +57,7 @@ int mitkExternalToolsTest(int argc, char* argv[])
 
     std::cout << "system() returned " << returnCode << std::endl;
 
-    if (returnCode == EXIT_FAILURE)
+    if (returnCode != 0)
     {
       std::cerr << "Configure FAILED. See output above." << std::endl;
       return EXIT_FAILURE;
@@ -68,16 +68,18 @@ int mitkExternalToolsTest(int argc, char* argv[])
 #ifndef WIN32
     commandline = "make";
     returnCode = system(commandline.c_str());
-#endif
-    // 
-    // TODO extend test here to support windows...
-    //
-    if (returnCode == EXIT_FAILURE)
+
+    if (returnCode != 0) // make should return 0 
     {
+      std::cout << "make returned " << returnCode << std::endl;
       std::cerr << "Building the project FAILED. See output above." << std::endl;
       return EXIT_FAILURE;
     }
 
+#endif
+    // 
+    // TODO extend test here to support windows...
+    //
     return returnCode;
   }
   else

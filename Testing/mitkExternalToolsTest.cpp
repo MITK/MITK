@@ -65,7 +65,18 @@ int mitkExternalToolsTest(int argc, char* argv[])
 
     // try to build MITK external project
 
-	// TODO extend test here...
+#ifndef WIN32
+    commandline = "make";
+    returnCode = system(commandline.c_str());
+#endif
+    // 
+    // TODO extend test here to support windows...
+    //
+    if (returnCode == EXIT_FAILURE)
+    {
+      std::cerr << "Building the project FAILED. See output above." << std::endl;
+      return EXIT_FAILURE;
+    }
 
     return returnCode;
   }

@@ -36,6 +36,12 @@ int mitkExternalToolsTest(int argc, char* argv[])
     std::cout << "MITK was compiled in '" << mitkBinaryDirectory << "'" << std::endl;
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
+    if (system((std::string("cd ") + mitkBinaryDirectory).c_str()) != 0)
+    {
+      std::cerr << "Couldn't change to MITK build dir. See output above." << std::endl;
+      return EXIT_FAILURE;
+    }
+
     std::string commandline(cmakeBinary);
     
     commandline += " -DMITK_DIR:PATH=";

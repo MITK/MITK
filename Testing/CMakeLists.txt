@@ -79,6 +79,7 @@ SET(${KITNAME}_TESTIMAGES
 
 SET(${KITNAME}_CUSTOM_TESTS 
     mitkLabeledImageToSurfaceFilterTest.cpp
+    mitkExternalToolsTest.cpp
 )
 
 MITK_CREATE_DEFAULT_TESTS()

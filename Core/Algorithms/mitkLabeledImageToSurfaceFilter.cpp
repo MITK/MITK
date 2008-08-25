@@ -30,20 +30,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkMatrix4x4.h>
 
-
-
 #include <mitkImageAccessByItk.h>
 #include <itkImageRegionIterator.h>
 #include <itkNumericTraits.h>
 
 
-
-mitk::LabeledImageToSurfaceFilter::LabeledImageToSurfaceFilter()
+mitk::LabeledImageToSurfaceFilter::LabeledImageToSurfaceFilter() :
+m_GaussianStandardDeviation(1.5),
+m_GenerateAllLabels(true),
+m_Label(1),
+m_BackgroundLabel(0)
 {
-  m_GaussianStandardDeviation = 1.5;
-  m_GenerateAllLabels = true;
-  m_Label = 1;
-  m_BackgroundLabel = 0;
 }
 
 mitk::LabeledImageToSurfaceFilter::~LabeledImageToSurfaceFilter()
@@ -61,7 +58,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   
   //
   // if we don't want to generate surfaces for all labels
-  // we have to remove all labales except m_Label and m_BackgroundLabel 
+  // we have to remove all labels except m_Label and m_BackgroundLabel 
   // from the list of available labels
   //
   if ( ! m_GenerateAllLabels )
@@ -87,7 +84,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   // check for the number of labels: if the whole image is filled, no
   // background is available and thus the numberOfOutpus is equal to the 
   // number of available labels in the image (which is a special case). 
-  // If we have background voxels, the number of ouputs is one less than
+  // If we have background voxels, the number of outputs is one less than
   // then number of available labels.
   //
   unsigned int numberOfOutputs = 0;
@@ -101,14 +98,14 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
   }
 
   //
-  // determine the number of timesteps of the input image
+  // determine the number of time steps of the input image
   //
   mitk::Image* image =  ( mitk::Image* )GetInput();
   unsigned int numberOfTimeSteps = image->GetTimeSlicedGeometry()->GetTimeSteps();
     
   //
   // set the number of outputs to the number of labels used.
-  // initialize the output surfaces accordingly (incl. timesteps)
+  // initialize the output surfaces accordingly (incl. time steps)
   //
   this->SetNumberOfOutputs( numberOfOutputs );
   this->SetNumberOfRequiredOutputs( numberOfOutputs );

@@ -21,48 +21,44 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <stdlib.h> // for system() call
 
-#ifdef WIN32
-  #include <direct.h>
-#else
-  #include <unistd.h>
-#endif
+#include <itksys/SystemTools.hxx> // for chdir et al.
 
 int mitkExternalToolsTest(int argc, char* argv[])
 {
   std::cout << "Got " << argc << " parameters" << std::endl;
   if ( argc == 4 )
   {
-    // "parse" commandline
-    std::string cmakeBinary( argv[1] );
-    std::string mitkBinaryDirectory( argv[2] );
-    std::string sourceDirectory( argv[3] );
-
+    // "parse" commandline 
+    // quote spaces in commandline parameters (all paths/files)
+    //std::string cmakeBinary         = itksys::SystemTools::EscapeChars( argv[1], " " );
+    std::string cmakeBinary         = argv[1];
+    std::string mitkBinaryDirectory = itksys::SystemTools::EscapeChars( argv[2], " " );
+    std::string sourceDirectory     = itksys::SystemTools::EscapeChars( argv[3], " " );
+    
     // try to configure MITK external project
     std::cout << "Calling CMake as '" << cmakeBinary << "'" << std::endl;
     std::cout << "MITK was compiled in '" << mitkBinaryDirectory << "'" << std::endl;
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
-#ifdef WIN32
-    if ( _chdir(mitkBinaryDirectory.c_str()) != 0 )
-#else
-    if ( chdir(mitkBinaryDirectory.c_str()) != 0 )
-#endif
+    if( itksys::SystemTools::ChangeDirectory(mitkBinaryDirectory.c_str()) != 0 )
     {
       std::cerr << "Couldn't change to MITK build dir. See output above." << std::endl;
       return EXIT_FAILURE;
     }
 
-    std::string commandline(cmakeBinary);
+    std::string commandline("\"\"");
+    commandline += cmakeBinary;
+    commandline += "\"";
     
     commandline += " -DMITK_DIR:PATH=";
 
-    commandline += """";
+    commandline += "\"\"";
     commandline += mitkBinaryDirectory;
-    commandline += """";
+    commandline += "\"\"";
     commandline += " ";
-    commandline += """";
+    commandline += "\"\"";
     commandline += sourceDirectory;
-    commandline += """";
+    commandline += "\"\"";
 
     std::cout << "Calling system() with '" 
               << commandline

@@ -57,17 +57,9 @@ public:
     mitkClassMacro(Interactor, StateMachine);
 
     /**
-    * @brief Obsolete! Call New(const char* DataTreeNode*) instead! To maintain interface for mitkObjectFactory.
-    **/
-    //mitkNewMacro(Self);
-    
-    //Interactor( );//obsolete!
-
-    /**
     * @brief NewMacro with two parameters for calling itk::Lightobject::New(..) method
     **/
     mitkNewMacro2Param(Self, const char*, DataTreeNode*);
-
 
   //##Documentation
   //##@brief Enumeration of the different modes an Interactor can be into. 
@@ -80,8 +72,6 @@ public:
   };
 
   typedef SMMode ModeType;
-
-
 
   //##Documentation
   //## @brief Get the Mode of the Interactor. Use enum SMMode for return parameter
@@ -102,6 +92,11 @@ public:
   //## Standard function to override if needed.
   //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+
+  /**
+  * @brief Updates the current TimeStep according to the asociated data and calls Superclass::HandleEvent()
+  **/
+  bool HandleEvent(StateEvent const* stateEvent);
 
   static const std::string XML_NODE_NAME;
 
@@ -144,6 +139,13 @@ protected:
   //##Documentation
   //## @brief Used by friend class DataTreeNode
   virtual void SetDataTreeNode( DataTreeNode* dataTreeNode );
+
+  /**
+  * @brief Derived from superclass to also cvheck if enough timesteps are instanciated in m_CurrentStateVector
+  * The number of timesteps is read from the dedicated data.
+  * @param[in] timeStep The timeStep that the statemachine has to be set to
+  **/
+  virtual void UpdateTimeStep(unsigned int timeStep);
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for

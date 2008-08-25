@@ -37,14 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
-/**
-* @brief Obsolete! Only to maintain interface!
-**/
-//mitk::Interactor::Interactor( )
-//  : mitk::StateMachine( NULL ), m_DataTreeNode(NULL), m_Mode(SMDESELECTED)
-//{
-//}
-
 mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
 : StateMachine(type), 
   m_DataTreeNode(dataTreeNode), 
@@ -163,7 +155,6 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     returnvalueTransition = 0.5;//it can be understood
   }
   
-
   //compute the center of the data taken care of if != NULL
   if (GetData() != NULL)
   {
@@ -237,5 +228,47 @@ const std::string& mitk::Interactor::GetXMLNodeName() const
 
 void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
 {
-    m_DataTreeNode = dataTreeNode;
+  m_DataTreeNode = dataTreeNode;
+  mitk::BaseData* data = dataTreeNode->GetData();
+  if (data != NULL)
+  {
+    unsigned int timeSteps = data->GetTimeSteps();
+    //expand the list of StartStates according to the number of timesteps in data
+    if (timeSteps > 1)
+      this->InitializeStartStates(timeSteps);
+  }
+}
+
+void mitk::Interactor::UpdateTimeStep(unsigned int timeStep)
+{
+  //check if the vector of StartStates contains enough pointers to use timeStep
+  if (timeStep > 1)
+  {
+    // Make sure that the data (if time-resolved) has enough entries;
+    // if not, create the required extra ones (empty)
+    if (m_DataTreeNode!= NULL)
+      if (m_DataTreeNode->GetData()!= NULL)
+        m_DataTreeNode->GetData()->Expand(timeStep+1); //+1 becuase the vector starts with 0 and the timesteps with 1
+    
+    //now check for this object
+    this->ExpandStartStateVector(timeStep+1); //nothing is changed if the number of timesteps in data equals the number of startstates held in statemachine
+  }
+
+  //set the time to the given time
+  Superclass::UpdateTimeStep(timeStep);
+
+  //time has to be up-to-date
+  //check and throw an exception if not so
+  if (timeStep != m_TimeStep)
+    itkExceptionMacro(<<"Time is invalid. Take care of synchonization!");
+}
+
+bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
+{
+  //update the Time and then call Superclass
+  unsigned int currentTimeStep = stateEvent->GetEvent()->GetSender()->GetTimeStep(m_DataTreeNode->GetData());
+  if (currentTimeStep != m_TimeStep)
+    this->UpdateTimeStep(currentTimeStep);
+
+  return Superclass::HandleEvent(stateEvent);
 }

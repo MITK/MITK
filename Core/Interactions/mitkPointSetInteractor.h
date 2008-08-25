@@ -41,10 +41,10 @@ namespace mitk
     mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
     /**
-     * \brief Clears all the elements in the list with undo-functionality and 
+     * @brief Clears all the elements from the given timeStep in the list with undo-functionality and 
      * resets the statemachine
      */
-    void Clear( int timeStep = 0, ScalarType timeInMS = 0.0 );
+    void Clear( unsigned int timeStep = 0, ScalarType timeInMS = 0.0 );
 
     /** \brief Sets the amount of precision */
     void SetPrecision( unsigned int precision );
@@ -64,29 +64,26 @@ namespace mitk
      *
      * if no n is set, then the number of points is unlimited*
      */
-    PointSetInteractor(const char * type, 
-      DataTreeNode* dataTreeNode, int n = -1);
+    PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
 
     /**
      * \brief Default Destructor
      **/
     virtual ~PointSetInteractor();
 
-    virtual bool ExecuteAction( Action* action, 
-      mitk::StateEvent const* stateEvent );
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
     /** \brief Deselects the Points in the PointSet.
      * supports Undo if enabled
      */
-    void UnselectAll( int timeStep = 0, ScalarType timeInMS = 0.0 );
+    void UnselectAll( unsigned int timeStep = 0, ScalarType timeInMS = 0.0 );
 
     /**
      * \brief Selects the point.
      * supports Undo if enabled.
      * \param position Needed for declaring operations
      */
-    void SelectPoint( int position, 
-      int timeStep = 0, ScalarType timeInMS = 0.0 );
+    void SelectPoint( int position, unsigned int timeStep = 0, ScalarType timeInMS = 0.0 );
 
     /** \brief to calculate a direction vector from last point and actual
      * point 

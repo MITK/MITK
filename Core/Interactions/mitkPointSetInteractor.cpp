@@ -56,8 +56,7 @@ void mitk::PointSetInteractor::SetPrecision(unsigned int precision)
 
 //##Documentation
 //## overwritten cause this class can handle it better!
-float mitk::PointSetInteractor
-::CalculateJurisdiction(StateEvent const* stateEvent) const
+float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
   float returnValue = 0.0;
   //if it is a key event that can be handled in the current state, then return 0.5
@@ -124,8 +123,7 @@ float mitk::PointSetInteractor
 //
 //}
 
-void mitk::PointSetInteractor
-::UnselectAll( int timeStep, ScalarType timeInMS )
+void mitk::PointSetInteractor::UnselectAll( unsigned int timeStep, ScalarType timeInMS )
 {
   mitk::PointSet *pointSet = 
     dynamic_cast<mitk::PointSet*>( m_DataTreeNode->GetData() );
@@ -173,8 +171,7 @@ void mitk::PointSetInteractor
   }
 }
 
-void mitk::PointSetInteractor
-::SelectPoint( int position, int timeStep, ScalarType timeInMS )
+void mitk::PointSetInteractor::SelectPoint( int position, unsigned int timeStep, ScalarType timeInMS )
 {
   mitk::PointSet *pointSet = dynamic_cast< mitk::PointSet * >( 
     m_DataTreeNode->GetData() );
@@ -205,8 +202,7 @@ void mitk::PointSetInteractor
 }
 
 
-bool mitk::PointSetInteractor
-::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
+bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
   bool ok = false;//for return type bool
 
@@ -218,26 +214,22 @@ bool mitk::PointSetInteractor
     return false;
   }
 
-  //get the timestep to also support 3D+T
+  //get the timestep to support 3D+T
   const mitk::Event *theEvent = stateEvent->GetEvent();
-  int timeStep = 0;
   mitk::ScalarType timeInMS = 0.0;
 
+  //check if the current timestep has to be changed
   if ( theEvent )
   {
     if (theEvent->GetSender() != NULL)
     {
-      timeStep = theEvent->GetSender()->GetTimeStep(pointSet);
+      //additionaly to m_TimeStep we need timeInMS to satisfy the execution of the operations
       timeInMS = theEvent->GetSender()->GetTime();
     }
   }
 
-  // Make sure that the point set (if time-resolved) has enough entries;
-  // if not, create the required extra ones (empty)
-  pointSet->Expand( timeStep+1 );
-
   //for reading on the points, Id's etc
-  mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet( timeStep );
+  mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet( m_TimeStep );
   if ( itkPointSet == NULL )
   {
     return false;
@@ -298,7 +290,7 @@ bool mitk::PointSetInteractor
 
       // undo-supported deselect of all points in the DataList; if List is
       // empty, then nothing will be unselected
-      this->UnselectAll( timeStep, timeInMS );
+      this->UnselectAll( m_TimeStep, timeInMS );
 
       // find the position, the point is to be added to: first entry with
       // empty index. If the Set is empty, then start with 0. if not empty, 
@@ -337,22 +329,7 @@ bool mitk::PointSetInteractor
       //execute the Operation
       pointSet->ExecuteOperation(doOp);
 
-      //outquoted, cause change in PointSet: the point is added and directly
-      //selected.
-      ////now select the new point
-      ////lastposition was the size, then the list got incremended, now 
-      ////lastposition is the index of the last element in list
-      //PointOperation* doSelOp = new mitk::PointOperation(OpSELECTPOINT, 
-      //  timeInMS, itkPoint, lastPosition);
-      //if (m_UndoEnabled)
-      //{
-      //  PointOperation* undoSelOp = new mitk::PointOperation(OpDESELECTPOINT, 
-      //    timeInMS, itkPoint, lastPosition);
-      //  OperationEvent *selOperationEvent = new OperationEvent(pointSet, 
-      //    doSelOp, undoSelOp);
-      //  m_UndoController->SetOperationEvent(selOperationEvent);
-      //}
-      //pointSet->ExecuteOperation(doSelOp);
+      //the point is added and directly selected in PintSet. So no need to call OpSELECTPOINT
 
       ok = true;
 
@@ -362,8 +339,7 @@ bool mitk::PointSetInteractor
     }
   case AcINITMOVEMENT:
     {
-      mitk::PositionEvent const *posEvent = 
-        dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
       
       if (posEvent == NULL)
         return false;
@@ -381,8 +357,7 @@ bool mitk::PointSetInteractor
     }
   case AcMOVESELECTED://moves all selected Elements
     {
-      mitk::PositionEvent const *posEvent = 
-        dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      mitk::PositionEvent const *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
 
       if (posEvent == NULL)
         return false;
@@ -407,9 +382,9 @@ bool mitk::PointSetInteractor
       while( it != end )
       {
         int position = it->Index();
-        if ( pointSet->GetSelectInfo(position, timeStep) )//if selected
+        if ( pointSet->GetSelectInfo(position, m_TimeStep) )//if selected
         {
-          PointSet::PointType pt = pointSet->GetPoint(position, timeStep);
+          PointSet::PointType pt = pointSet->GetPoint(position, m_TimeStep);
           mitk::Point3D sumVec;
           sumVec[0] = pt[0];
           sumVec[1] = pt[1];
@@ -444,12 +419,12 @@ bool mitk::PointSetInteractor
         itkPoint = posEvent->GetWorldPosition();
 
         //search the point in the list
-        int position = pointSet->SearchPoint(itkPoint, 0.0, timeStep);
+        int position = pointSet->SearchPoint(itkPoint, 0.0, m_TimeStep);
         //distance set to 0, cause we already got the exact point from last
         //State checkpointbut we also need the position in the list to remove it
         if (position>=0)//found a point
         {
-          PointSet::PointType pt = pointSet->GetPoint(position, timeStep);
+          PointSet::PointType pt = pointSet->GetPoint(position, m_TimeStep);
           itkPoint[0] = pt[0];
           itkPoint[1] = pt[1];
           itkPoint[2] = pt[2];
@@ -474,18 +449,18 @@ bool mitk::PointSetInteractor
           
           
           //only then a select of a point is possible!
-          if (pointSet->GetSize( timeStep ) > 0)
+          if (pointSet->GetSize( m_TimeStep ) > 0)
           {
             if (position>0)//not the first in list
             {
-              this->SelectPoint( position-1, timeStep, timeInMS );
+              this->SelectPoint( position-1, m_TimeStep, timeInMS );
             }
             //it was the first point in list, that was removed, so select 
             //the last in list
             else
             {
-              position = pointSet->GetSize( timeStep ) - 1; //last in list
-              this->SelectPoint( position, timeStep, timeInMS );
+              position = pointSet->GetSize( m_TimeStep ) - 1; //last in list
+              this->SelectPoint( position, m_TimeStep, timeInMS );
             }//else
           }//if
 
@@ -507,7 +482,7 @@ bool mitk::PointSetInteractor
           if (points->IndexExists(it->Index()))
           {
             //if point is selected
-            if (  pointSet->GetSelectInfo(it->Index(), timeStep) )
+            if (  pointSet->GetSelectInfo(it->Index(), m_TimeStep) )
             {
               //get the coordinates of that point to be undoable
               PointSet::PointType selectedPoint = it->Value();
@@ -573,11 +548,11 @@ bool mitk::PointSetInteractor
         /*
         * now select the point before the point/points that was/were deleted
         */
-        if (pointSet->GetSize( timeStep ) > 0) //only then a select of a point is possible!
+        if (pointSet->GetSize( m_TimeStep ) > 0) //only then a select of a point is possible!
         {
           if (points->IndexExists(lastDelPrevExistPosition))
           {
-            this->SelectPoint( lastDelPrevExistPosition, timeStep, timeInMS );
+            this->SelectPoint( lastDelPrevExistPosition, m_TimeStep, timeInMS );
           }
           else
           {
@@ -585,7 +560,7 @@ bool mitk::PointSetInteractor
             for (mitk::PointSet::PointsContainer::Iterator it = points->Begin(); it != points->End(); it++)
               if (points->IndexExists(it->Index()))
               {
-                this->SelectPoint( it->Index(), timeStep, timeInMS ); 
+                this->SelectPoint( it->Index(), m_TimeStep, timeInMS ); 
                 break;
               }
           }
@@ -614,7 +589,7 @@ bool mitk::PointSetInteractor
           position = it->Index();
           if ( points->IndexExists( position ) )
           {
-            pt = pointSet->GetPoint( position, timeStep );
+            pt = pointSet->GetPoint( position, m_TimeStep );
             PointOperation* doOp = 
               new mitk::PointOperation( OpREMOVE, timeInMS, pt, position );
             ++it;
@@ -640,11 +615,11 @@ bool mitk::PointSetInteractor
       {
         mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-        int position = pointSet->SearchPoint( worldPoint, m_Precision, timeStep );
+        int position = pointSet->SearchPoint( worldPoint, m_Precision, m_TimeStep );
         if (position>=0)//found a point near enough to the given point
         {
           //get that point, the one meant by the user!
-          PointSet::PointType pt = pointSet->GetPoint(position, timeStep);
+          PointSet::PointType pt = pointSet->GetPoint(position, m_TimeStep);
           mitk::Point2D displPoint;
           displPoint[0] = worldPoint[0]; displPoint[1] = worldPoint[1];
           //new Event with information YES and with the correct point
@@ -700,7 +675,7 @@ bool mitk::PointSetInteractor
         return false;
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
 
-      position = pointSet->SearchPoint(worldPoint, m_Precision, timeStep);
+      position = pointSet->SearchPoint(worldPoint, m_Precision, m_TimeStep);
 
       if (position>=0)
       {
@@ -711,7 +686,7 @@ bool mitk::PointSetInteractor
           posEvent->GetDisplayPosition(), posEvent->GetWorldPosition());
 
         //if selected on true, then call Event EIDYES
-        if (pointSet->GetSelectInfo(position, timeStep))
+        if (pointSet->GetSelectInfo(position, m_TimeStep))
         {
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent( EIDYES, newPosEvent );
@@ -758,7 +733,7 @@ bool mitk::PointSetInteractor
       }
       else
       {
-        if (pointSet->GetSize( timeStep ) < m_N-1 )
+        if (pointSet->GetSize( m_TimeStep ) < m_N-1 )
           //pointset after addition won't be full
         {
           mitk::StateEvent* newStateEvent = 
@@ -781,7 +756,7 @@ bool mitk::PointSetInteractor
   case AcCHECKEQUALS1:
     {
       //the number of points in the list is 1 (or smaler)
-      if (pointSet->GetSize( timeStep ) <= 1)
+      if (pointSet->GetSize( m_TimeStep ) <= 1)
       {
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
@@ -808,14 +783,14 @@ bool mitk::PointSetInteractor
       itkPoint = posEvent->GetWorldPosition();
 
       //search the point in the list
-      int position = pointSet->SearchPoint(itkPoint, 0.0, timeStep);
+      int position = pointSet->SearchPoint(itkPoint, 0.0, m_TimeStep);
       //distance set to 0, cause we already got the exact point from last
       //State checkpoint but we also need the position in the list to move it
       if (position>=0)//found a point
       {
         //first deselect the other points
         //undoable deselect of all points in the DataList
-        this->UnselectAll( timeStep, timeInMS);
+        this->UnselectAll( m_TimeStep, timeInMS);
 
         PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT,
           timeInMS, itkPoint, position);
@@ -851,7 +826,7 @@ bool mitk::PointSetInteractor
       itkPoint = posEvent->GetWorldPosition();
 
       //search the point in the list
-      int position = pointSet->SearchPoint(itkPoint, 0.0, timeStep);
+      int position = pointSet->SearchPoint(itkPoint, 0.0, m_TimeStep);
 
       //distance set to 0, cause we already got the exact point from last 
       // State checkpoint but we also need the position in the list to move it
@@ -880,7 +855,7 @@ bool mitk::PointSetInteractor
   case AcDESELECTALL:
     {
       //undo-supported able deselect of all points in the DataList
-      this->UnselectAll( timeStep, timeInMS );
+      this->UnselectAll( m_TimeStep, timeInMS );
       ok = true;
 
       // Update the display
@@ -910,9 +885,9 @@ bool mitk::PointSetInteractor
       while( it != end )
       {
         int position = it->Index();
-        if ( pointSet->GetSelectInfo(position, timeStep) )//if selected
+        if ( pointSet->GetSelectInfo(position, m_TimeStep) )//if selected
         {
-          PointSet::PointType pt = pointSet->GetPoint(position, timeStep);
+          PointSet::PointType pt = pointSet->GetPoint(position, m_TimeStep);
           Point3D itkPoint;
           itkPoint[0] = pt[0];
           itkPoint[1] = pt[1];
@@ -953,7 +928,7 @@ bool mitk::PointSetInteractor
   
   case AcCLEAR:
     {
-      this->Clear( timeStep, timeInMS );
+      this->Clear( m_TimeStep, timeInMS );
 
       // Update the display
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -968,7 +943,7 @@ bool mitk::PointSetInteractor
   return ok;
 }
 
-void mitk::PointSetInteractor::Clear( int timeStep, ScalarType timeInMS )
+void mitk::PointSetInteractor::Clear( unsigned int timeStep, ScalarType timeInMS )
 {
   mitk::Point3D point;
   point.Fill(0);
@@ -1016,6 +991,6 @@ void mitk::PointSetInteractor::Clear( int timeStep, ScalarType timeInMS )
   }
 
   //reset the statemachine
-  this->ResetStatemachineToStartState();
+  this->ResetStatemachineToStartState(timeStep);
 }
 

@@ -42,6 +42,7 @@ SET(${KITNAME}_TESTS
   mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
+  mitkStateMachineTest.cpp
   mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkStepperTest.cpp

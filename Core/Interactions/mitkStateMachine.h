@@ -145,6 +145,11 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     typedef std::map<int, TStateMachineFunctor*> ActionFunctionsMapType;
 
     /**
+    * @brief Type for a vector of StartStatePointers
+    **/
+    typedef std::vector<State::Pointer> StartStateVectorType;
+
+    /**
     * @brief Get the name and with this the type of the StateMachine
     **/
     std::string GetType() const;
@@ -210,7 +215,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     /**
     * @brief returns the current state
     **/
-    const State* GetCurrentState() const;
+    const State* GetCurrentState(unsigned int time = 0) const;
 
     /**
     * @brief if true, then UndoFunctionality is enabled
@@ -239,10 +244,32 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     virtual void ExecuteOperation(Operation* operation);
 
     /**
-    * @brief resets the current state to the startstate with undo functionality! Use carefully!
+    * @brief Resets the current state from the given timeStep to the StartState with undo functionality! Use carefully!
+    * @param[in] time If the statemachine has several timesteps to take care of, specify the according timestep
     **/
-    void ResetStatemachineToStartState();
+    void ResetStatemachineToStartState(unsigned int timeStep = 0);
 
+
+    /**
+    * @brief Initialize the vector of StartStates with the right number of elements according to the timesteps of the data
+    * @param[in] timeSteps Number of elements in the vector of StartStates to be created
+    **/
+    void InitializeStartStates(unsigned int timeSteps = 1);
+
+    /**
+    * @brief Check if the number of timeSteps is equal to the number of stored StartStates. Nothing is changed if the number is equal. 
+    **/
+    void ExpandStartStateVector(unsigned int timeSteps);
+
+    /**
+    * @brief Update the TimeStep of the statemachine with undo-support if undo enabled
+    **/
+    virtual void UpdateTimeStep(unsigned int timeStep);
+
+    /**
+    * @brief Current TimeStep if the data which is to be interacted on, has more than 1 TimeStep
+    **/
+    unsigned int m_TimeStep;
    
     virtual const std::string& GetXMLNodeName() const;
 
@@ -258,8 +285,8 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     /**
     * @brief Points to the current state.
     **/
-    State::Pointer m_CurrentState;
-    
+    StartStateVectorType m_CurrentStateVector;
+
     /**
     * @brief Map of the added Functions
     **/

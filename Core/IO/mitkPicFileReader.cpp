@@ -21,11 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 extern "C" 
 {
-ipPicDescriptor * MITKipPicGet( char *infile_name, ipPicDescriptor *pic );
-ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
+  ipPicDescriptor * MITKipPicGet( char *infile_name, ipPicDescriptor *pic );
+  ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
 }
 
-//##ModelId=3E1878400265
 void mitk::PicFileReader::GenerateOutputInformation()
 {
     Image::Pointer output = this->GetOutput();
@@ -181,7 +180,6 @@ void mitk::PicFileReader::ConvertHandedness(ipPicDescriptor* pic)
   }
 }
 
-//##ModelId=3E187255016C
 void mitk::PicFileReader::GenerateData()
 {
     Image::Pointer output = this->GetOutput();
@@ -336,13 +334,11 @@ bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::str
   return true;
 }
 
-//##ModelId=3E1874D202D0
 mitk::PicFileReader::PicFileReader()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
 }
 
-//##ModelId=3E1874E50179
 mitk::PicFileReader::~PicFileReader()
 {
 }

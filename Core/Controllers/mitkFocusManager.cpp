@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFocusManager.h"
 
-//##ModelId=3EDCAF790194
 mitk::FocusManager::FocusManager()
 {
 	m_Loop = true;//default
@@ -30,7 +29,6 @@ mitk::FocusManager::~FocusManager()
 {
 }
 
-//##ModelId=3EDCAF7901C3
 bool mitk::FocusManager::AddElement(FocusElement* element)
 {
   // Try find  
@@ -44,7 +42,6 @@ bool mitk::FocusManager::AddElement(FocusElement* element)
 	return true;
 }
 
-//##ModelId=3EDCAF790230
 bool mitk::FocusManager::RemoveElement(FocusElement* element)
 {
 	// Try find  
@@ -60,13 +57,11 @@ bool mitk::FocusManager::RemoveElement(FocusElement* element)
 	return true;
 }
 
-//##ModelId=3EDCAF7902BD
 mitk::FocusManager::FocusElement* mitk::FocusManager::GetFocused() const 
 {
   return m_FocElement.GetPointer();
 }
 
-//##ModelId=3EDCAF7902FB
 bool mitk::FocusManager::SetFocused(FocusElement* element)
 {
   if (m_FocElement == element)
@@ -80,31 +75,26 @@ bool mitk::FocusManager::SetFocused(FocusElement* element)
 	return true;
 }
 
-//##ModelId=3EDCAF790378
 bool mitk::FocusManager::IsLast()
 {
 	return (m_FocElement == m_FocusList.back());
 }
 
-//##ModelId=3EDCAF7903A7
 bool mitk::FocusManager::IsFirst()
 {
 	return (m_FocElement == m_FocusList.front());
 }
 
-//##ModelId=3EDCAF7903D6
 const mitk::FocusManager::FocusElement* mitk::FocusManager::GetFirst() const
 {
 	return (m_FocusList.front()).GetPointer();
 }
 
-//##ModelId=3EDCAF7A002D
 const mitk::FocusManager::FocusElement* mitk::FocusManager::GetLast() const
 {
 	return (m_FocusList.back()).GetPointer();
 }
 
-//##ModelId=3EDCAF7A007B
 bool mitk::FocusManager::GoToNext()
 {
 	//find the m_FocElement
@@ -131,7 +121,6 @@ bool mitk::FocusManager::GoToNext()
 	return false;
 }
 
-//##ModelId=3EDCAF7A00AA
 //##Documentation
 //## returns an iterator, that points to the 
 //## beginning of the list
@@ -140,7 +129,6 @@ mitk::FocusManager::FocusListIterator mitk::FocusManager::GetIter()
 	return m_FocusList.begin();
 }
 
-//##ModelId=3EDCAF7A00D8
 void mitk::FocusManager::SetLoop(bool loop)
 {
 	m_Loop = loop;

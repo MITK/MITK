@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E3AA308024B
 //##Documentation
 //## @brief Base class of all Mappers for 2D display
 //##
@@ -39,20 +38,16 @@ class MITK_CORE_EXPORT Mapper2D : public Mapper
   public:
     mitkClassMacro(Mapper2D,Mapper);
 
-    //##ModelId=3E3C45A0009E
     //##Documentation
     //## @brief Set Geometry3D containing the all possible Geometry2D that may be requested for mapping
     //## @sa m_Geometry3D
     virtual void SetGeometry3D(const mitk::Geometry3D* aGeometry3D);
 
   protected:
-    //##ModelId=3E3C46810341
     Mapper2D();
 
-    //##ModelId=3E3C4681035F
     virtual ~Mapper2D();
 
-    //##ModelId=3EDD039F03E6
     //##Documentation
     //## @brief Set Geometry3D containing the all possible Geometry2D that may be requested for mapping
     //## @note not yet implemented

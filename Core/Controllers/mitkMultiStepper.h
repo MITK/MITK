@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3DF8BF9A005D
 //##Documentation
 //## @brief Helper class to step through a list
 //##

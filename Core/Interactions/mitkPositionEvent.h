@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  //##ModelId=3E5B79B5012A
   //##Documentation
   //## @brief Event that stores coordinates
   //## 
@@ -35,7 +34,6 @@ namespace mitk {
   class MITK_CORE_EXPORT PositionEvent : public DisplayPositionEvent
   {
   public:
-    //##ModelId=3E5B7CF900F0
     //##Documentation
     //## @brief Constructor with all necessary arguments.
     //##

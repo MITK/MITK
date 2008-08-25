@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
-//##ModelId=3D6A0E8C02CC
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
   if( (id >= m_Mappers.size()) || (m_Mappers[id].IsNull()) ) 
@@ -55,7 +54,6 @@ mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
   return m_Mappers[id];
 }
 
-//##ModelId=3E32C49D00A8
 mitk::BaseData* mitk::DataTreeNode::GetData() const
 {
   return m_Data;
@@ -66,7 +64,6 @@ mitk::Interactor* mitk::DataTreeNode::GetInteractor() const
   return m_Interactor;
 }
 
-//##ModelId=3E33F4E4025B
 void mitk::DataTreeNode::SetData(mitk::BaseData* baseData)
 {
   if(m_Data!=baseData)
@@ -90,7 +87,6 @@ void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
   m_Interactor->SetDataTreeNode(this);
 }
 
-//##ModelId=3E33F5D702AA
 mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 {
   m_Mappers.resize(10);
@@ -99,7 +95,6 @@ mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
 }
 
 
-//##ModelId=3E33F5D702D3
 mitk::DataTreeNode::~DataTreeNode()
 {
   Interactor* interactor = this->GetInteractor();
@@ -112,7 +107,6 @@ mitk::DataTreeNode::~DataTreeNode()
   m_Data = NULL;
 }
 
-//##ModelId=3E33F5D7032D
 mitk::DataTreeNode& mitk::DataTreeNode::operator=(const DataTreeNode& right)
 {
   mitk::DataTreeNode* node=mitk::DataTreeNode::New();
@@ -153,7 +147,6 @@ MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& 
   return o;
 }
 
-//##ModelId=3E69331903C9
 void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
 {
   m_Mappers[id] = mapper;
@@ -162,7 +155,6 @@ void mitk::DataTreeNode::SetMapper(MapperSlotId id, mitk::Mapper* mapper)
     mapper->SetDataTreeNode(this);
 }
 
-//##ModelId=3E860A5C0032
 void mitk::DataTreeNode::UpdateOutputInformation()
 {
   if (this->GetSource())
@@ -171,33 +163,27 @@ void mitk::DataTreeNode::UpdateOutputInformation()
   }
 }
 
-//##ModelId=3E860A5E011B
 void mitk::DataTreeNode::SetRequestedRegionToLargestPossibleRegion()
 {
 }
 
-//##ModelId=3E860A5F03D9
 bool mitk::DataTreeNode::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   return false;
 }
 
-//##ModelId=3E860A620080
 bool mitk::DataTreeNode::VerifyRequestedRegion()
 {
     return true;
 }
 
-//##ModelId=3E860A640156
 void mitk::DataTreeNode::SetRequestedRegion(itk::DataObject * /*data*/)
 {
 }
 
-//##ModelId=3E860A6601DB
 void mitk::DataTreeNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }
-//##ModelId=3E3FE0420273
 mitk::PropertyList* mitk::DataTreeNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
   if(renderer==NULL)
@@ -218,7 +204,6 @@ void mitk::DataTreeNode::ConcatenatePropertyList(PropertyList *pList, bool repla
   m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
-//##ModelId=3EF189DB0111
 mitk::BaseProperty* mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
 {
   if (defaultRendererUsed)
@@ -328,7 +313,6 @@ bool mitk::DataTreeNode::GetColor(float rgb[3], mitk::BaseRenderer* renderer, co
   return true;
 }
 
-//##ModelId=3EF19420016B
 bool mitk::DataTreeNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
@@ -339,7 +323,6 @@ bool mitk::DataTreeNode::GetOpacity(float &opacity, mitk::BaseRenderer* renderer
   return true;
 }
 
-//##ModelId=3EF194220204
 bool mitk::DataTreeNode::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::LevelWindowProperty::Pointer levWinProp = dynamic_cast<mitk::LevelWindowProperty*>(GetProperty(propertyKey, renderer));
@@ -366,7 +349,6 @@ void mitk::DataTreeNode::SetColor(float red, float green, float blue, mitk::Base
   SetColor(color, renderer, propertyKey);
 }
 
-//##ModelId=3EF196360303
 void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::ColorProperty::Pointer prop;
@@ -374,7 +356,6 @@ void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* render
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-//##ModelId=3EF1966703D6
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   bool defaultRendererUsed = false;
@@ -386,7 +367,6 @@ void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* rendere
     GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(visible));
 }
 
-//##ModelId=3EF196880095
 void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::FloatProperty::Pointer prop;
@@ -394,7 +374,6 @@ void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer,
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-//##ModelId=3EF1969A0181
 void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
   mitk::LevelWindowProperty::Pointer prop;
@@ -435,7 +414,6 @@ void mitk::DataTreeNode::AddProperty(const char *propertyKey,
 }
 
 
-//##ModelId=3ED91D050121
 vtkLinearTransform* mitk::DataTreeNode::GetVtkTransform(int t) const
 {
   assert(m_Data.IsNotNull());

@@ -19,12 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DData.h"
 #include "mitkBaseProcess.h"
 
-//##ModelId=3E639CD30201
 mitk::Geometry2DData::Geometry2DData()
 {
 }
 
-//##ModelId=3E639CD30233
 mitk::Geometry2DData::~Geometry2DData()
 {
 }
@@ -42,7 +40,6 @@ void mitk::Geometry2DData::SetGeometry(mitk::Geometry3D *geometry)
   }
 }
 
-//##ModelId=3E6423D2030E
 void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
   if(geometry2d != NULL)
@@ -60,19 +57,16 @@ void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
     Superclass::SetGeometry(geometry2d);
 }
 
-//##ModelId=3E66CC5A0295
 void mitk::Geometry2DData::UpdateOutputInformation()
 {
   Superclass::UpdateOutputInformation();
 }
 
-//##ModelId=3E66CC5A02B4
 void mitk::Geometry2DData::SetRequestedRegionToLargestPossibleRegion()
 {
 
 }
 
-//##ModelId=3E66CC5A02D2
 bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   if(GetGeometry2D()==NULL) return true;
@@ -80,7 +74,6 @@ bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
   return false;
 }
 
-//##ModelId=3E66CC5A02F0
 bool mitk::Geometry2DData::VerifyRequestedRegion()
 {
   if(GetGeometry2D()==NULL) return false;
@@ -88,13 +81,11 @@ bool mitk::Geometry2DData::VerifyRequestedRegion()
   return true;
 }
 
-//##ModelId=3E66CC5A030E
 void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *)
 {
 
 }
 
-//##ModelId=3E67D85E00B7
 void mitk::Geometry2DData::CopyInformation(const itk::DataObject *)
 {
 }

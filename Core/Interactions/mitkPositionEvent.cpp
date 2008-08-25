@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkVector.h"
 
-//##ModelId=3E5B7CF900F0
 mitk::PositionEvent::PositionEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, const mitk::Point3D& worldPosition)
 : DisplayPositionEvent(sender, type, button, buttonState, key, displPosition)
 {

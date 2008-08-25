@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3ED94AC90382
 //##Documentation
 //## @brief Property containing a smart-pointer
 //## @ingroup DataTree
@@ -41,16 +40,12 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     itkNewMacro(SmartPointerProperty);
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
     
-    //##ModelId=3ED94B4203C1
     virtual bool operator==(const BaseProperty&) const;
 
-    //##ModelId=3ED94B750111
     virtual ~SmartPointerProperty();
 
-    //##ModelId=3ED952AD02B7
     itk::Object::Pointer GetSmartPointer() const;
 
-    //##ModelId=3ED952AD02F6
     void SetSmartPointer(itk::Object*);
 
     /// mainly for XML output
@@ -75,10 +70,8 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
 
   protected:
     
-    //##ModelId=3ED94B7500F2
     SmartPointerProperty(itk::Object* = NULL);
 
-    //##ModelId=3ED95309021C
     itk::Object::Pointer m_SmartPointer;
 
   private:

@@ -21,13 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 //template class itk::SmartPointerForwardReference<ImageDataItem>;
 
-
-//##ModelId=3E0B4663009F
 void mitk::SubImageSelector::SetPosNr(int /*p*/)
 {
 }
 
-//##ModelId=3E1A0FC903A5
 mitk::Image::ImageDataItemPointer mitk::SubImageSelector::GetSliceData(int s, int t, int n)
 {
 	mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
@@ -46,7 +43,6 @@ mitk::Image::ImageDataItemPointer mitk::SubImageSelector::GetChannelData(int n)
 	return input->GetChannelData(n);
 }
 
-//##ModelId=3E1A123E0396
 void mitk::SubImageSelector::SetChannelItem(mitk::Image::ImageDataItemPointer dataItem, int n)
 {
 	mitk::Image::Pointer output  = this->GetOutput();
@@ -72,13 +68,10 @@ void mitk::SubImageSelector::SetSliceItem(mitk::Image::ImageDataItemPointer data
 	output->m_Slices[pos]=dataItem;
 }
 
-//##ModelId=3E1B19AD02A6
 mitk::SubImageSelector::SubImageSelector()
 {
 }
 
-
-//##ModelId=3E1B19AD02CE
 mitk::SubImageSelector::~SubImageSelector()
 {
 }

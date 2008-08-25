@@ -31,7 +31,6 @@ mitk::ImageSource::ImageSource()
 /**
  *
  */
-//##ModelId=3E1886F103DB
 mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
 {
 	return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
@@ -55,7 +54,6 @@ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput()
 /**
  *
  */
-//##ModelId=3E1886F101F0
 mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(unsigned int idx)
 {
   return static_cast<OutputImageType*>
@@ -66,7 +64,6 @@ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(unsigned int id
 /**
  *
  */
-//##ModelId=3E1886F1024A
 void mitk::ImageSource::SetOutput(OutputImageType *output)
 {
   itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
@@ -77,7 +74,6 @@ void mitk::ImageSource::SetOutput(OutputImageType *output)
 /**
  * 
  */
-//##ModelId=3E1886F102A5
 void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 {
   this->GraftNthOutput(0, graft);
@@ -87,8 +83,6 @@ void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 /**
  * 
  */
-
-//##ModelId=3E1886F10313
 void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 {
   itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
@@ -114,8 +108,6 @@ void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 }
 
 //----------------------------------------------------------------------------
-
-//##ModelId=3E1886F202F6
 int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion)
 {
   // Get the output pointer
@@ -173,7 +165,6 @@ int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionTyp
 
 //----------------------------------------------------------------------------
 
-//##ModelId=3E1886F2022E
 void mitk::ImageSource::AllocateOutputs()
 {
   OutputImagePointer outputPtr;
@@ -189,7 +180,6 @@ void mitk::ImageSource::AllocateOutputs()
 
 //----------------------------------------------------------------------------
 
-//##ModelId=3E1886F200CF
 void mitk::ImageSource::GenerateData()
 {
   // Call a method that can be overriden by a subclass to allocate
@@ -220,7 +210,6 @@ void mitk::ImageSource::GenerateData()
 //----------------------------------------------------------------------------
 // The execute method created by the subclass.
 
-//##ModelId=3E1886F2010B
 void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, int)
 {
   itkExceptionMacro("subclass should override this method!!!");
@@ -230,7 +219,6 @@ void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, int)
 // the ThreadedGenerateData method after setting the correct region for this
 // thread. 
 
-//##ModelId=3E1886F30063
 ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
 {
   ThreadStruct *str;
@@ -266,21 +254,18 @@ void mitk::ImageSource::PrepareOutputs()
   Superclass::PrepareOutputs();
 }
 
-//##ModelId=3E3BCBD4000C
 void* mitk::ImageSource::GetData()
 {
     Update();
     return GetOutput()->GetData();
 }
 
-//##ModelId=3E3BCBD0024B
 ipPicDescriptor* mitk::ImageSource::GetPic()
 {
     Update();
     return GetOutput()->GetPic();
 }
 
-//##ModelId=3E3BCBD502FD
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
     Update();

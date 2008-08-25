@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3DCBFE35015D
 //##Documentation
 //## @brief Provides access to a slice of the input image
 //##
@@ -49,30 +48,22 @@ class MITK_CORE_EXPORT ImageSliceSelector : public SubImageSelector
 	itkSetMacro(ChannelNr,int);
 
 protected:
-    //##ModelId=3E1A0A2E027F
-    virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
   virtual void GenerateInputRequestedRegion();
 
-    //##ModelId=3E1A0A320090
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-	//##ModelId=3E1B196A0188
-    ImageSliceSelector();
+  ImageSliceSelector();
 
-	//##ModelId=3E1B196A01C4
-    virtual ~ImageSliceSelector();
+  virtual ~ImageSliceSelector();
 
-    //##ModelId=3E1A0B390283
-    int m_SliceNr;
+  int m_SliceNr;
 
-    //##ModelId=3E1A0B57011E
-    int m_TimeNr;
+  int m_TimeNr;
 
-    //##ModelId=3E1A0B5A0281
-    int m_ChannelNr;
+  int m_ChannelNr;
 
-//    ImageDataItem::Pointer m_CurrentSliceData;
 };
 
 } // namespace mitk

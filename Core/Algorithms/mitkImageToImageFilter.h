@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E1A05C3005C
 //##Documentation
 //## @brief Superclass of all classes having one or more Images as input and
 //## generating Images as output
@@ -38,37 +37,25 @@ public:
 	itkNewMacro(Self);
 
 	/** Superclass typedefs. */
-    //##ModelId=3E1A0A0303E6
 	typedef Superclass::OutputImageRegionType OutputImageRegionType;
 
 	/** Some convenient typedefs. */
-    //##ModelId=3E1A0A040012
 	typedef mitk::Image                    InputImageType;
-    //##ModelId=3E1A0A040030
 	typedef InputImageType::Pointer        InputImagePointer;
-    //##ModelId=3E1A0A040044
 	typedef InputImageType::ConstPointer   InputImageConstPointer;
-    //##ModelId=3E1A0A040062
 	typedef SlicedData::RegionType         InputImageRegionType; 
 
 	/** Set/Get the image input of this process object.  */
-    //##ModelId=3E1A0A04018E
 	virtual void SetInput( const InputImageType *image);
-    //##ModelId=3E1A0A0401CB
 	virtual void SetInput( unsigned int, const InputImageType * image);
-    //##ModelId=3E1A0A040225
 	const InputImageType * GetInput(void);
-    //##ModelId=3E1A0A040257
 	const InputImageType * GetInput(unsigned int idx);
 
 
 protected:
-	//##ModelId=3E1A06100338
 	ImageToImageFilter();
-	//##ModelId=3E1A06100356
 	virtual ~ImageToImageFilter();
 
-    //##ModelId=3E1A0A040293
 	virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
 	/** What is the input requested region that is required to produce the
@@ -85,11 +72,9 @@ protected:
 	*
 	* \sa ProcessObject::GenerateInputRequestedRegion(),
 	*     ImageSource::GenerateInputRequestedRegion() */
-    //##ModelId=3E1A0A040301
 	virtual void GenerateInputRequestedRegion();
 
 private:
-    //##ModelId=3E1A0A040316
 	void operator=(const Self&); //purposely not implemented
 };
 

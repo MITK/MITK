@@ -64,7 +64,6 @@ public:
   const Point3D &GetPosition() const;
   void SetPosition( const Point3D &position );
 
-  //##ModelId=3E3FF04F00E1
   virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
 

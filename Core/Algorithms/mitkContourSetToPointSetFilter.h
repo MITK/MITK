@@ -55,10 +55,8 @@ public:
   virtual void SetInput(const mitk::ContourSet *contourSet);
 
 protected:
-  //##ModelId=3EF4A4A70345
   ContourSetToPointSetFilter();
 
-  //##ModelId=3EF4A4A70363
   virtual ~ContourSetToPointSetFilter();
 
 protected:

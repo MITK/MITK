@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E1878F90199
 //##Documentation
 //## @brief Superclass of all classes generating Images (instances of class
 //## Image) as output. 
@@ -45,24 +44,18 @@ public:
   mitkClassMacro(ImageSource,BaseProcess);
   
   /** @brief Smart Pointer type to a DataObject. */
-    //##ModelId=3E1886F1001A
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /** @brief Method for creation through the object factory. */
   itkNewMacro(Self);  
 
   /** @brief Some convenient typedefs. */
-    //##ModelId=3E1886F10038
   typedef mitk::Image OutputImageType;
-    //##ModelId=3E1886F10056
   typedef OutputImageType::Pointer OutputImagePointer;
-    //##ModelId=3E1886F1006A
   typedef SlicedData::RegionType OutputImageRegionType;
 
   /** @brief Get the image output of this process object.  */
-    //##ModelId=3E1886F101A2
   OutputImageType * GetOutput(void);
-    //##ModelId=3E1886F101F0
   OutputImageType * GetOutput(unsigned int idx);
   
   /** @brief Set the image output of this process object. 
@@ -70,7 +63,6 @@ public:
    * This call is slated
    * to be removed from ITK. You should GraftOutput() and possible
    * DataObject::DisconnectPipeline() to properly change the output. */
-    //##ModelId=3E1886F1024A
   void SetOutput(OutputImageType *output);
 
   /** @brief Graft the specified DataObject onto this ProcessObject's output.
@@ -109,7 +101,6 @@ public:
    * filter's pipeline mechanism must be consistent with what the
    * mini-pipeline will do).
    *  */
-    //##ModelId=3E1886F102A5
   virtual void GraftOutput(OutputImageType *output);
 
   /** @brief Graft the specified data object onto this ProcessObject's idx'th
@@ -120,7 +111,6 @@ public:
    * must be a valid output number (less than
    * ProcessObject::GetNumberOfOutputs()). See the GraftOutput for
    * general usage information. */
-    //##ModelId=3E1886F10313
   virtual void GraftNthOutput(unsigned int idx, OutputImageType *output);
 
   /** @brief Make a DataObject of the correct type to used as the specified
@@ -138,21 +128,15 @@ public:
    * SmartPointer to a DataObject. If a subclass of ImageSource has
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
-    //##ModelId=3E1886F103DB
   virtual DataObjectPointer MakeOutput(unsigned int idx);
-    //##ModelId=3E3BCBD4000C
-    virtual void* GetData();
+  virtual void* GetData();
 
-    //##ModelId=3E3BCBD0024B
-    virtual ipPicDescriptor* GetPic();
+  virtual ipPicDescriptor* GetPic();
 
-    //##ModelId=3E3BCBD502FD
-    virtual vtkImageData* GetVtkImageData();
+  virtual vtkImageData* GetVtkImageData();
 
 protected:
-    //##ModelId=3E1886F20075
   ImageSource();
-    //##ModelId=3E1886F20093
   virtual ~ImageSource() {}
   
   /** @brief A version of GenerateData() specific for image processing
@@ -172,7 +156,6 @@ protected:
    * instead.
    *
    * \sa ThreadedGenerateData() */
-    //##ModelId=3E1886F200CF
   virtual void GenerateData();
 
   /** @brief If an imaging filter can be implemented as a multithreaded
@@ -199,7 +182,6 @@ protected:
    * different thread).
    *
    * \sa GenerateData(), SplitRequestedRegion() */
-    //##ModelId=3E1886F2010B
   virtual
   void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                             int threadId );
@@ -212,7 +194,6 @@ protected:
    * from GenerateData()) will resize the container if more memory is
    * needed.  Otherwise, the memory can be reused.
    */
-    //##ModelId=3E1886F201E8
   virtual void PrepareOutputs();
 
   /** @brief The GenerateData method normally allocates the buffers for all of the
@@ -222,7 +203,6 @@ protected:
    * behavior. For example, a filter may have multiple outputs with
    * varying resolution. Or a filter may want to process data in place by
    * grafting its input to its output.*/
-    //##ModelId=3E1886F2022E
   virtual void AllocateOutputs();
   
   /** @brief If an imaging filter needs to perform processing after the buffer
@@ -236,7 +216,6 @@ protected:
    *      4) Call AfterThreadedGenerateData()
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
-    //##ModelId=3E1886F2026A
   virtual void BeforeThreadedGenerateData() {};
   
   /** @brief If an imaging filter needs to perform processing after all
@@ -251,7 +230,6 @@ protected:
    *      4) Call AfterThreadedGenerateData()
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
-    //##ModelId=3E1886F202B0
   virtual void AfterThreadedGenerateData() {};
   
   /** @brief Split the output's RequestedRegion into "num" pieces, returning
@@ -261,7 +239,6 @@ protected:
    * regions must not overlap. The method returns the number of pieces that
    * the routine is capable of splitting the output RequestedRegion,
    * i.e. return value is less than or equal to "num". */
-    //##ModelId=3E1886F202F6
   virtual
   int SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion);
 
@@ -269,19 +246,15 @@ protected:
    *
    * The threading library will call this routine for each thread, which will delegate the
    * control to ThreadedGenerateData(). */
-    //##ModelId=3E1886F30063
   static ITK_THREAD_RETURN_TYPE ThreaderCallback( void *arg );
 
   /** @brief Internal structure used for passing image data into the threading library */
-    //##ModelId=3E1886F100A6
   struct ThreadStruct
   {
-        //##ModelId=3EDD039F0359
    Pointer Filter;
   };
   
 private:
-    //##ModelId=3E3BCCCD030D
   void operator=(const Self&); //purposely not implemented
 };
 

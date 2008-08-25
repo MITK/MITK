@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3F0189F0016F
 //##Documentation
 //## @brief DrawOperation, that handles all actions on seeds.
 //##
@@ -36,7 +35,6 @@ namespace mitk {
 class MITK_CORE_EXPORT DrawOperation : public Operation
 {
   public:
-  //##ModelId=3F0189F003A2
   //##Documentation
   //##@brief DrawOperation, that handles all actions on seeds.
   //##

@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkRenderingManager.h>
 
 
-//##ModelId=3F02F896006D
 mitk::ConferenceEventMapper::ConferenceEventMapper(){}
 
 mitk::ConferenceEventMapper::~ConferenceEventMapper(){}

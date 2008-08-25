@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string mitk::DataTree::XML_NODE_NAME = "mitkDataTree";
 const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
 
-//##ModelId=3E38F46A0190
 mitk::DataTree::DataTree() : 
 DataTreeBase( )
 {
@@ -35,7 +34,6 @@ DataTreeBase( )
 }
 
 
-//##ModelId=3E38F46A01AE
 mitk::DataTree::~DataTree()
 {
   Clear();
@@ -44,7 +42,6 @@ mitk::DataTree::~DataTree()
 /**
 *
 */
-//##ModelId=3E3FE0430148
 mitk::DataTreeIteratorClone mitk::DataTree::GetNext( const char* propertyKey, const mitk::BaseProperty* property,  mitk::DataTreeIteratorBase* startPosition )
 {
   DataTreeIteratorClone pos;

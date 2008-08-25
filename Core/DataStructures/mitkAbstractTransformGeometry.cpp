@@ -19,13 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAbstractTransformGeometry.h"
 #include <vtkAbstractTransform.h>
 
-//##ModelId=3EF4A266029C
 mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL), m_FrameGeometry(NULL)
 {
   Initialize();
 }
 
-//##ModelId=3EF4A266029D
 mitk::AbstractTransformGeometry::~AbstractTransformGeometry()
 {
 }
@@ -37,7 +35,6 @@ void mitk::AbstractTransformGeometry::Initialize()
   m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
 }
 
-//##ModelId=3EF4A2660237
 vtkAbstractTransform* mitk::AbstractTransformGeometry::GetVtkAbstractTransform() const
 {
   return m_ItkVtkAbstractTransform->GetVtkAbstractTransform();
@@ -73,7 +70,6 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &pt3d_mm, mitk
   //return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-//##ModelId=3EF4A2660256
 bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
@@ -84,7 +80,6 @@ bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D &pt3d_mm, mitk::Po
   return m_Plane->Map(pt3d_units, pt2d_mm);
 }
 
-//##ModelId=3EF4A266025F
 void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
@@ -108,7 +103,6 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, c
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-//##ModelId=3EF4A2660288
 bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
@@ -122,7 +116,6 @@ bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D & atPt3d_mm, const
   return m_Plane->Map(atPt3d_mm, vec3d_units, vec2d_mm);
 }
 
-//##ModelId=3EF4A2660292
 void mitk::AbstractTransformGeometry::Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const
 {
   m_Plane->Map(atPt2d_mm, vec2d_mm, vec3d_mm);

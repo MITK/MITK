@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointOperation.h"
 
-//##ModelId=3F0189F003A2
 mitk::PointOperation::PointOperation(OperationType operationType, Point3D point, int index, bool selected, PointSpecificationType type)
 : mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type), m_TimeInMS(0)
 {}
@@ -27,18 +26,15 @@ mitk::PointOperation::PointOperation(OperationType operationType, ScalarType tim
 : mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type), m_TimeInMS(timeInMS)
 {}
 
-//##ModelId=3F0189F003B2
 mitk::PointOperation::~PointOperation()
 {
 }
 
-//##ModelId=3F0189F003B4
 mitk::Point3D mitk::PointOperation::GetPoint()
 {
 	return m_Point;
 }
 
-//##ModelId=3F0189F003B5
 int mitk::PointOperation::GetIndex()
 {
 	return m_Index;

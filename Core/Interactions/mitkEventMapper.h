@@ -41,7 +41,6 @@ namespace mitk {
   class StateMachine;
   class StateEvent;
 
-  //##ModelId=3E5A390401F2
   //##Documentation
   //## @brief Maps an Event to its description
   //##
@@ -63,24 +62,19 @@ namespace mitk {
     static EventMapper *New();
     vtkTypeMacro(EventMapper,vtkXMLParser);
 
-    //##ModelId=3F0177080269
     typedef std::vector<mitk::EventDescription> EventDescriptionVec;
-    //##ModelId=3F0177080288
     typedef std::vector<mitk::EventDescription>::iterator EventDescriptionVecIter;
 
     typedef std::map<const char*, int, ltstr> ConstMap;
     typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
-    //##ModelId=3E5B349600CB
     //##Documentation
     //## set the global StateMachine. If temporaryly changed,
     //## then copy the old statemachine with GetStateMachine()
     static void SetGlobalStateMachine(StateMachine* stateMachine);
 
-    //##ModelId=3EDCA746026F
     static StateMachine* GetGlobalStateMachine();
 
-    //##ModelId=3E5B34CF0041
     //##Documentation
     //## searches the Event in m_EventDescription
     //## and if included transmitts the event to globalInteraction
@@ -94,7 +88,6 @@ namespace mitk {
     //## if not found it returns -1
     static StateEvent* RefreshStateEvent(StateEvent* stateEvent);
 
-    //##ModelId=3E5B35140072
     //##Documentation
     //## loads an XML-File containing Events into m_EventDescriptions
     //## also involved: EventMapper::startEvent(...)
@@ -110,12 +103,10 @@ namespace mitk {
     //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
     static bool LoadStandardBehavior();
 
-    //##ModelId=3E788FC00308
     //##Documentation
     //## reads a Tag from an XML-file
     //## adds Events to m_EventDescription
 
-    //##ModelId=3E7B20EE01F5
     std::string GetStyleName();
 
     //friendship because of SetStateEvent for computing WorldCoordinates
@@ -154,40 +145,27 @@ namespace mitk {
     //## @brief maps the strings to int for convertion from XML-Behaviour-File
     ConstMap m_EventConstMap;
 
-    //##ModelId=3E5B33F303CA
     //##Documentation
     //## @brief stores the information for the connection between QT-Events and the internal EventId.
     //## gets this information from xml-File
     static EventDescriptionVec m_EventDescriptions;
 
-    //##ModelId=3E5B343701F1
     static StateMachine *s_GlobalStateMachine;
 
-    //##ModelId=3E956E3A036B
     static StateEvent m_StateEvent;
 
-    //##ModelId=3E7B1EB800CC
     //##Documentation
     //## @brief stores the name of the Event-Style loaded
     static std::string m_StyleName;
 
-    //##ModelId=3E788FC000E5
     static const std::string STYLE;
-    //##ModelId=3E788FC0025C
     static const std::string NAME;
-    //##ModelId=3E788FC002AA
     static const std::string ID;
-    //##ModelId=3E785B1B00FD
     static const std::string TYPE;
-    //##ModelId=3E785B1B015B
     static const std::string BUTTON;
-    //##ModelId=3E8B08FA01AA
     static const std::string BUTTONSTATE;
-    //##ModelId=3E785B1B01A9
     static const std::string KEY;
-    //##
     static const std::string EVENTS;
-    //##
     static const std::string EVENT;
 
   };

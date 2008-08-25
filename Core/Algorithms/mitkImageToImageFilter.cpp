@@ -18,15 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageToImageFilter.h"
 
-//##ModelId=3E1A06100338
 mitk::ImageToImageFilter::ImageToImageFilter()
 {
 	// Modify superclass default values, can be overridden by subclasses
 	this->SetNumberOfRequiredInputs(1);
 }
 
-
-//##ModelId=3E1A06100356
 mitk::ImageToImageFilter::~ImageToImageFilter()
 {
 }
@@ -61,7 +58,6 @@ void mitk::ImageToImageFilter::SetInput( unsigned int index, const mitk::ImageTo
 /**
 *
 */
-//##ModelId=3E1A0A040225
 const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(void) 
 {
 	if (this->GetNumberOfInputs() < 1)
@@ -76,7 +72,6 @@ const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInp
 /**
 *
 */
-//##ModelId=3E1A0A040257
 const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(unsigned int idx)
 {
 	return static_cast< const mitk::ImageToImageFilter::InputImageType * >
@@ -87,7 +82,6 @@ const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInp
 
 //-----------------------------------------------------------------------
 //
-//##ModelId=3E1A0A040301
 void mitk::ImageToImageFilter::GenerateInputRequestedRegion()
 {
 	Superclass::GenerateInputRequestedRegion();
@@ -112,7 +106,6 @@ void mitk::ImageToImageFilter::GenerateInputRequestedRegion()
 	}  
 }
 
-//##ModelId=3E1A0A040293
 void mitk::ImageToImageFilter::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
 	Superclass::PrintSelf(os, indent);

@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E86AABB0082
 //##Documentation
 //## @brief Standard RGB color typedef (float)
 //##
@@ -33,7 +32,6 @@ namespace mitk {
 //## @ingroup Property
 typedef itk::RGBPixel< float > Color;
 
-//##ModelId=3E86A20C00FD
 //##Documentation
 //## @brief RGB color property
 //##
@@ -41,17 +39,14 @@ typedef itk::RGBPixel< float > Color;
 class MITK_CORE_EXPORT ColorProperty : public BaseProperty
 {
 protected:
-  //##ModelId=3E86A3B00061
   mitk::Color m_Color;
   
   ColorProperty();
   
   ColorProperty(const float red, const float green, const float blue);
     
-  //##ModelId=3E86A3450130
   ColorProperty(const float color[3]);
   
-  //##ModelId=3ED9530801BD
   ColorProperty(const mitk::Color & color);
     
 public:
@@ -63,18 +58,14 @@ public:
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);
   
-  //##ModelId=3E86A345014E
   virtual ~ColorProperty();
    
   virtual bool Assignable(const BaseProperty& other) const;
   virtual BaseProperty& operator=(const BaseProperty& other);
  
-  //##ModelId=3E86A35F000B
   virtual bool operator==(const BaseProperty& property) const;
   
-  //##ModelId=3E86AABB0371
   const mitk::Color & GetColor() const;
-  //##ModelId=3E86AABB0399
   const mitk::Color & GetValue() const;
   std::string GetValueAsString() const;
   void SetColor(const mitk::Color & color );

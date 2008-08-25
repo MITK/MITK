@@ -60,19 +60,12 @@ vtkStandardNewMacro(EventMapper);
 #endif //MBI_INTERNAL_CONFERENCE
 
 //XML Event
-//##ModelId=3E788FC000E5
 const std::string mitk::EventMapper::STYLE = "STYLE";
-//##ModelId=3E788FC0025C
 const std::string mitk::EventMapper::NAME = "NAME";
-//##ModelId=3E788FC002AA
 const std::string mitk::EventMapper::ID = "ID";
-//##ModelId=3E77572901E9
 const std::string mitk::EventMapper::TYPE = "TYPE";
-//##ModelId=3E7757290256
 const std::string mitk::EventMapper::BUTTON = "BUTTON";
-//##ModelId=3E8B08FA01AA
 const std::string mitk::EventMapper::BUTTONSTATE = "BUTTONSTATE";
-//##ModelId=3E77572902C4
 const std::string mitk::EventMapper::KEY = "KEY";
 
 const std::string mitk::EventMapper::EVENTS = "events";
@@ -97,7 +90,6 @@ struct ltstr
   }
 };
 
-//##ModelId=3F02F896006D
 mitk::EventMapper::EventMapper()
 {
 
@@ -441,12 +433,10 @@ mitk::EventMapper::EventMapper()
 
 }
 
-//##ModelId=3F02F896008C
 mitk::EventMapper::~EventMapper()
 {
 }
 
-//##ModelId=3E5B349600CB
 //##Documentation
 //## set the global StateMachine. If temporaryly changed,
 //## then copy the old statemachine with GetStateMachine()
@@ -462,7 +452,6 @@ void mitk::EventMapper::SetGlobalStateMachine(StateMachine *stateMachine)
   s_GlobalStateMachine = stateMachine;
 }
 
-//##ModelId=3EDCA746026F
 mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
 {
   if(s_GlobalStateMachine == NULL)
@@ -472,7 +461,6 @@ mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
   return s_GlobalStateMachine;
 }
 
-//##ModelId=3E5B34CF0041
 //##Documentation
 //## searches the Event in m_EventDescription
 //##  
@@ -551,7 +539,6 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
   return ok;
 }
 
-//##ModelId=3E5B35140072
 //##Documentation
 //## loads an XML-File containing Events into m_EventDescriptions
 //## also involved: EventMapper::startEvent(...)
@@ -622,7 +609,6 @@ void  mitk::EventMapper::StartElement (const char *elementName, const char **att
 
 }
 
-//##ModelId=3E7B20EE01F5
 std::string mitk::EventMapper::GetStyleName()
 {
   return m_StyleName;

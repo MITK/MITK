@@ -20,18 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 
 
-//##ModelId=3E1B1975031E
 mitk::ImageTimeSelector::ImageTimeSelector() : m_TimeNr(0), m_ChannelNr(0)
 {
 }
 
 
-//##ModelId=3E1B1975033C
 mitk::ImageTimeSelector::~ImageTimeSelector()
 {
 }
 
-//##ModelId=3E3BD0CC0232
 void mitk::ImageTimeSelector::GenerateOutputInformation()
 {
 	Image::ConstPointer input  = this->GetInput();
@@ -52,7 +49,6 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
   output->SetPropertyList(input->GetPropertyList()->Clone());  
 }
 
-//##ModelId=3E3BD0CE0194
 void mitk::ImageTimeSelector::GenerateData()
 {
   const Image::RegionType& requestedRegion = this->GetOutput()->GetRequestedRegion();

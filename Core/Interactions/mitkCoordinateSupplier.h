@@ -28,7 +28,6 @@ namespace mitk {
   class Operation;
   class OperationActor;
 
-  //##ModelId=3F0189F00094
   //##Documentation
   //## @brief Interactor
   //##
@@ -57,7 +56,6 @@ namespace mitk {
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
 
   private:
-    //##ModelId=3F0189F0024A
     OperationActor* m_Destination;
     Point3D m_OldPoint;
     Point3D m_CurrentPoint;

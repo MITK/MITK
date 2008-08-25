@@ -30,7 +30,6 @@ namespace mitk {
 
 class BaseData;
 
-//##ModelId=3DCBF9BC011A
 //##Documentation
 //## @brief Superclass of all classes generating some kind of mitk::BaseData.
 //##
@@ -59,22 +58,20 @@ public:
     return m_Updating;
   }
 
-  //##ModelId=3E8600DC03E2
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   virtual void UnRegister() const;
 
-  //##ModelId=3E8600DD000E
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   virtual int GetExternalReferenceCount() const;
+
 protected:
-  //##ModelId=3E8600DD0036
+
   BaseProcess();
-  //##ModelId=3E8600DD004A
+
   virtual ~BaseProcess();
 
-  //##ModelId=3E8600DD0072
   //##Documentation
   //## @brief Protected methods for setting outputs.
   //## 
@@ -83,7 +80,7 @@ protected:
   //## private and non-virtual: the important stuff is done in 
   //## mitk::BaseData::ConnectSource.
   virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
-  //##ModelId=3E8600DD00F4
+
   //##Documentation
   //## @brief Protected methods for setting outputs.
   //## 
@@ -94,17 +91,17 @@ protected:
   virtual void AddOutput(itk::DataObject *output);
 
 private:
-  //##ModelId=3E8600DC0356
+
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
   mutable bool m_Unregistering;
+
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
-  //##ModelId=3E8600DC037E
   mutable bool m_CalculatingExternalReferenceCount;
+
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.
-  //##ModelId=3E8600DC03B0
   mutable int m_ExternalReferenceCount;
 };
 

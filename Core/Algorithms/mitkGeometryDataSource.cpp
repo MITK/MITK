@@ -68,7 +68,6 @@ void mitk::GeometryDataSource::GraftOutput(mitk::GeometryData* graft)
   this->GraftNthOutput(0, graft);
 }
 
-//##ModelId=3EF56C440197
 void mitk::GeometryDataSource::GraftNthOutput(unsigned int idx, mitk::GeometryData *graft)
 {
   if (idx < this->GetNumberOfOutputs())

@@ -193,7 +193,6 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
    m_BitsPerComponent = m_Bpe / m_NumberOfComponents;
 }
 
-//##ModelId=3E140E4F00E9
 void mitk::PixelType::Initialize( ipPicType_t type, int bpe, int numberOfComponents )
 {
    m_Type = type;

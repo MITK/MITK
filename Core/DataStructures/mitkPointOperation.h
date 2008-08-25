@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3F0189F0016F
 //##Documentation
 //## @brief Operation that handles all actions on one Point.
 //##
@@ -36,7 +35,6 @@ namespace mitk {
 class MITK_CORE_EXPORT PointOperation : public Operation
 {
   public:
-  //##ModelId=3F0189F003A2
 	//##Documentation
 	//##@brief Operation that handles all actions on one Point.
 	//##
@@ -55,13 +53,10 @@ class MITK_CORE_EXPORT PointOperation : public Operation
 
   PointOperation(OperationType operationType,	Point3D point, ScalarType timeInMS, int index, bool selected, PointSpecificationType type);
 
-  //##ModelId=3F0189F003B2
   virtual ~PointOperation();
 
-  //##ModelId=3F0189F003B4
 	Point3D GetPoint();
 
-  //##ModelId=3F0189F003B5
 	int GetIndex();
 
   bool GetSelected();
@@ -71,10 +66,8 @@ class MITK_CORE_EXPORT PointOperation : public Operation
   ScalarType GetTimeInMS() const;
 
   private:
-  //##ModelId=3F0189F00393
 	Point3D m_Point;
 
-  //##ModelId=3F0189F003A1
   //##Documentation
   //##@brief to declare an index where to store the point in data
 	int m_Index;

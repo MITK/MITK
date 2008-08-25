@@ -21,19 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
-//##ModelId=3E8600DD0036
 mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
 
 }
 
-//##ModelId=3E8600DD004A
 mitk::BaseProcess::~BaseProcess()
 {
 
 }
 
-//##ModelId=3E8600DD000E
 int mitk::BaseProcess::GetExternalReferenceCount() const
 {
   if(m_CalculatingExternalReferenceCount==false) //this is only needed because a smart-pointer to m_Outputs (private!!) must be created by calling GetOutputs.
@@ -63,7 +60,6 @@ int mitk::BaseProcess::GetExternalReferenceCount() const
   return m_ExternalReferenceCount;
 }
 
-//##ModelId=3E8600DC03E2
 void mitk::BaseProcess::UnRegister() const
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
@@ -113,7 +109,6 @@ void mitk::BaseProcess::UnRegister() const
 * does not do a Register()/UnRegister() because of the 
 * desire to break the reference counting loop.
 */
-//##ModelId=3E8600DD0072
 void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
@@ -139,7 +134,6 @@ void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
 * Adds an output to the first null position in the output list.
 * Expands the list memory if necessary
 */
-//##ModelId=3E8600DD00F4
 void mitk::BaseProcess::AddOutput(itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED

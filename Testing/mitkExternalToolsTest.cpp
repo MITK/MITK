@@ -43,9 +43,9 @@ int mitkExternalToolsTest(int argc, char* argv[])
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
 #ifdef WIN32
-    if ( _chdir(mitkBinaryDirectory) != 0 )
+    if ( _chdir(mitkBinaryDirectory.c_str()) != 0 )
 #else
-    if ( chdir(mitkBinaryDirectory) != 0 )
+    if ( chdir(mitkBinaryDirectory.c_str()) != 0 )
 #endif
     {
       std::cerr << "Couldn't change to MITK build dir. See output above." << std::endl;

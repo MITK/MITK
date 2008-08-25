@@ -32,8 +32,8 @@ int mitkExternalToolsTest(int argc, char* argv[])
     // quote spaces in commandline parameters (all paths/files)
     //std::string cmakeBinary         = itksys::SystemTools::EscapeChars( argv[1], " " );
     std::string cmakeBinary         = argv[1];
-    std::string mitkBinaryDirectory = itksys::SystemTools::EscapeChars( argv[2], " " );
-    std::string sourceDirectory     = itksys::SystemTools::EscapeChars( argv[3], " " );
+    std::string mitkBinaryDirectory = argv[2];
+    std::string sourceDirectory     = argv[3];
     
     // try to configure MITK external project
     std::cout << "Calling CMake as '" << cmakeBinary << "'" << std::endl;
@@ -48,7 +48,7 @@ int mitkExternalToolsTest(int argc, char* argv[])
 
     std::string commandline("\"\"");
     commandline += cmakeBinary;
-    commandline += "\"";
+    commandline += "\"\"";
     
     commandline += " -DMITK_DIR:PATH=";
 

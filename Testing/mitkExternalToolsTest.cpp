@@ -26,17 +26,19 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkExternalToolsTest(int argc, char* argv[])
 {
   std::cout << "Got " << argc << " parameters" << std::endl;
-  if ( argc == 4 )
+  if ( argc == 5 )
   {
     // "parse" commandline 
     // quote spaces in commandline parameters (all paths/files)
     //std::string cmakeBinary         = itksys::SystemTools::EscapeChars( argv[1], " " );
     std::string cmakeBinary         = argv[1];
-    std::string mitkBinaryDirectory = argv[2];
-    std::string sourceDirectory     = argv[3];
+    std::string cmakeGenerator      = argv[2];
+    std::string mitkBinaryDirectory = argv[3];
+    std::string sourceDirectory     = argv[4];
     
     // try to configure MITK external project
     std::cout << "Calling CMake as '" << cmakeBinary << "'" << std::endl;
+    std::cout << "Calling CMake for generator '" << cmakeGenerator << "'" << std::endl;
     std::cout << "MITK was compiled in '" << mitkBinaryDirectory << "'" << std::endl;
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
@@ -46,19 +48,26 @@ int mitkExternalToolsTest(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    std::string commandline("\"\"");
+    std::string oneCommandlineQuote("\"");
+
+    std::string commandline( oneCommandlineQuote );
     commandline += cmakeBinary;
-    commandline += "\"\"";
+    commandline += oneCommandlineQuote;
     
+    commandline += " -G ";
+    commandline += oneCommandlineQuote;
+    commandline += cmakeGenerator;
+    commandline += oneCommandlineQuote;
+
     commandline += " -DMITK_DIR:PATH=";
 
-    commandline += "\"\"";
+    commandline += oneCommandlineQuote;
     commandline += mitkBinaryDirectory;
-    commandline += "\"\"";
+    commandline += oneCommandlineQuote;
     commandline += " ";
-    commandline += "\"\"";
+    commandline += oneCommandlineQuote;
     commandline += sourceDirectory;
-    commandline += "\"\"";
+    commandline += oneCommandlineQuote;
 
     std::cout << "Calling system() with '" 
               << commandline
@@ -100,8 +109,9 @@ int mitkExternalToolsTest(int argc, char* argv[])
   {
     std::cout << "Invoke this test with three parameters:" << std::endl;
     std::cout << "   1. CMake binary including necessary path" << std::endl;
-    std::cout << "   2. MITK binary path (top-level directory)" << std::endl;
-    std::cout << "   3. Source directory containing CMakeLists.txt" << std::endl;
+    std::cout << "   2. CMake generator name" << std::endl;
+    std::cout << "   3. MITK binary path (top-level directory)" << std::endl;
+    std::cout << "   4. Source directory containing CMakeLists.txt" << std::endl;
     return EXIT_FAILURE;
   }
 }

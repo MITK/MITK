@@ -21,6 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <stdlib.h> // for system() call
 
+#ifdef WIN32
+  #include <direct.h>
+#else
+  #include <unistd.h>
+#endif
+
 int mitkExternalToolsTest(int argc, char* argv[])
 {
   std::cout << "Got " << argc << " parameters" << std::endl;
@@ -36,7 +42,11 @@ int mitkExternalToolsTest(int argc, char* argv[])
     std::cout << "MITK was compiled in '" << mitkBinaryDirectory << "'" << std::endl;
     std::cout << "Configuring project in '" << sourceDirectory << "'" << std::endl;
 
-    if (system((std::string("cd ") + mitkBinaryDirectory).c_str()) != 0)
+#ifdef WIN32
+    if ( _chdir(mitkBinaryDirectory) != 0 )
+#else
+    if ( chdir(mitkBinaryDirectory) != 0 )
+#endif
     {
       std::cerr << "Couldn't change to MITK build dir. See output above." << std::endl;
       return EXIT_FAILURE;
@@ -71,7 +81,8 @@ int mitkExternalToolsTest(int argc, char* argv[])
 
     // try to build MITK external project
 
-#ifndef WIN32
+#ifdef WIN32
+#else
     commandline = "make";
     // commented out because mbits configures with Qt4. Have to check this monday.
     //returnCode = system(commandline.c_str());

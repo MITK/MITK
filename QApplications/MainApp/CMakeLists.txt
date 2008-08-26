@@ -172,7 +172,6 @@ INSTALL(TARGETS MainApp
    ARCHIVE DESTINATION lib/static)
 
 
-SET(CMAKE_BINARY ${CMAKE_COMMAND})
 SET(TOOL_EXTENSIONS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ToolExtensionsExample/)
 
 IF(MBISB_FUNCTIONALITY_NAMES_KNOWN OR MBIQM_FUNCTIONALITY_NAMES_KNOWN) 
@@ -182,12 +181,32 @@ ELSE(MBISB_FUNCTIONALITY_NAMES_KNOWN OR MBIQM_FUNCTIONALITY_NAMES_KNOWN)
 ENDIF(MBISB_FUNCTIONALITY_NAMES_KNOWN OR MBIQM_FUNCTIONALITY_NAMES_KNOWN)
 
 # CMAKE_GENERATOR is provided by CMake
-ADD_TEST(mitkExternalToolsTest 
-         ${EXECUTABLE_OUTPUT_PATH}/MITKTestDriver mitkExternalToolsTest 
-         "${CMAKE_BINARY}" 
+ADD_TEST(mitkExternalToolsTestPart1
+         "${CMAKE_COMMAND}" 
+         "-E"
+         "make_directory"
+         "tmp-external-tools"
+        )
+
+ADD_TEST(mitkExternalToolsTestPart2
+         "${CMAKE_COMMAND}" 
+         "-E"
+         "chdir"
+         "tmp-external-tools"
+         "${CMAKE_COMMAND}" 
+         "-G"
          "${CMAKE_GENERATOR}" 
-         "${MITK_WHERE_COMPILE}"
-         "${TOOL_EXTENSIONS_SOURCE_DIR}")
+         "-DMITK_DIR:PATH=${MITK_WHERE_COMPILE}"
+         "${TOOL_EXTENSIONS_SOURCE_DIR}"
+        )
 
-
+IF (NOT WIN32)
+ADD_TEST(mitkExternalToolsTestPart3
+         "${CMAKE_COMMAND}" 
+         "-E"
+         "chdir"
+         "tmp-external-tools"
+         "make"
+        )
+ENDIF (NOT WIN32)
 

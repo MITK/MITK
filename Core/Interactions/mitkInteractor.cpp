@@ -229,13 +229,18 @@ const std::string& mitk::Interactor::GetXMLNodeName() const
 void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
 {
   m_DataTreeNode = dataTreeNode;
-  mitk::BaseData* data = dataTreeNode->GetData();
-  if (data != NULL)
+  
+  //check for the number of timesteps and initialize the vector of CurrentStatePointer accordingly
+  if (m_DataTreeNode != NULL)
   {
-    unsigned int timeSteps = data->GetTimeSteps();
-    //expand the list of StartStates according to the number of timesteps in data
-    if (timeSteps > 1)
-      this->InitializeStartStates(timeSteps);
+    mitk::BaseData* data = dataTreeNode->GetData();
+    if (data != NULL)
+    {
+      unsigned int timeSteps = data->GetTimeSteps();
+      //expand the list of StartStates according to the number of timesteps in data
+      if (timeSteps > 1)
+        this->InitializeStartStates(timeSteps);
+    }
   }
 }
 
@@ -266,9 +271,13 @@ void mitk::Interactor::UpdateTimeStep(unsigned int timeStep)
 bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
 {
   //update the Time and then call Superclass
-  unsigned int currentTimeStep = stateEvent->GetEvent()->GetSender()->GetTimeStep(m_DataTreeNode->GetData());
-  if (currentTimeStep != m_TimeStep)
-    this->UpdateTimeStep(currentTimeStep);
+  mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
+  if (sender != NULL)
+  {
+    unsigned int currentTimeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+    if (currentTimeStep != m_TimeStep)
+      this->UpdateTimeStep(currentTimeStep);
+  }
 
   return Superclass::HandleEvent(stateEvent);
 }

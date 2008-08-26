@@ -454,6 +454,8 @@ int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
   //test setData() Method
   mitkDataTreeNodeTestClass::TestDataSetting(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestMapperSetting(myDataTreeNode);
+  
+  //note, that no data is set to the dataTreeNode
   mitkDataTreeNodeTestClass::TestInteractorSetting(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestPropertyList(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestSelected(myDataTreeNode);

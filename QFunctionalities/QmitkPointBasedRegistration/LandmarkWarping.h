@@ -3,7 +3,6 @@
 
 #include "itkDeformationFieldSource.h"
 #include "itkWarpImageFilter.h"
-#include "itkInverseDeformationFieldImageFilter.h"
 #include "itkCommand.h"
 #include "mitkProgressBar.h"
 
@@ -23,7 +22,6 @@ public:
 
 
   typedef   unsigned char  PixelType;
-  typedef   itk::Transform< double, Dimension, Dimension >                                       InverseTransform;
   typedef   itk::Image< PixelType, Dimension >                                                   FixedImageType;
   typedef   itk::Image< PixelType, Dimension >                                                   MovingImageType;
   typedef   itk::DeformationFieldSource< DeformationFieldType >                                  DeformationSourceType;
@@ -31,7 +29,6 @@ public:
   typedef   DeformationSourceType::LandmarkContainer                                             LandmarkContainerType;
   typedef   DeformationSourceType::LandmarkPointType                                             LandmarkPointType;
   typedef   itk::WarpImageFilter< MovingImageType, MovingImageType, DeformationFieldType  >      FilterType;
-  typedef   itk::InverseDeformationFieldImageFilter<DeformationFieldType, DeformationFieldType>  InverseFilterType;
 
   FixedImageType::Pointer m_FixedImage;
   MovingImageType::Pointer m_MovingImage;
@@ -40,7 +37,6 @@ public:
   LandmarkWarping::LandmarkContainerType::Pointer m_TargetLandmarks;
   LandmarkWarping::LandmarkContainerType::Pointer m_SourceLandmarks;
   FilterType::Pointer m_Warper;
-  InverseFilterType::Pointer m_Inverse;
   DeformationFieldType::ConstPointer m_DeformationField;
   DeformationFieldType::ConstPointer m_InverseDeformationField;
 

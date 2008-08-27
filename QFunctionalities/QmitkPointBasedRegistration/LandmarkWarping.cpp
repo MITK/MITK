@@ -1,7 +1,4 @@
 #include "LandmarkWarping.h"
-#include "itkKernelTransform.h"
-#include "itkCommand.h"
-#include "itkInverseDeformationFieldImageFilter.h"
 
 LandmarkWarping::LandmarkWarping()
 {
@@ -97,26 +94,7 @@ LandmarkWarping::MovingImageType::Pointer LandmarkWarping::Register()
 }
 
 LandmarkWarping::LandmarkContainerType::Pointer LandmarkWarping::GetTransformedTargetLandmarks()
-{ 
-  /*m_Inverse = InverseFilterType::New();
-  m_Inverse->SetOutputSpacing(m_DeformationField->GetSpacing());
-  m_Inverse->SetOutputOrigin(m_DeformationField->GetOrigin());
-  m_Inverse->SetSize(m_DeformationField->GetLargestPossibleRegion().GetSize());
-  m_Inverse->SetInput(m_DeformationField);
-  m_Inverse->SetSubsamplingFactor( 16 );
-  try
-  {
-    unsigned long obs3 = m_Inverse->AddObserver(itk::ProgressEvent(), m_Observer);
-    m_Inverse->UpdateLargestPossibleRegion();
-    m_Inverse->RemoveObserver(obs3);
-  }
-  catch(itk::ExceptionObject & excp)
-  {
-    std::cerr << "Exception thrown " << std::endl;
-    std::cerr << excp << std::endl;
-  }
-  m_InverseDeformationField = m_Inverse->GetOutput();*/
-
+{
   LandmarkContainerType::Pointer landmarks = LandmarkContainerType::New();
   LandmarkWarping::LandmarkPointType transformedTargetPoint;
 
@@ -124,46 +102,7 @@ LandmarkWarping::LandmarkContainerType::Pointer LandmarkWarping::GetTransformedT
   {
     LandmarkWarping::LandmarkPointType targetPoint=m_TargetLandmarks->GetElement(pointId);
     transformedTargetPoint  = m_LandmarkDeformer->GetKernelTransform()->TransformPoint(targetPoint);
-    /*m_Warper->GetDeformationField()->TransformPhysicalPointToIndex( targetPoint, index );
-    {
-      m_Warper->GetDeformationField()->TransformIndexToPhysicalPoint( fieldIt.GetIndex(), point );
-      point = m_Deformer->GetKernelTransform()->TransformPoint(point);
-      m_Warper->GetDeformationField()->TransformPhysicalPointToIndex( point, index2 );
-      if (index == index2)
-      {
-        m_Warper->GetDeformationField()->TransformIndexToPhysicalPoint( fieldIt.GetIndex(), targetPoint );
-        break;
-      }
-    }*/
     landmarks->InsertElement(pointId, transformedTargetPoint );
   }
-
-  //LandmarkContainerType::Pointer landmarks = LandmarkContainerType::New();
-  /*unsigned int pointId;
-  FilterType::IndexType index;
-  FilterType::IndexType index2;
-  // iterator for the deformation field
-  itk::ImageRegionIterator<DeformationFieldType> fieldIt( m_Warper->GetDeformationField(), m_DeformationField->GetLargestPossibleRegion() );
-  FilterType::DisplacementType displacement;
-  LandmarkWarping::LandmarkPointType point;
-  for(pointId=0; pointId<m_TargetLandmarks->Size();++pointId)
-  {
-    LandmarkWarping::LandmarkPointType targetPoint=m_TargetLandmarks->GetElement(pointId);
-    m_Warper->GetDeformationField()->TransformPhysicalPointToIndex( targetPoint, index );
-    fieldIt.GoToBegin();
-    while (!(fieldIt.IsAtEnd()))
-    {
-      m_Warper->GetDeformationField()->TransformIndexToPhysicalPoint( fieldIt.GetIndex(), point );
-      point = m_Deformer->GetKernelTransform()->TransformPoint(point);
-      m_Warper->GetDeformationField()->TransformPhysicalPointToIndex( point, index2 );
-      if (index == index2)
-      {
-        m_Warper->GetDeformationField()->TransformIndexToPhysicalPoint( fieldIt.GetIndex(), targetPoint );
-        break;
-      }
-      ++fieldIt;
-    }
-    landmarks->InsertElement(pointId, targetPoint);
-  }*/
   return landmarks;
 }

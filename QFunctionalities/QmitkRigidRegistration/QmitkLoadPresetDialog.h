@@ -31,7 +31,9 @@ class QPushButton;
 /**
   \brief Dialog for QmitkRigidRegistration.
 
-  This dialog is used to ask a user about a preset to load.
+  \ingroup RigidRegistration
+
+  This dialog is used to ask a user about a preset with transform, metric, optimizer and interpolator parameters to load.
 */
 class QmitkLoadPresetDialog : public QDialog
 {

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkVolumeCalculator.h"
 
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkDataTreeNodeFactory.h"
@@ -155,13 +156,30 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
   // display volume property, if it exists and should be displayed
-  bool shouldShowVolume = false;
+  bool shouldShowVolume = false, binary = false;
   float segmentationVolume = -1.0;
+
   mitk::DataTreeNode *node = this->GetDataTreeNode();
-  if ((node->GetBoolProperty("showVolume", shouldShowVolume)) &&
-      (shouldShowVolume) &&
-      (node->GetFloatProperty("volume", segmentationVolume)) &&
-      (segmentationVolume > 0))
+  mitk::Image* mitkimage = dynamic_cast<mitk::Image*>(node->GetData());
+
+  // Check if a volume in ml can be drawn in the image.
+  // This is the case if: 
+  // 1. The property "showVolume" is true AND [
+  // 2.1 The image has a volume stored as property (3D case) OR
+  // 2.2 The image is 3D or 4D and binary, so the volume can be calculated ]
+  if (
+    (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
+    (shouldShowVolume) && 
+     (
+       ((node->GetFloatProperty("volume", segmentationVolume)) &&
+       (segmentationVolume > 0))
+     || 
+       (mitkimage != NULL &&
+       mitkimage->GetDimension() >= 3 &&
+       node->GetBoolProperty("binary", binary) &&
+       binary)
+      )
+    )
   {
     // calculate screen position for text by searching for the object border
     ipPicDescriptor* pic = image->image();
@@ -230,6 +248,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       // draw a callout line and text
       glBegin(GL_LINES);  
+      glLineWidth(3);
 
       // origin of the first line segment
       glVertex3f(x, y, 0.0f);
@@ -245,12 +264,21 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 
       glEnd( );
 
+      // make sure a segmentation volume is present
+      if( segmentationVolume <= 0 )
+        // if not, check if the image is truly binary
+        if( mitkimage->GetScalarValueMax( renderer->GetTimeStep() ) == 1 )
+        {
+          // if yes, get the volume from image statistics
+          segmentationVolume = mitk::VolumeCalculator::ComputeVolume(
+            mitkimage->GetSlicedGeometry()->GetSpacing(), mitkimage->GetCountOfMaxValuedVoxelsNoRecompute(renderer->GetTimeStep()));
+        }
+
       // create text
       std::stringstream volumeString; 
       volumeString << std::fixed << std::setprecision(1) << segmentationVolume << " ml";
 
       // draw text
-
       mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
 
       Point2D pt2D;

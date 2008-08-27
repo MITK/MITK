@@ -49,6 +49,9 @@ namespace mitk
     std::vector<float> GetVolumes();
     void ComputeVolume();
 
+    void ComputeVolumeFromImageStatistics();
+    static float ComputeVolume(Vector3D spacing, unsigned int voxelCount);
+
   protected:
     
     VolumeCalculator();

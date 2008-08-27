@@ -1,4 +1,4 @@
-/*=========================================================================
+#/*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
@@ -63,6 +63,7 @@ std::vector<float> mitk::VolumeCalculator::GetVolumes()
 
 void mitk::VolumeCalculator::ComputeVolume()
 {
+  const_cast<Image*>(m_Image.GetPointer())->SetRequestedRegionToLargestPossibleRegion();
   if (m_Image->GetDimension() == 4) 
   {
     m_TimeSelector->SetInput(m_Image);
@@ -85,5 +86,37 @@ void mitk::VolumeCalculator::ComputeVolume()
     const_cast<Image*>(m_Image.GetPointer())->Update();
     AccessFixedDimensionByItk(m_Image,InternalCompute,2);
   }
+}
+
+void mitk::VolumeCalculator::ComputeVolumeFromImageStatistics()
+{
+  unsigned int dim = m_Image->GetDimension();
+
+  if(dim == 4)
+  {
+    m_Volumes.resize(m_Image->GetDimension(3),0);
+    Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
+
+    for(unsigned int t = 0; t < m_Image->GetDimension(3); ++t )
+    {
+      m_Volumes[t] = m_Image->GetCountOfMaxValuedVoxels(t) / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+    }
+  }
+  else if(dim == 3)
+  {
+    Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
+    m_Volume = m_Image->GetCountOfMaxValuedVoxels() / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+  }
+  else if (dim == 2) 
+  {
+    Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
+    m_Volume = m_Image->GetCountOfMaxValuedVoxels() / 100.0 * spacing[0] * spacing[1];
+  }
+  else itkExceptionMacro(<<"Wrong image dimension...");
+}
+
+float mitk::VolumeCalculator::ComputeVolume(Vector3D spacing, unsigned int voxelCount)
+{
+  return (voxelCount / 1000.0 * spacing[0] * spacing[1] * spacing[2]);
 }
 

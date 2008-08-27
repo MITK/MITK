@@ -432,16 +432,20 @@ public:
 
   //##Documentation
   //## \brief Get the smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMinNoRecompute() const
+  virtual mitk::ScalarType GetScalarValueMinNoRecompute( int t = 0 ) const
   {
-      return m_ScalarMin;
+    if ( t < m_ScalarMin.size() )
+      return m_ScalarMin[t];
+    else return itk::NumericTraits<ScalarType>::max();
   }
 
   //##Documentation
   //## \brief Get the second smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute() const
+  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute( int t = 0 ) const
   {
-      return m_Scalar2ndMin;
+    if ( t < m_Scalar2ndMin.size() )
+      return m_Scalar2ndMin[t];
+    else return itk::NumericTraits<ScalarType>::max();
   }
 
   //##Documentation
@@ -450,30 +454,46 @@ public:
 
   //##Documentation
   //## \brief Get the largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMaxNoRecompute() const
+  virtual mitk::ScalarType GetScalarValueMaxNoRecompute( int t = 0 ) const
   {
-      return m_ScalarMax;
+    if ( t < m_ScalarMax.size() )
+      return m_ScalarMax[t];
+    else return itk::NumericTraits<ScalarType>::NonpositiveMin();
   }
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute() const
+  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute( int t = 0 ) const
   {
-      return m_Scalar2ndMax;
+    if ( t < m_Scalar2ndMax.size() )
+      return m_Scalar2ndMax[t];
+    else return itk::NumericTraits<ScalarType>::NonpositiveMin();
   }
 
   //##Documentation
-  //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute() const
-  {
-      return m_CountOfMaxValuedVoxels;
-  }
+  //## \brief Get the count of voxels with the smallest scalar value in the dataset
+  mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0) const;
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute() const
+  mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0) const;
+
+  //##Documentation
+  //## \brief Get the count of voxels with the largest scalar value in the dataset
+  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute( int t = 0 ) const
   {
-      return m_CountOfMinValuedVoxels;
+    if ( t < m_CountOfMaxValuedVoxels.size() )
+      return m_CountOfMaxValuedVoxels[t];
+    else return 0;
+  }
+
+  //##Documentation
+  //## \brief Get the count of voxels with the smallest scalar value in the dataset
+  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute( int t = 0 ) const
+  {
+    if ( t < m_CountOfMinValuedVoxels.size() )
+      return m_CountOfMinValuedVoxels[t];
+    else return 0;
   }
 
   //##Documentation
@@ -494,7 +514,7 @@ public:
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
   template < typename ItkImageType >
-    friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage);
+    friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 
 protected:
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
@@ -503,7 +523,13 @@ protected:
 
   void ComputeOffsetTable();
 
-  virtual const void ComputeExtrema(int t=0) const;
+  virtual const void Expand( int timeSteps ) const;
+
+  virtual const bool IsValidTimeStep(int t) const;
+
+  virtual const void ResetImageStatistics() const;
+
+  virtual const void ComputeImageStatistics(int t=0) const;
 
   virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
@@ -533,12 +559,12 @@ protected:
   mutable itk::Object::Pointer m_HistogramGeneratorObject;
 
   mutable itk::Object::Pointer m_TimeSelectorForExtremaObject;
-  mutable unsigned int m_CountOfMinValuedVoxels;
-  mutable unsigned int m_CountOfMaxValuedVoxels;
-  mutable ScalarType m_ScalarMin;
-  mutable ScalarType m_ScalarMax;
-  mutable ScalarType m_Scalar2ndMin;
-  mutable ScalarType m_Scalar2ndMax;
+  mutable std::vector<unsigned int> m_CountOfMinValuedVoxels;
+  mutable std::vector<unsigned int> m_CountOfMaxValuedVoxels;
+  mutable std::vector<ScalarType> m_ScalarMin;
+  mutable std::vector<ScalarType> m_ScalarMax;
+  mutable std::vector<ScalarType> m_Scalar2ndMin;
+  mutable std::vector<ScalarType> m_Scalar2ndMax;
 
   itk::TimeStamp m_LastRecomputeTimeStamp;
 

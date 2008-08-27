@@ -52,7 +52,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     case QEvent::MouseButtonPress:
     { 
       m_ButtonPressed = true;
-      //std::cout << "#BP "<<std::endl;
 
       mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
       QMouseEvent* me = ( QMouseEvent* )( event );
@@ -62,6 +61,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       );
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
 
+      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
       mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
       return true;
     }
@@ -69,7 +69,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     
     case QEvent::MouseButtonDblClick:
     { 
-      //std::cout << "#DC "<<std::endl;
       mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
       QMouseEvent* me = ( QMouseEvent* )( event );
 
@@ -83,7 +82,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     case QEvent::MouseButtonRelease:
     { 
       m_ButtonPressed = false;
-      //std::cout << "#BR "<<std::endl;
       
       QMouseEvent* me = ( QMouseEvent* )( event );
 
@@ -102,7 +100,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       {
         if ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() != 0 )
         {
-          //std::cout << "#MM "<<std::endl;
           mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
           mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
         }
@@ -125,7 +122,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
    
     case QEvent::Resize:
       { 
-        //std::cout << "#R "<<std::endl;
         mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
 
         QResizeEvent* re = ( QResizeEvent* )( event );
@@ -137,7 +133,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
     case QEvent::Paint:
       { 
-        //std::cout << "#P ";
         QPaintEvent* pe = ( QPaintEvent* )( event );
         QPaintEvent* newPaintEvent = new QPaintEvent( pe->region() );
         m_EventQueue.push( ObjectEventPair(object, newPaintEvent) );
@@ -146,7 +141,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
      case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)
       {
-        //std::cout << "#CI "<<std::endl;
         mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
         return false;
@@ -154,7 +148,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
       case QEvent::KeyPress:
       { 
-        //std::cout << "#KP "<<std::endl;
         mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
         QKeyEvent* ke = ( QKeyEvent* )( event );
         QKeyEvent* newEvent = new QKeyEvent(
@@ -166,7 +159,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
       case QEvent::Timer:
       { 
-        //std::cout << "#T ";
         QTimerEvent* te = ( QTimerEvent* )( event );
         QTimerEvent* newEvent = new QTimerEvent(te->timerId());
         m_EventQueue.push( ObjectEventPair(object, newEvent) );
@@ -187,7 +179,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       case QEvent::MouseButtonPress:
       {
         m_ButtonPressed = true;
-        //std::cout << "#BP2 "<<std::endl;
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
         return false;
       }
@@ -212,24 +204,33 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
         return false;
       }
 
+      case QEvent::Wheel:
+      {
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+          mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
+        return false;
+      }     
+
       case QEvent::MouseButtonRelease:
       {
         m_ButtonPressed = false;
-        //std::cout << "#BR2 "<<std::endl;
         mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+          mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
       }
     
       case QEvent::Resize:
       {
-        //std::cout << "#R2 "<<std::endl;
-        //mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+          mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
       } 
 
       case QEvent::ChildInserted:
       {
-        //std::cout << "#CI2 ";
         mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         return false;
       }

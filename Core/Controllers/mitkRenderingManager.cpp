@@ -617,7 +617,6 @@ void
 RenderingManager
 ::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 {
-  //std::cout<< m_CurrentLOD << "<S";
   BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
   if (renderer)
   {
@@ -630,7 +629,6 @@ void
 RenderingManager
 ::RenderingProgressCallback( itk::Object* /*object*/, const itk::EventObject& /*event*/ )
 {
-  //std::cout << "P";
   this->DoMonitorRendering();
 
 }
@@ -639,11 +637,11 @@ void
 RenderingManager
 ::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 {
-  //std::cout<<"E> "<<std::endl;
   BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
   if (renderer)
   {
     m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
+
     this->DoFinishAbortRendering();
 
     /** Level-Of-Detail **/
@@ -653,6 +651,9 @@ RenderingManager
       {
         if ( !m_LODIncreaseBlocked )
         {
+          // make sure that timer is restarted for next request
+          m_UpdatePending = false;
+
           this->SetCurrentLOD( m_CurrentLOD + 1 );
           this->RequestUpdate(renderer->GetRenderWindow());
         }
@@ -683,7 +684,6 @@ void
 RenderingManager
 ::AbortRendering( vtkRenderWindow* renderWindow )
 {
-  //std::cout << "A";
   if ( (m_RenderWindowList.count( renderWindow ) != 0)
     && (m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS) )
   {
@@ -715,7 +715,6 @@ void
 RenderingManager
 ::SetCurrentLOD( int lod )
 {
-  //std::cout << lod << std::endl;
   if ( m_CurrentLOD != lod )
   {
     if( lod > m_MaxLOD )

@@ -335,6 +335,27 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  mitk::Image::Pointer vecImg = mitk::Image::New();
+  vecImg->Initialize(*imgMem->GetPixelType().GetTypeId(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
+  vecImg->SetImportChannel(imgMem->GetData(), 0, mitk::Image::ImportMemoryManagementType::CopyMemory );
+  vecImg->SetImportChannel(imgMem->GetData(), 1, mitk::Image::ImportMemoryManagementType::CopyMemory );
+  if( !vecImg->IsValidSlice(0,0,1))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  // TODO test the following initializers on channel-incorporation
+  //  void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
+  //  void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
+  //  void mitk::Image::Initialize(const mitk::Image* image) 
+  //  void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
+  //  void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim, int sDim)
+
+  //mitk::Image::Pointer vecImg = mitk::Image::New();
+  //vecImg->Initialize(PixelType(typeid(float), 6, itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
+  //vecImg->Initialize(PixelType(typeid(itk::Vector<float,6>)), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -719,7 +719,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int /*channels*/, int tDim, bool /*shiftBoundingBoxMinimumToZero*/ ) 
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim ) 
 {
   unsigned int dimensions[5];
   dimensions[0] = (unsigned int)(geometry.GetExtent(0)+0.5);
@@ -748,7 +748,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
   if ( dimensions[3] > 1 )
     dimension = 4;
 
-  Initialize( type, dimension, dimensions );
+  Initialize( type, dimension, dimensions, channels );
 
   SetGeometry(static_cast<Geometry3D*>(geometry.Clone().GetPointer()));
   
@@ -770,11 +770,11 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D
   }
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim, bool shiftBoundingBoxMinimumToZero ) 
+void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
 {
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializeEvenlySpaced(static_cast<Geometry2D*>(geometry2d.Clone().GetPointer()), sDim, flipped);
-  Initialize(type, *slicedGeometry, channels, tDim, shiftBoundingBoxMinimumToZero);
+  Initialize(type, *slicedGeometry, channels, tDim);
 }
 
 void mitk::Image::Initialize(const mitk::Image* image) 

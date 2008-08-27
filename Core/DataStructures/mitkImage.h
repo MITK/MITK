@@ -232,13 +232,8 @@ public:
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry3D
   //##
-  //## @param shiftBoundingBoxMinimumToZero The bounding-box (in units) 
-  //## of @a geometry does not necessarily has its minimum of (0,0,0). 
-  //## If @a shiftBoundingBoxMinimumToZero is @a true it is shifted there
-  //## without changing the world coordinate in mm of the minimum position
-  //## (the translation in mm is changed accordingly).
   //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1, bool shiftBoundingBoxMinimumToZero = true);
+  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
@@ -246,14 +241,9 @@ public:
   //## Initializes the bounding box according to the width/height of the 
   //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
   //## The spacing is calculated from the Geometry2D.
-  //## @param shiftBoundingBoxMinimumToZero The bounding-box (in units) 
-  //## of @a geometry2d does not necessarily has its minimum of (0,0,0). 
-  //## If @a shiftBoundingBoxMinimumToZero is @a true it is shifted there
-  //## without changing the world coordinate in mm of the minimum position
-  //## (the translation in mm is changed accordingly).
   //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
   //## \sa SlicedGeometry3D::InitializeEvenlySpaced
-  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=-1, bool shiftBoundingBoxMinimumToZero = true);
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=-1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another

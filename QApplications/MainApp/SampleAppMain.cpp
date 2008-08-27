@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     QApplication a( argc, argv );
 
     // popup a splash screen
-    bool showSplashScreen(true);
+    bool showSplashScreen(false);
     QmitkSplashScreen* splasher(NULL);
     if (showSplashScreen)
     {

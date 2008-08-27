@@ -337,8 +337,8 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
 
   mitk::Image::Pointer vecImg = mitk::Image::New();
   vecImg->Initialize(*imgMem->GetPixelType().GetTypeId(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
-  vecImg->SetImportChannel(imgMem->GetData(), 0, mitk::Image::ImportMemoryManagementType::CopyMemory );
-  vecImg->SetImportChannel(imgMem->GetData(), 1, mitk::Image::ImportMemoryManagementType::CopyMemory );
+  vecImg->SetImportChannel(imgMem->GetData(), 0, mitk::Image::CopyMemory );
+  vecImg->SetImportChannel(imgMem->GetData(), 1, mitk::Image::CopyMemory );
   if( !vecImg->IsValidSlice(0,0,1))
   {
     std::cout<<"[FAILED]"<<std::endl;

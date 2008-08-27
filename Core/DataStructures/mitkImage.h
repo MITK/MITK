@@ -432,7 +432,7 @@ public:
 
   //##Documentation
   //## \brief Get the smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMinNoRecompute( int t = 0 ) const
+  virtual mitk::ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_ScalarMin.size() )
       return m_ScalarMin[t];
@@ -441,7 +441,7 @@ public:
 
   //##Documentation
   //## \brief Get the second smallest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute( int t = 0 ) const
+  virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_Scalar2ndMin.size() )
       return m_Scalar2ndMin[t];
@@ -454,7 +454,7 @@ public:
 
   //##Documentation
   //## \brief Get the largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValueMaxNoRecompute( int t = 0 ) const
+  virtual mitk::ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_ScalarMax.size() )
       return m_ScalarMax[t];
@@ -463,7 +463,7 @@ public:
 
   //##Documentation
   //## \brief Get the second largest value for scalar images, but do not recompute it first
-  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute( int t = 0 ) const
+  virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_Scalar2ndMax.size() )
       return m_Scalar2ndMax[t];
@@ -480,7 +480,7 @@ public:
 
   //##Documentation
   //## \brief Get the count of voxels with the largest scalar value in the dataset
-  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute( int t = 0 ) const
+  virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_CountOfMaxValuedVoxels.size() )
       return m_CountOfMaxValuedVoxels[t];
@@ -489,7 +489,7 @@ public:
 
   //##Documentation
   //## \brief Get the count of voxels with the smallest scalar value in the dataset
-  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute( int t = 0 ) const
+  virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const
   {
     if ( t < m_CountOfMinValuedVoxels.size() )
       return m_CountOfMinValuedVoxels[t];

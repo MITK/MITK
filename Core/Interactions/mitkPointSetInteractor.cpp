@@ -83,23 +83,26 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
     return 0;
   }
 
-  //if the event can be understood and if there is a transition waiting for that event
-  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+  //get the time of the sender to look for the right transition.
+  mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
+  if (sender != NULL)
   {
-    returnValue = 0.5;//it can be understood
-  }
+    unsigned int timeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+    //if the event can be understood and if there is a transition waiting for that event
+    if (this->GetCurrentState(timeStep)->GetTransition(stateEvent->GetId())!=NULL)
+      returnValue = 0.5;//it can be understood
 
-  int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
-  mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
-  if ( pointSet != NULL )
-  {
-    //if we have one point or more, then check if the have been picked
-    if ( (pointSet->GetSize( timeStep ) > 0)
-      && (pointSet->SearchPoint(
-            disPosEvent->GetWorldPosition(), m_Precision, timeStep) > -1) )
+    mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+    if ( pointSet != NULL )
     {
-      returnValue = 1.0;
+      //if we have one point or more, then check if the have been picked
+      if ( (pointSet->GetSize( timeStep ) > 0)
+        && (pointSet->SearchPoint(
+        disPosEvent->GetWorldPosition(), m_Precision, timeStep) > -1) )
+      {
+        returnValue = 1.0;
+      }
     }
   }
   return returnValue;

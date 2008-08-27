@@ -649,7 +649,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         { //2d Koordinates for 3D Interaction; return false to redo
           //the last statechange
           mitk::StateEvent* newStateEvent = 
-            new mitk::StateEvent(EIDNO, posEvent);
+            new mitk::StateEvent(EIDNO, disPosEvent);
           this->HandleEvent(newStateEvent );
           ok = true;
         }

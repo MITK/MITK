@@ -25,6 +25,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /*!
+  \brief This class is used to hold all optimizer parameters needed for a rigid registration process.  
+
+  To use the rigid registration framework you have to create an instance of this class and fill it with the parameters
+  belonging to the selected optimizer. To let the rigid registration work properly, this instance has to be given 
+  to mitkImageRegistrationMethod before calling the update() method in mitkImageRegistrationMethod.
+
+  Also instances of the classes mitkTransformParameters and mitkMetricParameters have to be set in mitkImageRegistrationMethod 
+  before calling the update() method.
+
+  \ingroup RigidRegistration
+
+  \author Daniel Stein
+  */
   class MITK_CORE_EXPORT OptimizerParameters : public ::itk::Object
   {
   public:
@@ -32,6 +46,9 @@ namespace mitk {
     mitkClassMacro(OptimizerParameters,::itk::Object);
     itkNewMacro(Self);
 
+    /**
+    \brief Unique integer value for every optimizer.
+    */
     enum OptimizerType {
       EXHAUSTIVEOPTIMIZER = 0,
       GRADIENTDESCENTOPTIMIZER = 1,
@@ -49,181 +66,545 @@ namespace mitk {
       VERSORRIGID3DTRANSFORMOPTIMIZER = 13
     };
 
-    // for all Optimizer
+    /**
+    \brief Sets the optimizer used for registration by its unique integer value.
+    */
     itkSetMacro( Optimizer, int );
+    /**
+    \brief Returns the optimizer used for registration by its unique integer value.
+    */
     itkGetMacro( Optimizer, int );
 
+    /**
+    \brief Sets the images dimension which have to be registered.
+    */
     itkSetMacro( Dimension, unsigned int );
+    
+    /**
+    \brief Returns the images dimension which have to be registered.
+    */
     itkGetMacro( Dimension, unsigned int );
 
+    /**
+    \brief Sets whether the optimizer should maximize or minimize the metrics value.
+    */
     itkSetMacro( Maximize, bool );
+    
+    /**
+    \brief Returns whether the optimizer should maximize or minimize the metrics value.
+    */
     itkGetMacro( Maximize, bool );
 
-    // for itk::ExhaustiveOptimizer
+    /**
+    \brief for itk::ExhaustiveOptimizer
+    */
     itkSetMacro( StepLengthExhaustive, float );
+    
+    /**
+    \brief for itk::ExhaustiveOptimizer
+    */
     itkGetMacro( StepLengthExhaustive, float );
 
+    /**
+    \brief for itk::ExhaustiveOptimizer
+    */
     itkSetMacro( NumberOfStepsExhaustive, int );
+    
+    /**
+    \brief for itk::ExhaustiveOptimizer
+    */
     itkGetMacro( NumberOfStepsExhaustive, int );
 
-    // for itk::GradientDescentOptimizer
+    /**
+    \brief for itk::GradientDescentOptimizer
+    */
     itkSetMacro( LearningRateGradientDescent, float );
+    
+    /**
+    \brief for itk::GradientDescentOptimizer
+    */
     itkGetMacro( LearningRateGradientDescent, float );
 
+    /**
+    \brief for itk::GradientDescentOptimizer
+    */
     itkSetMacro( NumberOfIterationsGradientDescent, int );
+    
+    /**
+    \brief for itk::GradientDescentOptimizer
+    */
     itkGetMacro( NumberOfIterationsGradientDescent, int );
 
-    // for itk::QuaternionRigidTransformGradientDescentOptimizer
+    /**
+    \brief for itk::QuaternionRigidTransformGradientDescentOptimizer
+    */
     itkSetMacro( LearningRateQuaternionRigidTransformGradientDescent, float );
+    
+    /**
+    \brief for itk::QuaternionRigidTransformGradientDescentOptimizer
+    */
     itkGetMacro( LearningRateQuaternionRigidTransformGradientDescent, float );
 
+    /**
+    \brief for itk::QuaternionRigidTransformGradientDescentOptimizer
+    */
     itkSetMacro( NumberOfIterationsQuaternionRigidTransformGradientDescent, int );
+    
+    /**
+    \brief for itk::QuaternionRigidTransformGradientDescentOptimizer
+    */
     itkGetMacro( NumberOfIterationsQuaternionRigidTransformGradientDescent, int );
 
-    // for itk::OnePlusOneEvolutionaryOptimizer
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkSetMacro( GrowthFactorOnePlusOneEvolutionary, float );
+    
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkGetMacro( GrowthFactorOnePlusOneEvolutionary, float );
 
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkSetMacro( ShrinkFactorOnePlusOneEvolutionary, float );
+    
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkGetMacro( ShrinkFactorOnePlusOneEvolutionary, float );
 
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkSetMacro( EpsilonOnePlusOneEvolutionary, float );
+    
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkGetMacro( EpsilonOnePlusOneEvolutionary, float );
 
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkSetMacro( InitialRadiusOnePlusOneEvolutionary, float );
+    
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkGetMacro( InitialRadiusOnePlusOneEvolutionary, float );
 
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkSetMacro( NumberOfIterationsOnePlusOneEvolutionary, int );
+    
+    /**
+    \brief for itk::OnePlusOneEvolutionaryOptimizer
+    */
     itkGetMacro( NumberOfIterationsOnePlusOneEvolutionary, int );
 
-    // for itk::PowellOptimizer
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkSetMacro( StepLengthPowell, float );
+    
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkGetMacro( StepLengthPowell, float );
 
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkSetMacro( StepTolerancePowell, float );
+    
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkGetMacro( StepTolerancePowell, float );
 
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkSetMacro( ValueTolerancePowell, float );
+    
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkGetMacro( ValueTolerancePowell, float );
 
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkSetMacro( NumberOfIterationsPowell, int );
+    
+    /**
+    \brief for itk::PowellOptimizer
+    */
     itkGetMacro( NumberOfIterationsPowell, int );
 
-    // for itk::FRPROptimizer
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkSetMacro( StepLengthFRPR, float );
+    
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkGetMacro( StepLengthFRPR, float );
 
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkSetMacro( FletchReevesFRPR, bool );
+    
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkGetMacro( FletchReevesFRPR, bool );
 
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkSetMacro( PolakRibiereFRPR, bool );
+    
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkGetMacro( PolakRibiereFRPR, bool );
 
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkSetMacro( NumberOfIterationsFRPR, int );
+    
+    /**
+    \brief for itk::FRPROptimizer
+    */
     itkGetMacro( NumberOfIterationsFRPR, int );
 
-    // for itk::RegularStepGradientDescentOptimizer
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkSetMacro( GradientMagnitudeToleranceRegularStepGradientDescent, float );
+    
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkGetMacro( GradientMagnitudeToleranceRegularStepGradientDescent, float );
 
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkSetMacro( MinimumStepLengthRegularStepGradientDescent, float );
+    
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkGetMacro( MinimumStepLengthRegularStepGradientDescent, float );
 
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkSetMacro( MaximumStepLengthRegularStepGradientDescent, float );
+   
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkGetMacro( MaximumStepLengthRegularStepGradientDescent, float );
 
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkSetMacro( NumberOfIterationsRegularStepGradientDescent, int );
+    
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkGetMacro( NumberOfIterationsRegularStepGradientDescent, int );
 
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkSetMacro( RelaxationFactorRegularStepGradientDescent, double );
+    
+    /**
+    \brief for itk::RegularStepGradientDescentOptimizer
+    */
     itkGetMacro( RelaxationFactorRegularStepGradientDescent, double );
 
-    // for itk::VersorRigid3DTransformOptimizer
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkSetMacro( GradientMagnitudeToleranceVersorRigid3DTransform, float );
+    
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkGetMacro( GradientMagnitudeToleranceVersorRigid3DTransform, float );
 
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkSetMacro( MinimumStepLengthVersorRigid3DTransform, float );
+    
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkGetMacro( MinimumStepLengthVersorRigid3DTransform, float );
 
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkSetMacro( MaximumStepLengthVersorRigid3DTransform, float );
+    
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkGetMacro( MaximumStepLengthVersorRigid3DTransform, float );
 
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkSetMacro( NumberOfIterationsVersorRigid3DTransform, int );
+    
+    /**
+    \brief for itk::VersorRigid3DTransformOptimizer
+    */
     itkGetMacro( NumberOfIterationsVersorRigid3DTransform, int );
 
-    // for itk::VersorTransformOptimizer
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkSetMacro( GradientMagnitudeToleranceVersorTransform, float );
+    
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkGetMacro( GradientMagnitudeToleranceVersorTransform, float );
 
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkSetMacro( MinimumStepLengthVersorTransform, float );
+    
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkGetMacro( MinimumStepLengthVersorTransform, float );
 
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkSetMacro( MaximumStepLengthVersorTransform, float );
+    
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkGetMacro( MaximumStepLengthVersorTransform, float );
 
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkSetMacro( NumberOfIterationsVersorTransform, int );
+    
+    /**
+    \brief for itk::VersorTransformOptimizer
+    */
     itkGetMacro( NumberOfIterationsVersorTransform, int );
 
-    // for itk::AmoebaOptimizer
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     void SetSimplexDeltaAmoeba(itk::Array<double> simplexDelta);
+    
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itk::Array<double> GetSimplexDeltaAmoeba();
 
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkSetMacro( ParametersConvergenceToleranceAmoeba, float );
+    
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkGetMacro( ParametersConvergenceToleranceAmoeba, float );
 
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkSetMacro( FunctionConvergenceToleranceAmoeba, float );
+    
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkGetMacro( FunctionConvergenceToleranceAmoeba, float );
 
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkSetMacro( NumberOfIterationsAmoeba, int );
+
+    /**
+    \brief for itk::AmoebaOptimizer
+    */
     itkGetMacro( NumberOfIterationsAmoeba, int );
 
-    // for itk::ConjugateGradientOptimizer
+    // nothing for itk::ConjugateGradientOptimizer
 
-    // for itk::LBFGSOptimizer
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkSetMacro( GradientConvergenceToleranceLBFGS, float );
+    
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkGetMacro( GradientConvergenceToleranceLBFGS, float );
 
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkSetMacro( LineSearchAccuracyLBFGS, float );
+    
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkGetMacro( LineSearchAccuracyLBFGS, float );
 
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkSetMacro( DefaultStepLengthLBFGS, float );
+    
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkGetMacro( DefaultStepLengthLBFGS, float );
 
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkSetMacro( TraceOnLBFGS, bool );
+    
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkGetMacro( TraceOnLBFGS, bool );
 
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkSetMacro( NumberOfIterationsLBFGS, int );
+    
+    /**
+    \brief for itk::LBFGSOptimizer
+    */
     itkGetMacro( NumberOfIterationsLBFGS, int );
 
-    // for itk::SPSAOptimizer
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( aSPSA, float );
+
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( aSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( ASPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( ASPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( AlphaSPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( AlphaSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( cSPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( cSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( GammaSPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( GammaSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( ToleranceSPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( ToleranceSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( StateOfConvergenceDecayRateSPSA, float );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( StateOfConvergenceDecayRateSPSA, float );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( MinimumNumberOfIterationsSPSA, int );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( MinimumNumberOfIterationsSPSA, int );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( NumberOfPerturbationsSPSA, int );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( NumberOfPerturbationsSPSA, int );
 
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkSetMacro( NumberOfIterationsSPSA, int );
+    
+    /**
+    \brief for itk::SPSAOptimizer
+    */
     itkGetMacro( NumberOfIterationsSPSA, int );
 
   protected:

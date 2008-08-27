@@ -34,6 +34,17 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+
+  /*!
+  \brief Main class for the rigid registration pipeline.
+
+
+
+
+  \ingroup RigidRegistration
+
+  \author Daniel Stein
+  */
   class MITK_CORE_EXPORT ImageRegistrationMethod : public ImageToImageFilter
   {
 

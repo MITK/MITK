@@ -25,6 +25,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /*!
+  \brief This class creates a transform for a rigid registration process.  
+
+  This class will e.g. be instantiated by mitkImageRegistrationMethod and a 
+  transform corresponding to the integer value stored in mitkTransformParameters 
+  will be created. Therefore SetTransformParameters() has to be called with an instance
+  of mitkTransformParameters, which holds all parameter informations for the new
+  transformation.
+
+  GetTransform() returns the transform which then can be used in combination with a
+  metric, an optimizer and an interpolator within a registration pipeline. 
+
+
+  \ingroup RigidRegistration
+
+  \author Daniel Stein
+  */
+
   template < class TPixelType, unsigned int VImageDimension >
   class TransformFactory : public itk::Object
   {
@@ -45,15 +63,33 @@ namespace mitk {
 
     typedef typename TransformType::Pointer TransformPointer;
 
+    /**
+    \brief Returns the transform which then can be used in combination with a metric, an optimizer 
+    and an interpolator within a registration pipeline.
+    */
     TransformPointer GetTransform( );
+
+    /**
+    \brief Sets the fixed image which is needed by transform initializer.
+    */
     void SetFixedImage(FixedImageType* fixed);
+
+    /**
+    \brief Sets the moving image which is needed by transform initializer.
+    */
     void SetMovingImage(MovingImageType* moving);
 
+    /**
+    \brief Sets the instance to the transform parameters class which holds all parameters for the new transform.
+    */
     void SetTransformParameters(TransformParameters::Pointer transformParameters)
     {
       m_TransformParameters = transformParameters;
     }
 
+    /**
+    \brief Returns the instance to the transform parameters class which holds all parameters for the new transform.
+    */
     TransformParameters::Pointer GetTransformParameters()
     {
       return m_TransformParameters;

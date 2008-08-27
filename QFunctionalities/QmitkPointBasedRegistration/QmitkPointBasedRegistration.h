@@ -37,13 +37,18 @@ class QmitkStdMultiWidget;
 class QmitkPointBasedRegistrationControls;
 
 /*!
-\brief PointBasedRegistration 
+\brief The PointBasedRegistration functionality is used to perform point based registration.
 
-One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
-and CreateAction(..) from QmitkFunctionality. 
+This functionality allows you to register 2D as well as 3D images in a rigid and deformable manner via corresponding 
+PointSets. Register means to align two images, so that they become as similar as possible. 
+Therefore you have to set corresponding points in both images, which will be matched. The movement, which has to be 
+performed on the points to align them will be performed on the moving image as well. The result is shown in the multi-widget. 
+
+For more informations see: \ref QmitkPointBasedRegistrationUserManual
 
 \sa QmitkFunctionality
 \ingroup Functionalities
+\ingroup PointBasedRegistration
 */
 class QmitkPointBasedRegistration : public QmitkFunctionality
 {  
@@ -54,32 +59,32 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
     /*!  
-    \brief default constructor  
+    \brief Default constructor  
     */  
     QmitkPointBasedRegistration(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
     /*!  
-    \brief default destructor  
+    \brief Default destructor  
     */  
     virtual ~QmitkPointBasedRegistration();
 
     /*!  
-    \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
+    \brief Method for creating the widget containing the application   controls, like sliders, buttons etc.  
     */  
     virtual QWidget * CreateControlWidget(QWidget *parent);
 
     /*!  
-    \brief method for creating the applications main widget  
+    \brief Method for creating the applications main widget  
     */  
     virtual QWidget * CreateMainWidget(QWidget * parent);
 
     /*!  
-    \brief method for creating the connections of main and control widget  
+    \brief Method for creating the connections of main and control widget  
     */  
     virtual void CreateConnections();
 
     /*!  
-    \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
+    \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
     */  
     virtual QAction * CreateAction(QActionGroup *parent);
 
@@ -93,13 +98,13 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     virtual int TestYourself();
 
     /**
-       \brief helper method for testing
+       \brief Helper method for testing
     */
     bool TestAllTools();
     
   protected slots:
     /**
-       \brief helper method for testing
+       \brief Helper method for testing
     */
     void RegistrationErrorDialogFound( QWidget* widget );
 
@@ -115,143 +120,188 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
 
   protected slots:  
     
+    /*!
+    \brief Called whenever the data tree has changed. 
+    */
     void TreeChanged();
     
-    /*
-    * sets the fixed Image according to TreeNodeSelector widget
+    /*!  
+    \brief Sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(mitk::DataTreeIteratorClone imageIt);
     
-    /*
-    * sets the moving Image according to TreeNodeSelector widget
+    /*!  
+    \brief Sets the moving Image according to TreeNodeSelector widget
     */
     void MovingSelected(mitk::DataTreeIteratorClone imageIt);
 
-    /*
-    * calculates registration with vtkLandmarkTransform
+    /*!  
+    \brief Calculates registration with vtkLandmarkTransform
     */
     void calculateLandmarkbased(PointBasedRegistrationControlParameters* params);
 
-    /*
-    * calculates registration with itkLandmarkWarping
+    /*!  
+    \brief Calculates registration with itkLandmarkWarping
     */
     void calculateLandmarkWarping(PointBasedRegistrationControlParameters* params);
     
-    /*
-    * calculates registration with ICP and vtkLandmarkTransform
+    /*!  
+    \brief Calculates registration with ICP and vtkLandmarkTransform
     */
     void calculateLandmarkbasedWithICP(PointBasedRegistrationControlParameters* params);
     
-    /*
-    * adds mitk::PointSetInteractor for the moving image and removes mitk::PointSetInteractor from the fixed image,
-    * lets the fixed image become invisible and the moving image visible
+    /*!  
+    \brief Adds mitk::PointSetInteractor for the moving image and removes mitk::PointSetInteractor from the fixed image, 
+    lets the fixed image become invisible and the moving image visible
     */
     void addMovingInteractor();
     
-    /*
-    * adds mitk::PointSetInteractor for the fixed image  and removes mitk::PointSetInteractor from the fixed image,
-    * lets the moving image become invisible and the fixed image visible
+    /*!  
+    \brief Adds mitk::PointSetInteractor for the fixed image  and removes mitk::PointSetInteractor from the fixed image, 
+    lets the moving image become invisible and the fixed image visible
     */
     void addFixedInteractor();
 
-    /*
-    * checks if registration is possible
+    /*!  
+    \brief Checks if registration is possible
     */
     bool CheckCalculate();
 
+    /*!  
+    \brief Saves the registration result.
+    */
     void SaveModel();
+    
+    /*!  
+    \brief Performs an undo for the last transform.
+    */
     void UndoTransformation();
+    
+    /*!  
+    \brief Performs a redo for the last undo transform.
+    */
     void RedoTransformation();
 
-    /*
-    * removes all points from fixed and moving pointset
+    /*!  
+    \brief Removes all points from fixed and moving pointset
     */
     void ResetPointsets();
 
-    /*
-    * stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
-    * @param if true, then images will be shown in red and green
+    /*!  
+    \brief Stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
+
+    @param if true, then images will be shown in red and green
     */
     void showRedGreen(bool show);
 
-    /*
-    * removes mitk::PointSetInteractor from both images and let both images become visible
+    /*!  
+    \brief Removes mitk::PointSetInteractor from both images and let both images become visible
     */
     void bothSelected();
 
-    /*
-    * set the selected opacity for moving image
-    * @param opacity the selected opacity
+    /*!  
+    \brief Sets the selected opacity for moving image
+    
+    @param opacity the selected opacity
     */
     void OpacityUpdate(float opacity);
 
-    /*
-    * updates the moving landmarks in QmitkPointBasedRegistrationControls widget 
+    /*!  
+    \brief Updates the moving landmarks in QmitkPointBasedRegistrationControls widget 
     */
     void updateMovingLandmarksList();
 
-    /*
-    * updates the fixed landmarks in QmitkPointBasedRegistrationControls widget 
+    /*!  
+    \brief Updates the fixed landmarks in QmitkPointBasedRegistrationControls widget 
     */
     void updateFixedLandmarksList();
 
-    /*
-    * sets the point to be selected and jumps to the position in moving image according to this point
-    * @param pointID the point ID of the selected Pointsetpoint
+    /*!  
+    \brief Sets the point to be selected and jumps to the position in moving image according to this point
+    
+    @param pointID the point ID of the selected point set point
     */
     void movingLandmarkSelected(int pointID);
     
-    /*
-    * sets the point to be selected and jumps to the position in fixed image according to this point
-    * @param pointID the point ID of the selected Pointsetpoint
+    /*!  
+    \brief Sets the point to be selected and jumps to the position in fixed image according to this point
+    
+    @param pointID the point ID of the selected point set point
     */
     void fixedLandmarkSelected(int pointID);
 
-    /*
-    * sets the images to grayvalues or fixed image to red and moving image to green
-    * @param if true, then images will be shown in red and green
+    /*!  
+    \brief Sets the images to gray values or fixed image to red and moving image to green
+    
+    @param if true, then images will be shown in red and green
     */
     void setImageColor(bool redGreen);
 
-    /*
-    * removes the fixed mitk::PointSetInteractor
+    /*!  
+    \brief Removes the fixed mitk::PointSetInteractor
     */
     void removeFixedInteractor();
 
-    /*
-    * removes the fixed PointSetObserver
+    /*!  
+    \brief Removes the fixed PointSetObserver
     */
     void removeFixedObserver();
 
-    /*
-    * removes the moving mitk::PointSetInteractor
+    /*!  
+    \brief Removes the moving mitk::PointSetInteractor
     */
     void removeMovingInteractor();
 
-    /*
-    * removes the moving PointSetObserver
+    /*!  
+    \brief Removes the moving PointSetObserver
     */
     void removeMovingObserver();
 
+    /*!  
+    \brief Clears the undo and redo transformation lists.
+    */
     void clearTransformationLists();
 
+    /*!  
+    \brief Calculates the landmark error for the selected transformation.
+    */
     void checkLandmarkError();
     
+    /*!  
+    \brief Changes the transformation type and calls checkLandmarkError().
+    */
     void transformationChanged(int transform);
 
+    /*!  
+    \brief Sets whether all other data tree nodes except the two selected should be invisible or not.
+
+    True = all nodes invisible, false = all nodes visible.
+    */
     void setInvisible(bool invisible);
 
+    /*!  
+    \brief Opens a dialog box to select a file containing a point set for the fixed image.
+    */
     void loadFixedPointSet();
 
+    /*!  
+    \brief Opens a dialog box to select a file containing a point set for the moving image.
+    */
     void loadMovingPointSet();
 
+    /*!  
+    \brief Opens a dialog box to save the fixed image point set.
+    */
     void saveFixedPointSet();
 
+    /*!  
+    \brief Opens a dialog box to save the moving image point set.
+    */
     void saveMovingPointSet();
 
   protected:
 
-    // observerclass to react on changes on pointsetnodes
+    // observer class to react on changes on point set nodes
     class PointSetObserver : public itk::Command 
     {
     public:
@@ -271,7 +321,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
         Execute( (const itk::Object*) object, event );
       }
     
-      // if landmarks were added or removed, then update landmarklists
+      // if landmarks were added or removed, then update landmark lists
       void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
       {
         if (m_FixedImage)
@@ -290,7 +340,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
         m_Parent = parent;
       }
 
-      // @param fixed if true, this obsever belongs to the fixed pointset, otherwise to the moving pointset
+      // @param fixed if true, this observer belongs to the fixed point set, otherwise to the moving point set
       void SetFixed(bool fixed)
       {
         m_FixedImage = fixed;
@@ -301,7 +351,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
       // holds the QmitkPointBasedRegistration class to call function for updates on landmarks
       QmitkPointBasedRegistration*  m_Parent;
 
-      // stores the information whether this observer belongs to the fixed pointset or to the moving pointset
+      // stores the information whether this observer belongs to the fixed point set or to the moving point set
       bool m_FixedImage;
     };
 
@@ -312,7 +362,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     QmitkStdMultiWidget * m_MultiWidget;
 
     /*!  
-    * control widget to make all changes for pointbased registration 
+    * control widget to make all changes for point based registration 
     */  
     QmitkPointBasedRegistrationControls * m_Controls;
     mitk::PointSet::Pointer m_FixedLandmarks;

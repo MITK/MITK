@@ -24,12 +24,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /*!
+  \brief This class is used to hold all metric parameters needed for a rigid registration process.  
+
+  To use the rigid registration framework you have to create an instance of this class and fill it with the parameters
+  belonging to the selected metric. To let the rigid registration work properly, this instance has to be given 
+  to mitkImageRegistrationMethod before calling the update() method in mitkImageRegistrationMethod.
+
+  Also instances of the classes mitkTransformParameters and mitkOptimizerParameters have to be set in mitkImageRegistrationMethod 
+  before calling the update() method.
+
+
+  \ingroup RigidRegistration
+
+  \author Daniel Stein
+  */
   class MITK_CORE_EXPORT MetricParameters : public itk::Object
   {
   public:
     mitkClassMacro(MetricParameters,::itk::Object);
     itkNewMacro(Self);
 
+    /**
+    \brief Unique integer value for every metric.
+    */
     enum MetricType {
       MEANSQUARESIMAGETOIMAGEMETRIC = 0,
       NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC = 1,
@@ -46,49 +64,172 @@ namespace mitk {
       KAPPASTATISTICIMAGETOIMAGEMETRIC = 12
     };
 
+    /**
+    \brief Sets the metric used for registration by its unique integer value.
+    */
     itkSetMacro( Metric, int );
+    /**
+    \brief Returns the metric used for registration by its unique integer value.
+    */
     itkGetMacro( Metric, int );
 
+    /**
+    \brief Sets whether a gradient image has to be computed. Some optimizer need this.
+    */
     itkSetMacro( ComputeGradient, bool );
+    /**
+    \brief Returns whether a gradient image has to be computed.
+    */
     itkGetMacro( ComputeGradient, bool );
 
-    // for itk::KullbackLeiblerCompareHistogramImageToImageMetric
+    /**
+    \brief for itk::KullbackLeiblerCompareHistogramImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsKullbackLeiblerCompareHistogram, unsigned int );
+
+    /**
+    \brief for itk::KullbackLeiblerCompareHistogramImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsKullbackLeiblerCompareHistogram, unsigned int );
-    // for itk::CorrelationCoefficientHistogramImageToImageMetric
+
+    /**
+    \brief for itk::CorrelationCoefficientHistogramImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsCorrelationCoefficientHistogram, unsigned int );
+
+    /**
+    \brief for itk::CorrelationCoefficientHistogramImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsCorrelationCoefficientHistogram, unsigned int );
-    // for itk::MeanSquaresHistogramImageToImageMetric
+
+    /**
+    \brief for itk::MeanSquaresHistogramImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsMeanSquaresHistogram, unsigned int );
+
+    /**
+    \brief for itk::MeanSquaresHistogramImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsMeanSquaresHistogram, unsigned int );
-    // for itk::MutualInformationHistogramImageToImageMetric
+
+    /**
+    \brief for itk::MutualInformationHistogramImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsMutualInformationHistogram, unsigned int );
+
+    /**
+    \brief for itk::MutualInformationHistogramImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsMutualInformationHistogram, unsigned int );
-    // for itk::NormalizedMutualInformationHistogramImageToImageMetric
+
+    /**
+    \brief for itk::NormalizedMutualInformationHistogramImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsNormalizedMutualInformationHistogram, unsigned int );
+
+    /**
+    \brief for itk::NormalizedMutualInformationHistogramImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsNormalizedMutualInformationHistogram, unsigned int );
-    // for itk::MattesMutualInformationImageToImageMetric
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkSetMacro( SpatialSamplesMattesMutualInformation, unsigned int );
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkGetMacro( SpatialSamplesMattesMutualInformation, unsigned int );
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkSetMacro( UseSamplesMattesMutualInformation, bool );
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkGetMacro( UseSamplesMattesMutualInformation, bool );
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkSetMacro( NumberOfHistogramBinsMattesMutualInformation, unsigned int );
+
+    /**
+    \brief for itk::MattesMutualInformationImageToImageMetric
+    */
     itkGetMacro( NumberOfHistogramBinsMattesMutualInformation, unsigned int );
-    // for itk::MeanReciprocalSquareDifferenceImageToImageMetric
+
+    /**
+    \brief for itk::MeanReciprocalSquareDifferenceImageToImageMetric
+    */
     itkSetMacro( LambdaMeanReciprocalSquareDifference, unsigned int );
+
+    /**
+    \brief for itk::MeanReciprocalSquareDifferenceImageToImageMetric
+    */
     itkGetMacro( LambdaMeanReciprocalSquareDifference, unsigned int );
-    // for itk::MutualInformationImageToImageMetric
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( SpatialSamplesMutualInformation, unsigned int );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( SpatialSamplesMutualInformation, unsigned int );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( FixedImageStandardDeviationMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( FixedImageStandardDeviationMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( MovingImageStandardDeviationMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( MovingImageStandardDeviationMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( UseNormalizerAndSmootherMutualInformation, bool );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( UseNormalizerAndSmootherMutualInformation, bool );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( FixedSmootherVarianceMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( FixedSmootherVarianceMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkSetMacro( MovingSmootherVarianceMutualInformation, float );
+
+    /**
+    \brief for itk::MutualInformationImageToImageMetric
+    */
     itkGetMacro( MovingSmootherVarianceMutualInformation, float );
 
   protected:

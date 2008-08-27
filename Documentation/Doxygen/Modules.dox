@@ -101,4 +101,11 @@
   \brief A couple of classes related to rigid registration.
 */
 
+/**
+  \defgroup PointBasedRegistration Classes related to point based registration
+  \ingroup Registration
+  
+  \brief A couple of classes related to point based registration.
+*/
+
 

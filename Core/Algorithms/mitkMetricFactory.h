@@ -24,6 +24,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  /*!
+  \brief This class creates a metric for a rigid registration process.  
+
+  This class will e.g. be instantiated by mitkImageRegistrationMethod and a 
+  metric corresponding to the integer value stored in mitkMetricParameters 
+  will be created. Therefore SetMetricParameters() has to be called with an instance
+  of mitkMetricParameters, which holds all parameter informations for the new
+  metric.
+
+  GetMetric() returns the metric which then can be used in combination with a
+  transform, an optimizer and an interpolator within a registration pipeline. 
+
+
+  \ingroup RigidRegistration
+
+  \author Daniel Stein
+  */
+
   template < class TPixelType, unsigned int VImageDimension >
   class MetricFactory : public itk::Object
   {
@@ -39,13 +57,23 @@ namespace mitk {
     typedef typename itk::ImageToImageMetric< FixedImageType, MovingImageType >    MetricType;
     typedef typename MetricType::Pointer                MetricPointer;
 
+    /**
+    \brief Returns the metric which then can be used in combination with a transform, an optimizer 
+    and an interpolator within a registration pipeline.
+    */
     MetricPointer GetMetric( );
     
+    /**
+    \brief Sets the instance to the metric parameters class which holds all parameters for the new metric.
+    */
     void SetMetricParameters(MetricParameters::Pointer metricParameters)
     {
       m_MetricParameters = metricParameters;
     }
 
+    /**
+    \brief Returns the instance to the metric parameters class which holds all parameters for the new metric.
+    */
     MetricParameters::Pointer GetMetricParameters()
     {
       return m_MetricParameters;

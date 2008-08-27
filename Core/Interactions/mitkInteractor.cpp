@@ -271,15 +271,18 @@ void mitk::Interactor::UpdateTimeStep(unsigned int timeStep)
 bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
 {
   //update the Time and then call Superclass
-  mitk::Event const* event = stateEvent->GetEvent();
-  if (event != NULL)
+  if (stateEvent != NULL)
   {
-    mitk::BaseRenderer* sender = event->GetSender();
-    if (sender != NULL)
+    mitk::Event const* event = stateEvent->GetEvent();
+    if (event != NULL)
     {
-      unsigned int currentTimeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
-      if (currentTimeStep != m_TimeStep)
-        this->UpdateTimeStep(currentTimeStep);
+      mitk::BaseRenderer* sender = event->GetSender();
+      if (sender != NULL)
+      {
+        unsigned int currentTimeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+        if (currentTimeStep != m_TimeStep)
+          this->UpdateTimeStep(currentTimeStep);
+      }
     }
   }
   return Superclass::HandleEvent(stateEvent);

@@ -74,7 +74,13 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(interactor->GetMode() == mitk::Interactor::SMDESELECTED,"Testing right Mode and thus right action behavior")
   delete event;
 
-  delete stateEvent;
 
+  event = NULL;
+  stateEvent->Set(4, event);
+  MITK_TEST_CONDITION_REQUIRED(interactor->HandleEvent(stateEvent),"Testing to send event == NULL to interactor")
+  delete stateEvent;
+  stateEvent = NULL;
+  MITK_TEST_CONDITION_REQUIRED( ! interactor->HandleEvent(stateEvent),"Testing to send stateEvent == NULL to interactor")
+  
   MITK_TEST_END()
 }

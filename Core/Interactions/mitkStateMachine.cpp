@@ -108,6 +108,9 @@ void mitk::StateMachine::ResetStatemachineToStartState(unsigned int timeStep)
 
 bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 {
+  if (stateEvent == NULL)
+    return false;
+
   InteractionDebug::GetInstance()->Event( this, stateEvent->GetId() );
 
   if (m_CurrentStateVector.empty())

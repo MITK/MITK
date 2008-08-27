@@ -56,6 +56,7 @@ namespace mitk {
       return false;
 
     vtkXMLParser::SetFileName( fileName.c_str() );
+    m_XmlFileName = fileName;
 
     if ( !vtkXMLParser::Parse() )
     {

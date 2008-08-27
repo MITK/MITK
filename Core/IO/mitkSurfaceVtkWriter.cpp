@@ -55,7 +55,8 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkW
   }
 }
 
-std::vector<std::string> mitk::SurfaceVtkWriter<vtkSTLWriter>::GetPossibleFileExtensions()
+template<>
+std::vector<std::string> SurfaceVtkWriter<vtkSTLWriter>::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".stl");
@@ -63,7 +64,8 @@ std::vector<std::string> mitk::SurfaceVtkWriter<vtkSTLWriter>::GetPossibleFileEx
   return possibleFileExtensions;
 }
 
-std::vector<std::string> mitk::SurfaceVtkWriter<vtkPolyDataWriter>::GetPossibleFileExtensions()
+template<>
+std::vector<std::string> SurfaceVtkWriter<vtkPolyDataWriter>::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".vtk");
@@ -71,7 +73,8 @@ std::vector<std::string> mitk::SurfaceVtkWriter<vtkPolyDataWriter>::GetPossibleF
   return possibleFileExtensions;
 }
 
-std::vector<std::string> mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetPossibleFileExtensions()
+template<>
+std::vector<std::string> SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".vtp");

@@ -279,3 +279,9 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
   return( 0 );
 }
 
+std::vector<std::string> mitk::PicFileWriter::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".pic");
+  return possibleFileExtensions;
+}

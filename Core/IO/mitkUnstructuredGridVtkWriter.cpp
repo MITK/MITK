@@ -48,7 +48,19 @@ void UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::ExecuteWrite( VtkW
   }
 }
 
+std::vector<std::string> mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".vtk");
+  return possibleFileExtensions;
+}
 
+std::vector<std::string> mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".vtu");
+  return possibleFileExtensions;
+}
 
 template class UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
 

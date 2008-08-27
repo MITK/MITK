@@ -105,6 +105,12 @@ public:
      */
     PointSet* GetInput( const unsigned int& num );
 
+  
+    /**
+    * @brief Return the possible file extensions for the data type associated with the writer
+    */
+    virtual std::vector<std::string> GetPossibleFileExtensions();
+
     /**
     * @brief Return the extension to be added to the filename.
     */

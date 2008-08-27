@@ -32,10 +32,35 @@ void mitk::FileWriter::SetInput( DataTreeNode* )
 {
 }
 
+
 std::string mitk::FileWriter::GetFileExtension()
 {
   return "";
 }
+
+std::string mitk::FileWriter::GetPossibleFileExtensionsAsString()
+{
+  std::vector<std::string> possibleFileExtensions = this->GetPossibleFileExtensions();
+  std::stringstream stream;
+  for (unsigned int i=0; i<possibleFileExtensions.size()-1; i++)
+  {
+    stream<<"*"<<possibleFileExtensions.at(i)<<" ";
+  }
+  stream<<"*"<<possibleFileExtensions.at(possibleFileExtensions.size()-1);
+  return stream.str();
+}
+
+bool mitk::FileWriter::IsExtensionValid(std::string extension)
+{
+  std::vector<std::string> possibleFileExtensions = this->GetPossibleFileExtensions();
+  for (unsigned int i=0; i<possibleFileExtensions.size(); i++)
+  {
+    if (strcmp(extension.c_str(),possibleFileExtensions.at(i).c_str())==0)
+      return true;
+  }
+  return false;
+}
+
 
 mitk::FileWriter::FileWriter()
 {

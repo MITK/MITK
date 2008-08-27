@@ -336,6 +336,13 @@ std::string mitk::PointSetWriter::GetWritenMIMEType()
   return m_MimeType;
 }
 
+std::vector<std::string> mitk::PointSetWriter::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".mps");
+  return possibleFileExtensions;
+}
+
 std::string mitk::PointSetWriter::GetFileExtension()
 {
   return m_Extension;

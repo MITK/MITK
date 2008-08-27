@@ -51,6 +51,18 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     {
       fileName.append( fileWriter->GetDefaultExtension() );
     }
+    else
+    {
+      std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+      if (!fileWriter->IsExtensionValid(extension))
+      {
+        QString message;
+        message.append("File extension not suitable for writing given data. Choose one extension of this list: ");
+        message.append(fileWriter->GetPossibleFileExtensionsAsString().c_str());
+        QMessageBox::critical(NULL,"ERROR",message);
+        return;
+      }
+    }
   }
   else
     fileName = aFileName;
@@ -155,16 +167,20 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             return;
           }
 
-          // check if extension is .mps
-          if (qfileName.endsWith(".mps")==false)
+          mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
+          std::string extension = itksys::SystemTools::GetFilenameLastExtension( qfileName.ascii() );
+          // check if extension is valid
+          if (!writer->IsExtensionValid(extension))
           {
-            QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing PointSet data. Choose .mps");
+            QString message;
+            message.append("File extension not suitable for writing point set data. Choose one extension of this list: ");
+            message.append(writer->GetPossibleFileExtensionsAsString().c_str());
+            QMessageBox::critical(NULL,"ERROR",message);
             return;
           }
 
           if (fileName.empty() == false )
           {
-            mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
             writer->SetInput( pointset );
             writer->SetFileName( qfileName.ascii() );
             writer->Update();
@@ -605,6 +621,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
     {
       // file extension not suitable for writing specified data type
       QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Surface data. Choose .vtk, .stl or .vtp");
+      return "";
     }
     fileName = qfileName.ascii();
   }
@@ -662,16 +679,19 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
       return "";
     }
     // check if extension is suitable for writing image data
-    if ((extension!=".pic")&&(extension!=".mhd")&&(extension!=".vtk")&&(extension!=".vti")&&(extension!=".hdr")&&(extension!=".png")&&(extension!=".tif")&&(extension!=".jpg"))
+    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+    if (!imageWriter->IsExtensionValid(extension))
     {
-      QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Image data. Choose .pic, .mhd, .vtk, .vti, .hdr, .png, .tif or .jpg");
+      QString message;
+      message.append("File extension not suitable for writing image data. Choose one extension of this list: ");
+      message.append(imageWriter->GetPossibleFileExtensionsAsString().c_str());
+      QMessageBox::critical(NULL,"ERROR",message);
       return "";
     }
     dir += "/";
     lastDirectory = dir.c_str(); // remember path for next save dialog
     dir += baseFilename;
 
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
     imageWriter->SetInput(image);
     imageWriter->SetFileName(dir.c_str());
     imageWriter->SetExtension(extension.c_str());

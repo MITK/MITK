@@ -79,6 +79,18 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     virtual std::string GetFileExtension();
 
     //##Documentation
+    //## @brief Checks if given extension is valid for file writer
+    bool IsExtensionValid(std::string extension);
+
+    //##Documentation
+    //## @brief Return the possible file extensions for the data type associated with the writer
+    virtual std::vector<std::string> GetPossibleFileExtensions() = 0;
+
+    //##Documentation
+    //## @brief possible file extensions for the data type associated with the writer as string
+     virtual std::string GetPossibleFileExtensionsAsString();
+
+    //##Documentation
     //## @brief Check if the Writer can write this type of data of the 
     //## DataTreenode.
     virtual bool CanWriteDataType( DataTreeNode* );
@@ -99,6 +111,7 @@ protected:
     FileWriter();
 
     virtual ~FileWriter();
+
 };
 
 #define mitkWriterMacro                                                       \

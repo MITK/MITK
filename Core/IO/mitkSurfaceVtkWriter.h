@@ -150,6 +150,11 @@ public:
       return m_VtkWriter;
     }
 
+    /**
+    * @brief Return the possible file extensions for the data type associated with the writer
+    */
+    virtual std::vector<std::string> GetPossibleFileExtensions();
+
 protected:
 
     /**

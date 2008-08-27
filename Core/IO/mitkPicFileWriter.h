@@ -89,6 +89,13 @@ public:
      */
     const mitk::Image* GetInput();
 
+
+    /**
+    * @return possible file extensions for the data type associated with the writer
+    */
+    virtual std::vector<std::string> GetPossibleFileExtensions();
+
+ 
 protected:
 
     /**

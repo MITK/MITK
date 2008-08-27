@@ -215,6 +215,20 @@ std::string mitk::ImageWriter::GetWritenMIMEType()
   return m_MimeType;
 }
 
+std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".pic");
+  possibleFileExtensions.push_back(".mhd");
+  possibleFileExtensions.push_back(".vtk");
+  possibleFileExtensions.push_back(".vti");
+  possibleFileExtensions.push_back(".hdr");
+  possibleFileExtensions.push_back(".png");
+  possibleFileExtensions.push_back(".tif");
+  possibleFileExtensions.push_back(".jpg");
+  return possibleFileExtensions;
+}
+
 std::string mitk::ImageWriter::GetFileExtension()
 {
   return m_Extension;

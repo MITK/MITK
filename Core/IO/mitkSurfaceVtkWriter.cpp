@@ -55,7 +55,29 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkW
   }
 }
 
+std::vector<std::string> mitk::SurfaceVtkWriter<vtkSTLWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".stl");
+  possibleFileExtensions.push_back(".obj");
+  return possibleFileExtensions;
+}
 
+std::vector<std::string> mitk::SurfaceVtkWriter<vtkPolyDataWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".vtk");
+  possibleFileExtensions.push_back(".obj");
+  return possibleFileExtensions;
+}
+
+std::vector<std::string> mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".vtp");
+  possibleFileExtensions.push_back(".obj");
+  return possibleFileExtensions;
+}
 
 template class MITK_CORE_EXPORT SurfaceVtkWriter<vtkSTLWriter>;
 

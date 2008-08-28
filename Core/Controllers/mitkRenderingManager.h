@@ -85,12 +85,13 @@ public:
   typedef std::vector< float > FloatVector;
   typedef std::vector< bool > BoolVector;
 
-  enum
+  enum RequestType
   {
     REQUEST_UPDATE_ALL = 0,
     REQUEST_UPDATE_2DWINDOWS,
     REQUEST_UPDATE_3DWINDOWS
   };
+
 
   static Pointer New();
 
@@ -131,32 +132,36 @@ public:
   /** Requests all currently registered RenderWindows to be updated.
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
-  void RequestUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
+  void RequestUpdateAll( RequestType type = REQUEST_UPDATE_ALL );
+
 
   /** Immediately executes an update of all registered RenderWindows.
    * If only 2D or 3D windows should be updated, this can be specified
    * via the parameter requestType. */
-  void ForceImmediateUpdateAll( unsigned int requestType = REQUEST_UPDATE_ALL );
+  void ForceImmediateUpdateAll( RequestType type = REQUEST_UPDATE_ALL );
 
 
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataTreeNode. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( DataTreeIteratorBase *dataIt,
-    unsigned int requestType = REQUEST_UPDATE_ALL );
+    RequestType type = REQUEST_UPDATE_ALL );
+
 
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataStorage. */
   virtual bool InitializeViews( const DataStorage *storage,
-     unsigned int requestType = REQUEST_UPDATE_ALL );
+     RequestType type = REQUEST_UPDATE_ALL );
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( const Geometry3D *geometry,
-    unsigned int requestType = REQUEST_UPDATE_ALL );
+    RequestType type = REQUEST_UPDATE_ALL );
+
 
   /** Initializes the windows to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
-  virtual bool InitializeViews( unsigned int requestType = REQUEST_UPDATE_ALL );
+  virtual bool InitializeViews( RequestType type = REQUEST_UPDATE_ALL );
+
 
   /** Initializes the specified window to the geometry of the given
    * DataTreeNode. Set "initializeGlobalTimeSNC" to true in order to use this
@@ -251,8 +256,6 @@ protected:
    * after update. */
   virtual void CheckUpdatePending();
 
-
-
   bool m_UpdatePending;
 
   int m_CurrentLOD;
@@ -272,8 +275,6 @@ protected:
   void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
   void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
-
-
 
   typedef std::map< vtkRenderWindow *, int > RenderWindowList;
 

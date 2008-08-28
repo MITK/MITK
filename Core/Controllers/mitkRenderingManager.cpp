@@ -97,7 +97,6 @@ RenderingManager
   return factory->CreateRenderingManager();
 }
 
-
 RenderingManager *
 RenderingManager
 ::GetInstance()
@@ -218,7 +217,6 @@ RenderingManager
   }
 }
 
-
 void
 RenderingManager
 ::ForceImmediateUpdate( vtkRenderWindow *renderWindow )
@@ -237,22 +235,26 @@ RenderingManager
   m_LastUpdatedRW = renderWindow;
 
   // Immediately repaint this window (implementation platform specific)
+  // If the size is 0 it crahses
+  int *size = renderWindow->GetSize();
+  if ( 0 != size[0] && 0 != size[1] )
+  {
   renderWindow->Render();
-
+  }
 }
 
 
 void
 RenderingManager
-::RequestUpdateAll( unsigned int requestType )
+::RequestUpdateAll( RequestType type )
 {
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     int id = BaseRenderer::GetInstance(it->first)->GetMapperID();
-    if ( (requestType == REQUEST_UPDATE_ALL)
-      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    if ( (type == REQUEST_UPDATE_ALL)
+      || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
       this->RequestUpdate( it->first);
 
@@ -268,26 +270,32 @@ RenderingManager
   {
     m_UpdatePending = true;
     this->RestartTimer();
+
   }
 }
 
 
 void
 RenderingManager
-::ForceImmediateUpdateAll( unsigned int requestType )
+::ForceImmediateUpdateAll( RequestType type )
 {
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     int id = BaseRenderer::GetInstance(it->first)->GetMapperID();
-    if ( (requestType == REQUEST_UPDATE_ALL)
-      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    if ( (type == REQUEST_UPDATE_ALL)
+      || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
       //it->second = RENDERING_INPROGRESS;
 
       // Immediately repaint this window (implementation platform specific)
+      // If the size is 0, it crashes
+      int *size = it->first->GetSize();
+      if ( 0 != size[0] && 0 != size[1] )
+      {
       it->first->Render();
+	  }
 
       it->second = RENDERING_INACTIVE;
     }
@@ -305,7 +313,7 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( DataTreeIteratorBase * dataIt, unsigned int requestType )
+::InitializeViews( DataTreeIteratorBase * dataIt, RequestType type )
 {
   mitk::Geometry3D::Pointer geometry;
   if ( dataIt != NULL )
@@ -336,23 +344,23 @@ RenderingManager
   }
 
   // Use geometry for initialization
-  return this->InitializeViews( geometry.GetPointer(), requestType );
+  return this->InitializeViews( geometry.GetPointer(), type );
 }
 
 
 bool
 RenderingManager
-::InitializeViews( const DataStorage * storage, unsigned int requestType )
+::InitializeViews( const DataStorage * storage, RequestType type )
 {
   //TODO native DataStorage code
   mitk::DataTreePreOrderIterator it(storage->m_DataTree);
-  return this->InitializeViews(&it, requestType);
+  return this->InitializeViews(&it, type);
 }
 
 
 bool
 RenderingManager
-::InitializeViews( const Geometry3D * geometry, unsigned int requestType )
+::InitializeViews( const Geometry3D * geometry, RequestType type )
 {
   bool boundingBoxInitialized = false;
 
@@ -371,9 +379,9 @@ RenderingManager
     mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( it->first );
     int id = baseRenderer->GetMapperID();
-    if ( (requestType == REQUEST_UPDATE_ALL)
-      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    if ( (type == REQUEST_UPDATE_ALL)
+      || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
       this->InternalViewInitialization( baseRenderer, geometry,
         boundingBoxInitialized, id );
@@ -389,7 +397,7 @@ RenderingManager
     m_TimeNavigationController->Update();
   }
 
-  this->RequestUpdateAll( requestType );
+  this->RequestUpdateAll( type );
 
   vtkObject::SetGlobalWarningDisplay( warningLevel );
 
@@ -403,7 +411,7 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( unsigned int requestType )
+::InitializeViews( RequestType type )
 {
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
@@ -411,9 +419,9 @@ RenderingManager
     mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( it->first );
     int id = baseRenderer->GetMapperID();
-    if ( (requestType == REQUEST_UPDATE_ALL)
-      || ((requestType == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((requestType == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+    if ( (type == REQUEST_UPDATE_ALL)
+      || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
       mitk::SliceNavigationController *snc =
         baseRenderer->GetSliceNavigationController();
@@ -426,7 +434,7 @@ RenderingManager
     }
   }
 
-  this->RequestUpdateAll( requestType );
+  this->RequestUpdateAll( type );
 
   return true;
 }
@@ -630,7 +638,6 @@ RenderingManager
 ::RenderingProgressCallback( itk::Object* /*object*/, const itk::EventObject& /*event*/ )
 {
   this->DoMonitorRendering();
-
 }
 
 void
@@ -675,7 +682,6 @@ RenderingManager
       return true;
     }
   }
-
   return false;
 }
 

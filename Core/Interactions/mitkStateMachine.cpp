@@ -116,6 +116,9 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   if (m_CurrentStateVector.empty())
     return false;//m_CurrentStateVector needs to be initialized!
 
+  if (m_TimeStep >= m_CurrentStateVector.size())
+    return false;
+
   if (m_CurrentStateVector[m_TimeStep].IsNull())
     return false;//m_CurrentState needs to be initailized!
 

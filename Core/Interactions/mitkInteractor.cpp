@@ -247,7 +247,7 @@ void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
 void mitk::Interactor::UpdateTimeStep(unsigned int timeStep)
 {
   //check if the vector of StartStates contains enough pointers to use timeStep
-  if (timeStep > 1)
+  if (timeStep >= 1)
   {
     // Make sure that the data (if time-resolved) has enough entries;
     // if not, create the required extra ones (empty)
@@ -279,7 +279,8 @@ bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
       mitk::BaseRenderer* sender = event->GetSender();
       if (sender != NULL)
       {
-        unsigned int currentTimeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+        //Get the TimeStep according to CurrentWorldGeometry2D
+        unsigned int currentTimeStep = sender->GetTimeStep();
         if (currentTimeStep != m_TimeStep)
           this->UpdateTimeStep(currentTimeStep);
       }

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageSeriesWriter.h"
 #include "itkImageFileWriter.h"
 #include <itkRescaleIntensityImageFilter.h>
+#include "itkDiffusionTensor3D.h"
 
 template < typename TPixel, unsigned int VImageDimension > 
 void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
@@ -82,3 +83,49 @@ template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 3>(itkImageRGB
   writer->SetFileName( fileName.c_str() );
   writer->Update();
 };
+
+typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
+template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<float>, 3>(itkImageDTIF3* itkImage, const std::string& fileName)
+{
+  typedef itkImageDTIF3 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};
+
+typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
+template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<double>, 3>(itkImageDTID3* itkImage, const std::string& fileName)
+{
+  typedef itkImageDTID3 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};
+
+typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
+template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<float>, 2>(itkImageDTIF2* itkImage, const std::string& fileName)
+{
+  typedef itkImageDTIF2 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};
+
+typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
+template <> void _mitkItkImageWrite<itk::DiffusionTensor3D<double>, 2>(itkImageDTID2* itkImage, const std::string& fileName)
+{
+  typedef itkImageDTID2 TImageType;
+
+  itk::ImageFileWriter<TImageType>::Pointer writer = itk::ImageFileWriter<TImageType>::New();
+  writer->SetInput( itkImage );
+  writer->SetFileName( fileName.c_str() );
+  writer->Update();
+};
+
+

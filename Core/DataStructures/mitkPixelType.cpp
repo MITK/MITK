@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 #include <itkCovariantVector.h>
+#include "itkDiffusionTensor3D.h"
 
 mitk::PixelType::PixelType() : m_TypeId( NULL ), m_Type( ipPicUnknown ), m_Bpe( 0 ), m_NumberOfComponents( 1 )
 {
@@ -113,6 +114,7 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
     SET_ITK_TYPE_ID(SCALAR, 1, TYPE ) else                                            \
                                                                                       \
     SET_ITK_TYPE_ID(RGB, 3, itk::RGBPixel<TYPE> ) else                                \
+    SET_ITK_TYPE_ID(DIFFUSIONTENSOR3D, 6, itk::DiffusionTensor3D<TYPE> ) else                                \
     SET_ITK_TYPE_ID(VECTOR, 3, Vector3Type ) else                                     \
     SET_ITK_TYPE_ID(COVARIANTVECTOR, 3, CovariantVector3Type ) else                   \
     SET_ITK_TYPE_ID(POINT, 3, Point3Type ) else                                       \
@@ -169,11 +171,27 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
    }
    else if ( *m_TypeId == typeid( itk::Vector<float,2> ) )
    {
-      m_TypeId = & typeid( float );
-      m_NumberOfComponents *= 2;
-      m_Type = ipPicFloat;
-      m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
-      m_ItkTypeId = &typeid( itk::Vector<float,2> );
+     m_TypeId = & typeid( float );
+     m_NumberOfComponents *= 2;
+     m_Type = ipPicFloat;
+     m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
+     m_ItkTypeId = &typeid( itk::Vector<float,2> );
+   }
+   else if ( *m_TypeId == typeid( itk::DiffusionTensor3D<float> ) )
+   {
+     m_TypeId = & typeid( float );
+     m_NumberOfComponents *= 6;
+     m_Type = ipPicFloat;
+     m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
+     m_ItkTypeId = &typeid( itk::DiffusionTensor3D<float> );
+   }
+   else if ( *m_TypeId == typeid( itk::DiffusionTensor3D<double> ) )
+   {
+     m_TypeId = & typeid( double );
+     m_NumberOfComponents *= 6;
+     m_Type = ipPicFloat;
+     m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
+     m_ItkTypeId = &typeid( itk::DiffusionTensor3D<double> );
    }
    else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
    {

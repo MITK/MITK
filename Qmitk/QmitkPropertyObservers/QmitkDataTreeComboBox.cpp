@@ -335,23 +335,26 @@ void QmitkDataTreeComboBox::determineDisplayedProperty()
   // This (often) determines the key of the left-most string property.
   // If such a property cannot be determined, "name" is used as a default.
 
-  mitk::DataTreeFilter::ConstItemIterator itemiterend( m_DataTreeFilter->GetItems()->End() ); 
-  --itemiterend; // last but one item (first items are often empty, just for structure)
-  if (itemiterend != m_DataTreeFilter->GetItems()->End()) 
-  { 
-    // visible properties left to right
-    for( mitk::DataTreeFilter::PropertyList::const_iterator nameiter = m_DataTreeFilter->GetVisibleProperties().begin();
+  if(m_DataTreeFilter->GetItems()->size())
+  {
+    mitk::DataTreeFilter::ConstItemIterator itemiterend( m_DataTreeFilter->GetItems()->End() ); 
+    --itemiterend; // last but one item (first items are often empty, just for structure)
+    if (itemiterend != m_DataTreeFilter->GetItems()->End()) 
+    { 
+      // visible properties left to right
+      for( mitk::DataTreeFilter::PropertyList::const_iterator nameiter = m_DataTreeFilter->GetVisibleProperties().begin();
         nameiter != m_DataTreeFilter->GetVisibleProperties().end();
         ++nameiter )
-    {
-      // check if this is a string item
-      const mitk::BaseProperty* property( itemiterend->GetProperty(*nameiter) );
-  
-      if ( const mitk::StringProperty* prop = dynamic_cast<const mitk::StringProperty*>(property) )
       {
-        // success, use this for display
-        m_DisplayedProperty = prop->GetValue();
-        break;
+        // check if this is a string item
+        const mitk::BaseProperty* property( itemiterend->GetProperty(*nameiter) );
+
+        if ( const mitk::StringProperty* prop = dynamic_cast<const mitk::StringProperty*>(property) )
+        {
+          // success, use this for display
+          m_DisplayedProperty = prop->GetValue();
+          break;
+        }
       }
     }
   }

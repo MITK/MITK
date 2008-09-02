@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkReferenceCountWatcher.h"
+#include "itkDiffusionTensor3D.h"
+#include <mitkImageCast.h>
 
 #include <fstream>
 
@@ -237,6 +239,12 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
     std::cout<< imageDataItem->GetReferenceCount()-1 << " != 0. [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  imgMem=mitk::Image::New();
+  itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
+  imgMem->Initialize(mitk::PixelType(typeid(itk::DiffusionTensor3D<float>)), 40, *planegeometry);
+  mitk::CastToItkImage( imgMem, diffImage );
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;

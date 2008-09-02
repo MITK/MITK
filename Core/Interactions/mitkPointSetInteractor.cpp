@@ -89,8 +89,10 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
   {
     unsigned int timeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
     //if the event can be understood and if there is a transition waiting for that event
-    if (this->GetCurrentState(timeStep)->GetTransition(stateEvent->GetId())!=NULL)
-      returnValue = 0.5;//it can be understood
+    mitk::State const* state = this->GetCurrentState(timeStep);
+    if (state!= NULL)
+      if (state->GetTransition(stateEvent->GetId())!=NULL)
+        returnValue = 0.5;//it can be understood
 
 
     mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());

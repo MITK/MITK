@@ -215,7 +215,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     /**
     * @brief returns the current state
     **/
-    const State* GetCurrentState(unsigned int time = 0) const;
+    const State* GetCurrentState(unsigned int timeStep = 0) const;
 
     /**
     * @brief if true, then UndoFunctionality is enabled

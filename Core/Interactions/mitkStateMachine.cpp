@@ -82,10 +82,10 @@ std::string mitk::StateMachine::GetType() const
 	return m_Type;
 }
 
-const mitk::State* mitk::StateMachine::GetCurrentState(unsigned int time) const
+const mitk::State* mitk::StateMachine::GetCurrentState(unsigned int timeStep) const
 {
-  if (m_CurrentStateVector.size() >= time)
-    return m_CurrentStateVector[time].GetPointer();
+  if (m_CurrentStateVector.size() > timeStep) //the size of the vector has to be one integer higher than the timeStep.
+    return m_CurrentStateVector[timeStep].GetPointer();
   return NULL;
 }
 

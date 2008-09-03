@@ -23,6 +23,7 @@ SET(CPP_FILES
   QmitkDialogBar.cpp
   QmitkDialogBars/QmitkSliderDialogBar.cpp
   QmitkDialogBars/QmitkStandardViewsDialogBar.cpp
+  QmitkDialogBars/QmitkStereoOptionsDialogBar.cpp
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
@@ -145,6 +146,7 @@ SET(MOC_H_FILES
   QmitkDialogBar.h
   QmitkDialogBars/QmitkSliderDialogBar.h
   QmitkDialogBars/QmitkStandardViewsDialogBar.h
+  QmitkDialogBars/QmitkStereoOptionsDialogBar.h
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h

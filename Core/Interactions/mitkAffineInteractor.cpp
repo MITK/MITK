@@ -66,25 +66,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   if (inputtimegeometry == NULL)
     return false;
 
-  int timestep=0;
-  mitk::BaseRenderer* renderer = stateEvent->GetEvent()->GetSender();
-  if(renderer!=NULL)
-  {
-    const Geometry2D* worldgeometry = renderer->GetCurrentWorldGeometry2D();
-    assert(worldgeometry!=NULL);
-
-    if(worldgeometry->IsValid()==false)
-      return false;
-
-    ScalarType time = worldgeometry->GetTimeBounds()[0];
-    if(time> ScalarTypeNumericTraits::NonpositiveMin())
-      timestep = inputtimegeometry->MSToTimeStep(time);
-
-    if(inputtimegeometry->IsValidTime(timestep)==false)
-      return false;
-  }
-
-  Geometry3D* geometry = inputtimegeometry->GetGeometry3D(timestep);
+  Geometry3D* geometry = inputtimegeometry->GetGeometry3D(m_TimeStep);
 
   mitk::DisplayPositionEvent const *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
   switch (action->GetActionId())
@@ -111,7 +93,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
       }
 
-      if (this->CheckSelected(worldPoint, timestep))
+      if (this->CheckSelected(worldPoint, m_TimeStep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         selected->SetValue(true);
@@ -141,7 +123,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
     {
       mitk::Point3D worldPoint = event->GetWorldPosition();
       mitk::StateEvent* newStateEvent = NULL;
-      if (this->CheckSelected(worldPoint, timestep))
+      if (this->CheckSelected(worldPoint, m_TimeStep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, event);
         m_DataTreeNode->GetPropertyList()->SetProperty("selected", mitk::BoolProperty::New(true));  // TODO: Generate an Select Operation and send it to the undo controller ?

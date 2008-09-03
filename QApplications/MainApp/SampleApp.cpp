@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkSliderDialogBar.h"
 #include "QmitkStandardViewsDialogBar.h"
+#include "QmitkStereoOptionsDialogBar.h"
 
 #include <qlayout.h>
 
@@ -78,6 +79,8 @@ void SampleApp::InitializeFunctionality()
     qfm->AddDialogBar( sliderDialogBar );
     QmitkStandardViewsDialogBar *standardViewsDialogBar = new QmitkStandardViewsDialogBar( m_MultiWidget, "viewsbar", m_MultiWidget );
     qfm->AddDialogBar( standardViewsDialogBar );
+    QmitkStereoOptionsDialogBar *stereoOptionsDialogBar = new QmitkStereoOptionsDialogBar( m_MultiWidget, "stereobar", m_MultiWidget );
+    qfm->AddDialogBar( stereoOptionsDialogBar );
 
     // initialize toolbars
     qfm->InitToolbars();

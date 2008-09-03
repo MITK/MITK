@@ -383,9 +383,21 @@ void mitk::DataTreeNode::SetLevelWindow(mitk::LevelWindow levelWindow, mitk::Bas
 
 void mitk::DataTreeNode::SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer)
 {
-  mitk::IntProperty::Pointer prop;
-  prop = mitk::IntProperty::New(intValue);
-  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::IntProperty::New(intValue));
+}
+void mitk::DataTreeNode::SetBoolProperty( const char* propertyKey, bool boolValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+{
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
+}
+
+void mitk::DataTreeNode::SetFloatProperty( const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+{
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+}
+
+void mitk::DataTreeNode::SetStringProperty( const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )
+{
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
 
 void mitk::DataTreeNode::SetProperty(const char *propertyKey, 

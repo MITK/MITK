@@ -250,7 +250,7 @@ public:
   //## @brief Convenience access method for bool properties (instances of
   //## BoolProperty)
   //## @return @a true property was found
-  bool GetBoolProperty(const char* propertyKey, bool &boolValue, mitk::BaseRenderer* renderer=NULL) const;
+  bool GetBoolProperty(const char* propertyKey, bool &boolValue, mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for int properties (instances of
@@ -262,13 +262,13 @@ public:
   //## @brief Convenience access method for float properties (instances of
   //## FloatProperty)
   //## @return @a true property was found
-  bool GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer=NULL) const;
+  bool GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for string properties (instances of
   //## StringProperty)
   //## @return @a true property was found
-  bool GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const;
+  bool GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for color properties (instances of
@@ -315,7 +315,6 @@ public:
       return true;
     }
   }
-
   //##Documentation
   //## @brief Extra convenience access method for accessing the name of an object (instance of
   //## StringProperty with property-key "name"). 
@@ -345,7 +344,7 @@ public:
 
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances
-  //## of BoolProperty with property-key "visibile")
+  //## of BoolProperty with property-key "visible")
   //## @return @a true property was found
   //## @sa IsVisible
   //## @defaultRendererUsed is set to true if the specific renderer wasn't found so the default renderer was used
@@ -424,6 +423,21 @@ public:
   //## @brief Convenience method for setting int properties (instances of
   //## IntProperty)
   void SetIntProperty(const char* propertyKey, int intValue, mitk::BaseRenderer* renderer=NULL);
+
+  //##Documentation
+  //## @brief Convenience method for setting int properties (instances of
+  //## IntProperty)
+  void SetBoolProperty(const char* propertyKey, bool boolValue, mitk::BaseRenderer* renderer=NULL);
+
+  //##Documentation
+  //## @brief Convenience method for setting int properties (instances of
+  //## IntProperty)
+  void SetFloatProperty(const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer=NULL);
+
+  //##Documentation
+  //## @brief Convenience method for setting int properties (instances of
+  //## IntProperty)
+  void SetStringProperty(const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer=NULL);
 
   //##Documentation
   //## @brief Get the timestamp of the last change of the contents of this node or 

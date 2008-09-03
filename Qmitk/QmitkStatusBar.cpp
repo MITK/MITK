@@ -29,34 +29,34 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /**
- * Display the text in the statusbar of the applikation
+ * Display the text in the status bar of the application
  */
 void QmitkStatusBar::DisplayText(const char* t)
 {
   m_StatusBar->message(t);
-  // TODO bug #1357
-  //qApp->processEvents(); // produces crashes!
+  // bug #1357
+  qApp->processEvents();
 }
 
 /**
- * Display the text in the statusbar of the applikation for ms seconds
+ * Display the text in the status bar of the application for ms seconds
  */
 void QmitkStatusBar::DisplayText(const char* t, int ms)
 {
   m_StatusBar->message(t, ms);
-  // TODO bug #1357
-  //qApp->processEvents(); // produces crashes!
+  // bug #1357
+  qApp->processEvents();
 }
 
 /**
- * Clear the text in the StatusBar
+ * Clear the text in the status bar
  */
 void QmitkStatusBar::Clear()
 {
   if (m_StatusBar != NULL)
     m_StatusBar->clear();
-  // TODO bug #1357
-  //qApp->processEvents(); // produces crashes!
+  // bug #1357
+  qApp->processEvents();
 }
 
 /**

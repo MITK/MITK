@@ -33,18 +33,12 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
 : StateMachine(type),
   m_CurrentlyInInformListenersLoop(false)
 {
-  //build up the FocusManager
-  m_FocusManager = new mitk::FocusManager();
   m_InteractionDebugger = InteractionDebugger::New();
   InteractionDebugger::Deactivate();
 }
 
 mitk::GlobalInteraction::~GlobalInteraction()
 {
-  if ( m_FocusManager != NULL )
-  {
-    m_FocusManager = NULL;
-  }
   //s_GlobalInteraction doesn't have to be set = NULL;
 }
 
@@ -252,27 +246,27 @@ bool mitk::GlobalInteraction::AskCurrentInteractor(mitk::StateEvent const* state
 
 bool mitk::GlobalInteraction::AddFocusElement(mitk::FocusManager::FocusElement* element)
 {
-  return m_FocusManager->AddElement(element);
+  return m_FocusManager.AddElement(element);
 }
 
 bool mitk::GlobalInteraction::RemoveFocusElement(mitk::FocusManager::FocusElement* element)
 {
-  return m_FocusManager->RemoveElement(element);
+  return m_FocusManager.RemoveElement(element);
 }
 
 mitk::FocusManager::FocusElement* mitk::GlobalInteraction::GetFocus()
 {
-  return m_FocusManager->GetFocused();
+  return m_FocusManager.GetFocused();
 }
 
 bool mitk::GlobalInteraction::SetFocus(mitk::FocusManager::FocusElement* element)
 {
-  return m_FocusManager->SetFocused(element);
+  return m_FocusManager.SetFocused(element);
 }
 
 mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
 {
-  return m_FocusManager;
+  return &m_FocusManager;
 }
 
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)

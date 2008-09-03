@@ -23,13 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRendererCollection.h>
 #include <algorithm>
 
-typedef std::map<const vtkRenderWindow*,mitk::VtkLayerController*> vtkLayerControllerMapType;
-static vtkLayerControllerMapType vtkLayerControllerMap;
+mitk::VtkLayerController::vtkLayerControllerMapType mitk::VtkLayerController::s_LayerControllerMap;
 
 mitk::VtkLayerController * mitk::VtkLayerController::GetInstance(vtkRenderWindow* renWin)
 {
-  for(vtkLayerControllerMapType::iterator mapit = vtkLayerControllerMap.begin(); 
-      mapit != vtkLayerControllerMap.end(); mapit++)
+  for(vtkLayerControllerMapType::iterator mapit = s_LayerControllerMap.begin();
+      mapit != s_LayerControllerMap.end(); mapit++)
   {
     if( (*mapit).first == renWin)
       return (*mapit).second;
@@ -47,24 +46,37 @@ void  mitk::VtkLayerController::AddInstance(vtkRenderWindow* renWin, vtkRenderer
   mitk::VtkLayerController* ControllerInstance = new mitk::VtkLayerController(renWin);
   ControllerInstance->InsertSceneRenderer(mitkSceneRenderer);
 
-  vtkLayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
+  s_LayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
 }     
 
 void  mitk::VtkLayerController::RemoveInstance(vtkRenderWindow* renWin)
 {
-  vtkLayerControllerMapType::iterator mapit = vtkLayerControllerMap.find(renWin);
-  if(mapit != vtkLayerControllerMap.end())
-    vtkLayerControllerMap.erase(mapit);
+  vtkLayerControllerMapType::iterator mapit = s_LayerControllerMap.find(renWin);
+  if(mapit != s_LayerControllerMap.end())
+  {
+    delete mapit->second;
+    s_LayerControllerMap.erase( mapit );
+  }
 }
 
 mitk::VtkLayerController::VtkLayerController(vtkRenderWindow* renderWindow)
 {
   m_RenderWindow = renderWindow;
+  m_RenderWindow->Register( NULL );
   m_BackgroundRenderers.clear();
   m_ForegroundRenderers.clear();
   m_SceneRenderers.clear();
 
 }
+
+mitk::VtkLayerController::~VtkLayerController()
+{
+  if ( m_RenderWindow != NULL )
+  {
+    m_RenderWindow->UnRegister( NULL );
+  }
+}
+
 /**
  * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the background.
  * With forceAbsoluteBackground set true a renderer can be placed at the absolute background of the scene.

@@ -63,6 +63,7 @@ void mitk::VtkSurfaceReader::GenerateData()
         }
         reader->Delete();
       }
+      chooser->Delete();
     }
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
     else
@@ -110,6 +111,7 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
       chooser->Delete();
       return false;
     }
+    chooser->Delete();
   }
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
   else
@@ -121,6 +123,7 @@ bool mitk::VtkSurfaceReader::CanReadFile(const std::string filename, const std::
         chooser->Delete();
         return false;
       }
+      chooser->Delete();
     }
 #endif
     else

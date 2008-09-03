@@ -222,7 +222,7 @@ namespace mitk {
     
     //##Documentation
     //## @brief holds a list of BaseRenderer and one focused
-    FocusManager* m_FocusManager;
+    FocusManager m_FocusManager;
 
     bool m_CurrentlyInInformListenersLoop;
     bool m_CurrentlyInInformInteractorsLoop;

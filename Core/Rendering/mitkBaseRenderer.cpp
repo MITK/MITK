@@ -215,6 +215,8 @@ mitk::BaseRenderer::~BaseRenderer()
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
   
+  mitk::GlobalInteraction::GetInstance()->RemoveFocusElement(this);
+
   mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
   
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());

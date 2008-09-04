@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPropertyList.h"
 
+#include "mitkProperties.h"
+#include "mitkStringProperty.h"
+
 #include "mitkXMLWriter.h"
 #include "mitkXMLReader.h"
 
@@ -319,7 +322,7 @@ bool mitk::PropertyList::IsEnabled(const std::string& propertyKey)
 }
 
 
-void mitk::PropertyList::SetEnabled(const std::string& propertyKey,bool enabled) 
+void mitk::PropertyList::SetEnabled(const std::string& propertyKey, bool enabled) 
 {
   PropertyMap::iterator it = m_Properties.find( propertyKey );
   if (it != m_Properties.end() && it->second.second != enabled) 
@@ -328,6 +331,7 @@ void mitk::PropertyList::SetEnabled(const std::string& propertyKey,bool enabled)
     this->Modified();
   }
 }
+
 
 void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool replace)
 {
@@ -353,3 +357,77 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
   }
 }
 
+
+#ifndef _MSC_VER
+template <typename T>
+bool mitk::PropertyList::GetPropertyValue(const char* propertyKey, T & value) const
+{
+  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey) );
+  if ( gp != NULL )
+  {
+    value = gp->GetValue();
+    return true;
+  }
+  return false;
+}
+
+template bool mitk::PropertyList::GetPropertyValue<double>(char const*, double&) const;
+template bool mitk::PropertyList::GetPropertyValue<float>(char const*, float&) const;
+template bool mitk::PropertyList::GetPropertyValue<int>(char const*, int&) const;
+template bool mitk::PropertyList::GetPropertyValue<bool>(char const*, bool&) const;
+
+#endif
+
+
+bool mitk::PropertyList::GetBoolProperty(const char* propertyKey, bool& boolValue) const
+{
+  return GetPropertyValue<bool>(propertyKey, boolValue);
+}
+
+
+bool mitk::PropertyList::GetIntProperty(const char* propertyKey, int &intValue) const
+{
+  return GetPropertyValue<int>(propertyKey, intValue);
+}
+
+
+bool mitk::PropertyList::GetFloatProperty(const char* propertyKey, float &floatValue) const
+{
+  return GetPropertyValue<float>(propertyKey, floatValue);
+}
+
+
+bool mitk::PropertyList::GetStringProperty(const char* propertyKey, std::string& stringValue) const
+{
+  StringProperty* sp= dynamic_cast<StringProperty*>(GetProperty(propertyKey));
+  if ( sp != NULL )
+  {
+    stringValue = sp->GetValue();
+    return true;
+  }
+  return false;
+}
+
+
+void mitk::PropertyList::SetIntProperty(const char* propertyKey, int intValue)
+{
+  SetProperty(propertyKey, mitk::IntProperty::New(intValue));
+}
+
+
+void mitk::PropertyList::SetBoolProperty( const char* propertyKey, bool boolValue)
+{
+  SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
+}
+
+
+void mitk::PropertyList::SetFloatProperty( const char* propertyKey, float floatValue)
+{
+  SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+}
+
+
+void mitk::PropertyList::SetStringProperty( const char* propertyKey, const char* stringValue)
+{
+  SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
+}

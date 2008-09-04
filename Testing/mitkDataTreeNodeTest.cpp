@@ -390,13 +390,28 @@ static void TestPropertyList(mitk::DataTreeNode::Pointer dataTreeNode)
    
 
   MITK_TEST_CONDITION(dataTreeNode->GetPropertyList() != NULL, "Testing if the constructor set the propertylist" )
-    
-//  MITK_TEST_CONDITION(dataTreeNode->AddProperty() != NULL, "Testing if t" )
+
+  dataTreeNode->SetIntProperty("int", -31337);
+  int x;
+  dataTreeNode->GetIntProperty("int", x);
+  MITK_TEST_CONDITION(x == -31337, "Testing Set/GetIntProperty");
+
+  dataTreeNode->SetBoolProperty("bool", true);
+  bool b;
+  dataTreeNode->GetBoolProperty("bool", b);
+  MITK_TEST_CONDITION(b == true, "Testing Set/GetBoolProperty");
+  dataTreeNode->SetFloatProperty("float", -31.337);
+  float y;
+  dataTreeNode->GetFloatProperty("float", y);
+  MITK_TEST_CONDITION(y - -31.337 < 0.01, "Testing Set/GetFloatProperty");
+  dataTreeNode->SetStringProperty("string", "MITK");
+  std::string s = "GANZVIELPLATZ";
+  dataTreeNode->GetStringProperty("string", s);
+  MITK_TEST_CONDITION(s == "MITK", "Testing Set/GetStringProperty");
 
   MITK_TEST_CONDITION(propertyList == dataTreeNode->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
-
-
 }
+
 static void TestSelected(mitk::DataTreeNode::Pointer dataTreeNode)
 {
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();

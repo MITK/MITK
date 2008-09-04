@@ -46,12 +46,13 @@ QmitkDataTreeViewItem::QmitkDataTreeViewItem( QmitkDataTreeViewItem * parent, mi
   m_DataTreeIterator = nodeIt;
 
   m_TreeNode = nodeIt->Get();
-  char name[256];
+  //char name[256];
+  std::string name;
 
   if(m_TreeNode.IsNotNull())
   {
-    if (m_TreeNode->GetName(*name, NULL)) {
-      QListViewItem::setText(0,QString(name));
+    if (m_TreeNode->GetName(name, NULL)) {
+      QListViewItem::setText(0, QString(name.c_str()));
     } else {
       QListViewItem::setText(0,"No name!");
     }

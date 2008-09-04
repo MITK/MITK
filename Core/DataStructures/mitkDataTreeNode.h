@@ -268,7 +268,7 @@ public:
   //## @brief Convenience access method for string properties (instances of
   //## StringProperty)
   //## @return @a true property was found
-  bool GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer = NULL) const;
+  bool GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
   //## @brief Convenience access method for color properties (instances of
@@ -297,24 +297,11 @@ public:
   //## @brief Convenience access method for accessing the name of an object (instance of
   //## StringProperty with property-key "name")
   //## @return @a true property was found
-  bool GetName(char &nodeName, mitk::BaseRenderer* renderer, const char* propertyKey = "name") const
+  bool GetName(std::string& nodeName, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
   {
-    return GetStringProperty(propertyKey, &nodeName, renderer);
+    return GetStringProperty(propertyKey, nodeName, renderer);
   }
 
-  bool GetName(std::string &nodeName, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "name") const
-  {
-    mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
-    if(stringProp.IsNull())
-    {
-      return false;
-    } 
-    else 
-    {
-      nodeName = stringProp->GetValue();
-      return true;
-    }
-  }
   //##Documentation
   //## @brief Extra convenience access method for accessing the name of an object (instance of
   //## StringProperty with property-key "name"). 
@@ -437,7 +424,7 @@ public:
   //##Documentation
   //## @brief Convenience method for setting int properties (instances of
   //## IntProperty)
-  void SetStringProperty(const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer=NULL);
+  void SetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer=NULL);
 
   //##Documentation
   //## @brief Get the timestamp of the last change of the contents of this node or 

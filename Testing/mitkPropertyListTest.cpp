@@ -254,8 +254,84 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
     std::cout << "[PASSED]" << std::endl;
   else
     return EXIT_FAILURE;
+  
+  std::cout << "Testing GetPropertyValue(bool): ";
+  mitk::BoolProperty::Pointer gpvTest = mitk::BoolProperty::New(true);
+  propList->SetProperty("gpvBool", gpvTest);
+  bool b = false;
+  if ((propList->GetPropertyValue<bool>("gpvBool", b) == true) && (b == gpvTest->GetValue()))
+    std::cout << "[PASSED]" << std::endl;
+  else
+  {
+    std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+  
+  std::cout << "Testing GetPropertyValue(float): ";
+  mitk::FloatProperty::Pointer gpvTest2 = mitk::FloatProperty::New(3.1337);
+  propList->SetProperty("gpvfloat", gpvTest2);
+  float v = -1.23;
+  if ((propList->GetPropertyValue<float>("gpvfloat", v) == true) && (v == gpvTest2->GetValue()))
+    std::cout << "[PASSED]" << std::endl;
+  else
+  {
+    std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
 
+  {  
+    std::cout << "Testing GetBoolProperty(): ";
+    mitk::BoolProperty::Pointer prop = mitk::BoolProperty::New(true);
+    propList->ReplaceProperty("test", prop);
+    bool v = false;
+    if ((propList->GetBoolProperty("test", v) == true) && (v == prop->GetValue()))
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  {  
+    std::cout << "Testing GetIntProperty(): ";
+    mitk::IntProperty::Pointer prop = mitk::IntProperty::New(31337);
+    propList->ReplaceProperty("test", prop);
+    int v = 1;
+    if ((propList->GetIntProperty("test", v) == true) && (v == prop->GetValue()))
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  {  
+    std::cout << "Testing GetFloatProperty(): ";
+    mitk::FloatProperty::Pointer prop = mitk::FloatProperty::New(31.337);
+    propList->ReplaceProperty("test", prop);
+    float v = 1.2;
+    if ((propList->GetFloatProperty("test", v) == true) && (v == prop->GetValue()))
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+  } 
+  {  
+    std::cout << "Testing GetStringProperty(): ";
+    mitk::StringProperty::Pointer prop = mitk::StringProperty::New("MITK");
+    propList->ReplaceProperty("test", prop);
+    std::string v = "";
+    if ((propList->GetStringProperty("test", v) == true) && (v == prop->GetValue()))
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+  } 
+  
   std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;
 }
-

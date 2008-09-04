@@ -115,6 +115,66 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
      */ 
     void ConcatenatePropertyList(PropertyList *pList, bool replace = false);
 
+    //##Documentation
+    //## @brief Convenience access method for GenericProperty<T> properties 
+    //## (T being the type of the second parameter)
+    //## @return @a true property was found
+    template <typename T>
+    bool GetPropertyValue(const char* propertyKey, T & value) const
+#ifdef _MSC_VER
+    {
+      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey));
+      if ( gp != NULL )
+      {
+        value = gp->GetValue();
+        return true;
+      }
+      return false;
+    }
+#else
+      ;
+#endif
+
+    /**
+    * @brief Convenience method to access the value of a BoolProperty
+    */    
+    bool GetBoolProperty(const char* propertyKey, bool& boolValue) const;
+    
+    /**
+    * @brief Convenience method to set the value of a BoolProperty
+    */
+    void SetBoolProperty( const char* propertyKey, bool boolValue);
+    
+    /**
+    * @brief Convenience method to access the value of an IntProperty
+    */   
+    bool GetIntProperty(const char* propertyKey, int &intValue) const;
+
+    /**
+    * @brief Convenience method to set the value of an IntProperty
+    */
+    void SetIntProperty(const char* propertyKey, int intValue);
+
+    /**
+    * @brief Convenience method to access the value of a FloatProperty
+    */   
+    bool GetFloatProperty(const char* propertyKey, float &floatValue) const;
+
+    /**
+    * @brief Convenience method to set the value of a FloatProperty
+    */
+    void SetFloatProperty( const char* propertyKey, float floatValue);
+
+    /**
+    * @brief Convenience method to access the value of a StringProperty
+    */   
+    bool GetStringProperty(const char* propertyKey, std::string& stringValue) const;
+
+    /**
+    * @brief Convenience method to set the value of a StringProperty
+    */
+    void SetStringProperty( const char* propertyKey, const char* stringValue);
+
     /**
      * @brief Get the timestamp of the last change of the map or the last change of one of 
      * the properties store in the list (whichever is later).
@@ -156,7 +216,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
     PropertyMap m_Properties;
 
     virtual const std::string& GetXMLNodeName() const;
-
   private:
 
     /**

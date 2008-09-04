@@ -289,7 +289,7 @@ bool mitk::DataTreeNode::GetFloatProperty(const char* propertyKey, float &floatV
   return true;
 }
 
-bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const
+bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer) const
 {
   mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
   if(stringProp.IsNull())
@@ -298,7 +298,8 @@ bool mitk::DataTreeNode::GetStringProperty(const char* propertyKey, const char* 
   } 
   else 
   {
-    memcpy((void*)string, stringProp->GetValue(), strlen(stringProp->GetValue()) + 1 );
+    //memcpy((void*)string, stringProp->GetValue(), strlen(stringProp->GetValue()) + 1 ); // looks dangerous
+    string = stringProp->GetValue();
     return true;
   }
 }

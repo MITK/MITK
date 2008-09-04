@@ -49,11 +49,22 @@ bool mitk::FocusManager::RemoveElement(FocusElement* element)
 	if (position == m_FocusList.end())
 		return false;
 	position = m_FocusList.erase(position);
-	//first delete the one on the position, and store the one afterewards into position
-	if (position == m_FocusList.end())//deleded was the last in row, then take the one before
+	// first delete the one on the position, and store the one afterewards into position
+	if ( m_FocusList.size() == 0 )
+  {
+    // no more FocusElements available
+    m_FocElement = NULL;
+  }
+  else if ( position == m_FocusList.end() )
+  {
+    // deleted was the last in row, then take the one before
 		m_FocElement = m_FocusList.back();
+  }
 	else
-		m_FocElement = *position;//m_FocElement is equal to the next one in row
+  {
+		// m_FocElement is equal to the next one in row
+    m_FocElement = *position;
+  }
 	return true;
 }
 

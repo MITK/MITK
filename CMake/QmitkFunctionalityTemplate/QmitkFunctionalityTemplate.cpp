@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "icon.xpm"
 #include "QmitkTreeNodeSelector.h"
 #include "QmitkStdMultiWidget.h"
+#include "mitkStatusBar.h"
+#include "mitkProgressBar.h"
+
 
 @FUNCTIONALITY_NAME@::@FUNCTIONALITY_NAME@(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
     : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -28,8 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
   SetAvailability(true);
 }
 
+
 @FUNCTIONALITY_NAME@::~@FUNCTIONALITY_NAME@()
 {}
+
 
 QWidget * @FUNCTIONALITY_NAME@::CreateMainWidget(QWidget *parent)
 {
@@ -40,6 +45,7 @@ QWidget * @FUNCTIONALITY_NAME@::CreateMainWidget(QWidget *parent)
   return m_MultiWidget;
 }
 
+
 QWidget * @FUNCTIONALITY_NAME@::CreateControlWidget(QWidget *parent)
 {
   if (m_Controls == NULL)
@@ -48,6 +54,7 @@ QWidget * @FUNCTIONALITY_NAME@::CreateControlWidget(QWidget *parent)
   }
   return m_Controls;
 }
+
 
 void @FUNCTIONALITY_NAME@::CreateConnections()
 {
@@ -58,6 +65,7 @@ void @FUNCTIONALITY_NAME@::CreateConnections()
   }
 }
 
+
 QAction * @FUNCTIONALITY_NAME@::CreateAction(QActionGroup *parent)
 {
   QAction* action;
@@ -65,15 +73,18 @@ QAction * @FUNCTIONALITY_NAME@::CreateAction(QActionGroup *parent)
   return action;
 }
 
+
 void @FUNCTIONALITY_NAME@::TreeChanged()
 {
   m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator(this->GetDataTreeIterator());
 }
 
+
 void @FUNCTIONALITY_NAME@::Activated()
 {
   QmitkFunctionality::Activated();
 }
+
 
 void @FUNCTIONALITY_NAME@::ImageSelected(mitk::DataTreeIteratorClone imageIt)
 {
@@ -103,8 +114,19 @@ void @FUNCTIONALITY_NAME@::ImageSelected(mitk::DataTreeIteratorClone imageIt)
     }
   }
 }
+
+
 void @FUNCTIONALITY_NAME@::StartButtonClicked() 
 {
   std::cout << "Start Button clicked!" << std::endl;
+  WaitCursorOn(); // always good to show the user that the application is processing and will not react to user input for a while
+  mitk::StatusBar::GetInstance()->DisplayText("@FUNCTIONALITY_NAME@ is doing something...", 4000);  // tell the user what you are doing
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);  // use progress bar to show that the application is doing something
+  
+  // Do something here, add progress while you do it:
+  
+  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::ProgressBar::GetInstance()->Progress(); // last step, we're finished!
+  mitk::StatusBar::GetInstance()->DisplayText("@FUNCTIONALITY_NAME@ has finished...", 2000);
+  WaitCursorOff();  // restore normal mouse cursor after you finished
 }
-

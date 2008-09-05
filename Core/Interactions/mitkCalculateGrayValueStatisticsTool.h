@@ -41,10 +41,12 @@ class MITK_CORE_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsPr
 {
   public:
   
-    Message StatisticsCompleted;
+    
     
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
     itkNewMacro(CalculateGrayValueStatisticsTool);
+
+    Message<Self> StatisticsCompleted;
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

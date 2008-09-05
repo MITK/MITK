@@ -207,3 +207,12 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, co
   return segmentationNode;
 }
 
+void mitk::Tool::EmitErrorMessage( std::string message )
+{
+  ErrorMessage( message);
+}
+
+void mitk::Tool::EmitGUIProcessEventsMessage()
+{
+  GUIProcessEventsMessage.Send();
+}

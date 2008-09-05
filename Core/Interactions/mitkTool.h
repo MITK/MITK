@@ -76,24 +76,26 @@ class MITK_CORE_EXPORT Tool : public StateMachine
 {
   public:
 
-    typedef unsigned char DefaultSegmentationDataType;
+    mitkClassMacro(Tool, StateMachine);
 
+    typedef unsigned char DefaultSegmentationDataType;
+    
+    typedef Message<Self> ToolEvent;
+    typedef Message1<std::string, Self> ToolStringEvent;
     /**
      * \brief To let GUI process new events (e.g. qApp->processEvents() )
      */
-    Message GUIProcessEventsMessage;
+    ToolEvent GUIProcessEventsMessage;
  
     /**
      * \brief To send error messages (to be shown by some GUI)
      */
-    Message1<std::string> ErrorMessage;
+    ToolStringEvent ErrorMessage;
     
     /**
      * \brief To send general messages (to be shown by some GUI)
      */
-    Message1<std::string> GeneralMessage;
-
-    mitkClassMacro(Tool, StateMachine);
+    ToolStringEvent GeneralMessage;
 
     // no New(), there should only be subclasses
     
@@ -209,6 +211,9 @@ class MITK_CORE_EXPORT Tool : public StateMachine
      Derived tools should call their parents implementation.
     */
     virtual void Deactivated();
+
+    void EmitErrorMessage(std::string message);
+    void EmitGUIProcessEventsMessage();
 
     Tool(); // purposely hidden
     Tool( const char*); // purposely hidden

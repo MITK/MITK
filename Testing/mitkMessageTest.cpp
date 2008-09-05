@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkMessage.h"
@@ -29,13 +29,13 @@ class mitkMessageTestTestClass
 
 public:
 
-// dummy class to send around
-class Package
-{
+  // dummy class to send around
+  class Package
+  {
   public:
 
     Package(int content = 43)
-    :m_Content(content)
+      :m_Content(content)
     {
     }
 
@@ -52,29 +52,30 @@ class Package
   private:
 
     int m_Content;
-};
+  };
 
-class MessageSenderClass
-{
+  class MessageSenderClass
+  {
   public:
+    typedef MessageSenderClass Self;
 
     // message without any parameters, pure notification
-    Message WaveHand;
-    
+    Message<Self> WaveHand;
+
     // message without any parameters, pure notification
-    Message ShowFinger;
+    Message<Self> ShowFinger;
 
     // message with one parameter of type std::string
-    Message1<const std::string&> Say;
+    Message1<const std::string&, Self> Say;
 
     // message with one parameter of type double
-    Message1<double> WalkMeters;
+    Message1<double, Self> WalkMeters;
 
     // message with one parameter of class type Package
-    Message1<const Package&> GivePackage;
-    
+    Message1<const Package&, Self> GivePackage;
+
     // message with two parameters of type int and float
-    Message2<int, float> ShoutAgeAndFootSize;
+    Message2<int, float, Self> ShoutAgeAndFootSize;
 
     void DoShowFinger() 
     { 
@@ -107,20 +108,20 @@ class MessageSenderClass
     {
       ShoutAgeAndFootSize(age, size);
     }
-};
+  };
 
 
-// Receiver class remembers events received. 
-// Will tell about received events when asked.
-class MessageReceiverClass
-{
+  // Receiver class remembers events received. 
+  // Will tell about received events when asked.
+  class MessageReceiverClass
+  {
   public:
-      
+
     MessageReceiverClass()
     {
       Amnesia();
     }
-   
+
     void OnWaveHand()
     {
       m_HandWaved = true;
@@ -197,7 +198,7 @@ class MessageReceiverClass
       sender.GivePackage.AddListener( this, &MessageReceiverClass::OnGivePackage );
       sender.ShoutAgeAndFootSize.AddListener( this, &MessageReceiverClass::OnShoutAgeAndFootSize );
     }
- 
+
   private:
 
     bool m_HandWaved;
@@ -206,7 +207,7 @@ class MessageReceiverClass
     Package m_PackageReceived;
     int m_Age;
     float m_FootSize;
-};
+  };
 
 }; // end test class
 
@@ -215,54 +216,53 @@ class MessageReceiverClass
 
 int mitkMessageTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("Message")
+  MITK_TEST_BEGIN("Message");
 
   mitk::mitkMessageTestTestClass::MessageSenderClass sender;
   mitk::mitkMessageTestTestClass::MessageReceiverClass receiver;
 
   MITK_TEST_CONDITION_REQUIRED(true, "Testing instantiation");
-  
+
   receiver.RegisterObservers(sender);
-  
+
   MITK_TEST_CONDITION_REQUIRED(true, "Testing registration to messages");
 
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoWaveHand(),  // This is called "comma operator". Don't ask, read!
-       receiver.HandWaved()), 
-      "Message without parameters");
+    (sender.DoWaveHand(),  // This is called "comma operator". Don't ask, read!
+    receiver.HandWaved()), 
+    "Message without parameters");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoShowFinger(), 
-       receiver.HandWaved()), 
-      "Message without parameters");
+    (sender.DoShowFinger(), 
+    receiver.HandWaved()), 
+    "Message without parameters");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoSay("Blooodworsch"), 
-       receiver.WordsSaid() == "Blooodworsch"), 
-      "Message with std::string parameter");
+    (sender.DoSay("Blooodworsch"), 
+    receiver.WordsSaid() == "Blooodworsch"), 
+    "Message with std::string parameter");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoWalk(2.67), 
-       (receiver.MetersWalked() - 2.67) < 0.0001 ), 
-      "Message with double parameter");
+    (sender.DoWalk(2.67), 
+    (receiver.MetersWalked() - 2.67) < 0.0001 ), 
+    "Message with double parameter");
   receiver.Amnesia();
-  
+
   mitk::mitkMessageTestTestClass::Package package(8);
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoGivePackage(package), 
-       receiver.PackageReceived() == package), 
-      "Message with class parameter");
+    (sender.DoGivePackage(package), 
+    receiver.PackageReceived() == package), 
+    "Message with class parameter");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoShoutAgeAndFootSize(46, 30.5), 
-       (receiver.Age() == 46 && (receiver.FootSize() - 30.5 < 0.0001))), 
-      "Message with int AND loat parameter");
+    (sender.DoShoutAgeAndFootSize(46, 30.5), 
+    (receiver.Age() == 46 && (receiver.FootSize() - 30.5 < 0.0001))), 
+    "Message with int AND loat parameter");
   receiver.Amnesia();
 
   MITK_TEST_END()
 }
-

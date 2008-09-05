@@ -40,12 +40,11 @@ namespace mitk
 class MITK_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
 {
   public:
-
-    Message2<int,int> IntervalBordersChanged;
-    Message1<int>     ThresholdingValueChanged;
-    
     mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdTool);
+
+    Message2<int,int, Self> IntervalBordersChanged;
+    Message1<int, Self>     ThresholdingValueChanged;
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

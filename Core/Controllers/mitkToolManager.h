@@ -88,22 +88,18 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
     typedef std::vector<DataTreeNode*> DataVectorType; // has to be observed for delete events!
     typedef std::map<DataTreeNode*, unsigned long> NodeTagMapType;
 
+    Message NodePropertiesChanged;
+    Message NewNodesGenerated;
+
+    Message ActiveToolChanged;
+    Message ReferenceDataChanged;
+    Message WorkingDataChanged;
+
+    Message1<std::string> ToolErrorMessage;
+    Message1<std::string> GeneralToolMessage;
+    
     mitkClassMacro(ToolManager, itk::Object);
     itkNewMacro(ToolManager);
-
-    typedef Message<Self> ToolManagerEvent;
-    typedef Message1<std::string, Self> ToolManagerStringEvent;
-
-    ToolManagerEvent NodePropertiesChanged;
-    ToolManagerEvent NewNodesGenerated;
-
-    ToolManagerEvent ActiveToolChanged;
-    ToolManagerEvent ReferenceDataChanged;
-    ToolManagerEvent WorkingDataChanged;
-
-    ToolManagerStringEvent ToolErrorMessage;
-    ToolManagerStringEvent GeneralToolMessage;
-    
 
     /**
       \brief Gives you a list of all tools. 
@@ -221,7 +217,6 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
     void OnToolErrorMessage(std::string s);
     void OnGeneralToolMessage(std::string s);
 
-    void EmitNewNodesGenerated();
   protected:
 
     /**

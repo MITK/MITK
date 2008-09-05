@@ -197,11 +197,8 @@ class TMessageCommand2 : public MessageCommand2<T,U>
  *
  */
 // message without parameters (pure signals)
-template <class Owner>
 class Message
 { 
-  friend Owner; // this is needed because only the owner should be able to emit the event
-
   public: 
     
     typedef Message Self; 
@@ -240,7 +237,6 @@ class Message
       }
     }
 
-  protected:
     void Send()
     {
       for ( ListenerList::iterator iter = m_Listeners.begin();
@@ -257,7 +253,7 @@ class Message
       this->Send();
     }
 
-
+  protected:
     
     typedef std::vector<MessageCommand* > ListenerList;
     
@@ -284,10 +280,9 @@ class Database {
 
 
 // message with 1 parameter
-template <typename T, class Owner>
+template <typename T>
 class Message1
 { 
-  friend Owner; // this is needed because only the owner should be able to emit the event
   public: 
     
     typedef Message1 Self; 
@@ -325,7 +320,7 @@ class Message1
         }
       }
     }
-  protected:
+
     void Send(T t)
     {
       for ( typename ListenerList::iterator iter = m_Listeners.begin();
@@ -342,7 +337,7 @@ class Message1
       this->Send(t);
     }
 
-
+  protected:
     
     typedef std::vector<MessageCommand1<T>* > ListenerList;
     
@@ -352,10 +347,9 @@ class Message1
 
 
 // message with 2 parameters
-template <typename T, typename U, class Owner>
+template <typename T, typename U>
 class Message2
 { 
-  friend Owner; // this is needed because only the owner should be able to emit the event
   public: 
     
     typedef Message2 Self; 
@@ -394,7 +388,6 @@ class Message2
       }
     }
 
-  protected:
     void Send(T t, U u)
     {
       for ( typename ListenerList::iterator iter = m_Listeners.begin();
@@ -411,9 +404,16 @@ class Message2
       this->Send(t, u);
     }
 
-    typedef std::vector<MessageCommand2<T,U>* > ListenerList;   
-    mutable ListenerList m_Listeners;
 
+  protected:
+    
+    typedef std::vector<MessageCommand2<T,U>* > ListenerList;
+    
+    mutable ListenerList m_Listeners;
+  
 };
+
 } // namespace
+
 #endif
+

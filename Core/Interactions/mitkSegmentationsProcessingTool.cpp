@@ -100,7 +100,7 @@ void mitk::SegmentationsProcessingTool::SendErrorMessageIfAny()
 {
   if ( !m_FailedNodes.empty() )
   {
-    EmitErrorMessage( GetErrorMessage() + m_FailedNodes );
+    Tool::ErrorMessage( GetErrorMessage() + m_FailedNodes );
   }
 }
 

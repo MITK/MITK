@@ -364,7 +364,3 @@ void mitk::ToolManager::UnregisterClient()
   }
 }
 
-void mitk::ToolManager::EmitNewNodesGenerated()
-{
-  NewNodesGenerated.Send();
-}

@@ -175,7 +175,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode*
           }
           catch(...)
           {
-            EmitErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
+            Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
           }
         }
 

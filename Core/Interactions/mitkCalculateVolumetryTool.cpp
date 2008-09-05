@@ -56,7 +56,7 @@ bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataTreeNode* node )
 
     if (image->GetDimension() == 4)
     {
-      EmitErrorMessage("Volumetry only valid for timestep 0! Bug #1280");
+      Tool::ErrorMessage("Volumetry only valid for timestep 0! Bug #1280");
     }
 
     VolumeCalculator::Pointer volumetryFilter = VolumeCalculator::New();
@@ -82,6 +82,6 @@ bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataTreeNode* node )
 void mitk::CalculateVolumetryTool::FinishProcessingAllData()
 {
   Superclass::FinishProcessingAllData();
-  m_ToolManager->EmitNewNodesGenerated();
+  m_ToolManager->NodePropertiesChanged();
 }
 

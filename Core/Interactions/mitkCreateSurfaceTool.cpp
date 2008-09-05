@@ -91,6 +91,6 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataTreeNode* node )
 void mitk::CreateSurfaceTool::OnSurfaceCalculationDone()
 {
   ProgressBar::GetInstance()->Progress();
-  m_ToolManager->EmitNewNodesGenerated();
+  m_ToolManager->NewNodesGenerated();
 }
 

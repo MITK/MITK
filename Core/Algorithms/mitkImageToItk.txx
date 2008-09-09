@@ -201,9 +201,14 @@ template<class TOutputImage>
   direction.SetIdentity();
   unsigned int j;
   const AffineTransform3D::MatrixType& matrix = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
+  
+  // the following loop devides by spacing now to normalize columns.
+  // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092. 
   for ( i=0; i < itkDimMax3; ++i)
     for( j=0; j < itkDimMax3; ++j )
-      direction[i][j] = matrix[i][j];
+      direction[i][j] = matrix[i][j]/spacing[j];
+
+
 
   // set information into output image
   output->SetRegions( region );

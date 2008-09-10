@@ -1,6 +1,7 @@
 SET(H_FILES  
   mitkGenericProperty.h
   mitkTransferFunctionProperty.h
+  itkConfidenceDiffusionTensor3D.h
 )
 
 SET(CPP_FILES  

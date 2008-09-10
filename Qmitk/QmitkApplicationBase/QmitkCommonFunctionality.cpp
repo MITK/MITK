@@ -53,7 +53,7 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     }
     else
     {
-      std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
+      std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName.ascii() );
       if (!fileWriter->IsExtensionValid(extension))
       {
         QString message;

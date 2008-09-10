@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkRGBAPixel.h>
 #include <itkCovariantVector.h>
 #include "itkDiffusionTensor3D.h"
+#include "itkConfidenceDiffusionTensor3D.h"
 
 mitk::PixelType::PixelType() : m_TypeId( NULL ), m_Type( ipPicUnknown ), m_Bpe( 0 ), m_NumberOfComponents( 1 )
 {
@@ -192,6 +193,22 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      m_Type = ipPicFloat;
      m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
      m_ItkTypeId = &typeid( itk::DiffusionTensor3D<double> );
+   }
+   else if ( *m_TypeId == typeid( itk::ConfidenceDiffusionTensor3D<float> ) )
+   {
+     m_TypeId = & typeid( float );
+     m_NumberOfComponents *= 7;
+     m_Type = ipPicFloat;
+     m_Bpe = sizeof(float) * 8 * m_NumberOfComponents;
+     m_ItkTypeId = &typeid( itk::ConfidenceDiffusionTensor3D<float> );
+   }
+   else if ( *m_TypeId == typeid( itk::ConfidenceDiffusionTensor3D<double> ) )
+   {
+     m_TypeId = & typeid( double );
+     m_NumberOfComponents *= 7;
+     m_Type = ipPicFloat;
+     m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
+     m_ItkTypeId = &typeid( itk::ConfidenceDiffusionTensor3D<double> );
    }
    else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
    {

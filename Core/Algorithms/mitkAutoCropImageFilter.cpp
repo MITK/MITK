@@ -273,14 +273,14 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
     typedef ImageType::RegionType::SizeType::SizeValueType  SizeValueType;
 
-    m_RegionSize[0] = (SizeValueType)(m_MarginFactor * (maxima[0] - minima[0]));
-    m_RegionSize[1] = (SizeValueType)(m_MarginFactor * (maxima[1] - minima[1]));
-    m_RegionSize[2] = (SizeValueType)(m_MarginFactor * (maxima[2] - minima[2]));
+    m_RegionSize[0] = (SizeValueType)(m_MarginFactor * (maxima[0] - minima[0] + 1 ));
+    m_RegionSize[1] = (SizeValueType)(m_MarginFactor * (maxima[1] - minima[1] + 1 ));
+    m_RegionSize[2] = (SizeValueType)(m_MarginFactor * (maxima[2] - minima[2] + 1 ));
     m_RegionIndex = minima;
 
-    m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0])/2;
-    m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1])/2;
-    m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2])/2;
+    m_RegionIndex[0] -= (m_RegionSize[0] - maxima[0] + minima[0] - 1 )/2;
+    m_RegionIndex[1] -= (m_RegionSize[1] - maxima[1] + minima[1] - 1 )/2;
+    m_RegionIndex[2] -= (m_RegionSize[2] - maxima[2] + minima[2] - 1 )/2;
 
     ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);
     origRegion.Crop(cropRegion);

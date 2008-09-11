@@ -593,17 +593,18 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  if(m_DataTreeIterator.IsNull())
-    return;
+  DataStorage::Pointer storage = DataStorage::GetInstance();
 
-  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-
-  for(;it->IsAtEnd()==false;++it)
+  DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
+  for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();
+      iter != allObjects->end();
+      ++iter)
   {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if(node.IsNull())
+    DataTreeNode::Pointer node = *iter;
+    if ( node.IsNull() )
       continue;
-    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+
+    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
     if(mapper.IsNotNull())
     {
       mapper->ReleaseGraphicsResources(renWin);

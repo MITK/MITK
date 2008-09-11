@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkITKImageImport.h"
 #include "mitkReferenceCountWatcher.h"
 #include "itkDiffusionTensor3D.h"
+#include "itkConfidenceDiffusionTensor3D.h"
 #include <mitkImageCast.h>
 
 #include <fstream>
@@ -245,6 +246,25 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   itk::Image<itk::DiffusionTensor3D<float>,3>::Pointer diffImage;
   imgMem->Initialize(mitk::PixelType(typeid(itk::DiffusionTensor3D<float>)), 40, *planegeometry);
   mitk::CastToItkImage( imgMem, diffImage );
+  imgMem->InitializeByItk(diffImage.GetPointer());
+  std::cout<<"[PASSED]"<<std::endl;
+
+  itk::Image<itk::DiffusionTensor3D<double>,3>::Pointer diffImage2;
+  imgMem->Initialize(mitk::PixelType(typeid(itk::DiffusionTensor3D<double>)), 40, *planegeometry);
+  mitk::CastToItkImage( imgMem, diffImage2 );
+  imgMem->InitializeByItk(diffImage2.GetPointer());
+  std::cout<<"[PASSED]"<<std::endl;
+
+  itk::Image<itk::ConfidenceDiffusionTensor3D<float>,3>::Pointer confDiffImage;
+  imgMem->Initialize(mitk::PixelType(typeid(itk::ConfidenceDiffusionTensor3D<float>)), 40, *planegeometry);
+  mitk::CastToItkImage( imgMem, confDiffImage );
+  imgMem->InitializeByItk(confDiffImage.GetPointer());
+  std::cout<<"[PASSED]"<<std::endl;
+
+  itk::Image<itk::ConfidenceDiffusionTensor3D<double>,3>::Pointer confDiffImage2;
+  imgMem->Initialize(mitk::PixelType(typeid(itk::ConfidenceDiffusionTensor3D<double>)), 40, *planegeometry);
+  mitk::CastToItkImage( imgMem, confDiffImage2 );
+  imgMem->InitializeByItk(confDiffImage2.GetPointer());
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;

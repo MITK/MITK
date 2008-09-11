@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPicFileReader.h>
 #include <mitkImage.h>
 #include <mitkDataTree.h>
+#include <mitkDataStorage.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 
@@ -77,6 +78,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   std::cout << "Creating tree: ";
   mitk::DataTree::Pointer tree;
   tree=mitk::DataTree::New();
+  mitk::DataStorage::CreateInstance( tree );
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating iterator on tree: ";
@@ -211,6 +213,8 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   vtkImage->Delete();
   tree = NULL; // As the tree has been registered explicitely, destroy it again.
+  
+  mitk::DataStorage::GetInstance()->ShutdownSingleton();
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

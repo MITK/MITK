@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::LogoRendering::LogoRendering()
+:m_ImageData(NULL)
 {
   m_RenderWindow      = NULL;
   m_Renderer          = vtkRenderer::New();
@@ -86,6 +87,9 @@ mitk::LogoRendering::~LogoRendering()
 
   if ( m_VtkImageImport != NULL )
     m_VtkImageImport->Delete();
+
+  if ( m_ImageData != NULL)
+    delete[] m_ImageData;
 }
 
 /**
@@ -188,7 +192,7 @@ void mitk::LogoRendering::Enable()
             *dest++ = a;
           }        
 
-      m_VtkImageImport->SetImportVoidPointer(m_ImageData, 0 /*delete on destruct*/);
+      m_VtkImageImport->SetImportVoidPointer(m_ImageData);
       m_VtkImageImport->Modified();
       m_VtkImageImport->Update();
       

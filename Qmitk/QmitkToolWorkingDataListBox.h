@@ -33,7 +33,7 @@ class QCustomEvent;
   \ingroup Reliver
   \ingroup Widgets
 
-  There is a separate page describing the general design of QmitkSliceBasedSegmentation: \ref QmitkSliceBasedSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
   Shows the working data of a ToolManager in a segmentation setting. By default only the segmentation name is shown.
   Additional segmentation properties (like volume) might be shown - SetAdditionalColumns has to be called then.

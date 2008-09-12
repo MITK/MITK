@@ -4,9 +4,9 @@ shared object without using the MITK build
 system.
 
 The idea of tools is used in the MITK functionality
-SliceBasedSegmentation, which is documented here:
+InteractiveSegmentation, which is documented here:
 
-http://mitk.org/documentation/doxygen/QmitkSliceBasedSegmentationTechnicalPage.html
+http://mitk.org/documentation/doxygen/QmitkInteractiveSegmentationTechnicalPage.html
 
 A lengthy description of the external extensions
 can be found at

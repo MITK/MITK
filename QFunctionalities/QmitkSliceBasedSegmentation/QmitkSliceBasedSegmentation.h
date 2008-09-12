@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#if !defined(QmitkSliceBasedSegmentation_H__INCLUDED)
-#define QmitkSliceBasedSegmentation_H__INCLUDED
+#if !defined(QmitkInteractiveSegmentation_H__INCLUDED)
+#define QmitkInteractiveSegmentation_H__INCLUDED
 
 #include "QmitkFunctionality.h"
 
@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 class QmitkStdMultiWidget;
-class QmitkSliceBasedSegmentationControls;
+class QmitkInteractiveSegmentationControls;
 
 /**
   \brief Slice based segmentation of 3D and 3D+t images.
@@ -38,10 +38,10 @@ class QmitkSliceBasedSegmentationControls;
   \ingroup Functionalities
   \ingroup Reliver
 
-  There is a separate page describing the general design of QmitkSliceBasedSegmentation: \li \ref QmitkSliceBasedSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \li \ref QmitkInteractiveSegmentationTechnicalPage
 
   Implemented for the ReLiver application, requirements are from this project. 
-  QmitkSliceBasedSegmentation is mainly a restructured replacement for ERISBase.
+  QmitkInteractiveSegmentation is mainly a restructured replacement for ERISBase.
 
   Provides a set of interactive tool for segmentation in 2D slices (slices of 3D or 3D+t images).
   Technically it is based on mitk::ToolManager and the related classes mitk::Tool, QmitkToolSelectionBox, QmitkToolDataSelectionBox.
@@ -52,15 +52,15 @@ class QmitkSliceBasedSegmentationControls;
   Last contributor: $Author$
 \endverbatim
 */
-class QmitkSliceBasedSegmentation : public QmitkFunctionality
+class QmitkInteractiveSegmentation : public QmitkFunctionality
 {  
   Q_OBJECT
   
   public:  
   
-    QmitkSliceBasedSegmentation(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+    QmitkInteractiveSegmentation(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
-    virtual ~QmitkSliceBasedSegmentation();
+    virtual ~QmitkInteractiveSegmentation();
 
     /**
       \brief from QmitkFunctionality
@@ -152,7 +152,7 @@ class QmitkSliceBasedSegmentation : public QmitkFunctionality
     /**
       \brief This functionality's GUI
     */
-    QmitkSliceBasedSegmentationControls * m_Controls;
+    QmitkInteractiveSegmentationControls * m_Controls;
 };
-#endif // !defined(QmitkSliceBasedSegmentation_H__INCLUDED)
+#endif // !defined(QmitkInteractiveSegmentation_H__INCLUDED)
 

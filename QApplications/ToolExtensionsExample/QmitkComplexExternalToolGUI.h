@@ -30,10 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
   \ingroup Reliver
   
   There is a separate page describing the general design of 
-  QmitkSliceBasedSegmentation: \li \ref QmitkSliceBasedSegmentationTechnicalPage
+  QmitkInteractiveSegmentation: \li \ref QmitkInteractiveSegmentationTechnicalPage
 
   This is only meant as an example on how to create tools (and their GUIs) 
-  as en external extension to MITK's SliceBasedSegmentation
+  as en external extension to MITK's InteractiveSegmentation
   (and similar functionalities). The full description of how this works
   can be found here: \li \ref toolextensions
 

@@ -29,7 +29,7 @@ namespace mitk
   \brief Creates surface models from segmentations.
   \ingroup Reliver
   \sa mitk::Tool
-  \sa QmitkSliceBasedSegmentation
+  \sa QmitkInteractiveSegmentation
 
   Last contributor: $Author$
 */

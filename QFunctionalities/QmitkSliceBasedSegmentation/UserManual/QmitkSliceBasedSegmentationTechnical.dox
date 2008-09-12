@@ -1,14 +1,14 @@
 /**
 
-\page QmitkSliceBasedSegmentationTechnicalPage Technical design of QmitkSliceBasedSegmentation
+\page QmitkInteractiveSegmentationTechnicalPage Technical design of QmitkInteractiveSegmentation
 
-\li \ref QmitkSliceBasedSegmentationTechnicalPage2
-\li \ref QmitkSliceBasedSegmentationTechnicalPage3 
-\li \ref QmitkSliceBasedSegmentationTechnicalPage4
+\li \ref QmitkInteractiveSegmentationTechnicalPage2
+\li \ref QmitkInteractiveSegmentationTechnicalPage3 
+\li \ref QmitkInteractiveSegmentationTechnicalPage4
 
-\section QmitkSliceBasedSegmentationTechnicalPage2 Introduction
+\section QmitkInteractiveSegmentationTechnicalPage2 Introduction
 
-QmitkSliceBasedSegmentation was designed for the liver resection planning
+QmitkInteractiveSegmentation was designed for the liver resection planning
 project "ReLiver", which is developed under quality management.
 The goal was a stable, well-documented, extensible, and testable
 re-implementation of a functionality called "ERIS", which was used for manual
@@ -18,11 +18,11 @@ documentation and tests for newly developed code. In addition, the old code had
 some design weaknesses (e.g. a monolithic class), which would be hard to
 maintain in the future.
 
-By now SliceBasedSegmentation is a well tested and easily extensible vehicle for all kinds of interactive
-segmentation applications. A separate page describes how you can extend SliceBasedSegmentation with new
+By now InteractiveSegmentation is a well tested and easily extensible vehicle for all kinds of interactive
+segmentation applications. A separate page describes how you can extend InteractiveSegmentation with new
 tools in a shared object (DLL): \ref toolextensions.
 
-\section QmitkSliceBasedSegmentationTechnicalPage3 Overview of tasks
+\section QmitkInteractiveSegmentationTechnicalPage3 Overview of tasks
 
 We identified the following major tasks:
 
@@ -46,7 +46,7 @@ tool or the interpolation mechanism changed something.
 </ol>
 
 
-\section QmitkSliceBasedSegmentationTechnicalPage4 Classes involved
+\section QmitkInteractiveSegmentationTechnicalPage4 Classes involved
 
 The above blocks correspond to a number of classes. Here is an overview of all
 related classes with their responsibilities and relations:
@@ -93,7 +93,7 @@ to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests und
 will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,
 for itk::DeleteEvent, so no undo operation will be executed on/for images that have already been destroyed.
 <li> <b>GUI</b>: The top-level GUI is the functionality
-QmitkSliceBasedSegmentation, which is very thin in comparison to ERIS. There are
+QmitkInteractiveSegmentation, which is very thin in comparison to ERIS. There are
 separate widgets for image and tool selection, for interpolation. Additionaly,
 there are some methods to create, delete, crop, load and save segmentations.
 </ol>

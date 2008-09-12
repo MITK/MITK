@@ -1,2 +1,2 @@
-CREATE_QFUNCTIONALITY(QmitkSliceBasedSegmentation)
+CREATE_QFUNCTIONALITY(QmitkInteractiveSegmentation)
 

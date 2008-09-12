@@ -1,8 +1,8 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>QmitkSliceBasedSegmentationControls</class>
+<class>QmitkInteractiveSegmentationControls</class>
 <widget class="QWidget">
     <property name="name">
-        <cstring>QmitkSliceBasedSegmentationControls</cstring>
+        <cstring>QmitkInteractiveSegmentationControls</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -19,7 +19,7 @@
         </size>
     </property>
     <property name="caption">
-        <string>QmitkSliceBasedSegmentation</string>
+        <string>QmitkInteractiveSegmentation</string>
     </property>
     <vbox>
         <property name="name">

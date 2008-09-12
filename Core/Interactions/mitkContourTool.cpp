@@ -141,7 +141,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   }
   else
   {
-    SliceBasedSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
+    InteractiveSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
   }
 
   return true;

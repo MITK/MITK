@@ -15,11 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkSliceBasedSegmentation.h" // includes mitkConfig, where BUILD_TESTING is defined
+#include "QmitkInteractiveSegmentation.h" // includes mitkConfig, where BUILD_TESTING is defined
 
 #ifdef BUILD_TESTING // only if we build a test driver
 
-#include "QmitkSliceBasedSegmentationControls.h"
+#include "QmitkInteractiveSegmentationControls.h"
 
 #include "QmitkToolReferenceDataSelectionBox.h"
 #include "QmitkToolSelectionBox.h"
@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**
  * \brief Test entry point
  */
-int QmitkSliceBasedSegmentation::TestYourself()
+int QmitkInteractiveSegmentation::TestYourself()
 {
   std::cout << std::endl;
   time_t randomInit = std::time(0);
@@ -180,7 +180,7 @@ int QmitkSliceBasedSegmentation::TestYourself()
   return EXIT_SUCCESS;
 }
 
-bool QmitkSliceBasedSegmentation::TestAllTools()
+bool QmitkInteractiveSegmentation::TestAllTools()
 {
   QWidget* widget = m_Controls->m_ToolSelectionBox;
   QObjectList* childList = widget->queryList( "QToolButton" );
@@ -260,7 +260,7 @@ bool QmitkSliceBasedSegmentation::TestAllTools()
   return true;
 }
 
-bool QmitkSliceBasedSegmentation::TestInterpolation()
+bool QmitkInteractiveSegmentation::TestInterpolation()
 {
   std::cout << "Testing interpolation" << std::endl;
 
@@ -352,7 +352,7 @@ bool QmitkSliceBasedSegmentation::TestInterpolation()
 }
 
 
-void QmitkSliceBasedSegmentation::TestOnNewSegmentationDialogFound( QWidget* widget )
+void QmitkInteractiveSegmentation::TestOnNewSegmentationDialogFound( QWidget* widget )
 {
   // method is called after the "new segmentation dialog" shows up. the dialog is found in "widget"
   if (!widget) return;

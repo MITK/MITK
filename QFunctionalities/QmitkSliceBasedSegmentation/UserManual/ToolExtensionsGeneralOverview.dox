@@ -1,6 +1,6 @@
 /**
 
-\page toolextensions How to extend SliceBasedSegmentation with external tools
+\page toolextensions How to extend InteractiveSegmentation with external tools
 
 <ul>
 <li> \ref ToolExtensionsGeneralOverview2 </li>
@@ -17,9 +17,9 @@
 
 \section ToolExtensionsGeneralOverview2 Introduction
 
-The application for manual segmentation in MITK (SliceBasedSegmentation) comes
+The application for manual segmentation in MITK (InteractiveSegmentation) comes
 with a tool class framework that is extensible with new tools (description at
-\ref QmitkSliceBasedSegmentationTechnicalPage). The usual way
+\ref QmitkInteractiveSegmentationTechnicalPage). The usual way
 to create new tools (since it is mostly used inside DKFZ) is to just add new
 files to the MITK source code tree. However, this requires to be familiar with
 the MITK build system and turnaround time during development might be long 
@@ -38,7 +38,7 @@ how to build such external extensions.
 \section ToolExtensionsGeneralOverview3 What might be part of an extension
 
 The extension concept assumes that you want to create one or several new
-interactive segmentation tools for SliceBasedSegmentation or another MITK
+interactive segmentation tools for InteractiveSegmentation or another MITK
 functionality that uses the tools infrastructure. In the result you
 will create a shared object (DLL), which contains several tools and their GUI
 counterparts, plus optional code that your extension requires. The following
@@ -51,7 +51,7 @@ through the ITK object factory (so they inherit from itk::Object). Tools
 should handle the interaction part of a segmentation method, i.e. create
 seed points, draw contours, etc., in order to parameterize segmentation algorithms.
 Simple algorithms can even be part of a tool. A tools is identified by icon (XPM format),
-name (short string) and optionally a group name (e.g. the group name for SliceBasedSegmentation
+name (short string) and optionally a group name (e.g. the group name for InteractiveSegmentation
 is "default").
 
 <b>There is a naming convention</b>: you should put a tool called \c mitk::ExternalTool into
@@ -173,7 +173,7 @@ returned factory will be registered with the ITK object factory.
 If you successfully followed all the steps above, MITK will find your mitk::ExternalTool on
 application startup, when the ITK object factory is asked to create all known instances of
 mitk::Tool. Furthermore, if your mitk::ExternalTool claims to be part of the "default" group,
-there will be a new icon in SliceBasedSegmentation, which activates your tool.
+there will be a new icon in InteractiveSegmentation, which activates your tool.
 
 <b>Have fun!</b> (And Windows users: welcome to the world of DLLs)
 

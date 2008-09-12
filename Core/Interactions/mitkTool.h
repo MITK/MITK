@@ -51,7 +51,7 @@ class ToolManager;
   \ingroup Interaction
   \ingroup Reliver
 
-  There is a separate page describing the \ref QmitkSliceBasedSegmentationTechnicalPage.
+  There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
 
   Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know is, that 
   every derived tool should always call SuperClass::Deactivated() in its own implementation of Deactivated, because mitk::Tool

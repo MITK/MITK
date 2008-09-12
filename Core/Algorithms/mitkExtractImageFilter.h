@@ -35,7 +35,7 @@ namespace mitk
   \ingroup Process
   \ingroup Reliver
 
-  There is a separate page describing the general design of QmitkSliceBasedSegmentation: \ref QmitkSliceBasedSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
   This class takes a 3D mitk::Image as input and tries to extract one slice from it.
 

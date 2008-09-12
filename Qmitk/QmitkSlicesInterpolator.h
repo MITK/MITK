@@ -39,10 +39,10 @@ class QPushButton;
   \ingroup Reliver
   \ingroup Widgets
 
-  \sa QmitkSliceBasedSegmentation
+  \sa QmitkInteractiveSegmentation
   \sa mitk::SegmentationInterpolation
   
-  There is a separate page describing the general design of QmitkSliceBasedSegmentation: \ref QmitkSliceBasedSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation 
   (keeping track of which slices contain how much segmentation) and the algorithmic work, 

@@ -28,7 +28,7 @@ class QPushButton;
 #include <mitkCommon.h>
 
 /**
-  \brief Dialog for QmitkSliceBasedSegmentation.
+  \brief Dialog for QmitkInteractiveSegmentation.
 
   \ingroup Reliver
   \ingroup Widgets

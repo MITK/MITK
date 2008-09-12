@@ -213,7 +213,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }
 
-void mitk::SegTool2D::SliceBasedSegmentationBugMessage( const std::string& message )
+void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
 {
   std::cout << "********************************************************************************" << std::endl;
   std::cout << " " << message << std::endl;
@@ -222,7 +222,7 @@ void mitk::SegTool2D::SliceBasedSegmentationBugMessage( const std::string& messa
   std::cout << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl;
   std::cout << "  " << std::endl;
   std::cout << " Please file a BUG REPORT: " << std::endl;
-  std::cout << " http://makalu.inet.dkfz-heidelberg.de/bugzilla/enter_bug.cgi?product=ReLiver&component=QmitkSliceBasedSegmentation&assigned_to=d.maleike%40dkfz-heidelberg.de" << std::endl;
+  std::cout << " http://makalu.inet.dkfz-heidelberg.de/bugzilla/enter_bug.cgi?product=ReLiver&component=QmitkInteractiveSegmentation&assigned_to=d.maleike%40dkfz-heidelberg.de" << std::endl;
   std::cout << " Contain the following information:" << std::endl;
   std::cout << "  - What image were you working on?" << std::endl;
   std::cout << "  - Which region of the image?" << std::endl;

@@ -82,10 +82,10 @@
 */
  
 /**
-  \defgroup Reliver Classes related to SliceBasedSegmentation
+  \defgroup Reliver Classes related to InteractiveSegmentation
 
-  \brief A couple of classes related to SliceBasedSegmentation.
-  \sa QmitkSliceBasedSegmentationTechnicalPage
+  \brief A couple of classes related to InteractiveSegmentation.
+  \sa QmitkInteractiveSegmentationTechnicalPage
 */
 
 /**

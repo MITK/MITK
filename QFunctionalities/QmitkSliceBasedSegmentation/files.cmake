@@ -1,13 +1,13 @@
 SET( MOC_H_FILES 
-  QmitkSliceBasedSegmentation.h 
+  QmitkInteractiveSegmentation.h 
 )
 
 SET( CPP_FILES 
-  QmitkSliceBasedSegmentation.cpp 
-  QmitkSliceBasedSegmentationTesting.cpp
+  QmitkInteractiveSegmentation.cpp 
+  QmitkInteractiveSegmentationTesting.cpp
 )
 
 SET (UI_FILES 
-  QmitkSliceBasedSegmentationControls.ui
+  QmitkInteractiveSegmentationControls.ui
 )
 

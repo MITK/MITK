@@ -35,10 +35,10 @@ class Image;
   \ingroup Reliver
   
   There is a separate page describing the general design of 
-  QmitkSliceBasedSegmentation: \li \ref QmitkSliceBasedSegmentationTechnicalPage
+  QmitkInteractiveSegmentation: \li \ref QmitkInteractiveSegmentationTechnicalPage
 
   This is no functional tool, it is only meant as an example on how to
-  create tools as en external extension to MITK's SliceBasedSegmentation
+  create tools as en external extension to MITK's InteractiveSegmentation
   (and similar functionalities). The full description of how this works
   can be found here: \li \ref toolextensions
 
@@ -72,7 +72,7 @@ class ComplexExternalTool : public FeedbackContourTool
     /**
      * \brief Returns a (short) name for this tool.
      *
-     * E.g. in SliceBasedSegmentation, this string
+     * E.g. in InteractiveSegmentation, this string
      * would be displayed in a toolbutton right below
      * the tool's icon.
      */

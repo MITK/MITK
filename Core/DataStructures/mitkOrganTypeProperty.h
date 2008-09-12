@@ -28,7 +28,7 @@ namespace mitk
 /**
   \brief Enumerates all known organs :-)
 
-  \sa QmitkSliceBasedSegmentation
+  \sa QmitkInteractiveSegmentation
   \ingroup Reliver
   \ingroup DataTree
 

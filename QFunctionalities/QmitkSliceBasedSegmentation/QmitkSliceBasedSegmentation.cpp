@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkSliceBasedSegmentation.h"
-#include "QmitkSliceBasedSegmentationControls.h"
+#include "QmitkInteractiveSegmentation.h"
+#include "QmitkInteractiveSegmentationControls.h"
 #include "slicebasedsegmentation.h" // icon
 
 #include "QmitkStdMultiWidget.h"
@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qcheckbox.h>
 
-QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
+QmitkInteractiveSegmentation::QmitkInteractiveSegmentation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it), 
   m_MultiWidget(mitkStdMultiWidget), 
   m_Controls(NULL)
@@ -50,11 +50,11 @@ QmitkSliceBasedSegmentation::QmitkSliceBasedSegmentation(QObject *parent, const 
   SetAvailability(true);
 }
 
-QmitkSliceBasedSegmentation::~QmitkSliceBasedSegmentation()
+QmitkInteractiveSegmentation::~QmitkInteractiveSegmentation()
 {
 }
 
-QWidget * QmitkSliceBasedSegmentation::CreateMainWidget(QWidget *parent)
+QWidget * QmitkInteractiveSegmentation::CreateMainWidget(QWidget *parent)
 {
   if ( m_MultiWidget == NULL )
   {
@@ -63,11 +63,11 @@ QWidget * QmitkSliceBasedSegmentation::CreateMainWidget(QWidget *parent)
   return m_MultiWidget;
 }
 
-QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
+QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
 {
   if (m_Controls == NULL)
   {
-    m_Controls = new QmitkSliceBasedSegmentationControls(parent); // creates a tool manager
+    m_Controls = new QmitkInteractiveSegmentationControls(parent); // creates a tool manager
 
     mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
 
@@ -104,24 +104,24 @@ QWidget * QmitkSliceBasedSegmentation::CreateControlWidget(QWidget *parent)
 
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
 
-    toolManager->NodePropertiesChanged.AddListener( this, &QmitkSliceBasedSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
-    toolManager->NewNodesGenerated.AddListener( this, &QmitkSliceBasedSegmentation::OnNewNodesGenerated );          // update the list of segmentations
+    toolManager->NodePropertiesChanged.AddListener( this, &QmitkInteractiveSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
+    toolManager->NewNodesGenerated.AddListener( this, &QmitkInteractiveSegmentation::OnNewNodesGenerated );          // update the list of segmentations
   }
   return m_Controls;
 }
     
-void QmitkSliceBasedSegmentation::OnNodePropertiesChanged()
+void QmitkInteractiveSegmentation::OnNodePropertiesChanged()
 {
   m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
 }
   
-void QmitkSliceBasedSegmentation::OnNewNodesGenerated()
+void QmitkInteractiveSegmentation::OnNewNodesGenerated()
 {
   m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSliceBasedSegmentation::CreateConnections()
+void QmitkInteractiveSegmentation::CreateConnections()
 {
   if ( m_Controls )
   {
@@ -138,22 +138,22 @@ void QmitkSliceBasedSegmentation::CreateConnections()
   }
 }
 
-QAction * QmitkSliceBasedSegmentation::CreateAction(QActionGroup *parent)
+QAction * QmitkInteractiveSegmentation::CreateAction(QActionGroup *parent)
 {
-  QImage icon = qembed_findImage("slicebasedsegmentation");
+  QImage icon = qembed_findImage("interactivesegmentation");
   QPixmap pixmap(icon);
   QAction* action;
-  action = new QAction( tr( "Manual segmentation" ), pixmap, tr( "QmitkSliceBasedSegmentation" ), 0, parent, "QmitkSliceBasedSegmentation" );
+  action = new QAction( tr( "Interactive segmentation" ), pixmap, tr( "QmitkInteractiveSegmentation" ), 0, parent, "QmitkInteractiveSegmentation" );
   return action;
 }
 
-void QmitkSliceBasedSegmentation::TreeChanged()
+void QmitkInteractiveSegmentation::TreeChanged()
 {
   m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
   m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
 }
 
-void QmitkSliceBasedSegmentation::Activated()
+void QmitkInteractiveSegmentation::Activated()
 {
   QmitkFunctionality::Activated();
 
@@ -165,7 +165,7 @@ void QmitkSliceBasedSegmentation::Activated()
   m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( qApp );
 }
 
-void QmitkSliceBasedSegmentation::Deactivated()
+void QmitkInteractiveSegmentation::Deactivated()
 {
   QmitkFunctionality::Deactivated();
   
@@ -175,7 +175,7 @@ void QmitkSliceBasedSegmentation::Deactivated()
   m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( NULL );
 }
 
-void QmitkSliceBasedSegmentation::CreateNewSegmentation()
+void QmitkInteractiveSegmentation::CreateNewSegmentation()
 {
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
@@ -211,7 +211,7 @@ void QmitkSliceBasedSegmentation::CreateNewSegmentation()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSliceBasedSegmentation::DeleteSegmentation()
+void QmitkInteractiveSegmentation::DeleteSegmentation()
 {
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
   if (!toolManager) return;
@@ -260,7 +260,7 @@ void QmitkSliceBasedSegmentation::DeleteSegmentation()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSliceBasedSegmentation::LoadSegmentation()
+void QmitkInteractiveSegmentation::LoadSegmentation()
 {
   try
   {
@@ -332,7 +332,7 @@ void QmitkSliceBasedSegmentation::LoadSegmentation()
   }
 }
 
-void QmitkSliceBasedSegmentation::SaveSegmentation()
+void QmitkInteractiveSegmentation::SaveSegmentation()
 {
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
   if (!toolManager) return;
@@ -380,7 +380,7 @@ void QmitkSliceBasedSegmentation::SaveSegmentation()
   }
 }
 
-void QmitkSliceBasedSegmentation::OnToolSelected(int id)
+void QmitkInteractiveSegmentation::OnToolSelected(int id)
 {
   if (id >= 0)
   {
@@ -392,7 +392,7 @@ void QmitkSliceBasedSegmentation::OnToolSelected(int id)
   }
 }
 
-void QmitkSliceBasedSegmentation::ReinitializeToImage()
+void QmitkInteractiveSegmentation::ReinitializeToImage()
 {
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
@@ -408,7 +408,7 @@ void QmitkSliceBasedSegmentation::ReinitializeToImage()
   }
 }
 
-void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
+void QmitkInteractiveSegmentation::SetReferenceImagePixelSmoothing(bool on)
 {
   mitk::DataTreeNode::Pointer node = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
@@ -418,7 +418,7 @@ void QmitkSliceBasedSegmentation::SetReferenceImagePixelSmoothing(bool on)
   }
 }
 
-void QmitkSliceBasedSegmentation::CheckImageAlignment(mitk::Image* image)
+void QmitkInteractiveSegmentation::CheckImageAlignment(mitk::Image* image)
 {
   bool wrongAlignment(false);
 
@@ -489,7 +489,7 @@ void QmitkSliceBasedSegmentation::CheckImageAlignment(mitk::Image* image)
   }
 }
 
-void QmitkSliceBasedSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
+void QmitkInteractiveSegmentation::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
 {
   if (node)
   {

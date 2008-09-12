@@ -98,7 +98,7 @@ class MITK_CORE_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const PositionEvent*);
 
-    void SliceBasedSegmentationBugMessage( const std::string& message );
+    void InteractiveSegmentationBugMessage( const std::string& message );
  
   private:
 

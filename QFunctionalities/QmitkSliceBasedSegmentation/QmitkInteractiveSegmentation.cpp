@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkInteractiveSegmentation.h"
 #include "QmitkInteractiveSegmentationControls.h"
-#include "slicebasedsegmentation.h" // icon
+#include "interactivesegmentation.h" // icon
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkToolReferenceDataSelectionBox.h"

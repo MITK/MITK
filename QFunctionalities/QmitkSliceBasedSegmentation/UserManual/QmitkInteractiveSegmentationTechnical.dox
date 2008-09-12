@@ -51,7 +51,7 @@ tool or the interpolation mechanism changed something.
 The above blocks correspond to a number of classes. Here is an overview of all
 related classes with their responsibilities and relations:
 
-\image html slice_based_segmentation_related_classes.png
+\image html interactive_segmentation_related_classes.png
 
 <ol>
 <li> <b>Management of images</b>: mitk::ToolManager has a set of reference

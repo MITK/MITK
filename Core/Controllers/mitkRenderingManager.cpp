@@ -37,12 +37,10 @@ RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 RenderingManager
 ::RenderingManager()
 : m_UpdatePending( false ),
-  m_CurrentLOD( 0 ),
   m_MaxLOD( 2 ),
-  m_NumberOf3DRW( 0 ),
+  m_LODIncreaseBlocked( false ),
   m_ClippingPlaneEnabled( false ),
-  m_TimeNavigationController( NULL ),
-  m_LODIncreaseBlocked( false )
+  m_TimeNavigationController( NULL )
 {
   m_ShadingEnabled.assign(3, false);
   m_ShadingValues.assign(4, 0.0);
@@ -52,7 +50,6 @@ RenderingManager
 RenderingManager
 ::~RenderingManager()
 {
-
 }
 
 
@@ -181,10 +178,11 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  if ( m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS )
-  {
-    this->AbortRendering( renderWindow );
-  }
+  //TODO
+  //if ( m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS )
+  //{
+  //  this->AbortRendering( BaseRenderer::GetInstance( renderWindow ) );
+  //}
 
   m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
@@ -203,16 +201,11 @@ RenderingManager
   // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
-  m_NumberOf3DRW = 0;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     if ( it->second == RENDERING_REQUESTED )
     {
       m_UpdatePending = true;
-    }
-    if ( BaseRenderer::GetInstance(it->first)->GetMapperID() == 2 )
-    {
-      m_NumberOf3DRW++;
     }
   }
 }
@@ -234,12 +227,18 @@ RenderingManager
 
   m_LastUpdatedRW = renderWindow;
 
+  BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+
   // Immediately repaint this window (implementation platform specific)
   // If the size is 0 it crahses
   int *size = renderWindow->GetSize();
   if ( 0 != size[0] && 0 != size[1] )
   {
-  renderWindow->Render();
+    // Initialize end-callback counter to zero
+    m_EndCallbackCounterMap[renderer] = 0;
+
+    // Execute rendering
+    renderWindow->Render();
   }
 }
 
@@ -270,7 +269,6 @@ RenderingManager
   {
     m_UpdatePending = true;
     this->RestartTimer();
-
   }
 }
 
@@ -294,8 +292,13 @@ RenderingManager
       int *size = it->first->GetSize();
       if ( 0 != size[0] && 0 != size[1] )
       {
-      it->first->Render();
-	  }
+        // Initialize end-callback counter to zero
+        BaseRenderer *renderer = BaseRenderer::GetInstance( it->first );
+        m_EndCallbackCounterMap[renderer] = 0;
+
+        // Execute rendering
+        it->first->Render();
+      }
 
       it->second = RENDERING_INACTIVE;
     }
@@ -651,20 +654,39 @@ RenderingManager
 
     this->DoFinishAbortRendering();
 
-    /** Level-Of-Detail **/
-   if(m_NumberOf3DRW > 0)
-    {
-      if(m_CurrentLOD < m_MaxLOD)
-      {
-        if ( !m_LODIncreaseBlocked )
-        {
-          // make sure that timer is restarted for next request
-          m_UpdatePending = false;
+    // Level-of-Detail handling
 
-          this->SetCurrentLOD( m_CurrentLOD + 1 );
+    // Increase LOD only for LAST LOD-enabled mapper
+    // of this RenderWindow (i.e. BaseRenderer)
+    // (the detail-level is handled for all mappers of one RenderWindow
+    // simultaneously; only the last mapper callback is allowed to increase
+    // the LOD value)
+    if ( (renderer->GetNumberOfVisibleLODEnabledMappers() > 0)
+      && (++m_EndCallbackCounterMap[renderer] >= 
+          renderer->GetNumberOfVisibleLODEnabledMappers()) )
+    {
+      // Make sure that LOD-increase is currently not block
+      // (by mouse-movement)
+      if ( !m_LODIncreaseBlocked )
+      {
+        // Check if the maximum LOD level has already been reached
+        if ( m_NextLODMap[renderer] < m_MaxLOD )
+        {
+          // NO: increase the level for this renderer...
+          m_NextLODMap[renderer]++;
+
+          // ... and make sure that timer is restarted for next request
+          m_UpdatePending = false;
           this->RequestUpdate(renderer->GetRenderWindow());
         }
+        else
+        {
+          // YES: Reset to level 0 for next rendering request (by user)
+          m_NextLODMap[renderer] = 0;
+        }
       }
+      // Reset counter to zero (for next rendering round)
+      m_EndCallbackCounterMap[renderer] = 0;
     }
   }
 }
@@ -688,22 +710,14 @@ RenderingManager
 
 void
 RenderingManager
-::AbortRendering( vtkRenderWindow* renderWindow )
+::AbortRendering()
 {
-  if ( (m_RenderWindowList.count( renderWindow ) != 0)
-    && (m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS) )
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    renderWindow->SetAbortRender( true );
-  }
-  else
-  {
-    RenderWindowList::iterator it;
-    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    if ( it->second == RENDERING_INPROGRESS )
     {
-      if ( it->second == RENDERING_INPROGRESS )
-      {
-        it->first->SetAbortRender( true );
-      }
+      it->first->SetAbortRender( true );
     }
   }
 }
@@ -711,33 +725,46 @@ RenderingManager
 
 int
 RenderingManager
-::GetCurrentLOD()
+::GetNextLOD( BaseRenderer *renderer )
 {
-  return m_CurrentLOD;
-}
-
-
-void
-RenderingManager
-::SetCurrentLOD( int lod )
-{
-  if ( m_CurrentLOD != lod )
+  if ( renderer != NULL )
   {
-    if( lod > m_MaxLOD )
-    {
-      itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
-      return;
-    }
-    m_CurrentLOD = lod;
+    return m_NextLODMap[renderer];
+  }
+  else
+  {
+    return 0;
   }
 }
 
 
 void
 RenderingManager
-::SetNumberOfLOD( int number )
+::SetNextLOD( int lod, BaseRenderer *renderer )
 {
-  m_MaxLOD = number - 1;
+  int newLOD = lod < m_MaxLOD ? lod : m_MaxLOD;
+
+  if ( renderer != NULL )
+  {
+    m_NextLODMap[renderer] = newLOD;
+  }
+  else
+  {
+    // Set next LOD for all renderers
+    RenderWindowList::iterator it;
+    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    {
+      m_NextLODMap[BaseRenderer::GetInstance( it->first )] = newLOD;
+    }
+  }
+}
+
+
+void
+RenderingManager
+::SetMaximumLOD( int max )
+{
+  m_MaxLOD = max;
 }
 
 

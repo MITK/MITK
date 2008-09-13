@@ -199,7 +199,7 @@ public:
   virtual void UpdateCallback();
 
   bool IsRendering() const;
-  void AbortRendering( vtkRenderWindow *renderWindow );
+  void AbortRendering();
 
   /** En-/Disable LOD increase globally. */
   itkSetMacro( LODIncreaseBlocked, bool );
@@ -210,13 +210,16 @@ public:
   /** En-/Disable LOD increase globally. */
   itkBooleanMacro( LODIncreaseBlocked );
 
+
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
 
-  int GetCurrentLOD();
-  void SetCurrentLOD( int lod );
-  void SetNumberOfLOD( int number );
+  int GetNextLOD( BaseRenderer *renderer );
+
+  /** Set current LOD (NULL means all renderers)*/
+  void SetNextLOD( int lod, BaseRenderer *renderer = NULL );
+  void SetMaximumLOD( int max );
 
   void SetShading( bool state, int lod );
   bool GetShading( int lod );
@@ -258,11 +261,16 @@ protected:
 
   bool m_UpdatePending;
 
-  int m_CurrentLOD;
+  typedef std::map< BaseRenderer *, int > RendererIntMap;
+  typedef std::map< BaseRenderer *, bool > RendererBoolMap;
+
+  RendererIntMap m_NextLODMap;
+  RendererIntMap m_EndCallbackCounterMap;
 
   int m_MaxLOD;
 
-  int m_NumberOf3DRW;
+  bool m_LODIncreaseBlocked;
+
 
   BoolVector m_ShadingEnabled;
 
@@ -282,8 +290,6 @@ protected:
   RenderWindowVector m_AllRenderWindows;
 
   SliceNavigationController *m_TimeNavigationController;
-
-  bool m_LODIncreaseBlocked;
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;

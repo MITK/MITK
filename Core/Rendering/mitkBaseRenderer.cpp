@@ -116,7 +116,8 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
-  m_EmptyWorldGeometry(true)
+  m_EmptyWorldGeometry(true),
+  m_NumberOfVisibleLODEnabledMappers( 0 )
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -650,6 +651,13 @@ void mitk::BaseRenderer::ForceImmediateUpdate()
 {
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
 }
+
+
+unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
+{
+  return m_NumberOfVisibleLODEnabledMappers;
+}
+
 
 
 /*!

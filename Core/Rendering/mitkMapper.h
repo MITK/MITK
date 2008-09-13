@@ -134,6 +134,12 @@ namespace mitk {
     /** \brief Returns the current time step as calculated from the renderer */
     const int GetTimestep() const {return m_TimeStep;}; 
 
+    
+    /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
+     * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
+     * ProgressEvent on BaseRenderer. */
+    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return false; }
+
   protected:
 
     Mapper();

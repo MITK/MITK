@@ -77,6 +77,12 @@ public:
   static void StartCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+  /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
+   * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
+   * ProgressEvent on BaseRenderer. */
+  virtual bool IsLODEnabled( BaseRenderer *renderer ) const;
+
 protected:
 
 
@@ -138,8 +144,9 @@ protected:
   double m_PlaneNormalB;
   double m_PlaneNormalC;
 
-
   std::set< vtkRenderWindow * > m_RenderWindowInitialized;
+
+  std::map< BaseRenderer *, bool > m_LODRenderingEnabledMap;
 };
 
 } // namespace mitk

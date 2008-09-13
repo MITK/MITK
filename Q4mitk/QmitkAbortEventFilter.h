@@ -28,6 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCommon.h>
 
+namespace mitk
+{
+  class BaseRenderer;
+}
+
 class QMITK_EXPORT QmitkAbortEventFilter : public QObject
 {
 public:
@@ -47,6 +52,9 @@ protected:
   bool m_ButtonPressed;
   
   bool m_MouseMoved;
+  
+  // Renderer of RenderWindow in which mouse button was pressed
+  mitk::BaseRenderer *m_LODRendererAtButtonPress;
   
 private:
   typedef std::pair< QObject*, QEvent* > ObjectEventPair;

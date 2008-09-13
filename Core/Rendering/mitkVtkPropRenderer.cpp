@@ -232,6 +232,9 @@ PrepareMapperQueue iterates the datatree in order to find mappers which shall be
 */
 void mitk::VtkPropRenderer::PrepareMapperQueue()
 {
+  // variable for counting LOD-enabled mappers
+  m_NumberOfVisibleLODEnabledMappers = 0;
+
   // Do we have to update the mappers ?
   if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
     Update();
@@ -263,6 +266,12 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 
     if(m_MapperID == 1 && mapper->IsVtkBased())
       continue; //B/ no vtk mappers in 2D windows 
+
+    // The information about LOD-enabled mappers is required by RenderingManager
+    if ( mapper->IsLODEnabled( this ) )
+    {
+      ++m_NumberOfVisibleLODEnabledMappers;
+    }
 
     // mapper without a layer property get layer number 1
     int layer=1;

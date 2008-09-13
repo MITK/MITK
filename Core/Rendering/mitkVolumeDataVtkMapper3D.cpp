@@ -159,12 +159,11 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
 
   m_AbortCallbackCommand = vtkCallbackCommand::New();
-  m_AbortCallbackCommand->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
-
   m_StartCallbackCommand = vtkCallbackCommand::New();
-  m_StartCallbackCommand ->SetCallback( VolumeDataVtkMapper3D::StartCallback );
-
   m_EndCallbackCommand = vtkCallbackCommand::New();
+
+  m_AbortCallbackCommand->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
+  m_StartCallbackCommand->SetCallback( VolumeDataVtkMapper3D::StartCallback );
   m_EndCallbackCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
 
   this->CreateDefaultTransferFunctions();
@@ -209,7 +208,17 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   if ((input==NULL) || (input->IsInitialized()==false))
     return;
 
-  vtkRenderWindow* vtkRendWin = renderer->GetRenderWindow();
+  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+
+  // Register observer for start/end/abort-callbacks
+  if ( !renderWindow->HasObserver( vtkCommand::StartEvent, m_StartCallbackCommand ) )
+  {
+    renderWindow->AddObserver( vtkCommand::StartEvent, m_StartCallbackCommand );
+    renderWindow->AddObserver( vtkCommand::AbortCheckEvent, m_AbortCallbackCommand );
+    renderWindow->AddObserver( vtkCommand::EndEvent, m_EndCallbackCommand );
+  }
+     
+  bool volumeRenderingEnabled = true;
 
   if (this->IsVisible(renderer)==false ||
       this->GetDataTreeNode() == NULL ||
@@ -220,6 +229,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Prop3D->UnRegister( NULL );
     m_Prop3D = m_DummyProp;
     m_Prop3D->Register( NULL );
+
+    volumeRenderingEnabled = false;
 
     // Check if a bounding box should be displayed around the dataset
     // (even if volume rendering is disabled)
@@ -256,23 +267,25 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
           1.0, 1.0, 1.0 );
       }
     }
+  }
 
-    mitk::RenderingManager::GetInstance()->SetNumberOfLOD(1); //how many LODs should be used
+  // Set this mapper as LOD-enabled if volume rendering is ON
+  m_LODRenderingEnabledMap[renderer] = volumeRenderingEnabled;
 
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-
+  // Don't do anything (use dummy prop, see above) if VR is disabled
+  if ( !volumeRenderingEnabled )
+  {
     return;
   }
+
 
   m_Prop3D->UnRegister( NULL );
   m_Prop3D = m_VolumeLOD;
   m_Prop3D->Register( NULL );
 
-  mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
-
   this->SetPreferences();
 
-  switch ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() )
+  switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
   case 0:
   default:
@@ -328,20 +341,16 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   this->UpdateTransferFunctions( renderer );
 
-  vtkRenderWindowInteractor *interactor = vtkRendWin->GetInteractor();
+  vtkRenderWindowInteractor *interactor = renderWindow->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
 
 
-  if ( m_RenderWindowInitialized.find( vtkRendWin ) == m_RenderWindowInitialized.end() )
+  if ( m_RenderWindowInitialized.find( renderWindow ) == m_RenderWindowInitialized.end() )
   {
-    m_RenderWindowInitialized.insert( vtkRendWin );
+    m_RenderWindowInitialized.insert( renderWindow );
 
-    vtkRendWin->AddObserver( vtkCommand::AbortCheckEvent,m_AbortCallbackCommand );
-    vtkRendWin->AddObserver( vtkCommand::StartEvent, m_StartCallbackCommand );
-    vtkRendWin->AddObserver( vtkCommand::EndEvent, m_EndCallbackCommand );
-
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+    mitk::RenderingManager::GetInstance()->SetNextLOD(0);
 
     mitk::RenderingManager::GetInstance()->SetShading( true, 0 );
     mitk::RenderingManager::GetInstance()->SetShading( true, 1 );
@@ -626,6 +635,12 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
   }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
+
+bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer *renderer ) const
+{
+  return m_LODRenderingEnabledMap.find( renderer )->second;
 }
 
 

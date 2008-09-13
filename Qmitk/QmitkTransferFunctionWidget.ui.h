@@ -719,7 +719,7 @@ void QmitkTransferFunctionWidget::SetXValue()
   m_ScalarOpacityFunctionCanvas->SetX(m_XEdit->text().toFloat());
   m_ColorTransferFunctionCanvas->SetX(m_XEdit->text().toFloat());
   m_GradientOpacityCanvas->SetX(m_XEdit->text().toFloat());
-  mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
+  mitk::RenderingManager::GetInstance()->SetNextLOD(2);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -728,6 +728,6 @@ void QmitkTransferFunctionWidget::SetYValue()
 {
   m_ScalarOpacityFunctionCanvas->SetY(m_YEdit->text().toFloat());
   m_GradientOpacityCanvas->SetY(m_YEdit->text().toFloat());
-  mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
+  mitk::RenderingManager::GetInstance()->SetNextLOD(2);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

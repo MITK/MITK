@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DData.h"
 #include "mitkCameraController.h"
 #include "mitkEventTypedefs.h"
-#include <map>
 
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraController.h"
@@ -34,6 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+
+#include <map>
+#include <set>
+
 
 namespace mitk {
 
@@ -46,7 +49,7 @@ class DataStorage;
 //## @brief Organizes the rendering process
 //##
 //## Organizes the rendering process. A Renderer contains a reference to a
-//## (sub-) data tree and asks the mappers of the data objects to render
+//## data tree and asks the mappers of the data objects to render
 //## the data into the renderwindow it is associated to.
 //##
 //## #Render() checks if rendering is currently allowed by calling
@@ -351,7 +354,13 @@ public:
 
   void RequestUpdate();
   void ForceImmediateUpdate();
-  
+
+
+  /** Returns number of mappers which are visible and have level-of-detail
+   * rendering enabled */
+  unsigned int GetNumberOfVisibleLODEnabledMappers() const;
+
+ 
 protected:
 
   virtual ~BaseRenderer();
@@ -397,6 +406,7 @@ protected:
   //##Documentation
   //## @brief Sets m_CurrentWorldGeometry
   virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
+
 
 private:
   //##Documentation
@@ -496,6 +506,13 @@ protected:
   double m_Bounds[6];
   
   bool m_EmptyWorldGeometry;
+
+  typedef std::set< Mapper * > LODEnabledMappersType;
+
+  /** Number of mappers which are visible and have level-of-detail
+   * rendering enabled */
+  unsigned int m_NumberOfVisibleLODEnabledMappers;
+
 };
 
 } // namespace mitk

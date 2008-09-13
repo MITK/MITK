@@ -36,16 +36,41 @@ QmitkAbortEventFilter
   return &instance;
 }
 
-QmitkAbortEventFilter::QmitkAbortEventFilter()
+QmitkAbortEventFilter
+::QmitkAbortEventFilter()
+: m_LODRendererAtButtonPress( NULL )
 {
 }
-QmitkAbortEventFilter::~QmitkAbortEventFilter()
+QmitkAbortEventFilter
+::~QmitkAbortEventFilter()
 
 {
 }
 
-bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
+
+bool 
+QmitkAbortEventFilter
+::eventFilter( QObject *object, QEvent *event )
+{   
+  // Extract renderer (if event has been invoked on a RenderWindow)
+  bool isLODRenderer = false;
+  mitk::BaseRenderer *renderer = NULL;
+  QVTKWidget *qVTKWidget = dynamic_cast< QVTKWidget * >( object );
+  if (qVTKWidget != NULL )
+  {
+    renderer = mitk::BaseRenderer::GetInstance( qVTKWidget->GetRenderWindow() );
+    if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
+    {
+      isLODRenderer = true;
+    }
+    else
 {
+      // Only LOD enabled renderers are considered
+      renderer = NULL;
+    }
+
+  }
+
   if (mitk::RenderingManager::GetInstance()->IsRendering() )
   {
     switch ( event->type() )
@@ -53,17 +78,34 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
     case QEvent::MouseButtonPress:
     {
-      m_ButtonPressed = true;
+      // Let only the first (RenderWindow specific) click event affect
+      // the LOD process (Qt issues multiple events on mouse click, but the
+      // RenderWindow specific one is issued first)
+      if ( !m_ButtonPressed )
+      {
+        m_ButtonPressed = true;
 
-      mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        mitk::RenderingManager::GetInstance()->AbortRendering();
+
+        mitk::RenderingManager::GetInstance()->SetNextLOD( 0, renderer );
+        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
+
+        // Store renderer (if LOD-enabled), otherwise renderer will be NULL
+        m_LODRendererAtButtonPress = renderer;
+      }
+
+      // Store renderer if it is LOD enabled for mouse release
+      if ( isLODRenderer )
+      {
+        m_LODRendererAtButtonPress = renderer;
+      }
+
       QMouseEvent* me = ( QMouseEvent* )( event );
 
       QMouseEvent* newEvent = new QMouseEvent(
         me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
       m_EventQueue.push( ObjectEventPair(object, newEvent) );
-
-      mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
       return true;
     }
 
@@ -80,40 +122,42 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
       return true;
     }
 
-    case QEvent::MouseButtonRelease:
-    {
-      m_ButtonPressed = false;
-      
-      QMouseEvent* me = ( QMouseEvent* )( event );
-
-      QMouseEvent* newEvent = new QMouseEvent(
-        me->type(), me->pos(), me->globalPos(), me->button(),
-        me->buttons(), me->modifiers());
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
-
-      mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
-      return true;
-    }
-
     case QEvent::MouseMove:
     {
       if ( m_ButtonPressed )
       {
-        if ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() != 0 )
+        if ( mitk::RenderingManager::GetInstance()->GetNextLOD( m_LODRendererAtButtonPress ) != 0 )
         {
-          mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-          mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+          mitk::RenderingManager::GetInstance()->SetNextLOD( 0, m_LODRendererAtButtonPress );
+          mitk::RenderingManager::GetInstance()->AbortRendering();
         }
       }
       return true;
     }
 
+    case QEvent::MouseButtonRelease:
+    {
+      if ( m_ButtonPressed )
+      {
+        m_ButtonPressed = false;
+        
+        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
+      }
+      
+      QMouseEvent* me = ( QMouseEvent* )( event );
+      QMouseEvent* newEvent = new QMouseEvent(
+        me->type(), me->pos(), me->globalPos(), me->button(),
+        me->buttons(), me->modifiers());
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
     case QEvent::Wheel:
     {
-      mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-      mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
-      QWheelEvent* we = ( QWheelEvent* )( event );
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0, renderer );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
 
+      QWheelEvent* we = ( QWheelEvent* )( event );
       QWheelEvent* newEvent = new QWheelEvent(
         we->pos(), we->globalPos(), we->delta(), we->buttons(),
         we->modifiers(), we->orientation()
@@ -124,7 +168,7 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
     case QEvent::Resize:
       { 
-        mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        mitk::RenderingManager::GetInstance()->AbortRendering();
 
         QResizeEvent* re = ( QResizeEvent* )( event );
 
@@ -143,14 +187,14 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
      case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)
       {
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-        mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+        mitk::RenderingManager::GetInstance()->AbortRendering();
         return false;
       }
 
       case QEvent::KeyPress:
       { 
-        mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+        mitk::RenderingManager::GetInstance()->AbortRendering();
         QKeyEvent* ke = ( QKeyEvent* )( event );
         QKeyEvent* newEvent = new QKeyEvent(
           ke->type(), ke->key(), ke->modifiers(), ke->text(), false, ke->count()
@@ -169,7 +213,6 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
       default:
       {
-        //std::cout<<"Event Type: (Rendering)"<<event->type()<<std::endl;
         return false;
       }
     }
@@ -180,35 +223,35 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
     {
       case QEvent::MouseButtonPress:
       {
-        m_ButtonPressed = true;
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
+        // Let only the first (RenderWindow specific) click event affect
+        // the LOD process (Qt issues multiple events on mouse click, but the
+        // RenderWindow specific one is issued first)
+        if ( !m_ButtonPressed )
+        {
+          m_ButtonPressed = true;
+          //mitk::RenderingManager::GetInstance()->SetNextLOD( 0, renderer );
+          mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
+
+          m_LODRendererAtButtonPress = renderer;
+        }
+
+        // Store renderer if it is LOD enabled for mouse release
+        if ( isLODRenderer )
+        {
+          m_LODRendererAtButtonPress = renderer;
+        }
+
         return false;
       }
 
       case QEvent::MouseMove:
       {
-        if(m_ButtonPressed)
-        {
-          try
-          {
-            mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
-            mitk::NodePredicateProperty VolRenTurnedOn("volumerendering", mitk::BoolProperty::New(true));
-            mitk::DataStorage::SetOfObjects::ConstPointer VolRenSet =
-                dataStorage->GetSubset( VolRenTurnedOn );
-            if ( VolRenSet->Size() > 0 )
-            {
-              mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-            }
-          }
-          catch(...){}
-        }
+        // Nothing to do in this case
         return false;
       }
 
       case QEvent::Wheel:
       {
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll(
           mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
@@ -216,16 +259,27 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
       case QEvent::MouseButtonRelease:
       {
-        m_ButtonPressed = false;
-        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll(
-          mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
+        if ( m_ButtonPressed )
+        {
+          m_ButtonPressed = false;
+          mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
+
+          if ( m_LODRendererAtButtonPress != NULL )
+          {
+            mitk::RenderingManager::GetInstance()->RequestUpdate(
+              m_LODRendererAtButtonPress->GetRenderWindow() );
+          }
+          else
+          {
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+              mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
+          }
+        }
         return false;
       }
 
       case QEvent::Resize:
       {
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll(
           mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
@@ -233,26 +287,31 @@ bool QmitkAbortEventFilter::eventFilter( QObject *object, QEvent *event )
 
       case QEvent::ChildAdded:
       {
-        mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+          mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
       }
 
       default:
       {
-        //std::cout<<"Event Type: (Not Rendering)"<<event->type()<<std::endl;
         return false;
       }
     }
   }
 }
 
-void QmitkAbortEventFilter::ProcessEvents()
+
+void 
+QmitkAbortEventFilter
+::ProcessEvents()
 {
-  //std::cout << "P";
   qApp->processEvents( QEventLoop::AllEvents );
 }
 
-void QmitkAbortEventFilter::IssueQueuedEvents()
+
+void 
+QmitkAbortEventFilter
+::IssueQueuedEvents()
 {
   while ( !m_EventQueue.empty() )
   {
@@ -260,5 +319,4 @@ void QmitkAbortEventFilter::IssueQueuedEvents()
     QApplication::postEvent( eventPair.first, eventPair.second );
     m_EventQueue.pop();
   }
-
 }

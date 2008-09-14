@@ -58,7 +58,7 @@ related classes with their responsibilities and relations:
 data (original images) and a second set of working data (segmentations).
 mitk::Tool objects know a ToolManager and can ask the manager for the currently
 relevant images. There are two GUI elements that enable
-the user to modify the set of reference and working images (QmitkToolReferenceDataSelectionBox and QmitkToolWorkingDataListBox). GUI and non-GUI
+the user to modify the set of reference and working images (QmitkToolReferenceDataSelectionBox and QmitkToolWorkingDataSelectionBox). GUI and non-GUI
 classes are coupled by itk::Events (non-GUI to GUI) and direct method calls (GUI
 to non-GUI).
 <li> <b>Management of drawing tools</b>: As a second task, ToolManager manages all available tools and makes sure that one at a time is able to receive MITK events.

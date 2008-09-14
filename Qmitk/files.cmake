@@ -79,7 +79,7 @@ SET(CPP_FILES
   QmitkToolGUIArea.cpp
   QmitkToolReferenceDataSelectionBox.cpp  
   QmitkToolSelectionBox.cpp  
-  QmitkToolWorkingDataListBox.cpp  
+  QmitkToolWorkingDataSelectionBox.cpp  
   QmitkTransferFunctionCanvas.cpp
   QmitkUndoRedoButton.cpp
   QmitkUserInputSimulation.cpp
@@ -195,7 +195,7 @@ SET(MOC_H_FILES
   QmitkToolGUIArea.h
   QmitkToolReferenceDataSelectionBox.h  
   QmitkToolSelectionBox.h  
-  QmitkToolWorkingDataListBox.h  
+  QmitkToolWorkingDataSelectionBox.h  
   QmitkTransferFunctionCanvas.h
   QmitkUndoRedoButton.h
   QmitkVideoBackground.h

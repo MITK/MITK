@@ -43,7 +43,7 @@ class QCustomEvent;
 
   $Author$
 */
-class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
+class QMITK_EXPORT QmitkToolWorkingDataSelectionBox : public QListView
 {
   Q_OBJECT
 
@@ -61,11 +61,11 @@ class QMITK_EXPORT QmitkToolWorkingDataListBox : public QListView
      */
     enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
     
-    QmitkToolWorkingDataListBox(QWidget* parent = 0, const char* name = 0);
-    virtual ~QmitkToolWorkingDataListBox();
+    QmitkToolWorkingDataSelectionBox(QWidget* parent = 0, const char* name = 0);
+    virtual ~QmitkToolWorkingDataSelectionBox();
 
     /**
-      Installs an event filter on the given object. QmitkToolWorkingDataListBox will catch all key-press events
+      Installs an event filter on the given object. QmitkToolWorkingDataSelectionBox will catch all key-press events
       for the number keys 0 to 9 and select the appropriate segmentation, when a segmentation's index is matched.
 
       \warning If you call this function, don't forget to deactivate event filtering (e.g. when your functionality is deactivated)

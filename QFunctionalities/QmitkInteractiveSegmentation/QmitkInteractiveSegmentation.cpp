@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkToolReferenceDataSelectionBox.h"
-#include "QmitkToolWorkingDataListBox.h"
+#include "QmitkToolWorkingDataSelectionBox.h"
 #include "QmitkToolSelectionBox.h"
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
@@ -77,10 +77,10 @@ QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
 
     m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataTreeIterator->GetTree() );
 
-    m_Controls->m_ToolWorkingDataListBox->SetToolManager( *toolManager );
-    m_Controls->m_ToolWorkingDataListBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
-    m_Controls->m_ToolWorkingDataListBox->SetToolGroupsForFiltering("default segmentationProcessing");  // for determination of what tools should be asked for their data preference
-    //m_Controls->m_ToolWorkingDataListBox->SetDisplayOnlyDerivedNodes(false);                            // show only segmentations derived from the original image
+    m_Controls->m_ToolWorkingDataSelectionBox->SetToolManager( *toolManager );
+    m_Controls->m_ToolWorkingDataSelectionBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
+    m_Controls->m_ToolWorkingDataSelectionBox->SetToolGroupsForFiltering("default segmentationProcessing");  // for determination of what tools should be asked for their data preference
+    //m_Controls->m_ToolWorkingDataSelectionBox->SetDisplayOnlyDerivedNodes(false);                            // show only segmentations derived from the original image
 
     m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
     m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
@@ -112,12 +112,12 @@ QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
     
 void QmitkInteractiveSegmentation::OnNodePropertiesChanged()
 {
-  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+  m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
 }
   
 void QmitkInteractiveSegmentation::OnNewNodesGenerated()
 {
-  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+  m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -150,7 +150,7 @@ QAction * QmitkInteractiveSegmentation::CreateAction(QActionGroup *parent)
 void QmitkInteractiveSegmentation::TreeChanged()
 {
   m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
-  m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+  m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
 }
 
 void QmitkInteractiveSegmentation::Activated()
@@ -162,7 +162,7 @@ void QmitkInteractiveSegmentation::Activated()
   m_Controls->m_ToolSelectionBox->setEnabled( true );
   m_Controls->m_PostProcessingToolSelectionBox->setEnabled( true );
     
-  m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( qApp );
+  m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
 }
 
 void QmitkInteractiveSegmentation::Deactivated()
@@ -172,7 +172,7 @@ void QmitkInteractiveSegmentation::Deactivated()
   m_Controls->m_ToolSelectionBox->setEnabled( false );
   m_Controls->m_PostProcessingToolSelectionBox->setEnabled( false );
   
-  m_Controls->m_ToolWorkingDataListBox->InstallKeyFilterOn( NULL );
+  m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( NULL );
 }
 
 void QmitkInteractiveSegmentation::CreateNewSegmentation()
@@ -311,7 +311,7 @@ void QmitkInteractiveSegmentation::LoadSegmentation()
           mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
 
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-          m_Controls->m_ToolWorkingDataListBox->UpdateDataDisplay();
+          m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
         }
       }
     }

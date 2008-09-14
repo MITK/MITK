@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkToolWorkingDataListBox.h"
+#include "QmitkToolWorkingDataSelectionBox.h"
 #include "QmitkPropertyListPopup.h"
 
 #include "mitkDataStorage.h"
@@ -37,17 +37,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateAND.h"
  
-class QmitkToolWorkingDataListBoxUpdateDataEvent : public QCustomEvent
+class QmitkToolWorkingDataSelectionBoxUpdateDataEvent : public QCustomEvent
 {
   public:
-    QmitkToolWorkingDataListBoxUpdateDataEvent()
+    QmitkToolWorkingDataSelectionBoxUpdateDataEvent()
     : QCustomEvent( QEvent::MaxUser - 256 )
     {
     }
 };
    
 
-QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const char* name)
+QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, const char* name)
 :QListView(parent, name),
  m_ShowOnlySelected(true),
  m_SelfCall(false),
@@ -72,38 +72,38 @@ QmitkToolWorkingDataListBox::QmitkToolWorkingDataListBox(QWidget* parent, const 
   connect( this, SIGNAL(selectionChanged()),
            this, SLOT(OnWorkingDataSelectionChanged()) );
   
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 }
 
-QmitkToolWorkingDataListBox::~QmitkToolWorkingDataListBox()
+QmitkToolWorkingDataSelectionBox::~QmitkToolWorkingDataSelectionBox()
 {
 }
 
-mitk::ToolManager* QmitkToolWorkingDataListBox::GetToolManager()
+mitk::ToolManager* QmitkToolWorkingDataSelectionBox::GetToolManager()
 {
   return m_ToolManager;
 }
 
-void QmitkToolWorkingDataListBox::SetFirstColumnTitle(const QString& title)
+void QmitkToolWorkingDataSelectionBox::SetFirstColumnTitle(const QString& title)
 {
   QListView::setColumnText(1, title);
 }
 
-void QmitkToolWorkingDataListBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
+void QmitkToolWorkingDataSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 
   m_ToolManager = &newManager;
 
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 
   UpdateDataDisplay();
 }
      
-void QmitkToolWorkingDataListBox::OnWorkingDataSelectionChanged()
+void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
 {
   static mitk::ToolManager::DataVectorType previouslySelectedNodes;
 
@@ -126,7 +126,7 @@ void QmitkToolWorkingDataListBox::OnWorkingDataSelectionChanged()
   m_SelfCall = false;
 }
 
-void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified()
+void QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified()
 {
   UpdateNodeVisibility();
 
@@ -139,7 +139,7 @@ void QmitkToolWorkingDataListBox::OnToolManagerWorkingDataModified()
   UpdateDataDisplay();
 }
 
-void QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified()
+void QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified()
 {
   if ( m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData )
   {
@@ -150,12 +150,12 @@ void QmitkToolWorkingDataListBox::OnToolManagerReferenceDataModified()
   }
 }
   
-void QmitkToolWorkingDataListBox::UpdateDataDisplayLater()
+void QmitkToolWorkingDataSelectionBox::UpdateDataDisplayLater()
 {
-  qApp->postEvent( this, new QmitkToolWorkingDataListBoxUpdateDataEvent() ); // one round through the event loop
+  qApp->postEvent( this, new QmitkToolWorkingDataSelectionBoxUpdateDataEvent() ); // one round through the event loop
 }
 
-void QmitkToolWorkingDataListBox::customEvent(QCustomEvent* e)
+void QmitkToolWorkingDataSelectionBox::customEvent(QCustomEvent* e)
 {
   if ( e->type() == QEvent::MaxUser - 256 )
   {
@@ -163,7 +163,7 @@ void QmitkToolWorkingDataListBox::customEvent(QCustomEvent* e)
   }
 }
  
-void QmitkToolWorkingDataListBox::UpdateDataDisplay()
+void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
 {
   
   // get old/correct selection
@@ -304,7 +304,7 @@ void QmitkToolWorkingDataListBox::UpdateDataDisplay()
   }
 }
     
-mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetSelectedNodes()
+mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetSelectedNodes()
 {
   mitk::ToolManager::DataVectorType result;
 
@@ -332,7 +332,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetSelectedNodes(
   return result;
 }
 
-mitk::DataTreeNode* QmitkToolWorkingDataListBox::GetSelectedNode()
+mitk::DataTreeNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
 {
   QListViewItem* item = QListView::selectedItem();
   if (item)
@@ -347,7 +347,7 @@ mitk::DataTreeNode* QmitkToolWorkingDataListBox::GetSelectedNode()
   return NULL;
 }
 
-mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool onlyDerivedFromOriginal )
+mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes( bool onlyDerivedFromOriginal )
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
@@ -450,7 +450,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataListBox::GetAllNodes( bool
   return resultVector; 
 }
 
-void QmitkToolWorkingDataListBox::itemRightClicked( QListViewItem* item, const QPoint& p, int )
+void QmitkToolWorkingDataSelectionBox::itemRightClicked( QListViewItem* item, const QPoint& p, int )
 {
   if (item)
   {
@@ -472,14 +472,14 @@ void QmitkToolWorkingDataListBox::itemRightClicked( QListViewItem* item, const Q
   }
 }
 
-void QmitkToolWorkingDataListBox::SetShowOnlySelected(bool on)
+void QmitkToolWorkingDataSelectionBox::SetShowOnlySelected(bool on)
 {
   m_ShowOnlySelected = on;
 
   UpdateNodeVisibility();
 }
 
-void QmitkToolWorkingDataListBox::UpdateNodeVisibility()
+void QmitkToolWorkingDataSelectionBox::UpdateNodeVisibility()
 {
   // hide or show all nodes of our list
   mitk::ToolManager::DataVectorType allObjects = GetAllNodes(false); // really get all possible "segmentation"s and hide/show them
@@ -505,7 +505,7 @@ void QmitkToolWorkingDataListBox::UpdateNodeVisibility()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
     
-void QmitkToolWorkingDataListBox::SetAdditionalColumns(const std::string& columns)
+void QmitkToolWorkingDataSelectionBox::SetAdditionalColumns(const std::string& columns)
 {
   m_AdditionalColumns.clear();
 
@@ -546,7 +546,7 @@ void QmitkToolWorkingDataListBox::SetAdditionalColumns(const std::string& column
  Splits a string into a list of substrings, that were separated by the character \a separator.
  Within the chunks the separator character can be used as a normal character if it's escaped with \a escape
 */
-QmitkToolWorkingDataListBox::StringListType QmitkToolWorkingDataListBox::Split( const std::string& wholeString, const char separator, const char escape)
+QmitkToolWorkingDataSelectionBox::StringListType QmitkToolWorkingDataSelectionBox::Split( const std::string& wholeString, const char separator, const char escape)
 {
   StringListType resultVector;
   std::string::size_type currentPos( 0 );
@@ -585,7 +585,7 @@ QmitkToolWorkingDataListBox::StringListType QmitkToolWorkingDataListBox::Split( 
   return resultVector;
 }
 
-void QmitkToolWorkingDataListBox::keyReleaseEvent( QKeyEvent* k )
+void QmitkToolWorkingDataSelectionBox::keyReleaseEvent( QKeyEvent* k )
 {
 //handle DELETE key, reach through all others
   if ( k->key() == Qt::Key_Delete )
@@ -599,7 +599,7 @@ void QmitkToolWorkingDataListBox::keyReleaseEvent( QKeyEvent* k )
   QListView::keyPressEvent(k);
 }
 
-void QmitkToolWorkingDataListBox::keyPressEvent( QKeyEvent* k )
+void QmitkToolWorkingDataSelectionBox::keyPressEvent( QKeyEvent* k )
 {
   if ( k->key() >= Qt::Key_0 && k->key() <= Qt::Key_9 ) return;
   if ( k->key() == Qt::Key_Space ) return;
@@ -607,7 +607,7 @@ void QmitkToolWorkingDataListBox::keyPressEvent( QKeyEvent* k )
   QListView::keyPressEvent(k);
 }
 
-bool QmitkToolWorkingDataListBox::eventFilter( QObject *o, QEvent *e )
+bool QmitkToolWorkingDataSelectionBox::eventFilter( QObject *o, QEvent *e )
 {
   if ( e->type() == QEvent::KeyPress )
   {
@@ -666,7 +666,7 @@ bool QmitkToolWorkingDataListBox::eventFilter( QObject *o, QEvent *e )
   return QListView::eventFilter( o, e ); // default: reach through to parent
 }
 
-void QmitkToolWorkingDataListBox::InstallKeyFilterOn( QObject* object )
+void QmitkToolWorkingDataSelectionBox::InstallKeyFilterOn( QObject* object )
 {
   if (m_LastKeyFilterObject)
     m_LastKeyFilterObject->removeEventFilter(this);
@@ -677,13 +677,13 @@ void QmitkToolWorkingDataListBox::InstallKeyFilterOn( QObject* object )
   object->installEventFilter( this );
 }
 
-void QmitkToolWorkingDataListBox::SetToolGroupsForFiltering(const std::string& groups)
+void QmitkToolWorkingDataSelectionBox::SetToolGroupsForFiltering(const std::string& groups)
 {
   m_ToolGroupsForFiltering = groups;
   UpdateDataDisplay();
 }
 
-void QmitkToolWorkingDataListBox::SetDisplayOnlyDerivedNodes(bool on)
+void QmitkToolWorkingDataSelectionBox::SetDisplayOnlyDerivedNodes(bool on)
 {
   if ( m_DisplayOnlyDerivedNodes != on )
   {
@@ -692,7 +692,7 @@ void QmitkToolWorkingDataListBox::SetDisplayOnlyDerivedNodes(bool on)
   }
 }
 
-void QmitkToolWorkingDataListBox::SetDisplayMode( QmitkToolWorkingDataListBox::DisplayMode mode )
+void QmitkToolWorkingDataSelectionBox::SetDisplayMode( QmitkToolWorkingDataSelectionBox::DisplayMode mode )
 {
   if (m_DisplayMode != mode)
   {

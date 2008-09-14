@@ -32,7 +32,7 @@ class QmitkInteractiveSegmentationControls;
   
   \sa QmitkToolSelectionBox  
   \sa QmitkToolReferenceDataSelectionBox   
-  \sa QmitkToolWorkingDataListBox   
+  \sa QmitkToolWorkingDataSelectionBox   
   \sa mitk::ToolManager
 
   \ingroup Functionalities

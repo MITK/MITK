@@ -37,7 +37,7 @@ class PlaneGeometry;
 
   \sa QmitkToolSelectionBox  
   \sa QmitkToolReferenceDataSelectionBox   
-  \sa QmitkToolWorkingDataListBox   
+  \sa QmitkToolWorkingDataSelectionBox   
   \sa Tool
   \sa QmitkInteractiveSegmentation  
   

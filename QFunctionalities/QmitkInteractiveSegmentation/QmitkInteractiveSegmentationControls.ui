@@ -227,9 +227,9 @@
                         <string>Load segmentation from file</string>
                     </property>
                 </widget>
-                <widget class="QmitkToolWorkingDataListBox" row="0" column="0" rowspan="1" colspan="4">
+                <widget class="QmitkToolWorkingDataSelectionBox" row="0" column="0" rowspan="1" colspan="4">
                     <property name="name">
-                        <cstring>m_ToolWorkingDataListBox</cstring>
+                        <cstring>m_ToolWorkingDataSelectionBox</cstring>
                     </property>
                     <property name="font">
                         <font>
@@ -365,8 +365,8 @@
         <pixmap>image5</pixmap>
     </customwidget>
     <customwidget>
-        <class>QmitkToolWorkingDataListBox</class>
-        <header location="global">QmitkToolWorkingDataListBox.h</header>
+        <class>QmitkToolWorkingDataSelectionBox</class>
+        <header location="global">QmitkToolWorkingDataSelectionBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -441,7 +441,7 @@
     <includehint>QmitkToolReferenceDataSelectionBox.h</includehint>
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
-    <includehint>QmitkToolWorkingDataListBox.h</includehint>
+    <includehint>QmitkToolWorkingDataSelectionBox.h</includehint>
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>

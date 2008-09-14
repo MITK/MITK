@@ -740,9 +740,9 @@ RenderingManager
 
 void
 RenderingManager
-::SetNextLOD( int lod, BaseRenderer *renderer )
+::SetNextLOD( unsigned int lod, BaseRenderer *renderer )
 {
-  int newLOD = lod < m_MaxLOD ? lod : m_MaxLOD;
+  unsigned int newLOD = lod < m_MaxLOD ? lod : m_MaxLOD;
 
   if ( renderer != NULL )
   {
@@ -762,7 +762,7 @@ RenderingManager
 
 void
 RenderingManager
-::SetMaximumLOD( int max )
+::SetMaximumLOD( unsigned int max )
 {
   m_MaxLOD = max;
 }
@@ -771,7 +771,7 @@ RenderingManager
 //enable/disable shading
 void
 RenderingManager
-::SetShading(bool state, int lod)
+::SetShading(bool state, unsigned int lod)
 {
   if(lod>m_MaxLOD)
   {
@@ -784,7 +784,7 @@ RenderingManager
 
 bool
 RenderingManager
-::GetShading(int lod)
+::GetShading(unsigned int lod)
 {
   if(lod>m_MaxLOD)
   {

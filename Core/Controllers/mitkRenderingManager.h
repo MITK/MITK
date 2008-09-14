@@ -218,11 +218,11 @@ public:
   int GetNextLOD( BaseRenderer *renderer );
 
   /** Set current LOD (NULL means all renderers)*/
-  void SetNextLOD( int lod, BaseRenderer *renderer = NULL );
-  void SetMaximumLOD( int max );
+  void SetNextLOD( unsigned int lod, BaseRenderer *renderer = NULL );
+  void SetMaximumLOD( unsigned int max );
 
-  void SetShading( bool state, int lod );
-  bool GetShading( int lod );
+  void SetShading( bool state, unsigned int lod );
+  bool GetShading( unsigned int lod );
 
   void SetClippingPlaneStatus( bool status );
   bool GetClippingPlaneStatus();
@@ -261,13 +261,13 @@ protected:
 
   bool m_UpdatePending;
 
-  typedef std::map< BaseRenderer *, int > RendererIntMap;
+  typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
   RendererIntMap m_NextLODMap;
   RendererIntMap m_EndCallbackCounterMap;
 
-  int m_MaxLOD;
+  unsigned int m_MaxLOD;
 
   bool m_LODIncreaseBlocked;
 

@@ -112,7 +112,7 @@ QmitkAbortEventFilter
 
     case QEvent::MouseButtonDblClick:
     { 
-      mitk::RenderingManager::GetInstance()->AbortRendering( NULL );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
       QMouseEvent* me = ( QMouseEvent* )( event );
 
       QMouseEvent* newEvent = new QMouseEvent(

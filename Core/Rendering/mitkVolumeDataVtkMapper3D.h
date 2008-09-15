@@ -113,9 +113,6 @@ protected:
   
   vtkLODProp3D* m_VolumeLOD;
   
-  // Empty Prop (vtkAssembly) used if volume rendering is disabled
-  vtkAssembly *m_DummyProp;
-
   vtkCubeSource *m_BoundingBox;
   vtkPolyDataMapper *m_BoundingBoxMapper;
   vtkActor *m_BoundingBoxActor;

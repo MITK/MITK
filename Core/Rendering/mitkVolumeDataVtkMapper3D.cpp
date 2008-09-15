@@ -96,7 +96,6 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_VolumePropertyHigh = vtkVolumeProperty::New();
 
   m_VolumeLOD = vtkLODProp3D::New();
-  m_DummyProp = vtkAssembly::New();
 
   m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0); // RayCast
 
@@ -138,7 +137,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
   //m_Prop3D = m_Prop3DAssembly;
 
-  m_Prop3D = m_DummyProp;
+  m_Prop3D = m_VolumeLOD;
   m_Prop3D->Register(NULL);
 
   m_ImageCast = vtkImageShiftScale::New();
@@ -188,7 +187,6 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_BoundingBoxMapper->Delete();
   m_BoundingBoxActor->Delete();
   m_ImageMaskFilter->Delete();
-  m_DummyProp->Delete();
   m_DefaultColorTransferFunction->Delete();
   m_DefaultOpacityTransferFunction->Delete();
   m_DefaultGradientTransferFunction->Delete();
@@ -226,10 +224,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
     )
   {
-    m_Prop3D->UnRegister( NULL );
-    m_Prop3D = m_DummyProp;
-    m_Prop3D->Register( NULL );
-
     volumeRenderingEnabled = false;
 
     // Check if a bounding box should be displayed around the dataset
@@ -275,13 +269,13 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   // Don't do anything (use dummy prop, see above) if VR is disabled
   if ( !volumeRenderingEnabled )
   {
+    m_VolumeLOD->VisibilityOff();
     return;
   }
-
-
-  m_Prop3D->UnRegister( NULL );
-  m_Prop3D = m_VolumeLOD;
-  m_Prop3D->Register( NULL );
+  else
+  {
+    m_VolumeLOD->VisibilityOn();
+  }
 
   this->SetPreferences();
 
@@ -687,7 +681,7 @@ mitk::Image::Pointer mitk::VolumeDataVtkMapper3D::GetMask()
     mask->Initialize(this->m_Mask);
     mask->SetImportVolume(this->m_Mask->GetScalarPointer(), 0, 0, Image::ReferenceMemory);
     mask->SetGeometry(this->GetInput()->GetGeometry());
-	  return mask;
+    return mask;
   }
 
   return 0;

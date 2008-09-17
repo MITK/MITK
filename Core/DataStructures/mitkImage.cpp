@@ -652,6 +652,7 @@ mitk::ImageTimeSelector* mitk::Image::GetTimeSelector() const
 
     ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
     timeSelector->SetInput(this);
+	this->UnRegister();
   }
 
   return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );

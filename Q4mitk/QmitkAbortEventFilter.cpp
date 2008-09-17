@@ -59,7 +59,7 @@ QmitkAbortEventFilter
   if (qVTKWidget != NULL )
   {
     renderer = mitk::BaseRenderer::GetInstance( qVTKWidget->GetRenderWindow() );
-    if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
+    if ( renderer && renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
     {
       isLODRenderer = true;
     }

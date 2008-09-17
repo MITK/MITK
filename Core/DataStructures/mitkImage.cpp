@@ -638,17 +638,23 @@ void mitk::Image::Initialize()
     (*it)=NULL;
   }
   m_CompleteData = NULL;
+ 
+  this->GetTimeSelector(); // just to create m_TimeSelectorForExtremaObject 
 
-  if(m_TimeSelectorForExtremaObject.IsNull() && (GetReferenceCount() > 0))
-  {
-    m_TimeSelectorForExtremaObject = mitk::ImageTimeSelector::New();
-
-    mitk::ImageTimeSelector* timeSelector;
-    timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
-    timeSelector->SetInput(this);
-    this->UnRegister();
-  }
   SetRequestedRegionToLargestPossibleRegion();
+}
+
+mitk::ImageTimeSelector* mitk::Image::GetTimeSelector() const
+{
+  if(m_TimeSelectorForExtremaObject.IsNull())
+  {
+    m_TimeSelectorForExtremaObject = ImageTimeSelector::New().GetPointer();
+
+    ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+    timeSelector->SetInput(this);
+  }
+
+  return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
 }
 
 void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
@@ -656,6 +662,9 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   Clear();
 
   m_Dimension=dimension;
+
+  if(!dimensions)
+    itkExceptionMacro(<< "invalid zero dimension image");
 
   unsigned int i;
   for(i=0;i<dimension;++i)
@@ -1174,8 +1183,7 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 
 const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
 {
-  mitk::ImageTimeSelector* timeSelector;
-  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+  mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
   if(timeSelector!=NULL)
   {
     timeSelector->SetTimeNr(t);
@@ -1317,8 +1325,7 @@ const void mitk::Image::ComputeImageStatistics(int t) const
     m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
 
   // recompute
-  mitk::ImageTimeSelector* timeSelector;
-  timeSelector = static_cast<mitk::ImageTimeSelector*>(m_TimeSelectorForExtremaObject.GetPointer());
+  mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
   if(timeSelector!=NULL)
   {
     timeSelector->SetTimeNr(t);

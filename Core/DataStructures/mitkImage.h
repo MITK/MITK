@@ -36,6 +36,7 @@ namespace mitk {
 
 class SubImageSelector;
 class ImageDataItem;
+class ImageTimeSelector;
 
 //##Documentation
 //## @brief Image class for storing images
@@ -543,6 +544,8 @@ protected:
 
   //## @warning Has to be called by every Initialize method!
   virtual void Initialize();
+
+  ImageTimeSelector* GetTimeSelector() const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

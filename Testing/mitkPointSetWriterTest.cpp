@@ -63,11 +63,11 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"PointSet creation")
 
   // test for exception handling
-  MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-  myPointSetWriter->SetInput(pointSet);
-  myPointSetWriter->SetFileName("/tmp/not-existing");
-  myPointSetWriter->Update();
-  MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  //MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+  //myPointSetWriter->SetInput(pointSet);
+  //myPointSetWriter->SetFileName("/tmp/not-existing");
+  //myPointSetWriter->Update();
+  //MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
   
   // always end with this!
   MITK_TEST_END()

@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -251,11 +251,11 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     QFileInfo* fileInfo = new QFileInfo(QString(fileNameUsed.c_str()));
     if(!fileInfo->exists())
     {
-      QMessageBox::critical(NULL,"ERROR","Save not successful. File was not created");
+      QMessageBox::warning(NULL,"WARNING","File was not created or was split into multiple files");
     } else if(fileInfo->size()==0) {
-      QMessageBox::critical(NULL,"ERROR","Save not successful. File is empty");
+      QMessageBox::warning(NULL,"WARNING","File is empty");
     } else if(fileInfo->lastModified()<initialTime) {
-      QMessageBox::critical(NULL,"ERROR","Save not successful. File was not updated (only old version available)");
+      QMessageBox::warning(NULL,"WARNING","Save not successful. File was not updated (only old version available)");
     }
     delete fileInfo;
   } catch(...) {
@@ -700,6 +700,10 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
   catch ( itk::ExceptionObject &err)
   {
     itkGenericOutputMacro( << "Exception during write: " << err );
+    QString exceptionString;
+    exceptionString.append("Error during write image: ");
+    exceptionString.append(err.GetDescription());
+    QMessageBox::critical(NULL,"ERROR",exceptionString);
     return "";
   }
   catch ( ... )

@@ -82,6 +82,7 @@ void mitk::PointSetWriter::GenerateData()
     std::ofstream out( m_FileName.c_str() );
     if ( !out.good() )
     {
+      itkExceptionMacro(<< "File " << m_FileName << " could not be opened!");
         itkWarningMacro( << "Sorry, file " << m_FileName << " could not be opened!" );
         out.close();
         return ;

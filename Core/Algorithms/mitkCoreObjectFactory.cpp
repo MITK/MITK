@@ -202,7 +202,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
   mitk::DataTreeNode::Pointer nodePointer = node;
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNotNull() && image->GetInitialized())
+  if(image.IsNotNull() && image->IsInitialized())
   {
     mitk::ImageMapper2D::SetDefaultProperties(node);
     mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);

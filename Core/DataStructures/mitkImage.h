@@ -517,8 +517,6 @@ public:
   template < typename ItkImageType >
     friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 
-  itkGetMacro(Initialized, bool);
-
 protected:
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 

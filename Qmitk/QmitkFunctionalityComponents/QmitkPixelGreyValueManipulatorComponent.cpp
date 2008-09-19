@@ -1094,6 +1094,7 @@ void QmitkPixelGreyValueManipulatorComponent::CreateChangedGreyValueImage( itk::
         if(m_Segmentation.IsNotNull())
         {
             itk::ImageRegionConstIterator<ItkSegmentationImageType> itSeg(itkSegmentation, itkSegmentation->GetLargestPossibleRegion());
+            itSeg.GoToBegin();
             std::cout<<"CheckBox: "<<m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked()<<std::endl;
 
             if(m_PixelGreyValueManipulatorComponentGUI->GetInverseCheckBox()->isChecked())

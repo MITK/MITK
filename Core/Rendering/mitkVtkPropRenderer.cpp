@@ -575,7 +575,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
         if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetProp();
-          if (prop)
+          if ( prop && prop->GetVisibility() )
           {
             // add to assembly path
             returnPath->AddNode( prop, prop->GetMatrix() );

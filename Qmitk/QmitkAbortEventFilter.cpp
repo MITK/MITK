@@ -166,58 +166,120 @@ QmitkAbortEventFilter
     }    
    
     case QEvent::Resize:
-      { 
-        mitk::RenderingManager::GetInstance()->AbortRendering();
+    { 
+      mitk::RenderingManager::GetInstance()->AbortRendering();
 
-        QResizeEvent* re = ( QResizeEvent* )( event );
+      QResizeEvent* re = ( QResizeEvent* )( event );
 
-        QResizeEvent* newResizeEvent = new QResizeEvent( re->size(), re->oldSize() );
-        m_EventQueue.push( ObjectEventPair(object, newResizeEvent) );
-        return true;
-      }
+      QResizeEvent* newResizeEvent = new QResizeEvent( re->size(), re->oldSize() );
+      m_EventQueue.push( ObjectEventPair(object, newResizeEvent) );
+      return true;
+    }
 
     case QEvent::Paint:
-      { 
-        QPaintEvent* pe = ( QPaintEvent* )( event );
-        QPaintEvent* newPaintEvent = new QPaintEvent( pe->region() );
-        m_EventQueue.push( ObjectEventPair(object, newPaintEvent) );
-        return true;
-      }
+    { 
+      QPaintEvent* pe = ( QPaintEvent* )( event );
+      QPaintEvent* newPaintEvent = new QPaintEvent( pe->region() );
+      m_EventQueue.push( ObjectEventPair(object, newPaintEvent) );
+      return true;
+    }
 
-     case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)
-      {
-        mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-        mitk::RenderingManager::GetInstance()->AbortRendering();
-        return false;
-      }
+    case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
 
-      case QEvent::KeyPress:
-      { 
-        mitk::RenderingManager::GetInstance()->AbortRendering();
-        QKeyEvent* ke = ( QKeyEvent* )( event );
-        QKeyEvent* newEvent = new QKeyEvent(
-          ke->type(), ke->key(), ke->ascii(), ke->state(), ke->text(), false, ke->count()
-        );
-        m_EventQueue.push( ObjectEventPair(object, newEvent) );
-        return true;
-      }
+      QChildEvent* ce = ( QChildEvent* )( event );
+      QChildEvent* newChildEvent = new QChildEvent( 
+        QEvent::ChildInserted, ce->child() );
+      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
+      return true;
+    }
 
-      case QEvent::Timer:
-      { 
-        QTimerEvent* te = ( QTimerEvent* )( event );
-        QTimerEvent* newEvent = new QTimerEvent(te->timerId());
-        m_EventQueue.push( ObjectEventPair(object, newEvent) );
-        return true;
-      }
+    case QEvent::ChildRemoved: //change Layout (Big3D, 2D images up, etc.)
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
 
-      default:
-      {
-        return false;
-      }
+      QChildEvent* ce = ( QChildEvent* )( event );
+      QChildEvent* newChildEvent = new QChildEvent( 
+        QEvent::ChildRemoved, ce->child() );
+      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
+      return true;
+    }
+
+    case QEvent::Show:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QShowEvent* newShowEvent = new QShowEvent();
+      m_EventQueue.push( ObjectEventPair(object, newShowEvent) );
+      return true;
+    }
+
+    case QEvent::Hide:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QHideEvent* newHideEvent = new QHideEvent();
+      m_EventQueue.push( ObjectEventPair(object, newHideEvent) );
+      return true;
+    }
+
+    case QEvent::KeyPress:
+    { 
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+      QKeyEvent* ke = ( QKeyEvent* )( event );
+      QKeyEvent* newEvent = new QKeyEvent(
+        ke->type(), ke->key(), ke->ascii(), ke->state(), ke->text(), false, ke->count()
+      );
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
+    case QEvent::Close:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QCloseEvent* newEvent = new QCloseEvent();
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
+    case QEvent::ContextMenu:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QContextMenuEvent *cme = ( QContextMenuEvent * )( event );
+      QContextMenuEvent *newEvent = new QContextMenuEvent(
+        cme->reason(), cme->pos(), cme->globalPos(), cme->state() );
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
+    case QEvent::Timer:
+    { 
+      QTimerEvent* te = ( QTimerEvent* )( event );
+      QTimerEvent* newEvent = new QTimerEvent(te->timerId());
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
+    default:
+    {
+      //QEvent *newEvent = new QEvent( event->type() );
+      //m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      //return true;
+      return false;
+    }
     }
   }
- else
- {
+  else
+  {
     switch ( event->type() )
     {
       case QEvent::MouseButtonPress:

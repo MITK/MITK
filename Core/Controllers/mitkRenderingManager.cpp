@@ -628,8 +628,8 @@ void
 RenderingManager
 ::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 {
-  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer)
+  BaseRenderer *renderer = dynamic_cast< BaseRenderer* >( object );
+  if (renderer)// && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0))
   {
     m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INPROGRESS;
   }
@@ -638,55 +638,65 @@ RenderingManager
 
 void
 RenderingManager
-::RenderingProgressCallback( itk::Object* /*object*/, const itk::EventObject& /*event*/ )
+::RenderingProgressCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 {
-  this->DoMonitorRendering();
+  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
+  if (renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0))
+  {
+    //TODO: Re-enable this call to enable abort-mechanism. This is
+    // temporarily disabled until the persisting bug in the abort-mechanism
+    // is fixed.
+    //this->DoMonitorRendering();
+  }
 }
 
 void
 RenderingManager
 ::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
 {
-  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer)
+  BaseRenderer *renderer = dynamic_cast< BaseRenderer* >( object );
+  if ( renderer )
   {
     m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
 
-    this->DoFinishAbortRendering();
-
-    // Level-of-Detail handling
-
-    // Increase LOD only for LAST LOD-enabled mapper
-    // of this RenderWindow (i.e. BaseRenderer)
-    // (the detail-level is handled for all mappers of one RenderWindow
-    // simultaneously; only the last mapper callback is allowed to increase
-    // the LOD value)
-    if ( (renderer->GetNumberOfVisibleLODEnabledMappers() > 0)
-      && (++m_EndCallbackCounterMap[renderer] >= 
-          renderer->GetNumberOfVisibleLODEnabledMappers()) )
+    if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
     {
-      // Make sure that LOD-increase is currently not block
-      // (by mouse-movement)
-      if ( !m_LODIncreaseBlocked )
-      {
-        // Check if the maximum LOD level has already been reached
-        if ( m_NextLODMap[renderer] < m_MaxLOD )
-        {
-          // NO: increase the level for this renderer...
-          m_NextLODMap[renderer]++;
+      this->DoFinishAbortRendering();
 
-          // ... and make sure that timer is restarted for next request
-          m_UpdatePending = false;
-          this->RequestUpdate(renderer->GetRenderWindow());
-        }
-        else
+      // Level-of-Detail handling
+
+      // Increase LOD only for LAST LOD-enabled mapper
+      // of this RenderWindow (i.e. BaseRenderer)
+      // (the detail-level is handled for all mappers of one RenderWindow
+      // simultaneously; only the last mapper callback is allowed to increase
+      // the LOD value; this is necessary to enabled correct LOD handling for
+      // multiple datasets simultaneously)
+      if ( (++m_EndCallbackCounterMap[renderer] >= 
+            renderer->GetNumberOfVisibleLODEnabledMappers()) )
+      {
+        // Make sure that LOD-increase is currently not block
+        // (by mouse-movement)
+        if ( !m_LODIncreaseBlocked )
         {
-          // YES: Reset to level 0 for next rendering request (by user)
-          m_NextLODMap[renderer] = 0;
+          // Check if the maximum LOD level has already been reached
+          if ( m_NextLODMap[renderer] < m_MaxLOD )
+          {
+            // NO: increase the level for this renderer...
+            m_NextLODMap[renderer]++;
+
+            // ... and make sure that timer is restarted for next request
+            m_UpdatePending = false;
+            this->RequestUpdate(renderer->GetRenderWindow());
+          }
+          else
+          {
+            // YES: Reset to level 0 for next rendering request (by user)
+            m_NextLODMap[renderer] = 0;
+          }
         }
+        // Reset counter to zero (for next rendering round)
+        m_EndCallbackCounterMap[renderer] = 0;
       }
-      // Reset counter to zero (for next rendering round)
-      m_EndCallbackCounterMap[renderer] = 0;
     }
   }
 }

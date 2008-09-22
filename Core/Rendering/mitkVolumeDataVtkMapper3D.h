@@ -72,16 +72,12 @@ public:
   bool SetMask(const Image* mask);
   virtual void UpdateMask();
 
-  static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-  static void EndCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-  static void StartCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
-  virtual bool IsLODEnabled( BaseRenderer *renderer ) const;
+  virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
 
 protected:
 
@@ -125,10 +121,6 @@ protected:
   vtkImageData *m_Mask;
   vtkImageMask *m_ImageMaskFilter;
 
-  vtkCallbackCommand *m_AbortCallbackCommand;
-  vtkCallbackCommand *m_StartCallbackCommand;
-  vtkCallbackCommand *m_EndCallbackCommand;
-
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *m_DefaultColorTransferFunction;
@@ -143,7 +135,6 @@ protected:
 
   std::set< vtkRenderWindow * > m_RenderWindowInitialized;
 
-  std::map< BaseRenderer *, bool > m_LODRenderingEnabledMap;
 };
 
 } // namespace mitk

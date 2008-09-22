@@ -21,8 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 #include <vtkRenderWindow.h>
-
-#include <vtkRenderWindow.h>
+#include <vtkCallbackCommand.h>
 
 #include <itkCommand.h>
 #include <algorithm>
@@ -42,8 +41,8 @@ RenderingManager
   m_ClippingPlaneEnabled( false ),
   m_TimeNavigationController( NULL )
 {
-  m_ShadingEnabled.assign(3, false);
-  m_ShadingValues.assign(4, 0.0);
+  m_ShadingEnabled.assign( 3, false );
+  m_ShadingValues.assign( 4, 0.0 );
 }
 
 
@@ -131,23 +130,23 @@ RenderingManager
   typedef itk::MemberCommand< RenderingManager > MemberCommandType;
 
   // Add callbacks for rendering abort mechanism
-  BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-  if ( renderer )
+  //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+  if ( renderWindow )
   {
-    MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
-    startCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingStartCallback);
-    renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+    vtkCallbackCommand *startCallbackCommand = vtkCallbackCommand::New();
+    startCallbackCommand->SetCallback( 
+      RenderingManager::RenderingStartCallback );
+    renderWindow->AddObserver( vtkCommand::StartEvent, startCallbackCommand );
 
-    MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
-    progressCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingProgressCallback);
-    renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
+    vtkCallbackCommand *progressCallbackCommand = vtkCallbackCommand::New();
+    progressCallbackCommand->SetCallback( 
+      RenderingManager::RenderingProgressCallback );
+    renderWindow->AddObserver( vtkCommand::AbortCheckEvent, progressCallbackCommand );
 
-    MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
-    endCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingEndCallback);
-    renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
+    vtkCallbackCommand *endCallbackCommand = vtkCallbackCommand::New();
+    endCallbackCommand->SetCallback( 
+      RenderingManager::RenderingEndCallback );
+    renderWindow->AddObserver( vtkCommand::EndEvent, endCallbackCommand );
  }
 }
 
@@ -234,9 +233,6 @@ RenderingManager
   int *size = renderWindow->GetSize();
   if ( 0 != size[0] && 0 != size[1] )
   {
-    // Initialize end-callback counter to zero
-    m_EndCallbackCounterMap[renderer] = 0;
-
     // Execute rendering
     renderWindow->Render();
   }
@@ -292,10 +288,6 @@ RenderingManager
       int *size = it->first->GetSize();
       if ( 0 != size[0] && 0 != size[1] )
       {
-        // Initialize end-callback counter to zero
-        BaseRenderer *renderer = BaseRenderer::GetInstance( it->first );
-        m_EndCallbackCounterMap[renderer] = 0;
-
         // Execute rendering
         it->first->Render();
       }
@@ -626,76 +618,86 @@ RenderingManager
 
 void
 RenderingManager
-::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
+::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  BaseRenderer *renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer)// && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0))
+  // Static method: access member objects via static instance
+  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
   {
-    m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INPROGRESS;
+    renderWindowList[renderWindow] = RENDERING_INPROGRESS;
   }
 }
 
 
 void
 RenderingManager
-::RenderingProgressCallback( itk::Object* object, const itk::EventObject& /*event*/ )
+::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0))
-  {
-    //TODO: Re-enable this call to enable abort-mechanism. This is
-    // temporarily disabled until the persisting bug in the abort-mechanism
-    // is fixed.
-    //this->DoMonitorRendering();
-  }
-}
+  // Static method: access member objects via static instance
+  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
 
-void
-RenderingManager
-::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
-{
-  BaseRenderer *renderer = dynamic_cast< BaseRenderer* >( object );
-  if ( renderer )
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
   {
-    m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
-
-    if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
+    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+    if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
     {
-      this->DoFinishAbortRendering();
+      //TODO: Re-enable this call to enable abort-mechanism. This is
+      // temporarily disabled until the persisting bug in the abort-mechanism
+      // is fixed.
+      //GetInstance()->DoMonitorRendering();
+    }
+  }
+
+}
+
+void
+RenderingManager
+::RenderingEndCallback( vtkObject *caller, unsigned long , void *, void * )
+{
+  // Static method: access member objects via static instance
+  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+  RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
+  unsigned int &maxLOD = GetInstance()->m_MaxLOD;
+  bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
+  bool &updatePending = GetInstance()->m_UpdatePending;
+
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
+  {
+    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+    if ( renderer )
+    {
+      renderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
 
       // Level-of-Detail handling
-
-      // Increase LOD only for LAST LOD-enabled mapper
-      // of this RenderWindow (i.e. BaseRenderer)
-      // (the detail-level is handled for all mappers of one RenderWindow
-      // simultaneously; only the last mapper callback is allowed to increase
-      // the LOD value; this is necessary to enabled correct LOD handling for
-      // multiple datasets simultaneously)
-      if ( (++m_EndCallbackCounterMap[renderer] >= 
-            renderer->GetNumberOfVisibleLODEnabledMappers()) )
+      if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
       {
         // Make sure that LOD-increase is currently not block
         // (by mouse-movement)
-        if ( !m_LODIncreaseBlocked )
+        if ( !lodIncreaseBlocked )
         {
           // Check if the maximum LOD level has already been reached
-          if ( m_NextLODMap[renderer] < m_MaxLOD )
+          if ( nextLODMap[renderer] < maxLOD )
           {
             // NO: increase the level for this renderer...
-            m_NextLODMap[renderer]++;
+            nextLODMap[renderer]++;
 
             // ... and make sure that timer is restarted for next request
-            m_UpdatePending = false;
-            this->RequestUpdate(renderer->GetRenderWindow());
+            updatePending = false;
+            GetInstance()->RequestUpdate(renderer->GetRenderWindow());
           }
           else
           {
             // YES: Reset to level 0 for next rendering request (by user)
-            m_NextLODMap[renderer] = 0;
+            nextLODMap[renderer] = 0;
           }
         }
-        // Reset counter to zero (for next rendering round)
-        m_EndCallbackCounterMap[renderer] = 0;
+
+        // Issue events queued during rendering (abort mechanism)
+        GetInstance()->DoFinishAbortRendering();
       }
     }
   }

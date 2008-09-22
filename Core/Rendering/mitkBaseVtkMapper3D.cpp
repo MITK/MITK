@@ -76,16 +76,18 @@ void BaseVtkMapper3D::UpdateVtkTransform()
 
 void BaseVtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
-  if ( IsVisible(renderer)==false ) 
+  if ( this->IsVisible( renderer )==false ) 
     return;
   
-  if ( GetProp()->GetVisibility() )
-    GetProp()->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+  if ( this->GetProp()->GetVisibility() )
+  {
+    this->GetProp()->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+  }
 }
 
 void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false) 
+  if ( this->IsVisible(renderer)==false ) 
     return;
   
  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
@@ -97,11 +99,11 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
        return;
   }*/
   
-  if ( GetProp()->GetVisibility() )
+  if ( this->GetProp()->GetVisibility() )
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=3)  )
-    GetProp()->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+    this->GetProp()->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
 #else
-    GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+    this->GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
 #endif
 
 }
@@ -109,11 +111,13 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 {
-  if ( IsVisible(renderer)==false ) 
+  if ( this->IsVisible(renderer)==false ) 
     return;
   
-  if ( GetProp()->GetVisibility() )
-    GetProp()->RenderOverlay(renderer->GetVtkRenderer());
+  if ( this->GetProp()->GetVisibility() )
+  {
+    this->GetProp()->RenderOverlay(renderer->GetVtkRenderer());
+  }
 
   // Render annotations as overlay
   m_LabelActorCollection->InitTraversal();

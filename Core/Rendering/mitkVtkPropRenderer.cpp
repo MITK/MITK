@@ -250,35 +250,32 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
  
   int mapperNo = 0;
   mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-  for(;it->IsAtEnd()==false;++it)
+  for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
   {
     mitk::DataTreeNode::Pointer node = it->Get();
-    if(node.IsNull())
+
+    if ( node.IsNull() )
       continue;
+
     mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if(mapper.IsNull())
+    if ( mapper.IsNull() )
       continue;
 
-    //if(GetDisplayGeometry()->IsValid())
-    //{
-
-    //}
-
-    if(m_MapperID == 1 && mapper->IsVtkBased())
+    if ( m_MapperID == 1 && mapper->IsVtkBased() )
       continue; //B/ no vtk mappers in 2D windows 
 
     // The information about LOD-enabled mappers is required by RenderingManager
-    if ( mapper->IsLODEnabled( this ) )
+    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
     {
       ++m_NumberOfVisibleLODEnabledMappers;
     }
 
     // mapper without a layer property get layer number 1
-    int layer=1;
+    int layer = 1;
     node->GetIntProperty("layer", layer, this);
 
     int nr = (layer<<16) + mapperNo;
-    m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
+    m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
   }
 }
@@ -375,6 +372,7 @@ void mitk::VtkPropRenderer::Update()
   m_VtkMapperPresent=false;
 
   mitk::DataTreeIteratorClone it=m_DataTreeIterator;
+  it->GoToBegin();
 
   while(!it->IsAtEnd())
   {

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 class vtkRenderWindow;
+class vtkObject;
 
 namespace mitk
 {
@@ -265,7 +266,6 @@ protected:
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
   RendererIntMap m_NextLODMap;
-  RendererIntMap m_EndCallbackCounterMap;
 
   unsigned int m_MaxLOD;
 
@@ -280,9 +280,12 @@ protected:
 
   vtkRenderWindow *m_LastUpdatedRW;
 
-  void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
-  void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
-  void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
+  static void RenderingStartCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
+  static void RenderingProgressCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
+  static void RenderingEndCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
 
   typedef std::map< vtkRenderWindow *, int > RenderWindowList;
 

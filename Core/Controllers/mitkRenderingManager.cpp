@@ -226,8 +226,6 @@ RenderingManager
 
   m_LastUpdatedRW = renderWindow;
 
-  BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-
   // Immediately repaint this window (implementation platform specific)
   // If the size is 0 it crahses
   int *size = renderWindow->GetSize();
@@ -635,9 +633,6 @@ void
 RenderingManager
 ::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  // Static method: access member objects via static instance
-  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
-
   vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
   if ( renderWindow )
   {

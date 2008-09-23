@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E0B46B200FD
 //##Documentation
 //## @brief Provides access to a channel of the input image
 //##
@@ -42,22 +41,17 @@ public:
 	itkSetMacro(ChannelNr,int);
 
 protected:
-	//##ModelId=3E1B1980039C
 	ImageChannelSelector();
 
-	//##ModelId=3E1B198003B0
 	virtual ~ImageChannelSelector();
 
-	//##ModelId=3E3BD0C70343
-    virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
   virtual void GenerateInputRequestedRegion();
 
-  //##ModelId=3E3BD0C903DC
-    virtual void GenerateData();
+  virtual void GenerateData();
 
-    //##ModelId=3E1B1A0C005E
-	int m_ChannelNr;
+  int m_ChannelNr;
 };
 
 } // namespace mitk

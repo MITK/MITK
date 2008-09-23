@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3ED953070392
 //##Documentation
 //## @brief Property for level/window data
 //##
@@ -33,13 +32,10 @@ class MITK_CORE_EXPORT LevelWindowProperty : public BaseProperty
 {
 
 protected:
-    //##ModelId=3ED953090113
     LevelWindow m_LevWin;
 
-    //##ModelId=3ED953090121
     LevelWindowProperty();
 
-    //##ModelId=3EF198D9012D
     LevelWindowProperty(const mitk::LevelWindow &levWin);
         
 public:
@@ -48,16 +44,12 @@ public:
     itkNewMacro(LevelWindowProperty);
     mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow&);
 
-    //##ModelId=3ED953090122
     virtual ~LevelWindowProperty();
 
-    //##ModelId=3ED953090124
     virtual bool operator==(const BaseProperty& property) const;
 
-    //##ModelId=3ED953090133
     const mitk::LevelWindow & GetLevelWindow() const;
 
-    //##ModelId=3ED953090135
     void SetLevelWindow(const LevelWindow &levWin);
 
     virtual std::string GetValueAsString() const;

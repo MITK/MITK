@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3DCBFE4C006F
 //##Documentation
 //## @brief Provides access to a volume at a specific time of the input image
 //##
@@ -45,24 +44,18 @@ public:
 	itkSetMacro(ChannelNr,int);
 
 protected:
-	//##ModelId=3E1B1975031E
 	ImageTimeSelector();
 
-	//##ModelId=3E1B1975033C
 	virtual ~ImageTimeSelector();
 
-	//##ModelId=3E3BD0CC0232
-    virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
   virtual void GenerateInputRequestedRegion();
 
-	//##ModelId=3E3BD0CE0194
-    virtual void GenerateData();
+	virtual void GenerateData();
 
-  //##ModelId=3E1B1A0501C7
 	int m_TimeNr;
 
-	//##ModelId=3E1B1A08024D
 	int m_ChannelNr;
 };
 

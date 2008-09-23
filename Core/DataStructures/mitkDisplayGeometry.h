@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E3AE8F401DD
 //##Documentation
 //## @brief Describes the geometry on the display/screen for 2D display.
 //##
@@ -63,18 +62,13 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  //##ModelId=3E3AEA5101A2
   virtual void SetWorldGeometry(const mitk::Geometry2D* aWorldGeometry);
   itkGetConstObjectMacro(WorldGeometry, Geometry2D);
 
-  //##ModelId=3E3AE9FD00C5
   virtual void Zoom(mitk::ScalarType factor, const mitk::Point2D& centerInDisplayUnits);
-  //##ModelId=3E3AEE700380
   virtual void MoveBy(const mitk::Vector2D& shiftInDisplayUnits);
-  //##ModelId=3E3C38660226
   virtual void Fit();
 
-  //##ModelId=3E3C36920345
   //##Documentation
   //## @brief Set the size of the display in display units.
   //## 
@@ -87,16 +81,13 @@ public:
   //## When the aspect ration changes, the displayed region includes the old displayed region, but
   //## cannot be exaclty the same.
   virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion=true);
-  //##ModelId=3E3C36CD02D2
   virtual void SetOriginInMM(const mitk::Vector2D& origin_mm);
 
-  //##ModelId=3E3C516B0045
   mitk::Vector2D GetOriginInMM() const
   {
     return m_OriginInMM;
   }
 
-  //##ModelId=3E3C51890107
   mitk::Vector2D GetOriginInDisplayUnits() const
   {
     return m_OriginInDisplayUnits;
@@ -104,92 +95,64 @@ public:
 
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
-  //##ModelId=3E3AEB460259
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
-  //##ModelId=3E3AEB490380
   virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
 
-  //##ModelId=3E3AEB52008A
   virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;
-  //##ModelId=3E3AEB54017D
   virtual void WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const;
 
-  //##ModelId=3E3AEB620231
   virtual const TimeBounds& GetTimeBounds() const;
 
-  //##ModelId=3E3B994B02A6
   virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
-  //##ModelId=3E3B994802B6
   virtual void IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
-  //##ModelId=3E3C666E0299
   unsigned int GetDisplayWidth() const
   {
     assert(m_SizeInDisplayUnits[0] >= 0);  
     return (unsigned int)m_SizeInDisplayUnits[0];
   }
 
-  //##ModelId=3E3C668B0363
   unsigned int GetDisplayHeight() const
   {
     assert(m_SizeInDisplayUnits[1] >= 0);  
     return (unsigned int)m_SizeInDisplayUnits[1];
   }
 
-  //##ModelId=3E3D86CB0039
   mitk::Vector2D GetSizeInDisplayUnits() const
   {
     return m_SizeInDisplayUnits;
   }
 
-  //##ModelId=3E3D86E9015E
   mitk::Vector2D GetSizeInMM() const
   {
     return m_SizeInMM;
   }
 
-  //##ModelId=3E3D883B0132
   virtual void SetScaleFactor(mitk::ScalarType mmPerDisplayUnit);
-  //##ModelId=3E3ED45900A1
   mitk::ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
-  //##ModelId=3E48D5B40210
   virtual void DisplayToWorld(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
-  //##ModelId=3E48D5D7027E
   virtual void WorldToDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_display) const;
 
-  //##ModelId=3E48E2AE03A7
   virtual void DisplayToWorld(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_mm) const;
-  //##ModelId=3E48E2B40374
   virtual void WorldToDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_display) const;
 
-  //##ModelId=3EF436470027
   virtual void ULDisplayToMM(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_mm) const;
-  //##ModelId=3EF4364701AE
   virtual void MMToULDisplay(const mitk::Point2D &pt_mm, mitk::Point2D &pt_ULdisplay) const;
 
-  //##ModelId=3EF436470348
   virtual void ULDisplayToMM(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_mm) const;
-  //##ModelId=3EF436480105
   virtual void MMToULDisplay(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_ULdisplay) const;
 
-  //##ModelId=3EF4364802A9
   virtual void ULDisplayToDisplay(const mitk::Point2D &pt_ULdisplay, mitk::Point2D &pt_display) const;
-  //##ModelId=3EF43649007A
   virtual void DisplayToULDisplay(const mitk::Point2D &pt_display, mitk::Point2D &pt_ULdisplay) const;
 
-  //##ModelId=3EF436490251
   virtual void ULDisplayToDisplay(const mitk::Vector2D &vec_ULdisplay, mitk::Vector2D &vec_display) const;
-  //##ModelId=3EF4364A0049
   virtual void DisplayToULDisplay(const mitk::Vector2D &vec_display, mitk::Vector2D &vec_ULdisplay) const;
 
   /** Return this objects modified time.  */
-  //##ModelId=3E66CC5A0118
   virtual unsigned long GetMTime() const;
-  //##ModelId=3EF4935A01B6
   virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 
-  //##ModelId=3EF4935C03B8
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
   virtual bool IsValid() const;
@@ -198,24 +161,16 @@ public:
   //## @brief duplicates the geometry, NOT useful for this sub-class
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 protected:
-  //##ModelId=3E3AE91A035E
   DisplayGeometry();
-  //##ModelId=3E3AE91A037C
   virtual ~DisplayGeometry();
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-  //##ModelId=3E3AE9350140
   mitk::Vector2D m_OriginInMM;
-  //##ModelId=3E3C521C01EE
   mitk::Vector2D m_OriginInDisplayUnits;
-  //##ModelId=3E3AE94D00AE
   mitk::ScalarType m_ScaleFactorMMPerDisplayUnit;
-  //##ModelId=3E3D88E70252
   mitk::Vector2D m_SizeInMM;
-  //##ModelId=3E3AE97701A9
   mitk::Vector2D m_SizeInDisplayUnits;
-  //##ModelId=3E3AEA9001D5
   mitk::Geometry2D::ConstPointer m_WorldGeometry;
 };
 

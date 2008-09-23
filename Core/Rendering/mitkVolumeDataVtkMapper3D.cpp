@@ -43,7 +43,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkCallbackCommand.h>
 #include <vtkImageShiftScale.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageWriter.h>
@@ -96,7 +95,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_VolumePropertyHigh = vtkVolumeProperty::New();
 
   m_VolumeLOD = vtkLODProp3D::New();
-  m_DummyProp = vtkAssembly::New();
+  m_VolumeLOD->VisibilityOff();
 
   m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0); // RayCast
 
@@ -138,7 +137,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
   //m_Prop3D = m_Prop3DAssembly;
 
-  m_Prop3D = m_DummyProp;
+  m_Prop3D = m_VolumeLOD;
   m_Prop3D->Register(NULL);
 
   m_ImageCast = vtkImageShiftScale::New();
@@ -157,15 +156,6 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_T2DMapper->SetInput(m_Resampler->GetOutput());
 
-
-  m_AbortCallbackCommand = vtkCallbackCommand::New();
-  m_AbortCallbackCommand->SetCallback(mitk::VolumeDataVtkMapper3D::AbortCallback);
-
-  m_StartCallbackCommand = vtkCallbackCommand::New();
-  m_StartCallbackCommand ->SetCallback( VolumeDataVtkMapper3D::StartCallback );
-
-  m_EndCallbackCommand = vtkCallbackCommand::New();
-  m_EndCallbackCommand->SetCallback( VolumeDataVtkMapper3D::EndCallback );
 
   this->CreateDefaultTransferFunctions();
 }
@@ -189,13 +179,9 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   m_BoundingBoxMapper->Delete();
   m_BoundingBoxActor->Delete();
   m_ImageMaskFilter->Delete();
-  m_DummyProp->Delete();
   m_DefaultColorTransferFunction->Delete();
   m_DefaultOpacityTransferFunction->Delete();
   m_DefaultGradientTransferFunction->Delete();
-  m_AbortCallbackCommand->Delete();
-  m_StartCallbackCommand->Delete();
-  m_EndCallbackCommand->Delete();
 
   if (m_Mask)
   {
@@ -203,13 +189,15 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
   }
 }
 
-void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
+void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
-  if ((input==NULL) || (input->IsInitialized()==false))
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
+  if ( !input || !input->IsInitialized() )
     return;
 
-  vtkRenderWindow* vtkRendWin = renderer->GetRenderWindow();
+  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+   
+  bool volumeRenderingEnabled = true;
 
   if (this->IsVisible(renderer)==false ||
       this->GetDataTreeNode() == NULL ||
@@ -217,9 +205,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
       dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
     )
   {
-    m_Prop3D->UnRegister( NULL );
-    m_Prop3D = m_DummyProp;
-    m_Prop3D->Register( NULL );
+    volumeRenderingEnabled = false;
 
     // Check if a bounding box should be displayed around the dataset
     // (even if volume rendering is disabled)
@@ -256,23 +242,22 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
           1.0, 1.0, 1.0 );
       }
     }
-
-    mitk::RenderingManager::GetInstance()->SetNumberOfLOD(1); //how many LODs should be used
-
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
-
-    return;
   }
 
-  m_Prop3D->UnRegister( NULL );
-  m_Prop3D = m_VolumeLOD;
-  m_Prop3D->Register( NULL );
-
-  mitk::RenderingManager::GetInstance()->SetNumberOfLOD(3); //how many LODs should be used
+  // Don't do anything if VR is disabled
+  if ( !volumeRenderingEnabled )
+  {
+    m_VolumeLOD->VisibilityOff();
+    return;
+  }
+  else
+  {
+    m_VolumeLOD->VisibilityOn();
+  }
 
   this->SetPreferences();
 
-  switch ( mitk::RenderingManager::GetInstance()->GetCurrentLOD() )
+  switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
   case 0:
   default:
@@ -328,20 +313,16 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   this->UpdateTransferFunctions( renderer );
 
-  vtkRenderWindowInteractor *interactor = vtkRendWin->GetInteractor();
+  vtkRenderWindowInteractor *interactor = renderWindow->GetInteractor();
   interactor->SetDesiredUpdateRate(0.00001);
   interactor->SetStillUpdateRate(0.00001);
 
 
-  if ( m_RenderWindowInitialized.find( vtkRendWin ) == m_RenderWindowInitialized.end() )
+  if ( m_RenderWindowInitialized.find( renderWindow ) == m_RenderWindowInitialized.end() )
   {
-    m_RenderWindowInitialized.insert( vtkRendWin );
+    m_RenderWindowInitialized.insert( renderWindow );
 
-    vtkRendWin->AddObserver( vtkCommand::AbortCheckEvent,m_AbortCallbackCommand );
-    vtkRendWin->AddObserver( vtkCommand::StartEvent, m_StartCallbackCommand );
-    vtkRendWin->AddObserver( vtkCommand::EndEvent, m_EndCallbackCommand );
-
-    mitk::RenderingManager::GetInstance()->SetCurrentLOD(0);
+    mitk::RenderingManager::GetInstance()->SetNextLOD(0);
 
     mitk::RenderingManager::GetInstance()->SetShading( true, 0 );
     mitk::RenderingManager::GetInstance()->SetShading( true, 1 );
@@ -359,39 +340,6 @@ void mitk::VolumeDataVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   this->SetClippingPlane( interactor );
 }
 
-void mitk::VolumeDataVtkMapper3D::AbortCallback(vtkObject *caller, unsigned long , void *, void *) {
-
-  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
-  if ( renderWindow )
-  {
-    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-    renderer->InvokeEvent( itk::ProgressEvent() );
-  }
-
-}
-
-
-void mitk::VolumeDataVtkMapper3D::EndCallback(vtkObject *caller, unsigned long , void *, void *){
-
-  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
-  if ( renderWindow )
-  {
-    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-    renderer->InvokeEvent( itk::EndEvent() );
-  }
-
-}
-
-void mitk::VolumeDataVtkMapper3D::StartCallback(vtkObject *caller, unsigned long , void *, void *)
-{
-  vtkRenderWindow* renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
-  if ( renderWindow )
-  {
-    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-    renderer->InvokeEvent( itk::StartEvent() );
-  }
-
-}
 
 void mitk::VolumeDataVtkMapper3D::CreateDefaultTransferFunctions()
 {
@@ -629,6 +577,13 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
 }
 
 
+bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*/ ) const
+{
+  // Currently all volume mappers are LOD enabled
+  return true;
+}
+
+
 void mitk::VolumeDataVtkMapper3D::EnableMask()
 {
   if (!this->m_Mask)
@@ -670,9 +625,9 @@ mitk::Image::Pointer mitk::VolumeDataVtkMapper3D::GetMask()
     Image::Pointer mask = Image::New();
 
     mask->Initialize(this->m_Mask);
-    mask->SetVolume(this->m_Mask->GetScalarPointer());
+    mask->SetImportVolume(this->m_Mask->GetScalarPointer(), 0, 0, Image::ReferenceMemory);
     mask->SetGeometry(this->GetInput()->GetGeometry());
-	  return mask;
+    return mask;
   }
 
   return 0;

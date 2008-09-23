@@ -54,14 +54,12 @@ public:
   
   itkNewMacro(Self);
   
-  //##ModelId=3EF4A2660237
   //##Documentation
   //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
 
   virtual unsigned long GetMTime() const;
 
-  //##ModelId=3EF4A2660241
   //##Documentation
   //## @brief Get the rectangular area that is used for transformation by 
   //## m_VtkAbstractTransform and therewith defines the 2D manifold described by 
@@ -70,18 +68,14 @@ public:
   
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
 
-  //##ModelId=3EF4A2660256
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
   
-  //##ModelId=3EF4A266025F
   virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
     
   virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
-  //##ModelId=3EF4A2660288
   virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
   
-  //##ModelId=3EF4A2660292
   virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
   virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const;

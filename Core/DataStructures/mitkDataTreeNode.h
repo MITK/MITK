@@ -50,7 +50,6 @@ namespace mitk {
 
 class BaseRenderer;
 
-//##ModelId=3E031E2C0143
 //##Documentation
 //## @brief Class for nodes of the DataTree
 //##
@@ -76,14 +75,11 @@ public:
 
   itkNewMacro(Self);  
 
-  //##ModelId=3D6A0E8C02CC
   mitk::Mapper* GetMapper(MapperSlotId id) const;
-  //##ModelId=3E32C49D00A8
   //##Documentation
   //## @brief Get the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataTreeNode
   BaseData* GetData() const;
-  //##ModelId=3ED91D050121
   //##Documentation
   //## @brief Get the transformation applied prior to displaying the data as
   //## a vtkTransform
@@ -92,8 +88,6 @@ public:
   //##Documentation
   //## @brief Get the Interactor 
   Interactor* GetInteractor() const;
-
-  //##ModelId=3E33F4E4025B
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataTreeNode
@@ -104,29 +98,20 @@ public:
   //## @brief Set the Interactor
   virtual void SetInteractor(Interactor* interactor);
 
-  //##ModelId=3E33F5D7032D
   mitk::DataTreeNode& operator=(const DataTreeNode& right);
 
-  //##ModelId=3E34248B02E0
   mitk::DataTreeNode& operator=(BaseData* right);
-  //##ModelId=3E69331903C9
   virtual void SetMapper(MapperSlotId id, mitk::Mapper* mapper);
-  //##ModelId=3E860A5C0032
   virtual void UpdateOutputInformation();
 
-  //##ModelId=3E860A5E011B
   virtual void SetRequestedRegionToLargestPossibleRegion();
 
-  //##ModelId=3E860A5F03D9
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
 
-  //##ModelId=3E860A620080
   virtual bool VerifyRequestedRegion();
 
-  //##ModelId=3E860A640156
   virtual void SetRequestedRegion(itk::DataObject *data);
 
-  //##ModelId=3E860A6601DB
   virtual void CopyInformation(const itk::DataObject *data);
 
   //##Documentation
@@ -192,7 +177,6 @@ public:
   //## @sa m_PropertyList
   void ConcatenatePropertyList(PropertyList* pList, bool replace = false);
 
-  //##ModelId=3EF189DB0111
   //##Documentation
   //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList 
   //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
@@ -286,14 +270,12 @@ public:
   //## @return @a true property was found
   bool GetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer) const;
 
-  //##ModelId=3EF1941C011F
   //##Documentation
   //## @brief Convenience access method for color properties (instances of
   //## ColorProperty)
   //## @return @a true property was found
   bool GetColor(float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color") const;
 
-  //##ModelId=3EF194220204
   //##Documentation
   //## @brief Convenience access method for level-window properties (instances of
   //## LevelWindowProperty)
@@ -361,7 +343,6 @@ public:
     this->SetProperty("name", StringProperty::New(name));
   }
 
-  //##ModelId=3EF1941E01D6
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances
   //## of BoolProperty with property-key "visibile")
@@ -374,7 +355,6 @@ public:
     return GetBoolProperty(propertyKey, visible, renderer);
   }
 
-  //##ModelId=3EF19420016B
   //##Documentation
   //## @brief Convenience access method for opacity properties (instances of
   //## FloatProperty)
@@ -397,7 +377,6 @@ public:
     return defaultIsOn;
   }
 
-  //##ModelId=3EF19424012B
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances
   //## of BoolProperty). Return value is the visibility. Default is
@@ -421,25 +400,21 @@ public:
   //## @brief Convenience method for setting color properties (instances of
   //## ColorProperty)
   void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
-  //##ModelId=3EF196360303
   //##Documentation
   //## @brief Convenience method for setting color properties (instances of
   //## ColorProperty)
   void SetColor(const float rgb[3], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
 
-  //##ModelId=3EF1966703D6
   //##Documentation
   //## @brief Convenience method for setting visibility properties (instances
   //## of BoolProperty)
   void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
-  //##ModelId=3EF196880095
   //##Documentation
   //## @brief Convenience method for setting opacity properties (instances of
   //## FloatProperty)
   void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
 
-  //##ModelId=3EF1969A0181
   //##Documentation
   //## @brief Convenience method for setting level-window properties
   //## (instances of LevelWindowProperty)
@@ -493,24 +468,19 @@ public:
   static const std::string XML_NODE_NAME;
 
 protected:
-  //##ModelId=3E33F5D702AA
   DataTreeNode();
 
-  //##ModelId=3E33F5D702D3
   virtual ~DataTreeNode();
 
-  //##ModelId=3D6A0F8C0202
   //##Documentation
   //## @brief Mapper-slots
   mutable MapperVector m_Mappers;
 
-  //##ModelId=3E32C49D0095
   //##Documentation
   //## @brief The data object (instance of BaseData, e.g., an Image) managed
   //## by this DataTreeNode
   BaseData::Pointer m_Data;
 
-  //##ModelId=3E861B84033C
   //##Documentation
   //## @brief BaseRenderer-independent PropertyList
   //## 
@@ -518,7 +488,6 @@ protected:
   //## by the BaseRenderer-specific properties defined in m_MapOfPropertyLists.
   PropertyList::Pointer m_PropertyList;
 
-  //##ModelId=3EF16CFA010A
   //##Documentation
   //## @brief Map associating each BaseRenderer with its own PropertyList
   mutable MapOfPropertyLists m_MapOfPropertyLists;

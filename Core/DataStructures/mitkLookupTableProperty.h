@@ -25,47 +25,40 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3ED953070392
-//##Documentation
-//## @brief Property for LookupTable data
-//##
-//## @ingroup DataTree
-class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
-{
+  //##Documentation
+  //## @brief Property for LookupTable data
+  //##
+  //## @ingroup DataTree
+  class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
+  {
 
-protected:
-    //##ModelId=3ED953090113
-  LookupTable::Pointer m_LookupTable;
+  protected:
+    LookupTable::Pointer m_LookupTable;
 
-  LookupTableProperty();
+    LookupTableProperty();
 
-  //##ModelId=3ED953090121
-  LookupTableProperty(const mitk::LookupTable::Pointer lut);
+    LookupTableProperty(const mitk::LookupTable::Pointer lut);
 
-  //##ModelId=3EF198D9012D
-  //    LookupTableProperty(const mitk::LookupTable& aLookupTable);
-  
-public:
+    //    LookupTableProperty(const mitk::LookupTable& aLookupTable);
+
+  public:
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
     itkNewMacro(LookupTableProperty);
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
-    //##ModelId=3ED953090122
     virtual ~LookupTableProperty();
 
-    //##ModelId=3ED953090124
     virtual bool operator==(const BaseProperty& property) const;
 
     itkGetObjectMacro(LookupTable, LookupTable );
 
-    //##ModelId=3ED953090135
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
 
     virtual bool WriteXMLData(XMLWriter &xmlWriter);
 
     virtual bool ReadXMLData(XMLReader &xmlReader);
-};
+  };
 
 } // namespace mitk
 

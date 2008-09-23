@@ -43,7 +43,6 @@
 //protected:
 //  virtual void Repaint() { invalidate(); }
 //
-//  //##ModelId=3E3314590288
 //  bool m_InitNeeded;
 //  bool m_ResizeNeeded;
 //

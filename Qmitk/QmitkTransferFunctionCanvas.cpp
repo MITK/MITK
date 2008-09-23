@@ -154,7 +154,7 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent( QMouseEvent*  )
 {
   // m_GrabbedHandle = -1;
   update();
-  mitk::RenderingManager::GetInstance()->SetCurrentLOD(2);
+  mitk::RenderingManager::GetInstance()->SetNextLOD(1);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 };
 

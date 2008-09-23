@@ -56,16 +56,18 @@ const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D() 
 : m_vtkSelectedPointList(NULL),
-  m_vtkUnselectedPointList(NULL), 
-  //m_vtkContourPolyData(NULL),
-  m_VtkSelectedPolyDataMapper(NULL), 
-  m_VtkUnselectedPolyDataMapper(NULL),
-  //m_vtkContourPolyDataMapper(NULL),
-  m_vtkTextList(NULL), 
-  //m_Contour(NULL), 
-  //m_TubeFilter(NULL),
-  m_NumberOfSelectedAdded(0), 
-  m_NumberOfUnselectedAdded(0)
+ m_vtkUnselectedPointList(NULL), 
+ //m_vtkContourPolyData(NULL),
+ m_VtkSelectedPolyDataMapper(NULL), 
+ m_VtkUnselectedPolyDataMapper(NULL),
+ //m_vtkContourPolyDataMapper(NULL),
+ m_vtkTextList(NULL), 
+ //m_Contour(NULL), 
+ //m_TubeFilter(NULL),
+ m_NumberOfSelectedAdded(0), 
+ m_NumberOfUnselectedAdded(0),
+ m_PointSize(1.0),
+ m_ContourRadius(0.5)
 {
   //propassembly
   m_PointsAssembly = vtkPropAssembly::New();
@@ -94,8 +96,11 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
   m_ContourActor->ReleaseGraphicsResources(renWin);
 }
 
-void mitk::PointSetVtkMapper3D::GenerateData()
+void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 {
+  m_vtkSelectedPointList = vtkAppendPolyData::New();
+  m_vtkUnselectedPointList = vtkAppendPolyData::New();
+
   m_PointsAssembly->VisibilityOn();
 
   if(m_PointsAssembly->GetParts()->IsItemPresent(m_SelectedActor))
@@ -145,12 +150,12 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
   //now fill selected and unselected pointList
   //get size of Points in Property
-  ScalarType pointSize = 2;
+  m_PointSize = 2;
   mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
   if ( pointSizeProp.IsNotNull() )
-    pointSize = pointSizeProp->GetValue();
+    m_PointSize = pointSizeProp->GetValue();
 
-  //get the property for creating a lable onto every point only once
+  //get the property for creating a label onto every point only once
   bool showLabel = true;
   this->GetDataTreeNode()->GetBoolProperty("show label", showLabel);
   const char * pointLabel=NULL;
@@ -162,8 +167,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
       showLabel = false;
   }
 
-  m_vtkSelectedPointList = vtkAppendPolyData::New();
-  m_vtkUnselectedPointList = vtkAppendPolyData::New();
+
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
   //now add an object for each point in data
@@ -174,7 +178,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
   {
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType;
-  
+
     if(itkPointSet->GetPointData()->size() == 0 || pointDataBroken)
       pointType = mitk::PTUNDEFINED;
     else
@@ -191,7 +195,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     case mitk::PTUNDEFINED:
       {
         vtkSphereSource *sphere = vtkSphereSource::New();
-        sphere->SetRadius(pointSize);
+        sphere->SetRadius(m_PointSize);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
@@ -214,9 +218,9 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     case mitk::PTSTART:
       {
         vtkCubeSource *cube = vtkCubeSource::New();
-        cube->SetXLength(pointSize/2);
-        cube->SetYLength(pointSize/2);
-        cube->SetZLength(pointSize/2);
+        cube->SetXLength(m_PointSize/2);
+        cube->SetYLength(m_PointSize/2);
+        cube->SetZLength(m_PointSize/2);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         cube->SetCenter(point1[0],point1[1],point1[2]);
@@ -227,7 +231,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     case mitk::PTCORNER:
       {
         vtkConeSource *cone = vtkConeSource::New();
-        cone->SetRadius(pointSize);
+        cone->SetRadius(m_PointSize);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         cone->SetCenter(point1[0],point1[1],point1[2]);
@@ -239,7 +243,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     case mitk::PTEDGE:
       {
         vtkCylinderSource *cylinder = vtkCylinderSource::New();
-        cylinder->SetRadius(pointSize);
+        cylinder->SetRadius(m_PointSize);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         cylinder->SetCenter(point1[0],point1[1],point1[2]);
@@ -251,7 +255,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     case mitk::PTEND:
       {
         vtkSphereSource *sphere = vtkSphereSource::New();
-        sphere->SetRadius(pointSize);
+        sphere->SetRadius(m_PointSize);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
@@ -264,7 +268,7 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     default:
       {
         vtkSphereSource *sphere = vtkSphereSource::New();
-        sphere->SetRadius(pointSize);
+        sphere->SetRadius(m_PointSize);
         mitk::Point3D point1;
         point1 = input->GetPoint(pointsIter->Index(), timestep);
         sphere->SetCenter(point1[0],point1[1],point1[2]);
@@ -342,7 +346,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     if(pointDataIter != itkPointSet->GetPointData()->End())
       pointDataIter++;
   } // end FOR
-
+  
+  
   //now according to number of elements added to selected or unselected, build up the rendering pipeline
   if (m_NumberOfSelectedAdded > 0)
   {
@@ -373,8 +378,15 @@ void mitk::PointSetVtkMapper3D::GenerateData()
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
   m_vtkUnselectedPointList->Delete();
+}
 
-    //apply props
+
+void mitk::PointSetVtkMapper3D::GenerateData()
+{
+  //create new vtk render objects (e.g. sphere for a point)
+  this->CreateVTKRenderObjects();
+
+  //apply props
   Superclass::ApplyProperties( m_ContourActor, NULL );
   this->ApplyProperties(NULL);
 
@@ -383,9 +395,23 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
 void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
+
+
+  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
+  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize"));
+  // only create new vtk render objects if property values were changed
+  if ( pointSizeProp.IsNotNull() &&  contourSizeProp.IsNotNull() )
+  {
+    if (m_PointSize!=pointSizeProp->GetValue() || m_ContourRadius!= contourSizeProp->GetValue())
+    {
+      this->CreateVTKRenderObjects();
+    }
+  }
+
+
   Superclass::ApplyProperties( m_ContourActor, renderer );
   this->ApplyProperties(renderer);
-  
+
   if(IsVisible(renderer)==false)
   {
     m_UnselectedActor->VisibilityOff();
@@ -406,7 +432,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();
   }
- 
+
   if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity")) != NULL)
   {  
     mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity"));
@@ -461,7 +487,7 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform()
 
 void mitk::PointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-//check for color props and use it for rendering of selected/unselected points and contour 
+  //check for color props and use it for rendering of selected/unselected points and contour 
   //due to different params in VTK (double/float) we have to convert!
 
   //vars to convert to
@@ -571,89 +597,84 @@ void mitk::PointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
 
 void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 {
-    vtkAppendPolyData* vtkContourPolyData = vtkAppendPolyData::New();
-    vtkPolyDataMapper* vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 
+  vtkAppendPolyData* vtkContourPolyData = vtkAppendPolyData::New();
+  vtkPolyDataMapper* vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 
 
-    vtkPoints *points = vtkPoints::New();
-    vtkCellArray *polys = vtkCellArray::New();
-    
-    mitk::PointSet::PointsContainer::Iterator pointsIter;
-    mitk::PointSet::PointDataContainer::Iterator pointDataIter;
-    int j;
+  vtkPoints *points = vtkPoints::New();
+  vtkCellArray *polys = vtkCellArray::New();
 
-    // get and update the PointSet
-    mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-    input->Update();
+  mitk::PointSet::PointsContainer::Iterator pointsIter;
+  mitk::PointSet::PointDataContainer::Iterator pointDataIter;
+  int j;
 
-    int timestep = this->GetTimestep();
-    mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
-    if ( itkPointSet.GetPointer() == NULL) 
-    {
-      return;
-    }
+  // get and update the PointSet
+  mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
+  input->Update();
 
-    for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
-    {
-      vtkIdType cell[2] = {j-1,j};
-      mitk::Point3D point1;
-      point1 = input->GetPoint(pointsIter->Index(), timestep);
-      points->InsertPoint(j,point1[0],point1[1],point1[2]);
-      if (j>0)
-        polys->InsertNextCell(2,cell);
-    }
+  int timestep = this->GetTimestep();
+  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
+  if ( itkPointSet.GetPointer() == NULL) 
+  {
+    return;
+  }
 
-    bool close;
-    if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close"), renderer) == NULL)
-      close = false;
-    else
-      close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close"), renderer)->GetValue();
-    if (close) 
-    {
-      vtkIdType cell[2] = {j-1,0};
+  for (j=0, pointsIter=itkPointSet->GetPoints()->Begin(); pointsIter!=itkPointSet->GetPoints()->End() ; pointsIter++,j++)
+  {
+    vtkIdType cell[2] = {j-1,j};
+    mitk::Point3D point1;
+    point1 = input->GetPoint(pointsIter->Index(), timestep);
+    points->InsertPoint(j,point1[0],point1[1],point1[2]);
+    if (j>0)
       polys->InsertNextCell(2,cell);
-    }
+  }
 
-    vtkPolyData* contour = vtkPolyData::New();
-    contour->SetPoints(points);
-    points->Delete();
-    contour->SetLines(polys);
-    polys->Delete();
-    contour->Update();
+  bool close;
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close"), renderer) == NULL)
+    close = false;
+  else
+    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetPropertyList()->GetProperty("close"), renderer)->GetValue();
+  if (close) 
+  {
+    vtkIdType cell[2] = {j-1,0};
+    polys->InsertNextCell(2,cell);
+  }
 
-    vtkTubeFilter* tubeFilter = vtkTubeFilter::New();
-    tubeFilter->SetNumberOfSides( 12 );
-    tubeFilter->SetInput(contour);
-    contour->Delete();
+  vtkPolyData* contour = vtkPolyData::New();
+  contour->SetPoints(points);
+  points->Delete();
+  contour->SetLines(polys);
+  polys->Delete();
+  contour->Update();
 
-    //check for property contoursize. If not present, then take pointsize
-    ScalarType radius = 0.5;
-    mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize") );
+  vtkTubeFilter* tubeFilter = vtkTubeFilter::New();
+  tubeFilter->SetNumberOfSides( 12 );
+  tubeFilter->SetInput(contour);
+  contour->Delete();
 
-    //if no property could be found, then use pointsize
-    if (contourSizeProp.IsNull())
-      contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize") );
+  //check for property contoursize. 
+  m_ContourRadius = 0.5;
+  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize") );
 
-    //take whatever was usefull
-    if (contourSizeProp.IsNotNull())
-      radius = contourSizeProp->GetValue();
+  if (contourSizeProp.IsNotNull())
+    m_ContourRadius = contourSizeProp->GetValue();
 
-    tubeFilter->SetRadius( radius );
-    tubeFilter->Update();
+  tubeFilter->SetRadius( m_ContourRadius );
+  tubeFilter->Update();
 
-    //add to pipeline
-    vtkContourPolyData->AddInput(tubeFilter->GetOutput());
-    tubeFilter->Delete();
-    vtkContourPolyDataMapper->SetInput(vtkContourPolyData->GetOutput());
-    vtkContourPolyData->Delete();
+  //add to pipeline
+  vtkContourPolyData->AddInput(tubeFilter->GetOutput());
+  tubeFilter->Delete();
+  vtkContourPolyDataMapper->SetInput(vtkContourPolyData->GetOutput());
+  vtkContourPolyData->Delete();
 
-    //create a new instance of the actor
-    m_ContourActor->Delete();
-    m_ContourActor = vtkActor::New();
+  //create a new instance of the actor
+  m_ContourActor->Delete();
+  m_ContourActor = vtkActor::New();
 
-    m_ContourActor->SetMapper(vtkContourPolyDataMapper);
-    vtkContourPolyDataMapper->Delete();
-    
-    m_PointsAssembly->AddPart(m_ContourActor);
+  m_ContourActor->SetMapper(vtkContourPolyDataMapper);
+  vtkContourPolyDataMapper->Delete();
+
+  m_PointsAssembly->AddPart(m_ContourActor);
 }
 
 void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -669,3 +690,4 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, m
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
+

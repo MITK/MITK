@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 
-//##ModelId=3EF222410127
 void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( operation ) )
 {
   /*DisplayCoordinateOperation* dcOperation = static_cast<DisplayCoordinateOperation*>(operation);
@@ -51,7 +50,6 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( oper
   
 }
 
-//##ModelId=3EF2224401CB
 bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
@@ -151,7 +149,6 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   return ok;
 }
 
-//##ModelId=3EF2229F00F0
 mitk::DisplayVectorInteractor::DisplayVectorInteractor(const char * type, mitk::OperationActor* destination)
   : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination)
 {
@@ -164,7 +161,6 @@ mitk::DisplayVectorInteractor::DisplayVectorInteractor(const char * type, mitk::
 }
 
 
-//##ModelId=3EF2229F010E
 mitk::DisplayVectorInteractor::~DisplayVectorInteractor()
 {
 }

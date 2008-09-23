@@ -21,8 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 #include <vtkRenderWindow.h>
-
-#include <vtkRenderWindow.h>
+#include <vtkCallbackCommand.h>
 
 #include <itkCommand.h>
 #include <algorithm>
@@ -37,22 +36,20 @@ RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 RenderingManager
 ::RenderingManager()
 : m_UpdatePending( false ),
-  m_CurrentLOD( 0 ),
-  m_MaxLOD( 2 ),
-  m_NumberOf3DRW( 0 ),
+  //m_MaxLOD( 2 ),
+  m_MaxLOD( 1 ),
+  m_LODIncreaseBlocked( false ),
   m_ClippingPlaneEnabled( false ),
-  m_TimeNavigationController( NULL ),
-  m_LODIncreaseBlocked( false )
+  m_TimeNavigationController( NULL )
 {
-  m_ShadingEnabled.assign(3, false);
-  m_ShadingValues.assign(4, 0.0);
+  m_ShadingEnabled.assign( 3, false );
+  m_ShadingValues.assign( 4, 0.0 );
 }
 
 
 RenderingManager
 ::~RenderingManager()
 {
-
 }
 
 
@@ -135,23 +132,23 @@ RenderingManager
   typedef itk::MemberCommand< RenderingManager > MemberCommandType;
 
   // Add callbacks for rendering abort mechanism
-  BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-  if ( renderer )
+  //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+  if ( renderWindow )
   {
-    MemberCommandType::Pointer startCallbackCommand = MemberCommandType::New();
-    startCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingStartCallback);
-    renderer->AddObserver( itk::StartEvent(), startCallbackCommand );
+    vtkCallbackCommand *startCallbackCommand = vtkCallbackCommand::New();
+    startCallbackCommand->SetCallback( 
+      RenderingManager::RenderingStartCallback );
+    renderWindow->AddObserver( vtkCommand::StartEvent, startCallbackCommand );
 
-    MemberCommandType::Pointer progressCallbackCommand = MemberCommandType::New();
-    progressCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingProgressCallback);
-    renderer->AddObserver( itk::ProgressEvent(), progressCallbackCommand );
+    vtkCallbackCommand *progressCallbackCommand = vtkCallbackCommand::New();
+    progressCallbackCommand->SetCallback( 
+      RenderingManager::RenderingProgressCallback );
+    renderWindow->AddObserver( vtkCommand::AbortCheckEvent, progressCallbackCommand );
 
-    MemberCommandType::Pointer endCallbackCommand = MemberCommandType::New();
-    endCallbackCommand->SetCallbackFunction(
-      this, &RenderingManager::RenderingEndCallback);
-    renderer->AddObserver( itk::EndEvent(), endCallbackCommand );
+    vtkCallbackCommand *endCallbackCommand = vtkCallbackCommand::New();
+    endCallbackCommand->SetCallback( 
+      RenderingManager::RenderingEndCallback );
+    renderWindow->AddObserver( vtkCommand::EndEvent, endCallbackCommand );
  }
 }
 
@@ -182,10 +179,11 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  if ( m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS )
-  {
-    this->AbortRendering( renderWindow );
-  }
+  //TODO
+  //if ( m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS )
+  //{
+  //  this->AbortRendering( BaseRenderer::GetInstance( renderWindow ) );
+  //}
 
   m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
@@ -204,16 +202,11 @@ RenderingManager
   // Check if there are pending requests for any other windows
   m_UpdatePending = false;
   RenderWindowList::iterator it;
-  m_NumberOf3DRW = 0;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
     if ( it->second == RENDERING_REQUESTED )
     {
       m_UpdatePending = true;
-    }
-    if ( BaseRenderer::GetInstance(it->first)->GetMapperID() == 2 )
-    {
-      m_NumberOf3DRW++;
     }
   }
 }
@@ -237,7 +230,8 @@ RenderingManager
   m_LastUpdatedRW = renderWindow;
 
   // Immediately repaint this window (implementation platform specific)
-  renderWindow->Render();
+    // Execute rendering
+    renderWindow->Render();
 
 }
 
@@ -287,11 +281,12 @@ RenderingManager
       //it->second = RENDERING_INPROGRESS;
 
       // Immediately repaint this window (implementation platform specific)
-      it->first->Render();
+        // Execute rendering
+        it->first->Render();
+      }
 
       it->second = RENDERING_INACTIVE;
     }
-  }
 
   if ( m_UpdatePending )
   {
@@ -615,47 +610,83 @@ RenderingManager
 
 void
 RenderingManager
-::RenderingStartCallback( itk::Object* object, const itk::EventObject& /*event*/ )
+::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  //std::cout<< m_CurrentLOD << "<S";
-  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer)
+  // Static method: access member objects via static instance
+  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
   {
-    m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INPROGRESS;
+    renderWindowList[renderWindow] = RENDERING_INPROGRESS;
   }
 }
 
 
 void
 RenderingManager
-::RenderingProgressCallback( itk::Object* /*object*/, const itk::EventObject& /*event*/ )
+::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  //std::cout << "P";
-  this->DoMonitorRendering();
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
+  {
+    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+    if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
+    {
+      //TODO: Re-enable this call to enable abort-mechanism. This is
+      // temporarily disabled until the persisting bug in the abort-mechanism
+      // is fixed.
+      //GetInstance()->DoMonitorRendering();
+    }
+  }
 
 }
 
 void
 RenderingManager
-::RenderingEndCallback( itk::Object* object, const itk::EventObject& /*event*/ )
+::RenderingEndCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  //std::cout<<"E> "<<std::endl;
-  BaseRenderer* renderer = dynamic_cast< BaseRenderer* >( object );
-  if (renderer)
-  {
-    m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
-    this->DoFinishAbortRendering();
+  // Static method: access member objects via static instance
+  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+  RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
+  unsigned int &maxLOD = GetInstance()->m_MaxLOD;
+  bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
+  bool &updatePending = GetInstance()->m_UpdatePending;
 
-    /** Level-Of-Detail **/
-   if(m_NumberOf3DRW > 0)
+  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  if ( renderWindow )
+  {
+    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+    if ( renderer )
     {
-      if(m_CurrentLOD < m_MaxLOD)
+      renderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
+
+      // Level-of-Detail handling
+      if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
       {
-        if ( !m_LODIncreaseBlocked )
+        // Make sure that LOD-increase is currently not block
+        // (by mouse-movement)
+        if ( !lodIncreaseBlocked )
         {
-          this->SetCurrentLOD( m_CurrentLOD + 1 );
-          this->RequestUpdate(renderer->GetRenderWindow());
+          // Check if the maximum LOD level has already been reached
+          if ( nextLODMap[renderer] < maxLOD )
+          {
+            // NO: increase the level for this renderer...
+            nextLODMap[renderer]++;
+
+            // ... and make sure that timer is restarted for next request
+            updatePending = false;
+            GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+          }
+          else
+          {
+            // YES: Reset to level 0 for next rendering request (by user)
+            nextLODMap[renderer] = 0;
+          }
         }
+
+        // Issue events queued during rendering (abort mechanism)
+        GetInstance()->DoFinishAbortRendering();
       }
     }
   }
@@ -681,23 +712,14 @@ RenderingManager
 
 void
 RenderingManager
-::AbortRendering( vtkRenderWindow* renderWindow )
+::AbortRendering()
 {
-  //std::cout << "A";
-  if ( (m_RenderWindowList.count( renderWindow ) != 0)
-    && (m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS) )
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
-    renderWindow->SetAbortRender( true );
-  }
-  else
-  {
-    RenderWindowList::iterator it;
-    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    if ( it->second == RENDERING_INPROGRESS )
     {
-      if ( it->second == RENDERING_INPROGRESS )
-      {
-        it->first->SetAbortRender( true );
-      }
+      it->first->SetAbortRender( true );
     }
   }
 }
@@ -705,41 +727,53 @@ RenderingManager
 
 int
 RenderingManager
-::GetCurrentLOD()
+::GetNextLOD( BaseRenderer *renderer )
 {
-  return m_CurrentLOD;
-}
-
-
-void
-RenderingManager
-::SetCurrentLOD( int lod )
-{
-  //std::cout << lod << std::endl;
-  if ( m_CurrentLOD != lod )
+  if ( renderer != NULL )
   {
-    if( lod > m_MaxLOD )
-    {
-      itkWarningMacro(<<"LOD out of range requested: " << lod << " maxLOD: " << m_MaxLOD);
-      return;
-    }
-    m_CurrentLOD = lod;
+    return m_NextLODMap[renderer];
+  }
+  else
+  {
+    return 0;
   }
 }
 
 
 void
 RenderingManager
-::SetNumberOfLOD( int number )
+::SetNextLOD( unsigned int lod, BaseRenderer *renderer )
 {
-  m_MaxLOD = number - 1;
+  unsigned int newLOD = lod < m_MaxLOD ? lod : m_MaxLOD;
+
+  if ( renderer != NULL )
+  {
+    m_NextLODMap[renderer] = newLOD;
+  }
+  else
+  {
+    // Set next LOD for all renderers
+    RenderWindowList::iterator it;
+    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    {
+      m_NextLODMap[BaseRenderer::GetInstance( it->first )] = newLOD;
+    }
+  }
+}
+
+
+void
+RenderingManager
+::SetMaximumLOD( unsigned int max )
+{
+  m_MaxLOD = max;
 }
 
 
 //enable/disable shading
 void
 RenderingManager
-::SetShading(bool state, int lod)
+::SetShading(bool state, unsigned int lod)
 {
   if(lod>m_MaxLOD)
   {
@@ -752,7 +786,7 @@ RenderingManager
 
 bool
 RenderingManager
-::GetShading(int lod)
+::GetShading(unsigned int lod)
 {
   if(lod>m_MaxLOD)
   {

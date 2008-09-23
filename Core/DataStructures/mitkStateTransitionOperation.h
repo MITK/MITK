@@ -32,12 +32,33 @@ namespace mitk {
   class MITK_CORE_EXPORT StateTransitionOperation : public Operation
   {
   public:
-    StateTransitionOperation(OperationType operationType, State* state);
+    /**
+    * @brief default constructor
+    * @param[in] operationType The type of the operation
+    * @param[in] state The state to be stored
+    * @param[in] time The time according to the state; obligatory when there is only one timestep.
+    **/
+    StateTransitionOperation(OperationType operationType, State* state, unsigned int time = 0);
+    
+    /**
+    * @brief default constructor
+    **/
+    ~StateTransitionOperation();
 
+    /**
+    * @brief Return the state
+    **/
     State* GetState();
+    
+    /**
+    * @brief Return the time
+    **/
+    unsigned int GetTime();
 
   private:
-    State* m_State;
+    State::Pointer m_State;
+
+    unsigned int m_Time;
 
   };
 }//namespace mitk

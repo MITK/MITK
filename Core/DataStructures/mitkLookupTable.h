@@ -70,7 +70,6 @@ public:
     /*!
     * \brief non equality operator implementation
     */ 
-    //##ModelId=3EA969CD007C
     virtual bool operator!=( const LookupTable& LookupTable ) const;
 
     /*!

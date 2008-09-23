@@ -58,13 +58,11 @@ namespace mitk
 
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
-    //##ModelId=3F017B320121
     //##Documentation
     //## @brief deselects the Points in the PointSet.
     //## supports Undo if enabled
     void UnselectAll();
 
-    //##ModelId=3F05C0700185
     //##Documentation
     //## @brief Selects the point.
     //## supports Undo if enabled.
@@ -73,7 +71,6 @@ namespace mitk
 
   private:
 
-    //##ModelId=3F017B3200E3
     //##Documentation
     //## @brief the number of possible points in this object
     //##
@@ -84,7 +81,6 @@ namespace mitk
     //## @brief stores the current CellId this Statemachine works in
     unsigned int m_CurrentCellId;
 
-    //##ModelId=3F0AF6CF00C2
     //##Documentation
     //## @brief to calculate a direction vector from last point and actual point
     Point3D m_LastPoint;

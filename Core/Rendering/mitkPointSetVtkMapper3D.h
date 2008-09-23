@@ -32,9 +32,9 @@ class vtkPolyDataMapper;
 
 namespace mitk {
 
-class PointSet;
+  class PointSet;
 
-/**
+  /**
   * @brief Vtk-based mapper for PointSet
   *
   * Due to the need of different colors for selected 
@@ -64,59 +64,67 @@ class PointSet;
   *
   * @ingroup Mapper
   */
-class MITK_CORE_EXPORT PointSetVtkMapper3D : public BaseVtkMapper3D
-{
-public:
-  mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
+  class MITK_CORE_EXPORT PointSetVtkMapper3D : public BaseVtkMapper3D
+  {
+  public:
+    mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
 
-  itkNewMacro(Self);
+    itkNewMacro(Self);
 
-  virtual const mitk::PointSet* GetInput();
+    virtual const mitk::PointSet* GetInput();
 
-  //overwritten from BaseVtkMapper3D to be able to return a 
-  //m_PointsAssembly which is much faster than a vtkAssembly
-  virtual vtkProp* GetProp();
-  virtual void UpdateVtkTransform();
+    //overwritten from BaseVtkMapper3D to be able to return a 
+    //m_PointsAssembly which is much faster than a vtkAssembly
+    virtual vtkProp* GetProp();
+    virtual void UpdateVtkTransform();
 
-  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  void ReleaseGraphicsResources(vtkWindow *renWin);
+    void ReleaseGraphicsResources(vtkWindow *renWin);
 
-protected:
-  PointSetVtkMapper3D();
+  protected:
+    PointSetVtkMapper3D();
 
-  virtual ~PointSetVtkMapper3D();
+    virtual ~PointSetVtkMapper3D();
 
-  virtual void GenerateData();
-  virtual void GenerateData(mitk::BaseRenderer* renderer);
-  virtual void ApplyProperties(mitk::BaseRenderer* renderer);
-  virtual void CreateContour(mitk::BaseRenderer* renderer);
+    virtual void GenerateData();
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+    virtual void CreateContour(mitk::BaseRenderer* renderer);
+    virtual void CreateVTKRenderObjects();
 
-  vtkAppendPolyData *m_vtkSelectedPointList;
-  vtkAppendPolyData *m_vtkUnselectedPointList;
-//  vtkAppendPolyData *m_vtkContourPolyData;
 
-  vtkPolyDataMapper *m_VtkSelectedPolyDataMapper;
-  vtkPolyDataMapper *m_VtkUnselectedPolyDataMapper;
-//  vtkPolyDataMapper *m_vtkContourPolyDataMapper;
 
-  vtkActor *m_SelectedActor;
-  vtkActor *m_UnselectedActor;
-  vtkActor *m_ContourActor;
+    vtkAppendPolyData *m_vtkSelectedPointList;
+    vtkAppendPolyData *m_vtkUnselectedPointList;
+    //  vtkAppendPolyData *m_vtkContourPolyData;
 
-  vtkPropAssembly *m_PointsAssembly;
+    vtkPolyDataMapper *m_VtkSelectedPolyDataMapper;
+    vtkPolyDataMapper *m_VtkUnselectedPolyDataMapper;
+    //  vtkPolyDataMapper *m_vtkContourPolyDataMapper;
 
-  //help for contour between points
-  vtkAppendPolyData *m_vtkTextList;
-  //vtkPolyData *m_Contour;
-  //vtkTubeFilter *m_TubeFilter;
+    vtkActor *m_SelectedActor;
+    vtkActor *m_UnselectedActor;
+    vtkActor *m_ContourActor;
 
-  //variables to be able to log, how many inputs have been added to PolyDatas
-  unsigned int m_NumberOfSelectedAdded;
-  unsigned int m_NumberOfUnselectedAdded;
-};
+    vtkPropAssembly *m_PointsAssembly;
+
+    //help for contour between points
+    vtkAppendPolyData *m_vtkTextList;
+    //vtkPolyData *m_Contour;
+    //vtkTubeFilter *m_TubeFilter;
+
+    //variables to be able to log, how many inputs have been added to PolyDatas
+    unsigned int m_NumberOfSelectedAdded;
+    unsigned int m_NumberOfUnselectedAdded;
+
+    //variables to check if an update of the vtk objects is needed
+    ScalarType m_PointSize;
+    ScalarType m_ContourRadius;
+  };
 
 
 } // namespace mitk
 
 #endif /* MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273 */
+

@@ -207,22 +207,11 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     dataTreeNode->SetProperty("color",color);
     dataTreeNode->SetProperty("contour",contour);
     dataTreeNode->SetProperty("close",close);
-
-    mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
-
-    //const char *c="";
-    //if ( !strcmp(l.c_str(),c) )
-    // {
-
-    dataTreeNode->SetProperty("label",label);
-    // }
-
     dataTreeNode->SetInteractor(*sop);
-    dataTreeNode->SetProperty("name", label); /// name is identical with label????
+
     *node = dataTreeNode;
 
-    ////then add it to the existing DataTree
-    //m_DataTreeIterator->add(dataTreeNode);
+
   }
 
   if (m_CurrentInteraction.IsNotNull())

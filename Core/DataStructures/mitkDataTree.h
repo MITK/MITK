@@ -35,7 +35,6 @@ namespace mitk
 class XMLWriter;
 
 
-//##ModelId=3EA93EC901B8
 typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 
 //##Documentation
@@ -43,7 +42,6 @@ typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 //## @ingroup DataTree
 typedef	itk::TreeIteratorBase<DataTreeBase> DataTreeIteratorBase;
 
-//##ModelId=3E394E99028E
 //##Documentation
 //## @brief typedef to an iterator on the data tree
 //## @ingroup DataTree
@@ -61,7 +59,6 @@ typedef	itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
 
 typedef	itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
 
-//##ModelId=3E38F35101A0
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
 //## @ingroup DataTree
@@ -74,7 +71,6 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  //##ModelId=3E3FE0430148
   DataTreeIteratorClone GetNext( const char* propertyName, const mitk::BaseProperty* property,  DataTreeIteratorBase* startPosition = NULL );
 
   DataTreeIteratorClone GetIteratorToNode(const DataTreeNode* node, const DataTreeIteratorBase* startPosition = NULL )
@@ -115,7 +111,6 @@ public:
   //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
   static mitk::BoundingBox::Pointer ComputeBoundingBox(mitk::DataTreeIteratorBase* it, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
-  //##ModelId=3ED91D050085
   //##Documentation
   //## \brief Compute the bounding box of all visible parts of the data tree structure, for general 
   //## rendering or renderer specific visibility property checking
@@ -167,10 +162,8 @@ public:
   static const std::string 	XML_TAG_TREE_NODE;
 
 protected:
-  //##ModelId=3E38F46A0190
   DataTree();
 
-  //##ModelId=3E38F46A01AE
   virtual ~DataTree();
 
   static bool SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo = true );  

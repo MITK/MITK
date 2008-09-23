@@ -54,7 +54,6 @@ public:
   const Vector3D &GetNormal() const;
   void SetNormal( const Vector3D &normal );
 
-  //##ModelId=3E3FF04F00E1
   virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
 

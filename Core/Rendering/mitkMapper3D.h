@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E3AA2F60390
 //##Documentation
 //## @brief Base class of all mappers for 3D display
 //## @ingroup Mapper
@@ -33,10 +32,8 @@ class MITK_CORE_EXPORT Mapper3D : public Mapper
     mitkClassMacro(Mapper3D,Mapper);
 
   protected:
-    //##ModelId=3E3AE1C5010C
     Mapper3D();
 
-    //##ModelId=3E3AE1C5012A
     virtual ~Mapper3D();
 
 };

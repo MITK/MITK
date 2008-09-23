@@ -232,6 +232,9 @@ PrepareMapperQueue iterates the datatree in order to find mappers which shall be
 */
 void mitk::VtkPropRenderer::PrepareMapperQueue()
 {
+  // variable for counting LOD-enabled mappers
+  m_NumberOfVisibleLODEnabledMappers = 0;
+
   // Do we have to update the mappers ?
   if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
     Update();
@@ -247,29 +250,32 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
  
   int mapperNo = 0;
   mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-  for(;it->IsAtEnd()==false;++it)
+  for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
   {
     mitk::DataTreeNode::Pointer node = it->Get();
-    if(node.IsNull())
+
+    if ( node.IsNull() )
       continue;
+
     mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if(mapper.IsNull())
+    if ( mapper.IsNull() )
       continue;
 
-    //if(GetDisplayGeometry()->IsValid())
-    //{
-
-    //}
-
-    if(m_MapperID == 1 && mapper->IsVtkBased())
+    if ( m_MapperID == 1 && mapper->IsVtkBased() )
       continue; //B/ no vtk mappers in 2D windows 
 
+    // The information about LOD-enabled mappers is required by RenderingManager
+    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+    {
+      ++m_NumberOfVisibleLODEnabledMappers;
+    }
+
     // mapper without a layer property get layer number 1
-    int layer=1;
+    int layer = 1;
     node->GetIntProperty("layer", layer, this);
 
     int nr = (layer<<16) + mapperNo;
-    m_MappersMap.insert(std::pair<int,Mapper*>(nr, mapper));
+    m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
   }
 }
@@ -366,6 +372,7 @@ void mitk::VtkPropRenderer::Update()
   m_VtkMapperPresent=false;
 
   mitk::DataTreeIteratorClone it=m_DataTreeIterator;
+  it->GoToBegin();
 
   while(!it->IsAtEnd())
   {
@@ -566,7 +573,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
         if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetProp();
-          if (prop)
+          if ( prop && prop->GetVisibility() )
           {
             // add to assembly path
             returnPath->AddNode( prop, prop->GetMatrix() );
@@ -593,17 +600,18 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  if(m_DataTreeIterator.IsNull())
-    return;
+  DataStorage::Pointer storage = DataStorage::GetInstance();
 
-  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-
-  for(;it->IsAtEnd()==false;++it)
+  DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
+  for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();
+      iter != allObjects->end();
+      ++iter)
   {
-    mitk::DataTreeNode::Pointer node = it->Get();
-    if(node.IsNull())
+    DataTreeNode::Pointer node = *iter;
+    if ( node.IsNull() )
       continue;
-    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+
+    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
     if(mapper.IsNotNull())
     {
       mapper->ReleaseGraphicsResources(renWin);

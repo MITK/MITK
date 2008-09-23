@@ -72,11 +72,13 @@ public:
   bool SetMask(const Image* mask);
   virtual void UpdateMask();
 
-  static void AbortCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-  static void EndCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-  static void StartCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
-
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+  /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
+   * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
+   * ProgressEvent on BaseRenderer. */
+  virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+
 protected:
 
 
@@ -107,9 +109,6 @@ protected:
   
   vtkLODProp3D* m_VolumeLOD;
   
-  // Empty Prop (vtkAssembly) used if volume rendering is disabled
-  vtkAssembly *m_DummyProp;
-
   vtkCubeSource *m_BoundingBox;
   vtkPolyDataMapper *m_BoundingBoxMapper;
   vtkActor *m_BoundingBoxActor;
@@ -121,10 +120,6 @@ protected:
 
   vtkImageData *m_Mask;
   vtkImageMask *m_ImageMaskFilter;
-
-  vtkCallbackCommand *m_AbortCallbackCommand;
-  vtkCallbackCommand *m_StartCallbackCommand;
-  vtkCallbackCommand *m_EndCallbackCommand;
 
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
@@ -138,8 +133,8 @@ protected:
   double m_PlaneNormalB;
   double m_PlaneNormalC;
 
-
   std::set< vtkRenderWindow * > m_RenderWindowInitialized;
+
 };
 
 } // namespace mitk

@@ -23,28 +23,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E186F28009B
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
 class MITK_CORE_EXPORT FileReader
 {
   public:
-    //##ModelId=3EF4A7BC0213
     //##Documentation
     //## @brief Get the specified the file to load.
     //## 
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
     virtual const char* GetFileName() const = 0;
 
-    //##ModelId=3EF4A7F70240
     //##Documentation
     //## @brief Specify the file to load.
     //## 
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
     virtual void SetFileName(const char* aFileName) = 0;
 
-    //##ModelId=3EF4A81800E9
     //##Documentation
     //## @brief Get the specified file prefix for the file(s) to load. 
     //## 
@@ -52,7 +48,6 @@ class MITK_CORE_EXPORT FileReader
     //## the data is stored in multiple files.
     virtual const char* GetFilePrefix() const = 0;
 
-    //##ModelId=3EF4A826037E
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //## 
@@ -60,7 +55,6 @@ class MITK_CORE_EXPORT FileReader
     //## the data is stored in multiple files.
     virtual void SetFilePrefix(const char* aFilePrefix) = 0;
 
-    //##ModelId=3EF4A81E0305
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
     //## sprintf format used to build filename from FilePrefix and number.
@@ -69,7 +63,6 @@ class MITK_CORE_EXPORT FileReader
     //## the data is stored in multiple files.
     virtual const char* GetFilePattern() const = 0;
 
-    //##ModelId=3EF4A84E03B8
     //##Documentation
     //## @brief Specified file pattern for the file(s) to load. The sprintf
     //## format used to build filename from FilePrefix and number.
@@ -79,10 +72,8 @@ class MITK_CORE_EXPORT FileReader
     virtual void SetFilePattern(const char* aFilePattern) = 0;
 
 protected:
-    //##ModelId=3E188F1F027E
     FileReader();
 
-    //##ModelId=3E188F2800DC
     virtual ~FileReader();
 public:
 

@@ -22,7 +22,6 @@
 //#endif
 //
 ////----------------------------------------------------------------------------
-////##ModelId=3E6D600F00E1
 //VtkQRenderWindowInteractor* VtkQRenderWindowInteractor::New()
 //{
 //    // First try to create the object from the vtkObjectFactory
@@ -35,16 +34,11 @@
 //    return new VtkQRenderWindowInteractor;
 //}
 //
-////##ModelId=3E6D600F00CC
 //void (*VtkQRenderWindowInteractor::ClassExitMethod)(void *) = (void (*)(void *))NULL;
-////##ModelId=3E6D600F00E0
 //void *VtkQRenderWindowInteractor::ClassExitMethodArg = (void *)NULL;
-////##ModelId=3E6D600F00D6
 //void (*VtkQRenderWindowInteractor::ClassExitMethodArgDelete)(void *) = (void (*)(void *))NULL;
 //
 ////// Construct object so that light follows camera motion.
-////##ModelId=3E6D600F0164
-////##ModelId=3E6D600F0177
 //VtkQRenderWindowInteractor::VtkQRenderWindowInteractor() 
 //{
 //    //static int timerId           = 1;
@@ -53,14 +47,12 @@
 //    this->MouseInWindow = 0;
 //}
 //
-////##ModelId=3E6D600F016C
 //VtkQRenderWindowInteractor::~VtkQRenderWindowInteractor()
 //{
 //    
 //}
 //
 //// Begin processing keyboard strokes.
-////##ModelId=3E6D600F00F5
 //void VtkQRenderWindowInteractor::Initialize()
 //{
 // int *size;
@@ -83,7 +75,6 @@
 //
 //}
 //
-////##ModelId=3E6D600F00F7
 //void VtkQRenderWindowInteractor::Enable()
 //{
 //    if (this->GetEnabled())
@@ -99,7 +90,6 @@
 //}
 //
 //
-////##ModelId=3E6D600F00FF
 //void VtkQRenderWindowInteractor::Disable()
 //{
 //    if (!this->GetEnabled())
@@ -111,7 +101,6 @@
 //    this->Modified();
 //}
 //
-////##ModelId=3E6D600F0113
 //void VtkQRenderWindowInteractor::TerminateApp(void)
 //{
 //}
@@ -138,7 +127,6 @@
 //}
 //
 //
-////##ModelId=3E6D600F0115
 //int VtkQRenderWindowInteractor::CreateTimer(int timertype)
 //{
 //    if (timertype==VTKI_TIMER_FIRST)
@@ -148,7 +136,6 @@
 //    return 1;
 //}
 //
-////##ModelId=3E6D600F011D
 //int VtkQRenderWindowInteractor::DestroyTimer(void)
 //{
 //    killTimer(TimerId);
@@ -156,19 +143,16 @@
 //}
 //
 //
-////##ModelId=3E6D600F014F
 //void VtkQRenderWindowInteractor::SetSize(int w, int h)
 //{
 //    Resize(w, h);
 //}
 //
-////##ModelId=3E6D600F0158
 //void VtkQRenderWindowInteractor::SetSize(int size[2])
 //{
 //    Resize(size[0], size[1]);
 //}
 //
-////##ModelId=3E6D600F016D
 //void VtkQRenderWindowInteractor::Resize(int w, int h)
 //{
 //    UpdateSize(w, h);
@@ -191,7 +175,6 @@
 //
 //// Specify the default function to be called when an interactor needs to exit.
 //// This callback is overridden by an instance ExitMethod that is defined.
-////##ModelId=3E6D600F013A
 //void
 //VtkQRenderWindowInteractor::SetClassExitMethod(void (*f)(void *),void *arg)
 //{
@@ -214,7 +197,6 @@
 //
 //
 //// Set the arg delete method.  This is used to free user memory.
-////##ModelId=3E6D600F0144
 //void
 //VtkQRenderWindowInteractor::SetClassExitMethodArgDelete(void (*f)(void *))
 //{
@@ -226,13 +208,11 @@
 //    }
 //}
 //
-////##ModelId=3E6D600F00ED
 //void VtkQRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent)
 //{
 //    vtkRenderWindowInteractor::PrintSelf(os,indent);
 //}
 //
-////##ModelId=3E6D600F0147
 //void VtkQRenderWindowInteractor::ExitCallback()
 //{
 //    if (this->HasObserver(vtkCommand::ExitEvent))
@@ -250,27 +230,22 @@
 //}
 //
 //
-////##ModelId=3E6D600F011F
 //void VtkQRenderWindowInteractor::MousePressEvent(mitk::MouseEvent *)
 //{
 //}
 //
-////##ModelId=3E6D600F0128
 //void VtkQRenderWindowInteractor::MouseReleaseEvent(mitk::MouseEvent *)
 //{
 //}
 //
-////##ModelId=3E6D600F0130
 //void VtkQRenderWindowInteractor::MouseMoveEvent(mitk::MouseEvent *)
 //{
 //}
 //
-////##ModelId=3E6D600F0133
 //void VtkQRenderWindowInteractor::KeyPressEvent(mitk::KeyEvent *)
 //{
 //}
 //
-////##ModelId=3E6E4BB2027B
 //void VtkQRenderWindowInteractor::timerEvent ( QTimerEvent * )
 //{
 //    if (!this->GetEnabled())

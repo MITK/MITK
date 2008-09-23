@@ -20,18 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 
 
-//##ModelId=3E1B1980039C
 mitk::ImageChannelSelector::ImageChannelSelector() : m_ChannelNr(0)
 {
 }
 
-
-//##ModelId=3E1B198003B0
 mitk::ImageChannelSelector::~ImageChannelSelector()
 {
 }
 
-//##ModelId=3E3BD0C70343
 void mitk::ImageChannelSelector::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input  = this->GetInput();
@@ -46,7 +42,6 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 	output->SetGeometry(dynamic_cast<Geometry3D*>(input->GetTimeSlicedGeometry()->Clone().GetPointer()));
 }
 
-//##ModelId=3E3BD0C903DC
 void mitk::ImageChannelSelector::GenerateData()
 {
   const Image::RegionType& requestedRegion = GetOutput()->GetRequestedRegion();

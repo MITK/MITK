@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 class vtkRenderWindow;
+class vtkObject;
 
 namespace mitk
 {
@@ -194,7 +195,7 @@ public:
   virtual void UpdateCallback();
 
   bool IsRendering() const;
-  void AbortRendering( vtkRenderWindow *renderWindow );
+  void AbortRendering();
 
   /** En-/Disable LOD increase globally. */
   itkSetMacro( LODIncreaseBlocked, bool );
@@ -205,16 +206,19 @@ public:
   /** En-/Disable LOD increase globally. */
   itkBooleanMacro( LODIncreaseBlocked );
 
+
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
 
-  int GetCurrentLOD();
-  void SetCurrentLOD( int lod );
-  void SetNumberOfLOD( int number );
+  int GetNextLOD( BaseRenderer *renderer );
 
-  void SetShading( bool state, int lod );
-  bool GetShading( int lod );
+  /** Set current LOD (NULL means all renderers)*/
+  void SetNextLOD( unsigned int lod, BaseRenderer *renderer = NULL );
+  void SetMaximumLOD( unsigned int max );
+
+  void SetShading( bool state, unsigned int lod );
+  bool GetShading( unsigned int lod );
 
   void SetClippingPlaneStatus( bool status );
   bool GetClippingPlaneStatus();
@@ -255,11 +259,15 @@ protected:
 
   bool m_UpdatePending;
 
-  int m_CurrentLOD;
+  typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
+  typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
-  int m_MaxLOD;
+  RendererIntMap m_NextLODMap;
 
-  int m_NumberOf3DRW;
+  unsigned int m_MaxLOD;
+
+  bool m_LODIncreaseBlocked;
+
 
   BoolVector m_ShadingEnabled;
 
@@ -269,9 +277,12 @@ protected:
 
   vtkRenderWindow *m_LastUpdatedRW;
 
-  void RenderingStartCallback( itk::Object* object, const itk::EventObject& event );
-  void RenderingProgressCallback( itk::Object* object, const itk::EventObject& event );
-  void RenderingEndCallback( itk::Object* object, const itk::EventObject& event );
+  static void RenderingStartCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
+  static void RenderingProgressCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
+  static void RenderingEndCallback(
+    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
 
 
 
@@ -281,8 +292,6 @@ protected:
   RenderWindowVector m_AllRenderWindows;
 
   SliceNavigationController *m_TimeNavigationController;
-
-  bool m_LODIncreaseBlocked;
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;

@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-//##ModelId=3E6814230160
 //##Documentation
 //## @brief Base class of all OpenGL-based 2D-Mappers
 //##
@@ -34,12 +33,10 @@ namespace mitk {
 class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
 {
   public:
-    //##ModelId=3E67E9390346
     //##Documentation
     //## @brief Do the painting into the @a renderer
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
-    //##ModelId=3EF17AA10120
     //##Documentation
     //## @brief Apply color and opacity read from the PropertyList
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
@@ -49,9 +46,7 @@ class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
     void MitkRenderOverlay(mitk::BaseRenderer* renderer);
 
   protected:
-    //##ModelId=3E681470037E
     GLMapper2D();
-    //##ModelId=3E681470039C
     virtual ~GLMapper2D();    
 };
 

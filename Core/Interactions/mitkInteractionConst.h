@@ -165,6 +165,7 @@ typedef enum EOperations
   OpUNDELETE = 502,
   OpDELETECELL = 505,
   OpSTATECHANGE = 600, //change a state
+  OpTIMECHANGE = 601, //change a state
   OpTERMINATE = 666, //change a state
   OpSELECTPOINT = 700,
   OpSELECTLINE = 701,

@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 
 
-//##ModelId=3E1A0A2E027F
 void mitk::ImageSliceSelector::GenerateOutputInformation()
 {
 	mitk::Image::ConstPointer input  = this->GetInput();
@@ -45,19 +44,16 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 
-//##ModelId=3E1A0A320090
 void mitk::ImageSliceSelector::GenerateData()
 {
 	SetSliceItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), 0);
 }
 
-//##ModelId=3E1B196A0188
 mitk::ImageSliceSelector::ImageSliceSelector() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0)
 {
 }
 
 
-//##ModelId=3E1B196A01C4
 mitk::ImageSliceSelector::~ImageSliceSelector()
 {
 }

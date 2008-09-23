@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  //##ModelId=3E5A3910009B
   //##Documentation
   //## @brief adds additional Information (Name and EventID) to an Event
   //##
@@ -35,20 +34,15 @@ namespace mitk {
   class MITK_CORE_EXPORT EventDescription : public Event
   {
   public:
-    //##ModelId=3E5B30A30095
     EventDescription(int type, int button, int buttonState,int key, std::string name, int id);
 
-    //##ModelId=3E5B3103030A
     std::string GetName() const;
 
-    //##ModelId=3E5B3132027C
     int GetId() const;
 
   private:
-    //##ModelId=3E5B2F66020C
     std::string m_Name;
 
-    //##ModelId=3E5B2F660220
     int m_Id;
   };
 

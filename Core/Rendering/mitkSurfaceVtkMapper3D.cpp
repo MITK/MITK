@@ -37,13 +37,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlaneCollection.h>
 
 
-//##ModelId=3E70F60301D5
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 {
   return static_cast<const mitk::Surface * > ( GetData() );
 }
 
-//##ModelId=3E70F60301F4
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
 {
   m_VtkPolyDataMapper = vtkPolyDataMapper::New();
@@ -59,7 +57,6 @@ mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
   m_ClippingPlaneCollection = vtkPlaneCollection::New();
 }
 
-//##ModelId=3E70F60301F5
 mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 {
   m_VtkPolyDataMapper->Delete();
@@ -71,7 +68,6 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
   m_ClippingPlaneCollection->Delete();
 }
 
-//##ModelId=3EF19FA803BF
 void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   bool visible = IsVisible(renderer);

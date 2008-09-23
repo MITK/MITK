@@ -185,11 +185,48 @@ QmitkAbortEventFilter
         return true;
       }
 
-     case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)
+    case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QChildEvent* ce = ( QChildEvent* )( event );
+      QChildEvent* newChildEvent = new QChildEvent( 
+        QEvent::ChildAdded, ce->child() );
+      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
+      return true;
+    }
+
+    case QEvent::ChildRemoved: //change Layout (Big3D, 2D images up, etc.)
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QChildEvent* ce = ( QChildEvent* )( event );
+      QChildEvent* newChildEvent = new QChildEvent( 
+        QEvent::ChildRemoved, ce->child() );
+      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
+      return true;
+    }
+
+    case QEvent::Show:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QShowEvent* newShowEvent = new QShowEvent();
+      m_EventQueue.push( ObjectEventPair(object, newShowEvent) );
+      return true;
+    }
+
+    case QEvent::Hide:
       {
         mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
         mitk::RenderingManager::GetInstance()->AbortRendering();
-        return false;
+
+      QHideEvent* newHideEvent = new QHideEvent();
+      m_EventQueue.push( ObjectEventPair(object, newHideEvent) );
+      return true;
       }
 
       case QEvent::KeyPress:
@@ -202,6 +239,28 @@ QmitkAbortEventFilter
         m_EventQueue.push( ObjectEventPair(object, newEvent) );
         return true;
       }
+
+    case QEvent::Close:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QCloseEvent* newEvent = new QCloseEvent();
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
+
+    case QEvent::ContextMenu:
+    {
+      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
+      mitk::RenderingManager::GetInstance()->AbortRendering();
+
+      QContextMenuEvent *cme = ( QContextMenuEvent * )( event );
+      QContextMenuEvent *newEvent = new QContextMenuEvent(
+        cme->reason(), cme->pos(), cme->globalPos() );
+      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      return true;
+    }
 
       case QEvent::Timer:
       { 

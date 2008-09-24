@@ -757,7 +757,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Gradient color 2", mitk::ColorProperty::New( 0.7f, 0.7f, 0.8f ) );
   m_Options->SetProperty( "Background color", mitk::ColorProperty::New(0.0f,0.0f,0.0f) );
   m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New("/local/ip++bin/Documentations/Doxygen/html/") );
-  m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Department logo visible", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Department logo path", mitk::StringProperty::New("") );
   m_Options->SetProperty( "Default value for texture interpolation", mitk::BoolProperty::New(mitk::DataTreeNodeFactory::m_TextureInterpolationActive) );
@@ -769,10 +769,10 @@ void QmitkMainTemplate::init()
 
   //Set the toolbar state properties
   m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(true) );
-  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show search toolbar", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Show dropdown toolbar", mitk::BoolProperty::New(true) );
-  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(true) );
-  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Show icon set toolbar", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Show recently used toolbar", mitk::BoolProperty::New(false) );
 
   // Set option for zoom factor
   m_Options->SetProperty( "Standard views zoom factor", mitk::FloatProperty::New(1.0f) );

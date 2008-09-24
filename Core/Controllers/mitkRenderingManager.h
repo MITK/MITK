@@ -66,15 +66,12 @@ class SliceNavigationController;
  *
  * The interface of RenderingManager is platform independent. Platform
  * specific subclasses have to be implemented, though, to supply an
- * appropriate timer for controlling the update execution process. See method
- * documentation for a description of how this can be done.
+ * appropriate event issueing for controlling the update execution process.
+ * See method documentation for a description of how this can be done.
  *
  * \sa GenericRenderingManager An "empty" RenderingManager implementation which
  * can be used in tests etc.
  *
- * \todo Individual timers for specific RenderWindows - the desired maximum
- * update frequency of a 3D window could be less then that of a 2D window
- * \ingroup Renderer
  */
 class MITK_CORE_EXPORT RenderingManager : public itk::Object
 {
@@ -196,7 +193,8 @@ public:
   virtual ~RenderingManager();
 
   /** Executes all pending requests. This method has to be called by the
-   * timer used by concrete RenderingManager implementations. */
+   * system whenever a RenderingManager induced request event occurs in
+   * the system pipeline (see concrete RenderingManager implementations). */
   virtual void UpdateCallback();
 
   bool IsRendering() const;
@@ -244,21 +242,9 @@ protected:
 
   RenderingManager();
 
-  /** Abstract method for restarting the timer (to be implemented in
-   * subclasses). The timer is restarted whenever an update is requested
-   * for the first time. */
-  virtual void RestartTimer() = 0;
-
-  /** Abstract method for stopping the timer (to be implemented in
-   * subclasses). The timer is stopped whenever no more requests are
-   * pending. */
-  virtual void StopTimer() = 0;
-
-  /** Checks whether there are still pending update requests and sets
-   * m_UpdatePending accordingly. To be called when it is not clear that
-   * m_UpdatePending is still correct, e.g. typically after a single forced
-   * after update. */
-  virtual void CheckUpdatePending();
+  /** Abstract method for generating a system specific event for rendering
+   * request. This method is called whenever an update is requested */
+  virtual void GenerateRenderingRequestEvent() = 0;
 
   bool m_UpdatePending;
 
@@ -277,8 +263,6 @@ protected:
   bool m_ClippingPlaneEnabled;
 
   FloatVector m_ShadingValues;
-
-  vtkRenderWindow *m_LastUpdatedRW;
 
   static void RenderingStartCallback(
     vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
@@ -323,13 +307,10 @@ public:
   itkNewMacro(Self);
 
 protected:
-  virtual void RestartTimer()
+  virtual void GenerateRenderingRequestEvent()
   {
   };
 
-  virtual void StopTimer()
-  {
-  };
 };
 
 

@@ -1173,7 +1173,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNotNull())
+  if(image.IsNotNull() && image->IsInitialized())
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {

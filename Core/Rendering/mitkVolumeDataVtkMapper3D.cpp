@@ -531,7 +531,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNotNull())
+  if(image.IsNotNull() && image->IsInitialized())
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {

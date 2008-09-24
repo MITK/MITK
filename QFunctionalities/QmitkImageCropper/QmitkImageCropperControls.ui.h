@@ -38,6 +38,7 @@ void QmitkImageCropperControls::init()
   connect ( cmbImage, SIGNAL(activated(const mitk::DataTreeFilter::Item*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeFilter::Item*)) ); 
   m_SurroundingSlider->hide();
   m_SurroundingSpin->hide();
+  m_TLGrayvalue->hide();
 }
 
 
@@ -70,11 +71,13 @@ void QmitkImageCropperControls::m_EnableSurroundingCheckBox_toggled( bool value)
     {
 	m_SurroundingSlider->show();
 	m_SurroundingSpin->show();
+	m_TLGrayvalue->show();
     }
     else
     {
 	m_SurroundingSlider->hide();
 	m_SurroundingSpin->hide();
+	m_TLGrayvalue->hide();
     }
     
 }

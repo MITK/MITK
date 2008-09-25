@@ -618,7 +618,6 @@ RenderingManager
   RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
   unsigned int &maxLOD = GetInstance()->m_MaxLOD;
   bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
-  bool &updatePending = GetInstance()->m_UpdatePending;
 
   vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
   if ( renderWindow )

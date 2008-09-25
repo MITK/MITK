@@ -64,16 +64,10 @@ bool
 QmitkRenderingManager
 ::event( QEvent *event ) 
 {
-  std::cout << "$";
-  if ( event->type() == QmitkRenderingRequestEvent::RenderingRequest )
-  //QmitkRenderingRequestEvent *requestEvent = 
-  //  dynamic_cast< QmitkRenderingRequestEvent * >( event );
-  //if ( requestEvent != NULL )
+  if ( event->type() == (QEvent::Type) QmitkRenderingRequestEvent::RenderingRequest )
   {
     // Directly process all pending rendering requests
-    std::cout << "%";
     this->UpdateCallback();
-
     return true;
   }
 

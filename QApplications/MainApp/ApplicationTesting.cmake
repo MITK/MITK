@@ -1,6 +1,7 @@
 # tests without data or empty nodes
 SET(datatypes Image Surface PointSet Node) 
-
+OPTION(MITK_APPLICATION_TESTING "Test the main application. Needs GUI" OFF)
+OPTION(MITK_FUNCTIONALITY_TESTING "Test each functionlity on its own. Needs GUI" OFF)
 IF(MITK_APPLICATION_TESTING)
   ADD_TEST(MainAppWithoutData ${EXECUTABLE_OUTPUT_PATH}/MainApp -noMITKOptions -testing)
   ADD_TEST(MainAppOptionTesting ${EXECUTABLE_OUTPUT_PATH}/MainApp -noMITKOptions -optiontesting)

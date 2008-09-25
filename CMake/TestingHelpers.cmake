@@ -2,6 +2,8 @@
 #
 # CMake variables used:
 #
+# ${${KITNAME}_GUI_TESTS} : filenames of all tests that run without a parameter
+# ${${KITNAME}_IMAGE_GUI_TESTS : filenames of all tests that run with an image filename as parameter
 # ${${KITNAME}_TESTS} : filenames of all tests that run without a parameter
 # ${${KITNAME}_IMAGE_TESTS : filenames of all tests that run with an image filename as parameter
 # ${${KITNAME}_TESTIMAGES} : list of images passed as parameter for the IMAGE_TESTS
@@ -9,9 +11,15 @@
 #                              of these has to be specified manually with the ADD_TEST CMake command.
 # 
 MACRO(MITK_CREATE_DEFAULT_TESTS)
+  # add tests which need a GUI if it is not disabled
+  IF(NOT MITK_GUI_TESTS_DISABLED)
+    SET( ${KITNAME}_TESTS  ${${KITNAME}_TESTS} ${${KITNAME}_GUI_TESTS} )
+    SET( ${KITNAME}_IMAGE_TESTS  ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_IMAGE_GUI_TESTS} )
+  ENDIF(NOT MITK_GUI_TESTS_DISABLED)
+
   #
   # Create the TestDriver binary which contains all the tests.
-  #
+  #  
   CREATE_TEST_SOURCELIST(MITKTEST_SOURCE ${KITNAME}TestDriver.cpp 
     ${${KITNAME}_TESTS} ${${KITNAME}_IMAGE_TESTS} ${${KITNAME}_CUSTOM_TESTS}
   )

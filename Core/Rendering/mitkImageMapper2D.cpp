@@ -1134,7 +1134,8 @@ mitk::ImageMapper2D::RendererInfo::RemoveObserver()
 {
   if ( m_ObserverID != 0 )
   {
-    m_Renderer->RemoveObserver( m_ObserverID );
+    // m_ObserverID has to be decreased by one. Was incremented by one after creation to make the test m_ObserverID != 0 possible.
+    m_Renderer->RemoveObserver( m_ObserverID-1 );
   }
 }
 
@@ -1144,7 +1145,8 @@ mitk::ImageMapper2D::RendererInfo
 ::Initialize( int rendererID, mitk::BaseRenderer *renderer, 
   unsigned long observerID )
 {
-  m_ObserverID = observerID;
+  // increase ID by one to avoid 0 ID, has to be decreased before remove of the observer
+  m_ObserverID = observerID+1;
 
   assert(rendererID>=0);
   assert(m_RendererID<0);

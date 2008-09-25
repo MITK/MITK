@@ -21,24 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include <QObject>
+#include <QCustomEvent>
 
-class QTimer;
 class QmitkRenderingManagerInternal;
 class QmitkRenderingManagerFactory;
 
 /**
  * \brief Qt specific implementation of mitk::RenderingManager.
  *
- * This implementation uses a QTimer object to realize the RenderWindow
- * update timing. The execution of pending updates is controlled by the
- * timer.
- *
- * Generally, rendering execution is controlled by the timer. To make sure
- * that the execution is done regularly even if the timer is blocked for
- * some reason (e.g., timer events have lower priority than other events
- * which are blocking the event queue), rendering is also executed when
- * the mouse is moved with pressed left button over the render windows.
- * See Qmitk::RenderWindow::mouseMoveEvent(...)
+ * This implementation defines a QmitkRenderingRequestEvent to realize the
+ * rendering request process. The event must be handled by the Qmitk
+ * interface to Qt (QmitkRenderWindow).
  *
  * \ingroup Renderer
  */
@@ -53,49 +46,31 @@ public:
   virtual void DoMonitorRendering();
   virtual void DoFinishAbortRendering();
 
+  virtual bool event( QEvent *event );
 
 protected:
   itkFactorylessNewMacro(Self);
 
   QmitkRenderingManager();
 
-  virtual void RestartTimer();
-
-  virtual void StopTimer();
+  virtual void GenerateRenderingRequestEvent();
 
 
 private:
-
-  QmitkRenderingManagerInternal* m_QmitkRenderingManagerInternal;
 
   friend class QmitkRenderingManagerFactory;
 };
 
-class QMITK_EXPORT QmitkRenderingManagerInternal : public QObject
+class QmitkRenderingRequestEvent : public QCustomEvent
 {
-  Q_OBJECT
-
 public:
-  friend class QmitkRenderingManager;
+  enum Type
+  {
+    RenderingRequest = QEvent::MaxUser - 1024
+  };
 
-  virtual ~QmitkRenderingManagerInternal();
-
-protected:
-  QmitkRenderingManagerInternal();
-
-protected slots:
-
-  void RestartTimer();
-
-  void StopTimer();
-
-  void QUpdateCallback();
-
-private:
-  QmitkRenderingManager* m_QmitkRenderingManager;
-  QTimer *m_Timer;
-  static QmitkRenderingManager* m_Instance;
-
+  QmitkRenderingRequestEvent()
+  : QCustomEvent( RenderingRequest ) {};
 };
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

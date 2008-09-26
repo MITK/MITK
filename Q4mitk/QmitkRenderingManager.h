@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include <QObject>
-#include <QCustomEvent>
+#include <QEvent>
 
 class QmitkRenderingManagerInternal;
 class QmitkRenderingManagerFactory;
@@ -61,7 +61,7 @@ private:
   friend class QmitkRenderingManagerFactory;
 };
 
-class QmitkRenderingRequestEvent : public QCustomEvent
+class QmitkRenderingRequestEvent : public QEvent
 {
 public:
   enum Type
@@ -70,7 +70,7 @@ public:
   };
 
   QmitkRenderingRequestEvent()
-  : QCustomEvent( RenderingRequest ) {};
+  : QEvent( (QEvent::Type) RenderingRequest ) {};
 };
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

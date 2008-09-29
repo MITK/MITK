@@ -251,6 +251,9 @@ protected:
   typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
+  
+  RendererBoolMap m_RenderingAbortedMap;
+  
   RendererIntMap m_NextLODMap;
 
   unsigned int m_MaxLOD;

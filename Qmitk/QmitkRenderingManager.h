@@ -38,6 +38,7 @@ class QmitkRenderingManagerFactory;
 class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
+
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
   virtual ~QmitkRenderingManager();

@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeDataVtkMapper3D.h"
 #include "QmitkAbortEventFilter.h"
 #include "QmitkRenderWindow.h"
-#include "mitkRenderingManager.h"
+#include "QmitkRenderingManager.h"
+
 
 #include "mitkNodePredicateProperty.h"
 #include "mitkDataStorage.h"
@@ -27,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QEventLoop>
 #include <QMouseEvent>
 #include <QResizeEvent>
+#include <QPointer>
 
 QmitkAbortEventFilter*
 QmitkAbortEventFilter
@@ -52,6 +54,7 @@ bool
 QmitkAbortEventFilter
 ::eventFilter( QObject *object, QEvent *event )
 {   
+  typedef QPointer< QObject > GuardedObject;
   // Extract renderer (if event has been invoked on a RenderWindow)
   bool isLODRenderer = false;
   mitk::BaseRenderer *renderer = NULL;
@@ -87,6 +90,8 @@ QmitkAbortEventFilter
 
         mitk::RenderingManager::GetInstance()->AbortRendering();
 
+        // For non-LOD RenderWindows, renderer is set to NULL and consequently,
+        // the LOD counters for ALL RenderWindows are reset to 0.
         mitk::RenderingManager::GetInstance()->SetNextLOD( 0, renderer );
         mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
 
@@ -105,7 +110,7 @@ QmitkAbortEventFilter
       QMouseEvent* newEvent = new QMouseEvent(
         me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
     }
 
@@ -118,7 +123,7 @@ QmitkAbortEventFilter
       QMouseEvent* newEvent = new QMouseEvent(
         me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
     }
 
@@ -126,7 +131,7 @@ QmitkAbortEventFilter
     {
       if ( m_ButtonPressed )
       {
-        if ( mitk::RenderingManager::GetInstance()->GetNextLOD( m_LODRendererAtButtonPress ) != 0 )
+        if ( isLODRenderer && mitk::RenderingManager::GetInstance()->GetNextLOD( m_LODRendererAtButtonPress ) != 0 )
         {
           mitk::RenderingManager::GetInstance()->SetNextLOD( 0, m_LODRendererAtButtonPress );
           mitk::RenderingManager::GetInstance()->AbortRendering();
@@ -148,7 +153,7 @@ QmitkAbortEventFilter
       QMouseEvent* newEvent = new QMouseEvent(
         me->type(), me->pos(), me->globalPos(), me->button(),
         me->buttons(), me->modifiers());
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
     }
 
@@ -162,70 +167,15 @@ QmitkAbortEventFilter
         we->pos(), we->globalPos(), we->delta(), we->buttons(),
         we->modifiers(), we->orientation()
       );
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
-      return true;
-    }
-
-    case QEvent::Resize:
-      { 
-        mitk::RenderingManager::GetInstance()->AbortRendering();
-
-        QResizeEvent* re = ( QResizeEvent* )( event );
-
-        QResizeEvent* newResizeEvent = new QResizeEvent( re->size(), re->oldSize() );
-        m_EventQueue.push( ObjectEventPair(object, newResizeEvent) );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
         return true;
       }
 
     case QEvent::Paint:
       { 
         QPaintEvent* pe = ( QPaintEvent* )( event );
-        QPaintEvent* newPaintEvent = new QPaintEvent( pe->region() );
-        m_EventQueue.push( ObjectEventPair(object, newPaintEvent) );
-        return true;
-      }
-
-    case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)
-    {
-      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-      mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QChildEvent* ce = ( QChildEvent* )( event );
-      QChildEvent* newChildEvent = new QChildEvent( 
-        QEvent::ChildAdded, ce->child() );
-      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
-      return true;
-    }
-
-    case QEvent::ChildRemoved: //change Layout (Big3D, 2D images up, etc.)
-    {
-      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-      mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QChildEvent* ce = ( QChildEvent* )( event );
-      QChildEvent* newChildEvent = new QChildEvent( 
-        QEvent::ChildRemoved, ce->child() );
-      m_EventQueue.push( ObjectEventPair(object, newChildEvent) );
-      return true;
-    }
-
-    case QEvent::Show:
-    {
-      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-      mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QShowEvent* newShowEvent = new QShowEvent();
-      m_EventQueue.push( ObjectEventPair(object, newShowEvent) );
-      return true;
-    }
-
-    case QEvent::Hide:
-      {
-        mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-        mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QHideEvent* newHideEvent = new QHideEvent();
-      m_EventQueue.push( ObjectEventPair(object, newHideEvent) );
+      QPaintEvent* newEvent = new QPaintEvent( pe->region() );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
       }
 
@@ -236,37 +186,14 @@ QmitkAbortEventFilter
         QKeyEvent* newEvent = new QKeyEvent(
           ke->type(), ke->key(), ke->modifiers(), ke->text(), false, ke->count()
         );
-        m_EventQueue.push( ObjectEventPair(object, newEvent) );
-        return true;
-      }
-
-    case QEvent::Close:
-    {
-      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-      mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QCloseEvent* newEvent = new QCloseEvent();
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
     }
 
-    case QEvent::ContextMenu:
-    {
-      mitk::RenderingManager::GetInstance()->SetNextLOD( 0 );
-      mitk::RenderingManager::GetInstance()->AbortRendering();
-
-      QContextMenuEvent *cme = ( QContextMenuEvent * )( event );
-      QContextMenuEvent *newEvent = new QContextMenuEvent(
-        cme->reason(), cme->pos(), cme->globalPos() );
-      m_EventQueue.push( ObjectEventPair(object, newEvent) );
-      return true;
-    }
-
-      case QEvent::Timer:
+    case QmitkRenderingRequestEvent::RenderingRequest:
       { 
-        QTimerEvent* te = ( QTimerEvent* )( event );
-        QTimerEvent* newEvent = new QTimerEvent(te->timerId());
-        m_EventQueue.push( ObjectEventPair(object, newEvent) );
+      QmitkRenderingRequestEvent *newEvent = new QmitkRenderingRequestEvent();
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
         return true;
       }
 
@@ -375,7 +302,10 @@ QmitkAbortEventFilter
   while ( !m_EventQueue.empty() )
   {
     ObjectEventPair eventPair = m_EventQueue.front();
-    QApplication::postEvent( eventPair.first, eventPair.second );
+    if ( eventPair.first )
+    {
+      QApplication::postEvent( eventPair.first, eventPair.second );
+    }
     m_EventQueue.pop();
   }
 }

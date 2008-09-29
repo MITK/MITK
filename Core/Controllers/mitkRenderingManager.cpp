@@ -124,15 +124,16 @@ void
 RenderingManager
 ::AddRenderWindow( vtkRenderWindow *renderWindow )
 {
-  m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
-  m_AllRenderWindows.push_back( renderWindow );
-
-  typedef itk::MemberCommand< RenderingManager > MemberCommandType;
-
-  // Add callbacks for rendering abort mechanism
-  //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-  if ( renderWindow )
+  if ( renderWindow
+    && (m_RenderWindowList.find( renderWindow ) == m_RenderWindowList.end()) )
   {
+    m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
+    m_AllRenderWindows.push_back( renderWindow );
+
+    typedef itk::MemberCommand< RenderingManager > MemberCommandType;
+
+    // Add callbacks for rendering abort mechanism
+    //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
     vtkCallbackCommand *startCallbackCommand = vtkCallbackCommand::New();
     startCallbackCommand->SetCallback( 
       RenderingManager::RenderingStartCallback );
@@ -147,7 +148,7 @@ RenderingManager
     endCallbackCommand->SetCallback( 
       RenderingManager::RenderingEndCallback );
     renderWindow->AddObserver( vtkCommand::EndEvent, endCallbackCommand );
- }
+  }
 }
 
 
@@ -188,26 +189,10 @@ RenderingManager
   if ( !m_UpdatePending )
   {
     m_UpdatePending = true;
-    this->RestartTimer();
+    this->GenerateRenderingRequestEvent();
   }
 }
 
-
-void
-RenderingManager
-::CheckUpdatePending()
-{
-  // Check if there are pending requests for any other windows
-  m_UpdatePending = false;
-  RenderWindowList::iterator it;
-  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-  {
-    if ( it->second == RENDERING_REQUESTED )
-    {
-      m_UpdatePending = true;
-    }
-  }
-}
 
 void
 RenderingManager
@@ -216,15 +201,7 @@ RenderingManager
   // Erase potentially pending requests for this window
   m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
 
-  this->CheckUpdatePending();
-
-  // Stop the timer if no more requests are pending
-  if ( !m_UpdatePending )
-  {
-    this->StopTimer();
-  }
-
-  m_LastUpdatedRW = renderWindow;
+  m_UpdatePending = false;
 
   // Immediately repaint this window (implementation platform specific)
   // If the size is 0 it crahses
@@ -249,20 +226,8 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
-      this->RequestUpdate( it->first);
-
-      if ( m_RenderWindowList[it->first] == RENDERING_INACTIVE )
-      {
-        m_RenderWindowList[it->first] = RENDERING_REQUESTED;
-      }
+      this->RequestUpdate( it->first );
     }
-  }
-
-  // Restart the timer if there are no requests already
-  if ( !m_UpdatePending )
-  {
-    m_UpdatePending = true;
-    this->RestartTimer();
   }
 }
 
@@ -294,13 +259,7 @@ RenderingManager
     }
   }
 
-  if ( m_UpdatePending )
-  {
-    this->StopTimer();
-    m_UpdatePending = false;
-  }
-
-  this->CheckUpdatePending();
+  m_UpdatePending = false;
 }
 
 
@@ -601,6 +560,8 @@ void
 RenderingManager
 ::UpdateCallback()
 {
+  m_UpdatePending = false;
+
   // Satisfy all pending update requests
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
@@ -610,7 +571,6 @@ RenderingManager
       this->ForceImmediateUpdate( it->first );
     }
   }
-  m_UpdatePending = false;
 }
 
 
@@ -626,6 +586,8 @@ RenderingManager
   {
     renderWindowList[renderWindow] = RENDERING_INPROGRESS;
   }
+
+  GetInstance()->m_UpdatePending = false;
 }
 
 
@@ -642,10 +604,9 @@ RenderingManager
       //TODO: Re-enable this call to enable abort-mechanism. This is
       // temporarily disabled until the persisting bug in the abort-mechanism
       // is fixed.
-      //GetInstance()->DoMonitorRendering();
+      GetInstance()->DoMonitorRendering();
     }
   }
-
 }
 
 void
@@ -657,7 +618,6 @@ RenderingManager
   RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
   unsigned int &maxLOD = GetInstance()->m_MaxLOD;
   bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
-  bool &updatePending = GetInstance()->m_UpdatePending;
 
   vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
   if ( renderWindow )
@@ -670,7 +630,7 @@ RenderingManager
       // Level-of-Detail handling
       if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
       {
-        // Make sure that LOD-increase is currently not block
+        // Make sure that LOD-increase is currently not blocked
         // (by mouse-movement)
         if ( !lodIncreaseBlocked )
         {
@@ -680,9 +640,8 @@ RenderingManager
             // NO: increase the level for this renderer...
             nextLODMap[renderer]++;
 
-            // ... and make sure that timer is restarted for next request
-            updatePending = false;
-            GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+            // ... and request new update for this window
+            GetInstance()->RequestUpdate( renderer->GetRenderWindow() );
           }
           else
           {

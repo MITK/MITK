@@ -531,7 +531,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNotNull())
+  if(image.IsNotNull() && image->IsInitialized())
   {
     if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
     {
@@ -577,10 +577,12 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
 }
 
 
-bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*/ ) const
+bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer *renderer ) const
 {
-  // Currently all volume mappers are LOD enabled
-  return true;
+  // Volume mapper is LOD enabled if volumerendering is enabled
+  return
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer)) != NULL &&
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == true;
 }
 
 

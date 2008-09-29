@@ -113,18 +113,6 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
     m_Renderer->MouseMoveEvent(&event);
   }
 
-  // Request additional rendering if left mouse button had been pressed.
-  // This is required to make sure that the rendering is executed regularly;
-  // since the rendering mechanism is generally controlled and executed via a 
-  // timer, the timer might be blocked for longer periods if other Qt events
-  // with higher priorities are in the pipeline.
-  //
-  // See also QmitkRenderingManager
-  if ( me->buttons() & Qt::LeftButton )
-  {
-    mitk::RenderingManager::GetInstance()->UpdateCallback();
-  }
-  
   if (m_ResendQtEvents) me->ignore();
 }
 

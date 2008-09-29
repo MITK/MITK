@@ -24,15 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSliceNavigationController.h"
 
 #include <qapplication.h>
-#include <qtimer.h>
 
 
 QmitkRenderingManager
 ::QmitkRenderingManager()
 {
   qApp->installEventFilter( QmitkAbortEventFilter::GetInstance() );
-  m_QmitkRenderingManagerInternal = new QmitkRenderingManagerInternal;
-  m_QmitkRenderingManagerInternal->m_QmitkRenderingManager = this;
 }
 
 void
@@ -52,62 +49,27 @@ QmitkRenderingManager
 QmitkRenderingManager
 ::~QmitkRenderingManager()
 {
-  delete m_QmitkRenderingManagerInternal;
 }
 
 void
 QmitkRenderingManager
-::RestartTimer()
+::GenerateRenderingRequestEvent()
 {
-  m_QmitkRenderingManagerInternal->RestartTimer();
+  QmitkRenderingRequestEvent *event = new QmitkRenderingRequestEvent;
+  QApplication::postEvent( this, event );
 }
 
 
-void
+bool 
 QmitkRenderingManager
-::StopTimer()
+::event( QEvent *event ) 
 {
-  m_QmitkRenderingManagerInternal->StopTimer();
+  if ( event->type() == (QEvent::Type) QmitkRenderingRequestEvent::RenderingRequest )
+  {
+    // Directly process all pending rendering requests
+    this->UpdateCallback();
+    return true;
+  }
+
+  return false;
 }
-
-
-QmitkRenderingManagerInternal
-::QmitkRenderingManagerInternal()
-{
-  m_Timer = new QTimer( this );
-  connect( m_Timer, SIGNAL( timeout() ), this, SLOT( QUpdateCallback() ) );
-}
-
-
-QmitkRenderingManagerInternal
-::~QmitkRenderingManagerInternal()
-{
-  delete m_Timer;
-  m_QmitkRenderingManager = NULL;
-}
-
-
-void
-QmitkRenderingManagerInternal
-::RestartTimer()
-{
-  m_Timer->start( 5, TRUE );
-}
-
-
-void
-QmitkRenderingManagerInternal
-::StopTimer()
-{
-  m_Timer->stop();
-}
-
-
-void
-QmitkRenderingManagerInternal
-::QUpdateCallback()
-{
-  //std::cout << "QUpdateCallback()" << std::endl;
-  m_QmitkRenderingManager->UpdateCallback();
-}
-

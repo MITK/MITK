@@ -210,6 +210,16 @@ public:
   itkBooleanMacro( LODIncreaseBlocked );
 
 
+  /** En-/Disable LOD abort mechanism. */
+  itkSetMacro( LODAbortMechanismEnabled, bool );
+
+  /** En-/Disable LOD abort mechanism. */
+  itkGetMacro( LODAbortMechanismEnabled, bool );
+
+  /** En-/Disable LOD abort mechanism. */
+  itkBooleanMacro( LODAbortMechanismEnabled );
+
+
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
@@ -260,6 +270,7 @@ protected:
 
   bool m_LODIncreaseBlocked;
 
+  bool m_LODAbortMechanismEnabled;
 
   BoolVector m_ShadingEnabled;
 

@@ -766,6 +766,7 @@ void QmitkMainTemplate::init()
   mitk::FillVector3D(point,0.0,0.0,0.0);
   m_Options->SetProperty( "Startup window size", mitk::Point3dProperty::New(point) );
   m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
+  m_Options->SetProperty( "LOD abort mechanism (experimental)", mitk::BoolProperty::New(false) );
 
   //Set the toolbar state properties
   m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(true) );
@@ -957,6 +958,16 @@ void QmitkMainTemplate::Initialize()
   mitk::ColorProperty* colProperty = dynamic_cast<mitk::ColorProperty*>( m_Options->GetProperty("Background color"));
   mitk::Color c = colProperty->GetColor();
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+  // LOD abort mechanism (experimental)
+  mitk::BoolProperty* lodAbortProperty = dynamic_cast<mitk::BoolProperty*>(
+    m_Options->GetProperty( "LOD abort mechanism (experimental)" ) );
+  if ( lodAbortProperty != NULL )
+  {
+    mitk::RenderingManager::GetInstance()->SetLODAbortMechanismEnabled( 
+      lodAbortProperty->GetValue() );
+  }
+
 
   // Initialize other global options
   mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
@@ -1463,6 +1474,14 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     m_MultiWidget->setBackgroundColor(QColor((int)c.GetRed(),(int)c.GetGreen(), (int)c.GetBlue()));
     //m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
     mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->GetVtkRenderer()->SetBackground(c.GetRed(), c.GetGreen(), c.GetBlue());
+
+    mitk::BoolProperty* lodAbortProperty = dynamic_cast<mitk::BoolProperty*>(
+      m_Options->GetProperty( "LOD abort mechanism (experimental)" ) );
+    if ( lodAbortProperty != NULL )
+    {
+      mitk::RenderingManager::GetInstance()->SetLODAbortMechanismEnabled( 
+        lodAbortProperty->GetValue() );
+    }
 
     mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
     if (textureInterpolationProperty != NULL)

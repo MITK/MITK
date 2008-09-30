@@ -38,6 +38,7 @@ RenderingManager
 : m_UpdatePending( false ),
   m_MaxLOD( 2 ),
   m_LODIncreaseBlocked( false ),
+  m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
   m_TimeNavigationController( NULL )
 {
@@ -589,13 +590,16 @@ void
 RenderingManager
 ::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
-  if ( renderWindow )
+  if ( GetInstance()->m_LODAbortMechanismEnabled )
   {
-    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-    if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
+    vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+    if ( renderWindow )
     {
-      GetInstance()->DoMonitorRendering();
+      BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+      if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
+      {
+        GetInstance()->DoMonitorRendering();
+      }
     }
   }
 }

@@ -243,6 +243,33 @@ QmitkAbortEventFilter
       return true;
     }
 
+    case QEvent::FocusIn:
+    {
+      QFocusEvent *fe = (QFocusEvent *)( event );
+      QFocusEvent *newEvent = new QFocusEvent( QEvent::FocusIn );
+      newEvent->setReason( fe->reason() );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
+      return true;
+    }
+
+    case QEvent::FocusOut:
+    {
+      QFocusEvent *fe = (QFocusEvent *)( event );
+      QFocusEvent *newEvent = new QFocusEvent( QEvent::FocusOut );
+      newEvent->setReason( fe->reason() );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
+      return true;
+    }
+
+    case QEvent::Resize: 	 
+    { 	 
+      QResizeEvent *re = (QResizeEvent *)( event );
+      QResizeEvent *newEvent = new QResizeEvent(
+        re->size(), re->oldSize() );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
+      return true; 	 
+    }
+
     case QEvent::Timer:
     { 
       QTimerEvent* te = ( QTimerEvent* )( event );
@@ -251,9 +278,12 @@ QmitkAbortEventFilter
       return true;
     }
 
+    
     default:
     {
-      return false;
+      QEvent *newEvent = new QEvent( event->type() );
+      m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
+      return true;
     }
     }
   }

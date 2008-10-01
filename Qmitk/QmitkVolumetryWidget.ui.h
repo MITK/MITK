@@ -69,7 +69,7 @@ void QmitkVolumetryWidget::SetDataTreeNode(const mitk::DataTreeNode* node)
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_Node->GetData());
     image->Update();
-    if (image)
+    if (image && image->IsInitialized())
     {
       if (image->GetDimension() == 4)
       {

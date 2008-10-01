@@ -98,17 +98,16 @@ void QmitkRegionGrowing::Activated()
   {
     // new node and data item
     m_PointSetNode = mitk::DataTreeNode::New();
-	m_PointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New("Seedpoints for region growing")); 
-	m_PointSet = mitk::PointSet::New();
+    m_PointSetNode->SetName("Seedpoints for region growing");
+    m_PointSet = mitk::PointSet::New();
     m_PointSetNode->SetData( m_PointSet );
-
-    // new behaviour/interaction for the pointset node
     m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
-
     // add the pointset to the data tree (for rendering)
     GetDataTreeIterator()->Add( m_PointSetNode );
   }
+  // new behavior/interaction for the pointset node
+
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
 }
 
 void QmitkRegionGrowing::Deactivated()

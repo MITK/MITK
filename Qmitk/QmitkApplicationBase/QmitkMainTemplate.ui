@@ -887,10 +887,10 @@
                 <iconset>image8</iconset>
             </property>
             <property name="text">
-                <string>Plane slicing mode</string>
+                <string>Plane rotation mode</string>
             </property>
             <property name="toolTip">
-                <string>Plane slicing mode</string>
+                <string>Plane rotation mode</string>
             </property>
         </action>
         <action>

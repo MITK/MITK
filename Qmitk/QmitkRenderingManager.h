@@ -33,11 +33,16 @@ class QmitkRenderingManagerFactory;
  * rendering request process. The event must be handled by the Qmitk
  * interface to Qt (QmitkRenderWindow).
  *
+ * Note: it may be necessary to remove all pending RenderingRequestEvents
+ * from the system's event processing pipeline during system shutdown to
+ * make sure that dangling events do not lead to unexpected behavior.
+ *
  * \ingroup Renderer
  */
 class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
+
 public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
   virtual ~QmitkRenderingManager();

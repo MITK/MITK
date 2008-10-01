@@ -32,12 +32,14 @@ QmitkRenderingManager
   qApp->installEventFilter( QmitkAbortEventFilter::GetInstance() );
 }
 
+
 void
 QmitkRenderingManager
 ::DoMonitorRendering()
 {
   QmitkAbortEventFilter::GetInstance()->ProcessEvents();
 }
+
 
 void
 QmitkRenderingManager
@@ -46,17 +48,18 @@ QmitkRenderingManager
   QmitkAbortEventFilter::GetInstance()->IssueQueuedEvents();
 }
 
+
 QmitkRenderingManager
 ::~QmitkRenderingManager()
 {
 }
 
+
 void
 QmitkRenderingManager
 ::GenerateRenderingRequestEvent()
 {
-  QmitkRenderingRequestEvent *event = new QmitkRenderingRequestEvent;
-  QApplication::postEvent( this, event );
+  QApplication::postEvent( this, new QmitkRenderingRequestEvent );
 }
 
 
@@ -73,3 +76,4 @@ QmitkRenderingManager
 
   return false;
 }
+

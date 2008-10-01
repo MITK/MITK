@@ -210,6 +210,16 @@ public:
   itkBooleanMacro( LODIncreaseBlocked );
 
 
+  /** En-/Disable LOD abort mechanism. */
+  itkSetMacro( LODAbortMechanismEnabled, bool );
+
+  /** En-/Disable LOD abort mechanism. */
+  itkGetMacro( LODAbortMechanismEnabled, bool );
+
+  /** En-/Disable LOD abort mechanism. */
+  itkBooleanMacro( LODAbortMechanismEnabled );
+
+
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
@@ -251,12 +261,16 @@ protected:
   typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
+  
+  RendererBoolMap m_RenderingAbortedMap;
+  
   RendererIntMap m_NextLODMap;
 
   unsigned int m_MaxLOD;
 
   bool m_LODIncreaseBlocked;
 
+  bool m_LODAbortMechanismEnabled;
 
   BoolVector m_ShadingEnabled;
 

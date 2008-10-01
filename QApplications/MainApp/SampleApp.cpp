@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStandardViewsDialogBar.h"
 #include "QmitkStereoOptionsDialogBar.h"
 
+#include <qapplication.h>
+
 #include <qlayout.h>
 
 #include <qsplitter.h>
@@ -59,6 +61,13 @@ QmitkMainTemplate( parent, name, fl ), m_ControlsLeft ( false ), m_TestingParame
 */
 SampleApp::~SampleApp()
 {
+  // Make sure that all pending events are processed to avoid dangling
+  // RenderingRequestEvents that would otherwise lead to an application
+  // crash
+  while ( qApp->hasPendingEvents() )
+  {
+    qApp->processEvents();
+  }
   // no need to delete child widgets, Qt does it all for us
 }
 

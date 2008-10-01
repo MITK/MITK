@@ -322,7 +322,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
     m_RenderWindowInitialized.insert( renderWindow );
 
-    mitk::RenderingManager::GetInstance()->SetNextLOD(0);
+    mitk::RenderingManager::GetInstance()->SetNextLOD( 0, renderer );
 
     mitk::RenderingManager::GetInstance()->SetShading( true, 0 );
     mitk::RenderingManager::GetInstance()->SetShading( true, 1 );

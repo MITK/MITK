@@ -38,6 +38,7 @@ RenderingManager
 : m_UpdatePending( false ),
   m_MaxLOD( 2 ),
   m_LODIncreaseBlocked( false ),
+  m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
   m_TimeNavigationController( NULL )
 {
@@ -178,12 +179,6 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-  //TODO
-  //if ( m_RenderWindowList[renderWindow] == RENDERING_INPROGRESS )
-  //{
-  //  this->AbortRendering( BaseRenderer::GetInstance( renderWindow ) );
-  //}
-
   m_RenderWindowList[renderWindow] = RENDERING_REQUESTED;
 
   if ( !m_UpdatePending )
@@ -595,16 +590,16 @@ void
 RenderingManager
 ::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
-  if ( renderWindow )
+  if ( GetInstance()->m_LODAbortMechanismEnabled )
   {
-    BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
-    if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
+    vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+    if ( renderWindow )
     {
-      //TODO: Re-enable this call to enable abort-mechanism. This is
-      // temporarily disabled until the persisting bug in the abort-mechanism
-      // is fixed.
-      GetInstance()->DoMonitorRendering();
+      BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
+      if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
+      {
+        GetInstance()->DoMonitorRendering();
+      }
     }
   }
 }
@@ -615,6 +610,7 @@ RenderingManager
 {
   // Static method: access member objects via static instance
   RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+  RendererBoolMap &renderingAbortedMap = GetInstance()->m_RenderingAbortedMap;
   RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
   unsigned int &maxLOD = GetInstance()->m_MaxLOD;
   bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
@@ -630,28 +626,48 @@ RenderingManager
       // Level-of-Detail handling
       if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
       {
-        // Make sure that LOD-increase is currently not blocked
-        // (by mouse-movement)
-        if ( !lodIncreaseBlocked )
-        {
-          // Check if the maximum LOD level has already been reached
-          if ( nextLODMap[renderer] < maxLOD )
-          {
-            // NO: increase the level for this renderer...
-            nextLODMap[renderer]++;
+        bool newRenderingRequest = false;
 
-            // ... and request new update for this window
-            GetInstance()->RequestUpdate( renderer->GetRenderWindow() );
-          }
-          else
+        // Check if rendering has been aborted
+        if ( renderingAbortedMap[renderer] )
+        {
+          // YES: reset LOD counter and request next update
+          renderingAbortedMap[renderer] = false;
+          nextLODMap[renderer] = 0;
+          newRenderingRequest = true;
+        }
+        else
+        {
+          // NO: Make sure that LOD-increase is currently not blocked
+          // (by mouse-movement)
+          if ( !lodIncreaseBlocked )
           {
-            // YES: Reset to level 0 for next rendering request (by user)
-            nextLODMap[renderer] = 0;
+            // Check if the maximum LOD level has already been reached
+            if ( nextLODMap[renderer] < maxLOD )
+            {
+              // NO: increase the level for this renderer...
+              nextLODMap[renderer]++;
+
+              // ... and request new update for this window
+              newRenderingRequest = true;
+            }
+            else
+            {
+              // YES: Reset to level 0 for next rendering request (by user)
+              nextLODMap[renderer] = 0;
+            }
           }
         }
 
         // Issue events queued during rendering (abort mechanism)
         GetInstance()->DoFinishAbortRendering();
+
+        // Post new rendering request only at the end to give DoFinishAbortRendering
+        // the chance to process other events first!
+        if ( newRenderingRequest )
+        {
+          GetInstance()->RequestUpdate( renderer->GetRenderWindow() );
+        }
       }
     }
   }
@@ -684,6 +700,7 @@ RenderingManager
     if ( it->second == RENDERING_INPROGRESS )
     {
       it->first->SetAbortRender( true );
+      m_RenderingAbortedMap[BaseRenderer::GetInstance(it->first)] = true;
     }
   }
 }
